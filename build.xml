@@ -7,7 +7,7 @@
 
  <property name="src" location="src"/>
  <property name="build" location="_distBuild"/>
- <property name="dist"  location="dist/${platform}"/>
+ <property name="dist"  location="_dist/${platform}"/>
  
  <path id="mainClassPath">
   <pathelement location="lib/windows/swt.jar"/>
