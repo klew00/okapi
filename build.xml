@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="OkapiJava" default="dist" basedir=".">
+ <description>Build the distribution of the Java Okapi Tools.</description>
+ 
+ <property name="platform"  value="windows"/>
+ <!-- Walues: windows, macosx, gtk-linuk -->
+
+ <property name="src" location="src"/>
+ <property name="build" location="_distBuild"/>
+ <property name="dist"  location="dist/${platform}"/>
+ 
+ <path id="mainClassPath">
+  <pathelement location="lib/windows/swt.jar"/>
+  <pathelement location="lib/lucene-core-2.3.1.jar"/>
+ </path>
+ 
+ <condition property="isPlatformWindows">
+  <equals arg1="${platform}" arg2="windows"/>
+ </condition>
+ <condition property="isPlatformMacosx">
+  <equals arg1="${platform}" arg2="macosx"/>
+ </condition>
+ <condition property="isPlatformGtk-linux">
+  <equals arg1="${platform}" arg2="gtk-linux"/>
+ </condition>
+
+ <target name="init">
+  <tstamp/>
+  <mkdir dir="${build}"/>
+  <mkdir dir="${dist}/lib"/>
+ </target>
+
+ <target name="compile" depends="init">
+  <!-- Compile the java code from ${src} into ${build} -->
+  <javac srcdir="${src}/net" destdir="${build}" classpathref="mainClassPath"
+   target="1.5"/>
+ </target>
+
+ <target name="copyProp" depends="compile">
+  <copy todir="${build}/net">
+    <fileset dir="${src}/net" includes="**/*.properties"/>
+    <fileset dir="${src}/net" includes="**/*.png"/>
+  </copy>
+ </target>
+ 
+ <target name="windowsSpecific" if="isPlatformWindows">
+  <copy file="./data/${platform}/Borneo.bat" todir="${dist}"/>
+ </target>
+ 
+ <target name="macosxSpecific" if="isPlatformMacosx">
+  <copy file="./data/${platform}/Borneo" todir="${dist}"/>
+ </target>
+ 
+ <target name="gtk-linuxSpecific" if="isPlatformGtk-linux">
+  <copy file="./data/${platform}/Borneo" todir="${dist}"/>
+ </target>
+ 
+ <target name="dist" depends="windowsSpecific, macosxSpecific, gtk-linuxSpecific, copyProp">
+  <manifest file="${build}/MANIFEST.MF">
+   <attribute name="Main-Class" value="net.sf.okapi.Application.Borneo.Main"/>
+   <attribute name="Class-Path" value="swt.jar h2.jar mysql-connector-java-5.1.5-bin.jar"/>
+  </manifest>
+  
+  <jar jarfile="${dist}/lib/Borneo.jar" basedir="${build}" manifest="${build}/MANIFEST.MF"
+   excludes="MANIFEST.MF, **/Application/Tikal/**, **/Application/Quetzal/**, **/Application/Rainbow/**
+   **/okapi/Ferret/**, **/okapi/Translation/**"
+  />
+
+  <copy file="./lib/h2.jar" todir="${dist}/lib"/>
+  <copy file="./lib/mysql-connector-java-5.1.5-bin.jar" todir="${dist}/lib"/>
+  <copy file="./lib/${platform}/swt.jar" todir="${dist}/lib"/>
+  <copy file="./shared/Filters.xml" todir="${dist}/shared"/>
+  <copy file="./shared/Languages.xml" todir="${dist}/shared"/>
+
+ </target>
+
+ <target name="clean"
+  description="Clean up">
+  <!-- Delete the ${build} and ${dist} directory trees -->
+  <delete includeemptydirs="true">
+   <fileset dir="${build}"/>
+   <fileset dir="${dist}"/>
+  </delete>
+ </target>
+
+</project>
