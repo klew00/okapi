@@ -317,10 +317,6 @@ public class FilterItem implements IFilterItem {
 		return m_nGroupID;
 	}
 	
-	public int getInterfaceVersion () {
-		return 2;
-	}
-	
 	public int getItemID () {
 		return m_nItemID;
 	}

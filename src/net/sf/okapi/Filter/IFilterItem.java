@@ -76,8 +76,6 @@ public interface IFilterItem {
 
 	int getGroupID ();
 
-	int getInterfaceVersion ();
-
 	int getItemID ();
 
 	int getItemType ();

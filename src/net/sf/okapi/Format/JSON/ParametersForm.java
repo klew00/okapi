@@ -20,7 +20,6 @@
 
 package net.sf.okapi.Format.JSON;
 
-import net.sf.okapi.Borneo.Actions.ImportTranslationOptions;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.IParametersEditor;
 import net.sf.okapi.Library.Base.Utils;

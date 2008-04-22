@@ -23,15 +23,15 @@ package net.sf.okapi.Application.Borneo;
 import java.io.File;
 import java.util.Vector;
 
-import net.sf.okapi.Borneo.Actions.BaseAction;
-import net.sf.okapi.Borneo.Actions.IAction;
-import net.sf.okapi.Borneo.Actions.ImportPackageForm;
 import net.sf.okapi.Borneo.Core.Controller;
 import net.sf.okapi.Borneo.Core.DBBase;
 import net.sf.okapi.Borneo.Core.DBDoc;
 import net.sf.okapi.Borneo.Core.DBOptions;
 import net.sf.okapi.Borneo.Core.DBTarget;
 import net.sf.okapi.Borneo.Core.IControllerUI;
+import net.sf.okapi.Borneo.Actions.BaseAction;
+import net.sf.okapi.Borneo.Actions.IAction;
+import net.sf.okapi.Borneo.Actions.ImportPackageForm;
 import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.Utils;

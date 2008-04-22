@@ -20,11 +20,11 @@
 
 package net.sf.okapi.Application.Borneo;
 
+import net.sf.okapi.Borneo.Core.DBDoc;
 import net.sf.okapi.Borneo.Actions.BaseAction;
 import net.sf.okapi.Borneo.Actions.ExportPackageForm;
 import net.sf.okapi.Borneo.Actions.IAction;
 import net.sf.okapi.Borneo.Actions.ImportTranslationForm;
-import net.sf.okapi.Borneo.Core.DBDoc;
 import net.sf.okapi.Library.Base.IParametersEditor;
 import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Library.UI.Dialogs;
