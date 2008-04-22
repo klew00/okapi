@@ -2,9 +2,9 @@ package net.sf.okapi.Package.OmegaT;
 
 import java.io.File;
 
-import net.sf.okapi.Format.XML.XMLWriter;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.Utils;
+import net.sf.okapi.Format.XML.XMLWriter;
 
 public class Writer extends net.sf.okapi.Package.XLIFF.Writer {
 

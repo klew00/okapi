@@ -24,9 +24,9 @@ import java.io.File;
 
 import net.sf.okapi.Filter.FilterItemText;
 import net.sf.okapi.Filter.IFilterItem;
-import net.sf.okapi.Format.XML.XMLWriter;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Package.BaseWriter;
+import net.sf.okapi.Format.XML.XMLWriter;
 
 /**
  * Implements IWriter for generic XLIFF translation packages.
