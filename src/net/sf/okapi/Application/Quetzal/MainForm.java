@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import net.sf.okapi.Ferret.Core.Engine;
+import net.sf.okapi.ferret.Core.Engine;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.LogForm;
 import net.sf.okapi.Library.Base.Utils;
