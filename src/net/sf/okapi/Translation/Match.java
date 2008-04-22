@@ -26,62 +26,62 @@ import net.sf.okapi.Filter.IFilterItem;
 
 public class Match implements IMatch {
 	
-	private int         m_nKind = 0;
-	private int         m_nScore = 0;
-	private FilterItem  m_SrcFI;
-	private FilterItem  m_TrgFI;
+	private int         kind = 0;
+	private int         score = 0;
+	private FilterItem  fitemSrc;
+	private FilterItem  fitemTrg;
 
 	public Match () {
-		m_SrcFI = new FilterItem();
-		m_TrgFI = new FilterItem();
+		fitemSrc = new FilterItem();
+		fitemTrg = new FilterItem();
 	}
 	
 	public int getKind () {
-		return m_nKind;
+		return kind;
 	}
 
 	public int getScore () {
-		return m_nScore;
+		return score;
 	}
 
 	public IFilterItem getSource () {
-		return m_SrcFI;
+		return fitemSrc;
 	}
 
 	public String getSourceText () {
-		return m_SrcFI.getText(FilterItemText.ORIGINAL);
+		return fitemSrc.getText(FilterItemText.ORIGINAL);
 	}
 
 	public IFilterItem getTarget () {
-		return m_TrgFI;
+		return fitemTrg;
 	}
 
 	public String getTargetText () {
-		return m_TrgFI.getText(FilterItemText.ORIGINAL);
+		return fitemTrg.getText(FilterItemText.ORIGINAL);
 	}
 
-	public void setKind (int p_nKind) {
-		m_nKind = p_nKind;
+	public void setKind (int kind) {
+		kind = kind;
 	}
 
-	public void setScore (int p_nScore) {
-		m_nScore = p_nScore;
+	public void setScore (int score) {
+		score = score;
 	}
 
-	public void setSource (IFilterItem p_Item) {
-		m_SrcFI.copyFrom(p_Item);
+	public void setSource (IFilterItem fitem) {
+		fitemSrc.copyFrom(fitem);
 	}
 
-	public void setSourceText (String p_sText) {
-		m_SrcFI.setText(p_sText);
+	public void setSourceText (String text) {
+		fitemSrc.setText(text);
 	}
 
-	public void setTarget (IFilterItem p_Item) {
-		m_TrgFI.copyFrom(p_Item);
+	public void setTarget (IFilterItem fitem) {
+		fitemTrg.copyFrom(fitem);
 	}
 
-	public void setTargetText (String p_sText) {
-		m_TrgFI.setText(p_sText);
+	public void setTargetText (String text) {
+		fitemTrg.setText(text);
 	}
 
 }
