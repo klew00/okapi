@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Ferret.Core;
+package net.sf.okapi.ferret.Core;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
