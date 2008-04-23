@@ -31,7 +31,6 @@ import java.util.Locale;
 import javax.swing.JOptionPane;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 
 public class Utils {
 
@@ -364,7 +363,8 @@ public class Utils {
 		return sL1.equalsIgnoreCase(sL2);
 	}
 
-	static public String makeParametersFullPath (String p_sFilterSettings)
+	static public String makeParametersFullPath (String rootFolder,
+		String p_sFilterSettings)
 	{
 		String sTmp;
 		int n;
@@ -374,19 +374,19 @@ public class Utils {
 			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_SYSTEM)) != -1 )
 		{
 			sbTmp = sbTmp.delete(n+1, n+3); //LEN=2
-			sTmp = Utils.getOkapiParametersFolder(0) + sbTmp;
+			sTmp = Utils.getOkapiParametersFolder(rootFolder, 0) + sbTmp;
 		}
 		else if ( (n = sbTmp.indexOf(
 			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_PROJECT)) != -1 )
 		{
 			sbTmp = sbTmp.delete(n+1, n+3); //LEN=2
-			sTmp = Utils.getOkapiParametersFolder(2) + sbTmp;
+			sTmp = Utils.getOkapiParametersFolder(rootFolder, 2) + sbTmp;
 		}
 		else if ( (n = sbTmp.indexOf(
 			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_USER)) != -1 )
 		{
 			sbTmp = sbTmp.delete(n+1, n+3); // LEN=2
-			sTmp = Utils.getOkapiParametersFolder(1) + sbTmp;
+			sTmp = Utils.getOkapiParametersFolder(rootFolder, 1) + sbTmp;
 		}
 		else // Check for real folder
 		{
@@ -395,7 +395,7 @@ public class Utils {
 			if (( sTmp == null ) || ( sTmp.length() == 0 ))
 			{
 				// No folder: use system parameters (backward compatible)
-				sTmp = Utils.getOkapiParametersFolder() + File.separatorChar + sbTmp;
+				sTmp = Utils.getOkapiParametersFolder(rootFolder) + File.separatorChar + sbTmp;
 			}
 			else sTmp = sbTmp.toString(); // Real folder is already there
 		}
@@ -407,96 +407,78 @@ public class Utils {
 			return sTmp;
 	}
 
-	/**
-	 * Gets the home directory of the Okapi system.
-	 * The value is defined by the "OKAPIHOME" environment variable.
-	 * @return The root directory of the Okapi system (without trailing separator).
-	 */
-	static public String getOkapiFolder ()
-	{
-		// Get the variable
-		String sTmp = System.getenv(OKAPIHOME);
-		
-		if (( sTmp == null ) || ( sTmp.length() == 0 ))
-		{
-			String sOS = System.getProperty("os.name");
-			if ( sOS == null ) sOS = "";
-			else sOS = sOS.toLowerCase();
-			if ( sOS.equals("Linux") ) {
-				return "TODO"; //TODO: get OS names list and handle them
-			}
-			// Default: Windows
-			return "C:\\Program Files\\Okapi";
-		}
-		
-		// Make sure there is no trailing separator
-		if ( sTmp.endsWith(File.separator) ) {
-			sTmp = sTmp.substring(0, sTmp.length()-1);
-		}
-		return sTmp;
+	static public String getOkapiSharedFolder (String rootFolder) {
+		return rootFolder + File.separatorChar + "shared";
 	}
 
-	static public String getOkapiSharedFolder ()
-	{
-		return getOkapiFolder() + File.separatorChar + "Shared";
-	}
-
-	static public String getOkapiParametersFolder ()
-	{
-		return getOkapiSharedFolder() + File.separatorChar + "Parameters";
+	static public String getOkapiParametersFolder (String rootFolder) {
+		return getOkapiSharedFolder(rootFolder) + File.separatorChar + "parameters";
 	}
 
 	/**
 	 * Gets the Okapi Filter Parameters folder for a give type.
-	 * @param p_nType Type of the folder to fetch: 0=system, 1=User, 2=Project
+	 * @param p_nType Type of the folder to fetch: 0=System, 1=User, 2=Project
 	 * @return The Filter Parameters folder for the given type (without a trailing separator).
 	 */
-	static public String getOkapiParametersFolder (int p_nType)
+	static public String getOkapiParametersFolder (String rootFolder,
+		int p_nType)
 	{
 		String sTmp;
-		switch ( p_nType )
-		{
-			case 1: // User folder
-				sTmp = System.getProperty("user.dir");
-				sTmp = sTmp + File.separatorChar + "Okapi"
-					+ File.separatorChar + "Parameters";
+		switch ( p_nType ) {
+		case 2: // Project folder
+			// Check for the environment variable
+			sTmp = System.getenv(PARAMETERS_PRJDIR);
+			if (( sTmp != null ) && ( sTmp.length() > 0 ))
 				return sTmp;
-
-			case 2: // Project folder
-				// Check for the environment variable
-				sTmp = System.getenv(PARAMETERS_PRJDIR);
-				if (( sTmp == null ) || ( sTmp.length() == 0 )) {
-					sTmp = System.getProperty("user.dir");
-				}
-				return sTmp;
-
-			case 0: // System folder
-			default:
-				return getOkapiSharedFolder() + File.separatorChar + "Parameters";
+			// Else, fall through: use the User folder
+		case 1: // User folder
+			sTmp = System.getProperty("user.dir");
+			sTmp = sTmp + File.separatorChar + "okapi"
+				+ File.separatorChar + "parameters";
+			return sTmp;
+		case 0: // System folder
+		default:
+			return getOkapiParametersFolder(rootFolder);
 		}
 	}
 
 	/**
-	 * Splits a filter settings string into its different components.
-	 * @param p_sString The setting string to split.
-	 * @return An array of 3 strings: 0=folder, 1=filter and 2=parameters name.
+	 * Construct a filter settings string.
+	 * @param filterID Filter identifier (cannot be null nor empty).
+	 * @param paramsName Name of the parameters file (can be null or empty).
+	 * @return Filter settings string.
 	 */
-	static public String[] splitFilterSettings (String p_sString)
+	static public String buildFilterSettingsType1 (String filterID,
+		String paramsName)
 	{
-		String[] aOutput = new String[3];
-		for ( int i=0; i<3; i++ ) aOutput[i] = "";
+		String sTmp = filterID;
+		if (( paramsName != null ) && ( paramsName.length() > 0 ))
+			sTmp += (FilterSettingsMarkers.PARAMETERSSEP + paramsName);
+		return sTmp;
+	}
 
-		if (( p_sString == null ) || ( p_sString.length() == 0 ))
+	/**
+	 * Splits a filter settings string into its different components.
+	 * @param filterSettings The setting string to split.
+	 * @return An array of 4 strings: 0=folder, 1=filter id, 2=parameters name
+	 * and 3=full parameters file path (folder + parameters name + extension).
+	 */
+	static public String[] splitFilterSettingsType1 (String filterSettings) {
+		String[] aOutput = new String[4];
+		for ( int i=0; i<4; i++ ) aOutput[i] = "";
+
+		if (( filterSettings == null ) || ( filterSettings.length() == 0 ))
 			return aOutput;
 
-		File F = new File(p_sString);
+		File F = new File(filterSettings);
 		aOutput[0] = F.getParent();
 		String sTmp;
+//TODO: get real path.
 		if ( aOutput[0] == null ) aOutput[0] = "";
 		if ( aOutput[0].length() > 0 )
 			sTmp = F.getName();
 		else
-			sTmp = p_sString;
+			sTmp = filterSettings;
 
 		// Get the parameters file
 		int n;
@@ -509,24 +491,13 @@ public class Utils {
 
 		// Get the filter identifier
 		aOutput[1] = sTmp;
-		return aOutput;
-	}
-
-	/**
-	 * Construct a filter settings string.
-	 * @param p_sFilter Filter identifier (cannot be null nor empty).
-	 * @param p_sParamFile Parameters file (can be null or empty).
-	 * @return Filter settings string.
-	 */
-	static public String buildFilterSettings (String p_sFilter,
-		String p_sParamFile)
-	{
-		String sTmp = p_sFilter;
-
-		if (( p_sParamFile != null ) && ( p_sParamFile.length() > 0 ))
-			sTmp += (FilterSettingsMarkers.PARAMETERSSEP + p_sParamFile);
 		
-		return sTmp;
+		// Get the full path of the parameters file
+		if ( aOutput[0].length() > 0 )
+			aOutput[3] = aOutput[0] + File.separator;
+		aOutput[3] = aOutput[3] + aOutput[2] + FilterSettingsMarkers.PARAMETERS_FILEEXT;
+		
+		return aOutput;
 	}
 
 	static public String removeExtension (String p_sPath)

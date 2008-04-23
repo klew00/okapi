@@ -46,7 +46,6 @@ import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Filter.ILocalizationDirectives;
 import net.sf.okapi.Library.Base.FieldsString;
-import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.LineBreakType;
@@ -60,7 +59,6 @@ public class Filter implements IFilter {
 	private ILog                     m_Log;
 	private Parameters               m_Opt;
 	private FilterItem               m_CurrentFI;
-	private String                   m_sSettings;
 	private String                   m_sPath;
 	private String                   m_sInputEncoding;
 	private String                   m_sInputLanguage;
@@ -237,10 +235,6 @@ public class Filter implements IFilter {
 		return aInfo;
 	}
 
-	public String getSettingsString () {
-		return m_sSettings;
-	}
-
 	public IFilterItem getTranslatedItem () {
 		// Not supported
 		return null;
@@ -251,16 +245,12 @@ public class Filter implements IFilter {
 		resetInput();
 	}
 
-	public boolean loadSettings (String p_sSettings,
-		boolean p_bIgnoreErrors)
+	public boolean loadParameters (String path,
+		boolean ignoreErrors)
 	{
 		try {
-			m_sSettings = p_sSettings;
 			m_Opt.reset();
-			if (( m_sSettings != null ) && ( m_sSettings.indexOf(FilterSettingsMarkers.PARAMETERSSEP) > -1 )) {
-				// Not the defaults: try to load the parameters file
-				m_Opt.load(Utils.makeParametersFullPath(m_sSettings), p_bIgnoreErrors);
-			}
+			m_Opt.load(path, ignoreErrors);
 			return true;
 		}
 		catch ( Exception E ) {
@@ -674,14 +664,16 @@ public class Filter implements IFilter {
 		}
 	}
 
-	public void saveSettingsAs (String p_sPath,
-		String p_sPrefix)
+	public boolean saveParameters (String path,
+		String prefix)
 	{
 		try {
-		   m_Opt.save(p_sPath);
+			m_Opt.save(path);
+			return true;
 		}
 		catch ( Exception E ) {
 			m_Log.error(E.getLocalizedMessage());
+			return false;
 		}
 	}
 

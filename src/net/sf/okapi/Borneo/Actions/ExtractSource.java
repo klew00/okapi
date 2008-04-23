@@ -125,8 +125,8 @@ public class ExtractSource extends BaseAction {
 			//      return true; // Move on to next file
 			//   }
 			//}
-
-			m_FA.loadFilter(sFSettings);
+			String[] aRes = Utils.splitFilterSettingsType1(sFSettings);
+			m_FA.loadFilter(aRes[1], aRes[3]);
 			if ( m_FA.getLog().getErrorCount() > 0 ) {
 				bContinue = false;
 				return bContinue;

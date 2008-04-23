@@ -22,8 +22,9 @@ package net.sf.okapi.Filter;
 
 class FilterAccessItem {
 
-	public String       m_sClass;
-	public String       m_sName;
-	public String       m_sDescription;
+	public String       name;
+	public String       description;
+	public String       filterClass;
+	public String       editorClass;
 	
 }

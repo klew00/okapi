@@ -39,11 +39,12 @@ import net.sf.okapi.Borneo.Actions.UpdateTarget;
 import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
+import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Library.UI.LanguageManager;
 import net.sf.okapi.Package.Manifest;
 
-public class Controller {
+public class Controller implements IParametersProvider {
 
 	private ILog                       m_Log;
 	private IControllerUI              m_UI;
@@ -57,15 +58,15 @@ public class Controller {
 		m_UI = p_UI;
 	}
 
-	public void initialize (ILog p_Log,
-		String p_sRootDir)
+	public void initialize (ILog log,
+		String rootFolder)
 		throws Exception
 	{
-		m_Log = p_Log;
+		m_Log = log;
 		m_DBOpt = new DBOptions();
 		m_ActionData = new Hashtable<String, String>();
 		m_FA = new FilterAccess(m_Log);
-		m_sSharedDir = p_sRootDir + File.separator + "shared"; 
+		m_sSharedDir = Utils.getOkapiSharedFolder(rootFolder); 
 		m_FA.loadList(m_sSharedDir + File.separator + "Filters.xml");
 	}
 	
@@ -415,6 +416,24 @@ public class Controller {
 			m_UI.updateAllViews();
     		m_UI.stopWaiting();
     	}
+	}
+
+	// The location is a filter settings string
+	public IParameters load (String location)
+		throws Exception
+	{
+		String[] aRes = Utils.splitFilterSettingsType1(location);
+		m_FA.loadFilter(aRes[1], aRes[3]);
+		return m_FA.getFilter().getParameters();
+	}
+
+	public void save (String location,
+		IParameters paramObject)
+		throws Exception
+	{
+		// Assumes the passed object is the one that was loaded
+		String[] aRes = Utils.splitFilterSettingsType1(location);
+		paramObject.save(aRes[3]);
 	}
 
 }

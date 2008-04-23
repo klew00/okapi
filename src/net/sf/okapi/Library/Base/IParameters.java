@@ -78,4 +78,12 @@ public interface IParameters {
 	 */
 	public void save (String p_sPath)
 		throws Exception;
+
+	/**
+	 * Gets the full path of the last file where the parameters where loaded 
+	 * from or saved to.
+	 * @return The full path of the last load(), or null if object was not loaded
+	 * from a file.
+	 */
+	public String getPath ();
 }

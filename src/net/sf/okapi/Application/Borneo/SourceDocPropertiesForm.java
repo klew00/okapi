@@ -21,6 +21,7 @@
 package net.sf.okapi.Application.Borneo;
 
 import net.sf.okapi.Filter.FilterAccess;
+import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.UI.Dialogs;
 import net.sf.okapi.Library.UI.FilterSettingsPanel;
 import net.sf.okapi.Library.UI.OKCancelPanel;
@@ -45,12 +46,14 @@ class SourceDocPropertiesForm {
 	private OKCancelPanel         m_pnlActions;
 	private FilterSettingsPanel   m_pnlFSettings;
 
-	SourceDocPropertiesForm (Shell p_Parent)
+	SourceDocPropertiesForm (Shell p_Parent,
+		IParametersProvider paramsProv)
 	{
 		m_Shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		m_Shell.setText(Res.getString("SRCDOCPROP_TITLE"));
 		m_Shell.setImage(p_Parent.getImage());
 		m_Shell.setLayout(new GridLayout());
+		
 		
 		Composite cmpTmp = new Composite(m_Shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -60,7 +63,7 @@ class SourceDocPropertiesForm {
 		stTmp.setText("Filter settings:");
 		stTmp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-		m_pnlFSettings = new FilterSettingsPanel(cmpTmp, SWT.NONE);
+		m_pnlFSettings = new FilterSettingsPanel(cmpTmp, SWT.NONE, paramsProv);
 		m_pnlFSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);

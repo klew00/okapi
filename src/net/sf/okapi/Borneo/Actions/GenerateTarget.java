@@ -129,7 +129,7 @@ public class GenerateTarget extends BaseAction {
 				return true;
 			}
 			
-			m_FA.loadFilter(aRes[1]);
+			m_FA.loadFilterFromFilterSettingsType1(aRes[1]);
 			if ( m_FA.getLog().getErrorCount() > 0 ) return false;
 			Flt = m_FA.getFilter();
 

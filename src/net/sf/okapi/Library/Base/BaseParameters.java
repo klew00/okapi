@@ -31,12 +31,17 @@ import java.io.Writer;
 
 public abstract class BaseParameters implements IParameters {
 
+	protected String    path;
+	
 	public abstract void reset ();
 	
 	public abstract String toString ();
 	
 	public abstract void fromString (String p_sData);
 	
+	public String getPath () {
+		return path;
+	}
 	public String getParameter (String p_sName) {
 		//TODO: Find a faster/better way to implement getOption()
 		FieldsString FS = new FieldsString(toString());
@@ -52,7 +57,7 @@ public abstract class BaseParameters implements IParameters {
 		fromString(FS.toString());
 	}
 
-	public void load (String p_sPath,
+	public void load (String filePath,
 		boolean p_bIgnoreErrors)
 		throws Exception
 	{
@@ -61,7 +66,7 @@ public abstract class BaseParameters implements IParameters {
 			reset();
 			// Open the file
 			Reader SR = new InputStreamReader(
-				new BufferedInputStream(new FileInputStream(p_sPath)),
+				new BufferedInputStream(new FileInputStream(filePath)),
 				"UTF-8");
 				
 			// Read the file in one string
@@ -77,22 +82,24 @@ public abstract class BaseParameters implements IParameters {
 
 			// Parse it
 			fromString(sbTmp.toString());
+			path = filePath;
 		}
 		catch ( Exception E ) {
 			if ( !p_bIgnoreErrors ) throw E;
 		}
 	}
 
-	public void save (String p_sPath)
+	public void save (String filePath)
 		throws Exception
 	{
 		Writer SW = null;
 		try {
 			// Save the fields on file
 			SW = new OutputStreamWriter(
-				new BufferedOutputStream(new FileOutputStream(p_sPath)),
+				new BufferedOutputStream(new FileOutputStream(filePath)),
 				"UTF-8");
 			SW.write(this.toString());
+			path = filePath;
 		}
 		catch ( Exception E ) {
 			throw E;

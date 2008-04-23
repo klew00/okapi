@@ -21,6 +21,8 @@
 package net.sf.okapi.Library.UI;
 
 import net.sf.okapi.Filter.FilterAccess;
+import net.sf.okapi.Library.Base.IParameters;
+import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.Base.Utils;
 
 import org.eclipse.swt.SWT;
@@ -30,7 +32,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -38,15 +39,17 @@ import org.eclipse.swt.widgets.Text;
  */
 public class FilterSettingsPanel extends Composite {
 
-	FilterAccess        m_FA;
-	Text                m_edSettings;
-	Button              m_btEdit;
-	Shell               m_ShellForEditors;
+	private FilterAccess          m_FA;
+	private Text                  m_edSettings;
+	private Button                m_btEdit;
+	private IParametersProvider   paramProv;
 	
 	public FilterSettingsPanel(Composite p_Parent,
-		int p_nFlags)
+		int p_nFlags,
+		IParametersProvider paramProv)
 	{
 		super(p_Parent, SWT.NONE);
+		this.paramProv = paramProv;
 		createContent();
 	}
 	
@@ -84,9 +87,25 @@ public class FilterSettingsPanel extends Composite {
 	
 	private void editParameters () {
 		try {
-			String sTmp = m_edSettings.getText();
-			if ( sTmp.length() == 0 ) return;
-			m_FA.editFilterSettings(sTmp, false, getParent().getShell());
+			String filterSettings = m_edSettings.getText();
+			if ( filterSettings.length() == 0 ) {
+				//TODO: ask user if s/he wants to create new file
+				return;
+			}
+			// Invoke the parameters provider to load the parameters file.
+			// We do this like this because the provider may be on the server side.
+			IParameters params = paramProv.load(filterSettings);
+			if ( params == null ) {
+				//TODO: error message
+				return;
+			}
+			// Now call the editor (from the client side)
+			String[] aRes = Utils.splitFilterSettingsType1(filterSettings);
+			if ( m_FA.editFilterSettings(aRes[1], params, getParent().getShell()) ) {
+				// Save the data if needed
+				// We use the provider here to (to save on the server side)
+				paramProv.save(filterSettings, params);
+			}
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getLocalizedMessage(), null);

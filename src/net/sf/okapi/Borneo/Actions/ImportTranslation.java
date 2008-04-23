@@ -169,7 +169,7 @@ public class ImportTranslation extends BaseAction {
 			else m_FA.getLog().message(Res.getString("IMPORT_FROM") + sPath);
 			
 			// Loads the filter
-			m_FA.loadFilter(sFSettings);
+			m_FA.loadFilterFromFilterSettingsType1(sFSettings);
 			if ( m_FA.getLog().getErrorCount() > 0 ) return false;
 			Flt = m_FA.getFilter();
 

@@ -146,16 +146,11 @@ class MainForm implements IControllerUI {
 	public static String[]   s_aSrcStatus;
 	public static String[]   s_aTrgStatus;
 	
-	MainForm (Shell p_Shell)
-	{
+	MainForm (Shell p_Shell) {
 		try {
-			System.err.println("bno- in MainForm()");
 			m_Shell = p_Shell;
-			System.err.println("bno- before setdirectories()");
 			setDirectories();
-			System.err.println("bno- before loadResources()");
 			loadResources();
-			System.err.println("bno- before createContent()");
 			createContent();
 		}
 		catch ( Exception E ) {
@@ -1295,7 +1290,7 @@ class MainForm implements IControllerUI {
 			String sFileSet = TI.getText(DocumentsModel.COL_FILESET);
 
 			// Call the dialog
-			SourceDocPropertiesForm Dlg = new SourceDocPropertiesForm(m_Shell);
+			SourceDocPropertiesForm Dlg = new SourceDocPropertiesForm(m_Shell, m_C);
 			Dlg.setData(sFSettings, sEncoding, sFileSet, m_FA);
 			String[] aData = Dlg.showDialog();
 			if ( aData == null ) return;

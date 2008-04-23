@@ -70,7 +70,6 @@ public class Filter implements IFilter {
 	private String           m_sInputEncoding;
 	private String           m_sOutputLanguage;
 	private String           m_sOutputEncoding;
-	private String           m_sSettings;
 	private Parameters       m_Opt;
 
 	private String           m_sInput;
@@ -185,10 +184,6 @@ public class Filter implements IFilter {
 		return m_sOutputLanguage;
 	}
 
-	public String getSettingsString() {
-		return m_sSettings;
-	}
-
 	public IFilterItem getTranslatedItem() {
 		// Not supported with this filter
 		return null;
@@ -201,16 +196,12 @@ public class Filter implements IFilter {
 		m_Opt.m_LD.setLog(m_Log);
 	}
 
-	public boolean loadSettings(String p_sSettings,
-		boolean p_bIgnoreErrors)
+	public boolean loadParameters (String path,
+		boolean ignoreErrors)
 	{
 		try {
-			m_sSettings = p_sSettings;
 			m_Opt.reset();
-			if (( m_sSettings != null ) && ( m_sSettings.indexOf(FilterSettingsMarkers.PARAMETERSSEP) > -1 )) {
-				// Not the defaults: try to load the parameters file
-				m_Opt.load(Utils.makeParametersFullPath(m_sSettings), p_bIgnoreErrors);
-			}
+			m_Opt.load(path, ignoreErrors);
 			return true;
 		}
 		catch ( Exception E ) {
@@ -441,14 +432,16 @@ public class Filter implements IFilter {
 		m_sbEscape = new StringBuilder();
 	}
 	
-	public void saveSettingsAs (String p_sPath,
-		String p_sPrefix)
+	public boolean saveParameters (String path,
+		String prefix)
 	{
 		try {
-		   m_Opt.save(p_sPath);
+		   m_Opt.save(path);
+		   return true;
 		}
 		catch ( Exception E ) {
 			m_Log.error(E.getLocalizedMessage());
+			return false;
 		}
 	}
 

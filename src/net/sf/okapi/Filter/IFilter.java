@@ -136,13 +136,6 @@ public interface IFilter {
 	public String getOption (String p_sName);
 	
 	/**
-	 * Gets the current full string settings of the filter. It includes the filter
-	 * identifier and parameters information.
-	 * @return The filter settings string.
-	 */
-	public String getSettingsString ();
-
-	/**
 	 * Gets the FilterItem object for the translated item of the current
 	 * item. The returned object is meaningless if isTranslated() of the
 	 * current source item returns false. 
@@ -156,8 +149,8 @@ public interface IFilter {
 	 */
 	public void initialize (ILog p_Log);
 
-	public boolean loadSettings (String p_sFilterSettings,
-		boolean p_bIgnoreErrors);
+	public boolean loadParameters (String path,
+		boolean ignoreErrors);
 
 	/**
 	 * Opens an input file to be processed by the filter.
@@ -197,12 +190,13 @@ public interface IFilter {
 	
 	/**
 	 * Saves the filter settings data to a given file.
-	 * @param p_sPath Full path of the file where to save the data.
-	 * @param p_sPrefix Optional prefix. If not null, it will be placed in front of any
-	 * settings-related additional file(s) the filter saves along with the parameters file.
+	 * @param path Full path of the file where to save the data.
+	 * @param prefix Optional prefix. If not null, it must be placed in front of any
+	 * settings-related additional file(s) the filter saves along with the parameters
+	 * file.
 	 */
-	public void saveSettingsAs (String p_sPath,
-		String p_sPrefix);
+	public boolean saveParameters (String path,
+		String prefix);
 
 	public void setAncillaryDirectory (String p_sInputRoot,
 		String p_sAncillaryRoot);

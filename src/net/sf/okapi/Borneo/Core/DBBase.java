@@ -1014,12 +1014,16 @@ public abstract class DBBase {
 		if ( p_Filter == null ) return;
 
 		// Create a local parameters file (even if it's the default parameters)
-		String[] aRes = Utils.splitFilterSettings(p_Filter.getSettingsString());
-		
-		aRes[2] = Utils.makeID(p_Filter.getSettingsString());
-		String sFSettings = Utils.buildFilterSettings(aRes[1], aRes[2]);
+		// Make a unique name from the filter Id an dthe parameters path
+		String sTmp = p_Filter.getParameters().getPath();
+		if ( sTmp == null ) sTmp = p_Filter.getIdentifier() + sTmp; 
+		else sTmp = p_Filter.getIdentifier();
+		// Reduce it to a short unique string
+		sTmp = Utils.makeID(sTmp);
+		// Create filter settings from the filter ID and the unique name
+		String sFSettings = Utils.buildFilterSettingsType1(p_Filter.getIdentifier(), sTmp);
 		sCopyPath = sCommon + sFSettings + FilterSettingsMarkers.PARAMETERS_FILEEXT;
-		p_Filter.saveSettingsAs(sCopyPath, sKeyDot);
+		p_Filter.saveParameters(sCopyPath, sKeyDot);
 	}
 
 	/**
