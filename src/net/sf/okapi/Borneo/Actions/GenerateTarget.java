@@ -44,10 +44,13 @@ public class GenerateTarget extends BaseAction {
 	private String                m_sTarget;
 	private IFilterItem           m_SourceFI;
 	private ResultSet             m_rsTrg;
+	private String                rootFolder;
 	
-	public GenerateTarget (FilterAccess p_FA,
+	public GenerateTarget (String rootFolder,
+		FilterAccess p_FA,
 		DBBase p_DB)
 	{
+		this.rootFolder = rootFolder;
 		m_FA = p_FA;
 		m_DB = p_DB;
 		m_Doc = null;
@@ -129,7 +132,7 @@ public class GenerateTarget extends BaseAction {
 				return true;
 			}
 			
-			m_FA.loadFilterFromFilterSettingsType1(aRes[1]);
+			m_FA.loadFilterFromFilterSettingsType1(rootFolder, aRes[1]);
 			if ( m_FA.getLog().getErrorCount() > 0 ) return false;
 			Flt = m_FA.getFilter();
 

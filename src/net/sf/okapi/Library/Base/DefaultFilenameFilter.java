@@ -25,18 +25,18 @@ import java.io.FilenameFilter;
 
 public class DefaultFilenameFilter implements FilenameFilter
 {
-	private String      m_sPrefix;
+	private String      prefix;
 	
-	public DefaultFilenameFilter (String p_sPrefix) {
-		m_sPrefix = p_sPrefix;
+	public DefaultFilenameFilter (String prefix) {
+		this.prefix = prefix;
 	}
 
-	public boolean accept (File p_Directory,
-		String p_sFilename)
+	public boolean accept (File directory,
+		String fileName)
 	{
 		boolean bOK = true;
-		if ( p_sFilename != null ) {
-			bOK &= p_sFilename.startsWith(m_sPrefix);
+		if ( fileName != null ) {
+			bOK &= fileName.startsWith(prefix);
 		}
 		return bOK;
 	}

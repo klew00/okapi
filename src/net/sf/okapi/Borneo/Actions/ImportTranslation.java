@@ -47,10 +47,13 @@ public class ImportTranslation extends BaseAction {
 	private IFilterItem                m_SourceFI;
 	private IFilterItem                m_TargetFI;
 	private ResultSet                  m_rsTrg;
+	private String                     rootFolder;
 	
-	public ImportTranslation (FilterAccess p_FA,
+	public ImportTranslation (String rootFolder,
+		FilterAccess p_FA,
 		DBBase p_DB)
 	{
+		this.rootFolder = rootFolder;
 		m_FA = p_FA;
 		m_DB = p_DB;
 		m_Doc = null;
@@ -169,7 +172,7 @@ public class ImportTranslation extends BaseAction {
 			else m_FA.getLog().message(Res.getString("IMPORT_FROM") + sPath);
 			
 			// Loads the filter
-			m_FA.loadFilterFromFilterSettingsType1(sFSettings);
+			m_FA.loadFilterFromFilterSettingsType1(rootFolder, sFSettings);
 			if ( m_FA.getLog().getErrorCount() > 0 ) return false;
 			Flt = m_FA.getFilter();
 

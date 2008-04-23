@@ -40,6 +40,7 @@ public class FilterAccess {
 	private Hashtable<String, FilterAccessItem>  m_htFilters;
 	private IFilter                              m_Flt;
 	private IParametersEditor                    m_Editor;
+	private String                               currentClass;
 	
 	public FilterAccess (ILog p_Log) {
 		m_Log = p_Log;
@@ -78,6 +79,7 @@ public class FilterAccess {
 		throws Exception
 	{
 		try {
+			currentClass = null;
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Document Doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
@@ -127,8 +129,16 @@ public class FilterAccess {
 			// Map the ID to the class, and instantiate the filter
 			if ( !m_htFilters.containsKey(filterID) )
 				throw new Exception("Undefined filter ID.");
-			m_Flt = (IFilter)Class.forName(m_htFilters.get(filterID).filterClass).newInstance();
-			m_Flt.initialize(m_Log);
+
+			// Load if not already done
+			boolean bLoad = true;
+			if (( m_Flt != null ) && ( currentClass != null )) {
+				bLoad = !currentClass.equals(m_htFilters.get(filterID).filterClass);
+			}
+			if ( bLoad ) {
+				m_Flt = (IFilter)Class.forName(m_htFilters.get(filterID).filterClass).newInstance();
+				m_Flt.initialize(m_Log);
+			}
 			
 			// Load the parameters
 			if ( paramPath != null )
@@ -139,10 +149,11 @@ public class FilterAccess {
 		}
 	}
 
-	public void loadFilterFromFilterSettingsType1 (String filterSettings)
+	public void loadFilterFromFilterSettingsType1 (String rootFolder,
+		String filterSettings)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(filterSettings);
+		String[] aRes = Utils.splitFilterSettingsType1(rootFolder, filterSettings);
 		loadFilter(aRes[1], aRes[3]);
 	}
 	
@@ -178,18 +189,18 @@ public class FilterAccess {
 	 * @return True if the edit was successful, false if the use canceled
 	 * or if an error occurred.
 	 */
-	public boolean editFilterSettings (String filterID,
+	public boolean editParameters (String filterID,
 		IParameters paramObject,
 		Object uiContext)
 	{
 		try {
 			loadEditor(filterID);
-			m_Editor.edit(paramObject, uiContext);
+			if ( m_Editor == null ) return false;
+			return m_Editor.edit(paramObject, uiContext);
 		}
 		catch ( Exception E ) {
 			return false;
 		}
-		return true;
 	}
 	
 }

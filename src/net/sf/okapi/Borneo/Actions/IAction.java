@@ -50,6 +50,13 @@ public interface IAction
 
 	void stop ();
 
+	/**
+	 * Executes the action.
+	 * @param p_aDKeys Array of the DKey of the documents to process. 
+	 * @param p_aTargets Array of the codes of the targets to process. This can
+	 * be null or empty if the action is for source only.
+	 * @return
+	 */
 	boolean execute (int[] p_aDKeys,
 		String[] p_aTargets);
 

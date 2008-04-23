@@ -458,44 +458,45 @@ public class Utils {
 	}
 
 	/**
-	 * Splits a filter settings string into its different components.
+	 * Splits a filter settings string into its different components, including
+	 * the full path of the parameters file.
 	 * @param filterSettings The setting string to split.
 	 * @return An array of 4 strings: 0=folder, 1=filter id, 2=parameters name
 	 * and 3=full parameters file path (folder + parameters name + extension).
 	 */
-	static public String[] splitFilterSettingsType1 (String filterSettings) {
+	static public String[] splitFilterSettingsType1 (String rootFolder,
+		String filterSettings) {
 		String[] aOutput = new String[4];
 		for ( int i=0; i<4; i++ ) aOutput[i] = "";
 
 		if (( filterSettings == null ) || ( filterSettings.length() == 0 ))
 			return aOutput;
 
-		File F = new File(filterSettings);
+		// Expand the parameters part into full path
+		aOutput[3] = Utils.makeParametersFullPath(rootFolder, filterSettings);
+		
+		// Get the directory
+		File F = new File(aOutput[3]);
 		aOutput[0] = F.getParent();
 		String sTmp;
-//TODO: get real path.
 		if ( aOutput[0] == null ) aOutput[0] = "";
 		if ( aOutput[0].length() > 0 )
 			sTmp = F.getName();
 		else
-			sTmp = filterSettings;
+			sTmp = aOutput[3];
 
-		// Get the parameters file
+		// Get the parameters name
 		int n;
-		if ( (n = sTmp.indexOf(FilterSettingsMarkers.PARAMETERSSEP)) > -1 )
-		{
-			if ( n < sTmp.length()-1 )
+		if ( (n = sTmp.indexOf(FilterSettingsMarkers.PARAMETERSSEP)) > -1 ) {
+			if ( n < sTmp.length()-1 ) {
 				aOutput[2] = sTmp.substring(n+1);
-			sTmp = sTmp.substring(0, n); //LEN=n
+				aOutput[2] = Utils.removeExtension(aOutput[2]);
+			}
+			sTmp = sTmp.substring(0, n);
 		}
 
 		// Get the filter identifier
 		aOutput[1] = sTmp;
-		
-		// Get the full path of the parameters file
-		if ( aOutput[0].length() > 0 )
-			aOutput[3] = aOutput[0] + File.separator;
-		aOutput[3] = aOutput[3] + aOutput[2] + FilterSettingsMarkers.PARAMETERS_FILEEXT;
 		
 		return aOutput;
 	}

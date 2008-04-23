@@ -100,8 +100,8 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the client side)
-			String[] aRes = Utils.splitFilterSettingsType1(filterSettings);
-			if ( m_FA.editFilterSettings(aRes[1], params, getParent().getShell()) ) {
+			String[] aRes = paramProv.splitLocation(filterSettings);
+			if ( m_FA.editParameters(aRes[1], params, getParent().getShell()) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramProv.save(filterSettings, params);

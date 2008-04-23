@@ -22,14 +22,17 @@ package net.sf.okapi.Application.Tikal;
 
 public class Main {
 
+	public static void main(String[] args) {
+		Banner();
+		for ( int i=0; i<args.length; i++ ) {
+			
+		}
+	}
+
 	private static void Banner () {
 		System.out.print("============================================================");
 		System.out.print("Okapi Tikal");
 		System.out.print("============================================================");
-	}
-
-	public static void main(String[] p_Args) {
-		Banner();
 	}
 
 }
