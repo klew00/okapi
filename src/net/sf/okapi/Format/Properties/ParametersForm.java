@@ -219,8 +219,8 @@ public class ParametersForm implements IParametersEditor {
 	}
 	
 	private void setData () {
-		m_pnlLD.m_chkUseLD.setSelection(m_Data.m_LD.UseDirectives());
-		m_pnlLD.m_chkLocalizeOutside.setSelection(m_Data.m_LD.LocalizeOutside());
+		m_pnlLD.m_chkUseLD.setSelection(m_Data.m_LD.useDirectives());
+		m_pnlLD.m_chkLocalizeOutside.setSelection(m_Data.m_LD.localizeOutside());
 		m_edKeyCondition.setText(m_Data.m_sKeyCondition);
 		m_rdExtractOnlyMatchingKey.setSelection(m_Data.m_bExtractOnlyMatchingKey);
 		m_rdExcludeMatchingKey.setSelection(!m_Data.m_bExtractOnlyMatchingKey);
@@ -233,7 +233,7 @@ public class ParametersForm implements IParametersEditor {
 	}
 	
 	private void saveData () {
-		m_Data.m_LD.SetOptions(m_pnlLD.m_chkUseLD.getSelection(),
+		m_Data.m_LD.setOptions(m_pnlLD.m_chkUseLD.getSelection(),
 			m_pnlLD.m_chkLocalizeOutside.getSelection(), false);
 		m_Data.m_bUseKeyCondition = m_chkUseKeyFilter.getSelection();
 		m_Data.m_sKeyCondition = m_edKeyCondition.getText();

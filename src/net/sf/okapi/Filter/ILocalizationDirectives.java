@@ -26,25 +26,25 @@ public interface ILocalizationDirectives {
 
 	public void setLog (ILog p_Log);
 	
-	public boolean IsInDNLList (IFilterItem p_Item);
+	public boolean isInDNLList (IFilterItem p_Item);
 	
-	public boolean IsLocalizable (boolean p_bPopSingle);
+	public boolean isLocalizable (boolean p_bPopSingle);
 	
-	public boolean IsWithinScope ();
+	public boolean isWithinScope ();
 	
-	public void LoadDNLFile (String p_sBasePath);
+	public void loadDNLFile (String p_sBasePath);
 	
-	public boolean LocalizeOutside ();
+	public boolean localizeOutside ();
 	
-	public void Process (String p_sText);
+	public void process (String p_sText);
 	
-	public void Reset ();
+	public void reset ();
 	
-	public void SetOptions (boolean p_bUseDirectives,
+	public void setOptions (boolean p_bUseDirectives,
 		boolean p_bLocalizeOutside,
 		boolean p_bUseDNLFile);
 	
-	public boolean UseDirectives ();
+	public boolean useDirectives ();
 	
-	public boolean UseDNLFile ();
+	public boolean useDNLFile ();
 }

@@ -107,9 +107,7 @@ public class FilterAccess {
 	
 	/**
 	 * Loads a filter and its parameters (if necessary). If the filter is the 
-	 * filter currently loaded, it is not re-loaded. The parameters are re-loaded if
-	 * the filter is different, if the parameters have changed, or if the file holding
-	 * the parameters is newer than the last time the parameters where loaded. 
+	 * filter currently loaded, it is not re-loaded. 
 	 * @param filterID Identifier of the filter to load.
 	 * @param paramPath Full path of the parameters file to load. Use null
 	 * for no parameters.
@@ -128,7 +126,7 @@ public class FilterAccess {
 
 			// Map the ID to the class, and instantiate the filter
 			if ( !m_htFilters.containsKey(filterID) )
-				throw new Exception("Undefined filter ID.");
+				throw new Exception(String.format(Res.getString("UNDEF_FILTERID"), filterID)); 
 
 			// Load if not already done
 			boolean bLoad = true;
@@ -141,19 +139,22 @@ public class FilterAccess {
 			}
 			
 			// Load the parameters
-			if ( paramPath != null )
-				m_Flt.loadParameters(paramPath, false);
+			if ( paramPath != null ) {
+				if ( !m_Flt.loadParameters(paramPath, false) ) {
+					throw new Exception("Cannot load parameters file.");
+				}
+			}
 		}
 		catch ( Exception E ) {
 			throw E;
 		}
 	}
 
-	public void loadFilterFromFilterSettingsType1 (String rootFolder,
+	public void loadFilterFromFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(rootFolder, filterSettings);
+		String[] aRes = Utils.splitFilterSettingsType1(projectParamsFolder, filterSettings);
 		loadFilter(aRes[1], aRes[3]);
 	}
 	
@@ -170,7 +171,7 @@ public class FilterAccess {
 	
 			// Map the ID to the class, and instantiate the filter
 			if ( !m_htFilters.containsKey(filterID) )
-				throw new Exception("Undefined filter ID.");
+				throw new Exception(String.format(Res.getString("UNDEF_FILTERID"), filterID));
 			m_Editor = (IParametersEditor)Class.forName(m_htFilters.get(filterID).editorClass).newInstance();
 		}
 		catch ( Exception E ) {

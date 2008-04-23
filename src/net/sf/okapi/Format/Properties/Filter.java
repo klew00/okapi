@@ -286,9 +286,9 @@ public class Filter implements IFilter {
 			m_sOutputEncoding = m_sInputEncoding;
 
 			// Load the DNL list if needed
-			if ( m_Opt.m_LD.UseDNLFile() )
+			if ( m_Opt.m_LD.useDNLFile() )
 			{
-				m_Opt.m_LD.LoadDNLFile(p_sPath);
+				m_Opt.m_LD.loadDNLFile(p_sPath);
 			}
 
 			resetInput();
@@ -474,7 +474,7 @@ public class Filter implements IFilter {
 					}
 
 					if ( bComments ) {
-						m_Opt.m_LD.Process(sTmp);
+						m_Opt.m_LD.process(sTmp);
 						m_sbBuffer.append(m_sLine);
 						m_sbBuffer.append(m_sLineBreak);
 						continue;
@@ -567,24 +567,24 @@ public class Filter implements IFilter {
 				if ( m_Opt.m_bUseKeyCondition ) {
 					if ( m_Opt.m_bExtractOnlyMatchingKey ) {
 						if ( m_RE.matcher(sKey).matches() )
-							bExtract = m_Opt.m_LD.IsLocalizable(true);
+							bExtract = m_Opt.m_LD.isLocalizable(true);
 						else
 							bExtract = false;
 					}
 					else // Extract all but items with matching keys
 					{
 						if ( !m_RE.matcher(sKey).matches() )
-							bExtract = m_Opt.m_LD.IsLocalizable(true);
+							bExtract = m_Opt.m_LD.isLocalizable(true);
 						else
 							bExtract = false;
 					}
 				}
 				
-				if ( bExtract ) bExtract = m_Opt.m_LD.IsLocalizable(true);
+				if ( bExtract ) bExtract = m_Opt.m_LD.isLocalizable(true);
 				else {
 					// Make sure we pop/push the directives even if the 
 					// outcome is already decided, otherwise it gets out-of-sync
-					m_Opt.m_LD.IsLocalizable(true);
+					m_Opt.m_LD.isLocalizable(true);
 				}
 
 				if ( bExtract ) {
@@ -592,7 +592,7 @@ public class Filter implements IFilter {
 					m_CurrentFI.setResName(sKey);
 
 					// Check the DNL list here to have resname, etc.
-					bExtract = !m_Opt.m_LD.IsInDNLList(m_CurrentFI);
+					bExtract = !m_Opt.m_LD.isInDNLList(m_CurrentFI);
 				}
 
 				if ( bExtract ) {

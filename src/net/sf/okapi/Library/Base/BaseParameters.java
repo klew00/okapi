@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.CharBuffer;
 
 public abstract class BaseParameters implements IParameters {
 
@@ -68,14 +69,14 @@ public abstract class BaseParameters implements IParameters {
 			Reader SR = new InputStreamReader(
 				new BufferedInputStream(new FileInputStream(filePath)),
 				"UTF-8");
-				
+
 			// Read the file in one string
-			StringBuffer sbTmp = new StringBuffer(1024);
-			char[] aBuf = new char[1024];
+			StringBuilder sbTmp = new StringBuilder(1024);
+			char[] aBuf = new char[10];
 			@SuppressWarnings("unused")
 			int nCount;
 			while ((nCount = SR.read(aBuf)) > -1) {
-				sbTmp.append(aBuf.toString());	
+				sbTmp.append(aBuf, 0, nCount);	
 			}
 			SR.close();
 			SR = null;
@@ -98,7 +99,7 @@ public abstract class BaseParameters implements IParameters {
 			SW = new OutputStreamWriter(
 				new BufferedOutputStream(new FileOutputStream(filePath)),
 				"UTF-8");
-			SW.write(this.toString());
+			SW.write(toString());
 			path = filePath;
 		}
 		catch ( Exception E ) {

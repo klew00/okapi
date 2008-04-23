@@ -160,9 +160,9 @@ class MainForm implements IControllerUI {
 
     private void setDirectories () {
 		String sCP = System.getProperty("java.class.path");
-		System.err.println("bno- CP="+sCP);
+System.err.println("bno- CP="+sCP);
 		// Check if we are running from a jar
-		System.err.println("bno- searchInClassPath()");		
+System.err.println("bno- searchInClassPath()");		
 		m_sRootDir = Utils.searchInClassPath(sCP, "Borneo.jar");
 		System.err.println("bno- sRoot(1)="+m_sRootDir);
 		// If not, try the debug path
@@ -172,26 +172,20 @@ class MainForm implements IControllerUI {
 			m_sRootDir = Utils.getDirectoryName(m_sRootDir);
 		// Build the absolute path from there
 		m_sRootDir = (new File(m_sRootDir)).getAbsolutePath();
-		System.err.println("bno- final sRoot="+m_sRootDir);
-		m_sSharedDir = m_sRootDir + File.separator + "shared";
+System.err.println("bno- final sRoot="+m_sRootDir);
+		m_sSharedDir = Utils.getOkapiSharedFolder(m_sRootDir);
 	}
 	
 	private void loadResources () {
 		try {
 			// Create the core engine
-			System.err.println("bno- before create Controller()");
 			m_C = new Controller(this);
 
 			// Create manager for shared UI resources
-			System.err.println("bno- before create ResourceManager()");
 			m_RM = new ResourceManager(MainForm.class, m_Shell.getDisplay());
 			
-			System.err.println("bno- after new RM");
-			System.err.println("bno- RM is " + ((m_RM==null) ? "NULL" : "not NULL"));
-				
 			// Load images
 			m_RM.addImage("Borneo");
-			System.err.println("bno- after addImage");			
 			m_RM.addImage("First");
 			m_RM.addImage("Prev");
 			m_RM.addImage("Next");

@@ -109,7 +109,7 @@ public class Filter implements IFilter {
 	public void closeInput () {
 		// The file is already closed.
 		m_sInput = null; // Allows to dispose of the memory
-		if ( m_Opt != null ) m_Opt.m_LD.Reset();
+		if ( m_Opt != null ) m_Opt.m_LD.reset();
 	}
 
 	public String closeOutput () {
@@ -253,8 +253,8 @@ public class Filter implements IFilter {
 			m_sLineBreak = m_sOriginalLineBreak;
 			m_CurrentFI.setLineBreak(m_sLineBreak);
 
-			if ( m_Opt.m_LD.UseDNLFile() ) {
-				m_Opt.m_LD.LoadDNLFile(p_sPath);
+			if ( m_Opt.m_LD.useDNLFile() ) {
+				m_Opt.m_LD.loadDNLFile(p_sPath);
 			}
 			resetInput();
 		}
@@ -727,7 +727,7 @@ public class Filter implements IFilter {
 
 	private boolean doExtract (String p_sResName)
 	{
-		if ( !m_Opt.m_LD.IsLocalizable(true) ) return false;
+		if ( !m_Opt.m_LD.isLocalizable(true) ) return false;
 
 		// Treat options for key+value pairs
 		boolean bExtract = m_Opt.m_bExtractAllPairs;
@@ -750,7 +750,7 @@ public class Filter implements IFilter {
 			m_Opt.m_CodeFinder.processFilterItem(m_CurrentFI);
 
 		// Check the DNL list here to have resname, etc.
-		if ( m_Opt.m_LD.IsInDNLList(m_CurrentFI) ) return false;
+		if ( m_Opt.m_LD.isInDNLList(m_CurrentFI) ) return false;
 		
 		m_CurrentFI.setItemID(++m_nID);
 		m_nLastTrigger = m_nCurrent;

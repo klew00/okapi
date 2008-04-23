@@ -44,8 +44,8 @@ class Parameters extends BaseParameters {
 	
 	public void reset ()
 	{
-		m_LD.Reset();
-		m_LD.SetOptions(false, true, true); // Override: no LD use by default
+		m_LD.reset();
+		m_LD.setOptions(false, true, true); // Override: no LD use by default
 		m_CodeFinder.reset();
 		m_bUseCodeFinder = true;
 
@@ -65,8 +65,8 @@ class Parameters extends BaseParameters {
 	{
 		// Store the parameters in fields
 		FieldsString Tmp = new FieldsString();
-		Tmp.add("useld", m_LD.UseDirectives());
-		Tmp.add("localizeoutside", m_LD.LocalizeOutside());
+		Tmp.add("useld", m_LD.useDirectives());
+		Tmp.add("localizeoutside", m_LD.localizeOutside());
 		Tmp.add("userules", m_bUseCodeFinder);
 		Tmp.add("extstandalone", m_bExtractStandalone);
 		Tmp.add("extallpairs", m_bExtractAllPairs);
@@ -82,9 +82,9 @@ class Parameters extends BaseParameters {
 		FieldsString Tmp = new FieldsString(p_sData);
 
 		// Parse the fields
-		boolean bTmp1 = Tmp.get("useld", m_LD.UseDirectives());
-		boolean bTmp2 = Tmp.get("localizeoutside", m_LD.LocalizeOutside());
-		m_LD.SetOptions(bTmp1, bTmp2, true);
+		boolean bTmp1 = Tmp.get("useld", m_LD.useDirectives());
+		boolean bTmp2 = Tmp.get("localizeoutside", m_LD.localizeOutside());
+		m_LD.setOptions(bTmp1, bTmp2, true);
 		m_bUseCodeFinder = Tmp.get("userules", m_bUseCodeFinder);
 		m_bExtractStandalone = Tmp.get("extstandalone", m_bExtractStandalone);
 		m_bExtractAllPairs = Tmp.get("extallpairs", m_bExtractAllPairs);

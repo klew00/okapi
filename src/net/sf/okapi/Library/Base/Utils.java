@@ -363,63 +363,19 @@ public class Utils {
 		return sL1.equalsIgnoreCase(sL2);
 	}
 
-	static public String makeParametersFullPath (String rootFolder,
-		String p_sFilterSettings)
-	{
-		String sTmp;
-		int n;
-		StringBuilder sbTmp = new StringBuilder(p_sFilterSettings);
-		// Check for system parameters markers
-		if ( (n = sbTmp.indexOf(
-			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_SYSTEM)) != -1 )
-		{
-			sbTmp = sbTmp.delete(n+1, n+3); //LEN=2
-			sTmp = Utils.getOkapiParametersFolder(rootFolder, 0) + sbTmp;
-		}
-		else if ( (n = sbTmp.indexOf(
-			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_PROJECT)) != -1 )
-		{
-			sbTmp = sbTmp.delete(n+1, n+3); //LEN=2
-			sTmp = Utils.getOkapiParametersFolder(rootFolder, 2) + sbTmp;
-		}
-		else if ( (n = sbTmp.indexOf(
-			FilterSettingsMarkers.PARAMETERSSEP+FilterSettingsMarkers.FOLDERTYPE_USER)) != -1 )
-		{
-			sbTmp = sbTmp.delete(n+1, n+3); // LEN=2
-			sTmp = Utils.getOkapiParametersFolder(rootFolder, 1) + sbTmp;
-		}
-		else // Check for real folder
-		{
-			File F = new File(p_sFilterSettings);
-			sTmp = F.getParent(); 
-			if (( sTmp == null ) || ( sTmp.length() == 0 ))
-			{
-				// No folder: use system parameters (backward compatible)
-				sTmp = Utils.getOkapiParametersFolder(rootFolder) + File.separatorChar + sbTmp;
-			}
-			else sTmp = sbTmp.toString(); // Real folder is already there
-		}
-
-		// Need the extension?
-		if ( !sTmp.endsWith(FilterSettingsMarkers.PARAMETERS_FILEEXT) )
-			return sTmp + FilterSettingsMarkers.PARAMETERS_FILEEXT;
-		else
-			return sTmp;
-	}
-
 	static public String getOkapiSharedFolder (String rootFolder) {
 		return rootFolder + File.separatorChar + "shared";
 	}
 
-	static public String getOkapiParametersFolder (String rootFolder) {
+	/*static public String getOkapiParametersFolder (String rootFolder) {
 		return getOkapiSharedFolder(rootFolder) + File.separatorChar + "parameters";
-	}
+	}*/
 
 	/**
 	 * Gets the Okapi Filter Parameters folder for a give type.
 	 * @param p_nType Type of the folder to fetch: 0=System, 1=User, 2=Project
 	 * @return The Filter Parameters folder for the given type (without a trailing separator).
-	 */
+	 *
 	static public String getOkapiParametersFolder (String rootFolder,
 		int p_nType)
 	{
@@ -441,7 +397,7 @@ public class Utils {
 			return getOkapiParametersFolder(rootFolder);
 		}
 	}
-
+*/
 	/**
 	 * Construct a filter settings string.
 	 * @param filterID Filter identifier (cannot be null nor empty).
@@ -458,13 +414,15 @@ public class Utils {
 	}
 
 	/**
-	 * Splits a filter settings string into its different components, including
+	 * Splits a filter settings type 1 string into its different components, including
 	 * the full path of the parameters file.
+	 * A type 1 filter settings string is: filterID@paramatersName
+	 * @param projectParamsFolder The project folder where the parameters files are stored.
 	 * @param filterSettings The setting string to split.
 	 * @return An array of 4 strings: 0=folder, 1=filter id, 2=parameters name
 	 * and 3=full parameters file path (folder + parameters name + extension).
 	 */
-	static public String[] splitFilterSettingsType1 (String rootFolder,
+	static public String[] splitFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings) {
 		String[] aOutput = new String[4];
 		for ( int i=0; i<4; i++ ) aOutput[i] = "";
@@ -473,7 +431,8 @@ public class Utils {
 			return aOutput;
 
 		// Expand the parameters part into full path
-		aOutput[3] = Utils.makeParametersFullPath(rootFolder, filterSettings);
+		aOutput[3] = projectParamsFolder + File.separator + filterSettings
+			+ FilterSettingsMarkers.PARAMETERS_FILEEXT;
 		
 		// Get the directory
 		File F = new File(aOutput[3]);
@@ -496,7 +455,7 @@ public class Utils {
 		}
 
 		// Get the filter identifier
-		aOutput[1] = sTmp;
+		aOutput[1] = Utils.removeExtension(sTmp);
 		
 		return aOutput;
 	}

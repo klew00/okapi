@@ -52,20 +52,20 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 	private DNLFile          m_DNLF = null;
 	
 	public LocalizationDirectives () {
-		Reset();
+		reset();
 	}
 	
 	public void setLog (ILog p_Log) {
 		m_Log = p_Log;
 	}
 
-	public boolean IsInDNLList(IFilterItem p_Item) {
+	public boolean isInDNLList (IFilterItem p_Item) {
 		if ( !m_bUseDNLFile || ( m_DNLF == null )) return false;
 		return m_DNLF.Find(p_Item.getResName() + p_Item.getResType()
 			+ p_Item.getText(FilterItemText.ORIGINAL));
 	}
 
-	public boolean IsLocalizable(boolean p_bPopSingle) {
+	public boolean isLocalizable (boolean p_bPopSingle) {
 		boolean bRes = m_bLocalizeOutside; // Default
 		// If LD not used all is always localizable
 		if ( !m_bUseDirectives ) return true;
@@ -77,18 +77,18 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 				// Pop only the non-group properties
 				if ( !m_stkCtx.peek().m_bGroup )
 				{
-					Pop();
+					pop();
 				}
 			}
 		}
 		return bRes;
 	}
 
-	public boolean IsWithinScope() {
+	public boolean isWithinScope () {
 		return ( m_stkCtx.size() > 0 );
 	}
 
-	public void LoadDNLFile(String p_sBasePath) {
+	public void loadDNLFile (String p_sBasePath) {
 		try
 		{
 			if ( m_DNLF == null ) m_DNLF = new DNLFile();
@@ -100,27 +100,27 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 		}
 	}
 
-	public boolean LocalizeOutside() {
+	public boolean localizeOutside () {
 		// If LD not used all is always localizable
 		if ( !m_bUseDirectives ) return true;
 		return m_bLocalizeOutside;
 	}
 
-	public void Process(String p_sText) {
+	public void process (String p_sText) {
 		// LD not in used.
 		if ( !m_bUseDirectives ) return;
 
 		if ( p_sText.toLowerCase().lastIndexOf("_skip") > -1 )
 		{
-			Push(false, false);
+			push(false, false);
 		}
 		else if ( p_sText.toLowerCase().lastIndexOf("_bskip") > -1 )
 		{
-			Push(true, false);
+			push(true, false);
 		}
 		else if ( p_sText.toLowerCase().lastIndexOf("_eskip") > -1 )
 		{
-			int nRes = GetLastGroup();
+			int nRes = getLastGroup();
 			if ( nRes == -1 )
 			{
 				// _eskip found, but not _bskip
@@ -131,19 +131,19 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 				// _eskip found after _btext
 				m_Log.warning(Res.getString("LD_ESKIPAFTERBTEXT"));
 			}
-			Pop();
+			pop();
 		}
 		else if ( p_sText.toLowerCase().lastIndexOf("_text") > -1 )
 		{
-			Push(false, true);
+			push(false, true);
 		}
 		else if ( p_sText.toLowerCase().lastIndexOf("_btext") > -1 )
 		{
-			Push(true, true);
+			push(true, true);
 		}
 		else if ( p_sText.toLowerCase().lastIndexOf("_etext") > -1 )
 		{
-			int nRes = GetLastGroup();
+			int nRes = getLastGroup();
 			if ( nRes == -1 )
 			{
 				// _etext found, but not _btext
@@ -154,17 +154,17 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 				// _etext found after _bskip
 				m_Log.warning(Res.getString("LD_ETEXTAFTERBSKIP"));
 			}
-			Pop();
+			pop();
 		}
 	}
 
-	public void Reset() {
+	public void reset () {
 		m_stkCtx = new Stack<LDContext>();
-		SetOptions(true, true, true);
+		setOptions(true, true, true);
 		m_DNLF = null;
 	}
 
-	public void SetOptions(boolean p_bUseDirectives,
+	public void setOptions (boolean p_bUseDirectives,
 		boolean p_bLocalizeOutside,
 		boolean p_bUseDNLFile)
 	{
@@ -173,28 +173,26 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 		m_bUseDNLFile = p_bUseDNLFile;
 	}
 
-	public boolean UseDirectives() {
+	public boolean useDirectives () {
 		return m_bUseDirectives;
 	}
 
-	public boolean UseDNLFile() {
+	public boolean useDNLFile () {
 		return m_bUseDNLFile;
 	}
 
-	private void PopSingle ()
-	{
+	private void popSingle () {
 		// Pop only the non-group properties
 		if ( m_stkCtx.size() > 0 )
 		{
 			if ( !m_stkCtx.peek().m_bGroup )
 			{
-				Pop();
+				pop();
 			}
 		}
 	}
 
-	private int GetLastGroup ()
-	{
+	private int getLastGroup () {
 		for ( int i=m_stkCtx.size(); i>-1; i-- )
 		{
 			if ( m_stkCtx.peek().m_bGroup )
@@ -206,17 +204,14 @@ public class LocalizationDirectives implements ILocalizationDirectives {
 		return -1; // No group
 	}
 
-
-	private void Push (boolean p_bGroup,
+	private void push (boolean p_bGroup,
 		boolean p_bExtract)
 	{
-		PopSingle(); // Only one single at the top
+		popSingle(); // Only one single at the top
 		m_stkCtx.push(new LDContext(p_bGroup, p_bExtract));
 	}
 
-
-	private void Pop ()
-	{
+	private void pop () {
 		if ( m_stkCtx.size() > 0 ) m_stkCtx.pop();
 	}
 

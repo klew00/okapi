@@ -45,7 +45,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		m_LD.Reset();
+		m_LD.reset();
 		m_CodeFinder.reset();
 		m_bUseCodeFinder = true;
 		m_bEscapeExtendedChars = true;
@@ -68,8 +68,8 @@ public class Parameters extends BaseParameters {
 	{
 		// Store the parameters in fields
 		FieldsString Tmp = new FieldsString();
-		Tmp.add("useld", m_LD.UseDirectives());
-		Tmp.add("localizeoutside", m_LD.LocalizeOutside());
+		Tmp.add("useld", m_LD.useDirectives());
+		Tmp.add("localizeoutside", m_LD.localizeOutside());
 		Tmp.add("userules", m_bUseCodeFinder);
 		Tmp.add("usekeycondition", m_bUseKeyCondition);
 		Tmp.add("extractonlykeycond", m_bExtractOnlyMatchingKey);
@@ -85,9 +85,9 @@ public class Parameters extends BaseParameters {
 		FieldsString Tmp = new FieldsString(p_sData);
 
 		// Parse the fields
-		boolean bTmp1 = Tmp.get("useld", m_LD.UseDirectives());
-		boolean bTmp2 = Tmp.get("localizeoutside", m_LD.LocalizeOutside());
-		m_LD.SetOptions(bTmp1, bTmp2, true);
+		boolean bTmp1 = Tmp.get("useld", m_LD.useDirectives());
+		boolean bTmp2 = Tmp.get("localizeoutside", m_LD.localizeOutside());
+		m_LD.setOptions(bTmp1, bTmp2, true);
 		m_bUseCodeFinder = Tmp.get("userules", m_bUseCodeFinder);
 		m_bUseKeyCondition = Tmp.get("usekeycondition", m_bUseKeyCondition);
 		m_bExtractOnlyMatchingKey = Tmp.get("extractonlykeycond", m_bExtractOnlyMatchingKey);

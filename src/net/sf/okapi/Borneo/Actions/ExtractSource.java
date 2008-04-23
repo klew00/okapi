@@ -38,13 +38,10 @@ public class ExtractSource extends BaseAction {
 	private DBBase                m_DB;
 	private DBDoc                 m_Doc;
 	private PreparedStatement     m_PStm;
-	private String                rootFolder;
 	
-	public ExtractSource (String rootFolder,
-		FilterAccess p_FA,
+	public ExtractSource (FilterAccess p_FA,
 		DBBase p_DB)
 	{
-		this.rootFolder = rootFolder;
 		m_FA = p_FA;
 		m_DB = p_DB;
 		m_Doc = null;
@@ -128,7 +125,7 @@ public class ExtractSource extends BaseAction {
 			//      return true; // Move on to next file
 			//   }
 			//}
-			m_FA.loadFilterFromFilterSettingsType1(rootFolder, sFSettings);
+			m_FA.loadFilterFromFilterSettingsType1(m_DB.getParametersFolder(), sFSettings);
 			if ( m_FA.getLog().getErrorCount() > 0 ) {
 				bContinue = false;
 				return bContinue;

@@ -52,7 +52,6 @@ public class Controller implements IParametersProvider {
 	private DBOptions                  m_DBOpt;
 	private FilterAccess               m_FA;
 	private Hashtable<String, String>  m_ActionData;
-	private String                     rootFolder;
 	private String                     sharedFolder;
 
 	public Controller (IControllerUI p_UI) {
@@ -63,7 +62,6 @@ public class Controller implements IParametersProvider {
 		String rootFolder)
 		throws Exception
 	{
-		this.rootFolder = rootFolder;
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder); 
 		m_Log = log;
 		m_DBOpt = new DBOptions();
@@ -358,7 +356,7 @@ public class Controller implements IParametersProvider {
 		try {
 			//TODO: Replace ifs by dynamic load, like for the filters
 			if ( p_sActionID.equals(BaseAction.ID_EXTRACTSOURCE) ) {
-				Actn = new ExtractSource(rootFolder, m_FA, m_DB);
+				Actn = new ExtractSource(m_FA, m_DB);
 			}
 			else if ( p_sActionID.equals(BaseAction.ID_UPDATESOURCE) ) {
 				Actn = new UpdateSource(m_FA, m_DB);
@@ -367,13 +365,13 @@ public class Controller implements IParametersProvider {
 				Actn = new UpdateTarget(m_FA, m_DB);
 			}
 			else if ( p_sActionID.equals(BaseAction.ID_GENERATETARGET) ) {
-				Actn = new GenerateTarget(rootFolder, m_FA, m_DB);
+				Actn = new GenerateTarget(m_FA, m_DB);
 			}
 			else if ( p_sActionID.equals(BaseAction.ID_EXPORTPACKAGE) ) {
 				Actn = new ExportPackage(m_FA, m_DB);
 			}
 			else if ( p_sActionID.equals(BaseAction.ID_IMPORTTRANSLATION) ) {
-				Actn = new ImportTranslation(rootFolder, m_FA, m_DB);
+				Actn = new ImportTranslation(m_FA, m_DB);
 			}
 			else {
 				Utils.showError(String.format("Unknown action ID '%s'", p_sActionID), null);
@@ -424,23 +422,30 @@ public class Controller implements IParametersProvider {
 	public IParameters load (String location)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(rootFolder, location);
-		//TODO: catch the case where tthe params are not loaded
+		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 		m_FA.loadFilter(aRes[1], aRes[3]);
 		return m_FA.getFilter().getParameters();
 	}
 
+	public IParameters getDefaults (String location)
+		throws Exception
+	{
+		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
+		m_FA.loadFilter(aRes[1], null);
+		return m_FA.getFilter().getParameters();
+	}
+
+	
 	public void save (String location,
 		IParameters paramObject)
 		throws Exception
 	{
-		// Assumes the passed object is the one that was loaded
-		String[] aRes = Utils.splitFilterSettingsType1(rootFolder, location);
+		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 		paramObject.save(aRes[3]);
 	}
 
 	public String[] splitLocation(String location) {
-		return Utils.splitFilterSettingsType1(rootFolder, location);
+		return Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 	}
 
 }
