@@ -167,7 +167,7 @@ class DocumentsView extends Composite {
 		m_miGoToTrgTable.setText("&Go To Target Table");
 		m_miGoToTrgTable.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_MF.gotoTargetTable(m_MF.m_sCurrentTarget, m_MF.m_DView.getSelectedDIndex(), -1);
+				m_MF.gotoTargetTable(m_MF.currentTarget, m_MF.m_DView.getSelectedDIndex(), -1);
 			}
 		});
 
@@ -203,7 +203,7 @@ class DocumentsView extends Composite {
 		m_miEditTrgLangProp.setText("&Edit Target Language Properties...");
 		m_miEditTrgLangProp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_C.editTargetProperties(m_MF.m_sCurrentTarget);
+				m_C.editTargetProperties(m_MF.currentTarget);
 			}
 		});
 

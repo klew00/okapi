@@ -55,6 +55,8 @@ public class MainForm
 	private MenuItem    m_miImportTMX;
 	private MenuItem    m_miExportTMX;
 	private Text        m_edCount;
+
+	net.sf.okapi.connectors.tinytm.Connector ttConn = null;
 	
 	public MainForm (Shell p_Shell) {
 		m_Shell = p_Shell;
@@ -110,6 +112,14 @@ public class MainForm
 		new MenuItem(mnuTmp, SWT.SEPARATOR);
 
 		m_miImportTMX = new MenuItem(mnuTmp, SWT.PUSH);
+		m_miImportTMX.setText("&Test TinyTM");
+		m_miImportTMX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				testTinyTM();
+			}
+		});
+
+		m_miImportTMX = new MenuItem(mnuTmp, SWT.PUSH);
 		m_miImportTMX.setText("&Import TMX...");
 		m_miImportTMX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -160,7 +170,7 @@ public class MainForm
 	}
 
 	private void updateCommands () {
-		boolean bOn = m_C.isTMOpened();
+		boolean bOn = (m_C.isTMOpened() || (ttConn!=null));
 		m_btQuery.setEnabled(bOn);
 		m_edCount.setEnabled(bOn);
 		m_edQuery.setEnabled(bOn);
@@ -173,10 +183,8 @@ public class MainForm
 		}
 	}
 	
-	public void run ()
-	{
-		try
-		{
+	public void run () {
+		try {
 			Display Disp = m_Shell.getDisplay();
 			while ( !m_Shell.isDisposed() ) {
 				if (!Disp.readAndDispatch())
@@ -194,8 +202,7 @@ public class MainForm
 	}
 	
 	private void createTM () {
-		try
-		{
+		try {
 			String[] aPaths = Dialogs.browseFilenames(m_Shell, "New TM", false, null, null, null);
 			if ( aPaths == null ) return;
 			m_C.login("", "", "");
@@ -210,13 +217,26 @@ public class MainForm
 	}
 	
 	private void openTM () {
-		try
-		{
+		try {
 			String[] aPaths = Dialogs.browseFilenames(m_Shell, "Open TM", false, null, null, null);
 			if ( aPaths == null ) return;
 			String sBasePath = aPaths[0].substring(0, aPaths[0].lastIndexOf(File.separatorChar));
 			m_C.login("", "", "");
 			m_C.open(sBasePath);
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getMessage(), null);
+		}
+		finally {
+			updateCommands();
+		}
+	}
+	
+	private void testTinyTM () {
+		try {
+			ttConn = new net.sf.okapi.connectors.tinytm.Connector(m_Log);
+			ttConn.login("www.tinytm.org", "bbigboss", "ben");
+			ttConn.open("projop");
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getMessage(), null);
@@ -256,7 +276,7 @@ public class MainForm
 			m_lbResults.removeAll();
 
 			int nCount = 0;
-			if ( m_edQuery.getText().equals("*") )
+/*			if ( m_edQuery.getText().equals("*") )
 				nCount = m_C.queryAllEntries();
 			else
 				nCount = m_C.query(m_edQuery.getText());
@@ -270,7 +290,19 @@ public class MainForm
 				M = m_C.getNextMatch();
 				m_lbResults.add(String.format("[%d] S=%s, T=%s", M.getScore(),
 					M.getSourceText(), M.getTargetText()));
+			}*/
+			nCount = ttConn.query(m_edQuery.getText());
+			m_edCount.setText(String.format("=> %d", nCount));
+			IMatch M;
+			if ( nCount == 0 ) {
+				m_lbResults.add("<No match found for '"+m_edQuery.getText()+"'>");
 			}
+			else for ( int i=0; i<nCount; i++ ) {
+				M = ttConn.getNextMatch();
+				m_lbResults.add(String.format("[%d] S=%s, T=%s", M.getScore(),
+					M.getSourceText(), M.getTargetText()));
+			}
+			
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getMessage(), null);

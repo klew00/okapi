@@ -61,11 +61,11 @@ public class Match implements IMatch {
 	}
 
 	public void setKind (int kind) {
-		kind = kind;
+		this.kind = kind;
 	}
 
 	public void setScore (int score) {
-		score = score;
+		this.score = score;
 	}
 
 	public void setSource (IFilterItem fitem) {

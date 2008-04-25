@@ -216,7 +216,7 @@ class TargetView extends Composite {
 	}
 
 	void updateView () {
-		setDocument(m_MF.m_nTrgDocIndex);
+		setDocument(m_MF.trgDocIndex);
 	}
 	
 	void toggleDetails (boolean p_bShow) {
@@ -237,7 +237,7 @@ class TargetView extends Composite {
 				m_edDCurrent.setText("");
 				//m_edStatus.setText("");
 				m_Items.removeAll();
-				m_MF.m_nSrcDocIndex = p_nIndex;
+				m_MF.srcDocIndex = p_nIndex;
 				updateDocumentsButtons();
 //TODO				UpdateCounter();
 //TODO				m_CntxPanel.ClearContextFile();
@@ -251,8 +251,8 @@ class TargetView extends Composite {
 				m_edDCurrent.setText("<All documents>");
 				//m_edStatus.setText("");
 				m_ItemsM.setDB(m_C.getDB()); //TODO: move this to do it only when needed
-				m_ItemsM.updateTable(-2, m_MF.m_sCurrentTarget);
-				m_MF.m_nTrgDocIndex = p_nIndex;
+				m_ItemsM.updateTable(-2, m_MF.currentTarget);
+				m_MF.trgDocIndex = p_nIndex;
 				updateDocumentsButtons();
 //TODO				UpdateCounter();
 //TODO				m_CntxPanel.ClearContextFile();
@@ -274,8 +274,8 @@ class TargetView extends Composite {
 				+ m_Doc.getRelativePath());
 			//TODO m_edStatus.setText(m_Doc.getStatus());
 			m_ItemsM.setDB(m_C.getDB()); //TODO: move this to do it only when needed
-			m_ItemsM.updateTable(nDKey, m_MF.m_sCurrentTarget);
-			m_MF.m_nTrgDocIndex = p_nIndex;
+			m_ItemsM.updateTable(nDKey, m_MF.currentTarget);
+			m_MF.trgDocIndex = p_nIndex;
 			updateDocumentsButtons();
 //TODO			UpdateCounter();
 //TODO			m_CntxPanel.ReadContextFile(GetContextPath(m_Doc.Key), m_Grid.RowCount);*/
@@ -290,52 +290,52 @@ class TargetView extends Composite {
 	
 	private void firstDocument () {
 		if (( m_MF.getDocumentCount() > 0 )
-			&& (( m_MF.m_nTrgDocIndex > 0 )
-				|| (m_MF.m_nTrgDocIndex == -2))) {
+			&& (( m_MF.trgDocIndex > 0 )
+				|| (m_MF.trgDocIndex == -2))) {
 			setDocument(0);
 		}
 	}
 
 	private void previousDocument () {
-		if ( m_MF.m_nTrgDocIndex > 0 ) {
-			setDocument(m_MF.m_nTrgDocIndex-1);
+		if ( m_MF.trgDocIndex > 0 ) {
+			setDocument(m_MF.trgDocIndex-1);
 		}
 	}
 
 	private void nextDocument () {
-		if (( m_MF.m_nTrgDocIndex > -1 )
-			&& ( m_MF.m_nTrgDocIndex < m_MF.getDocumentCount()-1 )) {
-			setDocument(m_MF.m_nTrgDocIndex+1);
+		if (( m_MF.trgDocIndex > -1 )
+			&& ( m_MF.trgDocIndex < m_MF.getDocumentCount()-1 )) {
+			setDocument(m_MF.trgDocIndex+1);
 		}
 	}
 
 	private void lastDocument () {
 		if (( m_MF.getDocumentCount() > 0 )
-			&& ( m_MF.m_nTrgDocIndex < m_MF.getDocumentCount()-1 )) {
+			&& ( m_MF.trgDocIndex < m_MF.getDocumentCount()-1 )) {
 			setDocument(m_MF.getDocumentCount()-1);
 		}
 	}
 
 	private void allDocuments () {
-		if (( m_MF.m_nTrgDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )) {
+		if (( m_MF.trgDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )) {
 			setDocument(-2);
 		}
 	}
 
 	private void updateDocumentsButtons () {
 		m_btDFirst.setEnabled(
-			(( m_MF.getDocumentCount() > 0 ) && (( m_MF.m_nTrgDocIndex > 0 )
-				|| ( m_MF.m_nTrgDocIndex == -2 ))));
+			(( m_MF.getDocumentCount() > 0 ) && (( m_MF.trgDocIndex > 0 )
+				|| ( m_MF.trgDocIndex == -2 ))));
 		m_btDPrev.setEnabled(
-			( m_MF.m_nTrgDocIndex > 0 ));
+			( m_MF.trgDocIndex > 0 ));
 		m_btDNext.setEnabled(
-			(( m_MF.m_nTrgDocIndex > -1 )
-				&& ( m_MF.m_nTrgDocIndex < m_MF.getDocumentCount()-1 )));
+			(( m_MF.trgDocIndex > -1 )
+				&& ( m_MF.trgDocIndex < m_MF.getDocumentCount()-1 )));
 		m_btDLast.setEnabled(
 			(( m_MF.getDocumentCount() > 0 )
-				&& ( m_MF.m_nTrgDocIndex < m_MF.getDocumentCount()-1 )));
+				&& ( m_MF.trgDocIndex < m_MF.getDocumentCount()-1 )));
 		m_btDAll.setEnabled(
-			(( m_MF.m_nTrgDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )));
+			(( m_MF.trgDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )));
 		updateGroupButtons();
 	}
 	

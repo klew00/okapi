@@ -76,23 +76,23 @@ class MainForm implements IControllerUI {
 	FormatManager       m_FM;
 	FilterAccess        m_FA;
 
-	String                   m_sRootDir = null;
-	String                   m_sSharedDir = null;
-	int                      m_nSrcDocIndex = -1;
-	int                      m_nTrgDocIndex = -1;
-	String                   m_sCurrentTarget = null;
-	boolean                  m_bInChangeTarget = false;
+	String                   rootFolder = null;
+	String                   sharedFolder = null;
+	int                      srcDocIndex = -1;
+	int                      trgDocIndex = -1;
+	String                   currentTarget = null;
+	boolean                  targetIsBeingChanged = false;
 	String                   m_sCachedTrg;
 	DBTarget                 m_CachedTrg;
 	
-	private Controller       m_C;
-	private Shell            m_Shell;
+	private Controller       backEnd;
+	private Shell            shell;
 	private ILog             m_Log;
-	private StatusBar        m_stbMain;
+	private StatusBar        stbMain;
 	private int              m_nWait = 0;
 	
 	private ToolBar          m_tbMain;
-	private Combo            m_cbTarget;
+	private Combo            cbTarget;
 	
 	private Menu             m_mnuMain;
 	private MenuItem         m_mihFile;
@@ -148,7 +148,7 @@ class MainForm implements IControllerUI {
 	
 	MainForm (Shell p_Shell) {
 		try {
-			m_Shell = p_Shell;
+			shell = p_Shell;
 			setDirectories();
 			loadResources();
 			createContent();
@@ -163,26 +163,26 @@ class MainForm implements IControllerUI {
 System.err.println("bno- CP="+sCP);
 		// Check if we are running from a jar
 System.err.println("bno- searchInClassPath()");		
-		m_sRootDir = Utils.searchInClassPath(sCP, "Borneo.jar");
-		System.err.println("bno- sRoot(1)="+m_sRootDir);
+		rootFolder = Utils.searchInClassPath(sCP, "Borneo.jar");
+		System.err.println("bno- sRoot(1)="+rootFolder);
 		// If not, try the debug path
-		if ( m_sRootDir == null )
-			m_sRootDir = Utils.searchInClassPath(sCP, "bin");
+		if ( rootFolder == null )
+			rootFolder = Utils.searchInClassPath(sCP, "bin");
 		else // Remove the sub-folder name where the jar is
-			m_sRootDir = Utils.getDirectoryName(m_sRootDir);
+			rootFolder = Utils.getDirectoryName(rootFolder);
 		// Build the absolute path from there
-		m_sRootDir = (new File(m_sRootDir)).getAbsolutePath();
-System.err.println("bno- final sRoot="+m_sRootDir);
-		m_sSharedDir = Utils.getOkapiSharedFolder(m_sRootDir);
+		rootFolder = (new File(rootFolder)).getAbsolutePath();
+System.err.println("bno- final sRoot="+rootFolder);
+		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
 	}
 	
 	private void loadResources () {
 		try {
 			// Create the core engine
-			m_C = new Controller(this);
+			backEnd = new Controller(this);
 
 			// Create manager for shared UI resources
-			m_RM = new ResourceManager(MainForm.class, m_Shell.getDisplay());
+			m_RM = new ResourceManager(MainForm.class, shell.getDisplay());
 			
 			// Load images
 			m_RM.addImage("Borneo");
@@ -250,7 +250,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			s_aTrgStatus[DBBase.TSTATUS_OK] = Res.getString("TSTATUS_OK");
 
 			m_LM = new LanguageManager();
-			m_LM.loadList(m_sSharedDir + File.separator + "Languages.xml");
+			m_LM.loadList(sharedFolder + File.separator + "Languages.xml");
 
 			m_FM = new FormatManager();
 			//TODO m_FM.load(p_sPath);
@@ -262,8 +262,8 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 	void run () {
 		try {
-			Display Disp = m_Shell.getDisplay();
-			while ( !m_Shell.isDisposed() ) {
+			Display Disp = shell.getDisplay();
+			while ( !shell.isDisposed() ) {
 				if (!Disp.readAndDispatch())
 					Disp.sleep();
 			}
@@ -271,7 +271,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		finally {
 			// Dispose of any global resources
 			if ( m_RM != null ) m_RM.dispose();
-			if ( m_C != null ) m_C.close();
+			if ( backEnd != null ) backEnd.close();
 		}
 	}
 
@@ -283,19 +283,19 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		boolean p_bStartLog)
 	{
 		if ( ++m_nWait > 1 ) {
-			m_Shell.getDisplay().update();
+			shell.getDisplay().update();
 			return;
 		}
 
-		if ( p_sText != null ) m_stbMain.setInfo(p_sText);
+		if ( p_sText != null ) stbMain.setInfo(p_sText);
 		if ( p_bStartLog ) m_Log.beginProcess(null); 
-		m_Shell.getDisplay().update();
+		shell.getDisplay().update();
 	}
 
 	public void stopWaiting () {
 		m_nWait--;
-		if ( m_nWait < 1 ) m_stbMain.clearInfo();
-		m_Shell.getDisplay().update();
+		if ( m_nWait < 1 ) stbMain.clearInfo();
+		shell.getDisplay().update();
 		if ( m_Log.inProgress() ) m_Log.endProcess(null); 
 		if ( m_Log.getErrorAndWarningCount() > 0 ) m_Log.show();
 	}
@@ -307,16 +307,16 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	}
 	
 	public void reset () {
-		m_nSrcDocIndex = -1;
-		m_nTrgDocIndex = -1;
-		m_sCurrentTarget = null;
+		srcDocIndex = -1;
+		trgDocIndex = -1;
+		currentTarget = null;
 	}
 	
 	public void updateEverything () {
 		if ( needsClosure(true) ) return;
 
 		// Set the application title
-		m_Shell.setText((m_C.isProjectOpened() ? m_C.getDB().getName() + " - " : "")
+		shell.setText((backEnd.isProjectOpened() ? backEnd.getDB().getName() + " - " : "")
 			+ "Borneo [ALPHA]");
 
 		// Reset the cached data
@@ -329,7 +329,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	void updateCommands ()
 	{
-		boolean bOn = m_C.isProjectOpened();
+		boolean bOn = backEnd.isProjectOpened();
 		
 		m_miCloseProject.setEnabled(bOn);
 
@@ -345,11 +345,11 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miExtractSource.setEnabled(bOn);
 		m_miUpdateSource.setEnabled(bOn);
 		
-		m_miUpdateTarget.setEnabled(bOn && (m_sCurrentTarget != null));
-		m_miImportTranslation.setEnabled(bOn && (m_sCurrentTarget != null));
-		m_miExportPackage.setEnabled(bOn && (m_sCurrentTarget != null));
-		m_miImportPackage.setEnabled(bOn && (m_sCurrentTarget != null));
-		m_miGenerateTarget.setEnabled(bOn && (m_sCurrentTarget != null));
+		m_miUpdateTarget.setEnabled(bOn && (currentTarget != null));
+		m_miImportTranslation.setEnabled(bOn && (currentTarget != null));
+		m_miExportPackage.setEnabled(bOn && (currentTarget != null));
+		m_miImportPackage.setEnabled(bOn && (currentTarget != null));
+		m_miGenerateTarget.setEnabled(bOn && (currentTarget != null));
 
 		m_miToggleLog.setSelection(m_splMain.getMaximizedControl()==null);
 		//TODO do the update when the menu drop down
@@ -425,23 +425,23 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	private void createContent ()
 		throws Exception
 	{
-		m_Shell.setImage(m_RM.getImage("Borneo"));
+		shell.setImage(m_RM.getImage("Borneo"));
 		GridLayout layTmp1 = new GridLayout();
 		layTmp1.marginHeight = 0;
 		layTmp1.marginWidth = 0;
 		//layTmp1.horizontalSpacing = 0;
 		layTmp1.verticalSpacing = 0;
-		m_Shell.setLayout(layTmp1);
-		m_Shell.setSize(740, 510);
-		m_Shell.setMinimumSize(696, 480);
+		shell.setLayout(layTmp1);
+		shell.setSize(740, 510);
+		shell.setMinimumSize(696, 480);
 		
 		//=== Menus
 		
-	    m_mnuMain = new Menu(m_Shell, SWT.BAR);
+	    m_mnuMain = new Menu(shell, SWT.BAR);
 		
 		m_mihFile = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihFile.setText("&File");
-		Menu mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		Menu mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihFile.setMenu(mnuTmp);
 		m_miNewProject = new MenuItem(mnuTmp, SWT.PUSH);
 		m_miNewProject.setText("&New Project...\tCtrl+N");
@@ -450,7 +450,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miNewProject.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.createProject();
+				backEnd.createProject();
 			}
 		});
 		m_miOpenProject = new MenuItem(mnuTmp, SWT.PUSH);
@@ -460,7 +460,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miOpenProject.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.openProject(null);
+				backEnd.openProject(null);
 			}
 		});
 		m_miCloseProject = new MenuItem(mnuTmp, SWT.PUSH);
@@ -469,7 +469,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miCloseProject.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.closeProject();
+				backEnd.closeProject();
 			}
 		});
 		
@@ -480,7 +480,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miSelectServer.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.selectProjectServer();
+				backEnd.selectProjectServer();
 			}
 		});
 
@@ -491,13 +491,13 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miExit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( needsClosure(true) ) return;
-            	m_Shell.close();
+            	shell.close();
             }
 		});
 		
 		m_mihView = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihView.setText("&View");
-		mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihView.setMenu(mnuTmp);
 
 		m_miViewDocuments = new MenuItem(mnuTmp, SWT.RADIO);
@@ -572,7 +572,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 		m_mihDocuments = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihDocuments.setText("&Documents");
-		mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihDocuments.setMenu(mnuTmp);
 		
 		m_miAddDocuments = new MenuItem(mnuTmp, SWT.PUSH);
@@ -604,7 +604,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 		m_mihSource = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihSource.setText("&Source");
-		mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihSource.setMenu(mnuTmp);
 		
 		m_miExtractSource = new MenuItem(mnuTmp, SWT.PUSH);
@@ -624,7 +624,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 		m_mihTarget = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihTarget.setText("&Target");
-		mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihTarget.setMenu(mnuTmp);
 		
 		m_miUpdateTarget = new MenuItem(mnuTmp, SWT.PUSH);
@@ -656,7 +656,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_miImportPackage.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.importPackage(null);
+				backEnd.importPackage(null);
 			}
 		});
 
@@ -672,7 +672,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 		m_mihHelp = new MenuItem(m_mnuMain, SWT.CASCADE);
 		m_mihHelp.setText("&Help");
-		mnuTmp = new Menu(m_Shell, SWT.DROP_DOWN);
+		mnuTmp = new Menu(shell, SWT.DROP_DOWN);
 		m_mihHelp.setMenu(mnuTmp);
 
 		MenuItem miHelpTopic = new MenuItem(mnuTmp, SWT.PUSH);
@@ -734,11 +734,11 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			}
 		});
 
-		m_Shell.setMenuBar(m_mnuMain);
+		shell.setMenuBar(m_mnuMain);
 		
 		//=== Toolbar
 		
-		m_tbMain = new ToolBar(m_Shell, SWT.RIGHT);
+		m_tbMain = new ToolBar(shell, SWT.RIGHT);
 		
 		ToolItem tiTmp = new ToolItem(m_tbMain, SWT.PUSH);
 		tiTmp.setImage(m_RM.getImage("NewProject"));
@@ -746,7 +746,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		tiTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.createProject();
+				backEnd.createProject();
 			}
 		});
 
@@ -756,7 +756,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		tiTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( needsClosure(true) ) return;
-				m_C.openProject(null);
+				backEnd.openProject(null);
 			}
 		});
 		
@@ -801,23 +801,23 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	    tiTmp.setControl(stLang);
 
 	    tiTmp = new ToolItem(m_tbMain, SWT.SEPARATOR);
-		m_cbTarget = new Combo(m_tbMain, SWT.READ_ONLY);
-		m_cbTarget.setVisibleItemCount(25);
-		m_cbTarget.setBackground(m_RM.getColor("TrgDarkBG"));
-	    m_cbTarget.pack();
-	    m_cbTarget.addSelectionListener(new SelectionAdapter() {
+		cbTarget = new Combo(m_tbMain, SWT.READ_ONLY);
+		cbTarget.setVisibleItemCount(25);
+		cbTarget.setBackground(m_RM.getColor("TrgDarkBG"));
+	    cbTarget.pack();
+	    cbTarget.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				changeTarget(m_cbTarget.getItem(m_cbTarget.getSelectionIndex()), false);
+				changeTarget(cbTarget.getItem(cbTarget.getSelectionIndex()), false);
 			}
 		});
 		tiTmp.setWidth(100);
-		tiTmp.setControl(m_cbTarget);
+		tiTmp.setControl(cbTarget);
 		
 		m_tbMain.pack();
 		
 		//=== View bar
 		
-		Composite Comp = new Composite(m_Shell, SWT.NONE);
+		Composite Comp = new Composite(shell, SWT.NONE);
 		GridLayout layTmp2 = new GridLayout();
 		layTmp2.numColumns = 5;
 		layTmp2.marginHeight = 0;
@@ -894,7 +894,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 		//=== Main Panel
 		
-		m_splMain = new SashForm(m_Shell, SWT.VERTICAL);
+		m_splMain = new SashForm(shell, SWT.VERTICAL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		m_splMain.setLayoutData(gdTmp);
 
@@ -903,22 +903,22 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		m_pnlMain.setLayout(m_layMainPanel);
 		
 		m_Log = new LogPanel(m_splMain, SWT.NONE, this);
-		m_C.initialize(m_Log, m_sRootDir);
+		backEnd.initialize(m_Log, rootFolder);
 		m_FA = new FilterAccess(m_Log);
-		m_FA.loadList(m_sSharedDir+File.separator+"Filters.xml");
+		m_FA.loadList(sharedFolder+File.separator+"Filters.xml");
 
 		m_splMain.SASH_WIDTH = 4;
 		m_splMain.setWeights(new int[]{80,20});
 
-		m_DView = new DocumentsView(m_pnlMain, SWT.NONE, this, m_C);
-		m_SView = new SourceView(m_pnlMain, SWT.NONE, this, m_C);
-		m_TView = new TargetView(m_pnlMain, SWT.NONE, this, m_C);
-		m_PView = new SettingsView(m_pnlMain, SWT.NONE, this, m_C);
+		m_DView = new DocumentsView(m_pnlMain, SWT.NONE, this, backEnd);
+		m_SView = new SourceView(m_pnlMain, SWT.NONE, this, backEnd);
+		m_TView = new TargetView(m_pnlMain, SWT.NONE, this, backEnd);
+		m_PView = new SettingsView(m_pnlMain, SWT.NONE, this, backEnd);
 		
 		// Status bar
-		m_stbMain = new StatusBar(m_Shell, SWT.NONE);
+		stbMain = new StatusBar(shell, SWT.NONE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		m_stbMain.setLayoutData(gdTmp);
+		stbMain.setLayoutData(gdTmp);
 
 		// Set the default view
 		toggleLog(false);
@@ -946,7 +946,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		try {
 			if (( m_CachedTrg == null ) || !p_sLangCode.equals(m_sCachedTrg) ) {
 				// Load the target data
-				m_CachedTrg = m_C.getDB().getTargetData(p_sLangCode);
+				m_CachedTrg = backEnd.getDB().getTargetData(p_sLangCode);
 				m_sCachedTrg = p_sLangCode;
 			}
 		}
@@ -964,7 +964,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		// Check if settings are being edited
 		if ( m_PView.inEditMode() ) {
 			if ( p_bShowMessage ) {
-				MessageBox Dlg = new MessageBox(m_Shell, SWT.ICON_WARNING);
+				MessageBox Dlg = new MessageBox(shell, SWT.ICON_WARNING);
 				Dlg.setMessage(Res.getString("STILLEDITING"));
 				Dlg.open();
 			}
@@ -983,15 +983,15 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			if ( aDKeys == null ) return;
 
 			// Ask confirmation
-			MessageBox Dlg = new MessageBox(m_Shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			MessageBox Dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 			Dlg.setMessage(Res.getString("ASK_REMOVEDOC"));
 			Dlg.setText("Borneo");
 			if ( Dlg.open() != SWT.YES ) return;
 			
 			startWaiting("REMOVING_DOCUMENTS", false);
-			m_C.getDB().startBatchMode();
+			backEnd.getDB().startBatchMode();
 			for ( int i=0; i<aDKeys.length; i++ ) {
-				m_C.getDB().removeDocument(aDKeys[i]);
+				backEnd.getDB().removeDocument(aDKeys[i]);
 			}
 			bRes = true;
 		}
@@ -1001,7 +1001,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		}
 		finally {
 			try {
-				m_C.getDB().stopBatchMode(bRes);
+				backEnd.getDB().stopBatchMode(bRes);
 			}
 			catch ( Exception E ) {
 				Utils.showError(E.getLocalizedMessage(), null);
@@ -1023,8 +1023,8 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			if ( needsClosure(true) ) return;
 			// Get a list of paths if needed
 			if ( p_aPaths == null ) {
-				p_aPaths = Dialogs.browseFilenames(m_Shell, "Add Documents",
-					true, m_C.getDB().getSourceRoot(), null, null);
+				p_aPaths = Dialogs.browseFilenames(shell, "Add Documents",
+					true, backEnd.getDB().getSourceRoot(), null, null);
 			}
 			if ( p_aPaths == null ) return;
 			startWaiting("ADDING_DOCUMENTS", false);
@@ -1065,7 +1065,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			}
 			else {
 				String[] aRes = m_FM.guessFormat(sPath);
-				if ( m_C.getDB().addDocument(sPath, 0, aRes[0], aRes[1]) != -1 ) n++;
+				if ( backEnd.getDB().addDocument(sPath, 0, aRes[0], aRes[1]) != -1 ) n++;
 			}
 		}
 		return n;
@@ -1073,14 +1073,14 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	void updateTargetLists () {
 		try {
-			m_cbTarget.removeAll();
+			cbTarget.removeAll();
 			int nPrev = m_PView.getTargetListSelectionIndex();
 			m_PView.getTargetList().removeAll();
 
-			if ( m_C.isProjectOpened() ) {
-				Vector<String> aLangs = m_C.getDB().fetchLanguageList();
+			if ( backEnd.isProjectOpened() ) {
+				Vector<String> aLangs = backEnd.getDB().fetchLanguageList();
 				for ( int i=0; i<aLangs.size(); i++ ) {
-					m_cbTarget.add(aLangs.get(i));
+					cbTarget.add(aLangs.get(i));
 					m_PView.getTargetList().add(String.format("%s - %s",
 						aLangs.get(i), m_LM.GetNameFromCode(aLangs.get(i))));
 				}
@@ -1088,7 +1088,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 					nPrev = m_PView.getTargetList().getItemCount()-1;
 				if ( nPrev > -1 )
 					m_PView.getTargetList().select(nPrev);
-				changeTarget(m_sCurrentTarget, true);
+				changeTarget(currentTarget, true);
 			}
 			else {
 //TODO				m_btTarget.Text = Properties.Resources.TARGETBTN_ADD;
@@ -1107,22 +1107,22 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	{
 		try {
 			if ( needsClosure(true) ) return;
-			if (( m_sCurrentTarget == p_sNewTarget ) && !p_bForce ) return;
-			m_sCurrentTarget = p_sNewTarget;
-			if ( m_sCurrentTarget == null ) m_sCurrentTarget = ""; 
-			int n = m_cbTarget.indexOf(m_sCurrentTarget);
-			if ( n > -1 ) m_cbTarget.select(n);
+			if (( currentTarget == p_sNewTarget ) && !p_bForce ) return;
+			currentTarget = p_sNewTarget;
+			if ( currentTarget == null ) currentTarget = ""; 
+			int n = cbTarget.indexOf(currentTarget);
+			if ( n > -1 ) cbTarget.select(n);
 			
-			if ( m_cbTarget.getSelectionIndex() == -1 ) {
+			if ( cbTarget.getSelectionIndex() == -1 ) {
 				// Try to fall back to the first available target
-				if ( m_cbTarget.getItemCount() > 0 ) {
-					m_cbTarget.select(0);
-					m_sCurrentTarget = m_cbTarget.getItem(m_cbTarget.getSelectionIndex());
+				if ( cbTarget.getItemCount() > 0 ) {
+					cbTarget.select(0);
+					currentTarget = cbTarget.getItem(cbTarget.getSelectionIndex());
 				}
-				else m_sCurrentTarget = null;
+				else currentTarget = null;
 			}
 
-			if (( m_cbTarget.getItemCount() == 0 ) || ( m_sCurrentTarget == null )) {
+			if (( cbTarget.getItemCount() == 0 ) || ( currentTarget == null )) {
 //TODO				m_btTarget.Text = Properties.Resources.TARGETBTN_ADD;
 //TODO				m_btTarget.ToolTipText = Properties.Resources.TARGETBTN_ADDTIP;
 			}
@@ -1143,13 +1143,13 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	public boolean editTargetProperties (DBTarget p_Data,
 		String p_sLang) {
 		try {
-			TargetLangPropertiesForm Dlg = new TargetLangPropertiesForm(m_Shell);
+			TargetLangPropertiesForm Dlg = new TargetLangPropertiesForm(shell);
 			
 			int n = m_DView.getSelectedDKey();
 			DBDoc Doc = null;
-			if ( n > -1 ) Doc = m_C.getDB().getSourceDocumentData(n, null);
+			if ( n > -1 ) Doc = backEnd.getDB().getSourceDocumentData(n, null);
 
-			Dlg.setData(m_C.getDB().getSourceRoot(),
+			Dlg.setData(backEnd.getDB().getSourceRoot(),
 				((Doc!=null) ? Doc.getFullPath() : null), p_Data, p_sLang);
 			return Dlg.showDialog(); 
 		}
@@ -1162,13 +1162,13 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	public String selectProject (int p_nDBType) {
 		try {
 			if ( p_nDBType == 0 ) {
-				String[] aPaths = Dialogs.browseFilenames(m_Shell, "Open Project", false,
+				String[] aPaths = Dialogs.browseFilenames(shell, "Open Project", false,
 					null, "Borneo Projects (*.index.db)", "*.index.db");
 				if ( aPaths == null ) return null;
 				else return aPaths[0];
 			}
 			else {
-				SelectProjectForm Dlg = new SelectProjectForm(m_Shell);
+				SelectProjectForm Dlg = new SelectProjectForm(shell);
 				return Dlg.showDialog();
 			}
 		}
@@ -1180,8 +1180,8 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 
 	public String[] selectNewTargetLanguages () {
 		try {
-			AddLanguagesForm Dlg = new AddLanguagesForm(m_Shell, m_LM,
-				m_C.getDB().fetchLanguageList());
+			AddLanguagesForm Dlg = new AddLanguagesForm(shell, m_LM,
+				backEnd.getDB().fetchLanguageList());
 			return Dlg.showDialog();
 		}
 		catch ( Exception E ) {
@@ -1196,12 +1196,12 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			String sLang = m_PView.getTargetListSelection();
 			if ( sLang == null ) return;
 			// Ask confirmation
-			MessageBox Dlg = new MessageBox(m_Shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			MessageBox Dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 			Dlg.setMessage(String.format(Res.getString("ASK_REMOVETARGET"), sLang));
 			Dlg.setText("Borneo");
 			if ( Dlg.open() != SWT.YES ) return;
 			// Remove the language
-			m_C.removeTargetLanguage(sLang);
+			backEnd.removeTargetLanguage(sLang);
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getLocalizedMessage(), null);
@@ -1210,7 +1210,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	public boolean selectServerType (DBOptions p_Data) {
 		try {
-			SelectServerForm Dlg = new SelectServerForm(m_Shell);
+			SelectServerForm Dlg = new SelectServerForm(shell);
 			Dlg.setData(p_Data);
 			return Dlg.showDialog();
 		}
@@ -1222,7 +1222,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	public String[] selectNewProjectInfo (int p_nDBType) {
 		try {
-			NewProjectForm Dlg = new NewProjectForm(m_Shell, p_nDBType);
+			NewProjectForm Dlg = new NewProjectForm(shell, p_nDBType);
 			return Dlg.showDialog();
 		}
 		catch ( Exception E ) {
@@ -1234,7 +1234,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	void saveSettings () {
 		try {
 			startWaiting("UPDATING_PROJECT", false);
-			m_C.getDB().saveSettings();
+			backEnd.getDB().saveSettings();
 			m_PView.updateView();
 		}
 		catch ( Exception E ) {
@@ -1247,7 +1247,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	private void showAbout () {
 		try {
-			AboutForm Dlg = new AboutForm(m_Shell,
+			AboutForm Dlg = new AboutForm(shell,
 				"Borneo - Okapi Localization Manager",
 				"Version 0.1.0");
 			Dlg.showDialog();
@@ -1259,8 +1259,8 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	public String selectNewSourceRoot () {
 		try {
-			EditSourceRootForm Dlg = new EditSourceRootForm(m_Shell,
-				m_C.getDB().getSourceRoot());
+			EditSourceRootForm Dlg = new EditSourceRootForm(shell,
+				backEnd.getDB().getSourceRoot());
 			return Dlg.showDialog();
 		}
 		catch ( Exception E ) {
@@ -1284,7 +1284,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			String sFileSet = TI.getText(DocumentsModel.COL_FILESET);
 
 			// Call the dialog
-			SourceDocPropertiesForm Dlg = new SourceDocPropertiesForm(m_Shell, m_C);
+			SourceDocPropertiesForm Dlg = new SourceDocPropertiesForm(shell, backEnd);
 			Dlg.setData(sFSettings, sEncoding, sFileSet, m_FA);
 			String[] aData = Dlg.showDialog();
 			if ( aData == null ) return;
@@ -1320,15 +1320,15 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			switch ( m_nView ) {
 				case VIEW_DOCUMENTS:
 				case VIEW_SETTINGS:
-					m_C.launchAction(p_sActionID, -3, m_sCurrentTarget, m_sCurrentTarget);
+					backEnd.launchAction(p_sActionID, -3, currentTarget, currentTarget);
 					break;
 				case VIEW_SOURCE:
-					m_C.launchAction(p_sActionID, getDKeyFromListIndex(m_nSrcDocIndex),
-						m_sCurrentTarget, m_sCurrentTarget);
+					backEnd.launchAction(p_sActionID, getDKeyFromListIndex(srcDocIndex),
+						currentTarget, currentTarget);
 					break;
 				case VIEW_TARGET:
-					m_C.launchAction(p_sActionID, getDKeyFromListIndex(m_nTrgDocIndex),
-						m_sCurrentTarget, m_sCurrentTarget);
+					backEnd.launchAction(p_sActionID, getDKeyFromListIndex(trgDocIndex),
+						currentTarget, currentTarget);
 					break;
 			}
 		}
@@ -1343,7 +1343,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		String p_sCurrentTarget)
 	{
 		try {
-			ExecuteActionForm Dlg = new ExecuteActionForm(m_Shell, m_LM, m_DView, m_PView);
+			ExecuteActionForm Dlg = new ExecuteActionForm(shell, m_LM, m_DView, m_PView);
 			int nCurDKey = p_nDocScope;
 			if ( p_nDocScope < 0 ) nCurDKey = m_DView.getSelectedDKey();
 			DBDoc Doc = m_DView.getSourceDocumentData(nCurDKey, null);
@@ -1389,7 +1389,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 			setView(MainForm.VIEW_TARGET);
 			if ( p_sTarget != null )
 				changeTarget(p_sTarget, false);
-			if (( p_nDIndex > -1 ) && ( p_nDIndex != m_nTrgDocIndex ))
+			if (( p_nDIndex > -1 ) && ( p_nDIndex != trgDocIndex ))
 				m_TView.setDocument(p_nDIndex);
 			if ( p_nSKey > -1 )
 				m_TView.gotoItem(p_nSKey);
@@ -1405,7 +1405,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 		try {
 			if ( needsClosure(true) ) return;
 			setView(MainForm.VIEW_SOURCE);
-			if (( p_nDIndex > -1 ) && ( p_nDIndex != m_nSrcDocIndex ))
+			if (( p_nDIndex > -1 ) && ( p_nDIndex != srcDocIndex ))
 				m_SView.setDocument(p_nDIndex);
 			if ( p_nSKey > -1 )
 				m_SView.gotoItem(p_nSKey);
@@ -1417,7 +1417,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	
 	public String selectImportPackage () {
 		try {
-			String[] aPaths = Dialogs.browseFilenames(m_Shell, "Import Translation Package", false,
+			String[] aPaths = Dialogs.browseFilenames(shell, "Import Translation Package", false,
 				null, "Borneo Manifests (Manifest.xml)", "Manifest.xml");
 			if ( aPaths == null ) return null;
 			else return aPaths[0];
@@ -1431,7 +1431,7 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	public boolean editImportPackageOptions (Manifest p_Manifest) {
 		try {
 			ImportPackageForm Dlg = new ImportPackageForm();
-			return Dlg.edit(p_Manifest, (Object)m_Shell);
+			return Dlg.edit(p_Manifest, (Object)shell);
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getLocalizedMessage(), null);
@@ -1445,26 +1445,26 @@ System.err.println("bno- final sRoot="+m_sRootDir);
 	public void openProject (String p_sName) {
 		try {
 			// Do we need to select a server?
-			if ( m_C.getDB() == null ) {
+			if ( backEnd.getDB() == null ) {
 				
 			}
 			// Get the project name
 			String sName = p_sName;
 			// If there is no project parameter, select one
 			if ( sName == null ) {
-				if ( m_C.getDBOptions().getDBType() == 0 ) {
-					String[] aPaths = Dialogs.browseFilenames(m_Shell, "Open Project", false, null);
+				if ( backEnd.getDBOptions().getDBType() == 0 ) {
+					String[] aPaths = Dialogs.browseFilenames(shell, "Open Project", false, null);
 					if ( aPaths == null ) return;
 					else sName = aPaths[0];
 				}
 				else {
-					SelectProjectForm Dlg = new SelectProjectForm(m_Shell);
+					SelectProjectForm Dlg = new SelectProjectForm(shell);
 					sName = Dlg.showDialog();
 				}
 				if ( sName == null ) return;
 			}
 			startWaiting("OPENING_PROJECT", null);
-			Worker W = new Worker(m_C, 0);
+			Worker W = new Worker(backEnd, 0);
 			W.setParam1(sName);
 			W.start();
 		}

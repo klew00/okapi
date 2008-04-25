@@ -32,7 +32,6 @@ public class Main {
 		Display dispMain = null;
 		try
 		{
-			Class.forName("org.hsqldb.jdbcDriver");
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
 			MainForm MF = new MainForm(shlMain);

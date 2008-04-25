@@ -26,29 +26,30 @@ public interface ITMQuery {
 
 	/**
 	 * Logs on to the server.
-	 * @param p_sConnection The connection data.
-	 * @param p_sUsername The user-name.
-	 * @param p_sPassword The password.
+	 * @param connection The connection data. This value is different for
+	 * each TM system. See the documentation of the system for details.
+	 * @param username The username.
+	 * @param password The password.
 	 */
-	public void login (String p_sConnection,
-		String p_sUsername,
-		String p_sPassword);
+	public void login (String connection,
+		String username,
+		String password);
 	
 	public void logout ();
 	
 	/**
 	 * Opens a give resource.
-	 * @param p_sName
+	 * @param name Name of the TM to open.
 	 */
-	public void open (String p_sName);
+	public void open (String name);
 	
 	public void close ();
 	
 	public boolean isTMOpened ();
 	
-	public int query (String p_sText);
+	public int query (String text);
 	
-	public int query (IFilterItem p_Text);
+	public int query (IFilterItem filterItem);
 	
 	public int getCount ();
 	
@@ -56,7 +57,7 @@ public interface ITMQuery {
 	
 	public int getMaximum ();
 	
-	public void setMaximum (int p_nValue);
+	public void setMaximum (int value);
 	
 	/**
 	 * Gets the next match in the match list.

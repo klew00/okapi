@@ -103,6 +103,7 @@ public class Connector implements ITMQuery {
 	{
 		try {
 			logout();
+			Class.forName("org.hsqldb.jdbcDriver");
 			m_TM = new HSQLDbBackend(m_Log);
 			m_TM.login();
 		}

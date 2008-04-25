@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.Text;
 
 class SourceView extends Composite {
 
-	private MainForm    m_MF;
-	private Controller  m_C;
+	private MainForm    mf;
+	private Controller  backEnd;
 	private DBDoc       m_Doc = null;
 	private Text        m_edDCurrent;
 	private Text        m_edGCurrent;
@@ -67,8 +67,8 @@ class SourceView extends Composite {
 		Controller p_C)
 	{
 		super(p_Parent, p_nFlags);
-		m_MF = p_MF;
-		m_C = p_C;
+		mf = p_MF;
+		backEnd = p_C;
 		createContent();
 	}
 	
@@ -90,7 +90,7 @@ class SourceView extends Composite {
 		int nWidth = 74;
 		m_btDFirst = new Button(this, SWT.PUSH);
 		m_btDFirst.setText("First");
-		m_btDFirst.setImage(m_MF.m_RM.getImage("First"));
+		m_btDFirst.setImage(mf.m_RM.getImage("First"));
 		GridData gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btDFirst.setLayoutData(gdTmp);
@@ -102,7 +102,7 @@ class SourceView extends Composite {
 		
 		m_btDPrev = new Button(this, SWT.PUSH);
 		m_btDPrev.setText("Previous");
-		m_btDPrev.setImage(m_MF.m_RM.getImage("Prev"));
+		m_btDPrev.setImage(mf.m_RM.getImage("Prev"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btDPrev.setLayoutData(gdTmp);
@@ -114,7 +114,7 @@ class SourceView extends Composite {
 
 		m_btDNext = new Button(this, SWT.PUSH);
 		m_btDNext.setText("Next");
-		m_btDNext.setImage(m_MF.m_RM.getImage("Next"));
+		m_btDNext.setImage(mf.m_RM.getImage("Next"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btDNext.setLayoutData(gdTmp);
@@ -126,7 +126,7 @@ class SourceView extends Composite {
 
 		m_btDLast = new Button(this, SWT.PUSH);
 		m_btDLast.setText("Last");
-		m_btDLast.setImage(m_MF.m_RM.getImage("Last"));
+		m_btDLast.setImage(mf.m_RM.getImage("Last"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btDLast.setLayoutData(gdTmp);
@@ -138,7 +138,7 @@ class SourceView extends Composite {
 
 		m_btDAll = new Button(this, SWT.PUSH);
 		m_btDAll.setText("All");
-		m_btDAll.setImage(m_MF.m_RM.getImage("All"));
+		m_btDAll.setImage(mf.m_RM.getImage("All"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btDAll.setLayoutData(gdTmp);
@@ -159,35 +159,35 @@ class SourceView extends Composite {
 		
 		m_btGFirst = new Button(this, SWT.PUSH);
 		m_btGFirst.setText("First");
-		m_btGFirst.setImage(m_MF.m_RM.getImage("First"));
+		m_btGFirst.setImage(mf.m_RM.getImage("First"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btGFirst.setLayoutData(gdTmp);
 		
 		m_btGPrev = new Button(this, SWT.PUSH);
 		m_btGPrev.setText("Previous");
-		m_btGPrev.setImage(m_MF.m_RM.getImage("Prev"));
+		m_btGPrev.setImage(mf.m_RM.getImage("Prev"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btGPrev.setLayoutData(gdTmp);
 
 		m_btGNext = new Button(this, SWT.PUSH);
 		m_btGNext.setText("Next");
-		m_btGNext.setImage(m_MF.m_RM.getImage("Next"));
+		m_btGNext.setImage(mf.m_RM.getImage("Next"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btGNext.setLayoutData(gdTmp);
 
 		m_btGLast = new Button(this, SWT.PUSH);
 		m_btGLast.setText("Last");
-		m_btGLast.setImage(m_MF.m_RM.getImage("Last"));
+		m_btGLast.setImage(mf.m_RM.getImage("Last"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btGLast.setLayoutData(gdTmp);
 
 		m_btGAll = new Button(this, SWT.PUSH);
 		m_btGAll.setText("All");
-		m_btGAll.setImage(m_MF.m_RM.getImage("All"));
+		m_btGAll.setImage(mf.m_RM.getImage("All"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		m_btGAll.setLayoutData(gdTmp);
@@ -229,7 +229,7 @@ class SourceView extends Composite {
 		m_Items.setHeaderVisible(true);
 		m_Items.setLinesVisible(true);
 		m_ItemsM = new SourceModel();
-		m_ItemsM.linkTable(m_Items, m_MF.m_RM);
+		m_ItemsM.linkTable(m_Items, mf.m_RM);
 		
 		m_Details = new SourceDetailsPanel(m_splMain, SWT.NONE);
 		
@@ -238,7 +238,7 @@ class SourceView extends Composite {
 	}
 	
 	void updateView () {
-		setDocument(m_MF.m_nSrcDocIndex);
+		setDocument(mf.srcDocIndex);
 	}
 	
 	void toggleDetails (boolean p_bShow) {
@@ -264,7 +264,7 @@ class SourceView extends Composite {
 				m_edDCurrent.setText("");
 				m_edStatus.setText("");
 				m_Items.removeAll();
-				m_MF.m_nSrcDocIndex = p_nIndex;
+				mf.srcDocIndex = p_nIndex;
 				updateDocumentsButtons();
 //TODO				UpdateCounter();
 //TODO				m_CntxPanel.ClearContextFile();
@@ -277,9 +277,9 @@ class SourceView extends Composite {
 				m_Doc = null;
 				m_edDCurrent.setText("<All documents>");
 				m_edStatus.setText("");
-				m_ItemsM.setDB(m_C.getDB()); //TODO: move this to do it only when needed
+				m_ItemsM.setDB(backEnd.getDB()); //TODO: move this to do it only when needed
 				m_ItemsM.updateTable(-2, m_chkPending.getSelection());
-				m_MF.m_nSrcDocIndex = p_nIndex;
+				mf.srcDocIndex = p_nIndex;
 				updateDocumentsButtons();
 //TODO				UpdateCounter();
 //TODO				m_CntxPanel.ClearContextFile();
@@ -287,23 +287,23 @@ class SourceView extends Composite {
 			}
 
 			// Otherwise: a specific file
-			int nDKey = m_MF.getDKeyFromListIndex(p_nIndex);
-			m_Doc = m_MF.m_DView.getSourceDocumentData(nDKey, null);
+			int nDKey = mf.getDKeyFromListIndex(p_nIndex);
+			m_Doc = mf.m_DView.getSourceDocumentData(nDKey, null);
 
 			// Re-check the m_Doc object to avoid issue with m_Doc being nullified when
 			// calling Cancel when extracting on re-entering calls
 			if ( m_Doc == null ) {
 				// nDKey should be still OK
-				m_Doc = m_MF.m_DView.getSourceDocumentData(nDKey, null);
+				m_Doc = mf.m_DView.getSourceDocumentData(nDKey, null);
 			}
 
-			m_edDCurrent.setText(String.format("(%d/%d) ", p_nIndex+1, m_MF.getDocumentCount())
+			m_edDCurrent.setText(String.format("(%d/%d) ", p_nIndex+1, mf.getDocumentCount())
 				+ m_Doc.getRelativePath());
 			m_edStatus.setText(m_Doc.getStatus());
 
-			m_ItemsM.setDB(m_C.getDB()); //TODO: move this to do it only when needed
+			m_ItemsM.setDB(backEnd.getDB()); //TODO: move this to do it only when needed
 			m_ItemsM.updateTable(nDKey, m_chkPending.getSelection());
-			m_MF.m_nSrcDocIndex = p_nIndex;
+			mf.srcDocIndex = p_nIndex;
 			updateDocumentsButtons();
 //TODO			UpdateCounter();
 //TODO			m_CntxPanel.ReadContextFile(GetContextPath(m_Doc.Key), m_Grid.RowCount);*/
@@ -317,54 +317,54 @@ class SourceView extends Composite {
 	}
 
 	private void firstDocument () {
-		if (( m_MF.getDocumentCount() > 0 )
-			&& (( m_MF.m_nSrcDocIndex > 0 )
-				|| (m_MF.m_nSrcDocIndex == -2))) {
+		if (( mf.getDocumentCount() > 0 )
+			&& (( mf.srcDocIndex > 0 )
+				|| (mf.srcDocIndex == -2))) {
 			setDocument(0);
 		}
 	}
 
 	private void previousDocument () {
-		if ( m_MF.m_nSrcDocIndex > 0 ) {
-			setDocument(m_MF.m_nSrcDocIndex-1);
+		if ( mf.srcDocIndex > 0 ) {
+			setDocument(mf.srcDocIndex-1);
 		}
 	}
 
 	private void nextDocument () {
-		if (( m_MF.m_nSrcDocIndex > -1 )
-			&& ( m_MF.m_nSrcDocIndex < m_MF.getDocumentCount()-1 )) {
-			setDocument(m_MF.m_nSrcDocIndex+1);
+		if (( mf.srcDocIndex > -1 )
+			&& ( mf.srcDocIndex < mf.getDocumentCount()-1 )) {
+			setDocument(mf.srcDocIndex+1);
 		}
 	}
 
 	private void lastDocument () {
-		if (( m_MF.getDocumentCount() > 0 )
-			&& ( m_MF.m_nSrcDocIndex < m_MF.getDocumentCount()-1 )) {
-			setDocument(m_MF.getDocumentCount()-1);
+		if (( mf.getDocumentCount() > 0 )
+			&& ( mf.srcDocIndex < mf.getDocumentCount()-1 )) {
+			setDocument(mf.getDocumentCount()-1);
 		}
 	}
 
 	private void allDocuments () {
-		if (( m_MF.m_nSrcDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )) {
+		if (( mf.srcDocIndex > -2 ) && ( mf.getDocumentCount() > 0 )) {
 			setDocument(-2);
 		}
 	}
 
 	private void updateDocumentsButtons () {
-		m_chkPending.setEnabled(m_MF.getDocumentCount() > 0);
+		m_chkPending.setEnabled(mf.getDocumentCount() > 0);
 		m_btDFirst.setEnabled(
-			(( m_MF.getDocumentCount() > 0 ) && (( m_MF.m_nSrcDocIndex > 0 )
-				|| ( m_MF.m_nSrcDocIndex == -2 ))));
+			(( mf.getDocumentCount() > 0 ) && (( mf.srcDocIndex > 0 )
+				|| ( mf.srcDocIndex == -2 ))));
 		m_btDPrev.setEnabled(
-			( m_MF.m_nSrcDocIndex > 0 ));
+			( mf.srcDocIndex > 0 ));
 		m_btDNext.setEnabled(
-			(( m_MF.m_nSrcDocIndex > -1 )
-				&& ( m_MF.m_nSrcDocIndex < m_MF.getDocumentCount()-1 )));
+			(( mf.srcDocIndex > -1 )
+				&& ( mf.srcDocIndex < mf.getDocumentCount()-1 )));
 		m_btDLast.setEnabled(
-			(( m_MF.getDocumentCount() > 0 )
-				&& ( m_MF.m_nSrcDocIndex < m_MF.getDocumentCount()-1 )));
+			(( mf.getDocumentCount() > 0 )
+				&& ( mf.srcDocIndex < mf.getDocumentCount()-1 )));
 		m_btDAll.setEnabled(
-			(( m_MF.m_nSrcDocIndex > -2 ) && ( m_MF.getDocumentCount() > 0 )));
+			(( mf.srcDocIndex > -2 ) && ( mf.getDocumentCount() > 0 )));
 		updateGroupButtons();
 	}
 	
@@ -387,9 +387,9 @@ class SourceView extends Composite {
 	}
 	
 	private void updatePending () {
-		setDocument(m_MF.m_nSrcDocIndex);
+		setDocument(mf.srcDocIndex);
 		if ( m_chkPending.getSelection() )
-			m_chkPending.setBackground(m_MF.m_RM.getColor("Thistle"));
+			m_chkPending.setBackground(mf.m_RM.getColor("Thistle"));
 		else
 			m_chkPending.setBackground(m_chkPending.getParent().getBackground());
 	}
