@@ -25,6 +25,7 @@ import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.IParametersEditor;
@@ -42,6 +43,68 @@ public class FilterAccess {
 	private IParametersEditor                    m_Editor;
 	private String                               currentClass;
 	
+	/**
+	 * Construct a filter settings string.
+	 * @param filterID Filter identifier (cannot be null nor empty).
+	 * @param paramsName Name of the parameters file (can be null or empty).
+	 * @return Filter settings string.
+	 */
+	static public String buildFilterSettingsType1 (String filterID,
+		String paramsName)
+	{
+		String sTmp = filterID;
+		if (( paramsName != null ) && ( paramsName.length() > 0 ))
+			sTmp += (FilterSettingsMarkers.PARAMETERSSEP + paramsName);
+		return sTmp;
+	}
+
+	/**
+	 * Splits a filter settings type 1 string into its different components, including
+	 * the full path of the parameters file.
+	 * A type 1 filter settings string is: filterID@paramatersName
+	 * @param projectParamsFolder The project folder where the parameters files are stored.
+	 * @param filterSettings The setting string to split.
+	 * @return An array of 4 strings: 0=folder, 1=filter id, 2=parameters name
+	 * and 3=full parameters file path (folder + parameters name + extension).
+	 */
+	static public String[] splitFilterSettingsType1 (String projectParamsFolder,
+		String filterSettings) {
+		String[] aOutput = new String[4];
+		for ( int i=0; i<4; i++ ) aOutput[i] = "";
+
+		if (( filterSettings == null ) || ( filterSettings.length() == 0 ))
+			return aOutput;
+
+		// Expand the parameters part into full path
+		aOutput[3] = projectParamsFolder + File.separator + filterSettings
+			+ FilterSettingsMarkers.PARAMETERS_FILEEXT;
+		
+		// Get the directory
+		File F = new File(aOutput[3]);
+		aOutput[0] = F.getParent();
+		String sTmp;
+		if ( aOutput[0] == null ) aOutput[0] = "";
+		if ( aOutput[0].length() > 0 )
+			sTmp = F.getName();
+		else
+			sTmp = aOutput[3];
+
+		// Get the parameters name
+		int n;
+		if ( (n = sTmp.indexOf(FilterSettingsMarkers.PARAMETERSSEP)) > -1 ) {
+			if ( n < sTmp.length()-1 ) {
+				aOutput[2] = sTmp.substring(n+1);
+				aOutput[2] = Utils.removeExtension(aOutput[2]);
+			}
+			sTmp = sTmp.substring(0, n);
+		}
+
+		// Get the filter identifier
+		aOutput[1] = Utils.removeExtension(sTmp);
+		
+		return aOutput;
+	}
+
 	public FilterAccess (ILog p_Log) {
 		m_Log = p_Log;
 		m_htFilters = new Hashtable<String, FilterAccessItem>();
@@ -152,7 +215,7 @@ public class FilterAccess {
 		String filterSettings)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(projectParamsFolder, filterSettings);
+		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
 		loadFilter(aRes[1], aRes[3]);
 	}
 	

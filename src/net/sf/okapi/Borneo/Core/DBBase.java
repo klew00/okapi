@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.TableItem;
 
+import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Library.Base.DefaultFilenameFilter;
 import net.sf.okapi.Library.Base.FieldsString;
@@ -1021,7 +1022,7 @@ public abstract class DBBase {
 		// Reduce it to a short unique string
 		sTmp = Utils.makeID(sTmp);
 		// Create filter settings from the filter ID and the unique name
-		String sFSettings = Utils.buildFilterSettingsType1(p_Filter.getIdentifier(), sTmp);
+		String sFSettings = FilterAccess.buildFilterSettingsType1(p_Filter.getIdentifier(), sTmp);
 		sCopyPath = sCommon + sFSettings + FilterSettingsMarkers.PARAMETERS_FILEEXT;
 		p_Filter.getParameters().save(sCopyPath, sKeyDot);
 	}

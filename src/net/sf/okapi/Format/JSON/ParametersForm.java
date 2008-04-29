@@ -89,7 +89,7 @@ public class ParametersForm  implements IParametersEditor {
 	private void create (Shell p_Parent)
 	{
 		m_Shell.setText("JSON Filter Parameters");
-		m_Shell.setImage(p_Parent.getImage());
+		if ( p_Parent != null ) m_Shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;

@@ -88,10 +88,9 @@ public class ParametersForm implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent)
-	{
+	private void create (Shell p_Parent) {
 		m_Shell.setText("Properties Filter Parameters");
-		m_Shell.setImage(p_Parent.getImage());
+		if ( p_Parent != null ) m_Shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;

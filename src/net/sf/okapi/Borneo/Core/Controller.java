@@ -422,7 +422,7 @@ public class Controller implements IParametersProvider {
 	public IParameters load (String location)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 		m_FA.loadFilter(aRes[1], aRes[3]);
 		return m_FA.getFilter().getParameters();
 	}
@@ -430,7 +430,7 @@ public class Controller implements IParametersProvider {
 	public IParameters createParameters (String location)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 		m_FA.loadFilter(aRes[1], null);
 		return m_FA.getFilter().getParameters();
 	}
@@ -440,12 +440,12 @@ public class Controller implements IParametersProvider {
 		IParameters paramObject)
 		throws Exception
 	{
-		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 		paramObject.save(aRes[3], null);
 	}
 
 	public String[] splitLocation(String location) {
-		return Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
+		return FilterAccess.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 	}
 
 }

@@ -29,29 +29,26 @@ import net.sf.okapi.Library.Base.LogForm;
 
 public class MainForm
 {
-	private Shell       m_Shell;
-	private ILog        m_Log;
+	private Shell       shell;
+	private ILog        log;
 	
 	public MainForm (Shell p_Shell) {
-		m_Shell = p_Shell;
-		m_Log = new LogForm(m_Shell);
-		m_Log.setTitle("Rainbow Log");
+		shell = p_Shell;
+		log = new LogForm(shell);
+		log.setTitle("Rainbow Log");
 		createContent();
 	}
 
 	public void createContent () {
 		GridLayout layTmp = new GridLayout();
-		m_Shell.setLayout(layTmp);
-		
-		m_Shell.setText("Rainbow [v6 ALPHA]");
+		shell.setLayout(layTmp);
+		shell.setText("Rainbow [v6 ALPHA]");
 	}
 
-	public void run ()
-	{
-		try
-		{
-			Display Disp = m_Shell.getDisplay();
-			while ( !m_Shell.isDisposed() ) {
+	public void run () {
+		try {
+			Display Disp = shell.getDisplay();
+			while ( !shell.isDisposed() ) {
 				if (!Disp.readAndDispatch())
 					Disp.sleep();
 			}
