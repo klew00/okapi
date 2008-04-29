@@ -43,7 +43,6 @@ import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Filter.ILocalizationDirectives;
 import net.sf.okapi.Library.Base.FieldsString;
-import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.LineBreakType;

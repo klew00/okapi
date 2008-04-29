@@ -36,7 +36,7 @@ public class Connector implements ITMQuery {
 	
 	private ILog             m_Log;
 	private TMBase           m_TM = null;
-	private int              m_nMax = 5;
+	private int              m_nMax = 20;
 	private int              m_nCurrent = -1;
 	private Vector<Match>    m_aHits = new Vector<Match>();
 	
@@ -117,9 +117,10 @@ public class Connector implements ITMQuery {
 		close();
 	}
 
-	public void open (String p_sName) {
-		try
-		{
+	public void open (String p_sName,
+		String sourceLang,
+		String targetLang) {
+		try {
 			String sBasePath = Utils.removeExtension(p_sName);
 			m_TM.openTM(sBasePath);
 		}

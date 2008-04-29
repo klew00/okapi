@@ -41,7 +41,9 @@ public interface ITMQuery {
 	 * Opens a give resource.
 	 * @param name Name of the TM to open.
 	 */
-	public void open (String name);
+	public void open (String tmName,
+		String sourceLang,
+		String targetLang);
 	
 	public void close ();
 	

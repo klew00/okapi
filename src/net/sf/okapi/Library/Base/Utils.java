@@ -564,7 +564,7 @@ public class Utils {
 	 * a value null is return for it. If the line-break could not be detected, a value null is
 	 * return for it.
 	 */
-	public static String[] DetectInformation (String p_sPath,
+	public static String[] detectFileInformation (String p_sPath,
 		boolean p_bDetectLB)
 	{
 		// Set defaults
@@ -652,15 +652,15 @@ public class Utils {
 	 * @param p_sEnding The ending to look for.
 	 * @return The path where the ending was found (without the ending),
 	 * or null if it was not found.
-	 */
+	 *
 	public static String searchInClassPath (String p_sClassPath,
     	String p_sEnding)
     {
    		int nPos = p_sClassPath.indexOf(p_sEnding);
    		if ( nPos > -1) {
-   			// Semicolon before the path to the Jar
+   			// Separator before the path to the Jar
    			int nSC1 = p_sClassPath.lastIndexOf(File.pathSeparatorChar, nPos);
-   			// Semicolon after the path to the Jar
+   			// Separator after the path to the Jar
    			int nSC2 = p_sClassPath.indexOf(File.pathSeparatorChar, nPos);
    			if ( nSC1 < 0 ) nSC1 = -1;
    			if ( nSC2 < 0 ) nSC2 = p_sClassPath.length();
@@ -669,7 +669,7 @@ public class Utils {
    			return sPath;
    		}
         return null;
-    }
+    }*/
 
 	/**
 	 * Gets the type of platform the application is running on.

@@ -159,19 +159,13 @@ class MainForm implements IControllerUI {
 	}
 
     private void setDirectories () {
-		String sCP = System.getProperty("java.class.path");
-System.err.println("bno- CP="+sCP);
-		// Check if we are running from a jar
-System.err.println("bno- searchInClassPath()");		
-		rootFolder = Utils.searchInClassPath(sCP, "Borneo.jar");
-		System.err.println("bno- sRoot(1)="+rootFolder);
-		// If not, try the debug path
-		if ( rootFolder == null )
-			rootFolder = Utils.searchInClassPath(sCP, "bin");
-		else // Remove the sub-folder name where the jar is
-			rootFolder = Utils.getDirectoryName(rootFolder);
-		// Build the absolute path from there
-		rootFolder = (new File(rootFolder)).getAbsolutePath();
+    	// Get the location of the main class source
+    	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+    	rootFolder = file.getAbsolutePath();
+    	// Remove the JAR file if running an installed version
+    	if ( rootFolder.endsWith(".jar") ) rootFolder = Utils.getDirectoryName(rootFolder);
+    	// Remove the application folder in all cases
+    	rootFolder = Utils.getDirectoryName(rootFolder);
 System.err.println("bno- final sRoot="+rootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
 	}
@@ -391,30 +385,30 @@ System.err.println("bno- final sRoot="+rootFolder);
 		String sTitle = " ";
 		if ( m_miView != null ) m_miView.setSelection(false);
 		switch ( p_nView ) {
-			case VIEW_DOCUMENTS:
-				sTitle += Res.getString("MAIN_DViewTitle");
-				m_stViewTitle.setBackground(m_RM.getColor("Documents"));
-				m_layMainPanel.topControl = m_DView;
-				m_miView = m_miViewDocuments;
-				break;
-			case VIEW_SOURCE:
-				sTitle += Res.getString("MAIN_SViewTitle");
-				m_stViewTitle.setBackground(m_RM.getColor("Source"));
-				m_layMainPanel.topControl = m_SView;
-				m_miView = m_miViewSource;
-				break;
-			case VIEW_TARGET:
-				sTitle += Res.getString("MAIN_TViewTitle");
-				m_stViewTitle.setBackground(m_RM.getColor("Target"));
-				m_layMainPanel.topControl = m_TView;
-				m_miView = m_miViewTarget;
-				break;
-			case VIEW_SETTINGS:
-				sTitle += Res.getString("MAIN_PViewTitle");
-				m_stViewTitle.setBackground(m_RM.getColor("Settings"));
-				m_layMainPanel.topControl = m_PView;
-				m_miView = m_miViewSettings;
-				break;
+		case VIEW_DOCUMENTS:
+			sTitle += Res.getString("MAIN_DViewTitle");
+			m_stViewTitle.setBackground(m_RM.getColor("Documents"));
+			m_layMainPanel.topControl = m_DView;
+			m_miView = m_miViewDocuments;
+			break;
+		case VIEW_SOURCE:
+			sTitle += Res.getString("MAIN_SViewTitle");
+			m_stViewTitle.setBackground(m_RM.getColor("Source"));
+			m_layMainPanel.topControl = m_SView;
+			m_miView = m_miViewSource;
+			break;
+		case VIEW_TARGET:
+			sTitle += Res.getString("MAIN_TViewTitle");
+			m_stViewTitle.setBackground(m_RM.getColor("Target"));
+			m_layMainPanel.topControl = m_TView;
+			m_miView = m_miViewTarget;
+			break;
+		case VIEW_SETTINGS:
+			sTitle += Res.getString("MAIN_PViewTitle");
+			m_stViewTitle.setBackground(m_RM.getColor("Settings"));
+			m_layMainPanel.topControl = m_PView;
+			m_miView = m_miViewSettings;
+			break;
 		}
 		m_stViewTitle.setText(sTitle);
 		m_nView = p_nView;

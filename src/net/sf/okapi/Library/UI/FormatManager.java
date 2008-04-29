@@ -15,7 +15,7 @@ public class FormatManager {
 	 * 1=guessed filter settings or null,
 	 */
 	public String[] guessFormat (String p_sPath) {
-		String[] aRes = Utils.DetectInformation(p_sPath, false);
+		String[] aRes = Utils.detectFileInformation(p_sPath, false);
 		aRes[1] = null; 
 		String sExt = Utils.getExtension(p_sPath).toLowerCase();
 		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";

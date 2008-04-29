@@ -2,8 +2,8 @@ package net.sf.okapi.connectors.tinytm;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Vector;
 
 import net.sf.okapi.Filter.IFilterItem;
@@ -12,18 +12,21 @@ import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Translation.IMatch;
 import net.sf.okapi.Translation.ITMQuery;
 import net.sf.okapi.Translation.Match;
-import net.sf.okapi.ferret.Core.TMBase;
 
 public class Connector implements ITMQuery {
 
-	private Connection       conn = null;
-	private boolean          isTMOpened = false;
-	private ILog             log;
-	private String           server;
-	private String           username;
-	private String           password;
-	private int              currentMatch = -1;
-	private Vector<Match>    hits = new Vector<Match>();
+	private Connection            conn = null;
+	private boolean               isTMOpened = false;
+	private ILog                  log;
+	private String                server;
+	private String                username;
+	private String                password;
+	private int                   currentMatch = -1;
+	private Vector<Match>         hits = new Vector<Match>();
+	private int                   maxHits = 20;
+	private PreparedStatement     prepStm;
+	private String                sourceLang;
+	private String                targetLang;
 	
 	public Connector (ILog log) {
 		this.log = log;
@@ -42,6 +45,10 @@ public class Connector implements ITMQuery {
 	public void close () {
 		try {
 			if ( conn != null ) {
+				if ( prepStm != null ) {
+					try { prepStm.close(); } catch ( Exception E ) {};
+					prepStm = null;
+				}
 				conn.close();
 				conn = null;
 				isTMOpened = false;
@@ -57,7 +64,7 @@ public class Connector implements ITMQuery {
 	}
 
 	public int getMaximum () {
-		return 50;
+		return maxHits;
 	}
 
 	public IMatch getNextMatch() {
@@ -90,10 +97,14 @@ public class Connector implements ITMQuery {
 		close();
 	}
 
-	public void open (String name) {
+	public void open (String tmName,
+		String sourceLang,
+		String targetLang) {
 		try {
-			String sTmp = String.format("jdbc:postgresql://%s/%s", server, name);
+			String sTmp = String.format("jdbc:postgresql://%s/%s", server, tmName);
 			conn = DriverManager.getConnection(sTmp, username, password);
+			this.sourceLang = sourceLang;
+			this.targetLang = targetLang;
 			isTMOpened = true;
 		}
 		catch ( Exception E ) {
@@ -103,25 +114,20 @@ public class Connector implements ITMQuery {
 
 	public int query (String text) {
 		int nCount = 0;
-		Statement Stm = null;
 		hits.clear();
 		currentMatch = -1;
 		try {
-			String sTmp = String.format(
-				"SELECT * FROM tinytm_get_fuzzy_matches('en', 'de','%s','', '');",
-				text);
-			Stm = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rsHits = Stm.executeQuery(sTmp);
-			if ( rsHits.last() ) {
-				nCount = rsHits.getRow();
-				//if ( nCount > m_nMax ) nCount = m_nMax;
+			nCount = 0;
+			if ( prepStm == null ) {
+				prepStm = conn.prepareStatement("SELECT * FROM tinytm_get_fuzzy_matches('en', 'de',?,'', '');");
+				prepStm.setMaxRows(maxHits);
 			}
-			if ( nCount == 0 ) return 0;
-			
-			// Fill the matches
-			rsHits.beforeFirst();
-			for ( int i=0; i<nCount; i++ ) {
-				if ( !rsHits.next() ) break;
+			prepStm.setString(1, text);
+			ResultSet rsHits = prepStm.executeQuery();
+			while ( rsHits.next() ) {
+				if ( nCount+1 > maxHits ) return nCount;
+				nCount++;
+				// Fill the matches
 				Match M = new Match();
 				M.setScore(rsHits.getInt(1));
 				M.setSourceText(rsHits.getString(2));
@@ -133,12 +139,6 @@ public class Connector implements ITMQuery {
 			Utils.showError(E.getMessage(), null);
 			hits.clear();
 			currentMatch = -1;
-		}
-		finally {
-			if ( Stm != null ) {
-				try { Stm.close(); } catch ( Exception E ) {};
-				Stm = null;
-			}
 		}
 		return nCount;
 	}
@@ -153,6 +153,14 @@ public class Connector implements ITMQuery {
 	}
 
 	public void setMaximum (int value) {
-		// TODO Auto-generated method stub
+		try {
+			maxHits = value;
+			if ( prepStm != null ) {
+				prepStm.setMaxRows(maxHits);
+			}
+		}
+		catch ( Exception E ) {
+			log.error(E.getLocalizedMessage());
+		}
 	}
 }

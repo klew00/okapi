@@ -52,7 +52,7 @@ public class Engine implements ITMQuery {
 	private Searcher    m_Searcher = null;
 	private Analyzer    m_Analyzer = null;
 	private QueryParser m_Parser = null;
-	private int         m_nMax = 30;
+	private int         m_nMax = 20;
 	private Hits        m_Hits = null;
 	private int         m_nCurrent = -1;
 	private String      m_sPath;
@@ -75,7 +75,7 @@ public class Engine implements ITMQuery {
 				wrtTmp.close();
 				wrtTmp = null;
 			}
-			open(p_sPath);
+			open(p_sPath, "", "");
 		}		
 		catch ( Exception E ) {
 			m_Log.error(E.getLocalizedMessage());
@@ -254,7 +254,9 @@ public class Engine implements ITMQuery {
 		close();
 	}
 
-	public void open (String p_sName) {
+	public void open (String p_sName,
+		String sourceLang,
+		String targetLang) {
 		try {
 			m_sPath = p_sName;
 			m_Reader = IndexReader.open(m_sPath);

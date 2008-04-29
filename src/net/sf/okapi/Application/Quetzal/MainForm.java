@@ -222,7 +222,7 @@ public class MainForm
 			if ( aPaths == null ) return;
 			String sBasePath = aPaths[0].substring(0, aPaths[0].lastIndexOf(File.separatorChar));
 			m_C.login("", "", "");
-			m_C.open(sBasePath);
+			m_C.open(sBasePath, "", "");
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getMessage(), null);
@@ -236,7 +236,7 @@ public class MainForm
 		try {
 			ttConn = new net.sf.okapi.connectors.tinytm.Connector(m_Log);
 			ttConn.login("www.tinytm.org", "bbigboss", "ben");
-			ttConn.open("projop");
+			ttConn.open("projop", "en", "de");
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getMessage(), null);

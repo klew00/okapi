@@ -275,7 +275,7 @@ public class Filter implements IFilter {
 			m_sInputEncoding = p_sEncoding;
 
 			// Auto-detect encoding and line-breaks info before parsing
-			String[] aInfo = Utils.DetectInformation(p_sPath, true);
+			String[] aInfo = Utils.detectFileInformation(p_sPath, true);
 			if ( aInfo[0] != null ) m_sInputEncoding = aInfo[0];
 			if ( aInfo[1] != null ) m_sLineBreak = aInfo[1];
 			m_CurrentFI.setLineBreak(m_sLineBreak);
