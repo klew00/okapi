@@ -42,7 +42,6 @@ import net.sf.okapi.Filter.FilterProperty;
 import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Filter.ILocalizationDirectives;
-import net.sf.okapi.Library.Base.FieldsString;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.LineBreakType;
@@ -103,6 +102,10 @@ public class Filter implements IFilter {
 
 	public IParameters getParameters () {
 		return m_Opt;
+	}
+	
+	public void setParameters (IParameters paramsObject) {
+		m_Opt = (Parameters)paramsObject;
 	}
 	
 	public void closeInput () {
@@ -195,7 +198,7 @@ public class Filter implements IFilter {
 		m_Opt.m_LD.setLog(m_Log);
 	}
 
-	public boolean loadParameters (String path,
+	/*public boolean loadParameters (String path,
 		boolean ignoreErrors)
 	{
 		try {
@@ -207,7 +210,7 @@ public class Filter implements IFilter {
 			m_Log.error(E.getLocalizedMessage());
 			return false;
 		}
-	}
+	}*/
 
 	public boolean openInputFile (String p_sPath,
 		String p_sLanguage,
@@ -431,7 +434,7 @@ public class Filter implements IFilter {
 		m_sbEscape = new StringBuilder();
 	}
 	
-	public boolean saveParameters (String path,
+	/*public boolean saveParameters (String path,
 		String prefix)
 	{
 		try {
@@ -442,7 +445,7 @@ public class Filter implements IFilter {
 			m_Log.error(E.getLocalizedMessage());
 			return false;
 		}
-	}
+	}*/
 
 	public void setAncillaryDirectory(String p_sInputRoot,
 		String p_sAncillaryRoot) {
@@ -548,7 +551,7 @@ public class Filter implements IFilter {
 		return aInfo;
 	}
 
-	public String getOption (String p_sName) {
+/*	public String getOption (String p_sName) {
 		//TODO: Implement better handling of GetOption()
 		FieldsString FS = new FieldsString(getOptions());
 		return FS.get(p_sName, null);
@@ -570,7 +573,7 @@ public class Filter implements IFilter {
 	public void setOptions (String p_sValue) {
 		m_Opt.fromString(p_sValue);
 	}
-	
+*/	
 	private String escapeChars (String p_sValue) {
 		m_sbEscape = new StringBuilder();
 		for ( int i=0; i<p_sValue.length(); i++ ) {

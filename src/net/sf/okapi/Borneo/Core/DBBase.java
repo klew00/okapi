@@ -1007,7 +1007,7 @@ public abstract class DBBase {
 		Utils.copyFile(p_Doc.getFullPath(), sCopyPath, false);
 
 		// Make sure the result file is not read-only
-		File F = new File(sCopyPath);
+		//File F = new File(sCopyPath);
 		//TODO: Fix this for JRE 1.5 if ( !F.canWrite() ) F..setWritable(true);
 
 		// Nothing more to do if no filter is provided
@@ -1023,7 +1023,7 @@ public abstract class DBBase {
 		// Create filter settings from the filter ID and the unique name
 		String sFSettings = Utils.buildFilterSettingsType1(p_Filter.getIdentifier(), sTmp);
 		sCopyPath = sCommon + sFSettings + FilterSettingsMarkers.PARAMETERS_FILEEXT;
-		p_Filter.saveParameters(sCopyPath, sKeyDot);
+		p_Filter.getParameters().save(sCopyPath, sKeyDot);
 	}
 
 	/**

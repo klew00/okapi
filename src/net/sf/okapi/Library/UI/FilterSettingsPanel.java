@@ -149,7 +149,7 @@ public class FilterSettingsPanel extends Composite {
 
 			// Create a default parameters object.
 			// We do this like this because the provider may be on the server side.
-			IParameters params = paramProv.getDefaults(filterSettings);
+			IParameters params = paramProv.createParameters(filterSettings);
 			if ( params == null ) {
 				Utils.showError("Error when trying to create the parameters file.", null);
 				return;

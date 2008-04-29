@@ -140,9 +140,7 @@ public class FilterAccess {
 			
 			// Load the parameters
 			if ( paramPath != null ) {
-				if ( !m_Flt.loadParameters(paramPath, false) ) {
-					throw new Exception("Cannot load parameters file.");
-				}
+				m_Flt.getParameters().load(paramPath, false);
 			}
 		}
 		catch ( Exception E ) {

@@ -35,6 +35,12 @@ public interface IFilter {
 	public IParameters getParameters ();
 	
 	/**
+	 * Sets the parameters object for the filter.
+	 * @param paramsObject The new parameters object.
+	 */
+	public void setParameters (IParameters paramsObject);
+	
+	/**
 	 * Closes the current input (either file or string).
 	 */
 	public void closeInput ();
@@ -125,15 +131,15 @@ public interface IFilter {
 	/**
 	 * Gets a string holding all the parameter option.
 	 * @return String with all parameters.
-	 */
-	public String getOptions ();
+	 *
+	public String getOptions ();*/
 	
 	/**
 	 * Gets the value for the option specified by p_sName. 
 	 * @param p_sName The name of the option to retrieve.
 	 * @return Value of the option retrieved.
-	 */
-	public String getOption (String p_sName);
+	 *
+	public String getOption (String p_sName);*/
 	
 	/**
 	 * Gets the FilterItem object for the translated item of the current
@@ -149,8 +155,9 @@ public interface IFilter {
 	 */
 	public void initialize (ILog p_Log);
 
+	/*
 	public boolean loadParameters (String path,
-		boolean ignoreErrors);
+		boolean ignoreErrors);*/
 
 	/**
 	 * Opens an input file to be processed by the filter.
@@ -194,9 +201,9 @@ public interface IFilter {
 	 * @param prefix Optional prefix. If not null, it must be placed in front of any
 	 * settings-related additional file(s) the filter saves along with the parameters
 	 * file.
-	 */
+	 *
 	public boolean saveParameters (String path,
-		String prefix);
+		String prefix);*/
 
 	public void setAncillaryDirectory (String p_sInputRoot,
 		String p_sAncillaryRoot);
@@ -220,16 +227,16 @@ public interface IFilter {
 	/**
 	 * Sets the options for the filter.
 	 * @param p_sValue The list of options.
-	 */
-	public void setOptions (String p_sValue);
+	 *
+	public void setOptions (String p_sValue);*/
 	
 	/**
 	 * Sets a given option for the filter.
 	 * @param p_sName The name of the option.
 	 * @param p_sValue The value for this option.
-	 */
+	 *
 	public void setOption (String p_sName,
-		String p_sValue);
+		String p_sValue);*/
 	
 	/**
 	 * Specifies what layer to use for the output, and the codes to use.

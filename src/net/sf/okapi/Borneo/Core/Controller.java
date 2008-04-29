@@ -427,7 +427,7 @@ public class Controller implements IParametersProvider {
 		return m_FA.getFilter().getParameters();
 	}
 
-	public IParameters getDefaults (String location)
+	public IParameters createParameters (String location)
 		throws Exception
 	{
 		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
@@ -441,7 +441,7 @@ public class Controller implements IParametersProvider {
 		throws Exception
 	{
 		String[] aRes = Utils.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
-		paramObject.save(aRes[3]);
+		paramObject.save(aRes[3], null);
 	}
 
 	public String[] splitLocation(String location) {
