@@ -89,17 +89,19 @@ public abstract class BaseParameters implements IParameters {
 		}
 	}
 
-	public void save (String filePath)
+	public void save (String newPath,
+		String multiFilesPrefix)
 		throws Exception
 	{
+		// multiFilesPrefix is not used in this default implementation
 		Writer SW = null;
 		try {
 			// Save the fields on file
 			SW = new OutputStreamWriter(
-				new BufferedOutputStream(new FileOutputStream(filePath)),
+				new BufferedOutputStream(new FileOutputStream(newPath)),
 				"UTF-8");
 			SW.write(toString());
-			path = filePath;
+			path = newPath;
 		}
 		catch ( Exception E ) {
 			throw E;

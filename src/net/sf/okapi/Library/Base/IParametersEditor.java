@@ -31,22 +31,22 @@ public interface IParametersEditor {
 	 * Edits the values for the given parameters. If the edit succeeds
 	 * (returns true), the parameters have been updated in p_Parameters to
 	 * reflect the changes. 
-	 * @param p_Parameters The parameters to edit.
+	 * @param paramsObject The parameters to edit.
 	 * @param uiContext An implementation-specific object. For example, the
 	 * parent window from where the editor is called. The type and value of
 	 * uiContext depend on each implementation. See the documentation of the 
 	 * implementation for details. Because not all callers may be able to
-	 * provide the proper context, passing a null is allowed.
+	 * provide the proper context, passing a null value is allowed.
 	 * @return True if the edit was successful, false if the user canceled or if 
 	 * an error occurred. 
 	 */
-	public boolean edit (IParameters p_Parameters,
+	public boolean edit (IParameters paramsObject,
 		Object uiContext);
 	
 	/**
-	 * Creates an instance of the parameters object the editor can edit. This 
-	 * allows the user to create new parameters object from the interface, without
-	 * knowing what exact type of object is created. 
+	 * Creates an instance of the parameters object the editor can edit (with
+	 * the default values). This allows the user to create new parameters object 
+	 * from the interface, without knowing what exact type of object is created. 
 	 * @return An instance of the parameters object for the editor.
 	 */
 	public IParameters createParameters ();
