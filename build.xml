@@ -63,7 +63,7 @@
   
   <jar jarfile="${dist}/lib/Borneo.jar" basedir="${build}" manifest="${build}/MANIFEST.MF"
    excludes="MANIFEST.MF, **/Application/Tikal/**, **/Application/Quetzal/**, **/Application/Rainbow/**
-   **/okapi/Ferret/**, **/okapi/Translation/**"
+   **/okapi/ferret/**, **/okapi/Translation/**"
   />
 
   <copy file="./lib/h2.jar" todir="${dist}/lib"/>
