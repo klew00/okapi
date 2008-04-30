@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 
 public class FilterAccess {
 	
-	private ILog                                 m_Log;
+	private ILog                                 log;
 	private Hashtable<String, FilterAccessItem>  m_htFilters;
 	private IFilter                              m_Flt;
 	private IParametersEditor                    m_Editor;
@@ -105,13 +105,13 @@ public class FilterAccess {
 		return aOutput;
 	}
 
-	public FilterAccess (ILog p_Log) {
-		m_Log = p_Log;
+	public FilterAccess (ILog newLog) {
+		log = newLog;
 		m_htFilters = new Hashtable<String, FilterAccessItem>();
 	}
 	
 	public ILog getLog () {
-		return m_Log;
+		return log;
 	}
 	
 	/**
@@ -173,7 +173,7 @@ public class FilterAccess {
 	 * filter currently loaded, it is not re-loaded. 
 	 * @param filterID Identifier of the filter to load.
 	 * @param paramPath Full path of the parameters file to load. Use null
-	 * for no parameters.
+	 * for not loading any parameters file.
 	 */
 	public void loadFilter (String filterID,
 		String paramPath)
@@ -198,9 +198,10 @@ public class FilterAccess {
 			}
 			if ( bLoad ) {
 				m_Flt = (IFilter)Class.forName(m_htFilters.get(filterID).filterClass).newInstance();
-				m_Flt.initialize(m_Log);
+				m_Flt.initialize(log);
+				currentClass = m_htFilters.get(filterID).filterClass;
 			}
-			
+
 			// Load the parameters
 			if ( paramPath != null ) {
 				m_Flt.getParameters().load(paramPath, false);
