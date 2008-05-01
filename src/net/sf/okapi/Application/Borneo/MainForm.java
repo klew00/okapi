@@ -50,6 +50,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -244,7 +245,7 @@ System.err.println("bno- final sRoot="+rootFolder);
 			s_aTrgStatus[DBBase.TSTATUS_OK] = Res.getString("TSTATUS_OK");
 
 			m_LM = new LanguageManager();
-			m_LM.loadList(sharedFolder + File.separator + "Languages.xml");
+			m_LM.loadList(sharedFolder + File.separator + "languages.xml");
 
 			m_FM = new FormatManager();
 			//TODO m_FM.load(p_sPath);
@@ -426,8 +427,6 @@ System.err.println("bno- final sRoot="+rootFolder);
 		//layTmp1.horizontalSpacing = 0;
 		layTmp1.verticalSpacing = 0;
 		shell.setLayout(layTmp1);
-		shell.setSize(740, 510);
-		shell.setMinimumSize(696, 480);
 		
 		//=== Menus
 		
@@ -899,7 +898,7 @@ System.err.println("bno- final sRoot="+rootFolder);
 		m_Log = new LogPanel(m_splMain, SWT.NONE, this);
 		backEnd.initialize(m_Log, rootFolder);
 		m_FA = new FilterAccess(m_Log);
-		m_FA.loadList(sharedFolder+File.separator+"Filters.xml");
+		m_FA.loadList(sharedFolder+File.separator+"filters.xml");
 
 		m_splMain.SASH_WIDTH = 4;
 		m_splMain.setWeights(new int[]{80,20});
@@ -918,6 +917,9 @@ System.err.println("bno- final sRoot="+rootFolder);
 		toggleLog(false);
 		updateEverything();
 		setView(VIEW_SETTINGS);
+		
+		shell.setSize(740, 510);
+		shell.setMinimumSize(696, 480);
 	}
 	
 	int getDocumentCount () {

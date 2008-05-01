@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<commands>
+ <!-- File menu -->
+ <command name="file.exit" alt="1" key="F4">E&amp;xit&#x9;Alt+F4</command>
+ <!-- Input menu -->
+ <command name="input.addDocuments" ctrl="1" key="Insert">&amp;Add Documents...&#x9;Ctrl+Insert</command>
+ <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
+</commands>

@@ -23,6 +23,8 @@ package net.sf.okapi.Borneo.Core;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import net.sf.okapi.Library.Base.PathBuilder;
+
 public class DBTargetDoc {
 
 	private boolean          m_bExcluded;

@@ -18,54 +18,45 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Core;
+package net.sf.okapi.Application.Rainbow;
 
-import net.sf.okapi.Library.Base.PathBuilder;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 
-public class DBTarget {
+class StatusBar extends Composite {
+
+	private CLabel      infoLabel;
 	
-	private String         m_sRoot;
-	private String         m_sEncoding;
-	private PathBuilder    m_DefPB;
-
-	public DBTarget (String p_sLangCode) {
-		try {
-			m_sRoot = null;
-			m_DefPB = new PathBuilder();
-
-			/*TODO: get the right default encoding
-			 *  System.Globalization.CultureInfo CI
-				= System.Globalization.CultureInfo.GetCultureInfo(p_sLangCode);
-			m_sEncoding = System.Text.Encoding.GetEncoding(CI.TextInfo.ANSICodePage).WebName;
-			*/
-			m_sEncoding = "windows-1252"; //TODO: change to correct default
-		}
-		catch ( Exception E ) { // Or fall back to UTF-8
-			m_sEncoding = "UTF-8";
-		}
-	}
-
-
-	public String getRoot () {
-		return m_sRoot;
+	StatusBar (Composite p_Parent,
+		int p_nFlags) {
+		super(p_Parent, p_nFlags);
+		createContent();
 	}
 	
-	public void setRoot (String p_sValue) {
-		if (( p_sValue == null ) || ( p_sValue.length() == 0 )) 
-			m_sRoot = null;
-		else
-			m_sRoot = p_sValue;
+	private void createContent () {
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		this.setLayoutData(gdTmp);
+		
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 1;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		setLayout(layout);
+		
+		infoLabel = new CLabel(this, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		infoLabel.setLayoutData(gdTmp);
 	}
 
-	public String getEncoding () {
-		return m_sEncoding;
+	void setInfo (String p_sText) {
+		infoLabel.setText((p_sText == null) ? "" : p_sText);
 	}
 	
-	public void setEncoding (String p_sValue) {
-		m_sEncoding = p_sValue;
-	}
-
-	public PathBuilder getDefaultPB () {
-		return m_DefPB;
+	void clearInfo () {
+		infoLabel.setText("");
 	}
 }

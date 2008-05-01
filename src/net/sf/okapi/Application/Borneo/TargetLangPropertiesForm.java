@@ -23,9 +23,9 @@ package net.sf.okapi.Application.Borneo;
 import java.io.File;
 
 import net.sf.okapi.Borneo.Core.DBTarget;
-import net.sf.okapi.Borneo.Core.PathBuilderPanel;
 import net.sf.okapi.Library.UI.Dialogs;
 import net.sf.okapi.Library.UI.OKCancelPanel;
+import net.sf.okapi.Library.UI.PathBuilderPanel;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -80,7 +80,7 @@ class TargetLangPropertiesForm {
 		grpTmp.setLayout(new GridLayout());
 		
 		m_pnlPB = new PathBuilderPanel(grpTmp, SWT.NONE);
-		m_pnlPB.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		m_pnlPB.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// Add the listener for the target root 
 		m_edRoot.addModifyListener(new ModifyListener () {
@@ -131,7 +131,7 @@ class TargetLangPropertiesForm {
 		DBTarget p_Data,
 		String p_sLang)
 	{
-		m_Shell.setText(Res.getString("TRGLANGPROP_TITLE")+" "+p_sLang);
+		m_Shell.setText(Res.getString("TRGLANGPROP_TITLE")+p_sLang);
 		m_Data = p_Data;
 		
 		m_edEncoding.setText(m_Data.getEncoding());

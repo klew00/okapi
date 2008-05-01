@@ -29,13 +29,14 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import org.eclipse.swt.SWT;
 
 public class Utils {
 
-	public static final String OKAPIHOME         = "OKAPIHOME";
-	public static final String PARAMETERS_PRJDIR = "OKAPIPROJECTPARAMETERS";
+//	public static final String OKAPIHOME         = "OKAPIHOME";
+//	public static final String PARAMETERS_PRJDIR = "OKAPIPROJECTPARAMETERS";
 	
 	public static final int    PFTYPE_WIN        = 0;
 	public static final int    PFTYPE_MAC        = 1;
@@ -291,7 +292,8 @@ public class Utils {
 		boolean p_bShowDetails)
 	{
 		try {
-			//TODO: Create custom dialog where details can be hidden/shown 
+			//TODO: Create custom dialog where details can be hidden/shown
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			JOptionPane.showMessageDialog(null,
 			    p_sMessage + ((p_sDetails==null) ? "" : "\n"+p_sDetails),
 			    "Error", //TODO: Use application name
@@ -301,7 +303,7 @@ public class Utils {
 		{
 			JOptionPane.showMessageDialog(null,
 			    E.getMessage() + "\n" + E.getStackTrace(),
-			    "TODO: App name", //TODO: Use application name
+			    "Error", //TODO: Use application name
 			    JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -348,7 +350,7 @@ public class Utils {
 			if ( p_sLanguage1.length() > 2 )
 			{
 				sL1 = p_sLanguage1.substring(0, 3); //LEN=3
-				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 1); //LEN=2
+				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 2); //LEN=2
 			}
 			else sL1 = p_sLanguage1.substring(0, 2); //LEN=2
 
@@ -615,8 +617,8 @@ public class Utils {
 	 */
 	public static int getPlatformType () {
 		if ( "win32".equals(SWT.getPlatform()) ) return PFTYPE_WIN;
-		if ( "carbon".equals(SWT.getPlatform()) ) return PFTYPE_MAC;
 		if ( "gtk".equals(SWT.getPlatform()) ) return PFTYPE_UNIX;
+		if ( "carbon".equals(SWT.getPlatform()) ) return PFTYPE_MAC;
 		if ( "motif".equals(SWT.getPlatform()) ) return PFTYPE_UNIX;
 		return -1; // Unknown
 	}

@@ -67,7 +67,7 @@ public class Controller implements IParametersProvider {
 		m_DBOpt = new DBOptions();
 		m_ActionData = new Hashtable<String, String>();
 		m_FA = new FilterAccess(m_Log);
-		m_FA.loadList(sharedFolder + File.separator + "Filters.xml");
+		m_FA.loadList(sharedFolder + File.separator + "filters.xml");
 	}
 	
 	public boolean isProjectOpened () {
@@ -151,7 +151,7 @@ public class Controller implements IParametersProvider {
 			if ( aData == null ) return;
 			m_UI.startWaiting(Res.getString("CREATING_PROJECT"), false);
 			LanguageManager LM = new LanguageManager();
-			LM.loadList(sharedFolder + File.separator + "Languages.xml");
+			LM.loadList(sharedFolder + File.separator + "languages.xml");
 			String sLang = Utils.getDefaultSourceLanguage();
 			m_DB.createProject(aData[0], aData[1], sLang,
 				LM.getDefaultEncodingFromCode(sLang, Utils.getPlatformType()));

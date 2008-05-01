@@ -18,7 +18,9 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Core;
+package net.sf.okapi.Library.UI;
+
+import net.sf.okapi.Library.Base.PathBuilder;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -81,7 +83,6 @@ public class PathBuilderPanel extends Composite {
 				updateSample();
 			};
 		};
-
 
 		m_chkUseSubdir = new Button(this, SWT.CHECK);
 		m_chkUseSubdir.setText("Custom sub-folder:");
@@ -249,11 +250,22 @@ public class PathBuilderPanel extends Composite {
 		m_PB.setReplace(m_edReplace.getText());
 	}
 
-	public void updateSample ()
-	{
+	public void updateSample () {
 		if ( m_bInInit ) return;
+		
 		saveData();
 		String sTmp = m_PB.getPath(m_edBefore.getText(), m_sSrcRoot, m_sTrgRoot, m_sLang);
 		m_edAfter.setText(sTmp);
+		
+		m_edSubdir.setEnabled(m_chkUseSubdir.getSelection());
+		m_edPrefix.setEnabled(m_chkUsePrefix.getSelection());
+		m_edSuffix.setEnabled(m_chkUseSuffix.getSelection());
+		m_edSearch.setEnabled(m_chkUseReplace.getSelection());
+		m_edReplace.setEnabled(m_chkUseReplace.getSelection());
+		boolean enabled = m_chkUseExt.getSelection();
+		m_edExt.setEnabled(enabled);
+		m_rdExtAppend.setEnabled(enabled);
+		m_rdExtPrepend.setEnabled(enabled);
+		m_rdExtReplace.setEnabled(enabled);
 	}
 }

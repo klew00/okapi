@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Core;
+package net.sf.okapi.Library.Base;
 
 import java.io.File;
 import java.util.Locale;
