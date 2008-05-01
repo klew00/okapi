@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<okapiFilters>
+ 
+ <filter id="okf_properties"
+  filterClass="net.sf.okapi.Format.Properties.Filter"
+  editorClass="net.sf.okapi.Format.Properties.ParametersForm"
+ >Properties</filter>
+  
+ <filter id="okf_json"
+  filterClass="net.sf.okapi.Format.JSON.Filter"
+  editorClass="net.sf.okapi.Format.JSON.ParametersForm"
+ >JSON</filter>
+
+</okapiFilters>
