@@ -45,7 +45,7 @@ public class Segmenter implements ISegmenter {
 	}
 
 	public int Segment (IFilterItem p_FI) {
-		String sText = p_FI.getText(FilterItemText.CODED);
+//		String text = p_FI.getText(FilterItemText.CODED);
 		m_FI = new FilterItem();
 		m_FI.copyFrom(p_FI);
 		m_aStart = new ArrayList<Integer>();

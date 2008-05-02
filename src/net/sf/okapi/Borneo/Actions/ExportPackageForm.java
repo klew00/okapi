@@ -109,8 +109,9 @@ public class ExportPackageForm implements IParametersEditor {
 		m_lbTypes = new List(cmpTmp, SWT.BORDER);
 		m_lbTypes.add("Generic XLIFF");
 		m_lbTypes.add("OmegaT");
+		m_lbTypes.add("TagEditor TTX");
 		// To use neutral access to the list
-		m_lbTypes.setData("genericxliff\tomegat");
+		m_lbTypes.setData("genericxliff\tomegat\tttx");
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		m_lbTypes.setLayoutData(gdTmp);

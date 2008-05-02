@@ -3,10 +3,13 @@ package net.sf.okapi.Library.Base;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -28,58 +31,79 @@ public class LogForm implements ILog {
 	private ProgressBar      m_pbSecondary;
 	
 	public LogForm (Shell p_Parent) {
-		m_Shell = new Shell(p_Parent);
+		m_Shell = new Shell(p_Parent, SWT.BORDER | SWT.RESIZE | SWT.TITLE
+			| SWT.MODELESS | SWT.CLOSE | SWT.MAX | SWT.MIN);
 		createContent();
 	}
 	
-	private void createContent ()
-	{
-		m_Shell.setText("Log");
-		GridLayout layTmp = new GridLayout();
-		layTmp.numColumns = 4;
-		m_Shell.setLayout(layTmp);
+	private void createContent () {
+		m_Shell.setLayout(new GridLayout(4, false));
 		
-		//=== Buttons
+		// On close: Hide instead of closing
+		m_Shell.addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				event.doit = false;
+				hide();
+			}
+		});
 		
-		Composite cmpActions = new Composite(m_Shell, SWT.NONE);
-		
-		Button btHelp = new Button(cmpActions, SWT.PUSH);
+		int nWidth = 80;
+		Button btHelp = new Button(m_Shell, SWT.PUSH);
 		btHelp.setText("&Help");
+		GridData gdTmp = new GridData();
+		gdTmp.widthHint = nWidth;
+		btHelp.setLayoutData(gdTmp);
 		
-		Button btClear = new Button(cmpActions, SWT.PUSH);
+		Button btClear = new Button(m_Shell, SWT.PUSH);
 		btClear.setText("&Clear");
+		gdTmp = new GridData();
+		gdTmp.widthHint = nWidth;
+		btClear.setLayoutData(gdTmp);
 		btClear.addSelectionListener(new SelectionAdapter() {
-	      public void widgetSelected(SelectionEvent e) {
-	    	  clear();
-	      }
-	    });
+			public void widgetSelected(SelectionEvent e) {
+				clear();
+			}
+		});
 		
-		Button btStop = new Button(cmpActions, SWT.PUSH);
+		Button btStop = new Button(m_Shell, SWT.PUSH);
 		btStop.setText("&Stop");
+		gdTmp = new GridData();
+		gdTmp.widthHint = nWidth;
+		btStop.setLayoutData(gdTmp);
 		
-		Button btClose = new Button(cmpActions, SWT.PUSH);
+		Button btClose = new Button(m_Shell, SWT.PUSH);
 		btClose.setText("&Close");
+		gdTmp = new GridData();
+		gdTmp.widthHint = nWidth;
+		btClose.setLayoutData(gdTmp);
+		btClose.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				hide();
+			}
+		});
 		
 		//=== Progress
 		
 		m_pbPrimary = new ProgressBar(m_Shell, SWT.HORIZONTAL);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.verticalSpan = 4;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
 		m_pbPrimary.setLayoutData(gdTmp);
 
 		m_pbSecondary = new ProgressBar(m_Shell, SWT.HORIZONTAL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.verticalSpan = 4;
+		gdTmp.horizontalSpan = 4;
 		m_pbSecondary.setLayoutData(gdTmp);
 		
 		//=== Log itself
 
 		m_edLog = new Text(m_Shell, SWT.MULTI | SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 4;
+		gdTmp.horizontalSpan = 4;
 		m_edLog.setLayoutData(gdTmp);
 		
 		m_Shell.pack();
+		m_Shell.setMinimumSize(m_Shell.getSize());
+		m_Shell.setSize(600, 300);
 	}
 
 	public boolean beginProcess (String p_sTtext) {
@@ -146,13 +170,13 @@ public class LogForm implements ILog {
 		return setLog(LogType.MESSAGE, 0, "\n");
 	}
 
-	public void save (String p_sPath) {
-		//TODO: Implement save as for the log text
+	public void save (String path) {
+		// Not implemented for this implementation
 	}
 
-	public void setCallerData (long p_lData) {
+	public void setCallerData (long data) {
 		// Not used, just store it
-		m_lData = p_lData;
+		m_lData = data;
 	}
 
 	public void setHelp (String p_sPath) {
@@ -163,12 +187,11 @@ public class LogForm implements ILog {
 		int p_nValue,
 		String p_sValue)
 	{
-		//m_edLog.
 		switch ( p_nType ) {
-			case LogType.ERROR:
-				break;
-			case LogType.WARNING:
-				break;
+		case LogType.ERROR:
+			break;
+		case LogType.WARNING:
+			break;
 		}
 		return false;
 	}
@@ -195,19 +218,17 @@ public class LogForm implements ILog {
 		return setLog(LogType.WARNING, 0, p_sText);
 	}
 
-	public void hide() {
-		// TODO Auto-generated method stub
-		
+	public void hide () {
+		m_Shell.setVisible(false);
 	}
 
-	public void setTitle(String value) {
-		// TODO Auto-generated method stub
-		
+	public void setTitle (String text) {
+		m_Shell.setText(text);
 	}
 
-	public void show() {
-		// TODO Auto-generated method stub
-		
+	public void show () {
+		m_Shell.setVisible(true);
+		if ( m_Shell.getMinimized() ) m_Shell.setMinimized(false);
 	}
 
 	public boolean isVisible() {

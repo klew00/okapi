@@ -45,7 +45,7 @@ import net.sf.okapi.Library.Base.Utils;
  */
 public class Reader {
 
-	private static final String   NSXML = "http://www.w3.org/XML/1998/namespace";
+	//private static final String   NSXML = "http://www.w3.org/XML/1998/namespace";
 	
 	public static final int       RESULT_ERROR        = 0;
 	public static final int       RESULT_ENDOFDOC     = 1;

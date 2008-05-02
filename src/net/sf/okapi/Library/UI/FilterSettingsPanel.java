@@ -21,7 +21,6 @@
 package net.sf.okapi.Library.UI;
 
 import net.sf.okapi.Filter.FilterAccess;
-import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.Base.Utils;

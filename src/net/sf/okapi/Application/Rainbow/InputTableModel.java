@@ -1,9 +1,6 @@
 package net.sf.okapi.Application.Rainbow;
 
-import java.sql.SQLException;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -32,8 +29,11 @@ class InputTableModel {
 			item.setText(0, inp.relativePath);
 			item.setText(1, inp.filterSettings);
 		}
-		if ( selection != null ) 
-			table.setSelection(selection);
+		if ( selection == null ) {
+			if ( table.getItemCount() > 0 )
+				table.setSelection(0);
+		}
+		else table.setSelection(selection);
 	}
 
 }

@@ -27,8 +27,6 @@ import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.okapi.Library.Base.Utils;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -40,6 +38,7 @@ import org.w3c.dom.NodeList;
 
 public class ResourceManager {
 
+	@SuppressWarnings("unchecked")
 	private Class                      m_Cls;
 	private Display                    m_Disp;
 	private Hashtable<String, Image>   m_htImages;
@@ -56,6 +55,7 @@ public class ResourceManager {
 	 * root location of the place where the resources are.
 	 * @param p_Display Display to associate with the resources.
 	 */
+	@SuppressWarnings("unchecked")
 	public ResourceManager (Class p_Class,
 		Display p_Display)
 	{
@@ -237,6 +237,7 @@ public class ResourceManager {
 					else if ( key.equals("End") ) item.accelerator |= SWT.END;
 					else if ( key.equals("Insert") ) item.accelerator |= SWT.INSERT;
 					else if ( key.equals("Enter") ) item.accelerator |= SWT.CR;
+					else if ( key.equals("Delete") ) item.accelerator |= SWT.DEL;
 					else item.accelerator |= key.codePointAt(0);
 				}
 				commands.put(name, item);

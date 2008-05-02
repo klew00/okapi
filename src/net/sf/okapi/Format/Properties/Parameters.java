@@ -25,7 +25,6 @@ import net.sf.okapi.Filter.InlineCodeFinder;
 import net.sf.okapi.Filter.LocalizationDirectives;
 import net.sf.okapi.Library.Base.BaseParameters;
 import net.sf.okapi.Library.Base.FieldsString;
-import net.sf.okapi.Library.Base.ILog;
 
 public class Parameters extends BaseParameters {
 

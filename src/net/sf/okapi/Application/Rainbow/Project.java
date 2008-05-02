@@ -17,9 +17,12 @@ public class Project {
 	public String            sourceEncoding;
 	public String            targetLanguage;
 	public String            targetEncoding;
+	public String            paramsFolder;
+	public boolean           isModified;
 	
 	public Project (LanguageManager lm) {
 		inputRoot = System.getProperty("user.home");
+		paramsFolder = inputRoot;
 		outputRoot = "";
 		inputList = new ArrayList<Input>();
 		pathBuilder = new PathBuilder();
@@ -28,6 +31,7 @@ public class Project {
 		targetLanguage = Utils.getDefaultTargetLanguage().toUpperCase();
 		sourceEncoding = lm.getDefaultEncodingFromCode(sourceLanguage, Utils.getPlatformType());
 		targetEncoding = lm.getDefaultEncodingFromCode(targetLanguage, Utils.getPlatformType());
+		isModified = false;
 	}
 
 	/**
@@ -56,6 +60,7 @@ public class Project {
 		inp.filterSettings = ((filterSettings == null) ? "" : filterSettings);
 		inp.relativePath = newPath;
 		inputList.add(inp);
+		isModified = true;
 		return 0;
 	}
 
@@ -73,9 +78,55 @@ public class Project {
 	
 	public void save (String newPath) {
 		//TODO
+		isModified = false;
+		path = newPath;
 	}
 	
 	public void load (String newPath) {
 		//TODO
+		isModified = false;
+		path = newPath;
+	}
+	
+	public void setOutputRoot (String newRoot) {
+		if ( !outputRoot.equals(newRoot) ) {
+			outputRoot = newRoot;
+			isModified = true;
+		}
+	}
+
+	public void setSourceLanguage (String newLanguage) {
+		if ( !sourceLanguage.equals(newLanguage) ) {
+			sourceLanguage = newLanguage;
+			isModified = true;
+		}
+	}
+	
+	public void setSourceEncoding (String newEncoding) {
+		if ( !sourceEncoding.equals(newEncoding) ) {
+			sourceEncoding = newEncoding;
+			isModified = true;
+		}
+	}
+	
+	public void setTargetLanguage (String newLanguage) {
+		if ( !targetLanguage.equals(newLanguage) ) {
+			targetLanguage = newLanguage;
+			isModified = true;
+		}
+	}
+	
+	public void setTargetEncoding (String newEncoding) {
+		if ( !targetEncoding.equals(newEncoding) ) {
+			targetEncoding = newEncoding;
+			isModified = true;
+		}
+	}
+	
+	public void setParametersFolder (String newParameters) {
+		if ( !paramsFolder.equals(newParameters) ) {
+			paramsFolder = newParameters;
+			isModified = true;
+		}
 	}
 }

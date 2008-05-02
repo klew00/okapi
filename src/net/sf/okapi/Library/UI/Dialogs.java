@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Dialogs {
 	/**
 	 * Browses for one or more files.
+	 * @param p_Parent Parent of the dialog.
 	 * @param p_sTitle Title of the dialog box.
 	 * @param p_bMultiple True if the user can select more than one file.
 	 * @param p_sRoot Directory where to start. Use null for default directory.
@@ -66,6 +67,27 @@ public class Dialogs {
 		return aPaths;
 	}
 
+	static public String browseFilenamesForSave (Shell p_Parent,
+			String p_sTitle,
+			String p_sRoot,
+			String p_sFilterNames,
+			String p_sFilterExtensions)
+		{
+			FileDialog Dlg = new FileDialog(p_Parent, SWT.SAVE);
+			Dlg.setFilterPath(p_sRoot); // Can be null
+			if ( p_sFilterNames != null ) {
+				String[] aNames = p_sFilterNames.split("\t", -2);
+				Dlg.setFilterNames(aNames);
+			}
+			if ( p_sFilterExtensions != null ) {
+				String[] aExts = p_sFilterExtensions.split("\t", -2);
+				Dlg.setFilterExtensions(aExts);
+			}
+			Dlg.setText(p_sTitle);
+			if ( Dlg.open() == null ) return null;
+			return Dlg.getFileName();
+		}
+	
 	/**
 	 * Centers a given window on a given window.
 	 * @param p_Target The window to center.

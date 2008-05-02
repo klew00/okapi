@@ -274,7 +274,8 @@ public class PathBuilder {
 			sFile += getSuffix();
 		}
 
-		String sTmp = (p_sNewRoot==null ? p_sOriginalRoot : p_sNewRoot) + File.separatorChar;
+		String sTmp = (((p_sNewRoot==null)||(p_sNewRoot.length()==0))
+			? p_sOriginalRoot : p_sNewRoot) + File.separatorChar;
 		String sSub = getSubfolder();
 		if ( !useSubfolder() ) {
 			sSub = Utils.getDirectoryName(sPath);

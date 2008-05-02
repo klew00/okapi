@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -72,10 +72,12 @@ public class ExportPackage extends BaseAction {
 				m_Trg = m_DB.getTargetData(m_sTarget);
 			
 				// Instantiates a package writer
-				//TODO: make it dynamic!
+				//TODO: make it dynamic, using a plug-in model
 				if ( m_Opt.getPackageType().equals("omegat") )
 					m_PkgW = new net.sf.okapi.Package.OmegaT.Writer(m_FA.getLog());
-				else
+				else if ( m_Opt.getPackageType().equals("ttx") )
+					m_PkgW = new net.sf.okapi.Package.ttx.Writer(m_FA.getLog());
+				else if ( m_Opt.getPackageType().equals("omegat") )				
 					m_PkgW = new net.sf.okapi.Package.XLIFF.Writer(m_FA.getLog());
 				
 				// Start the package

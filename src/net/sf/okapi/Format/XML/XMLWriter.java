@@ -87,6 +87,10 @@ public class XMLWriter {
 		m_PW.println("-->");
 	}
 	
+	public void writeLineBreak () {
+		m_PW.println("");
+	}
+	
 	private void closeStartTag () {
 		if ( m_bInStartTag ) {
 			m_PW.write(">");

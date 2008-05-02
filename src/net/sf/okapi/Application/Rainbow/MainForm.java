@@ -40,8 +40,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -62,13 +63,14 @@ import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.Base.LogForm;
 import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Library.UI.Dialogs;
+import net.sf.okapi.Library.UI.EncodingManager;
 import net.sf.okapi.Library.UI.FormatManager;
 import net.sf.okapi.Library.UI.LanguageManager;
 import net.sf.okapi.Library.UI.PathBuilderPanel;
 import net.sf.okapi.Library.UI.ResourceManager;
 
-public class MainForm implements IParametersProvider
-{
+public class MainForm implements IParametersProvider {
+	
 	private Shell            shell;
 	private ILog             log;
 	private String           rootFolder;
@@ -88,6 +90,7 @@ public class MainForm implements IParametersProvider
 	private List             lbTargetLang;
 	private Text             edTargetEnc;
 	private List             lbTargetEnc;
+	private Text             edParamsFolder;
 	private TabItem          tiInput;
 	private TabItem          tiOptions;
 	private PathBuilderPanel pnlPathBuilder;
@@ -95,8 +98,15 @@ public class MainForm implements IParametersProvider
 	private LanguageManager  lm;
 	private ResourceManager  rm;
 	private FormatManager    fm;
-	private FilterAccess     fa;    
+	private FilterAccess     fa;
+	private EncodingManager  em;
+	private MenuItem         miSave;
 	private MenuItem         miEditInputProperties;
+	private MenuItem         cmiEditInputProperties;
+	private MenuItem         miOpenInputDocument;
+	private MenuItem         cmiOpenInputDocument;
+	private MenuItem         miRemoveInputDocuments;
+	private MenuItem         cmiRemoveInputDocuments;
 	
 	public MainForm (Shell p_Shell) {
 		try {
@@ -129,6 +139,24 @@ public class MainForm implements IParametersProvider
 		topItem.setMenu(dropMenu);
 		
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.new");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            	createProject();
+            }
+		});
+
+		miSave = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miSave, "file.save");
+		miSave.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            	saveProject(prj.path);
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.exit");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -142,6 +170,15 @@ public class MainForm implements IParametersProvider
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.log");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( log.isVisible() ) log.hide();
+				else log.show();
+            }
+		});
+		
 		// Input menu
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText("&Input");
@@ -156,7 +193,23 @@ public class MainForm implements IParametersProvider
             }
 		});
 		
+		miRemoveInputDocuments = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miRemoveInputDocuments, "input.removeDocuments");
+		miRemoveInputDocuments.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				removeDocuments(-1);
+            }
+		});
+		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		miOpenInputDocument = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miOpenInputDocument, "input.openDocument");
+		miOpenInputDocument.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openDocument(-1);
+            }
+		});
 		
 		miEditInputProperties = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miEditInputProperties, "input.editProperties");
@@ -247,6 +300,45 @@ public class MainForm implements IParametersProvider
 				}
 			}
 		});
+		
+		// Context menu for the input list
+		Menu inputTableMenu = new Menu(shell, SWT.POP_UP);
+		
+		menuItem = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "input.addDocuments");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				addDocumentsFromList(null);
+            }
+		});
+		
+		cmiRemoveInputDocuments = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiRemoveInputDocuments, "input.removeDocuments");
+		cmiRemoveInputDocuments.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				removeDocuments(-1);
+            }
+		});
+		
+		new MenuItem(inputTableMenu, SWT.SEPARATOR);
+		
+		cmiOpenInputDocument = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiOpenInputDocument, "input.openDocument");
+		cmiOpenInputDocument.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openDocument(-1);
+            }
+		});
+		
+		cmiEditInputProperties = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiEditInputProperties, "input.editProperties");
+		cmiEditInputProperties.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editInputProperties(-1);
+			}
+		});
+
+		inputTable.setMenu(inputTableMenu);
 
 		// Options tab
 		comp = new Composite(tabFolder, SWT.NONE);
@@ -317,18 +409,28 @@ public class MainForm implements IParametersProvider
 			lbSourceLang.add(lm.getItem(i).getName());
 			lbTargetLang.add(lm.getItem(i).getName());
 		}
-
-		// Output tab
+		
+		for ( int i=0; i<em.getCount(); i++ ) {
+			lbSourceEnc.add(em.getItem(i).name);
+			lbTargetEnc.add(em.getItem(i).name);
+		}
+		
+		// Other settings tab
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiOptions = new TabItem(tabFolder, SWT.NONE);
-		tiOptions.setText("Output Settings");
+		tiOptions.setText("Other Settings");
 		tiOptions.setControl(comp);
 		
-		label = new Label(comp, SWT.NONE);
-		label.setText("Output root:");
+		group = new Group(comp, SWT.NONE);
+		group.setLayout(new GridLayout(2, false));
+		group.setText("Output");
+		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edOutputRoot = new Text(comp, SWT.SINGLE | SWT.BORDER);
+		label = new Label(group, SWT.NONE);
+		label.setText("Root:");
+		
+		edOutputRoot = new Text(group, SWT.SINGLE | SWT.BORDER);
 		edOutputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edOutputRoot.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
@@ -337,8 +439,21 @@ public class MainForm implements IParametersProvider
 			}
 		});
 		
-		pnlPathBuilder = new PathBuilderPanel(comp, SWT.NONE);
-		pnlPathBuilder.setLayoutData(new GridData(GridData.FILL_BOTH));
+		pnlPathBuilder = new PathBuilderPanel(group, SWT.NONE);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		pnlPathBuilder.setLayoutData(gdTmp);
+
+		group = new Group(comp, SWT.NONE);
+		group.setLayout(new GridLayout(2, false));
+		group.setText("Filters Parameters");
+		group.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		label = new Label(group, SWT.NONE);
+		label.setText("Folder:");
+		
+		edParamsFolder = new Text(group, SWT.BORDER);
+		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Status bar
 		statusBar = new StatusBar(shell, SWT.NONE);
@@ -398,6 +513,11 @@ public class MainForm implements IParametersProvider
 	private void updateCommands () {
 		boolean enabled = (inputTable.getItemCount()>0);
 		miEditInputProperties.setEnabled(enabled);
+		cmiEditInputProperties.setEnabled(enabled);
+		miOpenInputDocument.setEnabled(enabled);
+		cmiOpenInputDocument.setEnabled(enabled);
+		miRemoveInputDocuments.setEnabled(enabled);
+		cmiRemoveInputDocuments.setEnabled(enabled);
 	}
 	
 	private void loadResources ()
@@ -405,12 +525,14 @@ public class MainForm implements IParametersProvider
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
 		rm.addImage("Rainbow");
-		rm.loadCommands("commands.xml");
+		rm.loadCommands("commands.xml"); //TODO: deal with localization
 		fm = new FormatManager();
 		fa = new FilterAccess(log);
 		fa.loadList(sharedFolder + File.separator + "filters.xml");
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml");
+		em = new EncodingManager();
+		em.loadList(sharedFolder + File.separator + "encodings.xml");
 	}
 	
 	private void changeRoot () {
@@ -435,12 +557,55 @@ public class MainForm implements IParametersProvider
 		return inputTable.getSelectionIndex();
 	}
 	
-	private void createProject () {
-		prj = new Project(lm);
+	private boolean canContinue () {
+		try {
+			if ( !prj.isModified ) return true;
+			else {
+				// Ask confirmation
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+				dlg.setMessage("Do you want to save the project?");
+				dlg.setText("Rainbow");
+				switch  ( dlg.open() ) {
+				case SWT.NO:
+					return true;
+				case SWT.CANCEL:
+					return false;
+				}
+				// Else save the project
+				saveProject(prj.path);
+			}
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
+	private void saveProject (String path) {
+		try {
+			if ( path == null ) {
+				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null, null, null);
+				if ( path == null ) return;
+			}
+			prj.save(path);
+			updateTitle();
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
+	}
+	
+	private void updateTitle () {
 		shell.setText(((prj.path == null)
 			? "Untitled"
 			: Utils.getFilename(prj.path, true))
 			+ " - Rainbow [v6.ALPHA]");
+	}
+	
+	private void createProject () {
+		prj = new Project(lm);
+		updateTitle();
 		inputTableMod.setProject(prj);
 		setSurfaceData();
 		updateCommands();
@@ -450,6 +615,7 @@ public class MainForm implements IParametersProvider
 	private void setSurfaceData () {
 		inputTableMod.updateTable(null);
 		edInputRoot.setText(prj.inputRoot);
+		edOutputRoot.setText(prj.outputRoot);
 		String sampleInput = prj.inputRoot + File.separator
 			+ "mySubFolder" + File.separator + "myFile.ext";
 		pnlPathBuilder.setData(prj.pathBuilder, prj.inputRoot, sampleInput, prj.outputRoot, "fr");
@@ -457,18 +623,24 @@ public class MainForm implements IParametersProvider
 		edSourceEnc.setText(prj.sourceEncoding);
 		edTargetLang.setText(prj.targetLanguage);
 		edTargetEnc.setText(prj.targetEncoding);
+		edParamsFolder.setText(prj.paramsFolder);
 	}
 	
 	/**
 	 * Saves the UI-accessible properties of the project into the project object.
 	 */
 	private void saveSurfaceData () {
+		String tmp = prj.pathBuilder.toString();
 		pnlPathBuilder.saveData();
-		prj.outputRoot = edOutputRoot.getText();
-		prj.sourceLanguage = edSourceLang.getText();
-		prj.sourceEncoding = edSourceEnc.getText();
-		prj.targetLanguage = edTargetLang.getText();
-		prj.targetEncoding = edTargetEnc.getText();
+		if ( !tmp.equals(prj.pathBuilder.toString()))
+			prj.isModified = true;
+		
+		prj.setOutputRoot(edOutputRoot.getText());
+		prj.setSourceLanguage(edSourceLang.getText());
+		prj.setSourceEncoding(edSourceEnc.getText());
+		prj.setTargetLanguage(edTargetLang.getText());
+		prj.setTargetEncoding(edTargetEnc.getText());
+		prj.setParametersFolder(edParamsFolder.getText());
 	}
 
 	private void addDocumentsFromList (String[] paths) {
@@ -523,6 +695,7 @@ public class MainForm implements IParametersProvider
 	
 	private void editInputProperties (int index) {
 		try {
+			saveSurfaceData();
 			int n = index;
 			if ( n < 0 ) {
 				if ( (n = getFocusedInputIndex()) < 0 ) return;
@@ -557,12 +730,12 @@ public class MainForm implements IParametersProvider
 				inp.filterSettings = aRes[0];
 				inp.encoding = aRes[1];
 			}
-			inputTableMod.updateTable(inputTable.getSelectionIndices());
 		}
 		catch ( Exception E ) {
 			Utils.showError(E.getLocalizedMessage(), null);
 		}
 		finally {
+			inputTableMod.updateTable(inputTable.getSelectionIndices());
 			stopWaiting();
 		}
 	}
@@ -595,5 +768,56 @@ public class MainForm implements IParametersProvider
 		return FilterAccess.splitFilterSettingsType1(sharedFolder, location);
 	}
 
+	private void openDocument (int index) {
+		try {
+			if ( index < 0 ) {
+				if ( (index = getFocusedInputIndex()) < 0 ) return;
+			}
+			Input inp = prj.getItemFromRelativePath(
+				inputTable.getItem(index).getText(0));
+			Program.launch(prj.inputRoot + File.separator + inp.relativePath); 
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
+	}
 	
+	private void removeDocuments (int index) {
+		try {
+			int n = index;
+			if ( n < 0 ) {
+				if ( (n = getFocusedInputIndex()) < 0 ) return;
+			}
+			
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			dlg.setMessage("You are going to remove the selected document(s) from the list.\nDo you want to proceed?");
+			dlg.setText("Rainbow");
+			if ( dlg.open() != SWT.YES ) return;
+
+			Input inp;
+			startWaiting("Updating project...", false);
+			if ( index < 0 ) {
+				int[] indices = inputTable.getSelectionIndices();
+				for ( int i=0; i<indices.length; i++ ) {
+					inp = prj.getItemFromRelativePath(
+						inputTable.getItem(indices[i]).getText(0));
+					prj.inputList.remove(inp);
+				}
+			}
+			else {
+				inp = prj.getItemFromRelativePath(
+					inputTable.getItem(index).getText(0));
+				prj.inputList.remove(inp);
+			}
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
+		finally {
+			inputTableMod.updateTable(null);
+			updateCommands();
+			stopWaiting();
+		}
+	}
 }

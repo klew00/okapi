@@ -35,9 +35,6 @@ import org.eclipse.swt.SWT;
 
 public class Utils {
 
-//	public static final String OKAPIHOME         = "OKAPIHOME";
-//	public static final String PARAMETERS_PRJDIR = "OKAPIPROJECTPARAMETERS";
-	
 	public static final int    PFTYPE_WIN        = 0;
 	public static final int    PFTYPE_MAC        = 1;
 	public static final int    PFTYPE_UNIX       = 2;
@@ -299,8 +296,7 @@ public class Utils {
 			    "Error", //TODO: Use application name
 			    JOptionPane.ERROR_MESSAGE);
 		}
-		catch ( Exception E )
-		{
+		catch ( Exception E ) {
 			JOptionPane.showMessageDialog(null,
 			    E.getMessage() + "\n" + E.getStackTrace(),
 			    "Error", //TODO: Use application name
@@ -336,32 +332,28 @@ public class Utils {
 		String sL2;
 		if ( p_sLanguage1.length() == 0 ) return false;
 		if ( p_sLanguage2.length() == 0 ) return false;
-			
+
 		p_sLanguage1 = p_sLanguage1.replace('_', '-');
 		p_sLanguage2 = p_sLanguage2.replace('_', '-');
 
-		if ( !p_bIgnoreSubLanguage )
-		{
+		if ( !p_bIgnoreSubLanguage ) {
 			sL1 = p_sLanguage1;
 			sL2 = p_sLanguage2;
 		}
-		else // Do not take the sub-language is account
-		{
-			if ( p_sLanguage1.length() > 2 )
-			{
-				sL1 = p_sLanguage1.substring(0, 3); //LEN=3
-				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 2); //LEN=2
+		else { // Do not take the sub-language is account
+			if ( p_sLanguage1.length() > 2 ) {
+				sL1 = p_sLanguage1.substring(0, 3);
+				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 2);
 			}
-			else sL1 = p_sLanguage1.substring(0, 2); //LEN=2
+			else sL1 = p_sLanguage1.substring(0, 2);
 
-			if ( p_sLanguage2.length() > 2 )
-			{
-				sL2 = p_sLanguage2.substring(0, 3); //LEN=3
-				if ( sL2.charAt(2) == '-' ) sL2 = sL2.substring(0, 2); //LEN=2
+			if ( p_sLanguage2.length() > 2 ) {
+				sL2 = p_sLanguage2.substring(0, 3);
+				if ( sL2.charAt(2) == '-' ) sL2 = sL2.substring(0, 2);
 			}
-			else sL2 = p_sLanguage2.substring(0, 2); //LEN=2
+			else sL2 = p_sLanguage2.substring(0, 2);
 		}
-			
+
 		return sL1.equalsIgnoreCase(sL2);
 	}
 
@@ -373,7 +365,7 @@ public class Utils {
 		return getOkapiSharedFolder(rootFolder) + File.separatorChar + "parameters";
 	}*/
 
-	/**
+	/*
 	 * Gets the Okapi Filter Parameters folder for a give type.
 	 * @param p_nType Type of the folder to fetch: 0=System, 1=User, 2=Project
 	 * @return The Filter Parameters folder for the given type (without a trailing separator).
