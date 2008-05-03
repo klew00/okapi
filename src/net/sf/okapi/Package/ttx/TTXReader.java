@@ -2,6 +2,8 @@ package net.sf.okapi.Package.ttx;
 
 import java.io.File;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -24,7 +26,6 @@ class TTXReader {
 	public static final int       STATUS_TOREVIEW     = 4;
 	public static final int       STATUS_OK           = 5;
 
-	private String           m_sVersion;
 	private IFilterItem      m_SrcFI;
 	private IFilterItem      m_TrgFI;
 	private IFilterItem      m_CurrentFI;
@@ -34,11 +35,13 @@ class TTXReader {
 	private Node             m_CurNode;
 	private int              m_nInCode;
 	private Stack<Boolean>   m_stkFirstChildDone;
+	private Pattern          idPattern;
 
 	//TODO: Implement case for multiple file in single doc
 	public TTXReader () {
 		m_SrcFI = new FilterItem();
 		m_TrgFI = new FilterItem();
+		idPattern = Pattern.compile("(\\d+)");
 	}
 	
 	protected void finalize ()
@@ -94,13 +97,8 @@ class TTXReader {
 				return false; // Document is done
 			}
 			String sName = getName();
-			if ( sName.equals("trans-unit") ) {
-				processTransUnit();
-				return true;
-			}
-			else if ( sName.equals("file") ) {
-				//TODO: handle multiple files
-				processFile();
+			if ( sName.equals("ut") ) {
+				if ( processUT() ) return true;
 			}
 		}
 	}
@@ -150,98 +148,27 @@ class TTXReader {
 		//TODO: check version, root, etc.
 	}
 	
-	private void processFile () {
-		//TODO: check language, etc.
-	}
-	
-	private void processTransUnit ()
+	private boolean processUT ()
 		throws Exception
 	{
-		Element Elem = (Element)m_CurNode;
-		String sTmp = Elem.getAttribute("translate");
-		if ( sTmp.length() > 0 ) m_SrcFI.setTranslatable(sTmp.equals("yes"));
-		sTmp = Elem.getAttribute("id");
-		if ( sTmp.length() == 0 ) throw new Exception("Missing attribute 'id'.");
-		else {
-			try {
-				m_SrcFI.setItemID(Integer.valueOf(sTmp));
+		String sTmp = m_CurNode.getTextContent();
+		if ( sTmp.indexOf("<u") == 0 ) {
+			Matcher M = idPattern.matcher(sTmp);
+			if ( M.find() ) {
+				m_SrcFI.setTranslatable(false);
+				m_SrcFI.setItemID(Integer.valueOf(
+					sTmp.substring(M.start(), M.end())));
 			}
-			catch ( Exception E ) {
-				throw new Exception("Invalid value for attribute 'id'.");
-			}
-		}
-		
-		// Process the content
-		while ( nextNode() ) {
-			String sName = getName();
-			if ( sName.equals("trans-unit") ) {
-				return; // End of the trans-unit element
-			}
-			if ( sName.equals("source") ) {
-				m_CurrentFI = m_SrcFI;
-				m_nInCode = 0;
-				processContent(sName);
-			}
-			else if ( sName.equals("target") ) {
-				processTarget();
+			else {
+				// ID not found, cannot merge
+				//TODO: set log
 			}
 		}
-	}
-	
-	/**
-	 * Processes a segment content. Set m_CurrentFI and set m_nInCode to zero before
-	 * calling this method with <source> or <target>.
-	 * @param p_sContainer The name of the element content that is processed.
-	 */
-	private void processContent (String p_sContainer)
-	{
-		while ( nextNode() ) {
-			switch ( m_CurNode.getNodeType() ) {
-			case Node.TEXT_NODE:
-			case Node.CDATA_SECTION_NODE:
-				if ( m_nInCode == 0 )
-					m_CurrentFI.appendText(m_CurNode.getTextContent());
-				break;
-
-			case Node.ELEMENT_NODE:
-				String sName = m_CurNode.getNodeName();
-				if ( sName.equals(p_sContainer) ) {
-					if ( sName.equals("bpt") ) m_nInCode--;
-					else if ( sName.equals("ept") ) m_nInCode--;
-					else if ( sName.equals("ph") ) m_nInCode--;
-					else if ( sName.equals("g") ) {
-						m_CurrentFI.appendCode(InlineCode.CLOSING, null, null);
-					}
-					// End return in all cases
-					return;
-				}
-				
-				// Else: It's a start of element
-				if ( sName.equals("g") ) {
-					m_CurrentFI.appendCode(InlineCode.OPENING, null, null);
-				}
-				else if ( sName.equals("x") ) {
-					m_CurrentFI.appendCode(InlineCode.ISOLATED, null, null);
-				}
-				else if ( sName.equals("bpt") ) {
-					m_CurrentFI.appendCode(InlineCode.OPENING, null, null);
-					m_nInCode++;
-				}
-				else if ( sName.equals("ept") ) {
-					m_CurrentFI.appendCode(InlineCode.CLOSING, null, null);
-					m_nInCode++;
-				}
-				else if ( sName.equals("ph") ) {
-					m_CurrentFI.appendCode(InlineCode.ISOLATED, null, null);
-					m_nInCode++;
-				}
-				else if ( sName.equals("it") ) {
-					m_CurrentFI.appendCode(InlineCode.ISOLATED, null, null);
-					m_nInCode++;
-				}
-				break;
-			}
+		else if ( sTmp.indexOf("</u>") == 0 ) {
+			// End of the TU
+			return true;
 		}
+		return false;
 	}
 	
 	private void processTarget () {
@@ -256,7 +183,7 @@ class TTXReader {
 
 		m_CurrentFI = m_TrgFI;
 		m_nInCode = 0;
-		processContent("target");
+		//TODOprocessContent("target");
 
 		if ( m_TrgFI.isEmpty() && !m_SrcFI.isEmpty() ) {
 			return; // No translation found

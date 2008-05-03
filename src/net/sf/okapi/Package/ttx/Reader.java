@@ -21,6 +21,7 @@
 package net.sf.okapi.Package.ttx;
 
 import net.sf.okapi.Filter.IFilterItem;
+import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Package.IReader;
 
 /**
@@ -28,29 +29,48 @@ import net.sf.okapi.Package.IReader;
  */
 public class Reader implements IReader {
 
-	public void closeDocument() {
-		// TODO Auto-generated method stub
-		
+	ILog                log;
+	TTXReader           reader;
+	
+	public Reader (ILog p_Log) {
+		log = p_Log;
+		reader = new TTXReader();
+	}
+	
+	public void closeDocument () {
+		try {
+			reader.close();
+		}
+		catch ( Exception E ) {
+			log.error(E.getLocalizedMessage());
+		}
 	}
 
-	public IFilterItem getSourceItem() {
-		// TODO Auto-generated method stub
-		return null;
+	public IFilterItem getSourceItem () {
+		return reader.getSourceItem();
 	}
 
-	public IFilterItem getTargetItem() {
-		// TODO Auto-generated method stub
-		return null;
+	public IFilterItem getTargetItem () {
+		return reader.getSourceItem();
 	}
 
-	public void openDocument(String path) {
-		// TODO Auto-generated method stub
-		
+	public void openDocument (String path) {
+		try {
+			reader.open(path);
+		}
+		catch ( Exception E ) {
+			log.error(E.getLocalizedMessage());
+		}
 	}
 
-	public boolean readItem() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean readItem () {
+		try {
+			return reader.readItem();
+		}
+		catch ( Exception E ) {
+			log.error(E.getLocalizedMessage());
+			return false;
+		}
 	}
 	
 }

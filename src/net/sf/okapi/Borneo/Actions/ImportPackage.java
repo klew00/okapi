@@ -33,7 +33,7 @@ import net.sf.okapi.Library.Base.LogType;
 import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Package.Manifest;
 import net.sf.okapi.Package.ManifestItem;
-import net.sf.okapi.Package.XLIFF.Reader;
+import net.sf.okapi.Package.IReader;
 
 public class ImportPackage extends BaseAction {
 
@@ -42,7 +42,7 @@ public class ImportPackage extends BaseAction {
 	private DBDoc                 m_Doc;
 	private String                m_sTarget;
 	private Manifest              m_Mnf;
-	private Reader                m_PkgR;
+	private IReader               m_PkgR;
 	
 	public ImportPackage (FilterAccess p_FA,
 		DBBase p_DB)
@@ -67,7 +67,16 @@ public class ImportPackage extends BaseAction {
 		try {
 			// Instantiate a package read of the proper type
 			//TODO: select from package type
-			m_PkgR = new Reader(m_FA.getLog());
+			if ( "omegat".equals(m_Mnf.getPackageType()) ) {
+				m_PkgR = new net.sf.okapi.Package.OmegaT.Reader(m_FA.getLog());
+			}
+			else if ( "genericxliff".equals(m_Mnf.getPackageType()) ) {
+				m_PkgR = new net.sf.okapi.Package.XLIFF.Reader(m_FA.getLog());
+			}
+			if ( "ttx".equals(m_Mnf.getPackageType()) ) {
+				m_PkgR = new net.sf.okapi.Package.ttx.Reader(m_FA.getLog());
+			}
+			
 			
 			// One target language only, and take it from the manifest
 			m_sTarget = m_Mnf.getTargetLanguage();

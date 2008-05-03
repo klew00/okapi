@@ -37,8 +37,7 @@ public class Reader implements IReader {
 		m_R = new net.sf.okapi.Format.XLIFF.Reader();
 	}
 
-	public void closeDocument ()
-	{
+	public void closeDocument () {
 		try {
 			m_R.close();
 		}
