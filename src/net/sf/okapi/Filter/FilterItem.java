@@ -709,7 +709,7 @@ public class FilterItem implements IFilterItem {
 	public void setEncoding (String p_sValue) {
 		m_Encoding = Charset.forName(p_sValue);
 		// For now we don't escape normal extended chars if the output
-		// encoding is UTF-8. This is for TWB v7 output in Text TM
+		// sourceEncoding is UTF-8. This is for TWB v7 output in Text TM
 		m_bRTFEscapeEC = !m_Encoding.name().equalsIgnoreCase("utf-8");
 	}
 	
@@ -805,7 +805,7 @@ public class FilterItem implements IFilterItem {
 		m_sRTFStartInLine = p_sRTFStartInLine;
 		m_sRTFStartProtected = p_sRTFStartProtected;
 		// m_bRTFEscapeEC may be changed here in the future.
-		// For now it depends on the encoding.
+		// For now it depends on the sourceEncoding.
 	}
 	
 	public void setStart(long p_lValue) {

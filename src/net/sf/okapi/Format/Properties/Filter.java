@@ -277,7 +277,7 @@ public class Filter implements IFilter {
 			m_sInputLanguage = p_sLanguage;
 			m_sInputEncoding = p_sEncoding;
 
-			// Auto-detect encoding and line-breaks info before parsing
+			// Auto-detect sourceEncoding and line-breaks info before parsing
 			String[] aInfo = Utils.detectFileInformation(p_sPath, true);
 			if ( aInfo[0] != null ) m_sInputEncoding = aInfo[0];
 			if ( aInfo[1] != null ) m_sLineBreak = aInfo[1];
@@ -285,7 +285,7 @@ public class Filter implements IFilter {
 
 			// By default output language is the same as input
 			m_sOutputLanguage = p_sLanguage;
-			// By default output encoding is the same as input
+			// By default output sourceEncoding is the same as input
 			m_sOutputEncoding = m_sInputEncoding;
 
 			// Load the DNL list if needed
@@ -322,14 +322,14 @@ public class Filter implements IFilter {
 		m_sInputEncoding = p_sEncoding;
 		// By default output language is the same as input
 		m_sOutputLanguage = p_sLanguage;
-		// By default output encoding is the same as input
+		// By default output sourceEncoding is the same as input
 		m_sOutputEncoding = p_sEncoding;
 
 		m_bInputStringMode = true;
 		m_sInput = p_sInput;
 		if ( m_sInput == null ) m_sInput = "";
 
-		// Set encoding, line-breaks info before parsing
+		// Set sourceEncoding, line-breaks info before parsing
 		m_sInputEncoding = "UTF-16";
 		m_sLineBreak = LineBreakType.UNIX;
 		m_CurrentFI.setLineBreak(m_sLineBreak);
@@ -344,7 +344,7 @@ public class Filter implements IFilter {
 			// Create the folder for the output if needed
 			Utils.createDirectories(p_sPath);
 
-			// Make sure we use an RTF-friendly encoding
+			// Make sure we use an RTF-friendly sourceEncoding
 			if ( m_nOutputLayer == FilterOutputLayer.RTF )
 			{
 				String sRTF = Utils.getANSIEncoding(m_sOutputLanguage);

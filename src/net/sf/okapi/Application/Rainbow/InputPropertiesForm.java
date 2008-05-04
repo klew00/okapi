@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -40,7 +40,8 @@ import org.eclipse.swt.widgets.Text;
 class InputPropertiesForm {
 	
 	private Shell                 shell;
-	private Text                  edEncoding;
+	private Text                  edSrcEncoding;
+	private Text                  edTrgEncoding;
 	private String[]              m_aResults = null;
 	private OKCancelPanel         pnlActions;
 	private FilterSettingsPanel   pnlFilterSettings;
@@ -65,9 +66,14 @@ class InputPropertiesForm {
 		pnlFilterSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		label = new Label(comp, SWT.NONE);
-		label.setText("Encoding:");
-		edEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
-		edEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		label.setText("Source encoding:");
+		edSrcEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		edSrcEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		label = new Label(comp, SWT.NONE);
+		label.setText("Target encoding:");
+		edTrgEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		edTrgEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		// Dialog-level buttons
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -105,17 +111,21 @@ class InputPropertiesForm {
 	}
 
 	void setData (String filterSettings,
-		String encoding,
-		FilterAccess p_FA) {
+		String sourceEncoding,
+		String targetEncoding,
+		FilterAccess p_FA)
+	{
 		pnlFilterSettings.setData(filterSettings, p_FA);
-		edEncoding.setText(encoding);
+		edSrcEncoding.setText(sourceEncoding);
+		edTrgEncoding.setText(targetEncoding);
 	}
 
 	private boolean saveData () {
 		try {
-			m_aResults = new String[2];
+			m_aResults = new String[3];
 			m_aResults[0] = pnlFilterSettings.getData();
-			m_aResults[1] = edEncoding.getText();
+			m_aResults[1] = edSrcEncoding.getText();
+			m_aResults[2] = edTrgEncoding.getText();
 		}
 		catch ( Exception E ) {
 			return false;

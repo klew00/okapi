@@ -253,7 +253,7 @@ public class Utils {
 	{
 		String sEncoding = "windows-1252";
 /*TODO
-		// Fall back to an RTF-friendly encoding
+		// Fall back to an RTF-friendly sourceEncoding
 		try
 		{
 			CultureInfo CI = new CultureInfo(p_sLanguage);
@@ -489,10 +489,10 @@ public class Utils {
 	}
 
 	/**
-	 * Tries to detect the encoding and optionally the line-break type of a given file.
+	 * Tries to detect the sourceEncoding and optionally the line-break type of a given file.
 	 * @param p_sPath the full path of the file.
 	 * @param p_bDetectLB True to try to detect line-break
-	 * @return A string array: 0=encoding, 1=Line-break type. If the encoding could not be detected
+	 * @return A string array: 0=sourceEncoding, 1=Line-break type. If the sourceEncoding could not be detected
 	 * a value null is return for it. If the line-break could not be detected, a value null is
 	 * return for it.
 	 */
@@ -508,9 +508,9 @@ public class Utils {
 			byte Buf[] = new byte[9];
 			int nRead = IS.read(Buf, 0, 3);
 			
-			// Try to detect the encoding
+			// Try to detect the sourceEncoding
 			if ( nRead > 1 ) {
-				// Try to get detect the encoding values
+				// Try to get detect the sourceEncoding values
 				if (( Buf[0]==(byte)0xFE ) && ( Buf[1]==(byte)0xFF )) aInfo[0] = "UTF-16BE";
 				if (( Buf[0]==(byte)0xFF ) && ( Buf[1]==(byte)0xFE )) aInfo[0] = "UTF-16LE";
 				if ( nRead > 2 ) {

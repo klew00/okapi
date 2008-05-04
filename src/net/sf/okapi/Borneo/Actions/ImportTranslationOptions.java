@@ -61,7 +61,7 @@ public class ImportTranslationOptions extends BaseParameters {
 	public void fromString (String p_sData) {
 		FieldsString FS = new FieldsString(p_sData);
 		m_nImportType = FS.get("importtype", m_nImportType);
-		m_sEncoding = FS.get("encoding", m_sEncoding);
+		m_sEncoding = FS.get("sourceEncoding", m_sEncoding);
 		m_sPath = FS.get("path", m_sPath);
 		m_sFSettings = FS.get("fsettings", m_sFSettings);
 		m_bIncludeWithout = FS.get("incwithout", m_bIncludeWithout);
@@ -77,7 +77,7 @@ public class ImportTranslationOptions extends BaseParameters {
 	public String toString () {
 		FieldsString FS = new FieldsString();
 		FS.add("importtype", m_nImportType);
-		FS.add("encoding", m_sEncoding);
+		FS.add("sourceEncoding", m_sEncoding);
 		FS.add("path", m_sPath);
 		FS.add("fsettings", m_sFSettings);
 		FS.add("incwithout", m_bIncludeWithout);

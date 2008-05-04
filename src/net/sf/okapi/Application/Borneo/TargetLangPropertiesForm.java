@@ -63,7 +63,7 @@ class TargetLangPropertiesForm {
 		cmpTmp.setLayout(layTmp);
 	
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Default encoding:");
+		stTmp.setText("Default sourceEncoding:");
 		m_edEncoding = new Text(cmpTmp, SWT.BORDER);
 		m_edEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		

@@ -114,7 +114,7 @@ public class GenerateTarget extends BaseAction {
 				return bContinue;
 			}
 
-			// Get the path, settings, and encoding from the storage
+			// Get the path, settings, and sourceEncoding from the storage
 			String[] aRes = m_DB.getOriginalData(p_nDKey, DBBase.DIR_TRGDOCS, m_sTarget);
 
 			// Compose the target path

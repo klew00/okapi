@@ -33,7 +33,7 @@ public class DBTarget {
 			m_sRoot = null;
 			m_DefPB = new PathBuilder();
 
-			/*TODO: get the right default encoding
+			/*TODO: get the right default sourceEncoding
 			 *  System.Globalization.CultureInfo CI
 				= System.Globalization.CultureInfo.GetCultureInfo(p_sLangCode);
 			m_sEncoding = System.Text.Encoding.GetEncoding(CI.TextInfo.ANSICodePage).WebName;

@@ -57,8 +57,8 @@ public interface IFilter {
 		String p_sPath);//out
 
 	/**
-	 * Gets the name of the current encoding.
-	 * @return The name of the current encoding.
+	 * Gets the name of the current sourceEncoding.
+	 * @return The name of the current sourceEncoding.
 	 */
 	public String getCurrentEncoding ();
 
@@ -163,7 +163,7 @@ public interface IFilter {
 	 * Opens an input file to be processed by the filter.
 	 * @param p_sPath The full path to the input file.
 	 * @param p_sLanguage The source language of the text to extract.
-	 * @param p_sEncoding The default encoding for the file.
+	 * @param p_sEncoding The default sourceEncoding for the file.
 	 * @return True if success, false otherwise.
 	 */
 	public boolean openInputFile (String p_sPath,

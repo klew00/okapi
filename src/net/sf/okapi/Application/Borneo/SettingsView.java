@@ -147,7 +147,7 @@ class SettingsView extends Composite {
 		});
 		
 		Label stSrcEnc = new Label(this, SWT.NONE);
-		stSrcEnc.setText("Default encoding:");
+		stSrcEnc.setText("Default sourceEncoding:");
 
 		m_edSrcEnc = new Text(this, SWT.SINGLE | SWT.BORDER);
 		m_edSrcEnc.setEditable(false);

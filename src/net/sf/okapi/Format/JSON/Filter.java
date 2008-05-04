@@ -223,7 +223,7 @@ public class Filter implements IFilter {
 			m_sInputLanguage = p_sLanguage;
 			m_sInputEncoding = p_sEncoding;
 			
-			//TODO: detection for encoding!!!
+			//TODO: detection for sourceEncoding!!!
 
 			// Open the file
 			InputStream IS = new BufferedInputStream(new FileInputStream(p_sPath));
@@ -294,7 +294,7 @@ public class Filter implements IFilter {
 			// Create the folder for the output if needed
 			Utils.createDirectories(p_sPath);
 
-			// Make sure we use an RTF-friendly encoding
+			// Make sure we use an RTF-friendly sourceEncoding
 			if ( m_nOutputLayer == FilterOutputLayer.RTF ) {
 				String sRTF = Utils.getANSIEncoding(m_sOutputLanguage);
 				if ( sRTF.length() > 0 ) {

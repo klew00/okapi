@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -81,6 +81,7 @@ public class MainForm implements IParametersProvider {
 	private StatusBar        statusBar;
 	private Text             edInputRoot;
 	private Button           btGetRoot;
+	private Button           chkUseOutputRoot;
 	private Text             edOutputRoot;
 	private Text             edSourceLang;
 	private List             lbSourceLang;
@@ -427,14 +428,27 @@ public class MainForm implements IParametersProvider {
 		group.setText("Output");
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		label = new Label(group, SWT.NONE);
-		label.setText("Root:");
+		chkUseOutputRoot = new Button(group, SWT.CHECK);
+		chkUseOutputRoot.setText("Use this root:");
+		chkUseOutputRoot.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
+				if ( chkUseOutputRoot.getSelection() )
+					pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+				else
+					pnlPathBuilder.setTargetRoot(null);
+				pnlPathBuilder.updateSample();
+			};
+		});
 		
 		edOutputRoot = new Text(group, SWT.SINGLE | SWT.BORDER);
 		edOutputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edOutputRoot.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
-				pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+				if ( chkUseOutputRoot.getSelection() )
+					pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+				else
+					pnlPathBuilder.setTargetRoot(null);
 				pnlPathBuilder.updateSample();
 			}
 		});
@@ -615,6 +629,7 @@ public class MainForm implements IParametersProvider {
 	private void setSurfaceData () {
 		inputTableMod.updateTable(null);
 		edInputRoot.setText(prj.inputRoot);
+		chkUseOutputRoot.setSelection(prj.useOutputRoot);
 		edOutputRoot.setText(prj.outputRoot);
 		String sampleInput = prj.inputRoot + File.separator
 			+ "mySubFolder" + File.separator + "myFile.ext";
@@ -634,7 +649,8 @@ public class MainForm implements IParametersProvider {
 		pnlPathBuilder.saveData();
 		if ( !tmp.equals(prj.pathBuilder.toString()))
 			prj.isModified = true;
-		
+	
+		prj.setUseOutputRoot(chkUseOutputRoot.getSelection());
 		prj.setOutputRoot(edOutputRoot.getText());
 		prj.setSourceLanguage(edSourceLang.getText());
 		prj.setSourceEncoding(edSourceEnc.getText());
@@ -680,7 +696,7 @@ public class MainForm implements IParametersProvider {
 			}
 			else {
 				String[] aRes = fm.guessFormat(path);
-				switch ( prj.addDocument(path, aRes[0], aRes[1]) ) {
+				switch ( prj.addDocument(path, aRes[0], null, aRes[1]) ) {
 				case 0: // OK
 					n++;
 					break;
@@ -703,13 +719,10 @@ public class MainForm implements IParametersProvider {
 			Input inp = prj.getItemFromRelativePath(
 				inputTable.getItem(n).getText(0));
 
-			// Set defaults
-			String filterSettings = inp.filterSettings;
-			String encoding = inp.encoding;
-
 			// Call the dialog
 			InputPropertiesForm dlg = new InputPropertiesForm(shell, this);
-			dlg.setData(filterSettings, encoding, fa);
+			dlg.setData(inp.filterSettings, inp.sourceEncoding,
+				inp.targetEncoding, fa);
 			String[] aRes = dlg.showDialog();
 			if ( aRes == null ) return;
 
@@ -721,14 +734,16 @@ public class MainForm implements IParametersProvider {
 					inp = prj.getItemFromRelativePath(
 						inputTable.getItem(indices[i]).getText(0));
 					inp.filterSettings = aRes[0];
-					inp.encoding = aRes[1];
+					inp.sourceEncoding = aRes[1];
+					inp.targetEncoding = aRes[2];
 				}
 			}
 			else {
 				inp = prj.getItemFromRelativePath(
 					inputTable.getItem(index).getText(0));
 				inp.filterSettings = aRes[0];
-				inp.encoding = aRes[1];
+				inp.sourceEncoding = aRes[1];
+				inp.targetEncoding = aRes[2];
 			}
 		}
 		catch ( Exception E ) {
