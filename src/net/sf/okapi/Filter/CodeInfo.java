@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2007 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -21,20 +21,21 @@
 package net.sf.okapi.Filter;
 
 class CodeInfo {
-	public String     m_sData;
-	public String     m_sLabel;
-	public int        m_nID;
-	public int        m_nType;
+
+	public String     data;
+	public String     label;
+	public int        id;
+	public int        type;
 
 	public CodeInfo () {
 	}
 
 	public CodeInfo (CodeInfo p_Obj)
 	{
-		m_sData = p_Obj.m_sData;
-		m_sLabel = p_Obj.m_sLabel;
-		m_nID = p_Obj.m_nID;
-		m_nType = p_Obj.m_nType;
+		data = p_Obj.data;
+		label = p_Obj.label;
+		id = p_Obj.id;
+		type = p_Obj.type;
 	}
 }
 

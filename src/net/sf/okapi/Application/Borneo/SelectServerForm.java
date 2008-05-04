@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -61,7 +61,6 @@ class SelectServerForm {
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layTmp = new GridLayout(2, false);
 		cmpTmp.setLayout(layTmp);
-		
 		
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Database type:");

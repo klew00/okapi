@@ -29,7 +29,6 @@ import net.sf.okapi.Library.UI.OKCancelPanel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -54,22 +53,26 @@ class SourceDocPropertiesForm {
 		m_Shell.setImage(p_Parent.getImage());
 		m_Shell.setLayout(new GridLayout());
 		
-		
 		Composite cmpTmp = new Composite(m_Shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		cmpTmp.setLayout(new GridLayout(2, false));
 
-		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Filter settings:");
-		stTmp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-
 		m_pnlFSettings = new FilterSettingsPanel(cmpTmp, SWT.NONE, paramsProv);
-		m_pnlFSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		m_pnlFSettings.setLayoutData(gdTmp);
 		
-		stTmp = new Label(cmpTmp, SWT.NONE);
+		int verticalIndent = 8;
+		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Encoding:");
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = verticalIndent;
+		stTmp.setLayoutData(gdTmp);
+		
 		m_edEncoding = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
-		m_edEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.verticalIndent = verticalIndent;
+		m_edEncoding.setLayoutData(gdTmp);
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("File set:");
@@ -92,14 +95,13 @@ class SourceDocPropertiesForm {
 			};
 		};
 		m_pnlActions = new OKCancelPanel(m_Shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		m_pnlActions.setLayoutData(gdTmp);
 		m_Shell.setDefaultButton(m_pnlActions.m_btOK);
 
 		m_Shell.pack();
-		Rectangle Rect = m_Shell.getBounds();
-		m_Shell.setMinimumSize(Rect.width, Rect.height);
+		m_Shell.setMinimumSize(m_Shell.getSize());
 		Dialogs.centerWindow(m_Shell, p_Parent);
 	}
 	

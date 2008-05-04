@@ -113,17 +113,17 @@ public class FilterItem implements IFilterItem {
 			case InlineCode.OPENING:
 			case InlineCode.CLOSING:
 				m_bNormalized = false;
-				CI.m_nID = -1;
+				CI.id = -1;
 				break;
 			case InlineCode.ISOLATED:
-				CI.m_nID = ++m_nLastCodeID;
+				CI.id = ++m_nLastCodeID;
 				break;
 		}
 
 		// In all cases:
-		CI.m_sData = p_sData;
-		CI.m_sLabel = p_sLabel;
-		CI.m_nType = p_nType;
+		CI.data = p_sData;
+		CI.label = p_sLabel;
+		CI.type = p_nType;
 		m_aCodes.add(CI);
 		m_sbText.append((char)p_nType);
 		m_sbText.append(IToS(m_aCodes.size()-1));
@@ -146,8 +146,8 @@ public class FilterItem implements IFilterItem {
 		int nPrevCorrection = 0;
 		int nCorrection = 0;
 		CodeInfo CI = new CodeInfo();
-		CI.m_nID = ++m_nLastCodeID;
-		CI.m_nType = InlineCode.ISOLATED;
+		CI.id = ++m_nLastCodeID;
+		CI.type = InlineCode.ISOLATED;
 
 		// Check for text group
 		if (( p_nTextIndex > -1 ) && ( p_nTextLength > 0 ))
@@ -155,38 +155,38 @@ public class FilterItem implements IFilterItem {
 			// Split and set the code into two codes
 			nPrevCorrection = (p_nStart-p_nCodeIndex);
 			int nTextStart = p_nTextIndex+nPrevCorrection;
-			CI.m_sData = m_sbText.toString().substring(p_nStart, nTextStart); //LEN=nTextStart-p_nStart);
-			CI.m_sData = expandCodes(CI.m_sData);
+			CI.data = m_sbText.toString().substring(p_nStart, nTextStart); //LEN=nTextStart-p_nStart);
+			CI.data = expandCodes(CI.data);
 			m_aCodes.add(CI);
 			// Adjust the text
 			m_sbText.delete(p_nStart, nTextStart); //LEN=nTextStart-p_nStart);
-			m_sbText.insert(p_nStart, String.format("%c%c", CI.m_nType, IToS(m_aCodes.size()-1)));
+			m_sbText.insert(p_nStart, String.format("%c%c", CI.type, IToS(m_aCodes.size()-1)));
 
 			// Second part, after text
 			CI = new CodeInfo();
-			CI.m_nID = ++m_nLastCodeID;
-			CI.m_nType = InlineCode.ISOLATED;
+			CI.id = ++m_nLastCodeID;
+			CI.type = InlineCode.ISOLATED;
 			nCorrection = 2-(nTextStart-p_nStart);
 			int nC2Start = (nTextStart+nCorrection)+p_nTextLength;
 			int nC2End = ((p_nCodeLength+nCorrection)+p_nStart);
 			int nC2Len = nC2End-nC2Start;
-			CI.m_sData = m_sbText.toString().substring(nC2Start, nC2End); //LEN=nC2Len
-			CI.m_sData = expandCodes(CI.m_sData);
+			CI.data = m_sbText.toString().substring(nC2Start, nC2End); //LEN=nC2Len
+			CI.data = expandCodes(CI.data);
 			m_aCodes.add(CI);
 			// Adjust the text
 			m_sbText.delete(nC2Start, nC2End); //LEN=nC2Len
-			m_sbText.insert(nC2Start, String.format("%c%c", CI.m_nType, IToS(m_aCodes.size()-1)));
+			m_sbText.insert(nC2Start, String.format("%c%c", CI.type, IToS(m_aCodes.size()-1)));
 			nCorrection += (2-nC2Len);
 		}
 		else
 		{
 			// Set the code
-			CI.m_sData = m_sbText.toString().substring(p_nStart, p_nStart+p_nCodeLength); //LEN=p_nCodeLength
-			CI.m_sData = expandCodes(CI.m_sData);
+			CI.data = m_sbText.toString().substring(p_nStart, p_nStart+p_nCodeLength); //LEN=p_nCodeLength
+			CI.data = expandCodes(CI.data);
 			m_aCodes.add(CI);
 			// Adjust the text
 			m_sbText.delete(p_nStart, p_nStart+p_nCodeLength); //LEN=p_nCodeLength
-			m_sbText.insert(p_nStart, String.format("%c%c", CI.m_nType, IToS(m_aCodes.size()-1)));
+			m_sbText.insert(p_nStart, String.format("%c%c", CI.type, IToS(m_aCodes.size()-1)));
 			nCorrection = 2-p_nCodeLength;
 		}
 
@@ -246,9 +246,9 @@ public class FilterItem implements IFilterItem {
 		boolean p_bStandardLineBreaks)
 	{
 		if ( p_bStandardLineBreaks )
-			return m_aCodes.get(p_nIndex).m_sData;
+			return m_aCodes.get(p_nIndex).data;
 		else // Else replace the line breaks
-			return m_aCodes.get(p_nIndex).m_sData.replaceAll("\n", m_sLineBreak);
+			return m_aCodes.get(p_nIndex).data.replaceAll("\n", m_sLineBreak);
 	}
 	
 	public int getCodeCount () {
@@ -259,14 +259,14 @@ public class FilterItem implements IFilterItem {
 		// ID may be changed at normalization:
 		// First, make sure the IDs are normalized
 		if ( !m_bNormalized ) normalizeCodes();
-		return m_aCodes.get(p_nIndex).m_nID;
+		return m_aCodes.get(p_nIndex).id;
 	}
 	
 	public int getCodeIndex (int p_nID,
 		int p_nType) {
 		for ( int i=0; i<m_aCodes.size(); i++ ) {
-			if (( m_aCodes.get(i).m_nID == p_nID )
-				&& ( m_aCodes.get(i).m_nType == p_nType )) { 
+			if (( m_aCodes.get(i).id == p_nID )
+				&& ( m_aCodes.get(i).type == p_nType )) { 
 				return i;
 			}
 		}
@@ -274,7 +274,7 @@ public class FilterItem implements IFilterItem {
 	}
 	
 	public String getCodeLabel (int p_nIndex) {
-		return m_aCodes.get(p_nIndex).m_sLabel;
+		return m_aCodes.get(p_nIndex).label;
 	}
 	
 	public String getCodeMapping () {
@@ -284,7 +284,7 @@ public class FilterItem implements IFilterItem {
 		for ( CodeInfo CI : m_aCodes )
 		{
 			sbTmp.append(String.format("%1$d\u0086%2$d\u0086%3$s\u0086%4$s\u0087",
-				CI.m_nID, CI.m_nType, CI.m_sData, CI.m_sLabel));
+				CI.id, CI.type, CI.data, CI.label));
 		}
 		return sbTmp.toString();
 	}
@@ -663,10 +663,10 @@ public class FilterItem implements IFilterItem {
 			String[] asTmp2 = sTmp1.split("\u0086");
 			if ( asTmp2.length < 4 ) break; // End
 			CodeInfo CI = new CodeInfo();
-			CI.m_nID = Integer.parseInt(asTmp2[0]);
-			CI.m_nType = Integer.parseInt(asTmp2[1]);
-			CI.m_sData = asTmp2[2];
-			CI.m_sLabel = asTmp2[3];
+			CI.id = Integer.parseInt(asTmp2[0]);
+			CI.type = Integer.parseInt(asTmp2[1]);
+			CI.data = asTmp2[2];
+			CI.label = asTmp2[3];
 			m_aCodes.add(CI);
 		}
 	}
@@ -857,10 +857,10 @@ public class FilterItem implements IFilterItem {
 		while ( i < m_aCodes.size() )
 		{
 			CI = m_aCodes.get(i);
-			if ( CI.m_nID == -1 ) {
+			if ( CI.id == -1 ) {
 				// If it's a closing code: it's isolated
-				if ( CI.m_nType == InlineCode.CLOSING ) {
-					m_aCodes.get(i).m_nID = ++m_nLastCodeID;
+				if ( CI.type == InlineCode.CLOSING ) {
+					m_aCodes.get(i).id = ++m_nLastCodeID;
 					changeCodeType(i, InlineCode.ISOLATED);
 					continue;
 				}
@@ -869,16 +869,16 @@ public class FilterItem implements IFilterItem {
 				j = i+1; bFound = false;
 				nStack = 1;
 				while ( j < m_aCodes.size() ) {
-					if ( m_aCodes.get(j).m_nType == InlineCode.CLOSING ) {
-						if ( m_aCodes.get(j).m_sLabel == CI.m_sLabel ) {
+					if ( m_aCodes.get(j).type == InlineCode.CLOSING ) {
+						if ( m_aCodes.get(j).label == CI.label ) {
 							if ( (--nStack) == 0 ) {
 								bFound = true;
 								break;
 							}
 						}
 					}
-					else if ( m_aCodes.get(j).m_nType == InlineCode.OPENING ) {
-						if ( m_aCodes.get(j).m_sLabel == CI.m_sLabel ) {
+					else if ( m_aCodes.get(j).type == InlineCode.OPENING ) {
+						if ( m_aCodes.get(j).label == CI.label ) {
 							nStack++;
 						}
 					}
@@ -886,12 +886,12 @@ public class FilterItem implements IFilterItem {
 				}
 
 				if ( bFound ) {
-					m_aCodes.get(i).m_nID = ++m_nLastCodeID;
-					m_aCodes.get(j).m_nID = m_nLastCodeID; // Same ID
+					m_aCodes.get(i).id = ++m_nLastCodeID;
+					m_aCodes.get(j).id = m_nLastCodeID; // Same ID
 				}
 				else {
 					// Change to Isolated tag (update the type)
-					m_aCodes.get(i).m_nID = ++m_nLastCodeID;
+					m_aCodes.get(i).id = ++m_nLastCodeID;
 					changeCodeType(i, InlineCode.ISOLATED);
 				}
 			}
@@ -913,7 +913,7 @@ public class FilterItem implements IFilterItem {
 					if ( i+1 > m_sbText.length() ) continue;
 					if ( p_nIndexZeroBased == SToI(m_sbText.charAt(i+1)) )
 					{
-						m_aCodes.get(p_nIndexZeroBased).m_nType = InlineCode.ISOLATED; 
+						m_aCodes.get(p_nIndexZeroBased).type = InlineCode.ISOLATED; 
 						m_sbText.setCharAt(i, (char)InlineCode.ISOLATED);
 						return;
 					}

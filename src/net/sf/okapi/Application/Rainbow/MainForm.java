@@ -161,7 +161,8 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "file.exit");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-            	shell.close();
+				//TODO: check at the close event level
+				if ( canContinue() ) shell.close();
             }
 		});
 

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2007 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,7 +20,8 @@
 
 package net.sf.okapi.Filter;
 
-import net.sf.okapi.Library.Base.*;
+import net.sf.okapi.Library.Base.ILog;
+import net.sf.okapi.Library.Base.IParameters;
 
 /**
  * Provides a common way of reading the localizable content of an arbitrary input.
@@ -52,9 +53,7 @@ public interface IFilter {
 	 */
 	public String closeOutput ();
 
-	public void generateAncillaryData (String p_sId, //out
-		String p_sType,//out
-		String p_sPath);//out
+	public String[] generateAncillaryData ();
 
 	/**
 	 * Gets the name of the current sourceEncoding.
@@ -104,9 +103,9 @@ public interface IFilter {
 	/**
 	 * Sets the value of the item ID for the filter. This is used to synchronize
 	 * IDs values when a first filter calls a secondary filter.
-	 * @param p_nID New last value.
+	 * @param id New last value.
 	 */
-	public void setLastItemID (int p_nID);
+	public void setLastItemID (int id);
 
 	public ILocalizationDirectives getLocalizationDirectives ();
 
@@ -129,19 +128,6 @@ public interface IFilter {
 	public String getOutputLanguage ();
 
 	/**
-	 * Gets a string holding all the parameter option.
-	 * @return String with all parameters.
-	 *
-	public String getOptions ();*/
-	
-	/**
-	 * Gets the value for the option specified by p_sName. 
-	 * @param p_sName The name of the option to retrieve.
-	 * @return Value of the option retrieved.
-	 *
-	public String getOption (String p_sName);*/
-	
-	/**
 	 * Gets the FilterItem object for the translated item of the current
 	 * item. The returned object is meaningless if isTranslated() of the
 	 * current source item returns false. 
@@ -151,40 +137,36 @@ public interface IFilter {
 
 	/**
 	 * Initializes the filter.
-	 * @param p_Log Log object where to report error and warning.
+	 * @param log Log object where to report error and warning.
 	 */
-	public void initialize (ILog p_Log);
-
-	/*
-	public boolean loadParameters (String path,
-		boolean ignoreErrors);*/
+	public void initialize (ILog log);
 
 	/**
 	 * Opens an input file to be processed by the filter.
-	 * @param p_sPath The full path to the input file.
-	 * @param p_sLanguage The source language of the text to extract.
-	 * @param p_sEncoding The default sourceEncoding for the file.
+	 * @param path The full path to the input file.
+	 * @param language The source language of the text to extract.
+	 * @param encoding The default sourceEncoding for the file.
 	 * @return True if success, false otherwise.
 	 */
-	public boolean openInputFile (String p_sPath,
-		String p_sLanguage,
-		String p_sEncoding);
+	public boolean openInputFile (String path,
+		String language,
+		String encoding);
 
-	public boolean openInputString (String p_sInput,
-		String p_sLanguage,
-		String p_sEncoding,
-		long p_lOffsetInFile);
+	public boolean openInputString (String data,
+		String language,
+		String encoding,
+		long offsetInFile);
 
-	public boolean openOutputFile (String p_sPath);
+	public boolean openOutputFile (String path);
 
 	public boolean openOutputString ();
 
 	/**
 	 * Query the filter for specific properties.
-	 * @param p_nProperty Identifier of the property to query.
+	 * @param propertyID Identifier of the property to query.
 	 * @return True if the filter supports the given property, false if not.
 	 */
-	public boolean queryProperty (int p_nProperty);
+	public boolean queryProperty (int propertyID);
 
 	/**
 	 * Reads the next item from the input.
@@ -205,62 +187,48 @@ public interface IFilter {
 	public boolean saveParameters (String path,
 		String prefix);*/
 
-	public void setAncillaryDirectory (String p_sInputRoot,
-		String p_sAncillaryRoot);
+	public void setAncillaryDirectory (String inputRoot,
+		String ancillaryRoot);
 
 	/**
 	 * Sets the localization directives options for the filter.
-	 * @param p_LD The localization directives options.
+	 * @param directives The localization directives options.
 	 * @return True if success, false otherwise.
 	 */
-	public boolean setLocalizationDirectives (ILocalizationDirectives p_LD);
+	public boolean setLocalizationDirectives (ILocalizationDirectives directives);
 
 	/**
 	 * Sets the options for the output.
-	 * @param p_sLanguage Code of the output language.
-	 * @param p_sEncoding Encoding name of the output.
+	 * @param language Code of the output language.
+	 * @param encoding Encoding name of the output.
 	 * @return True if success, false otherwise.
 	 */
-	public boolean setOutputOptions (String p_sLanguage,
-		String p_sEncoding);
+	public boolean setOutputOptions (String language,
+		String encoding);
 
 	/**
-	 * Sets the options for the filter.
-	 * @param p_sValue The list of options.
-	 *
-	public void setOptions (String p_sValue);*/
-	
-	/**
-	 * Sets a given option for the filter.
-	 * @param p_sName The name of the option.
-	 * @param p_sValue The value for this option.
-	 *
-	public void setOption (String p_sName,
-		String p_sValue);*/
-	
-	/**
 	 * Specifies what layer to use for the output, and the codes to use.
-	 * @param p_nLayer Type of layer to use. It should be one of the values define
+	 * @param layerType Type of layer to use. It should be one of the values define
 	 * in FilterOutputLayer. 
-	 * @param p_sStartDocument Codes for the start of the document.
-	 * @param p_sEndDocument Codes for the end of the document.
-	 * @param p_sStartCode Codes for the start of an external code section.
-	 * @param p_sEndCode Codes for the end of an external code section.
-	 * @param p_sStartInline Codes for the start of an inline code section.
-	 * @param p_sEndInline Codes for the end of an inline code section.
-	 * @param p_sStartText Codes for the start of a text section.
-	 * @param p_sEndText Codes for the end of a text section.
+	 * @param startDocument Codes for the start of the document.
+	 * @param endDocument Codes for the end of the document.
+	 * @param startCode Codes for the start of an external code section.
+	 * @param endCode Codes for the end of an external code section.
+	 * @param startInline Codes for the start of an inline code section.
+	 * @param endInline Codes for the end of an inline code section.
+	 * @param startText Codes for the start of a text section.
+	 * @param endText Codes for the end of a text section.
 	 * @return True if there is no error, false otherwise.
 	 */
-	public boolean useOutputLayer (int p_nLayer,
-		String p_sStartDocument,
-		String p_sEndDocument,
-		String p_sStartCode,
-		String p_sEndCode,
-		String p_sStartInline,
-		String p_sEndInline,
-		String p_sStartText,
-		String p_sEndText);
+	public boolean useOutputLayer (int layerType,
+		String startDocument,
+		String endDocument,
+		String startCode,
+		String endCode,
+		String startInline,
+		String endInline,
+		String startText,
+		String endText);
 	
 	/**
 	 * Get the information about the output layer used in the filter.

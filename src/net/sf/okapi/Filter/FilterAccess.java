@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -114,7 +114,12 @@ public class FilterAccess {
 	 */
 	static public String[] getParametersList (String paramsFolder) {
 		File D = new File(paramsFolder);
-		String aRes[] = D.list(new DefaultFilenameFilter(",fprm"));
+		String aRes[] = D.list(new DefaultFilenameFilter(FilterSettingsMarkers.PARAMETERS_FILEEXT));
+		if ( aRes == null ) aRes = new String[0];
+		// Remove the extensions
+		for ( int i=0; i<aRes.length; i++ ) {
+			aRes[i] = Utils.getFilename(aRes[i], false);
+		}
 		return aRes;
 	}
 

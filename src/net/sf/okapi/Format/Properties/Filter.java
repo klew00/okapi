@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -172,27 +172,24 @@ public class Filter implements IFilter {
 		return null; // For output file
 	}
 
-	public void generateAncillaryData(String p_sId,
-		String p_sType,
-		String p_sPath)
-	{
+	public String[] generateAncillaryData () {
 		// No ancillary data for this filter
-		p_sId = p_sType = p_sPath = null;
+		return null;
 	}
 
-	public String getCurrentEncoding() {
+	public String getCurrentEncoding () {
 		return m_sInputEncoding;
 	}
 
-	public String getCurrentLanguage() {
+	public String getCurrentLanguage () {
 		return m_sInputLanguage;
 	}
 
-	public String getDefaultDatatype() {
+	public String getDefaultDatatype () {
 		return "properties";
 	}
 
-	public String getIdentifier() {
+	public String getIdentifier () {
 		return "okf_properties";
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -21,6 +21,7 @@
 package net.sf.okapi.Library.UI;
 
 import net.sf.okapi.Filter.FilterAccess;
+import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.IParametersProvider;
 import net.sf.okapi.Library.Base.Utils;
@@ -45,14 +46,15 @@ public class FilterSettingsPanel extends Composite {
 	private Combo                 cbParameters;
 	private Button                btEdit;
 	private Button                btCreate;
-	private IParametersProvider   paramProv;
+	private IParametersProvider   paramsProv;
+	private String[]              paramsList;
 	
 	public FilterSettingsPanel(Composite p_Parent,
 		int p_nFlags,
 		IParametersProvider paramProv)
 	{
 		super(p_Parent, SWT.NONE);
-		this.paramProv = paramProv;
+		this.paramsProv = paramProv;
 		createContent();
 	}
 	
@@ -65,24 +67,37 @@ public class FilterSettingsPanel extends Composite {
 		Label label = new Label(this, SWT.NONE);
 		label.setText("Filter:");
 		
-		cbFilters = new Combo(this, SWT.DROP_DOWN);
+		cbFilters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		cbFilters.setLayoutData(gdTmp);
+		cbFilters.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e1) {
+				fillParametersList(0);
+			}
+			public void widgetDefaultSelected(SelectionEvent e2) {}
+		});
 
 		label = new Label(this, SWT.NONE);
 		label.setText("Parameters:");
 		
-		cbParameters = new Combo(this, SWT.DROP_DOWN);
+		cbParameters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		cbParameters.setLayoutData(gdTmp);
+		cbParameters.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e1) {
+				btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+			}
+			public void widgetDefaultSelected(SelectionEvent e2) {}
+		});
 
+		// place-holder
 		new Label(this, SWT.NONE);
 		
 		int nWidth = 80;
 		btEdit = new Button(this, SWT.PUSH);
-		btEdit.setText("Edit...");
+		btEdit.setText("&Edit...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btEdit.setLayoutData(gdTmp);
@@ -94,7 +109,7 @@ public class FilterSettingsPanel extends Composite {
 		});
 
 		btCreate = new Button(this, SWT.PUSH);
-		btCreate.setText("Create...");
+		btCreate.setText("&Create...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btCreate.setLayoutData(gdTmp);
@@ -107,28 +122,71 @@ public class FilterSettingsPanel extends Composite {
 
 	}
 	
-	public void setData (String p_sFSettings,
+	public void setData (String filterSettings,
 		FilterAccess p_FA) {
 		m_FA = p_FA;
+
+		// Get the list of available filters
 		//TODO: Need to get the filter list from the plugin system
+		cbFilters.add("<None>");
 		cbFilters.add("okf_properties");
 		cbFilters.add("okf_json");
+
+		// Get the list of available parameters
+		paramsList = paramsProv.getParametersList();
+	
+		// Set the current filter
+		String[] aRes = paramsProv.splitLocation(filterSettings);
+		int n = -1;
+		for ( int i=0; i<cbFilters.getItemCount(); i++ ) {
+			if ( cbFilters.getItem(i).equals(aRes[1]) ) {
+				n = i;
+				break;
+			}
+		}
+		cbFilters.select((n>-1) ? n : 0);
+		fillParametersList(0);
 		
-		cbFilters.setText(p_sFSettings);
+		// Set the current parameters file
+		n = -1;
+		for ( int i=0; i<cbParameters.getItemCount(); i++ ) {
+			if ( cbParameters.getItem(i).equals(filterSettings) ) {
+				n = i;
+				break;
+			}
+		}
+		if ( n == -1 ) n = 0;
+		cbParameters.select(n);
+		btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+		btCreate.setEnabled(!cbFilters.getText().startsWith("<"));
 	}
 	
 	public String getData () {
-		return cbFilters.getText();
+		if ( !cbParameters.getText().startsWith("<") )
+			return cbParameters.getText();
+		if ( !cbFilters.getText().startsWith("<") )
+			return cbFilters.getText();
+		return "";
 	}
 	
-	private void selectParameters () {
+	private void fillParametersList (int index) {
+		cbParameters.removeAll();
+		cbParameters.add("<None>");
+		for ( String item : paramsList ) {
+			if ( item.startsWith(cbFilters.getText()) ) {
+				cbParameters.add(item);
+			}
+		}
+		cbParameters.select(index);
+		btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+		btCreate.setEnabled(!cbFilters.getText().startsWith("<"));
 	}
 	
 	private void editParameters () {
 		try {
-			String filterSettings = cbFilters.getText();
+			String filterSettings = getData();
 			// Get the components
-			String[] aRes = paramProv.splitLocation(filterSettings);
+			String[] aRes = paramsProv.splitLocation(filterSettings);
 			if ( filterSettings.length() == 0 ) {
 				//TODO: ask user if s/he wants to create new file
 				return;
@@ -141,7 +199,7 @@ public class FilterSettingsPanel extends Composite {
 
 			// Invoke the parameters provider to load the parameters file.
 			// We do this like this because the provider may be on the server side.
-			IParameters params = paramProv.load(filterSettings);
+			IParameters params = paramsProv.load(filterSettings);
 			if ( params == null ) {
 				Utils.showError("Error when trying to load the parameters file.", null);
 				return;
@@ -150,7 +208,7 @@ public class FilterSettingsPanel extends Composite {
 			if ( m_FA.editParameters(aRes[1], params, getParent().getShell()) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
-				paramProv.save(filterSettings, params);
+				paramsProv.save(filterSettings, params);
 			}
 		}
 		catch ( Exception E ) {
@@ -160,18 +218,29 @@ public class FilterSettingsPanel extends Composite {
 
 	private void createParameters () {
 		try {
-			String filterSettings = cbFilters.getText();
-			// Get the components
-			String[] aRes = paramProv.splitLocation(filterSettings);
-			if ( aRes[2].length() == 0 ) {
-				// Cannot edit non-specified parameters file
-				Utils.showError("A parameters name must be defined.\nFor example: myParams in myFilter@myParams.", null);
-				return;
+			String filterSettings;
+			while ( true ) {
+				InputDialog dlg = new InputDialog(getShell(), "New Parameters",
+					"Name:", "myParameters", null);
+				String newName = dlg.showDialog();
+				if ( newName == null ) return;
+				filterSettings = cbFilters.getText() + FilterSettingsMarkers.PARAMETERSSEP + newName;
+				boolean found = false;
+				for ( String item : cbParameters.getItems() ) {
+					if ( item.equalsIgnoreCase(filterSettings) ) {
+						found = true;
+						break;
+					}
+				}
+				if ( !found ) break; // Name OK
 			}
+			
+			// Get the components
+			String[] aRes = paramsProv.splitLocation(filterSettings);
 
 			// Create a default parameters object.
 			// We do this like this because the provider may be on the server side.
-			IParameters params = paramProv.createParameters(filterSettings);
+			IParameters params = paramsProv.createParameters(filterSettings);
 			if ( params == null ) {
 				Utils.showError("Error when trying to create the parameters file.", null);
 				return;
@@ -180,7 +249,7 @@ public class FilterSettingsPanel extends Composite {
 			if ( m_FA.editParameters(aRes[1], params, getParent().getShell()) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
-				paramProv.save(filterSettings, params);
+				paramsProv.save(filterSettings, params);
 			}
 		}
 		catch ( Exception E ) {
