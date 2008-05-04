@@ -41,4 +41,12 @@ public interface IParametersProvider {
 	 * The values depend on each implementation.
 	 */
 	public String[] splitLocation (String location);
+	
+	/**
+	 * Gets the list of available sets of parameters (for example, the list
+	 * of all filter settings). 
+	 * @return An array of string, each string being the string you
+	 * would pass to load the give set of parameters. 
+	 */
+	public String[] getParametersList ();
 }

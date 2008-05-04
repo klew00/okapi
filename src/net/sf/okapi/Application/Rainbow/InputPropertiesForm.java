@@ -58,17 +58,26 @@ class InputPropertiesForm {
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		comp.setLayout(new GridLayout(2, false));
 
-		Label label = new Label(comp, SWT.NONE);
-		label.setText("Filter settings:");
-		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+//		Label label = new Label(comp, SWT.NONE);
+//		label.setText("Filter settings:");
+//		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
 		pnlFilterSettings = new FilterSettingsPanel(comp, SWT.NONE, paramsProv);
-		pnlFilterSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		pnlFilterSettings.setLayoutData(gdTmp);
 		
-		label = new Label(comp, SWT.NONE);
+		int verticalIndent = 8;
+		Label label = new Label(comp, SWT.NONE);
 		label.setText("Source encoding:");
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = verticalIndent;
+		label.setLayoutData(gdTmp);
+		
 		edSrcEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
-		edSrcEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.verticalIndent = verticalIndent;
+		edSrcEncoding.setLayoutData(gdTmp);
 		
 		label = new Label(comp, SWT.NONE);
 		label.setText("Target encoding:");
@@ -90,7 +99,7 @@ class InputPropertiesForm {
 			};
 		};
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.m_btOK);

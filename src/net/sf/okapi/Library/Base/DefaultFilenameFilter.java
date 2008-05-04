@@ -25,10 +25,18 @@ import java.io.FilenameFilter;
 
 public class DefaultFilenameFilter implements FilenameFilter
 {
+	private String      extension;
 	private String      prefix;
 	
-	public DefaultFilenameFilter (String prefix) {
+	public DefaultFilenameFilter (String extension) {
+		this.extension = extension;
+	}
+
+	public DefaultFilenameFilter (String prefix,
+		String extension)
+	{
 		this.prefix = prefix;
+		this.extension = extension;
 	}
 
 	public boolean accept (File directory,
@@ -36,7 +44,12 @@ public class DefaultFilenameFilter implements FilenameFilter
 	{
 		boolean bOK = true;
 		if ( fileName != null ) {
-			bOK &= fileName.startsWith(prefix);
+			if ( extension != null ) {
+				bOK &= extension.equalsIgnoreCase(Utils.getExtension(fileName));
+			}
+			if ( prefix != null ) {
+				bOK &= fileName.startsWith(prefix);
+			}
 		}
 		return bOK;
 	}

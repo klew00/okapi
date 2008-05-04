@@ -25,6 +25,7 @@ import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.okapi.Library.Base.DefaultFilenameFilter;
 import net.sf.okapi.Library.Base.FilterSettingsMarkers;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
@@ -103,6 +104,18 @@ public class FilterAccess {
 		aOutput[1] = Utils.removeExtension(sTmp);
 		
 		return aOutput;
+	}
+
+	/**
+	 * Gets the list of all parameters files in a given folder.
+	 * @param paramsFolder The folder to where to get the files.
+	 * @return The list of filter settings strings corresponding to the 
+	 * parameters files found.
+	 */
+	static public String[] getParametersList (String paramsFolder) {
+		File D = new File(paramsFolder);
+		String aRes[] = D.list(new DefaultFilenameFilter(",fprm"));
+		return aRes;
 	}
 
 	public FilterAccess (ILog newLog) {

@@ -985,7 +985,7 @@ public abstract class DBBase {
 		String sKeyDot = String.format("%d.", p_nDKey);
 		String sFrom = getStorage() + File.separator + p_sDirectory;
 		File Origin = new File(sFrom);
-		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot));
+		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot, null));
 		if ( aNames != null ) {
 			for ( String sName : aNames ) {
 				File F = new File(sFrom + File.separator + sName);
@@ -1055,7 +1055,7 @@ public abstract class DBBase {
 		String sFrom = getStorage() + File.separator + p_sFromFolder;
 		String sDest = getStorage() + File.separator + p_sToFolder; 
 		File Origin = new File(sFrom);
-		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot));
+		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot, null));
 		if ( aNames != null ) {
 			for ( String sName : aNames ) {
 				String sFromPath = sFrom + File.separator + sName; 
@@ -1088,7 +1088,7 @@ public abstract class DBBase {
 		String sFrom = getStorage() + File.separator + p_sFolder;
 		File Origin = new File(sFrom);
 
-		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot));
+		String[] aNames = Origin.list(new DefaultFilenameFilter(sKeyDot, null));
 		if ( aNames != null ) {
 			for ( String sName : aNames ) {
 				if ( Utils.getExtension(sName).equals(FilterSettingsMarkers.PARAMETERS_FILEEXT) ) {

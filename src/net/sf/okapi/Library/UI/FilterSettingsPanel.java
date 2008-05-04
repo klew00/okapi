@@ -31,8 +31,9 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
 
 /**
  * Implements a common UI to select a filter settings string.
@@ -40,9 +41,10 @@ import org.eclipse.swt.widgets.Text;
 public class FilterSettingsPanel extends Composite {
 
 	private FilterAccess          m_FA;
-	private Text                  m_edSettings;
-	private Button                m_btEdit;
-	private Button                m_btCreate;
+	private Combo                 cbFilters;
+	private Combo                 cbParameters;
+	private Button                btEdit;
+	private Button                btCreate;
 	private IParametersProvider   paramProv;
 	
 	public FilterSettingsPanel(Composite p_Parent,
@@ -55,55 +57,76 @@ public class FilterSettingsPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(2, false);
+		GridLayout layTmp = new GridLayout(3, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
 
-		m_edSettings = new Text(this, SWT.BORDER);
+		Label label = new Label(this, SWT.NONE);
+		label.setText("Filter:");
+		
+		cbFilters = new Combo(this, SWT.DROP_DOWN);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
-		m_edSettings.setLayoutData(gdTmp);
+		cbFilters.setLayoutData(gdTmp);
 
+		label = new Label(this, SWT.NONE);
+		label.setText("Parameters:");
+		
+		cbParameters = new Combo(this, SWT.DROP_DOWN);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		cbParameters.setLayoutData(gdTmp);
+
+		new Label(this, SWT.NONE);
+		
 		int nWidth = 80;
-		m_btEdit = new Button(this, SWT.PUSH);
-		m_btEdit.setText("Edit...");
+		btEdit = new Button(this, SWT.PUSH);
+		btEdit.setText("Edit...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
-		m_btEdit.setLayoutData(gdTmp);
-		m_btEdit.addSelectionListener(new SelectionListener () {
+		btEdit.setLayoutData(gdTmp);
+		btEdit.addSelectionListener(new SelectionListener () {
 			public void widgetSelected(SelectionEvent e) {
 				editParameters();
 			}
 			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
-		m_btCreate = new Button(this, SWT.PUSH);
-		m_btCreate.setText("Create...");
+		btCreate = new Button(this, SWT.PUSH);
+		btCreate.setText("Create...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
-		m_btCreate.setLayoutData(gdTmp);
-		m_btCreate.addSelectionListener(new SelectionListener () {
+		btCreate.setLayoutData(gdTmp);
+		btCreate.addSelectionListener(new SelectionListener () {
 			public void widgetSelected(SelectionEvent e) {
 				createParameters();
 			}
 			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
+
 	}
 	
 	public void setData (String p_sFSettings,
 		FilterAccess p_FA) {
 		m_FA = p_FA;
-		m_edSettings.setText(p_sFSettings);
+		//TODO: Need to get the filter list from the plugin system
+		cbFilters.add("okf_properties");
+		cbFilters.add("okf_json");
+		
+		cbFilters.setText(p_sFSettings);
 	}
 	
 	public String getData () {
-		return m_edSettings.getText();
+		return cbFilters.getText();
+	}
+	
+	private void selectParameters () {
 	}
 	
 	private void editParameters () {
 		try {
-			String filterSettings = m_edSettings.getText();
+			String filterSettings = cbFilters.getText();
 			// Get the components
 			String[] aRes = paramProv.splitLocation(filterSettings);
 			if ( filterSettings.length() == 0 ) {
@@ -137,7 +160,7 @@ public class FilterSettingsPanel extends Composite {
 
 	private void createParameters () {
 		try {
-			String filterSettings = m_edSettings.getText();
+			String filterSettings = cbFilters.getText();
 			// Get the components
 			String[] aRes = paramProv.splitLocation(filterSettings);
 			if ( aRes[2].length() == 0 ) {

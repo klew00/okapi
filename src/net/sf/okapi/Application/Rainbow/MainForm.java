@@ -783,6 +783,10 @@ public class MainForm implements IParametersProvider {
 		return FilterAccess.splitFilterSettingsType1(sharedFolder, location);
 	}
 
+	public String[] getParametersList () {
+		return FilterAccess.getParametersList(sharedFolder);
+	}
+
 	private void openDocument (int index) {
 		try {
 			if ( index < 0 ) {
@@ -835,4 +839,5 @@ public class MainForm implements IParametersProvider {
 			stopWaiting();
 		}
 	}
+
 }

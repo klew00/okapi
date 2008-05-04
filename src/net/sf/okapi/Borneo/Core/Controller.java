@@ -448,4 +448,8 @@ public class Controller implements IParametersProvider {
 		return FilterAccess.splitFilterSettingsType1(m_DB.getParametersFolder(), location);
 	}
 
+	public String[] getParametersList () {
+		return FilterAccess.getParametersList(m_DB.getParametersFolder());
+	}
+
 }
