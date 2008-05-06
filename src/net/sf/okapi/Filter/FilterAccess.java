@@ -98,7 +98,9 @@ public class FilterAccess {
 				aOutput[2] = Utils.removeExtension(aOutput[2]);
 			}
 			sTmp = sTmp.substring(0, n);
+			
 		}
+		else aOutput[3] = "";
 
 		// Get the filter identifier
 		aOutput[1] = Utils.removeExtension(sTmp);
@@ -221,7 +223,7 @@ public class FilterAccess {
 			}
 
 			// Load the parameters
-			if ( paramPath != null ) {
+			if (( paramPath != null ) && ( paramPath.length() > 0 )) {
 				m_Flt.getParameters().load(paramPath, false);
 			}
 		}

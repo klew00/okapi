@@ -9,9 +9,9 @@ public class FormatManager {
 	}
 	
 	/**
-	 * Tries to guess the format and the sourceEncoding of a give document.
+	 * Tries to guess the format and the encoding of a give document.
 	 * @param p_sPath Full path of the document to process.
-	 * @return An array of string: 0=guessed sourceEncoding or null,
+	 * @return An array of string: 0=guessed encoding or null,
 	 * 1=guessed filter settings or null,
 	 */
 	public String[] guessFormat (String p_sPath) {

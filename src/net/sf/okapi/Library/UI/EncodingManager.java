@@ -42,7 +42,7 @@ public class EncodingManager {
 			Fact.setValidating(false);
 			Document Doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
 			
-			NodeList NL = Doc.getElementsByTagName("sourceEncoding");
+			NodeList NL = Doc.getElementsByTagName("encoding");
 			items.clear();
 			EncodingItem item;
 			

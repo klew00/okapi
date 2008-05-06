@@ -77,10 +77,26 @@ public interface IProcessor {
 	boolean translate ();
 	
 	/**
+	 * Indicates if a given attribute of the current node of the traversal is
+	 * translatable.
+	 * @param attrName The name of the attribute to query.
+	 * @return True if the attribute is translatable, false otherwise.
+	 */
+	boolean translate (String attrName);
+	
+	/**
 	 * Gets the directionality for the text of the current node of the
 	 * traversal.
 	 * @return One of the DIR_* values.
 	 */
 	int getDirectionality ();
+	
+	/**
+	 * Gets the directionality for the text of a given attribute of the current 
+	 * node of the traversal.
+	 * @param attrName The name of the attribute to query.
+	 * @return One of the DIR_* values.
+	 */
+	int getDirectionality (String attrName);
 	
 }

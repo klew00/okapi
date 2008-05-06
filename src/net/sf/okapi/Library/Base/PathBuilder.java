@@ -77,6 +77,36 @@ public class PathBuilder {
 	public PathBuilder () {
 		reset();
 	}
+	
+	public void reset () {
+		m_bUseSubfolder = false;
+		m_sSubfolder = "";
+		m_bUseExt = true;
+		m_sExt = ".<$LCode>";
+		m_nExtType = EXTTYPE_PREPEND;
+		m_sPrefix = "";
+		m_sSuffix = "";
+		m_bUsePrefix = false;
+		m_bUseSuffix = false;
+		m_bUseReplace = false;
+		m_sSearch = "";
+		m_sReplace = "";
+	}
+
+	public void copyFrom (PathBuilder pathBuilder) {
+		m_bUseSubfolder = pathBuilder.m_bUseSubfolder;
+		m_sSubfolder = pathBuilder.m_sSubfolder;
+		m_bUseExt = pathBuilder.m_bUseExt;
+		m_sExt = pathBuilder.m_sExt;
+		m_nExtType = pathBuilder.m_nExtType;
+		m_sPrefix = pathBuilder.m_sPrefix;
+		m_sSuffix = pathBuilder.m_sSuffix;
+		m_bUsePrefix = pathBuilder.m_bUsePrefix;
+		m_bUseSuffix = pathBuilder.m_bUseSuffix;
+		m_bUseReplace = pathBuilder.m_bUseReplace;
+		m_sSearch = pathBuilder.m_sSearch;
+		m_sReplace = pathBuilder.m_sReplace;
+	}
 
 	public String getSubfolder () {
 		return m_sSubfolder;
@@ -217,21 +247,6 @@ public class PathBuilder {
 		setUseReplace(aFld[9].equals("1"));
 		setSearch(aFld[10]);
 		setReplace(aFld[11]);
-	}
-
-	public void reset () {
-		m_bUseSubfolder = false;
-		m_sSubfolder = "";
-		m_bUseExt = true;
-		m_sExt = ".<$LCode>";
-		m_nExtType = EXTTYPE_PREPEND;
-		m_sPrefix = "";
-		m_sSuffix = "";
-		m_bUsePrefix = false;
-		m_bUseSuffix = false;
-		m_bUseReplace = false;
-		m_sSearch = "";
-		m_sReplace = "";
 	}
 
 	/**

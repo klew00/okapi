@@ -60,7 +60,7 @@ public class LanguageManager {
 				N = NL.item(i).getAttributes().getNamedItem("lcid");
 				if ( N == null ) LI.setLCID(-1);
 				else LI.setLCID(Integer.valueOf(N.getTextContent()));
-				N = NL.item(i).getAttributes().getNamedItem("sourceEncoding");
+				N = NL.item(i).getAttributes().getNamedItem("encoding");
 				if ( N == null ) LI.setEncoding("UTF-8", Utils.PFTYPE_WIN);
 				else LI.setEncoding(N.getTextContent(), Utils.PFTYPE_WIN);
 				N = NL.item(i).getAttributes().getNamedItem("macEncoding");

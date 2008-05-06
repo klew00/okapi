@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,54 +18,25 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Core;
+package net.sf.okapi.Application.Rainbow;
 
-import net.sf.okapi.Library.Base.PathBuilder;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class DBTarget {
-	
-	private String         m_sRoot;
-	private String         m_sEncoding;
-	private PathBuilder    m_DefPB;
+class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.Application.Rainbow.Res";
 
-	public DBTarget (String p_sLangCode) {
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+		.getBundle(BUNDLE_NAME);
+
+	private Res() {
+	}
+
+	public static String getString(String key) {
 		try {
-			m_sRoot = null;
-			m_DefPB = new PathBuilder();
-
-			/*TODO: get the right default encoding
-			 *  System.Globalization.CultureInfo CI
-				= System.Globalization.CultureInfo.GetCultureInfo(p_sLangCode);
-			m_sEncoding = System.Text.Encoding.GetEncoding(CI.TextInfo.ANSICodePage).WebName;
-			*/
-			m_sEncoding = "windows-1252"; //TODO: change to correct default
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
 		}
-		catch ( Exception E ) { // Or fall back to UTF-8
-			m_sEncoding = "UTF-8";
-		}
-	}
-
-
-	public String getRoot () {
-		return m_sRoot;
-	}
-	
-	public void setRoot (String p_sValue) {
-		if (( p_sValue == null ) || ( p_sValue.length() == 0 )) 
-			m_sRoot = null;
-		else
-			m_sRoot = p_sValue;
-	}
-
-	public String getEncoding () {
-		return m_sEncoding;
-	}
-	
-	public void setEncoding (String p_sValue) {
-		m_sEncoding = p_sValue;
-	}
-
-	public PathBuilder getDefaultPB () {
-		return m_DefPB;
 	}
 }

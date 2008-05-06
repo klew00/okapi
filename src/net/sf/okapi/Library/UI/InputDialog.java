@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-class InputDialog {
+public class InputDialog {
 	
 	private Shell            shell;
 	private Text             edField;
@@ -50,7 +50,7 @@ class InputDialog {
 	 * @param defaultInputText Default input text (can be null).
 	 * @param helpFile Path to the help file (can be null).
 	 */
-	InputDialog (Shell p_Parent,
+	public InputDialog (Shell p_Parent,
 		String captionText,
 		String labelText,
 		String defaultInputText,
@@ -72,7 +72,9 @@ class InputDialog {
 		
 		edField = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		if ( defaultInputText != null ) edField.setText(defaultInputText);
-		edField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.widthHint = 640; // No larger than this by default
+		edField.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons
 
@@ -98,7 +100,7 @@ class InputDialog {
 		Dialogs.centerWindow(shell, p_Parent);
 	}
 	
-	String showDialog () {
+	public String showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )

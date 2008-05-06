@@ -36,10 +36,12 @@ public class Dialogs {
 	 * @param p_bMultiple True if the user can select more than one file.
 	 * @param p_sRoot Directory where to start. Use null for default directory.
 	 * @param p_sFilterNames List of filter names (tab-separated) to use. Can be null.
-	 * @param p_sFilterExtensions List of filter extensions (tab-separated) to use. Can be null.
+	 * @param p_sFilterExtensions List of filter extensions (tab-separated) to use.
+	 * Can be null.
 	 * Must be the same number of items as for p_aFilterNames.
 	 * @return An array of strings, where each string is the full path for one 
-	 * of the selected files, or null if the user canceled the command.
+	 * of the selected files. Returns null if the user canceled the command or
+	 * an error occurred.
 	 */
 	static public String[] browseFilenames (Shell p_Parent,
 		String p_sTitle,
@@ -67,6 +69,18 @@ public class Dialogs {
 		return aPaths;
 	}
 
+	/**
+	 * Browses for one or more files.
+	 * @param p_Parent Parent of the dialog.
+	 * @param p_sTitle Title of the dialog box.
+	 * @param p_sRoot Directory where to start. Use null for default directory.
+	 * @param p_sFilterNames List of filter names (tab-separated) to use. Can be null.
+	 * @param p_sFilterExtensions List of filter extensions (tab-separated) to use.
+	 * Can be null.
+	 * Must be the same number of items as for p_aFilterNames.
+	 * @return The full path of the selected file or null if the user canceled
+	 * the command or an error occurred.
+	 */
 	static public String browseFilenamesForSave (Shell p_Parent,
 			String p_sTitle,
 			String p_sRoot,
@@ -85,7 +99,7 @@ public class Dialogs {
 			}
 			Dlg.setText(p_sTitle);
 			if ( Dlg.open() == null ) return null;
-			return Dlg.getFileName();
+			return Dlg.getFilterPath() + File.separator + Dlg.getFileName();
 		}
 	
 	/**

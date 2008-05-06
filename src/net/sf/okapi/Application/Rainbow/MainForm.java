@@ -65,9 +65,11 @@ import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Library.UI.Dialogs;
 import net.sf.okapi.Library.UI.EncodingManager;
 import net.sf.okapi.Library.UI.FormatManager;
+import net.sf.okapi.Library.UI.InputDialog;
 import net.sf.okapi.Library.UI.LanguageManager;
 import net.sf.okapi.Library.UI.PathBuilderPanel;
 import net.sf.okapi.Library.UI.ResourceManager;
+
 
 public class MainForm implements IParametersProvider {
 	
@@ -108,12 +110,11 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         cmiOpenInputDocument;
 	private MenuItem         miRemoveInputDocuments;
 	private MenuItem         cmiRemoveInputDocuments;
+	private MenuItem         miPseudoTranslate;
 	
 	public MainForm (Shell p_Shell) {
 		try {
 			shell = p_Shell;
-			log = new LogForm(shell);
-			log.setTitle("Rainbow Log");
 			setDirectories();
 			loadResources();
 			createContent();
@@ -128,6 +129,8 @@ public class MainForm implements IParametersProvider {
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
 		shell.setImage(rm.getImage("Rainbow"));
+		log = new LogForm(shell);
+		log.setTitle("Rainbow Log");
 
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -143,15 +146,33 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "file.new");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-            	createProject();
+				createProject();
             }
 		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.open");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openProject(null);
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		miSave = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miSave, "file.save");
 		miSave.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
             	saveProject(prj.path);
+            }
+		});
+		
+		miSave = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miSave, "file.saveas");
+		miSave.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            	saveProject(null);
             }
 		});
 		
@@ -227,6 +248,14 @@ public class MainForm implements IParametersProvider {
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 
+		miPseudoTranslate = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miPseudoTranslate, "util.pseudoTranslate");
+		miPseudoTranslate.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				launchUtility();
+            }
+		});
+		
 		// Root panel
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Input Root:");
@@ -434,11 +463,7 @@ public class MainForm implements IParametersProvider {
 		chkUseOutputRoot.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
-				if ( chkUseOutputRoot.getSelection() )
-					pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
-				else
-					pnlPathBuilder.setTargetRoot(null);
-				pnlPathBuilder.updateSample();
+				updateOutputRoot();
 			};
 		});
 		
@@ -446,11 +471,7 @@ public class MainForm implements IParametersProvider {
 		edOutputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edOutputRoot.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
-				if ( chkUseOutputRoot.getSelection() )
-					pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
-				else
-					pnlPathBuilder.setTargetRoot(null);
-				pnlPathBuilder.updateSample();
+				updateOutputRoot();
 			}
 		});
 		
@@ -494,6 +515,29 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
+	private void launchUtility () {
+		try {
+			saveSurfaceData();
+			startWaiting("Processing files...", true);
+			UtilityDriver ud = new UtilityDriver(log, prj, fa);
+			ud.execute(shell);
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
+		finally {
+			stopWaiting();
+		}
+	}
+	
+	private void updateOutputRoot () {
+		if ( chkUseOutputRoot.getSelection() )
+			pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+		else
+			pnlPathBuilder.setTargetRoot(null);
+		pnlPathBuilder.updateSample();
+	}
+	
 	private void setDirectories () {
     	// Get the location of the main class source
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
@@ -533,6 +577,7 @@ public class MainForm implements IParametersProvider {
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
+		miPseudoTranslate.setEnabled(enabled);
 	}
 	
 	private void loadResources ()
@@ -551,8 +596,19 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void changeRoot () {
-		//TODO: implement changeRoot()
-		Utils.showError("TODO", null);
+		try {
+			InputDialog dlg = new InputDialog(shell, "Source Root",
+				"New root folder:", prj.inputRoot, null);
+			String newRoot = dlg.showDialog();
+			if ( newRoot == null ) return;
+			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home");
+			//TODO: additional check, dir exists, no trailing separator, etc.
+			prj.setInputRoot(newRoot);
+			resetDisplay();
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
 	}
 
 	/**
@@ -574,6 +630,7 @@ public class MainForm implements IParametersProvider {
 	
 	private boolean canContinue () {
 		try {
+			saveSurfaceData();
 			if ( !prj.isModified ) return true;
 			else {
 				// Ask confirmation
@@ -603,6 +660,7 @@ public class MainForm implements IParametersProvider {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null, null, null);
 				if ( path == null ) return;
 			}
+			saveSurfaceData();
 			prj.save(path);
 			updateTitle();
 		}
@@ -613,41 +671,70 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateTitle () {
 		shell.setText(((prj.path == null)
-			? "Untitled"
+			? Res.getString("UNTITLED")
 			: Utils.getFilename(prj.path, true))
 			+ " - Rainbow [v6.ALPHA]");
 	}
-	
-	private void createProject () {
-		prj = new Project(lm);
+
+	private void resetDisplay () {
 		updateTitle();
 		inputTableMod.setProject(prj);
 		setSurfaceData();
 		updateCommands();
 		inputTable.setFocus();
 	}
+	
+	private void createProject () {
+		prj = new Project(lm);
+		resetDisplay();
+	}
+	
+	private void openProject (String path) {
+		try {
+			if ( !canContinue() ) return;
+			if ( path == null ) {
+				String[] paths = Dialogs.browseFilenames(shell, "Open Project", false, null, null, null);
+				if ( paths == null ) return;
+				path = paths[0];
+			}
+			prj = new Project(lm);
+			prj.load(path);
+			resetDisplay();
+		}
+		catch ( Exception E ) {
+			Utils.showError(E.getLocalizedMessage(), null);
+		}
+	}
 
 	private void setSurfaceData () {
 		inputTableMod.updateTable(null);
+		
+		String sampleInput = prj.inputRoot + File.separator
+			+ "mySubFolder" + File.separator + "myFile.ext";
+		
+		pnlPathBuilder.setData(prj.pathBuilder, prj.inputRoot, sampleInput, prj.outputRoot, "fr");
+
 		edInputRoot.setText(prj.inputRoot);
 		chkUseOutputRoot.setSelection(prj.useOutputRoot);
 		edOutputRoot.setText(prj.outputRoot);
-		String sampleInput = prj.inputRoot + File.separator
-			+ "mySubFolder" + File.separator + "myFile.ext";
-		pnlPathBuilder.setData(prj.pathBuilder, prj.inputRoot, sampleInput, prj.outputRoot, "fr");
+
 		edSourceLang.setText(prj.sourceLanguage);
 		edSourceEnc.setText(prj.sourceEncoding);
 		edTargetLang.setText(prj.targetLanguage);
 		edTargetEnc.setText(prj.targetEncoding);
 		edParamsFolder.setText(prj.paramsFolder);
+
+		edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
+		updateOutputRoot();
 	}
 	
 	/**
 	 * Saves the UI-accessible properties of the project into the project object.
 	 */
 	private void saveSurfaceData () {
+		//TODO: Fix this, tmp is already equal because of example display
 		String tmp = prj.pathBuilder.toString();
-		pnlPathBuilder.saveData();
+		pnlPathBuilder.saveData(prj.pathBuilder);
 		if ( !tmp.equals(prj.pathBuilder.toString()))
 			prj.isModified = true;
 	

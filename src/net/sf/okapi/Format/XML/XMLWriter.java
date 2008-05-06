@@ -63,7 +63,7 @@ public class XMLWriter {
 	}
 	
 	public void writeStartDocument () {
-		m_PW.println("<?xml version=\"1.0\" sourceEncoding=\"utf-8\"?>");
+		m_PW.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 	}
 	
 	public void writeEndDocument () {

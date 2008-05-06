@@ -23,6 +23,12 @@ package net.sf.okapi.Application.Rainbow;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import net.sf.okapi.Format.XML.XMLWriter;
 import net.sf.okapi.Library.Base.PathBuilder;
 import net.sf.okapi.Library.Base.Utils;
@@ -57,7 +63,7 @@ public class Project {
 		targetEncoding = lm.getDefaultEncodingFromCode(targetLanguage, Utils.getPlatformType());
 		isModified = false;
 	}
-
+	
 	/**
 	 * Adds a document to the project.
 	 * @param newPath Full path of the document to add.
@@ -132,21 +138,38 @@ public class Project {
 			writer.writeAttributeString("use", (useOutputRoot ? "1" : "0"));
 			writer.writeString(outputRoot);
 			writer.writeEndElement(); // root
+			writer.writeStartElement("subFolder");
+			writer.writeAttributeString("use", (pathBuilder.useSubfolder() ? "1" : "0"));
+			writer.writeString(pathBuilder.getSubfolder());
+			writer.writeEndElement(); // subFolder
 			writer.writeStartElement("extension");
 			writer.writeAttributeString("use", (pathBuilder.useExtension() ? "1" : "0"));
 			writer.writeAttributeString("style", String.format("%d", pathBuilder.getExtensionType()));
-			writer.writeString(pathBuilder.getExtension());
+			writer.writeString(pathBuilder.getExtension()); 
 			writer.writeEndElement(); // extension
+			writer.writeStartElement("replace");
+			writer.writeAttributeString("use", (pathBuilder.useReplace() ? "1" : "0"));
+			writer.writeAttributeString("oldText", pathBuilder.getSearch());
+			writer.writeAttributeString("newText", pathBuilder.getReplace());
+			writer.writeEndElement(); // replace
+			writer.writeStartElement("prefix");
+			writer.writeAttributeString("use", (pathBuilder.usePrefix() ? "1" : "0"));
+			writer.writeString(pathBuilder.getPrefix());
+			writer.writeEndElement(); // prefix
+			writer.writeStartElement("suffix");
+			writer.writeAttributeString("use", (pathBuilder.useSuffix() ? "1" : "0"));
+			writer.writeString(pathBuilder.getSuffix());
+			writer.writeEndElement(); // suffix
 			writer.writeEndElement(); // output
 
 			writer.writeStartElement("options");
 			writer.writeAttributeString("sourceLanguage", sourceLanguage);
-			writer.writeAttributeString("sourceEncodinge", sourceEncoding);
+			writer.writeAttributeString("sourceEncoding", sourceEncoding);
 			writer.writeAttributeString("targetLanguage", targetLanguage);
 			writer.writeAttributeString("targetEncoding", targetEncoding);
 			writer.writeEndElement(); // options
 			
-			writer.writeElementString("parametersProject", paramsFolder);
+			writer.writeElementString("parametersFolder", paramsFolder);
 			
 			writer.writeEndElement(); // rainbowProject
 			writer.writeEndDocument();
@@ -157,15 +180,122 @@ public class Project {
 			if ( writer != null ) writer.close();
 		}
 	}
+
+	private Element getFirstElement (Element parent,
+		String name) {
+		NodeList nl = parent.getElementsByTagName(name);
+		if (( nl == null ) || ( nl.getLength() == 0 )) return null;
+		else return (Element)nl.item(0);
+	}
 	
+	/**
+	 * Loads an existing project. The project must have been just created before.
+	 * @param newPath Full path of the project file to load.
+	 * @throws Exception
+	 */
 	public void load (String newPath)
 		throws Exception
 	{
-		//TODO
-		isModified = false;
-		path = newPath;
+		try {
+			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+			Fact.setValidating(false);
+			Document Doc = Fact.newDocumentBuilder().parse(new File(newPath));
+			
+			Element rootElem = Doc.getDocumentElement();
+			String tmp = rootElem.getAttribute("version");
+			if ( !tmp.equals("4") ) {
+				throw new Exception("Unsupported version of the project file.");
+			}
+
+			Element elem1 = getFirstElement(rootElem, "fileSet");
+			if ( elem1 == null ) throw new Exception("Element <fileSet> missing.");
+			
+			Element elem2 = getFirstElement(elem1, "root");
+			if ( elem2 == null ) throw new Exception("Element <root> missing.");
+			inputRoot = elem2.getTextContent();
+			
+			NodeList nl = elem1.getElementsByTagName("fi");
+			Input item;
+			for ( int i=0; i<nl.getLength(); i++ ) {
+				elem2 = (Element)nl.item(i);
+				item = new Input();
+				item.filterSettings = elem2.getAttribute("fs");
+				item.format = elem2.getAttribute("fo");
+				item.sourceEncoding = elem2.getAttribute("se");
+				item.targetEncoding = elem2.getAttribute("te");
+				item.relativePath = elem2.getTextContent();
+				inputList.add(item);
+			}
+
+			elem1 = getFirstElement(rootElem, "output");
+			if ( elem1 == null ) throw new Exception("Element <output> missing.");
+			
+			elem2 = getFirstElement(elem1, "root");
+			if ( elem2 != null ) {
+				useOutputRoot = elem2.getAttribute("use").equals("1");
+				outputRoot = elem2.getTextContent();
+			}
+			
+			elem2 = getFirstElement(elem1, "subFolder");
+			if ( elem2 != null ) {
+				pathBuilder.setUseSubfolder(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setSubfolder(elem2.getTextContent());
+			}
+			
+			elem2 = getFirstElement(elem1, "extension");
+			if ( elem2 != null ) {
+				pathBuilder.setUseExtension(elem2.getAttribute("use").equals("1"));
+				int n = Integer.valueOf(elem2.getAttribute("style"));
+				if (( n < 0 ) || ( n > 2 )) n = 2; // Sanity check
+				pathBuilder.setExtensionType(n);
+				pathBuilder.setExtension(elem2.getTextContent());
+			}
+
+			elem2 = getFirstElement(elem1, "replace");
+			if ( elem2 != null ) {
+				pathBuilder.setUseReplace(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setSearch(elem2.getAttribute("oldText"));
+				pathBuilder.setReplace(elem2.getAttribute("newText"));
+			}
+
+			elem2 = getFirstElement(elem1, "prefix");
+			if ( elem2 != null ) {
+				pathBuilder.setUsePrefix(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setPrefix(elem2.getTextContent());
+			}
+
+			elem2 = getFirstElement(elem1, "suffix");
+			if ( elem2 != null ) {
+				pathBuilder.setUseSuffix(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setSuffix(elem2.getTextContent());
+			}
+
+			elem1 = getFirstElement(rootElem, "options");
+			if ( elem1 == null ) throw new Exception("Element <options> missing.");
+			sourceLanguage = elem1.getAttribute("sourceLanguage");
+			targetLanguage = elem1.getAttribute("targetLanguage");
+			sourceEncoding = elem1.getAttribute("sourceEncoding");
+			targetEncoding = elem1.getAttribute("targetEncoding");
+			
+			elem1 = getFirstElement(rootElem, "parametersFolder");
+			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
+			paramsFolder = elem1.getTextContent();
+
+			isModified = false;
+			path = newPath;
+		}
+		catch (Exception E ) {
+			throw E;
+		}
 	}
 	
+	public void setInputRoot (String newRoot) {
+		if ( !inputRoot.equals(newRoot) ) {
+			inputRoot = newRoot;
+			isModified = true;
+		}
+	}
+
 	public void setUseOutputRoot (boolean value) {
 		if ( useOutputRoot != value ) {
 			useOutputRoot = value;
@@ -215,12 +345,28 @@ public class Project {
 		}
 	}
 	
-	public String buildTargetPath (String relativeSourcePath,
-		String targetLanguage)
+	/**
+	 * Builds the full path for a target file.
+	 * @param relativeSourcePath
+	 * @return the full path of the target file.
+	 */
+	public String buildTargetPath (String relativeSourcePath)
 	{
 		return pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
 			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
 			targetLanguage);
+	}
+	
+	public String buildSourceEncoding (Input item) {
+		return ((item.sourceEncoding.length() == 0)
+			? sourceEncoding
+			: item.sourceEncoding);
+	}
+
+	public String buildTargetEncoding (Input item) {
+		return ((item.targetEncoding.length() == 0)
+			? targetEncoding
+			: item.targetEncoding);
 	}
 }

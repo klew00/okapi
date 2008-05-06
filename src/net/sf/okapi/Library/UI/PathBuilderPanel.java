@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class PathBuilderPanel extends Composite {
 	
-	private boolean     m_bInInit = true;
+	private int         initLevel = 0;
 	private Button      m_chkUseSubdir;
 	private Text        m_edSubdir;
 	private Button      m_chkUseExt;
@@ -53,7 +53,7 @@ public class PathBuilderPanel extends Composite {
 	private Text        m_edReplace;
 	private Text        m_edBefore;
 	private Text        m_edAfter;
-	private PathBuilder m_PB;
+	private PathBuilder m_TempPB;
 	private String      m_sSrcRoot;
 	private String      m_sTrgRoot;
 	private String      m_sLang;
@@ -200,7 +200,9 @@ public class PathBuilderPanel extends Composite {
 		String p_sTrgRoot,
 		String p_sLang)
 	{
-		m_PB = p_Data;
+		initLevel++;
+		m_TempPB = new PathBuilder();
+		m_TempPB.copyFrom(p_Data);
 		m_sSrcRoot = p_sSrcRoot;
 		m_sTrgRoot = p_sTrgRoot;
 		m_sLang = p_sLang;
@@ -225,36 +227,36 @@ public class PathBuilderPanel extends Composite {
 		m_edSearch.setText(p_Data.getSearch());
 		m_edReplace.setText(p_Data.getReplace());
 		
-		m_bInInit = false;
+		initLevel--;
 		updateSample();
 	}
 	
-	public void saveData () {
-		m_PB.setUseSubfolder(m_chkUseSubdir.getSelection());
-		m_PB.setSubfolder(m_edSubdir.getText());
+	public void saveData (PathBuilder pathBuilder) {
+		pathBuilder.setUseSubfolder(m_chkUseSubdir.getSelection());
+		pathBuilder.setSubfolder(m_edSubdir.getText());
 
-		m_PB.setUseExtension(m_chkUseExt.getSelection());
-		m_PB.setExtension(m_edExt.getText());
-		if ( m_rdExtReplace.getSelection() ) m_PB.setExtensionType(PathBuilder.EXTTYPE_REPLACE);
-		else if ( m_rdExtAppend.getSelection() ) m_PB.setExtensionType(PathBuilder.EXTTYPE_APPEND);
-		else m_PB.setExtensionType(PathBuilder.EXTTYPE_PREPEND);
+		pathBuilder.setUseExtension(m_chkUseExt.getSelection());
+		pathBuilder.setExtension(m_edExt.getText());
+		if ( m_rdExtReplace.getSelection() ) pathBuilder.setExtensionType(PathBuilder.EXTTYPE_REPLACE);
+		else if ( m_rdExtAppend.getSelection() ) pathBuilder.setExtensionType(PathBuilder.EXTTYPE_APPEND);
+		else pathBuilder.setExtensionType(PathBuilder.EXTTYPE_PREPEND);
 		
-		m_PB.setUsePrefix(m_chkUsePrefix.getSelection());
-		m_PB.setPrefix(m_edPrefix.getText());
+		pathBuilder.setUsePrefix(m_chkUsePrefix.getSelection());
+		pathBuilder.setPrefix(m_edPrefix.getText());
 		
-		m_PB.setUseSuffix(m_chkUseSuffix.getSelection());
-		m_PB.setSuffix(m_edSuffix.getText());
+		pathBuilder.setUseSuffix(m_chkUseSuffix.getSelection());
+		pathBuilder.setSuffix(m_edSuffix.getText());
 		
-		m_PB.setUseReplace(m_chkUseReplace.getSelection());
-		m_PB.setSearch(m_edSearch.getText());
-		m_PB.setReplace(m_edReplace.getText());
+		pathBuilder.setUseReplace(m_chkUseReplace.getSelection());
+		pathBuilder.setSearch(m_edSearch.getText());
+		pathBuilder.setReplace(m_edReplace.getText());
 	}
 
 	public void updateSample () {
-		if ( m_bInInit ) return;
+		if ( initLevel > 0 ) return;
 		
-		saveData();
-		String sTmp = m_PB.getPath(m_edBefore.getText(), m_sSrcRoot, m_sTrgRoot, m_sLang);
+		saveData(m_TempPB);
+		String sTmp = m_TempPB.getPath(m_edBefore.getText(), m_sSrcRoot, m_sTrgRoot, m_sLang);
 		m_edAfter.setText(sTmp);
 		
 		m_edSubdir.setEnabled(m_chkUseSubdir.getSelection());

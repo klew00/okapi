@@ -56,8 +56,8 @@ public interface IFilter {
 	public String[] generateAncillaryData ();
 
 	/**
-	 * Gets the name of the current sourceEncoding.
-	 * @return The name of the current sourceEncoding.
+	 * Gets the name of the current encoding.
+	 * @return The name of the current encoding.
 	 */
 	public String getCurrentEncoding ();
 
@@ -145,7 +145,7 @@ public interface IFilter {
 	 * Opens an input file to be processed by the filter.
 	 * @param path The full path to the input file.
 	 * @param language The source language of the text to extract.
-	 * @param encoding The default sourceEncoding for the file.
+	 * @param encoding The default encoding for the file.
 	 * @return True if success, false otherwise.
 	 */
 	public boolean openInputFile (String path,

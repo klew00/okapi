@@ -214,17 +214,18 @@ public class ITSProcessor implements IProcessor
 		}
 	}
 
+	private void removeFlag (Node node) {
+		//TODO: Any possible optimization, instead of using recursive calls
+		if ( node == null ) return;
+		node.setUserData(FLAGNAME, null, null);
+		if ( node.hasChildNodes() )
+			removeFlag(node.getFirstChild());
+		if ( node.getNextSibling() != null )
+			removeFlag(node.getNextSibling());
+	}
+	
 	public void disapplyRules () {
-		try {
-			XPathExpression expr = xpath.compile("//*/@"+FLAGNAME);
-			NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
-			Attr attr;
-			for ( int i=0; i<NL.getLength(); i++ ) {
-				attr = ((Attr)NL.item(i));
-				attr.getOwnerElement().removeAttribute(attr.getName());
-			}
-		}
-		catch ( Exception E ) {}; // Swallow the error
+		removeFlag(doc.getDocumentElement());
 	}
 
 	public Node getNode () {
@@ -272,18 +273,21 @@ public class ITSProcessor implements IProcessor
 		}
 	}
 	
+	/**
+	 * Updates the trace stack.
+	 * @param newNode Node to update 
+	 * @return False if the node passed as parameter is null, true otherwise.
+	 */
 	private boolean updateTraceData (Node newNode) {
 		// Check if the node is null
 		if ( newNode == null ) return false;
-		
-		// If not, check if it's an element
-		if ( newNode.getNodeType() != Node.ELEMENT_NODE ) return true;
 
-		// If element: check if it has ITS flags
-		String data = ((Element)newNode).getAttribute(FLAGNAME);
+		// Get the flag data
+		String data = (String)newNode.getUserData(FLAGNAME);
+		
 		// If this node has no ITS flags, then we leave the current states
 		// as they are. They have been set by inheritance.
-		if ( data.length() == 0 ) return true;
+		if ( data == null ) return true;
 		
 		// Otherwise: see if there are any flags to change
 		if ( data.charAt(FP_TRANSLATE) != '?' )
@@ -304,7 +308,6 @@ public class ITSProcessor implements IProcessor
 				break;
 			}
 		}
-		
 		return true;
 	}
 
@@ -402,32 +405,30 @@ public class ITSProcessor implements IProcessor
 		int position,
 		char value)
 	{
-		String attrName = FLAGNAME;
 		StringBuilder data = new StringBuilder();
-		
-		// Set flag name and target element based on the node type
-		Element elem;
-		if ( node.getNodeType() == Node.ATTRIBUTE_NODE ) {
-			elem = ((Attr)node).getOwnerElement();
-			attrName = attrName + node.getLocalName();
-		}
-		else elem = (Element)node;
-		
-		if ( elem.hasAttribute(attrName) ) {
-			data.append(elem.getAttribute(attrName));	
-		}
-		else {
+		if ( node.getUserData(FLAGNAME) == null )
 			data.append("????"+FLAGSEP);
-		}
-		data.setCharAt(FP_TRANSLATE, value);
-		elem.setAttribute(attrName, data.toString());
+		else
+			data.append((String)node.getUserData(FLAGNAME));
+		data.setCharAt(position, value);
+		node.setUserData(FLAGNAME, data.toString(), null);
 	}
 
 	public boolean translate () {
 		return trace.peek().translate;
 	}
 	
+	public boolean translate (String attrName) {
+		//TODO
+		return false;
+	}
+	
 	public int getDirectionality () {
 		return trace.peek().dir;
+	}
+
+	public int getDirectionality (String attrName) {
+		//TODO
+		return DIR_LTR;
 	}
 }

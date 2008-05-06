@@ -64,7 +64,7 @@ public class Log implements ILog {
 	}
 
 	public void clear() {
-		//TODO: Implement screen clearing
+		// Nothing to do
 	}
 	
 	public boolean canContinue() {

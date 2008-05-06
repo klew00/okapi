@@ -537,7 +537,7 @@ public abstract class DBBase {
 	 * Adds a document to the source list.
 	 * @param p_sFullPath Full path of the document to add.
 	 * @param p_nSrcType Type of source.
-	 * @param p_sEncoding Default sourceEncoding for the source document (can be null or empty).
+	 * @param p_sEncoding Default encoding for the source document (can be null or empty).
 	 * @param p_sFSettings Filter settings for the source document (can be null or empty).
 	 * @return A long that is the Document key, or -1 if an error occurs.
 	 * @throws Exception
@@ -1071,7 +1071,7 @@ public abstract class DBBase {
 	 * @param p_sFolder The storage sub-folder where to look.
 	 * @param p_sTarget target language code, or null for source data. 
 	 * @return An array of three strings: 0=path of the original file,
-	 * 1=filter settings, 2=sourceEncoding.
+	 * 1=filter settings, 2=encoding.
 	 */
 	public String[] getOriginalData (int p_nDKey,
 		String p_sFolder,

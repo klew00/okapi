@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,54 +18,71 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Core;
+package net.sf.okapi.utilities;
 
-import net.sf.okapi.Library.Base.PathBuilder;
+import net.sf.okapi.Filter.FilterItemText;
+import net.sf.okapi.Filter.FilterItemType;
+import net.sf.okapi.Filter.IFilter;
+import net.sf.okapi.Filter.IFilterItem;
+import net.sf.okapi.Library.Base.IParameters;
+import net.sf.okapi.utility.IUtility;
 
-public class DBTarget {
+public class PseudoTranslation implements IUtility {
 	
-	private String         m_sRoot;
-	private String         m_sEncoding;
-	private PathBuilder    m_DefPB;
+	IFilter             filter;
 
-	public DBTarget (String p_sLangCode) {
-		try {
-			m_sRoot = null;
-			m_DefPB = new PathBuilder();
-
-			/*TODO: get the right default encoding
-			 *  System.Globalization.CultureInfo CI
-				= System.Globalization.CultureInfo.GetCultureInfo(p_sLangCode);
-			m_sEncoding = System.Text.Encoding.GetEncoding(CI.TextInfo.ANSICodePage).WebName;
-			*/
-			m_sEncoding = "windows-1252"; //TODO: change to correct default
-		}
-		catch ( Exception E ) { // Or fall back to UTF-8
-			m_sEncoding = "UTF-8";
-		}
+	public String getIdentifier() {
+		return "pseudotranslation";
 	}
 
+	public boolean hasParameters () {
+		return false;
+	}
+	
+	public IParameters getParameters () {
+		// Not used
+		return null;
+	}
 
 	public String getRoot () {
-		return m_sRoot;
-	}
-	
-	public void setRoot (String p_sValue) {
-		if (( p_sValue == null ) || ( p_sValue.length() == 0 )) 
-			m_sRoot = null;
-		else
-			m_sRoot = p_sValue;
+		// Not used
+		return null;
 	}
 
-	public String getEncoding () {
-		return m_sEncoding;
-	}
-	
-	public void setEncoding (String p_sValue) {
-		m_sEncoding = p_sValue;
+	public boolean needRoot () {
+		return false;
 	}
 
-	public PathBuilder getDefaultPB () {
-		return m_DefPB;
+	public void processEndDocument () {
+		filter.closeOutput();
 	}
+
+	public void processItem (IFilterItem filterItem) {
+		if ( filterItem.getItemType() == FilterItemType.TEXT ) {
+			if ( filterItem.isTranslatable() ) {
+				String tmp = filterItem.getText(FilterItemText.CODED).replaceAll("\\p{L}", "X");
+				filterItem.modifyText(tmp.replaceAll("\\d", "N"));
+			}
+		}
+		filter.writeItem();
+	}
+
+	public void processStartDocument (IFilter newFilter,
+		String outputPath,
+		String outputLanguage,
+		String outputEncoding)
+	{
+		filter = newFilter;
+		filter.setOutputOptions(outputLanguage, outputEncoding);
+		filter.openOutputFile(outputPath);
+	}
+
+	public void setParameters (IParameters paramsObject) {
+		// Not used
+	}
+
+	public void setRoot (String root) {
+		// Not used
+	}
+
 }
