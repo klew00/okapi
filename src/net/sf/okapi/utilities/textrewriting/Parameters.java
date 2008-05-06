@@ -10,6 +10,10 @@ public class Parameters extends BaseParameters {
 	
 	public int          action;
 
+	public Parameters () {
+		reset();
+	}
+	
 	@Override
 	public void fromString(String data) {
 		// Read the file content as a set of fields
@@ -20,7 +24,7 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public void reset() {
-		action = ACTION_NOCHANGE;
+		action = ACTION_MASK; //ACTION_NOCHANGE;
 	}
 
 	@Override
