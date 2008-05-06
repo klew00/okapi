@@ -13,7 +13,4 @@
  <command name="input.removeDocuments" key="Delete">&amp;Remove Documents...&#x9;Delete</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
- <!-- Utilities menu -->
- <command name="util.pseudoTranslate">&amp;Pseudo-Translation...</command>
- 
 </commands>

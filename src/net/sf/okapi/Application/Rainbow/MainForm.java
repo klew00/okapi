@@ -21,6 +21,7 @@
 package net.sf.okapi.Application.Rainbow;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -69,6 +70,8 @@ import net.sf.okapi.Library.UI.InputDialog;
 import net.sf.okapi.Library.UI.LanguageManager;
 import net.sf.okapi.Library.UI.PathBuilderPanel;
 import net.sf.okapi.Library.UI.ResourceManager;
+import net.sf.okapi.plugins.PluginItem;
+import net.sf.okapi.plugins.PluginsAccess;
 
 
 public class MainForm implements IParametersProvider {
@@ -103,7 +106,10 @@ public class MainForm implements IParametersProvider {
 	private FormatManager    fm;
 	private FilterAccess     fa;
 	private EncodingManager  em;
+	private PluginsAccess    plugins;
+	private UtilityDriver    ud;
 	private MenuItem         miInput;
+	private MenuItem         miUtilities;
 	private MenuItem         miSave;
 	private MenuItem         miEditInputProperties;
 	private MenuItem         cmiEditInputProperties;
@@ -111,7 +117,6 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         cmiOpenInputDocument;
 	private MenuItem         miRemoveInputDocuments;
 	private MenuItem         cmiRemoveInputDocuments;
-	private MenuItem         miPseudoTranslate;
 	
 	public MainForm (Shell p_Shell) {
 		try {
@@ -249,19 +254,10 @@ public class MainForm implements IParametersProvider {
 		});
 
 		// Utilities menu
-		topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText("&Utilities");
-		dropMenu = new Menu(shell, SWT.DROP_DOWN);
-		topItem.setMenu(dropMenu);
+		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
+		miUtilities.setText("&Utilities");
+		buildUtilitiesMenu();
 
-		miPseudoTranslate = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miPseudoTranslate, "util.pseudoTranslate");
-		miPseudoTranslate.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				launchUtility();
-            }
-		});
-		
 		// Root panel
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Input Root:");
@@ -512,6 +508,29 @@ public class MainForm implements IParametersProvider {
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(origSize);
 	}
+	
+	private void buildUtilitiesMenu () {
+		// Remove an existing menu
+		Menu menu = miUtilities.getMenu();
+		if ( menu != null ) menu.dispose();
+		// Create new one
+		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		miUtilities.setMenu(dropMenu);
+		
+		// Add the utilities
+		Iterator<String> iter = plugins.getIterator();
+		while ( iter.hasNext() ) {
+			PluginItem item = plugins.getItem(iter.next());
+			MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+			menuItem.setText(item.name+"...");
+			menuItem.setData(item.id);
+			menuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					launchUtility(event);
+				}
+			});
+		}
+	}
 
 	public void run () {
 		try {
@@ -522,15 +541,25 @@ public class MainForm implements IParametersProvider {
 			}
 		}
 		finally {
-			// Dispose of any global resources 
+			// Dispose of any global resources
+			if ( rm != null ) rm.dispose();
 		}
 	}
 
-	private void launchUtility () {
+	private void launchUtility (SelectionEvent event) {
 		try {
+			// Save any pending data
 			saveSurfaceData();
+			// Create the utility driver if needed
+			if ( ud == null ) {
+				ud = new UtilityDriver(log, fa, plugins);
+			}
+			// Get the utility to run and instantiate it
+			String id = (String)((MenuItem)event.getSource()).getData();
+			if ( id == null ) return;
+			ud.setData(prj, id);
+			// Run it
 			startWaiting("Processing files...", true);
-			UtilityDriver ud = new UtilityDriver(log, prj, fa);
 			ud.execute(shell);
 		}
 		catch ( Exception E ) {
@@ -588,7 +617,7 @@ public class MainForm implements IParametersProvider {
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
-		miPseudoTranslate.setEnabled(enabled);
+		miUtilities.setEnabled(enabled);
 	}
 	
 	private void loadResources ()
@@ -602,6 +631,9 @@ public class MainForm implements IParametersProvider {
 		lm.loadList(sharedFolder + File.separator + "languages.xml");
 		em = new EncodingManager();
 		em.loadList(sharedFolder + File.separator + "encodings.xml");
+		plugins = new PluginsAccess();
+		//TODO: Choose a better location 
+		plugins.addAllPackages(sharedFolder);
 	}
 	
 	private void changeRoot () {

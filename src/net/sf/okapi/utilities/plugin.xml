@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<okapiPlugins version="1.0">
+ <plugin type="utility"
+  id="oku_textrewriting"
+  version="1.0"
+  pluginClass="net.sf.okapi.utilities.textrewriting.Utility"
+  editorClass="net.sf.okapi.utilities.textrewriting.Editor"
+  updateUri="http://okapi.sf.net/updates/textrewriting">
+  <info>
+   <name>Text Rewriting</name>
+   <description>Utility to re-write documents with different changes, for
+    example: masking translatable text, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+  <info xml:lang="fr">
+   <name>Re-ecriture de text</name>
+   <description>Utilitee pour re-ecrire des documents en faisant differentes
+    modifications. Par exemple, masquer le text traduisible, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+</okapiPlugins>

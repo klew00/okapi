@@ -30,11 +30,9 @@ import net.sf.okapi.Library.Base.IParameters;
 public interface IUtility {
 
 	/**
-	 * Gets the unique identifier for the utility.
-	 * @return The string identifying uniquely the utility (for example: "oku_extraction").
+	 * Indicates if the utility has parameters.
+	 * @return True if the utility has parameters, false otherwise.
 	 */
-	public String getIdentifier ();
-
 	public boolean hasParameters ();
 	
 	/**

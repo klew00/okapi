@@ -32,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.program.Program;
 
 public class Utils {
 
@@ -304,14 +305,14 @@ public class Utils {
 		}
 	}
 	
-	public static String getDefaultSourceLanguage ()
+	static public String getDefaultSourceLanguage ()
 	{
 		// In most case the 'source' language is English
 		// Even when we are on non-English machines
 		return "en-US";
 	}
 	
-	public static String getDefaultTargetLanguage ()
+	static public String getDefaultTargetLanguage ()
 	{
 		// Use the local language by default
 		Locale Loc = Locale.getDefault();
@@ -324,6 +325,12 @@ public class Utils {
 		else return sCode;
 	}
 
+	static public String getCurrentLanguage () {
+		String tmp1 = Locale.getDefault().getLanguage();
+		String tmp2 = Locale.getDefault().getCountry();
+		return (tmp1 + (tmp2.length()==0 ? "" : ("-"+tmp2))); 
+	}
+	
 	static public boolean areSameLanguages (String p_sLanguage1,
 		String p_sLanguage2,
 		boolean p_bIgnoreSubLanguage)
@@ -458,9 +465,7 @@ public class Utils {
 	static public void startPage (String p_sURL)
 	{
 		try {
-			Runtime RT = Runtime.getRuntime();
-			//TODO: No-windows parts
-			RT.exec("cmd.exe /C start " + p_sURL);
+			Program.launch(p_sURL); 
 		}
 		catch ( Exception E ) {
 			showError(E.getLocalizedMessage(), null);
@@ -507,8 +512,8 @@ public class Utils {
 			IS = new FileInputStream(p_sPath);
 			byte Buf[] = new byte[9];
 			int nRead = IS.read(Buf, 0, 3);
-			
 			// Try to detect the encoding
+			//TODO: add detection for UTF-32			
 			if ( nRead > 1 ) {
 				// Try to get detect the encoding values
 				if (( Buf[0]==(byte)0xFE ) && ( Buf[1]==(byte)0xFF )) aInfo[0] = "UTF-16BE";
@@ -577,31 +582,6 @@ public class Utils {
 		}
 		return (char)0; // Does not contain any characters listed in p_sCharList 
 	}
-
-	/**
-	 * Searches the element a classpath that ends a specific way. 
-	 * @param p_sClassPath The classpath where to search.
-	 * @param p_sEnding The ending to look for.
-	 * @return The path where the ending was found (without the ending),
-	 * or null if it was not found.
-	 *
-	public static String searchInClassPath (String p_sClassPath,
-    	String p_sEnding)
-    {
-   		int nPos = p_sClassPath.indexOf(p_sEnding);
-   		if ( nPos > -1) {
-   			// Separator before the path to the Jar
-   			int nSC1 = p_sClassPath.lastIndexOf(File.pathSeparatorChar, nPos);
-   			// Separator after the path to the Jar
-   			int nSC2 = p_sClassPath.indexOf(File.pathSeparatorChar, nPos);
-   			if ( nSC1 < 0 ) nSC1 = -1;
-   			if ( nSC2 < 0 ) nSC2 = p_sClassPath.length();
-   			String sPath = p_sClassPath.substring(nSC1+1, nSC2);
-   			sPath = sPath.substring(0, sPath.indexOf(p_sEnding));
-   			return sPath;
-   		}
-        return null;
-    }*/
 
 	/**
 	 * Gets the type of platform the application is running on.

@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Filter.FilterItemType;
 import net.sf.okapi.Library.Base.ILog;
+import net.sf.okapi.plugins.PluginItem;
+import net.sf.okapi.plugins.PluginsAccess;
 import net.sf.okapi.utility.IUtility;
 
 public class UtilityDriver {
@@ -37,19 +39,35 @@ public class UtilityDriver {
 	Project             prj;
 	FilterAccess        fa;
 	IUtility            util;
+	PluginItem          pluginItem;
+	String              utilityID;
+	PluginsAccess       plugins;
 	
 	public UtilityDriver (ILog newLog,
-		Project newPrj,
-		FilterAccess newFA)
+		FilterAccess newFA,
+		PluginsAccess newPlugins)
 	{
 		log = newLog;
-		prj = newPrj;
 		fa = newFA;
-		util = new net.sf.okapi.utilities.textrewriting.Utility();
+		plugins = newPlugins;
+	}
+
+	public void setData (Project newProject,
+		String newUtilityID)
+		throws Exception
+	{
+		prj = newProject;
+		utilityID = newUtilityID;
+		
+		if ( !plugins.containsID(newUtilityID) )
+			throw new Exception("Utility not found.");
+		pluginItem = plugins.getItem(newUtilityID);
+		util = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
 	}
 	
 	public void execute (Shell shell) {
 		try {
+			if ( pluginItem == null ) return;
 			// If there are no options to ask for,
 			// ask confirmation to launch the utility
 			if ( util.hasParameters() ) {
@@ -63,7 +81,7 @@ public class UtilityDriver {
 				if ( dlg.open() != SWT.YES ) return;
 			}
 			
-			log.beginTask("Pseudo Translation");
+			log.beginTask(pluginItem.name);
 			
 			for ( Input item : prj.inputList ) {
 				if ( item.filterSettings.length() == 0 ) continue;

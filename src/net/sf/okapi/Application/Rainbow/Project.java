@@ -199,9 +199,9 @@ public class Project {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document Doc = Fact.newDocumentBuilder().parse(new File(newPath));
+			Document doc = Fact.newDocumentBuilder().parse(new File(newPath));
 			
-			Element rootElem = Doc.getDocumentElement();
+			Element rootElem = doc.getDocumentElement();
 			String tmp = rootElem.getAttribute("version");
 			if ( !tmp.equals("4") ) {
 				throw new Exception("Unsupported version of the project file.");

@@ -36,10 +36,6 @@ public class Utility implements IUtility {
 		params = new Parameters();
 	}
 	
-	public String getIdentifier() {
-		return "textrewriting";
-	}
-
 	public boolean hasParameters () {
 		return false;
 	}
