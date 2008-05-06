@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.utilities;
+package net.sf.okapi.utilities.textrewriting;
 
 import net.sf.okapi.Filter.FilterItemText;
 import net.sf.okapi.Filter.FilterItemType;
@@ -27,12 +27,12 @@ import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.utility.IUtility;
 
-public class TextRewriting implements IUtility {
+public class Utility implements IUtility {
 	
 	IFilter             filter;
 	Parameters          params;
 
-	public TextRewriting () {
+	public Utility () {
 		params = new Parameters();
 	}
 	

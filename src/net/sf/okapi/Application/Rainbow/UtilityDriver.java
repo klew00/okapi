@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Filter.FilterItemType;
 import net.sf.okapi.Library.Base.ILog;
-import net.sf.okapi.utilities.PseudoTranslation;
 import net.sf.okapi.utility.IUtility;
 
 public class UtilityDriver {
@@ -46,7 +45,7 @@ public class UtilityDriver {
 		log = newLog;
 		prj = newPrj;
 		fa = newFA;
-		util = new PseudoTranslation();
+		util = new net.sf.okapi.utilities.textrewriting.Utility();
 	}
 	
 	public void execute (Shell shell) {

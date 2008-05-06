@@ -103,6 +103,7 @@ public class MainForm implements IParametersProvider {
 	private FormatManager    fm;
 	private FilterAccess     fa;
 	private EncodingManager  em;
+	private MenuItem         miInput;
 	private MenuItem         miSave;
 	private MenuItem         miEditInputProperties;
 	private MenuItem         cmiEditInputProperties;
@@ -125,12 +126,17 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	private void createContent () {
+	private void createContent ()
+		throws Exception
+	{
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
 		shell.setImage(rm.getImage("Rainbow"));
+
 		log = new LogForm(shell);
 		log.setTitle("Rainbow Log");
+		fa = new FilterAccess(log);
+		fa.loadList(sharedFolder + File.separator + "filters.xml");
 
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -203,10 +209,10 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		// Input menu
-		topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText("&Input");
+		miInput = new MenuItem(menuBar, SWT.CASCADE);
+		miInput.setText("&Input");
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
-		topItem.setMenu(dropMenu);
+		miInput.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "input.addDocuments");
@@ -273,10 +279,15 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		// Tab control
-		TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
+		final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 3;
 		tabFolder.setLayoutData(gdTmp);
+		tabFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				miInput.setEnabled(tabFolder.getSelectionIndex()==0);
+            }
+		});
 
 		// Input List tab
 		Composite comp = new Composite(tabFolder, SWT.NONE);
@@ -587,8 +598,6 @@ public class MainForm implements IParametersProvider {
 		rm.addImage("Rainbow");
 		rm.loadCommands("commands.xml"); //TODO: deal with localization
 		fm = new FormatManager();
-		fa = new FilterAccess(log);
-		fa.loadList(sharedFolder + File.separator + "filters.xml");
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml");
 		em = new EncodingManager();
