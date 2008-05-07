@@ -22,6 +22,7 @@ package net.sf.okapi.utility;
 
 import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Filter.IFilterItem;
+import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 
 /**
@@ -29,6 +30,8 @@ import net.sf.okapi.Library.Base.IParameters;
  */
 public interface IUtility {
 
+	public void initialize (ILog newLog);
+	
 	/**
 	 * Indicates if the utility has parameters.
 	 * @return True if the utility has parameters, false otherwise.
@@ -63,14 +66,18 @@ public interface IUtility {
 	 * @param root The new root for the utility.
 	 */
 	public void setRoot (String root);
-
-	public void processStartDocument (IFilter filter,
-		String outputPath,
-		String outputLanguage,
-		String outputEncoding);
 	
-	public void processEndDocument ();
+	public void startProcess (String inputLanguage,
+		String outputLanguage);
+	
+	public void processStartDocument (IFilter filter,
+		String inputPath,
+		String outputPath,
+		String outputEncoding);
 	
 	public void processItem (IFilterItem filterItem);
 	
+	public void processEndDocument ();
+	
+	public void endProcess ();
 }

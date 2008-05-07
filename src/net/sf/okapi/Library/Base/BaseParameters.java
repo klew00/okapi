@@ -32,6 +32,12 @@ import java.io.Writer;
 public abstract class BaseParameters implements IParameters {
 
 	protected String    path;
+
+	/* Do not define BaseParameters() constructor 
+	 * calling reset(), as some derived classes may need to 
+	 * create object before calling reset
+	 */
+	// public BaseParameters()
 	
 	public abstract void reset ();
 	

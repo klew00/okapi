@@ -33,6 +33,7 @@ import net.sf.okapi.Borneo.Actions.BaseAction;
 import net.sf.okapi.Borneo.Actions.IAction;
 import net.sf.okapi.Borneo.Actions.ImportPackageForm;
 import net.sf.okapi.Filter.FilterAccess;
+import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.Utils;
 import net.sf.okapi.Library.UI.AboutForm;
@@ -217,12 +218,12 @@ System.err.println("bno- final sRoot="+rootFolder);
 
 			// Colors for the target status
 			// Always add the base index to the status value
-			m_RM.addColor(DBBase.TSTATUS_NOTRANS+TSTATUSBASE, 192, 192, 192); // Silver
-			m_RM.addColor(DBBase.TSTATUS_TOTRANS+TSTATUSBASE, 255, 255, 0); // Yellow
-			m_RM.addColor(DBBase.TSTATUS_TOEDIT+TSTATUSBASE, 255, 215, 144); // Gold
-			m_RM.addColor(DBBase.TSTATUS_TOREVIEW+TSTATUSBASE, 144, 238, 144); // LightGreen
-			m_RM.addColor(DBBase.TSTATUS_OK+TSTATUSBASE, 50, 205, 50); // LimeGreen
-			m_RM.addColor(DBBase.TSTATUS_UNUSED+TSTATUSBASE, 255, 99, 71); // Tomato
+			m_RM.addColor(IFilterItem.TSTATUS_NOTRANS+TSTATUSBASE, 192, 192, 192); // Silver
+			m_RM.addColor(IFilterItem.TSTATUS_TOTRANS+TSTATUSBASE, 255, 255, 0); // Yellow
+			m_RM.addColor(IFilterItem.TSTATUS_TOEDIT+TSTATUSBASE, 255, 215, 144); // Gold
+			m_RM.addColor(IFilterItem.TSTATUS_TOREVIEW+TSTATUSBASE, 144, 238, 144); // LightGreen
+			m_RM.addColor(IFilterItem.TSTATUS_OK+TSTATUSBASE, 50, 205, 50); // LimeGreen
+			m_RM.addColor(IFilterItem.TSTATUS_UNUSED+TSTATUSBASE, 255, 99, 71); // Tomato
 
 			// Status labels for source
 			s_aSrcStatus = new String[7];
@@ -236,12 +237,12 @@ System.err.println("bno- final sRoot="+rootFolder);
 
 			// Status labels for target
 			s_aTrgStatus = new String[6];
-			s_aTrgStatus[DBBase.TSTATUS_NOTRANS] = Res.getString("TSTATUS_NOTRANS");
-			s_aTrgStatus[DBBase.TSTATUS_UNUSED] = Res.getString("TSTATUS_UNUSED");
-			s_aTrgStatus[DBBase.TSTATUS_TOTRANS] = Res.getString("TSTATUS_TOTRANS");
-			s_aTrgStatus[DBBase.TSTATUS_TOEDIT] = Res.getString("TSTATUS_TOEDIT");
-			s_aTrgStatus[DBBase.TSTATUS_TOREVIEW] = Res.getString("TSTATUS_TOREVIEW");
-			s_aTrgStatus[DBBase.TSTATUS_OK] = Res.getString("TSTATUS_OK");
+			s_aTrgStatus[IFilterItem.TSTATUS_NOTRANS] = Res.getString("TSTATUS_NOTRANS");
+			s_aTrgStatus[IFilterItem.TSTATUS_UNUSED] = Res.getString("TSTATUS_UNUSED");
+			s_aTrgStatus[IFilterItem.TSTATUS_TOTRANS] = Res.getString("TSTATUS_TOTRANS");
+			s_aTrgStatus[IFilterItem.TSTATUS_TOEDIT] = Res.getString("TSTATUS_TOEDIT");
+			s_aTrgStatus[IFilterItem.TSTATUS_TOREVIEW] = Res.getString("TSTATUS_TOREVIEW");
+			s_aTrgStatus[IFilterItem.TSTATUS_OK] = Res.getString("TSTATUS_OK");
 
 			m_LM = new LanguageManager();
 			m_LM.loadList(sharedFolder + File.separator + "languages.xml");

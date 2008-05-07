@@ -552,7 +552,7 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				ud = new UtilityDriver(log, fa, plugins);
+				ud = new UtilityDriver(log, fa, plugins, shell);
 			}
 			// Get the utility to run and instantiate it
 			String id = (String)((MenuItem)event.getSource()).getData();
@@ -887,7 +887,7 @@ public class MainForm implements IParametersProvider {
 	public IParameters createParameters (String location)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(sharedFolder, location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder, location);
 		fa.loadFilter(aRes[1], null);
 		return fa.getFilter().getParameters();
 	}
@@ -895,7 +895,7 @@ public class MainForm implements IParametersProvider {
 	public IParameters load (String location)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(sharedFolder, location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder, location);
 		fa.loadFilter(aRes[1], aRes[3]);
 		return fa.getFilter().getParameters();
 	}
@@ -904,16 +904,16 @@ public class MainForm implements IParametersProvider {
 		IParameters paramsObject)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(sharedFolder, location);
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder, location);
 		paramsObject.save(aRes[3], null);
 	}
 
 	public String[] splitLocation (String location) {
-		return FilterAccess.splitFilterSettingsType1(sharedFolder, location);
+		return FilterAccess.splitFilterSettingsType1(prj.paramsFolder, location);
 	}
 
 	public String[] getParametersList () {
-		return FilterAccess.getParametersList(sharedFolder);
+		return FilterAccess.getParametersList(prj.paramsFolder);
 	}
 
 	private void openDocument (int index) {

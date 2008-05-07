@@ -43,7 +43,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	public String getPackageType () {
-		return "genericxliff";
+		return "xliff";
 	}
 
 	public void createDocument (int p_nDKey,
@@ -88,7 +88,7 @@ public class Writer extends BaseWriter {
 			m_XW.writeAttributeString("translate", "no");
 		if ( p_Source.isPreFormatted() )
 			m_XW.writeAttributeString("xml:space", "preserve");
-		if (( p_Target != null ) && ( p_nStatus == TSTATUS_OK ))
+		if (( p_Target != null ) && ( p_nStatus == IFilterItem.TSTATUS_OK ))
 			m_XW.writeAttributeString("approved", "yes");
 		if ( p_Source.hasCoord() )
 			m_XW.writeAttributeString("coord", p_Source.getCoord());
@@ -107,16 +107,16 @@ public class Writer extends BaseWriter {
 			m_XW.writeAttributeString("xml:lang", m_Mnf.getTargetLanguage());
 			
 			switch ( p_nStatus ) {
-				case TSTATUS_OK:
+				case IFilterItem.TSTATUS_OK:
 					m_XW.writeAttributeString("state", "final");
 					break;
-				case TSTATUS_TOEDIT:
+				case IFilterItem.TSTATUS_TOEDIT:
 					m_XW.writeAttributeString("state", "translated");
 					break;
-				case TSTATUS_TOREVIEW:
+				case IFilterItem.TSTATUS_TOREVIEW:
 					m_XW.writeAttributeString("state", "needs-review-translation");
 					break;
-				case TSTATUS_TOTRANS:
+				case IFilterItem.TSTATUS_TOTRANS:
 					m_XW.writeAttributeString("state", "needs-translation");
 					break;
 			}

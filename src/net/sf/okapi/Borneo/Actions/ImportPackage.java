@@ -70,7 +70,7 @@ public class ImportPackage extends BaseAction {
 			if ( "omegat".equals(m_Mnf.getPackageType()) ) {
 				m_PkgR = new net.sf.okapi.Package.OmegaT.Reader(m_FA.getLog());
 			}
-			else if ( "genericxliff".equals(m_Mnf.getPackageType()) ) {
+			else if ( "xliff".equals(m_Mnf.getPackageType()) ) {
 				m_PkgR = new net.sf.okapi.Package.XLIFF.Reader(m_FA.getLog());
 			}
 			if ( "ttx".equals(m_Mnf.getPackageType()) ) {
@@ -191,8 +191,8 @@ public class ImportPackage extends BaseAction {
 
 				int nDBStatus = rsTrg.getInt(DBBase.TRGCOLI_STATUS);
 				switch ( nDBStatus ) {
-					case DBBase.TSTATUS_NOTRANS:
-					case DBBase.TSTATUS_UNUSED:
+					case IFilterItem.TSTATUS_NOTRANS:
+					case IFilterItem.TSTATUS_UNUSED:
 						continue;
 					default:
 						if ( !SrcFI.isTranslated() ) {
@@ -203,14 +203,14 @@ public class ImportPackage extends BaseAction {
 						rsTrg.updateString(DBBase.TRGCOLI_TTEXT, m_PkgR.getTargetItem(
 							).getText(FilterItemText.GENERIC));
 						switch ( nDBStatus ) {
-							case DBBase.TSTATUS_TOTRANS:
-								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, DBBase.TSTATUS_TOEDIT);
+							case IFilterItem.TSTATUS_TOTRANS:
+								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, IFilterItem.TSTATUS_TOEDIT);
 								break;
-							case DBBase.TSTATUS_TOEDIT:
-								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, DBBase.TSTATUS_TOREVIEW);
+							case IFilterItem.TSTATUS_TOEDIT:
+								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, IFilterItem.TSTATUS_TOREVIEW);
 								break;
-							case DBBase.TSTATUS_TOREVIEW:
-								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, DBBase.TSTATUS_OK);
+							case IFilterItem.TSTATUS_TOREVIEW:
+								rsTrg.updateInt(DBBase.TRGCOLN_STATUS, IFilterItem.TSTATUS_OK);
 								break;
 						}
 						rsTrg.updateRow();

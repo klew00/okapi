@@ -13,7 +13,7 @@ public class Parameters extends BaseParameters {
 	public Parameters () {
 		reset();
 	}
-	
+
 	@Override
 	public void fromString(String data) {
 		// Read the file content as a set of fields

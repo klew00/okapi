@@ -24,13 +24,19 @@ import net.sf.okapi.Filter.FilterItemText;
 import net.sf.okapi.Filter.FilterItemType;
 import net.sf.okapi.Filter.IFilter;
 import net.sf.okapi.Filter.IFilterItem;
+import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.utility.IUtility;
 
 public class Utility implements IUtility {
 	
 	IFilter             filter;
+	String              outputLanguage;
 	Parameters          params;
+
+	public void initialize(ILog newLog) {
+		// Not used
+	}
 
 	public Utility () {
 		params = new Parameters();
@@ -73,8 +79,8 @@ public class Utility implements IUtility {
 	}
 
 	public void processStartDocument (IFilter newFilter,
+		String inputPath,
 		String outputPath,
-		String outputLanguage,
 		String outputEncoding)
 	{
 		filter = newFilter;
@@ -88,6 +94,15 @@ public class Utility implements IUtility {
 
 	public void setRoot (String root) {
 		// Not used
+	}
+
+	public void endProcess () {
+		// Not used
+	}
+
+	public void startProcess (String inputLanguage,
+		String outputLanguage) {
+		this.outputLanguage = outputLanguage;
 	}
 
 }

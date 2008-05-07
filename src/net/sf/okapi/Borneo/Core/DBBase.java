@@ -166,13 +166,6 @@ public abstract class DBBase {
 	public static final int       SSTATUS_DELETED          = 6;
 	public static final int       SSTATUS_TOREMOVE         = 999;
 
-	public static final int       TSTATUS_NOTRANS          = 0;
-	public static final int       TSTATUS_UNUSED           = 1;
-	public static final int       TSTATUS_TOTRANS          = 2;
-	public static final int       TSTATUS_TOEDIT           = 3;
-	public static final int       TSTATUS_TOREVIEW         = 4;
-	public static final int       TSTATUS_OK               = 5;
-	
 	public static final int       LANGCODE_MAX             = 20;
 
 	protected Connection     m_Conn = null;

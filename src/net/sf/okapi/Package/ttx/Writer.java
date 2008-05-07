@@ -23,6 +23,8 @@ package net.sf.okapi.Package.ttx;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import net.sf.okapi.Filter.FilterItemText;
 import net.sf.okapi.Filter.IFilterItem;
@@ -38,12 +40,16 @@ public class Writer extends BaseWriter {
 	
 	private static final String   DTD_SETTINGS_FILE = "okapiTTX.ini";
 	
-	private XMLWriter   m_XW = null;
-	private String      m_sRelativePath;
-	private int         m_nDKey;
+	private XMLWriter        m_XW = null;
+	private String           m_sRelativePath;
+	private int              m_nDKey;
+	private SimpleDateFormat dateFmt;
 
 	public Writer(ILog log) {
 		super(log);
+		//CreationDate="20071026T162120Z"
+		dateFmt = new SimpleDateFormat("yyyyMMddTHHmmZ");
+		dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 	
 	public String getPackageType () {
@@ -145,9 +151,9 @@ public class Writer extends BaseWriter {
 		m_XW.writeStartElement("FrontMatter");
 
 		m_XW.writeStartElement("ToolSettings");
-		m_XW.writeAttributeString("CreationDate", "TODO"); //CreationDate="20071026T162120Z" 
+		m_XW.writeAttributeString("CreationDate", dateFmt.format(new java.util.Date())); 
 		m_XW.writeAttributeString("CreationTool", getClass().getName());
-		m_XW.writeAttributeString("CreationToolVersion", "TODO");
+		m_XW.writeAttributeString("CreationToolVersion", "1"); // TODO: toolversion
 		m_XW.writeEndElement(); // ToolSettings
 		
 		m_XW.writeStartElement("UserSettings");
@@ -160,7 +166,7 @@ public class Writer extends BaseWriter {
 		m_XW.writeAttributeString("TargetDefaultFont", "");
 		m_XW.writeAttributeString("SourceDocumentPath", p_sOriginal);
 		m_XW.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
-		m_XW.writeAttributeString("PlugInInfo", "TODO");
+		m_XW.writeAttributeString("PlugInInfo", "");
 		m_XW.writeEndElement(); // UserSettings
 		
 		m_XW.writeEndElement(); // FrontMatter

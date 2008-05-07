@@ -287,10 +287,10 @@ public class ImportTranslation extends BaseAction {
 		// Get the current status
 		int nS = m_rsTrg.getInt(DBBase.TRGCOLN_STATUS);
 		// Skip items with lower status than to-translate
-		if ( nS < DBBase.TSTATUS_TOTRANS ) return;
+		if ( nS < IFilterItem.TSTATUS_TOTRANS ) return;
 		// Adjust the scope index to 0 for to-translate
-		nS -= DBBase.TSTATUS_TOTRANS;
-		int nNewStatus = DBBase.TSTATUS_TOREVIEW;
+		nS -= IFilterItem.TSTATUS_TOTRANS;
+		int nNewStatus = IFilterItem.TSTATUS_TOREVIEW;
 
 		if (( bHasTrans && m_Opt.getScopeWithTranslation()[nS] )
 			|| ( !bHasTrans && m_Opt.getScopeWithoutTranslation()[nS] ))
@@ -317,7 +317,7 @@ public class ImportTranslation extends BaseAction {
 					// Then we keep the current target
 					if ( bHasTrans ) return;
 					// Otherwise we set the status to to-edit
-					nNewStatus = DBBase.TSTATUS_TOEDIT;
+					nNewStatus = IFilterItem.TSTATUS_TOEDIT;
 				}
 				m_rsTrg.updateString(DBBase.TRGCOLN_TTEXT, sTrg);
 			}

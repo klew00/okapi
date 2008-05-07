@@ -77,8 +77,9 @@ public class ExportPackage extends BaseAction {
 					m_PkgW = new net.sf.okapi.Package.OmegaT.Writer(m_FA.getLog());
 				else if ( m_Opt.getPackageType().equals("ttx") )
 					m_PkgW = new net.sf.okapi.Package.ttx.Writer(m_FA.getLog());
-				else if ( m_Opt.getPackageType().equals("omegat") )				
+				else if ( m_Opt.getPackageType().equals("xliff") )				
 					m_PkgW = new net.sf.okapi.Package.XLIFF.Writer(m_FA.getLog());
+				else throw new Exception("Package type unknown: "+m_Opt.getPackageType());
 				
 				// Start the package
 				String[] aRes = m_Opt.makePackageName(m_DB.getProjectID(), m_sTarget);
@@ -182,7 +183,7 @@ public class ExportPackage extends BaseAction {
 			ResultSet rsTrg = m_DB.fetchTargetItems(p_nDKey, m_sTarget);
 			while ( rsTrg.next() ) {
 				nTStatus = rsTrg.getInt(DBBase.TRGCOLI_STATUS);
-				if ( nTStatus == DBBase.TSTATUS_UNUSED ) continue;
+				if ( nTStatus == IFilterItem.TSTATUS_UNUSED ) continue;
 
 				m_SourceFI.reset();
 				m_SourceFI.setItemType(FilterItemType.TEXT);
@@ -195,7 +196,7 @@ public class ExportPackage extends BaseAction {
 				m_TargetFI.reset();
 				m_TargetFI.setCodeMapping(rsTrg.getString(DBBase.TRGCOLI_SCODES));
 				
-				bTranslate = (nTStatus != DBBase.TSTATUS_NOTRANS);
+				bTranslate = (nTStatus != IFilterItem.TSTATUS_NOTRANS);
 				//if ( !bTranslate && !m_Opt.IncludeNTItems ) continue;
 				m_SourceFI.setTranslatable(bTranslate);
 

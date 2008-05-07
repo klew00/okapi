@@ -18,7 +18,9 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.Borneo.Actions;
+package net.sf.okapi.utilities.extraction;
+
+import java.io.File;
 
 import net.sf.okapi.Library.Base.IParameters;
 import net.sf.okapi.Library.Base.IParametersEditor;
@@ -31,7 +33,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -43,15 +44,18 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ExportPackageForm implements IParametersEditor {
+public class Editor implements IParametersEditor {
 	
 	private Shell                 m_Shell;
 	private boolean               m_bResult = false;
 	private OKCancelPanel         m_pnlActions;
-	private ExportPackageOptions  m_Opt;
+	private Parameters            m_Opt;
 	private List                  m_lbTypes;
+	private Text                  edDescription;
 	private Text                  m_edName;
+	private Text                  m_edOutputFolder;
 	private Button                m_chkCreateZip;
+	private Button                m_chkIncludeMergeData;
 	private Text                  m_edSample;
 	private boolean               m_bInInit = true;
 	
@@ -65,7 +69,7 @@ public class ExportPackageForm implements IParametersEditor {
 	{
 		boolean bRes = false;
 		m_Shell = null;
-		m_Opt = (ExportPackageOptions)p_Options;
+		m_Opt = (Parameters)p_Options;
 		try {
 			m_Shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);
@@ -83,25 +87,28 @@ public class ExportPackageForm implements IParametersEditor {
 	}
 	
 	public IParameters createParameters () {
-		return new ExportPackageOptions();
+		return new Parameters();
 	}
 	
 	private void create (Shell p_Parent)
 	{
 		m_Shell.setText("Export Translation Package");
-		m_Shell.setImage(p_Parent.getImage());
+		if ( p_Parent != null ) m_Shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;
 		m_Shell.setLayout(layTmp);
 
-		//--- Options tab
-
 		TabFolder tfTmp = new TabFolder(m_Shell, SWT.NONE);
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+		//--- Format tab
+
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
+		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Package Format");
+		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Type of package to create:");
@@ -115,12 +122,34 @@ public class ExportPackageForm implements IParametersEditor {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		m_lbTypes.setLayoutData(gdTmp);
+		
+		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI);
+		edDescription.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 60;
+		edDescription.setLayoutData(gdTmp);
 
-		m_chkCreateZip = new Button(cmpTmp, SWT.CHECK);
-		m_chkCreateZip.setText("Compress the package into a ZIP file");
+		//--- Name tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Package Location");
+		tiTmp.setControl(cmpTmp);
 
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Optional extra name part:");
+		stTmp.setText("Root of the output folder:");
+		
+		m_edOutputFolder = new Text(cmpTmp, SWT.BORDER);
+		m_edOutputFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		m_edOutputFolder.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateSample();
+			}
+		});
+		
+		stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Package name:");
 		
 		m_edName = new Text(cmpTmp, SWT.BORDER);
 		m_edName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -131,16 +160,26 @@ public class ExportPackageForm implements IParametersEditor {
 		});
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Package directory name (parts will change depending on date/time and target language):");
+		stTmp.setText("Full path of the directory name:");
 		
 		m_edSample = new Text(cmpTmp, SWT.BORDER);
 		m_edSample.setEditable(false);
 		m_edSample.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		//--- Options tab
 		
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
-		
+
+		m_chkCreateZip = new Button(cmpTmp, SWT.CHECK);
+		m_chkCreateZip.setText("Compress the package into a ZIP file");
+
+		m_chkIncludeMergeData = new Button(cmpTmp, SWT.CHECK);
+		m_chkIncludeMergeData.setText("Includes the data to merge back the files");
+
 
 		//--- References tab
 		
@@ -168,8 +207,7 @@ public class ExportPackageForm implements IParametersEditor {
 		setData();
 		m_bInInit = false;
 		m_Shell.pack();
-		Rectangle Rect = m_Shell.getBounds();
-		m_Shell.setMinimumSize(Rect.width, Rect.height);
+		m_Shell.setMinimumSize(m_Shell.getSize());
 		Dialogs.centerWindow(m_Shell, p_Parent);
 	}
 	
@@ -186,30 +224,33 @@ public class ExportPackageForm implements IParametersEditor {
 		int n = -1;
 		String[] aItems = ((String)m_lbTypes.getData()).split("\t", -2);
 		for ( int i=0; i<aItems.length; i++ ) {
-			if ( aItems[i].equals(m_Opt.getPackageType()) ) {
+			if ( aItems[i].equals(m_Opt.pkgType) ) {
 				n = i;
 				break;
 			}
 		}
 		if ( n < 0 ) n = 0;
 		m_lbTypes.setSelection(n);
-		m_edName.setText(m_Opt.getName());
-		m_chkCreateZip.setSelection(m_Opt.getCreateZip());
+		m_edOutputFolder.setText(m_Opt.outputFolder);
+		m_edName.setText(m_Opt.pkgName);
+		m_chkCreateZip.setSelection(m_Opt.createZip);
 		updateSample();
 	}
 
 	private boolean saveData () {
 		if ( m_bInInit ) return true;
-		m_Opt.setName(m_edName.getText());
+		//m_Opt.setName("TODO:Name"); //TODO "m_edName.getText());
 		String[] aItems = ((String)m_lbTypes.getData()).split("\t", -2);
-		m_Opt.setPackageType(aItems[m_lbTypes.getSelectionIndex()]);
-		m_Opt.setCreateZip(m_chkCreateZip.getSelection());
+		m_Opt.pkgType = aItems[m_lbTypes.getSelectionIndex()];
+		m_Opt.createZip = m_chkCreateZip.getSelection();
+		m_Opt.pkgName = m_edName.getText();
+		m_Opt.outputFolder = m_edOutputFolder.getText();
 		return true;
 	}
 	
 	private void updateSample () {
 		saveData();
-		String[] aRes = m_Opt.makePackageName("<ProjectID>", "<Lang>");
-		m_edSample.setText(aRes[1]);
+//TODO		String[] aRes = m_Opt.makePackageName("<ProjectID>", "<Lang>");
+		m_edSample.setText(m_edOutputFolder.getText() + File.separator + m_edName.getText()); //TODO aRes[1]);
 	}
 }

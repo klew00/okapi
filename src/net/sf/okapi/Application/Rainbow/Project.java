@@ -78,7 +78,7 @@ public class Project {
 	{
 		// Is the root OK?
 		if ( newPath.indexOf(inputRoot) == -1 ) return 1;
-		newPath = newPath.substring(inputRoot.length());
+		newPath = newPath.substring(inputRoot.length()+1); // No leading separator
 		
 		// Does the path exists already?
 		for ( Input tmpInp : inputList ) {

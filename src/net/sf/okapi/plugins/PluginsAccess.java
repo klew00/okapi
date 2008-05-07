@@ -17,6 +17,10 @@ import org.w3c.dom.NodeList;
 public class PluginsAccess {
 
 	private static final String PLUGIN_FILENAME  = "plugin.xml";
+
+	public static final String TYPE_UTILITY      = "utility";
+	public static final String TYPE_FILTER       = "filter";
+	public static final String TYPE_PARAMEDITOR  = "editor";
 	
 	private HashMap<String, PluginItem>     items;
 	

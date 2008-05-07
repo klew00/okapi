@@ -26,6 +26,7 @@ import java.sql.Statement;
 import net.sf.okapi.Borneo.Core.DBBase;
 import net.sf.okapi.Borneo.Core.DBDoc;
 import net.sf.okapi.Filter.FilterAccess;
+import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Library.Base.LogType;
 import net.sf.okapi.Library.Base.Utils;
 
@@ -181,11 +182,11 @@ public class UpdateTarget extends BaseAction {
 								// except if there is no translation, then force 'to-translate'
 								String sTrgTText = rsTrg.getString(DBBase.TRGCOLI_TTEXT);  
 								if (( sTrgTText != null ) && ( sTrgTText.length() == 0 ))
-									rsTrg.updateInt(DBBase.TRGCOLI_STATUS, DBBase.TSTATUS_TOTRANS);
+									rsTrg.updateInt(DBBase.TRGCOLI_STATUS, IFilterItem.TSTATUS_TOTRANS);
 							}
 							else {
 								// If source text is different, force 'to-translate'
-								rsTrg.updateInt(DBBase.TRGCOLI_STATUS, DBBase.TSTATUS_TOTRANS);
+								rsTrg.updateInt(DBBase.TRGCOLI_STATUS, IFilterItem.TSTATUS_TOTRANS);
 							}
 							break;
 					}
@@ -195,7 +196,7 @@ public class UpdateTarget extends BaseAction {
 					rsTrg.updateString(DBBase.TRGCOLI_LANG, m_sTarget);
 					rsTrg.updateInt(DBBase.TRGCOLI_SKEY, nSKey);
 					rsTrg.updateInt(DBBase.TRGCOLI_DKEY, rsSrc.getInt(DBBase.SRCCOLI_DKEY));
-					rsTrg.updateInt(DBBase.TRGCOLI_STATUS, DBBase.TSTATUS_TOTRANS);
+					rsTrg.updateInt(DBBase.TRGCOLI_STATUS, IFilterItem.TSTATUS_TOTRANS);
 				}
 				// Common changes
 				rsTrg.updateString(DBBase.TRGCOLI_STEXT, rsSrc.getString(DBBase.SRCCOLI_TEXT));
@@ -208,7 +209,7 @@ public class UpdateTarget extends BaseAction {
 				rsTrg.updateBoolean(DBBase.TRGCOLI_FLAG, false);
 				// Read-only override
 				if ( rsSrc.getBoolean(DBBase.SRCCOLI_NOTRANS) ) {
-					rsTrg.updateInt(DBBase.TRGCOLI_STATUS, DBBase.TSTATUS_NOTRANS);
+					rsTrg.updateInt(DBBase.TRGCOLI_STATUS, IFilterItem.TSTATUS_NOTRANS);
 					rsTrg.updateString(DBBase.TRGCOLI_TTEXT, rsSrc.getString(DBBase.SRCCOLI_TEXT));
 				}
 				
@@ -221,7 +222,7 @@ public class UpdateTarget extends BaseAction {
 			// Set all the relevant target entries with a temporary 999 flag
 			sTmp = String.format("UPDATE %s SET %s=0, %s=%d WHERE (%s='%s' AND %s=%d AND %s=999)",
 				m_DB.getTableName(DBBase.TBLNAME_TRG), DBBase.TRGCOLN_TMP,
-				DBBase.TRGCOLN_STATUS, DBBase.TSTATUS_UNUSED, DBBase.TRGCOLN_LANG,
+				DBBase.TRGCOLN_STATUS, IFilterItem.TSTATUS_UNUSED, DBBase.TRGCOLN_LANG,
 				m_sTarget, DBBase.TRGCOLN_DKEY, p_nDKey, DBBase.TRGCOLN_TMP);
 			m_DB.doCommand(sTmp);
 

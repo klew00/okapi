@@ -25,14 +25,6 @@ import net.sf.okapi.Library.Base.Utils;
 
 public abstract class BaseWriter implements IWriter {
 	
-	// Same as in Borneo database
-	public static final int       TSTATUS_NOTRANS          = 0;
-	public static final int       TSTATUS_UNUSED           = 1;
-	public static final int       TSTATUS_TOTRANS          = 2;
-	public static final int       TSTATUS_TOEDIT           = 3;
-	public static final int       TSTATUS_TOREVIEW         = 4;
-	public static final int       TSTATUS_OK               = 5;
-
 	protected Manifest  m_Mnf;
 	protected ILog      m_Log;
 	

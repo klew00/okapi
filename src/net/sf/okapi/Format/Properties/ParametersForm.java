@@ -138,8 +138,8 @@ public class ParametersForm implements IParametersEditor {
 		m_rdExcludeMatchingKey = new Button(grpTmp, SWT.RADIO);
 		m_rdExcludeMatchingKey.setText("Do not extract the items with a key matching the given expression");
 		m_rdExcludeMatchingKey.setLayoutData(gdTmp);
-		
-		m_edKeyCondition = new Text(grpTmp, SWT.NONE);
+//TODO: m_edKeyCondition enabling/disabling depending on choice
+		m_edKeyCondition = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = 16;
 		m_edKeyCondition.setLayoutData(gdTmp);

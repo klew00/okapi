@@ -22,6 +22,13 @@ package net.sf.okapi.Filter;
 
 public interface IFilterItem {
 
+	public static final int       TSTATUS_NOTRANS          = 0;
+	public static final int       TSTATUS_UNUSED           = 1;
+	public static final int       TSTATUS_TOTRANS          = 2;
+	public static final int       TSTATUS_TOEDIT           = 3;
+	public static final int       TSTATUS_TOREVIEW         = 4;
+	public static final int       TSTATUS_OK               = 5;
+	
 	/**
 	 * Appends a character to the text text.
 	 * @param p_chValue The character to append.

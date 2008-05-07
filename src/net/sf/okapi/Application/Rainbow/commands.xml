@@ -10,7 +10,7 @@
  <command name="view.log" key="F9">&amp;Log&#x9;F9</command>
  <!-- Input menu -->
  <command name="input.addDocuments" ctrl="1" key="Insert">&amp;Add Documents...&#x9;Ctrl+Insert</command>
- <command name="input.removeDocuments" key="Delete">&amp;Remove Documents...&#x9;Delete</command>
+ <command name="input.removeDocuments">&amp;Remove Documents...</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
 </commands>

@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.Filter.FilterAccess;
 import net.sf.okapi.Filter.FilterItemType;
 import net.sf.okapi.Library.Base.ILog;
+import net.sf.okapi.Library.Base.IParametersEditor;
 import net.sf.okapi.plugins.PluginItem;
 import net.sf.okapi.plugins.PluginsAccess;
 import net.sf.okapi.utility.IUtility;
@@ -39,17 +40,21 @@ public class UtilityDriver {
 	Project             prj;
 	FilterAccess        fa;
 	IUtility            util;
+	IParametersEditor   editor;
 	PluginItem          pluginItem;
 	String              utilityID;
 	PluginsAccess       plugins;
+	Shell               shell;
 	
 	public UtilityDriver (ILog newLog,
 		FilterAccess newFA,
-		PluginsAccess newPlugins)
+		PluginsAccess newPlugins,
+		Shell newShell)
 	{
 		log = newLog;
 		fa = newFA;
 		plugins = newPlugins;
+		shell = newShell;
 	}
 
 	public void setData (Project newProject,
@@ -63,6 +68,12 @@ public class UtilityDriver {
 			throw new Exception("Utility not found.");
 		pluginItem = plugins.getItem(newUtilityID);
 		util = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
+		util.initialize(log);
+		
+		if ( pluginItem.editorClass.length() > 0 ) {
+			editor = (IParametersEditor)Class.forName(pluginItem.editorClass).newInstance();
+		}
+		else editor = null;
 	}
 	
 	public void execute (Shell shell) {
@@ -71,7 +82,9 @@ public class UtilityDriver {
 			// If there are no options to ask for,
 			// ask confirmation to launch the utility
 			if ( util.hasParameters() ) {
-				//TODO
+				if ( editor != null ) {
+					if ( !editor.edit(util.getParameters(), shell) ) return;
+				}
 			}
 			else {
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
@@ -83,21 +96,27 @@ public class UtilityDriver {
 			
 			log.beginTask(pluginItem.name);
 			
+			if ( util.needRoot() ) {
+				util.setRoot(prj.inputRoot);
+			}
+			
+			util.startProcess(prj.sourceLanguage, prj.targetLanguage);
+			
 			for ( Input item : prj.inputList ) {
 				if ( item.filterSettings.length() == 0 ) continue;
 				log.message("Input: "+item.relativePath);
 				
 				// Load the filter
-				fa.loadFilterFromFilterSettingsType1(prj.paramsFolder, item.filterSettings);
+				fa.loadFilterFromFilterSettingsType1(prj.paramsFolder,
+					item.filterSettings);
 				
 				// Open the input file
-				fa.getFilter().openInputFile(prj.inputRoot + File.separator + item.relativePath,
-					prj.sourceLanguage,
+				String inputPath = prj.inputRoot + File.separator + item.relativePath; 
+				fa.getFilter().openInputFile(inputPath, prj.sourceLanguage,
 					prj.buildSourceEncoding(item));
 				
-				util.processStartDocument(fa.getFilter(),
+				util.processStartDocument(fa.getFilter(), inputPath,
 					prj.buildTargetPath(item.relativePath),
-					prj.targetLanguage,
 					prj.buildTargetEncoding(item));
 				
 				while ( fa.getFilter().readItem() >FilterItemType.ENDINPUT ) {
@@ -107,6 +126,8 @@ public class UtilityDriver {
 				util.processEndDocument();
 				fa.getFilter().closeInput();
 			}
+			
+			util.endProcess();
 		}
 		catch ( Exception E ) {
 			log.error(E.getLocalizedMessage());
