@@ -8,14 +8,31 @@
   updateUri="http://okapi.sf.net/updates/textrewriting">
   <info>
    <name>Text Rewriting</name>
-   <description>Utility to re-write documents with different changes, for
+   <description>Re-writes documents with different changes, for
     example: masking translatable text, etc.</description>
    <provider>Okapi Framework</provider>
   </info>
   <info xml:lang="fr">
-   <name>Re-ecriture de text</name>
-   <description>Utilitee pour re-ecrire des documents en faisant differentes
+   <name>Re-écriture de Text</name>
+   <description>Re-écrit les documents en faisant differentes
     modifications. Par exemple, masquer le text traduisible, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ <plugin type="utility"
+  id="oku_extraction"
+  version="1.0"
+  pluginClass="net.sf.okapi.utilities.extraction.Utility"
+  editorClass="net.sf.okapi.utilities.extraction.Editor"
+  updateUri="http://okapi.sf.net/updates/extraction">
+  <info>
+   <name>Create Translation Package</name>
+   <description>Creates a translation package.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+  <info xml:lang="fr">
+   <name>Creer un Kit de Traduction</name>
+   <description>Crée un kit de traduction.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
