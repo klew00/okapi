@@ -69,8 +69,8 @@
   <copy file="./lib/h2.jar" todir="${dist}/lib"/>
   <copy file="./lib/mysql-connector-java-5.1.5-bin.jar" todir="${dist}/lib"/>
   <copy file="./lib/${platform}/swt.jar" todir="${dist}/lib"/>
-  <copy file="./shared/Filters.xml" todir="${dist}/shared"/>
-  <copy file="./shared/Languages.xml" todir="${dist}/shared"/>
+  <copy file="./shared/filters.xml" todir="${dist}/shared"/>
+  <copy file="./shared/fanguages.xml" todir="${dist}/shared"/>
 
  </target>
 
