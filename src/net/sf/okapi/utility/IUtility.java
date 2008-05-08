@@ -56,14 +56,14 @@ public interface IUtility {
 	public boolean needRoot ();
 	
 	/**
-	 * Gets the current root for the utility.
-	 * @return The current root for the utility.
+	 * Gets the current input root for the utility.
+	 * @return The current input root for the utility.
 	 */
 	public String getRoot ();
 	
 	/**
-	 * Sets the root for the utility.
-	 * @param root The new root for the utility.
+	 * Sets the input root for the utility.
+	 * @param root The new input root for the utility.
 	 */
 	public void setRoot (String root);
 	
@@ -75,7 +75,15 @@ public interface IUtility {
 		String outputPath,
 		String outputEncoding);
 	
-	public void processItem (IFilterItem filterItem);
+	/**
+	 * Processes an item. The target item can be provided from the filter itself
+	 * (using getTranslatedItem() if is the source item isTranslated() is true) or by a
+	 * secondary filter, or it can be null.
+	 * @param sourceItem The source item.
+	 * @param targetItem The target item or null.
+	 */
+	public void processItem (IFilterItem sourceItem,
+		IFilterItem targetItem);
 	
 	public void processEndDocument ();
 	

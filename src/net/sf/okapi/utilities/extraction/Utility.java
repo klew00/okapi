@@ -46,17 +46,14 @@ public class Utility implements IUtility {
 		writer.writeEndDocument();
 	}
 
-	public void processItem (IFilterItem filterItem) {
-		if ( filterItem.isTranslated() )
-			targetItem = filter.getTranslatedItem();
-		else
-			targetItem = null;
-		
+	public void processItem (IFilterItem sourceItem,
+		IFilterItem targetItem)
+	{
 		int status = IFilterItem.TSTATUS_TOTRANS;
-		if ( !filterItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
-		else if ( filterItem.isTranslated() ) status = IFilterItem.TSTATUS_TOEDIT;
+		if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
+		else if ( sourceItem.isTranslated() ) status = IFilterItem.TSTATUS_TOEDIT;
 
-		writer.writeItem(filterItem, targetItem, status);
+		writer.writeItem(sourceItem, targetItem, status);
 	}
 
 	public void processStartDocument (IFilter newFilter,

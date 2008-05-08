@@ -119,8 +119,9 @@ public class UtilityDriver {
 					prj.buildTargetPath(item.relativePath),
 					prj.buildTargetEncoding(item));
 				
-				while ( fa.getFilter().readItem() >FilterItemType.ENDINPUT ) {
-					util.processItem(fa.getFilter().getItem());
+				while ( fa.getFilter().readItem() > FilterItemType.ENDINPUT ) {
+					util.processItem(fa.getFilter().getItem(),
+						fa.getFilter().getTranslatedItem());
 				}
 				
 				util.processEndDocument();

@@ -64,13 +64,15 @@ public class Utility implements IUtility {
 		filter.closeOutput();
 	}
 
-	public void processItem (IFilterItem filterItem) {
-		if ( filterItem.getItemType() == FilterItemType.TEXT ) {
-			if ( filterItem.isTranslatable() ) {
+	public void processItem (IFilterItem sourceItem,
+		IFilterItem targetItem)
+	{
+		if ( sourceItem.getItemType() == FilterItemType.TEXT ) {
+			if ( sourceItem.isTranslatable() ) {
 				switch ( params.action ) {
 				case Parameters.ACTION_MASK:
-					String tmp = filterItem.getText(FilterItemText.CODED).replaceAll("\\p{L}", "X");
-					filterItem.modifyText(tmp.replaceAll("\\d", "N"));
+					String tmp = sourceItem.getText(FilterItemText.CODED).replaceAll("\\p{L}", "X");
+					sourceItem.modifyText(tmp.replaceAll("\\d", "N"));
 					break;
 				}
 			}

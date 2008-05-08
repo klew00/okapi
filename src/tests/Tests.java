@@ -28,15 +28,64 @@ import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Filter.InlineCode;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.Log;
+import net.sf.okapi.filters.ISegment;
+import net.sf.okapi.filters.Segment;
 
 public class Tests {
 
 	static final File INDEX_DIR = new File("index");
+
+	private static void testSegments () {
+		System.out.println("---start testSegments---");
+		ISegment seg = new Segment();
+		seg.append("text1");
+		seg.append(' ');
+		seg.append("text2");
+		seg.append(ISegment.CODE_ISOLATED, "br", "<br/>");
+		seg.append("text3 ");
+		seg.append(ISegment.CODE_OPENING, "b", "<b>");
+		seg.append("bolded text");
+		seg.append(ISegment.CODE_CLOSING, "b", "</b>");
+		
+		System.out.println("Original  : '"+seg.toString()+"'");
+		System.out.println("Coded     : '"+seg.getCodedText()+"'");
+		System.out.println("Generic   : '"+seg.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		System.out.println("Plain text: '"+seg.toString(ISegment.TEXTTYPE_PLAINTEXT)+"'");
+		System.out.println("XLIFF-1.2 : '"+seg.toString(ISegment.TEXTTYPE_XLIFF12)+"'");
+		System.out.println("TMX-1.4   : '"+seg.toString(ISegment.TEXTTYPE_TMX14)+"'");
+		
+		System.out.println("---codes:");
+		for ( int i=0; i<seg.getCodeCount(); i++ ) {
+			System.out.println(String.format("Code %d: id=%d, data='%s', label='%s'",
+				i, seg.getCodeID(i), seg.getCodeData(i), seg.getCodeLabel(i)));
+		}
+		System.out.println("Codes: '"+seg.getCodes()+"'");
+		
+		System.out.println("---internals:");
+		System.out.println("Original : '"+seg.toString()+"'");
+		
+		String tmp1 = seg.getCodes();
+		String tmp2 = seg.getCodedText();
+		seg = new Segment();
+		seg.setCodes(tmp1);
+		seg.setTextFromCoded(tmp2);
+		System.out.println("Rebuilt-1: '"+seg.toString()+"'");
+		
+		tmp1 = seg.getCodes();
+		tmp2 = seg.toString(ISegment.TEXTTYPE_GENERIC);
+		seg = new Segment();
+		seg.setCodes(tmp1);
+		seg.setTextFromGeneric(tmp2);
+		System.out.println("Rebuilt-2: '"+seg.toString()+"'");
+
+		System.out.println("---end testSegments---\n");
+
+	}
 	
 	public static void main(String[] args) throws Exception
 	{
-		@SuppressWarnings("unused")
-		int nTmp = Integer.parseInt("00c6", 16);
+		testSegments();
+		
 		
 		ILog myLog = new Log();
 		myLog.beginProcess("=== Start process");
