@@ -47,8 +47,7 @@ public class SegmentTest {
 		c3.id = 2;
 		codes.add(c3);
 		StringBuffer codeBuffer = new StringBuffer();
-		for (Code code : codes)
-		{
+		for (Code code : codes) {
 			codeBuffer.append(String.format("%1$d\u0086%2$d\u0086%3$s\u0086%4$s\u0087",
 				code.id, code.type, code.data, code.label));
 		}
@@ -116,6 +115,7 @@ public class SegmentTest {
 	public void segmentToString() {
 		// These should always be the same
 		assertEquals(segment.toString(ISegment.TEXTTYPE_ORIGINAL), segment.toString());
+		assertEquals(segment.toString(ISegment.TEXTTYPE_CODED), segment.getCodedText());
 		
 		// Test each toString type
 		assertEquals("text1 text2<br/>text3 <b>bolded text</b>", segment.toString());		
