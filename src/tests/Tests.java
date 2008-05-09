@@ -28,6 +28,8 @@ import net.sf.okapi.Filter.IFilterItem;
 import net.sf.okapi.Filter.InlineCode;
 import net.sf.okapi.Library.Base.ILog;
 import net.sf.okapi.Library.Base.Log;
+import net.sf.okapi.filters.ExtractionItem;
+import net.sf.okapi.filters.IExtractionItem;
 import net.sf.okapi.filters.ISegment;
 import net.sf.okapi.filters.Segment;
 
@@ -35,9 +37,9 @@ public class Tests {
 
 	static final File INDEX_DIR = new File("index");
 
-	private static void testSegments () {
+	private static void testSegments (ISegment initialSeg) {
 		System.out.println("---start testSegments---");
-		ISegment seg = new Segment();
+		ISegment seg = initialSeg;
 		seg.append("text1");
 		seg.append(' ');
 		seg.append("text2");
@@ -109,9 +111,42 @@ public class Tests {
 		System.out.println("---end testSegments---\n");
 	}
 	
+	private static void testExtractionItems () {
+		System.out.println("---start testExtractionItems---");
+		IExtractionItem item = new ExtractionItem();
+		item.append("text1");
+		item.append(ISegment.CODE_ISOLATED, null, "<br/>");
+		item.append("text2");
+		item.append(ISegment.CODE_OPENING, "b", "<b>");
+		item.append("text3");
+		item.append(ISegment.CODE_CLOSING, "b", "</b>");
+		item.append("text4");
+		System.out.println("item: '"+item.toString()+"'");
+		System.out.println(String.format("segment count = %d", item.getSegmentCount()));
+		
+		ISegment seg = new Segment();
+		seg.append("a");
+		seg.append(ISegment.CODE_ISOLATED, null, "<img/>");
+		seg.append("b");
+		seg.append(ISegment.CODE_OPENING, "i", "<i>");
+		seg.append("c");
+		seg.append(ISegment.CODE_CLOSING, "i", "</i>");
+		seg.append("d");
+		System.out.println("seg to add: '"+seg.toString()+"'");
+		
+		item.addSegment(seg);
+		System.out.println(String.format("segment count after addition = %d", item.getSegmentCount()));
+		System.out.println("item: '"+item.toString()+"'");
+		System.out.println("item: '"+item.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		
+		System.out.println("---end testExtractionItems---\n");
+	}
+	
 	public static void main(String[] args) throws Exception
 	{
-		testSegments();
+		testSegments(new Segment());
+		testSegments(new ExtractionItem());
+		testExtractionItems();
 		
 		
 		ILog myLog = new Log();

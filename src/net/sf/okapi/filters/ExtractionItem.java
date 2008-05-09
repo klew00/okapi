@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -27,8 +27,9 @@ import java.util.ArrayList;
  */
 public class ExtractionItem implements IExtractionItem {
 	
-	private Segment               lastSeg;
-	private ArrayList<Segment>    segList;
+	private ISegment              lastSeg;
+	private ISegment              compiledSeg;
+	private ArrayList<ISegment>   segList;
 	private boolean               isSegmented;
 
 	public ExtractionItem () {
@@ -36,9 +37,10 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public void reset () {
-		segList = new ArrayList<Segment>();
+		segList = new ArrayList<ISegment>();
 		segList.add(new Segment());
 		lastSeg = segList.get(0);
+		compiledSeg = lastSeg;
 		isSegmented = false;
 	}
 
@@ -53,13 +55,18 @@ public class ExtractionItem implements IExtractionItem {
 	public boolean isSegmented () {
 		return isSegmented;
 	}
+	
+	public void addSegment (ISegment newSegment) {
+		segList.add(newSegment);
+		lastSeg = segList.get(segList.size()-1);
+		isSegmented = true;
+	}
 
 	public void append (String text) {
 		lastSeg.append(text);
 	}
 
 	public void append (char value) {
-		if ( isSegmented ) buildItem();
 		lastSeg.append(value);
 	}
 
@@ -67,107 +74,197 @@ public class ExtractionItem implements IExtractionItem {
 		String label,
 		String codeData)
 	{
-		if ( isSegmented ) buildItem();
 		lastSeg.append(type, label, codeData);
 	}
 
-	public void append (Segment segment) {
-		if ( isSegmented ) buildItem();
+	public void append (ISegment segment) {
 		lastSeg.append(segment);
 	}
 
 	public void copyFrom (ISegment original) {
-		// TODO
+		if ( isSegmented ) {
+			buildCompiledSegment(true);
+		}
+		lastSeg.copyFrom(original);
 	}
 
 	public int getCodeCount () {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodeCount();
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodeCount();
+		}
+		else {
+			return lastSeg.getCodeCount();
+		}
 	}
 
 	public String getCodeData (int index) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodeData(index);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodeData(index);
+		}
+		else {
+			return lastSeg.getCodeData(index);
+		}
 	}
 
 	public int getCodeID (int index) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodeID(index);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodeID(index);
+		}
+		else {
+			return lastSeg.getCodeID(index);
+		}
 	}
 
 	public int getCodeIndex (int id, int type) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodeIndex(id, type);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodeIndex(id, type);
+		}
+		else {
+			return lastSeg.getCodeIndex(id, type);
+		}
 	}
 
 	public String getCodeLabel (int index) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodeLabel(index);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodeLabel(index);
+		}
+		else {
+			return lastSeg.getCodeLabel(index);
+		}
 	}
 
 	public String getCodedText () {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodedText();
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodedText();
+		}
+		else {
+			return lastSeg.getCodedText();
+		}
 	}
 
 	public String getCodes () {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getCodes();
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getCodes();
+		}
+		else {
+			return lastSeg.getCodes();
+		}
 	}
 
 	public int getLength (int textType) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.getLength(textType);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.getLength(textType);
+		}
+		else {
+			return lastSeg.getLength(textType);
+		}
 	}
 
 	public boolean hasCode () {
-		if ( isSegmented ) buildItem();
-		return lastSeg.hasCode();
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.hasCode();
+		}
+		else {
+			return lastSeg.hasCode();
+		}
 	}
 
 	public boolean hasText (boolean whiteSpaceIsText) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.hasText(whiteSpaceIsText);
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.hasText(whiteSpaceIsText);
+		}
+		else {
+			return lastSeg.hasText(whiteSpaceIsText);
+		}
 	}
 
 	public boolean isEmpty () {
-		if ( isSegmented ) buildItem();
-		return lastSeg.isEmpty();
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.isEmpty();
+		}
+		else {
+			return lastSeg.isEmpty();
+		}
 	}
 
 	public void setCodes (String data) {
-		if ( isSegmented ) buildItem();
+		if ( isSegmented ) {
+			buildCompiledSegment(true);
+		}
 		lastSeg.setCodes(data);
 	}
 
 	public void setText (String text) {
-		if ( isSegmented ) buildItem();
+		if ( isSegmented ) {
+			buildCompiledSegment(true);
+		}
 		lastSeg.setText(text);
 	}
 
 	public void setTextFromCoded (String codedText) {
-		if ( isSegmented ) buildItem();
-		lastSeg.setTextFromCoded(codedText);
+		if ( isSegmented ) {
+			buildCompiledSegment(true);
+		}
+		lastSeg.setTextFromCoded(codedText);	
 	}
 
 	public void setTextFromGeneric (String genericText) {
-		if ( isSegmented ) buildItem();
+		if ( isSegmented ) {
+			buildCompiledSegment(true);
+		}
 		lastSeg.setTextFromGeneric(genericText);
 	}
 
-	public String toString (int textType) {
-		if ( isSegmented ) buildItem();
-		return lastSeg.toString(textType);
+	@Override
+	public String toString () {
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.toString();
+		}
+		else {
+			return lastSeg.toString();	
+		}
 	}
 	
-	private void buildItem () {
-		if ( !isSegmented ) return;
-		Segment workSeg = new Segment();
-		for ( Segment seg : segList ) {
-	//		workSeg.append(seg);
+	public String toString (int textType) {
+		if ( isSegmented ) {
+			buildCompiledSegment(false);
+			return compiledSeg.toString(textType);
 		}
-		lastSeg = workSeg;
-		isSegmented = false; //????
+		else {
+			return lastSeg.toString(textType);	
+		}
+	}
+	
+	private void buildCompiledSegment (boolean removeSegmentation) {
+		if ( !isSegmented ) return;
+		// Check if any change occurred in the segments
+		//TODO
+		
+		// If needed: compile them into one
+		compiledSeg = new Segment();
+		for ( ISegment seg : segList ) {
+			compiledSeg.append(seg);
+		}
+		
+		// If requested go back to a non-segmented state
+		if ( removeSegmentation ) {
+			segList = new ArrayList<ISegment>();
+			segList.add(compiledSeg);
+			lastSeg = segList.get(0);
+			isSegmented = false;
+		}
 	}
 
 }

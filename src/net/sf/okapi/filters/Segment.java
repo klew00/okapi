@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -87,7 +87,7 @@ public class Segment implements ISegment {
 		data.append((char)ItoC(codes.size()-1));
 	}
 
-	public void append (Segment segment) {
+	public void append (ISegment segment) {
 		// Make sure the receiving segment is normalized 
 		if ( !isNormalized ) normalize();
 		
@@ -324,11 +324,11 @@ public class Segment implements ISegment {
 		}
 	}
 
-	private void unpackCodes (String data,
-		ArrayList<Code> codesUpdate)
+	private void unpackCodes (String rawData,
+		ArrayList<Code> codesToUpdate)
 	{
-		codesUpdate.clear();
-		String[] aTmp1 = data.split("\u0087");
+		codesToUpdate.clear();
+		String[] aTmp1 = rawData.split("\u0087");
 		for ( String tmp : aTmp1 )
 		{
 			String[] aTmp2 = tmp.split("\u0086");
@@ -338,7 +338,7 @@ public class Segment implements ISegment {
 			code.type = Integer.parseInt(aTmp2[1]);
 			code.data = aTmp2[2];
 			code.label = aTmp2[3];
-			codesUpdate.add(code);
+			codesToUpdate.add(code);
 		}
 	}
 	
@@ -394,6 +394,7 @@ public class Segment implements ISegment {
 				nStack = 1;
 				while ( j < codes.size() ) {
 					if ( codes.get(j).type == CODE_CLOSING ) {
+//TODO: Deal with null labels						
 						if ( codes.get(j).label.equals(code.label) ) {
 							if ( (--nStack) == 0 ) {
 								bFound = true;
@@ -402,6 +403,7 @@ public class Segment implements ISegment {
 						}
 					}
 					else if ( codes.get(j).type == CODE_OPENING ) {
+//TODO: Deal with null labels						
 						if ( codes.get(j).label.equals(code.label) ) {
 							nStack++;
 						}

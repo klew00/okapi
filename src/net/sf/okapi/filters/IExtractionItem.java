@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -40,5 +40,12 @@ public interface IExtractionItem extends ISegment {
 	 * @return An array of ISegment objects.
 	 */
 	ISegment[] getSegments ();
-	
+
+	/**
+	 * Adds an existing segment to the object.
+	 * If the object was not segmented yet, it becomes segmented,
+	 * and the content of the original object becomes the first segment,
+	 * while this added segment becomes the second segment.
+	 */
+	void addSegment (ISegment newSegment);
 }

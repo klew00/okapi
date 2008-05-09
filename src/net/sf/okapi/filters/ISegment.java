@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -89,7 +89,7 @@ public interface ISegment {
 	 * over the object. 
 	 * @param segment The segment to append.
 	 */
-	void append (Segment segment);
+	void append (ISegment segment);
 	
 	/**
 	 * Copies all the data of the original object into this one. 
