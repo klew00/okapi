@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters;
 
 /**
@@ -31,7 +51,8 @@ public interface ISegment {
 	public static final int TEXTTYPE_GENERIC     = 2;
 	public static final int TEXTTYPE_PLAINTEXT   = 3;
 	public static final int TEXTTYPE_XLIFF12     = 4;
-	public static final int TEXTTYPE_TMX14       = 5;
+	public static final int TEXTTYPE_XLIFF12XG   = 5;
+	public static final int TEXTTYPE_TMX14       = 6;
 	
 	/**
 	 * Resets the object. All text, codes, and other properties
@@ -61,6 +82,14 @@ public interface ISegment {
 	void append (int type,
 		String label,
 		String codeData);
+
+	/**
+	 * Appends the text and codes of an existing segment to the object.
+	 * Note that no other data (e.g. properties) of the given segment are copied
+	 * over the object. 
+	 * @param segment The segment to append.
+	 */
+	void append (Segment segment);
 	
 	/**
 	 * Copies all the data of the original object into this one. 
@@ -82,6 +111,14 @@ public interface ISegment {
 	 * @return The object in the requested text representation.
 	 */
 	String toString (int textType);
+	
+	/**
+	 * Gets the character length of a string representation of the object in a 
+	 * given format.
+	 * @param textType The type of format requested (one of the TEXTTYPE_* values)
+	 * @return The number of characters for the requested text representation.
+	 */
+	int getLength (int textType);
 	
 	/**
 	 * Gets a string serialization of the internal storage of codes.
@@ -169,4 +206,19 @@ public interface ISegment {
 	 * @return The label of the code at the given index (can be null).
 	 */
 	String getCodeLabel (int index);
+	
+	/**
+	 * Indicates whether the object is empty (no text and no codes). 
+	 * @return True if the object is empty, false if there is any text (white space
+	 * is seen as text here) or codes.
+	 */
+	boolean isEmpty ();
+	
+	/**
+	 * Indicates whether the object 
+	 * @param whiteSpaceIsText Indicate if the method should consider white spaces as
+	 * text. Note that in-line codes are not considered part of the text.
+	 * @return True if at least one text character exists, false otherwise.
+	 */
+	boolean hasText (boolean whiteSpaceIsText);
 }

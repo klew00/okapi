@@ -47,12 +47,13 @@ public class Tests {
 		seg.append("bolded text");
 		seg.append(ISegment.CODE_CLOSING, "b", "</b>");
 		
-		System.out.println("Original  : '"+seg.toString()+"'");
-		System.out.println("Coded     : '"+seg.getCodedText()+"'");
-		System.out.println("Generic   : '"+seg.toString(ISegment.TEXTTYPE_GENERIC)+"'");
-		System.out.println("Plain text: '"+seg.toString(ISegment.TEXTTYPE_PLAINTEXT)+"'");
-		System.out.println("XLIFF-1.2 : '"+seg.toString(ISegment.TEXTTYPE_XLIFF12)+"'");
-		System.out.println("TMX-1.4   : '"+seg.toString(ISegment.TEXTTYPE_TMX14)+"'");
+		System.out.println("Original   : '"+seg.toString()+"'");
+		System.out.println("Coded      : '"+seg.getCodedText()+"'");
+		System.out.println("Generic    : '"+seg.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		System.out.println("Plain text : '"+seg.toString(ISegment.TEXTTYPE_PLAINTEXT)+"'");
+		System.out.println("XLIFF-1.2  : '"+seg.toString(ISegment.TEXTTYPE_XLIFF12)+"'");
+		System.out.println("XLIFF-1.2XG: '"+seg.toString(ISegment.TEXTTYPE_XLIFF12XG)+"'");
+		System.out.println("TMX-1.4    : '"+seg.toString(ISegment.TEXTTYPE_TMX14)+"'");
 		
 		System.out.println("---codes:");
 		for ( int i=0; i<seg.getCodeCount(); i++ ) {
@@ -77,9 +78,35 @@ public class Tests {
 		seg.setCodes(tmp1);
 		seg.setTextFromGeneric(tmp2);
 		System.out.println("Rebuilt-2: '"+seg.toString()+"'");
-
+		
+		System.out.println("---append seg:");
+		seg.reset();
+		seg.append("a");
+		seg.append(ISegment.CODE_ISOLATED, null, "<br/>");
+		seg.append("b");
+		seg.append(ISegment.CODE_OPENING, "b", "<b>");
+		seg.append("c");
+		seg.append(ISegment.CODE_CLOSING, "b", "</b>");
+		seg.append("d");
+		System.out.println("seg1  : '"+seg.toString()+"'");
+		System.out.println("seg1  : '"+seg.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		
+		Segment seg2 = new Segment();
+		seg2.append("|e");
+		seg2.append(ISegment.CODE_ISOLATED, null, "<br/>");
+		seg2.append("f");
+		seg2.append(ISegment.CODE_OPENING, "i", "<i>");
+		seg2.append("g");
+		seg2.append(ISegment.CODE_CLOSING, "i", "</i>");
+		seg2.append("h");
+		System.out.println("seg2  : '"+seg2.toString()+"'");
+		System.out.println("seg2  : '"+seg2.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		
+		seg.append(seg2);
+		System.out.println("seg1+2: '"+seg.toString()+"'");
+		System.out.println("seg1+2: '"+seg.toString(ISegment.TEXTTYPE_GENERIC)+"'");
+		
 		System.out.println("---end testSegments---\n");
-
 	}
 	
 	public static void main(String[] args) throws Exception

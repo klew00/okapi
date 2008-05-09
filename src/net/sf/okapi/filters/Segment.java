@@ -1,9 +1,36 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.Library.Base.Utils;
+
 /**
  * Reference implementation of the ISegment interface.
+ * <p>The internal representation of the coded text:
+ * <p>Each code is coded in two Unicode characters of the Private Use Area.
+ * The first one indicates the type of code (isolated, opening or closing.
+ * The second one is the index to the code in the codes array, it is
+ * zero-based + a base value in the Unicode private Use Area.
  */
 public class Segment implements ISegment {
 
@@ -50,6 +77,8 @@ public class Segment implements ISegment {
 			code.id = ++lastCodeID;
 		}
 		else {
+			// Do not know the corresponding opening code yet.
+			//TODO: Mmmm... maybe we could with a stack... then no need for normalize()
 			code.id = -1;
 			isNormalized = false;
 		}
@@ -58,6 +87,44 @@ public class Segment implements ISegment {
 		data.append((char)ItoC(codes.size()-1));
 	}
 
+	public void append (Segment segment) {
+		// Make sure the receiving segment is normalized 
+		if ( !isNormalized ) normalize();
+		
+		// Change the indices in the coded text to append
+		StringBuilder tmp1 = new StringBuilder(segment.getCodedText());
+		// First index will be last of receiving codes + 1, size()-1 to start 
+		int newIndex = codes.size()-1;
+		for ( int i=0; i<tmp1.length(); i++ ) {
+			switch ( tmp1.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				if ( i+1 < tmp1.length() ) i++;
+				tmp1.setCharAt(i, ItoC(++newIndex));
+				continue;
+			}
+		}
+		
+		// Go through the codes of the segment to append
+		// and change the IDs and add to the codes of this segment
+		ArrayList<Code> tmpCodes = new ArrayList<Code>();
+		unpackCodes(segment.getCodes(), tmpCodes);
+		for ( Code code : tmpCodes ) {
+			if ( code.type == CODE_ISOLATED ) {
+				code.id = ++lastCodeID; // Update the ID
+			}
+			else { // Normalize afterward
+				code.id = -1;
+				isNormalized = false;
+			}
+			codes.add(code); // Add the code to the list
+		}
+		
+		// Add the updated coded text
+		data.append(tmp1);
+	}
+	
 	public void copyFrom (ISegment original) {
 		setCodes(original.getCodes());
 		setTextFromCoded(original.getCodedText());
@@ -111,8 +178,34 @@ public class Segment implements ISegment {
 			return getGenericText();
 		case TEXTTYPE_PLAINTEXT:
 			return getPlainText();
+		case TEXTTYPE_TMX14:
+			return getTMXText();
+		case TEXTTYPE_XLIFF12:
+			return getXLIFFText(true);
+		case TEXTTYPE_XLIFF12XG:
+			return getXLIFFText(false);
 		}
 		return null;
+	}
+	
+	public int getLength (int textType) {
+		switch ( textType ) {
+		case TEXTTYPE_ORIGINAL:
+			return getOriginalText().length();
+		case TEXTTYPE_CODED:
+			return getCodedText().length();
+		case TEXTTYPE_GENERIC:
+			return getGenericText().length();
+		case TEXTTYPE_PLAINTEXT:
+			return getPlainText().length();
+		case TEXTTYPE_TMX14:
+			return getTMXText().length();
+		case TEXTTYPE_XLIFF12:
+			return getXLIFFText(true).length();
+		case TEXTTYPE_XLIFF12XG:
+			return getXLIFFText(false).length();
+		}
+		return 0;
 	}
 
 	public String getCodedText () {
@@ -227,13 +320,14 @@ public class Segment implements ISegment {
 		if ( state > 0 ) {
 			// Case of "<123" or "</123"
 			data.append('<');
-			//if ( nState == 1 ) sbTmp.append('/');
 			data.append(genericText.substring(start));
 		}
 	}
-	
-	public void setCodes(String data) {
-		codes.clear();
+
+	private void unpackCodes (String data,
+		ArrayList<Code> codesUpdate)
+	{
+		codesUpdate.clear();
 		String[] aTmp1 = data.split("\u0087");
 		for ( String tmp : aTmp1 )
 		{
@@ -244,10 +338,38 @@ public class Segment implements ISegment {
 			code.type = Integer.parseInt(aTmp2[1]);
 			code.data = aTmp2[2];
 			code.label = aTmp2[3];
-			codes.add(code);
+			codesUpdate.add(code);
 		}
 	}
+	
+	public void setCodes(String data) {
+		unpackCodes(data, codes);
+	}
 
+	public boolean hasText(boolean whiteSpaceIsText)
+	{
+		for ( int i=0; i<data.length(); i++ ) {
+			switch ( data.codePointAt(i) ) {
+				case CODE_OPENING:
+				case CODE_CLOSING:
+				case CODE_ISOLATED:
+					if ( i+1 < data.length() ) i++;
+					continue;
+				default:
+					if ( whiteSpaceIsText )
+						return true; // At least one character is in the text
+					// Else: Text only if not white-psace
+					if ( !Character.isWhitespace(data.charAt(i)) ) return true;
+					break;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isEmpty() {
+		return (data.length() == 0);
+	}
+	
 	private void normalize () {
 		if ( isNormalized ) return;
 		
@@ -272,7 +394,7 @@ public class Segment implements ISegment {
 				nStack = 1;
 				while ( j < codes.size() ) {
 					if ( codes.get(j).type == CODE_CLOSING ) {
-						if ( codes.get(j).label == code.label ) {
+						if ( codes.get(j).label.equals(code.label) ) {
 							if ( (--nStack) == 0 ) {
 								bFound = true;
 								break;
@@ -280,7 +402,7 @@ public class Segment implements ISegment {
 						}
 					}
 					else if ( codes.get(j).type == CODE_OPENING ) {
-						if ( codes.get(j).label == code.label ) {
+						if ( codes.get(j).label.equals(code.label) ) {
 							nStack++;
 						}
 					}
@@ -311,8 +433,7 @@ public class Segment implements ISegment {
 				case CODE_OPENING:
 				case CODE_CLOSING:
 					if ( i+1 > data.length() ) continue;
-					if ( index == CtoI(data.charAt(i+1)) )
-					{
+					if ( index == CtoI(data.charAt(i+1)) ) {
 						codes.get(index).type = CODE_ISOLATED; 
 						data.setCharAt(i, (char)CODE_ISOLATED);
 						return;
@@ -342,15 +463,15 @@ public class Segment implements ISegment {
 		// Then convert them to generic tags
 		for ( int i=0; i<data.length(); i++ ) {
 			switch ( data.codePointAt(i) ) {
-			case ISegment.CODE_OPENING:
+			case CODE_OPENING:
 				if ( i+1 >= data.length() )	continue;
 				sbTmp.append("<"+getCodeID(CtoI(data.charAt(++i)))+">");
 				continue;
-			case ISegment.CODE_CLOSING:
+			case CODE_CLOSING:
 				if ( i+1 >= data.length() )	continue;
 				sbTmp.append("</"+getCodeID(CtoI(data.charAt(++i)))+">");
 				continue;
-			case ISegment.CODE_ISOLATED:
+			case CODE_ISOLATED:
 				if ( i+1 >= data.length() )	continue;
 				sbTmp.append("<"+getCodeID(CtoI(data.charAt(++i)))+"/>");
 				continue;
@@ -372,9 +493,9 @@ public class Segment implements ISegment {
 		StringBuilder sbTmp = new StringBuilder(data.length());
 		for ( int i=0; i<data.length(); i++ ) {
 			switch ( data.codePointAt(i) ) {
-			case ISegment.CODE_OPENING:
-			case ISegment.CODE_CLOSING:
-			case ISegment.CODE_ISOLATED:
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
 				if ( i+1 >= data.length() )	continue;
 				sbTmp.append(getCodeData(CtoI(data.charAt(++i))));
 				continue;
@@ -397,9 +518,9 @@ public class Segment implements ISegment {
 		for ( int i=0; i<data.length(); i++ ) {
 			switch ( data.codePointAt(i) )
 			{
-			case ISegment.CODE_OPENING:
-			case ISegment.CODE_CLOSING:
-			case ISegment.CODE_ISOLATED:
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
 				if ( i+1 < data.length() ) i++;
 				continue;
 			default:
@@ -407,6 +528,129 @@ public class Segment implements ISegment {
 				continue;
 			}
 		}
+		return sbTmp.toString();
+	}
+
+	private String getTMXText () {
+		// Return the plain string if no codes
+		if ( !hasCode() ) {
+			// Order is important: do '&' first
+			String tmp = data.toString().replaceAll("&", "&amp;");
+			tmp = tmp.replaceAll("\\<", "&lt;");
+			return tmp.replace("\\]\\>", "]&gt;");
+		}
+
+		if ( !isNormalized ) normalize();
+		StringBuffer sbTmp = new StringBuffer(data.length());
+
+		for ( int i=0; i<data.length(); i++ ) {
+			switch ( data.codePointAt(i) ) {
+			case CODE_OPENING:
+				if ( i+1 >= data.length() )	continue;
+				sbTmp.append(String.format("<bpt i=\"%1$s\" x=\"%2$d\">",
+					getCodeID(CtoI(data.charAt(++i))), CtoI(data.charAt(i))+1));
+				sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+				sbTmp.append("</bpt>");
+				continue;
+			case CODE_CLOSING:
+				if ( i+1 >= data.length() )	continue;
+				sbTmp.append(String.format("<ept i=\"%1$d\">", getCodeID(CtoI(data.charAt(++i)))));
+				sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+				sbTmp.append("</ept>");
+				continue;
+			case CODE_ISOLATED:
+				if ( i+1 >= data.length() )	continue;
+				sbTmp.append(String.format("<ph x=\"%1$d\">", CtoI(data.charAt(++i))+1));
+				sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+				sbTmp.append("</ph>");
+				continue;
+			case '&':
+				sbTmp.append("&amp;");
+				continue;
+			case '<':
+				sbTmp.append("&lt;");
+				continue;
+			case '>':
+				if (( i > 0 ) && ( data.charAt(i-1) == ']' ))
+					sbTmp.append("&gt;");
+				else
+					sbTmp.append(data.charAt(i));
+				continue;
+			default:
+				sbTmp.append(data.charAt(i));
+				continue;
+			}
+		}
+		return sbTmp.toString();
+	}
+
+	private String getXLIFFText (boolean useBPT) {
+		// Return the plain string if no codes
+		if ( !hasCode() ) {
+			// Order is important: do '&' first
+			String tmp = data.toString().replaceAll("&", "&amp;");
+			tmp = tmp.replaceAll("\\<", "&lt;");
+			return tmp.replace("\\]\\>", "]&gt;");
+		}
+
+		if ( !isNormalized ) normalize();
+		StringBuffer sbTmp = new StringBuffer(data.length());
+
+		for ( int i=0; i<data.length(); i++ ) {
+			switch ( data.codePointAt(i) ) {
+				case CODE_OPENING:
+					if ( i+1 >= data.length() )	continue;
+					if ( useBPT ) {
+						sbTmp.append("<bpt id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\">");
+						sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+						sbTmp.append("</bpt>");
+					}
+					else {
+						sbTmp.append("<g id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\">");
+					}
+					continue;
+				case CODE_CLOSING:
+					if ( i+1 >= data.length() )	continue;
+					if ( useBPT ) {
+						sbTmp.append("<ept id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\">");
+						sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+						sbTmp.append("</ept>");
+					}
+					else {
+						sbTmp.append("</g>");
+						++i; // Make sure we skip the code even if it's not used
+					}
+					continue;
+				case CODE_ISOLATED:
+					if ( i+1 >= data.length() )	continue;
+					if ( useBPT ) {
+						if ( getCodeData(CtoI(data.charAt(i+1))).length() > 0 ) {
+							sbTmp.append("<ph id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\">");
+							sbTmp.append(Utils.escapeToXML(getCodeData(CtoI(data.charAt(i))), 0, false));
+							sbTmp.append("</ph>");
+						}
+						else sbTmp.append("<ph id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\"/>");
+					}
+					else {
+						sbTmp.append("<x id=\"" + getCodeID(CtoI(data.charAt(++i))) + "\"/>");
+					}
+					continue;
+				case '&':
+					sbTmp.append("&amp;");
+					continue;
+				case '<':
+					sbTmp.append("&lt;");
+					continue;
+				case '>':
+					if (( i > 0 ) && ( data.charAt(i-1) == ']' )) sbTmp.append("&gt;");
+					else sbTmp.append(data.charAt(i));
+					continue;
+				default:
+					sbTmp.append(data.charAt(i));
+					continue;
+			}
+		}
+
 		return sbTmp.toString();
 	}
 

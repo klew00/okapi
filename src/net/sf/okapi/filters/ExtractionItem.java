@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves savourel (at ENLASO Corporation)                  */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters;
 
 import java.util.ArrayList;
@@ -12,12 +32,16 @@ public class ExtractionItem implements IExtractionItem {
 	private boolean               isSegmented;
 
 	public ExtractionItem () {
+		reset();
+	}
+
+	public void reset () {
 		segList = new ArrayList<Segment>();
 		segList.add(new Segment());
 		lastSeg = segList.get(0);
 		isSegmented = false;
 	}
-	
+
 	public int getSegmentCount () {
 		return segList.size();
 	}
@@ -35,6 +59,7 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public void append (char value) {
+		if ( isSegmented ) buildItem();
 		lastSeg.append(value);
 	}
 
@@ -42,86 +67,107 @@ public class ExtractionItem implements IExtractionItem {
 		String label,
 		String codeData)
 	{
+		if ( isSegmented ) buildItem();
 		lastSeg.append(type, label, codeData);
 	}
 
+	public void append (Segment segment) {
+		if ( isSegmented ) buildItem();
+		lastSeg.append(segment);
+	}
+
 	public void copyFrom (ISegment original) {
-		// TODO Auto-generated method stub
-		
+		// TODO
 	}
 
 	public int getCodeCount () {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public String getCodedText () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getCodes () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean hasCode () {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void setTextFromCoded (String codedText) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setCodes (String data) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public String toString (int textType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getCodeID (int index) {
-		if ( !isSegmented )
-			return lastSeg.getCodeID(index);
-		return 0; //TODO
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodeCount();
 	}
 
 	public String getCodeData (int index) {
-		if ( !isSegmented )
-			return lastSeg.getCodeData(index);
-		return null; // TODO
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodeData(index);
 	}
 
-	public int getCodeIndex(int id, int type) {
-		if ( !isSegmented )
-			return lastSeg.getCodeIndex(id, type);
-		return 0;
+	public int getCodeID (int index) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodeID(index);
 	}
 
-	public String getCodeLabel(int index) {
-		if ( !isSegmented )
-			return lastSeg.getCodeLabel(index);
-		return null;
+	public int getCodeIndex (int id, int type) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodeIndex(id, type);
 	}
 
-	public void reset() {
-		// TODO Auto-generated method stub
-		
+	public String getCodeLabel (int index) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodeLabel(index);
 	}
 
-	public void setText(String text) {
-		// TODO Auto-generated method stub
-		
+	public String getCodedText () {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodedText();
 	}
 
-	public void setTextFromGeneric(String genericText) {
-		// TODO Auto-generated method stub
-		
+	public String getCodes () {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getCodes();
+	}
+
+	public int getLength (int textType) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.getLength(textType);
+	}
+
+	public boolean hasCode () {
+		if ( isSegmented ) buildItem();
+		return lastSeg.hasCode();
+	}
+
+	public boolean hasText (boolean whiteSpaceIsText) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.hasText(whiteSpaceIsText);
+	}
+
+	public boolean isEmpty () {
+		if ( isSegmented ) buildItem();
+		return lastSeg.isEmpty();
+	}
+
+	public void setCodes (String data) {
+		if ( isSegmented ) buildItem();
+		lastSeg.setCodes(data);
+	}
+
+	public void setText (String text) {
+		if ( isSegmented ) buildItem();
+		lastSeg.setText(text);
+	}
+
+	public void setTextFromCoded (String codedText) {
+		if ( isSegmented ) buildItem();
+		lastSeg.setTextFromCoded(codedText);
+	}
+
+	public void setTextFromGeneric (String genericText) {
+		if ( isSegmented ) buildItem();
+		lastSeg.setTextFromGeneric(genericText);
+	}
+
+	public String toString (int textType) {
+		if ( isSegmented ) buildItem();
+		return lastSeg.toString(textType);
+	}
+	
+	private void buildItem () {
+		if ( !isSegmented ) return;
+		Segment workSeg = new Segment();
+		for ( Segment seg : segList ) {
+	//		workSeg.append(seg);
+		}
+		lastSeg = workSeg;
+		isSegmented = false; //????
 	}
 
 }
