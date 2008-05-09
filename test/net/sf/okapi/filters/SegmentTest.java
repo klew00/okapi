@@ -157,4 +157,19 @@ public class SegmentTest {
 		assertEquals(101, segment.getLength(ISegment.TEXTTYPE_XLIFF12));
 		assertEquals(53,  segment.getLength(ISegment.TEXTTYPE_XLIFF12XG));
 	}
+
+	@Test
+	public void setText() {
+		ISegment seg = new Segment();
+		seg.setText("Test settext method");
+		assertEquals("Test settext method",  seg.toString());
+
+		seg = new Segment();
+		seg.setTextFromCoded(segmentWithCodesAsString);
+		assertEquals(segmentWithCodesAsString, seg.toString(ISegment.TEXTTYPE_CODED));
+
+		seg = new Segment();
+		seg.setTextFromGeneric("text1 text2<1/>text3 <2>bolded text</2>");
+		assertEquals("text1 text2<1/>text3 <2>bolded text</2>", seg.toString(ISegment.TEXTTYPE_GENERIC));
+	}
 }
