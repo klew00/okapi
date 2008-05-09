@@ -82,6 +82,9 @@ public class SegmentTest {
 		assertEquals("", segment.getCodedText());
 		assertEquals("", segment.getCodes());
 		assertFalse(segment.hasCode());
+		assertFalse(segment.hasText(false));
+		assertFalse(segment.hasText(true));
+		assertTrue(segment.isEmpty());
 	}
 
 	@Test
@@ -98,6 +101,12 @@ public class SegmentTest {
 		ISegment seg = new Segment();
 		seg.copyFrom(segment);
 		assertEquals("text1 text2<br/>text3 <b>bolded text</b>", segment.toString(ISegment.TEXTTYPE_ORIGINAL));
+
+		// throw in a few more methods to test
+		assertTrue(segment.hasCode());
+		assertTrue(segment.hasText(false));
+		assertTrue(segment.hasText(true));
+		assertFalse(segment.isEmpty());
 	}
 
 	@Test
@@ -169,6 +178,7 @@ public class SegmentTest {
 		assertEquals(segmentWithCodesAsString, seg.toString(ISegment.TEXTTYPE_CODED));
 
 		seg = new Segment();
+		seg.setCodes(segment.getCodes());
 		seg.setTextFromGeneric("text1 text2<1/>text3 <2>bolded text</2>");
 		assertEquals("text1 text2<1/>text3 <2>bolded text</2>", seg.toString(ISegment.TEXTTYPE_GENERIC));
 	}
