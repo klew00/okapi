@@ -247,6 +247,10 @@ public class ExtractionItem implements IExtractionItem {
 		}
 	}
 	
+	public void makeOneSegment () {
+		buildCompiledSegment(true);
+	}
+	
 	private void buildCompiledSegment (boolean removeSegmentation) {
 		if ( !isSegmented ) return;
 		// Check if any change occurred in the segments

@@ -48,4 +48,9 @@ public interface IExtractionItem extends ISegment {
 	 * while this added segment becomes the second segment.
 	 */
 	void addSegment (ISegment newSegment);
+	
+	/**
+	 * Makes a single segment from all the segments in the object.
+	 */
+	void makeOneSegment ();
 }

@@ -41,10 +41,21 @@ public class Segment implements ISegment {
 	private int              lastCodeID;
 	private boolean          isNormalized;
 	
+	/**
+	 * Converts a character into an code index.
+	 * @param index The character to convert, taken from the coded string.
+	 * @return The index of the code.
+	 */
 	static private int CtoI (char index) {
 		return ((int)index)-INDEXBASE;
 	}
 
+	/**
+	 * Converts the index of a code into a character to use
+	 * in the coded string.
+	 * @param index the index to convert.
+	 * @return The character to use in the coded string.
+	 */
 	static private char ItoC (int index) {
 		return (char)(index+INDEXBASE);
 	}
@@ -394,8 +405,8 @@ public class Segment implements ISegment {
 				nStack = 1;
 				while ( j < codes.size() ) {
 					if ( codes.get(j).type == CODE_CLOSING ) {
-//TODO: Deal with null labels						
-						if ( codes.get(j).label.equals(code.label) ) {
+						if ((( codes.get(j).label == null ) && ( code.label == null ))
+							|| (( codes.get(j).label.equals(code.label) ))) {
 							if ( (--nStack) == 0 ) {
 								bFound = true;
 								break;
@@ -403,8 +414,8 @@ public class Segment implements ISegment {
 						}
 					}
 					else if ( codes.get(j).type == CODE_OPENING ) {
-//TODO: Deal with null labels						
-						if ( codes.get(j).label.equals(code.label) ) {
+						if ((( codes.get(j).label == null ) && ( code.label == null )) 
+							|| ( codes.get(j).label.equals(code.label) )) {
 							nStack++;
 						}
 					}

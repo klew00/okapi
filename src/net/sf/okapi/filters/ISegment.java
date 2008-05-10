@@ -129,7 +129,7 @@ public interface ISegment {
 	/**
 	 * Sets all the codes of the object based on the given string. 
 	 * @param data The serialization of the codes to apply.
-	 * You obtain this string using the getCodes() method.
+	 * You obtain this string using the {@link #getCodes()} method.
 	 */
 	void setCodes (String data);
 	
@@ -149,8 +149,9 @@ public interface ISegment {
 	
 	/**
 	 * Sets the text of the object based on the given coded string.
-	 * If you also change the codes using setCodes(), make sure to call
-	 * setCodes() before calling setTextFromCoded(). 
+	 * If you also change the codes using {@link #setCodes(String)}, make
+	 * sure to call {@link #setCodes(String)} before calling
+	 * {@link #setTextFromCoded(String)}. 
 	 * @param codedText The coded text to apply. You can obtain this string
 	 * using the getCodedText() method.
 	 */
@@ -158,6 +159,9 @@ public interface ISegment {
 	
 	/**
 	 * Sets the text of the object based on the given generic string.
+	 * If you also change the codes using {@link #setCodes(String)}, make 
+	 * sure to call {@link #setCodes(String)} before calling
+	 * {@link #setTextFromGeneric(String)}. 
 	 * @param genericText The generic text to apply. You can obtain this
 	 * string using the toString(TEXTTYPE_GENERIC) method.
 	 */
@@ -187,7 +191,7 @@ public interface ISegment {
 	/**
 	 * Gets the ID of a given in-line code.
 	 * @param index The zero-based index of the code to lookup.
-	 * This value must be between 0 and getCodeCount()-1.
+	 * This value must be between 0 and {@link #getCodeCount()}-1.
 	 * @return The ID value of the code at the given index. 
 	 */
 	int getCodeID (int index);
@@ -195,7 +199,7 @@ public interface ISegment {
 	/**
 	 * Gets the underlying data text for a given in-line code.
 	 * @param index The zero-based index of the code to lookup.
-	 * This value must be between 0 and getCodeCount()-1.
+	 * This value must be between 0 and {@link #getCodeCount()}-1.
 	 * @return The underlying data of the code at the given index (can be null).
 	 */
 	String getCodeData (int index);
@@ -209,15 +213,16 @@ public interface ISegment {
 	
 	/**
 	 * Indicates whether the object is empty (no text and no codes). 
-	 * @return True if the object is empty, false if there is any text (white space
-	 * is seen as text here) or codes.
+	 * @return True if the object is empty, false if there is any text
+	 * (white space is seen as text here) or codes.
 	 */
 	boolean isEmpty ();
 	
 	/**
 	 * Indicates whether the object 
-	 * @param whiteSpaceIsText Indicate if the method should consider white spaces as
-	 * text. Note that in-line codes are not considered part of the text.
+	 * @param whiteSpaceIsText Indicate if the method should consider white
+	 * spaces as text. Note that in-line codes are not considered part of
+	 * the text.
 	 * @return True if at least one text character exists, false otherwise.
 	 */
 	boolean hasText (boolean whiteSpaceIsText);
