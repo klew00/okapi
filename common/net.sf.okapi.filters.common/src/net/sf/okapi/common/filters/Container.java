@@ -29,6 +29,17 @@ public class Container implements IContainer {
 		return getText(false);
 	}
 	
+	public boolean isEmpty () {
+		if (( lastFrag == null ) || ( list.size() == 0 )) return true;
+		for ( IFragment frag : list ) {
+			if ( frag.isText() ) {
+				if ( ((TextFragment)frag).text.length() > 0 ) return false;
+			}
+			else return false; // At least one code
+		}
+		return true; // Found only empty text fragments
+	}
+	
 	private void reset () {
 		list = new ArrayList<IFragment>();
 		lastFrag = null;
@@ -61,7 +72,13 @@ public class Container implements IContainer {
 		lastFrag = fragment;
 	}
 
-	public String getText (boolean coded) {
+	/**
+	 * Gets the text of the object in original or coded format. 
+	 * @param coded Indicates if the returned text should be coded. Use true for coded, false
+	 * for original.
+	 * @return The coded or original text of the object.
+	 */
+	private String getText (boolean coded) {
 		if ( lastFrag == null ) return "";
 		StringBuilder text = new StringBuilder();
 		for ( IFragment frag : list ) {
@@ -109,9 +126,16 @@ public class Container implements IContainer {
 		return false;
 	}
 
+	/**
+	 * Resets the content of the object based on a coded text string and a map of 
+	 * codes.
+	 * @param codedText The coded text to use to create the new content.
+	 * @param codes The codes to use along with the coded text. Use null to use the existing codes.
+	 * @throws Exception
+	 */
 	private void resetContent (String codedText,
 		Map<Integer, IFragment> codes)
-		throws Exception
+		throws Exception //TODO: Maybe a specific exception
 	{
 		// Store code fragments temporarily
 		Map<Integer, IFragment> tmpMap = codes;
@@ -119,7 +143,7 @@ public class Container implements IContainer {
 		reset(); // Reset all
 
 		if ( codedText == null ) {
-			if ( tmpMap.size() > 0 ) //TODO: Maybe null just reset all?
+			if ( tmpMap.size() > 0 ) //TODO: Maybe null just reset all instead of giving an error?
 				throw new Exception("One missing code or more in the coded text.");
 			else return;
 		}
@@ -170,14 +194,14 @@ public class Container implements IContainer {
 	}
 
 	public void setContent (String codedText)
-		throws Exception
+		throws Exception //TODO: Maybe a specific exception
 	{
 		resetContent(codedText, null);
 	}
 
 	public void setContent (String codedText,
 		Map<Integer, IFragment> codes)
-		throws Exception
+		throws Exception //TODO: Maybe a specific exception
 	{
 		resetContent(codedText, codes);
 	}

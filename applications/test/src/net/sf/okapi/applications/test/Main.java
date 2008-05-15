@@ -21,10 +21,13 @@
 package net.sf.okapi.applications.test;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.okapi.common.filters.CodeFragment;
 import net.sf.okapi.common.filters.Container;
 import net.sf.okapi.common.filters.IContainer;
+import net.sf.okapi.common.filters.IFragment;
 
 public class Main {
 
@@ -35,14 +38,24 @@ public class Main {
 			System.out.println("---start testNewObjects---");
 			IContainer cnt = new Container();
 			cnt.append("t1");
-			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, null, "<br/>"));
+			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<br/>"));
 			cnt.append("t2");
 			System.out.println("out 1: " + cnt.toString());
 			String s1 = cnt.getCodedText();
 			cnt.setContent(s1);
 			System.out.println("out 2: " + cnt.toString());
-			cnt.setContent("");
+			Map<Integer, IFragment> codes = cnt.getCodes();
+			cnt.setContent(s1, codes);
 			System.out.println("out 3: " + cnt.toString());
+			
+			List<IFragment> list = cnt.getFragments();
+			for ( IFragment frag : list ) {
+				System.out.println(String.format("istext=%s, content='%s'",
+					(frag.isText() ? "yes" : "no "),
+					frag.toString()));
+			}
+			
+			
 		}		
 		catch ( Exception E ) {
 			System.out.println(E.getLocalizedMessage());

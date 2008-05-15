@@ -10,6 +10,18 @@ public interface IContainer {
 	public static final int CODE_ISOLATED   = 0xE103;
 
 	/**
+	 * Gets the content in its original format.
+	 * @return The content of the object in its original format.
+	 */
+	String toString ();
+	
+	/**
+	 * Indicates if the oebject is empty or not.
+	 * @return True if the object is empty, false otherwise.
+	 */
+	boolean isEmpty ();
+	
+	/**
 	 * Appends a text (without codes) to the object. 
 	 * @param text The text to append.
 	 */
@@ -74,7 +86,7 @@ public interface IContainer {
 	 * Helper function: Indicates if a given code point in a coded string
 	 * is the prefix of a code section.
 	 * @param codePoint The code point to look at.
-	 * @return True if the codepoint is the start of a code section.
+	 * @return True if the code-point is the start of a code section.
 	 */
 	boolean isCodePrefix (int codePoint);
 	
