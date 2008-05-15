@@ -20,37 +20,6 @@
 
 package net.sf.okapi.common.filters;
 
-public interface IExtractionItem extends ISegment {
+public interface IExtractionItem {
 
-	/**
-	 * Indicates whether an object is segmented or not. Not that an item may
-	 * have been segmented and still be made on a single segment.
-	 * @return True if the object has been segmented, false otherwise.
-	 */
-	boolean isSegmented ();
-
-	/**
-	 * Gets the number of segments in this object. The minimum value is 1.
-	 * @return The number of segments in the object.
-	 */
-	int getSegmentCount ();
-
-	/**
-	 * Gets the list of all segments in the object.
-	 * @return An array of ISegment objects.
-	 */
-	ISegment[] getSegments ();
-
-	/**
-	 * Adds an existing segment to the object.
-	 * If the object was not segmented yet, it becomes segmented,
-	 * and the content of the original object becomes the first segment,
-	 * while this added segment becomes the second segment.
-	 */
-	void addSegment (ISegment newSegment);
-	
-	/**
-	 * Makes a single segment from all the segments in the object.
-	 */
-	void makeOneSegment ();
 }
