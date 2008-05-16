@@ -11,6 +11,7 @@ public class Container implements IContainer {
 
 	private ArrayList<IFragment>       list;
 	private IFragment                  lastFrag;
+	private Map<String, Object>        props;
 
 	static private char ItoC (int id) {
 		return (char)(id+CHARBASE);
@@ -206,4 +207,23 @@ public class Container implements IContainer {
 		resetContent(codedText, codes);
 	}
 
+	public Object getProperty (String name) {
+		if ( props == null ) return null;
+		return props.get(name);
+	}
+
+	public void setProperty (String name,
+		Object value)
+	{
+		if ( props == null ) {
+			props = new HashMap<String, Object>();
+		}
+		props.put(name, value);
+	}
+
+	public void clearProperties () {
+		if ( props != null ) {
+			props.clear();
+		}
+	}
 }

@@ -16,7 +16,7 @@ public interface IContainer {
 	String toString ();
 	
 	/**
-	 * Indicates if the oebject is empty or not.
+	 * Indicates if the object is empty or not.
 	 * @return True if the object is empty, false otherwise.
 	 */
 	boolean isEmpty ();
@@ -89,5 +89,25 @@ public interface IContainer {
 	 * @return True if the code-point is the start of a code section.
 	 */
 	boolean isCodePrefix (int codePoint);
+
+	/**
+	 * Sets the property value object associated with a given property name.
+	 * @param name The name of the property (case sensitive).
+	 * @param value The new value to set.
+	 */
+	void setProperty (String name,
+		Object value);
 	
+	/**
+	 * Gets the value object associated with a given property name.
+	 * @param name The name of the property (case sensitive).
+	 * @return The current object associated with the given property name, this
+	 * can be null. Null is also return if there is no property for the given name.
+	 */
+	Object getProperty (String name);
+	
+	/**
+	 * Removes the list of properties associated with the object.
+	 */
+	void clearProperties ();
 }

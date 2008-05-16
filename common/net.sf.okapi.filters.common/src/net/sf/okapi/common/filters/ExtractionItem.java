@@ -20,10 +20,45 @@
 
 package net.sf.okapi.common.filters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Reference implementation of IExtractionItem.
  */
 public class ExtractionItem implements IExtractionItem {
 
+	private IContainer                 main;
+	private ArrayList<IExtractionItem> children;
+	private ArrayList<IContainer>      segments;
+	
+	public void addChild (IExtractionItem child) {
+		if ( children == null ) {
+			children = new ArrayList<IExtractionItem>();
+		}
+		children.add(child);
+	}
+
+	public List<IExtractionItem> getChildren () {
+		if ( children == null ) {
+			children = new ArrayList<IExtractionItem>();
+		}
+		return children;
+	}
+
+	public IContainer getContent () {
+		return main;
+	}
+
+	public List<IContainer> getSegments () {
+		if ( segments == null ) {
+			segments = new ArrayList<IContainer>();
+		}
+		return segments;
+	}
+
+	public void setContent (IContainer data) {
+		main = data;
+	}
 
 }

@@ -20,37 +20,53 @@
 
 package net.sf.okapi.common.filters;
 
-import java.util.List;
+import java.io.Reader;
+import java.io.Writer;
 
-public interface IExtractionItem {
+import net.sf.okapi.common.IParameters;
 
-	/**
-	 * Gets the un-segmented content of the item.
-	 * @return The IContainer object with the un-segmented content.
-	 */
-	IContainer getContent();
+public interface IFilter {
+
+	IParameters getParameters ();
+	
+	void setParameters (IParameters param);
 	
 	/**
-	 * Sets the content of the item.
-	 * @param data An IContainer object with the new content.
+	 * Opens the input to process.
+	 * @param reader The reader to use for the input.
+	 * @param language Language code of the source.
 	 */
-	void setContent (IContainer data);
+	void openInput (Reader reader,
+		String language);
 	
 	/**
-	 * Gets the list of the segments for the item.
-	 * @return A list of IContainer object corresponding to each segment.
+	 * Closes the current input.
 	 */
-	List<IContainer> getSegments();
+	void closeInput ();
+	
+	/**
+	 * Sets the options associated to the output.
+	 * @param language Language code of the target.
+	 */
+	void setOutputOptions (String language);
+	
+	/**
+	 * Opens or creates the output file.
+	 * @param writer The writer to use for output.
+	 */
+	void openOutput (Writer writer);
+	
+	/**
+	 * Closes the current output.
+	 */
+	void closeOutput ();
 
-	/**
-	 * Gets the list of children items for this item.
-	 * @return A list of IExtractionItem objects, one for each child item.
-	 */
-	List<IExtractionItem> getChildren();
+	int readItem ();
 	
-	/**
-	 * Adds a child item to this item.
-	 * @param child The IExtractionItem object to add.
-	 */
-	void addChild (IExtractionItem child);
+	boolean supports (int feature);
+	
+	IExtractionItem getSourceItem ();
+	
+	IExtractionItem getTargetItem ();
+	
 }

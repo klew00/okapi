@@ -55,7 +55,18 @@ public class Main {
 					frag.toString()));
 			}
 			
-			
+			cnt.setProperty("test1", "value1");
+			System.out.println(String.format("name='test1' value='%s'",
+				cnt.getProperty("test1")));
+			cnt.setProperty("test1", null);
+			System.out.println(String.format("name='test1' value='%s'",
+				cnt.getProperty("test1")));
+			cnt.setProperty("test1", "value1 again");
+			System.out.println(String.format("name='test1' value='%s'",
+				cnt.getProperty("test1")));
+			cnt.clearProperties();
+			System.out.println(String.format("name='test1' value='%s'",
+				cnt.getProperty("test1")));
 		}		
 		catch ( Exception E ) {
 			System.out.println(E.getLocalizedMessage());
