@@ -27,22 +27,22 @@ public class Util {
 
 	/**
 	 * Removes from the from of a string any of the specified characters. 
-	 * @param p_sText String to trim.
-	 * @param p_sChars List of the characters to trim.
+	 * @param text String to trim.
+	 * @param chars List of the characters to trim.
 	 * @return The trimmed string.
 	 */
-	static public String trimStart (String p_sText,
-		String p_sChars)
+	static public String trimStart (String text,
+		String chars)
 	{
-		if ( p_sText == null ) return p_sText;
+		if ( text == null ) return text;
 		int n = 0;
-		while ( n < p_sText.length() ) {
-			if ( p_sChars.indexOf(p_sText.charAt(n)) == -1 ) break;
+		while ( n < text.length() ) {
+			if ( chars.indexOf(text.charAt(n)) == -1 ) break;
 			n++;
 		}
-		if ( n >= p_sText.length() ) return "";
-		if ( n > 0 ) return p_sText.substring(n);
-		return p_sText;
+		if ( n >= text.length() ) return "";
+		if ( n > 0 ) return text.substring(n);
+		return text;
 	}
 
 }
