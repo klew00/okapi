@@ -21,7 +21,9 @@
 package net.sf.okapi.common.filters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reference implementation of IExtractionItem.
@@ -31,6 +33,13 @@ public class ExtractionItem implements IExtractionItem {
 	private IContainer                 main;
 	private ArrayList<IExtractionItem> children;
 	private ArrayList<IContainer>      segments;
+	private Map<String, Object>        props;
+	public int                         id;
+	public boolean                     isTranslatable;
+	public boolean                     hasTarget;
+	public String                      resname;
+	public String                      restype;
+	public boolean                     preserveFormatting;
 	
 	public void addChild (IExtractionItem child) {
 		if ( children == null ) {
@@ -61,4 +70,71 @@ public class ExtractionItem implements IExtractionItem {
 		main = data;
 	}
 
+	public int getID () {
+		return id;
+	}
+
+	public String getResname () {
+		return resname;
+	}
+
+	public String getRestype () {
+		return restype;
+	}
+
+	public boolean hasTarget () {
+		return hasTarget;
+	}
+
+	public boolean isTranslatable () {
+		return isTranslatable;
+	}
+
+	public void setID (int newId) {
+		id = newId;
+	}
+
+	public void setResname (String newResname) {
+		resname = newResname;
+	}
+
+	public void setRestype (String newRestype) {
+		restype = newRestype;
+	}
+
+	public void setHasTarget (boolean newHasTarget) {
+		hasTarget = newHasTarget;
+	}
+
+	public void setIsTranslatable(boolean newIsTranslatable) {
+		isTranslatable = newIsTranslatable;
+	}
+
+	public Object getProperty (String name) {
+		if ( props == null ) return null;
+		return props.get(name);
+	}
+
+	public void setProperty (String name,
+		Object value)
+	{
+		if ( props == null ) {
+			props = new HashMap<String, Object>();
+		}
+		props.put(name, value);
+	}
+
+	public void clearProperties () {
+		if ( props != null ) {
+			props.clear();
+		}
+	}
+
+	public boolean preserveFormatting () {
+		return preserveFormatting;
+	}
+
+	public void setPreserveFormatting (boolean preserve) {
+		preserveFormatting = preserve;
+	}
 }

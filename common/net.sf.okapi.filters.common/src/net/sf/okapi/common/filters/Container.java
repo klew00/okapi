@@ -25,6 +25,15 @@ public class Container implements IContainer {
 		reset();
 	}
 	
+	/**
+	 * Creates a Container object and initializes it with a given plain text string.
+	 * @param text The text to apply.
+	 */
+	public Container (String text) {
+		reset();
+		append(text);
+	}
+	
 	@Override
 	public String toString () {
 		return getText(false);
