@@ -21,13 +21,17 @@
 package net.sf.okapi.applications.test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.okapi.common.filters.CodeFragment;
-import net.sf.okapi.common.filters.Container;
-import net.sf.okapi.common.filters.IContainer;
-import net.sf.okapi.common.filters.IFragment;
+import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.filters.IOutputFilter;
+import net.sf.okapi.common.resource.CodeFragment;
+import net.sf.okapi.common.resource.Container;
+import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.IFragment;
 
 public class Main {
 
@@ -35,7 +39,7 @@ public class Main {
 
 	private static void testContainer () {
 		try {
-			System.out.println("---start testNewObjects---");
+			System.out.println("---start testContainer---");
 			IContainer cnt = new Container();
 			cnt.append("t1");
 			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<br/>"));
@@ -68,15 +72,38 @@ public class Main {
 			System.out.println(String.format("name='test1' value='%s'",
 				cnt.getProperty("test1")));
 		}		
-		catch ( Exception E ) {
-			System.out.println(E.getLocalizedMessage());
+		catch ( Exception e ) {
+			System.out.println(e.getLocalizedMessage());
 		}
-		System.out.println("---end testNewObjects---");
+		System.out.println("---end testContainer---");
+	}
+	
+	private static void testFilter () {
+		try {
+			System.out.println("---start testContainer---");
+		
+			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
+			FileInputStream input = new FileInputStream("test.properties");
+			inputFlt.initialize(input, "utf-8", null, null);
+			
+			IOutputFilter outputFlt = new net.sf.okapi.filters.properties.OutputFilter();
+			FileOutputStream output = new FileOutputStream("test.out.properties");
+			outputFlt.initialize(output, "us-ascii");
+			
+			inputFlt.setOutput(outputFlt);
+			inputFlt.convert();
+		
+		}
+		catch ( Exception e ) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		System.out.println("---end testContainer---");
 	}
 	
 	public static void main(String[] args) throws Exception
 	{
 		testContainer();
+		testFilter();
 	}		
 		
 }

@@ -1,4 +1,4 @@
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.resource;
 
 public class CodeFragment implements IFragment {
 	

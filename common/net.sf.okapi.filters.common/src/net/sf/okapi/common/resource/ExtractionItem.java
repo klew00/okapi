@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,11 +74,11 @@ public class ExtractionItem implements IExtractionItem {
 		return id;
 	}
 
-	public String getResname () {
+	public String getName () {
 		return resname;
 	}
 
-	public String getRestype () {
+	public String getType () {
 		return restype;
 	}
 
@@ -94,11 +94,11 @@ public class ExtractionItem implements IExtractionItem {
 		id = newId;
 	}
 
-	public void setResname (String newResname) {
+	public void setName (String newResname) {
 		resname = newResname;
 	}
 
-	public void setRestype (String newRestype) {
+	public void setType (String newRestype) {
 		restype = newRestype;
 	}
 

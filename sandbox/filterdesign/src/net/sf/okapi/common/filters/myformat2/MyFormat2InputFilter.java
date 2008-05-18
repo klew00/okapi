@@ -8,10 +8,6 @@ import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
 import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
-import net.sf.okapi.common.resource.Resource;
-import net.sf.okapi.common.resource.ResourceContainer;
 
 public class MyFormat2InputFilter implements IInputFilter{
 

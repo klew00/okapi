@@ -1,4 +1,4 @@
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.resource;
 
 import java.util.List;
 import java.util.Map;
