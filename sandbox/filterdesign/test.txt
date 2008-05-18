@@ -1,0 +1,7 @@
+Filter line
+second line
+Key1	text of first item
+# some comment
+Key2	text of second item
+Key3	text of third item
+Etc.
