@@ -92,15 +92,15 @@ public class Main {
 			
 			inputFlt.setOutput(outputFlt);
 			inputFlt.convert();
-		
 		}
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());
 		}
 		System.out.println("---end testContainer---");
 	}
-	
-	public static void main(String[] args) throws Exception
+
+	public static void main (String[] args)
+		throws Exception
 	{
 		testContainer();
 		testFilter();

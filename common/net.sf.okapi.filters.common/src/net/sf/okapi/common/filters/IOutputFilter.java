@@ -13,4 +13,11 @@ public interface IOutputFilter extends IResourceBuilder {
 	 */
 	void initialize (OutputStream output,
 		String encoding);
+
+	/**
+	 * Closes the current oupput and free any associated resources.
+	 */
+	void close ()
+		throws Exception; //TODO: Specific exception?
+
 }

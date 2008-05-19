@@ -98,7 +98,7 @@ public class InputFilter implements IInputFilter {
 			StringBuilder textBuffer = new StringBuilder();
 			String sValue = "";
 			String sKey = "";
-			boolean bMultiline = false;
+			boolean isMultiline = false;
 			int nStartText = 0;
 			long lS = -1;
 
@@ -115,7 +115,7 @@ public class InputFilter implements IInputFilter {
 				// Remove any leading white-spaces
 				String sTmp = Util.trimStart(textLine, "\t\r\n \f");
 
-				if ( bMultiline ) {
+				if ( isMultiline ) {
 					sValue += sTmp;
 				}
 				else {
@@ -127,19 +127,19 @@ public class InputFilter implements IInputFilter {
 					}
 
 					// Comments
-					boolean bComments = (( sTmp.charAt(0) == '#' ) || ( sTmp.charAt(0) == '!' ));
-					if ( !bComments &&  res.params.extraComments ) {
-						bComments = (sTmp.charAt(0) == ';'); // .NET style
-						if ( sTmp.startsWith("//") ) bComments = true; // C++/Java-style
+					boolean isComment = (( sTmp.charAt(0) == '#' ) || ( sTmp.charAt(0) == '!' ));
+					if ( !isComment &&  res.params.extraComments ) {
+						isComment = (sTmp.charAt(0) == ';'); // .NET style
+						if ( sTmp.startsWith("//") ) isComment = true; // C++/Java-style
 					}
 
-/*					if ( bComments ) {
-						m_Opt.m_LD.process(sTmp);
-						m_sbBuffer.append(m_sLine);
-						m_sbBuffer.append(m_sLineBreak);
+					if ( isComment ) {
+//TODO						m_Opt.m_LD.process(sTmp);
+						res.buffer.append(textLine);
+						res.buffer.append(lineBreak);
 						continue;
 					}
-*/
+
 					// Get the key
 					boolean bEscape = false;
 					int n = 0;
@@ -151,8 +151,7 @@ public class InputFilter implements IInputFilter {
 								continue;
 							}
 							if (( sTmp.charAt(i) == ':' ) || ( sTmp.charAt(i) == '=' )
-								|| ( Character.isWhitespace(sTmp.charAt(i)) ))
-							{
+								|| ( Character.isWhitespace(sTmp.charAt(i)) )) {
 								// That the first white-space after the key
 								n = i;
 								break;
@@ -171,7 +170,8 @@ public class InputFilter implements IInputFilter {
 					boolean bEmpty = true;
 					boolean bCheckEqual = true;
 					for ( int i=n; i<sTmp.length(); i++ ) {
-						if ( bCheckEqual && (( sTmp.charAt(i) == ':' ) || ( sTmp.charAt(i) == '=' ))) {
+						if ( bCheckEqual && (( sTmp.charAt(i) == ':' )
+							|| ( sTmp.charAt(i) == '=' ))) {
 							bCheckEqual = false;
 							continue;
 						}
@@ -202,7 +202,7 @@ public class InputFilter implements IInputFilter {
 
 					if ( (n % 2) != 0 ) { // Continue onto the next line
 						sValue = sValue.substring(0, sValue.length()-1);
-						bMultiline = true;
+						isMultiline = true;
 						// Preserve parsed text in case we do not extract
 						if ( keyBuffer.length() == 0 ) {
 							keyBuffer.append(textLine.substring(0, nStartText));
@@ -225,8 +225,7 @@ public class InputFilter implements IInputFilter {
 						else
 							bExtract = false;
 					}
-					else // Extract all but items with matching keys
-					{
+					else { // Extract all but items with matching keys
 						if ( !m_RE.matcher(sKey).matches() )
 							bExtract = m_Opt.m_LD.isLocalizable(true);
 						else
@@ -321,24 +320,28 @@ public class InputFilter implements IInputFilter {
 		}
 	}
 
-	private String unescape (String p_sValue) {
-		if ( p_sValue.indexOf('\\') == -1 ) return p_sValue;
-
+	/**
+	 * Un-escapes slash-u+HHHH characters in a string.
+	 * @param text The string to convert.
+	 * @return The converted string.
+	 */
+	private String unescape (String text) {
+		if ( text.indexOf('\\') == -1 ) return text;
 		StringBuilder tmpText = new StringBuilder();
-		for ( int i=0; i<p_sValue.length(); i++ ) {
-			if ( p_sValue.charAt(i) == '\\' ) {
-				if ( i+1 < p_sValue.length() ) {
-					switch ( p_sValue.charAt(i+1) ) {
+		for ( int i=0; i<text.length(); i++ ) {
+			if ( text.charAt(i) == '\\' ) {
+				if ( i+1 < text.length() ) {
+					switch ( text.charAt(i+1) ) {
 					case 'u':
-						if ( i+5 < p_sValue.length() ) {
+						if ( i+5 < text.length() ) {
 							try {
-								int nTmp = Integer.parseInt(p_sValue.substring(i+2, i+6), 16);
+								int nTmp = Integer.parseInt(text.substring(i+2, i+6), 16);
 								tmpText.append((char)nTmp);
 							}
 							catch ( Exception E ) {
 								logMessage(ILog.TYPE_WARNING,
 									String.format(Res.getString("INVALID_UESCAPE"),
-									p_sValue.substring(i+2, i+6)));
+									text.substring(i+2, i+6)));
 							}
 							i += 5;
 							continue;
@@ -346,17 +349,17 @@ public class InputFilter implements IInputFilter {
 						else {
 							logMessage(ILog.TYPE_WARNING,
 								String.format(Res.getString("INVALID_UESCAPE"),
-								p_sValue.substring(i+2)));
+								text.substring(i+2)));
 						}
 						break;
 					case '\\':
 						tmpText.append("\\\\");
-						i++; // Next '\' will be set below
+						i++; // Next '\' will be set after
 						continue;
 					}
 				}
 			}
-			tmpText.append(p_sValue.charAt(i));
+			else tmpText.append(text.charAt(i));
 		}
 		return tmpText.toString();
 	}
@@ -375,7 +378,7 @@ public class InputFilter implements IInputFilter {
 
 			// Open the input reader from the provided stream
 			rdr = new BufferedReader(
-				new InputStreamReader(
+				new InputStreamReader( //TODO: use a real BOM-aware input reader!
 					new BufferedInputStream(input), encoding));
 			
 			// Initializes the variables

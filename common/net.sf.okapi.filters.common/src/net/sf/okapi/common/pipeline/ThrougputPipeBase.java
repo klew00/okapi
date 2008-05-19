@@ -4,7 +4,7 @@ import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.IResourceContainer;
 
-public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe{
+public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe {
 
     private IResourceBuilder outputPipe;
     
@@ -18,7 +18,6 @@ public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe
 
     public void startContainer(IResourceContainer resourceContainer) {
         outputPipe.startContainer(resourceContainer);
-        
     }
 
     public void endContainer(IResourceContainer resourceCntainer) {
@@ -32,7 +31,6 @@ public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe
     public void endExtractionItem(IExtractionItem extractionItem) {
         outputPipe.endExtractionItem(extractionItem);
     }
-    
 
     public void setOutput(IResourceBuilder inputBuilder) {
         this.outputPipe = inputBuilder;

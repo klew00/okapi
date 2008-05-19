@@ -25,10 +25,28 @@ public class OutputFilter implements IOutputFilter {
 		this.encoding = encoding;
 	}
 
+	public void close ()
+		throws Exception
+	{
+		if ( writer != null ) {
+			writer.close();
+			writer = null;
+		}
+	}
+
 	public void endContainer (IResourceContainer resourceCntainer) {
 	}
 
 	public void endExtractionItem (IExtractionItem extractionItem) {
+		try {
+			// Write the buffer
+			writer.write(res.buffer.toString());
+			// Then write the item content
+			writer.write(escape(extractionItem.getContent().toString()));
+		}
+		catch ( Exception e ) {
+			System.err.println(e.getLocalizedMessage());
+		}
 	}
 
 	public void endResource (IResource resource) {
@@ -40,7 +58,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 		finally {
 			try {
-				writer.close();
+				close();
 			}
 			catch ( Exception e ) {
 				System.err.println(e.getLocalizedMessage());
@@ -52,15 +70,6 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	public void startExtractionItem (IExtractionItem extractionItem) {
-		try {
-			// Write the buffer
-			writer.write(res.buffer.toString());
-			// Then write the item content
-			writer.write(escape(extractionItem.getContent().toString()));
-		}
-		catch ( Exception e ) {
-			System.err.println(e.getLocalizedMessage());
-		}
 	}
 
 	public void startResource (IResource resource) {
@@ -81,24 +90,23 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	private String escape (String text)
-	{
-		StringBuilder m_sbEscape = new StringBuilder();
+	private String escape (String text) {
+		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( text.codePointAt(i) > 127 ) {
 				if ( res.params.escapeExtendedChars ) {
-					m_sbEscape.append(String.format("\\u%04x", text.codePointAt(i))); 
+					escaped.append(String.format("\\u%04x", text.codePointAt(i))); 
 				}
 				else {
 					if ( outputEncoder.canEncode(text.charAt(i)) )
-						m_sbEscape.append(text.charAt(i));
+						escaped.append(text.charAt(i));
 					else
-						m_sbEscape.append(String.format("\\u%04x", text.codePointAt(i)));
+						escaped.append(String.format("\\u%04x", text.codePointAt(i)));
 				}
 			}
-			else m_sbEscape.append(text.charAt(i));
+			else escaped.append(text.charAt(i));
 		}
-		return m_sbEscape.toString();
+		return escaped.toString();
 	}
 
 }
