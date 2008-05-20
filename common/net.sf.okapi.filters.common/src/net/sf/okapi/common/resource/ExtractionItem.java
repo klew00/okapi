@@ -40,6 +40,11 @@ public class ExtractionItem implements IExtractionItem {
 	public String                      resname;
 	public String                      restype;
 	public boolean                     preserveFormatting;
+
+	public ExtractionItem () {
+		// Default values different from initial
+		isTranslatable = true;
+	}
 	
 	public void addChild (IExtractionItem child) {
 		if ( children == null ) {

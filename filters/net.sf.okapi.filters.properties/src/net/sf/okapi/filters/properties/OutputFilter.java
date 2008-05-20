@@ -20,9 +20,11 @@ public class OutputFilter implements IOutputFilter {
 	private CharsetEncoder        outputEncoder;
 	
 	public void initialize (OutputStream output,
-		String encoding) {
+		String encoding,
+		String targetLanguage) {
 		this.output = output;
 		this.encoding = encoding;
+		// Not used: targetLanguage
 	}
 
 	public void close ()
