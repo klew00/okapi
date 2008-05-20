@@ -15,8 +15,6 @@ import net.sf.okapi.common.resource.IFragment;
 
 public class Main {
 
-	static final File INDEX_DIR = new File("index");
-
 	private static void testContainer () {
 		try {
 			System.out.println("---start testContainer---");
@@ -82,7 +80,7 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-//		testContainer();
+		testContainer();
 		testFilter();
 	}		
 		
