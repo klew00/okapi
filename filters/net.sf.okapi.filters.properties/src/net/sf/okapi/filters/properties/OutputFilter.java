@@ -43,6 +43,7 @@ public class OutputFilter implements IOutputFilter {
 			writer.write(res.buffer.toString());
 			// Then write the item content
 			writer.write(escape(extractionItem.getContent().toString()));
+			if ( res.endingLB ) writer.write(res.lineBreak);
 		}
 		catch ( Exception e ) {
 			System.err.println(e.getLocalizedMessage());
@@ -104,7 +105,19 @@ public class OutputFilter implements IOutputFilter {
 						escaped.append(String.format("\\u%04x", text.codePointAt(i)));
 				}
 			}
-			else escaped.append(text.charAt(i));
+			else {
+				switch ( text.charAt(i) ) {
+				case '\n':
+					escaped.append("\\n");
+					break;
+				case '\t':
+					escaped.append("\\t");
+					break;
+				default:
+					escaped.append(text.charAt(i));
+					break;
+				}
+			}
 		}
 		return escaped.toString();
 	}

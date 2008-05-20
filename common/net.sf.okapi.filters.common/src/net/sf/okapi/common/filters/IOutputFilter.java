@@ -15,7 +15,7 @@ public interface IOutputFilter extends IResourceBuilder {
 		String encoding);
 
 	/**
-	 * Closes the current oupput and free any associated resources.
+	 * Closes the current output and free any associated resources.
 	 */
 	void close ()
 		throws Exception; //TODO: Specific exception?

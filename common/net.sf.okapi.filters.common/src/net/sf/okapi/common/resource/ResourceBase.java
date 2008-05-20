@@ -19,6 +19,5 @@ public class ResourceBase implements IResource {
     public List<IExtractionItem> getExtractionItems() {
         return extractionItems;
     }
-
     
 }

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Reference implementation of the IContainer interface. 
+ */
 public class Container implements IContainer {
 
 	static private final int CHARBASE  = 0xE200;
@@ -27,7 +30,7 @@ public class Container implements IContainer {
 	
 	/**
 	 * Creates a Container object and initializes it with a given plain text string.
-	 * @param text The text to apply.
+	 * @param text The text to set.
 	 */
 	public Container (String text) {
 		reset();
@@ -40,7 +43,7 @@ public class Container implements IContainer {
 	}
 	
 	public boolean isEmpty () {
-		if (( lastFrag == null ) || ( list.size() == 0 )) return true;
+		if ( lastFrag == null ) return true;
 		for ( IFragment frag : list ) {
 			if ( frag.isText() ) {
 				if ( ((TextFragment)frag).text.length() > 0 ) return false;
@@ -84,12 +87,20 @@ public class Container implements IContainer {
 
 	/**
 	 * Gets the text of the object in original or coded format. 
-	 * @param coded Indicates if the returned text should be coded. Use true for coded, false
-	 * for original.
+	 * @param coded Indicates if the returned text should be coded. Use true 
+	 * for coded, false for original.
 	 * @return The coded or original text of the object.
 	 */
 	private String getText (boolean coded) {
+		// Empty
 		if ( lastFrag == null ) return "";
+
+		// Only one text fragment
+		if (( list.size() == 1 ) && ( lastFrag.isText() )) {
+			return lastFrag.toString();
+		}
+		
+		// Multiple segments or one code fragment
 		StringBuilder text = new StringBuilder();
 		for ( IFragment frag : list ) {
 			if ( frag.isText() ) {
@@ -140,7 +151,8 @@ public class Container implements IContainer {
 	 * Resets the content of the object based on a coded text string and a map of 
 	 * codes.
 	 * @param codedText The coded text to use to create the new content.
-	 * @param codes The codes to use along with the coded text. Use null to use the existing codes.
+	 * @param codes The codes to use along with the coded text. Use null to use the
+	 * existing codes.
 	 * @throws Exception
 	 */
 	private void resetContent (String codedText,

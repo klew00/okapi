@@ -51,7 +51,7 @@ public interface IInputFilter extends IOutputPipe {
 		throws Exception; //TODO: Specific exception?
 
 	/**
-	 * process the input and feed it to the output pipe.
+	 * Process the input and feed it to the output pipe.
 	 */
-	void convert ();
+	void process ();
 }

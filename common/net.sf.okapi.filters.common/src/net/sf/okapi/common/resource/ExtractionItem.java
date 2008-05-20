@@ -48,6 +48,10 @@ public class ExtractionItem implements IExtractionItem {
 		children.add(child);
 	}
 
+	public boolean isEmpty () {
+		return main.isEmpty();
+	}
+	
 	public List<IExtractionItem> getChildren () {
 		if ( children == null ) {
 			children = new ArrayList<IExtractionItem>();
@@ -106,7 +110,7 @@ public class ExtractionItem implements IExtractionItem {
 		hasTarget = newHasTarget;
 	}
 
-	public void setIsTranslatable(boolean newIsTranslatable) {
+	public void setIsTranslatable (boolean newIsTranslatable) {
 		isTranslatable = newIsTranslatable;
 	}
 

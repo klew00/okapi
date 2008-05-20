@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common;
 
+import java.io.File;
+
 /**
  * Collection of various all-purpose helper functions.
  */
@@ -45,4 +47,44 @@ public class Util {
 		return text;
 	}
 
+	/**
+	 * Gets the application name from an application caption.
+	 * This methods extracts the application name from a caption of the form 
+	 * "filename - application name". If no "- " is found, the whole caption
+	 * is returned as-it. 
+	 * @param text The full caption where to take the name from.
+	 * @return The name of the application.
+	 */
+	//TODO: Move to the UI library maybe (when there is one)
+	static public String getNameInCaption (String text) {
+		int n = text.indexOf("- ");
+		if ( n > -1 ) return text.substring(n+1);
+		else return text; // Same as caption itself
+	}
+
+	/**
+	 * Gets the directory name of a full path.
+	 * @param p_sPath Full path from where to extract the directory name.
+	 * @return The directory name (without the final separator), or an empty
+	 * string if p_sPath is a filename.
+	 */
+	static public String getDirectoryName (String p_sPath) {
+		int n = p_sPath.lastIndexOf(File.separator);
+		if ( n > 0 ) return p_sPath.substring(0, n);
+		else return "";
+	}
+	
+	/**
+	 * Creates the directory tree for the give full path (dir+filename)
+	 * @param p_sPath Directory and filename.
+	 */
+	static public void createDirectories (String p_sPath) {
+		int n = p_sPath.lastIndexOf(File.separatorChar);
+		if ( n == -1 ) return; // Nothing to do
+		// Else, use the directory part and create the tree	
+		String sDir = p_sPath.substring(0, n);
+		File F = new File(sDir);
+		F.mkdirs();
+	}
+	
 }

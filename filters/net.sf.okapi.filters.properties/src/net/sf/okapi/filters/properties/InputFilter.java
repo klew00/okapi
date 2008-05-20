@@ -19,12 +19,12 @@
 
 package net.sf.okapi.filters.properties;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.ILog;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -43,14 +43,13 @@ public class InputFilter implements IInputFilter {
 	public static final int RESULT_DATA          = 4;
 	
 	private InputStream      input;
+	private BufferedReader   reader;
 	private String           encoding;
 	private IResourceBuilder output;
 	private Resource         res;
-	private BufferedReader   rdr;
 	private IExtractionItem  item;
 	
 	private String           textLine;
-	private String           lineBreak = "\n"; //TODO: Detect LB and use that
 	private int              lineNumber;
 	private int              lineSince;
 	private long             position;
@@ -63,9 +62,9 @@ public class InputFilter implements IInputFilter {
 	public void close ()
 		throws Exception 
 	{
-		if ( rdr != null ) {
-			rdr.close();
-			rdr = null;
+		if ( reader != null ) {
+			reader.close();
+			reader = null;
 		}
 	}
 
@@ -88,8 +87,7 @@ public class InputFilter implements IInputFilter {
 	private int readItem (boolean resetBuffer) {
 		int result = RESULT_ERROR;
 
-		try
-		{
+		try {
 			if ( resetBuffer ) {
 				res.buffer = new StringBuilder();
 			}
@@ -122,7 +120,7 @@ public class InputFilter implements IInputFilter {
 					// Empty lines
 					if ( sTmp.length() == 0 ) {
 						res.buffer.append(textLine);
-						res.buffer.append(lineBreak);
+						res.buffer.append(res.lineBreak);
 						continue;
 					}
 
@@ -136,7 +134,7 @@ public class InputFilter implements IInputFilter {
 					if ( isComment ) {
 //TODO						m_Opt.m_LD.process(sTmp);
 						res.buffer.append(textLine);
-						res.buffer.append(lineBreak);
+						res.buffer.append(res.lineBreak);
 						continue;
 					}
 
@@ -308,7 +306,7 @@ public class InputFilter implements IInputFilter {
 		throws IOException
 	{
 		while ( true ) {
-			textLine = rdr.readLine();
+			textLine = reader.readLine();
 			if ( textLine != null ) {
 				lineNumber++;
 				lineSince++;
@@ -325,38 +323,45 @@ public class InputFilter implements IInputFilter {
 	 * @param text The string to convert.
 	 * @return The converted string.
 	 */
+	//TODO: Deal with escape ctrl, etc. \n should be converted
 	private String unescape (String text) {
 		if ( text.indexOf('\\') == -1 ) return text;
 		StringBuilder tmpText = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( text.charAt(i) == '\\' ) {
-				if ( i+1 < text.length() ) {
-					switch ( text.charAt(i+1) ) {
-					case 'u':
-						if ( i+5 < text.length() ) {
-							try {
-								int nTmp = Integer.parseInt(text.substring(i+2, i+6), 16);
-								tmpText.append((char)nTmp);
-							}
-							catch ( Exception E ) {
-								logMessage(ILog.TYPE_WARNING,
-									String.format(Res.getString("INVALID_UESCAPE"),
-									text.substring(i+2, i+6)));
-							}
-							i += 5;
-							continue;
+				switch ( text.charAt(i+1) ) {
+				case 'u':
+					if ( i+5 < text.length() ) {
+						try {
+							int nTmp = Integer.parseInt(text.substring(i+2, i+6), 16);
+							tmpText.append((char)nTmp);
 						}
-						else {
+						catch ( Exception E ) {
 							logMessage(ILog.TYPE_WARNING,
 								String.format(Res.getString("INVALID_UESCAPE"),
-								text.substring(i+2)));
+								text.substring(i+2, i+6)));
 						}
-						break;
-					case '\\':
-						tmpText.append("\\\\");
-						i++; // Next '\' will be set after
+						i += 5;
 						continue;
 					}
+					else {
+						logMessage(ILog.TYPE_WARNING,
+							String.format(Res.getString("INVALID_UESCAPE"),
+							text.substring(i+2)));
+					}
+					break;
+				case '\\':
+					tmpText.append("\\\\");
+					i++;
+					continue;
+				case 'n':
+					tmpText.append("\n");
+					i++;
+					continue;
+				case 't':
+					tmpText.append("\t");
+					i++;
+					continue;
 				}
 			}
 			else tmpText.append(text.charAt(i));
@@ -372,17 +377,16 @@ public class InputFilter implements IInputFilter {
 		//	Res.getString("LINE_LOCATION"), m_nLine) + p_sText);
 	}
 
-	public void convert () {
+	public void process () {
 		try {
-			// Create new resource
-
 			// Open the input reader from the provided stream
-			rdr = new BufferedReader(
-				new InputStreamReader( //TODO: use a real BOM-aware input reader!
-					new BufferedInputStream(input), encoding));
+			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
+			reader = new BufferedReader(
+				new InputStreamReader(bis, bis.detectEncoding()));
 			
 			// Initializes the variables
 			res.endingLB = true;
+			res.lineBreak = "\n"; //TODO: Auto-detection
 			id = 0;
 			lineNumber = 0;
 			lineSince = 0;

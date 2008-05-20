@@ -5,6 +5,12 @@ import java.util.List;
 public interface IExtractionItem {
 
 	/**
+	 * Indicates if this extraction item has any content.
+	 * @return True if there is text or codes, or both, false otherwise.
+	 */
+	boolean isEmpty ();
+	
+	/**
 	 * Gets the resource name of the item. This corresponds to the resname attribute
 	 * in XLIFF. Uniqueness of resname depends on each filter.
 	 * @return The resource name of the item, or null if there is none.
