@@ -10,17 +10,15 @@ import java.util.Map;
  */
 public class Container implements IContainer {
 
-	static private final int CHARBASE  = 0xE200;
-
 	private ArrayList<IFragment>       list;
 	private IFragment                  lastFrag;
 	private Map<String, Object>        props;
 
-	static private char ItoC (int id) {
+	static public char ItoC (int id) {
 		return (char)(id+CHARBASE);
 	}
 
-	static private int CtoI (char id) {
+	static public int CtoI (char id) {
 		return ((int)id)-CHARBASE;
 	}
 

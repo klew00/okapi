@@ -34,11 +34,13 @@ public interface IInputFilter extends IOutputPipe {
 	/**
 	 * Initializes the input to process.
 	 * @param reader The reader to use for the input.
+	 * @param name The name associated with the input (e.g. file name).
 	 * @param encoding The default encoding for the input.
 	 * @param sourceLanguage Language code of the source.
 	 * @param targeLanguage Language code of the target.
 	 */
 	void initialize (InputStream input,
+		String name,
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)

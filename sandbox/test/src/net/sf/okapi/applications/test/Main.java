@@ -1,6 +1,5 @@
 package net.sf.okapi.applications.test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
@@ -60,13 +59,14 @@ public class Main {
 		try {
 			System.out.println("---start testContainer---");
 		
+			String inputFile = "test.properties";
 			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
-			FileInputStream input = new FileInputStream("test.properties");
-			inputFlt.initialize(input, "utf-16", null, null);
+			FileInputStream input = new FileInputStream(inputFile);
+			inputFlt.initialize(input, inputFile, "utf-16", null, null);
 			
 			IOutputFilter outputFlt = new net.sf.okapi.filters.properties.OutputFilter();
 			FileOutputStream output = new FileOutputStream("test.out.properties");
-			outputFlt.initialize(output, "us-ascii");
+			outputFlt.initialize(output, "us-ascii", null);
 			
 			inputFlt.setOutput(outputFlt);
 			inputFlt.process();

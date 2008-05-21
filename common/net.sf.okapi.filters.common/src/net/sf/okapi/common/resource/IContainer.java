@@ -9,6 +9,8 @@ public interface IContainer {
 	public static final int CODE_CLOSING    = 0xE102;
 	public static final int CODE_ISOLATED   = 0xE103;
 
+	public static final int CHARBASE        = 0xE200;
+
 	/**
 	 * Gets the content in its original format.
 	 * @return The content of the object in its original format.

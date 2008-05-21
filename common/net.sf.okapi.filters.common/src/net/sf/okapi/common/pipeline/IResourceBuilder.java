@@ -9,8 +9,13 @@ public interface IResourceBuilder {
     public void startResource(IResource resource);
     public void endResource(IResource resource);
     
-    public void startExtractionItem(IExtractionItem extractionItem);
-    public void endExtractionItem(IExtractionItem extractionItem);
+    //YS: Added targetItem to try out. Maybe instead the target
+    // can be obtained from the source?
+    public void startExtractionItem (IExtractionItem sourceItem,
+    	IExtractionItem targetItem);
+    
+    public void endExtractionItem(IExtractionItem sourceItem,
+    	IExtractionItem targetItem);
     
     public void startContainer(IResourceContainer resourceContainer);
     public void endContainer(IResourceContainer resourceCntainer);

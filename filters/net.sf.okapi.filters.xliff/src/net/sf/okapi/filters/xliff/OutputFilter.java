@@ -32,10 +32,11 @@ public class OutputFilter implements IOutputFilter {
 	public void endContainer (IResourceContainer resourceCntainer) {
 	}
 
-	public void endExtractionItem (IExtractionItem extractionItem) {
+	public void endExtractionItem (IExtractionItem sourceItem,
+		IExtractionItem targetItem) {
 		if ( res.srcElem != null ) {
 			//TODO: Handle inline codes, etc.
-			String tmp = extractionItem.getContent().toString();
+			String tmp = sourceItem.getContent().toString();
 			
 			// Create a target element if needed
 			boolean newTarget = (res.trgElem == null); 
@@ -46,7 +47,7 @@ public class OutputFilter implements IOutputFilter {
 			}
 			// Set the target element
 			//TODO: cases for existing translation
-			if ( extractionItem.isTranslatable() ) {
+			if ( sourceItem.isTranslatable() ) {
 				res.trgElem.setTextContent(tmp);
 			}
 			else if ( newTarget ) {
@@ -70,7 +71,8 @@ public class OutputFilter implements IOutputFilter {
 	public void startContainer (IResourceContainer resourceContainer) {
 	}
 
-	public void startExtractionItem (IExtractionItem extractionItem) {
+	public void startExtractionItem (IExtractionItem sourceItem,
+		IExtractionItem targetItem) {
 	}
 
 	public void startResource (IResource resource) {

@@ -84,11 +84,13 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public String getName () {
-		return resname;
+		if ( resname == null ) return "";
+		else return resname;
 	}
 
 	public String getType () {
-		return restype;
+		if ( restype == null ) return "";
+		else return restype;
 	}
 
 	public boolean hasTarget () {

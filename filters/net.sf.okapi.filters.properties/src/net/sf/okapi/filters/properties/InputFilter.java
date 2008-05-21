@@ -73,6 +73,7 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void initialize (InputStream input,
+		String name,
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)
@@ -81,6 +82,7 @@ public class InputFilter implements IInputFilter {
 		close();
 		this.input = input;
 		this.encoding = encoding;
+		res.setName(name);
 		// neither sourceLanguage nor targetLanguage are used in this filter
 	}
 
@@ -404,8 +406,8 @@ public class InputFilter implements IInputFilter {
 					resetBuffer = false;
 					break;
 				case RESULT_ITEM:
-					output.startExtractionItem(item);
-					output.endExtractionItem(item);
+					output.startExtractionItem(item, null);
+					output.endExtractionItem(item, null);
 					resetBuffer = true;
 					break;
 				default:

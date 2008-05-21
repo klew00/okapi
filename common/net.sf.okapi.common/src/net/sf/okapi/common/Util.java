@@ -86,5 +86,60 @@ public class Util {
 		File F = new File(sDir);
 		F.mkdirs();
 	}
+
+	/**
+	 * Escapes a string for XML.
+	 * @param text String to escape.
+	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
+	 * and 3=quot only.
+	 * @param escapeGT True to always escape '>' to gt
+	 * @return The escaped string.
+	 */
+	static public String escapeToXML (String text,
+		int quoteMode,
+		boolean escapeGT)
+	{
+		if ( text == null ) return "";
+		StringBuffer sbTmp = new StringBuffer(text.length());
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case '<':
+				sbTmp.append("&lt;");
+				continue;
+			case '>':
+				if ( escapeGT ) sbTmp.append("&gt;");
+				else {
+					if (( i > 0 ) && ( text.charAt(i-1) == ']' )) sbTmp.append("&gt;");
+					else sbTmp.append('>');
+				}
+				continue;
+			case '&':
+				sbTmp.append("&amp;");
+				continue;
+			case '"':
+				if ( quoteMode > 0 ) sbTmp.append("&quot;");
+				else sbTmp.append('"');
+				continue;
+			case '\'':
+				switch ( quoteMode ) {
+				case 1:
+					sbTmp.append("&apos;");
+					break;
+				case 2:
+					sbTmp.append("&#39;");
+					break;
+				default:
+					sbTmp.append(text.charAt(i));
+					break;
+				}
+				continue;
+			default:
+				sbTmp.append(text.charAt(i));
+				continue;
+			}
+		}
+		return sbTmp.toString();
+	}
+	
 	
 }
