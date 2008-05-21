@@ -24,7 +24,16 @@ public class XLIFFReader {
 	public static final int       STATUS_TOREVIEW     = 4;
 	public static final int       STATUS_OK           = 5;
 
+	public static final int       RESULT_ENDINPUT          = 0;
+	public static final int       RESULT_STARTFILE         = 1;
+	public static final int       RESULT_ENDFILE           = 2;
+	public static final int       RESULT_STARTGROUP        = 3;
+	public static final int       RESULT_ENDGROUP          = 4;
+	public static final int       RESULT_STARTTRANSUNIT    = 5;
+	public static final int       RESULT_ENDTRANSUNIT      = 6;
+
 	public Resource          resource;
+	public FileResource      fileRes;
 	public IExtractionItem   sourceItem;
 	public IExtractionItem   targetItem;
 	
@@ -32,6 +41,8 @@ public class XLIFFReader {
 	private Node             node;
 	private int              inCode;
 	private Stack<Boolean>   firstChildDoneFlags;
+	private int              lastResult;
+	private boolean          backTrack;
 
 
 	public XLIFFReader () {
@@ -49,6 +60,7 @@ public class XLIFFReader {
 			firstChildDoneFlags.push(true); // For #document root
 			node = resource.doc.getDocumentElement();
 			firstChildDoneFlags.push(false);
+			lastResult = -1;
 			processXliff();
 		}
 		catch ( Exception e ) {
@@ -56,23 +68,43 @@ public class XLIFFReader {
 		}
 	}
 
+	/**
+	 * Reads the next part of the input.
+	 * @return One of the RESULT_* values.
+	 * @throws Exception
+	 */
+	//TODO: Change the parsing to get start/end elements
 	public int readItem ()
 		throws Exception
 	{
-		resetItem();
+		// If needed, resume parsing based on the last result
+		switch ( lastResult ) {
+		case RESULT_STARTTRANSUNIT:
+			lastResult = processEndTransUnit();
+			return lastResult;
+		}
+		
+		// Move on to the next node
 		while ( true ) {
 			if ( !nextNode() ) {
-				return 0; // Document is done
+				return RESULT_ENDINPUT; // Document is done
 			}
 			String sName = getName();
 			//TOFO: groups, etc.
 			if ( sName.equals("trans-unit") ) {
-				processTransUnit();
-				return 2;
+				resetItem();
+				lastResult = processStartTransUnit();
+				return lastResult;
 			}
 			else if ( sName.equals("file") ) {
-				//TODO: handle multiple files
-				processFile();
+				if ( backTrack ) {
+					lastResult = RESULT_ENDFILE;
+					return lastResult;
+				}
+				else {
+					lastResult = processFile();
+					return lastResult;
+				}
 			}
 		}
 	}
@@ -89,6 +121,7 @@ public class XLIFFReader {
 	
 	private boolean nextNode () {
 		if ( node != null ) {
+			backTrack = false;
 			if ( !firstChildDoneFlags.peek() && node.hasChildNodes() ) {
 				// Change the flag for the current node
 				firstChildDoneFlags.push(!firstChildDoneFlags.pop());
@@ -101,6 +134,7 @@ public class XLIFFReader {
 				if ( TmpNode == null ) {
 					node = node.getParentNode();
 					firstChildDoneFlags.pop();
+					backTrack = true;
 				}
 				else {
 					node = TmpNode;
@@ -124,11 +158,18 @@ public class XLIFFReader {
 		//TODO: check version, root, etc.
 	}
 	
-	private void processFile () {
-		//TODO: check language, etc.
+	private int processFile ()
+		throws Exception
+	{
+		fileRes = new FileResource();
+		Element Elem = (Element)node;
+		String tmp = Elem.getAttribute("original");
+		if ( tmp.length() == 0 ) throw new Exception("Missing attribute 'original'.");
+		else fileRes.setName(tmp);
+		return RESULT_STARTFILE;
 	}
 	
-	private void processTransUnit ()
+	private int processStartTransUnit ()
 		throws Exception
 	{
 		Element Elem = (Element)node;
@@ -144,12 +185,20 @@ public class XLIFFReader {
 				throw new Exception("Invalid value for attribute 'id'.");
 			}
 		}
-		
+		return RESULT_STARTTRANSUNIT;
+	}
+	
+	private int processEndTransUnit ()
+		throws Exception
+	{
 		// Process the content
+		if ( !node.hasChildNodes() ) {
+			return RESULT_ENDTRANSUNIT; // Empty trans-unit (should not exist, but just in case...)
+		}
 		while ( nextNode() ) {
 			String sName = getName();
 			if ( sName.equals("trans-unit") ) {
-				return; // End of the trans-unit element
+				return RESULT_ENDTRANSUNIT; // End of the trans-unit element
 			}
 			if ( sName.equals("source") ) {
 				resource.srcElem = (Element)node;
@@ -162,6 +211,7 @@ public class XLIFFReader {
 				processTarget();
 			}
 		}
+		return RESULT_ENDTRANSUNIT; // Should not get here
 	}
 	
 	/**

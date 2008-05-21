@@ -47,6 +47,7 @@ public class InputFilter implements IInputFilter {
 	public boolean supports (int feature) {
 		switch ( feature ) {
 		case FEATURE_TEXTBASED:
+		case FEATURE_BILINGUAL:
 			return true;
 		default:
 			return false;
@@ -63,16 +64,23 @@ public class InputFilter implements IInputFilter {
 			// Process
 			int n;
 			do {
+				//TODO: groups
 				switch ( (n = reader.readItem()) ) {
-				case 1: // Group
-					break;
-				case 2: // trans-unit
+				case XLIFFReader.RESULT_STARTTRANSUNIT:
 					output.startExtractionItem(reader.sourceItem, reader.targetItem);
+					break;
+				case XLIFFReader.RESULT_ENDTRANSUNIT:
 					output.endExtractionItem(reader.sourceItem, reader.targetItem);
+					break;
+				case XLIFFReader.RESULT_STARTFILE:
+					output.startContainer(reader.fileRes);
+					break;
+				case XLIFFReader.RESULT_ENDFILE:
+					output.endContainer(reader.fileRes);
 					break;
 				}
 			}
-			while ( n > 0 );
+			while ( n > XLIFFReader.RESULT_ENDINPUT );
 			
 			output.endResource(reader.resource);
 		}
