@@ -15,7 +15,7 @@
  */
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * This class is a strategy for handling exceptions in the pipeline.
@@ -59,7 +59,7 @@ public interface PipelineExceptionHandler {
     * @param document the document that triggered the exception.
     * @return what the pipeline should do about this
     */
-   PipelineFlow handleDocumentException(PipelineException ex, IResource resource);
+   PipelineFlow handleDocumentException(PipelineException ex, IResourceBuilder resourceBuilder);
 
    /**
     * Add an exception listener that should be notified on every exception generated.

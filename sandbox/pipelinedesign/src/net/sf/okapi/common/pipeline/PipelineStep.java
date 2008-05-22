@@ -15,7 +15,7 @@
  */
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * An instance of this class represents an atomic operation on a {@link Document}.
@@ -36,7 +36,7 @@ public interface PipelineStep {
     *
     * @throws PipelineException if the step fails execution.
     */
-   PipelineStepStatus execute(IResource resource) throws PipelineException;
+   PipelineStepStatus execute(IResourceBuilder resourceBuilder) throws PipelineException;
 
    /**
     * Will be called before a batch of documents is executed.

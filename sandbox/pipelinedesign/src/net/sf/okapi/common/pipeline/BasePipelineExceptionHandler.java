@@ -17,7 +17,7 @@ package net.sf.okapi.common.pipeline;
 
 import java.util.Set;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 import net.sf.okapi.utilities.IdentityHashSet;
 
 /**
@@ -60,9 +60,9 @@ public abstract class BasePipelineExceptionHandler implements PipelineExceptionH
     * @param ex the exception that was handled
     * @param document the document(if any) this exception was thrown on
     */
-   protected void notifyExceptionListeners(PipelineException ex, IResource resource) {
+   protected void notifyExceptionListeners(PipelineException ex, IResourceBuilder resourceBuilder) {
       for (PipelineExceptionListener exceptionListener : exceptionListeners) {
-         exceptionListener.onException(ex, resource);
+         exceptionListener.onException(ex, resourceBuilder);
       }
    }
 

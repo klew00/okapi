@@ -18,7 +18,7 @@ package net.sf.okapi.common.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * @version $Revision: 148 $
@@ -83,18 +83,18 @@ public class BaseSubPipeline implements SubPipeline {
    }
 
 
-   public PipelineStatusCode executeSteps(IResource resource) throws PipelineException {
+   public PipelineStatusCode executeSteps(IResourceBuilder resourceBuilder) throws PipelineException {
       PipelineStatusCode pipelineStatusCode = PipelineStatusCode.CONTINUE;
       for (PipelineStep pipelineStep : preparedSteps) {
          final PipelineStepStatusCode stepStatusCode;
          try {
-            PipelineStepStatus status = executeStep(resource, pipelineStep);
+            PipelineStepStatus status = executeStep(resourceBuilder, pipelineStep);
             if (status == null) {
                throw new PipelineException("null status received", pipelineStep.getName());
             }
             stepStatusCode = status.getStatusCode();
             if (stepStatusCode.hasSubPipeline()) {
-               pipelineStatusCode = status.getSubPipeline().executeSteps(resource);
+               pipelineStatusCode = status.getSubPipeline().executeSteps(resourceBuilder);
             } else {
                pipelineStatusCode = stepStatusCode.toPipelineStatusCode();
             }
@@ -111,8 +111,8 @@ public class BaseSubPipeline implements SubPipeline {
       return pipelineStatusCode;
    }
 
-   protected PipelineStepStatus executeStep(IResource resource, PipelineStep pipelineStep) throws PipelineException {
-      final PipelineStepStatus status = pipelineStep.execute(resource);
+   protected PipelineStepStatus executeStep(IResourceBuilder resourceBuilder, PipelineStep pipelineStep) throws PipelineException {
+      final PipelineStepStatus status = pipelineStep.execute(resourceBuilder);
       return status;
    }
 }

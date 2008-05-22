@@ -15,7 +15,7 @@
  */
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * The default exception handler. This will return a <tt>PipelineFlowEnum.STOP</tt> for all
@@ -42,8 +42,8 @@ public class DefaultPipelineExceptionHandler extends BasePipelineExceptionHandle
       return PipelineFlowEnum.STOP;
    }
 
-   public PipelineFlow handleDocumentException(PipelineException ex, IResource resource) {
-      notifyExceptionListeners(ex, resource);
+   public PipelineFlow handleDocumentException(PipelineException ex, IResourceBuilder resourceBuilder) {
+      notifyExceptionListeners(ex, resourceBuilder);
       return PipelineFlowEnum.STOP;
    }
 

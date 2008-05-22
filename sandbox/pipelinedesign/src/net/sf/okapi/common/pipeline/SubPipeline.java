@@ -17,7 +17,7 @@ package net.sf.okapi.common.pipeline;
 
 import java.util.List;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * An interface the represents a sub-pipeline. Differs from {@link Pipeline} in that it does not have an error-handler.
@@ -70,5 +70,5 @@ public interface SubPipeline {
     *
     * @throws PipelineException if the sub-pipeline failed to process the given document.
     */
-   PipelineStatusCode executeSteps(IResource resource) throws PipelineException;
+   PipelineStatusCode executeSteps(IResourceBuilder resourceBuilder) throws PipelineException;
 }

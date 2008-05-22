@@ -15,7 +15,7 @@
  */
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * A simple error-handler that logs all exceptions.
@@ -23,7 +23,7 @@ import net.sf.okapi.common.resource.IResource;
  * @version $Revision: 83 $
  */
 public class LoggingPipelineExceptionListener implements PipelineExceptionListener {
-   public void onException(PipelineException ex, IResource resource) {
+   public void onException(PipelineException ex, IResourceBuilder resourceBuilder) {
 	   // TODO: Implement logging
    }
 }

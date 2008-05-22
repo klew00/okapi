@@ -15,11 +15,11 @@
  */
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * @version $Revision: 83 $
  */
 public interface PipelineExceptionListener {
-   void onException(PipelineException ex, IResource resource);
+   void onException(PipelineException ex, IResourceBuilder resourceBuilder);
 }

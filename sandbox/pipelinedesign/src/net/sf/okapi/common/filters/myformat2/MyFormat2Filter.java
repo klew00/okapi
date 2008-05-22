@@ -4,33 +4,21 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.pipeline.IResourceBuilder;
+import net.sf.okapi.common.pipeline.PipelineException;
+import net.sf.okapi.common.pipeline.PipelineStep;
+import net.sf.okapi.common.pipeline.PipelineStepStatus;
 import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
-public class MyFormat2InputFilter implements IInputFilter{
-
-    private IResourceBuilder output;
-    private InputStream      input;
-    private BufferedReader   reader;
-
-    
-    public MyFormat2InputFilter (InputStream input) {
-    	this.input = input;
-    }
-    
-    public void setOutput (IResourceBuilder output) {
-        this.output = output;
-    }
-    
-    public void convert () {
-       	try {
-       		MyResource2 res = new MyResource2();
-       		reader = new BufferedReader(new InputStreamReader(input));
-       		output.startResource(res);
-
-       		// Items are key\tText lines
+public class MyFormat2Filter implements PipelineStep {
+	private static final String VERSION = "1.0.0";
+	
+    public PipelineStepStatus execute(IResourceBuilder resourceBuilder)
+			throws PipelineException {
+    	try {       		
+    		// Items are key\tText lines
        		int n;
 	    	while ( true ) {
 	    		String line = reader.readLine();
@@ -59,6 +47,27 @@ public class MyFormat2InputFilter implements IInputFilter{
        	catch ( Exception e ) {
        		System.err.println(e.getLocalizedMessage());
        	}
-    }
+       	
+       	return PipelineStepStatus.DEFAULT;
+	}
 
+	public void finish(boolean success) throws PipelineException {
+		// TODO Auto-generated method stub		
+	}
+
+	public String getName() {
+		return MyFormat2Filter.class.toString();
+	}
+
+	public String getRevision() {
+		return VERSION;
+	}
+
+	public void prepare() throws PipelineException {
+		// TODO Auto-generated method stub		
+	}
+
+	public void setName(String name) {
+		// TODO Auto-generated method stub		
+	}
 }

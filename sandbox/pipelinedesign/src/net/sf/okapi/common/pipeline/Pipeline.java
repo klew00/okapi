@@ -17,7 +17,7 @@ package net.sf.okapi.common.pipeline;
 
 import java.util.List;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.IResourceBuilder;
 
 /**
  * @version $Revision: 146 $
@@ -71,12 +71,12 @@ public class Pipeline extends BaseSubPipeline {
     * @param document document to be run through the pipeline
     * @return status
     */
-   public PipelineFlow execute(IResource resource) {
+   public PipelineFlow execute(IResourceBuilder resourceBuilder) {
       try {
-         executeSteps(resource);
+         executeSteps(resourceBuilder);
          return PipelineFlowEnum.CONTINUE;
       } catch (Exception e) {
-         return pipelineExceptionHandler.handleDocumentException(wrapToPiplineException(e), resource);
+         return pipelineExceptionHandler.handleDocumentException(wrapToPiplineException(e), resourceBuilder);
       }
    }
 
@@ -86,10 +86,10 @@ public class Pipeline extends BaseSubPipeline {
     * @param documents documents to be run through the pipeline
     * @return success indicator
     */
-   public boolean execute(Iterable<IResource> resources) {
+   public boolean execute(Iterable<IResourceBuilder> resourceBuilders) {
       try {
-         for (IResource resource : resources) {
-            PipelineFlow pipelineFlow = execute(resource);
+         for (IResourceBuilder resourceBuilder : resourceBuilders) {
+            PipelineFlow pipelineFlow = execute(resourceBuilder);
             if (pipelineFlow.isStopPipeline()) {
                return pipelineFlow.isSuccess();
             }
@@ -106,12 +106,12 @@ public class Pipeline extends BaseSubPipeline {
     * @param documents documents to be run through the pipeline
     * @return success indicator
     */
-   public boolean run(Iterable<IResource> resources) {
+   public boolean run(Iterable<IResourceBuilder> resourceBuilders) {
       boolean success = false;
       try {
          success = prepare();
          if (success) {
-            success = execute(resources);
+            success = execute(resourceBuilders);
          }
       } finally {
          finish(success);

@@ -1,8 +1,4 @@
-package net.sf.okapi.common.pipeline;
-
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+package net.sf.okapi.common.resource;
 
 public interface IResourceBuilder {
 
@@ -13,7 +9,6 @@ public interface IResourceBuilder {
     public void endExtractionItem(IExtractionItem extractionItem);
     
     public void startContainer(IResourceContainer resourceContainer);
-    public void endContainer(IResourceContainer resourceCntainer);
-    
+    public void endContainer(IResourceContainer resourceCntainer);   
 }
 
