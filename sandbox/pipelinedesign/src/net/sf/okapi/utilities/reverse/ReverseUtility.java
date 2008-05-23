@@ -10,8 +10,11 @@ public class ReverseUtility implements PipelineStep {
 
     public PipelineStepStatus execute(IResourceBuilder resourceBuilder)
 			throws PipelineException {
-		// TODO Auto-generated method stub
-		return null;
+    	 for (IExtractionItem item : resourceBuilder.getResource().getExtractionItems()) {
+    		 String reverse = new StringBuffer(item.getContent()).reverse().toString();
+    	     item.setContent(reverse);
+		 }
+		return PipelineStepStatus.DEFAULT;
 	}
 
 	public void finish(boolean success) throws PipelineException {
@@ -38,13 +41,4 @@ public class ReverseUtility implements PipelineStep {
 		// TODO Auto-generated method stub
 
 	}
-
-	/*@Override
-    public void endExtractionItem(IExtractionItem extractionItem) {
-        String reverse = new StringBuffer(extractionItem.getContent()).reverse().toString();
-        extractionItem.setContent(reverse);
-
-        super.endExtractionItem(extractionItem);
-    }*/
-
 }
