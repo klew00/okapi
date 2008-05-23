@@ -17,7 +17,7 @@ public class CodeFragment implements IFragment {
 	/**
 	 * Extra format-specific data that is needed to re-build the original code.
 	 */
-	public String       extraData;
+	public Object       extraData;
 
 	public CodeFragment (int type,
 		int id,
@@ -31,7 +31,7 @@ public class CodeFragment implements IFragment {
 	public CodeFragment (int type,
 		int id,
 		String code,
-		String extraData)
+		Object extraData)
 	{
 		this.type = type;
 		this.id = id;

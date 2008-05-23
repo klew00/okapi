@@ -247,6 +247,13 @@ public class XLIFFReader {
 		if ( !node.hasChildNodes() ) {
 			return;
 		}
+
+		// For now use a stack for tracking the id
+		// Not great: Assumes all openings have closings.
+		//TODO: improve id setting mechanism for inline codes
+		int id = 0;
+		Stack<Integer> idStack = new Stack<Integer>();
+		idStack.push(id);
 		
 		while ( nextNode() ) {
 			switch ( node.getNodeType() ) {
@@ -266,33 +273,36 @@ public class XLIFFReader {
 					else if ( sName.equals("ept") ) inCode--;
 					else if ( sName.equals("ph") ) inCode--;
 					else if ( sName.equals("g") ) {
-						//TODO: use real IDs. 1 will not work
-						content.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+						content.append(
+							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), sName));
 					}
 					continue; // Move on the next node
 				}
 				
 				// Else: It's a start of element
 				if ( sName.equals("g") ) {
-					content.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					idStack.push(++id);
+					content.append(
+						new CodeFragment(IContainer.CODE_OPENING, id, sName));
 				}
 				else if ( sName.equals("x") ) {
-					appendCode(IContainer.CODE_ISOLATED);
+					appendCode(IContainer.CODE_ISOLATED, ++id);
 				}
 				else if ( sName.equals("bpt") ) {
-					appendCode(IContainer.CODE_OPENING);
+					idStack.push(++id);
+					appendCode(IContainer.CODE_OPENING, id);
 					inCode++;
 				}
 				else if ( sName.equals("ept") ) {
-					appendCode(IContainer.CODE_CLOSING);
+					appendCode(IContainer.CODE_CLOSING, idStack.pop());
 					inCode++;
 				}
 				else if ( sName.equals("ph") ) {
-					appendCode(IContainer.CODE_ISOLATED);
+					appendCode(IContainer.CODE_ISOLATED, ++id);
 					inCode++;
 				}
 				else if ( sName.equals("it") ) {
-					appendCode(IContainer.CODE_ISOLATED);
+					appendCode(IContainer.CODE_ISOLATED, ++id);
 					inCode++;
 				}
 				break;
@@ -303,8 +313,11 @@ public class XLIFFReader {
 	/**
 	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
 	 * @param type The type of in-line code.
+	 * @param id The id of the code to add.
 	 */
-	private void appendCode (int type) {
+	private void appendCode (int type,
+		int id)
+	{
 		String inside = node.getTextContent(); // No support for <sub>
 		NamedNodeMap attrs = node.getAttributes();
 		StringBuilder tmp = new StringBuilder();
@@ -312,7 +325,7 @@ public class XLIFFReader {
 			tmp.append(String.format("%s%s=\"%s\"", (tmp.length()>0 ? "" : " "), attrs.item(i).getNodeName(),
 				attrs.item(i).getNodeValue()));
 		}
-		content.append(new CodeFragment(type, 1, inside, tmp.toString()));
+		content.append(new CodeFragment(type, 1, inside, node));
 	}
 	
 	private void processTarget () {
