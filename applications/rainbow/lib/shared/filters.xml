@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<okapiFilters>
+ 
+ <filter id="okf_properties"
+  inputFilterClass="net.sf.okapi.filters.properties.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.properties.OutputFilter"
+  editorClass="net.sf.okapi.filters.ui.properties.Editor"
+ >Properties</filter>
+  
+ <filter id="okf_xliff"
+  inputFilterClass="net.sf.okapi.filters.xliff.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.xliff.OutputFilter"
+ >XLIFF</filter>
+  
+</okapiFilters>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<okapiPlugins version="1.0">
+ <plugin type="utility"
+  id="oku_textrewriting"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
+  updateUri="http://okapi.sf.net/updates/textrewriting">
+  <info>
+   <name>Text Rewriting</name>
+   <description>Re-writes documents with different changes, for
+    example: masking translatable text, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+  <info xml:lang="fr">
+   <name>Re-écriture de Text</name>
+   <description>Re-écrit les documents en faisant differentes
+    modifications. Par exemple, masquer le text traduisible, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ <plugin type="utility"
+  id="oku_extraction"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.extraction.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
+  updateUri="http://okapi.sf.net/updates/extraction">
+  <info>
+   <name>Create Translation Package</name>
+   <description>Creates a translation package.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+  <info xml:lang="fr">
+   <name>Creer un Kit de Traduction</name>
+   <description>Crée un kit de traduction.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ <plugin type="utility"
+  id="oku_alignment"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
+  updateUri="http://okapi.sf.net/updates/alignment">
+  <info>
+   <name>Create TMX from Billingual Document</name>
+   <description>Creates a TMX file from a set of bi-lingual documents such as XLIFF files.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+</okapiPlugins>
