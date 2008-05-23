@@ -1,4 +1,4 @@
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.resource;
 
 import java.io.IOException;
 import java.io.InputStream;

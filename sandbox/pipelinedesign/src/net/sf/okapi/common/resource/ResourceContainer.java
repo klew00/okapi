@@ -7,7 +7,7 @@ public class ResourceContainer implements IResourceContainer{
 
     private String name;
     private List<IExtractionItem> extractionItems = new ArrayList<IExtractionItem>();
-    
+
     public String getName() {
         return name;
     }
@@ -15,7 +15,11 @@ public class ResourceContainer implements IResourceContainer{
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    public void addExtractionItem(IExtractionItem item) {
+    	extractionItems.add(item);
+    }
+
     public List<IExtractionItem> getExtractionItems() {
         return extractionItems;
     }

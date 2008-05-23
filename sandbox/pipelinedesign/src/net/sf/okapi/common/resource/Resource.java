@@ -15,6 +15,10 @@ public class Resource implements IResource {
         this.name = name;
     }
 
+    public void addExtractionItem(IExtractionItem item) {
+    	extractionItems.add(item);
+    }
+
     public List<IExtractionItem> getExtractionItems() {
         return extractionItems;
     }
