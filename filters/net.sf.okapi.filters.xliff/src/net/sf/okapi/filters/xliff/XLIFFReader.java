@@ -6,6 +6,7 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import net.sf.okapi.common.resource.CodeFragment;
@@ -32,10 +33,10 @@ public class XLIFFReader {
 	public static final int       RESULT_STARTTRANSUNIT    = 5;
 	public static final int       RESULT_ENDTRANSUNIT      = 6;
 
-	public Resource          resource;
-	public FileResource      fileRes;
-	public IExtractionItem   sourceItem;
-	public IExtractionItem   targetItem;
+	protected Resource            resource;
+	protected FileResource        fileRes;
+	protected IExtractionItem     sourceItem;
+	protected IExtractionItem     targetItem;
 	
 	private IContainer       content;
 	private Node             node;
@@ -43,16 +44,19 @@ public class XLIFFReader {
 	private Stack<Boolean>   firstChildDoneFlags;
 	private int              lastResult;
 	private boolean          backTrack;
-
+	private boolean          fallbackToID;
+	
 
 	public XLIFFReader () {
 		resource = new Resource();
 	}
 	
-	public void open (InputStream input)
+	public void open (InputStream input,
+		boolean fallbackToID)
 		throws Exception
 	{
 		try {
+			this.fallbackToID = fallbackToID;
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			fact.setValidating(false);
 			resource.doc = fact.newDocumentBuilder().parse(input);
@@ -66,6 +70,22 @@ public class XLIFFReader {
 		catch ( Exception e ) {
 			throw e;
 		}
+	}
+
+	/**
+	 * Gets the last source item read.
+	 * @return The last source item read.
+	 */
+	public IExtractionItem getSourceItem () {
+		return sourceItem;
+	}
+
+	/**
+	 * Gets the last target item read.
+	 * @return The last target item read, or null if there are no target item.
+	 */
+	public IExtractionItem getTargetItem () {
+		return targetItem;
 	}
 
 	/**
@@ -89,14 +109,14 @@ public class XLIFFReader {
 			if ( !nextNode() ) {
 				return RESULT_ENDINPUT; // Document is done
 			}
-			String sName = getName();
+			String name = getName();
 			//TOFO: groups, etc.
-			if ( sName.equals("trans-unit") ) {
+			if ( name.equals("trans-unit") ) {
 				resetItem();
 				lastResult = processStartTransUnit();
 				return lastResult;
 			}
-			else if ( sName.equals("file") ) {
+			else if ( name.equals("file") ) {
 				if ( backTrack ) {
 					lastResult = RESULT_ENDFILE;
 					return lastResult;
@@ -177,14 +197,13 @@ public class XLIFFReader {
 		if ( sTmp.length() > 0 ) sourceItem.setIsTranslatable(sTmp.equals("yes"));
 		sTmp = Elem.getAttribute("id");
 		if ( sTmp.length() == 0 ) throw new Exception("Missing attribute 'id'.");
-		else {
-			try {
-				sourceItem.setID(Integer.valueOf(sTmp));
-			}
-			catch ( Exception E ) {
-				throw new Exception("Invalid value for attribute 'id'.");
-			}
-		}
+		else sourceItem.setID(sTmp);
+		sTmp = Elem.getAttribute("resname");
+		if ( sTmp.length() > 0 ) sourceItem.setName(sTmp);
+		else if ( fallbackToID ) sourceItem.setName(sourceItem.getID());
+		sTmp = Elem.getAttribute("restype");
+		if ( sTmp.length() > 0 ) sourceItem.setType(sTmp);
+		
 		return RESULT_STARTTRANSUNIT;
 	}
 	
@@ -210,6 +229,9 @@ public class XLIFFReader {
 			else if ( sName.equals("target") ) {
 				processTarget();
 			}
+			else if ( sName.equals("note") ) {
+				if ( !backTrack ) sourceItem.setNote(node.getTextContent());
+			}
 		}
 		return RESULT_ENDTRANSUNIT; // Should not get here
 	}
@@ -219,7 +241,7 @@ public class XLIFFReader {
 	 * calling this method with <source> or <target>.
 	 * @param p_sContainer The name of the element content that is processed.
 	 */
-	private void processContent (String p_sContainer)
+	private void processContent (String container)
 	{
 		// Is this an empty <source> or <target>?
 		if ( !node.hasChildNodes() ) {
@@ -236,7 +258,10 @@ public class XLIFFReader {
 	
 			case Node.ELEMENT_NODE:
 				String sName = node.getNodeName();
-				if ( sName.equals(p_sContainer) ) {
+				if ( sName.equals(container) ) {
+					return;
+				}
+				if ( backTrack ) {
 					if ( sName.equals("bpt") ) inCode--;
 					else if ( sName.equals("ept") ) inCode--;
 					else if ( sName.equals("ph") ) inCode--;
@@ -244,8 +269,7 @@ public class XLIFFReader {
 						//TODO: use real IDs. 1 will not work
 						content.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
 					}
-					// End return in all cases
-					return;
+					continue; // Move on the next node
 				}
 				
 				// Else: It's a start of element
@@ -253,27 +277,42 @@ public class XLIFFReader {
 					content.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
 				}
 				else if ( sName.equals("x") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					appendCode(IContainer.CODE_ISOLATED);
 				}
 				else if ( sName.equals("bpt") ) {
-					content.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					appendCode(IContainer.CODE_OPENING);
 					inCode++;
 				}
 				else if ( sName.equals("ept") ) {
-					content.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+					appendCode(IContainer.CODE_CLOSING);
 					inCode++;
 				}
 				else if ( sName.equals("ph") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					appendCode(IContainer.CODE_ISOLATED);
 					inCode++;
 				}
 				else if ( sName.equals("it") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					appendCode(IContainer.CODE_ISOLATED);
 					inCode++;
 				}
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
+	 * @param type The type of in-line code.
+	 */
+	private void appendCode (int type) {
+		String inside = node.getTextContent(); // No support for <sub>
+		NamedNodeMap attrs = node.getAttributes();
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<attrs.getLength(); i++ ) {
+			tmp.append(String.format("%s%s=\"%s\"", (tmp.length()>0 ? "" : " "), attrs.item(i).getNodeName(),
+				attrs.item(i).getNodeValue()));
+		}
+		content.append(new CodeFragment(type, 1, inside, tmp.toString()));
 	}
 	
 	private void processTarget () {

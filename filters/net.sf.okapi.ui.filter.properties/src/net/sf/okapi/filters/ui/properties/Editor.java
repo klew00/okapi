@@ -1,4 +1,11 @@
-package net.sf.okapi.filters.properties;
+package net.sf.okapi.filters.ui.properties;
+
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.LDPanel;
+import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.filters.properties.Parameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,12 +20,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
-
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersEditor;
-import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.LDPanel;
-import net.sf.okapi.common.ui.OKCancelPanel;
 
 public class Editor implements IParametersEditor {
 	

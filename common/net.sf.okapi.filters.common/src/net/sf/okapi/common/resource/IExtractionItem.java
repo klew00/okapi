@@ -43,13 +43,13 @@ public interface IExtractionItem {
 	 * It must be the same for two identical input processed with the same parameters. 
 	 * @return The identifier of the item.
 	 */
-	int getID ();
+	String getID ();
 	
 	/**
 	 * Sets the identifier of the item.
 	 * @param id The identifier value to set.
 	 */
-	void setID (int id);
+	void setID (String id);
 	
 	/**
 	 * Indicates if the item is translatable. Some item may be part of the extraction scope
@@ -140,4 +140,22 @@ public interface IExtractionItem {
 	 * Removes the list of properties associated with the object.
 	 */
 	void clearProperties ();
+	
+	/**
+	 * Indicates if the object has an associated note.
+	 * @return True if there is an associated note, false otherwise.
+	 */
+	boolean hasNote ();
+	
+	/**
+	 * Gets the notes for the object.
+	 * @return A string with the note(s).
+	 */
+	String getNote ();
+	
+	/**
+	 * Sets the notes for the object.
+	 * @param text The new text to set.
+	 */
+	void setNote (String text);
 }

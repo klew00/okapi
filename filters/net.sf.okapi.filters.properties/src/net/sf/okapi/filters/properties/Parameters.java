@@ -27,12 +27,12 @@ public class Parameters extends BaseParameters {
 
 //	public ILocalizationDirectives   m_LD;
 //	public InlineCodeFinder          m_CodeFinder;
-	protected boolean                useCodeFinder;
-	protected boolean                escapeExtendedChars;
-	protected boolean                useKeyCondition;
-	protected boolean                extractOnlyMatchingKey;
-	protected String                 keyCondition;
-	protected boolean                extraComments;
+	public boolean                useCodeFinder;
+	public boolean                escapeExtendedChars;
+	public boolean                useKeyCondition;
+	public boolean                extractOnlyMatchingKey;
+	public String                 keyCondition;
+	public boolean                extraComments;
 
 	public Parameters () {
 //		m_LD = (ILocalizationDirectives)new LocalizationDirectives();

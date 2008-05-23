@@ -30,16 +30,19 @@ import java.util.Map;
  */
 public class ExtractionItem implements IExtractionItem {
 
+	protected String                   id;
+	protected boolean                  isTranslatable;
+	protected boolean                  hasTarget;
+	protected String                   resname;
+	protected String                   restype;
+	protected boolean                  preserveFormatting;
+	protected String                   notes;
+
 	private IContainer                 main;
 	private ArrayList<IExtractionItem> children;
 	private ArrayList<IContainer>      segments;
 	private Map<String, Object>        props;
-	public int                         id;
-	public boolean                     isTranslatable;
-	public boolean                     hasTarget;
-	public String                      resname;
-	public String                      restype;
-	public boolean                     preserveFormatting;
+
 
 	public ExtractionItem () {
 		// Default values different from initial
@@ -79,7 +82,7 @@ public class ExtractionItem implements IExtractionItem {
 		main = data;
 	}
 
-	public int getID () {
+	public String getID () {
 		return id;
 	}
 
@@ -101,7 +104,7 @@ public class ExtractionItem implements IExtractionItem {
 		return isTranslatable;
 	}
 
-	public void setID (int newId) {
+	public void setID (String newId) {
 		id = newId;
 	}
 
@@ -147,5 +150,17 @@ public class ExtractionItem implements IExtractionItem {
 
 	public void setPreserveFormatting (boolean preserve) {
 		preserveFormatting = preserve;
+	}
+
+	public boolean hasNote () {
+		return (( notes != null ) && ( notes.length() > 0 ));
+	}
+	
+	public String getNote () {
+		return notes;
+	}
+
+	public void setNote (String text) {
+		notes = text;
 	}
 }

@@ -1,6 +1,7 @@
 package net.sf.okapi.filters.xliff;
 
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
@@ -11,10 +12,13 @@ public class InputFilter implements IInputFilter {
 	private InputStream      input;
 	private IResourceBuilder output;
 	private XLIFFReader      reader;
+	private Parameters       params;
+	private Pattern          pattern;
 	
 
 	public InputFilter () {
 		reader = new XLIFFReader();
+		params = new Parameters();
 	}
 	
 	public void close ()
@@ -23,7 +27,7 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public void initialize (InputStream input,
@@ -42,6 +46,7 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
 	}
 
 	public boolean supports (int feature) {
@@ -57,7 +62,11 @@ public class InputFilter implements IInputFilter {
 	public void process () {
 		try {
 			close();
-			reader.open(input);
+			reader.open(input, params.fallbackToID);
+			
+			if ( params.useStateValues ) {
+				pattern = Pattern.compile(params.stateValues);
+			}
 			// Get started
 			output.startResource(reader.resource);
 			
@@ -67,10 +76,14 @@ public class InputFilter implements IInputFilter {
 				//TODO: groups
 				switch ( (n = reader.readItem()) ) {
 				case XLIFFReader.RESULT_STARTTRANSUNIT:
-					output.startExtractionItem(reader.sourceItem, reader.targetItem);
+					// Do nothing: Both events to be sent when end trans-unit comes
+					// We do this because of the condition based on state attribute.
 					break;
 				case XLIFFReader.RESULT_ENDTRANSUNIT:
-					output.endExtractionItem(reader.sourceItem, reader.targetItem);
+					if ( isExtractable() ) {
+						output.startExtractionItem(reader.sourceItem, reader.targetItem);
+						output.endExtractionItem(reader.sourceItem, reader.targetItem);
+					}
 					break;
 				case XLIFFReader.RESULT_STARTFILE:
 					output.startContainer(reader.fileRes);
@@ -101,4 +114,13 @@ public class InputFilter implements IInputFilter {
 		this.output = builder;
 	}
 
+	private boolean isExtractable () {
+		if ( !params.useStateValues ) return true;
+		if ( reader.targetItem == null ) return true;
+		String state = (String)reader.targetItem.getProperty("state");
+		if (( state == null ) || ( state.length() == 0 )) {
+			return params.extractNoState;
+		}
+		return pattern.matcher(state).find();
+	}
 }

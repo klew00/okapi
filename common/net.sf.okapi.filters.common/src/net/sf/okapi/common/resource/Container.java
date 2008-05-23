@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reference implementation of the IContainer interface. 
+ * Reference implementation of the IContainer interface.
+ * <p>In this implementation the codes are encoded into 2-char sequence:
+ * the type of code, then its index in the list of codes. Note that the map 
+ * returned by getCodes() is mapped on indices not IDs (it could be an array).
  */
 public class Container implements IContainer {
 
@@ -14,12 +17,12 @@ public class Container implements IContainer {
 	private IFragment                  lastFrag;
 	private Map<String, Object>        props;
 
-	static public char ItoC (int id) {
-		return (char)(id+CHARBASE);
+	static public char ItoC (int index) {
+		return (char)(index+CHARBASE);
 	}
 
-	static public int CtoI (char id) {
-		return ((int)id)-CHARBASE;
+	static public int CtoI (char index) {
+		return ((int)index)-CHARBASE;
 	}
 
 	public Container () {
@@ -100,6 +103,7 @@ public class Container implements IContainer {
 		
 		// Multiple segments or one code fragment
 		StringBuilder text = new StringBuilder();
+		int index = 0;
 		for ( IFragment frag : list ) {
 			if ( frag.isText() ) {
 				text.append(frag.toString());
@@ -107,10 +111,11 @@ public class Container implements IContainer {
 			else {
 				if ( coded ) {
 					text.append((char)((CodeFragment)frag).type);
-					text.append(ItoC(((CodeFragment)frag).id));
+					text.append(ItoC(index));
+					index++; // Not used if not coded
 				}
 				else {
-					text.append(((CodeFragment)frag).data);
+					text.append(frag.toString());
 				}
 			}
 		}
@@ -123,9 +128,11 @@ public class Container implements IContainer {
 
 	public Map<Integer, IFragment> getCodes () {
 		HashMap<Integer, IFragment> map = new HashMap<Integer, IFragment>();
+		int index = 0;
 		for ( IFragment frag : list ) {
 			if ( !frag.isText() ) {
-				map.put(((CodeFragment)frag).id, frag);
+				map.put(index, frag);
+				index++;
 			}
 		}
 		return map;
@@ -144,7 +151,19 @@ public class Container implements IContainer {
 		}
 		return false;
 	}
-
+	
+	// Specific to this class for now
+/*	public int getIDFromIndex (int index) {
+		int codeIndex = 0;
+		for ( IFragment frag : list ) {
+			if ( !frag.isText() ) {
+				if ( codeIndex == index ) return ((CodeFragment)frag).id;
+				codeIndex++;
+			}
+		}
+		return -1; // Not found
+	}
+*/
 	/**
 	 * Resets the content of the object based on a coded text string and a map of 
 	 * codes.
@@ -186,10 +205,10 @@ public class Container implements IContainer {
 				// Then map to existing codes
 				if ( ++i >= codedText.length() )
 					throw new Exception("Missing id after code prefix.");
-				int id = CtoI(codedText.charAt(i));
-				if ( !tmpMap.containsKey(id) )
-					throw new Exception(String.format("Code id '%d' is not in the object.", id));
-				list.add(tmpMap.get(id));
+				int codeIndex = CtoI(codedText.charAt(i));
+				if ( !tmpMap.containsKey(codeIndex) )
+					throw new Exception(String.format("Code index '%d' is not in the object.", codeIndex));
+				list.add(tmpMap.get(codeIndex));
 				codeCount++;
 				start = i+1;
 				break;

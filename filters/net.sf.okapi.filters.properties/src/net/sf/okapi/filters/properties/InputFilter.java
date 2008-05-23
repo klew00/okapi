@@ -48,7 +48,6 @@ public class InputFilter implements IInputFilter {
 	private IResourceBuilder output;
 	private Resource         res;
 	private IExtractionItem  item;
-	
 	private String           textLine;
 	private int              lineNumber;
 	private int              lineSince;
@@ -265,7 +264,7 @@ public class InputFilter implements IInputFilter {
 				}
 
 				item.setPreserveFormatting(true);
-				item.setID(++id);
+				item.setID(String.valueOf(++id));
 				result = RESULT_ITEM;
 				item.setProperty("start", lS);
 
