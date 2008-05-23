@@ -41,11 +41,14 @@ public class Main {
         	Pipeline pipeline = new Pipeline();
             pipeline.setPipelineSteps(steps);
             eListeners.add(new LoggingPipelineExceptionListener());            
-                                    
-            // run the steps
+            
+            // add steps to pipeline
             pipeline.setPipelineSteps(steps);
+
             // do default preprocessing on steps
             pipeline.prepare();
+            
+            // run all the steps
             pipeline.executeSteps(resourceBuilder);
         }
         catch ( Exception e ) {
