@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:camouflage:resource"
+	elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:r="urn:camouflage:resource">
+    
+    <complexType name="ExtensibleElement">
+		<sequence>
+			<any minOccurs="0" maxOccurs="unbounded" namespace="##other"
+				processContents="lax">
+			</any>
+		</sequence>
+		<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+	</complexType>
+	
+	<complexType name="Resource">
+		<complexContent>
+			<extension base="r:ExtensibleElement">
+				<sequence>
+                    <element ref="r:meta-data" minOccurs="0" maxOccurs="1"/>
+                    <element name="resource-model" type="r:ContainerContent" minOccurs="1" maxOccurs="1"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	
+	<complexType name="MetaData">
+		<complexContent>
+			<extension base="r:ExtensibleElement">
+			</extension>
+		</complexContent>
+	</complexType>
+    
+    <complexType name="ExtractionItem">
+        <complexContent>
+            <extension base="r:ExtensibleElement">
+                <sequence>
+                    <element name="content" type="r:Content" minOccurs="1" maxOccurs="1"></element>
+                    <element name="children" type="r:ContainerContent" minOccurs="0" maxOccurs="1"></element>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="Content" mixed="true">
+        <choice minOccurs="0" maxOccurs="unbounded">
+            <element name="inline" type="string"></element>
+        </choice>
+        <!-- TODO: anyAttribute allowed here? -->
+    </complexType>
+
+    <complexType name="ContainerContent">
+        <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="r:container"></element>
+            <element ref="r:extraction-item"></element>
+        </choice>
+        <!-- TODO: anyAttribute allowed here? -->
+    </complexType>
+    
+    <complexType name="Container">
+        <complexContent>
+            <extension base="r:ExtensibleElement">
+                <sequence>
+                    <element name="children" type="r:Container"></element>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+    <complexType name="Segment">
+        <complexContent>
+            <extension base="r:ExtensibleElement">
+            </extension>
+        </complexContent>
+    </complexType>
+
+	<element name="resource" type="r:Resource">
+		<annotation>
+			<documentation>
+    		  This is the root element for a resource. A resource represents a 'Document'.
+    		</documentation>
+		</annotation>
+	</element>
+	
+	<element name="meta-data" type="r:MetaData"></element>
+	<element name="resource-model" type="r:ContainerContent"></element>
+	<element name="extraction-item" type="r:ExtractionItem"></element>
+	<element name="container" type="r:Container"></element>
+	<element name="segment" type="r:Segment"></element>
+</schema>
