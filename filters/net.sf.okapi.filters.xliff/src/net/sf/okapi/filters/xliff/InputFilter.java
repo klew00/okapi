@@ -22,7 +22,6 @@ public class InputFilter implements IInputFilter {
 	}
 	
 	public void close ()
-		throws Exception 
 	{
 	}
 
@@ -35,7 +34,6 @@ public class InputFilter implements IInputFilter {
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)
-		throws Exception
 	{
 		close();
 		this.input = input;
@@ -97,16 +95,8 @@ public class InputFilter implements IInputFilter {
 			
 			output.endResource(reader.resource);
 		}
-		catch ( Exception e ) {
-			System.err.println(e.getLocalizedMessage());
-		}
 		finally {
-			try {
-				close();
-			}
-			catch ( Exception e ) {
-				System.err.println(e.getLocalizedMessage());
-			}
+			close();
 		}
 	}
 

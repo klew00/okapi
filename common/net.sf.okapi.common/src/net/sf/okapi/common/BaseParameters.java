@@ -65,7 +65,6 @@ public abstract class BaseParameters implements IParameters {
 
 	public void load (String filePath,
 		boolean p_bIgnoreErrors)
-		throws Exception
 	{
 		try {
 			// Reset the parameters to their defaults
@@ -90,14 +89,13 @@ public abstract class BaseParameters implements IParameters {
 			fromString(sbTmp.toString());
 			path = filePath;
 		}
-		catch ( Exception E ) {
-			if ( !p_bIgnoreErrors ) throw E;
+		catch ( Exception e ) {
+			if ( !p_bIgnoreErrors ) throw new RuntimeException(e);
 		}
 	}
 
 	public void save (String newPath,
 		String multiFilesPrefix)
-		throws Exception
 	{
 		// multiFilesPrefix is not used in this default implementation
 		Writer SW = null;
@@ -109,11 +107,12 @@ public abstract class BaseParameters implements IParameters {
 			SW.write(toString());
 			path = newPath;
 		}
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 		finally {
-			if ( SW != null ) SW.close();
+			if ( SW != null )
+				try { SW.close(); } catch ( Exception e ) {};
 		}
 	}
 }

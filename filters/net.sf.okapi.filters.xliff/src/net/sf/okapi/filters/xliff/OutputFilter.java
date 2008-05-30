@@ -3,7 +3,6 @@ package net.sf.okapi.filters.xliff;
 import java.io.OutputStream;
 import java.util.List;
 
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;

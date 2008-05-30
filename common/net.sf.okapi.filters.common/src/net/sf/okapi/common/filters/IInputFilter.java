@@ -37,20 +37,19 @@ public interface IInputFilter extends IOutputPipe {
 	 * @param name The name associated with the input (e.g. file name).
 	 * @param encoding The default encoding for the input.
 	 * @param sourceLanguage Language code of the source.
-	 * @param targeLanguage Language code of the target.
+	 * @param targeLanguage Language code of the target (can be null 
+	 * in monolingual input).
 	 */
 	void initialize (InputStream input,
 		String name,
 		String encoding,
 		String sourceLanguage,
-		String targetLanguage)
-		throws Exception; //TODO: Specific exception?
+		String targetLanguage);
 	
 	/**
 	 * Closes the current input and free any associated resources.
 	 */
-	void close ()
-		throws Exception; //TODO: Specific exception?
+	void close ();
 
 	/**
 	 * Process the input and feed it to the output pipe.

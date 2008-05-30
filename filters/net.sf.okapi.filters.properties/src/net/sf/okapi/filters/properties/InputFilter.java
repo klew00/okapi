@@ -58,12 +58,15 @@ public class InputFilter implements IInputFilter {
 		res = new Resource();
 	}
 	
-	public void close ()
-		throws Exception 
-	{
-		if ( reader != null ) {
-			reader.close();
-			reader = null;
+	public void close () {
+		try {
+			if ( reader != null ) {
+				reader.close();
+				reader = null;
+			}
+		}
+		catch ( Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -76,7 +79,6 @@ public class InputFilter implements IInputFilter {
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)
-		throws Exception
 	{
 		close();
 		this.input = input;
@@ -87,7 +89,6 @@ public class InputFilter implements IInputFilter {
 
 	private int readItem (boolean resetBuffer) {
 		int result = RESULT_ERROR;
-
 		try {
 			if ( resetBuffer ) {
 				res.buffer = new StringBuilder();
@@ -277,12 +278,9 @@ public class InputFilter implements IInputFilter {
 				return result;
 			}
 		}
-		catch ( Exception E ) {
-			logMessage(ILog.TYPE_ERROR, E.getMessage());
-			result = RESULT_ERROR;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
-
-		return result;
 	}
 
 	public void setParameters (IParameters params) {
@@ -418,15 +416,10 @@ public class InputFilter implements IInputFilter {
 			output.endResource(res);
 		}
 		catch ( Exception e ) {
-			logMessage(0, e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 		finally {
-			try {
-				close();
-			}
-			catch ( Exception e ) {
-				logMessage(0, e.getLocalizedMessage());
-			}
+			close();
 		}
 	}
 

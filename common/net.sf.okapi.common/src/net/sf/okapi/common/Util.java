@@ -21,6 +21,9 @@
 package net.sf.okapi.common;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 /**
  * Collection of various all-purpose helper functions.
@@ -139,6 +142,55 @@ public class Util {
 			}
 		}
 		return sbTmp.toString();
+	}
+
+	public static void copyFile (String fromPath,
+		String toPath,
+		boolean move)
+	{
+		FileChannel ic = null;
+		FileChannel oc = null;
+		try {
+			createDirectories(toPath);
+			ic = new FileInputStream(fromPath).getChannel();
+			oc = new FileOutputStream(toPath).getChannel();
+			ic.transferTo(0, ic.size(), oc);
+			if ( move ) {
+				ic.close(); ic = null;
+				File file = new File(fromPath);
+				file.delete();
+			}
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( ic != null ) ic.close();
+				if ( oc != null ) oc.close();
+			}
+			catch ( Exception e ) {};
+		}
+	}
+	
+	/**
+	 * Gets the filename of a path.
+	 * @param path The path from where to get the filename.
+	 * @param keepExtension True to keep the existing extension, false to remove it.
+	 * @return The filename with or without extension.
+	 */
+	static public String getFilename (String path,
+		boolean keepExtension) {
+		// Get the filename
+		int n = path.lastIndexOf(File.separator);
+		if ( n > -1 ) path = path.substring(n+1);
+
+		if ( keepExtension ) return path;
+		
+		// Remove the extension if there is one
+	    n = path.lastIndexOf('.');
+        if ( n > -1 ) return path.substring(0, n);
+        else return path;
 	}
 	
 }

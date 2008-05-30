@@ -1,10 +1,4 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +18,7 @@ public class Main {
         //=== Test with file and custom resources
         try {        
         	// Create the filter, writer and utility steps
-        	String inputPath = "D:\\OKPAI\\OKAPI\\sandbox\\pipelinedesign\\test.txt";
+        	String inputPath = "test.txt";
         	MyFormat2Filter myFilter = new MyFormat2Filter();
         	MyFormat2ResourceBuilder resourceBuilder = new MyFormat2ResourceBuilder(new FileRawData(new File(inputPath)));
         	MyFormat2SimpleWriter simpleWriter = new MyFormat2SimpleWriter();

@@ -45,9 +45,9 @@ public interface IContainer {
 	 * Sets the content of the object, using the codes currently set.
 	 * @param codedText The coded text to set. This string must match the
 	 * codes already set in the object.
+	 * @throws InvalidContentException (runtime)
 	 */
-	void setContent (String codedText)
-		throws Exception;
+	void setContent (String codedText);
 	
 	/**
 	 * Sets the content of the object, using a new set of codes, and a
@@ -56,10 +56,10 @@ public interface IContainer {
 	 * codes passed as parameter.
 	 * @param codes The codes to set. They must correspond to the codes
 	 * passed as parameter.
+	 * @throws InvalidContentException (runtime)
 	 */
 	void setContent (String codedText,
-		Map<Integer, IFragment> codes)
-		throws Exception;
+		Map<Integer, IFragment> codes);
 	
 	/**
 	 * Gets a list of all the fragments that compose the object.

@@ -53,7 +53,6 @@ public class XLIFFReader {
 	
 	public void open (InputStream input,
 		boolean fallbackToID)
-		throws Exception
 	{
 		try {
 			this.fallbackToID = fallbackToID;
@@ -68,7 +67,7 @@ public class XLIFFReader {
 			processXliff();
 		}
 		catch ( Exception e ) {
-			throw e;
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -91,12 +90,9 @@ public class XLIFFReader {
 	/**
 	 * Reads the next part of the input.
 	 * @return One of the RESULT_* values.
-	 * @throws Exception
 	 */
 	//TODO: Change the parsing to get start/end elements
-	public int readItem ()
-		throws Exception
-	{
+	public int readItem () {
 		// If needed, resume parsing based on the last result
 		switch ( lastResult ) {
 		case RESULT_STARTTRANSUNIT:
@@ -178,25 +174,21 @@ public class XLIFFReader {
 		//TODO: check version, root, etc.
 	}
 	
-	private int processFile ()
-		throws Exception
-	{
+	private int processFile () {
 		fileRes = new FileResource();
 		Element Elem = (Element)node;
 		String tmp = Elem.getAttribute("original");
-		if ( tmp.length() == 0 ) throw new Exception("Missing attribute 'original'.");
+		if ( tmp.length() == 0 ) throw new RuntimeException("Missing attribute 'original'.");
 		else fileRes.setName(tmp);
 		return RESULT_STARTFILE;
 	}
 	
-	private int processStartTransUnit ()
-		throws Exception
-	{
+	private int processStartTransUnit () {
 		Element Elem = (Element)node;
 		String sTmp = Elem.getAttribute("translate");
 		if ( sTmp.length() > 0 ) sourceItem.setIsTranslatable(sTmp.equals("yes"));
 		sTmp = Elem.getAttribute("id");
-		if ( sTmp.length() == 0 ) throw new Exception("Missing attribute 'id'.");
+		if ( sTmp.length() == 0 ) throw new RuntimeException("Missing attribute 'id'.");
 		else sourceItem.setID(sTmp);
 		sTmp = Elem.getAttribute("resname");
 		if ( sTmp.length() > 0 ) sourceItem.setName(sTmp);
@@ -207,9 +199,7 @@ public class XLIFFReader {
 		return RESULT_STARTTRANSUNIT;
 	}
 	
-	private int processEndTransUnit ()
-		throws Exception
-	{
+	private int processEndTransUnit () {
 		// Process the content
 		if ( !node.hasChildNodes() ) {
 			return RESULT_ENDTRANSUNIT; // Empty trans-unit (should not exist, but just in case...)

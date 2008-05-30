@@ -170,11 +170,10 @@ public class Container implements IContainer {
 	 * @param codedText The coded text to use to create the new content.
 	 * @param codes The codes to use along with the coded text. Use null to use the
 	 * existing codes.
-	 * @throws Exception
+	 * @throws InvalidContentException (runtime)
 	 */
 	private void resetContent (String codedText,
 		Map<Integer, IFragment> codes)
-		throws Exception //TODO: Maybe a specific exception
 	{
 		// Store code fragments temporarily
 		Map<Integer, IFragment> tmpMap = codes;
@@ -183,7 +182,7 @@ public class Container implements IContainer {
 
 		if ( codedText == null ) {
 			if ( tmpMap.size() > 0 ) //TODO: Maybe null just reset all instead of giving an error?
-				throw new Exception("One missing code or more in the coded text.");
+				throw new InvalidContentException("One missing code or more in the coded text.");
 			else return;
 		}
 
@@ -204,10 +203,10 @@ public class Container implements IContainer {
 				}
 				// Then map to existing codes
 				if ( ++i >= codedText.length() )
-					throw new Exception("Missing id after code prefix.");
+					throw new InvalidContentException("Missing id after code prefix.");
 				int codeIndex = CtoI(codedText.charAt(i));
 				if ( !tmpMap.containsKey(codeIndex) )
-					throw new Exception(String.format("Code index '%d' is not in the object.", codeIndex));
+					throw new InvalidContentException(String.format("Code index '%d' is not in the object.", codeIndex));
 				list.add(tmpMap.get(codeIndex));
 				codeCount++;
 				start = i+1;
@@ -226,21 +225,20 @@ public class Container implements IContainer {
 		}
 		
 		if ( codeCount < tmpMap.size() )
-			throw new Exception("One missing code or more in the coded text.");
+			throw new InvalidContentException("One missing code or more in the coded text.");
 		
-		// Update latFrag once at the end
-		lastFrag = list.get(list.size()-1);
+		// Update lastFrag once at the end (if needed)
+		if ( len > 0 ) {
+			lastFrag = list.get(list.size()-1);
+		}
 	}
 
-	public void setContent (String codedText)
-		throws Exception //TODO: Maybe a specific exception
-	{
+	public void setContent (String codedText) {
 		resetContent(codedText, null);
 	}
 
 	public void setContent (String codedText,
 		Map<Integer, IFragment> codes)
-		throws Exception //TODO: Maybe a specific exception
 	{
 		resetContent(codedText, codes);
 	}
