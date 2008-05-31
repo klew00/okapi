@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.packages.omegat;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-
 /**
  * Implements IReader for OmegaT packages.
  * This class is the same as its super class, but still needs to be
@@ -29,7 +27,7 @@ import net.sf.okapi.applications.rainbow.lib.ILog;
  */
 public class Reader extends net.sf.okapi.applications.rainbow.packages.xliff.Reader {
 
-	public Reader(ILog log) {
-		super(log);
+	public Reader() {
+		super();
 	}
 }

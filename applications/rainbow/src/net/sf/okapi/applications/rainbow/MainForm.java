@@ -78,6 +78,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class MainForm implements IParametersProvider {
 	
+	private final String     UTIL_MERGING = "rnb_merging";
+	
 	private Shell            shell;
 	private ILog             log;
 	private String           rootFolder;
@@ -147,7 +149,7 @@ public class MainForm implements IParametersProvider {
 
 		log = new LogForm(shell);
 		log.setTitle("Rainbow Log");
-		fa = new FilterAccess(log);
+		fa = new FilterAccess();
 		fa.loadList(sharedFolder + File.separator + "filters.xml");
 
 		// Menus
@@ -588,11 +590,21 @@ public class MainForm implements IParametersProvider {
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miUtilities.setMenu(dropMenu);
 		
-		// Add the utilities
+		// Add the hard-wired utilities
+		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem.setText("Merge Translation Package...");
+		menuItem.setData(UTIL_MERGING);
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				launchUtility(event);
+			}
+		});
+		
+		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
 			PluginItem item = plugins.getItem(iter.next());
-			MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+			menuItem = new MenuItem(dropMenu, SWT.PUSH);
 			menuItem.setText(item.name+"...");
 			menuItem.setData(item.id);
 			menuItem.addSelectionListener(new SelectionAdapter() {
@@ -623,11 +635,18 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				ud = new UtilityDriver(log, fa, plugins, shell);
+				ud = new UtilityDriver(log, fa, plugins);
 			}
 			// Get the utility to run and instantiate it
 			String id = (String)((MenuItem)event.getSource()).getData();
 			if ( id == null ) return;
+			
+			// Hard-wired utility or plug-in?
+			if ( id.equals(UTIL_MERGING) ) {
+				doMerge(null);
+				return;
+			}
+			
 			ud.setData(prj, id);
 			// Run it
 			startWaiting("Processing files...", true);
@@ -748,7 +767,7 @@ public class MainForm implements IParametersProvider {
 	private void changeRoot () {
 		try {
 			InputDialog dlg = new InputDialog(shell, "Source Root",
-				"New root folder:", prj.inputRoot, null);
+				"New root folder:", prj.getInputRoot(), null);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return;
 			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home");
@@ -822,7 +841,7 @@ public class MainForm implements IParametersProvider {
 	private void updateTitle () {
 		shell.setText(((prj.path == null)
 			? Res.getString("UNTITLED")
-			: Utils.getFilename(prj.path, true))
+			: Util.getFilename(prj.path, true))
 			+ " - Rainbow [v6.ALPHA]");
 	}
 
@@ -859,21 +878,21 @@ public class MainForm implements IParametersProvider {
 	private void setSurfaceData () {
 		inputTableMod.updateTable(null);
 		
-		String sampleInput = prj.inputRoot + File.separator
+		String sampleInput = prj.getInputRoot() + File.separator
 			+ "mySubFolder" + File.separator + "myFile.ext";
 		
-		pnlPathBuilder.setData(prj.pathBuilder, prj.inputRoot, sampleInput,
-			prj.outputRoot, "fr");
+		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(), sampleInput,
+			prj.getOutputRoot(), "fr");
 
-		edInputRoot.setText(prj.inputRoot);
-		chkUseOutputRoot.setSelection(prj.useOutputRoot);
-		edOutputRoot.setText(prj.outputRoot);
+		edInputRoot.setText(prj.getInputRoot());
+		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());
+		edOutputRoot.setText(prj.getOutputRoot());
 
-		edSourceLang.setText(prj.sourceLanguage);
-		edSourceEnc.setText(prj.sourceEncoding);
-		edTargetLang.setText(prj.targetLanguage);
-		edTargetEnc.setText(prj.targetEncoding);
-		edParamsFolder.setText(prj.paramsFolder);
+		edSourceLang.setText(prj.getSourceLanguage());
+		edSourceEnc.setText(prj.getSourceEncoding());
+		edTargetLang.setText(prj.getTargetLanguage());
+		edTargetEnc.setText(prj.getTargetEncoding());
+		edParamsFolder.setText(prj.getParametersFolder());
 
 		edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
 		updateOutputRoot();
@@ -903,7 +922,7 @@ public class MainForm implements IParametersProvider {
 			// Get a list of paths if needed
 			if ( paths == null ) {
 				paths = Dialogs.browseFilenames(shell, "Add Documents",
-					true, prj.inputRoot, null, null);
+					true, prj.getInputRoot(), null, null);
 			}
 			if ( paths == null ) return;
 			// Add all the selected files and folders
@@ -997,7 +1016,7 @@ public class MainForm implements IParametersProvider {
 	public IParameters createParameters (String location)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder,
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		fa.loadFilter(aRes[1], null);
 		return fa.inputFilter.getParameters();
@@ -1006,7 +1025,7 @@ public class MainForm implements IParametersProvider {
 	public IParameters load (String location)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder,
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		fa.loadFilter(aRes[1], aRes[3]);
 		return fa.inputFilter.getParameters();
@@ -1016,17 +1035,17 @@ public class MainForm implements IParametersProvider {
 		IParameters paramsObject)
 		throws Exception
 	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.paramsFolder,
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		paramsObject.save(aRes[3], null);
 	}
 
 	public String[] splitLocation (String location) {
-		return FilterAccess.splitFilterSettingsType1(prj.paramsFolder, location);
+		return FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(), location);
 	}
 
 	public String[] getParametersList () {
-		return FilterAccess.getParametersList(prj.paramsFolder);
+		return FilterAccess.getParametersList(prj.getParametersFolder());
 	}
 
 	private void openDocument (int index) {
@@ -1036,7 +1055,7 @@ public class MainForm implements IParametersProvider {
 			}
 			Input inp = prj.getItemFromRelativePath(
 				inputTable.getItem(index).getText(0));
-			Program.launch(prj.inputRoot + File.separator + inp.relativePath); 
+			Program.launch(prj.getInputRoot() + File.separator + inp.relativePath); 
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
@@ -1082,4 +1101,26 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
+	private void doMerge (String manifestPath) {
+		try {
+			String[] inputs;
+			if ( manifestPath == null ) {
+				// Use the input file list
+				inputs = prj.getInputPaths();
+			}
+			else {
+				inputs = new String[1];
+				inputs[0] = manifestPath;
+			}
+			if ( inputs.length < 1 ) return;
+			
+			// Go through one or more manifest
+//			for ( String inputPath : inputs ) {
+//				//TODO
+//			}
+		}
+		catch ( Exception e ) {
+			log.error(e.getLocalizedMessage());
+		}
+	}
 }

@@ -20,7 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.resource.IExtractionItem;
 
@@ -29,21 +28,14 @@ import net.sf.okapi.common.resource.IExtractionItem;
  */
 public class Reader implements IReader {
 
-	ILog                log;
 	TTXReader           reader;
 	
-	public Reader (ILog p_Log) {
-		log = p_Log;
+	public Reader () {
 		reader = new TTXReader();
 	}
 	
 	public void closeDocument () {
-		try {
-			reader.close();
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-		}
+		reader.close();
 	}
 
 	public IExtractionItem getSourceItem () {
@@ -55,22 +47,11 @@ public class Reader implements IReader {
 	}
 
 	public void openDocument (String path) {
-		try {
-			reader.open(path);
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-		}
+		reader.open(path);
 	}
 
 	public boolean readItem () {
-		try {
-			return reader.readItem();
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-			return false;
-		}
+		return reader.readItem();
 	}
 	
 }

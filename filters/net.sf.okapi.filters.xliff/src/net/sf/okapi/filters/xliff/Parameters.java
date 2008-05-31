@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
+		super.reset();
 		useStateValues = true;
 		stateValues = "new|needs-translation";
 		extractOnlyMatchingValues = true;
@@ -55,10 +56,9 @@ public class Parameters extends BaseParameters {
 		return Tmp.toString();
 	}
 	
-	public void fromString (String p_sData)
-	{
+	public void fromString (String data) {
 		// Read the file content as a set of fields
-		FieldsString Tmp = new FieldsString(p_sData);
+		FieldsString Tmp = new FieldsString(data);
 
 		// Parse the fields
 		useStateValues = Tmp.get("useStateValues", useStateValues);

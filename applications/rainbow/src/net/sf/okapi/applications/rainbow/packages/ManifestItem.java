@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation                   */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -22,39 +22,40 @@ package net.sf.okapi.applications.rainbow.packages;
 
 public class ManifestItem {
 
-	private String      m_sFile;
-	private boolean     m_bSelected;
-	private boolean     m_bExist;
+	private String      relativePath;
+	private boolean     selected;
+	private boolean     exists;
 
-	public ManifestItem (String p_sFile,
-		boolean p_bSelected)
+	public ManifestItem (String relativePath,
+		boolean selected)
 	{
-		m_sFile = p_sFile;
-		m_bSelected = p_bSelected;
-		m_bExist = true;
+		if ( relativePath == null ) throw new NullPointerException();
+		this.relativePath = relativePath;
+		this.selected = selected;
+		exists = true;
 	}
 
 	public String getRelativePath () {
-		return m_sFile;
+		return relativePath;
 	}
 	
 	public String getRelativeTargetPath () {
-		return m_sFile;
+		return relativePath;
 	}
 	
-	public boolean isSelected () {
-		return m_bSelected;
+	public boolean selected () {
+		return selected;
 	}
 	
-	public void setSelected (boolean p_bValue) {
-		m_bSelected = p_bValue;
+	public void setSelected (boolean value) {
+		selected = value;
 	}
 	
 	public boolean exists () {
-		return m_bExist;
+		return exists;
 	}
 	
-	public void setExist (boolean p_bValue) {
-		m_bExist = p_bValue;
+	public void setExists (boolean value) {
+		exists = value;
 	}
 }

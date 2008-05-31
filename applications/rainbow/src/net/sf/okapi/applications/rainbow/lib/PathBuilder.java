@@ -280,7 +280,7 @@ public class PathBuilder {
 			}
 		}
 
-		String sFile = Utils.getFilename(sPath, false);
+		String sFile = Util.getFilename(sPath, false);
 		if ( usePrefix() ) {
 			sFile = getPrefix() + sFile;
 		}

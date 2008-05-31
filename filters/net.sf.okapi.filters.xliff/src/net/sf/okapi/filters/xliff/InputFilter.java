@@ -12,25 +12,23 @@ public class InputFilter implements IInputFilter {
 	private InputStream      input;
 	private IResourceBuilder output;
 	private XLIFFReader      reader;
-	private Parameters       params;
 	private Pattern          pattern;
 	
 
 	public InputFilter () {
 		reader = new XLIFFReader();
-		params = new Parameters();
 	}
 	
-	public void close ()
-	{
+	public void close () {
 	}
 
 	public IParameters getParameters () {
-		return params;
+		return reader.resource.getParameters();
 	}
 
 	public void initialize (InputStream input,
 		String name,
+		String filterSettings,
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)
@@ -38,13 +36,11 @@ public class InputFilter implements IInputFilter {
 		close();
 		this.input = input;
 		reader.resource.setName(name);
-		// Not used: encoding;
-		// Not used: sourceLanguage
-		// Not used: targetLanguage
-	}
-
-	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+		reader.resource.setName(name);
+		reader.resource.setFilterSettings(filterSettings);
+		reader.resource.setSourceEncoding(encoding);
+		//TODO: Get the real target/output encoding from parameters
+		reader.resource.setTargetEncoding(encoding);
 	}
 
 	public boolean supports (int feature) {
@@ -60,10 +56,11 @@ public class InputFilter implements IInputFilter {
 	public void process () {
 		try {
 			close();
-			reader.open(input, params.fallbackToID);
+			Resource res = (Resource)reader.resource;
+			reader.open(input, res.params.fallbackToID);
 			
-			if ( params.useStateValues ) {
-				pattern = Pattern.compile(params.stateValues);
+			if ( res.params.useStateValues ) {
+				pattern = Pattern.compile(res.params.stateValues);
 			}
 			// Get started
 			output.startResource(reader.resource);
@@ -105,11 +102,12 @@ public class InputFilter implements IInputFilter {
 	}
 
 	private boolean isExtractable () {
-		if ( !params.useStateValues ) return true;
+		Resource res = (Resource)reader.resource;
+		if ( !res.params.useStateValues ) return true;
 		if ( reader.targetItem == null ) return true;
 		String state = (String)reader.targetItem.getProperty("state");
 		if (( state == null ) || ( state.length() == 0 )) {
-			return params.extractNoState;
+			return res.params.extractNoState;
 		}
 		return pattern.matcher(state).find();
 	}

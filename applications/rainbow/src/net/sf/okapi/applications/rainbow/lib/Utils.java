@@ -22,13 +22,9 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Locale;
-
-import net.sf.okapi.common.Util;
 
 public class Utils {
 
@@ -289,26 +285,6 @@ public class Utils {
         return "";
 	}
 	
-	/**
-	 * Gets the filename (without extension) of a path.
-	 * @param p_sPath The path from where to get the filename.
-	 * @param p_bKeepExtension True to keep the existing extension, false to remove it.
-	 * @return The filename without extension.
-	 */
-	static public String getFilename (String p_sPath,
-		boolean p_bKeepExtension) {
-		// Get the filename
-		int n = p_sPath.lastIndexOf(File.separator);
-		if ( n > -1 ) p_sPath = p_sPath.substring(n+1);
-
-		if ( p_bKeepExtension ) return p_sPath;
-		
-		// Remove the extension if there is one
-	    n = p_sPath.lastIndexOf('.');
-        if ( n > -1 ) return p_sPath.substring(0, n);
-        else return p_sPath;
-	}
-	
 	public static String[] splitLanguageCode (String p_sCode) {
 		if (( p_sCode == null ) || ( p_sCode.length() == 0 )) return null;
 		String[] aRes = new String[2];
@@ -363,42 +339,14 @@ public class Utils {
 
 			//TODO: LB auto-detection
 		}
-		catch ( Exception E ) {
-			// Do nothing.
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 		finally {
 			if ( IS != null )
-				try { IS.close(); } catch ( Exception E ){};
+				try { IS.close(); } catch ( Exception e ){};
 		}
 		return aInfo;
-	}
-	
-	public static void copyFile (String p_sFromPath,
-		String p_sToPath,
-		boolean p_bMove)
-		throws Exception
-	{
-		FileChannel IC = null;
-		FileChannel OC = null;
-		try {
-			Util.createDirectories(p_sToPath);
-			IC = new FileInputStream(p_sFromPath).getChannel();
-			OC = new FileOutputStream(p_sToPath).getChannel();
-			IC.transferTo(0, IC.size(), OC);
-			
-			if ( p_bMove ) {
-				IC.close(); IC = null;
-				File F = new File(p_sFromPath);
-				F.delete();
-			}
-		}
-		catch ( Exception E ) {
-			throw E;
-		}
-		finally {
-			if ( IC != null ) IC.close();
-			if ( OC != null ) OC.close();
-		}
 	}
 	
 	/**

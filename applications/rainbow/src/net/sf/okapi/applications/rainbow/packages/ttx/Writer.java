@@ -27,10 +27,10 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
@@ -48,8 +48,9 @@ public class Writer extends BaseWriter {
 	private int              docKey;
 	private SimpleDateFormat dateFmt;
 
-	public Writer(ILog log) {
-		super(log);
+
+	public Writer() {
+		super();
 		//CreationDate="20071026T162120Z"
 		dateFmt = new SimpleDateFormat("yyyyMMdd'T'HHmmZ");
 		dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -65,10 +66,11 @@ public class Writer extends BaseWriter {
 		InputStream in = null;
 		FileOutputStream out = null;
 		try {
+			manifest.setSourceLocation("work");
+			manifest.setTargetLocation("work");
 			super.writeStartPackage();
 			// Copy the tag settings file to the root of the package
 			in = getClass().getResourceAsStream(DTD_SETTINGS_FILE);
-			Util.createDirectories(manifest.getRoot() + File.separator);
 			out = new FileOutputStream(manifest.getRoot() + File.separator + DTD_SETTINGS_FILE);
 			byte[] buffer = new byte[1024];
 			int bytesRead;
@@ -77,39 +79,35 @@ public class Writer extends BaseWriter {
 			}
 		}
 		catch ( Exception e ) {
-			e.printStackTrace();
-			log.error(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 		finally {
 			try {
 				if ( in != null ) in.close();
 				if ( out != null ) out.close();
 			}
-			catch ( Exception e ) {
-				e.printStackTrace();
-				log.error(e.getLocalizedMessage());
-			}
+			catch ( Exception e ) {} // Swallow it
 		}
 	}
 
-	public void createDocument (int docKey,
-		String newRelativePath)
+	public void createDocument (int docID,
+		String newRelativePath,
+		String inputEncoding,
+		String outputEncoding,
+		String filterSettings,
+		IParameters filterParams)
 	{
-		try {
-			if ( writer == null ) writer = new XMLWriter();
-			else writer.close(); // Else: make sure the previous output is closed
+		super.createDocument(docID, relativePath, inputEncoding,
+			outputEncoding, filterSettings, filterParams);
+		if ( writer == null ) writer = new XMLWriter();
+		else writer.close(); // Else: make sure the previous output is closed
 		
-			this.docKey = docKey;
-			relativePath = newRelativePath + ".xml.ttx";
+		this.docKey = docID;
+		this.relativePath = newRelativePath + ".xml.ttx";
 
-			writer.create(manifest.getRoot() + File.separator
-				+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-				+ relativePath);
-		}
-		catch ( Exception e ) {
-			e.printStackTrace();
-			log.error(e.getLocalizedMessage());
-		}
+		writer.create(manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+			+ relativePath);
 	}
 
 	public void writeEndDocument () {
@@ -159,7 +157,7 @@ public class Writer extends BaseWriter {
 	
 	public void writeItem (IExtractionItem sourceItem,
 		IExtractionItem targetItem,
-		int p_nStatus)
+		int status)
 	{
 		writer.writeRawXML(String.format(
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'&gt;</ut>",
@@ -199,7 +197,7 @@ public class Writer extends BaseWriter {
 		return relation.toString() + DTD_SETTINGS_FILE;
 	}
 	
-	public void writeStartDocument (String p_sOriginal) {
+	public void writeStartDocument () {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("TRADOStag");
@@ -221,7 +219,7 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
 		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
 		writer.writeAttributeString("TargetDefaultFont", "");
-		writer.writeAttributeString("SourceDocumentPath", p_sOriginal);
+		writer.writeAttributeString("SourceDocumentPath", relativePath);
 		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
 		writer.writeAttributeString("PlugInInfo", "");
 		writer.writeEndElement(); // UserSettings

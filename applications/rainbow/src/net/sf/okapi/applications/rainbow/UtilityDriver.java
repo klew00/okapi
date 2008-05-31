@@ -26,6 +26,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
@@ -40,43 +43,43 @@ import org.eclipse.swt.widgets.Shell;
 
 public class UtilityDriver {
 
-	ILog                log;
-	Project             prj;
-	FilterAccess        fa;
-	IUtility            util;
-	IParametersEditor   editor;
-	PluginItem          pluginItem;
-	String              utilityID;
-	PluginsAccess       plugins;
-	Shell               shell;
+	private ILog                  log;
+	private Project               prj;
+	private FilterAccess          fa;
+	private IUtility              util;
+	private IParametersEditor     editor;
+	private PluginItem            pluginItem;
+	private PluginsAccess         plugins;
+	private final Logger          logger = LoggerFactory.getLogger(UtilityDriver.class);
 	
-	public UtilityDriver (ILog newLog,
+	public UtilityDriver (ILog log,
 		FilterAccess newFA,
-		PluginsAccess newPlugins,
-		Shell newShell)
+		PluginsAccess newPlugins)
 	{
-		log = newLog;
+		this.log = log;
 		fa = newFA;
 		plugins = newPlugins;
-		shell = newShell;
 	}
 
-	public void setData (Project newProject,
-		String newUtilityID)
-		throws Exception
+	public void setData (Project project,
+		String utilityID)
 	{
-		prj = newProject;
-		utilityID = newUtilityID;
-		
-		if ( !plugins.containsID(newUtilityID) )
-			throw new Exception("Utility not found.");
-		pluginItem = plugins.getItem(newUtilityID);
-		util = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
-		
-		if ( pluginItem.editorClass.length() > 0 ) {
-			editor = (IParametersEditor)Class.forName(pluginItem.editorClass).newInstance();
+		try {
+			prj = project;
+			
+			if ( !plugins.containsID(utilityID) )
+				throw new RuntimeException("Utility not found.");
+			pluginItem = plugins.getItem(utilityID);
+			util = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
+			
+			if ( pluginItem.editorClass.length() > 0 ) {
+				editor = (IParametersEditor)Class.forName(pluginItem.editorClass).newInstance();
+			}
+			else editor = null;
 		}
-		else editor = null;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public void execute (Shell shell) {
@@ -99,44 +102,49 @@ public class UtilityDriver {
 			
 			log.beginTask(pluginItem.name);
 			
-			if ( util.needRoot() ) {
-				util.setRoot(prj.inputRoot);
+			if ( util.needsRoot() ) {
+				util.setRoot(prj.getInputRoot());
 			}
 
-			util.doProlog(prj.sourceLanguage, prj.targetLanguage);
+			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 			
 			for ( Input item : prj.inputList ) {
 				if ( item.filterSettings.length() == 0 ) continue;
 				log.message("Input: "+item.relativePath);
-				
-				// Load the filter
-				fa.loadFilterFromFilterSettingsType1(prj.paramsFolder,
-					item.filterSettings);
-				
 				// Initialize the input
-				String inputPath = prj.inputRoot + File.separator + item.relativePath;
-				InputStream input = new FileInputStream(inputPath);
-				fa.inputFilter.initialize(input, inputPath, prj.buildSourceEncoding(item),
-					prj.sourceLanguage, prj.targetLanguage);
-				fa.inputFilter.setOutput(util);
-				
-				if ( util.needOutput() ) {
-					// Initialize the output
-					OutputStream output = new FileOutputStream(prj.buildTargetPath(item.relativePath));
-					fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
-							prj.targetLanguage);
-					util.setOutput(fa.outputFilter);
+				String inputPath = prj.getInputRoot() + File.separator + item.relativePath;
+
+				if ( util.isFilterDriven() ) {
+					// Load the filter
+					fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
+						item.filterSettings);
+					InputStream input = new FileInputStream(inputPath);
+					fa.inputFilter.initialize(input, inputPath,
+						item.filterSettings, prj.buildSourceEncoding(item),
+						prj.getSourceLanguage(), prj.getTargetLanguage());
+					fa.inputFilter.setOutput(util);
+					
+					// Initialize the output if needed
+					if ( util.needsOutput() ) {
+						// Initialize the output
+						OutputStream output = new FileOutputStream(prj.buildTargetPath(item.relativePath));
+						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
+								prj.getTargetLanguage());
+						util.setOutput(fa.outputFilter);
+					}
+
+					// Process the input 
+					fa.inputFilter.process();
 				}
-				
-				// Process the input 
-				fa.inputFilter.process();
+				else { // Not filter-driven, just execute with input file
+					util.execute(inputPath);
+				}
 			}
 
 			util.doEpilog();
 		}
 		catch ( Exception e ) {
-			e.printStackTrace();
-			log.error(e.getLocalizedMessage());
+			logger.error("Error with utility.", e);
 		}
 		finally {
 			log.endTask(null);

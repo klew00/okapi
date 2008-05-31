@@ -79,9 +79,7 @@ class TTXReader {
 	    }
 	}
 
-	public void open (String p_sPath)
-		throws Exception
-	{
+	public void open (String p_sPath) {
 		try {
 			close();
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
@@ -92,10 +90,8 @@ class TTXReader {
 			node = Doc.getDocumentElement();
 			m_stkFirstChildDone.push(false);
 		}
-		catch ( Exception E ) {
-			// Reduce all exception to the same, so we can change the internal
-			// implementation without changing the API
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -104,9 +100,7 @@ class TTXReader {
 		if ( nodeList != null ) nodeList = null;
 	}
 
-	public boolean readItem ()
-		throws Exception
-	{
+	public boolean readItem () {
 		resetItem();
 		while ( true ) {
 			if ( !nextNode() ) {
@@ -165,9 +159,7 @@ class TTXReader {
 		targetItem = new ExtractionItem();
 	}
 
-	private boolean processUT ()
-		throws Exception
-	{
+	private boolean processUT () {
 		boolean result = false;
 		String content = node.getTextContent().trim();
 		if ( content.indexOf("<u ") == 0 ) {
@@ -176,7 +168,7 @@ class TTXReader {
 				sourceItem.setIsTranslatable(false);
 				sourceItem.setID(content.substring(M.start(), M.end()));
 			}
-			else throw new Exception("ID value not found for <u> element: "+content);
+			else throw new RuntimeException("ID value not found for <u> element: "+content);
 		}
 		else if ( content.equals("</u>") ) {
 			// If <ut> contains a </u> tag, that's the end of the filter item

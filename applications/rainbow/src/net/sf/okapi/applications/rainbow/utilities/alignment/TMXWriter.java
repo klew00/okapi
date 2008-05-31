@@ -1,8 +1,6 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import java.io.FileNotFoundException;
-
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class TMXWriter {
@@ -20,9 +18,8 @@ public class TMXWriter {
 		
 	}
 	
-	public void create (String path)
-		throws FileNotFoundException
-	{
+	public void create (String path) {
+		if ( path == null ) throw new NullPointerException();
 		writer = new XMLWriter();
 		tmxCont = new TMXContent();
 		writer.create(path);
@@ -31,6 +28,8 @@ public class TMXWriter {
 	public void writeStartDocument (String sourceLanguage,
 		String targetLanguage)
 	{
+		if ( sourceLanguage == null ) throw new NullPointerException();
+		if ( targetLanguage == null ) throw new NullPointerException();
 		this.sourceLang = sourceLanguage;
 		this.targetLang = targetLanguage;
 		
@@ -49,8 +48,11 @@ public class TMXWriter {
 	public void writeItem (IExtractionItem sourceItem,
 		IExtractionItem targetItem)
 	{
-		writer.writeStartElement("tu");
+		if ( sourceItem == null ) throw new NullPointerException();
+		// targetItem can be null, not check for it
 		
+		writer.writeStartElement("tu");
+
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);
 		writer.writeStartElement("seg");

@@ -42,7 +42,7 @@ class InputPropertiesForm {
 	private Shell                 shell;
 	private Text                  edSrcEncoding;
 	private Text                  edTrgEncoding;
-	private String[]              m_aResults = null;
+	private String[]              results;
 	private OKCancelPanel         pnlActions;
 	private FilterSettingsPanel   pnlFilterSettings;
 
@@ -87,7 +87,7 @@ class InputPropertiesForm {
 		// Dialog-level buttons
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_aResults = null;
+				results = null;
 				if ( e.widget.getData().equals("h") ) {
 					//TODO: Call help
 					return;
@@ -116,7 +116,7 @@ class InputPropertiesForm {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
-		return m_aResults;
+		return results;
 	}
 
 	void setData (String filterSettings,
@@ -131,10 +131,10 @@ class InputPropertiesForm {
 
 	private boolean saveData () {
 		try {
-			m_aResults = new String[3];
-			m_aResults[0] = pnlFilterSettings.getData();
-			m_aResults[1] = edSrcEncoding.getText();
-			m_aResults[2] = edTrgEncoding.getText();
+			results = new String[3];
+			results[0] = pnlFilterSettings.getData();
+			results[1] = edSrcEncoding.getText();
+			results[2] = edTrgEncoding.getText();
 		}
 		catch ( Exception E ) {
 			return false;

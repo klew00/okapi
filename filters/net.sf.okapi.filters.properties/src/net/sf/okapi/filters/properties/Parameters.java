@@ -41,6 +41,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
+		super.reset();
 //		m_LD.reset();
 //		m_CodeFinder.reset();
 		useCodeFinder = true;
@@ -60,8 +61,7 @@ public class Parameters extends BaseParameters {
 */ //		m_CodeFinder.createExpression();
 	}
 
-	public String toString ()
-	{
+	public String toString () {
 		// Store the parameters in fields
 		FieldsString Tmp = new FieldsString();
 //		Tmp.add("useld", m_LD.useDirectives());
@@ -75,10 +75,9 @@ public class Parameters extends BaseParameters {
 		return Tmp.toString();
 	}
 	
-	public void fromString (String p_sData)
-	{
+	public void fromString (String data) {
 		// Read the file content as a set of fields
-		FieldsString Tmp = new FieldsString(p_sData);
+		FieldsString Tmp = new FieldsString(data);
 
 		// Parse the fields
 //		boolean bTmp1 = Tmp.get("useld", m_LD.useDirectives());

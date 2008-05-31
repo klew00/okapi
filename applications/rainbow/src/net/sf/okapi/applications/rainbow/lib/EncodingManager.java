@@ -54,9 +54,7 @@ public class EncodingManager {
 		return -1;
 	}
 	
-	public void loadList (String p_sPath)
-		throws Exception
-	{
+	public void loadList (String p_sPath) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
@@ -86,9 +84,9 @@ public class EncodingManager {
 				if ( item.name == null ) throw new Exception("The element 'name' is missing.");
 				items.add(item);
 			}
-	    }
-		catch ( Exception E ) {
-			throw E;
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 	

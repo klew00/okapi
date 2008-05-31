@@ -83,9 +83,7 @@ public class PluginsAccess {
 		return items.keySet().iterator();
 	}
 	
-	public void addPackage (String path)
-		throws Exception
-	{
+	public void addPackage (String path) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
@@ -131,8 +129,8 @@ public class PluginsAccess {
 				items.put(item.id, item);
 			}
 		}
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 

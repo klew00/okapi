@@ -1,5 +1,8 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
@@ -8,6 +11,9 @@ import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Utility extends ThrougputPipeBase implements IUtility  {
 
+	private final Logger          logger = LoggerFactory.getLogger(Utility.class);
+
+	
 	public void doProlog (String sourceLanguage,
 		String targetLanguage) {
 	}
@@ -27,11 +33,11 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		return false;
 	}
 
-	public boolean needRoot () {
+	public boolean needsRoot () {
 		return false;
 	}
 
-	public boolean needOutput () {
+	public boolean needsOutput () {
 		return true;
 	}
 
@@ -45,18 +51,27 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
     public void endExtractionItem(IExtractionItem sourceItem,
     	IExtractionItem targetItem)
 	{
-    	try {
-    		if ( sourceItem.isTranslatable() ) {
-    			//TODO: handle bilingual files
-    			IContainer cnt = sourceItem.getContent(); 
-    			String tmp = cnt.getCodedText().replaceAll("\\p{L}", "X");
-    			cnt.setContent(tmp.replaceAll("\\d", "N"));
-    		}
-    	   	super.endExtractionItem(sourceItem, targetItem);
-    	}
-    	catch ( Exception e ) {
-    		System.err.println(e.getLocalizedMessage());
-    	}
+		String tmp = "";
+		try {
+			if ( sourceItem.isTranslatable() ) {
+				//TODO: handle bilingual files
+				IContainer cnt = sourceItem.getContent(); 
+				tmp = cnt.getCodedText().replaceAll("\\p{L}", "X");
+				cnt.setContent(tmp.replaceAll("\\d", "N"));
+				super.endExtractionItem(sourceItem, targetItem);
+			}
+		}
+		catch ( Exception e ) {
+			logger.warn("Error when setting new content: '"+tmp+"'", e);
+			super.endExtractionItem(sourceItem, targetItem);
+		}
     }
 	
+	public void execute (String inputPath) {
+		// Do nothing: this utility is filter-driven.
+	}
+
+	public boolean isFilterDriven () {
+		return true;
+	}
 }

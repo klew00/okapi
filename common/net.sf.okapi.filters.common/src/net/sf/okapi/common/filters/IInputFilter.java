@@ -20,21 +20,11 @@ public interface IInputFilter extends IOutputPipe {
 	boolean supports (int feature);
 	
 	/**
-	 * Gets the current parameters for the filter.
-	 * @return An IParameters object of the current parameters.
-	 */
-	IParameters getParameters ();
-	
-	/**
-	 * Sets the parameters for the filter. Parameters must be set before opening the input.
-	 * @param params The new IParameters object to use.
-	 */
-	void setParameters (IParameters params);
-	
-	/**
 	 * Initializes the input to process.
 	 * @param reader The reader to use for the input.
 	 * @param name The name associated with the input (e.g. file name).
+	 * @param filterSettings The filter settings.
+	 * @param params The parameters to use. 
 	 * @param encoding The default encoding for the input.
 	 * @param sourceLanguage Language code of the source.
 	 * @param targeLanguage Language code of the target (can be null 
@@ -42,9 +32,15 @@ public interface IInputFilter extends IOutputPipe {
 	 */
 	void initialize (InputStream input,
 		String name,
+		String filterSettings,
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage);
+	
+	/**
+	 * Gets the current parameters object for the filter.
+	 */
+	IParameters getParameters ();
 	
 	/**
 	 * Closes the current input and free any associated resources.

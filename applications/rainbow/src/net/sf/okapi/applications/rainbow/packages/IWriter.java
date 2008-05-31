@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 /**
@@ -29,29 +30,43 @@ public interface IWriter {
 
 	public String getPackageType ();
 	
-	public void setParameters (String p_sSourceLanguage,
-		String p_sTargetLanguage,
-		String p_sProjectID,
-		String p_sOutputDir,
-		String p_sPackageID);
+	/**
+	 * Sets the global parameters of the package.
+	 * @param sourceLanguage The source language.
+	 * @param targetLanguage The target language.
+	 * @param projectID The project identifier.
+	 * @param outputDir The root folder for the output.
+	 * @param packageID The package identifier.
+	 * @param sourceRoot The root folder of the original inputs.
+	 */
+	public void setParameters (String sourceLanguage,
+		String targetLanguage,
+		String projectID,
+		String outputDir,
+		String packageID,
+		String sourceRoot);
 	
 	public void writeStartPackage ();
 	
-	public void writeEndPackage (boolean p_bCreateZip);
+	public void writeEndPackage (boolean createZip);
 	
-	public void createDocument (int p_nDKey,
-		String p_sRelativePath);
+	public void createDocument (int docID,
+		String relativePath,
+		String inputEncoding,
+		String outputEncoding,
+		String filterSettings,
+		IParameters filterParams);
 	
-	public void writeStartDocument (String p_sOriginal);
+	public void writeStartDocument ();
 	
 	/**
 	 * Writes an item in the current document. 
-	 * @param p_Source The source item.
-	 * @param p_Target The target item.
+	 * @param sourceItem The source item.
+	 * @param targetItem The target item.
 	 * @param p_nStatus The current target status (same values as Borneo DB TSTATUS_*)
 	 */
-	public void writeItem (IExtractionItem p_Source,
-		IExtractionItem p_Target,
+	public void writeItem (IExtractionItem sourceItem,
+		IExtractionItem targetItem,
 		int p_nStatus);
 	
 	public void writeEndDocument ();

@@ -44,7 +44,6 @@ public class InputFilter implements IInputFilter {
 	
 	private InputStream      input;
 	private BufferedReader   reader;
-	private String           encoding;
 	private IResourceBuilder output;
 	private Resource         res;
 	private IExtractionItem  item;
@@ -73,18 +72,21 @@ public class InputFilter implements IInputFilter {
 	public IParameters getParameters () {
 		return res.params;
 	}
-
+	
 	public void initialize (InputStream input,
 		String name,
+		String filterSettings,
 		String encoding,
 		String sourceLanguage,
 		String targetLanguage)
 	{
 		close();
 		this.input = input;
-		this.encoding = encoding;
 		res.setName(name);
-		// neither sourceLanguage nor targetLanguage are used in this filter
+		res.setFilterSettings(filterSettings);
+		res.setSourceEncoding(encoding);
+		//TODO: Get the real target/output encoding from parameters
+		res.setTargetEncoding(encoding);
 	}
 
 	private int readItem (boolean resetBuffer) {
@@ -283,10 +285,6 @@ public class InputFilter implements IInputFilter {
 		}
 	}
 
-	public void setParameters (IParameters params) {
-		res.params = (Parameters)params;
-	}
-
 	public boolean supports (int feature) {
 		switch ( feature ) {
 		case FEATURE_TEXTBASED:
@@ -379,7 +377,7 @@ public class InputFilter implements IInputFilter {
 	public void process () {
 		try {
 			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
+			BOMAwareInputStream bis = new BOMAwareInputStream(input, res.getSourceEncoding());
 			reader = new BufferedReader(
 				new InputStreamReader(bis, bis.detectEncoding()));
 			

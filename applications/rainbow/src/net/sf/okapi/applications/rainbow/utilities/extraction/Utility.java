@@ -2,7 +2,6 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
@@ -16,7 +15,6 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	private String      rootFolder;
 	private Parameters  params;
 	private IWriter     writer;
-	private ILog        log;
 	
 	
 	public Utility () {
@@ -33,24 +31,19 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
-		try {
-			if ( params.pkgType.equals("xliff") )
-				writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer(log);
-			else if ( params.pkgType.equals("omegat") )
-				writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer(log);
-			else if ( params.pkgType.equals("ttx") )
-				writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer(log);
-			else
-				throw new Exception("Unknown package type: " + params.pkgType);
+		if ( params.pkgType.equals("xliff") )
+			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
+		else if ( params.pkgType.equals("omegat") )
+			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
+		else if ( params.pkgType.equals("ttx") )
+			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
+		else
+			throw new RuntimeException("Unknown package type: " + params.pkgType);
 			
-			writer.setParameters(sourceLanguage, targetLanguage,
-				"TODO:projectID", params.outputFolder + File.separator + params.pkgName,
-				params.makePackageID());
-			writer.writeStartPackage();
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-		}
+		writer.setParameters(sourceLanguage, targetLanguage,
+			"TODO:projectID", params.outputFolder + File.separator + params.pkgName,
+			params.makePackageID(), rootFolder);
+		writer.writeStartPackage();
 	}
 
 	public IParameters getParameters () {
@@ -65,11 +58,11 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 		return true;
 	}
 
-	public boolean needRoot () {
+	public boolean needsRoot () {
 		return true;
 	}
 
-	public boolean needOutput () {
+	public boolean needsOutput () {
 		// This utility does not re-write the input
 		return false;
 	}
@@ -79,6 +72,7 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	}
 
 	public void setRoot (String root) {
+		if ( root == null ) throw new NullPointerException();
 		rootFolder = root;
 	}
 
@@ -86,8 +80,10 @@ public class Utility extends ThrougputPipeBase implements IUtility {
     public void startResource (IResource resource) {
 		//TODO: Check name for problems
 		String relativePath = resource.getName().substring(rootFolder.length()+1);
-		writer.createDocument(relativePath.hashCode(), relativePath);
-		writer.writeStartDocument(relativePath);
+		writer.createDocument(relativePath.hashCode(), relativePath,
+			resource.getSourceEncoding(), resource.getTargetEncoding(),
+			resource.getFilterSettings(), resource.getParameters());
+		writer.writeStartDocument();
     }
 	
 	@Override
@@ -118,5 +114,13 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 
 	@Override
 	public void endContainer (IResourceContainer resourceCntainer) {
+	}
+
+	public void execute (String inputPath) {
+		// Do nothing: this utility is filter-driven.
+	}
+
+	public boolean isFilterDriven () {
+		return true;
 	}
 }

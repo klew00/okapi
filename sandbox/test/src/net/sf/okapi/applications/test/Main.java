@@ -62,7 +62,7 @@ public class Main {
 			String inputFile = "test.properties";
 			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
 			FileInputStream input = new FileInputStream(inputFile);
-			inputFlt.initialize(input, inputFile, "utf-16", null, null);
+			inputFlt.initialize(input, inputFile, null, "utf-16", null, null);
 			
 			IOutputFilter outputFlt = new net.sf.okapi.filters.properties.OutputFilter();
 			FileOutputStream output = new FileOutputStream("test.out.properties");

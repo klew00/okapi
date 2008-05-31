@@ -22,6 +22,7 @@ package net.sf.okapi.common;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
@@ -39,7 +40,9 @@ public abstract class BaseParameters implements IParameters {
 	 */
 	// public BaseParameters()
 	
-	public abstract void reset ();
+	public void reset () {
+		path = null;
+	}
 	
 	public abstract String toString ();
 	
@@ -97,9 +100,14 @@ public abstract class BaseParameters implements IParameters {
 	public void save (String newPath,
 		String multiFilesPrefix)
 	{
-		// multiFilesPrefix is not used in this default implementation
 		Writer SW = null;
 		try {
+			// Set the output filename
+			if ( multiFilesPrefix != null ) {
+				String fname = Util.getFilename(newPath, true);
+				String dir = Util.getDirectoryName(newPath);
+				newPath = dir + File.separator + multiFilesPrefix + fname;
+			}
 			// Save the fields on file
 			SW = new OutputStreamWriter(
 				new BufferedOutputStream(new FileOutputStream(newPath)),

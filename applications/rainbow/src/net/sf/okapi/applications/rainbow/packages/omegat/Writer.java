@@ -22,15 +22,10 @@ package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 
 public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Writer {
-
-	public Writer(ILog log) {
-		super(log);
-	}
 
 	@Override
 	public String getPackageType () {
@@ -40,15 +35,14 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	@Override
 	public void writeStartPackage ()
 	{
-		super.writeStartPackage();
+		// Set the source and target before calling the base class.
 		manifest.setSourceLocation("source");
 		manifest.setTargetLocation("target");
+		super.writeStartPackage();
 		
 		// Create the OmegaT directories
 		Util.createDirectories(manifest.getRoot() + File.separator + "glossary" + File.separator);
 		Util.createDirectories(manifest.getRoot() + File.separator + "omegat" + File.separator);
-		Util.createDirectories(manifest.getRoot() + File.separator + "source" + File.separator);
-		Util.createDirectories(manifest.getRoot() + File.separator + "target" + File.separator);
 		Util.createDirectories(manifest.getRoot() + File.separator + "tm" + File.separator);
 	}
 
@@ -101,8 +95,8 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			XR.writeEndElement(); // project
 			XR.writeEndElement(); // omegat
 		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 		finally {
 			if ( XR != null ) {

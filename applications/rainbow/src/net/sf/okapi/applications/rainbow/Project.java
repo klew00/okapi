@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.PathBuilder;
 import net.sf.okapi.applications.rainbow.lib.Utils;
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
@@ -37,19 +37,21 @@ import org.w3c.dom.NodeList;
 
 public class Project {
 
-	public String            inputRoot;
-	public boolean           useOutputRoot;
-	public String            outputRoot;
-	public String            path;
-	public ArrayList<Input>  inputList;
-	public PathBuilder       pathBuilder;
-	public String            sourceLanguage;
-	public String            sourceEncoding;
-	public String            targetLanguage;
-	public String            targetEncoding;
-	public String            paramsFolder;
-	public boolean           isModified;
+	protected String              path;
+	protected ArrayList<Input>    inputList;
+	protected PathBuilder         pathBuilder;
+	protected boolean             isModified;
 	
+	private String                inputRoot;
+	private boolean               useOutputRoot;
+	private String                outputRoot;
+	private String                sourceLanguage;
+	private String                sourceEncoding;
+	private String                targetLanguage;
+	private String                targetEncoding;
+	private String                paramsFolder;
+	
+
 	public Project (LanguageManager lm) {
 		inputRoot = System.getProperty("user.home");
 		paramsFolder = inputRoot;
@@ -296,6 +298,10 @@ public class Project {
 			isModified = true;
 		}
 	}
+	
+	public String getInputRoot () {
+		return inputRoot;
+	}
 
 	public void setUseOutputRoot (boolean value) {
 		if ( useOutputRoot != value ) {
@@ -303,12 +309,20 @@ public class Project {
 			isModified = true;
 		}
 	}
+	
+	public boolean getUseOutputRoot () {
+		return useOutputRoot;
+	}
 
 	public void setOutputRoot (String newRoot) {
 		if ( !outputRoot.equals(newRoot) ) {
 			outputRoot = newRoot;
 			isModified = true;
 		}
+	}
+	
+	public String getOutputRoot () {
+		return outputRoot;
 	}
 
 	public void setSourceLanguage (String newLanguage) {
@@ -318,11 +332,19 @@ public class Project {
 		}
 	}
 	
+	public String getSourceLanguage () {
+		return sourceLanguage;
+	}
+	
 	public void setSourceEncoding (String newEncoding) {
 		if ( !sourceEncoding.equals(newEncoding) ) {
 			sourceEncoding = newEncoding;
 			isModified = true;
 		}
+	}
+	
+	public String getSourceEncoding () {
+		return sourceEncoding;
 	}
 	
 	public void setTargetLanguage (String newLanguage) {
@@ -332,6 +354,10 @@ public class Project {
 		}
 	}
 	
+	public String getTargetLanguage () {
+		return targetLanguage;
+	}
+	
 	public void setTargetEncoding (String newEncoding) {
 		if ( !targetEncoding.equals(newEncoding) ) {
 			targetEncoding = newEncoding;
@@ -339,11 +365,19 @@ public class Project {
 		}
 	}
 	
+	public String getTargetEncoding () {
+		return targetEncoding;
+	}
+	
 	public void setParametersFolder (String newParameters) {
 		if ( !paramsFolder.equals(newParameters) ) {
 			paramsFolder = newParameters;
 			isModified = true;
 		}
+	}
+	
+	public String getParametersFolder () {
+		return paramsFolder;
 	}
 	
 	/**
@@ -369,5 +403,14 @@ public class Project {
 		return ((item.targetEncoding.length() == 0)
 			? targetEncoding
 			: item.targetEncoding);
+	}
+	
+	public String[] getInputPaths () {
+		String[] inputs = new String[inputList.size()];
+		int i = -1;
+		for ( Input item : inputList ) {
+			inputs[++i] = this.inputRoot + File.separator + item.relativePath;
+		}
+		return inputs;
 	}
 }

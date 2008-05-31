@@ -20,24 +20,26 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
+import java.io.File;
+
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
 public abstract class BaseWriter implements IWriter {
 	
 	protected Manifest  manifest;
-	protected ILog      log;
+	protected String    sourceRoot;
 	
-	public BaseWriter (ILog log) {
-		this.log = log;
-		manifest = new Manifest(log);
+	public BaseWriter () {
+		manifest = new Manifest();
 	}
 	
 	public void setParameters (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
 		String outputDir,
-		String packageID)
+		String packageID,
+		String sourceRoot)
 	{
 		manifest.setSourceLanguage(sourceLanguage);
 		manifest.setTargetLanguage(targetLanguage);
@@ -45,11 +47,27 @@ public abstract class BaseWriter implements IWriter {
 		manifest.setRoot(outputDir);
 		manifest.setPackageID(packageID);
 		manifest.setPackageType(getPackageType());
+		this.sourceRoot = sourceRoot;
 	}
 
 	public void writeStartPackage () {
-		// Create the directory
+		// Create the root directory
 		Util.createDirectories(manifest.getRoot());
+		
+		String tmp = manifest.getSourceLocation();
+		if (( tmp != null ) && ( tmp.length() > 0 )) {
+			Util.createDirectories(manifest.getRoot() + File.separator + tmp + File.separator);
+		}
+		
+		tmp = manifest.getTargetLocation();
+		if (( tmp != null ) && ( tmp.length() > 0 )) {
+			Util.createDirectories(manifest.getRoot() + File.separator + tmp + File.separator);
+		}
+
+		tmp = manifest.getOriginalLocation();
+		if (( tmp != null ) && ( tmp.length() > 0 )) {
+			Util.createDirectories(manifest.getRoot() + File.separator + tmp + File.separator);
+		}
 	}
 
 	public void writeEndPackage (boolean createZip) {
@@ -58,15 +76,49 @@ public abstract class BaseWriter implements IWriter {
 			if ( manifest != null ) {
 				manifest.Save();
 			}
-			
 			if ( createZip ) {
 				// Zip the package if needed
 				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
 			}
 		}
 		catch ( Exception e ) {
-			e.printStackTrace();
-			log.error(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 	}
+	
+	public void createDocument (int docID,
+		String relativePath,
+		String inputEncoding,
+		String outputEncoding,
+		String filterSettings,
+		IParameters filterParams)
+	{
+		if ( relativePath == null ) throw new NullPointerException();
+		if ( inputEncoding == null ) throw new NullPointerException();
+		if ( outputEncoding == null ) throw new NullPointerException();
+
+		try {
+			// If needed copy the original input to the package
+			String tmp = manifest.getOriginalLocation();
+			if (( tmp == null ) || ( tmp.length() == 0 )) return;
+				
+			String inputPath = sourceRoot + File.separator + relativePath;
+			String docPrefix = String.format("%d.", docID);
+			String destination = manifest.getRoot() + File.separator + tmp
+				+ File.separator + docPrefix;
+			destination = destination + inputEncoding + "#" + outputEncoding + ".ori";
+			Util.copyFile(inputPath, destination, false);
+			
+			String name = filterParams.getPath();
+			if ( name == null ) name = filterSettings + ".fprm"; // Defaults
+			String paramsCopy = Util.getFilename(name, true);
+			paramsCopy = manifest.getRoot() + File.separator + tmp
+				+ File.separator + paramsCopy;
+			filterParams.save(paramsCopy, docPrefix);
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 }

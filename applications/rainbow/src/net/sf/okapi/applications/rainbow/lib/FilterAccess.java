@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 
@@ -41,7 +42,6 @@ public class FilterAccess {
 	private String                               currentInFlt;
 	private String                               currentOutFlt;
 
-	public ILog                                  log;
 	public IInputFilter                          inputFilter;
 	public IOutputFilter                         outputFilter;
 	public IParametersEditor                     paramsEditor;
@@ -122,13 +122,12 @@ public class FilterAccess {
 		if ( aRes == null ) aRes = new String[0];
 		// Remove the extensions
 		for ( int i=0; i<aRes.length; i++ ) {
-			aRes[i] = Utils.getFilename(aRes[i], false);
+			aRes[i] = Util.getFilename(aRes[i], false);
 		}
 		return aRes;
 	}
 
-	public FilterAccess (ILog newLog) {
-		log = newLog;
+	public FilterAccess () {
 		m_htFilters = new Hashtable<String, FilterAccessItem>();
 	}
 	
@@ -143,17 +142,14 @@ public class FilterAccess {
 	 * </okapiFilters>
 	 * @param p_sPath Full path of the list file to load.
 	 */
-	public void loadList (String p_sPath)
-		throws Exception
-	{
+	public void loadList (String p_sPath) {
 		try {
 			currentInFlt = null;
 			currentOutFlt = null;
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document Doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
-			
-			NodeList NL = Doc.getElementsByTagName("filter");
+			Document doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
+			NodeList NL = doc.getElementsByTagName("filter");
 			m_htFilters.clear();
 			FilterAccessItem FAI;
 			for ( int i=0; i<NL.getLength(); i++ ) {
@@ -172,8 +168,8 @@ public class FilterAccess {
 				m_htFilters.put(sID, FAI);
 			}
 		}
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -186,7 +182,6 @@ public class FilterAccess {
 	 */
 	public void loadFilter (String filterID,
 		String paramPath)
-		throws Exception
 	{
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
@@ -223,9 +218,10 @@ public class FilterAccess {
 			if (( paramPath != null ) && ( paramPath.length() > 0 )) {
 				inputFilter.getParameters().load(paramPath, false);
 			}
+			else inputFilter.getParameters().reset();
 		}
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -237,9 +233,7 @@ public class FilterAccess {
 		loadFilter(aRes[1], aRes[3]);
 	}
 	
-	public void loadEditor (String filterID)
-		throws Exception
-	{
+	public void loadEditor (String filterID) {
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
 			// we remove the NNN. part. That part is reserved for multi-file storage info
@@ -253,8 +247,8 @@ public class FilterAccess {
 				throw new Exception(String.format(Res.getString("UNDEF_FILTERID"), filterID));
 			paramsEditor = (IParametersEditor)Class.forName(m_htFilters.get(filterID).editorClass).newInstance();
 		}
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -278,7 +272,7 @@ public class FilterAccess {
 			if ( paramsEditor == null ) return false;
 			return paramsEditor.edit(paramObject, uiContext);
 		}
-		catch ( Exception E ) {
+		catch ( Exception e ) {
 			return false;
 		}
 	}

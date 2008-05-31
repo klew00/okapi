@@ -65,7 +65,7 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 	 * Indicates if the utility need the root to be defined.
 	 * @return True if the root is needed, false otherwise.
 	 */
-	boolean needRoot ();
+	boolean needsRoot ();
 	
 	/**
 	 * Gets the current input root for the utility.
@@ -84,5 +84,18 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 	 * the output filters.
 	 * @return True if there is an output to pipe in, false otherwise.
 	 */
-	boolean needOutput ();
+	boolean needsOutput ();
+	
+	/**
+	 * Indicates if the utility is filter driven or not. If it is not, the utility 
+	 * is processed using the {@link #execute()} method.
+	 * @return True if the utility is filter-driven, false otherwise.
+	 */
+	boolean isFilterDriven ();
+	
+	/**
+	 * Executes the utility (for non filter-driven utilities).
+	 * @param inputPath Full path of the input file on which to apply the utility.
+	 */
+	void execute (String inputPath);
 }

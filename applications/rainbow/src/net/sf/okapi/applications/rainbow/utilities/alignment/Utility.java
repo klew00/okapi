@@ -1,6 +1,5 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
@@ -10,7 +9,6 @@ import net.sf.okapi.common.resource.IResourceContainer;
 
 public class Utility extends ThrougputPipeBase implements IUtility {
 
-	private ILog        log;
 	private TMXWriter   writer;
 	
 	
@@ -25,13 +23,8 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
-		try {
-			writer.create("Test.tmx"); //TODO: Get name from the params
-			writer.writeStartDocument(sourceLanguage, targetLanguage);
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-		}
+		writer.create("Test.tmx"); //TODO: Get name from the params
+		writer.writeStartDocument(sourceLanguage, targetLanguage);
 	}
 
 	public IParameters getParameters () {
@@ -46,11 +39,11 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 		return false;
 	}
 
-	public boolean needRoot () {
+	public boolean needsRoot () {
 		return true;
 	}
 
-	public boolean needOutput () {
+	public boolean needsOutput () {
 		// This utility does not re-write the input
 		return false;
 	}
@@ -89,5 +82,13 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 
 	@Override
 	public void endContainer (IResourceContainer resourceCntainer) {
+	}
+
+	public void execute (String inputPath) {
+		// Do nothing: this utility is filter-driven.
+	}
+
+	public boolean isFilterDriven () {
+		return true;
 	}
 }

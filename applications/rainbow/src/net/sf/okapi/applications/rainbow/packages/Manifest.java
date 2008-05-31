@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -27,138 +27,160 @@ import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Implements the writing and reading of a manifest document, commonly used in different types of
- * translation packages.
+ * Implements the writing and reading of a manifest document, commonly used
+ * in different types of translation packages.
  */
 public class Manifest {
-	private ILog                               m_Log;
-	private Hashtable<Integer, ManifestItem>   m_Docs;
-	private String                             m_sRoot;
-	private String                             m_sPackageID;
-	private String                             m_sPackageType;
-	private String                             m_sProjectID;
-	private String                             m_sSrcLang;
-	private String                             m_sTrgLang;
-	private String                             m_sSrcDir;
-	private String                             m_sTrgDir;
+	private Hashtable<Integer, ManifestItem>   docs;
+	private String                             rootFolder;
+	private String                             packageID;
+	private String                             packageType;
+	private String                             projectID;
+	private String                             sourceLang;
+	private String                             targetLang;
+	private String                             originalDir;
+	private String                             sourceDir;
+	private String                             targetDir;
 
 
-	public Manifest (ILog p_Log) {
-		m_Log = p_Log;
-		m_Docs = new Hashtable<Integer, ManifestItem>();
-		m_sSrcDir = m_sTrgDir = "";
+	public Manifest () {
+		docs = new Hashtable<Integer, ManifestItem>();
+		sourceDir = targetDir = "";
+		originalDir = "";
 	}
 
 	public Hashtable<Integer, ManifestItem> getItems () {
-		return m_Docs;
+		return docs;
 	}
 
 	public String getPackageID () {
-		return m_sPackageID;
+		return packageID;
 	}
 	
-	public void setPackageID (String p_sValue) {
-		m_sPackageID = p_sValue;
+	public void setPackageID (String value) {
+		packageID = value;
 	}
 
 	public String getPackageType () {
-		return m_sPackageType;
+		return packageType;
 	}
 	
-	public void setPackageType (String p_sValue) {
-		m_sPackageType = p_sValue;
+	public void setPackageType (String value) {
+		packageType = value;
 	}
 
 	public String getProjectID () {
-		return m_sProjectID;
+		return projectID;
 	}
 	
-	public void setProjectID (String p_sValue) {
-		m_sProjectID = p_sValue;
+	public void setProjectID (String value) {
+		projectID = value;
 	}
 
 	public String getSourceLanguage () {
-		return m_sSrcLang;
+		return sourceLang;
 	}
 	
-	public void setSourceLanguage (String p_sValue) {
-		m_sSrcLang = p_sValue;
+	public void setSourceLanguage (String value) {
+		if ( value == null ) throw new NullPointerException();
+		sourceLang = value;
 	}
 
 	public String getTargetLanguage () {
-		return m_sTrgLang;
+		return targetLang;
 	}
 	
-	public void setTargetLanguage (String p_sValue) {
-		m_sTrgLang = p_sValue;
+	public void setTargetLanguage (String value) {
+		if ( value == null ) throw new NullPointerException();
+		targetLang = value;
 	}
 
 	public String getRoot () {
-		return m_sRoot;
+		return rootFolder;
 	}
 	
-	public void setRoot (String p_sValue) {
-		m_sRoot = p_sValue;
+	public void setRoot (String value) {
+		if ( value == null ) throw new NullPointerException();
+		rootFolder = value;
 	}
 
 	public String getSourceLocation () {
-		return m_sSrcDir;
+		return sourceDir;
 	}
 	
-	public void setSourceLocation (String p_sValue) {
-		if ( p_sValue == null ) m_sSrcDir = "";
-		else m_sSrcDir = p_sValue;
+	public void setSourceLocation (String value) {
+		if ( value == null ) sourceDir = "";
+		else sourceDir = value;
 	}
 
 	public String getTargetLocation () {
-		return m_sTrgDir;
+		return targetDir;
 	}
 	
-	public void setTargetLocation (String p_sValue) {
-		if ( p_sValue == null ) m_sTrgDir = "";
-		else m_sTrgDir = p_sValue;
+	public void setTargetLocation (String value) {
+		if ( value == null ) targetDir = "";
+		else targetDir = value;
+	}
+
+	public String getOriginalLocation () {
+		return originalDir;
+	}
+	
+	public void setOriginalLocation (String value) {
+		if ( value == null ) originalDir = "";
+		else originalDir = value;
 	}
 
 	/**
 	 * Adds a document to the manifest.
-	 * @param p_nDKey Key of the document. Must be unique within the manifest.
-	 * @param p_sRelativePath Relative path of the document (without leading separator).
+	 * @param docID Key of the document. Must be unique within the manifest.
+	 * @param relativePath Relative path of the document (without leading separator).
 	 */
-	public void addDocument (int p_nDKey,
-		String p_sRelativePath)
+	public void addDocument (int docID,
+		String relativePath)
 	{
-		m_Docs.put(p_nDKey, new ManifestItem(p_sRelativePath, true));
+		docs.put(docID, new ManifestItem(relativePath, true));
 	}
 
-	public String getItemFullSourcePath (int p_nDKey) {
-		return m_sRoot + File.separator
-			+ (( m_sSrcDir.length() == 0 ) ? "" : (m_sSrcDir + File.separator))
-			+ m_Docs.get(p_nDKey).getRelativePath();
+	public String getItemFullSourcePath (int docID) {
+		return rootFolder + File.separator
+			+ (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
+			+ docs.get(docID).getRelativePath();
 	}
 
-	public String getItemRelativeSourcePath (int p_nDKey) {
-		return (( m_sSrcDir.length() == 0 ) ? "" : (m_sSrcDir + File.separator))
-			+ m_Docs.get(p_nDKey).getRelativePath();
+	public String getItemRelativeSourcePath (int docID) {
+		return (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
+			+ docs.get(docID).getRelativePath();
 	}
 
-	public String getItemFullTargetPath (int p_nDKey) {
-		return m_sRoot + File.separator
-			+ (( m_sTrgDir.length() == 0 ) ? "" : (m_sTrgDir + File.separator))
-			+ m_Docs.get(p_nDKey).getRelativePath();
+	public String getItemFullTargetPath (int docID) {
+		return rootFolder + File.separator
+			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
+			+ docs.get(docID).getRelativePath();
 	}
 
-	public String getItemRelativeTargetPath (int p_nDKey) {
-		return (( m_sTrgDir.length() == 0 ) ? "" : (m_sTrgDir + File.separator))
-			+ m_Docs.get(p_nDKey).getRelativePath();
+	public String getItemRelativeTargetPath (int docID) {
+		return (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
+			+ docs.get(docID).getRelativePath();
+	}
+
+	public String getItemFullOriginalPath (int docID) {
+		return rootFolder + File.separator
+			+ (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
+			+ docs.get(docID).getRelativePath();
+	}
+
+	public String getItemRelativeOriginalPath (int docID) {
+		return (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
+			+ docs.get(docID).getRelativePath();
 	}
 
 	/**
@@ -168,7 +190,7 @@ public class Manifest {
 		XMLWriter XW = null;
 		try {
 			XW = new XMLWriter();
-			XW.create(m_sRoot + File.separator + "manifest.xml");
+			XW.create(rootFolder + File.separator + "manifest.xml");
 
 			XW.writeStartDocument();
 			XW.writeComment("=================================================================");
@@ -178,22 +200,22 @@ public class Manifest {
 			XW.writeAttributeString("xmlns:its", "http://www.w3.org/2005/11/its");
 			XW.writeAttributeString("its:version", "1.0");
 			XW.writeAttributeString("its:translate", "no");
-			XW.writeAttributeString("projectID", m_sProjectID);
-			XW.writeAttributeString("packageID", m_sPackageID);
-			XW.writeAttributeString("sourceLang", m_sSrcLang);
-			XW.writeAttributeString("targetLang", m_sTrgLang);
-			XW.writeAttributeString("packageType", m_sPackageType);
-			XW.writeAttributeString("sourceDir", m_sSrcDir);
-			XW.writeAttributeString("targetDir", m_sTrgDir);
+			XW.writeAttributeString("projectID", projectID);
+			XW.writeAttributeString("packageID", packageID);
+			XW.writeAttributeString("sourceLang", sourceLang);
+			XW.writeAttributeString("targetLang", targetLang);
+			XW.writeAttributeString("packageType", packageType);
+			XW.writeAttributeString("sourceDir", sourceDir);
+			XW.writeAttributeString("targetDir", targetDir);
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			XW.writeAttributeString("date", DF.format(new java.util.Date()));
 
-			Enumeration<Integer> E = m_Docs.keys();
+			Enumeration<Integer> E = docs.keys();
 			while ( E.hasMoreElements() ) {
 				int nDKey = E.nextElement();
 				XW.writeStartElement("doc");
-				XW.writeAttributeString("key", String.valueOf(nDKey));
-				XW.writeString(m_Docs.get(nDKey).getRelativePath());
+				XW.writeAttributeString("id", String.valueOf(nDKey));
+				XW.writeString(docs.get(nDKey).getRelativePath());
 				XW.writeEndElement();
 			}
 
@@ -201,19 +223,18 @@ public class Manifest {
 			XW.writeEndDocument();
 		}
 		catch ( Exception e ) {
-			e.printStackTrace();
-			m_Log.error(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 		finally {
 			if ( XW != null ) XW.close();
 		}
 	}
 
-	public boolean load (String p_sPath) {
+	public void load (String path) {
 		try {
 			DocumentBuilderFactory DFac = DocumentBuilderFactory.newInstance();
 		    // Not needed in this case: DFac.setNamespaceAware(true);
-		    Document XD = DFac.newDocumentBuilder().parse("file:///"+p_sPath);
+		    Document XD = DFac.newDocumentBuilder().parse("file:///"+path);
 		    
 		    NodeList NL = XD.getElementsByTagName("borneoManifest");
 		    if ( NL == null ) throw new Exception("Invalid manifest file.");
@@ -250,46 +271,43 @@ public class Manifest {
 		    sTmp = E.getAttribute("targetDir");
 		    setTargetLocation(sTmp);
 
-		    m_Docs.clear();
+		    docs.clear();
 		    NL = E.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
 		    	E = (Element)NL.item(i);
-		    	sTmp = E.getAttribute("key");
+		    	sTmp = E.getAttribute("id");
 			    if (( sTmp == null ) || ( sTmp.length() == 0 ))
-			    	throw new Exception("Missing key attribute.");
+			    	throw new Exception("Missing id attribute.");
 			    
-		    	m_Docs.put(Integer.valueOf(sTmp),
+		    	docs.put(Integer.valueOf(sTmp),
 		    		new ManifestItem(E.getTextContent(), true));
 		    }
 
-		    m_sRoot = Util.getDirectoryName(p_sPath);
+		    rootFolder = Util.getDirectoryName(path);
 		}
-		catch ( Exception E ) {
-			m_Log.error(E.getLocalizedMessage());
-			return false;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
-		return true;
 	}
 
+	/**
+	 * Checks the content of the manifest against the package where
+	 * it has been found.
+	 * @return The number of error found.
+	 */
 	public int checkPackageContent () {
 		int nErrors = 0;
-		try {
-			Enumeration<Integer> E = m_Docs.keys();
-			int nDKey;
-			ManifestItem MI;
-			while ( E.hasMoreElements() ) {
-				nDKey = E.nextElement();
-				MI = m_Docs.get(nDKey);
-				File F = new File(getItemFullTargetPath(nDKey));
-				if ( !F.exists() ) {
-					m_Log.warning("The document not found: " + F.getAbsolutePath());
-					nErrors++;
-					MI.setExist(false);
-				}
+		Enumeration<Integer> E = docs.keys();
+		int nDKey;
+		ManifestItem MI;
+		while ( E.hasMoreElements() ) {
+			nDKey = E.nextElement();
+			MI = docs.get(nDKey);
+			File F = new File(getItemFullTargetPath(nDKey));
+			if ( !F.exists() ) {
+				nErrors++;
+				MI.setExists(false);
 			}
-		}
-		catch ( Exception E ) {
-			m_Log.error(E.getLocalizedMessage());
 		}
 		return nErrors;
 	}

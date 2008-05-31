@@ -22,9 +22,9 @@ package net.sf.okapi.applications.rainbow.packages.xliff;
 
 import java.io.File;
 
-import net.sf.okapi.applications.rainbow.lib.ILog;
-import net.sf.okapi.applications.rainbow.lib.XMLWriter;
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -39,8 +39,8 @@ public class Writer extends BaseWriter {
 	private XLIFFContent     xliffCont;
 
 
-	public Writer(ILog log) {
-		super(log);
+	public Writer () {
+		super();
 		xliffCont = new XLIFFContent();
 	}
 	
@@ -48,23 +48,43 @@ public class Writer extends BaseWriter {
 		return "xliff";
 	}
 
-	public void createDocument (int p_nDKey,
-		String p_sRelativePath)
-	{
-		try {
-			if ( writer == null ) writer = new XMLWriter();
-			else writer.close(); // Else: make sure the previous output is closed
-		
-			docKey = p_nDKey;
-			relativePath = p_sRelativePath + ".xlf";
+	@Override
+	public void writeStartPackage () {
+		// Set source and target if they are not set yet
+		// This allow other package types to be derived from this one.
+		String tmp = manifest.getSourceLocation();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			manifest.setSourceLocation("work");
+		}
+		tmp = manifest.getTargetLocation();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			manifest.setTargetLocation("work");
+		}
+		tmp = manifest.getOriginalLocation();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			manifest.setOriginalLocation("original");
+		}
+		super.writeStartPackage();
+	}
 
-			writer.create(manifest.getRoot() + File.separator
-				+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-				+ relativePath);
-		}
-		catch ( Exception E ) {
-			log.error(E.getLocalizedMessage());
-		}
+	public void createDocument (int docID,
+		String relativePath,
+		String inputEncoding,
+		String outputEncoding,
+		String filtersettings,
+		IParameters filterParams)
+	{
+		super.createDocument(docID, relativePath, inputEncoding,
+			outputEncoding, filtersettings, filterParams);
+		if ( writer == null ) writer = new XMLWriter();
+		else writer.close(); // Else: make sure the previous output is closed
+		
+		docKey = docID;
+		this.relativePath = relativePath + ".xlf";
+
+		writer.create(manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+			+ relativePath);
 	}
 
 	public void writeEndDocument () {
@@ -78,7 +98,7 @@ public class Writer extends BaseWriter {
 
 	public void writeItem (IExtractionItem sourceItem,
 		IExtractionItem targetItem,
-		int p_nStatus)
+		int status)
 	{
 		writer.writeStartElement("trans-unit");
 		writer.writeAttributeString("id", String.valueOf(sourceItem.getID()));
@@ -90,7 +110,7 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("translate", "no");
 		if ( sourceItem.preserveFormatting() )
 			writer.writeAttributeString("xml:space", "preserve");
-//TODO		if (( p_Target != null ) && ( p_nStatus == IExtractionItem.TSTATUS_OK ))
+//TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
 //			m_XW.writeAttributeString("approved", "yes");
 //		if ( p_Source.hasCoord() )
 //			m_XW.writeAttributeString("coord", p_Source.getCoord());
@@ -142,7 +162,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndElement(); // trans-unit
 	}
 
-	public void writeStartDocument (String p_sOriginal) {
+	public void writeStartDocument () {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("xliff");
@@ -152,7 +172,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("source-language", manifest.getSourceLanguage());
 		writer.writeAttributeString("target-language", manifest.getTargetLanguage());
-		writer.writeAttributeString("original", p_sOriginal);
+		writer.writeAttributeString("original", relativePath);
 		writer.writeAttributeString("datatype", "TODO");
 		
 		writer.writeStartElement("header");
@@ -160,5 +180,4 @@ public class Writer extends BaseWriter {
 		
 		writer.writeStartElement("body");
 	}
-
 }

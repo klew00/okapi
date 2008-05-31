@@ -39,9 +39,7 @@ public class LanguageManager {
 		m_aLangs = new Vector<LanguageItem>();
 	}
 	
-	public void loadList (String p_sPath)
-		throws Exception
-	{
+	public void loadList (String p_sPath) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
@@ -80,8 +78,8 @@ public class LanguageManager {
 				m_aLangs.add(LI);
 			}
         }
-		catch ( Exception E ) {
-			throw E;
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 	
