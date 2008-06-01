@@ -28,7 +28,10 @@ import net.sf.okapi.common.Util;
 public abstract class BaseWriter implements IWriter {
 	
 	protected Manifest  manifest;
-	protected String    sourceRoot;
+	protected int       docID;
+	protected String    inputRoot;
+	protected String    relativeInputPath;
+	protected String    relativeOutputPath;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
@@ -47,7 +50,7 @@ public abstract class BaseWriter implements IWriter {
 		manifest.setRoot(outputDir);
 		manifest.setPackageID(packageID);
 		manifest.setPackageType(getPackageType());
-		this.sourceRoot = sourceRoot;
+		this.inputRoot = sourceRoot;
 	}
 
 	public void writeStartPackage () {
@@ -87,26 +90,32 @@ public abstract class BaseWriter implements IWriter {
 	}
 	
 	public void createDocument (int docID,
-		String relativePath,
+		String relativeInputPath,
+		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
 		String filterSettings,
 		IParameters filterParams)
 	{
-		if ( relativePath == null ) throw new NullPointerException();
+		if ( relativeInputPath == null ) throw new NullPointerException();
+		if ( relativeOutputPath == null ) throw new NullPointerException();
 		if ( inputEncoding == null ) throw new NullPointerException();
 		if ( outputEncoding == null ) throw new NullPointerException();
 
+		this.docID = docID;
+		this.relativeInputPath = relativeInputPath;
+		this.relativeOutputPath = relativeOutputPath;
+		
 		try {
 			// If needed copy the original input to the package
 			String tmp = manifest.getOriginalLocation();
 			if (( tmp == null ) || ( tmp.length() == 0 )) return;
 				
-			String inputPath = sourceRoot + File.separator + relativePath;
+			String inputPath = inputRoot + File.separator + relativeInputPath;
 			String docPrefix = String.format("%d.", docID);
+			
 			String destination = manifest.getRoot() + File.separator + tmp
-				+ File.separator + docPrefix;
-			destination = destination + inputEncoding + "#" + outputEncoding + ".ori";
+				+ File.separator + docPrefix + ".ori";
 			Util.copyFile(inputPath, destination, false);
 			
 			String name = filterParams.getPath();

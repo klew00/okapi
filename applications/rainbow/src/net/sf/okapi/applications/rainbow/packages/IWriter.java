@@ -51,7 +51,8 @@ public interface IWriter {
 	public void writeEndPackage (boolean createZip);
 	
 	public void createDocument (int docID,
-		String relativePath,
+		String relativeInputPath,
+		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
 		String filterSettings,

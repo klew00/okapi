@@ -102,8 +102,8 @@ public class UtilityDriver {
 			
 			log.beginTask(pluginItem.name);
 			
-			if ( util.needsRoot() ) {
-				util.setRoot(prj.getInputRoot());
+			if ( util.needsRoots() ) {
+				util.setRoots(prj.getInputRoot(), prj.buildOutputRoot());
 			}
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
@@ -111,8 +111,12 @@ public class UtilityDriver {
 			for ( Input item : prj.inputList ) {
 				if ( item.filterSettings.length() == 0 ) continue;
 				log.message("Input: "+item.relativePath);
-				// Initialize the input
+			
+				// Initialize the input/output data
 				String inputPath = prj.getInputRoot() + File.separator + item.relativePath;
+				String outputPath = prj.buildTargetPath(item.relativePath);
+				util.setInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
+				util.setOutputData(outputPath, prj.buildTargetEncoding(item));
 
 				if ( util.isFilterDriven() ) {
 					// Load the filter
@@ -125,9 +129,9 @@ public class UtilityDriver {
 					fa.inputFilter.setOutput(util);
 					
 					// Initialize the output if needed
-					if ( util.needsOutput() ) {
+					if ( util.needsOutputFilter() ) {
 						// Initialize the output
-						OutputStream output = new FileOutputStream(prj.buildTargetPath(item.relativePath));
+						OutputStream output = new FileOutputStream(outputPath);
 						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
 								prj.getTargetLanguage());
 						util.setOutput(fa.outputFilter);
@@ -137,7 +141,7 @@ public class UtilityDriver {
 					fa.inputFilter.process();
 				}
 				else { // Not filter-driven, just execute with input file
-					util.execute(inputPath);
+					util.processInput();
 				}
 			}
 

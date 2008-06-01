@@ -39,7 +39,7 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 		String targetLanguage);
 
 	/**
-	 * Executes any epilog steps needed by this utility.
+	 * Executes any concluding steps needed by this utility.
 	 * This method should be called once, after processing all inputs.
 	 */
 	void doEpilog ();
@@ -65,37 +65,64 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 	 * Indicates if the utility need the root to be defined.
 	 * @return True if the root is needed, false otherwise.
 	 */
-	boolean needsRoot ();
+	boolean needsRoots ();
 	
 	/**
 	 * Gets the current input root for the utility.
 	 * @return The current input root for the utility.
 	 */
-	String getRoot ();
+	String getInputRoot ();
 	
 	/**
-	 * Sets the input root for the utility.
-	 * @param root The new input root for the utility.
+	 * Gets the output root for the utility.
+	 * @return The current output root for the utility.
 	 */
-	void setRoot (String root);
+	String getOutputRoot ();
+	
+	/**
+	 * Sets the input and output roots for the utility.
+	 * @param inputRoot The input root for the utility.
+	 * @param outputRoot The output root for the utility. 
+	 */
+	void setRoots (String inputRoot,
+		String outputRoot);
 
 	/**
-	 * Indicates if the utility has an output to pipe into
-	 * the output filters.
-	 * @return True if there is an output to pipe in, false otherwise.
+	 * Indicates if the utility has to use the output filter
+	 * pipe for its last output.
+	 * @return True if the output filter is required, false otherwise.
 	 */
-	boolean needsOutput ();
+	boolean needsOutputFilter ();
 	
 	/**
 	 * Indicates if the utility is filter driven or not. If it is not, the utility 
-	 * is processed using the {@link #execute()} method.
+	 * is processed using the {@link #processInput()} method.
 	 * @return True if the utility is filter-driven, false otherwise.
 	 */
 	boolean isFilterDriven ();
+
+	/**
+	 * Sets the data for the input.
+	 * @param path The full path of the input to process.
+	 * @param encoding The default encoding.
+	 * @param filterSettings The filter settings to use.
+	 */
+	void setInputData (String path,
+		String encoding,
+		String filterSettings);
 	
 	/**
-	 * Executes the utility (for non filter-driven utilities).
-	 * @param inputPath Full path of the input file on which to apply the utility.
+	 * Sets the data for the output.
+	 * @param path The full path of the output.
+	 * @param encoding The encoding.
 	 */
-	void execute (String inputPath);
+	void setOutputData (String path,
+		String encoding);
+
+	/**
+	 * Executes the utility for the last input set
+	 * (for non filter-driven utilities).
+	 */
+	void processInput ();
+
 }

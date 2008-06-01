@@ -25,7 +25,11 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		return null;
 	}
 
-	public String getRoot () {
+	public String getInputRoot () {
+		return null;
+	}
+	
+	public String getOutputRoot () {
 		return null;
 	}
 
@@ -33,18 +37,19 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		return false;
 	}
 
-	public boolean needsRoot () {
+	public boolean needsRoots () {
 		return false;
 	}
 
-	public boolean needsOutput () {
+	public boolean needsOutputFilter () {
 		return true;
 	}
 
 	public void setParameters (IParameters paramsObject) {
 	}
 
-	public void setRoot (String root) {
+	public void setRoots (String inputRoot,
+		String outputRoot) {
 	}
 
 	@Override
@@ -67,11 +72,22 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		}
     }
 	
-	public void execute (String inputPath) {
+	public void processInput () {
 		// Do nothing: this utility is filter-driven.
 	}
 
 	public boolean isFilterDriven () {
 		return true;
+	}
+
+	public void setInputData (String path,
+		String encoding,
+		String filterSettings)
+	{
+	}
+
+	public void setOutputData (String path,
+		String encoding)
+	{
 	}
 }

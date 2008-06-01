@@ -33,9 +33,9 @@ import net.sf.okapi.filters.xliff.XLIFFContent;
  */
 public class Writer extends BaseWriter {
 	
+	private static final String   EXTENSION = ".xlf";
+
 	private XMLWriter        writer = null;
-	private String           relativePath;
-	private int              docKey;
 	private XLIFFContent     xliffCont;
 
 
@@ -68,23 +68,21 @@ public class Writer extends BaseWriter {
 	}
 
 	public void createDocument (int docID,
-		String relativePath,
+		String relativeInputPath,
+		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
 		String filtersettings,
 		IParameters filterParams)
 	{
-		super.createDocument(docID, relativePath, inputEncoding,
-			outputEncoding, filtersettings, filterParams);
+		super.createDocument(docID, relativeInputPath, relativeOutputPath,
+			inputEncoding, outputEncoding, filtersettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed
 		
-		docKey = docID;
-		this.relativePath = relativePath + ".xlf";
-
 		writer.create(manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-			+ relativePath);
+			+ relativeInputPath + EXTENSION);
 	}
 
 	public void writeEndDocument () {
@@ -93,7 +91,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndElement(); // xliff
 		writer.writeEndDocument();
 		writer.close();
-		manifest.addDocument(docKey, relativePath);
+		manifest.addDocument(docID, relativeInputPath + EXTENSION);
 	}
 
 	public void writeItem (IExtractionItem sourceItem,
@@ -172,7 +170,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("source-language", manifest.getSourceLanguage());
 		writer.writeAttributeString("target-language", manifest.getTargetLanguage());
-		writer.writeAttributeString("original", relativePath);
+		writer.writeAttributeString("original", relativeInputPath);
 		writer.writeAttributeString("datatype", "TODO");
 		
 		writer.writeStartElement("header");

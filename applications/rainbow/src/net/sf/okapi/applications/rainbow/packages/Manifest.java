@@ -142,12 +142,12 @@ public class Manifest {
 	/**
 	 * Adds a document to the manifest.
 	 * @param docID Key of the document. Must be unique within the manifest.
-	 * @param relativePath Relative path of the document (without leading separator).
+	 * @param relativeInputPath Relative path of the input document (without leading separator).
 	 */
 	public void addDocument (int docID,
-		String relativePath)
+		String relativeInputPath)
 	{
-		docs.put(docID, new ManifestItem(relativePath, true));
+		docs.put(docID, new ManifestItem(relativeInputPath, true));
 	}
 
 	public String getItemFullSourcePath (int docID) {

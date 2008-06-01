@@ -393,6 +393,20 @@ public class Project {
 			targetLanguage);
 	}
 	
+	public String buildRelativeTargetPath (String relativeSourcePath) {
+		String tmp = pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
+			inputRoot,
+			(useOutputRoot ? outputRoot : null ),
+			targetLanguage);
+		if ( useOutputRoot ) return tmp.substring(inputRoot.length());
+		else return tmp.substring(outputRoot.length());
+	}
+	
+	public String buildOutputRoot () {
+		if ( useOutputRoot ) return inputRoot;
+		else return outputRoot;
+	}
+	
 	public String buildSourceEncoding (Input item) {
 		return ((item.sourceEncoding.length() == 0)
 			? sourceEncoding

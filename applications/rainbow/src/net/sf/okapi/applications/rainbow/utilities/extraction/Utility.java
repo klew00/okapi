@@ -12,7 +12,10 @@ import net.sf.okapi.common.resource.IResourceContainer;
 
 public class Utility extends ThrougputPipeBase implements IUtility {
 
-	private String      rootFolder;
+	private String      inputRoot;
+	private String      inputPath;
+	private String      outputRoot;
+	private String      outputPath;
 	private Parameters  params;
 	private IWriter     writer;
 	
@@ -42,7 +45,7 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 			
 		writer.setParameters(sourceLanguage, targetLanguage,
 			"TODO:projectID", params.outputFolder + File.separator + params.pkgName,
-			params.makePackageID(), rootFolder);
+			params.makePackageID(), inputRoot);
 		writer.writeStartPackage();
 	}
 
@@ -50,19 +53,23 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 		return params;
 	}
 
-	public String getRoot () {
-		return rootFolder;
+	public String getInputRoot () {
+		return inputRoot;
+	}
+
+	public String getOutputRoot () {
+		return outputRoot;
 	}
 
 	public boolean hasParameters () {
 		return true;
 	}
 
-	public boolean needsRoot () {
+	public boolean needsRoots () {
 		return true;
 	}
 
-	public boolean needsOutput () {
+	public boolean needsOutputFilter () {
 		// This utility does not re-write the input
 		return false;
 	}
@@ -71,18 +78,23 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 		params = (Parameters)paramsObject;
 	}
 
-	public void setRoot (String root) {
-		if ( root == null ) throw new NullPointerException();
-		rootFolder = root;
+	public void setRoots (String inputRoot,
+		String outputRoot)
+	{
+		if ( inputRoot == null ) throw new NullPointerException();
+		if ( outputRoot == null ) throw new NullPointerException();
+		this.inputRoot = inputRoot;
+		this.outputRoot = outputRoot;
 	}
 
 	@Override
     public void startResource (IResource resource) {
-		//TODO: Check name for problems
-		String relativePath = resource.getName().substring(rootFolder.length()+1);
-		writer.createDocument(relativePath.hashCode(), relativePath,
-			resource.getSourceEncoding(), resource.getTargetEncoding(),
-			resource.getFilterSettings(), resource.getParameters());
+		String relativeInput = inputPath.substring(inputRoot.length()+1);
+		String relativeOutput = outputPath.substring(outputRoot.length()+1);
+		writer.createDocument(relativeInput.hashCode(), relativeInput,
+			relativeOutput, resource.getSourceEncoding(),
+			resource.getTargetEncoding(), resource.getFilterSettings(),
+			resource.getParameters());
 		writer.writeStartDocument();
     }
 	
@@ -116,11 +128,28 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	public void endContainer (IResourceContainer resourceCntainer) {
 	}
 
-	public void execute (String inputPath) {
+	public void processInput () {
 		// Do nothing: this utility is filter-driven.
 	}
 
 	public boolean isFilterDriven () {
 		return true;
+	}
+
+	public void setInputData (String path,
+		String encoding,
+		String filterSettings)
+	{
+		if ( path == null ) throw new NullPointerException();
+		inputPath = path;
+	}
+
+	public void setOutputData (String path,
+		String encoding)
+	{
+		if ( path == null ) throw new NullPointerException();
+		// Not used: if ( encoding == null ) throw new NullPointerException();
+		outputPath = path;
+		// Not used: outputEncoding = encoding;
 	}
 }

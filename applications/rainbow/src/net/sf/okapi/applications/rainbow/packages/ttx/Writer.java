@@ -42,10 +42,9 @@ import net.sf.okapi.common.resource.IFragment;
 public class Writer extends BaseWriter {
 	
 	private static final String   DTD_SETTINGS_FILE = "okapiTTX.ini";
+	private static final String   EXTENSION = ".xml.ttx";
 	
 	private XMLWriter        writer;
-	private String           relativePath;
-	private int              docKey;
 	private SimpleDateFormat dateFmt;
 
 
@@ -91,23 +90,21 @@ public class Writer extends BaseWriter {
 	}
 
 	public void createDocument (int docID,
-		String newRelativePath,
+		String relativeInputPath,
+		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
 		String filterSettings,
 		IParameters filterParams)
 	{
-		super.createDocument(docID, relativePath, inputEncoding,
-			outputEncoding, filterSettings, filterParams);
+		super.createDocument(docID, relativeInputPath, relativeOutputPath,
+			inputEncoding, outputEncoding, filterSettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed
 		
-		this.docKey = docID;
-		this.relativePath = newRelativePath + ".xml.ttx";
-
 		writer.create(manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-			+ relativePath);
+			+ relativeInputPath + EXTENSION);
 	}
 
 	public void writeEndDocument () {
@@ -117,7 +114,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndElement(); // TRADOStag
 		writer.writeEndDocument();
 		writer.close();
-		manifest.addDocument(docKey, relativePath);
+		manifest.addDocument(docID, relativeInputPath + EXTENSION);
 	}
 
 	private void writeContent (IContainer content) {
@@ -185,7 +182,7 @@ public class Writer extends BaseWriter {
 	}
 
 	private String getSettingsRelativePath () {
-		String dir = Util.getDirectoryName(relativePath);
+		String dir = Util.getDirectoryName(relativeInputPath);
 		int n = dir.length();
 		if ( n == 0 ) return ".\\" + DTD_SETTINGS_FILE; // TTX are under Windows, use DOS separator
 		dir = dir.replaceAll("\\"+File.separator, ""); // Using backslash for regex escape
@@ -219,7 +216,7 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
 		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
 		writer.writeAttributeString("TargetDefaultFont", "");
-		writer.writeAttributeString("SourceDocumentPath", relativePath);
+		writer.writeAttributeString("SourceDocumentPath", relativeInputPath);
 		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
 		writer.writeAttributeString("PlugInInfo", "");
 		writer.writeEndElement(); // UserSettings
