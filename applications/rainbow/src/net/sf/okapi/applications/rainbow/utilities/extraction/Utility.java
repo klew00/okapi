@@ -18,6 +18,7 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	private String      outputPath;
 	private Parameters  params;
 	private IWriter     writer;
+	private int         id;
 	
 	
 	public Utility () {
@@ -42,7 +43,8 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
-			
+		
+		id = 0;
 		writer.setParameters(sourceLanguage, targetLanguage,
 			"TODO:projectID", params.outputFolder + File.separator + params.pkgName,
 			params.makePackageID(), inputRoot);
@@ -91,7 +93,7 @@ public class Utility extends ThrougputPipeBase implements IUtility {
     public void startResource (IResource resource) {
 		String relativeInput = inputPath.substring(inputRoot.length()+1);
 		String relativeOutput = outputPath.substring(outputRoot.length()+1);
-		writer.createDocument(relativeInput.hashCode(), relativeInput,
+		writer.createDocument(++id, relativeInput,
 			relativeOutput, resource.getSourceEncoding(),
 			resource.getTargetEncoding(), resource.getFilterSettings(),
 			resource.getParameters());

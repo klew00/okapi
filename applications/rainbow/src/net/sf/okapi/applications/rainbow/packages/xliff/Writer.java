@@ -24,6 +24,7 @@ import java.io.File;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.filters.xliff.XLIFFContent;
@@ -37,6 +38,7 @@ public class Writer extends BaseWriter {
 
 	private XMLWriter        writer = null;
 	private XLIFFContent     xliffCont;
+	private boolean          createTarget = false;
 
 
 	public Writer () {
@@ -47,7 +49,7 @@ public class Writer extends BaseWriter {
 	public String getPackageType () {
 		return "xliff";
 	}
-
+	
 	@Override
 	public void writeStartPackage () {
 		// Set source and target if they are not set yet
@@ -64,6 +66,9 @@ public class Writer extends BaseWriter {
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
 			manifest.setOriginalLocation("original");
 		}
+		
+		createTarget = (manifest.getPackageType().equals("omegat"));
+		
 		super.writeStartPackage();
 	}
 
@@ -79,10 +84,17 @@ public class Writer extends BaseWriter {
 			inputEncoding, outputEncoding, filtersettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed
-		
+
+		String tmp = relativeInputPath; // Default
+		// OmegaT does not support sub-folder, so we flatten the structure
+		// and make sure identical filename do not clash
+		if ( manifest.getPackageType().equals("omegat") ) {
+			tmp = Util.getFilename(relativeInputPath, true);
+			tmp = String.format("%d.%s", docID, tmp);
+		}
 		writer.create(manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-			+ relativeInputPath + EXTENSION);
+			+ tmp + EXTENSION);
 	}
 
 	public void writeEndDocument () {
@@ -147,6 +159,13 @@ public class Writer extends BaseWriter {
 				writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
 			}
 
+			writer.writeEndElement(); // target
+		}
+		// No target available: Set the source if needed
+		else if ( createTarget ) { 
+			writer.writeStartElement("target");
+			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
+			writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
 			writer.writeEndElement(); // target
 		}
 

@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 
