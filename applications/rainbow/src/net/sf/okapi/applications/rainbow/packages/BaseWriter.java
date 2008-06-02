@@ -30,8 +30,11 @@ public abstract class BaseWriter implements IWriter {
 	protected Manifest  manifest;
 	protected int       docID;
 	protected String    inputRoot;
-	protected String    relativeInputPath;
-	protected String    relativeOutputPath;
+	protected String    relativeWorkPath;
+	protected String    relativeSourcePath;
+	protected String    relativeTargetPath;
+	protected String    sourceEncoding;
+	protected String    targetEncoding;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
@@ -90,32 +93,34 @@ public abstract class BaseWriter implements IWriter {
 	}
 	
 	public void createDocument (int docID,
-		String relativeInputPath,
-		String relativeOutputPath,
-		String inputEncoding,
-		String outputEncoding,
+		String relativeSourcePath,
+		String relativeTargetPath,
+		String sourceEncoding,
+		String targetEncoding,
 		String filterSettings,
 		IParameters filterParams)
 	{
-		if ( relativeInputPath == null ) throw new NullPointerException();
-		if ( relativeOutputPath == null ) throw new NullPointerException();
-		if ( inputEncoding == null ) throw new NullPointerException();
-		if ( outputEncoding == null ) throw new NullPointerException();
+		if ( relativeSourcePath == null ) throw new NullPointerException();
+		if ( relativeTargetPath == null ) throw new NullPointerException();
+		if ( sourceEncoding == null ) throw new NullPointerException();
+		if ( targetEncoding == null ) throw new NullPointerException();
 
 		this.docID = docID;
-		this.relativeInputPath = relativeInputPath;
-		this.relativeOutputPath = relativeOutputPath;
+		this.relativeSourcePath = relativeSourcePath;
+		this.relativeTargetPath = relativeTargetPath;
+		this.sourceEncoding = sourceEncoding;
+		this.targetEncoding = targetEncoding;
 		
 		try {
 			// If needed copy the original input to the package
 			String tmp = manifest.getOriginalLocation();
 			if (( tmp == null ) || ( tmp.length() == 0 )) return;
 				
-			String inputPath = inputRoot + File.separator + relativeInputPath;
+			String inputPath = inputRoot + File.separator + relativeSourcePath;
 			String docPrefix = String.format("%d.", docID);
 			
 			String destination = manifest.getRoot() + File.separator + tmp
-				+ File.separator + docPrefix + ".ori";
+				+ File.separator + docPrefix + "ori"; // docPrefix has a dot
 			Util.copyFile(inputPath, destination, false);
 			
 			String name = filterParams.getPath();

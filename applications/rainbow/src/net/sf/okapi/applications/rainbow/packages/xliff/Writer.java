@@ -38,7 +38,6 @@ public class Writer extends BaseWriter {
 
 	private XMLWriter        writer = null;
 	private XLIFFContent     xliffCont;
-	private boolean          createTarget = false;
 
 
 	public Writer () {
@@ -66,35 +65,35 @@ public class Writer extends BaseWriter {
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
 			manifest.setOriginalLocation("original");
 		}
-		
-		createTarget = (manifest.getPackageType().equals("omegat"));
-		
 		super.writeStartPackage();
 	}
 
+	@Override
 	public void createDocument (int docID,
-		String relativeInputPath,
-		String relativeOutputPath,
-		String inputEncoding,
-		String outputEncoding,
+		String relativeSourcePath,
+		String relativeTargetPath,
+		String sourceEncoding,
+		String targetEncoding,
 		String filtersettings,
 		IParameters filterParams)
 	{
-		super.createDocument(docID, relativeInputPath, relativeOutputPath,
-			inputEncoding, outputEncoding, filtersettings, filterParams);
-		if ( writer == null ) writer = new XMLWriter();
-		else writer.close(); // Else: make sure the previous output is closed
-
-		String tmp = relativeInputPath; // Default
+		relativeWorkPath = relativeSourcePath;
 		// OmegaT does not support sub-folder, so we flatten the structure
 		// and make sure identical filename do not clash
 		if ( manifest.getPackageType().equals("omegat") ) {
-			tmp = Util.getFilename(relativeInputPath, true);
-			tmp = String.format("%d.%s", docID, tmp);
+			relativeWorkPath = String.format("%d.%s", docID,
+				Util.getFilename(relativeSourcePath, true));
 		}
+		relativeWorkPath += EXTENSION;
+
+		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
+			sourceEncoding, targetEncoding, filtersettings, filterParams);
+		if ( writer == null ) writer = new XMLWriter();
+		else writer.close(); // Else: make sure the previous output is closed
+
 		writer.create(manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-			+ tmp + EXTENSION);
+			+ relativeWorkPath);
 	}
 
 	public void writeEndDocument () {
@@ -103,7 +102,8 @@ public class Writer extends BaseWriter {
 		writer.writeEndElement(); // xliff
 		writer.writeEndDocument();
 		writer.close();
-		manifest.addDocument(docID, relativeInputPath + EXTENSION);
+		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+			relativeTargetPath, sourceEncoding, targetEncoding);
 	}
 
 	public void writeItem (IExtractionItem sourceItem,
@@ -161,8 +161,7 @@ public class Writer extends BaseWriter {
 
 			writer.writeEndElement(); // target
 		}
-		// No target available: Set the source if needed
-		else if ( createTarget ) { 
+		else { // Use the source 
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
 			writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
@@ -189,7 +188,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("source-language", manifest.getSourceLanguage());
 		writer.writeAttributeString("target-language", manifest.getTargetLanguage());
-		writer.writeAttributeString("original", relativeInputPath);
+		writer.writeAttributeString("original", relativeSourcePath);
 		writer.writeAttributeString("datatype", "TODO");
 		
 		writer.writeStartElement("header");

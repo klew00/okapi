@@ -50,7 +50,7 @@ public class Writer extends BaseWriter {
 
 	public Writer() {
 		super();
-		//CreationDate="20071026T162120Z"
+		// CreationDate format: "20071026T162120Z"
 		dateFmt = new SimpleDateFormat("yyyyMMdd'T'HHmmZ");
 		dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
@@ -67,6 +67,7 @@ public class Writer extends BaseWriter {
 		try {
 			manifest.setSourceLocation("work");
 			manifest.setTargetLocation("work");
+			manifest.setOriginalLocation("original");
 			super.writeStartPackage();
 			// Copy the tag settings file to the root of the package
 			in = getClass().getResourceAsStream(DTD_SETTINGS_FILE);
@@ -90,21 +91,22 @@ public class Writer extends BaseWriter {
 	}
 
 	public void createDocument (int docID,
-		String relativeInputPath,
-		String relativeOutputPath,
-		String inputEncoding,
-		String outputEncoding,
+		String relativeSourcePath,
+		String relativeTargetPath,
+		String sourceEncoding,
+		String targetEncoding,
 		String filterSettings,
 		IParameters filterParams)
 	{
-		super.createDocument(docID, relativeInputPath, relativeOutputPath,
-			inputEncoding, outputEncoding, filterSettings, filterParams);
+		relativeWorkPath = relativeSourcePath + EXTENSION; 
+		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
+			sourceEncoding, targetEncoding, filterSettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed
 		
 		writer.create(manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-			+ relativeInputPath + EXTENSION);
+			+ relativeWorkPath);
 	}
 
 	public void writeEndDocument () {
@@ -114,7 +116,8 @@ public class Writer extends BaseWriter {
 		writer.writeEndElement(); // TRADOStag
 		writer.writeEndDocument();
 		writer.close();
-		manifest.addDocument(docID, relativeInputPath + EXTENSION);
+		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+			relativeTargetPath, sourceEncoding, targetEncoding);
 	}
 
 	private void writeContent (IContainer content) {
@@ -182,7 +185,7 @@ public class Writer extends BaseWriter {
 	}
 
 	private String getSettingsRelativePath () {
-		String dir = Util.getDirectoryName(relativeInputPath);
+		String dir = Util.getDirectoryName(relativeSourcePath);
 		int n = dir.length();
 		if ( n == 0 ) return ".\\" + DTD_SETTINGS_FILE; // TTX are under Windows, use DOS separator
 		dir = dir.replaceAll("\\"+File.separator, ""); // Using backslash for regex escape
@@ -216,7 +219,7 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
 		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
 		writer.writeAttributeString("TargetDefaultFont", "");
-		writer.writeAttributeString("SourceDocumentPath", relativeInputPath);
+		writer.writeAttributeString("SourceDocumentPath", relativeSourcePath);
 		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
 		writer.writeAttributeString("PlugInInfo", "");
 		writer.writeEndElement(); // UserSettings

@@ -142,91 +142,104 @@ public class Manifest {
 	/**
 	 * Adds a document to the manifest.
 	 * @param docID Key of the document. Must be unique within the manifest.
-	 * @param relativeInputPath Relative path of the input document (without leading separator).
+	 * @param relativeInputPath Relative path of the input document.
+	 * @param relativeOutputPath Relative path of the output document.
 	 */
 	public void addDocument (int docID,
-		String relativeInputPath)
+		String relativeWorkPath,
+		String relativeInputPath,
+		String relativeOutputPath,
+		String inputEncoding,
+		String outputEncoding)
 	{
-		docs.put(docID, new ManifestItem(relativeInputPath, true));
+		docs.put(docID, new ManifestItem(relativeWorkPath,
+			relativeInputPath, relativeOutputPath,
+			inputEncoding, outputEncoding, true));
 	}
 
 	public String getItemFullSourcePath (int docID) {
 		return rootFolder + File.separator
 			+ (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	public String getItemRelativeSourcePath (int docID) {
 		return (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	public String getItemFullTargetPath (int docID) {
 		return rootFolder + File.separator
 			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	public String getItemRelativeTargetPath (int docID) {
 		return (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	public String getItemFullOriginalPath (int docID) {
 		return rootFolder + File.separator
 			+ (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	public String getItemRelativeOriginalPath (int docID) {
 		return (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
-			+ docs.get(docID).getRelativePath();
+			+ docs.get(docID).getRelativeInputPath();
 	}
 
 	/**
 	 * Saves the manifest file. This method assumes the root is set.
 	 */
 	public void Save () {
-		XMLWriter XW = null;
+		XMLWriter writer = null;
 		try {
-			XW = new XMLWriter();
-			XW.create(rootFolder + File.separator + "manifest.xml");
+			writer = new XMLWriter();
+			writer.create(rootFolder + File.separator + "manifest.xml");
 
-			XW.writeStartDocument();
-			XW.writeComment("=================================================================");
-			XW.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE");
-			XW.writeComment("=================================================================");
-			XW.writeStartElement("borneoManifest");
-			XW.writeAttributeString("xmlns:its", "http://www.w3.org/2005/11/its");
-			XW.writeAttributeString("its:version", "1.0");
-			XW.writeAttributeString("its:translate", "no");
-			XW.writeAttributeString("projectID", projectID);
-			XW.writeAttributeString("packageID", packageID);
-			XW.writeAttributeString("sourceLang", sourceLang);
-			XW.writeAttributeString("targetLang", targetLang);
-			XW.writeAttributeString("packageType", packageType);
-			XW.writeAttributeString("sourceDir", sourceDir);
-			XW.writeAttributeString("targetDir", targetDir);
+			writer.writeStartDocument();
+			writer.writeComment("=================================================================");
+			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE");
+			writer.writeComment("=================================================================");
+			writer.writeStartElement("rainbowManifest");
+			writer.writeAttributeString("xmlns:its", "http://www.w3.org/2005/11/its");
+			writer.writeAttributeString("its:version", "1.0");
+			writer.writeAttributeString("its:translate", "no");
+			writer.writeAttributeString("projectID", projectID);
+			writer.writeAttributeString("packageID", packageID);
+			writer.writeAttributeString("sourceLang", sourceLang);
+			writer.writeAttributeString("targetLang", targetLang);
+			writer.writeAttributeString("packageType", packageType);
+			writer.writeAttributeString("sourceDir", sourceDir);
+			writer.writeAttributeString("targetDir", targetDir);
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-			XW.writeAttributeString("date", DF.format(new java.util.Date()));
+			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 
 			Enumeration<Integer> E = docs.keys();
+			ManifestItem item;
 			while ( E.hasMoreElements() ) {
-				int nDKey = E.nextElement();
-				XW.writeStartElement("doc");
-				XW.writeAttributeString("id", String.valueOf(nDKey));
-				XW.writeString(docs.get(nDKey).getRelativePath());
-				XW.writeEndElement();
+				int id = E.nextElement();
+				item = docs.get(id);
+				writer.writeStartElement("doc");
+				writer.writeAttributeString("id", String.valueOf(id));
+				writer.writeAttributeString("work", item.getRelativeWorkPath());
+				writer.writeAttributeString("input", item.getRelativeInputPath());
+				writer.writeAttributeString("output", item.getRelativeOutputPath());
+				writer.writeAttributeString("inputEncoding", item.getInputEncoding());
+				writer.writeAttributeString("outputEncoding", item.getOutputEncoding());
+				writer.writeEndElementLineBreak();
 			}
 
-			XW.writeEndElement(); // borneoManifest
-			XW.writeEndDocument();
+			writer.writeEndElement(); // rainbowManifest
+			writer.writeEndDocument();
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
 		finally {
-			if ( XW != null ) XW.close();
+			if ( writer != null ) writer.close();
 		}
 	}
 
@@ -234,53 +247,74 @@ public class Manifest {
 		try {
 			DocumentBuilderFactory DFac = DocumentBuilderFactory.newInstance();
 		    // Not needed in this case: DFac.setNamespaceAware(true);
-		    Document XD = DFac.newDocumentBuilder().parse("file:///"+path);
+		    Document doc = DFac.newDocumentBuilder().parse("file:///"+path);
 		    
-		    NodeList NL = XD.getElementsByTagName("borneoManifest");
+		    NodeList NL = doc.getElementsByTagName("borneoManifest");
 		    if ( NL == null ) throw new Exception("Invalid manifest file.");
-		    Element E = (Element)NL.item(0);
+		    Element elem = (Element)NL.item(0);
 		    
-		    String sTmp = E.getAttribute("projectID");
-		    if (( sTmp == null ) || ( sTmp.length() == 0 ))
+		    String tmp = elem.getAttribute("projectID");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new Exception("Missing projectID attribute.");
-		    else setProjectID(sTmp);
+		    else setProjectID(tmp);
 		    
-		    sTmp = E.getAttribute("packageID");
-		    if (( sTmp == null ) || ( sTmp.length() == 0 ))
+		    tmp = elem.getAttribute("packageID");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new Exception("Missing packageID attribute.");
-		    else setPackageID(sTmp);
+		    else setPackageID(tmp);
 		    
-		    sTmp = E.getAttribute("packageType");
-		    if (( sTmp == null ) || ( sTmp.length() == 0 ))
+		    tmp = elem.getAttribute("packageType");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new Exception("Missing packageType attribute.");
-		    else setPackageType(sTmp);
+		    else setPackageType(tmp);
 		    
-		    sTmp = E.getAttribute("sourceLang");
-		    if (( sTmp == null ) || ( sTmp.length() == 0 ))
+		    tmp = elem.getAttribute("sourceLang");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new Exception("Missing sourceLang attribute.");
-		    else setSourceLanguage(sTmp);
+		    else setSourceLanguage(tmp);
 		    
-		    sTmp = E.getAttribute("targetLang");
-		    if (( sTmp == null ) || ( sTmp.length() == 0 ))
-		    	throw new Exception("Missing targetLang attribute.");
-		    else setTargetLanguage(sTmp);
+		    tmp = elem.getAttribute("targetLang");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
+		    	throw new RuntimeException("Missing targetLang attribute.");
+		    else setTargetLanguage(tmp);
 
-		    sTmp = E.getAttribute("sourceDir");
-		    setSourceLocation(sTmp);
+		    tmp = elem.getAttribute("sourceDir");
+		    setSourceLocation(tmp);
 
-		    sTmp = E.getAttribute("targetDir");
-		    setTargetLocation(sTmp);
+		    tmp = elem.getAttribute("targetDir");
+		    setTargetLocation(tmp);
 
+		    String inPath, outPath, inEnc, outEnc;
 		    docs.clear();
-		    NL = E.getElementsByTagName("doc");
+		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
-		    	E = (Element)NL.item(i);
-		    	sTmp = E.getAttribute("id");
-			    if (( sTmp == null ) || ( sTmp.length() == 0 ))
-			    	throw new Exception("Missing id attribute.");
+		    	elem = (Element)NL.item(i);
+		    	tmp = elem.getAttribute("id");
+			    if (( tmp == null ) || ( tmp.length() == 0 ))
+			    	throw new RuntimeException("Missing id attribute.");
+			    int id = Integer.valueOf(tmp);
 			    
-		    	docs.put(Integer.valueOf(sTmp),
-		    		new ManifestItem(E.getTextContent(), true));
+		    	tmp = elem.getAttribute("work");
+			    if (( tmp == null ) || ( tmp.length() == 0 ))
+			    	throw new RuntimeException("Missing work attribute.");
+			    
+		    	inPath = elem.getAttribute("input");
+			    if (( inPath == null ) || ( inPath.length() == 0 ))
+			    	throw new RuntimeException("Missing input attribute.");
+			    
+		    	outPath = elem.getAttribute("output");
+			    if (( outPath == null ) || ( outPath.length() == 0 ))
+			    	throw new RuntimeException("Missing output attribute.");
+			    
+		    	inEnc = elem.getAttribute("inputEncoding");
+			    if (( inEnc == null ) || ( inEnc.length() == 0 ))
+			    	throw new RuntimeException("Missing inputEncoding attribute.");
+			    
+		    	outEnc = elem.getAttribute("outputEncoding");
+			    if (( outEnc == null ) || ( outEnc.length() == 0 ))
+			    	throw new RuntimeException("Missing outputEncoding attribute.");
+			    
+		    	docs.put(id, new ManifestItem(tmp, inPath, outPath, inEnc, outEnc, true));
 		    }
 
 		    rootFolder = Util.getDirectoryName(path);

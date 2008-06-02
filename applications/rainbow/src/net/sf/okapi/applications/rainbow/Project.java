@@ -403,8 +403,8 @@ public class Project {
 	}
 	
 	public String buildOutputRoot () {
-		if ( useOutputRoot ) return inputRoot;
-		else return outputRoot;
+		if ( useOutputRoot ) return outputRoot;
+		else return inputRoot;
 	}
 	
 	public String buildSourceEncoding (Input item) {

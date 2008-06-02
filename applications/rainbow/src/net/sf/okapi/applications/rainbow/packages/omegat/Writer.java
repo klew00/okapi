@@ -22,7 +22,6 @@ package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
 
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 
@@ -67,33 +66,33 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 
 			XR.writeStartElement("source_dir");
 			XR.writeRawXML("__DEFAULT__");
-			XR.writeEndElement(); // source_dir
+			XR.writeEndElementLineBreak(); // source_dir
 			
 			XR.writeStartElement("target_dir");
 			XR.writeRawXML("__DEFAULT__");
-			XR.writeEndElement(); // target_dir
+			XR.writeEndElementLineBreak(); // target_dir
 			
 			XR.writeStartElement("tm_dir");
 			XR.writeRawXML("__DEFAULT__");
-			XR.writeEndElement(); // tm_dir
+			XR.writeEndElementLineBreak(); // tm_dir
 			
 			XR.writeStartElement("glossary_dir");
 			XR.writeRawXML("__DEFAULT__");
-			XR.writeEndElement(); // glossary_dir
+			XR.writeEndElementLineBreak(); // glossary_dir
 			
 			XR.writeStartElement("source_lang");
 			XR.writeRawXML(manifest.getSourceLanguage());
-			XR.writeEndElement(); // source_lang
+			XR.writeEndElementLineBreak(); // source_lang
 
 			XR.writeStartElement("target_lang");
 			XR.writeRawXML(manifest.getTargetLanguage());
-			XR.writeEndElement(); // target_lang
+			XR.writeEndElementLineBreak(); // target_lang
 
 			XR.writeStartElement("sentence_seg");
 			XR.writeRawXML("true");
-			XR.writeEndElement(); // sentence_seg
+			XR.writeEndElementLineBreak(); // sentence_seg
 
-			XR.writeEndElement(); // project
+			XR.writeEndElementLineBreak(); // project
 			XR.writeEndElement(); // omegat
 		}
 		catch ( Exception e ) {

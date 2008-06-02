@@ -22,27 +22,56 @@ package net.sf.okapi.applications.rainbow.packages;
 
 public class ManifestItem {
 
-	private String      relativePath;
+	private String      relativeWorkPath;
+	private String      relativeInputPath;
+	private String      relativeOutputPath;
+	private String      inputEncoding;
+	private String      outputEncoding;
 	private boolean     selected;
 	private boolean     exists;
 
-	public ManifestItem (String relativePath,
+	public ManifestItem (String relativeWorkPath,
+		String relativeInputPath,
+		String relativeOutputPath,
+		String inputEncoding,
+		String outputEncoding,
 		boolean selected)
 	{
-		if ( relativePath == null ) throw new NullPointerException();
-		this.relativePath = relativePath;
+		if ( relativeWorkPath == null ) throw new NullPointerException();
+		if ( relativeInputPath == null ) throw new NullPointerException();
+		if ( relativeOutputPath == null ) throw new NullPointerException();
+		if ( inputEncoding == null ) throw new NullPointerException();
+		if ( outputEncoding == null ) throw new NullPointerException();
+		
+		this.relativeWorkPath = relativeWorkPath;
+		this.relativeInputPath = relativeInputPath;
+		this.relativeOutputPath = relativeOutputPath;
+		this.inputEncoding = inputEncoding;
+		this.outputEncoding = outputEncoding;
 		this.selected = selected;
 		exists = true;
 	}
 
-	public String getRelativePath () {
-		return relativePath;
+	public String getRelativeWorkPath () {
+		return relativeWorkPath;
 	}
 	
-	public String getRelativeTargetPath () {
-		return relativePath;
+	public String getRelativeInputPath () {
+		return relativeInputPath;
 	}
 	
+	public String getRelativeOutputPath () {
+		return relativeOutputPath;
+	}
+	
+	public String getInputEncoding () {
+		return inputEncoding;
+	}
+
+	public String getOutputEncoding () {
+		return outputEncoding;
+	}
+
 	public boolean selected () {
 		return selected;
 	}
