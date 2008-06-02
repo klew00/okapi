@@ -30,6 +30,8 @@ public interface IWriter {
 
 	public String getPackageType ();
 	
+	public String getReaderClass ();
+	
 	/**
 	 * Sets the global parameters of the package.
 	 * @param sourceLanguage The source language.

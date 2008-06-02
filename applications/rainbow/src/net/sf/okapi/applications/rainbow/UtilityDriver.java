@@ -109,7 +109,9 @@ public class UtilityDriver {
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 			
 			for ( Input item : prj.inputList ) {
-				if ( item.filterSettings.length() == 0 ) continue;
+				// Skip item without filter if the utility is filter-driven
+				if ( util.isFilterDriven() && ( item.filterSettings.length() == 0 )) continue;
+				// Otherwise: process
 				log.message("Input: "+item.relativePath);
 			
 				// Initialize the input/output data

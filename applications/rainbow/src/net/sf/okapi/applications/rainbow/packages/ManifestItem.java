@@ -27,6 +27,7 @@ public class ManifestItem {
 	private String      relativeOutputPath;
 	private String      inputEncoding;
 	private String      outputEncoding;
+	private String      filterID;
 	private boolean     selected;
 	private boolean     exists;
 
@@ -35,6 +36,7 @@ public class ManifestItem {
 		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
+		String filterID,
 		boolean selected)
 	{
 		if ( relativeWorkPath == null ) throw new NullPointerException();
@@ -42,12 +44,14 @@ public class ManifestItem {
 		if ( relativeOutputPath == null ) throw new NullPointerException();
 		if ( inputEncoding == null ) throw new NullPointerException();
 		if ( outputEncoding == null ) throw new NullPointerException();
+		if ( filterID == null ) throw new NullPointerException();
 		
 		this.relativeWorkPath = relativeWorkPath;
 		this.relativeInputPath = relativeInputPath;
 		this.relativeOutputPath = relativeOutputPath;
 		this.inputEncoding = inputEncoding;
 		this.outputEncoding = outputEncoding;
+		this.filterID = filterID;
 		this.selected = selected;
 		exists = true;
 	}
@@ -70,6 +74,10 @@ public class ManifestItem {
 
 	public String getOutputEncoding () {
 		return outputEncoding;
+	}
+
+	public String getFilterID () {
+		return filterID;
 	}
 
 	public boolean selected () {

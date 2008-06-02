@@ -49,6 +49,11 @@ public class Writer extends BaseWriter {
 		return "xliff";
 	}
 	
+	public String getReaderClass () {
+		//TODO: Use dynamic anme
+		return "net.sf.okapi.applications.rainbow.packages.xliff.Reader";
+	}
+	
 	@Override
 	public void writeStartPackage () {
 		// Set source and target if they are not set yet
@@ -103,7 +108,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndDocument();
 		writer.close();
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding);
+			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
 	public void writeItem (IExtractionItem sourceItem,

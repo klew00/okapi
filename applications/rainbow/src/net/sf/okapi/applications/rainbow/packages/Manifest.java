@@ -49,6 +49,7 @@ public class Manifest {
 	private String                             originalDir;
 	private String                             sourceDir;
 	private String                             targetDir;
+	private String                             readerClass;
 
 
 	public Manifest () {
@@ -57,10 +58,22 @@ public class Manifest {
 		originalDir = "";
 	}
 
+	public void setReaderClass (String readerClass) {
+		this.readerClass = readerClass;
+	}
+	
+	public String getReaderClass () {
+		return readerClass;
+	}
+	
 	public Hashtable<Integer, ManifestItem> getItems () {
 		return docs;
 	}
 
+	public ManifestItem getItem (int docID) {
+		return docs.get(docID);
+	}
+	
 	public String getPackageID () {
 		return packageID;
 	}
@@ -150,11 +163,12 @@ public class Manifest {
 		String relativeInputPath,
 		String relativeOutputPath,
 		String inputEncoding,
-		String outputEncoding)
+		String outputEncoding,
+		String filterID)
 	{
 		docs.put(docID, new ManifestItem(relativeWorkPath,
 			relativeInputPath, relativeOutputPath,
-			inputEncoding, outputEncoding, true));
+			inputEncoding, outputEncoding, filterID, true));
 	}
 
 	public String getItemFullSourcePath (int docID) {
@@ -212,6 +226,8 @@ public class Manifest {
 			writer.writeAttributeString("sourceLang", sourceLang);
 			writer.writeAttributeString("targetLang", targetLang);
 			writer.writeAttributeString("packageType", packageType);
+			writer.writeAttributeString("readerClass", readerClass);
+			writer.writeAttributeString("originalDir", originalDir);
 			writer.writeAttributeString("sourceDir", sourceDir);
 			writer.writeAttributeString("targetDir", targetDir);
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
@@ -224,6 +240,7 @@ public class Manifest {
 				item = docs.get(id);
 				writer.writeStartElement("doc");
 				writer.writeAttributeString("id", String.valueOf(id));
+				writer.writeAttributeString("filter", item.getFilterID());
 				writer.writeAttributeString("work", item.getRelativeWorkPath());
 				writer.writeAttributeString("input", item.getRelativeInputPath());
 				writer.writeAttributeString("output", item.getRelativeOutputPath());
@@ -249,7 +266,7 @@ public class Manifest {
 		    // Not needed in this case: DFac.setNamespaceAware(true);
 		    Document doc = DFac.newDocumentBuilder().parse("file:///"+path);
 		    
-		    NodeList NL = doc.getElementsByTagName("borneoManifest");
+		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
 		    if ( NL == null ) throw new Exception("Invalid manifest file.");
 		    Element elem = (Element)NL.item(0);
 		    
@@ -268,6 +285,11 @@ public class Manifest {
 		    	throw new Exception("Missing packageType attribute.");
 		    else setPackageType(tmp);
 		    
+		    tmp = elem.getAttribute("readerClass");
+		    if (( tmp == null ) || ( tmp.length() == 0 ))
+		    	throw new Exception("Missing readerClass attribute.");
+		    else setReaderClass(tmp);
+		    
 		    tmp = elem.getAttribute("sourceLang");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new Exception("Missing sourceLang attribute.");
@@ -278,13 +300,16 @@ public class Manifest {
 		    	throw new RuntimeException("Missing targetLang attribute.");
 		    else setTargetLanguage(tmp);
 
+		    tmp = elem.getAttribute("originalDir");
+		    setOriginalLocation(tmp);
+
 		    tmp = elem.getAttribute("sourceDir");
 		    setSourceLocation(tmp);
 
 		    tmp = elem.getAttribute("targetDir");
 		    setTargetLocation(tmp);
 
-		    String inPath, outPath, inEnc, outEnc;
+		    String inPath, outPath, inEnc, outEnc, filterID;
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
@@ -314,7 +339,11 @@ public class Manifest {
 			    if (( outEnc == null ) || ( outEnc.length() == 0 ))
 			    	throw new RuntimeException("Missing outputEncoding attribute.");
 			    
-		    	docs.put(id, new ManifestItem(tmp, inPath, outPath, inEnc, outEnc, true));
+			    filterID = elem.getAttribute("filter");
+			    if (( filterID == null ) || ( filterID.length() == 0 ))
+			    	throw new RuntimeException("Missing filter attribute.");
+			    
+		    	docs.put(id, new ManifestItem(tmp, inPath, outPath, inEnc, outEnc, filterID, true));
 		    }
 
 		    rootFolder = Util.getDirectoryName(path);

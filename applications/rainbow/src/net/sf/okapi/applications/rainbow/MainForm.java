@@ -36,6 +36,7 @@ import net.sf.okapi.applications.rainbow.lib.ResourceManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
@@ -77,8 +78,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
 public class MainForm implements IParametersProvider {
-	
-	private final String     UTIL_MERGING = "rnb_merging";
 	
 	private Shell            shell;
 	private ILog             log;
@@ -591,7 +590,7 @@ public class MainForm implements IParametersProvider {
 		miUtilities.setMenu(dropMenu);
 		
 		// Add the hard-wired utilities
-		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+/*		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		menuItem.setText("Merge Translation Package...");
 		menuItem.setData(UTIL_MERGING);
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -599,12 +598,12 @@ public class MainForm implements IParametersProvider {
 				launchUtility(event);
 			}
 		});
-		
+*/		
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
 			PluginItem item = plugins.getItem(iter.next());
-			menuItem = new MenuItem(dropMenu, SWT.PUSH);
+			MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
 			menuItem.setText(item.name+"...");
 			menuItem.setData(item.id);
 			menuItem.addSelectionListener(new SelectionAdapter() {
@@ -640,12 +639,6 @@ public class MainForm implements IParametersProvider {
 			// Get the utility to run and instantiate it
 			String id = (String)((MenuItem)event.getSource()).getData();
 			if ( id == null ) return;
-			
-			// Hard-wired utility or plug-in?
-			if ( id.equals(UTIL_MERGING) ) {
-				doMerge(null);
-				return;
-			}
 			
 			ud.setData(prj, id);
 			// Run it
@@ -1101,26 +1094,4 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	private void doMerge (String manifestPath) {
-		try {
-			String[] inputs;
-			if ( manifestPath == null ) {
-				// Use the input file list
-				inputs = prj.getInputPaths();
-			}
-			else {
-				inputs = new String[1];
-				inputs[0] = manifestPath;
-			}
-			if ( inputs.length < 1 ) return;
-			
-			// Go through one or more manifest
-//			for ( String inputPath : inputs ) {
-//				//TODO
-//			}
-		}
-		catch ( Exception e ) {
-			log.error(e.getLocalizedMessage());
-		}
-	}
 }

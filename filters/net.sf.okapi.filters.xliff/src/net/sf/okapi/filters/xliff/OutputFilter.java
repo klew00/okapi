@@ -24,7 +24,8 @@ public class OutputFilter implements IOutputFilter {
 	private OutputStream     output;
 	private String           targetLang;
 
-	public void close () throws Exception {
+	public void close () {
+		// Nothing to do
 	}
 
 	public void initialize (OutputStream output,

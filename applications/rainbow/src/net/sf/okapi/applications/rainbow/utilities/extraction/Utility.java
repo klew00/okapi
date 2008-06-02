@@ -2,6 +2,7 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
@@ -93,10 +94,10 @@ public class Utility extends ThrougputPipeBase implements IUtility {
     public void startResource (IResource resource) {
 		String relativeInput = inputPath.substring(inputRoot.length()+1);
 		String relativeOutput = outputPath.substring(outputRoot.length()+1);
-		writer.createDocument(++id, relativeInput,
-			relativeOutput, resource.getSourceEncoding(),
-			resource.getTargetEncoding(), resource.getFilterSettings(),
-			resource.getParameters());
+		String[] res = FilterAccess.splitFilterSettingsType1("", resource.getFilterSettings());
+		writer.createDocument(++id, relativeInput, relativeOutput,
+			resource.getSourceEncoding(), resource.getTargetEncoding(),
+			res[1], resource.getParameters());
 		writer.writeStartDocument();
     }
 	

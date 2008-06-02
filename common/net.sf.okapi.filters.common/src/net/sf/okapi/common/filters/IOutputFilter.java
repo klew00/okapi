@@ -19,7 +19,6 @@ public interface IOutputFilter extends IResourceBuilder {
 	/**
 	 * Closes the current output and free any associated resources.
 	 */
-	void close ()
-		throws Exception; //TODO: Specific exception?
+	void close ();
 
 }

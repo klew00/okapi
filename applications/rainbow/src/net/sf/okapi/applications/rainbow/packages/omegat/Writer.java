@@ -33,6 +33,12 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	}
 	
 	@Override
+	public String getReaderClass () {
+		//TODO: Use dynamic anme
+		return "net.sf.okapi.applications.rainbow.packages.omegat.Reader";
+	}
+	
+	@Override
 	public void writeStartPackage ()
 	{
 		// Set the source and target before calling the base class.

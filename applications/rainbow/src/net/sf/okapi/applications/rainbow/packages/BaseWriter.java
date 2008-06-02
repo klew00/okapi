@@ -35,9 +35,11 @@ public abstract class BaseWriter implements IWriter {
 	protected String    relativeTargetPath;
 	protected String    sourceEncoding;
 	protected String    targetEncoding;
+	protected String    filterID;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
+		manifest.setReaderClass(getReaderClass());
 	}
 	
 	public void setParameters (String sourceLanguage,
@@ -97,37 +99,36 @@ public abstract class BaseWriter implements IWriter {
 		String relativeTargetPath,
 		String sourceEncoding,
 		String targetEncoding,
-		String filterSettings,
+		String filterID,
 		IParameters filterParams)
 	{
 		if ( relativeSourcePath == null ) throw new NullPointerException();
 		if ( relativeTargetPath == null ) throw new NullPointerException();
 		if ( sourceEncoding == null ) throw new NullPointerException();
 		if ( targetEncoding == null ) throw new NullPointerException();
+		if ( filterID == null ) throw new NullPointerException();
 
 		this.docID = docID;
 		this.relativeSourcePath = relativeSourcePath;
 		this.relativeTargetPath = relativeTargetPath;
 		this.sourceEncoding = sourceEncoding;
 		this.targetEncoding = targetEncoding;
+		this.filterID = filterID;
 		
 		try {
 			// If needed copy the original input to the package
-			String tmp = manifest.getOriginalLocation();
-			if (( tmp == null ) || ( tmp.length() == 0 )) return;
+			String subFolder = manifest.getOriginalLocation();
+			if (( subFolder == null ) || ( subFolder.length() == 0 )) return;
 				
 			String inputPath = inputRoot + File.separator + relativeSourcePath;
 			String docPrefix = String.format("%d.", docID);
 			
-			String destination = manifest.getRoot() + File.separator + tmp
+			String destination = manifest.getRoot() + File.separator + subFolder
 				+ File.separator + docPrefix + "ori"; // docPrefix has a dot
 			Util.copyFile(inputPath, destination, false);
 			
-			String name = filterParams.getPath();
-			if ( name == null ) name = filterSettings + ".fprm"; // Defaults
-			String paramsCopy = Util.getFilename(name, true);
-			paramsCopy = manifest.getRoot() + File.separator + tmp
-				+ File.separator + paramsCopy;
+			String paramsCopy = manifest.getRoot() + File.separator + subFolder
+				+ File.separator + "fprm";
 			filterParams.save(paramsCopy, docPrefix);
 		}
 		catch ( Exception e ) {

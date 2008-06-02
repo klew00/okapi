@@ -28,11 +28,15 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	public void close ()
-		throws Exception
 	{
-		if ( writer != null ) {
-			writer.close();
-			writer = null;
+		try {
+			if ( writer != null ) {
+				writer.close();
+				writer = null;
+			}
+		}
+		catch ( Exception e ) {
+			throw new RuntimeException(e);
 		}
 	}
 

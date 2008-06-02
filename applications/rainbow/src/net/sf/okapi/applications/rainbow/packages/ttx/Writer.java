@@ -59,6 +59,11 @@ public class Writer extends BaseWriter {
 		return "ttx";
 	}
 
+	public String getReaderClass () {
+		//TODO: Get the class path from object
+		return "net.sf.okapi.applications.rainbow.packages.ttx.Reader";
+	}
+	
 	@Override
 	public void writeStartPackage ()
 	{
@@ -95,12 +100,12 @@ public class Writer extends BaseWriter {
 		String relativeTargetPath,
 		String sourceEncoding,
 		String targetEncoding,
-		String filterSettings,
+		String filterID,
 		IParameters filterParams)
 	{
 		relativeWorkPath = relativeSourcePath + EXTENSION; 
 		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
-			sourceEncoding, targetEncoding, filterSettings, filterParams);
+			sourceEncoding, targetEncoding, filterID, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed
 		
@@ -117,7 +122,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndDocument();
 		writer.close();
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding);
+			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
 	private void writeContent (IContainer content) {

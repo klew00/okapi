@@ -3,13 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.properties"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xliff"/>
 	<classpathentry kind="lib" path="C:/OkapiJava/trunk/applications/rainbow/lib/windows/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filter.properties"/>
 	<classpathentry kind="lib" path="C:/OkapiJava/trunk/applications/rainbow/lib/shared/slf4j-jdk14-1.5.0.jar"/>
 	<classpathentry kind="lib" path="C:/OkapiJava/trunk/applications/rainbow/lib/shared/slf4j-api-1.5.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xliff"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
