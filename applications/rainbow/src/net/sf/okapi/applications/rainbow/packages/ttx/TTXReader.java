@@ -65,6 +65,7 @@ class TTXReader {
 	private int              textType;
 	private NodeList         nodeList = null;
 	private Node             node;
+	private boolean          backTrack;
 	private Stack<Boolean>   m_stkFirstChildDone;
 	private Pattern          idPattern;
 	private int              inline;
@@ -72,8 +73,6 @@ class TTXReader {
 
 	//TODO: Implement case for multiple file in single doc
 	public TTXReader () {
-		sourceItem = new ExtractionItem();
-		targetItem = new ExtractionItem();
 		idPattern = Pattern.compile("(\\d+)");
 	}
 	
@@ -153,6 +152,7 @@ class TTXReader {
 	
 	private boolean nextNode () {
 		if ( node != null ) {
+			backTrack = false;
 			if ( !m_stkFirstChildDone.peek() && node.hasChildNodes() ) {
 				// Change the flag for the current node
 				m_stkFirstChildDone.push(!m_stkFirstChildDone.pop());
@@ -165,6 +165,7 @@ class TTXReader {
 				if ( TmpNode == null ) {
 					node = node.getParentNode();
 					m_stkFirstChildDone.pop();
+					backTrack = true;
 				}
 				else {
 					node = TmpNode;
@@ -204,6 +205,7 @@ class TTXReader {
 			inText = false;
 			sourceItem.setContent(srcCont);
 			if ( !trgCont.isEmpty() ) {
+				targetItem = new ExtractionItem();
 				targetItem.setContent(trgCont);
 				sourceItem.setHasTarget(true);
 			}
@@ -226,7 +228,7 @@ class TTXReader {
 		if ( lang.equals(sourceLang) ) textType = SOURCE;
 		else textType = TARGET;
 		inline = 0;
-		processContent("tuv");
+		processContent("Tuv");
 	}
 	
 	private void processContent (String container) {
@@ -247,64 +249,33 @@ class TTXReader {
 				break;
 
 			case Node.ELEMENT_NODE:
-				String sName = node.getNodeName();
-				if ( sName.equals(container) ) {
-					if ( sName.equals("bpt") ) inline--;
-					else if ( sName.equals("ept") ) inline--;
-					else if ( sName.equals("ph") ) inline--;
-					else if ( sName.equals("g") ) {
-						if ( (textType & SOURCE) == SOURCE )
-							srcCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
-						if ( (textType & TARGET) == TARGET )
-							trgCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
-					}
-					// End return in all cases
+				String name = node.getNodeName();
+				if ( name.equals(container) ) {
+					// End return
 					return;
 				}
 				
+				if ( backTrack ) {
+					if ( name.equals("ut") ) inline--;
+					continue;
+				}
+
 				// Else: It's a start of element
-				if ( sName.equals("g") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
-				}
-				else if ( sName.equals("x") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
-				}
-				else if ( sName.equals("bpt") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
-					inline++;
-				}
-				else if ( sName.equals("ept") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
-					inline++;
-				}
-				else if ( sName.equals("ph") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
-					inline++;
-				}
-				else if ( sName.equals("it") ) {
-					if ( (textType & SOURCE) == SOURCE )
-						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
-					if ( (textType & TARGET) == TARGET )
-						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+				if ( name.equals("ut") ) {
+					appendCode(IContainer.CODE_ISOLATED, name);
 					inline++;
 				}
 				break;
 			}
 		}
+	}
+	
+	private void appendCode (int type,
+		String code)
+	{
+		if ( (textType & SOURCE) == SOURCE )
+			srcCont.append(new CodeFragment(type, 1, code));
+		if ( (textType & TARGET) == TARGET )
+			trgCont.append(new CodeFragment(type, 1, code));
 	}
 }

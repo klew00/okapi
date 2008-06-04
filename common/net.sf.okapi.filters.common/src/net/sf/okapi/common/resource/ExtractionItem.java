@@ -47,6 +47,7 @@ public class ExtractionItem implements IExtractionItem {
 	public ExtractionItem () {
 		// Default values different from initial
 		isTranslatable = true;
+		main = new Container();
 	}
 	
 	public void addChild (IExtractionItem child) {
@@ -79,6 +80,7 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public void setContent (IContainer data) {
+		if ( data == null ) throw new NullPointerException(); 
 		main = data;
 	}
 

@@ -254,44 +254,44 @@ public class XLIFFReader {
 				break;
 	
 			case Node.ELEMENT_NODE:
-				String sName = node.getNodeName();
-				if ( sName.equals(container) ) {
+				String name = node.getNodeName();
+				if ( name.equals(container) ) {
 					return;
 				}
 				if ( backTrack ) {
-					if ( sName.equals("bpt") ) inCode--;
-					else if ( sName.equals("ept") ) inCode--;
-					else if ( sName.equals("ph") ) inCode--;
-					else if ( sName.equals("g") ) {
+					if ( name.equals("bpt") ) inCode--;
+					else if ( name.equals("ept") ) inCode--;
+					else if ( name.equals("ph") ) inCode--;
+					else if ( name.equals("g") ) {
 						content.append(
-							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), sName));
+							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), name));
 					}
 					continue; // Move on the next node
 				}
 				
 				// Else: It's a start of element
-				if ( sName.equals("g") ) {
+				if ( name.equals("g") ) {
 					idStack.push(++id);
 					content.append(
-						new CodeFragment(IContainer.CODE_OPENING, id, sName));
+						new CodeFragment(IContainer.CODE_OPENING, id, name));
 				}
-				else if ( sName.equals("x") ) {
+				else if ( name.equals("x") ) {
 					appendCode(IContainer.CODE_ISOLATED, ++id);
 				}
-				else if ( sName.equals("bpt") ) {
+				else if ( name.equals("bpt") ) {
 					idStack.push(++id);
 					appendCode(IContainer.CODE_OPENING, id);
 					inCode++;
 				}
-				else if ( sName.equals("ept") ) {
+				else if ( name.equals("ept") ) {
 					appendCode(IContainer.CODE_CLOSING, idStack.pop());
 					inCode++;
 				}
-				else if ( sName.equals("ph") ) {
+				else if ( name.equals("ph") ) {
 					appendCode(IContainer.CODE_ISOLATED, ++id);
 					inCode++;
 				}
-				else if ( sName.equals("it") ) {
+				else if ( name.equals("it") ) {
 					appendCode(IContainer.CODE_ISOLATED, ++id);
 					inCode++;
 				}

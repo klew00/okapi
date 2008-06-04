@@ -17,6 +17,7 @@ import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.ExtractionItem;
+import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {
@@ -109,7 +110,8 @@ public class Merger extends ThrougputPipeBase {
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
-			logger.warn("No more package items to merge.");
+			logger.warn("There is no more package item to merge (for ID={})",
+				sourceItem.getID());
 			// Keep writing the output file
 			super.endExtractionItem(sourceItem, targetItem);
 			return;
@@ -132,7 +134,8 @@ public class Merger extends ThrougputPipeBase {
 				targetItem = new ExtractionItem();
 				sourceItem.setHasTarget(true);
 			}
-			targetItem.setContent(trgPkgItem.getContent());
+			// Set the codedText part of the content only. Do not modify the codes!
+			targetItem.getContent().setContent(trgPkgItem.getContent().getCodedText());
 		}
 		
 		// Call output filter
