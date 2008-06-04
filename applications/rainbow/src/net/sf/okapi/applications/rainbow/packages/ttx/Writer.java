@@ -73,6 +73,7 @@ public class Writer extends BaseWriter {
 			manifest.setSourceLocation("work");
 			manifest.setTargetLocation("work");
 			manifest.setOriginalLocation("original");
+			manifest.setDoneLocation("done");
 			super.writeStartPackage();
 			// Copy the tag settings file to the root of the package
 			in = getClass().getResourceAsStream(DTD_SETTINGS_FILE);

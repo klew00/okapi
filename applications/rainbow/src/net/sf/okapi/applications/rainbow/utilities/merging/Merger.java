@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
@@ -13,6 +16,7 @@ import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
+import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {
@@ -20,6 +24,7 @@ public class Merger extends ThrougputPipeBase {
 	private Manifest         manifest;
 	private IReader          reader;
 	private FilterAccess     fa;
+	private final Logger     logger = LoggerFactory.getLogger(Utility.class);
 
 	public Merger () {
 		fa = new FilterAccess();
@@ -51,6 +56,14 @@ public class Merger extends ThrougputPipeBase {
 			// Skip items not selected for merge
 			if ( !item.selected() ) return;
 			
+			// File to merge
+			String fileToMerge = manifest.getFileToMergePath(docID);
+			// Instantiate a package reader of the proper type
+			if ( reader == null ) {
+				reader = (IReader)Class.forName(manifest.getReaderClass()).newInstance();
+			}
+			logger.info("Merging: " + fileToMerge);
+
 			// Original and parameters files
 			String originalFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
 				+ File.separator + String.format("%d.ori", docID);
@@ -59,13 +72,6 @@ public class Merger extends ThrougputPipeBase {
 			// Load the relevant filter
 			fa.loadFilter(item.getFilterID(), paramsFile);
 			
-			// File to merge
-			String fileToMerge = manifest.getRoot() + File.separator + manifest.getTargetLocation()
-				+ File.separator + item.getRelativeWorkPath();
-			// Instantiate a package reader of the proper type
-			if ( reader == null ) {
-				reader = (IReader)Class.forName(manifest.getReaderClass()).newInstance();
-			}
 			reader.openDocument(fileToMerge);
 			
 			// Initializes the input
@@ -74,7 +80,8 @@ public class Merger extends ThrougputPipeBase {
 				manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
 			// Initializes the output
-			String outputFile = manifest.getItemFullTargetPath(docID);
+			String outputFile = manifest.getFileToGeneratePath(docID);
+			Util.createDirectories(outputFile);
 			OutputStream output = new FileOutputStream(outputFile);
 			fa.outputFilter.initialize(output, item.getOutputEncoding(), manifest.getTargetLanguage());
 
@@ -99,7 +106,36 @@ public class Merger extends ThrougputPipeBase {
     public void endExtractionItem (IExtractionItem sourceItem,
     	IExtractionItem targetItem)
 	{
-		//TODO: Merging
+		// Get item from the package document
+		if ( !reader.readItem() ) {
+			// Problem: 
+			logger.warn("No more package items to merge.");
+			// Keep writing the output file
+			super.endExtractionItem(sourceItem, targetItem);
+			return;
+		}
+		
+		// Update the item if needed
+		if ( sourceItem.isTranslatable() ) {
+			IExtractionItem srcPkgItem = reader.getSourceItem();
+			
+			if ( !sourceItem.getID().equals(srcPkgItem.getID()) ) {
+				// Problem: different IDs
+				logger.warn("ID mismatch: original item: '{}' package item: '{}'",
+					sourceItem.getID(), srcPkgItem.getID());
+				super.endExtractionItem(sourceItem, targetItem);
+				return;
+			}
+			
+			IExtractionItem trgPkgItem = reader.getTargetItem();
+			if ( targetItem == null ) {
+				targetItem = new ExtractionItem();
+				sourceItem.setHasTarget(true);
+			}
+			targetItem.setContent(trgPkgItem.getContent());
+		}
+		
+		// Call output filter
 		super.endExtractionItem(sourceItem, targetItem);
 	}
     

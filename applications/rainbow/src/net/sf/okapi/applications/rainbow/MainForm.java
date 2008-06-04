@@ -36,7 +36,6 @@ import net.sf.okapi.applications.rainbow.lib.ResourceManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
-import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;

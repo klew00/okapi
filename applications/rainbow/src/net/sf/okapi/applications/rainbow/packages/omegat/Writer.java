@@ -34,19 +34,19 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	
 	@Override
 	public String getReaderClass () {
-		//TODO: Use dynamic anme
+		//TODO: Use dynamic name
 		return "net.sf.okapi.applications.rainbow.packages.omegat.Reader";
 	}
 	
 	@Override
 	public void writeStartPackage ()
 	{
-		// Set the source and target before calling the base class.
+		// Set any non-default folders before calling the base class.
 		manifest.setSourceLocation("source");
 		manifest.setTargetLocation("target");
 		super.writeStartPackage();
 		
-		// Create the OmegaT directories
+		// Create the OmegaT-specific directories
 		Util.createDirectories(manifest.getRoot() + File.separator + "glossary" + File.separator);
 		Util.createDirectories(manifest.getRoot() + File.separator + "omegat" + File.separator);
 		Util.createDirectories(manifest.getRoot() + File.separator + "tm" + File.separator);

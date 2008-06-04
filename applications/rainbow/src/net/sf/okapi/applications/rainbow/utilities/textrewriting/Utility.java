@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
+import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
@@ -59,10 +60,14 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		String tmp = "";
 		try {
 			if ( sourceItem.isTranslatable() ) {
-				//TODO: handle bilingual files
-				IContainer cnt = sourceItem.getContent(); 
-				tmp = cnt.getCodedText().replaceAll("\\p{L}", "X");
-				cnt.setContent(tmp.replaceAll("\\d", "N"));
+				if ( !sourceItem.hasTarget() ) {
+					targetItem = new ExtractionItem();
+					sourceItem.setHasTarget(true);
+				}
+				tmp = sourceItem.getContent().getCodedText().replaceAll("\\p{L}", "X");
+				tmp = tmp.replaceAll("\\d", "N");
+				IContainer cnt = targetItem.getContent(); 
+				cnt.setContent(tmp, sourceItem.getContent().getCodes());
 				super.endExtractionItem(sourceItem, targetItem);
 			}
 		}

@@ -79,7 +79,8 @@ public class Util {
 	
 	/**
 	 * Creates the directory tree for the give full path (dir+filename)
-	 * @param p_sPath Directory and filename.
+	 * @param p_sPath Directory and filename. If you want to pass only a directory
+	 * name make sure it has a trailing separator (e.g. "c:\project\tmp\").
 	 */
 	static public void createDirectories (String p_sPath) {
 		int n = p_sPath.lastIndexOf(File.separatorChar);

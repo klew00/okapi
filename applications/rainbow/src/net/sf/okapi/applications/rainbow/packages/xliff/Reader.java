@@ -38,7 +38,14 @@ public class Reader implements IReader {
 	}
 
 	public boolean readItem () {
-		return (reader.readItem() > 0);
+		int n;
+		do {
+			switch ( (n = reader.readItem()) ) {
+			case XLIFFReader.RESULT_ENDTRANSUNIT:
+				return true;
+			}
+		} while ( n > XLIFFReader.RESULT_ENDINPUT );
+		return false;
 	}
 
 }

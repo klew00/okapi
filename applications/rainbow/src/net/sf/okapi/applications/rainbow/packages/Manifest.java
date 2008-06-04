@@ -49,13 +49,16 @@ public class Manifest {
 	private String                             originalDir;
 	private String                             sourceDir;
 	private String                             targetDir;
+	private String                             doneDir;
 	private String                             readerClass;
 
 
 	public Manifest () {
 		docs = new Hashtable<Integer, ManifestItem>();
-		sourceDir = targetDir = "";
+		sourceDir = "";
+		targetDir = "";
 		originalDir = "";
+		doneDir = "";
 	}
 
 	public void setReaderClass (String readerClass) {
@@ -152,6 +155,15 @@ public class Manifest {
 		else originalDir = value;
 	}
 
+	public String getDoneLocation () {
+		return doneDir;
+	}
+	
+	public void setDoneLocation (String value) {
+		if ( value == null ) doneDir = "";
+		else doneDir = value;
+	}
+
 	/**
 	 * Adds a document to the manifest.
 	 * @param docID Key of the document. Must be unique within the manifest.
@@ -171,37 +183,16 @@ public class Manifest {
 			inputEncoding, outputEncoding, filterID, true));
 	}
 
-	public String getItemFullSourcePath (int docID) {
-		return rootFolder + File.separator
-			+ (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
-	}
-
-	public String getItemRelativeSourcePath (int docID) {
-		return (( sourceDir.length() == 0 ) ? "" : (sourceDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
-	}
-
-	public String getItemFullTargetPath (int docID) {
+	public String getFileToMergePath (int docID) {
 		return rootFolder + File.separator
 			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
+			+ docs.get(docID).getRelativeWorkPath();
 	}
 
-	public String getItemRelativeTargetPath (int docID) {
-		return (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
-	}
-
-	public String getItemFullOriginalPath (int docID) {
+	public String getFileToGeneratePath (int docID) {
 		return rootFolder + File.separator
-			+ (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
-	}
-
-	public String getItemRelativeOriginalPath (int docID) {
-		return (( originalDir.length() == 0 ) ? "" : (originalDir + File.separator))
-			+ docs.get(docID).getRelativeInputPath();
+			+ (( doneDir.length() == 0 ) ? "" : (doneDir + File.separator))
+			+ docs.get(docID).getRelativeOutputPath();
 	}
 
 	/**
@@ -230,6 +221,7 @@ public class Manifest {
 			writer.writeAttributeString("originalDir", originalDir);
 			writer.writeAttributeString("sourceDir", sourceDir);
 			writer.writeAttributeString("targetDir", targetDir);
+			writer.writeAttributeString("doneDir", doneDir);
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 
@@ -309,6 +301,9 @@ public class Manifest {
 		    tmp = elem.getAttribute("targetDir");
 		    setTargetLocation(tmp);
 
+		    tmp = elem.getAttribute("doneDir");
+		    setDoneLocation(tmp);
+
 		    String inPath, outPath, inEnc, outEnc, filterID;
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
@@ -366,7 +361,7 @@ public class Manifest {
 		while ( E.hasMoreElements() ) {
 			nDKey = E.nextElement();
 			MI = docs.get(nDKey);
-			File F = new File(getItemFullTargetPath(nDKey));
+			File F = new File(getFileToMergePath(nDKey));
 			if ( !F.exists() ) {
 				nErrors++;
 				MI.setExists(false);

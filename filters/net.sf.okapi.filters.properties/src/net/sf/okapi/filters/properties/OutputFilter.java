@@ -50,7 +50,12 @@ public class OutputFilter implements IOutputFilter {
 			// Write the buffer
 			writer.write(res.buffer.toString());
 			// Then write the item content
-			writer.write(escape(sourceItem.getContent().toString()));
+			if ( sourceItem.hasTarget() ) {
+				writer.write(escape(targetItem.getContent().toString()));
+			}
+			else {
+				writer.write(escape(sourceItem.getContent().toString()));
+			}
 			if ( res.endingLB ) writer.write(res.lineBreak);
 		}
 		catch ( Exception e ) {

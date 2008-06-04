@@ -34,6 +34,7 @@ import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -50,17 +51,24 @@ class TTXReader {
 	public static final int       STATUS_TOEDIT       = 3;
 	public static final int       STATUS_TOREVIEW     = 4;
 	public static final int       STATUS_OK           = 5;
-
-	public IExtractionItem   sourceItem;
-	public IExtractionItem   targetItem;
 	
-	private IContainer       content;
+	private static final int      SOURCE              = 0x01;
+	private static final int      TARGET              = 0x02;
+	private static final int      BOTH                = 0x03;
+
+	protected IExtractionItem     sourceItem;
+	protected IExtractionItem     targetItem;
+	
+	private String           sourceLang;
+	private IContainer       srcCont;
+	private IContainer       trgCont;
+	private int              textType;
 	private NodeList         nodeList = null;
 	private Node             node;
 	private Stack<Boolean>   m_stkFirstChildDone;
 	private Pattern          idPattern;
-	private int              tuvType;
 	private int              inline;
+	private boolean          inText;
 
 	//TODO: Implement case for multiple file in single doc
 	public TTXReader () {
@@ -98,6 +106,7 @@ class TTXReader {
 	public void close () {
 		// Make list available for GC
 		if ( nodeList != null ) nodeList = null;
+		inText = false;
 	}
 
 	public boolean readItem () {
@@ -115,6 +124,19 @@ class TTXReader {
 			}
 			else if ( name.equals("Tu") ) {
 				processTU();
+			}
+			else if ( name.equals("UserSettings") ) {
+				processUserSettings();
+			}
+			else if ( inText ) {
+				switch ( node.getNodeType() ) {
+				case Node.TEXT_NODE:
+				case Node.CDATA_SECTION_NODE:
+					String tmp = node.getTextContent();
+					if ( (textType & SOURCE) == SOURCE ) srcCont.append(tmp);
+					if ( (textType & TARGET) == TARGET ) trgCont.append(tmp);
+					break;
+				}
 			}
 		}
 	}
@@ -156,22 +178,36 @@ class TTXReader {
 	
 	private void resetItem () {
 		sourceItem = new ExtractionItem();
-		targetItem = new ExtractionItem();
+		targetItem = null;
+	}
+	
+	private void processUserSettings () {
+		sourceLang = ((Element)node).getAttribute("SourceLanguage");
 	}
 
 	private boolean processUT () {
 		boolean result = false;
-		String content = node.getTextContent().trim();
-		if ( content.indexOf("<u ") == 0 ) {
-			Matcher M = idPattern.matcher(content);
+		String text = node.getTextContent().trim();
+		if ( text.indexOf("<u ") == 0 ) {
+			inText = true;
+			textType = SOURCE;
+			srcCont = new Container();
+			trgCont = new Container();
+			Matcher M = idPattern.matcher(text);
 			if ( M.find() ) {
 				sourceItem.setIsTranslatable(false);
-				sourceItem.setID(content.substring(M.start(), M.end()));
+				sourceItem.setID(text.substring(M.start(), M.end()));
 			}
-			else throw new RuntimeException("ID value not found for <u> element: "+content);
+			else throw new RuntimeException("ID value not found for <u> element: "+text);
 		}
-		else if ( content.equals("</u>") ) {
-			// If <ut> contains a </u> tag, that's the end of the filter item
+		else if ( text.equals("</u>") ) {
+			inText = false;
+			sourceItem.setContent(srcCont);
+			if ( !trgCont.isEmpty() ) {
+				targetItem.setContent(trgCont);
+				sourceItem.setHasTarget(true);
+			}
+			// If <ut> contains a </u> tag, that's the end of the item
 			result = true;
 		}
 		// Then move to the closing tag
@@ -182,16 +218,15 @@ class TTXReader {
 	}
 
 	private void processTU () {
-		tuvType = 0;
+		textType = BOTH;
 	}
 	
 	private void processTUV () {
-		tuvType++;
-		content = new Container();
+		String lang = ((Element)node).getAttribute("Lang");
+		if ( lang.equals(sourceLang) ) textType = SOURCE;
+		else textType = TARGET;
 		inline = 0;
 		processContent("tuv");
-		if ( tuvType == 1 ) sourceItem.setContent(content);
-		else targetItem.setContent(content);
 	}
 	
 	private void processContent (String container) {
@@ -204,8 +239,11 @@ class TTXReader {
 			switch ( node.getNodeType() ) {
 			case Node.TEXT_NODE:
 			case Node.CDATA_SECTION_NODE:
-				if ( inline == 0 )
-					content.append(node.getTextContent());
+				if ( inline == 0 ) {
+					String tmp = node.getTextContent();
+					if ( (textType & SOURCE) == SOURCE ) srcCont.append(tmp);
+					if ( (textType & TARGET) == TARGET ) trgCont.append(tmp);
+				}
 				break;
 
 			case Node.ELEMENT_NODE:
@@ -215,7 +253,10 @@ class TTXReader {
 					else if ( sName.equals("ept") ) inline--;
 					else if ( sName.equals("ph") ) inline--;
 					else if ( sName.equals("g") ) {
-						content.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+						if ( (textType & SOURCE) == SOURCE )
+							srcCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+						if ( (textType & TARGET) == TARGET )
+							trgCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
 					}
 					// End return in all cases
 					return;
@@ -223,25 +264,43 @@ class TTXReader {
 				
 				// Else: It's a start of element
 				if ( sName.equals("g") ) {
-					content.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
 				}
 				else if ( sName.equals("x") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
 				}
 				else if ( sName.equals("bpt") ) {
-					content.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_OPENING, 1, sName));
 					inline++;
 				}
 				else if ( sName.equals("ept") ) {
-					content.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_CLOSING, 1, sName));
 					inline++;
 				}
 				else if ( sName.equals("ph") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
 					inline++;
 				}
 				else if ( sName.equals("it") ) {
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & SOURCE) == SOURCE )
+						srcCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
+					if ( (textType & TARGET) == TARGET )
+						trgCont.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, sName));
 					inline++;
 				}
 				break;

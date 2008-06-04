@@ -76,6 +76,9 @@ public abstract class BaseWriter implements IWriter {
 		if (( tmp != null ) && ( tmp.length() > 0 )) {
 			Util.createDirectories(manifest.getRoot() + File.separator + tmp + File.separator);
 		}
+
+		// No need to create the folder structure for the 'done' folder
+		// It will be done when merging
 	}
 
 	public void writeEndPackage (boolean createZip) {

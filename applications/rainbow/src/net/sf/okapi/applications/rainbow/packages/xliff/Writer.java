@@ -70,6 +70,9 @@ public class Writer extends BaseWriter {
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
 			manifest.setOriginalLocation("original");
 		}
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			manifest.setDoneLocation("done");
+		}
 		super.writeStartPackage();
 	}
 

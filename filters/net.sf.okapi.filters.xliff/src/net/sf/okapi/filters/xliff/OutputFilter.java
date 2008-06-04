@@ -8,6 +8,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -49,14 +50,18 @@ public class OutputFilter implements IOutputFilter {
 		}
 
 		// Set new nodes
+		Document doc = elem.getOwnerDocument();
 		List<IFragment> fragList = item.getContent().getFragments();
 		for ( IFragment frag : fragList ) {
 			if ( frag.isText() ) {
-				elem.appendChild(elem.getOwnerDocument().createTextNode(
+				elem.appendChild(doc.createTextNode(
 					frag.toString()));
 			}
 			else { // Re-use the original code
-				elem.appendChild(((Node)((CodeFragment)frag).extraData).cloneNode(true));
+				// We need to use importNode() for case where target
+				// is created from the source item.
+				elem.appendChild(doc.importNode(
+					(Node)((CodeFragment)frag).extraData, true));
 			}
 		}
 	}
@@ -76,7 +81,12 @@ public class OutputFilter implements IOutputFilter {
 			// Set the target element
 			//TODO: cases for existing translation
 			if ( sourceItem.isTranslatable() ) {
-				buildContent(res.trgElem, sourceItem);
+				if ( sourceItem.hasTarget() ) {
+					buildContent(res.trgElem, targetItem);
+				}
+				else {
+					buildContent(res.trgElem, sourceItem);
+				}
 			}
 			else if ( newTarget || !res.trgElem.hasChildNodes() ) {
 				// Fill new target with original text
