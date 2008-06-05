@@ -9,7 +9,9 @@ import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
+import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
 
 public class Main {
@@ -55,6 +57,24 @@ public class Main {
 		System.out.println("---end testContainer---");
 	}
 	
+	private static void testItem () {
+		try {
+			System.out.println("---start testItem---");
+			IExtractionItem item = new ExtractionItem();
+			item.addSegment(new Container("This is segment 1. "));
+			item.addSegment(new Container("This is segment 2."));
+			List<IContainer> list = item.getSegments();
+			for ( IContainer seg : list ) {
+				System.out.println("seg='"+seg.toString()+"'");
+			}
+			System.out.println("all segs= '"+item.toString()+"'");
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		System.out.println("---end testItem---");
+	}
+	
 	private static void testFilter () {
 		try {
 			System.out.println("---start testContainer---");
@@ -80,8 +100,9 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testContainer();
-		testFilter();
+		testItem();
+		//testContainer();
+		//testFilter();
 	}		
 		
 }

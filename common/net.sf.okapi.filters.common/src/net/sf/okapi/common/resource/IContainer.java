@@ -42,6 +42,12 @@ public interface IContainer {
 	void append (IFragment fragment);
 	
 	/**
+	 * Appends a IContainer object to the object.
+	 * @param content The data to append.
+	 */
+	void append (IContainer content);
+	
+	/**
 	 * Sets the content of the object, using the codes currently set.
 	 * @param codedText The coded text to set. This string must match the
 	 * codes already set in the object.

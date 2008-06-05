@@ -86,6 +86,15 @@ public class Container implements IContainer {
 		lastFrag = fragment;
 	}
 
+	public void append (IContainer content) {
+		List<IFragment> fragList = content.getFragments();
+		for ( IFragment frag : fragList ) {
+			list.add(frag);
+		}
+		if ( list.size() > 0 )
+			lastFrag = list.get(list.size()-1);
+	}
+
 	/**
 	 * Gets the text of the object in original or coded format. 
 	 * @param coded Indicates if the returned text should be coded. Use true 

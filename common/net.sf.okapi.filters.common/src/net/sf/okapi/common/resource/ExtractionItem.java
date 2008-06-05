@@ -30,18 +30,18 @@ import java.util.Map;
  */
 public class ExtractionItem implements IExtractionItem {
 
-	protected String                   id;
-	protected boolean                  isTranslatable;
-	protected boolean                  hasTarget;
-	protected String                   resname;
-	protected String                   restype;
-	protected boolean                  preserveFormatting;
-	protected String                   notes;
-
+	private String                     id;
+	private boolean                    isTranslatable;
+	private boolean                    hasTarget;
+	private String                     resname;
+	private String                     restype;
+	private boolean                    preserveFormatting;
+	private String                     note;
 	private IContainer                 main;
 	private ArrayList<IExtractionItem> children;
 	private ArrayList<IContainer>      segments;
 	private Map<String, Object>        props;
+	private boolean                    isSegmented;
 
 
 	public ExtractionItem () {
@@ -49,8 +49,17 @@ public class ExtractionItem implements IExtractionItem {
 		isTranslatable = true;
 		main = new Container();
 	}
+
+	@Override
+	public String toString () {
+		if ( isSegmented )
+			return buildCompiledSegment(false).toString();
+		else
+			return main.toString();
+	}
 	
 	public void addChild (IExtractionItem child) {
+		//TODO: Need some kind of reference in the coded text
 		if ( children == null ) {
 			children = new ArrayList<IExtractionItem>();
 		}
@@ -58,7 +67,8 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public boolean isEmpty () {
-		return main.isEmpty();
+		if ( isSegmented ) return buildCompiledSegment(false).isEmpty();
+		else return main.isEmpty();
 	}
 	
 	public List<IExtractionItem> getChildren () {
@@ -69,19 +79,27 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public IContainer getContent () {
-		return main;
+		if ( isSegmented ) {
+			return buildCompiledSegment(false);
+		}
+		else return main;
 	}
 
 	public List<IContainer> getSegments () {
-		if ( segments == null ) {
-			segments = new ArrayList<IContainer>();
-		}
-		return segments;
+		if ( isSegmented ) return segments;
+		// Else: Make a temporary list of all segments
+		List<IContainer> tmpSegments = new ArrayList<IContainer>();
+		tmpSegments.add(main);
+		return tmpSegments;
 	}
-
+	
 	public void setContent (IContainer data) {
 		if ( data == null ) throw new NullPointerException(); 
 		main = data;
+		if ( isSegmented ) {
+			segments.clear();
+			isSegmented = false;
+		}
 	}
 
 	public String getID () {
@@ -155,14 +173,49 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public boolean hasNote () {
-		return (( notes != null ) && ( notes.length() > 0 ));
+		return (( note != null ) && ( note.length() > 0 ));
 	}
 	
 	public String getNote () {
-		return notes;
+		return note;
 	}
 
 	public void setNote (String text) {
-		notes = text;
+		note = text;
 	}
+	
+	public void removeSegmentation () {
+		buildCompiledSegment(true);
+	}
+	
+	public void addSegment (IContainer segment) {
+		if ( !isSegmented ) {
+			if ( segments == null ) segments = new ArrayList<IContainer>();
+			else segments.clear();
+			if ( !main.isEmpty() ) segments.add(main);
+			isSegmented = true;
+		}
+		segments.add(segment);
+	}
+
+	private IContainer buildCompiledSegment (boolean removeSegmentation) {
+		if ( !isSegmented ) return main;
+
+		// If needed: compile all segments into one object
+		Container compiled = new Container();
+		for ( IContainer seg : segments ) {
+			compiled.append(seg);
+		}
+		
+		// Remove the segmentation if requested
+		if ( removeSegmentation ) {
+			main = compiled;
+			segments.clear();
+			isSegmented = false;
+		}
+		
+		// Return the compiled segment
+		return compiled;
+	}
+
 }

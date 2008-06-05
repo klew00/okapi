@@ -5,6 +5,12 @@ import java.util.List;
 public interface IExtractionItem {
 
 	/**
+	 * Gets the content of the item in its original format.
+	 * @return The content of the object in its original format.
+	 */
+	String toString ();
+	
+	/**
 	 * Indicates if this extraction item has any content.
 	 * @return True if there is text or codes, or both, false otherwise.
 	 */
@@ -158,4 +164,18 @@ public interface IExtractionItem {
 	 * @param text The new text to set.
 	 */
 	void setNote (String text);
+	
+	/**
+	 * Removes the segmentation breaks in an object. The object becomes
+	 * a single segment.
+	 */
+	void removeSegmentation ();
+	
+	/**
+	 * Adds a segment to the item. If the item is not already segmented
+	 * the existing content is set as the first segment, and this new
+	 * segment as the second.
+	 * @param segment The segment to add.
+	 */
+	void addSegment (IContainer segment);
 }
