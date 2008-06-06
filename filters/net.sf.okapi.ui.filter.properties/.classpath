@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/OkapiJava/trunk/filters/net.sf.okapi.ui.filter.properties/lib/windows/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
+	<classpathentry kind="lib" path="lib/windows/swt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
