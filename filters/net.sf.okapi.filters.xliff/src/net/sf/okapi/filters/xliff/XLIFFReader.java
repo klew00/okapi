@@ -91,35 +91,30 @@ public class XLIFFReader {
 	 * Reads the next part of the input.
 	 * @return One of the RESULT_* values.
 	 */
-	//TODO: Change the parsing to get start/end elements
 	public int readItem () {
 		// If needed, resume parsing based on the last result
 		switch ( lastResult ) {
 		case RESULT_STARTTRANSUNIT:
-			lastResult = processEndTransUnit();
-			return lastResult;
+			return (lastResult = processEndTransUnit());
 		}
 		
 		// Move on to the next node
 		while ( true ) {
 			if ( !nextNode() ) {
-				return RESULT_ENDINPUT; // Document is done
+				return (lastResult = RESULT_ENDINPUT); // Document is done
 			}
 			String name = getName();
-			//TOFO: groups, etc.
+			//TODO: groups, etc.
 			if ( name.equals("trans-unit") ) {
 				resetItem();
-				lastResult = processStartTransUnit();
-				return lastResult;
+				return (lastResult = processStartTransUnit());
 			}
 			else if ( name.equals("file") ) {
 				if ( backTrack ) {
-					lastResult = RESULT_ENDFILE;
-					return lastResult;
+					return (lastResult = RESULT_ENDFILE);
 				}
 				else {
-					lastResult = processFile();
-					return lastResult;
+					return (lastResult = processFile());
 				}
 			}
 		}
@@ -315,7 +310,7 @@ public class XLIFFReader {
 			tmp.append(String.format("%s%s=\"%s\"", (tmp.length()>0 ? "" : " "), attrs.item(i).getNodeName(),
 				attrs.item(i).getNodeValue()));
 		}
-		content.append(new CodeFragment(type, 1, inside, node));
+		content.append(new CodeFragment(type, id, inside, node));
 	}
 	
 	private void processTarget () {

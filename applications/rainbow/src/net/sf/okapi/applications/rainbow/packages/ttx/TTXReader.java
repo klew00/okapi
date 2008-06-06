@@ -116,7 +116,7 @@ class TTXReader {
 			}
 			String name = getName();
 			if ( name.equals("ut") ) {
-				if ( processUT() ) return true;
+				if ( processOuterUT() ) return true;
 			}
 			else if ( name.equals("Tuv") ) {
 				processTUV();
@@ -186,7 +186,7 @@ class TTXReader {
 		sourceLang = ((Element)node).getAttribute("SourceLanguage");
 	}
 
-	private boolean processUT () {
+	private boolean processOuterUT () {
 		boolean result = false;
 		String text = node.getTextContent().trim();
 		if ( text.indexOf("<u ") == 0 ) {
@@ -254,14 +254,13 @@ class TTXReader {
 					// End return
 					return;
 				}
-				
 				if ( backTrack ) {
 					if ( name.equals("ut") ) inline--;
 					continue;
 				}
-
 				// Else: It's a start of element
 				if ( name.equals("ut") ) {
+					//TODO: Handle open/close tags
 					appendCode(IContainer.CODE_ISOLATED, name);
 					inline++;
 				}

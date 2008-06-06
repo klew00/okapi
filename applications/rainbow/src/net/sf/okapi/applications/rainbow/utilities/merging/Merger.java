@@ -17,7 +17,6 @@ import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {

@@ -59,7 +59,8 @@ public class ExtractionItem implements IExtractionItem {
 	}
 	
 	public void addChild (IExtractionItem child) {
-		//TODO: Need some kind of reference in the coded text
+		//TODO: This can't work as it: we need a reference to where the child
+		// is going in the parent, for merging.
 		if ( children == null ) {
 			children = new ArrayList<IExtractionItem>();
 		}
