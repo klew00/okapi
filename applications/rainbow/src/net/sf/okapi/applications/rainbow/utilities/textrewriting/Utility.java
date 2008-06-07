@@ -54,26 +54,24 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 	}
 
 	@Override
-    public void endExtractionItem(IExtractionItem sourceItem,
-    	IExtractionItem targetItem)
-	{
+    public void endExtractionItem(IExtractionItem item) {
 		String tmp = "";
 		try {
-			if ( sourceItem.isTranslatable() ) {
-				if ( !sourceItem.hasTarget() ) {
-					targetItem = new ExtractionItem();
-					sourceItem.setHasTarget(true);
+			if ( item.isTranslatable() ) {
+				if ( !item.hasTarget() ) {
+					item.setTarget(new ExtractionItem());
 				}
-				tmp = sourceItem.getContent().getCodedText().replaceAll("\\p{L}", "X");
+				tmp = item.getContent().getCodedText().replaceAll("\\p{L}", "X");
 				tmp = tmp.replaceAll("\\d", "N");
-				IContainer cnt = targetItem.getContent(); 
-				cnt.setContent(tmp, sourceItem.getContent().getCodes());
-				super.endExtractionItem(sourceItem, targetItem);
+				IContainer cnt = item.getTarget().getContent(); 
+				cnt.setContent(tmp, item.getContent().getCodes());
 			}
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when setting new content: '"+tmp+"'", e);
-			super.endExtractionItem(sourceItem, targetItem);
+		}
+		finally {
+			super.endExtractionItem(item);
 		}
     }
 	

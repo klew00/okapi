@@ -78,11 +78,18 @@ public interface IExtractionItem {
 	boolean hasTarget ();
 	
 	/**
-	 * Sets the flag that indicates if the item has a corresponding target item.
-	 * @param hasTarget The new value to set.
+	 * Gets the target item of a source item.
+	 * @return The target item of this item, or null.
 	 */
-	void setHasTarget (boolean hasTarget);
-
+	IExtractionItem getTarget ();
+	
+	/**
+	 * Sets the target item for a source item. Uset setTarget(null) to remove an
+	 * existing target.
+	 * @param item The target item for this source item.
+	 */
+	void setTarget (IExtractionItem item);
+	
 	/**
 	 * Indicates if the content of this item should have its white-spaces preserved.
 	 * @return True if the formatting should be preserved, false otherwise.

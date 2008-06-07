@@ -32,7 +32,6 @@ public class ExtractionItem implements IExtractionItem {
 
 	private String                     id;
 	private boolean                    isTranslatable;
-	private boolean                    hasTarget;
 	private String                     resname;
 	private String                     restype;
 	private boolean                    preserveFormatting;
@@ -42,6 +41,7 @@ public class ExtractionItem implements IExtractionItem {
 	private ArrayList<IContainer>      segments;
 	private Map<String, Object>        props;
 	private boolean                    isSegmented;
+	private IExtractionItem            target;
 
 
 	public ExtractionItem () {
@@ -118,7 +118,7 @@ public class ExtractionItem implements IExtractionItem {
 	}
 
 	public boolean hasTarget () {
-		return hasTarget;
+		return (target != null);
 	}
 
 	public boolean isTranslatable () {
@@ -135,10 +135,6 @@ public class ExtractionItem implements IExtractionItem {
 
 	public void setType (String newRestype) {
 		restype = newRestype;
-	}
-
-	public void setHasTarget (boolean newHasTarget) {
-		hasTarget = newHasTarget;
 	}
 
 	public void setIsTranslatable (boolean newIsTranslatable) {
@@ -217,6 +213,14 @@ public class ExtractionItem implements IExtractionItem {
 		
 		// Return the compiled segment
 		return compiled;
+	}
+
+	public IExtractionItem getTarget () {
+		return target;
+	}
+
+	public void setTarget (IExtractionItem item) {
+		target = item;
 	}
 
 }

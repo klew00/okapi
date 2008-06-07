@@ -16,7 +16,9 @@ import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
+import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.ExtractionItem;
+import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {
@@ -103,42 +105,53 @@ public class Merger extends ThrougputPipeBase {
 	}
 
 	@Override
-    public void endExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem)
-	{
+    public void endExtractionItem (IExtractionItem item) {
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
 			logger.warn("There is no more package item to merge (for ID={})",
-				sourceItem.getID());
+				item.getID());
 			// Keep writing the output file
-			super.endExtractionItem(sourceItem, targetItem);
+			super.endExtractionItem(item);
 			return;
 		}
 		
 		// Update the item if needed
-		if ( sourceItem.isTranslatable() ) {
-			IExtractionItem srcPkgItem = reader.getSourceItem();
+		if ( item.isTranslatable() ) {
+			IExtractionItem srcPkgItem = reader.getItem();
 			
-			if ( !sourceItem.getID().equals(srcPkgItem.getID()) ) {
+			if ( !item.getID().equals(srcPkgItem.getID()) ) {
 				// Problem: different IDs
 				logger.warn("ID mismatch: original item: '{}' package item: '{}'",
-					sourceItem.getID(), srcPkgItem.getID());
-				super.endExtractionItem(sourceItem, targetItem);
+					item.getID(), srcPkgItem.getID());
+				super.endExtractionItem(item);
 				return;
 			}
 			
-			IExtractionItem trgPkgItem = reader.getTargetItem();
-			if ( targetItem == null ) {
-				targetItem = new ExtractionItem();
-				sourceItem.setHasTarget(true);
+			if ( !srcPkgItem.hasTarget() ) {
+				logger.error("Item id={}: No translation provided", item.getID());
+				item.setTarget(item);
 			}
-			// Set the codedText part of the content only. Do not modify the codes!
-			targetItem.getContent().setContent(trgPkgItem.getContent().getCodedText());
+			else {
+				if ( !item.hasTarget() ) {
+					// Create the target entry for the output if it does not exist yet
+					item.setTarget(new ExtractionItem());
+				}
+				// Set the codedText part of the content only. Do not modify the codes!
+				try {
+					item.getTarget().getContent().setContent(
+						srcPkgItem.getTarget().getContent().getCodedText(),
+						item.getContent().getCodes());
+				}
+				catch ( RuntimeException e ) {
+					logger.error("Error with item id={}.", item.getID());
+					throw e;
+				}
+			}
 		}
 		
 		// Call output filter
-		super.endExtractionItem(sourceItem, targetItem);
+		super.endExtractionItem(item);
 	}
     
 }

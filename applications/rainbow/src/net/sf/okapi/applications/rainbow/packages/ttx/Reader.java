@@ -38,12 +38,8 @@ public class Reader implements IReader {
 		reader.close();
 	}
 
-	public IExtractionItem getSourceItem () {
-		return reader.sourceItem;
-	}
-
-	public IExtractionItem getTargetItem () {
-		return reader.sourceItem;
+	public IExtractionItem getItem () {
+		return reader.item;
 	}
 
 	public void openDocument (String path) {

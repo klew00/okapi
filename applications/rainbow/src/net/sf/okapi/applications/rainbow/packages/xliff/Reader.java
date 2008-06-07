@@ -20,12 +20,8 @@ public class Reader implements IReader {
 	public void closeDocument () {
 	}
 
-	public IExtractionItem getSourceItem () {
-		return reader.getSourceItem();
-	}
-
-	public IExtractionItem getTargetItem () {
-		return reader.getTargetItem();
+	public IExtractionItem getItem () {
+		return reader.getItem();
 	}
 
 	public void openDocument (String path) {

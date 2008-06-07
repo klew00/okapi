@@ -25,14 +25,12 @@ public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe
     }
 
     //YS: See comment in IResourceBuilder
-    public void startExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem) {
-        outputPipe.startExtractionItem(sourceItem, targetItem);
+    public void startExtractionItem (IExtractionItem item) {
+        outputPipe.startExtractionItem(item);
     }
 
-    public void endExtractionItem(IExtractionItem sourceItem,
-    	IExtractionItem targetItem) {
-        outputPipe.endExtractionItem(sourceItem, targetItem);
+    public void endExtractionItem(IExtractionItem item) {
+        outputPipe.endExtractionItem(item);
     }
 
     public void setOutput(IResourceBuilder inputBuilder) {

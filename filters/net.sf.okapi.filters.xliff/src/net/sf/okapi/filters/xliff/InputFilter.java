@@ -76,8 +76,8 @@ public class InputFilter implements IInputFilter {
 					break;
 				case XLIFFReader.RESULT_ENDTRANSUNIT:
 					if ( isExtractable() ) {
-						output.startExtractionItem(reader.sourceItem, reader.targetItem);
-						output.endExtractionItem(reader.sourceItem, reader.targetItem);
+						output.startExtractionItem(reader.item);
+						output.endExtractionItem(reader.item);
 					}
 					break;
 				case XLIFFReader.RESULT_STARTFILE:
@@ -103,9 +103,11 @@ public class InputFilter implements IInputFilter {
 
 	private boolean isExtractable () {
 		Resource res = (Resource)reader.resource;
+		
 		if ( !res.params.useStateValues ) return true;
-		if ( reader.targetItem == null ) return true;
-		String state = (String)reader.targetItem.getProperty("state");
+		if ( !reader.item.hasTarget() ) return true;
+		
+		String state = (String)reader.item.getTarget().getProperty("state");
 		if (( state == null ) || ( state.length() == 0 )) {
 			return res.params.extractNoState;
 		}

@@ -34,8 +34,6 @@ public interface IReader {
 
 	public boolean readItem ();
 	
-	public IExtractionItem getSourceItem ();
-	
-	public IExtractionItem getTargetItem ();
+	public IExtractionItem getItem ();
 	
 }

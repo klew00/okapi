@@ -11,11 +11,9 @@ public interface IResourceBuilder {
     
     //YS: Added targetItem to try out. Maybe instead the target
     // can be obtained from the source?
-    public void startExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem);
+    public void startExtractionItem (IExtractionItem item);
     
-    public void endExtractionItem(IExtractionItem sourceItem,
-    	IExtractionItem targetItem);
+    public void endExtractionItem(IExtractionItem item);
     
     public void startContainer(IResourceContainer resourceContainer);
     public void endContainer(IResourceContainer resourceCntainer);

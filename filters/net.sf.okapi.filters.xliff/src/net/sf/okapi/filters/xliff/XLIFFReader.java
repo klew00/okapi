@@ -35,8 +35,7 @@ public class XLIFFReader {
 
 	protected Resource            resource;
 	protected FileResource        fileRes;
-	protected IExtractionItem     sourceItem;
-	protected IExtractionItem     targetItem;
+	protected IExtractionItem     item;
 	
 	private IContainer       content;
 	private Node             node;
@@ -72,19 +71,11 @@ public class XLIFFReader {
 	}
 
 	/**
-	 * Gets the last source item read.
-	 * @return The last source item read.
+	 * Gets the last item read.
+	 * @return The last item read.
 	 */
-	public IExtractionItem getSourceItem () {
-		return sourceItem;
-	}
-
-	/**
-	 * Gets the last target item read.
-	 * @return The last target item read, or null if there are no target item.
-	 */
-	public IExtractionItem getTargetItem () {
-		return targetItem;
+	public IExtractionItem getItem () {
+		return item;
 	}
 
 	/**
@@ -158,8 +149,7 @@ public class XLIFFReader {
 	}
 	
 	private void resetItem () {
-		sourceItem = new ExtractionItem();
-		targetItem = null;
+		item = new ExtractionItem();
 		resource.srcElem = null;
 		resource.trgElem = null;
 		resource.status = STATUS_TOTRANS;
@@ -181,15 +171,15 @@ public class XLIFFReader {
 	private int processStartTransUnit () {
 		Element Elem = (Element)node;
 		String sTmp = Elem.getAttribute("translate");
-		if ( sTmp.length() > 0 ) sourceItem.setIsTranslatable(sTmp.equals("yes"));
+		if ( sTmp.length() > 0 ) item.setIsTranslatable(sTmp.equals("yes"));
 		sTmp = Elem.getAttribute("id");
 		if ( sTmp.length() == 0 ) throw new RuntimeException("Missing attribute 'id'.");
-		else sourceItem.setID(sTmp);
+		else item.setID(sTmp);
 		sTmp = Elem.getAttribute("resname");
-		if ( sTmp.length() > 0 ) sourceItem.setName(sTmp);
-		else if ( fallbackToID ) sourceItem.setName(sourceItem.getID());
+		if ( sTmp.length() > 0 ) item.setName(sTmp);
+		else if ( fallbackToID ) item.setName(item.getID());
 		sTmp = Elem.getAttribute("restype");
-		if ( sTmp.length() > 0 ) sourceItem.setType(sTmp);
+		if ( sTmp.length() > 0 ) item.setType(sTmp);
 		
 		return RESULT_STARTTRANSUNIT;
 	}
@@ -209,13 +199,13 @@ public class XLIFFReader {
 				content = new Container();
 				inCode = 0;
 				processContent(sName);
-				sourceItem.setContent(content);
+				item.setContent(content);
 			}
 			else if ( sName.equals("target") ) {
 				processTarget();
 			}
 			else if ( sName.equals("note") ) {
-				if ( !backTrack ) sourceItem.setNote(node.getTextContent());
+				if ( !backTrack ) item.setNote(node.getTextContent());
 			}
 		}
 		return RESULT_ENDTRANSUNIT; // Should not get here
@@ -314,11 +304,11 @@ public class XLIFFReader {
 	}
 	
 	private void processTarget () {
-		targetItem = new ExtractionItem();
+		item.setTarget(new ExtractionItem());
 		resource.trgElem = (Element)node;
 		String tmp = resource.trgElem.getAttribute("state");
 		if ( tmp.length() > 0 ) {
-			targetItem.setProperty("state", tmp);
+			item.getTarget().setProperty("state", tmp);
 			if ( tmp.equals("needs-translation") ) resource.status = STATUS_TOTRANS;
 			else if ( tmp.equals("final") ) resource.status = STATUS_OK;
 			else if ( tmp.equals("translated") ) resource.status = STATUS_TOEDIT;
@@ -328,11 +318,10 @@ public class XLIFFReader {
 		content = new Container();
 		inCode = 0;
 		processContent("target");
-		targetItem.setContent(content);
-
-		if ( !sourceItem.isEmpty() && !targetItem.isEmpty() ) {
-			sourceItem.setHasTarget(true);
-		}
+		if ( !item.isEmpty() && !content.isEmpty() )
+			item.getTarget().setContent(content);
+		else
+			item.setTarget(null);
 	}
 	
 }

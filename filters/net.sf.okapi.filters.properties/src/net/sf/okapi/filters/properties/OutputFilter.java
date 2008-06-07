@@ -43,18 +43,17 @@ public class OutputFilter implements IOutputFilter {
 	public void endContainer (IResourceContainer resourceCntainer) {
 	}
 
-	public void endExtractionItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem)
+	public void endExtractionItem (IExtractionItem item)
 	{
 		try {
 			// Write the buffer
 			writer.write(res.buffer.toString());
 			// Then write the item content
-			if ( sourceItem.hasTarget() ) {
-				writer.write(escape(targetItem.getContent().toString()));
+			if ( item.hasTarget() ) {
+				writer.write(escape(item.getTarget().getContent().toString()));
 			}
 			else {
-				writer.write(escape(sourceItem.getContent().toString()));
+				writer.write(escape(item.getContent().toString()));
 			}
 			if ( res.endingLB ) writer.write(res.lineBreak);
 		}
@@ -83,8 +82,7 @@ public class OutputFilter implements IOutputFilter {
 	public void startContainer (IResourceContainer resourceContainer) {
 	}
 
-	public void startExtractionItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem) {
+	public void startExtractionItem (IExtractionItem item) {
 	}
 
 	public void startResource (IResource resource) {

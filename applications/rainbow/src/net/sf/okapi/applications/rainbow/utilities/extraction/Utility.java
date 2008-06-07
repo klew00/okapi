@@ -107,20 +107,17 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	}
 	
 	@Override
-    public void startExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem) {
+    public void startExtractionItem (IExtractionItem item) {
 	}
 	
 	@Override
-    public void endExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem)
-	{
+    public void endExtractionItem (IExtractionItem item ) {
 		//int status = IFilterItem.TSTATUS_TOTRANS;
 		//if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
 		//else if ( sourceItem.hasTarget() ) status = IFilterItem.TSTATUS_TOEDIT;
 
-		writer.writeItem(sourceItem,
-			(params.includeTargets ? targetItem : null), 0); //TODO: status
+		writer.writeItem(item,
+			(params.includeTargets ? item.getTarget() : null), 0); //TODO: status
 	}
     
 	@Override

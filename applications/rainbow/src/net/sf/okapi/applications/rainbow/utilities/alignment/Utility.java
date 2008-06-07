@@ -69,16 +69,17 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 	}
 	
 	@Override
-    public void startExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem) {
+    public void startExtractionItem (IExtractionItem item) {
 	}
 	
 	@Override
-    public void endExtractionItem (IExtractionItem sourceItem,
-    	IExtractionItem targetItem)
-	{
-		if (( targetItem != null ) && ( !targetItem.isEmpty() )) {
-			writer.writeItem(sourceItem, targetItem);
+    public void endExtractionItem (IExtractionItem item) {
+		if ( item.hasTarget() ) {
+			IExtractionItem targetItem = item.getTarget();
+			if (( targetItem != null ) && ( !targetItem.isEmpty() )) {
+				//TODO: Use normal item (getTarget)
+				writer.writeItem(item, targetItem);
+			}
 		}
 	}
     

@@ -401,8 +401,8 @@ public class InputFilter implements IInputFilter {
 					resetBuffer = false;
 					break;
 				case RESULT_ITEM:
-					output.startExtractionItem(item, null);
-					output.endExtractionItem(item, null);
+					output.startExtractionItem(item);
+					output.endExtractionItem(item);
 					resetBuffer = true;
 					break;
 				default:

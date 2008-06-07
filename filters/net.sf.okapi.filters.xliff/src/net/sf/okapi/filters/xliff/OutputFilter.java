@@ -66,8 +66,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 	
-	public void endExtractionItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem) {
+	public void endExtractionItem (IExtractionItem item) {
 		if ( res.srcElem != null ) {
 			// Create a target element if needed
 			boolean newTarget = (res.trgElem == null);
@@ -80,12 +79,12 @@ public class OutputFilter implements IOutputFilter {
 			}
 			// Set the target element
 			//TODO: cases for existing translation
-			if ( sourceItem.isTranslatable() ) {
-				if ( sourceItem.hasTarget() ) {
-					buildContent(res.trgElem, targetItem);
+			if ( item.isTranslatable() ) {
+				if ( item.hasTarget() ) {
+					buildContent(res.trgElem, item.getTarget());
 				}
 				else {
-					buildContent(res.trgElem, sourceItem);
+					buildContent(res.trgElem, item);
 				}
 			}
 			else if ( newTarget || !res.trgElem.hasChildNodes() ) {
@@ -112,8 +111,7 @@ public class OutputFilter implements IOutputFilter {
 	public void startContainer (IResourceContainer resourceContainer) {
 	}
 
-	public void startExtractionItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem) {
+	public void startExtractionItem (IExtractionItem item) {
 	}
 
 	public void startResource (IResource resource) {

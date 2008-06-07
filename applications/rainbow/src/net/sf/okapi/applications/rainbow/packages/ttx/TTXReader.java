@@ -56,8 +56,7 @@ class TTXReader {
 	private static final int      TARGET              = 0x02;
 	private static final int      BOTH                = 0x03;
 
-	protected IExtractionItem     sourceItem;
-	protected IExtractionItem     targetItem;
+	protected IExtractionItem     item;
 	
 	private String           sourceLang;
 	private IContainer       srcCont;
@@ -178,8 +177,7 @@ class TTXReader {
 	}
 	
 	private void resetItem () {
-		sourceItem = new ExtractionItem();
-		targetItem = null;
+		item = new ExtractionItem();
 	}
 	
 	private void processUserSettings () {
@@ -196,18 +194,18 @@ class TTXReader {
 			trgCont = new Container();
 			Matcher M = idPattern.matcher(text);
 			if ( M.find() ) {
-				sourceItem.setIsTranslatable(false);
-				sourceItem.setID(text.substring(M.start(), M.end()));
+				item.setIsTranslatable(false);
+				item.setID(text.substring(M.start(), M.end()));
 			}
 			else throw new RuntimeException("ID value not found for <u> element: "+text);
 		}
 		else if ( text.equals("</u>") ) {
 			inText = false;
-			sourceItem.setContent(srcCont);
+			item.setContent(srcCont);
 			if ( !trgCont.isEmpty() ) {
-				targetItem = new ExtractionItem();
-				targetItem.setContent(trgCont);
-				sourceItem.setHasTarget(true);
+				item.setTarget(new ExtractionItem());
+				item.getTarget().setContent(trgCont);
+				
 			}
 			// If <ut> contains a </u> tag, that's the end of the item
 			result = true;
