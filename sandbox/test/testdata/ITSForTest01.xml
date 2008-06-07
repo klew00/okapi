@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<its:rules xmlns:its="http://www.w3.org/2005/11/its"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:ext="okapi-framework:its-extensions"
+ version="1.0" its:translate="no"
+ xlink:href="ITSForTest01_linked.xml" xlink:type="simple"
+ >
+ <its:translateRule selector="//data" translate="no"/>
+ <its:translateRule selector="//*/@text" translate="yes"/>
+ <its:translateRule selector="//elem" translate="yes" ext:idPointer="@myID"/>
+ 
+ <its:withinTextRule selector="//code|//b" withinText="yes"/>
+ <its:withinTextRule selector="//fn" withinText="nested"/>
+ 
+</its:rules>

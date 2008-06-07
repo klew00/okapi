@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<its:rules xmlns:its="http://www.w3.org/2005/11/its"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:ext="okapi-framework:its-extensions"
+ xmlns:xdoc="nsOfXDocParts"
+ version="1.0" its:translate="no"
+ >
+ <its:translateRule selector="//xdoc:rmk" translate="no"/>
+ </its:rules>
