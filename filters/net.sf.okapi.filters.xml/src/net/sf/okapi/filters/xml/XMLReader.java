@@ -5,12 +5,15 @@ import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.common.resource.CodeFragment;
+import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 import org.w3c.dom.Node;
+import org.w3c.its.IProcessor;
 import org.w3c.its.ITSEngine;
+import org.w3c.its.ITraversal;
 
 public class XMLReader {
 
@@ -22,9 +25,10 @@ public class XMLReader {
 
 	protected Resource       resource;
 	
-	private IExtractionItem  sourceItem;
-	private IExtractionItem  targetItem;
-	private int              lastResult;
+	private boolean          needNewItem;
+	private IExtractionItem  item;
+	private IContainer       content;
+	private int              codeID;
 	private Node             node;
 	private ITSEngine        itsProc;
 	
@@ -45,60 +49,85 @@ public class XMLReader {
 			node = resource.doc.getDocumentElement();
 			applyITSRules();
 			itsProc.startTraversal();
+			content = new Container();
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public IExtractionItem getSourceItem () {
-		return sourceItem;
-	}
-
-	public IExtractionItem getTargetItem () {
-		return targetItem;
-	}
-	
-	private void resetItems () {
-		sourceItem = new ExtractionItem();
-		targetItem = null;
+	public IExtractionItem getItem () {
+		return item;
 	}
 
 	public int read () {
-		boolean append = false;
-		IContainer cont = null;
-		int codeID = 0;
+		if ( needNewItem ) {
+			createNewItem();
+			needNewItem = false;
+		}
+
 		while ( true ) {
 			if ( (node = itsProc.nextNode()) == null ) {
-				return (lastResult = RESULT_ENDINPUT); // Document is done
+				return RESULT_ENDINPUT; // Document is done
 			}
 			switch ( node.getNodeType() ) {
 			case Node.ELEMENT_NODE:
-				if ( !itsProc.translate() ) continue;
 				if ( itsProc.backTracking() ) {
-					return (lastResult = RESULT_ENDTRANSUNIT);
+					// Was it an in-line element?
+					switch ( itsProc.getWithinText() ) {
+					case ITraversal.WITHINTEXT_YES:
+						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeID,
+							node.getNodeValue()));
+						break;
+					default:
+						//TODO: Nested case
+						if ( !content.isEmpty() ) {
+							return RESULT_ENDTRANSUNIT;
+						}
+						break;
+					}
 				}
-				else {
-					resetItems();
-					cont = sourceItem.getContent();
-					sourceItem.setName(node.getLocalName());
-					append = true;
-					return (lastResult = RESULT_STARTTRANSUNIT);
+				else { // We start a new element
+					switch ( itsProc.getWithinText() ) {
+					case ITraversal.WITHINTEXT_YES:
+						content.append(new CodeFragment(IContainer.CODE_OPENING, ++codeID,
+							node.getNodeValue()));
+						break;
+					//case itsProc.WITHINTEXT_NESTED:
+						//TODO
+					default:
+						// Finish previous item if needed
+						if ( !content.isEmpty() ) {
+							needNewItem = true;
+							return RESULT_ENDTRANSUNIT;
+						}
+						break;
+					}
+					// IF there is nothing to send, then start new item now
+					createNewItem();
+					return RESULT_STARTTRANSUNIT;
 				}
 				//break;
 			case Node.TEXT_NODE:
-				if ( !append ) continue;
 				if ( itsProc.translate() ) {
-					cont.append(node.getNodeValue());
+					content.append(node.getNodeValue());
 				}
 				else {
-					cont.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
+					content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 						node.getNodeValue()));
 				}
+				break;
 			}
 		}
 	}
 
+	
+	private void createNewItem () {
+		item = new ExtractionItem();
+		item.setType(node.getLocalName());
+		content = item.getContent();
+		codeID = 0;
+	}
 	
 	private void applyITSRules () {
 		itsProc = new ITSEngine(resource.doc, resource.getName());

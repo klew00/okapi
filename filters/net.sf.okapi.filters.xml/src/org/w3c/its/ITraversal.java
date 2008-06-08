@@ -4,6 +4,16 @@ import org.w3c.dom.Node;
 
 public interface ITraversal {
 	
+	public static final int DIR_RTL              = 0;
+	public static final int DIR_LTR              = 1;
+	public static final int DIR_RLO              = 2;
+	public static final int DIR_LRO              = 3;
+	
+	public static final int WITHINTEXT_NO        = 0;
+	public static final int WITHINTEXT_YES       = 1;
+	public static final int WITHINTEXT_NESTED    = 2;
+	
+	
 	/**
 	 * Starts the traversal of the document.
 	 */
@@ -20,7 +30,7 @@ public interface ITraversal {
 	 * for an element node, this indicate the equivalent of a closing tag.
 	 * @return True if the current node is found while backtracking, false otherwise. 
 	 */
-	boolean backTracking ();
+ 	boolean backTracking ();
 
 	/**
 	 * Indicates if the current node of the traversal is translatable.
@@ -50,4 +60,10 @@ public interface ITraversal {
 	 * @return One of the DIR_* values.
 	 */
 	int getDirectionality (String attrName);
+	
+	/**
+	 * Gets the withinText-related information for the current element.
+	 * @return One of the WINTINTEXT_* values.
+	 */
+	int getWithinText ();
 }

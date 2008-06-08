@@ -39,6 +39,7 @@ public class Writer extends BaseWriter {
 	private XMLWriter        writer = null;
 	private XLIFFContent     xliffCont;
 	private boolean          excludeNoTranslate = false;
+	private boolean          useSourceForTranslated = false;
 
 
 	public Writer () {
@@ -51,7 +52,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	public String getReaderClass () {
-		//TODO: Use dynamic anme
+		//TODO: Use dynamic name
 		return "net.sf.okapi.applications.rainbow.packages.xliff.Reader";
 	}
 	
@@ -96,6 +97,10 @@ public class Writer extends BaseWriter {
 				Util.getFilename(relativeSourcePath, true));
 			// Do not export items with translate='no'
 			excludeNoTranslate = true;
+			// If translated found: replace the target text by the source.
+			// Trusting the target will be gotten from the TMX from original
+			// This to allow editing of pre-translated items.
+			useSourceForTranslated = true;
 		}
 		relativeWorkPath += EXTENSION;
 
@@ -147,7 +152,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
-		writer.writeEndElement(); // source
+		writer.writeEndElementLineBreak(); // source
 
 		// Target (if needed)
 		if ( targetItem != null ) {
@@ -169,20 +174,22 @@ public class Writer extends BaseWriter {
 					break;
 			}
 */
-			if ( sourceItem.hasTarget() ) {
+			if ( sourceItem.hasTarget() && !useSourceForTranslated ) {
 				writer.writeRawXML(xliffCont.setContent(targetItem.getContent()).toString());
 			}
 			else {
 				writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
 			}
 
-			writer.writeEndElement(); // target
+			writer.writeEndElementLineBreak(); // target
+			// Write the item in the TM if needed
+			tmxWriter.writeItem(sourceItem);
 		}
 		else { // Use the source 
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
 			writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
-			writer.writeEndElement(); // target
+			writer.writeEndElementLineBreak(); // target
 		}
 
 		// Note
@@ -192,7 +199,8 @@ public class Writer extends BaseWriter {
 			writer.writeEndElementLineBreak(); // note
 		}
 
-		writer.writeEndElement(); // trans-unit
+		writer.writeEndElementLineBreak(); // trans-unit
+		
 	}
 
 	public void writeStartDocument () {

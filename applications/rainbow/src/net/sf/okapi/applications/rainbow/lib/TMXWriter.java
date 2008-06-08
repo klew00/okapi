@@ -1,4 +1,4 @@
-package net.sf.okapi.applications.rainbow.utilities.alignment;
+package net.sf.okapi.applications.rainbow.lib;
 
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.IExtractionItem;
@@ -9,17 +9,23 @@ public class TMXWriter {
 	private TMXContent  tmxCont;
 	private String      sourceLang;
 	private String      targetLang;
+	private int         itemCount;
+
 
 	public void close () {
 		if ( writer != null ) {
 			writer.close();
 			writer = null;
 		}
-		
 	}
 	
+	public int getItemCount () {
+		return itemCount;
+	}
+
 	public void create (String path) {
 		if ( path == null ) throw new NullPointerException();
+		itemCount = 0;
 		writer = new XMLWriter();
 		tmxCont = new TMXContent();
 		writer.create(path);
@@ -36,6 +42,17 @@ public class TMXWriter {
 		writer.writeStartDocument();
 		writer.writeStartElement("tmx");
 		writer.writeAttributeString("version", "1.4");
+		
+		writer.writeStartElement("header");
+		writer.writeAttributeString("creationtool", "TODO");
+		writer.writeAttributeString("creationtoolversion", "TODO");
+		writer.writeAttributeString("segtype", "paragraph");
+		writer.writeAttributeString("o-tmf", "TODO");
+		writer.writeAttributeString("adminlang", "en");
+		writer.writeAttributeString("srclang", sourceLang);
+		writer.writeAttributeString("datatype", "TODO");
+		writer.writeEndElement(); // header
+		
 		writer.writeStartElement("body");
 	}
 	
@@ -45,11 +62,10 @@ public class TMXWriter {
 		writer.writeEndDocument();
 	}
 	
-	public void writeItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem)
+	public void writeItem (IExtractionItem sourceItem)
 	{
 		if ( sourceItem == null ) throw new NullPointerException();
-		// targetItem can be null, not check for it
+		itemCount++;
 		
 		writer.writeStartElement("tu");
 
@@ -60,11 +76,12 @@ public class TMXWriter {
 		writer.writeEndElement(); // seg
 		writer.writeEndElementLineBreak(); // tuv
 		
-		if ( targetItem != null ) {
+		if ( sourceItem.hasTarget() ) {
 			writer.writeStartElement("tuv");
 			writer.writeAttributeString("xml:lang", targetLang);
 			writer.writeStartElement("seg");
-			writer.writeRawXML(tmxCont.setContent(targetItem.getContent()).toString());
+			writer.writeRawXML(tmxCont.setContent(
+				sourceItem.getTarget().getContent()).toString());
 			writer.writeEndElement(); // seg
 			writer.writeEndElementLineBreak(); // tuv
 		}

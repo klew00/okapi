@@ -270,7 +270,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			backTracking = false;
 			if ( !trace.peek().isChildDone && node.hasChildNodes() ) {
 				// Change the flag for the current node
-				ITSTrace tmp = new ITSTrace(trace.peek(), !trace.peek().isChildDone);
+				ITSTrace tmp = new ITSTrace(trace.peek(), true);
 				trace.pop();
 				trace.push(tmp);
 				// Get the new node and push its flag
@@ -521,5 +521,10 @@ public class ITSEngine implements IProcessor, ITraversal
 	public int getDirectionality (String attrName) {
 		//TODO
 		return DIR_LTR;
+	}
+	
+	public int getWithinText () {
+		//TODO
+		return WITHINTEXT_NO;
 	}
 }

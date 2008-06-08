@@ -172,6 +172,8 @@ public class Writer extends BaseWriter {
 		if (( sourceItem.hasTarget() ) && ( targetItem != null )) {
 			//TODO: Info about the match
 			writer.writeStartElement("Tu");
+			//TODO: writer.writeAttributeString("Origin", "manual");
+			//TODO: writer.writeAttributeString("MatchPercent", "100");
 			writer.writeStartElement("Tuv");
 			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
 			writeContent(sourceItem.getContent());
@@ -181,6 +183,9 @@ public class Writer extends BaseWriter {
 			writeContent(targetItem.getContent());
 			writer.writeEndElement(); //Tuv
 			writer.writeEndElement(); //Tu
+
+			// Write the item in the TM if needed
+			tmxWriter.writeItem(sourceItem);
 		}
 		else {
 			writeContent(sourceItem.getContent());

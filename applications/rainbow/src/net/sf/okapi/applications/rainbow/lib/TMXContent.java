@@ -1,4 +1,4 @@
-package net.sf.okapi.applications.rainbow.utilities.alignment;
+package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class TMXContent {
 	 * Generates a TMX string from the content.
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
-	 * @param escapeGT True to always escape '>' to gt
+	 * @param escapeGT True to always escape '>' to gt.
 	 * @return
 	 */
 	public String toString (int quoteMode,
@@ -54,21 +54,21 @@ public class TMXContent {
 			case IContainer.CODE_OPENING:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).id;
-				tmp.append(String.format("<bpt id=\"%d\">", id));
+				tmp.append(String.format("<bpt i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</bpt>");
 				break;
 			case IContainer.CODE_CLOSING:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).id;
-				tmp.append(String.format("<ept id=\"%d\">", id));
+				tmp.append(String.format("<ept i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ept>");
 				break;
 			case IContainer.CODE_ISOLATED:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).id;				
-				tmp.append(String.format("<ph id=\"%d\">", id));
+				tmp.append(String.format("<ph i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ph>");
 				break;

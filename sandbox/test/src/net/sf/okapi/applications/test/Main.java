@@ -6,6 +6,13 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.its.IProcessor;
+import org.w3c.its.ITSEngine;
+
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.CodeFragment;
@@ -14,6 +21,7 @@ import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
+import net.sf.okapi.filters.xml.Resource;
 import net.sf.okapi.filters.xml.XMLReader;
 
 public class Main {
@@ -63,19 +71,19 @@ public class Main {
 		try {
 			System.out.println("---start testXMLReader---");
 			XMLReader reader = new XMLReader();
-			String inputName = "Test01.xml";
+			String inputName = "testdata\\Test01.xml";
 			InputStream input = new FileInputStream(inputName);
 			reader.open(input, inputName);
 			int n;
 			do {
 				n = reader.read();
-				IExtractionItem item = reader.getSourceItem();
+				IExtractionItem item = reader.getItem();
 				switch ( n ) {
 				case XMLReader.RESULT_STARTTRANSUNIT:
-					System.out.println("sTU:"+item.getName()+",'"+item.getContent().toString()+"'");
+					System.out.println("sTU:"+item.getType()+",'"+item.getContent().toString()+"'");
 					break;
 				case XMLReader.RESULT_ENDTRANSUNIT:
-					System.out.println("eTU:"+item.getName()+",'"+item.getContent().toString()+"'");
+					System.out.println("eTU:"+item.getType()+",'"+item.getContent().toString()+"'");
 					break;
 				}
 			} while ( n > XMLReader.RESULT_ENDINPUT );
@@ -84,6 +92,41 @@ public class Main {
 			e.printStackTrace();
 		}
 		System.out.println("---end testXMLReader---");
+	}
+	
+	private static void testITSEngine () {
+		try {
+			System.out.println("---start testITSEngine---");
+			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
+			fact.setNamespaceAware(true);
+			fact.setValidating(false);
+			String inputPath = "testdata//test01.xml";
+			InputStream input = new FileInputStream(inputPath);
+			Document doc = fact.newDocumentBuilder().parse(input);
+			ITSEngine itsEng = new ITSEngine(doc, inputPath);
+			itsEng.applyRules(IProcessor.DC_ALL);
+			
+			itsEng.startTraversal();
+			Node node;
+			while ( (node = itsEng.nextNode()) != null ) {
+				switch ( node.getNodeType() ) {
+				case Node.ELEMENT_NODE:
+					if ( itsEng.backTracking() ) {
+						System.out.println("end of "+node.getLocalName());
+					}
+					else {
+						System.out.println("start of "+node.getLocalName());
+						System.out.println(String.format("translate=%s",
+							(itsEng.translate() ? "yes" : "no")));
+					}
+					break;
+				}
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		System.out.println("---end testITSEngine---");
 	}
 	
 	private static void testItem () {
@@ -144,7 +187,8 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testXMLReader();
+		testITSEngine();
+		//testXMLReader();
 		//testItem();
 		//testContainer();
 		//testFilter();

@@ -1,6 +1,6 @@
 package org.w3c.its;
 
-public class ITSTrace {
+class ITSTrace {
 	boolean             isChildDone;
 	boolean             translate;
 	int                 dir;

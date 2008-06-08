@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 ENLASO Corporation, Okapi Development Team             */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages;
 
 import java.io.File;
 
+import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
@@ -36,23 +37,26 @@ public abstract class BaseWriter implements IWriter {
 	protected String    sourceEncoding;
 	protected String    targetEncoding;
 	protected String    filterID;
+	protected TMXWriter tmxWriter;
+	protected String    tmxPath;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
 		manifest.setReaderClass(getReaderClass());
+		tmxWriter = new TMXWriter();
 	}
 	
 	public void setParameters (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
-		String outputDir,
+		String outputFolder,
 		String packageID,
 		String sourceRoot)
 	{
 		manifest.setSourceLanguage(sourceLanguage);
 		manifest.setTargetLanguage(targetLanguage);
 		manifest.setProjectID(projectID);
-		manifest.setRoot(outputDir);
+		manifest.setRoot(outputFolder);
 		manifest.setPackageID(packageID);
 		manifest.setPackageType(getPackageType());
 		this.inputRoot = sourceRoot;
@@ -79,6 +83,14 @@ public abstract class BaseWriter implements IWriter {
 
 		// No need to create the folder structure for the 'done' folder
 		// It will be done when merging
+		
+		// Create the reference TMX (pre-translations found in the source files)
+		if ( tmxPath == null ) {
+			tmxPath = manifest.getRoot() + File.separator + "fromOriginal.tmx";
+		}
+		tmxWriter.create(tmxPath);
+		tmxWriter.writeStartDocument(manifest.getSourceLanguage(),
+			manifest.getTargetLanguage());
 	}
 
 	public void writeEndPackage (boolean createZip) {
@@ -90,6 +102,13 @@ public abstract class BaseWriter implements IWriter {
 			if ( createZip ) {
 				// Zip the package if needed
 				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
+			}
+	
+			tmxWriter.writeEndDocument();
+			tmxWriter.close();
+			if ( tmxWriter.getItemCount() == 0 ) {
+				File file = new File(tmxPath);
+				file.delete();
 			}
 		}
 		catch ( Exception e ) {

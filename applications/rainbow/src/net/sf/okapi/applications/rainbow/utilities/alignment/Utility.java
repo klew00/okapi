@@ -1,5 +1,6 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
@@ -79,10 +80,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	@Override
     public void endExtractionItem (IExtractionItem item) {
 		if ( item.hasTarget() ) {
-			IExtractionItem targetItem = item.getTarget();
-			if (( targetItem != null ) && ( !targetItem.isEmpty() )) {
-				//TODO: Use normal item (getTarget)
-				writer.writeItem(item, targetItem);
+			if ( !item.getTarget().isEmpty() ) {
+				writer.writeItem(item);
 			}
 		}
 	}

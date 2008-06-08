@@ -1,27 +1,17 @@
 package org.w3c.its;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public interface IProcessor {
 	
-	static int DC_LANGINFO        = 0x0001;
-	static int DC_TRANSLATE       = 0x0002;
-	static int DC_WITHINTEXT      = 0x0004;
-	static int DC_LOCNOTE         = 0x0008;
-	static int DC_TERMINOLOGY     = 0x0010;
-	static int DC_DIRECTIONALITY  = 0x0020;
-	static int DC_RUBY            = 0x0040;
-	static int DC_ALL             = 0xFFFF;
-	
-	static int DIR_RTL            = 0;
-	static int DIR_LTR            = 1;
-	static int DIR_RLO            = 2;
-	static int DIR_LRO            = 3;
-	
-	static int WITHINTEXT_NO      = 0;
-	static int WITHINTEXT_YES     = 1;
-	static int WITHINTEXT_NESTED  = 2;
+	public static final int DC_LANGINFO          = 0x0001;
+	public static final int DC_TRANSLATE         = 0x0002;
+	public static final int DC_WITHINTEXT        = 0x0004;
+	public static final int DC_LOCNOTE           = 0x0008;
+	public static final int DC_TERMINOLOGY       = 0x0010;
+	public static final int DC_DIRECTIONALITY    = 0x0020;
+	public static final int DC_RUBY              = 0x0040;
+	public static final int DC_ALL               = 0xFFFF;
 	
 	/**
 	 * Adds a set of global rules to the document to process. The rules are added
