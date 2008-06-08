@@ -42,10 +42,11 @@
   id="oku_alignment"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
   updateUri="http://okapi.sf.net/updates/alignment">
   <info>
-   <name>Create TMX from Billingual Document</name>
-   <description>Creates a TMX file from a set of bi-lingual documents such as XLIFF files.</description>
+   <name>Create TMX from Bilingual Document</name>
+   <description>Creates a TMX file from a set of bilingual documents such as XLIFF files.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

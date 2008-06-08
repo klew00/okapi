@@ -33,6 +33,8 @@ import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
@@ -121,6 +123,7 @@ public class UtilityDriver {
 				util.setOutputData(outputPath, prj.buildTargetEncoding(item));
 
 				if ( util.isFilterDriven() ) {
+					IFilterDrivenUtility filterUtil = (IFilterDrivenUtility)util;
 					// Load the filter
 					fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
 						item.filterSettings);
@@ -128,22 +131,22 @@ public class UtilityDriver {
 					fa.inputFilter.initialize(input, inputPath,
 						item.filterSettings, prj.buildSourceEncoding(item),
 						prj.getSourceLanguage(), prj.getTargetLanguage());
-					fa.inputFilter.setOutput(util);
+					fa.inputFilter.setOutput(filterUtil);
 					
 					// Initialize the output if needed
-					if ( util.needsOutputFilter() ) {
+					if ( filterUtil.needsOutputFilter() ) {
 						// Initialize the output
 						OutputStream output = new FileOutputStream(outputPath);
 						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
 								prj.getTargetLanguage());
-						util.setOutput(fa.outputFilter);
+						filterUtil.setOutput(fa.outputFilter);
 					}
 
 					// Process the input 
 					fa.inputFilter.process();
 				}
 				else { // Not filter-driven, just execute with input file
-					util.processInput();
+					 ((ISimpleUtility)util).processInput();
 				}
 			}
 

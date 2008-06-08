@@ -15,7 +15,7 @@
 </trans-unit>
 <trans-unit id="3">
 <source xml:lang="en-US">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></source>
-<target xml:lang="fr-FR">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></target>
+<target xml:lang="fr-FR">FRENCH About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></target>
 </trans-unit>
 
 <trans-unit id="4" translate="no">
@@ -27,7 +27,7 @@
 </trans-unit>
 <trans-unit id="6" translate="no">
 <source xml:lang="en-US">translate=no About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></source>
-<target xml:lang="fr-FR">translate=no About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></target>
+<target xml:lang="fr-FR">FRENCH translate=no About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></target>
 </trans-unit>
 
 <trans-unit id="7">

@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.packages.Manifest;
-import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 
-public class Utility extends ThrougputPipeBase implements IUtility {
+
+public class Utility implements ISimpleUtility {
 
 	private String           inputRoot;
 	private String           outputRoot;
@@ -52,10 +52,6 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 		return true;
 	}
 
-	public boolean needsOutputFilter () {
-		return false;
-	}
-	
 	public void setParameters (IParameters paramsObject) {
 	}
 

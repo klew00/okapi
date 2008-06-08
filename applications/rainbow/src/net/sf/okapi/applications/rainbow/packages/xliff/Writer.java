@@ -38,6 +38,7 @@ public class Writer extends BaseWriter {
 
 	private XMLWriter        writer = null;
 	private XLIFFContent     xliffCont;
+	private boolean          excludeNoTranslate = false;
 
 
 	public Writer () {
@@ -86,11 +87,15 @@ public class Writer extends BaseWriter {
 		IParameters filterParams)
 	{
 		relativeWorkPath = relativeSourcePath;
-		// OmegaT does not support sub-folder, so we flatten the structure
-		// and make sure identical filename do not clash
+		
+		// OmegaT specific options
 		if ( manifest.getPackageType().equals("omegat") ) {
+			// OmegaT does not support sub-folder, so we flatten the structure
+			// and make sure identical filename do not clash
 			relativeWorkPath = String.format("%d.%s", docID,
 				Util.getFilename(relativeSourcePath, true));
+			// Do not export items with translate='no'
+			excludeNoTranslate = true;
 		}
 		relativeWorkPath += EXTENSION;
 
@@ -118,6 +123,10 @@ public class Writer extends BaseWriter {
 		IExtractionItem targetItem,
 		int status)
 	{
+		if ( excludeNoTranslate ) {
+			if ( !sourceItem.isTranslatable() ) return;
+		}
+		
 		writer.writeStartElement("trans-unit");
 		writer.writeAttributeString("id", String.valueOf(sourceItem.getID()));
 		if ( sourceItem.getName().length() != 0 )

@@ -21,13 +21,11 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.pipeline.IOutputPipe;
-import net.sf.okapi.common.pipeline.IResourceBuilder;
 
 /**
  * Provides a common way of executing an arbitrary utility.
  */
-public interface IUtility extends IResourceBuilder, IOutputPipe {
+public interface IUtility {
 
 	/**
 	 * Executes any prolog steps needed by this utility.
@@ -88,13 +86,6 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 		String outputRoot);
 
 	/**
-	 * Indicates if the utility has to use the output filter
-	 * pipe for its last output.
-	 * @return True if the output filter is required, false otherwise.
-	 */
-	boolean needsOutputFilter ();
-	
-	/**
 	 * Indicates if the utility is filter driven or not. If it is not, the utility 
 	 * is processed using the {@link #processInput()} method.
 	 * @return True if the utility is filter-driven, false otherwise.
@@ -118,11 +109,5 @@ public interface IUtility extends IResourceBuilder, IOutputPipe {
 	 */
 	void setOutputData (String path,
 		String encoding);
-
-	/**
-	 * Executes the utility for the last input set
-	 * (for non filter-driven utilities).
-	 */
-	void processInput ();
 
 }

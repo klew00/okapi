@@ -3,14 +3,14 @@ package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
-public class Utility extends ThrougputPipeBase implements IUtility  {
+public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
 	private final Logger          logger = LoggerFactory.getLogger(Utility.class);
 
@@ -50,7 +50,8 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 	}
 
 	public void setRoots (String inputRoot,
-		String outputRoot) {
+		String outputRoot)
+	{
 	}
 
 	@Override
@@ -75,10 +76,6 @@ public class Utility extends ThrougputPipeBase implements IUtility  {
 		}
     }
 	
-	public void processInput () {
-		// Do nothing: this utility is filter-driven.
-	}
-
 	public boolean isFilterDriven () {
 		return true;
 	}

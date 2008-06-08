@@ -4,14 +4,14 @@ import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
-import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.IResourceContainer;
 
-public class Utility extends ThrougputPipeBase implements IUtility {
+public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
 	private String      inputRoot;
 	private String      inputPath;
@@ -126,10 +126,6 @@ public class Utility extends ThrougputPipeBase implements IUtility {
 
 	@Override
 	public void endContainer (IResourceContainer resourceCntainer) {
-	}
-
-	public void processInput () {
-		// Do nothing: this utility is filter-driven.
 	}
 
 	public boolean isFilterDriven () {
