@@ -155,6 +155,24 @@ public class Main {
 				System.out.println("seg='"+seg.toString()+"'");
 			}
 			System.out.println("all segs= '"+item.toString()+"'");
+			
+			item = new ExtractionItem();
+			item.getContent().append("item1");
+			ExtractionItem childItem1 = new ExtractionItem();
+			childItem1.getContent().append("child1 of item1");
+			item.addChild(childItem1);
+			ExtractionItem childItem2 = new ExtractionItem();
+			childItem2.getContent().append("child1 of child1 of item1");
+			childItem1.addChild(childItem2);
+			childItem2 = new ExtractionItem();
+			childItem2.getContent().append("child2 of child1 of item1");
+			childItem1.addChild(childItem2);
+			
+			IExtractionItem currentItem = item.getFirstItem();
+			do {
+				System.out.println("item text=" + currentItem.toString()
+					+ ", parent=" + (currentItem.getParent()==null ? "none" : currentItem.getParent().toString()));
+			} while ((currentItem = item.getNextItem()) != null);
 		}
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -187,9 +205,9 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testITSEngine();
+		//testITSEngine();
 		//testXMLReader();
-		//testItem();
+		testItem();
 		//testContainer();
 		//testFilter();
 	}		

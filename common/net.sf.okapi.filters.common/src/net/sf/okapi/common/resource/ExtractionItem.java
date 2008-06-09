@@ -42,6 +42,9 @@ public class ExtractionItem implements IExtractionItem {
 	private Map<String, Object>        props;
 	private boolean                    isSegmented;
 	private IExtractionItem            target;
+	private IExtractionItem            parent;
+	private int                        currentIndex;
+	private ArrayList<IExtractionItem> allItems;
 
 
 	public ExtractionItem () {
@@ -60,10 +63,13 @@ public class ExtractionItem implements IExtractionItem {
 	
 	public void addChild (IExtractionItem child) {
 		//TODO: This can't work as it: we need a reference to where the child
-		// is going in the parent, for merging.
+		// is going in the parent, for merging (or can we just use indices?)
 		if ( children == null ) {
 			children = new ArrayList<IExtractionItem>();
 		}
+		// We assume all item in a given item are items of the same
+		// implementation.
+		((ExtractionItem)child).parent = this;
 		children.add(child);
 	}
 
@@ -223,4 +229,44 @@ public class ExtractionItem implements IExtractionItem {
 		target = item;
 	}
 
+	public boolean hasChild () {
+		if ( children == null ) return false;
+		else return !children.isEmpty();
+	}
+
+	public IExtractionItem getParent () {
+		return parent;
+	}
+
+	/**
+	 * Store recursively the children items of an items in the allItems list.
+	 * @param parentItem The parent item to store.
+	 */
+	private void storeItems (IExtractionItem parentItem) {
+		if ( parentItem.hasChild() ) {
+			for ( IExtractionItem item : parentItem.getChildren() ) {
+				storeItems(item);
+			}
+		}
+		allItems.add(parentItem);
+	}
+	
+	public IExtractionItem getFirstItem () {
+		if ( this.hasChild() ) {
+			allItems = new ArrayList<IExtractionItem>();
+			storeItems(this);
+			currentIndex = -1;
+			return getNextItem();
+		}
+		else {
+			allItems = null;
+			return this;
+		}
+	}
+	
+	public IExtractionItem getNextItem () {
+		if ( allItems == null ) return null;
+		if ( ++currentIndex < allItems.size() ) return allItems.get(currentIndex);
+		else return null;
+	}
 }

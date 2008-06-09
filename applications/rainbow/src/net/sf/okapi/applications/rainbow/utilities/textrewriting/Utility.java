@@ -56,20 +56,25 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 
 	@Override
     public void endExtractionItem(IExtractionItem item) {
-		String tmp = "";
 		try {
-			if ( item.isTranslatable() ) {
-				if ( !item.hasTarget() ) {
-					item.setTarget(new ExtractionItem());
+			String tmp = "";
+			IExtractionItem currentItem = item.getFirstItem();
+			do {
+				try {
+					if ( currentItem.isTranslatable() ) {
+						if ( !currentItem.hasTarget() ) {
+							currentItem.setTarget(new ExtractionItem());
+						}
+						tmp = currentItem.getContent().getCodedText().replaceAll("\\p{L}", "X");
+						tmp = tmp.replaceAll("\\d", "N");
+						IContainer cnt = currentItem.getTarget().getContent(); 
+						cnt.setContent(tmp, currentItem.getContent().getCodes());
+					}
 				}
-				tmp = item.getContent().getCodedText().replaceAll("\\p{L}", "X");
-				tmp = tmp.replaceAll("\\d", "N");
-				IContainer cnt = item.getTarget().getContent(); 
-				cnt.setContent(tmp, item.getContent().getCodes());
-			}
-		}
-		catch ( Exception e ) {
-			logger.warn("Error when setting new content: '"+tmp+"'", e);
+				catch ( Exception e ) {
+					logger.warn("Error when updating content: '"+tmp+"'", e);
+				}
+			} while ( (currentItem = item.getNextItem()) != null ); 
 		}
 		finally {
 			super.endExtractionItem(item);

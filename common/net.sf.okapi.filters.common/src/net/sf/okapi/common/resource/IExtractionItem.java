@@ -185,4 +185,35 @@ public interface IExtractionItem {
 	 * @param segment The segment to add.
 	 */
 	void addSegment (IContainer segment);
+
+	/**
+	 * Indicates whether this item has at least one child.
+	 * @return True if the item has at least one child, false otherwise.
+	 */
+	boolean hasChild ();
+	
+	/**
+	 * Gets the parent item of this item.
+	 * @return The parent item of this item, or null if this item has no parent.
+	 */
+	IExtractionItem getParent ();
+	
+	/**
+	 * Gets the first item in this item. It is guaranteed that this call
+	 * will not return null, as there is at least the parent item itself.
+	 * If the item has no child, this method returns the item itself, then
+	 * {@link #getNextItem()} return null. If the item has children
+	 * this method returns the first item in the branch, then calls to
+	 * {@link #getNextItem()} return the other items, or null when there
+	 * are no more.
+	 * @return The next item in this item. Never is never returned.
+	 */
+	IExtractionItem getFirstItem ();
+	
+	/**
+	 * Gets the next item in this item.
+	 * @return The next item in this item, or null if there is no more
+	 * children items.
+	 */
+	IExtractionItem getNextItem ();
 }
