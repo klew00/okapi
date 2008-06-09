@@ -12,6 +12,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.its.IProcessor;
 import org.w3c.its.ITSEngine;
+import org.w3c.its.ITraversal;
 
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
@@ -71,7 +72,7 @@ public class Main {
 		try {
 			System.out.println("---start testXMLReader---");
 			XMLReader reader = new XMLReader();
-			String inputName = "testdata\\Test01.xml";
+			String inputName = "testdata\\Test02.xml";
 			InputStream input = new FileInputStream(inputName);
 			reader.open(input, inputName);
 			int n;
@@ -100,7 +101,7 @@ public class Main {
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 			fact.setNamespaceAware(true);
 			fact.setValidating(false);
-			String inputPath = "testdata//test01.xml";
+			String inputPath = "testdata//test02.xml";
 			InputStream input = new FileInputStream(inputPath);
 			Document doc = fact.newDocumentBuilder().parse(input);
 			ITSEngine itsEng = new ITSEngine(doc, inputPath);
@@ -116,8 +117,21 @@ public class Main {
 					}
 					else {
 						System.out.println("start of "+node.getLocalName());
-						System.out.println(String.format("translate=%s",
+						System.out.println(String.format("   translate=%s",
 							(itsEng.translate() ? "yes" : "no")));
+						switch ( itsEng.getWithinText() ) {
+						case ITraversal.WITHINTEXT_YES:
+							System.out.println("   withinText=yes");
+							break;
+						case ITraversal.WITHINTEXT_NESTED:
+							System.out.println("   withinText=nested");
+							break;
+						default:
+							System.out.println("   withinText=no");
+							break;
+						}
+						System.out.println(String.format("   directionality=%d",
+							itsEng.getDirectionality()));
 					}
 					break;
 				}
@@ -205,9 +219,9 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		//testITSEngine();
-		//testXMLReader();
-		testItem();
+		testITSEngine();
+		testXMLReader();
+		//testItem();
 		//testContainer();
 		//testFilter();
 	}		

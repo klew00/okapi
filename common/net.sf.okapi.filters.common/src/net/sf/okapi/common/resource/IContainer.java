@@ -12,8 +12,10 @@ public interface IContainer {
 	public static final int CHARBASE        = 0xE200;
 
 	/**
-	 * Gets the content in its original format.
-	 * @return The content of the object in its original format.
+	 * Gets A string representation of the content in a format close to
+	 * its original format. There is no guarantee that this representation will
+	 * be a valid representation of the original format.
+	 * @return A string representation of the content.
 	 */
 	String toString ();
 	
@@ -22,6 +24,14 @@ public interface IContainer {
 	 * @return True if the object is empty, false otherwise.
 	 */
 	boolean isEmpty ();
+	
+	/**
+	 * Indicates if the object contains at least one character.
+	 * @param includingWhiteSpaces True to count whitespace characters as text,
+	 * false to exclude them. Note that codes do not count as text.
+	 * @return True if the object contains some text.
+	 */
+	boolean hasText (boolean includingWhiteSpaces);
 	
 	/**
 	 * Appends a text (without codes) to the object. 

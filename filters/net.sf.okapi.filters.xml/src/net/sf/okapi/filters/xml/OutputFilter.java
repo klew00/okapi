@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.xliff;
+package net.sf.okapi.filters.xml;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -39,62 +39,41 @@ public class OutputFilter implements IOutputFilter {
 	public void endContainer (IResourceContainer resourceContainer) {
 	}
 
-	private void buildContent (Element elem,
+	private void buildContent (Node node,
 		IExtractionItem item)
 	{
 		// Remove existing content
-		Node node = elem.getFirstChild();
-		while ( node != null ) {
-			elem.removeChild(node);
-			node = elem.getFirstChild();
+		Node tmpNode = node.getFirstChild();
+		while ( tmpNode != null ) {
+			node.removeChild(tmpNode);
+			tmpNode = node.getFirstChild();
 		}
 
 		// Set new nodes
-		Document doc = elem.getOwnerDocument();
+		Document doc = node.getOwnerDocument();
 		List<IFragment> fragList = item.getContent().getFragments();
 		for ( IFragment frag : fragList ) {
 			if ( frag.isText() ) {
-				elem.appendChild(doc.createTextNode(
+				node.appendChild(doc.createTextNode(
 					frag.toString()));
 			}
 			else { // Re-use the original code
 				// We need to use importNode() for case where target
 				// is created from the source item.
-				elem.appendChild(doc.importNode(
+				node.appendChild(doc.importNode(
 					(Node)((CodeFragment)frag).extraData, true));
 			}
 		}
 	}
 	
 	public void endExtractionItem (IExtractionItem item) {
-		if ( res.srcElem != null ) {
-			// Create a target element if needed
-			boolean newTarget = (res.trgElem == null);
-			if  ( newTarget ) {
-				res.trgElem = res.doc.createElement("target");
-				res.trgElem.setAttribute("xml:lang", targetLang);
-				//TODO: insert after source instead of append at the end of source parent
-				res.srcElem.getParentNode().appendChild(res.trgElem);
-				res.srcElem.getParentNode().appendChild(res.doc.createTextNode("\n"));
+		// Set the target text
+		//TODO: children!
+		if ( item.isTranslatable() ) {
+			if ( item.hasTarget() ) {
+				buildContent(res.srcNode, item.getTarget());
 			}
-			// Set the target element
-			//TODO: cases for existing translation
-			if ( item.isTranslatable() ) {
-				if ( item.hasTarget() ) {
-					buildContent(res.trgElem, item.getTarget());
-				}
-				else {
-					buildContent(res.trgElem, item);
-				}
-			}
-			else if ( newTarget || !res.trgElem.hasChildNodes() ) {
-				// Fill new target with original text
-				Node node = res.srcElem.getFirstChild();
-				while ( node != null ) {
-					res.trgElem.appendChild(node.cloneNode(true));
-					node = node.getNextSibling();
-				}
-			}
+			// Else: no modification
 		}
 	}
 

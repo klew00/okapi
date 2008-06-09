@@ -54,6 +54,23 @@ public class Container implements IContainer {
 		return true; // Found only empty text fragments
 	}
 	
+	public boolean hasText (boolean includingWhiteSpaces) {
+		if ( lastFrag == null ) return false;
+		for ( IFragment frag : list ) {
+			if ( frag.isText() ) {
+				if ( includingWhiteSpaces ) {
+					if ( ((TextFragment)frag).text.length() > 0 ) return true;
+				}
+				else { // Check for any non-whitespace chars
+					String tmp = ((TextFragment)frag).text.toString();
+					for ( int i=0; i<tmp.length(); i++ )
+						if ( !Character.isWhitespace(tmp.charAt(i)) ) return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	private void reset () {
 		list = new ArrayList<IFragment>();
 		lastFrag = null;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc xmlns:xd="nsOfXDocParts" xmlns:its="http://www.w3.org/2005/11/its" its:version="1.0">
- <elem text="Text attribute">Paragraph.</elem>
- <elem xml:id="ID1">Paragraph 2</elem>
+ <elem text="Text attribute">Paragraph with &lt;=lt, &amp;=amp, &quot;=quot, &apos;=apos.</elem>
+ <elem xml:id="ID1">Paragraph 2<!--comment  --> end of paragraph.</elem>
  <data its:translate="no">Data not to localize</data>
  <elem myID="ID2">Text with <code>code</code> and <b>bold</b>.</elem>
  <elem myID="ID3" xml:id="OtherID">Text with a footnote<fn>Text of the footnote</fn> and more text</elem>

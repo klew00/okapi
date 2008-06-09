@@ -12,4 +12,9 @@
   outputFilterClass="net.sf.okapi.filters.xliff.OutputFilter"
  >XLIFF</filter>
   
+ <filter id="okf_xml"
+  inputFilterClass="net.sf.okapi.filters.xml.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.xml.OutputFilter"
+ >XML</filter>
+  
 </okapiFilters>

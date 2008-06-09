@@ -4,9 +4,10 @@ import java.util.List;
 
 public interface IExtractionItem {
 
-	/**
-	 * Gets the content of the item in its original format.
-	 * @return The content of the object in its original format.
+	/** Gets A string representation of the content in a format close to
+	 * its original format. There is no guarantee that this representation will
+	 * be a valid representation of the original format.
+	 * @return A string representation of the content.
 	 */
 	String toString ();
 	

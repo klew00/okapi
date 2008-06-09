@@ -380,16 +380,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( data.charAt(FP_WITHINTEXT) != '?' ) {
 			switch ( data.charAt(FP_WITHINTEXT) ) {
 			case '0':
-				trace.peek().dir = WITHINTEXT_NO;
+				trace.peek().withinText = WITHINTEXT_NO;
 				break;
 			case '1':
-				trace.peek().dir = WITHINTEXT_YES;
+				trace.peek().withinText = WITHINTEXT_YES;
 				break;
 			case '2':
-				trace.peek().dir = WITHINTEXT_NESTED;
+				trace.peek().withinText = WITHINTEXT_NESTED;
 				break;
 			}
-			
 		}
 	}
 
@@ -433,11 +432,11 @@ public class ITSEngine implements IProcessor, ITraversal
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
-							String.format("%d", rule.dir).charAt(0));
+							String.valueOf(rule.dir).charAt(0));
 						break;
 					case IProcessor.DC_WITHINTEXT:
 						setFlag(NL.item(i), FP_WITHINTEXT,
-							String.format("%d", rule.dir).charAt(0));
+							String.valueOf(rule.withinText).charAt(0));
 						break;
 					}
 				}
@@ -519,12 +518,10 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	public int getDirectionality (String attrName) {
-		//TODO
-		return DIR_LTR;
+		return trace.peek().dir;
 	}
 	
 	public int getWithinText () {
-		//TODO
-		return WITHINTEXT_NO;
+		return trace.peek().withinText;
 	}
 }

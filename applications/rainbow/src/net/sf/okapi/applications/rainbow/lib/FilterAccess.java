@@ -218,7 +218,10 @@ public class FilterAccess {
 			if (( paramPath != null ) && ( paramPath.length() > 0 )) {
 				inputFilter.getParameters().load(paramPath, false);
 			}
-			else inputFilter.getParameters().reset();
+			else {
+				IParameters params = inputFilter.getParameters();
+				if ( params != null ) params.reset();
+			}
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);
