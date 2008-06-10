@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.IProcessor;
 import org.w3c.its.ITSEngine;
@@ -132,6 +133,12 @@ public class Main {
 						}
 						System.out.println(String.format("   directionality=%d",
 							itsEng.getDirectionality()));
+						NamedNodeMap list = node.getAttributes();
+						for ( int i=0; i<list.getLength(); i++ ) {
+							Node attr = list.item(i);
+							System.out.println("      - " + attr.getNodeName() + ", trans="
+								+ (itsEng.translate(attr.getNodeName()) ? "yes" : "no"));
+						}
 					}
 					break;
 				}

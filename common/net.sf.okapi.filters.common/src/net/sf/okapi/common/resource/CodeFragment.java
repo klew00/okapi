@@ -2,22 +2,11 @@ package net.sf.okapi.common.resource;
 
 public class CodeFragment implements IFragment {
 	
-	/**
-	 * Original code string.
-	 */
-	public String       code;
-	/**
-	 * Type of code.
-	 */
-	public int          type;
-	/**
-	 * ID of the code in the content.
-	 */
-	public int          id;
-	/**
-	 * Extra format-specific data that is needed to re-build the original code.
-	 */
-	public Object       extraData;
+	protected String       code;
+	protected int          type;
+	protected int          id;
+	protected Object       data;
+
 
 	public CodeFragment (int type,
 		int id,
@@ -31,12 +20,12 @@ public class CodeFragment implements IFragment {
 	public CodeFragment (int type,
 		int id,
 		String code,
-		Object extraData)
+		Object data)
 	{
 		this.type = type;
 		this.id = id;
 		this.code = code;
-		this.extraData = extraData;
+		this.data = data;
 	}
 		
 	public String toString () {
@@ -45,5 +34,17 @@ public class CodeFragment implements IFragment {
 	
 	public boolean isText () {
 		return false;
+	}
+	
+	public Object getData () {
+		return data;
+	}
+	
+	public int getID () {
+		return id;
+	}
+	
+	public int getType () {
+		return type;
 	}
 }

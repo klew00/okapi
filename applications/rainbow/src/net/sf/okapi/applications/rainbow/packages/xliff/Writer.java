@@ -125,8 +125,17 @@ public class Writer extends BaseWriter {
 	}
 
 	public void writeItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem,
+			IExtractionItem targetItem,
 		int status)
+	{
+		IExtractionItem current = sourceItem.getFirstItem();
+		do {
+			processItem(current, current.getTarget());
+		} while ( (current = sourceItem.getNextItem()) != null );
+	}
+	
+	private void processItem (IExtractionItem sourceItem,
+		IExtractionItem targetItem)
 	{
 		if ( excludeNoTranslate ) {
 			if ( !sourceItem.isTranslatable() ) return;

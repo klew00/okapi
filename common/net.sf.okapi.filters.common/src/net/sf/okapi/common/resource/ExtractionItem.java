@@ -45,6 +45,7 @@ public class ExtractionItem implements IExtractionItem {
 	private IExtractionItem            parent;
 	private int                        currentIndex;
 	private ArrayList<IExtractionItem> allItems;
+	private Object                     data;
 
 
 	public ExtractionItem () {
@@ -268,5 +269,13 @@ public class ExtractionItem implements IExtractionItem {
 		if ( allItems == null ) return null;
 		if ( ++currentIndex < allItems.size() ) return allItems.get(currentIndex);
 		else return null;
+	}
+
+	public Object getData () {
+		return data;
+	}
+
+	public void setData (Object data) {
+		this.data = data;
 	}
 }

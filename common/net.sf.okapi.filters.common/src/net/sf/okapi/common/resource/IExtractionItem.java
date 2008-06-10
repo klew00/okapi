@@ -217,4 +217,20 @@ public interface IExtractionItem {
 	 * children items.
 	 */
 	IExtractionItem getNextItem ();
+	
+	/**
+	 * Gets the filter-specific data object that may be attached to this
+	 * item. This is used to store information the filter need to output
+	 * the item.
+	 * @return A filter-specific object for the item. Can be null.  
+	 */
+	Object getData ();
+	
+	/**
+	 * Sets the filter-specific data object that may be attached to this
+	 * item. This is used to store information the filter need to output
+	 * the item.
+	 * @param data The object to set.
+	 */
+	void setData (Object data);
 }

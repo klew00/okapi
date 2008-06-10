@@ -53,21 +53,21 @@ public class TMXContent {
 			switch ( codedText.codePointAt(i) ) {
 			case IContainer.CODE_OPENING:
 				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).id;
+				id = ((CodeFragment)codes.get(index)).getID();
 				tmp.append(String.format("<bpt i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</bpt>");
 				break;
 			case IContainer.CODE_CLOSING:
 				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).id;
+				id = ((CodeFragment)codes.get(index)).getID();
 				tmp.append(String.format("<ept i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ept>");
 				break;
 			case IContainer.CODE_ISOLATED:
 				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).id;				
+				id = ((CodeFragment)codes.get(index)).getID();				
 				tmp.append(String.format("<ph i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ph>");

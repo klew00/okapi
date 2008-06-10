@@ -215,12 +215,14 @@ public class FilterAccess {
 			}
 
 			// Load the parameters
-			if (( paramPath != null ) && ( paramPath.length() > 0 )) {
-				inputFilter.getParameters().load(paramPath, false);
-			}
-			else {
-				IParameters params = inputFilter.getParameters();
-				if ( params != null ) params.reset();
+			IParameters params = inputFilter.getParameters();
+			if ( params != null ) { // Not all filters have parameters
+				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
+					params.load(paramPath, false);
+				}
+				else {
+					params.reset();
+				}
 			}
 		}
 		catch ( Exception e ) {

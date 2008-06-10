@@ -61,7 +61,7 @@ public class OutputFilter implements IOutputFilter {
 				// We need to use importNode() for case where target
 				// is created from the source item.
 				elem.appendChild(doc.importNode(
-					(Node)((CodeFragment)frag).extraData, true));
+					(Node)((CodeFragment)frag).getData(), true));
 			}
 		}
 	}

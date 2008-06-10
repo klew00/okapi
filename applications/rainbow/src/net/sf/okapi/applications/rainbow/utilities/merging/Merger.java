@@ -104,16 +104,25 @@ public class Merger extends ThrougputPipeBase {
 
 	@Override
     public void endExtractionItem (IExtractionItem item) {
+		IExtractionItem current = item.getFirstItem();
+		do {
+			processItem(current);
+		} while ( (current = item.getNextItem()) != null );
+
+		// Call output filter
+		super.endExtractionItem(item);
+	}
+
+	private void processItem (IExtractionItem item) {
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
 			logger.warn("There is no more package item to merge (for ID={})",
 				item.getID());
-			// Keep writing the output file
-			super.endExtractionItem(item);
+			// Keep the source
 			return;
 		}
-		
+
 		// Update the item if needed
 		if ( item.isTranslatable() ) {
 			IExtractionItem srcPkgItem = reader.getItem();
@@ -122,10 +131,10 @@ public class Merger extends ThrougputPipeBase {
 				// Problem: different IDs
 				logger.warn("ID mismatch: original item: '{}' package item: '{}'",
 					item.getID(), srcPkgItem.getID());
-				super.endExtractionItem(item);
+				// Keep the source
 				return;
 			}
-			
+
 			if ( !srcPkgItem.hasTarget() ) {
 				logger.error("Item id={}: No translation provided", item.getID());
 				item.setTarget(item);
@@ -147,9 +156,6 @@ public class Merger extends ThrougputPipeBase {
 				}
 			}
 		}
-		
-		// Call output filter
-		super.endExtractionItem(item);
 	}
     
 }

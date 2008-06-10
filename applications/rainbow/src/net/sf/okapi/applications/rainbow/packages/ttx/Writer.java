@@ -133,7 +133,7 @@ public class Writer extends BaseWriter {
 				writer.writeString(frag.toString());
 			}
 			else {
-				switch ( ((CodeFragment)frag).type ) {
+				switch ( ((CodeFragment)frag).getType() ) {
 				case IContainer.CODE_OPENING:
 					writer.writeStartElement("ut");
 					writer.writeAttributeString("Type", "start");
@@ -164,6 +164,15 @@ public class Writer extends BaseWriter {
 	public void writeItem (IExtractionItem sourceItem,
 		IExtractionItem targetItem,
 		int status)
+	{
+		IExtractionItem current = sourceItem.getFirstItem();
+		do {
+			processItem(current, current.getTarget());
+		} while ( (current = sourceItem.getNextItem()) != null );
+	}
+	
+	private void processItem (IExtractionItem sourceItem,
+		IExtractionItem targetItem)
 	{
 		writer.writeRawXML(String.format(
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'&gt;</ut>",

@@ -12,6 +12,7 @@ import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.ITSEngine;
@@ -33,7 +34,7 @@ public class XMLReader {
 	private int              itemID;
 	private boolean          hasText;
 	private Node             node;
-	private ITSEngine        itsProc;
+	private ITSEngine        itsEng;
 	private int              codeID;
 	private Stack<Integer>   codeIDStack;
 	
@@ -43,7 +44,7 @@ public class XMLReader {
 	}
 	
 	public void open (InputStream input,
-			String inputName)
+		String inputName)
 	{
 		try {
 			DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -53,7 +54,7 @@ public class XMLReader {
 			resource.doc = fact.newDocumentBuilder().parse(input);
 			node = resource.doc.getDocumentElement();
 			applyITSRules();
-			itsProc.startTraversal();
+			itsEng.startTraversal();
 			sendEndEvent = false;
 			codeIDStack = new Stack<Integer>();
 		}
@@ -71,17 +72,18 @@ public class XMLReader {
 			sendEndEvent = false;
 			return RESULT_ENDTRANSUNIT;
 		}
+		item = new ExtractionItem();
 		resetStorage();
 
 		while ( true ) {
-			if ( (node = itsProc.nextNode()) == null ) {
+			if ( (node = itsEng.nextNode()) == null ) {
 				return RESULT_ENDINPUT; // Document is done
 			}
 			
 			switch ( node.getNodeType() ) {
 			case Node.ELEMENT_NODE:
-				if ( itsProc.backTracking() ) { // Closing tag
-					switch ( itsProc.getWithinText() ) {
+				if ( itsEng.backTracking() ) { // Closing tag
+					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
 						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeIDStack.pop(),
 							tagToString(node, false), node));
@@ -89,10 +91,7 @@ public class XMLReader {
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
 						if ( hasText ) {
-							createNewItem(node);
-							item.setContent(content);
-							item.setID(String.valueOf(++itemID));
-							sendEndEvent = true;
+							setItemInfo(node);
 							return RESULT_STARTTRANSUNIT;
 						}
 						else {
@@ -102,19 +101,22 @@ public class XMLReader {
 					}
 				}
 				else { // Start tag
-					switch ( itsProc.getWithinText() ) {
+					//TODO: Deal with empty elements!
+					processAttributes();
+					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
-						content.append(new CodeFragment(IContainer.CODE_OPENING, codeIDStack.push(++codeID),
-							tagToString(node, true), node));
+						if ( node.hasChildNodes() )
+							content.append(new CodeFragment(IContainer.CODE_OPENING, codeIDStack.push(++codeID),
+								tagToString(node, true), node));
+						else // Empty element
+							content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
+								tagToString(node, true), node));
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
 						// Finish previous item if needed
 						if ( hasText ) {
-							createNewItem(node.getParentNode());
-							item.setContent(content);
-							item.setID(String.valueOf(++itemID));
-							sendEndEvent = true;
+							setItemInfo(node.getParentNode());
 							return RESULT_STARTTRANSUNIT;
 						}
 						else {
@@ -125,7 +127,7 @@ public class XMLReader {
 				}
 				break;
 			case Node.TEXT_NODE:
-				if ( itsProc.translate() ) {
+				if ( itsEng.translate() ) {
 					content.append(node.getNodeValue());
 					// Check for text content if we have none so far
 					if ( !hasText ) {
@@ -165,6 +167,26 @@ public class XMLReader {
 		}
 	}
 
+	/**
+	 * Check for translatable attributes.
+	 */
+	private void processAttributes () {
+		if ( !node.hasAttributes() ) return; // Fast way out
+		NamedNodeMap list = node.getAttributes();
+		Node attr;
+		for ( int i=0; i<list.getLength(); i++ ) {
+			attr = list.item(i);
+			if ( itsEng.translate(attr.getNodeName()) ) {
+				ExtractionItem attrItem = new ExtractionItem();
+				attrItem.getContent().setContent(attr.getNodeValue());
+				attrItem.setID(String.valueOf(++itemID));
+				attrItem.setType("x-attr-"+attr.getNodeName());
+				attrItem.setData(attr);
+				item.addChild(attrItem);
+			}
+		}
+	}
+	
 	private void resetStorage () {
 		codeID = 0;
 		codeIDStack.clear();
@@ -173,21 +195,24 @@ public class XMLReader {
 		content = new Container();
 	}
 	
-	private void createNewItem (Node node) {
+	private void setItemInfo (Node node) {
 		if ( node == null ) throw new NullPointerException();
-		item = new ExtractionItem();
 		item.setType("x-"+node.getLocalName());
+		item.setContent(content);
+		item.setID(String.valueOf(++itemID));
+		item.setName(((Element)node).getAttribute("xml:id"));
+		sendEndEvent = true;
 		resource.srcNode = node;
 	}
 	
 	private void applyITSRules () {
-		itsProc = new ITSEngine(resource.doc, resource.getName());
+		itsEng = new ITSEngine(resource.doc, resource.getName());
 		
 		// Add any external rules file(s)
 		//TODO: Get the info from the parameters
 		
 		// Apply the all rules (external and internal)
-		itsProc.applyRules(ITSEngine.DC_LANGINFO | ITSEngine.DC_TRANSLATE
+		itsEng.applyRules(ITSEngine.DC_LANGINFO | ITSEngine.DC_TRANSLATE
 			| ITSEngine.DC_WITHINTEXT);
 	}
 	
@@ -197,13 +222,16 @@ public class XMLReader {
 		if ( startTag ) {
 			StringBuilder tmp = new StringBuilder();
 			tmp.append("<" + element.getNodeName());
-			NamedNodeMap attrs = element.getAttributes();
-			for ( int i=0; i<attrs.getLength(); i++ ) {
-				Node attr = attrs.item(i);
-				tmp.append(" " + attr.getNodeName() + "=\""
-					+ Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
+			if ( element.hasAttributes() ) {
+				NamedNodeMap attrs = element.getAttributes();
+				for ( int i=0; i<attrs.getLength(); i++ ) {
+					Node attr = attrs.item(i);
+					tmp.append(" " + attr.getNodeName() + "=\""
+							+ Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
+				}
 			}
-			tmp.append(">");
+			if ( node.hasChildNodes() ) tmp.append(">");
+			else tmp.append("/>");
 			return tmp.toString();
 		}
 		else {

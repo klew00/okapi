@@ -295,7 +295,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		return node;
 	}
 	
-	public Node OLD_nextNode () {
+/*	public Node OLD_nextNode () {
 		// Check for start or end
 		backTracking = false;
 		if ( startTraversal ) {
@@ -339,7 +339,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			backTracking = true;
 			if (( node == null ) || ( trace.empty() )) return null;
 		}
-	}
+	}*/
 	
 	/**
 	 * Updates the trace stack.
@@ -509,8 +509,13 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 	
 	public boolean translate (String attrName) {
-		//TODO
-		return false;
+		if ( node == null ) return false;
+		if ( !(node instanceof Element) ) return false;
+		Node attr = ((Element)node).getAttributeNode(attrName);
+		String tmp;
+		if ( (tmp = (String)attr.getUserData(FLAGNAME)) == null ) return false;
+		// '?' and 'n' will return (correctly) false
+		return (tmp.charAt(FP_TRANSLATE) == 'y');
 	}
 	
 	public int getDirectionality () {
