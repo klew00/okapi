@@ -25,6 +25,8 @@ public class XMLReader {
 	public static final int       RESULT_ENDGROUP          = 2;
 	public static final int       RESULT_STARTTRANSUNIT    = 3;
 	public static final int       RESULT_ENDTRANSUNIT      = 4;
+	
+	public static final String    ILMARKER  = "@MRK:";
 
 	protected Resource       resource;
 	
@@ -129,7 +131,7 @@ public class XMLReader {
 			case Node.TEXT_NODE:
 				if ( itsEng.translate() ) {
 					content.append(node.getNodeValue());
-					// Check for text content if we have none so far
+					// Check if we have already some content and change flag if needed
 					if ( !hasText ) {
 						for ( int i=0; i<node.getNodeValue().length(); i++ ) {
 							if ( !Character.isWhitespace(node.getNodeValue().charAt(i)) ) {
@@ -140,26 +142,26 @@ public class XMLReader {
 					}
 				}
 				else {
+					//TODO: Need to escape text (?)
 					content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 						node.getNodeValue(), node));
 				}
 				break;
 			case Node.CDATA_SECTION_NODE:
-				//TODO:
+				//TODO: CDATA_SECTION_NODE
 				break;
 			case Node.ENTITY_NODE:
-				//TODO
+				//TODO: ENTITY_NODE
 				break;
 			case Node.ENTITY_REFERENCE_NODE:
-				//TODO
+				//TODO: ENTITY_REFERENCE_NODE
 				break;
 			case Node.COMMENT_NODE:
-				//TODO:
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 					"<!--"+node.getNodeValue()+"-->", node));
 				break;
 			case Node.PROCESSING_INSTRUCTION_NODE:
-				//TODO
+				//TODO: PIs
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 					node.getNodeValue(), node));
 				break;
@@ -182,6 +184,12 @@ public class XMLReader {
 				attrItem.setID(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
 				attrItem.setData(attr);
+				if ( itsEng.getWithinText() == ITraversal.WITHINTEXT_YES ) {
+					// For sub-items in in-line codes: Replace the value by a
+					// marker so it can be used later for merging (as the node
+					// itself will not be available).
+					attr.setNodeValue(String.format("%s%d", ILMARKER, itemID));
+				}
 				item.addChild(attrItem);
 			}
 		}
@@ -227,7 +235,7 @@ public class XMLReader {
 				for ( int i=0; i<attrs.getLength(); i++ ) {
 					Node attr = attrs.item(i);
 					tmp.append(" " + attr.getNodeName() + "=\""
-							+ Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
+						+ Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
 				}
 			}
 			if ( node.hasChildNodes() ) tmp.append(">");

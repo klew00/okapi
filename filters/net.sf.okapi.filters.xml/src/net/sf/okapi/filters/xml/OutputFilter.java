@@ -2,6 +2,7 @@ package net.sf.okapi.filters.xml;
 
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -31,6 +32,7 @@ public class OutputFilter implements IOutputFilter {
 	private OutputStream               output;
 	private DocumentBuilderFactory     fact;
 	private DocumentBuilder            docBuilder;
+	private ArrayList<IExtractionItem> subItems;
 
 
 	public void close () {
@@ -55,7 +57,8 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	private void buildContent (Node node,
-		IExtractionItem item)
+		IExtractionItem item,
+		String content)
 	{
 		// Remove existing content
 		Node tmpNode = node.getFirstChild();
@@ -65,29 +68,11 @@ public class OutputFilter implements IOutputFilter {
 		}
 
 		Document doc = node.getOwnerDocument();
-		DocumentFragment df = parseXMLString(doc, makeXMLString(item));
+		DocumentFragment df = parseXMLString(doc, content);
 		
-		//node.appendChild(df.getFirstChild());
 		while ( df.hasChildNodes() ) {
 			node.appendChild(df.removeChild(df.getFirstChild()));
         }
-
-/*		
-//		// Set new nodes
-//		Document doc = node.getOwnerDocument();
-//		List<IFragment> fragList = item.getContent().getFragments();
-//		for ( IFragment frag : fragList ) {
-//			if ( frag.isText() ) {
-//				node.appendChild(doc.createTextNode(
-//					frag.toString()));
-//			}
-//			else { // Re-use the original code
-//				// We need to use importNode() for case where target
-//				// is created from the source item.
-//				node.appendChild(doc.importNode(
-//					(Node)((CodeFragment)frag).getData(), true));
-//			}
-//		}*/
 	}
 	
 	public void endExtractionItem (IExtractionItem item) {
@@ -97,13 +82,37 @@ public class OutputFilter implements IOutputFilter {
 			if ( current.isTranslatable() ) {
 				if ( current.hasTarget() ) {
 					// Attribute case: Simply set the value of the node passed by the data
-					//TODO: Test for attributes in in-line tags when copied to target location
 					Node attr = (Node)current.getData();
 					if ( attr != null ) {
-						attr.setNodeValue(current.getTarget().getContent().toString());
+						if ( attr.getNodeValue().startsWith(XMLReader.ILMARKER) ) {
+							// This is an item extracted from an in-line code
+							// We have to wait the parent to be merged to set it
+							current.getTarget().setID(current.getID()); // Copy ID
+							subItems.add(current.getTarget());
+						}
+						else { // Not in in-line code, set it now
+							attr.setNodeValue(current.getTarget().getContent().toString());
+						}
 					}
 					else {
-						buildContent(res.srcNode, current.getTarget());
+						String tmp = makeXMLString(current.getTarget());
+						// Merge items extracted from in-line codes if there are any
+						if ( subItems.size() > 0 ) {
+							for ( IExtractionItem subItem : subItems ) {
+								String mark = XMLReader.ILMARKER + subItem.getID();
+								if ( tmp.indexOf(mark) > -1 ) {
+									//TODO: We risk double-escape if the sub-item has in-line code
+									tmp = tmp.replace(mark, Util.escapeToXML(
+										subItem.toString(),3,false));
+								}
+								else {
+									//TODO: Warning: marker not found for sub-item
+								}
+							}
+							subItems.clear();
+						}
+						// Merge the content
+						buildContent(res.srcNode, current.getTarget(), tmp);
 					}
 				}
 			}
@@ -129,6 +138,7 @@ public class OutputFilter implements IOutputFilter {
 
 	public void startResource (IResource resource) {
 		res = (Resource)resource;
+		subItems = new ArrayList<IExtractionItem>();
 	}
 
 	private String makeXMLString (IExtractionItem item) {
@@ -139,7 +149,8 @@ public class OutputFilter implements IOutputFilter {
 				tmp.append(Util.escapeToXML(frag.toString(), 0, false));
 			}
 			else { // Re-use the original code
-				//TODO: escape the attribute values
+				// Attribute values should be escaped correctly already
+				//TODO: What about escape for code frags that are text not attrinute?
 				tmp.append(frag.toString());
 			}
 		}

@@ -49,7 +49,6 @@ public class XLIFFContent {
 		StringBuilder tmp = new StringBuilder();
 		int index;
 		int id;
-		//TODO: change to index-based not id-based
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case IContainer.CODE_OPENING:
