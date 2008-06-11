@@ -72,7 +72,6 @@ public class OutputFilter implements IOutputFilter {
 			node.appendChild(df.removeChild(df.getFirstChild()));
         }
 
-
 /*		
 //		// Set new nodes
 //		Document doc = node.getOwnerDocument();
@@ -98,7 +97,7 @@ public class OutputFilter implements IOutputFilter {
 			if ( current.isTranslatable() ) {
 				if ( current.hasTarget() ) {
 					// Attribute case: Simply set the value of the node passed by the data
-					//TODO: Test for attributes in inline tags when copied to target location
+					//TODO: Test for attributes in in-line tags when copied to target location
 					Node attr = (Node)current.getData();
 					if ( attr != null ) {
 						attr.setNodeValue(current.getTarget().getContent().toString());
@@ -151,8 +150,9 @@ public class OutputFilter implements IOutputFilter {
 		String fragment)
 	{
 		// Make sure we have boundaries
-		fragment = "<FrAg>"+fragment+"</FrAg>";
+		fragment = "<F>"+fragment+"</F>";
 		try {
+			// Parse the fragment
 			Document tmpDoc = docBuilder.parse(
 				new InputSource(new StringReader(fragment)));
 			// Import the nodes of the new document into the destination
@@ -165,13 +165,12 @@ public class OutputFilter implements IOutputFilter {
 				docfrag.appendChild(node.removeChild(node.getFirstChild()));
             }
 			return docfrag;
-		} catch ( SAXException e ) {
+		//} catch ( SAXException e ) {
 			// A parsing error occurred. Invalid XML
 			//TODO: Log
 		} catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
-        return null;
     }
 	
 }

@@ -17,6 +17,7 @@ public class Container implements IContainer {
 	private IFragment                  lastFrag;
 	private Map<String, Object>        props;
 
+	
 	static public char ItoC (int index) {
 		return (char)(index+CHARBASE);
 	}
@@ -152,16 +153,16 @@ public class Container implements IContainer {
 		return getText(true);
 	}
 
-	public Map<Integer, IFragment> getCodes () {
-		HashMap<Integer, IFragment> map = new HashMap<Integer, IFragment>();
+	public List<IFragment> getCodes () {
+		ArrayList<IFragment> codes = new ArrayList<IFragment>();
 		int index = 0;
 		for ( IFragment frag : list ) {
 			if ( !frag.isText() ) {
-				map.put(index, frag);
+				codes.add(frag);
 				index++;
 			}
 		}
-		return map;
+		return codes;
 	}
 
 	public List<IFragment> getFragments () {
@@ -199,15 +200,15 @@ public class Container implements IContainer {
 	 * @throws InvalidContentException (runtime)
 	 */
 	private void resetContent (String codedText,
-		Map<Integer, IFragment> codes)
+		List<IFragment> codes)
 	{
 		// Store code fragments temporarily
-		Map<Integer, IFragment> tmpMap = codes;
-		if ( tmpMap == null ) tmpMap = getCodes();
+		List<IFragment> tmpList = codes;
+		if ( tmpList == null ) tmpList = getCodes();
 		reset(); // Reset all
 
 		if ( codedText == null ) {
-			if ( tmpMap.size() > 0 ) //TODO: Maybe null just reset all instead of giving an error?
+			if ( tmpList.size() > 0 ) //TODO: Maybe null just reset all instead of giving an error?
 				throw new InvalidContentException("One missing code or more in the coded text.");
 			else return;
 		}
@@ -231,9 +232,9 @@ public class Container implements IContainer {
 				if ( ++i >= codedText.length() )
 					throw new InvalidContentException("Missing id after code prefix.");
 				int codeIndex = CtoI(codedText.charAt(i));
-				if ( !tmpMap.containsKey(codeIndex) )
+				if ( codeIndex >= tmpList.size() )
 					throw new InvalidContentException(String.format("Code index '%d' is not in the object.", codeIndex));
-				list.add(tmpMap.get(codeIndex));
+				list.add(tmpList.get(codeIndex));
 				codeCount++;
 				start = i+1;
 				break;
@@ -250,7 +251,7 @@ public class Container implements IContainer {
 			list.add(lastFrag);
 		}
 		
-		if ( codeCount < tmpMap.size() )
+		if ( codeCount < tmpList.size() )
 			throw new InvalidContentException("One missing code or more in the coded text.");
 		
 		// Update lastFrag once at the end (if needed)
@@ -264,7 +265,7 @@ public class Container implements IContainer {
 	}
 
 	public void setContent (String codedText,
-		Map<Integer, IFragment> codes)
+		List<IFragment> codes)
 	{
 		resetContent(codedText, codes);
 	}

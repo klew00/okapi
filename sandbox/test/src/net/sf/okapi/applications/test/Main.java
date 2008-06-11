@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -23,7 +22,6 @@ import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.filters.xml.Resource;
 import net.sf.okapi.filters.xml.XMLReader;
 
 public class Main {
@@ -39,7 +37,7 @@ public class Main {
 			String s1 = cnt.getCodedText();
 			cnt.setContent(s1);
 			System.out.println("out 2: " + cnt.toString());
-			Map<Integer, IFragment> codes = cnt.getCodes();
+			List<IFragment> codes = cnt.getCodes();
 			cnt.setContent(s1, codes);
 			System.out.println("out 3: " + cnt.toString());
 			

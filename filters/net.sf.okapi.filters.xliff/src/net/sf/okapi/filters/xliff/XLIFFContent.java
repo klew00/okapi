@@ -1,6 +1,6 @@
 package net.sf.okapi.filters.xliff;
 
-import java.util.Map;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.CodeFragment;
@@ -14,8 +14,8 @@ import net.sf.okapi.common.resource.IFragment;
  */
 public class XLIFFContent {
 
-	private String                     codedText;
-	private Map<Integer, IFragment>    codes;
+	private String           codedText;
+	private List<IFragment>  codes;
 	
 	public XLIFFContent () {
 		codedText = "";

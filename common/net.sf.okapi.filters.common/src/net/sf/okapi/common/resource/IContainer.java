@@ -1,7 +1,6 @@
 package net.sf.okapi.common.resource;
 
 import java.util.List;
-import java.util.Map;
 
 public interface IContainer {
 
@@ -75,7 +74,7 @@ public interface IContainer {
 	 * @throws InvalidContentException (runtime)
 	 */
 	void setContent (String codedText,
-		Map<Integer, IFragment> codes);
+		List<IFragment> codes);
 	
 	/**
 	 * Gets a list of all the fragments that compose the object.
@@ -96,9 +95,9 @@ public interface IContainer {
 
 	/**
 	 * Gets the codes of the object.
-	 * @return A map of the codes of the object.
+	 * @return A list of the codes of the object.
 	 */
-	Map<Integer, IFragment> getCodes ();
+	List<IFragment> getCodes ();
 
 	/**
 	 * Helper function: Indicates if a given code point in a coded string

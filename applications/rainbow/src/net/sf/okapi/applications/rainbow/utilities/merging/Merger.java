@@ -25,6 +25,7 @@ public class Merger extends ThrougputPipeBase {
 	private IReader          reader;
 	private FilterAccess     fa;
 	private final Logger     logger = LoggerFactory.getLogger(Utility.class);
+	private boolean          skipNoTranslate;
 
 	public Merger () {
 		fa = new FilterAccess();
@@ -43,11 +44,14 @@ public class Merger extends ThrougputPipeBase {
 	}
 
 	public void initialize (Manifest manifest) {
-		this.manifest = manifest;
+		// Close any previous reader
 		if ( reader != null ) {
 			reader.closeDocument();
 			reader = null;
 		}
+		// Set the manifest and the options
+		this.manifest = manifest;
+		skipNoTranslate = "omegat".equals(manifest.getPackageType());
 	}
 	
 	public void merge (int docID) {
@@ -114,6 +118,9 @@ public class Merger extends ThrougputPipeBase {
 	}
 
 	private void processItem (IExtractionItem item) {
+		// Skip the non-translatable if they are not included in the package
+		if ( skipNoTranslate && !item.isTranslatable() ) return;
+			
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
@@ -136,7 +143,7 @@ public class Merger extends ThrougputPipeBase {
 			}
 
 			if ( !srcPkgItem.hasTarget() ) {
-				logger.error("Item id={}: No translation provided", item.getID());
+				logger.warn("Item id={}: No translation provided", item.getID());
 				item.setTarget(item);
 			}
 			else {
@@ -152,7 +159,8 @@ public class Merger extends ThrougputPipeBase {
 				}
 				catch ( RuntimeException e ) {
 					logger.error("Error with item id={}.", item.getID());
-					throw e;
+					// Use the source instead, continue the merge
+					item.setTarget(item);
 				}
 			}
 		}
