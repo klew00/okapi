@@ -424,19 +424,22 @@ public class ITSEngine implements IProcessor, ITraversal
 				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				
 				// Apply the rule specific action on the selected nodes
+				// Global rules are applies before local so they should 
+				// always override existing flag. override should be set to false
+				// only for default attributes.
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					switch ( rule.ruleType ) {
 					case IProcessor.DC_TRANSLATE:
 						setFlag(NL.item(i), FP_TRANSLATE,
-							(rule.translate ? 'y' : 'n'));
+							(rule.translate ? 'y' : 'n'), true);
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
-							String.valueOf(rule.dir).charAt(0));
+							String.valueOf(rule.dir).charAt(0), true);
 						break;
 					case IProcessor.DC_WITHINTEXT:
 						setFlag(NL.item(i), FP_WITHINTEXT,
-							String.valueOf(rule.withinText).charAt(0));
+							String.valueOf(rule.withinText).charAt(0), true);
 						break;
 					}
 				}
@@ -461,7 +464,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					// Set the flag on the others
 					//TODO: Validate values
 					setFlag(attr.getOwnerElement(), FP_TRANSLATE,
-						(attr.getValue().equals("yes") ? 'y' : 'n'));
+						(attr.getValue().equals("yes") ? 'y' : 'n'), attr.getSpecified());
 				}
 			}
 			
@@ -482,7 +485,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "lro".equals(attr.getValue()) ) n = DIR_LRO;
 					else throw new RuntimeException("Invalid value for 'dir'."); 
 					setFlag(attr.getOwnerElement(), FP_DIRECTIONALITY,
-						String.format("%d", n).charAt(0));
+						String.format("%d", n).charAt(0), attr.getSpecified());
 				}
 			}
 		}
@@ -491,16 +494,27 @@ public class ITSEngine implements IProcessor, ITraversal
 		}
 	}
 
+	/**
+	 * Sets the flag for a given node.
+	 * @param node The node to flag.
+	 * @param position The position for the data category.
+	 * @param value The value to set.
+	 * @param override True if the value should override an existing value.
+	 * False should be used only for default attribute values.
+	 */
 	private void setFlag (Node node,
 		int position,
-		char value)
+		char value,
+		boolean override)
 	{
 		StringBuilder data = new StringBuilder();
 		if ( node.getUserData(FLAGNAME) == null )
 			data.append("????"+FLAGSEP);
 		else
 			data.append((String)node.getUserData(FLAGNAME));
-		data.setCharAt(position, value);
+
+		if ( override || ( data.charAt(position) != '?' )) 
+			data.setCharAt(position, value);
 		node.setUserData(FLAGNAME, data.toString(), null);
 	}
 
