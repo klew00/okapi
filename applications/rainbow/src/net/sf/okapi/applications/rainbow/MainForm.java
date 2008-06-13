@@ -593,16 +593,6 @@ public class MainForm implements IParametersProvider {
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miUtilities.setMenu(dropMenu);
 		
-		// Add the hard-wired utilities
-/*		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		menuItem.setText("Merge Translation Package...");
-		menuItem.setData(UTIL_MERGING);
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				launchUtility(event);
-			}
-		});
-*/		
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {

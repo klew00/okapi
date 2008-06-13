@@ -5,6 +5,7 @@
   id="oku_textrewriting"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
   updateUri="http://okapi.sf.net/updates/textrewriting">
   <info>
    <name>Text Rewriting</name>
@@ -16,6 +17,19 @@
    <name>Re-écriture de Text</name>
    <description>Re-écrit les documents en faisant differentes
     modifications. Par exemple, masquer le text traduisible, etc.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ 
+ <plugin type="utility"
+  id="oku_alignment"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
+  updateUri="http://okapi.sf.net/updates/alignment">
+  <info>
+   <name>Create TMX from Bilingual Document</name>
+   <description>Creates a TMX file from a set of bilingual documents such as XLIFF files.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
@@ -34,19 +48,6 @@
   <info xml:lang="fr">
    <name>Creer un Kit de Traduction</name>
    <description>Crée un kit de traduction.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
- 
- <plugin type="utility"
-  id="oku_alignment"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
-  updateUri="http://okapi.sf.net/updates/alignment">
-  <info>
-   <name>Create TMX from Bilingual Document</name>
-   <description>Creates a TMX file from a set of bilingual documents such as XLIFF files.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

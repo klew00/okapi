@@ -13,7 +13,12 @@ import net.sf.okapi.common.resource.IExtractionItem;
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
 	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private Parameters            params;
 
+	
+	public Utility () {
+		params = new Parameters();
+	}
 	
 	public void doProlog (String sourceLanguage,
 		String targetLanguage) {
@@ -23,7 +28,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 	
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public String getInputRoot () {
@@ -35,7 +40,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 
 	public boolean hasParameters () {
-		return false;
+		return true;
 	}
 
 	public boolean needsRoots () {
@@ -47,6 +52,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 
 	public void setParameters (IParameters paramsObject) {
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,
@@ -57,22 +63,27 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	@Override
     public void endExtractionItem(IExtractionItem item) {
 		try {
-			String tmp = "";
 			IExtractionItem currentItem = item.getFirstItem();
 			do {
-				try {
-					if ( currentItem.isTranslatable() ) {
-						if ( !currentItem.hasTarget() ) {
-							currentItem.setTarget(new ExtractionItem());
-						}
-						tmp = currentItem.getContent().getCodedText().replaceAll("\\p{L}", "X");
-						tmp = tmp.replaceAll("\\d", "N");
-						IContainer cnt = currentItem.getTarget().getContent(); 
-						cnt.setContent(tmp, currentItem.getContent().getCodes());
-					}
+				// Skip non-translatable
+				if ( !currentItem.isTranslatable() ) continue;
+				// Skip if already translate (only if required)
+				if ( currentItem.hasTarget() && !params.applyToExistingTarget ) continue;
+				// Else: do the requested modifications
+				// Make sure we have a target where to set data
+				if ( !currentItem.hasTarget() ) {
+					currentItem.setTarget(new ExtractionItem());
+					currentItem.getTarget().getContent().setContent(
+						currentItem.getContent().getCodedText(),
+						currentItem.getContent().getCodes());
 				}
-				catch ( Exception e ) {
-					logger.warn("Error when updating content: '"+tmp+"'", e);
+				switch ( params.type ) {
+				case Parameters.TYPE_XNREPLACE:
+					replaceWithXN(currentItem);
+					break;
+				}
+				if ( params.addPrefix || params.addSuffix || params.addName ) {
+					addText(currentItem);
 				}
 			} while ( (currentItem = item.getNextItem()) != null ); 
 		}
@@ -80,6 +91,47 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			super.endExtractionItem(item);
 		}
     }
+	
+	private void replaceWithXN (IExtractionItem item) {
+		String tmp = null;
+		try {
+			tmp = item.getTarget().getContent().getCodedText().replaceAll("\\p{L}", "X");
+			tmp = tmp.replaceAll("\\d", "N");
+			IContainer cnt = item.getTarget().getContent(); 
+			cnt.setContent(tmp, item.getContent().getCodes());
+		}
+		catch ( Exception e ) {
+			logger.warn("Error when updating content: '"+tmp+"'", e);
+		}
+	}
+	
+	/**
+	 * Adds prefix and/or suffix to the target. This method assumes that
+	 * the item has gone through the first transformation already.
+	 * @param item The item to process.
+	 */
+	private void addText (IExtractionItem item) {
+		String tmp = null;
+		try {
+			// Use the target as the text to change.
+			tmp = item.getTarget().getContent().getCodedText();
+			if ( params.addPrefix ) {
+				tmp = params.prefix + tmp;
+			}
+			if ( params.addSuffix ) {
+				tmp += params.suffix;
+			}
+			if ( params.addName ) {
+				if ( item.getName().length() > 0 ) tmp += "."+item.getName();
+				else tmp += "_"+item.getID();
+			}
+			IContainer cnt = item.getTarget().getContent(); 
+			cnt.setContent(tmp, item.getContent().getCodes());
+		}
+		catch ( Exception e ) {
+			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);
+		}
+	}
 	
 	public boolean isFilterDriven () {
 		return true;

@@ -21,8 +21,8 @@
 package net.sf.okapi.applications.rainbow.plugins;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -40,10 +40,10 @@ public class PluginsAccess {
 	public static final String TYPE_FILTER       = "filter";
 	public static final String TYPE_PARAMEDITOR  = "editor";
 	
-	private HashMap<String, PluginItem>     items;
+	private LinkedHashMap<String, PluginItem>    items;
 	
 	public PluginsAccess () {
-		items = new HashMap<String, PluginItem>();
+		items = new LinkedHashMap<String, PluginItem>();
 	}
 	
 	public boolean containsID (String id) {
