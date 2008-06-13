@@ -16,8 +16,9 @@ import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
+import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class OutputFilter implements IOutputFilter {
 	
@@ -36,7 +37,7 @@ public class OutputFilter implements IOutputFilter {
 		targetLang = targetLanguage;
 	}
 
-	public void endContainer (IResourceContainer resourceContainer) {
+	public void endContainer (IGroupResource resourceContainer) {
 	}
 
 	private void buildContent (Element elem,
@@ -98,7 +99,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void endResource (IResource resource) {
+	public void endResource (IDocumentResource resource) {
 		try {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(res.doc), new StreamResult(output));
@@ -108,14 +109,17 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void startContainer (IResourceContainer resourceContainer) {
+	public void startContainer (IGroupResource resource) {
 	}
 
 	public void startExtractionItem (IExtractionItem item) {
 	}
 
-	public void startResource (IResource resource) {
+	public void startResource (IDocumentResource resource) {
 		res = (Resource)resource;
 	}
 
+    public void skeletonContainer (ISkeletonResource resource) {
+    }
+    
 }

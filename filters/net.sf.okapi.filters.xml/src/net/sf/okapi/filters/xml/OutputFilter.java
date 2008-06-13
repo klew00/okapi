@@ -16,15 +16,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
+import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class OutputFilter implements IOutputFilter {
 	
@@ -53,7 +52,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void endContainer (IResourceContainer resourceContainer) {
+	public void endContainer (IGroupResource resource) {
 	}
 
 	private void buildContent (Node node,
@@ -82,7 +81,8 @@ public class OutputFilter implements IOutputFilter {
 			if ( current.isTranslatable() ) {
 				if ( current.hasTarget() ) {
 					// Attribute case: Simply set the value of the node passed by the data
-					Node attr = (Node)current.getData();
+					//TODO: Redo the merging for attr Node attr = (Node)current.getData();
+					Node attr = null;
 					if ( attr != null ) {
 						if ( attr.getNodeValue().startsWith(XMLReader.ILMARKER) ) {
 							// This is an item extracted from an in-line code
@@ -120,7 +120,7 @@ public class OutputFilter implements IOutputFilter {
 		while ( (current = item.getNextItem()) != null );
 	}
 
-	public void endResource (IResource resource) {
+	public void endResource (IDocumentResource resource) {
 		try {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(res.doc), new StreamResult(output));
@@ -130,17 +130,20 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void startContainer (IResourceContainer resourceContainer) {
+	public void startContainer (IGroupResource resource) {
 	}
 
 	public void startExtractionItem (IExtractionItem item) {
 	}
 
-	public void startResource (IResource resource) {
+	public void startResource (IDocumentResource resource) {
 		res = (Resource)resource;
 		subItems = new ArrayList<IExtractionItem>();
 	}
 
+    public void skeletonContainer (ISkeletonResource resource) {
+    }
+    
 	private String makeXMLString (IExtractionItem item) {
 		StringBuilder tmp = new StringBuilder();
 		List<IFragment> fragList = item.getContent().getFragments();

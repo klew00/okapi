@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
@@ -80,6 +81,7 @@ public class MainForm implements IParametersProvider {
 	
 	private Shell            shell;
 	private ILog             log;
+	private LogHandler       logHandler;
 	private String           rootFolder;
 	private String           sharedFolder;
 	private Project          prj;
@@ -147,6 +149,9 @@ public class MainForm implements IParametersProvider {
 
 		log = new LogForm(shell);
 		log.setTitle("Rainbow Log");
+		logHandler = new LogHandler(log);
+	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler);
+
 		fa = new FilterAccess();
 		fa.loadList(sharedFolder + File.separator + "filters.xml");
 

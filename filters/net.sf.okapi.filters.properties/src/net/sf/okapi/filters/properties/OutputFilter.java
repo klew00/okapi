@@ -8,8 +8,9 @@ import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
+import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class OutputFilter implements IOutputFilter {
 
@@ -40,14 +41,14 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void endContainer (IResourceContainer resourceCntainer) {
+	public void endContainer (IGroupResource resource) {
 	}
 
 	public void endExtractionItem (IExtractionItem item)
 	{
 		try {
 			// Write the buffer
-			writer.write(res.buffer.toString());
+			writer.write(res.sklRes.toString());
 			// Then write the item content
 			if ( item.hasTarget() ) {
 				writer.write(escape(item.getTarget().getContent().toString()));
@@ -62,9 +63,9 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void endResource (IResource resource) {
+	public void endResource (IDocumentResource resource) {
 		try {
-			writer.write(res.buffer.toString());
+			writer.write(res.sklRes.toString());
 		}
 		catch ( Exception e ) {
 			System.err.println(e.getLocalizedMessage());
@@ -79,13 +80,13 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void startContainer (IResourceContainer resourceContainer) {
+	public void startContainer (IGroupResource resource) {
 	}
 
 	public void startExtractionItem (IExtractionItem item) {
 	}
 
-	public void startResource (IResource resource) {
+	public void startResource (IDocumentResource resource) {
 		try {
 			// Save the resource for later use
 			res = (Resource)resource;
@@ -96,13 +97,18 @@ public class OutputFilter implements IOutputFilter {
 			outputEncoder = Charset.forName(encoding).newEncoder(); 
 			
 			// Write the buffer
-			writer.write(res.buffer.toString());
+			writer.write(res.sklRes.toString());
 		}
 		catch ( Exception e ) {
-			System.err.println(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 	}
 
+    public void skeletonContainer (ISkeletonResource resource) {
+    	// In this writer, this is done in the other handlers
+    	// (for now)
+    }
+    
 	private String escape (String text) {
 		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {

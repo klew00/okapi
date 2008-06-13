@@ -52,7 +52,7 @@ public class UtilityDriver {
 	private IParametersEditor     editor;
 	private PluginItem            pluginItem;
 	private PluginsAccess         plugins;
-	private final Logger          logger = LoggerFactory.getLogger(UtilityDriver.class);
+	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	
 	public UtilityDriver (ILog log,
 		FilterAccess newFA,

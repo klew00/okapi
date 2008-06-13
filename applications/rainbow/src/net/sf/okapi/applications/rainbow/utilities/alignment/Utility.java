@@ -5,8 +5,8 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
+import net.sf.okapi.common.resource.IGroupResource;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
@@ -66,11 +66,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
 
 	@Override
-    public void startResource (IResource resource) {
+    public void startResource (IDocumentResource resource) {
     }
 	
 	@Override
-    public void endResource (IResource resource) {
+    public void endResource (IDocumentResource resource) {
 	}
 	
 	@Override
@@ -87,11 +87,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
     
 	@Override
-    public void startContainer (IResourceContainer resourceContainer) {
+    public void startContainer (IGroupResource resource) {
 	}
 
 	@Override
-	public void endContainer (IResourceContainer resourceCntainer) {
+	public void endContainer (IGroupResource resource) {
 	}
 
 	public boolean isFilterDriven () {

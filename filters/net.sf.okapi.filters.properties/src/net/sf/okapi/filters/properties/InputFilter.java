@@ -33,6 +33,7 @@ import net.sf.okapi.common.pipeline.IResourceBuilder;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.SkeletonResource;
 
 public class InputFilter implements IInputFilter {
 
@@ -52,6 +53,7 @@ public class InputFilter implements IInputFilter {
 	private int              lineSince;
 	private long             position;
 	private int              id;
+
 
 	public InputFilter () {
 		res = new Resource();
@@ -93,7 +95,7 @@ public class InputFilter implements IInputFilter {
 		int result = RESULT_ERROR;
 		try {
 			if ( resetBuffer ) {
-				res.buffer = new StringBuilder();
+				res.sklRes = new SkeletonResource();
 			}
 			
 			StringBuilder keyBuffer = new StringBuilder();
@@ -106,7 +108,7 @@ public class InputFilter implements IInputFilter {
 
 			while ( true ) {
 				if ( !getNextLine() ) {
-					if ( res.buffer.length() > 0 ) {
+					if ( res.sklRes.data.length() > 0 ) {
 						// Some data still to pass along
 						res.endingLB = false; // No ending line-break;
 					}
@@ -123,8 +125,8 @@ public class InputFilter implements IInputFilter {
 				else {
 					// Empty lines
 					if ( sTmp.length() == 0 ) {
-						res.buffer.append(textLine);
-						res.buffer.append(res.lineBreak);
+						res.sklRes.data.append(textLine);
+						res.sklRes.data.append(res.lineBreak);
 						continue;
 					}
 
@@ -137,8 +139,8 @@ public class InputFilter implements IInputFilter {
 
 					if ( isComment ) {
 //TODO						m_Opt.m_LD.process(sTmp);
-						res.buffer.append(textLine);
-						res.buffer.append(res.lineBreak);
+						res.sklRes.data.append(textLine);
+						res.sklRes.data.append(res.lineBreak);
 						continue;
 					}
 
@@ -257,19 +259,19 @@ public class InputFilter implements IInputFilter {
 						// Single-line case
 						keyBuffer.append(textLine.substring(0, nStartText));
 					}
-					res.buffer.append(keyBuffer);
+					res.sklRes.data.append(keyBuffer);
 				}
 				else {
-					res.buffer.append(keyBuffer);
-					res.buffer.append(textBuffer);
-					res.buffer.append(textLine);
+					res.sklRes.data.append(keyBuffer);
+					res.sklRes.data.append(textBuffer);
+					res.sklRes.data.append(textLine);
 					return RESULT_DATA;
 				}
 
-				item.setPreserveFormatting(true);
+				item.setPreserveSpaces(true);
 				item.setID(String.valueOf(++id));
 				result = RESULT_ITEM;
-				item.setProperty("start", lS);
+				item.setProperty("start", String.valueOf(lS));
 
 //TODO: handle {0,choice...} cases
 //http://java.sun.com/j2se/1.4.2/docs/api/java/text/MessageFormat.html
@@ -383,7 +385,7 @@ public class InputFilter implements IInputFilter {
 			
 			// Initializes the variables
 			res.endingLB = true;
-			res.lineBreak = "\n"; //TODO: Auto-detection
+			res.lineBreak = "\n"; //TODO: Auto-detection of line-break type
 			id = 0;
 			lineNumber = 0;
 			lineSince = 0;
@@ -398,9 +400,11 @@ public class InputFilter implements IInputFilter {
 			do {
 				switch ( n = readItem(resetBuffer) ) {
 				case RESULT_DATA:
+					// Don't send the skeleton chunk now, wait for the complete one
 					resetBuffer = false;
 					break;
 				case RESULT_ITEM:
+					output.skeletonContainer(res.sklRes);
 					output.startExtractionItem(item);
 					output.endExtractionItem(item);
 					resetBuffer = true;
@@ -411,6 +415,7 @@ public class InputFilter implements IInputFilter {
 				}
 			} while ( n > RESULT_END ); 
 			
+			output.skeletonContainer(res.sklRes);
 			output.endResource(res);
 		}
 		catch ( Exception e ) {

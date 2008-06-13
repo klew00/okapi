@@ -21,39 +21,34 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import net.sf.okapi.common.Util;
 
 /**
  * Reference implementation of IExtractionItem.
  */
-public class ExtractionItem implements IExtractionItem {
+public class ExtractionItem extends CommonResource implements IExtractionItem {
 
-	private String                     id;
-	private boolean                    isTranslatable;
-	private String                     resname;
-	private String                     restype;
-	private boolean                    preserveFormatting;
 	private String                     note;
 	private IContainer                 main;
 	private ArrayList<IExtractionItem> children;
 	private ArrayList<IContainer>      segments;
-	private Map<String, Object>        props;
 	private boolean                    isSegmented;
 	private IExtractionItem            target;
 	private IExtractionItem            parent;
 	private int                        currentIndex;
 	private ArrayList<IExtractionItem> allItems;
-	private Object                     data;
 
 
 	public ExtractionItem () {
-		// Default values different from initial
-		isTranslatable = true;
 		main = new Container();
 	}
 
+	public int getKind () {
+		return KIND_ITEM;
+	}
+	
 	@Override
 	public String toString () {
 		if ( isSegmented )
@@ -110,70 +105,8 @@ public class ExtractionItem implements IExtractionItem {
 		}
 	}
 
-	public String getID () {
-		return id;
-	}
-
-	public String getName () {
-		if ( resname == null ) return "";
-		else return resname;
-	}
-
-	public String getType () {
-		if ( restype == null ) return "";
-		else return restype;
-	}
-
 	public boolean hasTarget () {
 		return (target != null);
-	}
-
-	public boolean isTranslatable () {
-		return isTranslatable;
-	}
-
-	public void setID (String newId) {
-		id = newId;
-	}
-
-	public void setName (String newResname) {
-		resname = newResname;
-	}
-
-	public void setType (String newRestype) {
-		restype = newRestype;
-	}
-
-	public void setIsTranslatable (boolean newIsTranslatable) {
-		isTranslatable = newIsTranslatable;
-	}
-
-	public Object getProperty (String name) {
-		if ( props == null ) return null;
-		return props.get(name);
-	}
-
-	public void setProperty (String name,
-		Object value)
-	{
-		if ( props == null ) {
-			props = new HashMap<String, Object>();
-		}
-		props.put(name, value);
-	}
-
-	public void clearProperties () {
-		if ( props != null ) {
-			props.clear();
-		}
-	}
-
-	public boolean preserveFormatting () {
-		return preserveFormatting;
-	}
-
-	public void setPreserveFormatting (boolean preserve) {
-		preserveFormatting = preserve;
 	}
 
 	public boolean hasNote () {
@@ -271,11 +204,49 @@ public class ExtractionItem implements IExtractionItem {
 		else return null;
 	}
 
-	public Object getData () {
-		return data;
-	}
+	private static void itemToXML (IExtractionItem item,
+		StringBuilder text)
+	{
+		text.append(String.format("<item id=\"%s\" type=\"%s\" name=\"%s\"",
+			Util.escapeToXML(item.getID(), 3, false),
+			Util.escapeToXML(item.getType(), 3, false),
+			Util.escapeToXML(item.getName(), 3, false)));
+		text.append(String.format(" translate=\"%s\" xml:space=\"%s\">",
+			(item.isTranslatable() ? "yes" : "no"),
+			(item.preserveSpaces() ? "preserve" : "default")));
 
-	public void setData (Object data) {
-		this.data = data;
+		((ExtractionItem)item).propertiesToXML(text);
+		((ExtractionItem)item).extensionsToXML(text);
+		
+		if ( item.hasChild() ) {
+			text.append("<children>");
+			for ( IExtractionItem subItem : item.getChildren() ) {
+				itemToXML(subItem, text);
+			}
+			text.append("</children>");
+		}
+		
+		text.append("<src>");
+		text.append(item.getContent().toXML());
+		text.append("</src>");
+		text.append("<trg>");
+		if ( item.hasTarget() ) {
+			text.append(item.getTarget().getContent().toXML());
+		}
+		text.append("</trg>");
+		
+		if ( item.hasNote() ) {
+			text.append("<note>");
+			text.append(Util.escapeToXML(item.getNote(), 0, false));
+			text.append("</note>");
+		}
+
+		text.append("</item>");
+	}
+	
+	public String toXML () {
+		StringBuilder text = new StringBuilder();
+		itemToXML(this, text);
+		return text.toString();
 	}
 }

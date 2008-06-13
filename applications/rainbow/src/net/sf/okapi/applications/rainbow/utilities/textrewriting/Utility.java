@@ -12,7 +12,7 @@ import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
-	private final Logger          logger = LoggerFactory.getLogger(Utility.class);
+	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 	
 	public void doProlog (String sourceLanguage,

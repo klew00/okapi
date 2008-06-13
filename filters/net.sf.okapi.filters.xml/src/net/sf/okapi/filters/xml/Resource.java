@@ -5,7 +5,7 @@ import net.sf.okapi.common.IParameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class Resource extends net.sf.okapi.common.resource.ResourceBase {
+public class Resource extends net.sf.okapi.common.resource.DocumentResource {
 
 	public Document          doc;
 	public Node              srcNode;

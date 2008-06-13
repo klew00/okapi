@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.Util;
+
 /**
  * Reference implementation of the IContainer interface.
  * <p>In this implementation the codes are encoded into 2-char sequence:
@@ -289,4 +291,42 @@ public class Container implements IContainer {
 			props.clear();
 		}
 	}
+
+	public String toXML () {
+		// Empty
+		if ( lastFrag == null ) return "";
+
+		// Only one text fragment
+		if (( list.size() == 1 ) && ( lastFrag.isText() )) {
+			return Util.escapeToXML(lastFrag.toString(), 0, false);
+		}
+		
+		// Multiple segments or one code fragment
+		StringBuilder text = new StringBuilder();
+		int index = 0;
+		for ( IFragment frag : list ) {
+			if ( frag.isText() ) {
+				text.append(Util.escapeToXML(frag.toString(), 0, false));
+			}
+			else {
+				switch ( ((CodeFragment)frag).type ) {
+				case IContainer.CODE_ISOLATED:
+					text.append(String.format("<ic id=\"%d\" data=\"%s\"/>",
+						index, Util.escapeToXML(frag.toString(), 3, false)));
+					break;
+				case IContainer.CODE_OPENING:
+					text.append(String.format("<oc id=\"%d\" data=\"%s\"/>",
+						index, Util.escapeToXML(frag.toString(), 3, false)));
+					break;
+				case IContainer.CODE_CLOSING:
+					text.append(String.format("<cc id=\"%d\" data=\"%s\"/>",
+						index, Util.escapeToXML(frag.toString(), 3, false)));
+					break;
+				}
+				index++;
+			}
+		}
+		return text.toString();
+	}
+
 }

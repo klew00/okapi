@@ -33,8 +33,10 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 /**
  * Implements IWriter for TTX-based translation packages.
@@ -115,7 +117,7 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument () {
+	public void writeEndDocument (IDocumentResource resource) {
 		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;/okapiTTX&gt;</ut>");
 		writer.writeEndElement(); // Raw
 		writer.writeEndElement(); // Body
@@ -216,8 +218,12 @@ public class Writer extends BaseWriter {
 		}
 		return relation.toString() + DTD_SETTINGS_FILE;
 	}
+
+	public void writeSkeletonPart (ISkeletonResource resource) {
+		// Nothing to do
+	}
 	
-	public void writeStartDocument () {
+	public void writeStartDocument (IDocumentResource resource) {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("TRADOStag");

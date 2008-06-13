@@ -17,7 +17,7 @@ public class Utility implements ISimpleUtility {
 	private String           manifestPath;
 	private Manifest         manifest;
 	private Merger           merger;
-	private final Logger     logger = LoggerFactory.getLogger(Utility.class);
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	
 	public Utility () {
 	}

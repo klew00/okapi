@@ -183,7 +183,7 @@ public class XMLReader {
 				attrItem.getContent().setContent(attr.getNodeValue());
 				attrItem.setID(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
-				attrItem.setData(attr);
+				//TODO: Find another way! attrItem.setData(attr);
 				if ( itsEng.getWithinText() == ITraversal.WITHINTEXT_YES ) {
 					// For sub-items in in-line codes: Replace the value by a
 					// marker so it can be used later for merging (as the node

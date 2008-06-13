@@ -24,7 +24,7 @@ public class Merger extends ThrougputPipeBase {
 	private Manifest         manifest;
 	private IReader          reader;
 	private FilterAccess     fa;
-	private final Logger     logger = LoggerFactory.getLogger(Utility.class);
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private boolean          skipNoTranslate;
 
 	public Merger () {
@@ -97,7 +97,8 @@ public class Merger extends ThrougputPipeBase {
 			fa.inputFilter.process();
 		}
 		catch ( Exception e ) {
-			throw new RuntimeException(e);
+			// Log and move on to the next file
+			logger.error("Merging error. " + e.getCause().getLocalizedMessage(), e);
 		}
 		finally {
 			if ( fa.outputFilter != null ) fa.outputFilter.close();
@@ -151,7 +152,8 @@ public class Merger extends ThrougputPipeBase {
 					// Create the target entry for the output if it does not exist yet
 					item.setTarget(new ExtractionItem());
 				}
-				// Set the codedText part of the content only. Do not modify the codes!
+				// Set the codedText part of the content only. Do not modify the codes.
+				//TODO: in-line could be clones: the code should come from the translation not the original then.
 				try {
 					item.getTarget().getContent().setContent(
 						srcPkgItem.getTarget().getContent().getCodedText(),

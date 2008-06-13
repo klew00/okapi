@@ -21,7 +21,9 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 /**
  * Provides a common way create a translation package. 
@@ -60,7 +62,9 @@ public interface IWriter {
 		String filterSettings,
 		IParameters filterParams);
 	
-	public void writeStartDocument ();
+	public void writeStartDocument (IDocumentResource resource);
+	
+	public void writeSkeletonPart (ISkeletonResource resource);
 	
 	/**
 	 * Writes an item in the current document. 
@@ -72,6 +76,6 @@ public interface IWriter {
 		IExtractionItem targetItem,
 		int p_nStatus);
 	
-	public void writeEndDocument ();
+	public void writeEndDocument (IDocumentResource resource);
 
 }

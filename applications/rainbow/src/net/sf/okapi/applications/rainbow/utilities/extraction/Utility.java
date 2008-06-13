@@ -8,8 +8,9 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.IResourceContainer;
+import net.sf.okapi.common.resource.IDocumentResource;
+import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
@@ -42,6 +43,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
 		else if ( params.pkgType.equals("ttx") )
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
+		else if ( params.pkgType.equals("test") )
+			writer = new net.sf.okapi.applications.rainbow.packages.test.Writer();
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 		
@@ -91,19 +94,19 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
 
 	@Override
-    public void startResource (IResource resource) {
+    public void startResource (IDocumentResource resource) {
 		String relativeInput = inputPath.substring(inputRoot.length()+1);
 		String relativeOutput = outputPath.substring(outputRoot.length()+1);
 		String[] res = FilterAccess.splitFilterSettingsType1("", resource.getFilterSettings());
 		writer.createDocument(++id, relativeInput, relativeOutput,
 			resource.getSourceEncoding(), resource.getTargetEncoding(),
 			res[1], resource.getParameters());
-		writer.writeStartDocument();
+		writer.writeStartDocument(resource);
     }
 	
 	@Override
-    public void endResource (IResource resource) {
-		writer.writeEndDocument();
+    public void endResource (IDocumentResource resource) {
+		writer.writeEndDocument(resource);
 	}
 	
 	@Override
@@ -121,13 +124,18 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
     
 	@Override
-    public void startContainer (IResourceContainer resourceContainer) {
+    public void startContainer (IGroupResource resource) {
 	}
 
 	@Override
-	public void endContainer (IResourceContainer resourceCntainer) {
+	public void endContainer (IGroupResource resource) {
 	}
 
+	@Override
+	public void skeletonContainer (ISkeletonResource resource) {
+		writer.writeSkeletonPart(resource);
+	}
+	
 	public boolean isFilterDriven () {
 		return true;
 	}

@@ -512,7 +512,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			data.append("????"+FLAGSEP);
 		else
 			data.append((String)node.getUserData(FLAGNAME));
-
+		// Set the new value (if not there yet or override requested)
 		if ( override || ( data.charAt(position) != '?' )) 
 			data.setCharAt(position, value);
 		node.setUserData(FLAGNAME, data.toString(), null);
@@ -537,7 +537,12 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	public int getDirectionality (String attrName) {
-		return trace.peek().dir;
+		if ( node == null ) return DIR_LTR;
+		if ( !(node instanceof Element) ) return DIR_LTR;
+		Node attr = ((Element)node).getAttributeNode(attrName);
+		String tmp;
+		if ( (tmp = (String)attr.getUserData(FLAGNAME)) == null ) return DIR_LTR;
+		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
 	}
 	
 	public int getWithinText () {

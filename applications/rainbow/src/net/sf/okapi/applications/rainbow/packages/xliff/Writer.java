@@ -26,7 +26,9 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.ISkeletonResource;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
 /**
@@ -114,7 +116,7 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument () {
+	public void writeEndDocument (IDocumentResource resource) {
 		writer.writeEndElement(); // body
 		writer.writeEndElement(); // file
 		writer.writeEndElement(); // xliff
@@ -149,7 +151,7 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("restype", sourceItem.getType());
 		if ( !sourceItem.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
-		if ( sourceItem.preserveFormatting() )
+		if ( sourceItem.preserveSpaces() )
 			writer.writeAttributeString("xml:space", "preserve");
 //TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
 //			m_XW.writeAttributeString("approved", "yes");
@@ -209,10 +211,13 @@ public class Writer extends BaseWriter {
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
-		
 	}
 
-	public void writeStartDocument () {
+	public void writeSkeletonPart (ISkeletonResource resource) {
+		// Nothing to do
+	}
+	
+	public void writeStartDocument (IDocumentResource resource) {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("xliff");

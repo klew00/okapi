@@ -1,16 +1,17 @@
 package net.sf.okapi.filters.properties;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.SkeletonResource;
 
-public class Resource extends net.sf.okapi.common.resource.ResourceBase {
+public class Resource extends net.sf.okapi.common.resource.DocumentResource {
 
 	public boolean           endingLB;
 	public String            lineBreak;
-	public StringBuilder     buffer;
+	public SkeletonResource  sklRes;
 	public Parameters        params;
 	
 	public Resource () {
-		buffer = new StringBuilder();
+		sklRes = new SkeletonResource();
 		params = new Parameters();
 	}
 

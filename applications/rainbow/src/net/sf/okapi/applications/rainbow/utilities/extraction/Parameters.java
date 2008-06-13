@@ -57,12 +57,12 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public void reset() {
-		pkgType = "omegat";
+		pkgType = "xliff";
 		createZip = false;
 		pkgName = "pack1";
 		includeMergeData = false;
 		outputFolder = System.getProperty("user.home") + File.separator
-			+ "localization projects";
+			+ "Localization Projects";
 		includeTargets = true;
 	}
 

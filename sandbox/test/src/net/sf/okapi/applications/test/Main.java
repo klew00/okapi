@@ -226,9 +226,9 @@ public class Main {
 	{
 		testITSEngine();
 		testXMLReader();
-		//testItem();
-		//testContainer();
-		//testFilter();
+		testItem();
+		testContainer();
+		testFilter();
 	}		
 		
 }

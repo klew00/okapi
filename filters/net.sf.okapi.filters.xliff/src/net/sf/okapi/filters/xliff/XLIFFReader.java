@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.ExtractionItem;
+import net.sf.okapi.common.resource.GroupResource;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
@@ -34,7 +35,7 @@ public class XLIFFReader {
 	public static final int       RESULT_ENDTRANSUNIT      = 6;
 
 	protected Resource            resource;
-	protected FileResource        fileRes;
+	protected GroupResource       fileRes;
 	protected IExtractionItem     item;
 	
 	private IContainer       content;
@@ -160,7 +161,7 @@ public class XLIFFReader {
 	}
 	
 	private int processFile () {
-		fileRes = new FileResource();
+		fileRes = new GroupResource();
 		Element Elem = (Element)node;
 		String tmp = Elem.getAttribute("original");
 		if ( tmp.length() == 0 ) throw new RuntimeException("Missing attribute 'original'.");

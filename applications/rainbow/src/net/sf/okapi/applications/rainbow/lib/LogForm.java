@@ -124,7 +124,7 @@ public class LogForm implements ILog {
 		
 		//=== Log itself
 
-		edLog = new Text(shell, SWT.MULTI | SWT.BORDER);
+		edLog = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
 		edLog.setLayoutData(gdTmp);

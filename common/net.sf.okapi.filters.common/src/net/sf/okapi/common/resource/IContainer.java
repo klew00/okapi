@@ -127,4 +127,6 @@ public interface IContainer {
 	 * Removes the list of properties associated with the object.
 	 */
 	void clearProperties ();
+	
+	String toXML ();
 }
