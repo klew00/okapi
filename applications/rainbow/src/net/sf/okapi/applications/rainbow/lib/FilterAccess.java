@@ -21,10 +21,12 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -35,6 +37,7 @@ import net.sf.okapi.common.filters.IOutputFilter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class FilterAccess {
 	
@@ -154,21 +157,27 @@ public class FilterAccess {
 			FilterAccessItem FAI;
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				Node N = NL.item(i).getAttributes().getNamedItem("id");
-				if ( N == null ) throw new Exception("The attribute 'id' is missing.");
+				if ( N == null ) throw new RuntimeException("The attribute 'id' is missing.");
 				FAI = new FilterAccessItem();
 				String sID = N.getTextContent();
 				N = NL.item(i).getAttributes().getNamedItem("inputFilterClass");
-				if ( N == null ) throw new Exception("The attribute 'inputFilterClass' is missing.");
+				if ( N == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
 				FAI.inputFilterClass = N.getTextContent();
 				N = NL.item(i).getAttributes().getNamedItem("outputFilterClass");
-				if ( N == null ) throw new Exception("The attribute 'outputFilterClass' is missing.");
+				if ( N == null ) throw new RuntimeException("The attribute 'outputFilterClass' is missing.");
 				FAI.outputFilterClass = N.getTextContent();
 				N = NL.item(i).getAttributes().getNamedItem("editorClass");
 				if ( N != null ) FAI.editorClass = N.getTextContent();
 				m_htFilters.put(sID, FAI);
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( SAXException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -193,7 +202,7 @@ public class FilterAccess {
 
 			// Map the ID to the class, and instantiate the filter
 			if ( !m_htFilters.containsKey(filterID) )
-				throw new Exception(String.format(Res.getString("UNDEF_FILTERID"), filterID)); 
+				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID)); 
 
 			// Load if not already done
 			boolean bLoad = true;
@@ -225,14 +234,19 @@ public class FilterAccess {
 				}
 			}
 		}
-		catch ( Exception e ) {
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void loadFilterFromFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings)
-		throws Exception
 	{
 		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
 		loadFilter(aRes[1], aRes[3]);
@@ -249,10 +263,16 @@ public class FilterAccess {
 	
 			// Map the ID to the class, and instantiate the filter
 			if ( !m_htFilters.containsKey(filterID) )
-				throw new Exception(String.format(Res.getString("UNDEF_FILTERID"), filterID));
+				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID));
 			paramsEditor = (IParametersEditor)Class.forName(m_htFilters.get(filterID).editorClass).newInstance();
 		}
-		catch ( Exception e ) {
+		catch ( InstantiationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -268,6 +288,7 @@ public class FilterAccess {
 	 * @return True if the edit was successful, false if the use canceled
 	 * or if an error occurred.
 	 */
+	//TODO: Rethink the error handling
 	public boolean editParameters (String filterID,
 		IParameters paramObject,
 		Object uiContext)

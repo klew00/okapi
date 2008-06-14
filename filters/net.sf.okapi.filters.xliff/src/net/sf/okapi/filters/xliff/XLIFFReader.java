@@ -1,13 +1,16 @@
 package net.sf.okapi.filters.xliff;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
@@ -65,7 +68,13 @@ public class XLIFFReader {
 			lastResult = -1;
 			processXliff();
 		}
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
 		}
 	}

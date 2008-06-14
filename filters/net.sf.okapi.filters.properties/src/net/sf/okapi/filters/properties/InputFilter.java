@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.ILog;
@@ -66,7 +67,7 @@ public class InputFilter implements IInputFilter {
 				reader = null;
 			}
 		}
-		catch ( Exception e) {
+		catch ( IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -270,6 +271,10 @@ public class InputFilter implements IInputFilter {
 
 				item.setPreserveSpaces(true);
 				item.setID(String.valueOf(++id));
+//For test
+				item.setExtension("TestExtension",
+					new TestExtension("Data of the extension for item " + item.getID()));
+//end for test				
 				result = RESULT_ITEM;
 				item.setProperty("start", String.valueOf(lS));
 
@@ -282,7 +287,7 @@ public class InputFilter implements IInputFilter {
 				return result;
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -335,7 +340,7 @@ public class InputFilter implements IInputFilter {
 							int nTmp = Integer.parseInt(text.substring(i+2, i+6), 16);
 							tmpText.append((char)nTmp);
 						}
-						catch ( Exception E ) {
+						catch ( Exception e ) {
 							logMessage(ILog.TYPE_WARNING,
 								String.format(Res.getString("INVALID_UESCAPE"),
 								text.substring(i+2, i+6)));
@@ -392,6 +397,10 @@ public class InputFilter implements IInputFilter {
 			position = 0;
 			
 			// Get started
+//For test			
+			res.setExtension("docLevelExtension",
+				new TestExtension("Document-level extension."));
+//End for test			
 			output.startResource(res);
 			
 			// Process
@@ -418,7 +427,10 @@ public class InputFilter implements IInputFilter {
 			output.skeletonContainer(res.sklRes);
 			output.endResource(res);
 		}
-		catch ( Exception e ) {
+		catch ( UnsupportedEncodingException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 		finally {

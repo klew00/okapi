@@ -1,6 +1,7 @@
 package net.sf.okapi.applications.rainbow.packages.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
@@ -63,22 +64,17 @@ public class Writer extends BaseWriter {
 			writer = new PrintWriter(path, "UTF-8");
 			writer.println("<?xml version=\"1.0\"?>");
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public void writeEndDocument (IDocumentResource resource) {
-		try {
-			buffer.append(resource.endToXML());
-			writer.print(buffer.toString());
-			writer.close();
-			manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-				relativeTargetPath, sourceEncoding, targetEncoding, filterID);
-		}
-		catch ( Exception e ) {
-			throw new RuntimeException(e);
-		}
+		buffer.append(resource.endToXML());
+		writer.print(buffer.toString());
+		writer.close();
+		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
 	public void writeItem (IExtractionItem item,

@@ -1,6 +1,6 @@
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,9 +77,9 @@ public class Utility implements ISimpleUtility {
 		logger.info("Target: " + targetLang);
 		
 		// Process each selected document in the manifest
-		Enumeration<Integer> E = manifest.getItems().keys();
-		while ( E.hasMoreElements() ) {
-			merger.merge(E.nextElement());
+		Iterator<Integer> iter = manifest.getItems().keySet().iterator();
+		while ( iter.hasNext() ) {
+			merger.merge(iter.next());
 		}
 	}
 

@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -339,12 +340,12 @@ public class Utils {
 
 			//TODO: LB auto-detection
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 		finally {
 			if ( IS != null )
-				try { IS.close(); } catch ( Exception e ){};
+				try { IS.close(); } catch ( IOException e ){};
 		}
 		return aInfo;
 	}

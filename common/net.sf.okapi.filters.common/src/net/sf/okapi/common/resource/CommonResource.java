@@ -151,7 +151,10 @@ public abstract class CommonResource implements ICommonResource {
 		if (( extensions != null ) && ( extensions.size() > 0 )) {
 			output.append("<extensions>");
 			for ( String key : extensions.keySet() ) {
+				output.append(String.format("<ext name=\"%s\" class=\"%s\">",
+					key, Util.escapeToXML(extensions.get(key).getClass().getCanonicalName(), 3, false)));
 				output.append(extensions.get(key).toXML());
+				output.append("</ext>");
 			}
 			output.append("</extensions>");
 		}

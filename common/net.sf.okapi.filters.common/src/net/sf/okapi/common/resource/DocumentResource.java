@@ -80,7 +80,11 @@ public abstract class DocumentResource extends GroupResource implements IDocumen
 	}
 	
 	public String endToXML () {
-		return "</document>";
+		StringBuilder tmp = new StringBuilder();
+		propertiesToXML(tmp);
+		extensionsToXML(tmp);
+		tmp.append("</document>");
+		return tmp.toString();
 	}
 	
 	public String getFilterSettings () {

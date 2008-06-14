@@ -23,6 +23,7 @@ package net.sf.okapi.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
@@ -162,7 +163,7 @@ public class Util {
 				file.delete();
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 		finally {
@@ -170,7 +171,7 @@ public class Util {
 				if ( ic != null ) ic.close();
 				if ( oc != null ) oc.close();
 			}
-			catch ( Exception e ) {};
+			catch ( IOException e ) {};
 		}
 	}
 	

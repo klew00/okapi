@@ -21,13 +21,16 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class EncodingManager {
 	
@@ -66,7 +69,7 @@ public class EncodingManager {
 			
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				Node N = NL.item(i).getAttributes().getNamedItem("iana");
-				if ( N == null ) throw new Exception("The attribute 'iana' is missing.");
+				if ( N == null ) throw new RuntimeException("The attribute 'iana' is missing.");
 				item = new EncodingItem();
 				item.ianaName = N.getTextContent();
 				N = NL.item(i).getAttributes().getNamedItem("cp");
@@ -81,11 +84,17 @@ public class EncodingManager {
 					}
 					else N = N.getNextSibling();
 				}
-				if ( item.name == null ) throw new Exception("The element 'name' is missing.");
+				if ( item.name == null ) throw new RuntimeException("The element 'name' is missing.");
 				items.add(item);
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
 		}
 	}

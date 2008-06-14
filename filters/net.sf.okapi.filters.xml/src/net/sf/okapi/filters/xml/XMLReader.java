@@ -1,9 +1,11 @@
 package net.sf.okapi.filters.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.CodeFragment;
@@ -17,6 +19,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.ITSEngine;
 import org.w3c.its.ITraversal;
+import org.xml.sax.SAXException;
 
 public class XMLReader {
 
@@ -60,7 +63,13 @@ public class XMLReader {
 			sendEndEvent = false;
 			codeIDStack = new Stack<Integer>();
 		}
-		catch ( Exception e ) {
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

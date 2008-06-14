@@ -1,5 +1,6 @@
 package net.sf.okapi.filters.xml;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -8,7 +9,10 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -17,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
@@ -49,7 +54,7 @@ public class OutputFilter implements IOutputFilter {
 			fact = DocumentBuilderFactory.newInstance();
 			docBuilder = fact.newDocumentBuilder();
 		}
-		catch ( Exception e ) {
+		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -128,7 +133,10 @@ public class OutputFilter implements IOutputFilter {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(res.doc), new StreamResult(output));
 		}
-		catch ( Exception e ) {
+		catch ( TransformerConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( TransformerException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -185,7 +193,11 @@ public class OutputFilter implements IOutputFilter {
 		//} catch ( SAXException e ) {
 			// A parsing error occurred. Invalid XML
 			//TODO: Log
-		} catch ( Exception e ) {
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
     }

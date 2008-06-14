@@ -4,6 +4,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -105,7 +107,10 @@ public class OutputFilter implements IOutputFilter {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(res.doc), new StreamResult(output));
 		}
-		catch ( Exception e ) {
+		catch ( TransformerConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( TransformerException e ) {
 			throw new RuntimeException(e);
 		}
 	}

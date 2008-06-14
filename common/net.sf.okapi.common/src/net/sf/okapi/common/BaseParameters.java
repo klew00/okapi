@@ -25,6 +25,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -92,7 +93,7 @@ public abstract class BaseParameters implements IParameters {
 			fromString(sbTmp.toString());
 			path = filePath;
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			if ( !p_bIgnoreErrors ) throw new RuntimeException(e);
 		}
 	}
@@ -115,12 +116,12 @@ public abstract class BaseParameters implements IParameters {
 			SW.write(toString());
 			path = newPath;
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 		finally {
 			if ( SW != null )
-				try { SW.close(); } catch ( Exception e ) {};
+				try { SW.close(); } catch ( IOException e ) {};
 		}
 	}
 }

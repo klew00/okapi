@@ -21,11 +21,13 @@
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
@@ -37,6 +39,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Reads a TTX file, where okapiTTX is the underlying format.
@@ -96,7 +99,13 @@ class TTXReader {
 			node = Doc.getDocumentElement();
 			m_stkFirstChildDone.push(false);
 		}
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

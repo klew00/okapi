@@ -104,9 +104,6 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			XR.writeEndElementLineBreak(); // project
 			XR.writeEndElement(); // omegat
 		}
-		catch ( Exception e ) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			if ( XR != null ) {
 				XR.writeEndDocument();

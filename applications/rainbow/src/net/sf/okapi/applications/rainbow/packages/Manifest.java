@@ -21,11 +21,14 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -33,13 +36,14 @@ import net.sf.okapi.common.XMLWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Implements the writing and reading of a manifest document, commonly used
  * in different types of translation packages.
  */
 public class Manifest {
-	private Hashtable<Integer, ManifestItem>   docs;
+	private LinkedHashMap<Integer, ManifestItem> docs;
 	private String                             rootFolder;
 	private String                             packageID;
 	private String                             packageType;
@@ -54,7 +58,7 @@ public class Manifest {
 
 
 	public Manifest () {
-		docs = new Hashtable<Integer, ManifestItem>();
+		docs = new LinkedHashMap<Integer, ManifestItem>();
 		sourceDir = "";
 		targetDir = "";
 		originalDir = "";
@@ -69,7 +73,7 @@ public class Manifest {
 		return readerClass;
 	}
 	
-	public Hashtable<Integer, ManifestItem> getItems () {
+	public Map<Integer, ManifestItem> getItems () {
 		return docs;
 	}
 
@@ -225,10 +229,10 @@ public class Manifest {
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 
-			Enumeration<Integer> E = docs.keys();
+			Iterator<Integer> iter = docs.keySet().iterator();
 			ManifestItem item;
-			while ( E.hasMoreElements() ) {
-				int id = E.nextElement();
+			while ( iter.hasNext() ) {
+				int id = iter.next();
 				item = docs.get(id);
 				writer.writeStartElement("doc");
 				writer.writeAttributeString("id", String.valueOf(id));
@@ -244,9 +248,6 @@ public class Manifest {
 			writer.writeEndElement(); // rainbowManifest
 			writer.writeEndDocument();
 		}
-		catch ( Exception e ) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			if ( writer != null ) writer.close();
 		}
@@ -259,32 +260,32 @@ public class Manifest {
 		    Document doc = DFac.newDocumentBuilder().parse("file:///"+path);
 		    
 		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
-		    if ( NL == null ) throw new Exception("Invalid manifest file.");
+		    if ( NL == null ) throw new RuntimeException("Invalid manifest file.");
 		    Element elem = (Element)NL.item(0);
 		    
 		    String tmp = elem.getAttribute("projectID");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new Exception("Missing projectID attribute.");
+		    	throw new RuntimeException("Missing projectID attribute.");
 		    else setProjectID(tmp);
 		    
 		    tmp = elem.getAttribute("packageID");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new Exception("Missing packageID attribute.");
+		    	throw new RuntimeException("Missing packageID attribute.");
 		    else setPackageID(tmp);
 		    
 		    tmp = elem.getAttribute("packageType");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new Exception("Missing packageType attribute.");
+		    	throw new RuntimeException("Missing packageType attribute.");
 		    else setPackageType(tmp);
 		    
 		    tmp = elem.getAttribute("readerClass");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new Exception("Missing readerClass attribute.");
+		    	throw new RuntimeException("Missing readerClass attribute.");
 		    else setReaderClass(tmp);
 		    
 		    tmp = elem.getAttribute("sourceLang");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new Exception("Missing sourceLang attribute.");
+		    	throw new RuntimeException("Missing sourceLang attribute.");
 		    else setSourceLanguage(tmp);
 		    
 		    tmp = elem.getAttribute("targetLang");
@@ -343,7 +344,13 @@ public class Manifest {
 
 		    rootFolder = Util.getDirectoryName(path);
 		}
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -355,11 +362,11 @@ public class Manifest {
 	 */
 	public int checkPackageContent () {
 		int nErrors = 0;
-		Enumeration<Integer> E = docs.keys();
+		Iterator<Integer> iter = docs.keySet().iterator();
 		int nDKey;
 		ManifestItem MI;
-		while ( E.hasMoreElements() ) {
-			nDKey = E.nextElement();
+		while ( iter.hasNext() ) {
+			nDKey = iter.next();
 			MI = docs.get(nDKey);
 			File F = new File(getFileToMergePath(nDKey));
 			if ( !F.exists() ) {

@@ -1,6 +1,7 @@
 package net.sf.okapi.applications.rainbow.packages.test;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.resource.IExtractionItem;
@@ -25,7 +26,7 @@ public class Reader implements IReader {
 		try {
 			reader.open(new FileInputStream(path), true);
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

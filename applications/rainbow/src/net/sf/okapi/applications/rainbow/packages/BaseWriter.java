@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
@@ -111,7 +112,7 @@ public abstract class BaseWriter implements IWriter {
 				file.delete();
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -137,26 +138,21 @@ public abstract class BaseWriter implements IWriter {
 		this.targetEncoding = targetEncoding;
 		this.filterID = filterID;
 		
-		try {
-			// If needed copy the original input to the package
-			String subFolder = manifest.getOriginalLocation();
-			if (( subFolder == null ) || ( subFolder.length() == 0 )) return;
+		// If needed copy the original input to the package
+		String subFolder = manifest.getOriginalLocation();
+		if (( subFolder == null ) || ( subFolder.length() == 0 )) return;
 				
-			String inputPath = inputRoot + File.separator + relativeSourcePath;
-			String docPrefix = String.format("%d.", docID);
+		String inputPath = inputRoot + File.separator + relativeSourcePath;
+		String docPrefix = String.format("%d.", docID);
 			
-			String destination = manifest.getRoot() + File.separator + subFolder
-				+ File.separator + docPrefix + "ori"; // docPrefix has a dot
-			Util.copyFile(inputPath, destination, false);
+		String destination = manifest.getRoot() + File.separator + subFolder
+			+ File.separator + docPrefix + "ori"; // docPrefix has a dot
+		Util.copyFile(inputPath, destination, false);
 			
-			String paramsCopy = manifest.getRoot() + File.separator + subFolder
-				+ File.separator + "fprm";
-			if ( filterParams != null ) {
-				filterParams.save(paramsCopy, docPrefix);
-			}
-		}
-		catch ( Exception e ) {
-			throw new RuntimeException(e);
+		String paramsCopy = manifest.getRoot() + File.separator + subFolder
+			+ File.separator + "fprm";
+		if ( filterParams != null ) {
+			filterParams.save(paramsCopy, docPrefix);
 		}
 	}
 	

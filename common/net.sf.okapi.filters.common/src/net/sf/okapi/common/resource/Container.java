@@ -15,11 +15,11 @@ import net.sf.okapi.common.Util;
  */
 public class Container implements IContainer {
 
-	private ArrayList<IFragment>       list;
-	private IFragment                  lastFrag;
-	private Map<String, Object>        props;
+	private ArrayList<IFragment>  list;
+	private IFragment             lastFrag;
+	private Map<String, Object>   props;
 
-	
+
 	static public char ItoC (int index) {
 		return (char)(index+CHARBASE);
 	}
@@ -292,6 +292,22 @@ public class Container implements IContainer {
 		}
 	}
 
+	/**
+	 * Gets the underlying data of the closing code for a given id. 
+	 * @param id The id to look for.
+	 * @return The data or empty if not found.
+	 */
+	private String getClosingCodeForID (int id) {
+		for ( IFragment frag : list ) {
+			if ( frag.isText() ) continue;
+			if ( ((CodeFragment)frag).id == id ) {
+				if ( ((CodeFragment)frag).type == CODE_CLOSING ) 
+					return frag.toString();
+			}
+		}
+		return "";
+	}
+	
 	public String toXML () {
 		// Empty
 		if ( lastFrag == null ) return "";
@@ -308,19 +324,20 @@ public class Container implements IContainer {
 			if ( frag.isText() ) {
 				text.append(Util.escapeToXML(frag.toString(), 0, false));
 			}
-			else {
-				switch ( ((CodeFragment)frag).type ) {
+			else { // Else, it's a code fragment
+				CodeFragment cf = (CodeFragment)frag;
+				switch ( cf.type ) {
 				case IContainer.CODE_ISOLATED:
 					text.append(String.format("<ic id=\"%d\" data=\"%s\"/>",
-						index, Util.escapeToXML(frag.toString(), 3, false)));
+						cf.id, Util.escapeToXML(cf.toString(), 3, false)));
 					break;
 				case IContainer.CODE_OPENING:
-					text.append(String.format("<oc id=\"%d\" data=\"%s\"/>",
-						index, Util.escapeToXML(frag.toString(), 3, false)));
+					text.append(String.format("<pc id=\"%d\" start=\"%s\" end=\"%s\">",
+						cf.id, Util.escapeToXML(cf.toString(), 3, false),
+						Util.escapeToXML(getClosingCodeForID(cf.id), 3, false)));
 					break;
 				case IContainer.CODE_CLOSING:
-					text.append(String.format("<cc id=\"%d\" data=\"%s\"/>",
-						index, Util.escapeToXML(frag.toString(), 3, false)));
+					text.append("</pc>");
 					break;
 				}
 				index++;

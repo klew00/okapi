@@ -1,8 +1,10 @@
 package net.sf.okapi.filters.properties;
 
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -28,15 +30,14 @@ public class OutputFilter implements IOutputFilter {
 		// Not used: targetLanguage
 	}
 
-	public void close ()
-	{
+	public void close () {
 		try {
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -58,7 +59,7 @@ public class OutputFilter implements IOutputFilter {
 			}
 			if ( res.endingLB ) writer.write(res.lineBreak);
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			System.err.println(e.getLocalizedMessage());
 		}
 	}
@@ -67,16 +68,11 @@ public class OutputFilter implements IOutputFilter {
 		try {
 			writer.write(res.sklRes.toString());
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			System.err.println(e.getLocalizedMessage());
 		}
 		finally {
-			try {
-				close();
-			}
-			catch ( Exception e ) {
-				System.err.println(e.getLocalizedMessage());
-			}
+			close();
 		}
 	}
 
@@ -99,7 +95,10 @@ public class OutputFilter implements IOutputFilter {
 			// Write the buffer
 			writer.write(res.sklRes.toString());
 		}
-		catch ( Exception e ) {
+		catch ( UnsupportedEncodingException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

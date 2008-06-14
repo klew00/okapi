@@ -67,11 +67,9 @@ public interface IParameters {
 	 * @param ignoreErrors True if the load should ignore any error
 	 * such as file not found. If an error occurs and this is set to true,
 	 * the method should create the parameters object with its default values.
-	 * @throws Exception 
 	 */
 	public void load (String filePath,
-		boolean ignoreErrors)
-		throws Exception;
+		boolean ignoreErrors);
 	
 	/**
 	 * Saves the parameters to a file.
@@ -82,8 +80,7 @@ public interface IParameters {
 	 * @throws Exception
 	 */
 	public void save (String filePath,
-		String multiFilesPrefix)
-		throws Exception;
+		String multiFilesPrefix);
 
 	/**
 	 * Gets the full path of the last file where the parameters where loaded 

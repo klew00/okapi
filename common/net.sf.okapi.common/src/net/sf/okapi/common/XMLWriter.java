@@ -22,6 +22,7 @@ package net.sf.okapi.common;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -58,7 +59,7 @@ public class XMLWriter {
 			inStartTag = false;
 			elements = new Stack<String>();
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

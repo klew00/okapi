@@ -21,15 +21,18 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class LanguageManager {
 	
@@ -51,7 +54,7 @@ public class LanguageManager {
 			
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				Node N = NL.item(i).getAttributes().getNamedItem("code");
-				if ( N == null ) throw new Exception("The attribute 'code' is missing.");
+				if ( N == null ) throw new RuntimeException("The attribute 'code' is missing.");
 				LI = new LanguageItem();
 				LI.code = N.getTextContent().toUpperCase();
 				N = NL.item(i).getAttributes().getNamedItem("lcid");
@@ -74,11 +77,17 @@ public class LanguageManager {
 					}
 					else N = N.getNextSibling();
 				}
-				if ( LI.name == null ) throw new Exception("The element 'name' is missing.");
+				if ( LI.name == null ) throw new RuntimeException("The element 'name' is missing.");
 				m_aLangs.add(LI);
 			}
         }
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

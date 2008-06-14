@@ -12,17 +12,10 @@ public class UIUtil {
 	/**
 	 * Opens a given page in the default browser.
 	 * @param url URL (can be a local file) of the page to open.
-	 * @throws IOException
 	 */
 	static public void startPage (String url)
 	{
-		try {
-			Program.launch(url); 
-		}
-		catch ( Exception e ) {
-			System.err.println(e.getLocalizedMessage());
-			Dialogs.showError(null, e.getLocalizedMessage(), null);
-		}
+		Program.launch(url); 
 	}
 	
 	/**

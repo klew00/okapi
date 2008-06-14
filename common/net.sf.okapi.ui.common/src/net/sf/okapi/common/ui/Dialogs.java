@@ -130,15 +130,10 @@ public class Dialogs {
 		String message,
 		String details)
 	{
-		try {
-			MessageBox dlg = new MessageBox(shell, SWT.ICON_ERROR);
-			dlg.setMessage(message);
-			dlg.setText("Error");
-			dlg.open();
-		}
-		catch ( Exception E ) {
-			System.err.println(message);
-		}
+		MessageBox dlg = new MessageBox(shell, SWT.ICON_ERROR);
+		dlg.setMessage(message);
+		dlg.setText("Error");
+		dlg.open();
 	}
 		
 }

@@ -110,15 +110,10 @@ public class InputDialog {
 	}
 	
 	private boolean saveData () {
-		try {
-			result = edField.getText();
-			if ( result.length() == 0 ) {
-				edField.selectAll();
-				edField.setFocus();
-				return false;
-			}
-		}
-		catch ( Exception E ) {
+		result = edField.getText();
+		if ( result.length() == 0 ) {
+			edField.selectAll();
+			edField.setFocus();
 			return false;
 		}
 		return true;

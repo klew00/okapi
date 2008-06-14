@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages.ttx;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -86,7 +87,7 @@ public class Writer extends BaseWriter {
 				out.write(buffer, 0, bytesRead);
 			}
 		}
-		catch ( Exception e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 		finally {
@@ -94,7 +95,7 @@ public class Writer extends BaseWriter {
 				if ( in != null ) in.close();
 				if ( out != null ) out.close();
 			}
-			catch ( Exception e ) {} // Swallow it
+			catch ( IOException e ) {} // Swallow it
 		}
 	}
 

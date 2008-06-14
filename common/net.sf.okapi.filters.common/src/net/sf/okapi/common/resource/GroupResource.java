@@ -40,7 +40,11 @@ public class GroupResource extends CommonResource implements IGroupResource {
 	}
 	
 	public String endToXML () {
-		return "</grp>";
+		StringBuilder tmp = new StringBuilder();
+		propertiesToXML(tmp);
+		extensionsToXML(tmp);
+		tmp.append("</grp>");
+		return tmp.toString();
 	}
 	
 	public String toXML () {

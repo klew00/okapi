@@ -1,13 +1,16 @@
 package org.w3c.its;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Attr;
@@ -15,6 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class ITSEngine implements IProcessor, ITraversal  
 {
@@ -66,7 +70,13 @@ public class ITSEngine implements IProcessor, ITraversal
 			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docPath));
 			addExternalRules(rulesDoc, docPath);
 		}
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -179,7 +189,13 @@ public class ITSEngine implements IProcessor, ITraversal
 			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docPath));
 			compileRules(rulesDoc, docPath, isInternal);
 		}
-		catch ( Exception e ) {
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -489,7 +505,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				}
 			}
 		}
-		catch ( Exception e ) {
+		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
 	}
