@@ -80,10 +80,10 @@ public class Main {
 				IExtractionItem item = reader.getItem();
 				switch ( n ) {
 				case XMLReader.RESULT_STARTTRANSUNIT:
-					System.out.println("sTU:"+item.getType()+",'"+item.getContent().toString()+"'");
+					System.out.println("sTU:"+item.getType()+",'"+item.getSource().toString()+"'");
 					break;
 				case XMLReader.RESULT_ENDTRANSUNIT:
-					System.out.println("eTU:"+item.getType()+",'"+item.getContent().toString()+"'");
+					System.out.println("eTU:"+item.getType()+",'"+item.getSource().toString()+"'");
 					break;
 				}
 			} while ( n > XMLReader.RESULT_ENDINPUT );
@@ -176,15 +176,15 @@ public class Main {
 			System.out.println("all segs= '"+item.toString()+"'");
 			
 			item = new ExtractionItem();
-			item.getContent().append("item1");
+			item.getSource().append("item1");
 			ExtractionItem childItem1 = new ExtractionItem();
-			childItem1.getContent().append("child1 of item1");
+			childItem1.getSource().append("child1 of item1");
 			item.addChild(childItem1);
 			ExtractionItem childItem2 = new ExtractionItem();
-			childItem2.getContent().append("child1 of child1 of item1");
+			childItem2.getSource().append("child1 of child1 of item1");
 			childItem1.addChild(childItem2);
 			childItem2 = new ExtractionItem();
-			childItem2.getContent().append("child2 of child1 of item1");
+			childItem2.getSource().append("child2 of child1 of item1");
 			childItem1.addChild(childItem2);
 			
 			IExtractionItem currentItem = item.getFirstItem();

@@ -68,12 +68,10 @@ public interface IWriter {
 	
 	/**
 	 * Writes an item in the current document. 
-	 * @param sourceItem The source item.
-	 * @param targetItem The target item.
+	 * @param item The item to write.
 	 * @param p_nStatus The current target status (same values as Borneo DB TSTATUS_*)
 	 */
-	public void writeItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem,
+	public void writeItem (IExtractionItem item,
 		int p_nStatus);
 	
 	public void writeEndDocument (IDocumentResource resource);

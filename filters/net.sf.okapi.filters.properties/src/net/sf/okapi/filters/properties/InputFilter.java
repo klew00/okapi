@@ -246,7 +246,7 @@ public class InputFilter implements IInputFilter {
 
 				if ( bExtract ) {
 					item = new ExtractionItem();
-					item.setContent(new Container(unescape(sValue)));
+					item.setSource(new Container(unescape(sValue)));
 					item.setName(sKey);
 
 					// Check the DNL list here to have resname, etc.

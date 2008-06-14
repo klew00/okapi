@@ -51,10 +51,10 @@ public class OutputFilter implements IOutputFilter {
 			writer.write(res.sklRes.toString());
 			// Then write the item content
 			if ( item.hasTarget() ) {
-				writer.write(escape(item.getTarget().getContent().toString()));
+				writer.write(escape(item.getTarget().toString()));
 			}
 			else {
-				writer.write(escape(item.getContent().toString()));
+				writer.write(escape(item.getSource().toString()));
 			}
 			if ( res.endingLB ) writer.write(res.lineBreak);
 		}

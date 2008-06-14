@@ -16,7 +16,7 @@ import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.ExtractionItem;
+import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {
@@ -145,24 +145,24 @@ public class Merger extends ThrougputPipeBase {
 
 			if ( !srcPkgItem.hasTarget() ) {
 				logger.warn("Item id={}: No translation provided", item.getID());
-				item.setTarget(item);
+				item.setTarget(item.getSource());
 			}
 			else {
 				if ( !item.hasTarget() ) {
 					// Create the target entry for the output if it does not exist yet
-					item.setTarget(new ExtractionItem());
+					item.setTarget(new Container());
 				}
 				// Set the codedText part of the content only. Do not modify the codes.
 				//TODO: in-line could be clones: the code should come from the translation not the original then.
 				try {
-					item.getTarget().getContent().setContent(
-						srcPkgItem.getTarget().getContent().getCodedText(),
-						item.getContent().getCodes());
+					item.getTarget().setContent(
+						srcPkgItem.getTarget().getCodedText(),
+						item.getSource().getCodes());
 				}
 				catch ( RuntimeException e ) {
 					logger.error("Error with item id={}.", item.getID());
 					// Use the source instead, continue the merge
-					item.setTarget(item);
+					item.setTarget(item.getSource());
 				}
 			}
 		}

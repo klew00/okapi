@@ -201,11 +201,9 @@ class TTXReader {
 		}
 		else if ( text.equals("</u>") ) {
 			inText = false;
-			item.setContent(srcCont);
+			item.setSource(srcCont);
 			if ( !trgCont.isEmpty() ) {
-				item.setTarget(new ExtractionItem());
-				item.getTarget().setContent(trgCont);
-				
+				item.setTarget(trgCont);
 			}
 			// If <ut> contains a </u> tag, that's the end of the item
 			result = true;

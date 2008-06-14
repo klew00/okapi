@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.ExtractionItem;
+import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
@@ -72,10 +72,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 				// Else: do the requested modifications
 				// Make sure we have a target where to set data
 				if ( !currentItem.hasTarget() ) {
-					currentItem.setTarget(new ExtractionItem());
-					currentItem.getTarget().getContent().setContent(
-						currentItem.getContent().getCodedText(),
-						currentItem.getContent().getCodes());
+					currentItem.setTarget(new Container());
+					currentItem.getTarget().setContent(
+						currentItem.getSource().getCodedText(),
+						currentItem.getSource().getCodes());
 				}
 				switch ( params.type ) {
 				case Parameters.TYPE_XNREPLACE:
@@ -95,10 +95,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private void replaceWithXN (IExtractionItem item) {
 		String tmp = null;
 		try {
-			tmp = item.getTarget().getContent().getCodedText().replaceAll("\\p{L}", "X");
+			tmp = item.getTarget().getCodedText().replaceAll("\\p{L}", "X");
 			tmp = tmp.replaceAll("\\d", "N");
-			IContainer cnt = item.getTarget().getContent(); 
-			cnt.setContent(tmp, item.getContent().getCodes());
+			IContainer cnt = item.getTarget(); 
+			cnt.setContent(tmp, item.getSource().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
@@ -114,7 +114,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		String tmp = null;
 		try {
 			// Use the target as the text to change.
-			tmp = item.getTarget().getContent().getCodedText();
+			tmp = item.getTarget().getCodedText();
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
@@ -125,8 +125,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 				if ( item.getName().length() > 0 ) tmp += "."+item.getName();
 				else tmp += "_"+item.getID();
 			}
-			IContainer cnt = item.getTarget().getContent(); 
-			cnt.setContent(tmp, item.getContent().getCodes());
+			IContainer cnt = item.getTarget(); 
+			cnt.setContent(tmp, item.getSource().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);

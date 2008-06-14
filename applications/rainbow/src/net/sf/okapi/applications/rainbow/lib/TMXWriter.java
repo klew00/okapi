@@ -72,7 +72,7 @@ public class TMXWriter {
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);
 		writer.writeStartElement("seg");
-		writer.writeRawXML(tmxCont.setContent(sourceItem.getContent()).toString());
+		writer.writeRawXML(tmxCont.setContent(sourceItem.getSource()).toString());
 		writer.writeEndElement(); // seg
 		writer.writeEndElementLineBreak(); // tuv
 		
@@ -81,7 +81,7 @@ public class TMXWriter {
 			writer.writeAttributeString("xml:lang", targetLang);
 			writer.writeStartElement("seg");
 			writer.writeRawXML(tmxCont.setContent(
-				sourceItem.getTarget().getContent()).toString());
+				sourceItem.getTarget()).toString());
 			writer.writeEndElement(); // seg
 			writer.writeEndElementLineBreak(); // tuv
 		}

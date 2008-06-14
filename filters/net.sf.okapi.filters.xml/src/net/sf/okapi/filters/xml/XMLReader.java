@@ -180,7 +180,7 @@ public class XMLReader {
 			attr = list.item(i);
 			if ( itsEng.translate(attr.getNodeName()) ) {
 				ExtractionItem attrItem = new ExtractionItem();
-				attrItem.getContent().setContent(attr.getNodeValue());
+				attrItem.getSource().setContent(attr.getNodeValue());
 				attrItem.setID(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
 				//TODO: Find another way! attrItem.setData(attr);
@@ -206,7 +206,7 @@ public class XMLReader {
 	private void setItemInfo (Node node) {
 		if ( node == null ) throw new NullPointerException();
 		item.setType("x-"+node.getLocalName());
-		item.setContent(content);
+		item.setSource(content);
 		item.setID(String.valueOf(++itemID));
 		item.setName(((Element)node).getAttribute("xml:id"));
 		sendEndEvent = true;

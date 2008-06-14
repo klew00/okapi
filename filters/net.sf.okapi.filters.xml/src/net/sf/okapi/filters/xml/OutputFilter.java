@@ -2,7 +2,8 @@ package net.sf.okapi.filters.xml;
 
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -19,6 +20,7 @@ import org.xml.sax.InputSource;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
+import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
 import net.sf.okapi.common.resource.IDocumentResource;
@@ -31,7 +33,7 @@ public class OutputFilter implements IOutputFilter {
 	private OutputStream               output;
 	private DocumentBuilderFactory     fact;
 	private DocumentBuilder            docBuilder;
-	private ArrayList<IExtractionItem> subItems;
+	private HashMap<String, IContainer> subItems;
 
 
 	public void close () {
@@ -56,7 +58,6 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	private void buildContent (Node node,
-		IExtractionItem item,
 		String content)
 	{
 		// Remove existing content
@@ -87,23 +88,25 @@ public class OutputFilter implements IOutputFilter {
 						if ( attr.getNodeValue().startsWith(XMLReader.ILMARKER) ) {
 							// This is an item extracted from an in-line code
 							// We have to wait the parent to be merged to set it
-							current.getTarget().setID(current.getID()); // Copy ID
-							subItems.add(current.getTarget());
+							subItems.put(current.getID(), current.getTarget());
 						}
 						else { // Not in in-line code, set it now
-							attr.setNodeValue(current.getTarget().getContent().toString());
+							attr.setNodeValue(current.getTarget().toString());
 						}
 					}
 					else {
 						String tmp = makeXMLString(current.getTarget());
 						// Merge items extracted from in-line codes if there are any
 						if ( subItems.size() > 0 ) {
-							for ( IExtractionItem subItem : subItems ) {
-								String mark = XMLReader.ILMARKER + subItem.getID();
+							Iterator<String> iter = subItems.keySet().iterator();
+							while ( iter.hasNext() ) {
+								String id = iter.next();
+								String mark = XMLReader.ILMARKER + id;
+								IContainer cont = subItems.get(id);
 								if ( tmp.indexOf(mark) > -1 ) {
 									//TODO: We risk double-escape if the sub-item has in-line code
 									tmp = tmp.replace(mark, Util.escapeToXML(
-										subItem.toString(),3,false));
+										cont.toString(),3,false));
 								}
 								else {
 									//TODO: Warning: marker not found for sub-item
@@ -112,7 +115,7 @@ public class OutputFilter implements IOutputFilter {
 							subItems.clear();
 						}
 						// Merge the content
-						buildContent(res.srcNode, current.getTarget(), tmp);
+						buildContent(res.srcNode, tmp);
 					}
 				}
 			}
@@ -138,15 +141,15 @@ public class OutputFilter implements IOutputFilter {
 
 	public void startResource (IDocumentResource resource) {
 		res = (Resource)resource;
-		subItems = new ArrayList<IExtractionItem>();
+		subItems = new HashMap<String, IContainer>();
 	}
 
     public void skeletonContainer (ISkeletonResource resource) {
     }
     
-	private String makeXMLString (IExtractionItem item) {
+	private String makeXMLString (IContainer item) {
 		StringBuilder tmp = new StringBuilder();
-		List<IFragment> fragList = item.getContent().getFragments();
+		List<IFragment> fragList = item.getFragments();
 		for ( IFragment frag : fragList ) {
 			if ( frag.isText() ) {
 				tmp.append(Util.escapeToXML(frag.toString(), 0, false));

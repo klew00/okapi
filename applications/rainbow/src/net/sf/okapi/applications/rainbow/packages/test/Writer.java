@@ -81,13 +81,19 @@ public class Writer extends BaseWriter {
 		}
 	}
 
-	public void writeItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem,
+	public void writeItem (IExtractionItem item,
 		int status)
 	{
-		// toXML() is recursive already
-		// So just call it.
-		buffer.append(sourceItem.toXML());
+		// Write the item in the TM if needed
+		IExtractionItem current = item.getFirstItem();
+		do {
+			if ( current.hasTarget() ) {
+				tmxWriter.writeItem(current);
+			}
+		} while ( (current = item.getNextItem()) != null );
+
+		// toXML() is recursive already, so just call it.
+		buffer.append(item.toXML());
 	}
 	
 	public void writeSkeletonPart (ISkeletonResource resource) {

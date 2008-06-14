@@ -30,19 +30,19 @@ import net.sf.okapi.common.Util;
  */
 public class ExtractionItem extends CommonResource implements IExtractionItem {
 
-	private String                     note;
-	private IContainer                 main;
+	private IContainer                 source;
+	private IContainer                 target;
 	private ArrayList<IExtractionItem> children;
 	private ArrayList<IContainer>      segments;
 	private boolean                    isSegmented;
-	private IExtractionItem            target;
 	private IExtractionItem            parent;
+	private String                     note;
 	private int                        currentIndex;
 	private ArrayList<IExtractionItem> allItems;
 
 
 	public ExtractionItem () {
-		main = new Container();
+		source = new Container();
 	}
 
 	public int getKind () {
@@ -54,7 +54,7 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		if ( isSegmented )
 			return buildCompiledSegment(false).toString();
 		else
-			return main.toString();
+			return source.toString();
 	}
 	
 	public void addChild (IExtractionItem child) {
@@ -71,7 +71,7 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 
 	public boolean isEmpty () {
 		if ( isSegmented ) return buildCompiledSegment(false).isEmpty();
-		else return main.isEmpty();
+		else return source.isEmpty();
 	}
 	
 	public List<IExtractionItem> getChildren () {
@@ -81,24 +81,24 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		return children;
 	}
 
-	public IContainer getContent () {
+	public IContainer getSource () {
 		if ( isSegmented ) {
 			return buildCompiledSegment(false);
 		}
-		else return main;
+		else return source;
 	}
 
 	public List<IContainer> getSegments () {
 		if ( isSegmented ) return segments;
 		// Else: Make a temporary list of all segments
 		List<IContainer> tmpSegments = new ArrayList<IContainer>();
-		tmpSegments.add(main);
+		tmpSegments.add(source);
 		return tmpSegments;
 	}
 	
-	public void setContent (IContainer data) {
+	public void setSource (IContainer data) {
 		if ( data == null ) throw new NullPointerException(); 
-		main = data;
+		source = data;
 		if ( isSegmented ) {
 			segments.clear();
 			isSegmented = false;
@@ -129,14 +129,14 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		if ( !isSegmented ) {
 			if ( segments == null ) segments = new ArrayList<IContainer>();
 			else segments.clear();
-			if ( !main.isEmpty() ) segments.add(main);
+			if ( !source.isEmpty() ) segments.add(source);
 			isSegmented = true;
 		}
 		segments.add(segment);
 	}
 
 	private IContainer buildCompiledSegment (boolean removeSegmentation) {
-		if ( !isSegmented ) return main;
+		if ( !isSegmented ) return source;
 
 		// If needed: compile all segments into one object
 		Container compiled = new Container();
@@ -146,7 +146,7 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		
 		// Remove the segmentation if requested
 		if ( removeSegmentation ) {
-			main = compiled;
+			source = compiled;
 			segments.clear();
 			isSegmented = false;
 		}
@@ -155,12 +155,12 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		return compiled;
 	}
 
-	public IExtractionItem getTarget () {
+	public IContainer getTarget () {
 		return target;
 	}
 
-	public void setTarget (IExtractionItem item) {
-		target = item;
+	public void setTarget (IContainer target) {
+		this.target = target;
 	}
 
 	public boolean hasChild () {
@@ -227,11 +227,11 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		}
 		
 		text.append("<src>");
-		text.append(item.getContent().toXML());
+		text.append(item.getSource().toXML());
 		text.append("</src>");
 		text.append("<trg>");
 		if ( item.hasTarget() ) {
-			text.append(item.getTarget().getContent().toXML());
+			text.append(item.getTarget().toXML());
 		}
 		text.append("</trg>");
 		

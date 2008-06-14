@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.CodeFragment;
+import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
 import net.sf.okapi.common.resource.IDocumentResource;
@@ -41,7 +42,7 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	private void buildContent (Element elem,
-		IExtractionItem item)
+		IContainer content)
 	{
 		// Remove existing content
 		Node node = elem.getFirstChild();
@@ -52,7 +53,7 @@ public class OutputFilter implements IOutputFilter {
 
 		// Set new nodes
 		Document doc = elem.getOwnerDocument();
-		List<IFragment> fragList = item.getContent().getFragments();
+		List<IFragment> fragList = content.getFragments();
 		for ( IFragment frag : fragList ) {
 			if ( frag.isText() ) {
 				elem.appendChild(doc.createTextNode(
@@ -85,7 +86,7 @@ public class OutputFilter implements IOutputFilter {
 					buildContent(res.trgElem, item.getTarget());
 				}
 				else {
-					buildContent(res.trgElem, item);
+					buildContent(res.trgElem, item.getSource());
 				}
 			}
 			else if ( newTarget || !res.trgElem.hasChildNodes() ) {

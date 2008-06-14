@@ -18,29 +18,29 @@ public interface IExtractionItem extends ICommonResource {
 	boolean hasTarget ();
 	
 	/**
-	 * Gets the target item of a source item.
-	 * @return The target item of this item, or null.
+	 * Gets the target of the item.
+	 * @return The target of this item, or null.
 	 */
-	IExtractionItem getTarget ();
+	IContainer getTarget ();
 	
 	/**
-	 * Sets the target item for a source item. Uset setTarget(null) to remove an
+	 * Sets the target for this item. Use setTarget(null) to remove an
 	 * existing target.
-	 * @param item The target item for this source item.
+	 * @param target The target for this item.
 	 */
-	void setTarget (IExtractionItem item);
+	void setTarget (IContainer target);
 	
 	/**
-	 * Gets the unsegmented content of the item.
+	 * Gets the unsegmented content of the source of the item.
 	 * @return The IContainer object with the unsegmented content.
 	 */
-	IContainer getContent();
+	IContainer getSource();
 	
 	/**
-	 * Sets the content of the item.
-	 * @param data An IContainer object with the new content.
+	 * Sets the content of the source of the item.
+	 * @param data An IContainer object with the new source content.
 	 */
-	void setContent (IContainer data);
+	void setSource (IContainer data);
 	
 	/**
 	 * Gets the list of the segments for the item.

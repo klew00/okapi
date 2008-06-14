@@ -163,43 +163,40 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
-	public void writeItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem,
+	public void writeItem (IExtractionItem item,
 		int status)
 	{
-		IExtractionItem current = sourceItem.getFirstItem();
+		IExtractionItem current = item.getFirstItem();
 		do {
-			processItem(current, current.getTarget());
-		} while ( (current = sourceItem.getNextItem()) != null );
+			processItem(current);
+		} while ( (current = item.getNextItem()) != null );
 	}
 	
-	private void processItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem)
-	{
+	private void processItem (IExtractionItem item) {
 		writer.writeRawXML(String.format(
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'&gt;</ut>",
-			sourceItem.getID()));
+			item.getID()));
 		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
-		if (( sourceItem.hasTarget() ) && ( targetItem != null )) {
+		if ( item.hasTarget() ) {
 			//TODO: Info about the match
 			writer.writeStartElement("Tu");
 			//TODO: writer.writeAttributeString("Origin", "manual");
 			//TODO: writer.writeAttributeString("MatchPercent", "100");
 			writer.writeStartElement("Tuv");
 			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
-			writeContent(sourceItem.getContent());
+			writeContent(item.getSource());
 			writer.writeEndElement(); //Tuv
 			writer.writeStartElement("Tuv");
 			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
-			writeContent(targetItem.getContent());
+			writeContent(item.getTarget());
 			writer.writeEndElement(); //Tuv
 			writer.writeEndElement(); //Tu
 
 			// Write the item in the TM if needed
-			tmxWriter.writeItem(sourceItem);
+			tmxWriter.writeItem(item);
 		}
 		else {
-			writeContent(sourceItem.getContent());
+			writeContent(item.getSource());
 		}
 		
 		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"u\">&lt;/u&gt;</ut>");

@@ -126,32 +126,29 @@ public class Writer extends BaseWriter {
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (IExtractionItem sourceItem,
-			IExtractionItem targetItem,
+	public void writeItem (IExtractionItem item,
 		int status)
 	{
-		IExtractionItem current = sourceItem.getFirstItem();
+		IExtractionItem current = item.getFirstItem();
 		do {
-			processItem(current, current.getTarget());
-		} while ( (current = sourceItem.getNextItem()) != null );
+			processItem(current);
+		} while ( (current = item.getNextItem()) != null );
 	}
 	
-	private void processItem (IExtractionItem sourceItem,
-		IExtractionItem targetItem)
-	{
+	private void processItem (IExtractionItem item) {
 		if ( excludeNoTranslate ) {
-			if ( !sourceItem.isTranslatable() ) return;
+			if ( !item.isTranslatable() ) return;
 		}
 		
 		writer.writeStartElement("trans-unit");
-		writer.writeAttributeString("id", String.valueOf(sourceItem.getID()));
-		if ( sourceItem.getName().length() != 0 )
-			writer.writeAttributeString("resname", sourceItem.getName());
-		if ( sourceItem.getType().length() != 0 )
-			writer.writeAttributeString("restype", sourceItem.getType());
-		if ( !sourceItem.isTranslatable() )
+		writer.writeAttributeString("id", String.valueOf(item.getID()));
+		if ( item.getName().length() != 0 )
+			writer.writeAttributeString("resname", item.getName());
+		if ( item.getType().length() != 0 )
+			writer.writeAttributeString("restype", item.getType());
+		if ( !item.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
-		if ( sourceItem.preserveSpaces() )
+		if ( item.preserveSpaces() )
 			writer.writeAttributeString("xml:space", "preserve");
 //TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
 //			m_XW.writeAttributeString("approved", "yes");
@@ -162,11 +159,11 @@ public class Writer extends BaseWriter {
 
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
+		writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
 		writer.writeEndElementLineBreak(); // source
 
 		// Target (if needed)
-		if ( targetItem != null ) {
+		if ( item.hasTarget() ) {
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
 			
@@ -185,28 +182,28 @@ public class Writer extends BaseWriter {
 					break;
 			}
 */
-			if ( sourceItem.hasTarget() && !useSourceForTranslated ) {
-				writer.writeRawXML(xliffCont.setContent(targetItem.getContent()).toString());
+			if ( item.hasTarget() && !useSourceForTranslated ) {
+				writer.writeRawXML(xliffCont.setContent(item.getTarget()).toString());
 			}
 			else {
-				writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
+				writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
 			}
 
 			writer.writeEndElementLineBreak(); // target
 			// Write the item in the TM if needed
-			tmxWriter.writeItem(sourceItem);
+			tmxWriter.writeItem(item);
 		}
 		else { // Use the source 
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-			writer.writeRawXML(xliffCont.setContent(sourceItem.getContent()).toString());
+			writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
 			writer.writeEndElementLineBreak(); // target
 		}
 
 		// Note
-		if ( sourceItem.hasNote() ) {
+		if ( item.hasNote() ) {
 			writer.writeStartElement("note");
-			writer.writeString(sourceItem.getNote());
+			writer.writeString(item.getNote());
 			writer.writeEndElementLineBreak(); // note
 		}
 

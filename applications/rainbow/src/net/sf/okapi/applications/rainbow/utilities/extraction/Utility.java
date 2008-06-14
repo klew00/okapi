@@ -119,8 +119,12 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		//if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
 		//else if ( sourceItem.hasTarget() ) status = IFilterItem.TSTATUS_TOEDIT;
 
-		writer.writeItem(item,
-			(params.includeTargets ? item.getTarget() : null), 0); //TODO: status
+		if ( params.includeTargets ) {
+			//TODO: Find a solution to not output item with
+			// existing target
+		}
+		//TODO: Status
+		writer.writeItem(item, 0);
 	}
     
 	@Override

@@ -18,7 +18,6 @@ import net.sf.okapi.common.resource.IExtractionItem;
 
 public class XLIFFReader {
 
-	// Same as in Borneo database TSTATUS_* values
 	public static final int       STATUS_NOTRANS      = 0;
 	public static final int       STATUS_UNUSED       = 1;
 	public static final int       STATUS_TOTRANS      = 2;
@@ -200,7 +199,7 @@ public class XLIFFReader {
 				content = new Container();
 				inCode = 0;
 				processContent(sName);
-				item.setContent(content);
+				item.setSource(content);
 			}
 			else if ( sName.equals("target") ) {
 				processTarget();
@@ -305,7 +304,7 @@ public class XLIFFReader {
 	}
 	
 	private void processTarget () {
-		item.setTarget(new ExtractionItem());
+		item.setTarget(new Container());
 		resource.trgElem = (Element)node;
 		String tmp = resource.trgElem.getAttribute("state");
 		if ( tmp.length() > 0 ) {
@@ -320,7 +319,7 @@ public class XLIFFReader {
 		inCode = 0;
 		processContent("target");
 		if ( !item.isEmpty() && !content.isEmpty() )
-			item.getTarget().setContent(content);
+			item.setTarget(content);
 		else
 			item.setTarget(null);
 	}
