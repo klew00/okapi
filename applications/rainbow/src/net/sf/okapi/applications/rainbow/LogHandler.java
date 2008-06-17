@@ -31,6 +31,7 @@ class LogHandler extends Handler {
 	public void publish (LogRecord record) {
 		if ( record.getLevel() == Level.SEVERE ) {
 			log.error(record.getMessage());
+			log.error(record.getThrown().getLocalizedMessage());
 			for ( StackTraceElement elem : record.getThrown().getStackTrace() ) {
 				log.message(" at "+elem.toString());
 			}

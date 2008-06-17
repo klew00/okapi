@@ -69,6 +69,7 @@ public class OutputFilter implements IOutputFilter {
 
 	private void buildContent (Node node,
 		String content)
+		throws SAXException, IOException
 	{
 		// Remove the part of the existing content that is
 		// marked with 'toDel' user-data flag
@@ -113,8 +114,7 @@ public class OutputFilter implements IOutputFilter {
 		do {
 			if ( current.isTranslatable() ) {
 				if ( current.hasTarget() ) {
-					// Attribute case: Simply set the value of the node passed by the data
-					//TODO: Redo the merging for attr Node attr = (Node)current.getData();
+					// Check for attribute sub-item case
 					String siFlag = current.getProperty("subItem");
 					if ( siFlag != null ) {
 						if ( siFlag.startsWith(XMLReader.ILMARKER) ) {
@@ -147,7 +147,6 @@ public class OutputFilter implements IOutputFilter {
 										cont.toString(), 3, false));
 								}
 								else {
-									// Warning: marker not found for sub-item
 									logger.warn(String.format("Cannot found marker for sub-item id='%s' in item id='%s'",
 										id, current.getID()));
 								}
@@ -155,7 +154,17 @@ public class OutputFilter implements IOutputFilter {
 							subItems.clear();
 						}
 						// Merge the content
-						buildContent(res.srcNode, tmp);
+						try {
+							buildContent(res.srcNode, tmp);
+						}
+						catch ( IOException e ) {
+							logger.error(String.format("Problem in new content of item id='%s'.",
+								current.getID()), e);
+						}
+						catch ( SAXException e ) {
+							logger.error(String.format("Problem in new content of item id='%s'.",
+								current.getID()), e);
+						}
 					}
 				}
 			}
@@ -208,31 +217,24 @@ public class OutputFilter implements IOutputFilter {
 	
 	private DocumentFragment parseXMLString (Document doc,
 		String fragment)
+		throws SAXException, IOException
 	{
 		// Make sure we have boundaries
 		fragment = "<F>"+fragment+"</F>";
-		try {
-			// Parse the fragment
-			Document tmpDoc = docBuilder.parse(
-				new InputSource(new StringReader(fragment)));
-			// Import the nodes of the new document into the destination
-			// document so that they will be compatible with the it
-			Node node = doc.importNode(tmpDoc.getDocumentElement(), true);
-			// Create the document fragment node to hold the new nodes
-			DocumentFragment docfrag = doc.createDocumentFragment();
-            // Move the nodes into the fragment
-			while ( node.hasChildNodes() ) {
-				docfrag.appendChild(node.removeChild(node.getFirstChild()));
-            }
-			return docfrag;
-		} catch ( SAXException e ) {
-			// A parsing error occurred. Invalid XML
-			logger.error("XML syntax error: " + e.getLocalizedMessage(), e);
-			throw new RuntimeException(e);
+
+		// Parse the fragment
+		Document tmpDoc = docBuilder.parse(
+			new InputSource(new StringReader(fragment)));
+		// Import the nodes of the new document into the destination
+		// document so that they will be compatible with the it
+		Node node = doc.importNode(tmpDoc.getDocumentElement(), true);
+		// Create the document fragment node to hold the new nodes
+		DocumentFragment docfrag = doc.createDocumentFragment();
+        // Move the nodes into the fragment
+		while ( node.hasChildNodes() ) {
+			docfrag.appendChild(node.removeChild(node.getFirstChild()));
 		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
+		return docfrag;
     }
 	
 }

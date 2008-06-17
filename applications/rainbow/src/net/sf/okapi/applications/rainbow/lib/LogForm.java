@@ -143,6 +143,8 @@ public class LogForm implements ILog {
 	
 	public boolean beginProcess (String p_sText) {
 		if ( inProgress() ) return false;
+		clear();
+		edLog.append("=== Start process\n");
 		if (( p_sText != null ) && ( p_sText.length() > 0 ))
 			setLog(LogType.MESSAGE, 0, p_sText);
 		errorCount = warningCount = 0;
@@ -186,6 +188,9 @@ public class LogForm implements ILog {
 		if ( inProgress ) {
 			if (( p_sText != null ) && ( p_sText.length() > 0 ))
 				setLog(LogType.MESSAGE, 0, p_sText);
+			edLog.append(String.format("Error count: %d, ", errorCount));
+			edLog.append(String.format("Warning count: %d\n", errorCount));
+			edLog.append("=== End process");
 		}
 		inProgress = false;
 		updateDisplay();
@@ -249,15 +254,15 @@ public class LogForm implements ILog {
 	{
 		switch ( p_nType ) {
 		case LogType.ERROR:
-			edLog.insert("Error: " + p_sValue + "\n");
+			edLog.append("Error: " + p_sValue + "\n");
 			errorCount++;
 			break;
 		case LogType.WARNING:
-			edLog.insert("Warning: " + p_sValue + "\n");
+			edLog.append("Warning: " + p_sValue + "\n");
 			warningCount++;
 			break;
 		case LogType.MESSAGE:
-			edLog.insert(p_sValue + "\n");
+			edLog.append(p_sValue + "\n");
 			break;
 		case LogType.SUBPROGRESS:
 		case LogType.MAINPROGRESS:
