@@ -31,6 +31,7 @@ public class XMLReader {
 	
 	public static final String    ILMARKER  = "@MRK:";
 
+
 	protected Resource       resource;
 	
 	private boolean          sendEndEvent;
@@ -99,7 +100,6 @@ public class XMLReader {
 					case ITraversal.WITHINTEXT_YES:
 						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeIDStack.pop(),
 							tagToString(node, false), node));
-						node.setUserData("toDel", true, null);
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
@@ -123,6 +123,7 @@ public class XMLReader {
 						else // Empty element
 							content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 								tagToString(node, true), node));
+						node.setUserData("toDel", true, null);
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
@@ -132,6 +133,13 @@ public class XMLReader {
 							return RESULT_STARTTRANSUNIT;
 						}
 						else {
+							if ( item.hasChild() ) {
+								// Has no content, just one child or more.
+								//TODO: Return the item to allow treatment of children
+//								item.setIsTranslatable(false);
+//								setItemInfo(node.getParentNode());
+//								return RESULT_STARTTRANSUNIT;
+							}
 							resetStorage();
 						}
 						break;
@@ -193,12 +201,16 @@ public class XMLReader {
 				attrItem.getSource().setContent(attr.getNodeValue());
 				attrItem.setID(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
-				//TODO: Find another way! attrItem.setData(attr);
 				if ( itsEng.getWithinText() == ITraversal.WITHINTEXT_YES ) {
 					// For sub-items in in-line codes: Replace the value by a
 					// marker so it can be used later for merging (as the node
 					// itself will not be available).
-					attr.setNodeValue(String.format("%s%d", ILMARKER, itemID));
+					attrItem.setProperty("subItem", String.format("%s%d", ILMARKER, itemID));
+					attr.setNodeValue(attrItem.getProperty("subItem"));
+				}
+				else {
+					// For non-inline tag: jut use the attribute name
+					attrItem.setProperty("subItem", attr.getNodeName());
 				}
 				item.addChild(attrItem);
 			}

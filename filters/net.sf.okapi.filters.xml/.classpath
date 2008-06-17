@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
+	<classpathentry kind="lib" path="C:/OkapiJava/trunk/filters/net.sf.okapi.filters.xml/lib/shared/slf4j-api-1.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

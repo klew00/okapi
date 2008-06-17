@@ -13,6 +13,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.common.Util;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -128,7 +130,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					// xlink:href allows the use of xml:base so we need to calculate it
 					// The initial base is the folder of the current document
 					File tmpFile = new File(docPath);
-					String baseFolder = tmpFile.getPath();
+					String baseFolder = Util.getDirectoryName(tmpFile.getPath());
 					// Then we look for the last xml:base specified
 					Node node = rulesElem;
 					while ( node != null ) {
@@ -186,6 +188,11 @@ public class ITSEngine implements IProcessor, ITraversal
 		boolean isInternal)
 	{
 		try {
+			if ( fact == null ) { 
+				fact = DocumentBuilderFactory.newInstance();
+				fact.setNamespaceAware(true);
+				fact.setValidating(false);
+			}
 			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docPath));
 			compileRules(rulesDoc, docPath, isInternal);
 		}

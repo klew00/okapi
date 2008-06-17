@@ -17,8 +17,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -34,11 +38,12 @@ import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class OutputFilter implements IOutputFilter {
 	
-	private Resource                   res;
-	private OutputStream               output;
-	private DocumentBuilderFactory     fact;
-	private DocumentBuilder            docBuilder;
-	private HashMap<String, IContainer> subItems;
+	private Resource                        res;
+	private OutputStream                    output;
+	private DocumentBuilderFactory          fact;
+	private DocumentBuilder                 docBuilder;
+	private HashMap<String, IContainer>     subItems;
+	private final Logger                    logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 
 	public void close () {
@@ -65,7 +70,8 @@ public class OutputFilter implements IOutputFilter {
 	private void buildContent (Node node,
 		String content)
 	{
-		// Remove existing content
+		// Remove the part of the existing content that is
+		// marked with 'toDel' user-data flag
 		boolean foundNodeToDelete = false;
 		Node beforeNode = null;
 		Node deleteNode = null;
@@ -92,7 +98,8 @@ public class OutputFilter implements IOutputFilter {
 		DocumentFragment df = parseXMLString(doc, content);
 
 		if ( df.hasChildNodes() ) {
-			// If beforeNode is null, insertBefore does an append(), which is what we need 
+			// If beforeNode is null, insertBefore does an append(),
+			// which is what we need.
 			node.insertBefore(df.removeChild(df.getFirstChild()), beforeNode);
 			while ( df.hasChildNodes() ) {
 				node.appendChild(df.removeChild(df.getFirstChild()));
@@ -108,15 +115,21 @@ public class OutputFilter implements IOutputFilter {
 				if ( current.hasTarget() ) {
 					// Attribute case: Simply set the value of the node passed by the data
 					//TODO: Redo the merging for attr Node attr = (Node)current.getData();
-					Node attr = null;
-					if ( attr != null ) {
-						if ( attr.getNodeValue().startsWith(XMLReader.ILMARKER) ) {
+					String siFlag = current.getProperty("subItem");
+					if ( siFlag != null ) {
+						if ( siFlag.startsWith(XMLReader.ILMARKER) ) {
 							// This is an item extracted from an in-line code
 							// We have to wait the parent to be merged to set it
 							subItems.put(current.getID(), current.getTarget());
 						}
 						else { // Not in in-line code, set it now
-							attr.setNodeValue(current.getTarget().toString());
+							Element elem = (Element)res.srcNode;
+							Attr attr = elem.getAttributeNode(siFlag);
+							if ( attr != null ) attr.setNodeValue(current.getTarget().toString());
+							else {
+								logger.warn(String.format("Cannot found mergeable attribute '%s' in item id='%s'",
+									siFlag, current.getID()));
+							}
 						}
 					}
 					else {
@@ -131,10 +144,12 @@ public class OutputFilter implements IOutputFilter {
 								if ( tmp.indexOf(mark) > -1 ) {
 									//TODO: We risk double-escape if the sub-item has in-line code
 									tmp = tmp.replace(mark, Util.escapeToXML(
-										cont.toString(),3,false));
+										cont.toString(), 3, false));
 								}
 								else {
-									//TODO: Warning: marker not found for sub-item
+									// Warning: marker not found for sub-item
+									logger.warn(String.format("Cannot found marker for sub-item id='%s' in item id='%s'",
+										id, current.getID()));
 								}
 							}
 							subItems.clear();
@@ -147,7 +162,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 		while ( (current = item.getNextItem()) != null );
 	}
-
+	
 	public void endResource (IDocumentResource resource) {
 		try {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -210,11 +225,9 @@ public class OutputFilter implements IOutputFilter {
 				docfrag.appendChild(node.removeChild(node.getFirstChild()));
             }
 			return docfrag;
-		//} catch ( SAXException e ) {
+		} catch ( SAXException e ) {
 			// A parsing error occurred. Invalid XML
-			//TODO: Log
-		}
-		catch ( SAXException e ) {
+			logger.error("XML syntax error: " + e.getLocalizedMessage(), e);
 			throw new RuntimeException(e);
 		}
 		catch ( IOException e ) {
