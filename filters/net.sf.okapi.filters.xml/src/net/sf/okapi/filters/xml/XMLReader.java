@@ -62,6 +62,7 @@ public class XMLReader {
 			itsEng.startTraversal();
 			sendEndEvent = false;
 			codeIDStack = new Stack<Integer>();
+			itemID = 0;
 		}
 		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
@@ -98,6 +99,7 @@ public class XMLReader {
 					case ITraversal.WITHINTEXT_YES:
 						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeIDStack.pop(),
 							tagToString(node, false), node));
+						node.setUserData("toDel", true, null);
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
@@ -112,7 +114,6 @@ public class XMLReader {
 					}
 				}
 				else { // Start tag
-					//TODO: Deal with empty elements!
 					processAttributes();
 					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
@@ -138,6 +139,7 @@ public class XMLReader {
 				}
 				break;
 			case Node.TEXT_NODE:
+			case Node.CDATA_SECTION_NODE:
 				if ( itsEng.translate() ) {
 					content.append(node.getNodeValue());
 					// Check if we have already some content and change flag if needed
@@ -155,9 +157,7 @@ public class XMLReader {
 					content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 						node.getNodeValue(), node));
 				}
-				break;
-			case Node.CDATA_SECTION_NODE:
-				//TODO: CDATA_SECTION_NODE
+				node.setUserData("toDel", true, null);
 				break;
 			case Node.ENTITY_NODE:
 				//TODO: ENTITY_NODE
@@ -168,11 +168,12 @@ public class XMLReader {
 			case Node.COMMENT_NODE:
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
 					"<!--"+node.getNodeValue()+"-->", node));
+				node.setUserData("toDel", true, null);
 				break;
 			case Node.PROCESSING_INSTRUCTION_NODE:
-				//TODO: PIs
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-					node.getNodeValue(), node));
+					"<?"+node.getNodeName()+" "+node.getNodeValue()+"?>", node));
+				node.setUserData("toDel", true, null);
 				break;
 			}
 		}

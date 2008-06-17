@@ -66,18 +66,38 @@ public class OutputFilter implements IOutputFilter {
 		String content)
 	{
 		// Remove existing content
-		Node tmpNode = node.getFirstChild();
-		while ( tmpNode != null ) {
-			node.removeChild(tmpNode);
-			tmpNode = node.getFirstChild();
+		boolean foundNodeToDelete = false;
+		Node beforeNode = null;
+		Node deleteNode = null;
+		Node currentNode = node.getFirstChild();
+		while ( currentNode != null ) {
+			if ( currentNode.getUserData("toDel") == null ) {
+				if ( foundNodeToDelete ) { // Deletion done, stop here
+					beforeNode = currentNode;
+					break;
+				}
+				else { // No deletion done yet, keep looking for the first one
+					currentNode = currentNode.getNextSibling();
+				}
+			}
+			else { // Do the deletion, set the flag
+				deleteNode = currentNode;
+				currentNode = currentNode.getNextSibling();
+				node.removeChild(deleteNode);
+				foundNodeToDelete = true;
+			}
 		}
 
 		Document doc = node.getOwnerDocument();
 		DocumentFragment df = parseXMLString(doc, content);
-		
-		while ( df.hasChildNodes() ) {
-			node.appendChild(df.removeChild(df.getFirstChild()));
-        }
+
+		if ( df.hasChildNodes() ) {
+			// If beforeNode is null, insertBefore does an append(), which is what we need 
+			node.insertBefore(df.removeChild(df.getFirstChild()), beforeNode);
+			while ( df.hasChildNodes() ) {
+				node.appendChild(df.removeChild(df.getFirstChild()));
+			}
+		}
 	}
 	
 	public void endExtractionItem (IExtractionItem item) {

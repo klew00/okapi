@@ -15,6 +15,7 @@ public class Parameters extends BaseParameters {
 	protected String    suffix;
 	protected boolean   applyToExistingTarget;
 	protected boolean   addName;
+	protected boolean   addID;
 	
 	
 	public Parameters () {
@@ -33,6 +34,7 @@ public class Parameters extends BaseParameters {
 		suffix = tmp.get("suffix", suffix);
 		applyToExistingTarget = tmp.get("applyToExistingTarget", applyToExistingTarget);
 		addName = tmp.get("addName", addName);
+		addID = tmp.get("addID", addID);
 	}
 
 	@Override
@@ -44,6 +46,7 @@ public class Parameters extends BaseParameters {
 		suffix = "]]";
 		applyToExistingTarget = false;
 		addName = false;
+		addID = false;
 	}
 
 	@Override
@@ -57,6 +60,7 @@ public class Parameters extends BaseParameters {
 		tmp.add("suffix", suffix);
 		tmp.add("applyToExistingTarget", applyToExistingTarget);
 		tmp.add("addName", addName);
+		tmp.add("addID", addID);
 		return tmp.toString();
 	}
 	

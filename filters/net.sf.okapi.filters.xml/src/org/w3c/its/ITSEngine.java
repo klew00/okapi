@@ -177,7 +177,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				}
 			}
 		}
-		catch ( Exception e ) {
+		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -461,7 +461,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				}
 		    }
 		}
-		catch ( Exception e ) {
+		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
 	}

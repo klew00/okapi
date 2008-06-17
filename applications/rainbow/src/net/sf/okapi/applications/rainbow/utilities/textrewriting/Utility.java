@@ -118,12 +118,15 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
-			if ( params.addSuffix ) {
-				tmp += params.suffix;
-			}
 			if ( params.addName ) {
 				if ( item.getName().length() > 0 ) tmp += "."+item.getName();
 				else tmp += "_"+item.getID();
+			}
+			if ( params.addID ) {
+				tmp += "_"+item.getID();
+			}
+			if ( params.addSuffix ) {
+				tmp += params.suffix;
 			}
 			IContainer cnt = item.getTarget(); 
 			cnt.setContent(tmp, item.getSource().getCodes());

@@ -52,6 +52,7 @@ public class Editor implements IParametersEditor {
 	private Text                  edSuffix;
 	private boolean               inInit = true;
 	private Button                chkApplyToExistingTarget;
+	private Button                chkAddID;
 	private Button                chkAddName;
 	
 	/**
@@ -132,10 +133,16 @@ public class Editor implements IParametersEditor {
 		edSuffix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		chkAddName = new Button(cmpTmp, SWT.CHECK);
-		chkAddName.setText("Append the name/id of the item.");
+		chkAddName.setText("Append the name of the item.");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkAddName.setLayoutData(gdTmp);
+
+		chkAddID = new Button(cmpTmp, SWT.CHECK);
+		chkAddID.setText("Append the extraction ID of the item.");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAddID.setLayoutData(gdTmp);
 
 		chkApplyToExistingTarget = new Button(cmpTmp, SWT.CHECK);
 		chkApplyToExistingTarget.setText("Modify also the items with an exiting translation.");
@@ -184,6 +191,7 @@ public class Editor implements IParametersEditor {
 		edSuffix.setText(params.suffix);
 		chkApplyToExistingTarget.setSelection(params.applyToExistingTarget);
 		chkAddName.setSelection(params.addName);
+		chkAddID.setSelection(params.addID);
 	}
 
 	private boolean saveData () {
@@ -195,6 +203,7 @@ public class Editor implements IParametersEditor {
 		params.suffix = edSuffix.getText();
 		params.applyToExistingTarget = chkApplyToExistingTarget.getSelection();
 		params.addName = chkAddName.getSelection();
+		params.addID = chkAddID.getSelection();
 		result = true;
 		return true;
 	}

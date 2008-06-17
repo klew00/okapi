@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
-<doc xmlns:xd="nsOfXDocParts" xmlns:its="http://www.w3.org/2005/11/its" its:version="1.0">
- <elem text="Text attribute">Paragraph with &lt;=lt, &amp;=amp, &quot;=quot, &apos;=apos.</elem>
- <elem xml:id="ID1">Paragraph 2<!--comment  --> end of paragraph.</elem>
- <data its:translate="no">Data not to localize</data>
- <elem myID="ID2">Text with <code>code</code> and <b>bold</b>.</elem>
- <elem myID="ID3" xml:id="OtherID">Text with a footnote<fn>Text of the footnote</fn> and more text</elem>
- <elem>Text with <xd:rmk its:translate="no">XDoc info non-translatable</xd:rmk> and more text.</elem>
+<doc>
+ <elem myID="ID1">Text with <code>code</code>.</elem>
+ <elem myID="ID2">Text with <code>code and <b>bold and <i>italics</i> re-bold</b> re-code</code>.</elem>
+ <elem>text1<?testPI dataPI?>text2</elem>
 </doc>

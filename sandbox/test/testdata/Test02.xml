@@ -17,5 +17,8 @@
  <data its:translate="no">Data not to localize</data>
  <elem myID="ID2">Text with <code text="Translate: &lt;=lt,&apos;=apos,&quot;=quot.">code</code> and <b>bold</b>.</elem>
  <elem myID="ID3" xml:id="OtherID">Text with a footnote<fn>Text of the footnote</fn> and more text</elem>
+ <elem><![CDATA[Text in cdata &=amp, <=lt, end.]]></elem>
  <elem>Text with <xd:rmk its:translate="no">XDoc info non-translatable</xd:rmk> and more text.</elem>
+ <elem>Text before <![CDATA[and now  in cdata &=amp, <=lt, ]]>ends here.</elem>
+ <elem>Text before PI<?testPI data in pi   ?> Text after (space before)</elem>
 </doc>
