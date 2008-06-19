@@ -45,8 +45,7 @@ public class OutputFilter implements IOutputFilter {
 	public void endContainer (IGroupResource resource) {
 	}
 
-	public void endExtractionItem (IExtractionItem item)
-	{
+	public void endExtractionItem (IExtractionItem item) {
 		try {
 			// Write the buffer
 			writer.write(res.sklRes.toString());
@@ -60,7 +59,7 @@ public class OutputFilter implements IOutputFilter {
 			if ( res.endingLB ) writer.write(res.lineBreak);
 		}
 		catch ( IOException e ) {
-			System.err.println(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -69,7 +68,7 @@ public class OutputFilter implements IOutputFilter {
 			writer.write(res.sklRes.toString());
 		}
 		catch ( IOException e ) {
-			System.err.println(e.getLocalizedMessage());
+			throw new RuntimeException(e);
 		}
 		finally {
 			close();
@@ -95,9 +94,6 @@ public class OutputFilter implements IOutputFilter {
 			// Write the buffer
 			writer.write(res.sklRes.toString());
 		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
-		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
@@ -106,6 +102,7 @@ public class OutputFilter implements IOutputFilter {
     public void skeletonContainer (ISkeletonResource resource) {
     	// In this writer, this is done in the other handlers
     	// (for now)
+    	//TODO: Not a good idea: we need to change that and use skeletonContainer
     }
     
 	private String escape (String text) {

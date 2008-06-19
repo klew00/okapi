@@ -24,9 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BOMAwareInputStream;
-import net.sf.okapi.common.ILog;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
@@ -53,7 +56,9 @@ public class InputFilter implements IInputFilter {
 	private int              lineNumber;
 	private int              lineSince;
 	private long             position;
-	private int              id;
+	private int              itemID;
+	private int              sklID;
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 
 	public InputFilter () {
@@ -97,6 +102,7 @@ public class InputFilter implements IInputFilter {
 		try {
 			if ( resetBuffer ) {
 				res.sklRes = new SkeletonResource();
+				res.sklRes.setID(String.format("s%d", ++sklID));
 			}
 			
 			StringBuilder keyBuffer = new StringBuilder();
@@ -270,7 +276,7 @@ public class InputFilter implements IInputFilter {
 				}
 
 				item.setPreserveSpaces(true);
-				item.setID(String.valueOf(++id));
+				item.setID(String.valueOf(++itemID));
 //For test
 				item.setExtension("TestExtension",
 					new TestExtension("Data of the extension for item " + item.getID()));
@@ -341,7 +347,7 @@ public class InputFilter implements IInputFilter {
 							tmpText.append((char)nTmp);
 						}
 						catch ( Exception e ) {
-							logMessage(ILog.TYPE_WARNING,
+							logMessage(Level.WARNING,
 								String.format(Res.getString("INVALID_UESCAPE"),
 								text.substring(i+2, i+6)));
 						}
@@ -349,7 +355,7 @@ public class InputFilter implements IInputFilter {
 						continue;
 					}
 					else {
-						logMessage(ILog.TYPE_WARNING,
+						logMessage(Level.WARNING,
 							String.format(Res.getString("INVALID_UESCAPE"),
 							text.substring(i+2)));
 					}
@@ -373,12 +379,18 @@ public class InputFilter implements IInputFilter {
 		return tmpText.toString();
 	}
 
-	private void logMessage (int type,
+	private void logMessage (Level level,
 		String text)
 	{
-		System.err.println(text);
-		//m_Log.setLog(p_nType, 0, String.format(
-		//	Res.getString("LINE_LOCATION"), m_nLine) + p_sText);
+		if ( level == Level.WARNING ) {
+			logger.warn(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
+		}
+		else if ( level == Level.SEVERE ) {
+			logger.error(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
+		}
+		else {
+			logger.info(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
+		}
 	}
 
 	public void process () {
@@ -391,7 +403,8 @@ public class InputFilter implements IInputFilter {
 			// Initializes the variables
 			res.endingLB = true;
 			res.lineBreak = "\n"; //TODO: Auto-detection of line-break type
-			id = 0;
+			itemID = 0;
+			sklID = 0;
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;

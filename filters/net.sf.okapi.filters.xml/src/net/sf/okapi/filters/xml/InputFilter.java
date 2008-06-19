@@ -36,6 +36,8 @@ public class InputFilter implements IInputFilter {
 		reader.resource.setName(name);
 		reader.resource.setFilterSettings(filterSettings);
 		reader.resource.setSourceEncoding(encoding);
+		reader.resource.setSourceLanguage(sourceLanguage);
+		reader.resource.setTargetLanguage(targetLanguage);
 		//TODO: Get the real target/output encoding from parameters
 		reader.resource.setTargetEncoding(encoding);
 	}

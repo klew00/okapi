@@ -6,12 +6,22 @@
 </header>
 <body>
 
+<trans-unit id="S_displayAxis_Paste_of_JMP_type__TYPEA_expecte_xxx" restype="x-misc">
+	<source>Paste of JMP type <ph id="^1">^TYPEA</ph> expected but JMP type <ph id="^2">^TYPEB</ph> on clipboard.</source>
+	<target>Collage de JMP de type <ph id="^1">^TYPEA</ph> attendu, mais JMP de type <ph id="^2">^TYPEB</ph> dans le presse-papiers.</target>
+	<alt-trans>
+		<target xml:lang="de">Einfügen des JMP-Typ <ph id="^1">^TYPEA</ph> wurde erwartet, aber JMP-Typ <ph id="^2">^TYPEB</ph> befindet sich in der Zwischenablage.</target>
+	</alt-trans>
+</trans-unit>
+
 <trans-unit id="1">
-<source xml:lang="en-US">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></source>
+<source xml:lang="en-US">About <bpt id="1" ctype='x-test'>{{</bpt>Gandalf<ept id="1">}}</ept></source>
 </trans-unit>
 <trans-unit id="2">
 <source xml:lang="en-US">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></source>
 <target xml:lang="fr-FR"></target>
+<note>Note 1 (&amp;=amp, &quot;=quot, etc.)</note>
+<note>Note 2</note>
 </trans-unit>
 <trans-unit id="3">
 <source xml:lang="en-US">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></source>
@@ -31,7 +41,8 @@
 </trans-unit>
 
 <trans-unit id="7">
-<source xml:lang="en-US">About <bpt id="1">&lt;b></bpt>Gandalf<ept id="1">&lt;/b></ept></source>
+<source xml:lang="en-US">About <bpt id="1">&lt;b></bpt>Gandalf in bold<ept id="1">&lt;/b></ept></source>
+<!--comment-->
 </trans-unit>
 <trans-unit id="8">
 <source xml:lang="en-US">&lt;=lt, &amp;=amp, &quot;=quot, &apos;=apos, <ph id="1">&lt;&amp;&quot;&apos;</ph>.</source>

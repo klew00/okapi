@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
+	<classpathentry kind="lib" path="lib/shared/slf4j-api-1.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

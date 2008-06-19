@@ -20,6 +20,9 @@ public class InputFilter implements IInputFilter {
 	}
 	
 	public void close () {
+		if ( reader != null ) {
+			reader.close();
+		}
 	}
 
 	public IParameters getParameters () {
@@ -38,6 +41,8 @@ public class InputFilter implements IInputFilter {
 		reader.resource.setName(name);
 		reader.resource.setFilterSettings(filterSettings);
 		reader.resource.setSourceEncoding(encoding);
+		reader.resource.setSourceLanguage(sourceLanguage);
+		reader.resource.setTargetLanguage(targetLanguage);
 		//TODO: Get the real target/output encoding from parameters
 		reader.resource.setTargetEncoding(encoding);
 	}
@@ -73,11 +78,15 @@ public class InputFilter implements IInputFilter {
 					// Do nothing: Both events to be sent when end trans-unit comes
 					// We do this because of the condition based on state attribute.
 					break;
+				//case XLIFFReader.
 				case XLIFFReader.RESULT_ENDTRANSUNIT:
 					if ( isExtractable() ) {
 						output.startExtractionItem(reader.item);
 						output.endExtractionItem(reader.item);
 					}
+					break;
+				case XLIFFReader.RESULT_SKELETON:
+					output.skeletonContainer(reader.getSkeleton());
 					break;
 				case XLIFFReader.RESULT_STARTFILE:
 					output.startContainer(reader.fileRes);

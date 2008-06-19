@@ -33,7 +33,7 @@ public class XLIFFContent {
 	
 	@Override
 	public String toString () {
-		return toString(1, true);
+		return toString(1, true, false);
 	}
 
 	/**
@@ -41,10 +41,13 @@ public class XLIFFContent {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt
-	 * @return
+	 * @param codeOnlyMode True when the inline codes are to be set as raw-values.
+	 * This option is to be used when the inline code is an XLIFF-inline code itself.
+	 * @return The coded string.
 	 */
 	public String toString (int quoteMode,
-		boolean escapeGT)
+		boolean escapeGT,
+		boolean codeOnlyMode)
 	{
 		StringBuilder tmp = new StringBuilder();
 		int index;
@@ -54,23 +57,38 @@ public class XLIFFContent {
 			case IContainer.CODE_OPENING:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).getID();
-				tmp.append(String.format("<bpt id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</bpt>");
+				if ( codeOnlyMode ) {
+					tmp.append(codes.get(index).toString());
+				}
+				else {
+					tmp.append(String.format("<bpt id=\"%d\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</bpt>");
+				}
 				break;
 			case IContainer.CODE_CLOSING:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).getID();
-				tmp.append(String.format("<ept id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</ept>");
+				if ( codeOnlyMode ) {
+					tmp.append(codes.get(index).toString());
+				}
+				else {
+					tmp.append(String.format("<ept id=\"%d\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</ept>");
+				}
 				break;
 			case IContainer.CODE_ISOLATED:
 				index = Container.CtoI(codedText.charAt(++i));
 				id = ((CodeFragment)codes.get(index)).getID();
-				tmp.append(String.format("<ph id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</ph>");
+				if ( codeOnlyMode ) {
+					tmp.append(codes.get(index).toString());
+				}
+				else {
+					tmp.append(String.format("<ph id=\"%d\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</ph>");
+				}
 				break;
 			case '>':
 				if ( escapeGT ) tmp.append("&gt;");

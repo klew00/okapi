@@ -5,6 +5,8 @@ import net.sf.okapi.common.Util;
 public class SkeletonResource implements ISkeletonResource {
 
 	public StringBuilder     data;
+
+	private String           id;
 	
 	
 	public SkeletonResource () {
@@ -20,12 +22,22 @@ public class SkeletonResource implements ISkeletonResource {
 		return data.toString();
 	}
 
+	public String getID () {
+		if ( id == null ) return "";
+		return id;
+	}
+
+	public void setID (String newId) {
+		id = newId;
+	}
+
 	public void setData (String text) {
 		data = new StringBuilder(text);
 	}
 
 	public String toXML () {
-		return "<skl>" + Util.escapeToXML(data.toString(), 0, false) + "</skl>";
+		return "<skl id=\"" + id + "\">"
+			+ Util.escapeToXML(data.toString(), 0, false) + "</skl>";
 	}
 
 }

@@ -232,10 +232,10 @@ public class Container implements IContainer {
 				}
 				// Then map to existing codes
 				if ( ++i >= codedText.length() )
-					throw new InvalidContentException("Missing id after code prefix.");
+					throw new InvalidContentException("Missing index after code prefix.");
 				int codeIndex = CtoI(codedText.charAt(i));
 				if ( codeIndex >= tmpList.size() )
-					throw new InvalidContentException(String.format("Code index '%d' is not in the object.", codeIndex));
+					throw new InvalidContentException(String.format("Code index='%d' is not in the object.", codeIndex));
 				list.add(tmpList.get(codeIndex));
 				codeCount++;
 				start = i+1;

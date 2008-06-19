@@ -27,20 +27,6 @@ public interface ICommonResource extends IBaseResource {
 	void setType (String restype);
 	
 	/**
-	 * Gets the identifier of the object. This value must be unique within the current
-	 * document. It may be sequential or not, it may change depending on the parameters.
-	 * It must be the same for two identical input processed with the same parameters. 
-	 * @return The identifier of the object.
-	 */
-	String getID ();
-	
-	/**
-	 * Sets the identifier of the object.
-	 * @param id The identifier value to set.
-	 */
-	void setID (String id);
-	
-	/**
 	 * Indicates if the object is translatable. Some objects may be part of the extraction 
 	 * scope but because of specific parameters set in the filter they may be seen as 
 	 * non-translatable.

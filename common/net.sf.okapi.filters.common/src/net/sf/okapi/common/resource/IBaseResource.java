@@ -21,6 +21,20 @@ public interface IBaseResource {
 	String toString ();
 	
 	/**
+	 * Gets the identifier of the object. This value must be unique within the current
+	 * document. It may be sequential or not, it may change depending on the parameters.
+	 * It must be the same for two identical input processed with the same parameters. 
+	 * @return The identifier of the object.
+	 */
+	String getID ();
+	
+	/**
+	 * Sets the identifier of the object.
+	 * @param id The identifier value to set.
+	 */
+	void setID (String id);
+	
+	/**
 	 * Gets the XML representation of the object.
 	 * @return The XML representation of the object.
 	 */

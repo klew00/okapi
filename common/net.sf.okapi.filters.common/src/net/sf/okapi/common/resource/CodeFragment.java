@@ -5,7 +5,6 @@ public class CodeFragment implements IFragment {
 	protected String       code;
 	protected int          type;
 	protected int          id;
-	protected Object       data;
 
 
 	public CodeFragment (int type,
@@ -25,7 +24,6 @@ public class CodeFragment implements IFragment {
 		this.type = type;
 		this.id = id;
 		this.code = code;
-		this.data = data;
 	}
 		
 	public String toString () {
@@ -34,10 +32,6 @@ public class CodeFragment implements IFragment {
 	
 	public boolean isText () {
 		return false;
-	}
-	
-	public Object getData () {
-		return data;
 	}
 	
 	public int getID () {
