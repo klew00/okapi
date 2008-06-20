@@ -125,7 +125,7 @@ public class Merger extends ThrougputPipeBase {
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
-			logger.warn("There is no more package item to merge (for ID={})",
+			logger.warn("There is no more package item to merge (for id=\"{}\")",
 				item.getID());
 			// Keep the source
 			return;
@@ -137,17 +137,13 @@ public class Merger extends ThrougputPipeBase {
 			
 			if ( !item.getID().equals(srcPkgItem.getID()) ) {
 				// Problem: different IDs
-				logger.warn("ID mismatch: original item: '{}' package item: '{}'",
+				logger.warn("ID mismatch: original item id=\"{}\" package item id=\"{}\"",
 					item.getID(), srcPkgItem.getID());
 				// Keep the source
 				return;
 			}
 
-			if ( !srcPkgItem.hasTarget() ) {
-				logger.warn("Item id={}: No translation provided", item.getID());
-				item.setTarget(item.getSource());
-			}
-			else {
+			if ( srcPkgItem.hasTarget() ) {
 				if ( !item.hasTarget() ) {
 					// Create the target entry for the output if it does not exist yet
 					item.setTarget(new Container());
@@ -160,8 +156,14 @@ public class Merger extends ThrougputPipeBase {
 						item.getSource().getCodes());
 				}
 				catch ( RuntimeException e ) {
-					logger.error("Error with item id={}.", item.getID());
+					logger.error("Error with item id=\"{}\".", item.getID());
 					// Use the source instead, continue the merge
+					item.setTarget(item.getSource());
+				}
+			}
+			else { // No translation in package
+				if ( !item.isEmpty() ) {
+					logger.warn("Item id=\"{}\": No translation provided.", item.getID());
 					item.setTarget(item.getSource());
 				}
 			}

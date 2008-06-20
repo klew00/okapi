@@ -157,6 +157,7 @@ public class Writer extends BaseWriter {
 //		if ( p_Source.hasFont() )
 //			m_XW.writeAttributeString("font", p_Source.getFont());
 
+		writer.writeLineBreak();
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());

@@ -12,7 +12,6 @@ public class InputFilter implements IInputFilter {
 	private InputStream      input;
 	private IResourceBuilder output;
 	private XLIFFReader      reader;
-	private Pattern          pattern;
 	
 
 	public InputFilter () {
@@ -63,9 +62,6 @@ public class InputFilter implements IInputFilter {
 			Resource res = (Resource)reader.resource;
 			reader.open(input, res.params.fallbackToID);
 			
-			if ( res.params.useStateValues ) {
-				pattern = Pattern.compile(res.params.stateValues);
-			}
 			// Get started
 			output.startResource(reader.resource);
 			
@@ -80,10 +76,8 @@ public class InputFilter implements IInputFilter {
 					break;
 				//case XLIFFReader.
 				case XLIFFReader.RESULT_ENDTRANSUNIT:
-					if ( isExtractable() ) {
-						output.startExtractionItem(reader.item);
-						output.endExtractionItem(reader.item);
-					}
+					output.startExtractionItem(reader.item);
+					output.endExtractionItem(reader.item);
 					break;
 				case XLIFFReader.RESULT_SKELETON:
 					output.skeletonContainer(reader.getSkeleton());
@@ -106,19 +100,6 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void setOutput (IResourceBuilder builder) {
-		this.output = builder;
-	}
-
-	private boolean isExtractable () {
-		Resource res = (Resource)reader.resource;
-		
-		if ( !res.params.useStateValues ) return true;
-		if ( !reader.item.hasTarget() ) return true;
-		
-		String state = (String)reader.item.getTarget().getProperty("state");
-		if (( state == null ) || ( state.length() == 0 )) {
-			return res.params.extractNoState;
-		}
-		return pattern.matcher(state).find();
+		output = builder;
 	}
 }

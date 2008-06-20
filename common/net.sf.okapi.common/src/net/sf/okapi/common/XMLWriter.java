@@ -180,6 +180,7 @@ public class XMLWriter {
 	 * Writes a line-break.
 	 */
 	public void writeLineBreak () {
+		closeStartTag();
 		writer.println("");
 	}
 	

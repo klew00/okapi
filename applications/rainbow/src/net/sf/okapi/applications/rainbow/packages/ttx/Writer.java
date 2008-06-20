@@ -119,14 +119,18 @@ public class Writer extends BaseWriter {
 	}
 
 	public void writeEndDocument (IDocumentResource resource) {
-		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;/okapiTTX&gt;</ut>");
-		writer.writeEndElement(); // Raw
-		writer.writeEndElement(); // Body
-		writer.writeEndElement(); // TRADOStag
-		writer.writeEndDocument();
-		writer.close();
-		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+		try {
+			writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;/okapiTTX&gt;</ut>");
+			writer.writeEndElement(); // Raw
+			writer.writeEndElement(); // Body
+			writer.writeEndElement(); // TRADOStag
+			writer.writeEndDocument();
+			manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+					relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+		}
+		finally {
+			writer.close();
+		}
 	}
 
 	private void writeContent (IContainer content) {

@@ -63,8 +63,8 @@ public class OutputFilter implements IOutputFilter {
 				content.setContent(content.getCodedText(), res.inlineCodes);
 			}
 			catch ( InvalidContentException e ) {
-				logger.error(String.format("Inline code problem in item id='%s':",
-					item.getID()), e);
+				logger.error(String.format("Inline code problem in item id=\"%s\" (resname=\"%s\"):",
+					item.getID(), item.getName()), e);
 			}
 			String tmp = xliffCont.setContent(content).toString(0, false, true);
 			writer.write(escapeChars(tmp));

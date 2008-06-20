@@ -260,7 +260,7 @@ public class Container implements IContainer {
 				codeCount, tmpList.size()));
 		
 		// Update lastFrag once at the end (if needed)
-		if ( len > 0 ) {
+		if ( list.size() > 0 ) {
 			lastFrag = list.get(list.size()-1);
 		}
 	}

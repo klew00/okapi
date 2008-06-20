@@ -68,6 +68,9 @@ public class TMXWriter {
 		itemCount++;
 		
 		writer.writeStartElement("tu");
+		String tuid = item.getName();
+		if (( tuid != null ) && ( tuid.length() > 0 ))
+			writer.writeAttributeString("tuid", tuid);
 
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);

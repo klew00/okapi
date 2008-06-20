@@ -2,6 +2,7 @@ package net.sf.okapi.filters.xliff;
 
 import java.io.InputStream;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -54,6 +55,7 @@ public class XLIFFReader {
 	private IContainer            content;
 	private int                   nextAction;
 	private boolean               fallbackToID;
+	private Pattern               pattern;
 	
 
 	public XLIFFReader () {
@@ -87,6 +89,9 @@ public class XLIFFReader {
 			sklID = 0;
 			itemID = 0;
 			sklAfter = new SkeletonResource();
+			if ( resource.params.useStateValues ) {
+				pattern = Pattern.compile(resource.params.stateValues);
+			}
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
@@ -238,20 +243,22 @@ public class XLIFFReader {
 	private int processStartTransUnit () {
 		try {
 			resetItem();
-			storeStartElement();
-			String sTmp = reader.getAttributeValue("", "translate");
-			if ( sTmp != null ) item.setIsTranslatable(sTmp.equals("yes"));
-		
-			sTmp = reader.getAttributeValue("", "id");
-			if ( sTmp == null ) throw new RuntimeException("Missing attribute 'id'.");
 			item.setID(String.format("%d", ++itemID));
-			
-			sTmp = reader.getAttributeValue("", "resname");
-			if ( sTmp != null ) item.setName(sTmp);
-			else if ( fallbackToID ) item.setName(item.getID());
-			
-			sTmp = reader.getAttributeValue("", "restype");
-			if ( sTmp != null ) item.setType(sTmp);
+			storeStartElement();
+
+			String tmp = reader.getAttributeValue("", "translate");
+			if ( tmp != null ) item.setIsTranslatable(tmp.equals("yes"));
+		
+			tmp = reader.getAttributeValue("", "resname");
+			if ( tmp != null ) item.setName(tmp);
+			else if ( fallbackToID ) {
+				tmp = reader.getAttributeValue("", "id");
+				if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
+				item.setName(tmp);
+			}
+
+			tmp = reader.getAttributeValue("", "restype");
+			if ( tmp != null ) item.setType(tmp);
 			
 			// Get the content
 			int eventType;
@@ -304,7 +311,7 @@ public class XLIFFReader {
 					if ( !targetDone ) {
 						// Faster that separating XMLStreamConstants.SPACE
 						// from other data in the all process
-						String tmp = reader.getText();
+						tmp = reader.getText();
 						for ( int i=0; i<tmp.length(); i++ ) {
 							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
 								checkTarget();
@@ -371,9 +378,9 @@ public class XLIFFReader {
 	 * before calling this method with <source> or <target>.
 	 * @param tagName The name of the element content that is being processed.
 	 * @param store True if the data must be stored in the skeleton.
-	 * @param, makeInline True to create an array of start-element for in-lined.
+	 * @param, makeInline True to create an array of outer in-line codes.
 	 * This is used to merge later on.
-	 * @param content IContainer where to put the content.
+	 * @param content The object where to put the code.
 	 */
 	private void processContent (String tagName,
 		boolean store,
@@ -458,6 +465,9 @@ public class XLIFFReader {
 	 * @param type The type of in-line code.
 	 * @param id The id of the code to add.
 	 * @param tagName The tag name of the in-line element to process.
+	 * @param store True if we need to store the data in the skeleton.
+	 * @param, makeInline True to create an array of outer in-line codes.
+	 * @param content The object where to put the code.
 	 */
 	private void appendCode (int type,
 		int id,
@@ -468,19 +478,21 @@ public class XLIFFReader {
 	{
 		try {
 			StringBuilder tmp = new StringBuilder();
+			StringBuilder outerCode = null;
 			if ( makeInline ) {
-				tmp.append("<"+tagName);
+				outerCode = new StringBuilder();
+				outerCode.append("<"+tagName);
 				int count = reader.getAttributeCount();
 				String prefix;
 				for ( int i=0; i<count; i++ ) {
 					if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 					prefix = reader.getAttributePrefix(i); 
-					tmp.append(String.format(" %s%s=\"%s\"",
+					outerCode.append(String.format(" %s%s=\"%s\"",
 						(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 						reader.getAttributeLocalName(i),
 						reader.getAttributeValue(i)));
 				}
-				tmp.append(">");
+				outerCode.append(">");
 			}
 			int eventType;
 			while ( reader.hasNext() ) {
@@ -489,16 +501,19 @@ public class XLIFFReader {
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
-						if ( makeInline ) tmp.append("</"+tagName+">");
+						if ( makeInline ) {
+							outerCode.append("</"+tagName+">");
+							resource.inlineCodes.add(
+								new CodeFragment(type, id, outerCode.toString()));
+						}
 						content.append(new CodeFragment(type, id, tmp.toString()));
-						if ( makeInline ) resource.inlineCodes.add(
-							new CodeFragment(type, id, tmp.toString()));
 						return;	
 					}
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					tmp.append(reader.getText());
+					if ( makeInline ) outerCode.append(reader.getText());
 					if ( store ) {
 						// Make sure it's escaped
 						currentSkl.data.append(Util.escapeToXML(reader.getText(), 0, false));
@@ -536,6 +551,17 @@ public class XLIFFReader {
 			item.setTarget(content);
 		else
 			item.setTarget(null);
+	}
+	
+	private boolean isExtractable () {
+		if ( !resource.params.useStateValues ) return true;
+		if ( !item.hasTarget() ) return true;
+		
+		String state = (String)item.getTarget().getProperty("state");
+		if (( state == null ) || ( state.length() == 0 )) {
+			return resource.params.extractNoState;
+		}
+		return pattern.matcher(state).find();
 	}
 	
 }
