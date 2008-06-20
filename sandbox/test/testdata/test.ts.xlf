@@ -5,19 +5,15 @@
 <tool tool-id="P25CBF2C2" tool-name="Okapi.Utilities.Set01" tool-version="1.0.21.0"/>
 </header>
 <body>
+<trans-unit id="S_displayAxis_Paste_of_XYZ_type__TYPEA_expecte_xxx" restype="x-misc">
+	<source>Paste of XYZ type <ph id="^1">^TYPEA</ph> expected but XYZ type <ph id="^2">^TYPEB</ph> on clipboard.</source>
+</trans-unit>
+
 <trans-unit id="S_bivarPoly__Z_xxx" restype="x-misc">
 	<source><ph id="^1">^Z</ph></source>
 	<target><ph id="^1">^Z</ph></target>
 	<alt-trans>
 		<target xml:lang="de"><ph id="^1">^Z</ph></target>
-	</alt-trans>
-</trans-unit>
-
-<trans-unit id="S_displayAxis_Paste_of_XYZ_type__TYPEA_expecte_xxx" restype="x-misc">
-	<source>Paste of XYZ type <ph id="^1">^TYPEA</ph> expected but XYZ type <ph id="^2">^TYPEB</ph> on clipboard.</source>
-	<target>Collage de XYZ de type <ph id="^1">^TYPEA</ph> attendu, mais XYZ de type <ph id="^2">^TYPEB</ph> dans le presse-papiers.</target>
-	<alt-trans>
-		<target xml:lang="de">Einfügen des XYZ-Typ <ph id="^1">^TYPEA</ph> wurde erwartet, aber XYZ-Typ <ph id="^2">^TYPEB</ph> befindet sich in der Zwischenablage.</target>
 	</alt-trans>
 </trans-unit>
 

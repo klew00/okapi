@@ -55,6 +55,7 @@ public class XLIFFReader {
 	private IContainer            content;
 	private int                   nextAction;
 	private boolean               fallbackToID;
+	private boolean               useInlineIDs;
 	private Pattern               pattern;
 	
 
@@ -420,8 +421,15 @@ public class XLIFFReader {
 						if ( store ) storeEndElement();
 						content.append(
 							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), name));
-						if ( makeInline ) resource.inlineCodes.add(
-							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), "TESTeg"+name));
+						if ( makeInline ) {
+							String tmp = reader.getPrefix();
+							if (( tmp != null ) && ( tmp.length()>0 )) {
+								tmp = tmp+":";
+							}
+							resource.inlineCodes.add(
+								new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(),
+									"</"+tmp+name+">"));
+						}
 					}
 					break;
 					
@@ -432,8 +440,34 @@ public class XLIFFReader {
 						idStack.push(++id);
 						content.append(
 							new CodeFragment(IContainer.CODE_OPENING, id, name));
-						if ( makeInline ) resource.inlineCodes.add(
-							new CodeFragment(IContainer.CODE_OPENING, id, "TESTsg"+name));
+						if ( makeInline ) {
+							String prefix = reader.getPrefix();
+							StringBuilder tmpg = new StringBuilder();
+							if (( prefix == null ) || ( prefix.length()==0 )) {
+								tmpg.append("<"+reader.getLocalName());
+							}
+							else {
+								tmpg.append("<"+prefix+":"+reader.getLocalName());
+							}
+							int count = reader.getNamespaceCount();
+							for ( int i=0; i<count; i++ ) {
+								tmpg.append(String.format(" xmlns:%s=\"%s\"",
+									reader.getNamespacePrefix(i),
+									reader.getNamespaceURI(i)));
+							}
+							count = reader.getAttributeCount();
+							for ( int i=0; i<count; i++ ) {
+								if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+								prefix = reader.getAttributePrefix(i); 
+								tmpg.append(String.format(" %s%s=\"%s\"",
+									(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+									reader.getAttributeLocalName(i),
+									reader.getAttributeValue(i)));
+							}
+							tmpg.append(">");
+							resource.inlineCodes.add(
+								new CodeFragment(IContainer.CODE_OPENING, id, tmpg.toString()));
+						}
 					}
 					else if ( name.equals("x") ) {
 						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, makeInline, content);
@@ -494,10 +528,49 @@ public class XLIFFReader {
 				}
 				outerCode.append(">");
 			}
+			
+/*			if ( useInlineIDs ) { // Try to use existing id of inline code
+				String ilID = reader.getAttributeValue("", "id");
+				if (( ilID != null ) && ( ilID.length()>0 )) {
+					
+				}
+			}
+*/				
 			int eventType;
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
 				switch ( eventType ) {
+				case XMLStreamConstants.START_ELEMENT:
+					if ( store ) storeStartElement();
+					if ( makeInline ) {
+						String prefix = reader.getPrefix();
+						StringBuilder tmpg = new StringBuilder();
+						if (( prefix == null ) || ( prefix.length()==0 )) {
+							tmpg.append("<"+reader.getLocalName());
+						}
+						else {
+							tmpg.append("<"+prefix+":"+reader.getLocalName());
+						}
+						int count = reader.getNamespaceCount();
+						for ( int i=0; i<count; i++ ) {
+							tmpg.append(String.format(" xmlns:%s=\"%s\"",
+								reader.getNamespacePrefix(i),
+								reader.getNamespaceURI(i)));
+						}
+						count = reader.getAttributeCount();
+						for ( int i=0; i<count; i++ ) {
+							if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+							prefix = reader.getAttributePrefix(i); 
+							tmpg.append(String.format(" %s%s=\"%s\"",
+								(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+								reader.getAttributeLocalName(i),
+								reader.getAttributeValue(i)));
+						}
+						tmpg.append(">");
+						outerCode.append(tmpg.toString());
+					}
+					break;
+					
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
@@ -509,6 +582,7 @@ public class XLIFFReader {
 						content.append(new CodeFragment(type, id, tmp.toString()));
 						return;	
 					}
+					break;
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:

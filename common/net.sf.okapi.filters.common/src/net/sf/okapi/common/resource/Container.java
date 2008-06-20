@@ -157,11 +157,9 @@ public class Container implements IContainer {
 
 	public List<IFragment> getCodes () {
 		ArrayList<IFragment> codes = new ArrayList<IFragment>();
-		int index = 0;
 		for ( IFragment frag : list ) {
 			if ( !frag.isText() ) {
 				codes.add(frag);
-				index++;
 			}
 		}
 		return codes;
@@ -181,18 +179,6 @@ public class Container implements IContainer {
 		return false;
 	}
 	
-	// Specific to this class for now
-/*	public int getIDFromIndex (int index) {
-		int codeIndex = 0;
-		for ( IFragment frag : list ) {
-			if ( !frag.isText() ) {
-				if ( codeIndex == index ) return ((CodeFragment)frag).id;
-				codeIndex++;
-			}
-		}
-		return -1; // Not found
-	}
-*/
 	/**
 	 * Resets the content of the object based on a coded text string and a map of 
 	 * codes.
@@ -204,17 +190,21 @@ public class Container implements IContainer {
 	private void resetContent (String codedText,
 		List<IFragment> codes)
 	{
-		// Store code fragments temporarily
+		// Store new fragments temporarily
 		List<IFragment> tmpList = codes;
+		// If we don't have new ones, use the current list
 		if ( tmpList == null ) tmpList = getCodes();
-		reset(); // Reset all
+		// Reset all the list
+		reset();
 
 		if ( codedText == null ) {
 			if ( tmpList.size() > 0 ) //TODO: Maybe null just reset all instead of giving an error?
-				throw new InvalidContentException("One missing code or more in the coded text.");
+				throw new InvalidContentException("No coded text for the list of codes.");
 			else return;
 		}
 
+		String oldMap = null;
+		
 		int codeCount = 0;
 		int start = 0;
 		int len = 0;
@@ -230,15 +220,44 @@ public class Container implements IContainer {
 					list.add(lastFrag);
 					len = 0;
 				}
+
+				if ( oldMap == null ) {
+					StringBuilder tmp = new StringBuilder();
+					for ( IFragment frag : tmpList ) {
+						if ( !frag.isText() ) {
+							// Each old type+id set at position oldIndex*2
+							tmp.append((char)((CodeFragment)frag).type);
+							tmp.append((char)((CodeFragment)frag).id);
+						}
+					}
+					oldMap = tmp.toString();
+				}
+				
 				// Then map to existing codes
 				if ( ++i >= codedText.length() )
 					throw new InvalidContentException("Missing index after code prefix.");
+				// Get the index
 				int codeIndex = CtoI(codedText.charAt(i));
-				if ( codeIndex >= tmpList.size() ) {
-					throw new InvalidContentException(String.format("Code index='%d' is not in the new set of codes.",
+				// Get the id for the code at codeIndex
+				int type = oldMap.codePointAt(codeIndex*2);
+				int id = oldMap.codePointAt((codeIndex*2)+1);
+				// Search for the same id+codeType in the new codes
+				int newCodeIndex = -1;
+				int j = 0;
+				for ( IFragment frag : tmpList ) {
+					if ( frag.isText() ) continue;
+					// All fragments here are codes
+					if (( ((CodeFragment)frag).id == id )
+						&& ( ((CodeFragment)frag).type == type )) {
+						newCodeIndex = j;
+					}
+					j++;
+				}
+				if ( newCodeIndex == -1 ) {
+					throw new InvalidContentException(String.format("Code index %d is not in the new set of codes.",
 						codeIndex));
 				}
-				list.add(tmpList.get(codeIndex));
+				list.add(tmpList.get(newCodeIndex));
 				codeCount++;
 				start = i+1;
 				break;

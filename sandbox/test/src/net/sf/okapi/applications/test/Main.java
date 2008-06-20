@@ -3,6 +3,7 @@ package net.sf.okapi.applications.test;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,9 +35,11 @@ public class Main {
 			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<br/>"));
 			cnt.append("t2");
 			System.out.println("out 1: " + cnt.toString());
+			
 			String s1 = cnt.getCodedText();
 			cnt.setContent(s1);
 			System.out.println("out 2: " + cnt.toString());
+			
 			List<IFragment> codes = cnt.getCodes();
 			cnt.setContent(s1, codes);
 			System.out.println("out 3: " + cnt.toString());
@@ -47,6 +50,31 @@ public class Main {
 					(frag.isText() ? "yes" : "no "),
 					frag.toString()));
 			}
+			
+			cnt = new Container();
+			cnt.append("t1");
+			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<C1/>"));
+			cnt.append("t2");
+			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 2, "<C2/>"));
+			cnt.append("t3");
+			System.out.println("out 1: " + cnt.toString());
+
+			s1 = cnt.getCodedText();
+			String s2 = s1.substring(2, 4);
+			String s3 = s1.substring(6, 8);
+			StringBuilder sb1 = new StringBuilder(s1);
+			sb1.setCharAt(2, s3.charAt(0));
+			sb1.setCharAt(3, s3.charAt(1));
+			sb1.setCharAt(6, s2.charAt(0));
+			sb1.setCharAt(7, s2.charAt(1));
+			cnt.setContent(sb1.toString());
+			System.out.println("out 2: " + cnt.toString());
+			
+			ArrayList<IFragment> newCodes = new ArrayList<IFragment>();
+			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 2, "<Ca2/>"));
+			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<Cb1/>"));
+			cnt.setContent(cnt.getCodedText(), newCodes);
+			System.out.println("out 3: " + cnt.toString());
 			
 			cnt.setProperty("test1", "value1");
 			System.out.println(String.format("name='test1' value='%s'",
@@ -62,7 +90,7 @@ public class Main {
 				cnt.getProperty("test1")));
 		}		
 		catch ( Exception e ) {
-			System.out.println(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 		System.out.println("---end testContainer---");
 	}
@@ -224,11 +252,11 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testITSEngine();
-		testXMLReader();
-		testItem();
+		//testITSEngine();
+		//testXMLReader();
+		//testItem();
 		testContainer();
-		testFilter();
+		//testFilter();
 	}		
 		
 }
