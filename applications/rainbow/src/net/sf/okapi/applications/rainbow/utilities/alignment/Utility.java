@@ -7,6 +7,7 @@ import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.ISkeletonResource;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
@@ -94,6 +95,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	public void endContainer (IGroupResource resource) {
 	}
 
+	@Override
+	public void skeletonContainer (ISkeletonResource resource) {
+	}
+	
 	public boolean isFilterDriven () {
 		return true;
 	}

@@ -234,8 +234,10 @@ public class Container implements IContainer {
 				if ( ++i >= codedText.length() )
 					throw new InvalidContentException("Missing index after code prefix.");
 				int codeIndex = CtoI(codedText.charAt(i));
-				if ( codeIndex >= tmpList.size() )
-					throw new InvalidContentException(String.format("Code index='%d' is not in the object.", codeIndex));
+				if ( codeIndex >= tmpList.size() ) {
+					throw new InvalidContentException(String.format("Code index='%d' is not in the new set of codes.",
+						codeIndex));
+				}
 				list.add(tmpList.get(codeIndex));
 				codeCount++;
 				start = i+1;
@@ -254,7 +256,8 @@ public class Container implements IContainer {
 		}
 		
 		if ( codeCount < tmpList.size() )
-			throw new InvalidContentException("One missing code or more in the coded text.");
+			throw new InvalidContentException(String.format("Number of codes found in the text: %d, number of codes in the code list: %d.",
+				codeCount, tmpList.size()));
 		
 		// Update lastFrag once at the end (if needed)
 		if ( len > 0 ) {

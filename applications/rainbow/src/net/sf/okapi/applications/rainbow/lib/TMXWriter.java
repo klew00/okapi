@@ -62,9 +62,9 @@ public class TMXWriter {
 		writer.writeEndDocument();
 	}
 	
-	public void writeItem (IExtractionItem sourceItem)
+	public void writeItem (IExtractionItem item)
 	{
-		if ( sourceItem == null ) throw new NullPointerException();
+		if ( item == null ) throw new NullPointerException();
 		itemCount++;
 		
 		writer.writeStartElement("tu");
@@ -72,16 +72,16 @@ public class TMXWriter {
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);
 		writer.writeStartElement("seg");
-		writer.writeRawXML(tmxCont.setContent(sourceItem.getSource()).toString());
+		writer.writeRawXML(tmxCont.setContent(item.getSource()).toString());
 		writer.writeEndElement(); // seg
 		writer.writeEndElementLineBreak(); // tuv
 		
-		if ( sourceItem.hasTarget() ) {
+		if ( item.hasTarget() ) {
 			writer.writeStartElement("tuv");
 			writer.writeAttributeString("xml:lang", targetLang);
 			writer.writeStartElement("seg");
 			writer.writeRawXML(tmxCont.setContent(
-				sourceItem.getTarget()).toString());
+				item.getTarget()).toString());
 			writer.writeEndElement(); // seg
 			writer.writeEndElementLineBreak(); // tuv
 		}

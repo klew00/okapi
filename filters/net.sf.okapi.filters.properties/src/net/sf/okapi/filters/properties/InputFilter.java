@@ -93,6 +93,8 @@ public class InputFilter implements IInputFilter {
 		res.setName(name);
 		res.setFilterSettings(filterSettings);
 		res.setSourceEncoding(encoding);
+		res.setSourceLanguage(sourceLanguage);
+		res.setTargetLanguage(targetLanguage);
 		//TODO: Get the real target/output encoding from parameters
 		res.setTargetEncoding(encoding);
 	}

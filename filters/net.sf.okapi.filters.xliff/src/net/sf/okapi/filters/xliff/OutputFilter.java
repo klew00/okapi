@@ -50,9 +50,12 @@ public class OutputFilter implements IOutputFilter {
 	public void endContainer (IGroupResource resourceContainer) {
 	}
 
-	private void buildContent (IContainer content)
-	{
+	private void buildContent (IExtractionItem item) {
 		try {
+			IContainer content;
+			if ( item.hasTarget() ) content = item.getTarget();
+			else content = item.getSource();
+
 			if ( res.needTargetElement ) {
 				writer.write(String.format("<target xml:lang=\"%s\">", res.getTargetLanguage()));
 			}
@@ -60,7 +63,8 @@ public class OutputFilter implements IOutputFilter {
 				content.setContent(content.getCodedText(), res.inlineCodes);
 			}
 			catch ( InvalidContentException e ) {
-				logger.error("Inline code problem:", e);
+				logger.error(String.format("Inline code problem in item id='%s':",
+					item.getID()), e);
 			}
 			String tmp = xliffCont.setContent(content).toString(0, false, true);
 			writer.write(escapeChars(tmp));
@@ -86,12 +90,7 @@ public class OutputFilter implements IOutputFilter {
 	
 	public void endExtractionItem (IExtractionItem item) {
 		if ( item.isTranslatable() ) {
-			if ( item.hasTarget() ) {
-				buildContent(item.getTarget());
-			}
-			else {
-				buildContent(item.getSource());
-			}
+			buildContent(item);
 		}
 	}
 

@@ -46,6 +46,7 @@ public class XLIFFReader {
 	private SkeletonResource      sklBefore;
 	private SkeletonResource      sklAfter;
 	private SkeletonResource      currentSkl;
+	private int                   itemID;
 	private int                   sklID;
 	private boolean               sourceDone;
 	private boolean               targetDone;
@@ -84,6 +85,7 @@ public class XLIFFReader {
 			reader = fact.createXMLStreamReader(input);
 			nextAction = -1;
 			sklID = 0;
+			itemID = 0;
 			sklAfter = new SkeletonResource();
 		}
 		catch ( XMLStreamException e) {
@@ -176,9 +178,6 @@ public class XLIFFReader {
 	
 	private void resetItem () {
 		item = new ExtractionItem();
-		resource.srcElem = null;
-		resource.trgElem = null;
-		resource.status = STATUS_TOTRANS;
 	}
 	
 	private int processFile () {
@@ -241,11 +240,11 @@ public class XLIFFReader {
 			resetItem();
 			storeStartElement();
 			String sTmp = reader.getAttributeValue("", "translate");
-			if ( sTmp!= null ) item.setIsTranslatable(sTmp.equals("yes"));
+			if ( sTmp != null ) item.setIsTranslatable(sTmp.equals("yes"));
 		
 			sTmp = reader.getAttributeValue("", "id");
 			if ( sTmp == null ) throw new RuntimeException("Missing attribute 'id'.");
-			else item.setID(sTmp);
+			item.setID(String.format("%d", ++itemID));
 			
 			sTmp = reader.getAttributeValue("", "resname");
 			if ( sTmp != null ) item.setName(sTmp);
@@ -522,14 +521,14 @@ public class XLIFFReader {
 		}
 		
 		item.setTarget(new Container());
-		String tmp = reader.getAttributeValue("", "state");
-		if ( tmp != null ) {
+		//String tmp = reader.getAttributeValue("", "state");
+		/*if ( tmp != null ) {
 			item.getTarget().setProperty("state", tmp);
 			if ( tmp.equals("needs-translation") ) resource.status = STATUS_TOTRANS;
 			else if ( tmp.equals("final") ) resource.status = STATUS_OK;
 			else if ( tmp.equals("translated") ) resource.status = STATUS_TOEDIT;
 			else if ( tmp.equals("needs-review-translation") ) resource.status = STATUS_TOREVIEW;
-		}
+		}*/
 		content = new Container();
 		processContent("target", false, false, content);
 		resource.needTargetElement = false;

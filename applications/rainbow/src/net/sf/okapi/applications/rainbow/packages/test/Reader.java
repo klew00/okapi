@@ -5,14 +5,14 @@ import java.io.IOException;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.filters.xliff.OldXLIFFReader;
+import net.sf.okapi.filters.xliff.XLIFFReader;
 
 public class Reader implements IReader {
 	
-	OldXLIFFReader reader;
+	XLIFFReader reader;
 	
 	public Reader () {
-		reader = new OldXLIFFReader();
+		reader = new XLIFFReader();
 	}
 
 	public void closeDocument () {
@@ -35,10 +35,10 @@ public class Reader implements IReader {
 		int n;
 		do {
 			switch ( (n = reader.readItem()) ) {
-			case OldXLIFFReader.RESULT_ENDTRANSUNIT:
+			case XLIFFReader.RESULT_ENDTRANSUNIT:
 				return true;
 			}
-		} while ( n > OldXLIFFReader.RESULT_ENDINPUT );
+		} while ( n > XLIFFReader.RESULT_ENDINPUT );
 		return false;
 	}
 

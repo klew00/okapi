@@ -189,7 +189,7 @@ public class LogForm implements ILog {
 			if (( p_sText != null ) && ( p_sText.length() > 0 ))
 				setLog(LogType.MESSAGE, 0, p_sText);
 			edLog.append(String.format("Error count: %d, ", errorCount));
-			edLog.append(String.format("Warning count: %d\n", errorCount));
+			edLog.append(String.format("Warning count: %d\n", warningCount));
 			edLog.append("=== End process");
 		}
 		inProgress = false;
