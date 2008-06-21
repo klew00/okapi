@@ -26,7 +26,7 @@ public class Reader implements IReader {
 
 	public void openDocument (String path) {
 		try {
-			reader.open(new FileInputStream(path), true);
+			reader.open(new FileInputStream(path));
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);

@@ -54,8 +54,6 @@ public class XLIFFReader {
 	private XMLStreamReader       reader; 
 	private IContainer            content;
 	private int                   nextAction;
-	private boolean               fallbackToID;
-	private boolean               useInlineIDs;
 	private Pattern               pattern;
 	
 
@@ -76,12 +74,9 @@ public class XLIFFReader {
 		}
 	}
 	
-	public void open (InputStream input,
-		boolean fallbackToID)
-	{
+	public void open (InputStream input) {
 		try {
 			close();
-			this.fallbackToID = fallbackToID;
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			//fact.setProperty(XMLInputFactory.IS_COALESCING, false);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
@@ -153,7 +148,8 @@ public class XLIFFReader {
 				case XMLStreamConstants.SPACE:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.CHARACTERS:
-					currentSkl.data.append(reader.getText());
+					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+						0, resource.params.escapeGT));
 					break;
 				case XMLStreamConstants.COMMENT:
 					currentSkl.data.append("<!--"+ reader.getText() + "-->");
@@ -207,8 +203,9 @@ public class XLIFFReader {
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
-			currentSkl.data.append(String.format(" xmlns:%s=\"%s\"",
-				reader.getNamespacePrefix(i),
+			prefix = reader.getNamespacePrefix(i);
+			currentSkl.data.append(String.format(" xmlns%s=\"%s\"",
+				((prefix.length()>0) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		
@@ -252,7 +249,7 @@ public class XLIFFReader {
 		
 			tmp = reader.getAttributeValue("", "resname");
 			if ( tmp != null ) item.setName(tmp);
-			else if ( fallbackToID ) {
+			else if ( resource.params.fallbackToID ) {
 				tmp = reader.getAttributeValue("", "id");
 				if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
 				item.setName(tmp);
@@ -270,13 +267,9 @@ public class XLIFFReader {
 				case XMLStreamConstants.START_ELEMENT:
 					name = reader.getLocalName();
 					if ( "source".equals(name) ) {
-						content = new Container();
 						storeStartElement();
-						processContent(name, true, true, content);
+						processSource();
 						storeEndElement();
-						item.setSource(content);
-						sklAfter.data = new StringBuilder();
-						sourceDone = true;
 					}
 					else if ( "target".equals(name) ) {
 						storeStartElement();
@@ -320,7 +313,8 @@ public class XLIFFReader {
 							}
 						}
 					}
-					currentSkl.data.append(reader.getText());
+					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+						0, resource.params.escapeGT));
 					break;
 				case XMLStreamConstants.COMMENT:
 					checkTarget();
@@ -354,7 +348,8 @@ public class XLIFFReader {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					currentSkl.data.append(Util.escapeToXML(reader.getText(), 0, false));
+					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+						0, resource.params.escapeGT));
 					tmp.append(reader.getText());
 					break;
 				case XMLStreamConstants.END_ELEMENT:
@@ -406,10 +401,9 @@ public class XLIFFReader {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					content.append(reader.getText());
-					if ( store ) {
-						// Make sure it's escaped
-						currentSkl.data.append(Util.escapeToXML(reader.getText(), 0, false));
-					}
+					if ( store )
+						currentSkl.data.append(Util.escapeToXML(reader.getText(),
+							0, resource.params.escapeGT));
 					break;
 		
 				case XMLStreamConstants.END_ELEMENT:
@@ -451,8 +445,9 @@ public class XLIFFReader {
 							}
 							int count = reader.getNamespaceCount();
 							for ( int i=0; i<count; i++ ) {
+								prefix = reader.getNamespacePrefix(i);
 								tmpg.append(String.format(" xmlns:%s=\"%s\"",
-									reader.getNamespacePrefix(i),
+									((prefix.length()>0) ? ":"+prefix : ""),
 									reader.getNamespaceURI(i)));
 							}
 							count = reader.getAttributeCount();
@@ -553,8 +548,9 @@ public class XLIFFReader {
 						}
 						int count = reader.getNamespaceCount();
 						for ( int i=0; i<count; i++ ) {
+							prefix = reader.getNamespacePrefix(i);
 							tmpg.append(String.format(" xmlns:%s=\"%s\"",
-								reader.getNamespacePrefix(i),
+								((prefix.length()>0) ? ":"+prefix : ""),
 								reader.getNamespaceURI(i)));
 						}
 						count = reader.getAttributeCount();
@@ -587,11 +583,12 @@ public class XLIFFReader {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					tmp.append(reader.getText());
-					if ( makeInline ) outerCode.append(reader.getText());
-					if ( store ) {
-						// Make sure it's escaped
-						currentSkl.data.append(Util.escapeToXML(reader.getText(), 0, false));
-					}
+					if ( makeInline )
+						outerCode.append(Util.escapeToXML(reader.getText(),
+							0, resource.params.escapeGT));
+					if ( store )
+						currentSkl.data.append(Util.escapeToXML(reader.getText(),
+							0, resource.params.escapeGT));
 					break;
 				}
 			}
@@ -599,6 +596,20 @@ public class XLIFFReader {
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private void processSource () {
+		if ( sourceDone ) {
+			// Case where this entry is not the main one, but from an alt-trans
+			Container tmpCont = new Container();
+			processContent("source", true, false, tmpCont);
+			return;
+		}
+		content = new Container();
+		processContent("source", true, true, content);
+		item.setSource(content);
+		sklAfter.data = new StringBuilder();
+		sourceDone = true;
 	}
 	
 	private void processTarget () {

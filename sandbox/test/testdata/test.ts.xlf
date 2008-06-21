@@ -1,10 +1,42 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:okp="okapi-framework:xliff-extensions">
+<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:okp="okapi-framework:xliff-extensions"
+xmlns:iws="testURI">
 <file datatype="xml" okp:encoding="utf-8" okp:settings="okf_xml@P%P1E31A1B8" original="\aboutBoxDlg_ro.ts" source-language="en-US" target-language="fr-FR">
 <header>
 <tool tool-id="P25CBF2C2" tool-name="Okapi.Utilities.Set01" tool-version="1.0.21.0"/>
 </header>
 <body>
+
+<trans-unit id="0000000012" datatype="x-text/xml" restype="string">
+  <source>For Office Use Only</source> 
+  <target>Chỉ Dành Cho Văn Phòng Sử Dụng</target> 
+  <alt-trans match-quality="100.00">
+  <source>For Office Use Only</source> 
+  <target>Chỉ Dành Cho Văn Phòng Sử Dụng</target> 
+  <iws:attribute name="_tm_created_by">automation automation</iws:attribute> 
+  <iws:attribute name="_tm_created_date">1213193161065</iws:attribute> 
+  <iws:attribute name="_tm_modified_by">automation automation</iws:attribute> 
+  <iws:attribute name="_tm_modified_date">1213193161065</iws:attribute> 
+  </alt-trans>
+  <alt-trans match-quality="75.00">
+  <source>For Test Use Only</source> 
+  <target xml:lang="fr">Pour test uniquement</target> 
+  <iws:attribute name="_tm_created_by">automation automation</iws:attribute> 
+  <iws:attribute name="_tm_created_date">1213193161065</iws:attribute> 
+  <iws:attribute name="_tm_modified_by">automation automation</iws:attribute> 
+  <iws:attribute name="_tm_modified_date">1213193161065</iws:attribute> 
+  </alt-trans>
+  <iws:segment-metadata tm_score="100.00" ws_word_count="4" max_segment_length="0">
+  <iws:status translation_type="manual_translation" /> 
+  </iws:segment-metadata>
+  <iws:markup-seg sequence="0000000011">&lt;/RPT_NAME&gt;&lt;SEQUENCE&gt;3&lt;/SEQUENCE&gt;&lt;TRANS_TEXT&gt;</iws:markup-seg> 
+  </trans-unit>
+
+<trans-unit id="7">
+<source xml:lang="en-US">About <bpt id="1">&lt;b></bpt>Gandalf in bold<ept id="1">&lt;/b></ept></source>
+<!--comment-->
+</trans-unit>
+
 <trans-unit id="S_displayAxis_Paste_of_XYZ_type__TYPEA_expecte_xxx" restype="x-misc">
 	<source>Paste of XYZ type <ph id="^1">^TYPEA</ph> expected but XYZ type <ph id="^2">^TYPEB</ph> on clipboard.</source>
 </trans-unit>
@@ -51,10 +83,6 @@
 <target xml:lang="fr-FR">FRENCH translate=no About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept></target>
 </trans-unit>
 
-<trans-unit id="7">
-<source xml:lang="en-US">About <bpt id="1">&lt;b></bpt>Gandalf in bold<ept id="1">&lt;/b></ept></source>
-<!--comment-->
-</trans-unit>
 <trans-unit id="8">
 <source xml:lang="en-US">&lt;=lt, &amp;=amp, &quot;=quot, &apos;=apos, <ph id="1">&lt;&amp;&quot;&apos;</ph>.</source>
 </trans-unit>

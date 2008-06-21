@@ -252,11 +252,12 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		//testITSEngine();
-		//testXMLReader();
-		//testItem();
 		testContainer();
-		//testFilter();
+		if ( args.length == 0 ) return;
+		testITSEngine();
+		testXMLReader();
+		testItem();
+		testFilter();
 	}		
 		
 }

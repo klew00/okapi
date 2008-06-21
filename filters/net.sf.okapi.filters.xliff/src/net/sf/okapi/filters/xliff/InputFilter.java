@@ -1,7 +1,6 @@
 package net.sf.okapi.filters.xliff;
 
 import java.io.InputStream;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
@@ -59,8 +58,7 @@ public class InputFilter implements IInputFilter {
 	public void process () {
 		try {
 			close();
-			Resource res = (Resource)reader.resource;
-			reader.open(input, res.params.fallbackToID);
+			reader.open(input);
 			
 			// Get started
 			output.startResource(reader.resource);

@@ -25,11 +25,13 @@ import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean                useStateValues;
-	protected boolean                extractOnlyMatchingValues;
-	protected String                 stateValues;
-	protected boolean                extractNoState;
-	protected boolean                fallbackToID;
+	protected boolean   useStateValues;
+	protected boolean   extractOnlyMatchingValues;
+	protected String    stateValues;
+	protected boolean   extractNoState;
+	protected boolean   fallbackToID;
+	protected boolean   escapeGT;
+	
 
 	public Parameters () {
 		reset();
@@ -42,29 +44,32 @@ public class Parameters extends BaseParameters {
 		extractOnlyMatchingValues = true;
 		extractNoState = true;
 		fallbackToID = true;
+		escapeGT = false;
 	}
 
 	public String toString ()
 	{
 		// Store the parameters in fields
-		FieldsString Tmp = new FieldsString();
-		Tmp.add("useStateValues", useStateValues);
-		Tmp.add("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		Tmp.add("stateValues", stateValues);
-		Tmp.add("extractNoState", extractNoState);
-		Tmp.add("fallbackToID", fallbackToID);
-		return Tmp.toString();
+		FieldsString tmp = new FieldsString();
+		tmp.add("useStateValues", useStateValues);
+		tmp.add("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		tmp.add("stateValues", stateValues);
+		tmp.add("extractNoState", extractNoState);
+		tmp.add("fallbackToID", fallbackToID);
+		tmp.add("escapeGT", escapeGT);
+		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
 		// Read the file content as a set of fields
-		FieldsString Tmp = new FieldsString(data);
+		FieldsString tmp = new FieldsString(data);
 
 		// Parse the fields
-		useStateValues = Tmp.get("useStateValues", useStateValues);
-		extractOnlyMatchingValues = Tmp.get("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		stateValues = Tmp.get("stateValues", stateValues);
-		extractNoState = Tmp.get("extractNoState", extractNoState);
-		fallbackToID = Tmp.get("fallbackToID", fallbackToID);
+		useStateValues = tmp.get("useStateValues", useStateValues);
+		extractOnlyMatchingValues = tmp.get("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		stateValues = tmp.get("stateValues", stateValues);
+		extractNoState = tmp.get("extractNoState", extractNoState);
+		fallbackToID = tmp.get("fallbackToID", fallbackToID);
+		escapeGT = tmp.get("escapeGT", escapeGT);
 	}
 }

@@ -17,7 +17,6 @@ import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 
 public class Merger extends ThrougputPipeBase {
@@ -152,10 +151,6 @@ public class Merger extends ThrougputPipeBase {
 				// Set the codedText part of the content only. Do not modify the codes.
 				//TODO: in-line could be clones: the code should come from the translation not the original then.
 				try {
-					String s1 = srcPkgItem.getTarget().toString();
-					String s2 = item.getSource().toString();
-					IContainer c1 = srcPkgItem.getTarget();
-					IContainer c2 = item.getSource();
 					item.getTarget().setContent(
 						srcPkgItem.getTarget().getCodedText(),
 						item.getSource().getCodes());
