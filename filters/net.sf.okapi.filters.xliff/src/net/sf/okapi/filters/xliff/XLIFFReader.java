@@ -1,6 +1,7 @@
 package net.sf.okapi.filters.xliff;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.GroupResource;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.IFragment;
 import net.sf.okapi.common.resource.ISkeletonResource;
 import net.sf.okapi.common.resource.SkeletonResource;
 
@@ -42,6 +44,7 @@ public class XLIFFReader {
 
 	protected Resource            resource;
 	protected GroupResource       fileRes;
+	protected Stack<GroupResource> groupResStack;
 	protected IExtractionItem     item;
 
 	private SkeletonResource      sklBefore;
@@ -56,10 +59,15 @@ public class XLIFFReader {
 	private int                   nextAction;
 	private Pattern               pattern;
 	
+//	private String                elemTransUnit;
+//	private String                elemFile;
+//	private String                elemNote;
+	
 
 	public XLIFFReader () {
 		resource = new Resource();
 		sklBefore = new SkeletonResource();
+		groupResStack = new Stack<GroupResource>();
 	}
 	
 	public void close () {
@@ -118,9 +126,19 @@ public class XLIFFReader {
 			case RESULT_ENDTRANSUNIT:
 				nextAction = -1;
 				return RESULT_ENDTRANSUNIT;
+			case RESULT_STARTGROUP:
+				nextAction = -1;
+				return RESULT_STARTGROUP;
+			case RESULT_ENDGROUP:
+				nextAction = -2;
+				return RESULT_ENDGROUP;
 			case RESULT_ENDINPUT:
 				nextAction = -1;
 				return RESULT_ENDINPUT;
+			case -2: // Pop group
+				nextAction = -1;
+				groupResStack.pop();
+				break;
 			}
 			sourceDone = targetDone = false;
 			sklBefore.data = new StringBuilder(sklAfter.toString());
@@ -140,9 +158,16 @@ public class XLIFFReader {
 					else if ( "trans-unit".equals(name) ) {
 						return processStartTransUnit();
 					}
+					//else if ( "group".equals(name) ) {
+					//	return processStartGroup();
+					//}
 					else storeStartElement();
 					break;
 				case XMLStreamConstants.END_ELEMENT:
+					//if ( "group".equals(reader.getLocalName()) ) {
+					//	return processEndGroup();
+					//}
+					//else 
 					storeEndElement();
 					break;
 				case XMLStreamConstants.SPACE:
@@ -157,6 +182,9 @@ public class XLIFFReader {
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
 					currentSkl.data.append("<?"+ reader.getPITarget() + " "
 						+ reader.getPIData() + "?>");
+					break;
+				case XMLStreamConstants.DTD:
+					processDTD();
 					break;
 				case XMLStreamConstants.START_DOCUMENT:
 					//TODO
@@ -175,6 +203,26 @@ public class XLIFFReader {
 			throw new RuntimeException(e);
 		}
 		nextAction = RESULT_ENDINPUT; 
+		return RESULT_SKELETON;
+	}
+
+	private void processDTD () {
+//		List notations = (List)reader.getProperty("javax.xml.stream.notations");
+//		List entities = (List)reader.getProperty("javax.xml.stream.entities");
+//		int i = notations.size();
+	}
+	
+	private int processStartGroup () {
+		storeStartElement();
+		groupResStack.push(new GroupResource());
+		nextAction = RESULT_STARTGROUP;
+		return RESULT_SKELETON;
+	}
+	
+	private int processEndGroup () {
+		// Pop is done in main loop after the call comes back
+		storeEndElement();
+		nextAction = RESULT_ENDGROUP;
 		return RESULT_SKELETON;
 	}
 	
@@ -208,7 +256,6 @@ public class XLIFFReader {
 				((prefix.length()>0) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
-		
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
@@ -374,14 +421,15 @@ public class XLIFFReader {
 	 * before calling this method with <source> or <target>.
 	 * @param tagName The name of the element content that is being processed.
 	 * @param store True if the data must be stored in the skeleton.
-	 * @param, makeInline True to create an array of outer in-line codes.
 	 * This is used to merge later on.
 	 * @param content The object where to put the code.
+	 * @param inlineCodes Array where to save the in-line codes. Do not save if this parameter
+	 * is set to null.
 	 */
 	private void processContent (String tagName,
 		boolean store,
-		boolean makeInline,
-		IContainer content)
+		IContainer content,
+		ArrayList<IFragment> inlineCodes)
 	{
 		try {
 			int id = 0;
@@ -390,8 +438,8 @@ public class XLIFFReader {
 			int eventType;
 			String name;
 			
-			if ( makeInline ) {
-				resource.inlineCodes.clear();
+			if ( inlineCodes != null ) {
+				inlineCodes.clear();
 			}
 			
 			while ( reader.hasNext() ) {
@@ -411,17 +459,18 @@ public class XLIFFReader {
 					if ( name.equals(tagName) ) {
 						return;
 					}
-					else if ( name.equals("g") ) {
+					else if ( name.equals("g") || name.equals("mrk") ) {
 						if ( store ) storeEndElement();
+						int tmpID = idStack.pop();
 						content.append(
-							new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(), name));
-						if ( makeInline ) {
+							new CodeFragment(IContainer.CODE_CLOSING, tmpID, name));
+						if ( inlineCodes != null ) {
 							String tmp = reader.getPrefix();
 							if (( tmp != null ) && ( tmp.length()>0 )) {
 								tmp = tmp+":";
 							}
-							resource.inlineCodes.add(
-								new CodeFragment(IContainer.CODE_CLOSING, idStack.pop(),
+							inlineCodes.add(
+								new CodeFragment(IContainer.CODE_CLOSING, tmpID,
 									"</"+tmp+name+">"));
 						}
 					}
@@ -430,11 +479,11 @@ public class XLIFFReader {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
 					name = reader.getLocalName();
-					if ( name.equals("g") ) {
+					if ( name.equals("g") || name.equals("mrk") ) {
 						idStack.push(++id);
 						content.append(
 							new CodeFragment(IContainer.CODE_OPENING, id, name));
-						if ( makeInline ) {
+						if ( inlineCodes != null ) {
 							String prefix = reader.getPrefix();
 							StringBuilder tmpg = new StringBuilder();
 							if (( prefix == null ) || ( prefix.length()==0 )) {
@@ -460,25 +509,25 @@ public class XLIFFReader {
 									reader.getAttributeValue(i)));
 							}
 							tmpg.append(">");
-							resource.inlineCodes.add(
+							inlineCodes.add(
 								new CodeFragment(IContainer.CODE_OPENING, id, tmpg.toString()));
 						}
 					}
 					else if ( name.equals("x") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, makeInline, content);
+						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("bpt") ) {
 						idStack.push(++id);
-						appendCode(IContainer.CODE_OPENING, id, name, store, makeInline, content);
+						appendCode(IContainer.CODE_OPENING, id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("ept") ) {
-						appendCode(IContainer.CODE_CLOSING, idStack.pop(), name, store, makeInline, content);
+						appendCode(IContainer.CODE_CLOSING, idStack.pop(), name, store, content, inlineCodes);
 					}
 					else if ( name.equals("ph") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, makeInline, content);
+						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("it") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, makeInline, content);
+						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
 					}
 					break;
 				}
@@ -495,20 +544,21 @@ public class XLIFFReader {
 	 * @param id The id of the code to add.
 	 * @param tagName The tag name of the in-line element to process.
 	 * @param store True if we need to store the data in the skeleton.
-	 * @param, makeInline True to create an array of outer in-line codes.
 	 * @param content The object where to put the code.
+	 * @param inlineCodes Array where to save the original in-line code.
+	 * Do not save if this parameter is null.
 	 */
 	private void appendCode (int type,
 		int id,
 		String tagName,
 		boolean store,
-		boolean makeInline,
-		IContainer content)
+		IContainer content,
+		ArrayList<IFragment> inlineCodes)
 	{
 		try {
 			StringBuilder tmp = new StringBuilder();
 			StringBuilder outerCode = null;
-			if ( makeInline ) {
+			if ( inlineCodes != null ) {
 				outerCode = new StringBuilder();
 				outerCode.append("<"+tagName);
 				int count = reader.getAttributeCount();
@@ -537,7 +587,7 @@ public class XLIFFReader {
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
-					if ( makeInline ) {
+					if ( inlineCodes != null ) {
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
 						if (( prefix == null ) || ( prefix.length()==0 )) {
@@ -570,9 +620,9 @@ public class XLIFFReader {
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
-						if ( makeInline ) {
+						if ( inlineCodes != null ) {
 							outerCode.append("</"+tagName+">");
-							resource.inlineCodes.add(
+							inlineCodes.add(
 								new CodeFragment(type, id, outerCode.toString()));
 						}
 						content.append(new CodeFragment(type, id, tmp.toString()));
@@ -583,7 +633,7 @@ public class XLIFFReader {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					tmp.append(reader.getText());
-					if ( makeInline )
+					if ( inlineCodes != null )
 						outerCode.append(Util.escapeToXML(reader.getText(),
 							0, resource.params.escapeGT));
 					if ( store )
@@ -602,11 +652,11 @@ public class XLIFFReader {
 		if ( sourceDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
 			Container tmpCont = new Container();
-			processContent("source", true, false, tmpCont);
+			processContent("source", true, tmpCont, null);
 			return;
 		}
 		content = new Container();
-		processContent("source", true, true, content);
+		processContent("source", true, content, resource.srcCodes);
 		item.setSource(content);
 		sklAfter.data = new StringBuilder();
 		sourceDone = true;
@@ -616,7 +666,7 @@ public class XLIFFReader {
 		if ( targetDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
 			Container tmpCont = new Container();
-			processContent("target", true, false, tmpCont);
+			processContent("target", true, tmpCont, null);
 			return;
 		}
 		
@@ -630,7 +680,7 @@ public class XLIFFReader {
 			else if ( tmp.equals("needs-review-translation") ) resource.status = STATUS_TOREVIEW;
 		}*/
 		content = new Container();
-		processContent("target", false, false, content);
+		processContent("target", false, content, resource.trgCodes);
 		resource.needTargetElement = false;
 		if ( !item.isEmpty() && !content.isEmpty() )
 			item.setTarget(content);

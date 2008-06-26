@@ -3,6 +3,7 @@ package net.sf.okapi.applications.test;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,7 +132,8 @@ public class Main {
 			String inputPath = "testdata//test02.xml";
 			InputStream input = new FileInputStream(inputPath);
 			Document doc = fact.newDocumentBuilder().parse(input);
-			ITSEngine itsEng = new ITSEngine(doc, inputPath);
+			URI inputURI = new URI("file:///"+inputPath);
+			ITSEngine itsEng = new ITSEngine(doc, inputURI);
 			itsEng.applyRules(IProcessor.DC_ALL);
 			
 			itsEng.startTraversal();
@@ -252,9 +254,9 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testContainer();
-		if ( args.length == 0 ) return;
 		testITSEngine();
+		if ( args.length == 0 ) return;
+		testContainer();
 		testXMLReader();
 		testItem();
 		testFilter();

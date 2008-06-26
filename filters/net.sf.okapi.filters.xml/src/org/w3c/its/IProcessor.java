@@ -1,5 +1,7 @@
 package org.w3c.its;
 
+import java.net.URI;
+
 import org.w3c.dom.Document;
 
 public interface IProcessor {
@@ -18,18 +20,18 @@ public interface IProcessor {
 	 * to the internal storage of the document, not to the document tree.
 	 * Use this method to add one rule set or more before calling applyRules().
 	 * @param docRules Document where the global rules are declared.
-	 * @param docPath path of the document. This is needed because xlink:href need
+	 * @param docURI URI of the document. This is needed because xlink:href need
 	 * a initial location.
 	 */
 	void addExternalRules (Document rulesDoc,
-		String docPath);
+		URI docURI);
 
 	/**
 	 * Adds a set of global rules to the document to process.
 	 * See {@link #addExternalRules(Document, String)} for more details.
-	 * @param docPath Path of the document that conatins the rules to add.
+	 * @param docURI URI of the document that contains the rules to add.
 	 */
-	void addExternalRules (String docPath);
+	void addExternalRules (URI docURI);
 
 	/**
 	 * Applies the current ITS rules to the document. This method decorates

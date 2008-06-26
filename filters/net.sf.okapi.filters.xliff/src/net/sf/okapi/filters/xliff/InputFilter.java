@@ -72,7 +72,6 @@ public class InputFilter implements IInputFilter {
 					// Do nothing: Both events to be sent when end trans-unit comes
 					// We do this because of the condition based on state attribute.
 					break;
-				//case XLIFFReader.
 				case XLIFFReader.RESULT_ENDTRANSUNIT:
 					output.startExtractionItem(reader.item);
 					output.endExtractionItem(reader.item);
@@ -85,6 +84,12 @@ public class InputFilter implements IInputFilter {
 					break;
 				case XLIFFReader.RESULT_ENDFILE:
 					output.endContainer(reader.fileRes);
+					break;
+				case XLIFFReader.RESULT_STARTGROUP:
+					output.startContainer(reader.groupResStack.peek());
+					break;
+				case XLIFFReader.RESULT_ENDGROUP:
+					output.endContainer(reader.groupResStack.peek());
 					break;
 				}
 			}

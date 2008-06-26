@@ -2,6 +2,8 @@ package net.sf.okapi.filters.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -99,7 +101,7 @@ public class XMLReader {
 					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
 						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeIDStack.pop(),
-							tagToString(node, false), node));
+							tagToString(node, false)));
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
@@ -119,10 +121,10 @@ public class XMLReader {
 					case ITraversal.WITHINTEXT_YES:
 						if ( node.hasChildNodes() )
 							content.append(new CodeFragment(IContainer.CODE_OPENING, codeIDStack.push(++codeID),
-								tagToString(node, true), node));
+								tagToString(node, true)));
 						else // Empty element
 							content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-								tagToString(node, true), node));
+								tagToString(node, true)));
 						node.setUserData("toDel", true, null);
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
@@ -163,7 +165,7 @@ public class XMLReader {
 				else {
 					//TODO: Need to escape text (?)
 					content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-						node.getNodeValue(), node));
+						node.getNodeValue()));
 				}
 				node.setUserData("toDel", true, null);
 				break;
@@ -175,12 +177,12 @@ public class XMLReader {
 				break;
 			case Node.COMMENT_NODE:
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-					"<!--"+node.getNodeValue()+"-->", node));
+					"<!--"+node.getNodeValue()+"-->"));
 				node.setUserData("toDel", true, null);
 				break;
 			case Node.PROCESSING_INSTRUCTION_NODE:
 				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-					"<?"+node.getNodeName()+" "+node.getNodeValue()+"?>", node));
+					"<?"+node.getNodeName()+" "+node.getNodeValue()+"?>"));
 				node.setUserData("toDel", true, null);
 				break;
 			}
@@ -236,14 +238,20 @@ public class XMLReader {
 	}
 	
 	private void applyITSRules () {
-		itsEng = new ITSEngine(resource.doc, resource.getName());
+		try {
+			URI inputURI = new URI(Util.makeURIFromPath(resource.getName()));
+			itsEng = new ITSEngine(resource.doc, inputURI);
 		
-		// Add any external rules file(s)
-		//TODO: Get the info from the parameters
+			// Add any external rules file(s)
+			//TODO: Get the info from the parameters
 		
-		// Apply the all rules (external and internal)
-		itsEng.applyRules(ITSEngine.DC_LANGINFO | ITSEngine.DC_TRANSLATE
-			| ITSEngine.DC_WITHINTEXT);
+			// Apply the all rules (external and internal)
+			itsEng.applyRules(ITSEngine.DC_LANGINFO | ITSEngine.DC_TRANSLATE
+					| ITSEngine.DC_WITHINTEXT);
+		}
+		catch ( URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private String tagToString (Node element,

@@ -15,17 +15,7 @@ public class CodeFragment implements IFragment {
 		this.id = id;
 		this.code = code;
 	}
-		
-	public CodeFragment (int type,
-		int id,
-		String code,
-		Object data)
-	{
-		this.type = type;
-		this.id = id;
-		this.code = code;
-	}
-		
+			
 	public String toString () {
 		return code;
 	}
@@ -41,4 +31,5 @@ public class CodeFragment implements IFragment {
 	public int getType () {
 		return type;
 	}
+	
 }

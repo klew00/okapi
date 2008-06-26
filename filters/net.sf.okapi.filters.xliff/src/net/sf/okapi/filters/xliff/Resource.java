@@ -10,12 +10,14 @@ public class Resource extends net.sf.okapi.common.resource.DocumentResource {
 
 	protected Parameters               params;
 	protected boolean                  needTargetElement;
-	protected ArrayList<IFragment>     inlineCodes;
+	protected ArrayList<IFragment>     srcCodes;
+	protected ArrayList<IFragment>     trgCodes;
 	
 
 	public Resource () {
 		params = new Parameters();
-		inlineCodes = new ArrayList<IFragment>();
+		srcCodes = new ArrayList<IFragment>();
+		trgCodes = new ArrayList<IFragment>();		
 	}
 	
 	public IParameters getParameters () {

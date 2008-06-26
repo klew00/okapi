@@ -239,19 +239,24 @@ public class Container implements IContainer {
 				// Get the index
 				int codeIndex = CtoI(codedText.charAt(i));
 				// Get the id for the code at codeIndex
-				int type = oldMap.codePointAt(codeIndex*2);
-				int id = oldMap.codePointAt((codeIndex*2)+1);
-				// Search for the same id+codeType in the new codes
 				int newCodeIndex = -1;
-				int j = 0;
-				for ( IFragment frag : tmpList ) {
-					if ( frag.isText() ) continue;
-					// All fragments here are codes
-					if (( ((CodeFragment)frag).id == id )
-						&& ( ((CodeFragment)frag).type == type )) {
-						newCodeIndex = j;
+				try {
+					int type = oldMap.codePointAt(codeIndex*2);
+					int id = oldMap.codePointAt((codeIndex*2)+1);
+					// Search for the same id+codeType in the new codes
+					int j = 0;
+					for ( IFragment frag : tmpList ) {
+						if ( frag.isText() ) continue;
+						// All fragments here are codes
+						if (( ((CodeFragment)frag).id == id )
+							&& ( ((CodeFragment)frag).type == type )) {
+							newCodeIndex = j;
+						}
+						j++;
 					}
-					j++;
+				}
+				catch ( Exception e ) {
+					throw new InvalidContentException(e);
 				}
 				if ( newCodeIndex == -1 ) {
 					throw new InvalidContentException(String.format("Code index %d is not in the new set of codes.",

@@ -2,6 +2,8 @@ package org.w3c.its;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -37,7 +39,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 	private DocumentBuilderFactory     fact; 
 	private Document                   doc;
-	private String                     docPath;
+	private URI                        docURI;
 	private NSContextManager           nsContext;
 	private XPathFactory               xpFact;
 	private XPath                      xpath;
@@ -49,10 +51,10 @@ public class ITSEngine implements IProcessor, ITraversal
 
 	
 	public ITSEngine (Document doc,
-		String docPath)
+		URI docURI)
 	{
 		this.doc = doc;
-		this.docPath = docPath;
+		this.docURI = docURI;
 		node = null;
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
@@ -62,15 +64,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		xpath.setNamespaceContext(nsContext);
 	}
 
-	public void addExternalRules (String docPath) {
+	public void addExternalRules (URI docURI) {
 		try {
 			if ( fact == null ) { 
 				fact = DocumentBuilderFactory.newInstance();
 				fact.setNamespaceAware(true);
 				fact.setValidating(false);
 			}
-			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docPath));
-			addExternalRules(rulesDoc, docPath);
+			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docURI));
+			addExternalRules(rulesDoc, docURI);
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
@@ -84,13 +86,13 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	public void addExternalRules (Document rulesDoc,
-		String docPath)
+		URI docURI)
 	{
-		compileRules(rulesDoc, docPath, false);
+		compileRules(rulesDoc, docURI, false);
 	}
 	
 	private void compileRules (Document rulesDoc,
-		String docPath,
+		URI docURI,
 		boolean isInternal)
 	{
 		try {
@@ -129,7 +131,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 					// xlink:href allows the use of xml:base so we need to calculate it
 					// The initial base is the folder of the current document
-					File tmpFile = new File(docPath);
+					File tmpFile = new File(docURI);
 					String baseFolder = Util.getDirectoryName(tmpFile.getPath());
 					// Then we look for the last xml:base specified
 					Node node = rulesElem;
@@ -156,7 +158,8 @@ public class ITSEngine implements IProcessor, ITraversal
 					}
 
 					// Load the document and the rules
-					loadLinkedRules(href, isInternal);
+					URI linkedDoc = new URI(href);
+					loadLinkedRules(linkedDoc, isInternal);
 				}
 
 				// Process each rule inside its:rules
@@ -182,9 +185,12 @@ public class ITSEngine implements IProcessor, ITraversal
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
 		}
+		catch ( URISyntaxException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 	
-	private void loadLinkedRules (String docPath,
+	private void loadLinkedRules (URI docURI,
 		boolean isInternal)
 	{
 		try {
@@ -193,8 +199,8 @@ public class ITSEngine implements IProcessor, ITraversal
 				fact.setNamespaceAware(true);
 				fact.setValidating(false);
 			}
-			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docPath));
-			compileRules(rulesDoc, docPath, isInternal);
+			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docURI));
+			compileRules(rulesDoc, docURI, isInternal);
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
@@ -435,7 +441,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		try {
 			// Compile any internal global rules
 			clearInternalGlobalRules();
-			compileRules(doc, docPath, true);
+			compileRules(doc, docURI, true);
 			
 			// Now apply the compiled rules
 		    for ( ITSRule rule : rules ) {

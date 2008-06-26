@@ -52,22 +52,33 @@ public class OutputFilter implements IOutputFilter {
 
 	private void buildContent (IExtractionItem item) {
 		try {
-			IContainer content;
-			if ( item.hasTarget() ) content = item.getTarget();
-			else content = item.getSource();
-
 			if ( res.needTargetElement ) {
 				writer.write(String.format("<target xml:lang=\"%s\">", res.getTargetLanguage()));
+				// We did not have a target, so we get the inlines from the source, as the
+				// new target is likely to be obtain from the source
+				//TODO: This does not resolve all case, some target may be generated from another file, need to handle that
+				res.trgCodes = res.srcCodes;
 			}
 			try {
-				content.setContent(content.getCodedText(), res.inlineCodes);
+				// We reset the in-line code here to use the full-outer XML, rather than
+				// the codes in the fragments that are just the inner portion
+				IContainer content;
+				if ( item.hasTarget() ) {
+					content = item.getTarget();
+					content.setContent(content.getCodedText(), res.trgCodes);
+				}
+				else {
+					content = item.getSource();
+					content.setContent(content.getCodedText(), res.srcCodes);
+				}
+				String tmp = xliffCont.setContent(content).toString(0, false, true);
+				writer.write(escapeChars(tmp));
 			}
 			catch ( InvalidContentException e ) {
 				logger.error(String.format("Inline code problem in item id=\"%s\" (resname=\"%s\"):",
 					item.getID(), item.getName()), e);
+				logger.info("Content: ["+item.toString()+"]");
 			}
-			String tmp = xliffCont.setContent(content).toString(0, false, true);
-			writer.write(escapeChars(tmp));
 			if ( res.needTargetElement ) {
 				writer.write("</target>\n");
 			}

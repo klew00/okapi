@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 
 /**
@@ -194,5 +196,24 @@ public class Util {
         if ( n > -1 ) return path.substring(0, n);
         else return path;
 	}
-	
+
+	/**
+	 * Makes a URI string from a path. If the path itself can be recognized as a string
+	 * URI already, it is passed unchanged. For example "C:\test" and "file:///C:/test"
+	 * will both return "file:///C:/test" encoded as URI.
+	 * @param path The path to change to URI string.
+	 * @return The URI string.
+	 */
+	static public String makeURIFromPath (String path) {
+		if ( path.startsWith("file:///") ) return path;
+		if ( path.startsWith("http://") ) return path;
+		if ( path.startsWith("https://") ) return path;
+		if ( path.startsWith("ftp://") ) return path;
+		try {
+			return "file:///"+URLEncoder.encode(path.replace('\\', '/'), "UTF-8");
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new RuntimeException(e); // UTF-8 should be always supported anyway
+		}
+	}
 }
