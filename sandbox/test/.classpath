@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xml"/>
 	<classpathentry kind="lib" path="lib/shared/slf4j-jdk14-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/shared/slf4j-api-1.5.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

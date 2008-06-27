@@ -25,6 +25,10 @@ import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
 import net.sf.okapi.filters.xml.XMLReader;
+import net.sf.okapi.lib.segmentation.LanguageMap;
+import net.sf.okapi.lib.segmentation.LanguageRule;
+import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Main {
 
@@ -251,11 +255,43 @@ public class Main {
 		System.out.println("---end testContainer---");
 	}
 
+	private static void testSegmentation () {
+		try {
+			System.out.println("---start testSegmentation---");
+			Segmenter seg = new Segmenter();
+			
+			ArrayList<Rule> rules = new ArrayList<Rule>();
+			rules.add(new Rule("M[Rr]\\.", "\\s|$", true));
+			LanguageRule langRule = new LanguageRule();
+			langRule.setRules(rules);
+			seg.addLanguageRule("french", langRule);
+
+			rules = new ArrayList<Rule>();
+			rules.add(new Rule("\\.", "\\s|$", true));
+			langRule = new LanguageRule();
+			langRule.setRules(rules);
+			seg.addLanguageRule("default", langRule);
+
+			seg.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
+			seg.addLanguageMap(new LanguageMap(".*", "default"));
+			
+			seg.setCascade(true);
+			seg.selectLanguageRule("fr");
+			
+			seg.saveRules("output.srx");
+		}
+		catch ( Exception e ) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		System.out.println("---end testSegmentation---");
+	}
+
 	public static void main (String[] args)
 		throws Exception
 	{
-		testITSEngine();
+		testSegmentation();
 		if ( args.length == 0 ) return;
+		testITSEngine();
 		testContainer();
 		testXMLReader();
 		testItem();
