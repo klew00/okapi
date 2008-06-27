@@ -78,7 +78,7 @@ public class InputDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) {
-					UIUtil.startPage(help);
+					UIUtil.start(help);
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

@@ -186,16 +186,9 @@ public class XLIFFReader {
 				case XMLStreamConstants.DTD:
 					processDTD();
 					break;
-				case XMLStreamConstants.START_DOCUMENT:
-					//TODO
-					break;
-				case XMLStreamConstants.END_DOCUMENT:
-					//TODO
-					break;
 				case XMLStreamConstants.ENTITY_REFERENCE:
-					//TODO
+					//TODO: handle entity references
 					break;
-					//More to do
 				}
 			}
 		}
@@ -207,6 +200,7 @@ public class XLIFFReader {
 	}
 
 	private void processDTD () {
+		//TODO: handle DTD declaration
 //		List notations = (List)reader.getProperty("javax.xml.stream.notations");
 //		List entities = (List)reader.getProperty("javax.xml.stream.entities");
 //		int i = notations.size();

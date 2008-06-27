@@ -23,7 +23,7 @@ package net.sf.okapi.applications.rainbow.lib;
 public class FormatManager {
 
 	public void load (String p_sPath) {
-		//TODO
+		//TODO: Load format manager data from external file
 	}
 	
 	/**

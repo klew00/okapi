@@ -10,12 +10,12 @@ public class UIUtil {
 	public static final int    PFTYPE_UNIX       = 2;
 
 	/**
-	 * Opens a given page in the default browser.
-	 * @param url URL (can be a local file) of the page to open.
+	 * Starts a program or a command.
+	 * @param command Command or program to launch. This can also be a 
+	 * URL (to open a browser), etc.
 	 */
-	static public void startPage (String url)
-	{
-		Program.launch(url); 
+	static public void start (String command) {
+		Program.launch(command); 
 	}
 	
 	/**

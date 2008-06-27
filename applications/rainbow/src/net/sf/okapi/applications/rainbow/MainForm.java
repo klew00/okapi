@@ -42,6 +42,7 @@ import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -119,6 +120,7 @@ public class MainForm implements IParametersProvider {
 	private UtilityDriver    ud;
 	private MenuItem         miInput;
 	private MenuItem         miUtilities;
+	private MenuItem         miHelp;
 	private MenuItem         miSave;
 	private MenuItem         miEditInputProperties;
 	private MenuItem         cmiEditInputProperties;
@@ -270,6 +272,65 @@ public class MainForm implements IParametersProvider {
 		miUtilities.setText("&Utilities");
 		buildUtilitiesMenu();
 
+		// Help menu
+		miHelp = new MenuItem(menuBar, SWT.CASCADE);
+		miHelp.setText("&Help");
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		miHelp.setMenu(dropMenu);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.topics");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO Help main topics
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.howtouse");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO Help 'hot to use...'
+			}
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.update");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO Help check for updates
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.feedback");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Rainbow)");
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.users");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://groups.yahoo.com/group/okapitools/");
+			}
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.about");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO About box
+			}
+		});
+
+		
 		// Root panel
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Input Root:");

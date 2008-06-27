@@ -9,12 +9,10 @@ public class Reader implements IReader {
 	}
 
 	public IExtractionItem getItem () {
-		//TODO
 		return null;
 	}
 
 	public void openDocument (String path) {
-		//TODO
 	}
 
 	public boolean readItem () {

@@ -185,7 +185,7 @@ public class Editor implements IParametersEditor {
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("References");
-		//TODO
+		//TODO: Reference tab
 		
 		//--- Dialog-level buttons
 

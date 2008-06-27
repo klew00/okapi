@@ -78,7 +78,7 @@ public class LogForm implements ILog {
 		button.setLayoutData(gdTmp);
 		button.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				UIUtil.startPage(helpFile);
+				UIUtil.start(helpFile);
 			}
 		});
 		

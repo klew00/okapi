@@ -73,7 +73,7 @@ public class Utils {
 					else sbTmp.append(p_sText.charAt(i));
 					continue;
 
-				case '\u00a0': // Nbsp
+				case '\u00a0': // Non-breaking space
 					sbTmp.append("\\~"); // No extra space (it's a control word)
 					break;
 
@@ -149,7 +149,7 @@ public class Utils {
 	static public String getANSIEncoding (String p_sLanguage)
 	{
 		String sEncoding = "windows-1252";
-/*TODO
+/*TODO: getANSIEncoding
 		// Fall back to an RTF-friendly encoding
 		try
 		{
