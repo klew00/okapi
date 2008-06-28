@@ -12,8 +12,9 @@ public interface IContainer {
 
 	/**
 	 * Gets A string representation of the content in a format close to
-	 * its original format. There is no guarantee that this representation will
-	 * be a valid representation of the original format.
+	 * its original format. There is no guarantee that this representation 
+	 * will be a valid representation of the original format with regard
+	 * to escaped characters.
 	 * @return A string representation of the content.
 	 */
 	String toString ();

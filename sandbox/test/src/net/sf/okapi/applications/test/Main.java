@@ -26,7 +26,6 @@ import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
 import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
-import net.sf.okapi.lib.segmentation.LanguageRule;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
@@ -260,16 +259,13 @@ public class Main {
 			System.out.println("---start testSegmentation---");
 			Segmenter seg = new Segmenter();
 			
-			ArrayList<Rule> rules = new ArrayList<Rule>();
-			rules.add(new Rule("M[Rr]\\.", "\\s|$", true));
-			LanguageRule langRule = new LanguageRule();
-			langRule.setRules(rules);
+			ArrayList<Rule> langRule = new ArrayList<Rule>();
+			langRule.add(new Rule("Mr\\.", "\\s", false));
 			seg.addLanguageRule("french", langRule);
 
-			rules = new ArrayList<Rule>();
-			rules.add(new Rule("\\.", "\\s|$", true));
-			langRule = new LanguageRule();
-			langRule.setRules(rules);
+			langRule = new ArrayList<Rule>();
+			langRule.add(new Rule("\\b\\w{2,}\\.+[\"\'”\\)]?", "\\s|$", true));
+			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
 			seg.addLanguageRule("default", langRule);
 
 			seg.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
@@ -277,8 +273,22 @@ public class Main {
 			
 			seg.setCascade(true);
 			seg.selectLanguageRule("fr");
-			
 			seg.saveRules("output.srx");
+			
+			Container cont = new Container("Mr. XYZ. (Test.) and more test. ");
+			int segCount = seg.segment(cont);
+			System.out.println(String.format("Text=[%s] nb seg: %d",
+				cont.toString(), segCount));
+
+			cont = new Container("One... Two... ");
+			segCount = seg.segment(cont);
+			System.out.println(String.format("Text=[%s] nb seg: %d",
+				cont.toString(), segCount));
+
+			cont = new Container("Mr. XYZ. One...");
+			segCount = seg.segment(cont);
+			System.out.println(String.format("Text=[%s] nb seg: %d",
+				cont.toString(), segCount));
 		}
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());

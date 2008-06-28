@@ -2,6 +2,8 @@ package net.sf.okapi.lib.segmentation;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.XMLWriter;
@@ -17,15 +19,20 @@ public class Segmenter {
 	private boolean     includeEndCodes = true; // SRX default
 	private boolean     includeIsolatedCodes = false; // SRX default
 	private String      langCode = null;
+	private String      inlineCodes;
 	
-	private ArrayList<LanguageMap>          langMaps;
-	private Hashtable<String, LanguageRule> langRules;
-	private ArrayList<CompiledRule>         rules;
+	private ArrayList<LanguageMap>               langMaps;
+	private Hashtable<String, ArrayList<Rule>>   langRules;
+	private ArrayList<CompiledRule>              rules;
+	private LinkedHashMap<Integer, Boolean>      splits;
 
 
 	public Segmenter () {
 		langMaps = new ArrayList<LanguageMap>();
-		langRules = new Hashtable<String, LanguageRule>();
+		langRules = new Hashtable<String, ArrayList<Rule>>();
+		// Pattern for handling inline codes 
+		inlineCodes = String.format("((\\u%04x|\\u%04x|\\u%04x).)?",
+			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED); 
 	}
 
 	public boolean segmentSubFlows () {
@@ -103,7 +110,7 @@ public class Segmenter {
 	 * @param langRule Language rule object to add.
 	 */
 	public void addLanguageRule (String name,
-		LanguageRule langRule)
+			ArrayList<Rule> langRule)
 	{
 		langRules.put(name, langRule);
 	}
@@ -124,10 +131,45 @@ public class Segmenter {
 	 */
 	public int segment (IContainer original) {
 		if ( langCode == null ) {
-			return 0;
+			//TODO: throw an exception?
+			return -1; // Need to call selectLanguageRule()
 		}
-		//TODO: implement segment
-		return 0;
+		
+		// Build the list of split positions
+		String codedText = original.getCodedText();
+		splits = new LinkedHashMap<Integer, Boolean>();
+		Matcher m;
+		for ( CompiledRule rule : rules ) {
+			m = rule.pattern.matcher(codedText);
+			while ( m.find() ) {
+				int n = m.start()+m.group(1).length();
+				if ( n > codedText.length() ) continue; // Match the end
+				if ( splits.containsKey(n) ) {
+					// Do not update if we found a no-break before
+					if ( !splits.get(n) ) continue;
+				}
+				// Add or update split
+				splits.put(n, rule.isBreak);
+			}
+		}
+
+		// Count breaks and adjust positions
+		int breakCount = 0;
+		StringBuilder tmp = new StringBuilder();
+		int start = 0;
+		for ( int pos : splits.keySet() ) {
+			if ( splits.get(pos) ) {
+				breakCount++;
+				tmp.append("["+codedText.substring(start, pos)+"]");
+				start = pos;
+			}
+		}
+		// Last one
+		tmp.append("["+codedText.substring(start)+"]");
+		System.out.println(tmp.toString());
+		
+		// Return the number of segment found
+		return breakCount+1;
 	}
 	
 	/**
@@ -171,9 +213,10 @@ public class Segmenter {
 		if ( !langRules.containsKey(ruleName) ) {
 			throw new SegmentationRuleException("language rule '"+ruleName+"' not found.");
 		}
-		for ( Rule rule : langRules.get(ruleName).getRules() ) {
+		ArrayList<Rule> langRule = langRules.get(ruleName);
+		for ( Rule rule : langRule ) {
 			rules.add(
-				new CompiledRule("("+rule.before+")("+rule.after+")", rule.isBreak));
+				new CompiledRule("("+rule.before+")("+inlineCodes+rule.after+")", rule.isBreak));
 		}
 	}
 	
@@ -227,8 +270,8 @@ public class Segmenter {
 			for ( String ruleName : langRules.keySet() ) {
 				writer.writeStartElement("languageRule");
 				writer.writeAttributeString("languagerulename", ruleName);
-				LanguageRule langRule = langRules.get(ruleName);
-				for ( Rule rule : langRule.rules ) {
+				ArrayList<Rule> langRule = langRules.get(ruleName);
+				for ( Rule rule : langRule ) {
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
 					writer.writeElementString("beforebreak", rule.before);
