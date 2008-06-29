@@ -6,6 +6,9 @@ public class LanguageMap {
 	protected String    ruleName;
 	
 	
+	public LanguageMap () {
+	}
+	
 	public LanguageMap (String pattern,
 		String ruleName)
 	{

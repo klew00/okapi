@@ -255,9 +255,9 @@ public class Manifest {
 
 	public void load (String path) {
 		try {
-			DocumentBuilderFactory DFac = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 		    // Not needed in this case: DFac.setNamespaceAware(true);
-		    Document doc = DFac.newDocumentBuilder().parse("file:///"+path);
+		    Document doc = docFac.newDocumentBuilder().parse("file:///"+path);
 		    
 		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
 		    if ( NL == null ) throw new RuntimeException("Invalid manifest file.");

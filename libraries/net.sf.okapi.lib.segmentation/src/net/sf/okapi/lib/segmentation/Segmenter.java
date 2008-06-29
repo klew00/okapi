@@ -1,24 +1,42 @@
 package net.sf.okapi.lib.segmentation;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
 
 public class Segmenter {
 	
+	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
 	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
 	
-	private boolean     segmentSubFlows = true; // SRX default
-	private boolean     cascade = false; // There is no SRX default for this
-	private boolean     includeStartCodes = false; // SRX default
-	private boolean     includeEndCodes = true; // SRX default
-	private boolean     includeIsolatedCodes = false; // SRX default
-	private String      langCode = null;
+	private boolean     segmentSubFlows;
+	private boolean     cascade;
+	private boolean     includeStartCodes;
+	private boolean     includeEndCodes;
+	private boolean     includeIsolatedCodes;
+	private String      langCode;
 	private String      inlineCodes;
 	
 	private ArrayList<LanguageMap>               langMaps;
@@ -28,13 +46,25 @@ public class Segmenter {
 
 
 	public Segmenter () {
+		resetAll();
+	}
+
+	public void resetAll () {
+		resetRules();
 		langMaps = new ArrayList<LanguageMap>();
 		langRules = new Hashtable<String, ArrayList<Rule>>();
 		// Pattern for handling inline codes 
 		inlineCodes = String.format("((\\u%04x|\\u%04x|\\u%04x).)?",
 			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED); 
+		segmentSubFlows = true; // SRX default
+		cascade = false; // There is no SRX default for this
+		includeStartCodes = false; // SRX default
+		includeEndCodes = true; // SRX default
+		includeIsolatedCodes = false; // SRX default
+		splits = null;
+		langCode = null;
 	}
-
+	
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
@@ -110,7 +140,7 @@ public class Segmenter {
 	 * @param langRule Language rule object to add.
 	 */
 	public void addLanguageRule (String name,
-			ArrayList<Rule> langRule)
+		ArrayList<Rule> langRule)
 	{
 		langRules.put(name, langRule);
 	}
@@ -122,6 +152,17 @@ public class Segmenter {
 	 */
 	public void addLanguageMap (LanguageMap langMap) {
 		langMaps.add(langMap);
+	}
+	
+	/**
+	 * Segments a given plain text string. Use {@link #segment(IContainer)}
+	 * to process text with in-line codes.
+	 * @param text Plain text to segment.
+	 * @return The number of segment found.
+	 */
+	public int segment (String text) {
+		Container tmp = new Container(text);
+		return segment(tmp);
 	}
 	
 	/**
@@ -155,21 +196,38 @@ public class Segmenter {
 
 		// Count breaks and adjust positions
 		int breakCount = 0;
-		StringBuilder tmp = new StringBuilder();
 		int start = 0;
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
 				breakCount++;
-				tmp.append("["+codedText.substring(start, pos)+"]");
 				start = pos;
 			}
 		}
-		// Last one
-		tmp.append("["+codedText.substring(start)+"]");
-		System.out.println(tmp.toString());
+		// Last one (if necessary)
+		if ( start < codedText.length() ) {
+			breakCount++;
+		}
 		
 		// Return the number of segment found
-		return breakCount+1;
+		return breakCount;
+	}
+
+	/**
+	 * Gets the list of all the split positions in the text
+	 * that was last segmented. You must call {@link #segment(IContainer)}
+	 * or {@link #segment(String)} before calling this method.
+	 * @return An array of integers where each value is a split position
+	 * in the coded text that was segmented.
+	 */
+	public ArrayList<Integer> getSplitPositions () {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		if ( splits == null ) return list;
+		for ( int pos : splits.keySet() ) {
+			if ( splits.get(pos) ) {
+				list.add(pos);
+			}
+		}
+		return list;
 	}
 	
 	/**
@@ -226,6 +284,114 @@ public class Segmenter {
 	 */
 	public void loadRules (String rulesPath) {
 		//TODO: load SRX (possibly embedded in another  doc)
+		try {
+			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+			Fact.setValidating(false);
+			Document doc = Fact.newDocumentBuilder().parse(new File(rulesPath));
+			Node node = doc.getDocumentElement();
+			resetAll();
+			XPathFactory xpathFac = XPathFactory.newInstance();
+			XPath xpath = xpathFac.newXPath();
+//TODO: Handle namespaces!
+			XPathExpression xpe = xpath.compile("//srx");
+			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
+			if ( srxList.getLength() < 1 ) return;
+			
+			// Treat the first occurrence (we assume there is never more in one file)
+			Element srxElem = (Element)srxList.item(0);
+			Element elem1 = getFirstElementByTagName("header", srxElem);
+			String tmp = elem1.getAttribute("segmentsubflows");
+			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
+			tmp = elem1.getAttribute("cascade");
+			if ( tmp.length() > 0 ) cascade = "yes".equals(tmp);
+			// formathandle elements
+			NodeList list2 = elem1.getElementsByTagName("formathandle");
+			for ( int i=0; i<list2.getLength(); i++ ) {
+				Element elem2 = (Element)list2.item(i);
+				tmp = elem2.getAttribute("type");
+				if ( "start".equals(tmp) ) {
+					tmp = elem2.getAttribute("include");
+					if ( tmp.length() > 0 ) includeStartCodes = "yes".equals(tmp); 
+				}
+				else if ( "end".equals(tmp) ) {
+					tmp = elem2.getAttribute("include");
+					if ( tmp.length() > 0 ) includeEndCodes = "yes".equals(tmp); 
+				}
+				else if ( "isolated".equals(tmp) ) {
+					tmp = elem2.getAttribute("include");
+					if ( tmp.length() > 0 ) includeIsolatedCodes = "yes".equals(tmp); 
+				}
+			}
+			//TODO: formathandle
+			
+			// Get the body element
+			elem1 = getFirstElementByTagName("body", srxElem);
+			
+			// languagerules
+			Element elem2 = getFirstElementByTagName("languagerules", elem1);
+			// For each languageRule
+			list2 = elem2.getElementsByTagName("languagerule");
+			for ( int i=0; i<list2.getLength(); i++ ) {
+				Element elem3 = (Element)list2.item(i);
+				ArrayList<Rule> tmpList = new ArrayList<Rule>();
+				String ruleName = elem3.getAttribute("languagerulename");
+				// For each rule
+				NodeList list3 = elem3.getElementsByTagName("rule");
+				for ( int j=0; j<list3.getLength(); j++ ) {
+					Element elem4 = (Element)list3.item(j);
+					Rule newRule = new Rule();
+					tmp = elem4.getAttribute("break");
+					if ( tmp.length() > 0 ) newRule.isBreak = "yes".equals(tmp);
+					Element elem5 = getFirstElementByTagName("beforebreak", elem4);
+					if ( elem5 != null ) newRule.before = elem5.getTextContent();
+					elem5 = getFirstElementByTagName("afterbreak", elem4);
+					if ( elem5 != null ) newRule.after = elem5.getTextContent();
+					tmpList.add(newRule);
+				}
+				langRules.put(ruleName, tmpList);
+			}
+
+			// maprules
+			elem2 = getFirstElementByTagName("maprules", elem1);
+			// For each languagemap
+			list2 = elem2.getElementsByTagName("languagemap");
+			for ( int i=0; i<list2.getLength(); i++ ) {
+				Element elem3 = (Element)list2.item(i);
+				LanguageMap langMap = new LanguageMap();
+				tmp = elem3.getAttribute("languagepattern");
+				if ( tmp.length() > 0 ) langMap.pattern = tmp;
+				tmp = elem3.getAttribute("languagerulename");
+				if ( tmp.length() > 0 ) langMap.ruleName = tmp;
+				langMaps.add(langMap);
+			}
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Gets the first occurrence of a given element from a given
+	 * element.
+	 * @param tagName Name of the element to look for.
+	 * @param elem Element where to look for.
+	 * @return The first found element, or null.
+	 */
+	private Element getFirstElementByTagName (String tagName,
+		Element elem)
+	{
+		NodeList list = (NodeList)elem.getElementsByTagName(tagName);
+		if (( list == null ) || ( list.getLength() < 1 )) return null;
+		return (Element)list.item(0);
 	}
 	
 	/**
@@ -242,58 +408,67 @@ public class Segmenter {
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
 			writer.writeAttributeString("version", "2.0");
-
+			writer.writeLineBreak();
+			
 			writer.writeStartElement("header");
 			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
 			writer.writeAttributeString("cascade", (cascade ? "yes": "no"));
+			writer.writeLineBreak();
 
 			writer.writeStartElement("formathandle");
 			writer.writeAttributeString("type", "start");
 			writer.writeAttributeString("include", (includeStartCodes ? "yes" : "no"));
-			writer.writeEndElement(); // formathandle
+			writer.writeEndElementLineBreak(); // formathandle
 			
 			writer.writeStartElement("formathandle");
 			writer.writeAttributeString("type", "end");
 			writer.writeAttributeString("include", (includeEndCodes ? "yes" : "no"));
-			writer.writeEndElement(); // formathandle
+			writer.writeEndElementLineBreak(); // formathandle
 			
 			writer.writeStartElement("formathandle");
 			writer.writeAttributeString("type", "isolated");
 			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
-			writer.writeEndElement(); // formathandle
+			writer.writeEndElementLineBreak(); // formathandle
 			
-			writer.writeEndElement(); // header
+			writer.writeEndElementLineBreak(); // header
 
 			writer.writeStartElement("body");
-	
-			writer.writeStartElement("languageRules");
+			writer.writeLineBreak();
+			
+			writer.writeStartElement("languagerules");
+			writer.writeLineBreak();
 			for ( String ruleName : langRules.keySet() ) {
-				writer.writeStartElement("languageRule");
+				writer.writeStartElement("languagerule");
 				writer.writeAttributeString("languagerulename", ruleName);
+				writer.writeLineBreak();
 				ArrayList<Rule> langRule = langRules.get(ruleName);
 				for ( Rule rule : langRule ) {
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
+					writer.writeLineBreak();
 					writer.writeElementString("beforebreak", rule.before);
+					writer.writeLineBreak();					
 					writer.writeElementString("afterbreak", rule.after);
-					writer.writeEndElement(); // rule
+					writer.writeLineBreak();					
+					writer.writeEndElementLineBreak(); // rule
 				}
-				writer.writeEndElement(); // languagerule
+				writer.writeEndElementLineBreak(); // languagerule
 			}
-			writer.writeEndElement(); // languagerules
+			writer.writeEndElementLineBreak(); // languagerules
 			
 			writer.writeStartElement("maprules");
+			writer.writeLineBreak();			
 			for ( LanguageMap langMap : langMaps ) {
 				writer.writeStartElement("languagemap");
 				writer.writeAttributeString("languagepattern", langMap.pattern);
 				writer.writeAttributeString("languagerulename", langMap.ruleName);
-				writer.writeEndElement(); // languagemap
+				writer.writeEndElementLineBreak(); // languagemap
 			}
-			writer.writeEndElement(); // maprules
+			writer.writeEndElementLineBreak(); // maprules
 			
-			writer.writeEndElement(); // body
+			writer.writeEndElementLineBreak(); // body
 			
-			writer.writeEndElement(); // srx
+			writer.writeEndElementLineBreak(); // srx
 			writer.writeEndDocument();
 		}
 		finally {

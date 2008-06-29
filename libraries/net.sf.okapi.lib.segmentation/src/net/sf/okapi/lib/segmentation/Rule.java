@@ -7,12 +7,22 @@ public class Rule {
 	protected boolean   isBreak;
 	
 	
+	public Rule () {
+		before = "";
+		after = "";
+		isBreak = false;
+	}
+	
 	public Rule (String before,
 		String after,
 		boolean isBreak)
 	{
-		this.before = before;
-		this.after = after;
+		if ( before == null ) this.before = "";
+		else this.before = before;
+		
+		if ( this.after == null ) this.after = "";
+		else this.after = after;
+		
 		this.isBreak = isBreak;
 	}
 	

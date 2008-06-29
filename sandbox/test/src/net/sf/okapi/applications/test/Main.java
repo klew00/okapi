@@ -264,8 +264,9 @@ public class Main {
 			seg.addLanguageRule("french", langRule);
 
 			langRule = new ArrayList<Rule>();
-			langRule.add(new Rule("\\b\\w{2,}\\.+[\"\'”\\)]?", "\\s|$", true));
+			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "\\s", true));
 			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
+			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
 			seg.addLanguageRule("default", langRule);
 
 			seg.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
@@ -273,22 +274,36 @@ public class Main {
 			
 			seg.setCascade(true);
 			seg.selectLanguageRule("fr");
-			seg.saveRules("output.srx");
 			
 			Container cont = new Container("Mr. XYZ. (Test.) and more test. ");
 			int segCount = seg.segment(cont);
-			System.out.println(String.format("Text=[%s] nb seg: %d",
-				cont.toString(), segCount));
+			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+					cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
 
 			cont = new Container("One... Two... ");
 			segCount = seg.segment(cont);
-			System.out.println(String.format("Text=[%s] nb seg: %d",
-				cont.toString(), segCount));
+			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+					cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
 
 			cont = new Container("Mr. XYZ. One...");
 			segCount = seg.segment(cont);
-			System.out.println(String.format("Text=[%s] nb seg: %d",
-				cont.toString(), segCount));
+			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+					cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
+
+			String text = "Test! (And more?) Etc. And the last without period";
+			segCount = seg.segment(text);
+			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+					text, segCount, printSplits(seg, text)));
+
+			seg.loadRules("example.srx");
+			seg.selectLanguageRule("en");
+			text = "The U.K. Prime Minister, Mr. Blair, was seen out with his family today. Not the Queen.";
+			segCount = seg.segment(text);
+			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+					text, segCount, printSplits(seg, text)));
+			
+			seg.saveRules("output.srx");
+			
 		}
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());
@@ -296,6 +311,23 @@ public class Main {
 		System.out.println("---end testSegmentation---");
 	}
 
+	static private String printSplits (Segmenter segmenter,
+		String input)
+	{
+		ArrayList<Integer> list = segmenter.getSplitPositions();
+		StringBuilder tmp = new StringBuilder();
+		int start = 0;
+		for ( int pos : list ) {
+			tmp.append("["+input.substring(start, pos)+"]");
+			start = pos;
+		}
+		// Last one (if necessary)
+		if ( start < input.length() ) {
+			tmp.append("["+input.substring(start)+"]");
+		}
+		return tmp.toString();
+	}
+	
 	public static void main (String[] args)
 		throws Exception
 	{
