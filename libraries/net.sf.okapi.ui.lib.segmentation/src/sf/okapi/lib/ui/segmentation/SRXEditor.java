@@ -2,7 +2,11 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Stack;
 
+import net.sf.okapi.common.resource.CodeFragment;
+import net.sf.okapi.common.resource.Container;
+import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -15,6 +19,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,6 +27,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
@@ -35,10 +42,14 @@ public class SRXEditor {
 	private RulesTableModel  rulesTableMod;
 	private Combo            cbGroup;
 	private Segmenter        segmenter;
+	private IContainer       sampleText;
+	private Button           btSRXDocs;
+	private Menu             popupSRCDocs;
 	
 
 	public SRXEditor (Shell parent) {
 		segmenter = new Segmenter();
+		sampleText = new Container();
 		//TODO: normal load
 		//start test
 		ArrayList<Rule> langRule = new ArrayList<Rule>();
@@ -63,11 +74,11 @@ public class SRXEditor {
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout(5, false);
+		GridLayout layTmp = new GridLayout(6, false);
 		cmpTmp.setLayout(layTmp);
 		
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Language rule currently displayed:");
+		label.setText("Language rules currently displayed:");
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
@@ -82,7 +93,7 @@ public class SRXEditor {
 			};
 		});
 		
-		int topButtonsWidth = 150;
+		int topButtonsWidth = 140;
 		Button btTmp = new Button(cmpTmp, SWT.PUSH);
 		btTmp.setText("Groups and Options...");
 		gdTmp = new GridData();
@@ -94,11 +105,28 @@ public class SRXEditor {
 			}
 		});
 		
+		btSRXDocs = new Button(cmpTmp, SWT.PUSH);
+		btSRXDocs.setText("SRX Document...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = topButtonsWidth;
+		btSRXDocs.setLayoutData(gdTmp);
+		setFileMenu(shell, btSRXDocs);
+		btSRXDocs.addSelectionListener( new SelectionAdapter () {
+			public void widgetSelected(SelectionEvent evt) {
+				if (( popupSRCDocs != null ) && ( !popupSRCDocs.isVisible() )) {
+					Rectangle bounds = btSRXDocs.getBounds(); 
+					Point menuLoc = btSRXDocs.getParent().toDisplay(
+						bounds.x, bounds.y + bounds.height);
+					popupSRCDocs.setLocation(menuLoc.x, menuLoc.y);
+					popupSRCDocs.setVisible(true);
+				}}
+			});
+		
 		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		tblRules.setHeaderVisible(true);
 		tblRules.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		gdTmp.minimumHeight = 130;
 		tblRules.setLayoutData(gdTmp);
 		tblRules.addControlListener(new ControlAdapter() {
@@ -191,6 +219,37 @@ public class SRXEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void setFileMenu (Shell shell,
+		Button fileButton)
+	{
+		popupSRCDocs = new Menu(shell, SWT.POP_UP);
+		fileButton.setMenu(popupSRCDocs);
+
+		MenuItem menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
+		menuItem.setText("Open SRX Document...");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				loadSRXDocument(null);
+            }
+		});
+
+		menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
+		menuItem.setText("Save Current Document");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO: save doc
+            }
+		});
+
+		menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
+		menuItem.setText("Save Current Document As...");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//TODO: save doc as
+            }
+		});
+}
+
 	public void showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -199,20 +258,56 @@ public class SRXEditor {
 		}
 	}
 	
+	private void processInlineCodes () {
+		try {
+			String text = edSample.getText().replaceAll("<x>", String.valueOf((char)IContainer.CODE_OPENING));
+			text = text.replaceAll("</x>", String.valueOf((char)IContainer.CODE_CLOSING));
+			text = text.replaceAll("<x/>", String.valueOf((char)IContainer.CODE_ISOLATED));
+	
+			sampleText.reset();
+			Stack<Integer> stackID = new Stack<Integer>();
+			int id = 0;
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.codePointAt(i) ) {
+				case IContainer.CODE_OPENING:
+					sampleText.append(new CodeFragment(IContainer.CODE_OPENING,
+						stackID.push(++id), "<x>"));
+					break;
+				case IContainer.CODE_CLOSING:
+					sampleText.append(new CodeFragment(IContainer.CODE_CLOSING,
+						stackID.pop(), "</x>"));
+					break;
+				case IContainer.CODE_ISOLATED:
+					sampleText.append(new CodeFragment(IContainer.CODE_OPENING,
+						++id, "<x/>"));
+					break;
+				default:
+					sampleText.append(text.charAt(i));
+				}
+			}
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
 	private void updateResults () {
-		//TODO: update result box
-		String text = edSample.getText();
-		segmenter.segment(text);
+		// Convert the sample field content into an parsed item
+		processInlineCodes();
+		
+		String oriText = edSample.getText();
+		segmenter.segment(oriText);
+		//segmenter.segment(sampleText);
 		StringBuilder tmp = new StringBuilder();
 		ArrayList<Integer> list = segmenter.getSplitPositions();
 		tmp.append(String.format("%d: ", list.size()+1));
 		int start = 0;
 		for ( int pos : list ) {
-			tmp.append("["+text.substring(start, pos)+"] ");
+		tmp.append("["+oriText.substring(start, pos)+"] ");
 			start = pos;
 		}
 		// Last one
-		tmp.append("["+text.substring(start)+"]");
+		tmp.append("["+oriText.substring(start)+"]");
 		edResults.setText(tmp.toString());
 	}
 	
@@ -231,10 +326,41 @@ public class SRXEditor {
 	}
 	
 	private void editGroupsAndOptions () {
+		try {
+			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, segmenter);
+			dlg.showDialog();
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+		finally {
+			updateAll();
+		}
+	}
+	
+	private void updateAll () {
 		fillLanguageRuleList();
 		if ( cbGroup.getItemCount() > 0 ) {
 			cbGroup.select(0);
 		}
 		updateRules();
+	}
+	
+	private void loadSRXDocument (String path) {
+		try {
+			if ( path == null ) {
+				String[] paths = Dialogs.browseFilenames(shell, "Open SRX Document",
+					false, null, "SRX Documents (*.srx)", "*.srx");
+				if ( paths != null ) path = paths[0];
+			}
+			segmenter.loadRules(path);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+		finally {
+			fillLanguageRuleList();
+			updateAll();
+		}
 	}
 }

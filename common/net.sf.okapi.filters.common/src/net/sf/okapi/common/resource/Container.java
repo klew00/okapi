@@ -74,7 +74,7 @@ public class Container implements IContainer {
 		return false;
 	}
 	
-	private void reset () {
+	public void reset () {
 		list = new ArrayList<IFragment>();
 		lastFrag = null;
 	}

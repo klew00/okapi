@@ -78,6 +78,11 @@ public interface IContainer {
 		List<IFragment> codes);
 	
 	/**
+	 * Resets the content of the object to no text and no codes.
+	 */
+	void reset ();
+	
+	/**
 	 * Gets a list of all the fragments that compose the object.
 	 * @return The list of text and code fragments of the object.
 	 */

@@ -191,7 +191,7 @@ public class Segmenter {
 			m = rule.pattern.matcher(codedText);
 			while ( m.find() ) {
 				int n = m.start()+m.group(1).length();
-				if ( n > codedText.length() ) continue; // Match the end
+				if ( n >= codedText.length() ) continue; // Match the end
 				if ( splits.containsKey(n) ) {
 					// Do not update if we found a no-break before
 					if ( !splits.get(n) ) continue;
@@ -203,18 +203,13 @@ public class Segmenter {
 
 		// Count breaks and adjust positions
 		int breakCount = 0;
-		int start = 0;
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
 				breakCount++;
-				start = pos;
 			}
 		}
-		// Last one (if necessary)
-		if ( start < codedText.length() ) {
-			breakCount++;
-		}
-		
+		// Last one
+		breakCount++;
 		// Return the number of segment found
 		return breakCount;
 	}

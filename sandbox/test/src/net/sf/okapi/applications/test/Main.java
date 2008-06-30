@@ -264,7 +264,7 @@ public class Main {
 			seg.addLanguageRule("french", langRule);
 
 			langRule = new ArrayList<Rule>();
-			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "\\s", true));
+			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "", true));
 			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
 			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
 			seg.addLanguageRule("default", langRule);
@@ -275,7 +275,7 @@ public class Main {
 			seg.setCascade(true);
 			seg.selectLanguageRule("fr");
 			
-			Container cont = new Container("Mr. XYZ. (Test.) and more test. ");
+			Container cont = new Container("Mr. XYZ. (Test.) and more test.");
 			int segCount = seg.segment(cont);
 			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
 				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
@@ -321,10 +321,8 @@ public class Main {
 			tmp.append("["+input.substring(start, pos)+"]");
 			start = pos;
 		}
-		// Last one (if necessary)
-		if ( start < input.length() ) {
-			tmp.append("["+input.substring(start)+"]");
-		}
+		// Last one
+		tmp.append("["+input.substring(start)+"]");
 		return tmp.toString();
 	}
 	
