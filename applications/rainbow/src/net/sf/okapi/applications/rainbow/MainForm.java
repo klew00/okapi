@@ -78,6 +78,8 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
+import sf.okapi.lib.ui.segmentation.SRXEditor;
+
 public class MainForm implements IParametersProvider {
 	
 	private Shell            shell;
@@ -122,6 +124,7 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         miUtilities;
 	private MenuItem         miHelp;
 	private MenuItem         miSave;
+	private MenuItem         miTools;
 	private MenuItem         miEditInputProperties;
 	private MenuItem         cmiEditInputProperties;
 	private MenuItem         miOpenInputDocument;
@@ -271,6 +274,20 @@ public class MainForm implements IParametersProvider {
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
 		miUtilities.setText("&Utilities");
 		buildUtilitiesMenu();
+
+		// Tools menu
+		miTools = new MenuItem(menuBar, SWT.CASCADE);
+		miTools.setText("&Tools");
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		miTools.setMenu(dropMenu);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.editsegrules");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editSegmentationRules(null);
+			}
+		});
 
 		// Help menu
 		miHelp = new MenuItem(menuBar, SWT.CASCADE);
@@ -1104,6 +1121,17 @@ public class MainForm implements IParametersProvider {
 			Input inp = prj.getItemFromRelativePath(
 				inputTable.getItem(index).getText(0));
 			Program.launch(prj.getInputRoot() + File.separator + inp.relativePath); 
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
+	private void editSegmentationRules (String path) {
+		try {
+			SRXEditor dlg = new SRXEditor(shell);
+			//TODO: implement case where SRX file is provided as parameter
+			dlg.showDialog();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);

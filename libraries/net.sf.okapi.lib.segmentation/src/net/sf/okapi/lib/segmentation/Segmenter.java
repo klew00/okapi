@@ -3,7 +3,6 @@ package net.sf.okapi.lib.segmentation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,10 +38,10 @@ public class Segmenter {
 	private String      langCode;
 	private String      inlineCodes;
 	
-	private ArrayList<LanguageMap>               langMaps;
-	private Hashtable<String, ArrayList<Rule>>   langRules;
-	private ArrayList<CompiledRule>              rules;
-	private LinkedHashMap<Integer, Boolean>      splits;
+	private ArrayList<LanguageMap>                    langMaps;
+	private LinkedHashMap<String, ArrayList<Rule>>    langRules;
+	private ArrayList<CompiledRule>                   rules;
+	private LinkedHashMap<Integer, Boolean>           splits;
 
 
 	public Segmenter () {
@@ -52,7 +51,7 @@ public class Segmenter {
 	public void resetAll () {
 		resetRules();
 		langMaps = new ArrayList<LanguageMap>();
-		langRules = new Hashtable<String, ArrayList<Rule>>();
+		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
 		// Pattern for handling inline codes 
 		inlineCodes = String.format("((\\u%04x|\\u%04x|\\u%04x).)?",
 			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED); 
@@ -63,6 +62,14 @@ public class Segmenter {
 		includeIsolatedCodes = false; // SRX default
 		splits = null;
 		langCode = null;
+	}
+	
+	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
+		return langRules;
+	}
+	
+	public ArrayList<Rule> getLanguageRules (String ruleName) {
+		return langRules.get(ruleName);
 	}
 	
 	public boolean segmentSubFlows () {

@@ -20,7 +20,7 @@ public class Rule {
 		if ( before == null ) this.before = "";
 		else this.before = before;
 		
-		if ( this.after == null ) this.after = "";
+		if ( after == null ) this.after = "";
 		else this.after = after;
 		
 		this.isBreak = isBreak;

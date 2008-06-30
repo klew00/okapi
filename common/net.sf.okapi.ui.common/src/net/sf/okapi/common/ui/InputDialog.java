@@ -69,6 +69,7 @@ public class InputDialog {
 		edField = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		if ( defaultInputText != null ) edField.setText(defaultInputText);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		//TODO: Fix this max width, it's not working
 		gdTmp.widthHint = 640; // No larger than this by default
 		edField.setLayoutData(gdTmp);
 		

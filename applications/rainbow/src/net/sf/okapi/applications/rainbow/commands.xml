@@ -13,6 +13,8 @@
  <command name="input.removeDocuments">&amp;Remove Documents...</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
+ <!-- Tools menu -->
+ <command name="tools.editsegrules">Edit &amp;Segmentation Rules...</command>
  <!-- Help menu -->
  <command name="help.topics" key="F1">&amp;Help Topics&#x9;F1</command>
  <command name="help.howtouse">How To &amp;Use Rainbow</command>

@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/windows/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xml"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.lib.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
