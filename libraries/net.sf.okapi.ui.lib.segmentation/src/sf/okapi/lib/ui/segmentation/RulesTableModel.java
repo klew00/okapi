@@ -29,7 +29,7 @@ class RulesTableModel {
 		this.list = list;
 	}
 
-	void updateTable () {
+	void updateTable (int selection) {
 		table.removeAll();
 		if ( list == null ) return;
 		for ( Rule rule : list ) {
@@ -38,7 +38,13 @@ class RulesTableModel {
 			item.setText(1, rule.getBefore());
 			item.setText(2, rule.getAfter());
 		}
-		table.setSelection(0);
+		
+		if (( selection < 0 ) || ( selection > table.getItemCount()-1 )) {
+			selection = table.getItemCount()-1;
+		}
+		if ( table.getItemCount() > 0 ) {
+			table.setSelection(selection);
+		}
 	}
 
 }

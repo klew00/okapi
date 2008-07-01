@@ -29,6 +29,7 @@ public class Segmenter {
 	
 	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
 	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
+	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	
 	private boolean     segmentSubFlows;
 	private boolean     cascade;
@@ -37,6 +38,7 @@ public class Segmenter {
 	private boolean     includeIsolatedCodes;
 	private String      langCode;
 	private String      inlineCodes;
+	private String      sampleText;
 	
 	private ArrayList<LanguageMap>                    langMaps;
 	private LinkedHashMap<String, ArrayList<Rule>>    langRules;
@@ -70,6 +72,10 @@ public class Segmenter {
 	
 	public ArrayList<Rule> getLanguageRules (String ruleName) {
 		return langRules.get(ruleName);
+	}
+	
+	public ArrayList<LanguageMap> getAllLanguagesMaps () {
+		return langMaps;
 	}
 	
 	public boolean segmentSubFlows () {
@@ -139,6 +145,24 @@ public class Segmenter {
 		includeIsolatedCodes = value;
 	}
 	
+	/**
+	 * Gets the current sample text. This text is an example string that can be used
+	 * to test the various rules. It can be handy to be able to save it along with
+	 * the SRX document.
+	 * @return The sample text, or an empty string.
+	 */
+	public String getSample () {
+		if ( sampleText == null ) return "";
+		else return sampleText;
+	}
+	
+	/**
+	 * Sets the sample text.
+	 * @param value Sample text.
+	 */
+	public void setSample (String value) {
+		sampleText = value;
+	}
 	/**
 	 * Adds a language rule to the segmenter. If another language rule
 	 * with the same name exists already it will be replaced by the
@@ -324,13 +348,19 @@ public class Segmenter {
 					if ( tmp.length() > 0 ) includeIsolatedCodes = "yes".equals(tmp); 
 				}
 			}
-			//TODO: formathandle
+			
+			// Extensions
+			//TODO: Hanlde namespace to read sample text
+			Element elem2 = getFirstElementByTagName("sample", elem1);
+			if ( elem2 != null ) {
+				setSample(elem2.getTextContent());
+			}
 			
 			// Get the body element
 			elem1 = getFirstElementByTagName("body", srxElem);
 			
 			// languagerules
-			Element elem2 = getFirstElementByTagName("languagerules", elem1);
+			elem2 = getFirstElementByTagName("languagerules", elem1);
 			// For each languageRule
 			list2 = elem2.getElementsByTagName("languagerule");
 			for ( int i=0; i<list2.getLength(); i++ ) {
@@ -431,6 +461,11 @@ public class Segmenter {
 			writer.writeAttributeString("type", "isolated");
 			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
 			writer.writeEndElementLineBreak(); // formathandle
+			
+			writer.writeStartElement("okpsrx:sample");
+			writer.writeAttributeString("xmlns:okpsrx", NSURI_OKPSRX);
+			writer.writeString(getSample());
+			writer.writeEndElementLineBreak(); // okpsrx:sample
 			
 			writer.writeEndElementLineBreak(); // header
 

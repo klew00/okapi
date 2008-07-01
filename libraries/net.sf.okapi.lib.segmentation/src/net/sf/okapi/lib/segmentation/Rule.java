@@ -30,11 +30,23 @@ public class Rule {
 		return before;
 	}
 	
+	public void setBefore (String value) {
+		before = value;
+	}
+	
 	public String getAfter () {
 		return after;
 	}
 	
+	public void setAfter (String value) {
+		after = value;
+	}
+	
 	public boolean isBreak () {
 		return isBreak;
+	}
+	
+	public void setIsBreak (boolean value) {
+		isBreak = value;
 	}
 }

@@ -42,32 +42,23 @@ public class SRXEditor {
 	private RulesTableModel  rulesTableMod;
 	private Combo            cbGroup;
 	private Segmenter        segmenter;
+	private String           srxPath;
 	private IContainer       sampleText;
 	private Button           btSRXDocs;
 	private Menu             popupSRCDocs;
+	private Button           btAddRule;
+	private Button           btEditRule;
+	private Button           btRemoveRule;
+	private Button           btMoveUpRule;
+	private Button           btMoveDownRule;
 	
 
 	public SRXEditor (Shell parent) {
 		segmenter = new Segmenter();
+		srxPath = null;
 		sampleText = new Container();
-		//TODO: normal load
-		//start test
-		ArrayList<Rule> langRule = new ArrayList<Rule>();
-		langRule.add(new Rule("Mr\\.", "\\s", false));
-		segmenter.addLanguageRule("french", langRule);
-		langRule = new ArrayList<Rule>();
-		langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "\\s", true));
-		langRule.add(new Rule("\\.\\.\\.", "\\s", true));
-		langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
-		segmenter.addLanguageRule("default", langRule);
-		segmenter.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
-		segmenter.addLanguageMap(new LanguageMap(".*", "default"));
-		segmenter.setCascade(true);
-		segmenter.selectLanguageRule("fr");
-		//end test
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		//TODO: Externalize string
 		shell.setText("Edit Segmentation Rules");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
@@ -89,7 +80,7 @@ public class SRXEditor {
 		cbGroup.setLayoutData(gdTmp);
 		cbGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateRules();
+				updateRules(0);
 			};
 		});
 		
@@ -119,10 +110,10 @@ public class SRXEditor {
 						bounds.x, bounds.y + bounds.height);
 					popupSRCDocs.setLocation(menuLoc.x, menuLoc.y);
 					popupSRCDocs.setVisible(true);
-				}}
-			});
+			}}
+		});
 		
-		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		tblRules.setHeaderVisible(true);
 		tblRules.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -140,6 +131,11 @@ public class SRXEditor {
 				tblRules.getColumn(2).setWidth(nHalf);
 		    }
 		});
+		tblRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateRulesButtons();
+			};
+		});
 		rulesTableMod = new RulesTableModel();
 		rulesTableMod.linkTable(tblRules);
 		
@@ -153,39 +149,64 @@ public class SRXEditor {
 		cmpGroup.setLayoutData(gdTmp);
 
 		int ruleButtonsWidth = 80;
-		btTmp = new Button(cmpGroup, SWT.PUSH);
-		btTmp.setText("&Add...");
+		btAddRule = new Button(cmpGroup, SWT.PUSH);
+		btAddRule.setText("&Add...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
-		btTmp.setLayoutData(gdTmp);
+		btAddRule.setLayoutData(gdTmp);
+		btAddRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRule(true);
+			}
+		});
 		
-		btTmp = new Button(cmpGroup, SWT.PUSH);
-		btTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btTmp.setText("&Edit...");
+		btEditRule = new Button(cmpGroup, SWT.PUSH);
+		btEditRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btEditRule.setText("&Edit...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
-		btTmp.setLayoutData(gdTmp);
+		btEditRule.setLayoutData(gdTmp);
+		btEditRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRule(false);
+			}
+		});
+		
+		btRemoveRule = new Button(cmpGroup, SWT.PUSH);
+		btRemoveRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btRemoveRule.setText("&Remove");
+		gdTmp = new GridData();
+		gdTmp.widthHint = ruleButtonsWidth;
+		btRemoveRule.setLayoutData(gdTmp);
+		btRemoveRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeRule();
+			}
+		});
 
-		btTmp = new Button(cmpGroup, SWT.PUSH);
-		btTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btTmp.setText("&Remove");
+		btMoveUpRule = new Button(cmpGroup, SWT.PUSH);
+		btMoveUpRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btMoveUpRule.setText("Move &Up");
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
-		btTmp.setLayoutData(gdTmp);
+		btMoveUpRule.setLayoutData(gdTmp);
+		btMoveUpRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveUpRule();
+			}
+		});
 
-		btTmp = new Button(cmpGroup, SWT.PUSH);
-		btTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btTmp.setText("Move &Up");
+		btMoveDownRule = new Button(cmpGroup, SWT.PUSH);
+		btMoveDownRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btMoveDownRule.setText("Move &Down");
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
-		btTmp.setLayoutData(gdTmp);
-
-		btTmp = new Button(cmpGroup, SWT.PUSH);
-		btTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btTmp.setText("Move &Down");
-		gdTmp = new GridData();
-		gdTmp.widthHint = ruleButtonsWidth;
-		btTmp.setLayoutData(gdTmp);
+		btMoveDownRule.setLayoutData(gdTmp);
+		btMoveDownRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDownRule();
+			}
+		});
 
 		cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -212,11 +233,16 @@ public class SRXEditor {
 				updateResults();
 			}
 		});
-		edSample.setText("Hello <x>Mr. Gandalf.</x>");
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Dialogs.centerWindow(shell, parent);
+		
+		updateAll();
+		updateSample();
+		if ( edSample.getText().length() == 0 ) { // Default
+			edSample.setText("Hello <x>Mr. Gandalf.</x>");
+		}
 	}
 	
 	private void setFileMenu (Shell shell,
@@ -237,7 +263,7 @@ public class SRXEditor {
 		menuItem.setText("Save Current Document");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO: save doc
+				saveSRXDocument(srxPath);
             }
 		});
 
@@ -245,7 +271,7 @@ public class SRXEditor {
 		menuItem.setText("Save Current Document As...");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO: save doc as
+				saveSRXDocument(null);
             }
 		});
 }
@@ -293,7 +319,7 @@ public class SRXEditor {
 	
 	private void updateResults () {
 		// Convert the sample field content into an parsed item
-		processInlineCodes();
+		//processInlineCodes();
 		
 		String oriText = edSample.getText();
 		segmenter.segment(oriText);
@@ -311,18 +337,32 @@ public class SRXEditor {
 		edResults.setText(tmp.toString());
 	}
 	
-	private void fillLanguageRuleList () {
+	private void updateLanguageRuleList () {
 		cbGroup.removeAll();
 		LinkedHashMap<String, ArrayList<Rule>> langRules = segmenter.getAllLanguageRules();
 		for ( String ruleName : langRules.keySet() ) {
 			cbGroup.add(ruleName);
 		}
+		if ( cbGroup.getItemCount() > 0 ) {
+			cbGroup.select(0);
+		}
+		updateRules(0);
 	}
 	
-	private void updateRules () {
+	private void updateRules (int selection) {
 		rulesTableMod.setLanguageRules(
 			segmenter.getLanguageRules(cbGroup.getText()));
-		rulesTableMod.updateTable();
+		rulesTableMod.updateTable(selection);
+		updateRulesButtons();
+	}
+	
+	private void updateRulesButtons () {
+		int n = tblRules.getSelectionIndex();
+		btAddRule.setEnabled(cbGroup.getSelectionIndex()>-1);
+		btEditRule.setEnabled(n != -1);
+		btRemoveRule.setEnabled(n != -1);
+		btMoveUpRule.setEnabled(n > 0);
+		btMoveDownRule.setEnabled(n < tblRules.getItemCount()-1);
 	}
 	
 	private void editGroupsAndOptions () {
@@ -337,13 +377,13 @@ public class SRXEditor {
 			updateAll();
 		}
 	}
+
+	private void updateSample () {
+		edSample.setText(segmenter.getSample());
+	}
 	
 	private void updateAll () {
-		fillLanguageRuleList();
-		if ( cbGroup.getItemCount() > 0 ) {
-			cbGroup.select(0);
-		}
-		updateRules();
+		updateLanguageRuleList();
 	}
 	
 	private void loadSRXDocument (String path) {
@@ -351,16 +391,90 @@ public class SRXEditor {
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open SRX Document",
 					false, null, "SRX Documents (*.srx)", "*.srx");
-				if ( paths != null ) path = paths[0];
+				if ( paths == null ) return; // Cancel
+				else path = paths[0];
 			}
 			segmenter.loadRules(path);
+			srxPath = path;
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 		finally {
-			fillLanguageRuleList();
 			updateAll();
+			updateSample();
 		}
 	}
+	
+	private void saveSRXDocument (String path) {
+		try {
+			if ( path == null ) {
+				path = Dialogs.browseFilenamesForSave(shell, "Save SRX Document", null,
+					"SRX Documents (*.srx)", "*.srx");
+				if ( path == null ) return;
+			}
+			segmenter.setSample(edSample.getText());
+			segmenter.saveRules(path);
+			srxPath = path;
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
+	private void editRule (boolean createNewRule) {
+		//TODO
+		//Dialogs.showError(shell, "Not implemented yet.", null);
+		Rule rule;
+		String caption;
+		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
+		int n = -1;
+		if ( createNewRule ) {
+			caption = "New Rule";
+			rule = new Rule("", "", true);
+		}
+		else {
+			n = tblRules.getSelectionIndex();
+			if ( n == -1 ) return;
+			rule = segmenter.getLanguageRules(ruleName).get(n);
+			caption = "Edit Rule";
+		}
+		
+		LanguageMapDialog dlg = new LanguageMapDialog(shell, caption, rule);
+		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
+		
+		if ( createNewRule ) {
+			segmenter.getLanguageRules(ruleName).add(rule);
+			n = segmenter.getLanguageRules(ruleName).size()-1;
+		}
+		else {
+			segmenter.getLanguageRules(ruleName).set(n, rule);
+		}
+		updateRules(n);
+	}
+	
+	private void removeRule () {
+		int n = tblRules.getSelectionIndex();
+		if ( n == -1 ) return;
+		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
+		segmenter.getLanguageRules(ruleName).remove(n);
+		tblRules.remove(n);
+		if ( n > tblRules.getItemCount()-1 )
+			n = tblRules.getItemCount()-1;
+		if ( tblRules.getItemCount() > 0 )
+			tblRules.select(n);
+		updateRulesButtons();
+		updateResults();
+	}
+	
+	private void moveUpRule () {
+		//TODO
+		Dialogs.showError(shell, "Not implemented yet.", null);
+	}
+	
+	private void moveDownRule () {
+		//TODO
+		Dialogs.showError(shell, "Not implemented yet.", null);
+	}
+	
 }
