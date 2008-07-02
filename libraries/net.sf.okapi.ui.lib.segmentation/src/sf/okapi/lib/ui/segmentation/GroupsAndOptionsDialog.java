@@ -3,8 +3,11 @@ package sf.okapi.lib.ui.segmentation;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -12,11 +15,15 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class GroupsAndOptionsDialog {
@@ -33,7 +40,12 @@ public class GroupsAndOptionsDialog {
 	private Button           btRemoveMap;
 	private Button           btMoveUpMap;
 	private Button           btMoveDownMap;
-	
+	private Button           chkSegmentSubFlows;
+	private Button           chkCascade;
+	private Button           chkIncludeOpeningCodes;
+	private Button           chkIncludeClosingCodes;
+	private Button           chkIncludeIsolatedCodes;
+	private ClosePanel       pnlActions;	
 
 	public GroupsAndOptionsDialog (Shell parent,
 		Segmenter segmenter)
@@ -52,6 +64,24 @@ public class GroupsAndOptionsDialog {
 		grpTmp.setLayoutData(gdTmp);
 		GridLayout layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
+
+		chkSegmentSubFlows = new Button(grpTmp, SWT.CHECK);
+		chkSegmentSubFlows.setText("Segment sub-flow items");
+		
+		chkIncludeOpeningCodes = new Button(grpTmp, SWT.CHECK);
+		chkIncludeOpeningCodes.setText("Include opening in-line codes");
+		
+		chkCascade = new Button(grpTmp, SWT.CHECK);
+		chkCascade.setText("Cascade language maps");
+		
+		chkIncludeClosingCodes = new Button(grpTmp, SWT.CHECK);
+		chkIncludeClosingCodes.setText("Include closing in-line codes");
+
+		// Place-holder for empty spot
+		new Label(grpTmp, SWT.NONE);
+		
+		chkIncludeIsolatedCodes = new Button(grpTmp, SWT.CHECK);
+		chkIncludeIsolatedCodes.setText("Include isolated in-line codes");
 		
 		//=== Language Rules
 		
@@ -62,9 +92,11 @@ public class GroupsAndOptionsDialog {
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
 		
-		lbLangRules = new List(grpTmp, SWT.BORDER);
+		int listWidthHint = 150;
+		lbLangRules = new List(grpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 3;
+		gdTmp.widthHint = listWidthHint;
 		lbLangRules.setLayoutData(gdTmp);
 		lbLangRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -115,9 +147,10 @@ public class GroupsAndOptionsDialog {
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
 		
-		lbLangMaps = new List(grpTmp, SWT.BORDER);
+		lbLangMaps = new List(grpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 5;
+		gdTmp.widthHint = listWidthHint;		
 		lbLangMaps.setLayoutData(gdTmp);
 		lbLangMaps.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -180,10 +213,42 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				if ( !validate() ) event.doit = false;
+				else getOptions();
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
+
+		//--- Dialog-level buttons
+		
+		SelectionAdapter CloseActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( e.widget.getData().equals("h") ) {
+					//TODO: UIUtil.start(help);
+					return;
+				}
+				if ( e.widget.getData().equals("c") ) {
+					shell.close();
+				}
+			};
+		};
+		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		pnlActions.setLayoutData(gdTmp);
+		shell.setDefaultButton(pnlActions.btClose);
+		
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Dialogs.centerWindow(shell, parent);
 
+		setOptions();
 		updateLanguageRules(null);
 		updateLanguageMaps(0);
 	}
@@ -194,6 +259,22 @@ public class GroupsAndOptionsDialog {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+	}
+
+	private void setOptions () {
+		chkSegmentSubFlows.setSelection(segmenter.segmentSubFlows());
+		chkCascade.setSelection(segmenter.cascade());
+		chkIncludeOpeningCodes.setSelection(segmenter.includeStartCodes());
+		chkIncludeClosingCodes.setSelection(segmenter.includeEndCodes());
+		chkIncludeIsolatedCodes.setSelection(segmenter.includeIsolatedCodes());
+	}
+	
+	private void getOptions () {
+		segmenter.setSegmentSubFlows(chkSegmentSubFlows.getSelection());
+		segmenter.setCascade(chkCascade.getSelection());
+		segmenter.setIncludeStartCodes(chkIncludeOpeningCodes.getSelection());
+		segmenter.setIncludeEndCodes(chkIncludeClosingCodes.getSelection());
+		segmenter.setIncludeIsolatedCodes(chkIncludeIsolatedCodes.getSelection());
 	}
 	
 	private void updateRulesButtons () {
@@ -246,22 +327,48 @@ public class GroupsAndOptionsDialog {
 	}
 	
 	private void editMap (boolean createNewMap) {
+		LanguageMap langMap;
+		String caption;
+		int n = -1;
+		if ( createNewMap ) {
+			caption = "New Language Map";
+			langMap = new LanguageMap("", "");
+		}
+		else {
+			n = lbLangMaps.getSelectionIndex();
+			if ( n == -1 ) return;
+			langMap = segmenter.getAllLanguagesMaps().get(n);
+			caption = "Edit Language Map";
+		}
 		
+		LanguageMapDialog dlg = new LanguageMapDialog(shell, caption, langMap);
+		if ( (langMap = dlg.showDialog()) == null ) return; // Cancel
+		
+		if ( createNewMap ) {
+			segmenter.addLanguageMap(langMap);
+			n = segmenter.getAllLanguagesMaps().size()+1;
+		}
+		else {
+			segmenter.getAllLanguagesMaps().set(n, langMap);
+		}
+		segmenter.setIsModified(true);
+		updateLanguageMaps(n);
 	}
 	
 	private void removeMap () {
 		int n = lbLangMaps.getSelectionIndex();
 		if ( n == -1 ) return;
 		segmenter.getAllLanguagesMaps().remove(n);
+		segmenter.setIsModified(true);
 		updateLanguageMaps(n);
 	}
 	
 	private void moveUpMap () {
-		
+		//TODO: moveUpMap
 	}
 	
 	private void moveDownMap () {
-		
+		//TODO: moveDownMap
 	}
 	
 	private void editRules (boolean createNewRules) {
@@ -312,6 +419,38 @@ public class GroupsAndOptionsDialog {
 		if ( n == -1 ) return;
 		String ruleName = lbLangRules.getItem(n);
 		segmenter.getAllLanguageRules().remove(ruleName);
+		segmenter.setIsModified(true);
 		updateLanguageRules(null);
+	}
+	
+	private boolean validate () {
+		try {
+			int nonexistingRules = 0;
+			LinkedHashMap<String, ArrayList<Rule>> list = segmenter.getAllLanguageRules();
+			for ( LanguageMap langRule : segmenter.getAllLanguagesMaps() ) {
+				if ( !list.containsKey(langRule.getRuleName()) ) {
+					nonexistingRules++;
+				}
+			}
+			
+			if ( nonexistingRules == 0 ) return true;
+			// Else: Error.
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setText(shell.getText());
+			dlg.setMessage(String.format("Number of invalid names: %d\n"
+				+ "Do you want to proceed anyway?", nonexistingRules));
+			switch ( dlg.open() ) {
+			case SWT.CANCEL:
+			case SWT.NO:
+				return false;
+			case SWT.YES:
+				return true;
+			}
+		}
+		catch ( Exception e) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			return false;
+		}
+		return true;
 	}
 }

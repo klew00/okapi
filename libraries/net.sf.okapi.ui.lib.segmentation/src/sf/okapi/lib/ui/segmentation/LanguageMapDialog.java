@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 
 import org.eclipse.swt.SWT;
@@ -11,7 +12,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -20,17 +20,15 @@ import org.eclipse.swt.widgets.Text;
 public class LanguageMapDialog {
 	
 	private Shell            shell;
-	private Text             edBefore;
-	private Text             edAfter;
-	private Button           rdBreak;
-	private Button           rdNoBreak;
-	private Rule             result = null;
+	private Text             edPattern;
+	private Text             edRuleName;
+	private LanguageMap      result = null;
 	private OKCancelPanel    pnlActions;
 
 
 	public LanguageMapDialog (Shell parent,
 		String caption,
-		Rule rule)
+		LanguageMap langMap)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( caption != null ) shell.setText(caption);
@@ -43,39 +41,20 @@ public class LanguageMapDialog {
 		cmpTmp.setLayout(layTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Expression before the position:");
+		label.setText("Regular expression describing the language map:");
 		
-		edBefore = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
+		edPattern = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edBefore.setLayoutData(gdTmp);
-		edBefore.setText(rule.getBefore());
+		edPattern.setLayoutData(gdTmp);
+		edPattern.setText(langMap.getPattern());
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Expression after the position:");
+		label.setText("Name of the language rule associated with the regular expression:");
 		
-		edAfter = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
+		edRuleName = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edAfter.setLayoutData(gdTmp);
-		edAfter.setText(rule.getAfter());
-		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Action for this rule:");
-		
-		rdBreak = new Button(cmpTmp, SWT.RADIO);
-		rdBreak.setText("Insert a segment break at this position");
-		gdTmp = new GridData();
-		int indent = 20;
-		gdTmp.horizontalIndent = indent;
-		rdBreak.setLayoutData(gdTmp);
-
-		rdNoBreak = new Button(cmpTmp, SWT.RADIO);
-		rdNoBreak.setText("Do not break at this position");
-		gdTmp = new GridData();
-		gdTmp.horizontalIndent = indent;
-		rdNoBreak.setLayoutData(gdTmp);
-
-		rdBreak.setSelection(rule.isBreak());
-		rdNoBreak.setSelection(!rule.isBreak());
+		edRuleName.setLayoutData(gdTmp);
+		edRuleName.setText(langMap.getRuleName());
 		
 		//--- Dialog-level buttons
 
@@ -101,7 +80,7 @@ public class LanguageMapDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public Rule showDialog () {
+	public LanguageMap showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
@@ -112,15 +91,14 @@ public class LanguageMapDialog {
 
 	private boolean saveData () {
 		try {
-			if (( edBefore.getText().length() == 0 )
-				&& ( edAfter.getText().length() == 0 )) {
-				edBefore.selectAll();
-				edBefore.setFocus();
+			if (( edPattern.getText().length() == 0 )
+				&& ( edRuleName.getText().length() == 0 )) {
+				edPattern.selectAll();
+				edPattern.setFocus();
 				return false;
 			}
-			Pattern.compile(edBefore.getText());
-			Pattern.compile(edAfter.getText());
-			result = new Rule(edBefore.getText(), edAfter.getText(), rdBreak.getSelection());
+			Pattern.compile(edPattern.getText());
+			result = new LanguageMap(edPattern.getText(), edRuleName.getText());
 			return true;
 		}
 		catch ( Exception e) {

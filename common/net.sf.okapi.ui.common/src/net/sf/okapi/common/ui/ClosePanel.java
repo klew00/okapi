@@ -32,10 +32,9 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * Default panel for Help/OK/cancel buttons
  */
-public class OKCancelPanel extends Composite {
+public class ClosePanel extends Composite {
 
-	public Button       btOK;
-	public Button       btCancel;
+	public Button       btClose;
 	public Button       btHelp;
 
 	/**
@@ -43,11 +42,11 @@ public class OKCancelPanel extends Composite {
 	 * @param parent Parent control.
 	 * @param flags Style flags.
 	 * @param action Action to execute when any of the buttons is clicked.
-	 * The receiving event, the widget's data is marked: 'c' for the Cancel
-	 * button, 'o' for OK, and 'h' for help.
+	 * The receiving event, the widget's data is marked: 'c' for the Close
+	 * button, and 'h' for help.
 	 * @param showHelp True to display the Help button.
 	 */
-	public OKCancelPanel (Composite parent,
+	public ClosePanel (Composite parent,
 		int flags,
 		SelectionAdapter action,
 		boolean showHelp)
@@ -84,31 +83,17 @@ public class OKCancelPanel extends Composite {
 		cmpTmp.setLayoutData(gdTmp);
 
 		// Create the buttons in a platform-specific order
-		if ( UIUtil.getPlatformType() == UIUtil.PFTYPE_WIN ) {
-			btOK = new Button(cmpTmp, SWT.PUSH);
-			btCancel = new Button(cmpTmp, SWT.PUSH);
-		}
-		else {
-			btCancel = new Button(cmpTmp, SWT.PUSH);
-			btOK = new Button(cmpTmp, SWT.PUSH);
-		}
+		btClose = new Button(cmpTmp, SWT.PUSH);
 
-		btOK.setText("OK");
-		btOK.setData("o");
-		btOK.addSelectionListener(action);
+		btClose.setText("Close");
+		btClose.setData("c");
+		btClose.addSelectionListener(action);
 		RowData rdTmp = new RowData();
 		rdTmp.width = nWidth;
-		btOK.setLayoutData(rdTmp);
-		
-		btCancel.setText("Cancel");
-		btCancel.setData("c");
-		btCancel.addSelectionListener(action);
-		rdTmp = new RowData();
-		rdTmp.width = nWidth;
-		btCancel.setLayoutData(rdTmp);
+		btClose.setLayoutData(rdTmp);
 	}
 	
-	public void setOKText (String text) {
-		btOK.setText(text);
+	public void setCloseText (String text) {
+		btClose.setText(text);
 	}
 }

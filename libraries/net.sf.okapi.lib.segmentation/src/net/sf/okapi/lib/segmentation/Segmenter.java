@@ -17,7 +17,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -27,7 +26,7 @@ import net.sf.okapi.common.resource.IContainer;
 
 public class Segmenter {
 	
-	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
+//	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
 	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
 	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	
@@ -36,9 +35,13 @@ public class Segmenter {
 	private boolean     includeStartCodes;
 	private boolean     includeEndCodes;
 	private boolean     includeIsolatedCodes;
-	private String      langCode;
+	private String      currentLanguageCode;
 	private String      inlineCodes;
+	
 	private String      sampleText;
+	private String      sampleLanguage;
+	private boolean     modified;
+	private boolean     sampleOnMappedRules; 
 	
 	private ArrayList<LanguageMap>                    langMaps;
 	private LinkedHashMap<String, ArrayList<Rule>>    langRules;
@@ -56,14 +59,17 @@ public class Segmenter {
 		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
 		// Pattern for handling inline codes 
 		inlineCodes = String.format("((\\u%04x|\\u%04x|\\u%04x).)?",
-			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED); 
+			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED);
 		segmentSubFlows = true; // SRX default
 		cascade = false; // There is no SRX default for this
 		includeStartCodes = false; // SRX default
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		splits = null;
-		langCode = null;
+		currentLanguageCode = null;
+		modified = false;
+		sampleText = "Hello <x>Mr. Gandalf.</x>";
+		sampleLanguage = "en";
 	}
 	
 	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
@@ -91,7 +97,10 @@ public class Segmenter {
 	}
 	
 	public void setCascade (boolean value) {
-		cascade = value;
+		if ( value != cascade ) {
+			cascade = value;
+			modified = true;
+		}
 	}
 	
 	/**
@@ -108,7 +117,10 @@ public class Segmenter {
 	 * @param value The new value to use.
 	 */
 	public void setIncludeStartCodes (boolean value) {
-		includeStartCodes = value;
+		if ( value != includeStartCodes ) {
+			includeStartCodes = value;
+			modified = true;
+		}
 	}
 	
 	/**
@@ -125,7 +137,10 @@ public class Segmenter {
 	 * @param value The new value to use.
 	 */
 	public void setIncludeEndCodes (boolean value) {
-		includeEndCodes = value;
+		if ( value != includeEndCodes ) {
+			includeEndCodes = value;
+			modified = true;
+		}
 	}
 	
 	/**
@@ -142,7 +157,10 @@ public class Segmenter {
 	 * @param value The new value to use.
 	 */
 	public void setIncludeIsolatedCodes (boolean value) {
-		includeIsolatedCodes = value;
+		if ( value != includeIsolatedCodes ) {
+			includeIsolatedCodes = value;
+			modified = true;
+		}
 	}
 	
 	/**
@@ -151,7 +169,7 @@ public class Segmenter {
 	 * the SRX document.
 	 * @return The sample text, or an empty string.
 	 */
-	public String getSample () {
+	public String getSampleText () {
 		if ( sampleText == null ) return "";
 		else return sampleText;
 	}
@@ -160,9 +178,85 @@ public class Segmenter {
 	 * Sets the sample text.
 	 * @param value Sample text.
 	 */
-	public void setSample (String value) {
+	public void setSampleText (String value) {
+		if ( value != null ) {
+			if ( !value.equals(sampleText) ) {
+				modified = true;
+			}
+		}
+		else if ( sampleText != null ) {
+			modified = true;
+		}
 		sampleText = value;
 	}
+	
+	/**
+	 * Gets the current sample language code.
+	 * @return The sample language code.
+	 */
+	public String getSampleLanguage () {
+		return sampleLanguage;
+	}
+	
+	/**
+	 * Sets the sample language code. Null or empty strings are changed
+	 * to the default value.
+	 * @param value The new sample language code.
+	 */
+	public void setSampleLanguage (String value) {
+		if (( value == null ) || ( value.length() == 0 )) {
+			sampleLanguage = "en";
+			modified = true;
+		}
+		else {
+			if ( !value.equals(sampleLanguage) ) {
+				sampleLanguage = value;
+				modified = true;
+			}
+		}
+	}
+	
+	/**
+	 * Indicates of (when sampling the rules) the sample should be
+	 * computed from all the active rules.
+	 * @return True to compute from all matching rules, false to use 
+	 * a single given language rule set.
+	 */
+	public boolean sampleOnMappedRules () {
+		return sampleOnMappedRules;
+	}
+	
+	/**
+	 * Sets the indicator on how to apply rules for samples.
+	 * @param value True to compute from all the matching rules,
+	 * false to use a single language rule set.
+	 */
+	public void setSampleOnMappedRules (boolean value) {
+		if ( value != sampleOnMappedRules ) {
+			sampleOnMappedRules = value;
+			modified = true;
+		}
+	}
+	
+	/**
+	 * Indicates if the segmenter data have been modified since the
+	 * last load or save.
+	 * @return True if they have been modified, false if there is no changes.
+	 */
+	public boolean isModified () {
+		return modified;
+	}
+	
+	/**
+	 * Sets the flag indicating if the segmenter data have been
+	 * modified since the last load or save. If you make change to the rules or
+	 * language maps directly to the lists, make sure to set this flag to true.
+	 * @param value The new value.
+	 */
+	public void setIsModified (boolean value) {
+		modified = value;
+	}
+	
 	/**
 	 * Adds a language rule to the segmenter. If another language rule
 	 * with the same name exists already it will be replaced by the
@@ -174,6 +268,7 @@ public class Segmenter {
 		ArrayList<Rule> langRule)
 	{
 		langRules.put(name, langRule);
+		modified = true;
 	}
 	
 	/**
@@ -183,6 +278,7 @@ public class Segmenter {
 	 */
 	public void addLanguageMap (LanguageMap langMap) {
 		langMaps.add(langMap);
+		modified = true;
 	}
 	
 	/**
@@ -202,7 +298,7 @@ public class Segmenter {
 	 * @return The number of segment found.
 	 */
 	public int segment (IContainer original) {
-		if ( langCode == null ) {
+		if ( currentLanguageCode == null ) {
 			//TODO: throw an exception?
 			return -1; // Need to call selectLanguageRule()
 		}
@@ -257,35 +353,48 @@ public class Segmenter {
 	}
 	
 	/**
-	 * Sets the language this segmenter works with. This method
+	 * Sets the rules for the segmentation. This method
 	 * applies the language code you specify to the language mappings
 	 * currently available in the segmenter and compile the rules
 	 * when one or more language map is found. The matching is done in
 	 * the order of the list of language maps and more than one can be 
 	 * selected if {@link #cascade()} is true.
-	 * @param languageCode The language code. the value must be a 
+	 * @param languageCode The language code. the value should be a 
 	 * BCP-47 value (e.g. "de", "fr-ca", etc.)
-	 * @return The number of language map that match the language code.
 	 */
-	public int selectLanguageRule (String languageCode) {
-		int count = 0;
+	public void applyLanguageRules (String languageCode,
+		boolean forceReset)
+	{
+		if ( !forceReset && languageCode.equals(currentLanguageCode) ) return;
 		resetRules();
 		for ( LanguageMap langMap : langMaps ) {
 			if ( Pattern.matches(langMap.pattern, languageCode) ) {
 				compileRules(langMap.ruleName);
-				count++;
 				if ( !cascade() ) break; // Stop at the first matching map
 			}
 		}
-		langCode = languageCode;
-		return count;
+		currentLanguageCode = languageCode;
+	}
+	
+	/**
+	 * Applies a single language rule group to do the segmentation.
+	 * @param ruleName The name of the rule group to apply.
+	 */
+	public void applySingleLanguageRule (String ruleName,
+		boolean forceReset)
+	{
+		if ( !forceReset && ("__"+ruleName).equals(currentLanguageCode) ) return;
+		// Else; reset the rules
+		resetRules();
+		compileRules(ruleName);
+		currentLanguageCode = "__"+ruleName;
 	}
 
 	/**
 	 * Reset the set of active rules to nothing.
 	 */
 	private void resetRules () {
-		langCode = null;
+		currentLanguageCode = null;
 		rules = new ArrayList<CompiledRule>();
 	}
 	
@@ -300,7 +409,8 @@ public class Segmenter {
 		ArrayList<Rule> langRule = langRules.get(ruleName);
 		for ( Rule rule : langRule ) {
 			rules.add(
-				new CompiledRule("("+rule.before+")("+inlineCodes+rule.after+")", rule.isBreak));
+				//TODO: new CompiledRule("("+rule.before+")("+inlineCodes+rule.after+")", rule.isBreak));
+				new CompiledRule("("+rule.before+")("+rule.after+")", rule.isBreak));
 		}
 	}
 	
@@ -314,7 +424,6 @@ public class Segmenter {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Document doc = Fact.newDocumentBuilder().parse(new File(rulesPath));
-			Node node = doc.getDocumentElement();
 			resetAll();
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();
@@ -350,10 +459,10 @@ public class Segmenter {
 			}
 			
 			// Extensions
-			//TODO: Hanlde namespace to read sample text
-			Element elem2 = getFirstElementByTagName("sample", elem1);
+			//TODO: Handle namespace to read sample text
+			Element elem2 = getFirstElementByTagName("okpsrx:sample", elem1);
 			if ( elem2 != null ) {
-				setSample(elem2.getTextContent());
+				setSampleText(elem2.getTextContent());
 			}
 			
 			// Get the body element
@@ -396,6 +505,7 @@ public class Segmenter {
 				if ( tmp.length() > 0 ) langMap.ruleName = tmp;
 				langMaps.add(langMap);
 			}
+			modified = false;
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
@@ -464,7 +574,7 @@ public class Segmenter {
 			
 			writer.writeStartElement("okpsrx:sample");
 			writer.writeAttributeString("xmlns:okpsrx", NSURI_OKPSRX);
-			writer.writeString(getSample());
+			writer.writeString(getSampleText());
 			writer.writeEndElementLineBreak(); // okpsrx:sample
 			
 			writer.writeEndElementLineBreak(); // header
@@ -507,6 +617,7 @@ public class Segmenter {
 			
 			writer.writeEndElementLineBreak(); // srx
 			writer.writeEndDocument();
+			modified = false;
 		}
 		finally {
 			if ( writer != null ) writer.close();

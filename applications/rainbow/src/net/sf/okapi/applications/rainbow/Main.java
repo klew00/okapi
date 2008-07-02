@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow;
 
-import net.sf.okapi.common.ui.Dialogs;
-
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -30,16 +28,15 @@ public class Main {
 	public static void main (String args[])
 	{
 		Display dispMain = null;
-		try
-		{
+		try {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
 			MainForm MF = new MainForm(shlMain);
 			shlMain.open();
 			MF.run();
 		}
-		catch ( Exception E ) {
-			Dialogs.showError(null, E.getMessage(), null);
+		catch ( Exception e ) {
+			e.printStackTrace();
 		}
 		finally {
 			if ( dispMain != null ) dispMain.dispose();

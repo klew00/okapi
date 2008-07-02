@@ -273,7 +273,7 @@ public class Main {
 			seg.addLanguageMap(new LanguageMap(".*", "default"));
 			
 			seg.setCascade(true);
-			seg.selectLanguageRule("fr");
+			seg.applyLanguageRules("fr", true);
 			
 			Container cont = new Container("Mr. XYZ. (Test.) and more test.");
 			int segCount = seg.segment(cont);
@@ -296,7 +296,7 @@ public class Main {
 				text, segCount, printSplits(seg, text)));
 
 			seg.loadRules("example.srx");
-			seg.selectLanguageRule("en");
+			seg.applyLanguageRules("en", true);
 			text = "The U.K. Prime Minister, Mr. Blair, was seen out with his family today. Not the Queen.";
 			segCount = seg.segment(text);
 			System.out.println(String.format("[%s] nb seg: %d\n%s\n",

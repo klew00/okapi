@@ -7,8 +7,8 @@ import java.util.Stack;
 import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
@@ -19,6 +19,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -29,14 +31,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
 
 	private Shell            shell;
-	private Text             edSample;
+	private Text             edSampleText;
 	private Text             edResults;
 	private Table            tblRules;
 	private RulesTableModel  rulesTableMod;
@@ -51,6 +55,10 @@ public class SRXEditor {
 	private Button           btRemoveRule;
 	private Button           btMoveUpRule;
 	private Button           btMoveDownRule;
+	private ClosePanel       pnlActions;
+	private Button           rdApplySampleForMappedRules;
+	private Button           rdApplySampleForCurrentSet;
+	private Text             edSampleLanguage;
 	
 
 	public SRXEditor (Shell parent) {
@@ -59,7 +67,7 @@ public class SRXEditor {
 		sampleText = new Container();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Edit Segmentation Rules");
+		shell.setText("Segmentation Rules Editor");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		
@@ -80,7 +88,7 @@ public class SRXEditor {
 		cbGroup.setLayoutData(gdTmp);
 		cbGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateRules(0);
+				updateRules(0, false);
 			};
 		});
 		
@@ -208,41 +216,106 @@ public class SRXEditor {
 			}
 		});
 
+		//--- Sample block
+		
 		cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		layTmp = new GridLayout();
-		cmpTmp.setLayout(layTmp);
+		cmpTmp.setLayout(new GridLayout(3, false));
 		
 		label = new Label(cmpTmp, SWT.None);
 		label.setText("Sample text (use <x>...</x> and <x/> for inline codes):");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 3;
+		label.setLayoutData(gdTmp);
 		
 		int sampleMinHeight = 40;
-		edSample = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+		edSampleText = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.minimumHeight = sampleMinHeight;
-		edSample.setLayoutData(gdTmp);
+		gdTmp.horizontalSpan = 3;
+		edSampleText.setLayoutData(gdTmp);
+		
+		rdApplySampleForCurrentSet = new Button(cmpTmp, SWT.RADIO);
+		rdApplySampleForCurrentSet.setText("Test on the current set of rules only");
+		rdApplySampleForCurrentSet.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+				updateRules(tblRules.getSelectionIndex(), true);
+			};
+		});
 
-		edResults = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-		edResults.setLayoutData(gdTmp);
-		gdTmp.minimumHeight = sampleMinHeight;
-		edResults.setEditable(false);
-
-		edSample.addModifyListener(new ModifyListener () {
+		rdApplySampleForMappedRules = new Button(cmpTmp, SWT.RADIO);
+		rdApplySampleForMappedRules.setText("Test on the rules for this language code:");
+		rdApplySampleForMappedRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+				updateRules(tblRules.getSelectionIndex(), true);
+			};
+		});
+		
+		edSampleLanguage = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
+		gdTmp = new GridData();
+		edSampleLanguage.setLayoutData(gdTmp);
+		edSampleLanguage.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
-				updateResults();
+				updateResults(false);
 			}
 		});
 
+
+		edResults = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		edResults.setLayoutData(gdTmp);
+		gdTmp.minimumHeight = sampleMinHeight;
+		gdTmp.horizontalSpan = 3;
+		edResults.setEditable(false);
+
+		edSampleText.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults(false);
+			}
+		});
+
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				if ( !confirmClose() ) event.doit = false;
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
+
+		
+		//--- Dialog-level buttons
+		
+		SelectionAdapter CloseActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( e.widget.getData().equals("h") ) {
+					//TODO: UIUtil.start(help);
+					return;
+				}
+				if ( e.widget.getData().equals("c") ) {
+					shell.close();
+				}
+			};
+		};
+		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		pnlActions.setLayoutData(gdTmp);
+		shell.setDefaultButton(pnlActions.btClose);
+		
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 700 ) startSize.x = 700; 
+		if ( startSize.y < 600 ) startSize.y = 600; 
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 		
 		updateAll();
-		updateSample();
-		if ( edSample.getText().length() == 0 ) { // Default
-			edSample.setText("Hello <x>Mr. Gandalf.</x>");
-		}
 	}
 	
 	private void setFileMenu (Shell shell,
@@ -286,7 +359,7 @@ public class SRXEditor {
 	
 	private void processInlineCodes () {
 		try {
-			String text = edSample.getText().replaceAll("<x>", String.valueOf((char)IContainer.CODE_OPENING));
+			String text = edSampleText.getText().replaceAll("<x>", String.valueOf((char)IContainer.CODE_OPENING));
 			text = text.replaceAll("</x>", String.valueOf((char)IContainer.CODE_CLOSING));
 			text = text.replaceAll("<x/>", String.valueOf((char)IContainer.CODE_ISOLATED));
 	
@@ -317,11 +390,28 @@ public class SRXEditor {
 		}
 	}
 	
-	private void updateResults () {
+	private void updateResults (boolean forceReset) {
+		// Check if we need to re-build the list of applicable rules
+		if ( cbGroup.getSelectionIndex() != -1 ) {
+			// Both methods applies new rules only if the 
+			// parameter passed is different from the current identifier
+			// or if forceReset is true.
+			if ( rdApplySampleForCurrentSet.getSelection() ) {
+				segmenter.applySingleLanguageRule(cbGroup.getText(), forceReset);
+			}
+			else { // Applies all the matching rules
+				// Make sure we have a language code
+				if ( edSampleLanguage.getText().length() == 0 ) {
+					edSampleLanguage.setText("en");
+				}
+				segmenter.applyLanguageRules(edSampleLanguage.getText(), forceReset);
+			}
+		}
+		
 		// Convert the sample field content into an parsed item
 		//processInlineCodes();
 		
-		String oriText = edSample.getText();
+		String oriText = edSampleText.getText();
 		segmenter.segment(oriText);
 		//segmenter.segment(sampleText);
 		StringBuilder tmp = new StringBuilder();
@@ -329,8 +419,8 @@ public class SRXEditor {
 		tmp.append(String.format("%d: ", list.size()+1));
 		int start = 0;
 		for ( int pos : list ) {
-		tmp.append("["+oriText.substring(start, pos)+"] ");
-			start = pos;
+			tmp.append("["+oriText.substring(start, pos)+"] ");
+				start = pos;
 		}
 		// Last one
 		tmp.append("["+oriText.substring(start)+"]");
@@ -346,13 +436,15 @@ public class SRXEditor {
 		if ( cbGroup.getItemCount() > 0 ) {
 			cbGroup.select(0);
 		}
-		updateRules(0);
+		updateRules(0, true);
 	}
 	
-	private void updateRules (int selection) {
+	private void updateRules (int selection,
+		boolean forceReset) {
 		rulesTableMod.setLanguageRules(
 			segmenter.getLanguageRules(cbGroup.getText()));
 		rulesTableMod.updateTable(selection);
+		updateResults(forceReset);
 		updateRulesButtons();
 	}
 	
@@ -367,6 +459,7 @@ public class SRXEditor {
 	
 	private void editGroupsAndOptions () {
 		try {
+			getSurfaceData();
 			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, segmenter);
 			dlg.showDialog();
 		}
@@ -378,11 +471,22 @@ public class SRXEditor {
 		}
 	}
 
-	private void updateSample () {
-		edSample.setText(segmenter.getSample());
+	private void setSurfaceData () {
+		edSampleText.setText(segmenter.getSampleText());
+		edSampleLanguage.setText(segmenter.getSampleLanguage());
+		rdApplySampleForMappedRules.setSelection(segmenter.sampleOnMappedRules());
+		rdApplySampleForCurrentSet.setSelection(!segmenter.sampleOnMappedRules());
+		edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+	}
+
+	private void getSurfaceData () {
+		segmenter.setSampleText(edSampleText.getText());
+		segmenter.setSampleLanguage(edSampleLanguage.getText());
+		segmenter.setSampleOnMappedRules(rdApplySampleForMappedRules.getSelection());
 	}
 	
 	private void updateAll () {
+		setSurfaceData();
 		updateLanguageRuleList();
 	}
 	
@@ -402,29 +506,27 @@ public class SRXEditor {
 		}
 		finally {
 			updateAll();
-			updateSample();
 		}
 	}
 	
-	private void saveSRXDocument (String path) {
+	private boolean saveSRXDocument (String path) {
 		try {
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save SRX Document", null,
 					"SRX Documents (*.srx)", "*.srx");
-				if ( path == null ) return;
+				if ( path == null ) return false;
 			}
-			segmenter.setSample(edSample.getText());
+			getSurfaceData();
 			segmenter.saveRules(path);
 			srxPath = path;
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
+		return true;
 	}
 	
 	private void editRule (boolean createNewRule) {
-		//TODO
-		//Dialogs.showError(shell, "Not implemented yet.", null);
 		Rule rule;
 		String caption;
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
@@ -440,7 +542,7 @@ public class SRXEditor {
 			caption = "Edit Rule";
 		}
 		
-		LanguageMapDialog dlg = new LanguageMapDialog(shell, caption, rule);
+		RuleDialog dlg = new RuleDialog(shell, caption, rule);
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
@@ -450,7 +552,8 @@ public class SRXEditor {
 		else {
 			segmenter.getLanguageRules(ruleName).set(n, rule);
 		}
-		updateRules(n);
+		segmenter.setIsModified(true);
+		updateRules(n, true);
 	}
 	
 	private void removeRule () {
@@ -458,23 +561,58 @@ public class SRXEditor {
 		if ( n == -1 ) return;
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
 		segmenter.getLanguageRules(ruleName).remove(n);
+		segmenter.setIsModified(true);
 		tblRules.remove(n);
 		if ( n > tblRules.getItemCount()-1 )
 			n = tblRules.getItemCount()-1;
 		if ( tblRules.getItemCount() > 0 )
 			tblRules.select(n);
 		updateRulesButtons();
-		updateResults();
+		updateResults(true);
 	}
 	
 	private void moveUpRule () {
-		//TODO
-		Dialogs.showError(shell, "Not implemented yet.", null);
+		int n = tblRules.getSelectionIndex();
+		if ( n < 1 ) return;
+		// Move in the segmenter
+		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
+		Rule tmp = segmenter.getLanguageRules(ruleName).get(n-1);
+		segmenter.getLanguageRules(ruleName).set(n-1,
+			segmenter.getLanguageRules(ruleName).get(n));
+		segmenter.getLanguageRules(ruleName).set(n, tmp);
+		segmenter.setIsModified(true);
+		// Update
+		updateRules(n-1, true);
 	}
 	
 	private void moveDownRule () {
-		//TODO
-		Dialogs.showError(shell, "Not implemented yet.", null);
+		int n = tblRules.getSelectionIndex();
+		if ( n > tblRules.getItemCount()-2 ) return;
+		// Move in the segmenter
+		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
+		Rule tmp = segmenter.getLanguageRules(ruleName).get(n+1);
+		segmenter.getLanguageRules(ruleName).set(n+1,
+			segmenter.getLanguageRules(ruleName).get(n));
+		segmenter.getLanguageRules(ruleName).set(n, tmp);
+		segmenter.setIsModified(true);
+		// Update
+		updateRules(n+1, true);
 	}
 	
+	private boolean confirmClose () {
+		getSurfaceData();
+		if ( segmenter.isModified() ) {
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setText(shell.getText());
+			dlg.setMessage("The segmentation rules have been modified but not saved.\n"
+				+"Do you want to save them before leaving the editor?");
+			switch ( dlg.open() ) {
+			case SWT.CANCEL:
+				return false;
+			case SWT.YES:
+				return saveSRXDocument(srxPath);
+			}
+		}
+		return true;
+	}
 }
