@@ -34,7 +34,6 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel    pnlActions;
 	private Parameters       params;
 	private Button           chkEscapeExtendedChars;
-	//TODO private CodeFinderPanel  m_CFPanel;
 
 	/**
 	 * Invokes the editor for the Properties filter parameters.

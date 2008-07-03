@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
-import net.sf.okapi.common.ui.OKCancelPanel;
-import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -17,6 +15,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -72,7 +71,7 @@ public class GroupsAndOptionsDialog {
 		chkIncludeOpeningCodes.setText("Include opening in-line codes");
 		
 		chkCascade = new Button(grpTmp, SWT.CHECK);
-		chkCascade.setText("Cascade language maps");
+		chkCascade.setText("Cascade language maps matching");
 		
 		chkIncludeClosingCodes = new Button(grpTmp, SWT.CHECK);
 		chkIncludeClosingCodes.setText("Include closing in-line codes");
@@ -181,7 +180,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btRemoveMap = new Button(grpTmp, SWT.PUSH);
-		btRemoveMap.setText("Remove...");
+		btRemoveMap.setText("Remove");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btRemoveMap.setLayoutData(gdTmp);
@@ -246,6 +245,9 @@ public class GroupsAndOptionsDialog {
 		
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.y < 400 ) startSize.y = 400;
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 
 		setOptions();
@@ -364,11 +366,25 @@ public class GroupsAndOptionsDialog {
 	}
 	
 	private void moveUpMap () {
-		//TODO: moveUpMap
+		int n = lbLangMaps.getSelectionIndex();
+		if ( n < 1 ) return;
+		LanguageMap tmp = segmenter.getAllLanguagesMaps().get(n-1);
+		segmenter.getAllLanguagesMaps().set(n-1,
+			segmenter.getAllLanguagesMaps().get(n));
+		segmenter.getAllLanguagesMaps().set(n, tmp);
+		segmenter.setIsModified(true);
+		updateLanguageMaps(--n);
 	}
 	
 	private void moveDownMap () {
-		//TODO: moveDownMap
+		int n = lbLangMaps.getSelectionIndex();
+		if ( n > lbLangMaps.getItemCount()-2 ) return;
+		LanguageMap tmp = segmenter.getAllLanguagesMaps().get(n+1);
+		segmenter.getAllLanguagesMaps().set(n+1,
+			segmenter.getAllLanguagesMaps().get(n));
+		segmenter.getAllLanguagesMaps().set(n, tmp);
+		segmenter.setIsModified(true);
+		updateLanguageMaps(++n);
 	}
 	
 	private void editRules (boolean createNewRules) {
@@ -418,6 +434,17 @@ public class GroupsAndOptionsDialog {
 		int n = lbLangRules.getSelectionIndex();
 		if ( n == -1 ) return;
 		String ruleName = lbLangRules.getItem(n);
+		// Ask confirmation
+		MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+		dlg.setText(shell.getText());
+		dlg.setMessage(String.format("This command will delete all thes rules grouped under '%s'.\n"
+			+ "Do you want to proceed with the deletion?", ruleName));
+		switch ( dlg.open() ) {
+		case SWT.CANCEL:
+		case SWT.NO:
+			return;
+		}
+		// Remove
 		segmenter.getAllLanguageRules().remove(ruleName);
 		segmenter.setIsModified(true);
 		updateLanguageRules(null);
@@ -437,8 +464,8 @@ public class GroupsAndOptionsDialog {
 			// Else: Error.
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
-			dlg.setMessage(String.format("Number of invalid names: %d\n"
-				+ "Do you want to proceed anyway?", nonexistingRules));
+			dlg.setMessage(String.format("Number of language maps associated with non-existing rules: %d\n"
+				+ "Do you want to proceed closing the dialog?", nonexistingRules));
 			switch ( dlg.open() ) {
 			case SWT.CANCEL:
 			case SWT.NO:

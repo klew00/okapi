@@ -40,6 +40,8 @@ public class FormatManager {
 		else if ( sExt.equals(".json") ) aRes[1] = "okf_json";
 		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
 		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
+		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
+		else if ( sExt.equals(".htm") ) aRes[1] = "okf_html";
 		return aRes;
 	}
 }

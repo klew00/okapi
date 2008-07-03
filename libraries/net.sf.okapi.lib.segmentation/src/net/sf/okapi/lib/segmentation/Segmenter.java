@@ -419,7 +419,6 @@ public class Segmenter {
 	 * @param rulesPath The full path of the rules file to load.
 	 */
 	public void loadRules (String rulesPath) {
-		//TODO: load SRX (possibly embedded in another  doc)
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
@@ -427,7 +426,7 @@ public class Segmenter {
 			resetAll();
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();
-//TODO: Handle namespaces!
+//TODO: Handle namespaces (e.g. to allow nested SRX rules)
 			XPathExpression xpe = xpath.compile("//srx");
 			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
 			if ( srxList.getLength() < 1 ) return;

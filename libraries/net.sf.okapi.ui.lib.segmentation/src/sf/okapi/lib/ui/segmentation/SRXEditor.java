@@ -2,11 +2,7 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Stack;
 
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -34,7 +30,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
@@ -47,9 +42,9 @@ public class SRXEditor {
 	private Combo            cbGroup;
 	private Segmenter        segmenter;
 	private String           srxPath;
-	private IContainer       sampleText;
+//	private IContainer       sampleText;
 	private Button           btSRXDocs;
-	private Menu             popupSRCDocs;
+	private Menu             popupSRXDocs;
 	private Button           btAddRule;
 	private Button           btEditRule;
 	private Button           btRemoveRule;
@@ -64,7 +59,7 @@ public class SRXEditor {
 	public SRXEditor (Shell parent) {
 		segmenter = new Segmenter();
 		srxPath = null;
-		sampleText = new Container();
+//		sampleText = new Container();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Segmentation Rules Editor");
@@ -112,12 +107,12 @@ public class SRXEditor {
 		setFileMenu(shell, btSRXDocs);
 		btSRXDocs.addSelectionListener( new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent evt) {
-				if (( popupSRCDocs != null ) && ( !popupSRCDocs.isVisible() )) {
+				if (( popupSRXDocs != null ) && ( !popupSRXDocs.isVisible() )) {
 					Rectangle bounds = btSRXDocs.getBounds(); 
 					Point menuLoc = btSRXDocs.getParent().toDisplay(
 						bounds.x, bounds.y + bounds.height);
-					popupSRCDocs.setLocation(menuLoc.x, menuLoc.y);
-					popupSRCDocs.setVisible(true);
+					popupSRXDocs.setLocation(menuLoc.x, menuLoc.y);
+					popupSRXDocs.setVisible(true);
 			}}
 		});
 		
@@ -280,7 +275,7 @@ public class SRXEditor {
 		shell.addShellListener(new ShellListener() {
 			public void shellActivated(ShellEvent event) {}
 			public void shellClosed(ShellEvent event) {
-				if ( !confirmClose() ) event.doit = false;
+				if ( !checkIfRulesNeedSaving() ) event.doit = false;
 			}
 			public void shellDeactivated(ShellEvent event) {}
 			public void shellDeiconified(ShellEvent event) {}
@@ -321,18 +316,28 @@ public class SRXEditor {
 	private void setFileMenu (Shell shell,
 		Button fileButton)
 	{
-		popupSRCDocs = new Menu(shell, SWT.POP_UP);
-		fileButton.setMenu(popupSRCDocs);
+		popupSRXDocs = new Menu(shell, SWT.POP_UP);
+		fileButton.setMenu(popupSRXDocs);
 
-		MenuItem menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
-		menuItem.setText("Open SRX Document...");
+		MenuItem menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
+		menuItem.setText("New Document");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				newSRXDocument();
+            }
+		});
+
+		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
+		menuItem.setText("Open Document...");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				loadSRXDocument(null);
             }
 		});
 
-		menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
+		new MenuItem(popupSRXDocs, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
 		menuItem.setText("Save Current Document");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -340,7 +345,7 @@ public class SRXEditor {
             }
 		});
 
-		menuItem = new MenuItem(popupSRCDocs, SWT.PUSH);
+		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
 		menuItem.setText("Save Current Document As...");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -357,7 +362,7 @@ public class SRXEditor {
 		}
 	}
 	
-	private void processInlineCodes () {
+/*	private void processInlineCodes () {
 		try {
 			String text = edSampleText.getText().replaceAll("<x>", String.valueOf((char)IContainer.CODE_OPENING));
 			text = text.replaceAll("</x>", String.valueOf((char)IContainer.CODE_CLOSING));
@@ -388,7 +393,7 @@ public class SRXEditor {
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
-	}
+	}*/
 	
 	private void updateResults (boolean forceReset) {
 		// Check if we need to re-build the list of applicable rules
@@ -486,8 +491,16 @@ public class SRXEditor {
 	}
 	
 	private void updateAll () {
+		cbGroup.removeAll();
 		setSurfaceData();
 		updateLanguageRuleList();
+	}
+	
+	private void newSRXDocument () {
+		if ( !checkIfRulesNeedSaving() ) return;
+		segmenter = new Segmenter();
+		srxPath = null;
+		updateAll();
 	}
 	
 	private void loadSRXDocument (String path) {
@@ -599,13 +612,18 @@ public class SRXEditor {
 		updateRules(n+1, true);
 	}
 	
-	private boolean confirmClose () {
+	/**
+	 * Checks if the rules need saving, and save them after prompting
+	 * the user if needed.
+	 * @return False if the user cancel, true if a decision is made. 
+	 */
+	private boolean checkIfRulesNeedSaving () {
 		getSurfaceData();
 		if ( segmenter.isModified() ) {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
 			dlg.setMessage("The segmentation rules have been modified but not saved.\n"
-				+"Do you want to save them before leaving the editor?");
+				+"Do you want to save them?");
 			switch ( dlg.open() ) {
 			case SWT.CANCEL:
 				return false;

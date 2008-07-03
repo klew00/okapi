@@ -23,6 +23,7 @@ package net.sf.okapi.common.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -69,8 +70,7 @@ public class InputDialog {
 		edField = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		if ( defaultInputText != null ) edField.setText(defaultInputText);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		//TODO: Fix this max width, it's not working
-		gdTmp.widthHint = 640; // No larger than this by default
+		//gdTmp.widthHint = 640;
 		edField.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons
@@ -94,6 +94,9 @@ public class InputDialog {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 450 ) startSize.x = 450;
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}
 	
