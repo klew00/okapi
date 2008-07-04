@@ -17,6 +17,11 @@
   outputFilterClass="net.sf.okapi.filters.xml.OutputFilter"
  >XML</filter>
   
+ <filter id="okf_regex"
+  inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
+ >Regular Expressions</filter>
+  
  <filter id="okf_html"
   inputFilterClass="net.sf.okapi.filters.html.InputFilter"
   outputFilterClass="net.sf.okapi.filters.html.OutputFilter"

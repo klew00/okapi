@@ -91,6 +91,7 @@ public class OutputFilter implements IOutputFilter {
 			outputEncoder = Charset.forName(encoding).newEncoder(); 
 			
 			// Write the buffer
+			//TODO: Wrong, this needs to be send as skeleton event
 			writer.write(res.sklRes.toString());
 		}
 		catch ( IOException e ) {

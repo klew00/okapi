@@ -110,9 +110,14 @@ public class XLIFFReader {
 		return item;
 	}
 
+	/**
+	 * Gets the last skeleton part read.
+	 * @return
+	 */
 	public ISkeletonResource getSkeleton () {
 		return currentSkl;
 	}
+	
 	/**
 	 * Reads the next part of the input.
 	 * @return One of the RESULT_* values.
