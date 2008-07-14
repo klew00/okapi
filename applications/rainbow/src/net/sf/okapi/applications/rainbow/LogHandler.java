@@ -32,7 +32,7 @@ class LogHandler extends Handler {
 		if ( record.getLevel() == Level.SEVERE ) {
 			log.error(record.getMessage());
 			log.message(record.getThrown().getLocalizedMessage());
-			log.message(" at "+record.getThrown().toString());
+			log.message(" @ "+record.getThrown().toString());
 		}
 		else if ( record.getLevel() == Level.WARNING ) {
 			log.warning(record.getMessage());

@@ -31,8 +31,8 @@ public interface IExtractionItem extends ICommonResource {
 	void setTarget (IContainer target);
 	
 	/**
-	 * Gets the unsegmented content of the source of the item.
-	 * @return The IContainer object with the unsegmented content.
+	 * Gets the source container of the item.
+	 * @return The IContainer object for the source.
 	 */
 	IContainer getSource();
 	
@@ -43,10 +43,16 @@ public interface IExtractionItem extends ICommonResource {
 	void setSource (IContainer data);
 	
 	/**
-	 * Gets the list of the segments for the item.
-	 * @return A list of IContainer object corresponding to each segment.
+	 * Gets the list of the segments for the source.
+	 * @return A list of IPart object corresponding to each source segment.
 	 */
-	List<IContainer> getSegments();
+	List<IPart> getSourceSegments();
+
+	/**
+	 * Gets the list of the segments for the target.
+	 * @return A list of IPart object corresponding to each target segment.
+	 */
+	List<IPart> getTargetSegments();
 
 	/**
 	 * Gets the list of children items for this item.
@@ -78,20 +84,6 @@ public interface IExtractionItem extends ICommonResource {
 	 */
 	void setNote (String text);
 	
-	/**
-	 * Removes the segmentation breaks in an object. The object becomes
-	 * a single segment.
-	 */
-	void removeSegmentation ();
-	
-	/**
-	 * Adds a segment to the item. If the item is not already segmented
-	 * the existing content is set as the first segment, and this new
-	 * segment as the second.
-	 * @param segment The segment to add.
-	 */
-	void addSegment (IContainer segment);
-
 	/**
 	 * Indicates whether this item has at least one child.
 	 * @return True if the item has at least one child, false otherwise.

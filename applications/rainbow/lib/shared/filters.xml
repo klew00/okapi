@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <okapiFilters>
  
+ <filter id="okf_regex"
+  inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
+  editorClass="net.sf.okapi.filters.ui.regex.Editor"
+ >Regular Expressions</filter>
+  
  <filter id="okf_properties"
   inputFilterClass="net.sf.okapi.filters.properties.InputFilter"
   outputFilterClass="net.sf.okapi.filters.properties.OutputFilter"
@@ -16,11 +22,6 @@
   inputFilterClass="net.sf.okapi.filters.xml.InputFilter"
   outputFilterClass="net.sf.okapi.filters.xml.OutputFilter"
  >XML</filter>
-  
- <filter id="okf_regex"
-  inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
-  outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
- >Regular Expressions</filter>
   
  <filter id="okf_html"
   inputFilterClass="net.sf.okapi.filters.html.InputFilter"

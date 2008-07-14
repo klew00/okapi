@@ -7,6 +7,7 @@ import net.sf.okapi.common.resource.CodeFragment;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IFragment;
+import net.sf.okapi.common.resource.IPart;
 
 /**
  * Handles the conversion between a abstract content (IContainer)
@@ -21,11 +22,11 @@ public class TMXContent {
 		codedText = "";
 	}
 	
-	public TMXContent (IContainer content) {
+	public TMXContent (IPart content) {
 		setContent(content);
 	}
 	
-	public TMXContent setContent (IContainer content) {
+	public TMXContent setContent (IPart content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;

@@ -30,6 +30,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -39,12 +40,14 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 m_Shell;
-	private boolean               m_bResult = false;
-	private OKCancelPanel         m_pnlActions;
-	private Parameters            m_Opt;
-	private Text                  m_edTMXPath;
-	private boolean               m_bInInit = true;
+	private Shell                 shell;
+	private boolean               result = false;
+	private OKCancelPanel         pnlActions;
+	private Parameters            params;
+	private Text                  edTMXPath;
+	private Button                chkSegment;
+	private Text                  edSRXPath;
+	private boolean               inInit = true;
 	
 	/**
 	 * Invokes the editor for the parameters of this utility.
@@ -56,19 +59,19 @@ public class Editor implements IParametersEditor {
 	{
 		boolean bRes = false;
 		try {
-			m_Shell = null;
-			m_Opt = (Parameters)p_Options;
-			m_Shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			shell = null;
+			params = (Parameters)p_Options;
+			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);
 			return showDialog();
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(m_Shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			bRes = false;
 		}
 		finally {
 			// Dispose of the shell, but not of the display
-			if ( m_Shell != null ) m_Shell.dispose();
+			if ( shell != null ) shell.dispose();
 		}
 		return bRes;
 	}
@@ -77,16 +80,16 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent)
+	private void create (Shell parent)
 	{
-		m_Shell.setText("Align Bilingual Documents");
-		if ( p_Parent != null ) m_Shell.setImage(p_Parent.getImage());
+		shell.setText("Align Bilingual Documents");
+		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;
-		m_Shell.setLayout(layTmp);
+		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(m_Shell, SWT.NONE);
+		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		//--- Main tab
@@ -94,57 +97,67 @@ public class Editor implements IParametersEditor {
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Output Options");
+		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Full path of the TMX document to generate:");
 		
-		m_edTMXPath = new Text(cmpTmp, SWT.BORDER);
-		m_edTMXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edTMXPath = new Text(cmpTmp, SWT.BORDER);
+		edTMXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		chkSegment = new Button(cmpTmp, SWT.CHECK);
+		chkSegment.setText("Segment the items using the following SRX document:");
+		
+		edSRXPath = new Text(cmpTmp, SWT.BORDER);
+		edSRXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				m_bResult = false;
+				result = false;
 				if ( e.widget.getData().equals("h") ) {
 					//TODO: Call help
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();
-				m_Shell.close();
+				shell.close();
 			};
 		};
-		m_pnlActions = new OKCancelPanel(m_Shell, SWT.NONE, OKCancelActions, true);
-		m_pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		m_Shell.setDefaultButton(m_pnlActions.btOK);
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		shell.setDefaultButton(pnlActions.btOK);
 
 		setData();
-		m_bInInit = false;
-		m_Shell.pack();
-		m_Shell.setMinimumSize(m_Shell.getSize());
-		Dialogs.centerWindow(m_Shell, p_Parent);
+		inInit = false;
+		shell.pack();
+		shell.setMinimumSize(shell.getSize());
+		Dialogs.centerWindow(shell, parent);
 	}
 	
 	private boolean showDialog () {
-		m_Shell.open();
-		while ( !m_Shell.isDisposed() ) {
-			if ( !m_Shell.getDisplay().readAndDispatch() )
-				m_Shell.getDisplay().sleep();
+		shell.open();
+		while ( !shell.isDisposed() ) {
+			if ( !shell.getDisplay().readAndDispatch() )
+				shell.getDisplay().sleep();
 		}
-		return m_bResult;
+		return result;
 	}
 
 	private void setData () {
-		m_edTMXPath.setText(m_Opt.tmxPath);
+		edTMXPath.setText(params.tmxPath);
+		chkSegment.setSelection(params.segment);
+		edSRXPath.setText(params.srxPath);
 	}
 
 	private boolean saveData () {
-		if ( m_bInInit ) return true;
-		m_Opt.tmxPath = m_edTMXPath.getText();
-		m_bResult = true;
+		if ( inInit ) return true;
+		params.tmxPath = edTMXPath.getText();
+		params.segment = chkSegment.getSelection();
+		params.srxPath = edSRXPath.getText();
+		result = true;
 		return true;
 	}
-	
+
 }

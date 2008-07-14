@@ -4,26 +4,19 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IGroupResource;
 import net.sf.okapi.common.resource.ISkeletonResource;
-import net.sf.okapi.common.resource.InvalidContentException;
 
 public class OutputFilter implements IOutputFilter {
 	
 	private OutputStream          output;
 	private OutputStreamWriter    writer;
-	private CharsetEncoder        outputEncoder;
-	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+//	private CharsetEncoder        outputEncoder;
+	//private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 
 	public void close () {
@@ -49,17 +42,17 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	private void buildContent (IExtractionItem item) {
-/*		try {
+		try {
+			if ( item.hasTarget() ) {
+				writer.write(item.getTarget().toString());
 			}
-			catch ( InvalidContentException e ) {
-				logger.error(String.format("Inline code problem in item id=\"%s\" (resname=\"%s\"):",
-					item.getID(), item.getName()), e);
-				logger.info("Content: ["+item.toString()+"]");
+			else {
+				writer.write(item.getSource().toString());
 			}
 		}
-		catch ( IOException e ) {
+		catch ( IOException e) {
 			throw new RuntimeException(e);
-		}*/
+		}
 	}
 	
 	public void endExtractionItem (IExtractionItem item) {
@@ -84,7 +77,7 @@ public class OutputFilter implements IOutputFilter {
 			writer = new OutputStreamWriter(
 				new BufferedOutputStream(output), resource.getTargetEncoding());
 			//TODO: maybe the outputEncoder won't be needed?
-			outputEncoder = Charset.forName(resource.getTargetEncoding()).newEncoder(); 
+			//outputEncoder = Charset.forName(resource.getTargetEncoding()).newEncoder(); 
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

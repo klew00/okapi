@@ -153,7 +153,7 @@ public class MainForm implements IParametersProvider {
 		shell.setImage(rm.getImage("Rainbow"));
 
 		log = new LogForm(shell);
-		log.setTitle("Rainbow Log");
+		log.setTitle(Res.getString("LOG_CAPTION"));
 		logHandler = new LogHandler(log);
 	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler);
 
@@ -166,7 +166,7 @@ public class MainForm implements IParametersProvider {
 
 		// File menu
 		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText("&File");
+		topItem.setText(rm.getCommandLabel("file"));
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 		
@@ -217,7 +217,7 @@ public class MainForm implements IParametersProvider {
 
 		// View menu
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText("&View");
+		topItem.setText(rm.getCommandLabel("view"));
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 
@@ -232,7 +232,7 @@ public class MainForm implements IParametersProvider {
 		
 		// Input menu
 		miInput = new MenuItem(menuBar, SWT.CASCADE);
-		miInput.setText("&Input");
+		miInput.setText(rm.getCommandLabel("input"));
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miInput.setMenu(dropMenu);
 
@@ -277,7 +277,7 @@ public class MainForm implements IParametersProvider {
 
 		// Tools menu
 		miTools = new MenuItem(menuBar, SWT.CASCADE);
-		miTools.setText("&Tools");
+		miTools.setText(rm.getCommandLabel("tools"));
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miTools.setMenu(dropMenu);
 
@@ -291,6 +291,7 @@ public class MainForm implements IParametersProvider {
 
 		// Help menu
 		miHelp = new MenuItem(menuBar, SWT.CASCADE);
+		miHelp.setText(rm.getCommandLabel("help"));
 		miHelp.setText("&Help");
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miHelp.setMenu(dropMenu);
@@ -343,14 +344,18 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.about");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO About box
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
+				dlg.setText("About Rainbow");
+				dlg.setMessage("Rainbow - Okapi Localization Toolbox\n"
+					+"Version 6.ALPHA");
+				dlg.open();
 			}
 		});
 
 		
 		// Root panel
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("Input Root:");
+		label.setText(Res.getString("MAIN_INPUTROOT"));
 		
 		edInputRoot = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		edInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -379,7 +384,7 @@ public class MainForm implements IParametersProvider {
 		Composite comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiInput = new TabItem(tabFolder, SWT.NONE);
-		tiInput.setText("Input Documents");
+		tiInput.setText(Res.getString("INPTAB_CAPTION"));
 		tiInput.setControl(comp);
 	
 		inputTable = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
@@ -472,16 +477,16 @@ public class MainForm implements IParametersProvider {
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiOptions = new TabItem(tabFolder, SWT.NONE);
-		tiOptions.setText("Languages and Encodings");
+		tiOptions.setText(Res.getString("OPTTAB_CAPTION"));
 		tiOptions.setControl(comp);
 		
 		Group group = new Group(comp, SWT.NONE);
-		group.setText("Source");
+		group.setText(Res.getString("OPTTAB_GRPSOURCE"));
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout(4, false));
 		
 		label = new Label(group, SWT.NONE);
-		label.setText("Language:");
+		label.setText(Res.getString("OPTTAB_LANG"));
 		
 		edSourceLang = new Text(group, SWT.BORDER);
 		edSourceLang.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -492,7 +497,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		label = new Label(group, SWT.NONE);
-		label.setText("Encoding:");
+		label.setText(Res.getString("OPTTAB_ENC"));
 		
 		edSourceEnc = new Text(group, SWT.BORDER);
 		edSourceEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -535,12 +540,12 @@ public class MainForm implements IParametersProvider {
 		});
 
 		group = new Group(comp, SWT.NONE);
-		group.setText("Target");
+		group.setText(Res.getString("OPTTAB_GRPTARGET"));
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout(4, false));
 		
 		label = new Label(group, SWT.NONE);
-		label.setText("Language:");
+		label.setText(Res.getString("OPTTAB_LANG"));
 		
 		edTargetLang = new Text(group, SWT.BORDER);
 		edTargetLang.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -551,7 +556,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		label = new Label(group, SWT.NONE);
-		label.setText("Encoding:");
+		label.setText(Res.getString("OPTTAB_ENC"));
 		
 		edTargetEnc = new Text(group, SWT.BORDER);
 		edTargetEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

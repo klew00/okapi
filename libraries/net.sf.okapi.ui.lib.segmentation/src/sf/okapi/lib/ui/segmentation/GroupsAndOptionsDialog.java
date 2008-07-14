@@ -8,7 +8,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
-import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -30,7 +30,7 @@ public class GroupsAndOptionsDialog {
 	private Shell            shell;
 	private List             lbLangRules;
 	private List             lbLangMaps;
-	private Segmenter        segmenter;
+	private SRXDocument      srxDoc;
 	private Button           btAddRules;
 	private Button           btRenameRules;
 	private Button           btRemoveRules;
@@ -47,9 +47,9 @@ public class GroupsAndOptionsDialog {
 	private ClosePanel       pnlActions;	
 
 	public GroupsAndOptionsDialog (Shell parent,
-		Segmenter segmenter)
+		SRXDocument srxDoc)
 	{
-		this.segmenter = segmenter;
+		this.srxDoc = srxDoc;
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Groups And Options");
@@ -264,19 +264,19 @@ public class GroupsAndOptionsDialog {
 	}
 
 	private void setOptions () {
-		chkSegmentSubFlows.setSelection(segmenter.segmentSubFlows());
-		chkCascade.setSelection(segmenter.cascade());
-		chkIncludeOpeningCodes.setSelection(segmenter.includeStartCodes());
-		chkIncludeClosingCodes.setSelection(segmenter.includeEndCodes());
-		chkIncludeIsolatedCodes.setSelection(segmenter.includeIsolatedCodes());
+		chkSegmentSubFlows.setSelection(srxDoc.segmentSubFlows());
+		chkCascade.setSelection(srxDoc.cascade());
+		chkIncludeOpeningCodes.setSelection(srxDoc.includeStartCodes());
+		chkIncludeClosingCodes.setSelection(srxDoc.includeEndCodes());
+		chkIncludeIsolatedCodes.setSelection(srxDoc.includeIsolatedCodes());
 	}
 	
 	private void getOptions () {
-		segmenter.setSegmentSubFlows(chkSegmentSubFlows.getSelection());
-		segmenter.setCascade(chkCascade.getSelection());
-		segmenter.setIncludeStartCodes(chkIncludeOpeningCodes.getSelection());
-		segmenter.setIncludeEndCodes(chkIncludeClosingCodes.getSelection());
-		segmenter.setIncludeIsolatedCodes(chkIncludeIsolatedCodes.getSelection());
+		srxDoc.setSegmentSubFlows(chkSegmentSubFlows.getSelection());
+		srxDoc.setCascade(chkCascade.getSelection());
+		srxDoc.setIncludeStartCodes(chkIncludeOpeningCodes.getSelection());
+		srxDoc.setIncludeEndCodes(chkIncludeClosingCodes.getSelection());
+		srxDoc.setIncludeIsolatedCodes(chkIncludeIsolatedCodes.getSelection());
 	}
 	
 	private void updateRulesButtons () {
@@ -287,7 +287,7 @@ public class GroupsAndOptionsDialog {
 	
 	private void updateLanguageRules (String selection) {
 		lbLangRules.removeAll();
-		LinkedHashMap<String, ArrayList<Rule>> list = segmenter.getAllLanguageRules();
+		LinkedHashMap<String, ArrayList<Rule>> list = srxDoc.getAllLanguageRules();
 		
 		if (( selection != null ) && !list.containsKey(selection) ) {
 			selection = null;
@@ -315,7 +315,7 @@ public class GroupsAndOptionsDialog {
 	
 	private void updateLanguageMaps (int selection) {
 		lbLangMaps.removeAll();
-		ArrayList<LanguageMap> list = segmenter.getAllLanguagesMaps();
+		ArrayList<LanguageMap> list = srxDoc.getAllLanguagesMaps();
 		for ( LanguageMap langMap : list ) {
 			lbLangMaps.add(langMap.getPattern() + " --> " + langMap.getRuleName());
 		}
@@ -339,7 +339,7 @@ public class GroupsAndOptionsDialog {
 		else {
 			n = lbLangMaps.getSelectionIndex();
 			if ( n == -1 ) return;
-			langMap = segmenter.getAllLanguagesMaps().get(n);
+			langMap = srxDoc.getAllLanguagesMaps().get(n);
 			caption = "Edit Language Map";
 		}
 		
@@ -347,43 +347,43 @@ public class GroupsAndOptionsDialog {
 		if ( (langMap = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewMap ) {
-			segmenter.addLanguageMap(langMap);
-			n = segmenter.getAllLanguagesMaps().size()+1;
+			srxDoc.addLanguageMap(langMap);
+			n = srxDoc.getAllLanguagesMaps().size()+1;
 		}
 		else {
-			segmenter.getAllLanguagesMaps().set(n, langMap);
+			srxDoc.getAllLanguagesMaps().set(n, langMap);
 		}
-		segmenter.setIsModified(true);
+		srxDoc.setIsModified(true);
 		updateLanguageMaps(n);
 	}
 	
 	private void removeMap () {
 		int n = lbLangMaps.getSelectionIndex();
 		if ( n == -1 ) return;
-		segmenter.getAllLanguagesMaps().remove(n);
-		segmenter.setIsModified(true);
+		srxDoc.getAllLanguagesMaps().remove(n);
+		srxDoc.setIsModified(true);
 		updateLanguageMaps(n);
 	}
 	
 	private void moveUpMap () {
 		int n = lbLangMaps.getSelectionIndex();
 		if ( n < 1 ) return;
-		LanguageMap tmp = segmenter.getAllLanguagesMaps().get(n-1);
-		segmenter.getAllLanguagesMaps().set(n-1,
-			segmenter.getAllLanguagesMaps().get(n));
-		segmenter.getAllLanguagesMaps().set(n, tmp);
-		segmenter.setIsModified(true);
+		LanguageMap tmp = srxDoc.getAllLanguagesMaps().get(n-1);
+		srxDoc.getAllLanguagesMaps().set(n-1,
+			srxDoc.getAllLanguagesMaps().get(n));
+		srxDoc.getAllLanguagesMaps().set(n, tmp);
+		srxDoc.setIsModified(true);
 		updateLanguageMaps(--n);
 	}
 	
 	private void moveDownMap () {
 		int n = lbLangMaps.getSelectionIndex();
 		if ( n > lbLangMaps.getItemCount()-2 ) return;
-		LanguageMap tmp = segmenter.getAllLanguagesMaps().get(n+1);
-		segmenter.getAllLanguagesMaps().set(n+1,
-			segmenter.getAllLanguagesMaps().get(n));
-		segmenter.getAllLanguagesMaps().set(n, tmp);
-		segmenter.setIsModified(true);
+		LanguageMap tmp = srxDoc.getAllLanguagesMaps().get(n+1);
+		srxDoc.getAllLanguagesMaps().set(n+1,
+			srxDoc.getAllLanguagesMaps().get(n));
+		srxDoc.getAllLanguagesMaps().set(n, tmp);
+		srxDoc.setIsModified(true);
 		updateLanguageMaps(++n);
 	}
 	
@@ -393,7 +393,7 @@ public class GroupsAndOptionsDialog {
 		String caption;
 		if ( createNewRules ) {
 			name = String.format("group%d",
-				segmenter.getAllLanguageRules().size()+1);
+				srxDoc.getAllLanguageRules().size()+1);
 			caption = "New Rules";
 		}
 		else {
@@ -410,20 +410,20 @@ public class GroupsAndOptionsDialog {
 		
 			// Else:
 			if ( createNewRules ) {
-				if ( segmenter.getAllLanguageRules().containsKey(name) ) {
+				if ( srxDoc.getAllLanguageRules().containsKey(name) ) {
 					Dialogs.showError(shell,
 						String.format("The name \"%s\" exists already.\nPlease choose another one.", name),
 						null);
 				}
 				else {
-					segmenter.addLanguageRule(name, new ArrayList<Rule>());
+					srxDoc.addLanguageRule(name, new ArrayList<Rule>());
 					break;
 				}
 			}
 			else {
-				ArrayList<Rule> list = segmenter.getLanguageRules(oldName);
-				segmenter.getAllLanguageRules().remove(oldName);
-				segmenter.addLanguageRule(name, list);
+				ArrayList<Rule> list = srxDoc.getLanguageRules(oldName);
+				srxDoc.getAllLanguageRules().remove(oldName);
+				srxDoc.addLanguageRule(name, list);
 				break;
 			}
 		}
@@ -445,16 +445,16 @@ public class GroupsAndOptionsDialog {
 			return;
 		}
 		// Remove
-		segmenter.getAllLanguageRules().remove(ruleName);
-		segmenter.setIsModified(true);
+		srxDoc.getAllLanguageRules().remove(ruleName);
+		srxDoc.setIsModified(true);
 		updateLanguageRules(null);
 	}
 	
 	private boolean validate () {
 		try {
 			int nonexistingRules = 0;
-			LinkedHashMap<String, ArrayList<Rule>> list = segmenter.getAllLanguageRules();
-			for ( LanguageMap langRule : segmenter.getAllLanguagesMaps() ) {
+			LinkedHashMap<String, ArrayList<Rule>> list = srxDoc.getAllLanguageRules();
+			for ( LanguageMap langRule : srxDoc.getAllLanguagesMaps() ) {
 				if ( !list.containsKey(langRule.getRuleName()) ) {
 					nonexistingRules++;
 				}

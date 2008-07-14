@@ -6,6 +6,11 @@
 </header>
 <body>
 
+<trans-unit id="0">
+<source xml:lang="en-US">Etc. Gandalf. This is a test.</source>
+<target xml:lang="fr-FR">Etc. Gandalf. C'est un test.</target>
+</trans-unit>
+
 <trans-unit id="1">
 <source xml:lang="en-US">About <bpt id="1">{{</bpt>Gandalf<ept id="1">}}</ept> IN SUBFOLDER1</source>
 </trans-unit>

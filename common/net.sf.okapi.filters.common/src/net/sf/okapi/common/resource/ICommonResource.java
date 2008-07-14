@@ -51,7 +51,7 @@ public interface ICommonResource extends IBaseResource {
 	 * preserved.
 	 * @param preserve The new value to set.
 	 */
-	void setPreserveSpaces (boolean preserve);
+	void setPreserveSpace (boolean preserve);
 	
 	/**
 	 * Sets the property value associated with a given property name.

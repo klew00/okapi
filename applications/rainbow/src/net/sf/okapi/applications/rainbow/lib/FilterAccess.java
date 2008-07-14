@@ -293,14 +293,9 @@ public class FilterAccess {
 		IParameters paramObject,
 		Object uiContext)
 	{
-		try {
-			loadEditor(filterID);
-			if ( paramsEditor == null ) return false;
-			return paramsEditor.edit(paramObject, uiContext);
-		}
-		catch ( Exception e ) {
-			return false;
-		}
+		loadEditor(filterID);
+		if ( paramsEditor == null ) return false;
+		return paramsEditor.edit(paramObject, uiContext);
 	}
 	
 	public Map<String, FilterAccessItem> getItems () {

@@ -5,10 +5,9 @@ import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
-	/**
-	 * Full path of the TMX document to create.
-	 */
 	public String       tmxPath;
+	public boolean      segment;
+	public String       srxPath;
 	
 
 	public Parameters () {
@@ -21,11 +20,15 @@ public class Parameters extends BaseParameters {
 		FieldsString tmp = new FieldsString(data);
 		// Parse the fields
 		tmxPath = tmp.get("tmxPath", tmxPath);
+		segment = tmp.get("segment", segment);
+		srxPath = tmp.get("srxPath", tmxPath);
 	}
 
 	@Override
 	public void reset () {
 		tmxPath = "output.tmx";
+		segment = false;
+		srxPath = "default.srx";
 	}
 
 	@Override
@@ -33,6 +36,8 @@ public class Parameters extends BaseParameters {
 		// Store the parameters in fields
 		FieldsString tmp = new FieldsString();
 		tmp.add("tmxPath", tmxPath);
+		tmp.add("srxPath", srxPath);
+		tmp.add("segment", segment);
 		return tmp.toString();
 	}
 }

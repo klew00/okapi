@@ -1,17 +1,15 @@
 package net.sf.okapi.filters.regex;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean   extractOuterStrings;
-	protected String    startString;
-	protected String    endString;
+	protected boolean        extractOuterStrings;
+	protected String         startString;
+	protected String         endString;
 	
 	protected ArrayList<Rule>     rules;
 	protected String              expression;
@@ -24,29 +22,25 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		super.reset();
 		rules = new ArrayList<Rule>();
-		extractOuterStrings = false;
 		startString = "\"";
 		endString = "\"";
+		extractOuterStrings = false;
 	}
 
 	public String toString ()
 	{
-		// Store the parameters in fields
 		FieldsString tmp = new FieldsString();
-		tmp.add("extractOuterStrings", extractOuterStrings);
 		tmp.add("startString", startString);
 		tmp.add("endString", endString);
+		tmp.add("extractOuterStrings", extractOuterStrings);
 		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
-		// Read the file content as a set of fields
 		FieldsString tmp = new FieldsString(data);
-
-		// Parse the fields
-		extractOuterStrings = tmp.get("extractOuterStrings", extractOuterStrings);
 		startString = tmp.get("startString", startString);
 		endString = tmp.get("endString", endString);
+		extractOuterStrings = tmp.get("extractOuterStrings", extractOuterStrings);
 	}
 	
 	public void compileRules () {
@@ -58,5 +52,7 @@ public class Parameters extends BaseParameters {
 		expression = tmp.toString();
 	}
 	
-	
+	public ArrayList<Rule> getRules () {
+		return rules;
+	}
 }

@@ -18,42 +18,25 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.applications.rainbow;
+package net.sf.okapi.common.ui;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-class InputTableModel {
-	
-	Table               table;
-	Project             prj;
+class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.common.ui.Res";
 
-	void linkTable (Table newTable) {
-		table = newTable;
-		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText(Res.getString("INPTAB_RELPATH"));
-		col = new TableColumn(table, SWT.NONE);
-		col.setText(Res.getString("INPTAB_FSETTINGS"));
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+		.getBundle(BUNDLE_NAME);
+
+	private Res() {
 	}
 
-	void setProject (Project newProject) {
-		prj = newProject;
-	}
-	
-	void updateTable (int[] selection) {
-		table.removeAll();
-		for ( Input inp : prj.inputList ) {
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, inp.relativePath);
-			item.setText(1, inp.filterSettings);
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
 		}
-		if ( selection == null ) {
-			if ( table.getItemCount() > 0 )
-				table.setSelection(0);
-		}
-		else table.setSelection(selection);
 	}
-
 }

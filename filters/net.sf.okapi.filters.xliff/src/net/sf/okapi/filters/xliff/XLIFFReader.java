@@ -3,7 +3,6 @@ package net.sf.okapi.filters.xliff;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -57,7 +56,7 @@ public class XLIFFReader {
 	private XMLStreamReader       reader; 
 	private IContainer            content;
 	private int                   nextAction;
-	private Pattern               pattern;
+//	private Pattern               pattern;
 	
 //	private String                elemTransUnit;
 //	private String                elemFile;
@@ -93,9 +92,9 @@ public class XLIFFReader {
 			sklID = 0;
 			itemID = 0;
 			sklAfter = new SkeletonResource();
-			if ( resource.params.useStateValues ) {
+/*			if ( resource.params.useStateValues ) {
 				pattern = Pattern.compile(resource.params.stateValues);
-			}
+			}*/
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
@@ -211,7 +210,7 @@ public class XLIFFReader {
 //		int i = notations.size();
 	}
 	
-	private int processStartGroup () {
+/*	private int processStartGroup () {
 		storeStartElement();
 		groupResStack.push(new GroupResource());
 		nextAction = RESULT_STARTGROUP;
@@ -223,7 +222,7 @@ public class XLIFFReader {
 		storeEndElement();
 		nextAction = RESULT_ENDGROUP;
 		return RESULT_SKELETON;
-	}
+	}*/
 	
 	private void resetItem () {
 		item = new ExtractionItem();
@@ -687,7 +686,7 @@ public class XLIFFReader {
 			item.setTarget(null);
 	}
 	
-	private boolean isExtractable () {
+/*	private boolean isExtractable () {
 		if ( !resource.params.useStateValues ) return true;
 		if ( !item.hasTarget() ) return true;
 		
@@ -696,6 +695,6 @@ public class XLIFFReader {
 			return resource.params.extractNoState;
 		}
 		return pattern.matcher(state).find();
-	}
+	}*/
 	
 }

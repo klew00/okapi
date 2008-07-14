@@ -47,6 +47,7 @@ public class OutputFilter implements IOutputFilter {
 	public void endExtractionItem (IExtractionItem item) {
 		try {
 			// Write the buffer
+			//TODO: Use the skel event for this!
 			writer.write(res.sklRes.toString());
 			// Then write the item content
 			if ( item.hasTarget() ) {

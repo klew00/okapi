@@ -13,5 +13,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.lib.segmentation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.regex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filter.properties"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.regex"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

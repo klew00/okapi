@@ -2,10 +2,15 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
+import net.sf.okapi.common.resource.Container;
+import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.IPart;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
@@ -40,9 +45,10 @@ public class SRXEditor {
 	private Table            tblRules;
 	private RulesTableModel  rulesTableMod;
 	private Combo            cbGroup;
+	private SRXDocument      srxDoc;
 	private Segmenter        segmenter;
 	private String           srxPath;
-//	private IContainer       sampleText;
+	private IContainer       sampleText;
 	private Button           btSRXDocs;
 	private Menu             popupSRXDocs;
 	private Button           btAddRule;
@@ -57,9 +63,10 @@ public class SRXEditor {
 	
 
 	public SRXEditor (Shell parent) {
+		srxDoc = new SRXDocument();
 		segmenter = new Segmenter();
 		srxPath = null;
-//		sampleText = new Container();
+		sampleText = new Container();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Segmentation Rules Editor");
@@ -402,14 +409,16 @@ public class SRXEditor {
 			// parameter passed is different from the current identifier
 			// or if forceReset is true.
 			if ( rdApplySampleForCurrentSet.getSelection() ) {
-				segmenter.applySingleLanguageRule(cbGroup.getText(), forceReset);
+				segmenter = srxDoc.applySingleLanguageRule(cbGroup.getText(),
+					(forceReset ? null : segmenter));
 			}
 			else { // Applies all the matching rules
 				// Make sure we have a language code
 				if ( edSampleLanguage.getText().length() == 0 ) {
 					edSampleLanguage.setText("en");
 				}
-				segmenter.applyLanguageRules(edSampleLanguage.getText(), forceReset);
+				segmenter = srxDoc.applyLanguageRules(edSampleLanguage.getText(),
+					(forceReset ? null : segmenter));
 			}
 		}
 		
@@ -417,8 +426,22 @@ public class SRXEditor {
 		//processInlineCodes();
 		
 		String oriText = edSampleText.getText();
-		segmenter.segment(oriText);
-		//segmenter.segment(sampleText);
+		sampleText.setContent(oriText);
+		if ( segmenter.getLanguage() != null ) {
+			segmenter.segment(sampleText);
+			StringBuilder tmp = new StringBuilder();
+			List<IPart> segList = sampleText.getSegments();
+			tmp.append(String.format("%d: ", segList.size()));
+			for ( IPart seg : segList ) {
+				tmp.append("["+seg.toString()+"] ");
+			}
+			edResults.setText(tmp.toString());
+		}
+		else {
+			edResults.setText("");
+		}
+			
+		/*
 		StringBuilder tmp = new StringBuilder();
 		ArrayList<Integer> list = segmenter.getSplitPositions();
 		tmp.append(String.format("%d: ", list.size()+1));
@@ -429,12 +452,13 @@ public class SRXEditor {
 		}
 		// Last one
 		tmp.append("["+oriText.substring(start)+"]");
-		edResults.setText(tmp.toString());
+		edResults.setText(tmp.toString());*/
+		
 	}
 	
 	private void updateLanguageRuleList () {
 		cbGroup.removeAll();
-		LinkedHashMap<String, ArrayList<Rule>> langRules = segmenter.getAllLanguageRules();
+		LinkedHashMap<String, ArrayList<Rule>> langRules = srxDoc.getAllLanguageRules();
 		for ( String ruleName : langRules.keySet() ) {
 			cbGroup.add(ruleName);
 		}
@@ -447,7 +471,7 @@ public class SRXEditor {
 	private void updateRules (int selection,
 		boolean forceReset) {
 		rulesTableMod.setLanguageRules(
-			segmenter.getLanguageRules(cbGroup.getText()));
+			srxDoc.getLanguageRules(cbGroup.getText()));
 		rulesTableMod.updateTable(selection);
 		updateResults(forceReset);
 		updateRulesButtons();
@@ -465,7 +489,7 @@ public class SRXEditor {
 	private void editGroupsAndOptions () {
 		try {
 			getSurfaceData();
-			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, segmenter);
+			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc);
 			dlg.showDialog();
 		}
 		catch ( Exception e ) {
@@ -477,17 +501,17 @@ public class SRXEditor {
 	}
 
 	private void setSurfaceData () {
-		edSampleText.setText(segmenter.getSampleText());
-		edSampleLanguage.setText(segmenter.getSampleLanguage());
-		rdApplySampleForMappedRules.setSelection(segmenter.sampleOnMappedRules());
-		rdApplySampleForCurrentSet.setSelection(!segmenter.sampleOnMappedRules());
+		edSampleText.setText(srxDoc.getSampleText());
+		edSampleLanguage.setText(srxDoc.getSampleLanguage());
+		rdApplySampleForMappedRules.setSelection(srxDoc.sampleOnMappedRules());
+		rdApplySampleForCurrentSet.setSelection(!srxDoc.sampleOnMappedRules());
 		edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
 	}
 
 	private void getSurfaceData () {
-		segmenter.setSampleText(edSampleText.getText());
-		segmenter.setSampleLanguage(edSampleLanguage.getText());
-		segmenter.setSampleOnMappedRules(rdApplySampleForMappedRules.getSelection());
+		srxDoc.setSampleText(edSampleText.getText());
+		srxDoc.setSampleLanguage(edSampleLanguage.getText());
+		srxDoc.setSampleOnMappedRules(rdApplySampleForMappedRules.getSelection());
 	}
 	
 	private void updateAll () {
@@ -498,7 +522,7 @@ public class SRXEditor {
 	
 	private void newSRXDocument () {
 		if ( !checkIfRulesNeedSaving() ) return;
-		segmenter = new Segmenter();
+		srxDoc = new SRXDocument();
 		srxPath = null;
 		updateAll();
 	}
@@ -511,7 +535,7 @@ public class SRXEditor {
 				if ( paths == null ) return; // Cancel
 				else path = paths[0];
 			}
-			segmenter.loadRules(path);
+			srxDoc.loadRules(path);
 			srxPath = path;
 		}
 		catch ( Exception e ) {
@@ -530,7 +554,7 @@ public class SRXEditor {
 				if ( path == null ) return false;
 			}
 			getSurfaceData();
-			segmenter.saveRules(path);
+			srxDoc.saveRules(path);
 			srxPath = path;
 		}
 		catch ( Exception e ) {
@@ -551,7 +575,7 @@ public class SRXEditor {
 		else {
 			n = tblRules.getSelectionIndex();
 			if ( n == -1 ) return;
-			rule = segmenter.getLanguageRules(ruleName).get(n);
+			rule = srxDoc.getLanguageRules(ruleName).get(n);
 			caption = "Edit Rule";
 		}
 		
@@ -559,13 +583,13 @@ public class SRXEditor {
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
-			segmenter.getLanguageRules(ruleName).add(rule);
-			n = segmenter.getLanguageRules(ruleName).size()-1;
+			srxDoc.getLanguageRules(ruleName).add(rule);
+			n = srxDoc.getLanguageRules(ruleName).size()-1;
 		}
 		else {
-			segmenter.getLanguageRules(ruleName).set(n, rule);
+			srxDoc.getLanguageRules(ruleName).set(n, rule);
 		}
-		segmenter.setIsModified(true);
+		srxDoc.setIsModified(true);
 		updateRules(n, true);
 	}
 	
@@ -573,8 +597,8 @@ public class SRXEditor {
 		int n = tblRules.getSelectionIndex();
 		if ( n == -1 ) return;
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
-		segmenter.getLanguageRules(ruleName).remove(n);
-		segmenter.setIsModified(true);
+		srxDoc.getLanguageRules(ruleName).remove(n);
+		srxDoc.setIsModified(true);
 		tblRules.remove(n);
 		if ( n > tblRules.getItemCount()-1 )
 			n = tblRules.getItemCount()-1;
@@ -589,11 +613,11 @@ public class SRXEditor {
 		if ( n < 1 ) return;
 		// Move in the segmenter
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
-		Rule tmp = segmenter.getLanguageRules(ruleName).get(n-1);
-		segmenter.getLanguageRules(ruleName).set(n-1,
-			segmenter.getLanguageRules(ruleName).get(n));
-		segmenter.getLanguageRules(ruleName).set(n, tmp);
-		segmenter.setIsModified(true);
+		Rule tmp = srxDoc.getLanguageRules(ruleName).get(n-1);
+		srxDoc.getLanguageRules(ruleName).set(n-1,
+			srxDoc.getLanguageRules(ruleName).get(n));
+		srxDoc.getLanguageRules(ruleName).set(n, tmp);
+		srxDoc.setIsModified(true);
 		// Update
 		updateRules(n-1, true);
 	}
@@ -603,11 +627,11 @@ public class SRXEditor {
 		if ( n > tblRules.getItemCount()-2 ) return;
 		// Move in the segmenter
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
-		Rule tmp = segmenter.getLanguageRules(ruleName).get(n+1);
-		segmenter.getLanguageRules(ruleName).set(n+1,
-			segmenter.getLanguageRules(ruleName).get(n));
-		segmenter.getLanguageRules(ruleName).set(n, tmp);
-		segmenter.setIsModified(true);
+		Rule tmp = srxDoc.getLanguageRules(ruleName).get(n+1);
+		srxDoc.getLanguageRules(ruleName).set(n+1,
+			srxDoc.getLanguageRules(ruleName).get(n));
+		srxDoc.getLanguageRules(ruleName).set(n, tmp);
+		srxDoc.setIsModified(true);
 		// Update
 		updateRules(n+1, true);
 	}
@@ -619,7 +643,7 @@ public class SRXEditor {
 	 */
 	private boolean checkIfRulesNeedSaving () {
 		getSurfaceData();
-		if ( segmenter.isModified() ) {
+		if ( srxDoc.isModified() ) {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
 			dlg.setMessage("The segmentation rules have been modified but not saved.\n"

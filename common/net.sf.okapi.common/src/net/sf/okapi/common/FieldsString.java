@@ -24,186 +24,187 @@ package net.sf.okapi.common;
  * Helper class to store and retrieve key-values pairs.
  */
 public class FieldsString {
+	
 	public static final char FIELDMARKER    = '\u009C';
 	public static final char GROUPMARKER    = '\u009D';
 	
-	private StringBuilder  m_sbData;
+	private StringBuilder  data;
+
 
 	public FieldsString () {
-		m_sbData = new StringBuilder();
+		data = new StringBuilder();
 		reset();
 	}
 	
-	public FieldsString (String p_sData) {
-		if ( p_sData != null ) m_sbData = new StringBuilder(p_sData);
+	public FieldsString (String data) {
+		if ( data != null ) this.data = new StringBuilder(data);
 		else {
-			m_sbData = new StringBuilder();
+			this.data = new StringBuilder();
 			reset();
 		}
 	}
 
 	public void reset () {
-		m_sbData = new StringBuilder();
-		m_sbData.append(FIELDMARKER);
+		data = new StringBuilder();
+		data.append(FIELDMARKER);
 	}
 
 	public String toString () {
-		return m_sbData.toString();
+		return data.toString();
 	}
 
-	public void set (String p_sName,
-		String p_sValue)
+	public void set (String name,
+		String value)
 	{
 		// Create the full name+value string
-		if ( p_sValue != null ) {
-			p_sValue = String.format("%s=%s%s", p_sName.toLowerCase(),
-				p_sValue.replace("\r", "$0d$"), FIELDMARKER);
+		if ( value != null ) {
+			value = String.format("%s=%s%s", name.toLowerCase(),
+				value.replace("\r", "$0d$"), FIELDMARKER);
 		}
 
 		// Search if the the field exists
-		String sName = FIELDMARKER + p_sName.toLowerCase() + "=";
-		int nPos1 = m_sbData.toString().indexOf(sName);
-		if ( nPos1 < 0 ) { // Not found: add it
-			if ( p_sValue != null ) {
-				m_sbData.append(p_sValue);
+		String tmpName = FIELDMARKER + name.toLowerCase() + "=";
+		int pos1 = data.toString().indexOf(tmpName);
+		if ( pos1 < 0 ) { // Not found: add it
+			if ( value != null ) {
+				data.append(value);
 			}
 			return;
 		}
 
 		// Else: It exists, replace it
 		// Search for the value
-		int nPos2 = m_sbData.toString().indexOf(FIELDMARKER, nPos1+1);
-		if ( nPos2 < 0 ) nPos2 = nPos1; // No end marker, no value;
+		int pos2 = data.toString().indexOf(FIELDMARKER, pos1+1);
+		if ( pos2 < 0 ) pos2 = pos1; // No end marker, no value;
 
 		// Replace the value
-		m_sbData.delete(nPos1+1, nPos2); //LEN=nPos2-nPos1
-		if ( p_sValue != null )
-			m_sbData.insert(nPos1+1, p_sValue);
+		data.delete(pos1+1, pos2); //LEN=pos2-pos1
+		if ( value != null )
+			data.insert(pos1+1, value);
 	}
 
-	public void add (String p_sName,
-		String p_sValue)
+	public void add (String name,
+		String value)
 	{
-		if ( p_sValue == null ) {
-			m_sbData.append(String.format("%s=%s%s", p_sName.toLowerCase(),
+		if ( value == null ) {
+			data.append(String.format("%s=%s%s", name.toLowerCase(),
 				"", FIELDMARKER));
 		}
 		else {
-			m_sbData.append(String.format("%s=%s%S", p_sName.toLowerCase(),
-				p_sValue.replace("\r", "$0d$"), FIELDMARKER));
+			data.append(String.format("%s=%s%S", name.toLowerCase(),
+				value.replace("\r", "$0d$"), FIELDMARKER));
 		}
 	}
 
-	public void add (String p_sName,
-		boolean p_bValue)
+	public void add (String name,
+		boolean value)
 	{
-		m_sbData.append(String.format("%s=%s%S", p_sName.toLowerCase(),
-			(p_bValue ? 1 : 0), FIELDMARKER));
+		data.append(String.format("%s=%s%S", name.toLowerCase(),
+			(value ? 1 : 0), FIELDMARKER));
 	}
 
-	public void add (String p_sName,
-		int p_nValue)
+	public void add (String name,
+		int value)
 	{
-		m_sbData.append(String.format("%s=%s%S", p_sName.toLowerCase(),
-			p_nValue, FIELDMARKER));
+		data.append(String.format("%s=%s%S", name.toLowerCase(),
+			value, FIELDMARKER));
 	}
 
-	public void add (String p_sName,
-		char p_chValue)
+	public void add (String name,
+		char value)
 	{
-		m_sbData.append(String.format("%s=%s%S", p_sName.toLowerCase(),
-			p_chValue, FIELDMARKER));
+		data.append(String.format("%s=%s%S", name.toLowerCase(),
+			value, FIELDMARKER));
 	}
 	
-	public void addGroup (String p_sName,
-		String p_sValue)
+	public void addGroup (String name,
+		String value)
 	{
-		m_sbData.append(String.format("%s%s=%s%s%s", GROUPMARKER, 
-			p_sName.toLowerCase(), p_sValue, GROUPMARKER, FIELDMARKER));
+		data.append(String.format("%s%s=%s%s%s", GROUPMARKER, 
+			name.toLowerCase(), value, GROUPMARKER, FIELDMARKER));
 	}
 
-	public String get (String p_sName,
-		String p_sDefaultValue)
+	public String get (String name,
+		String defaultValue)
 	{
 		try {
 			// Search for the field name
-			String sName = FIELDMARKER + p_sName.toLowerCase() + "=";
-			int nPos1 = m_sbData.toString().indexOf(sName);
-			if ( nPos1 < 0 ) return p_sDefaultValue; // Field name not found
+			String tmpName = FIELDMARKER + name.toLowerCase() + "=";
+			int pos1 = data.toString().indexOf(tmpName);
+			if ( pos1 < 0 ) return defaultValue; // Field name not found
 
 			// Search for the value
-			nPos1 += sName.length();
-			int nPos2 = m_sbData.toString().indexOf(FIELDMARKER, nPos1);
-			if ( nPos2 < 0 ) return p_sDefaultValue; // No value found
+			pos1 += tmpName.length();
+			int pos2 = data.toString().indexOf(FIELDMARKER, pos1);
+			if ( pos2 < 0 ) return defaultValue; // No value found
 
 			// Get the value
-			return m_sbData.toString().substring(
-				nPos1, nPos2).replace("$0d$", "\r"); //LEN=(nPos2-nPos1)
+			return data.toString().substring(
+				pos1, pos2).replace("$0d$", "\r"); //LEN=(pos2-pos1)
 		}
-		catch (Exception E)
-		{
-			return p_sDefaultValue;
+		catch (Exception e) {
+			return defaultValue;
 		}
 	}
 
-	public boolean get (String p_sName,
-		boolean p_bDefaultValue)
+	public boolean get (String name,
+		boolean defaultValue)
 	{
 		try {
-			String sTmp = get(p_sName, null);
-			if ( sTmp == null ) return p_bDefaultValue;
+			String sTmp = get(name, null);
+			if ( sTmp == null ) return defaultValue;
 			return sTmp.equals("1");
 		}
-		catch (Exception E) {
-			return p_bDefaultValue;
+		catch (Exception e) {
+			return defaultValue;
 		}
 	}
 
-	public int get (String p_sName,
-		int p_nDefaultValue)
+	public int get (String name,
+		int defaultValue)
 	{
 		try {
-			String sTmp = get(p_sName, null);
-			if ( sTmp == null ) return p_nDefaultValue;
-			return Integer.parseInt(sTmp);
+			String tmp = get(name, null);
+			if ( tmp == null ) return defaultValue;
+			return Integer.parseInt(tmp);
 		}
-		catch (Exception E) {
-			return p_nDefaultValue;
+		catch (Exception e) {
+			return defaultValue;
 		}
 	}
 
-	public char get (String p_sName,
-		char p_chDefaultValue)
+	public char get (String name,
+		char defaultValue)
 	{
 		try {
-			String sTmp = get(p_sName, null);
-			if (( sTmp == null ) || ( sTmp.length() == 0 )) return p_chDefaultValue;
-			return sTmp.charAt(0);
+			String tmp = get(name, null);
+			if (( tmp == null ) || ( tmp.length() == 0 )) return defaultValue;
+			return tmp.charAt(0);
 		}
-		catch (Exception E) {
-			return p_chDefaultValue;
+		catch (Exception e) {
+			return defaultValue;
 		}
 	}
 
-	public String getGroup (String p_sName,
-		String p_sDefaultValue)
+	public String getGroup (String name,
+		String defaultValue)
 	{
 		try {
 			// Search for the field name
-			String sName = GROUPMARKER + p_sName.toLowerCase() + "=";
-			int nPos1 = m_sbData.toString().indexOf(sName);
-			if ( nPos1 < 0 ) return p_sDefaultValue; // Field name not found
+			String tmpName = GROUPMARKER + name.toLowerCase() + "=";
+			int pos1 = data.toString().indexOf(tmpName);
+			if ( pos1 < 0 ) return defaultValue; // Field name not found
 
 			// Search for the value
-			nPos1 += sName.length();
-			int nPos2 = m_sbData.toString().indexOf(GROUPMARKER, nPos1);
-			if ( nPos2 < 0 ) return p_sDefaultValue; // No value found
+			pos1 += tmpName.length();
+			int pos2 = data.toString().indexOf(GROUPMARKER, pos1);
+			if ( pos2 < 0 ) return defaultValue; // No value found
 
 			// Get the value
-			return m_sbData.toString().substring(nPos1, nPos2); //LEN=(nPos2-nPos1)
+			return data.toString().substring(pos1, pos2); //LEN=(pos2-pos1)
 		}
-		catch (Exception E) {
-			return p_sDefaultValue;
+		catch (Exception e) {
+			return defaultValue;
 		}
 	}
 

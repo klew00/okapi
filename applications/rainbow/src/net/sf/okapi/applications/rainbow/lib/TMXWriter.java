@@ -1,7 +1,10 @@
 package net.sf.okapi.applications.rainbow.lib;
 
+import java.util.List;
+
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.IPart;
 
 public class TMXWriter {
 	
@@ -67,24 +70,43 @@ public class TMXWriter {
 		if ( item == null ) throw new NullPointerException();
 		itemCount++;
 		
-		writer.writeStartElement("tu");
 		String tuid = item.getName();
+		if (( tuid == null ) || ( tuid.length() == 0 )) {
+			tuid = String.format("autoID%d", itemCount);
+		}
+		writeTU(item.getSource(), item.getTarget(), tuid);
+		
+		if ( item.getSource().isSegmented() ) {
+			List<IPart> srcList = item.getSourceSegments();
+			List<IPart> trgList = item.getTargetSegments();
+			for ( int i=0; i<srcList.size(); i++ ) {
+				writeTU(srcList.get(i),
+					(i>trgList.size()-1) ? null : trgList.get(i),
+					String.format("%s_s%d", tuid, i+1));
+			}
+		}
+	}
+	
+	private void writeTU (IPart source,
+		IPart target,
+		String tuid)
+	{
+		writer.writeStartElement("tu");
 		if (( tuid != null ) && ( tuid.length() > 0 ))
 			writer.writeAttributeString("tuid", tuid);
 
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);
 		writer.writeStartElement("seg");
-		writer.writeRawXML(tmxCont.setContent(item.getSource()).toString());
+		writer.writeRawXML(tmxCont.setContent(source).toString());
 		writer.writeEndElement(); // seg
 		writer.writeEndElementLineBreak(); // tuv
 		
-		if ( item.hasTarget() ) {
+		if ( target != null ) {
 			writer.writeStartElement("tuv");
 			writer.writeAttributeString("xml:lang", targetLang);
 			writer.writeStartElement("seg");
-			writer.writeRawXML(tmxCont.setContent(
-				item.getTarget()).toString());
+			writer.writeRawXML(tmxCont.setContent(target).toString());
 			writer.writeEndElement(); // seg
 			writer.writeEndElementLineBreak(); // tuv
 		}

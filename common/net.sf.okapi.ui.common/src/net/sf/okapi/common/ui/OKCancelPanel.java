@@ -66,7 +66,7 @@ public class OKCancelPanel extends Composite {
 		int nWidth = 80;
 
 		btHelp = new Button(this, SWT.PUSH);
-		btHelp.setText("Help");
+		btHelp.setText(Res.getString("OKCancelPanel.btHelp"));
 		btHelp.setData("h");
 		btHelp.addSelectionListener(action);
 		GridData gdTmp = new GridData();
@@ -93,14 +93,14 @@ public class OKCancelPanel extends Composite {
 			btOK = new Button(cmpTmp, SWT.PUSH);
 		}
 
-		btOK.setText("OK");
+		btOK.setText(Res.getString("OKCancelPanel.btOK"));
 		btOK.setData("o");
 		btOK.addSelectionListener(action);
 		RowData rdTmp = new RowData();
 		rdTmp.width = nWidth;
 		btOK.setLayoutData(rdTmp);
 		
-		btCancel.setText("Cancel");
+		btCancel.setText(Res.getString("OKCancelPanel.btCancel"));
 		btCancel.setData("c");
 		btCancel.addSelectionListener(action);
 		rdTmp = new RowData();

@@ -4,5 +4,10 @@ public interface IFragment {
 
 	String toString ();
 	
+	IFragment clone ();
+	
 	boolean isText ();
+	
+	String toXML (IPart parent);
+
 }

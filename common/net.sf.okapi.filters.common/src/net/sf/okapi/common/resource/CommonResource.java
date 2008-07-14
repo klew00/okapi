@@ -82,7 +82,7 @@ public abstract class CommonResource implements ICommonResource {
 		return preserveWS;
 	}
 
-	public void setPreserveSpaces (boolean preserve) {
+	public void setPreserveSpace (boolean preserve) {
 		preserveWS = preserve;
 	}
 

@@ -52,6 +52,7 @@ public abstract class BaseParameters implements IParameters {
 	public String getPath () {
 		return path;
 	}
+	
 	public String getParameter (String name) {
 		//TODO: Find a faster/better way to implement getOption()
 		FieldsString FS = new FieldsString(toString());
@@ -81,7 +82,6 @@ public abstract class BaseParameters implements IParameters {
 			// Read the file in one string
 			StringBuilder sbTmp = new StringBuilder(1024);
 			char[] aBuf = new char[10];
-			@SuppressWarnings("unused")
 			int nCount;
 			while ((nCount = SR.read(aBuf)) > -1) {
 				sbTmp.append(aBuf, 0, nCount);	

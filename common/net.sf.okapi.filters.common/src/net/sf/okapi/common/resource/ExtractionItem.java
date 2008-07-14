@@ -27,14 +27,14 @@ import net.sf.okapi.common.Util;
 
 /**
  * Reference implementation of IExtractionItem.
+ * Any method applied to a container is applied to the source container, 
+ * except if indicated otherwise by the method's name. 
  */
 public class ExtractionItem extends CommonResource implements IExtractionItem {
 
 	private IContainer                 source;
 	private IContainer                 target;
 	private ArrayList<IExtractionItem> children;
-	private ArrayList<IContainer>      segments;
-	private boolean                    isSegmented;
 	private IExtractionItem            parent;
 	private String                     note;
 	private int                        currentIndex;
@@ -51,10 +51,7 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 	
 	@Override
 	public String toString () {
-		if ( isSegmented )
-			return buildCompiledSegment(false).toString();
-		else
-			return source.toString();
+		return source.toString();
 	}
 	
 	public void addChild (IExtractionItem child) {
@@ -70,8 +67,7 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 	}
 
 	public boolean isEmpty () {
-		if ( isSegmented ) return buildCompiledSegment(false).isEmpty();
-		else return source.isEmpty();
+		return source.isEmpty();
 	}
 	
 	public List<IExtractionItem> getChildren () {
@@ -82,27 +78,21 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 	}
 
 	public IContainer getSource () {
-		if ( isSegmented ) {
-			return buildCompiledSegment(false);
-		}
-		else return source;
+		return source;
 	}
 
-	public List<IContainer> getSegments () {
-		if ( isSegmented ) return segments;
-		// Else: Make a temporary list of all segments
-		List<IContainer> tmpSegments = new ArrayList<IContainer>();
-		tmpSegments.add(source);
-		return tmpSegments;
+	public List<IPart> getSourceSegments () {
+		return source.getSegments();
+	}
+	
+	public List<IPart> getTargetSegments () {
+		if ( target != null ) return target.getSegments();
+		else return null;
 	}
 	
 	public void setSource (IContainer data) {
 		if ( data == null ) throw new NullPointerException(); 
 		source = data;
-		if ( isSegmented ) {
-			segments.clear();
-			isSegmented = false;
-		}
 	}
 
 	public boolean hasTarget () {
@@ -121,40 +111,6 @@ public class ExtractionItem extends CommonResource implements IExtractionItem {
 		note = text;
 	}
 	
-	public void removeSegmentation () {
-		buildCompiledSegment(true);
-	}
-	
-	public void addSegment (IContainer segment) {
-		if ( !isSegmented ) {
-			if ( segments == null ) segments = new ArrayList<IContainer>();
-			else segments.clear();
-			if ( !source.isEmpty() ) segments.add(source);
-			isSegmented = true;
-		}
-		segments.add(segment);
-	}
-
-	private IContainer buildCompiledSegment (boolean removeSegmentation) {
-		if ( !isSegmented ) return source;
-
-		// If needed: compile all segments into one object
-		Container compiled = new Container();
-		for ( IContainer seg : segments ) {
-			compiled.append(seg);
-		}
-		
-		// Remove the segmentation if requested
-		if ( removeSegmentation ) {
-			source = compiled;
-			segments.clear();
-			isSegmented = false;
-		}
-		
-		// Return the compiled segment
-		return compiled;
-	}
-
 	public IContainer getTarget () {
 		return target;
 	}

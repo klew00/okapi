@@ -65,7 +65,7 @@ public class ClosePanel extends Composite {
 		int nWidth = 80;
 
 		btHelp = new Button(this, SWT.PUSH);
-		btHelp.setText("Help");
+		btHelp.setText(Res.getString("ClosePanel.btHelp"));
 		btHelp.setData("h");
 		btHelp.addSelectionListener(action);
 		GridData gdTmp = new GridData();
@@ -85,7 +85,7 @@ public class ClosePanel extends Composite {
 		// Create the buttons in a platform-specific order
 		btClose = new Button(cmpTmp, SWT.PUSH);
 
-		btClose.setText("Close");
+		btClose.setText(Res.getString("ClosePanel.btClose"));
 		btClose.setData("c");
 		btClose.addSelectionListener(action);
 		RowData rdTmp = new RowData();

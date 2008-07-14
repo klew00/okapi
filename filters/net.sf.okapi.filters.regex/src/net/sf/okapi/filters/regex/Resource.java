@@ -1,11 +1,12 @@
 package net.sf.okapi.filters.regex;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.ISkeletonResource;
 import net.sf.okapi.common.resource.SkeletonResource;
 
 public class Resource extends net.sf.okapi.common.resource.DocumentResource {
 
-	public SkeletonResource  sklRes;
+	public ISkeletonResource sklRes;
 	protected Parameters     params;
 	
 

@@ -24,9 +24,13 @@ import net.sf.okapi.common.resource.ExtractionItem;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IFragment;
+import net.sf.okapi.common.resource.IPart;
+import net.sf.okapi.common.resource.Part;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Main {
@@ -75,23 +79,56 @@ public class Main {
 			System.out.println("out 2: " + cnt.toString());
 			
 			ArrayList<IFragment> newCodes = new ArrayList<IFragment>();
-			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 2, "<Ca2/>"));
-			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 1, "<Cb1/>"));
+			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 2, "[IC2]"));
+			newCodes.add(new CodeFragment(IContainer.CODE_ISOLATED, 1, "[IC1]"));
 			cnt.setContent(cnt.getCodedText(), newCodes);
 			System.out.println("out 3: " + cnt.toString());
 			
-			cnt.setProperty("test1", "value1");
-			System.out.println(String.format("name='test1' value='%s'",
-				cnt.getProperty("test1")));
-			cnt.setProperty("test1", null);
-			System.out.println(String.format("name='test1' value='%s'",
-				cnt.getProperty("test1")));
-			cnt.setProperty("test1", "value1 again");
-			System.out.println(String.format("name='test1' value='%s'",
-				cnt.getProperty("test1")));
-			cnt.clearProperties();
-			System.out.println(String.format("name='test1' value='%s'",
-				cnt.getProperty("test1")));
+			System.out.println("---segmentation tries:");
+			cnt = new Container();
+			cnt.append(new Part("textoutside-before", false));
+			cnt.append(new Container("t1 "));
+			cnt.append(new Container("t2 "));
+			cnt.append(new Part("Text in the segment", true));
+			cnt.append(new CodeFragment(IContainer.CODE_ISOLATED, 1, "[ic1]"));
+			cnt.append(new TextFragment(" textoutside-after"));
+			System.out.println("txt=["+cnt.toString()+"]");
+			System.out.println("xml=["+cnt.toXML()+"]");
+			
+			cnt.joinParts();
+			System.out.println("no-seg: txt=["+cnt.toString()+"]");
+			System.out.println("no-seg: xml=["+cnt.toXML()+"]");
+			
+			System.out.println("---extract() tries:");
+			cnt = new Container("0123456789");
+			cnt.append(new CodeFragment(IContainer.CODE_OPENING, 1, "[OC1]"));
+			cnt.append("cdef");
+			cnt.append(new CodeFragment(IContainer.CODE_CLOSING, 1, "[CC1]"));
+			// 0123456789--cdef--
+			// 012345678901234567
+			System.out.println("ori=["+cnt.toString()+"]");
+			IPart res = cnt.copy(2, 5);
+			System.out.println("copy(2,5)=["+res.toXML()+"]");
+			res = cnt.copy(4, 14);
+			System.out.println("copy(4,14)=["+res.toXML()+"]");
+			res = cnt.copy(0);
+			System.out.println("copy(0)=["+res.toXML()+"]");
+			res = cnt.copy(7);
+			System.out.println("copy(7)=["+res.toXML()+"]");
+			res = cnt.copy(10);
+			System.out.println("copy(10)=["+res.toXML()+"]");
+			res = cnt.copy(0, 1);
+			System.out.println("copy(0, 1)=["+res.toXML()+"]");
+			res = cnt.copy(4, 4);
+			System.out.println("copy(4, 4)=["+res.toXML()+"]");
+			res = cnt.copy(0, 16);
+			System.out.println("copy(0, 16)=["+res.toXML()+"]");
+			res = cnt.copy(10, 16);
+			System.out.println("copy(10, 16)=["+res.toXML()+"]");
+			res = cnt.copy(10, 12);
+			System.out.println("copy(10, 12)=["+res.toXML()+"]");
+			System.out.println("ori=["+cnt.toString()+"]");
+			
 		}		
 		catch ( Exception e ) {
 			e.printStackTrace();
@@ -186,28 +223,6 @@ public class Main {
 			System.out.println("---start testItem---");
 			IExtractionItem item = new ExtractionItem();
 			
-			item.addSegment(new Container("This is segment 1. "));
-			item.addSegment(new Container("This is segment 2. "));
-			List<IContainer> list = item.getSegments();
-			for ( IContainer seg : list ) {
-				System.out.println("seg='"+seg.toString()+"'");
-			}
-			System.out.println("all segs= '"+item.toString()+"'");
-			item.addSegment(new Container("This is segment 3."));
-			list = item.getSegments();
-			for ( IContainer seg : list ) {
-				System.out.println("seg='"+seg.toString()+"'");
-			}
-			System.out.println("all segs= '"+item.toString()+"'");
-			
-			item.removeSegmentation();
-			System.out.println("After removing segs:");
-			list = item.getSegments();
-			for ( IContainer seg : list ) {
-				System.out.println("seg='"+seg.toString()+"'");
-			}
-			System.out.println("all segs= '"+item.toString()+"'");
-			
 			item = new ExtractionItem();
 			item.getSource().append("item1");
 			ExtractionItem childItem1 = new ExtractionItem();
@@ -234,7 +249,7 @@ public class Main {
 	
 	private static void testFilter () {
 		try {
-			System.out.println("---start testContainer---");
+			System.out.println("---start testFilter---");
 		
 			String inputFile = "test.properties";
 			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
@@ -251,58 +266,60 @@ public class Main {
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());
 		}
-		System.out.println("---end testContainer---");
+		System.out.println("---end testFilter---");
 	}
 
 	private static void testSegmentation () {
 		try {
 			System.out.println("---start testSegmentation---");
-			Segmenter seg = new Segmenter();
+			SRXDocument srxDoc = new SRXDocument();
 			
 			ArrayList<Rule> langRule = new ArrayList<Rule>();
 			langRule.add(new Rule("Mr\\.", "\\s", false));
-			seg.addLanguageRule("french", langRule);
+			srxDoc.addLanguageRule("french", langRule);
 
 			langRule = new ArrayList<Rule>();
 			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "", true));
 			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
 			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
-			seg.addLanguageRule("default", langRule);
+			srxDoc.addLanguageRule("default", langRule);
 
-			seg.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
-			seg.addLanguageMap(new LanguageMap(".*", "default"));
+			srxDoc.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
+			srxDoc.addLanguageMap(new LanguageMap(".*", "default"));
 			
-			seg.setCascade(true);
-			seg.applyLanguageRules("fr", true);
+			srxDoc.setCascade(true);
+			Segmenter seg = srxDoc.applyLanguageRules("fr", null);
 			
-			Container cont = new Container("Mr. XYZ. (Test.) and more test.");
-			int segCount = seg.segment(cont);
-			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+			IContainer cont = new Container(" Mr. XYZ. (Test.) and more test.  ");
+			int segCount = seg.computeSegments(cont);
+			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
 				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
+			cont = seg.segment(cont);
+			System.out.println("xml: ["+cont.toXML()+"]");
 
 			cont = new Container("One... Two... ");
-			segCount = seg.segment(cont);
-			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+			segCount = seg.computeSegments(cont);
+			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
 				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
 
 			cont = new Container("Mr. XYZ. One...");
-			segCount = seg.segment(cont);
-			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+			segCount = seg.computeSegments(cont);
+			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
 				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
 
 			String text = "Test! (And more?) Etc. And the last without period";
-			segCount = seg.segment(text);
-			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+			segCount = seg.computeSegments(text);
+			System.out.println(String.format("[%s]\nnb seg %d\n%s",
 				text, segCount, printSplits(seg, text)));
 
-			seg.loadRules("example.srx");
-			seg.applyLanguageRules("en", true);
-			text = "The U.K. Prime Minister, Mr. Blair, was seen out with his family today. Not the Queen.";
-			segCount = seg.segment(text);
-			System.out.println(String.format("[%s] nb seg: %d\n%s\n",
+			srxDoc.loadRules("example.srx");
+			seg = srxDoc.applyLanguageRules("en", null);
+			text = "The U.K. Prime Minister, Mr. Blair, was seen out with his family today.  Not the Queen.\tNo?";
+			segCount = seg.computeSegments(text);
+			System.out.println(String.format("[%s]\nnb seg %d\n%s",
 				text, segCount, printSplits(seg, text)));
 			
-			seg.saveRules("output.srx");
+			srxDoc.saveRules("output.srx");
 			
 		}
 		catch ( Exception e ) {
@@ -329,12 +346,13 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testSegmentation();
-		if ( args.length == 0 ) return;
-		testITSEngine();
 		testContainer();
-		testXMLReader();
+		
+		if ( args.length == 0 ) return;
+		testSegmentation();
 		testItem();
+		testITSEngine();
+		testXMLReader();
 		testFilter();
 	}		
 		

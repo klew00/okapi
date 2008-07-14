@@ -277,7 +277,7 @@ public class InputFilter implements IInputFilter {
 					return RESULT_DATA;
 				}
 
-				item.setPreserveSpaces(true);
+				item.setPreserveSpace(true);
 				item.setID(String.valueOf(++itemID));
 //For test
 				item.setExtension("TestExtension",

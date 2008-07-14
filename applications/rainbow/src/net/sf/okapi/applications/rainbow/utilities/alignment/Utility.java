@@ -8,11 +8,14 @@ import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
 import net.sf.okapi.common.resource.IGroupResource;
 import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
 	private TMXWriter   writer;
 	private Parameters  params;
+//	private Segmenter   srcSegmenter;
+//	private Segmenter   trgSegmenter;
 	
 	
 	public Utility () {
@@ -30,6 +33,13 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	{
 		writer.create(params.tmxPath);
 		writer.writeStartDocument(sourceLanguage, targetLanguage);
+		
+		if ( params.segment ) {
+			SRXDocument doc = new SRXDocument();
+			doc.loadRules(params.srxPath);
+			//TODO: srcSegmenter = doc.applyLanguageRules(sourceLanguage, null);
+			//TODO: trgSegmenter = doc.applyLanguageRules(targetLanguage, null);
+		}
 	}
 
 	public IParameters getParameters () {
@@ -82,6 +92,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
     public void endExtractionItem (IExtractionItem item) {
 		if ( item.hasTarget() ) {
 			if ( !item.getTarget().isEmpty() ) {
+				/*TODO: if ( params.segment ) {
+					srcSegmenter.segment(item.getSource());
+					trgSegmenter.segment(item.getTarget());
+				}*/
 				writer.writeItem(item);
 			}
 		}

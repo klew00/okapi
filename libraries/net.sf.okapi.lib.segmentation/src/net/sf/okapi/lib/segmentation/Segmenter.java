@@ -1,34 +1,14 @@
 package net.sf.okapi.lib.segmentation;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.IPart;
 
 public class Segmenter {
-	
-//	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
-	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
-	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	
 	private boolean     segmentSubFlows;
 	private boolean     cascade;
@@ -36,71 +16,49 @@ public class Segmenter {
 	private boolean     includeEndCodes;
 	private boolean     includeIsolatedCodes;
 	private String      currentLanguageCode;
-	private String      inlineCodes;
 	
-	private String      sampleText;
-	private String      sampleLanguage;
-	private boolean     modified;
-	private boolean     sampleOnMappedRules; 
-	
-	private ArrayList<LanguageMap>                    langMaps;
-	private LinkedHashMap<String, ArrayList<Rule>>    langRules;
-	private ArrayList<CompiledRule>                   rules;
-	private LinkedHashMap<Integer, Boolean>           splits;
+	private ArrayList<CompiledRule>         rules;
+	private LinkedHashMap<Integer, Boolean> splits;
+	private ArrayList<Integer>              starts;
+	private ArrayList<Integer>              ends;
 
 
 	public Segmenter () {
-		resetAll();
+		reset();
 	}
 
-	public void resetAll () {
-		resetRules();
-		langMaps = new ArrayList<LanguageMap>();
-		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
-		// Pattern for handling inline codes 
-		inlineCodes = String.format("((\\u%04x|\\u%04x|\\u%04x).)?",
-			IContainer.CODE_OPENING, IContainer.CODE_CLOSING, IContainer.CODE_ISOLATED);
+	/**
+	 * Reset the options to their defaults, and the compiled rules
+	 * to nothing.
+	 */
+	public void reset () {
+		currentLanguageCode = null;
+		rules = new ArrayList<CompiledRule>();
+		splits = null;
 		segmentSubFlows = true; // SRX default
 		cascade = false; // There is no SRX default for this
 		includeStartCodes = false; // SRX default
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
-		splits = null;
-		currentLanguageCode = null;
-		modified = false;
-		sampleText = "Hello <x>Mr. Gandalf.</x>";
-		sampleLanguage = "en";
 	}
-	
-	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
-		return langRules;
-	}
-	
-	public ArrayList<Rule> getLanguageRules (String ruleName) {
-		return langRules.get(ruleName);
-	}
-	
-	public ArrayList<LanguageMap> getAllLanguagesMaps () {
-		return langMaps;
+
+	public void setOptions (boolean segmentSubFlows,
+		boolean includeStartCodes,
+		boolean includeEndCodes,
+		boolean includeIsolatedCodes)
+	{
+		this.segmentSubFlows = segmentSubFlows;
+		this.includeStartCodes = includeStartCodes;
+		this.includeEndCodes = includeEndCodes;
+		this.includeIsolatedCodes = includeIsolatedCodes;
 	}
 	
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
 	
-	public void setSegmentSubFlows (boolean value) {
-		segmentSubFlows = value;
-	}
-	
 	public boolean cascade () {
 		return cascade;
-	}
-	
-	public void setCascade (boolean value) {
-		if ( value != cascade ) {
-			cascade = value;
-			modified = true;
-		}
 	}
 	
 	/**
@@ -112,35 +70,11 @@ public class Segmenter {
 	}
 	
 	/**
-	 * Sets the indicator that tells if start codes should be included or not.
-	 * (See SRX implementation notes).
-	 * @param value The new value to use.
-	 */
-	public void setIncludeStartCodes (boolean value) {
-		if ( value != includeStartCodes ) {
-			includeStartCodes = value;
-			modified = true;
-		}
-	}
-	
-	/**
 	 * Indicates if end codes should be included (See SRX implementation notes).
 	 * @return True if they should be included, false otherwise.
 	 */
 	public boolean includeEndCodes () {
 		return includeEndCodes;
-	}
-	
-	/**
-	 * Sets the indicator that tells if end codes should be included or not.
-	 * (See SRX implementation notes).
-	 * @param value The new value to use.
-	 */
-	public void setIncludeEndCodes (boolean value) {
-		if ( value != includeEndCodes ) {
-			includeEndCodes = value;
-			modified = true;
-		}
 	}
 	
 	/**
@@ -152,156 +86,29 @@ public class Segmenter {
 	}
 	
 	/**
-	 * Sets the indicator that tells if isolated codes should be included or not.
-	 * (See SRX implementation notes).
-	 * @param value The new value to use.
-	 */
-	public void setIncludeIsolatedCodes (boolean value) {
-		if ( value != includeIsolatedCodes ) {
-			includeIsolatedCodes = value;
-			modified = true;
-		}
-	}
-	
-	/**
-	 * Gets the current sample text. This text is an example string that can be used
-	 * to test the various rules. It can be handy to be able to save it along with
-	 * the SRX document.
-	 * @return The sample text, or an empty string.
-	 */
-	public String getSampleText () {
-		if ( sampleText == null ) return "";
-		else return sampleText;
-	}
-	
-	/**
-	 * Sets the sample text.
-	 * @param value Sample text.
-	 */
-	public void setSampleText (String value) {
-		if ( value != null ) {
-			if ( !value.equals(sampleText) ) {
-				modified = true;
-			}
-		}
-		else if ( sampleText != null ) {
-			modified = true;
-		}
-		sampleText = value;
-	}
-	
-	/**
-	 * Gets the current sample language code.
-	 * @return The sample language code.
-	 */
-	public String getSampleLanguage () {
-		return sampleLanguage;
-	}
-	
-	/**
-	 * Sets the sample language code. Null or empty strings are changed
-	 * to the default value.
-	 * @param value The new sample language code.
-	 */
-	public void setSampleLanguage (String value) {
-		if (( value == null ) || ( value.length() == 0 )) {
-			sampleLanguage = "en";
-			modified = true;
-		}
-		else {
-			if ( !value.equals(sampleLanguage) ) {
-				sampleLanguage = value;
-				modified = true;
-			}
-		}
-	}
-	
-	/**
-	 * Indicates of (when sampling the rules) the sample should be
-	 * computed from all the active rules.
-	 * @return True to compute from all matching rules, false to use 
-	 * a single given language rule set.
-	 */
-	public boolean sampleOnMappedRules () {
-		return sampleOnMappedRules;
-	}
-	
-	/**
-	 * Sets the indicator on how to apply rules for samples.
-	 * @param value True to compute from all the matching rules,
-	 * false to use a single language rule set.
-	 */
-	public void setSampleOnMappedRules (boolean value) {
-		if ( value != sampleOnMappedRules ) {
-			sampleOnMappedRules = value;
-			modified = true;
-		}
-	}
-	
-	/**
-	 * Indicates if the segmenter data have been modified since the
-	 * last load or save.
-	 * @return True if they have been modified, false if there is no changes.
-	 */
-	public boolean isModified () {
-		return modified;
-	}
-	
-	/**
-	 * Sets the flag indicating if the segmenter data have been
-	 * modified since the last load or save. If you make change to the rules or
-	 * language maps directly to the lists, make sure to set this flag to true.
-	 * @param value The new value.
-	 */
-	public void setIsModified (boolean value) {
-		modified = value;
-	}
-	
-	/**
-	 * Adds a language rule to the segmenter. If another language rule
-	 * with the same name exists already it will be replaced by the
-	 * new one, without warning.
-	 * @param name Name of the language rule to add.
-	 * @param langRule Language rule object to add.
-	 */
-	public void addLanguageRule (String name,
-		ArrayList<Rule> langRule)
-	{
-		langRules.put(name, langRule);
-		modified = true;
-	}
-	
-	/**
-	 * Adds a language map to the segmenter. The new map is added
-	 * at the end of the one already there.
-	 * @param langMap The language map object to add.
-	 */
-	public void addLanguageMap (LanguageMap langMap) {
-		langMaps.add(langMap);
-		modified = true;
-	}
-	
-	/**
-	 * Segments a given plain text string. Use {@link #segment(IContainer)}
-	 * to process text with in-line codes.
+	 * Calculate the segmentation of a given plain text string.
 	 * @param text Plain text to segment.
 	 * @return The number of segment found.
 	 */
-	public int segment (String text) {
+	public int computeSegments (String text) {
 		Container tmp = new Container(text);
-		return segment(tmp);
+		return computeSegments(tmp);
 	}
 	
 	/**
-	 * Segments a given IContainer object.
+	 * calculate the segmentation of a given IContainer object.
 	 * @param original The object to segment.
 	 * @return The number of segment found.
 	 */
-	public int segment (IContainer original) {
+	public int computeSegments (IContainer original) {
 		if ( currentLanguageCode == null ) {
-			//TODO: throw an exception?
-			return -1; // Need to call selectLanguageRule()
+			// Need to call selectLanguageRule()
+			throw new RuntimeException("No language defined for the segmeter.");
 		}
+		
+		// Remove any existing segmentation
+		//TODO: Handle case to allow secondary segmentation (segment the segments)
+		original.joinParts();
 		
 		// Build the list of split positions
 		String codedText = original.getCodedText();
@@ -321,25 +128,112 @@ public class Segmenter {
 			}
 		}
 
-		// Count breaks and adjust positions
-		int breakCount = 0;
+		// Now build the lists of start and end of each segment
+		// but trim them of any white-spaces
+		starts = new ArrayList<Integer>();
+		ends = new ArrayList<Integer>();
+		int textEnd;
+		int textStart = 0;
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
-				breakCount++;
+				while ( true ) {
+					if ( textStart == pos ) break;
+					if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
+					else break;
+				}
+				if ( textStart == pos ) {
+					// Only spaces in the segment: Continue with the next position
+					continue;
+				}
+				textEnd = pos;
+				// There is at least one non-space char before pos: find it
+				// and store the range.
+				while ( Character.isSpaceChar(codedText.charAt(textEnd)) ) {
+					textEnd--;
+				}
+				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
+				starts.add(textStart);
+				ends.add(textEnd);
+				textStart = pos;
 			}
 		}
 		// Last one
-		breakCount++;
+		int lastPos = codedText.length();
+		if ( textStart < lastPos ) {
+			while ( true ) {
+				if ( textStart == lastPos ) break;
+				if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
+				else break;
+			}
+			if ( textStart < lastPos ) {
+				textEnd = lastPos-1;
+				while ( Character.isSpaceChar(codedText.charAt(textEnd)) ) {
+					textEnd--;
+				}
+				if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
+				starts.add(textStart);
+				ends.add(textEnd);
+			}
+		}
+		// Add an extra value in ends to hold the total length of the coded text
+		// to avoid having to re-create it when segmenting.
+		ends.add(lastPos);
+		
 		// Return the number of segment found
-		return breakCount;
+		// (ends contains one extra value, so make sure to use starts for this)
+		return starts.size();
+	}
+
+	/**
+	 * Segments a given IContainer object.
+	 * @param original The container to segment.
+	 * @return The same container passed as parameter, but now segmented if needed.
+	 */
+	public IContainer segment (IContainer original) {
+		if ( computeSegments(original) < 2 ) {
+			// No more than 1 segment
+			return original;
+		}
+		
+		// Otherwise we have at least two segments:
+		// Build a temporary list of these segments
+		ArrayList<IPart> newParts = new ArrayList<IPart>();
+		int start = 0;
+		int textStart;
+		// Note: Always drive with starts (as ends has one extra value)
+		int i;
+		for ( i=0; i<starts.size(); i++ ) {
+			textStart = starts.get(i);
+			if ( start < textStart ) {
+				newParts.add(original.copy(start, textStart));
+				newParts.get(newParts.size()-1).setIsSegment(false);
+			}
+			newParts.add(original.copy(textStart, ends.get(i)));
+			start = ends.get(i);
+		}
+		// The last extra value in ends contains the coded text length
+		// We use it here to add the possible last non-segment part.
+		if ( start < ends.get(i) ) {
+			// Avoid copy(start) to avoid extra cost of copy(start, -1)
+			newParts.add(original.copy(start, ends.get(i)));
+			newParts.get(newParts.size()-1).setIsSegment(false);
+		}
+		
+		// And rebuild the original container, this time segmented
+		original.reset();
+		for ( IPart part : newParts ) {
+			original.append(part);
+		}
+		return original;
 	}
 
 	/**
 	 * Gets the list of all the split positions in the text
-	 * that was last segmented. You must call {@link #segment(IContainer)}
-	 * or {@link #segment(String)} before calling this method.
+	 * that was last segmented. You must call {@link #computeSegment(IContainer)}
+	 * or {@link #computeSegments(String)} before calling this method.
 	 * @return An array of integers where each value is a split position
-	 * in the coded text that was segmented.
+	 * in the coded text that was segmented. The split position between two segments
+	 * is the first character position of the second segment.
 	 */
 	public ArrayList<Integer> getSplitPositions () {
 		ArrayList<Integer> list = new ArrayList<Integer>();
@@ -353,273 +247,24 @@ public class Segmenter {
 	}
 	
 	/**
-	 * Sets the rules for the segmentation. This method
-	 * applies the language code you specify to the language mappings
-	 * currently available in the segmenter and compile the rules
-	 * when one or more language map is found. The matching is done in
-	 * the order of the list of language maps and more than one can be 
-	 * selected if {@link #cascade()} is true.
-	 * @param languageCode The language code. the value should be a 
-	 * BCP-47 value (e.g. "de", "fr-ca", etc.)
+	 * Gets the language used to apply the rules.
+	 * @return The language code used to apply the rules, or null, if none is 
+	 * specified yet.
 	 */
-	public void applyLanguageRules (String languageCode,
-		boolean forceReset)
-	{
-		if ( !forceReset && languageCode.equals(currentLanguageCode) ) return;
-		resetRules();
-		for ( LanguageMap langMap : langMaps ) {
-			if ( Pattern.matches(langMap.pattern, languageCode) ) {
-				compileRules(langMap.ruleName);
-				if ( !cascade() ) break; // Stop at the first matching map
-			}
-		}
+	public String getLanguage () {
+		return currentLanguageCode;
+	}
+	
+	protected void setLanguage (String languageCode) {
 		currentLanguageCode = languageCode;
 	}
 	
-	/**
-	 * Applies a single language rule group to do the segmentation.
-	 * @param ruleName The name of the rule group to apply.
-	 */
-	public void applySingleLanguageRule (String ruleName,
-		boolean forceReset)
-	{
-		if ( !forceReset && ("__"+ruleName).equals(currentLanguageCode) ) return;
-		// Else; reset the rules
-		resetRules();
-		compileRules(ruleName);
-		currentLanguageCode = "__"+ruleName;
-	}
-
-	/**
-	 * Reset the set of active rules to nothing.
-	 */
-	private void resetRules () {
-		currentLanguageCode = null;
-		rules = new ArrayList<CompiledRule>();
+	protected void setCascade (boolean value) {
+		cascade = value;
 	}
 	
-	/**
-	 * Compiles a language rule into the current set of active rules.
-	 * @param ruleName The name of the language rule to compile.
-	 */
-	private void compileRules (String ruleName) {
-		if ( !langRules.containsKey(ruleName) ) {
-			throw new SegmentationRuleException("language rule '"+ruleName+"' not found.");
-		}
-		ArrayList<Rule> langRule = langRules.get(ruleName);
-		for ( Rule rule : langRule ) {
-			rules.add(
-				//TODO: new CompiledRule("("+rule.before+")("+inlineCodes+rule.after+")", rule.isBreak));
-				new CompiledRule("("+rule.before+")("+rule.after+")", rule.isBreak));
-		}
+	protected void addRule (CompiledRule compiledRule) {
+		rules.add(compiledRule);
 	}
-	
-	/**
-	 * Loads an SRX rules file.
-	 * @param rulesPath The full path of the rules file to load.
-	 */
-	public void loadRules (String rulesPath) {
-		try {
-			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
-			Fact.setValidating(false);
-			Document doc = Fact.newDocumentBuilder().parse(new File(rulesPath));
-			resetAll();
-			XPathFactory xpathFac = XPathFactory.newInstance();
-			XPath xpath = xpathFac.newXPath();
-//TODO: Handle namespaces (e.g. to allow nested SRX rules)
-			XPathExpression xpe = xpath.compile("//srx");
-			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
-			if ( srxList.getLength() < 1 ) return;
-			
-			// Treat the first occurrence (we assume there is never more in one file)
-			Element srxElem = (Element)srxList.item(0);
-			Element elem1 = getFirstElementByTagName("header", srxElem);
-			String tmp = elem1.getAttribute("segmentsubflows");
-			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
-			tmp = elem1.getAttribute("cascade");
-			if ( tmp.length() > 0 ) cascade = "yes".equals(tmp);
-			// formathandle elements
-			NodeList list2 = elem1.getElementsByTagName("formathandle");
-			for ( int i=0; i<list2.getLength(); i++ ) {
-				Element elem2 = (Element)list2.item(i);
-				tmp = elem2.getAttribute("type");
-				if ( "start".equals(tmp) ) {
-					tmp = elem2.getAttribute("include");
-					if ( tmp.length() > 0 ) includeStartCodes = "yes".equals(tmp); 
-				}
-				else if ( "end".equals(tmp) ) {
-					tmp = elem2.getAttribute("include");
-					if ( tmp.length() > 0 ) includeEndCodes = "yes".equals(tmp); 
-				}
-				else if ( "isolated".equals(tmp) ) {
-					tmp = elem2.getAttribute("include");
-					if ( tmp.length() > 0 ) includeIsolatedCodes = "yes".equals(tmp); 
-				}
-			}
-			
-			// Extensions
-			//TODO: Handle namespace to read sample text
-			Element elem2 = getFirstElementByTagName("okpsrx:sample", elem1);
-			if ( elem2 != null ) {
-				setSampleText(elem2.getTextContent());
-			}
-			
-			// Get the body element
-			elem1 = getFirstElementByTagName("body", srxElem);
-			
-			// languagerules
-			elem2 = getFirstElementByTagName("languagerules", elem1);
-			// For each languageRule
-			list2 = elem2.getElementsByTagName("languagerule");
-			for ( int i=0; i<list2.getLength(); i++ ) {
-				Element elem3 = (Element)list2.item(i);
-				ArrayList<Rule> tmpList = new ArrayList<Rule>();
-				String ruleName = elem3.getAttribute("languagerulename");
-				// For each rule
-				NodeList list3 = elem3.getElementsByTagName("rule");
-				for ( int j=0; j<list3.getLength(); j++ ) {
-					Element elem4 = (Element)list3.item(j);
-					Rule newRule = new Rule();
-					tmp = elem4.getAttribute("break");
-					if ( tmp.length() > 0 ) newRule.isBreak = "yes".equals(tmp);
-					Element elem5 = getFirstElementByTagName("beforebreak", elem4);
-					if ( elem5 != null ) newRule.before = elem5.getTextContent();
-					elem5 = getFirstElementByTagName("afterbreak", elem4);
-					if ( elem5 != null ) newRule.after = elem5.getTextContent();
-					tmpList.add(newRule);
-				}
-				langRules.put(ruleName, tmpList);
-			}
 
-			// maprules
-			elem2 = getFirstElementByTagName("maprules", elem1);
-			// For each languagemap
-			list2 = elem2.getElementsByTagName("languagemap");
-			for ( int i=0; i<list2.getLength(); i++ ) {
-				Element elem3 = (Element)list2.item(i);
-				LanguageMap langMap = new LanguageMap();
-				tmp = elem3.getAttribute("languagepattern");
-				if ( tmp.length() > 0 ) langMap.pattern = tmp;
-				tmp = elem3.getAttribute("languagerulename");
-				if ( tmp.length() > 0 ) langMap.ruleName = tmp;
-				langMaps.add(langMap);
-			}
-			modified = false;
-		}
-		catch ( SAXException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( XPathExpressionException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 * Gets the first occurrence of a given element from a given
-	 * element.
-	 * @param tagName Name of the element to look for.
-	 * @param elem Element where to look for.
-	 * @return The first found element, or null.
-	 */
-	private Element getFirstElementByTagName (String tagName,
-		Element elem)
-	{
-		NodeList list = (NodeList)elem.getElementsByTagName(tagName);
-		if (( list == null ) || ( list.getLength() < 1 )) return null;
-		return (Element)list.item(0);
-	}
-	
-	/**
-	 * Saves the current rules to an SRX rules file.
-	 * @param rulesPath The full path of the file where to save the rules.
-	 */
-	public void saveRules (String rulesPath) {
-		XMLWriter writer = null;
-		try {
-			writer = new XMLWriter();
-			writer.create(rulesPath);
-			writer.writeStartDocument();
-
-			writer.writeStartElement("srx");
-			writer.writeAttributeString("xmlns", NSURI_SRX20);
-			writer.writeAttributeString("version", "2.0");
-			writer.writeLineBreak();
-			
-			writer.writeStartElement("header");
-			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
-			writer.writeAttributeString("cascade", (cascade ? "yes": "no"));
-			writer.writeLineBreak();
-
-			writer.writeStartElement("formathandle");
-			writer.writeAttributeString("type", "start");
-			writer.writeAttributeString("include", (includeStartCodes ? "yes" : "no"));
-			writer.writeEndElementLineBreak(); // formathandle
-			
-			writer.writeStartElement("formathandle");
-			writer.writeAttributeString("type", "end");
-			writer.writeAttributeString("include", (includeEndCodes ? "yes" : "no"));
-			writer.writeEndElementLineBreak(); // formathandle
-			
-			writer.writeStartElement("formathandle");
-			writer.writeAttributeString("type", "isolated");
-			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
-			writer.writeEndElementLineBreak(); // formathandle
-			
-			writer.writeStartElement("okpsrx:sample");
-			writer.writeAttributeString("xmlns:okpsrx", NSURI_OKPSRX);
-			writer.writeString(getSampleText());
-			writer.writeEndElementLineBreak(); // okpsrx:sample
-			
-			writer.writeEndElementLineBreak(); // header
-
-			writer.writeStartElement("body");
-			writer.writeLineBreak();
-			
-			writer.writeStartElement("languagerules");
-			writer.writeLineBreak();
-			for ( String ruleName : langRules.keySet() ) {
-				writer.writeStartElement("languagerule");
-				writer.writeAttributeString("languagerulename", ruleName);
-				writer.writeLineBreak();
-				ArrayList<Rule> langRule = langRules.get(ruleName);
-				for ( Rule rule : langRule ) {
-					writer.writeStartElement("rule");
-					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
-					writer.writeLineBreak();
-					writer.writeElementString("beforebreak", rule.before);
-					writer.writeLineBreak();					
-					writer.writeElementString("afterbreak", rule.after);
-					writer.writeLineBreak();					
-					writer.writeEndElementLineBreak(); // rule
-				}
-				writer.writeEndElementLineBreak(); // languagerule
-			}
-			writer.writeEndElementLineBreak(); // languagerules
-			
-			writer.writeStartElement("maprules");
-			writer.writeLineBreak();			
-			for ( LanguageMap langMap : langMaps ) {
-				writer.writeStartElement("languagemap");
-				writer.writeAttributeString("languagepattern", langMap.pattern);
-				writer.writeAttributeString("languagerulename", langMap.ruleName);
-				writer.writeEndElementLineBreak(); // languagemap
-			}
-			writer.writeEndElementLineBreak(); // maprules
-			
-			writer.writeEndElementLineBreak(); // body
-			
-			writer.writeEndElementLineBreak(); // srx
-			writer.writeEndDocument();
-			modified = false;
-		}
-		finally {
-			if ( writer != null ) writer.close();
-		}
-	}
 }

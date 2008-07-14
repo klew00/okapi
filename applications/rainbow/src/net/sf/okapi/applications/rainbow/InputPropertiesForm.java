@@ -50,7 +50,7 @@ class InputPropertiesForm {
 		IParametersProvider paramsProv)
 	{
 		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Properties");
+		shell.setText(Res.getString("INPROP_CAPTION"));
 		shell.setImage(p_Parent.getImage());
 		shell.setLayout(new GridLayout());
 		
@@ -58,29 +58,33 @@ class InputPropertiesForm {
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		comp.setLayout(new GridLayout(2, false));
 
-//		Label label = new Label(comp, SWT.NONE);
-//		label.setText("Filter settings:");
-//		label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-
 		pnlFilterSettings = new FilterSettingsPanel(comp, SWT.NONE, paramsProv);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlFilterSettings.setLayoutData(gdTmp);
 		
 		int verticalIndent = 8;
-		Label label = new Label(comp, SWT.NONE);
-		label.setText("Source encoding:");
+		
+		Label label = new Label(comp, SWT.NONE); // Place-holder
 		gdTmp = new GridData();
 		gdTmp.verticalIndent = verticalIndent;
 		label.setLayoutData(gdTmp);
 		
+		label = new Label(comp, SWT.NONE);
+		label.setText(Res.getString("INPROP_ENCNOTE"));
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = verticalIndent;
+		label.setLayoutData(gdTmp);
+
+		label = new Label(comp, SWT.NONE);
+		label.setText(Res.getString("INPROP_SRCENCODING"));
+		
 		edSrcEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.verticalIndent = verticalIndent;
 		edSrcEncoding.setLayoutData(gdTmp);
 		
 		label = new Label(comp, SWT.NONE);
-		label.setText("Target encoding:");
+		label.setText(Res.getString("INPROP_TRGENCODING"));
 		edTrgEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
 		edTrgEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
