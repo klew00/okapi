@@ -12,33 +12,33 @@
     <extraction-item>
       <extensions>
         <skl:skl-fragment>First &lt;b&gt;sentence&lt;/b&gt;.[Break]Second sentence.</skl:skl-fragment>
-          </extensions>
-            <source>
-              <c:seg>
-                <c:content>
-                  <c:text-run>
-                    <c:text>First </c:text>
-                  </c:text-run>
-                  <c:inline startCode="&lt;b&gt;" endCode="&lt;/b&gt;">
-                    <c:text-run>
-                      <c:text>sentence</c:text>
-                    </c:text-run>
-                  </c:inline>
-                  <c:text-run>
-                    <c:text>.</c:text>
-                  </c:text-run>
-                </c:content>
-              </c:seg>
+      </extensions>
+      <source>
+        <c:seg>
+          <c:content>
+            <c:text-run>
+              <c:text>First </c:text>
+            </c:text-run>
+            <c:inline startCode="&lt;b&gt;" endCode="&lt;/b&gt;">
               <c:text-run>
-                <c:text>[Break]</c:text>
+                <c:text>sentence</c:text>
               </c:text-run>
-              <c:seg>
-                <c:content>
-                  <c:text-run>
-                    <c:text>Second sentence.</c:text>
-                  </c:text-run>
-                </c:content>
-              </c:seg>
+            </c:inline>
+            <c:text-run>
+              <c:text>.</c:text>
+            </c:text-run>
+          </c:content>
+        </c:seg>
+        <c:text-run>
+          <c:text>[Break]</c:text>
+        </c:text-run>
+        <c:seg>
+          <c:content>
+            <c:text-run>
+              <c:text>Second sentence.</c:text>
+            </c:text-run>
+          </c:content>
+        </c:seg>
       </source>
       <target>
       </target>
