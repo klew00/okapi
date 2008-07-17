@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import net.sf.okapi.resource.ContentMarker;
 import net.sf.okapi.resource.EndPairedContentMarker;
 import net.sf.okapi.resource.IContent;
-import net.sf.okapi.resource.IContentContainer;
+import net.sf.okapi.resource.IContainer;
 import net.sf.okapi.resource.MarkupContainer;
 import net.sf.okapi.resource.RootContainer;
 import net.sf.okapi.resource.SegmentContainer;
@@ -63,7 +63,7 @@ public class DummyXmlSerializer implements IResouceSerializer{
 		serialize(fragment, 0);
 	}
 
-	public void serialize(IContentContainer container) {
+	public void serialize(IContainer container) {
 		serialize(container, 0);
 	}
 
@@ -100,8 +100,8 @@ public class DummyXmlSerializer implements IResouceSerializer{
 		if(content instanceof TextFragment){
 			serialize((TextFragment)content,indentLevel);
 		}
-		else if(content instanceof IContentContainer){
-			serialize((IContentContainer)content,indentLevel);
+		else if(content instanceof IContainer){
+			serialize((IContainer)content,indentLevel);
 		}
 		else if(content instanceof ContentMarker){
 			serialize((ContentMarker)content, indentLevel);
@@ -116,7 +116,7 @@ public class DummyXmlSerializer implements IResouceSerializer{
 		writer.write("</text-run>\n");
 	}
 
-	public void serialize(IContentContainer container, int indentLevel) {
+	public void serialize(IContainer container, int indentLevel) {
 		if(container instanceof MarkupContainer){
 			serialize((MarkupContainer)container,indentLevel);
 			
@@ -126,7 +126,7 @@ public class DummyXmlSerializer implements IResouceSerializer{
 		}
 	}
 
-	private void serializeChildren(IContentContainer container, int indentLevel){
+	private void serializeChildren(IContainer container, int indentLevel){
 		for(IContent child: container){
 			serialize(child,indentLevel);
 		}

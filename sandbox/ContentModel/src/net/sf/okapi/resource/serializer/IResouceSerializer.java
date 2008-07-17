@@ -3,7 +3,7 @@ package net.sf.okapi.resource.serializer;
 import net.sf.okapi.resource.ContentMarker;
 import net.sf.okapi.resource.EndPairedContentMarker;
 import net.sf.okapi.resource.IContent;
-import net.sf.okapi.resource.IContentContainer;
+import net.sf.okapi.resource.IContainer;
 import net.sf.okapi.resource.MarkupContainer;
 import net.sf.okapi.resource.RootContainer;
 import net.sf.okapi.resource.SegmentContainer;
@@ -16,7 +16,7 @@ public interface IResouceSerializer {
 	public void serialize(IContent content);
 	public void serialize(TextFragment fragment);
 	
-	public void serialize(IContentContainer container);
+	public void serialize(IContainer container);
 	public void serialize(RootContainer container);
 	public void serialize(MarkupContainer container);
 	public void serialize(SegmentContainer container);

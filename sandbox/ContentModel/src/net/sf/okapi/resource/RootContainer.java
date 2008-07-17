@@ -16,14 +16,14 @@ public class RootContainer extends ContainerBase{
 		return Collections.unmodifiableList(segments);
 	}
 	
-	private void getSegmentsReqursive(IContentContainer container, List<SegmentContainer> segments){
+	private void getSegmentsReqursive(IContainer container, List<SegmentContainer> segments){
 		for(IContent child : container){
 			if(child instanceof SegmentContainer){
 				segments.add((SegmentContainer)child);
 				// TODO should we allow segments within segments?
 			}
-			else if(child instanceof IContentContainer){
-				getSegmentsReqursive((IContentContainer)child, segments);
+			else if(child instanceof IContainer){
+				getSegmentsReqursive((IContainer)child, segments);
 			}
 		}
 	}

@@ -15,7 +15,6 @@ public class Main {
 		
 		// Hello <b>big</b> world!
 		
-		
 		RootContainer root = new RootContainer();
 
 		// 'Hello '
@@ -24,6 +23,8 @@ public class Main {
 		// '<b>big</b>'
 		MarkupContainer markup = new MarkupContainer();
 		markup.add(new TextFragment("big"));
+		MarkupContainer markup2 = new MarkupContainer();
+		markup.add(markup2);
 		root.add(markup);
 		
 		// ' world!'
@@ -47,7 +48,10 @@ public class Main {
 		
 		DummyXmlSerializer serializer = new DummyXmlSerializer(new PrintWriter(System.out));
 		
-		serializer.serialize(root);
+		System.out.println(root.getCodedText());
+		System.out.println(markup.getCodedText());
+		System.out.println(markup.getCodedText(1));
+		//serializer.serialize(root);
 		serializer.flush();
 	}
 	

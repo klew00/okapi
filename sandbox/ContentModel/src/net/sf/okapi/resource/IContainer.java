@@ -2,7 +2,7 @@ package net.sf.okapi.resource;
 
 import java.util.List;
 
-public interface IContentContainer extends List<IContent>{
+public interface IContainer extends List<IContent>{
 
 	/**
 	 * Retrieves a String encoded representation of the content.
