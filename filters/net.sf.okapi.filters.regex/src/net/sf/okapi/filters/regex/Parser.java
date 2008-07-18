@@ -277,10 +277,10 @@ public class Parser implements IParser {
 			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
 				GroupResource groupRes = new GroupResource();
 				groupRes.setID(String.format("%d", ++groupID));
-				if ( rule.nameStart != null ) {
+				if ( rule.nameStart.length() > 0 ) {
 					String name = getMatch(startResult.group(), rule.nameStart, rule.nameEnd);
 					if ( name != null ) {
-						if ( rule.nameFormat != null ) {
+						if ( rule.nameFormat.length() > 0 ) {
 							String tmp = rule.nameFormat.replace("<parentName>",
 								(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
 							groupRes.setName(tmp.replace("<self>", name));
@@ -352,7 +352,7 @@ public class Parser implements IParser {
 		item.setPreserveSpace(rule.preserveWS);
 		splitItem(item, rule.splitters);
 		if ( name != null ) {
-			if ( rule.nameFormat != null ) {
+			if ( rule.nameFormat.length() > 0 ) {
 				String tmp = rule.nameFormat.replace("<parentName>",
 					(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
 				item.setName(tmp.replace("<self>", name));
@@ -519,7 +519,7 @@ public class Parser implements IParser {
 			item.setPreserveSpace(rule.preserveWS);
 			//splitItem(item, rule.splitters);
 			if ( name != null ) {
-				if ( rule.nameFormat != null ) {
+				if ( rule.nameFormat.length() > 0 ) {
 					String tmp = rule.nameFormat.replace("<parentName>",
 						(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
 					item.setName(tmp.replace("<self>", name));

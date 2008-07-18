@@ -315,21 +315,30 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void editRule (boolean newRule) {
-		//TODO
 		Rule rule;
+		String caption;
 		if ( newRule ) {
 			rule = new Rule();
 			rule.setRuleName("newRule");
+			caption = "Add New Rule";
 		}
-		else rule = null; //TODO: get real rule
+		else {
+			int n = lbRules.getSelectionIndex();
+			if ( n == -1 ) return;
+			rule = rules.get(n);
+			caption = "Edit Rule";
+		}
 		
-		//EditRuleForm dlg = new EdirRuleForm();
+		RuleDialog dlg = new RuleDialog(shell, caption, rule);
+		if ( !dlg.showDialog() ) return;
+		rule = dlg.getRule();
 		
 		if ( newRule ) {
 			rules.add(rule);
 			lbRules.add(rule.getRuleName());
 			lbRules.select(lbRules.getItemCount()-1);
 		}
+		updateRule();
 	}
 	
 	private void removeRule () {

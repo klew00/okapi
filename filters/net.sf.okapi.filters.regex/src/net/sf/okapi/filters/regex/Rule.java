@@ -22,6 +22,11 @@ public class Rule {
 	protected boolean             preserveWS;
 
 	public Rule () {
+		start = "";
+		end = "";
+		nameStart = "";
+		nameEnd = "";
+		nameFormat = "";
 	}
 	
 	public Rule (Rule obj) {
@@ -49,6 +54,7 @@ public class Rule {
 	}
 	
 	public void setStart (String value) {
+		if ( value == null ) throw new NullPointerException();
 		start = value;
 	}
 
@@ -57,22 +63,25 @@ public class Rule {
 	}
 	
 	public void setEnd (String value) {
+		if ( value == null ) throw new NullPointerException();
 		end = value;
 	}
 
-	public String getStartName () {
+	public String getNameStart () {
 		return nameStart;
 	}
 	
-	public void setStartName (String value) {
+	public void setNameStart (String value) {
+		if ( value == null ) throw new NullPointerException();
 		nameStart = value;
 	}
 
-	public String getEndName () {
+	public String getNameEnd () {
 		return nameEnd;
 	}
 	
-	public void setEndName (String value) {
+	public void setNameEnd (String value) {
+		if ( value == null ) throw new NullPointerException();
 		nameEnd = value;
 	}
 
@@ -81,6 +90,7 @@ public class Rule {
 	}
 	
 	public void setNameFormat (String value) {
+		if ( value == null ) throw new NullPointerException();
 		nameFormat = value;
 	}
 
