@@ -10,6 +10,7 @@ public class Parameters extends BaseParameters {
 	protected boolean        extractOuterStrings;
 	protected String         startString;
 	protected String         endString;
+	protected boolean        useBSlashEscape;
 	
 	protected ArrayList<Rule>     rules;
 	protected String              expression;
@@ -25,6 +26,7 @@ public class Parameters extends BaseParameters {
 		startString = "\"";
 		endString = "\"";
 		extractOuterStrings = false;
+		useBSlashEscape = true;
 	}
 
 	public String toString ()
@@ -33,6 +35,11 @@ public class Parameters extends BaseParameters {
 		tmp.add("startString", startString);
 		tmp.add("endString", endString);
 		tmp.add("extractOuterStrings", extractOuterStrings);
+		tmp.add("useBSlashEscape", useBSlashEscape);
+		tmp.add("ruleCount", rules.size());
+		for ( int i=0; i<rules.size(); i++ ) {
+			tmp.addGroup(String.format("rule%d", i), rules.get(i).toString());
+		}
 		return tmp.toString();
 	}
 	
@@ -41,6 +48,14 @@ public class Parameters extends BaseParameters {
 		startString = tmp.get("startString", startString);
 		endString = tmp.get("endString", endString);
 		extractOuterStrings = tmp.get("extractOuterStrings", extractOuterStrings);
+		useBSlashEscape = tmp.get("useBSlashEscape", useBSlashEscape);
+		Rule rule;
+		int count = tmp.get("ruleCount", 0);
+		for ( int i=0; i<count; i++ ) {
+			rule = new Rule();
+			rule.fromString(tmp.get(String.format("rule%d", i), null));
+			rules.add(rule);
+		}
 	}
 	
 	public void compileRules () {

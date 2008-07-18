@@ -145,7 +145,7 @@ public class XLIFFReader {
 				break;
 			}
 			sourceDone = targetDone = false;
-			sklBefore.data = new StringBuilder(sklAfter.toString());
+			sklBefore.setData(sklAfter.toString());
 			sklBefore.setID(String.format("s%d", ++sklID));
 			currentSkl = sklBefore;
 			resource.needTargetElement = true;
@@ -177,14 +177,14 @@ public class XLIFFReader {
 				case XMLStreamConstants.SPACE:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.CHARACTERS:
-					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+					currentSkl.appendData(Util.escapeToXML(reader.getText(),
 						0, resource.params.escapeGT));
 					break;
 				case XMLStreamConstants.COMMENT:
-					currentSkl.data.append("<!--"+ reader.getText() + "-->");
+					currentSkl.appendData("<!--"+ reader.getText() + "-->");
 					break;
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					currentSkl.data.append("<?"+ reader.getPITarget() + " "
+					currentSkl.appendData("<?"+ reader.getPITarget() + " "
 						+ reader.getPIData() + "?>");
 					break;
 				case XMLStreamConstants.DTD:
@@ -241,16 +241,16 @@ public class XLIFFReader {
 	private void storeStartElement () {
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
-			currentSkl.data.append("<"+reader.getLocalName());
+			currentSkl.appendData("<"+reader.getLocalName());
 		}
 		else {
-			currentSkl.data.append("<"+prefix+":"+reader.getLocalName());
+			currentSkl.appendData("<"+prefix+":"+reader.getLocalName());
 		}
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
-			currentSkl.data.append(String.format(" xmlns%s=\"%s\"",
+			currentSkl.appendData(String.format(" xmlns%s=\"%s\"",
 				((prefix.length()>0) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
@@ -258,21 +258,21 @@ public class XLIFFReader {
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
 			prefix = reader.getAttributePrefix(i); 
-			currentSkl.data.append(String.format(" %s%s=\"%s\"",
+			currentSkl.appendData(String.format(" %s%s=\"%s\"",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i),
 				reader.getAttributeValue(i)));
 		}
-		currentSkl.data.append(">");
+		currentSkl.appendData(">");
 	}
 	
 	private void storeEndElement () {
 		String ns = reader.getPrefix();
 		if (( ns == null ) || ( ns.length()==0 )) {
-			currentSkl.data.append("</"+reader.getLocalName()+">");
+			currentSkl.appendData("</"+reader.getLocalName()+">");
 		}
 		else {
-			currentSkl.data.append("</"+ns+":"+reader.getLocalName()+">");
+			currentSkl.appendData("</"+ns+":"+reader.getLocalName()+">");
 		}
 	}
 	
@@ -358,16 +358,16 @@ public class XLIFFReader {
 							}
 						}
 					}
-					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+					currentSkl.appendData(Util.escapeToXML(reader.getText(),
 						0, resource.params.escapeGT));
 					break;
 				case XMLStreamConstants.COMMENT:
 					checkTarget();
-					currentSkl.data.append("<!--"+ reader.getText() + "-->");
+					currentSkl.appendData("<!--"+ reader.getText() + "-->");
 					break;
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
 					checkTarget();
-					currentSkl.data.append("<?"+ reader.getPITarget() + " "
+					currentSkl.appendData("<?"+ reader.getPITarget() + " "
 						+ reader.getPIData() + "?>");
 					break;
 				}
@@ -393,7 +393,7 @@ public class XLIFFReader {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					currentSkl.data.append(Util.escapeToXML(reader.getText(),
+					currentSkl.appendData(Util.escapeToXML(reader.getText(),
 						0, resource.params.escapeGT));
 					tmp.append(reader.getText());
 					break;
@@ -448,7 +448,7 @@ public class XLIFFReader {
 				case XMLStreamConstants.SPACE:
 					content.append(reader.getText());
 					if ( store )
-						currentSkl.data.append(Util.escapeToXML(reader.getText(),
+						currentSkl.appendData(Util.escapeToXML(reader.getText(),
 							0, resource.params.escapeGT));
 					break;
 		
@@ -635,7 +635,7 @@ public class XLIFFReader {
 						outerCode.append(Util.escapeToXML(reader.getText(),
 							0, resource.params.escapeGT));
 					if ( store )
-						currentSkl.data.append(Util.escapeToXML(reader.getText(),
+						currentSkl.appendData(Util.escapeToXML(reader.getText(),
 							0, resource.params.escapeGT));
 					break;
 				}
@@ -656,7 +656,7 @@ public class XLIFFReader {
 		content = new Container();
 		processContent("source", true, content, resource.srcCodes);
 		item.setSource(content);
-		sklAfter.data = new StringBuilder();
+		sklAfter.setData("");
 		sourceDone = true;
 	}
 	

@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -42,6 +43,9 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel    pnlActions;
 	private Parameters       params;
 	private ArrayList<Rule>  rules;
+	private int              ruleIndex = -1;
+	private Combo            cbRuleType;
+	private Button           chkPreserveWS;
 
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -106,7 +110,7 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		pnlLD = new LDPanel(grpTmp, SWT.NONE);
-		
+
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
@@ -146,8 +150,46 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		lbRules.setLayoutData(gdTmp);
+		lbRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateRule();
+			};
+		});
 		
-		new Label(cmpTmp, SWT.NONE);
+		//--- Rule properties
+		
+		Group propGroup = new Group(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		propGroup.setLayout(layTmp);
+		propGroup.setText("Rule properties");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.verticalSpan = 3;
+		propGroup.setLayoutData(gdTmp);
+		
+		Text edExpression = new Text(propGroup, SWT.BORDER | SWT.V_SCROLL);
+		edExpression.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 50;
+		edExpression.setLayoutData(gdTmp);
+		
+		label = new Label(propGroup, SWT.NONE);
+		label.setText("Action:");
+		
+		cbRuleType = new Combo(propGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbRuleType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		cbRuleType.add("Extract the strings inside the content");
+		cbRuleType.add("Extract the content itself");
+		cbRuleType.add("Treat the content as a comment");
+		cbRuleType.add("Do not extract the content");
+		
+		chkPreserveWS = new Button(propGroup, SWT.CHECK);
+		chkPreserveWS.setText("Preserve white spaces");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkPreserveWS.setLayoutData(gdTmp);
+
+		//--- end rule properties
 		
 		int buttonWidth = 80;
 		btAdd = new Button(cmpTmp, SWT.PUSH);
@@ -155,26 +197,44 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btAdd.setLayoutData(gdTmp);
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRule(true);
+			};
+		});
 		
 		btMoveUp = new Button(cmpTmp, SWT.PUSH);
 		btMoveUp.setText("Move Up");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btMoveUp.setLayoutData(gdTmp);
+		btMoveUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveUpRule();
+			};
+		});
 		
-		new Label(cmpTmp, SWT.NONE);
-
 		btRemove = new Button(cmpTmp, SWT.PUSH);
 		btRemove.setText("Remove...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btRemove.setLayoutData(gdTmp);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeRule();
+			};
+		});
 		
 		btMoveDown = new Button(cmpTmp, SWT.PUSH);
 		btMoveDown.setText("Move Down");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btMoveDown.setLayoutData(gdTmp);
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDownRule();
+			};
+		});
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Rules");
@@ -227,8 +287,24 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updateRule () {
-		//int n = lbRules.getSelectionIndex();
+		saveRuleData(ruleIndex);
 		
+		int newRuleIndex = lbRules.getSelectionIndex();
+		boolean enabled = (newRuleIndex > -1 );
+		cbRuleType.setEnabled(enabled);
+		chkPreserveWS.setEnabled(enabled);
+
+		ruleIndex = newRuleIndex;
+		if ( ruleIndex < 0 ) return;
+		
+		Rule rule = rules.get(ruleIndex);
+		chkPreserveWS.setSelection(rule.preserveSpace());
+	}
+	
+	private void saveRuleData (int index) {
+		if ( index < 0 ) return;
+		Rule rule = rules.get(index);
+		rule.setPreserveSpace(chkPreserveWS.getSelection());
 	}
 	
 	private void updateRuleButtons () {
@@ -238,13 +314,43 @@ public class Editor implements IParametersEditor {
 		btRemove.setEnabled(n != -1);
 	}
 	
+	private void editRule (boolean newRule) {
+		//TODO
+		Rule rule;
+		if ( newRule ) {
+			rule = new Rule();
+			rule.setRuleName("newRule");
+		}
+		else rule = null; //TODO: get real rule
+		
+		//EditRuleForm dlg = new EdirRuleForm();
+		
+		if ( newRule ) {
+			rules.add(rule);
+			lbRules.add(rule.getRuleName());
+			lbRules.select(lbRules.getItemCount()-1);
+		}
+	}
+	
+	private void removeRule () {
+		
+	}
+	
+	private void moveUpRule () {
+		
+	}
+	
+	private void moveDownRule () {
+		
+	}
+	
 	private void setData () {
 		chkExtractOuterStrings.setSelection(
 			"1".equals(params.getParameter("extractOuterStrings")));
 		edStartString.setText(params.getParameter("startString"));
 		edEndString.setText(params.getParameter("endString"));
 		for ( Rule rule : rules ) {
-			lbRules.add(rule.getName());
+			lbRules.add(rule.getRuleName());
 		}
 		updateRule();
 		updateRuleButtons();

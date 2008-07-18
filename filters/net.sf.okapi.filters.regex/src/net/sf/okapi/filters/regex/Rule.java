@@ -1,17 +1,22 @@
 package net.sf.okapi.filters.regex;
 
+import net.sf.okapi.common.FieldsString;
+
 public class Rule {
 
 	public static final int       RULETYPE_STRING     = 0;
 	public static final int       RULETYPE_CONTENT    = 1;
 	public static final int       RULETYPE_COMMENT    = 2;
 	public static final int       RULETYPE_NOTRANS    = 3;
+	public static final int       RULETYPE_OPENGROUP  = 4;
+	public static final int       RULETYPE_CLOSEGROUP = 5;
 	
-	protected String              name;
+	protected String              ruleName;
 	protected String              start;
 	protected String              end;
-	protected String              startName;
-	protected String              endName;
+	protected String              nameStart;
+	protected String              nameEnd;
+	protected String              nameFormat;
 	protected String              splitters;
 	protected int                 ruleType;
 	protected boolean             preserveWS;
@@ -20,20 +25,23 @@ public class Rule {
 	}
 	
 	public Rule (Rule obj) {
-		name = obj.name;
+		ruleName = obj.ruleName;
 		start = obj.start;
 		end = obj.end;
+		nameStart = obj.nameStart;
+		nameEnd = obj.nameEnd;
+		nameFormat = obj.nameFormat;
 		splitters = obj.splitters;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
 	}
 	
-	public String getName () {
-		return name;
+	public String getRuleName () {
+		return ruleName;
 	}
 	
-	public void setName (String value) {
-		name = value;
+	public void setRuleName (String value) {
+		ruleName = value;
 	}
 	
 	public String getStart () {
@@ -53,19 +61,27 @@ public class Rule {
 	}
 
 	public String getStartName () {
-		return startName;
+		return nameStart;
 	}
 	
 	public void setStartName (String value) {
-		startName = value;
+		nameStart = value;
 	}
 
 	public String getEndName () {
-		return endName;
+		return nameEnd;
 	}
 	
 	public void setEndName (String value) {
-		endName = value;
+		nameEnd = value;
+	}
+
+	public String getNameFormat () {
+		return nameFormat;
+	}
+	
+	public void setNameFormat (String value) {
+		nameFormat = value;
 	}
 
 	public String getSplitters () {
@@ -91,4 +107,32 @@ public class Rule {
 	public void setPreserveSpace (boolean value) {
 		preserveWS = value;
 	}
+
+	@Override
+	public String toString ()
+	{
+		FieldsString tmp = new FieldsString();
+		tmp.add("ruleName", ruleName);
+		tmp.add("ruleType", ruleType);
+		tmp.add("start", start);
+		tmp.add("end", end);
+		tmp.add("nameStart", nameStart);
+		tmp.add("nameEnd", nameEnd);
+		tmp.add("nameFormat", nameFormat);
+		tmp.add("preserveWS", preserveWS);
+		return tmp.toString();
+	}
+	
+	public void fromString (String data) {
+		FieldsString tmp = new FieldsString(data);
+		ruleName = tmp.get("ruleName", ruleName);
+		ruleType = tmp.get("ruleType", ruleType);
+		start = tmp.get("start", start);
+		end = tmp.get("end", end);
+		nameStart = tmp.get("nameStart", nameStart);
+		nameEnd = tmp.get("nameEnd", nameEnd);
+		nameFormat = tmp.get("nameFormat", nameFormat);
+		preserveWS = tmp.get("preserveWS", preserveWS);
+	}
+	
 }

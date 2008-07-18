@@ -117,7 +117,7 @@ public class InputFilter implements IInputFilter {
 
 			while ( true ) {
 				if ( !getNextLine() ) {
-					if ( res.sklRes.data.length() > 0 ) {
+					if ( !res.sklRes.isEmpty() ) {
 						// Some data still to pass along
 						res.endingLB = false; // No ending line-break;
 					}
@@ -134,8 +134,8 @@ public class InputFilter implements IInputFilter {
 				else {
 					// Empty lines
 					if ( sTmp.length() == 0 ) {
-						res.sklRes.data.append(textLine);
-						res.sklRes.data.append(res.lineBreak);
+						res.sklRes.appendData(textLine);
+						res.sklRes.appendData(res.lineBreak);
 						continue;
 					}
 
@@ -148,8 +148,8 @@ public class InputFilter implements IInputFilter {
 
 					if ( isComment ) {
 //TODO						m_Opt.m_LD.process(sTmp);
-						res.sklRes.data.append(textLine);
-						res.sklRes.data.append(res.lineBreak);
+						res.sklRes.appendData(textLine);
+						res.sklRes.appendData(res.lineBreak);
 						continue;
 					}
 
@@ -268,12 +268,12 @@ public class InputFilter implements IInputFilter {
 						// Single-line case
 						keyBuffer.append(textLine.substring(0, nStartText));
 					}
-					res.sklRes.data.append(keyBuffer);
+					res.sklRes.appendData(keyBuffer);
 				}
 				else {
-					res.sklRes.data.append(keyBuffer);
-					res.sklRes.data.append(textBuffer);
-					res.sklRes.data.append(textLine);
+					res.sklRes.appendData(keyBuffer);
+					res.sklRes.appendData(textBuffer);
+					res.sklRes.appendData(textLine);
 					return RESULT_DATA;
 				}
 
