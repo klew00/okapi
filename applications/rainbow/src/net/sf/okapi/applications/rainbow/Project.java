@@ -390,6 +390,7 @@ public class Project {
 		return pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
 			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
+			sourceLanguage,
 			targetLanguage);
 	}
 	
@@ -397,6 +398,7 @@ public class Project {
 		String tmp = pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
 			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
+			sourceLanguage,
 			targetLanguage);
 		if ( useOutputRoot ) return tmp.substring(inputRoot.length());
 		else return tmp.substring(outputRoot.length());

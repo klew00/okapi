@@ -46,9 +46,6 @@ public class OutputFilter implements IOutputFilter {
 
 	public void endExtractionItem (IExtractionItem item) {
 		try {
-			// Write the buffer
-			//TODO: Use the skel event for this!
-			writer.write(res.sklRes.toString());
 			// Then write the item content
 			if ( item.hasTarget() ) {
 				writer.write(escape(item.getTarget().toString()));
@@ -65,13 +62,10 @@ public class OutputFilter implements IOutputFilter {
 
 	public void endResource (IDocumentResource resource) {
 		try {
-			writer.write(res.sklRes.toString());
+			writer.flush();
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			close();
 		}
 	}
 
@@ -90,10 +84,6 @@ public class OutputFilter implements IOutputFilter {
 			writer = new OutputStreamWriter(
 				new BufferedOutputStream(output), encoding);
 			outputEncoder = Charset.forName(encoding).newEncoder(); 
-			
-			// Write the buffer
-			//TODO: Wrong, this needs to be send as skeleton event
-			writer.write(res.sklRes.toString());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -101,9 +91,12 @@ public class OutputFilter implements IOutputFilter {
 	}
 
     public void skeletonContainer (ISkeletonResource resource) {
-    	// In this writer, this is done in the other handlers
-    	// (for now)
-    	//TODO: Not a good idea: we need to change that and use skeletonContainer
+    	try {
+    		writer.write(resource.toString());
+    	}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
     }
     
 	private String escape (String text) {

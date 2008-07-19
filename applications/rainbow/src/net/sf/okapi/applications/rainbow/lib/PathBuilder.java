@@ -46,14 +46,16 @@ public class PathBuilder {
 	private String      m_sReplace;
 
 	static public String replaceVariables (String p_sInput,
-		String p_sLang)
+		String srcLang,
+		String trgLang)
 	{
 		// Macros
 		if ( p_sInput.indexOf("<$") == -1 ) return p_sInput;
 
-		p_sInput = p_sInput.replace("<$LCodeU>", p_sLang.toUpperCase());
-		p_sInput = p_sInput.replace("<$LCodeL>", p_sLang.toLowerCase());
-		p_sInput = p_sInput.replace("<$LCode>", p_sLang.toLowerCase());
+		p_sInput = p_sInput.replace("<$SrcLangU>", srcLang.toUpperCase());
+		p_sInput = p_sInput.replace("<$SrcLang>", srcLang.toLowerCase());
+		p_sInput = p_sInput.replace("<$TrgLangU>", trgLang.toUpperCase());
+		p_sInput = p_sInput.replace("<$TrgLang>", trgLang.toLowerCase());
 
 //TODO		Locale LC;
 		try {
@@ -62,15 +64,15 @@ public class PathBuilder {
 		}
 		catch (Exception E ) {
 			// On error, replace by error place-holder
-			p_sInput = p_sInput.replace("<$LNameE>", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("<$LWin3>", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("<$LCID>", Res.getString("BLDPATH_NOVARVALUE"));
-			return p_sInput.replace("<$LNameN>", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("<$SrcLangNameE>", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("<$SrcLangWin3>", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("<$SrcLCID>", Res.getString("BLDPATH_NOVARVALUE"));
+			return p_sInput.replace("<$SrcLangNameN>", Res.getString("BLDPATH_NOVARVALUE"));
 		}
-		p_sInput = p_sInput.replace("<$LNameE>", "TODO"); //CI.EnglishName);
+		p_sInput = p_sInput.replace("<$SrcLangNameE>", "TODO"); //CI.EnglishName);
 		//TODO p_sInput = p_sInput.replace("<$LWin3>", "TODO"); //CI.ThreeLetterWindowsLanguageName);
 		//TODO p_sInput = p_sInput.replace("<$LCID>", "TODO"); //CI.LCID.ToString());
-		return p_sInput.replace("<$LNameN>", "TODO"); //CI.NativeName);
+		return p_sInput.replace("<$SrcLangNameN>", "TODO"); //CI.NativeName);
 	}
 
 	public PathBuilder () {
@@ -254,13 +256,14 @@ public class PathBuilder {
 	 * @param p_sOriginalRoot Root in the path to transform.
 	 * @param p_sNewRoot New root to use.  If p_sNewRoot is null, 
 	 * p_sOriginalRoot is used.
-	 * @param p_sLang Language code.
+	 * @param srcLang Language code.
 	 * @return The transformed path.
 	 */
 	public String getPath (String p_sFullPath,
 		String p_sOriginalRoot,
 		String p_sNewRoot,
-		String p_sLang)
+		String srcLang,
+		String trgLang)
 	{
 		String sPath = p_sFullPath.substring(p_sOriginalRoot.length());
 
@@ -303,6 +306,6 @@ public class PathBuilder {
 		if ( useReplace() && ( getSearch().length() != 0 ))
 			sTmp = sTmp.replace(getSearch(), getReplace());
 
-		return replaceVariables(sTmp, p_sLang);
+		return replaceVariables(sTmp, srcLang, trgLang);
 	}
 }

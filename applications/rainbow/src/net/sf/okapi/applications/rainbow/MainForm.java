@@ -518,6 +518,7 @@ public class MainForm implements IParametersProvider {
 				if ( n > -1 ) {
 					inSourceLangSelection = true;
 					edSourceLang.setText(lm.getItem(n).code);
+					pnlPathBuilder.setSourceLanguage(lm.getItem(n).code);
 					inSourceLangSelection = false;
 				}
 			};
@@ -577,6 +578,7 @@ public class MainForm implements IParametersProvider {
 				if ( n > -1 ) {
 					inTargetLangSelection = true;
 					edTargetLang.setText(lm.getItem(n).code);
+					pnlPathBuilder.setTargetLanguage(lm.getItem(n).code);
 					inTargetLangSelection = false;
 				}
 			};
@@ -767,10 +769,12 @@ public class MainForm implements IParametersProvider {
 	}
 
 	private void updateOutputRoot () {
-		if ( chkUseOutputRoot.getSelection() )
+		if ( chkUseOutputRoot.getSelection() ) {
 			pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
-		else
+		}
+		else {
 			pnlPathBuilder.setTargetRoot(null);
+		}
 		pnlPathBuilder.updateSample();
 	}
 	
@@ -952,7 +956,7 @@ public class MainForm implements IParametersProvider {
 			+ "mySubFolder" + File.separator + "myFile.ext";
 		
 		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(), sampleInput,
-			prj.getOutputRoot(), "fr");
+			prj.getOutputRoot(), "en", "fr");
 
 		edInputRoot.setText(prj.getInputRoot());
 		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());

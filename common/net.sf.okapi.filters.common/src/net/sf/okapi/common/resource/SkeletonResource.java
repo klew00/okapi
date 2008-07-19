@@ -23,6 +23,7 @@ public class SkeletonResource implements ISkeletonResource {
 	public String toString () {
 		//TODO: Implement SkeletonResource.toString()
 		if ( isOffsetBased() ) throw new RuntimeException("SkeletonResource.toString not fully implemented");
+		if ( data == null ) return "";
 		return data.toString();
 	}
 
@@ -47,7 +48,8 @@ public class SkeletonResource implements ISkeletonResource {
 	}
 	
 	public void appendData (StringBuilder text) {
-		data.append(text);
+		if ( data == null ) data = new StringBuilder(text);
+		else data.append(text);
 		offset = -1;
 	}
 	
@@ -71,6 +73,7 @@ public class SkeletonResource implements ISkeletonResource {
 	public String toXML () {
 		//TODO: Implement SkeletonResource.toXML()
 		if ( isOffsetBased() ) throw new RuntimeException("SkeletonResource.toXML not fully implemented");
+		if ( data == null ) return "<skl id=\"" + id + "\"></skl>";
 		return "<skl id=\"" + id + "\">"
 			+ Util.escapeToXML(data.toString(), 0, false) + "</skl>";
 	}
