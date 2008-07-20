@@ -33,8 +33,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class LDPanel extends Composite {
 
-	public Button       chkUseLD;
-	public Button       chkLocalizeOutside;
+	private Button      chkUseLD;
+	private Button      chkLocalizeOutside;
 	
 	public LDPanel (Composite parent,
 		int flags)
@@ -68,5 +68,20 @@ public class LDPanel extends Composite {
 	
 	public void updateDisplay () {
 		chkLocalizeOutside.setEnabled(chkUseLD.getSelection());
+	}
+	
+	public void setOptions (boolean useLD,
+		boolean localizeOutside)
+	{
+		chkUseLD.setSelection(useLD);
+		chkLocalizeOutside.setSelection(localizeOutside);
+	}
+	
+	public boolean getUseLD () {
+		return chkUseLD.getSelection();
+	}
+	
+	public boolean getLocalizeOutside () {
+		return chkLocalizeOutside.getSelection();
 	}
 }

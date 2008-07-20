@@ -62,7 +62,7 @@ public class OutputFilter implements IOutputFilter {
 
 	public void endResource (IDocumentResource resource) {
 		try {
-			writer.flush();
+			writer.close();
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

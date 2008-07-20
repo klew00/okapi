@@ -100,6 +100,7 @@ public class Parser implements IParser {
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;
+			nextAction = -1;
 			if ( resource.params.useKeyCondition ) {
 				keyConditionPattern = Pattern.compile(resource.params.keyCondition); 
 			}
@@ -205,7 +206,7 @@ public class Parser implements IParser {
 					}
 
 					if ( isComment ) {
-//TODO						m_Opt.m_LD.process(sTmp);
+						resource.params.locDir.process(sTmp);
 						resource.sklRes.appendData(textLine);
 						resource.sklRes.appendData(resource.lineBreak);
 						continue;
@@ -285,39 +286,28 @@ public class Parser implements IParser {
 				}
 
 				// Check for key condition
-				// Then for directives (they can overwrite the condition)
-				//TODO: Revisit if key should override directives or reverse
+				// Directives overwrite the key condition
 				boolean bExtract = true;
-				
-				if ( keyConditionPattern != null ) {
-					if ( resource.params.extractOnlyMatchingKey ) {
-						if ( keyConditionPattern.matcher(sKey).matches() )
-							bExtract = true; //TODO: m_Opt.m_LD.isLocalizable(true);
-						else
-							bExtract = false;
-					}
-					else { // Extract all but items with matching keys
-						if ( !keyConditionPattern.matcher(sKey).matches() )
-							bExtract = true; //TODO: m_Opt.m_LD.isLocalizable(true);
-						else
-							bExtract = false;
+				if ( resource.params.locDir.isWithinScope() ) {
+					bExtract = resource.params.locDir.isLocalizable(true);
+				}
+				else { // Check for key condition
+					if (  keyConditionPattern != null ) {
+						if ( resource.params.extractOnlyMatchingKey ) {
+							if ( !keyConditionPattern.matcher(sKey).matches() )
+								bExtract = false;
+						}
+						else { // Extract all but items with matching keys
+							if ( keyConditionPattern.matcher(sKey).matches() )
+								bExtract = false;
+						}
 					}
 				}
-				
-				/*if ( bExtract ) bExtract = m_Opt.m_LD.isLocalizable(true);
-				else {
-					// Make sure we pop/push the directives even if the 
-					// outcome is already decided, otherwise it gets out-of-sync
-					m_Opt.m_LD.isLocalizable(true);
-				}*/
 
 				if ( bExtract ) {
 					item = new ExtractionItem();
 					item.setSource(new Container(unescape(sValue)));
 					item.setName(sKey);
-
-					// Check the DNL list here to have resname, etc.
-//					bExtract = !m_Opt.m_LD.isInDNLList(srcItem);
 				}
 
 				if ( bExtract ) {

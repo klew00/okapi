@@ -22,28 +22,26 @@ package net.sf.okapi.filters.properties;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-//	public ILocalizationDirectives   m_LD;
-//	public InlineCodeFinder          m_CodeFinder;
 	public boolean                useCodeFinder;
 	public boolean                escapeExtendedChars;
 	public boolean                useKeyCondition;
 	public boolean                extractOnlyMatchingKey;
 	public String                 keyCondition;
 	public boolean                extraComments;
+	public LocalizationDirectives locDir;
 
 	public Parameters () {
-//		m_LD = (ILocalizationDirectives)new LocalizationDirectives();
-//		m_CodeFinder = new InlineCodeFinder();
+		locDir = new LocalizationDirectives();
 		reset();
 	}
 	
 	public void reset () {
 		super.reset();
-//		m_LD.reset();
-//		m_CodeFinder.reset();
+		locDir.reset();
 		useCodeFinder = true;
 		escapeExtendedChars = true;
 		
@@ -64,30 +62,28 @@ public class Parameters extends BaseParameters {
 	public String toString () {
 		// Store the parameters in fields
 		FieldsString Tmp = new FieldsString();
-//		Tmp.add("useld", m_LD.useDirectives());
-//		Tmp.add("localizeoutside", m_LD.localizeOutside());
+		Tmp.add("useld", locDir.useLD());
+		Tmp.add("localizeoutside", locDir.localizeOutside());
 		Tmp.add("userules", useCodeFinder);
 		Tmp.add("usekeycondition", useKeyCondition);
 		Tmp.add("extractonlykeycond", extractOnlyMatchingKey);
 		Tmp.add("keycondition", keyCondition);
 		Tmp.add("escapechars", escapeExtendedChars);
-//		Tmp.addGroup("rules", m_CodeFinder.getOptions());
 		return Tmp.toString();
 	}
 	
 	public void fromString (String data) {
 		// Read the file content as a set of fields
 		FieldsString Tmp = new FieldsString(data);
-
+		reset();
 		// Parse the fields
-//		boolean bTmp1 = Tmp.get("useld", m_LD.useDirectives());
-//		boolean bTmp2 = Tmp.get("localizeoutside", m_LD.localizeOutside());
-//		m_LD.setOptions(bTmp1, bTmp2, true);
+		boolean bTmp1 = Tmp.get("useld", locDir.useLD());
+		boolean bTmp2 = Tmp.get("localizeoutside", locDir.localizeOutside());
+		locDir.setOptions(bTmp1, bTmp2);
 		useCodeFinder = Tmp.get("userules", useCodeFinder);
 		useKeyCondition = Tmp.get("usekeycondition", useKeyCondition);
 		extractOnlyMatchingKey = Tmp.get("extractonlykeycond", extractOnlyMatchingKey);
 		keyCondition = Tmp.get("keycondition", keyCondition);
 		escapeExtendedChars = Tmp.get("escapechars", escapeExtendedChars);
-//		m_CodeFinder.setOptions(Tmp.getGroup("rules", m_CodeFinder.getOptions()));
 	}
 }

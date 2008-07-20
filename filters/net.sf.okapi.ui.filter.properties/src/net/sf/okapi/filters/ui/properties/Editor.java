@@ -196,22 +196,19 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-//TODO		m_pnlLD.m_chkUseLD.setSelection(m_Data.m_LD.useDirectives());
-//TODO		m_pnlLD.m_chkLocalizeOutside.setSelection(m_Data.m_LD.localizeOutside());
+		pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
 		edKeyCondition.setText(params.keyCondition);
 		rdExtractOnlyMatchingKey.setSelection(params.extractOnlyMatchingKey);
 		rdExcludeMatchingKey.setSelection(!params.extractOnlyMatchingKey);
 		chkUseKeyFilter.setSelection(params.useKeyCondition);
 		chkExtraComments.setSelection(params.extraComments);
 		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
-//TODO		m_CFPanel.setData(m_Data.m_bUseCodeFinder, m_Data.m_CodeFinder);
 		pnlLD.updateDisplay();
 		updateKeyFilter();
 	}
 	
 	private void saveData () {
-//TODO		m_Data.m_LD.setOptions(m_pnlLD.m_chkUseLD.getSelection(),
-//TODO			m_pnlLD.m_chkLocalizeOutside.getSelection(), false);
+		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
 		params.useKeyCondition = chkUseKeyFilter.getSelection();
 		params.keyCondition = edKeyCondition.getText();
 		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
