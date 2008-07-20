@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -67,7 +68,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void create (Shell p_Parent) {
-		shell.setText("Properties Filter Parameters");
+		shell.setText(Res.getString("EditorCaption"));
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -87,7 +88,7 @@ public class Editor implements IParametersEditor {
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Localization directives");
+		grpTmp.setText(Res.getString("LodDirTitle"));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		pnlLD = new LDPanel(grpTmp, SWT.NONE);
@@ -95,12 +96,12 @@ public class Editor implements IParametersEditor {
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Key filtering");
+		grpTmp.setText(Res.getString("KeyCondTitle"));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		
 		chkUseKeyFilter = new Button(grpTmp, SWT.CHECK);
-		chkUseKeyFilter.setText("Use the following key condition:");
+		chkUseKeyFilter.setText(Res.getString("chkUseKeyFilter"));
 		chkUseKeyFilter.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateKeyFilter();
@@ -108,39 +109,37 @@ public class Editor implements IParametersEditor {
 		});
 
 		rdExtractOnlyMatchingKey = new Button(grpTmp, SWT.RADIO);
-		rdExtractOnlyMatchingKey.setText("Extract only the items with a key matching the given expression");
+		rdExtractOnlyMatchingKey.setText(Res.getString("rdExtractOnlyMatchingKey"));
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		rdExtractOnlyMatchingKey.setLayoutData(gdTmp);
 
 		rdExcludeMatchingKey = new Button(grpTmp, SWT.RADIO);
-		rdExcludeMatchingKey.setText("Do not extract the items with a key matching the given expression");
+		rdExcludeMatchingKey.setText(Res.getString("rdExcludeMatchingKey"));
 		rdExcludeMatchingKey.setLayoutData(gdTmp);
-//TODO: m_edKeyCondition enabling/disabling depending on choice
+
 		edKeyCondition = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = 16;
 		edKeyCondition.setLayoutData(gdTmp);
 		
+		Label label = new Label(grpTmp, SWT.WRAP);
+		label.setText(Res.getString("KeyCondNote"));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalIndent = 16;
+		gdTmp.widthHint = 300;
+		label.setLayoutData(gdTmp);
+		
 		chkExtraComments = new Button(cmpTmp, SWT.CHECK);
-		chkExtraComments.setText("Recognize additional comment markers");
+		chkExtraComments.setText(Res.getString("chkExtraComments"));
 
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
+		tiTmp.setText(Res.getString("tabOptions"));
 		tiTmp.setControl(cmpTmp);
 		
 		//--- Inline tab
-		
-		//cmpTmp = new Composite(tfTmp, SWT.NONE);
-		//layTmp = new GridLayout();
-		//cmpTmp.setLayout(layTmp);
-		
-/*TODO		m_CFPanel = new CodeFinderPanel(tfTmp, SWT.NONE);
-		
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Inline Codes");
-		tiTmp.setControl(m_CFPanel);
-*/
+		//TODO: Inline tab
+
 		//--- Output tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
@@ -150,15 +149,15 @@ public class Editor implements IParametersEditor {
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Extended characters");
+		grpTmp.setText(Res.getString("grpExtendedChars"));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 
 		chkEscapeExtendedChars = new Button(grpTmp, SWT.CHECK);
-		chkEscapeExtendedChars.setText("Always escape all extended characters");
+		chkEscapeExtendedChars.setText(Res.getString("chkEscapeExtendedChars"));
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Output");
+		tiTmp.setText(Res.getString("tabOutput"));
 		tiTmp.setControl(cmpTmp);
 		
 		
