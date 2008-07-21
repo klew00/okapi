@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow;
 
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -28,7 +30,7 @@ import org.eclipse.swt.widgets.TableItem;
 class InputTableModel {
 	
 	Table               table;
-	Project             prj;
+	ArrayList<Input>    inputList;
 
 	void linkTable (Table newTable) {
 		table = newTable;
@@ -38,13 +40,13 @@ class InputTableModel {
 		col.setText(Res.getString("INPTAB_FSETTINGS"));
 	}
 
-	void setProject (Project newProject) {
-		prj = newProject;
+	void setProject (ArrayList<Input> inputList) {
+		this.inputList = inputList;
 	}
 	
 	void updateTable (int[] selection) {
 		table.removeAll();
-		for ( Input inp : prj.inputList ) {
+		for ( Input inp : inputList ) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, inp.relativePath);
 			item.setText(1, inp.filterSettings);

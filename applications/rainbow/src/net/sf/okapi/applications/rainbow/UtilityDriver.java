@@ -102,23 +102,24 @@ public class UtilityDriver {
 				if ( dlg.open() != SWT.YES ) return;
 			}
 			
+			//TODO: Implement multilist support (we use only list 0 here)
 			log.beginTask(pluginItem.name);
 			
 			if ( util.needsRoots() ) {
-				util.setRoots(prj.getInputRoot(), prj.buildOutputRoot());
+				util.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 			
-			for ( Input item : prj.inputList ) {
+			for ( Input item : prj.getList(0) ) {
 				// Skip item without filter if the utility is filter-driven
 				if ( util.isFilterDriven() && ( item.filterSettings.length() == 0 )) continue;
 				// Otherwise: process
 				log.message("Input: "+item.relativePath);
 			
 				// Initialize the input/output data
-				String inputPath = prj.getInputRoot() + File.separator + item.relativePath;
-				String outputPath = prj.buildTargetPath(item.relativePath);
+				String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
+				String outputPath = prj.buildTargetPath(0, item.relativePath);
 				util.setInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
 				util.setOutputData(outputPath, prj.buildTargetEncoding(item));
 

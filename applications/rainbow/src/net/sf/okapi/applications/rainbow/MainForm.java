@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -82,14 +83,16 @@ import sf.okapi.lib.ui.segmentation.SRXEditor;
 
 public class MainForm implements IParametersProvider {
 	
+	private int                        currentInput;
+	private ArrayList<Table>           inputTables;
+	private ArrayList<InputTableModel> inputTableMods;
+
 	private Shell            shell;
 	private ILog             log;
 	private LogHandler       logHandler;
 	private String           rootFolder;
 	private String           sharedFolder;
 	private Project          prj;
-	private Table            inputTable;
-	private InputTableModel  inputTableMod;
 	private StatusBar        statusBar;
 	private Text             edInputRoot;
 	private Button           btGetRoot;
@@ -108,7 +111,9 @@ public class MainForm implements IParametersProvider {
 	private List             lbTargetEnc;
 	private boolean          inTargetEncSelection;
 	private Text             edParamsFolder;
-	private TabItem          tiInput;
+	private TabItem          tiInputList1;
+	private TabItem          tiInputList2;
+	private TabItem          tiInputList3;
 	private TabItem          tiOptions;
 	private PathBuilderPanel pnlPathBuilder;
 	private int              waitCount;
@@ -141,7 +146,7 @@ public class MainForm implements IParametersProvider {
 			createProject();
 		}
 		catch ( Exception E ) {
-			Dialogs.showError(shell, E.getLocalizedMessage(), null);			
+			Dialogs.showError(shell, E.getMessage(), null);			
 		}
 	}
 
@@ -272,7 +277,7 @@ public class MainForm implements IParametersProvider {
 
 		// Utilities menu
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
-		miUtilities.setText("&Utilities");
+		miUtilities.setText(rm.getCommandLabel("utilities"));
 		buildUtilitiesMenu();
 
 		// Tools menu
@@ -292,7 +297,6 @@ public class MainForm implements IParametersProvider {
 		// Help menu
 		miHelp = new MenuItem(menuBar, SWT.CASCADE);
 		miHelp.setText(rm.getCommandLabel("help"));
-		miHelp.setText("&Help");
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miHelp.setMenu(dropMenu);
 
@@ -347,7 +351,7 @@ public class MainForm implements IParametersProvider {
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
 				dlg.setText("About Rainbow");
 				dlg.setMessage("Rainbow - Okapi Localization Toolbox\n"
-					+"Version 6.ALPHA");
+					+"Version "+Res.getString("VERSION"));
 				dlg.open();
 			}
 		});
@@ -374,65 +378,34 @@ public class MainForm implements IParametersProvider {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 3;
 		tabFolder.setLayoutData(gdTmp);
-		tabFolder.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				miInput.setEnabled(tabFolder.getSelectionIndex()==0);
-            }
-		});
+		// Events are set at the end of this methods
 
-		// Input List tab
+		inputTables = new ArrayList<Table>(1);
+		inputTableMods = new ArrayList<InputTableModel>();
+		
+		// Input List 1
 		Composite comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
-		tiInput = new TabItem(tabFolder, SWT.NONE);
-		tiInput.setText(Res.getString("INPTAB_CAPTION"));
-		tiInput.setControl(comp);
-	
-		inputTable = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-		inputTable.setHeaderVisible(true);
-		inputTable.setLinesVisible(true);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 3;
-		inputTable.setLayoutData(gdTmp);
-		inputTable.addControlListener(new ControlAdapter() {
-		    public void controlResized(ControlEvent e) {
-				Rectangle rect = inputTable.getClientArea();
-				//TODO: Check behavior when manual resize a column width out of client area
-				int nPart = (int)(rect.width / 100);
-				inputTable.getColumn(0).setWidth(70*nPart);
-				inputTable.getColumn(1).setWidth(rect.width-inputTable.getColumn(0).getWidth());
-		    }
-		});
-		inputTable.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.character == ' ') {
-					editInputProperties(-1);
-				}
-			}
-		});
-
-		inputTableMod = new InputTableModel();
-		inputTableMod.linkTable(inputTable);
+		tiInputList1 = new TabItem(tabFolder, SWT.NONE);
+		tiInputList1.setText(Res.getString("tiInputList1"));
+		tiInputList1.setControl(comp);
+		buildInputTab(0, comp);
 		
-		// Drop target for the table
-		DropTarget dropTarget = new DropTarget(inputTable, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
-		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
-		dropTarget.addDropListener(new DropTargetAdapter() {
-			public void drop (DropTargetEvent e) {
-				FileTransfer FT = FileTransfer.getInstance();
-				if ( FT.isSupportedType(e.currentDataType) ) {
-					String[] paths = (String[])e.data;
-					if ( paths != null ) {
-						if ( paths.length == 1 ) {
-							//if ( Utils.getFilename(aPaths[0], true).toLowerCase().equals("manifest.xml") ) {
-							//	m_C.importPackage(aPaths[0]);
-							//	return;
-							//}
-						}
-						addDocumentsFromList(paths);
-					}
-				}
-			}
-		});
+		// Input List 2
+		comp = new Composite(tabFolder, SWT.NONE);
+		comp.setLayout(new GridLayout());
+		tiInputList2 = new TabItem(tabFolder, SWT.NONE);
+		tiInputList2.setText(Res.getString("tiInputList2"));
+		tiInputList2.setControl(comp);
+		buildInputTab(1, comp);
+		
+		// Input List 3
+		comp = new Composite(tabFolder, SWT.NONE);
+		comp.setLayout(new GridLayout());
+		tiInputList3 = new TabItem(tabFolder, SWT.NONE);
+		tiInputList3.setText(Res.getString("tiInputList3"));
+		tiInputList3.setControl(comp);
+		buildInputTab(2, comp);
 		
 		// Context menu for the input list
 		Menu inputTableMenu = new Menu(shell, SWT.POP_UP);
@@ -471,7 +444,10 @@ public class MainForm implements IParametersProvider {
 			}
 		});
 
-		inputTable.setMenu(inputTableMenu);
+		// Set the popup menus for the input lists
+		inputTables.get(0).setMenu(inputTableMenu);
+		inputTables.get(1).setMenu(inputTableMenu);
+		inputTables.get(2).setMenu(inputTableMenu);
 
 		// Options tab
 		comp = new Composite(tabFolder, SWT.NONE);
@@ -659,7 +635,19 @@ public class MainForm implements IParametersProvider {
 		edParamsFolder = new Text(group, SWT.BORDER);
 		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		// Status bar
+		// Tabs change event (define here to avoid triggering it while creating the content)
+		tabFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
+					currentInput = tabFolder.getSelectionIndex();
+				}
+				else currentInput = -1;
+				updateCommands();
+				updateInputRoot();
+				miInput.setEnabled(currentInput!=-1);
+            }
+		});
+
 		statusBar = new StatusBar(shell, SWT.NONE);
 		
 		// Set the minimal size to the packed size
@@ -668,6 +656,63 @@ public class MainForm implements IParametersProvider {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(origSize);
+	}
+	
+	private void buildInputTab (int index,
+		Composite comp)
+	{
+		Table table = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 3;
+		table.setLayoutData(gdTmp);
+		table.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		    	Table table = (Table)e.getSource();
+		    	Rectangle rect = table.getClientArea();
+				//TODO: Check behavior when manual resize a column width out of client area
+				int nPart = (int)(rect.width / 100);
+				table.getColumn(0).setWidth(70*nPart);
+				table.getColumn(1).setWidth(rect.width-table.getColumn(0).getWidth());
+		    }
+		});
+		table.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.character == ' ') {
+					editInputProperties(-1);
+				}
+			}
+		});
+
+		InputTableModel model = new InputTableModel();
+		model.linkTable(table);
+
+		// Drop target for the table
+		DropTarget dropTarget = new DropTarget(table, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
+		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public void drop (DropTargetEvent e) {
+				FileTransfer FT = FileTransfer.getInstance();
+				if ( FT.isSupportedType(e.currentDataType) ) {
+					String[] paths = (String[])e.data;
+					if ( paths != null ) {
+						if ( paths.length == 1 ) {
+							//if ( Utils.getFilename(aPaths[0], true).toLowerCase().equals("manifest.xml") ) {
+							//	m_C.importPackage(aPaths[0]);
+							//	return;
+							//}
+						}
+						addDocumentsFromList(paths);
+					}
+				}
+			}
+		});
+		
+		inputTables.add(table);
+		inputTableMods.add(model);
+		currentInput = index;
 	}
 	
 	private void buildUtilitiesMenu () {
@@ -725,7 +770,7 @@ public class MainForm implements IParametersProvider {
 			ud.execute(shell);
 		}
 		catch ( Exception E ) {
-			Dialogs.showError(shell, E.getLocalizedMessage(), null);
+			Dialogs.showError(shell, E.getMessage(), null);
 		}
 		finally {
 			stopWaiting();
@@ -769,13 +814,18 @@ public class MainForm implements IParametersProvider {
 	}
 
 	private void updateOutputRoot () {
-		if ( chkUseOutputRoot.getSelection() ) {
-			pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+		try {
+			if ( chkUseOutputRoot.getSelection() ) {
+				pnlPathBuilder.setTargetRoot(edOutputRoot.getText());
+			}
+			else {
+				pnlPathBuilder.setTargetRoot(null);
+			}
+			pnlPathBuilder.updateSample();
 		}
-		else {
-			pnlPathBuilder.setTargetRoot(null);
+		catch ( Exception E ) {
+			Dialogs.showError(shell, E.getMessage(), null);
 		}
-		pnlPathBuilder.updateSample();
 	}
 	
 	private void setDirectories () {
@@ -812,7 +862,7 @@ public class MainForm implements IParametersProvider {
 	}
 
 	private void updateCommands () {
-		boolean enabled = (inputTable.getItemCount()>0);
+		boolean enabled = (( currentInput > -1 ) && ( currentInput < inputTables.size() ));
 		miEditInputProperties.setEnabled(enabled);
 		cmiEditInputProperties.setEnabled(enabled);
 		miOpenInputDocument.setEnabled(enabled);
@@ -841,16 +891,16 @@ public class MainForm implements IParametersProvider {
 	private void changeRoot () {
 		try {
 			InputDialog dlg = new InputDialog(shell, "Source Root",
-				"New root folder:", prj.getInputRoot(), null);
+				"New root folder:", prj.getInputRoot(currentInput), null);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return;
 			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home");
 			//TODO: additional check, dir exists, no trailing separator, etc.
-			prj.setInputRoot(newRoot);
-			resetDisplay();
+			prj.setInputRoot(currentInput, newRoot);
+			resetDisplay(currentInput);
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
@@ -860,15 +910,15 @@ public class MainForm implements IParametersProvider {
 	 * @return The index of the focused item, or -1.
 	 */
 	private int getFocusedInputIndex () {
-		int index = inputTable.getSelectionIndex();
+		int index = inputTables.get(currentInput).getSelectionIndex();
 		if ( index == -1 ) {
-			if ( inputTable.getItemCount() > 0 ) {
-				inputTable.select(0);
-				return inputTable.getSelectionIndex();
+			if ( inputTables.get(currentInput).getItemCount() > 0 ) {
+				inputTables.get(currentInput).select(0);
+				return inputTables.get(currentInput).getSelectionIndex();
 			}
 			else return -1;
 		}
-		return inputTable.getSelectionIndex();
+		return inputTables.get(currentInput).getSelectionIndex();
 	}
 	
 	private boolean canContinue () {
@@ -891,7 +941,7 @@ public class MainForm implements IParametersProvider {
 			}
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 			return false;
 		}
 		return true;
@@ -908,7 +958,7 @@ public class MainForm implements IParametersProvider {
 			updateTitle();
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -916,20 +966,29 @@ public class MainForm implements IParametersProvider {
 		shell.setText(((prj.path == null)
 			? Res.getString("UNTITLED")
 			: Util.getFilename(prj.path, true))
-			+ " - Rainbow [v6.ALPHA]");
+			+ " - Rainbow "+Res.getString("VERSION"));
 	}
 
-	private void resetDisplay () {
+	// Use -1 for all lists
+	private void resetDisplay (int listIndex) {
 		updateTitle();
-		inputTableMod.setProject(prj);
+
+		if (( listIndex < 0 ) || ( listIndex == 0 ))
+			inputTableMods.get(0).setProject(prj.getList(0));
+		if (( listIndex < 0 ) || ( listIndex == 1 ))
+			inputTableMods.get(1).setProject(prj.getList(1));
+		if (( listIndex < 0 ) || ( listIndex == 2 ))
+			inputTableMods.get(2).setProject(prj.getList(2));
+		
 		setSurfaceData();
 		updateCommands();
-		inputTable.setFocus();
+		inputTables.get(currentInput).setFocus();
 	}
 	
 	private void createProject () {
 		prj = new Project(lm);
-		resetDisplay();
+		currentInput = 0;
+		resetDisplay(-1);
 	}
 	
 	private void openProject (String path) {
@@ -942,23 +1001,26 @@ public class MainForm implements IParametersProvider {
 			}
 			prj = new Project(lm);
 			prj.load(path);
-			resetDisplay();
+			resetDisplay(-1);
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
 	private void setSurfaceData () {
-		inputTableMod.updateTable(null);
+		for ( InputTableModel model : inputTableMods ) {
+			model.updateTable(null);
+		}
 		
-		String sampleInput = prj.getInputRoot() + File.separator
+		//TODO: select the list to build output 
+		String sampleInput = prj.getInputRoot(0) + File.separator
 			+ "mySubFolder" + File.separator + "myFile.ext";
 		
-		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(), sampleInput,
+		//TODO: select the list to build output 
+		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
 			prj.getOutputRoot(), "en", "fr");
 
-		edInputRoot.setText(prj.getInputRoot());
 		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());
 		edOutputRoot.setText(prj.getOutputRoot());
 
@@ -969,6 +1031,13 @@ public class MainForm implements IParametersProvider {
 		edParamsFolder.setText(prj.getParametersFolder());
 
 		edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
+		updateInputRoot();
+		updateOutputRoot();
+	}
+	
+	private void updateInputRoot () {
+		if ( currentInput == -1 ) return;
+		edInputRoot.setText(prj.getInputRoot(currentInput));
 		updateOutputRoot();
 	}
 	
@@ -996,7 +1065,7 @@ public class MainForm implements IParametersProvider {
 			// Get a list of paths if needed
 			if ( paths == null ) {
 				paths = Dialogs.browseFilenames(shell, "Add Documents",
-					true, prj.getInputRoot(), null, null);
+					true, prj.getInputRoot(currentInput), null, null);
 			}
 			if ( paths == null ) return;
 			// Add all the selected files and folders
@@ -1004,10 +1073,10 @@ public class MainForm implements IParametersProvider {
 			doAddDocuments(paths, null);
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMod.updateTable(null);
+			inputTableMods.get(currentInput).updateTable(null);
 			updateCommands();
 			stopWaiting();
 		}
@@ -1028,7 +1097,7 @@ public class MainForm implements IParametersProvider {
 			}
 			else {
 				String[] aRes = fm.guessFormat(path);
-				switch ( prj.addDocument(path, aRes[0], null, aRes[1]) ) {
+				switch ( prj.addDocument(currentInput, path, aRes[0], null, aRes[1]) ) {
 				case 0: // OK
 					n++;
 					break;
@@ -1042,14 +1111,16 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void editInputProperties (int index) {
+		Table table = inputTables.get(currentInput);
 		try {
 			saveSurfaceData();
 			int n = index;
 			if ( n < 0 ) {
 				if ( (n = getFocusedInputIndex()) < 0 ) return;
 			}
-			Input inp = prj.getItemFromRelativePath(
-				inputTable.getItem(n).getText(0));
+			
+			Input inp = prj.getItemFromRelativePath(currentInput,
+				table.getItem(n).getText(0));
 
 			// Call the dialog
 			InputPropertiesForm dlg = new InputPropertiesForm(shell, this);
@@ -1061,28 +1132,28 @@ public class MainForm implements IParametersProvider {
 			// Update the file(s) data
 			startWaiting("Updating project...", false);
 			if ( index < 0 ) {
-				int[] indices = inputTable.getSelectionIndices();
+				int[] indices = table.getSelectionIndices();
 				for ( int i=0; i<indices.length; i++ ) {
-					inp = prj.getItemFromRelativePath(
-						inputTable.getItem(indices[i]).getText(0));
+					inp = prj.getItemFromRelativePath(currentInput,
+						table.getItem(indices[i]).getText(0));
 					inp.filterSettings = aRes[0];
 					inp.sourceEncoding = aRes[1];
 					inp.targetEncoding = aRes[2];
 				}
 			}
 			else {
-				inp = prj.getItemFromRelativePath(
-					inputTable.getItem(index).getText(0));
+				inp = prj.getItemFromRelativePath(currentInput,
+					table.getItem(index).getText(0));
 				inp.filterSettings = aRes[0];
 				inp.sourceEncoding = aRes[1];
 				inp.targetEncoding = aRes[2];
 			}
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMod.updateTable(inputTable.getSelectionIndices());
+			inputTableMods.get(currentInput).updateTable(table.getSelectionIndices());
 			stopWaiting();
 		}
 	}
@@ -1127,12 +1198,12 @@ public class MainForm implements IParametersProvider {
 			if ( index < 0 ) {
 				if ( (index = getFocusedInputIndex()) < 0 ) return;
 			}
-			Input inp = prj.getItemFromRelativePath(
-				inputTable.getItem(index).getText(0));
-			Program.launch(prj.getInputRoot() + File.separator + inp.relativePath); 
+			Input inp = prj.getItemFromRelativePath(currentInput,
+				inputTables.get(currentInput).getItem(index).getText(0));
+			Program.launch(prj.getInputRoot(currentInput) + File.separator + inp.relativePath); 
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -1143,7 +1214,7 @@ public class MainForm implements IParametersProvider {
 			dlg.showDialog();
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -1162,25 +1233,24 @@ public class MainForm implements IParametersProvider {
 
 			Input inp;
 			startWaiting("Updating project...", false);
+			Table table = inputTables.get(currentInput);
 			if ( index < 0 ) {
-				int[] indices = inputTable.getSelectionIndices();
+				int[] indices = table.getSelectionIndices();
 				for ( int i=0; i<indices.length; i++ ) {
-					inp = prj.getItemFromRelativePath(
-						inputTable.getItem(indices[i]).getText(0));
-					prj.inputList.remove(inp);
+					inp = prj.getItemFromRelativePath(currentInput, table.getItem(indices[i]).getText(0));
+					prj.getList(currentInput).remove(inp);
 				}
 			}
 			else {
-				inp = prj.getItemFromRelativePath(
-					inputTable.getItem(index).getText(0));
-				prj.inputList.remove(inp);
+				inp = prj.getItemFromRelativePath(currentInput, table.getItem(index).getText(0));
+				prj.getList(currentInput).remove(inp);
 			}
 		}
 		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMod.updateTable(null);
+			inputTableMods.get(currentInput).updateTable(null);
 			updateCommands();
 			stopWaiting();
 		}

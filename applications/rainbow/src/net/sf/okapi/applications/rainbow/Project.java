@@ -37,12 +37,13 @@ import org.w3c.dom.NodeList;
 
 public class Project {
 
+	protected ArrayList<ArrayList<Input>>   inputLists;
+	private ArrayList<String>               inputRoots;
+	
 	protected String              path;
-	protected ArrayList<Input>    inputList;
 	protected PathBuilder         pathBuilder;
 	protected boolean             isModified;
 	
-	private String                inputRoot;
 	private boolean               useOutputRoot;
 	private String                outputRoot;
 	private String                sourceLanguage;
@@ -53,11 +54,20 @@ public class Project {
 	
 
 	public Project (LanguageManager lm) {
-		inputRoot = System.getProperty("user.home");
-		paramsFolder = inputRoot;
+		paramsFolder = System.getProperty("user.home");
 		useOutputRoot = false;
 		outputRoot = "";
-		inputList = new ArrayList<Input>();
+		
+		// Three lists
+		inputLists = new ArrayList<ArrayList<Input>>();
+		inputRoots = new ArrayList<String>();
+		inputLists.add(new ArrayList<Input>());
+		inputRoots.add(System.getProperty("user.home"));
+		inputLists.add(new ArrayList<Input>());
+		inputRoots.add(System.getProperty("user.home"));
+		inputLists.add(new ArrayList<Input>());
+		inputRoots.add(System.getProperty("user.home"));
+		
 		pathBuilder = new PathBuilder();
 		pathBuilder.setExtension(".out");
 		sourceLanguage = Utils.getDefaultSourceLanguage().toUpperCase();
@@ -67,24 +77,30 @@ public class Project {
 		isModified = false;
 	}
 	
+	public ArrayList<Input> getList (int index) {
+		return inputLists.get(index);
+	}
+	
 	/**
 	 * Adds a document to the project.
+	 * @param listIndex Index of the input list where perform the operation.
 	 * @param newPath Full path of the document to add.
 	 * @param sourceEncoding Default sourceEncoding for the document (can be null).
 	 * @param filterSettings Filter settings string for the document (can be null). 
 	 * @return 0=Document added, 1=bad root, 2=exists already
 	 */
-	public int addDocument (String newPath,
-			String sourceEncoding,
-			String targetEncoding,
+	public int addDocument (int listIndex,
+		String newPath,
+		String sourceEncoding,
+		String targetEncoding,
 		String filterSettings)
 	{
 		// Is the root OK?
-		if ( newPath.indexOf(inputRoot) == -1 ) return 1;
-		newPath = newPath.substring(inputRoot.length()+1); // No leading separator
+		if ( newPath.indexOf(inputRoots.get(listIndex)) == -1 ) return 1;
+		newPath = newPath.substring(inputRoots.get(listIndex).length()+1); // No leading separator
 		
 		// Does the path exists already?
-		for ( Input tmpInp : inputList ) {
+		for ( Input tmpInp : inputLists.get(listIndex) ) {
 			if ( tmpInp.relativePath.equalsIgnoreCase(newPath) ) return 2; 
 		}
 		
@@ -94,18 +110,21 @@ public class Project {
 		inp.targetEncoding = ((targetEncoding == null) ? "" : targetEncoding);
 		inp.filterSettings = ((filterSettings == null) ? "" : filterSettings);
 		inp.relativePath = newPath;
-		inputList.add(inp);
+		inputLists.get(listIndex).add(inp);
 		isModified = true;
 		return 0;
 	}
 
 	/**
 	 * Gets an input item from the list, based on its relative path name.
+	 * @param listIndex Index of the input list where perform the operation.
 	 * @param relativePath Relative path of the item to search for.
 	 * @return An Input object or null.
 	 */
-	public Input getItemFromRelativePath (String relativePath) {
-		for ( Input inp : inputList ) {
+	public Input getItemFromRelativePath (int listIndex,
+		String relativePath)
+	{
+		for ( Input inp : inputLists.get(listIndex) ) {
 			if ( inp.relativePath.equalsIgnoreCase(relativePath) ) return inp;
 		}
 		return null;
@@ -122,19 +141,23 @@ public class Project {
 			writer.writeStartElement("rainbowProject");
 			writer.writeAttributeString("version", "4");
 			
-			writer.writeStartElement("fileSet");
-			writer.writeAttributeString("id", "1");
-			writer.writeElementString("root", inputRoot);
-			for ( Input item : inputList ) {
-				writer.writeStartElement("fi");
-				writer.writeAttributeString("fs", item.filterSettings);
-				writer.writeAttributeString("fo", item.format);
-				writer.writeAttributeString("se", item.sourceEncoding);
-				writer.writeAttributeString("te", item.targetEncoding);
-				writer.writeString(item.relativePath);
-				writer.writeEndElement(); // fi
+			int i=0;
+			for ( ArrayList<Input> inputList : inputLists ) {
+				writer.writeStartElement("fileSet");
+				writer.writeAttributeString("id", String.format("%d", i+1));
+				writer.writeElementString("root", inputRoots.get(i));
+				for ( Input item : inputList ) {
+					writer.writeStartElement("fi");
+					writer.writeAttributeString("fs", item.filterSettings);
+					writer.writeAttributeString("fo", item.format);
+					writer.writeAttributeString("se", item.sourceEncoding);
+					writer.writeAttributeString("te", item.targetEncoding);
+					writer.writeString(item.relativePath);
+					writer.writeEndElement(); // fi
+				}
+				writer.writeEndElement(); // fileSet
+				i++;
 			}
-			writer.writeEndElement(); // fileSet
 			
 			writer.writeStartElement("output");
 			writer.writeStartElement("root");
@@ -210,24 +233,29 @@ public class Project {
 				throw new Exception("Unsupported version of the project file.");
 			}
 
-			Element elem1 = getFirstElement(rootElem, "fileSet");
-			if ( elem1 == null ) throw new Exception("Element <fileSet> missing.");
-			
-			Element elem2 = getFirstElement(elem1, "root");
-			if ( elem2 == null ) throw new Exception("Element <root> missing.");
-			inputRoot = elem2.getTextContent();
-			
-			NodeList nl = elem1.getElementsByTagName("fi");
-			Input item;
-			for ( int i=0; i<nl.getLength(); i++ ) {
-				elem2 = (Element)nl.item(i);
-				item = new Input();
-				item.filterSettings = elem2.getAttribute("fs");
-				item.format = elem2.getAttribute("fo");
-				item.sourceEncoding = elem2.getAttribute("se");
-				item.targetEncoding = elem2.getAttribute("te");
-				item.relativePath = elem2.getTextContent();
-				inputList.add(item);
+			Element elem1;
+			Element elem2;
+			NodeList n1 = rootElem.getElementsByTagName("fileSet");
+			//TODO: Allow for un-ordered list of fileSet ???
+			for ( int i=0; i<n1.getLength(); i++ ) {
+				elem1 = (Element)n1.item(i);
+
+				elem2 = getFirstElement(elem1, "root");
+				if ( elem2 == null ) throw new Exception("Element <root> missing.");
+				inputRoots.set(i, elem2.getTextContent());
+
+				NodeList n2 = elem1.getElementsByTagName("fi");
+				Input item;
+				for ( int j=0; j<n2.getLength(); j++ ) {
+					elem2 = (Element)n2.item(j);
+					item = new Input();
+					item.filterSettings = elem2.getAttribute("fs");
+					item.format = elem2.getAttribute("fo");
+					item.sourceEncoding = elem2.getAttribute("se");
+					item.targetEncoding = elem2.getAttribute("te");
+					item.relativePath = elem2.getTextContent();
+					inputLists.get(i).add(item);
+				}
 			}
 
 			elem1 = getFirstElement(rootElem, "output");
@@ -292,15 +320,17 @@ public class Project {
 		}
 	}
 	
-	public void setInputRoot (String newRoot) {
-		if ( !inputRoot.equals(newRoot) ) {
-			inputRoot = newRoot;
+	public void setInputRoot (int listIndex,
+		String newRoot)
+	{
+		if ( !inputRoots.get(listIndex).equals(newRoot) ) {
+			inputRoots.set(listIndex, newRoot);
 			isModified = true;
 		}
 	}
 	
-	public String getInputRoot () {
-		return inputRoot;
+	public String getInputRoot (int listIndex) {
+		return inputRoots.get(listIndex);
 	}
 
 	public void setUseOutputRoot (boolean value) {
@@ -382,31 +412,37 @@ public class Project {
 	
 	/**
 	 * Builds the full path for a target file.
+	 * @param listIndex list to work with.
 	 * @param relativeSourcePath
 	 * @return the full path of the target file.
 	 */
-	public String buildTargetPath (String relativeSourcePath)
+	public String buildTargetPath (int listIndex,
+		String relativeSourcePath)
 	{
-		return pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
-			inputRoot,
+		return pathBuilder.getPath(inputRoots.get(listIndex) + File.separator + relativeSourcePath,
+			inputRoots.get(listIndex),
 			(useOutputRoot ? outputRoot : null ),
 			sourceLanguage,
 			targetLanguage);
 	}
 	
-	public String buildRelativeTargetPath (String relativeSourcePath) {
-		String tmp = pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
-			inputRoot,
+	public String buildRelativeTargetPath (int listIndex,
+		String relativeSourcePath)
+	{
+		String tmp = pathBuilder.getPath(inputRoots.get(listIndex) + File.separator + relativeSourcePath,
+				inputRoots.get(listIndex),
 			(useOutputRoot ? outputRoot : null ),
 			sourceLanguage,
 			targetLanguage);
-		if ( useOutputRoot ) return tmp.substring(inputRoot.length());
+		if ( useOutputRoot ) {
+			return tmp.substring(inputRoots.get(listIndex).length());
+		}
 		else return tmp.substring(outputRoot.length());
 	}
 	
-	public String buildOutputRoot () {
+	public String buildOutputRoot (int listIndex) {
 		if ( useOutputRoot ) return outputRoot;
-		else return inputRoot;
+		else return inputRoots.get(listIndex);
 	}
 	
 	public String buildSourceEncoding (Input item) {
@@ -421,11 +457,11 @@ public class Project {
 			: item.targetEncoding);
 	}
 	
-	public String[] getInputPaths () {
-		String[] inputs = new String[inputList.size()];
+	public String[] getInputPaths (int listIndex) {
+		String[] inputs = new String[inputLists.get(listIndex).size()];
 		int i = -1;
-		for ( Input item : inputList ) {
-			inputs[++i] = this.inputRoot + File.separator + item.relativePath;
+		for ( Input item : inputLists.get(listIndex) ) {
+			inputs[++i] = inputRoots.get(listIndex) + File.separator + item.relativePath;
 		}
 		return inputs;
 	}

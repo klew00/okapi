@@ -131,7 +131,7 @@ public class Dialogs {
 		String details)
 	{
 		MessageBox dlg = new MessageBox(shell, SWT.ICON_ERROR);
-		dlg.setMessage(message);
+		dlg.setMessage((message==null) ? "The error message is null." : message);
 		dlg.setText("Error");
 		dlg.open();
 	}
