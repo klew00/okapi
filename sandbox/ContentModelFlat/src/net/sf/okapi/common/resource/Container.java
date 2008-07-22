@@ -289,7 +289,7 @@ public class Container implements IContainer {
 					// search for corresponding closing code
 					int stack = 1;
 					for ( int j=i+1; j<codes.size(); j++ ) {
-						if ( codes.get(j))
+						//if ( codes.get(j))
 					}
 				}
 				break;
