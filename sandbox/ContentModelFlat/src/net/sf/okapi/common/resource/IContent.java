@@ -46,5 +46,7 @@ public interface IContent {
 	public IContainer getParent ();
 	
 	public void setParent (IContainer parent);
+	
+	public void balanceCodes ();
 
 }

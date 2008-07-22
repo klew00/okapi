@@ -1,10 +1,7 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class Container implements IContainer {
 
@@ -91,14 +88,14 @@ public class Container implements IContainer {
 	public void setSegment (int index,
 		IContent content)
 	{
+		content.setParent(this);
 		parts.set(getPartIndexFromSegmentIndex(index), content);
-		//TODO: update lastID and all IDs
-		//TODO: update parent
+		updateCodes();
 	}
 
 	public void removeSegment (int index) {
 		parts.remove(getPartIndexFromSegmentIndex(index));
-		//TODO: update lastID and all IDs
+		updateCodes();
 	}
 	
 	public IContent getPart (int index) {
@@ -108,14 +105,14 @@ public class Container implements IContainer {
 	public void setPart (int index,
 		IContent content)
 	{
+		content.setParent(this);
 		parts.set(index, content);
-		//TODO: update lastID and all IDs
-		//TODO: update parent
+		updateCodes();
 	}
 
 	public void removePart (int index) {
 		parts.remove(index);
-		//TODO: update lastID and all IDs
+		updateCodes();
 	}
 
 	public void append (CharSequence sequence) {
@@ -227,8 +224,7 @@ public class Container implements IContainer {
 		//TODO: check for call from setcodedtext(text) if codes survive
 		lastPart.codes = new ArrayList<Code>(codes);
 		lastPart.text = new StringBuilder(codedText);
-		
-		//TODO: update lastID
+		updateCodes();
 	}
 
 	public void setID (int id) {
@@ -257,6 +253,13 @@ public class Container implements IContainer {
 			throw new IllegalArgumentException("Cannot set the parent of a container.");
 	}
 	
+	public void balanceCodes () {
+		if ( lastPart == null ) return;
+		for ( IContent part : parts ) {
+			part.balanceCodes();
+		}
+	}
+	
 	private int getPartIndexFromSegmentIndex (int index) {
 		int i = 0;
 		for ( int j=0; j<parts.size(); j++ ) {
@@ -273,6 +276,10 @@ public class Container implements IContainer {
 		boolean needBalance = false;
 		int last = 0;
 		List<Code> codes = getCodes();
+		if ( codes.size() == 0 ) {
+			lastID = 0;
+			return;
+		}
 		
 		// Re-number the IDs
 		int i = 0;
@@ -282,24 +289,54 @@ public class Container implements IContainer {
 				i++;
 				continue; // Skip unbalanced codes for now
 			}
+			
+			int stack;
+			boolean found;
+			
 			switch ( code.type ) {
 			case CODE_OPENING:
-				if ( code.id != ++last ) {
-					code.id = last;
-					// search for corresponding closing code
-					int stack = 1;
-					for ( int j=i+1; j<codes.size(); j++ ) {
-						//if ( codes.get(j))
+				code.id = ++last;
+				// Search for corresponding closing code
+				stack = 1;
+				found = false;
+				for ( int j=i+1; j<codes.size(); j++ ) {
+					if ( codes.get(j).type == CODE_OPENING ) stack++;
+					else if ( codes.get(j).type == CODE_CLOSING ) {
+						if ( --stack == 0 ) {
+							codes.get(j).id = code.id;
+							found = true;
+							break;
+						}
 					}
+				}
+				if ( !found ) {
+					code.id = -1;
+					needBalance = true;
 				}
 				break;
 			case CODE_CLOSING:
-				// Do nothing: should be already fixed through the opening one.
+				// Should have a match already, as the opening should be before
+				stack = 1;
+				found = false;
+				for ( int j=i-1; j>-1; j-- ) {
+					if ( codes.get(j).type == CODE_CLOSING ) stack++;
+					else if ( codes.get(j).type == CODE_OPENING ) {
+						if ( --stack == 0 ) {
+							if ( codes.get(j).id != code.id ) {
+								throw new RuntimeException("updateCodes() bug!");
+							}
+							found = true;
+							break;
+						}
+					}
+				}
+				if ( !found ) {
+					code.id = -1;
+					needBalance = true;
+				}
 				break;
 			case CODE_ISOLATED:
-				if ( code.id != ++last ) {
-					code.id = last;
-				}
+				code.id = ++last;
 				break;
 			}
 			i++;
@@ -307,12 +344,7 @@ public class Container implements IContainer {
 		
 		// Reset the last code ID
 		lastID = last;
-		
 		// Now balance if needed
-		if ( needBalance ) {
-			for ( IContent part : parts ) {
-				//TODO part.
-			}
-		}
+		if ( needBalance ) balanceCodes();
 	}
 }

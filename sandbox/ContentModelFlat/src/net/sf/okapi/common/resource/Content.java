@@ -177,27 +177,7 @@ public class Content implements IContent {
 		this.parent = parent;
 	}
 	
-	private void changeCodeType (int index,
-		int newType )
-	{
-		// Update the code
-		codes.get(index).type = newType;;
-
-		// Update the coded text marker
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.codePointAt(i) ) {
-			case CODE_OPENING:
-			case CODE_CLOSING:
-			case CODE_ISOLATED:
-				if ( toIndex(text.charAt(++i)) == index ) {
-					text.setCharAt(i-1, toChar(newType));
-					return; // Done
-				}
-			}
-		}
-	}
-	
-	protected void balanceCodes () {
+	public void balanceCodes () {
 		if ( codes == null ) return;
 		Code code;
 		for ( int i=0; i<codes.size(); i++ ) {
@@ -232,6 +212,27 @@ public class Content implements IContent {
 					code.id = parent.setLastCodeID(parent.getLastCodeID()+1);
 				}
 				break;
+			}
+		}
+		isBalanced = true;
+	}
+	
+	private void changeCodeType (int index,
+		int newType )
+	{
+		// Update the code
+		codes.get(index).type = newType;;
+
+		// Update the coded text marker
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				if ( toIndex(text.charAt(++i)) == index ) {
+					text.setCharAt(i-1, toChar(newType));
+					return; // Done
+				}
 			}
 		}
 	}
