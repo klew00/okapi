@@ -83,6 +83,26 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		add(first, newSeg);
 	}
 
+	public void createSegment (int start, int end) {
+		int[] startSeg = getIndicesFromCodedTextPosition(start, true);
+		int[] endSeg = getIndicesFromCodedTextPosition(end, false);
+		if (( startSeg == null ) || ( endSeg == null ))
+			throw new IllegalArgumentException("Invalid start or end position.");
+		
+		String tmpText;
+		List<Code> tmpCodes;
+		if (( startSeg[0] == endSeg[0] ) && ( startSeg[1] == endSeg[1] )) {
+			// start == end: split that segment into two parts
+			//tmpText = get(startSeg[0]).getCodedText(startSeg[1], );
+			//tmpCodes = get(startSeg[0]).getCodes(0, end)
+		}
+		else { // Split into three parts
+			
+		}
+		//TODO
+		throw new UnsupportedOperationException("Not implemented yet.");
+	}
+	
 	public List<IContent> getSegments () {
 		ArrayList<IContent> list = new ArrayList<IContent>();
 		for ( IContent part : this ) {
@@ -222,8 +242,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	}
 
 	public String getCodedText (int start, int end) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented yet.");
+		return getCodedText().substring(start, end);
 	}
 
 	public List<Code> getCodes () {
@@ -236,8 +255,21 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	}
 
 	public List<Code> getCodes (int start, int end) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented yet.");
+		//TODO: Improve the code, this is quite costly to 
+		String tmp = getCodedText().substring(start, end);
+		List<Code> codes = getCodes();
+		List<Code> list = new ArrayList<Code>();
+		for ( int i=start; i<end; i++ ) {
+			switch ( tmp.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				//TODO: Do we need to clone the item copied???
+				list.add(codes.get(Content.toIndex(tmp.charAt(++i))));
+				break;
+			}
+		}
+		return list;
 	}
 
 	public String getEquivText () {
@@ -267,6 +299,11 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		tmp.isBalanced = false;
 		add(tmp);
 		updateCodes();
+	}
+
+	public void removeContent (int start, int end) {
+		//TODO
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public void setID (int id) {
@@ -311,6 +348,38 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		}
 		throw new IllegalArgumentException(
 			String.format("No segment part found at index %d.", index));
+	}
+	
+	/**
+	 * Gets the index of the part where a position is locate as well as
+	 * its relative position in that part. For example, given a container made 
+	 * of two segments: [abcd][efgh], the position 6 (g) returns [1,2] that is:
+	 * second element of the list and third character in that element.
+	 * @param pos The absolute position in the complete coded text.
+	 * @param ending Indicates if this is an ending position.
+	 * @return An array of 2 integers: 0=index of the part, 1=relation position.
+	 * The method returns null if the position could not be found.
+	 */
+	private int[] getIndicesFromCodedTextPosition (int pos,
+		boolean ending)
+	{
+		int result[] = new int[2];
+		int correction = 0;
+		int len;
+		// Make sure ending position falls in itemN if it is itmeN(length)+1
+		int end = (ending ? 1 : 0);
+		// Look for the item where the position is
+		for ( int i=0; i<size(); i++ ) {
+			len = get(i).getCodedText().length();
+			if (( pos >= correction ) && ( pos < correction+len+end )) {
+				result[0] = i;
+				// Result in out of bound by 1 for ending, and that's what we want
+				result[1] = len-((correction+len)-pos);
+				return result;
+			}
+			correction += len;
+		}
+		return null; // Not found
 	}
 
 	/**

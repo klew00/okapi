@@ -98,6 +98,8 @@ public class Main {
 		printSegments(cont);
 		System.out.println("cont2:");
 		printSegments(cont2);
+		
+		//cont.getCodes(, end)
 
 	}
 

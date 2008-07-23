@@ -27,6 +27,8 @@ public interface IContent {
 
 	public void setCodedText (String codedText, List<Code> codes);
 	
+	public void removeContent (int start, int end);
+	
 	public void append (CharSequence sequence);
 	
 	public void append (char value);

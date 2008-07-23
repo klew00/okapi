@@ -17,6 +17,8 @@ public interface IContainer extends List<IContent>, IContent {
 	public void joinAll ();
 	
 	public void joinSegments (int first, int last);
+	
+	public void createSegment (int start, int end);
 
 	public List<IContent> getSegments ();
 	

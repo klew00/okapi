@@ -131,8 +131,7 @@ public class Content implements IContent {
 	public String getCodedText (int start,
 		int end)
 	{
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented yet.");
+		return text.substring(start, end);
 	}
 
 	public List<Code> getCodes () {
@@ -145,8 +144,18 @@ public class Content implements IContent {
 	public List<Code> getCodes (int start,
 		int end)
 	{
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Not implemented yet.");
+		List<Code> list = new ArrayList<Code>();
+		for ( int i=start; i<end; i++ ) {
+			switch ( text.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				//TODO: Do we need to clone the item copied???
+				list.add(codes.get(toIndex(text.charAt(++i))));
+				break;
+			}
+		}
+		return list;
 	}
 
 	public String getEquivText () {
@@ -193,6 +202,20 @@ public class Content implements IContent {
 		this.codes = new ArrayList<Code>(codes);
 		isBalanced = false; // Just to make sure it is checked
 		// TODO: validation
+	}
+
+	public void removeContent (int start, int end) {
+		//TODO: should we check if start/end points to code indices?
+		for ( int i=start; i<end; i++ ) {
+			switch ( text.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				codes.remove(toIndex(text.charAt(++i)));
+				break;
+			}
+		}
+		text.replace(start, end, "");
 	}
 
 	public void setID (int id) {
