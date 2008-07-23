@@ -21,6 +21,28 @@ public class Content implements IContent {
 		return ((int)index)-CHARBASE;
 	}
 
+	/**
+	 * Add a given value to the index value of every code in the coded text.
+	 * @param codedText The coded text to change.
+	 * @param addition The value to add.
+	 */
+	public static String updateCodeIndices (String codedText,
+		int addition)
+	{
+		StringBuilder buffer = new StringBuilder(codedText);
+		for ( int i=0; i<buffer.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				int n = Content.toIndex(buffer.charAt(i+1));
+				buffer.setCharAt(++i, Content.toChar(n+addition));
+				break;
+			}
+		}
+		return buffer.toString();
+	}
+
 	protected Content (IContainer parent,
 		boolean isSegment)
 	{
@@ -61,9 +83,24 @@ public class Content implements IContent {
 	}
 
 	public void append (String text) {
-		// Add "" or the character is not taken into account (bug?)
 		if ( this.text == null ) this.text = new StringBuilder(text);
 		else this.text.append(text);
+	}
+	
+	public void append (IContent content) {
+		// Prepare the text
+		if ( text == null ) text = new StringBuilder();
+		// Check the codes
+		List<Code> list = content.getCodes();
+		if ( list.size() == 0 ) {
+			text.append(content.getCodedText());
+			return; // No code to add, we're done.
+		}
+		else {
+			if ( codes == null ) codes = new ArrayList<Code>();
+			text.append(updateCodeIndices(content.getCodedText(), codes.size()));
+			codes.addAll(list); // Must be copies of the codes!
+		}
 	}
 
 	public void append (int codeType,
@@ -240,5 +277,5 @@ public class Content implements IContent {
 			}
 		}
 	}
-	
+
 }

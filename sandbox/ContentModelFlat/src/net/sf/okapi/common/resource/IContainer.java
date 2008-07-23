@@ -4,15 +4,19 @@ import java.util.List;
 
 public interface IContainer extends List<IContent>, IContent {
 
-	public IContent addPart (boolean isSegment);
+	public IContent addContent (boolean isSegment);
 	
-	public IContent addPart (boolean isSegment, String text);
+	public IContent addContent (boolean isSegment, String text);
 	
+	// Maybe specific for flat model
 	public int getLastCodeID ();
 	
+	// Maybe specific for flat model
 	public int setLastCodeID (int value);
 
-	public void joinParts();
+	public void joinAll ();
+	
+	public void joinSegments (int first, int last);
 
 	public List<IContent> getSegments ();
 	

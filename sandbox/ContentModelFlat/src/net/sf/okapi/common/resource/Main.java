@@ -13,14 +13,14 @@ public class Main {
 		cont.append("cd ");
 		System.out.println(cont.getEquivText());
 		
-		IContent cnt = cont.addPart(true);
+		IContent cnt = cont.addContent(true);
 		cnt.append("sent1.");
 		System.out.println(cont.getEquivText());
 
-		cont.addPart(false, " ");
+		cont.addContent(false, " ");
 		System.out.println(cont.getEquivText());
 
-		cont.addPart(true, "sent2");
+		cont.addContent(true, "sent2");
 		cont.append("+codes: ");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
 		cont.append("bold");
@@ -49,7 +49,7 @@ public class Main {
 
 		// New test set
 		cont = new Container();
-		cnt = cont.addPart(true, "sent1");
+		cnt = cont.addContent(true, "sent1");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
 		cont.append("bold1_1");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
@@ -57,8 +57,8 @@ public class Main {
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
 		cont.append("bold1_1bis");
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
-		cont.addPart(false, "_");
-		cont.addPart(true, "sent2");
+		cont.addContent(false, "_");
+		cont.addContent(true, "sent2");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
 		cont.append("bold2_1");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
@@ -66,8 +66,8 @@ public class Main {
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
 		cont.append("bold2_1bis");
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
-		cont.addPart(false, "_");
-		cont.addPart(true, "sent3");
+		cont.addContent(false, "_");
+		cont.addContent(true, "sent3");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
 		cont.append("bold3_1");
 		cont.append(IContent.CODE_OPENING, "b", "<b>");
@@ -77,20 +77,28 @@ public class Main {
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
 		printSegments(cont);
 
-/*		IContainer cont2 = new Container();
+		IContainer cont2 = new Container();
 		cont2.add(cont.getSegment(1));
 		System.out.println("cont:");
 		printSegments(cont);
 		System.out.println("cont2:");
 		printSegments(cont2);
-*/
-		cont.removeSegment(1);
-		printSegments(cont);
 
+		//cont.removeSegment(1);
+		//System.out.println("cont after removeSegment(1):");
+		//printSegments(cont);
+
+		cont.joinSegments(1, 2);
+		printSegments(cont);
+		
 		codes = cont.getCodes();
 		String codedText = cont.getCodedText();
 		cont.setCodedText(modifyCodedText(codedText));
+		System.out.println("cont after modif:");
 		printSegments(cont);
+		System.out.println("cont2:");
+		printSegments(cont2);
+
 	}
 
 	private static void printSegments (IContainer container) {

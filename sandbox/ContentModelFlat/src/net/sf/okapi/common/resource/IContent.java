@@ -1,6 +1,5 @@
 package net.sf.okapi.common.resource;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface IContent {
@@ -34,6 +33,8 @@ public interface IContent {
 	
 	public void append (String text);
 	
+	public void append (IContent content);
+	
 	public void append (int codeType, String label, String data);
 	
 	public void clear ();
@@ -44,10 +45,13 @@ public interface IContent {
 	
 	public int getLength ();
 
+	// Maybe specific for flat model
 	public IContainer getParent ();
 	
+	// Maybe specific for flat model
 	public void setParent (IContainer parent);
 	
+	// Maybe specific for flat model 
 	public void balanceCodes ();
 
 }

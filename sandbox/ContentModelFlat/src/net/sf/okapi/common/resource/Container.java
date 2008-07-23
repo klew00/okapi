@@ -2,6 +2,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Container extends ArrayList<IContent> implements IContainer {
@@ -12,12 +13,12 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	private int                   id;
 
 
-	public IContent addPart (boolean isSegment) {
+	public IContent addContent (boolean isSegment) {
 		add(new Content(this, isSegment));
 		return get(size()-1);
 	}
 	
-	public IContent addPart (boolean isSegment,
+	public IContent addContent (boolean isSegment,
 		String text)
 	{
 		Content tmp = new Content(this, text);
@@ -35,7 +36,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		return lastID;
 	}
 	
-	public void joinParts () {
+	public void joinAll () {
 		if ( size() < 2 ) return;
 		// Create temporary holders for text and codes
 		List<Code> newCodes = new ArrayList<Code>();
@@ -44,7 +45,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		int addition = 0;
 		for ( IContent part : this ) {
 			// Fix the code indices and add the coded text 
-			newText.append(updateCodeIndices(part.getCodedText(), addition));
+			newText.append(Content.updateCodeIndices(part.getCodedText(), addition));
 			// Add codes (no need for cloning here)
 			newCodes.addAll(part.getCodes());
 			addition = newCodes.size();
@@ -52,6 +53,34 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		clear();
 		// Set the new data
 		setCodedText(newText.toString(), newCodes);
+	}
+	
+	public void joinSegments (int first, int last) {
+		first = getPartIndexFromSegmentIndex(first);
+		last = getPartIndexFromSegmentIndex(last);
+		if (( last < first ) || ( first < 0 ) || ( last > size()-1 ))
+			throw new IllegalArgumentException("Invalid first or last index.");
+		if ( first == last ) return; // Nothing to do
+		
+		//TODO: a faster way would be to start concatenation on get(first)
+		// Create temporary holders for text and codes
+		StringBuilder newText = new StringBuilder();
+		List<Code> newCodes = new ArrayList<Code>();
+		
+		// Join the segments and anything in-between
+		int addition = 0;
+		for ( int i=first; i<=last; i++ ) {
+			// Fix the code indices and add the coded text 
+			newText.append(Content.updateCodeIndices(get(first).getCodedText(), addition));
+			// Add codes (no need for cloning here)
+			newCodes.addAll(get(first).getCodes());
+			addition = newCodes.size();
+			remove(first);
+		}
+		// Create the new content and add it
+		IContent newSeg = new Content(this, true);
+		newSeg.setCodedText(newText.toString(), newCodes);
+		add(first, newSeg);
 	}
 
 	public List<IContent> getSegments () {
@@ -61,7 +90,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 				list.add(part);
 			}
 		}
-		return list;
+		return Collections.unmodifiableList(list);
 	}
 	
 	public IContent getSegment (int index) {
@@ -95,6 +124,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 			throw new IllegalArgumentException("Cannot add a null content.");
 		content.setParent(this);
 		super.add(index, content);
+		updateLastCodeID();
 	}
 	
 	@Override
@@ -102,7 +132,9 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		if ( content == null )
 			throw new IllegalArgumentException("Cannot add a null content.");
 		content.setParent(this);
-		return super.add(content);
+		boolean result = super.add(content);
+		updateLastCodeID();
+		return result;
 	}
 
 	@Override
@@ -159,6 +191,15 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		else get(size()-1).append(text);
 	}
 
+	public void append (IContent content) {
+		if ( size() == 0 ) add(content);
+		else {
+			get(size()-1).append(content);
+			updateLastCodeID();
+		}
+		
+	}
+
 	public void append (int codeType,
 		String label,
 		String data)
@@ -174,7 +215,7 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		int addition = 0;
 		for ( IContent part : this ) {
 			// Fix the code indices and append the coded text
-			tmp.append(updateCodeIndices(part.getCodedText(), addition));
+			tmp.append(Content.updateCodeIndices(part.getCodedText(), addition));
 			addition += part.getCodes().size();
 		}
 		return tmp.toString();
@@ -204,7 +245,6 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		if ( size() == 1 ) return get(size()-1).getEquivText();
 		StringBuilder tmp = new StringBuilder();
 		for ( IContent part : this ) {
-			//TODO: need to update the code indices!!!
 			tmp.append(part.getEquivText());
 		}
 		return tmp.toString();
@@ -271,28 +311,6 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		}
 		throw new IllegalArgumentException(
 			String.format("No segment part found at index %d.", index));
-	}
-
-	/**
-	 * Add a given value to the index value of every code in the coded text.
-	 * @param codedText The coded text to change.
-	 * @param addition The value to add.
-	 */
-	private String updateCodeIndices (String codedText,
-		int addition)
-	{
-		StringBuilder buffer = new StringBuilder(codedText);
-		for ( int i=0; i<buffer.length(); i++ ) {
-			switch ( codedText.codePointAt(i) ) {
-			case CODE_OPENING:
-			case CODE_CLOSING:
-			case CODE_ISOLATED:
-				int n = Content.toIndex(buffer.charAt(i+1));
-				buffer.setCharAt(++i, Content.toChar(n+addition));
-				break;
-			}
-		}
-		return buffer.toString();
 	}
 
 	/**
