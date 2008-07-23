@@ -95,7 +95,7 @@ public class Content implements IContent {
 		int end)
 	{
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public List<Code> getCodes () {
@@ -109,7 +109,7 @@ public class Content implements IContent {
 		int end)
 	{
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public String getEquivText () {
@@ -140,18 +140,22 @@ public class Content implements IContent {
 	}
 
 	public boolean isEmpty () {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 	public void setCodedText (String codedText) {
-		// TODO Auto-generated method stub
+		setCodedText(codedText, codes);
+		// TODO: validation
 	}
 
 	public void setCodedText (String codedText,
 		List<Code> codes)
 	{
-		// TODO Auto-generated method stub
+		text = new StringBuilder(codedText);
+		this.codes = new ArrayList<Code>(codes);
+		isBalanced = false; // Just to make sure it is checked
+		// TODO: validation
 	}
 
 	public void setID (int id) {

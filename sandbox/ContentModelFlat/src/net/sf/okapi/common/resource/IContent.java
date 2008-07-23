@@ -1,5 +1,6 @@
 package net.sf.okapi.common.resource;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface IContent {

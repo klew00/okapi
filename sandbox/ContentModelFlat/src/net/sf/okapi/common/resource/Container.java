@@ -1,35 +1,29 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Container extends ArrayList<IContent> implements IContainer {
 
 	private static final long     serialVersionUID = 1L;
 	
-	private Content               lastPart;
-	private ArrayList<IContent>   parts;
 	private int                   lastID;
 	private int                   id;
 
 
-	public Container () {
-		parts = new ArrayList<IContent>();
-	}
-	
 	public IContent addPart (boolean isSegment) {
-		lastPart = new Content(this, isSegment);
-		parts.add(lastPart);
-		return lastPart;
+		add(new Content(this, isSegment));
+		return get(size()-1);
 	}
 	
 	public IContent addPart (boolean isSegment,
 		String text)
 	{
-		lastPart = new Content(this, text);
-		lastPart.isSegment = isSegment;
-		parts.add(lastPart);
-		return lastPart;
+		Content tmp = new Content(this, text);
+		tmp.isSegment = isSegment;
+		add(tmp);
+		return get(size()-1);
 	}
 	
 	public int getLastCodeID () {
@@ -42,30 +36,27 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	}
 	
 	public void joinParts () {
-		if (( lastPart == null ) || ( parts.size() == 1 )) return;
+		if ( size() < 2 ) return;
 		// Create temporary holders for text and codes
 		List<Code> newCodes = new ArrayList<Code>();
 		StringBuilder newText = new StringBuilder();
 		// Gather the segments data
 		int addition = 0;
-		for ( IContent part : parts ) {
+		for ( IContent part : this ) {
 			// Fix the code indices and add the coded text 
 			newText.append(updateCodeIndices(part.getCodedText(), addition));
 			// Add codes (no need for cloning here)
 			newCodes.addAll(part.getCodes());
 			addition = newCodes.size();
 		}
-		// Make sure setCodedText() won't be called recursively
-		// by setting lastPart to null
-		lastPart = null;
-		parts = new ArrayList<IContent>();
+		clear();
 		// Set the new data
 		setCodedText(newText.toString(), newCodes);
 	}
 
 	public List<IContent> getSegments () {
 		ArrayList<IContent> list = new ArrayList<IContent>();
-		for ( IContent part : parts ) {
+		for ( IContent part : this ) {
 			if ( part.isSegment() ) {
 				list.add(part);
 			}
@@ -73,14 +64,9 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		return list;
 	}
 	
-	public List<IContent> getParts () {
-		//TODO: should it be copy or self?
-		return parts;
-	}
-	
 	public IContent getSegment (int index) {
 		int i = 0;
-		for ( IContent part : parts ) {
+		for ( IContent part : this ) {
 			if ( part.isSegment() ) {
 				if ( i == index ) return part;
 				i++;
@@ -94,63 +80,99 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		IContent content)
 	{
 		content.setParent(this);
-		parts.set(getPartIndexFromSegmentIndex(index), content);
+		set(getPartIndexFromSegmentIndex(index), content);
 		updateCodes();
 	}
 
 	public void removeSegment (int index) {
-		parts.remove(getPartIndexFromSegmentIndex(index));
+		remove(getPartIndexFromSegmentIndex(index));
 		updateCodes();
 	}
 	
-	public void append (CharSequence sequence) {
-		if ( lastPart == null ) {
-			lastPart = new Content(this, sequence);
-			parts.add(lastPart);
+	@Override
+	public void add (int index, IContent content) {
+		if ( content == null )
+			throw new IllegalArgumentException("Cannot add a null content.");
+		content.setParent(this);
+		super.add(index, content);
+	}
+	
+	@Override
+	public boolean add (IContent content) {
+		if ( content == null )
+			throw new IllegalArgumentException("Cannot add a null content.");
+		content.setParent(this);
+		return super.add(content);
+	}
+
+	@Override
+	public boolean addAll (Collection collection) {
+		//TODO
+		throw new UnsupportedOperationException("Not implemented yet.");
+	}
+	
+	@Override
+	public boolean addAll (int index,
+		Collection collection)
+	{
+		//TODO
+		throw new UnsupportedOperationException("Not implemented yet.");
+	}
+	
+	@Override
+	public IContent set (int index,
+		IContent content)
+	{
+		if ( content == null )
+			throw new IllegalArgumentException("Cannot set a null content.");
+		content.setParent(this);
+		return super.set(index, content);
+	}
+
+	@Override
+	public boolean isEmpty () {
+		for ( IContent part : this ) {
+			if ( !part.isEmpty() ) return false;
 		}
-		else lastPart.append(sequence);
+		return true;
+	}
+
+	@Override
+	public void clear () {
+		super.clear();
+		lastID = 0;
+		id = 0;
+	}
+
+	public void append (CharSequence sequence) {
+		if ( size() == 0 ) add(new Content(this, sequence));
+		else get(size()-1).append(sequence);
 	}
 
 	public void append (char value) {
-		if ( lastPart == null ) {
-			lastPart = new Content(this, value);
-			parts.add(lastPart);
-		}
-		else lastPart.append(value);
+		if ( size() == 0 ) add(new Content(this, value));
+		else get(size()-1).append(value);
 	}
 
 	public void append (String text) {
-		if ( lastPart == null ) {
-			lastPart = new Content(this, text);
-			parts.add(lastPart);
-		}
-		else lastPart.append(text);
+		if ( size() == 0 ) add(new Content(this, text));
+		else get(size()-1).append(text);
 	}
 
 	public void append (int codeType,
 		String label,
 		String data)
 	{
-		if ( lastPart == null ) {
-			lastPart = new Content(this, true);
-			parts.add(lastPart);
-		}
-		lastPart.append(codeType, label, data);
-	}
-
-	public void clear () {
-		lastPart = null;
-		parts = new ArrayList<IContent>();
-		lastID = 0;
-		id = 0;
+		if ( size() == 0 ) add(new Content(this, true));
+		get(size()-1).append(codeType, label, data);
 	}
 
 	public String getCodedText () {
-		if ( lastPart == null ) return "";
-		if ( parts.size() == 1 ) return lastPart.getCodedText();
+		if ( size() == 0 ) return "";
+		if ( size() == 1 ) return get(size()-1).getCodedText();
 		StringBuilder tmp = new StringBuilder();
 		int addition = 0;
-		for ( IContent part : parts ) {
+		for ( IContent part : this ) {
 			// Fix the code indices and append the coded text
 			tmp.append(updateCodeIndices(part.getCodedText(), addition));
 			addition += part.getCodes().size();
@@ -160,13 +182,13 @@ public class Container extends ArrayList<IContent> implements IContainer {
 
 	public String getCodedText (int start, int end) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public List<Code> getCodes () {
 		ArrayList<Code> list = new ArrayList<Code>();
-		if ( lastPart == null ) return list;
-		for ( IContent part : parts ) {
+		if ( size() == 0 ) return list;
+		for ( IContent part : this ) {
 			list.addAll(part.getCodes());
 		}
 		return list;
@@ -174,14 +196,14 @@ public class Container extends ArrayList<IContent> implements IContainer {
 
 	public List<Code> getCodes (int start, int end) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Not implemented yet.");
 	}
 
 	public String getEquivText () {
-		if ( lastPart == null ) return "";
-		if ( parts.size() == 1 ) return lastPart.getEquivText();
+		if ( size() == 0 ) return "";
+		if ( size() == 1 ) return get(size()-1).getEquivText();
 		StringBuilder tmp = new StringBuilder();
-		for ( IContent part : parts ) {
+		for ( IContent part : this ) {
 			//TODO: need to update the code indices!!!
 			tmp.append(part.getEquivText());
 		}
@@ -192,15 +214,6 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		return id;
 	}
 
-	public boolean isEmpty () {
-		if ( lastPart == null ) return true;
-		if ( parts.size() == 1 ) return lastPart.isEmpty();
-		for ( IContent part : parts ) {
-			if ( !part.isEmpty() ) return false;
-		}
-		return true;
-	}
-
 	public void setCodedText (String codedText) {
 		setCodedText(codedText, getCodes());
 	}
@@ -208,12 +221,11 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	public void setCodedText (String codedText,
 		List<Code> codes)
 	{
-		lastPart = new Content(this, true);
-		lastPart.codes = new ArrayList<Code>(codes);
-		lastPart.text = new StringBuilder(codedText);
-		parts = new ArrayList<IContent>();
-		parts.add(lastPart);
-		lastPart.isBalanced = false;
+		clear();
+		Content tmp = new Content(this, true);
+		tmp.setCodedText(codedText, codes);
+		tmp.isBalanced = false;
+		add(tmp);
 		updateCodes();
 	}
 
@@ -222,9 +234,8 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	}
 	
 	public boolean isSegment () {
-		if ( lastPart == null ) return false;
-		if ( parts.size() == 1 ) return lastPart.isSegment;
-		for ( IContent part : parts ) {
+		if ( size() == 0 ) return false;
+		for ( IContent part : this ) {
 			if ( !part.isSegment() ) return false;
 		}
 		return true;
@@ -244,16 +255,16 @@ public class Container extends ArrayList<IContent> implements IContainer {
 	}
 	
 	public void balanceCodes () {
-		if ( lastPart == null ) return;
-		for ( IContent part : parts ) {
+		if ( size() == 0 ) return;
+		for ( IContent part : this ) {
 			part.balanceCodes();
 		}
 	}
 	
 	private int getPartIndexFromSegmentIndex (int index) {
 		int i = 0;
-		for ( int j=0; j<parts.size(); j++ ) {
-			if ( parts.get(j).isSegment() ) {
+		for ( int j=0; j<size(); j++ ) {
+			if ( get(j).isSegment() ) {
 				if ( i == index ) return j;
 				else i++;
 			}
@@ -283,12 +294,24 @@ public class Container extends ArrayList<IContent> implements IContainer {
 		}
 		return buffer.toString();
 	}
+
+	/**
+	 * Updates the last code ID value. This assumes every part has balanced codes,
+	 * otherwise the call to balance codes is triggered and wrong IDs may be set as
+	 * the operation of balancing codes depend of a correct value for the last code ID.
+	 */
+	private void updateLastCodeID () {
+		List<Code> list;
+		lastID = 0;
+		for ( IContent part : this ) {
+			list = part.getCodes(); // This may trigger balanceCodes()
+			for ( Code code : list ) {
+				if ( code.id > lastID ) lastID = code.id;
+			}
+		}
+	}
 	
 	private void updateCodes () {
-		//TODO:
-		/*
-		 * Need to update the codedtext when code list changes
-		 */
 		boolean needBalance = false;
 		int last = 0;
 		List<Code> codes = getCodes();

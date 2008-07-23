@@ -16,8 +16,6 @@ public interface IContainer extends List<IContent>, IContent {
 
 	public List<IContent> getSegments ();
 	
-	public List<IContent> getParts ();
-	
 	public IContent getSegment (int index);
 	
 	public void setSegment (int index, IContent content);

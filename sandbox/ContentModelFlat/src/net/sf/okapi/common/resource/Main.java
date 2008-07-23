@@ -31,17 +31,11 @@ public class Main {
 		cont.append(IContent.CODE_ISOLATED, "br", "<br/>");
 		System.out.println(cont.getEquivText());
 		
-		List<IContent> list = cont.getSegments();
-		System.out.print("List of the segments: ");
-		for ( int i=0; i<list.size(); i++ ) {
-			System.out.print(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
-		}
-		System.out.println("");
+		printSegments(cont);
 
-		list = cont.getParts();
 		System.out.print("List of the parts: ");
-		for ( int i=0; i<list.size(); i++ ) {
-			System.out.print(String.format("[part(%d)='%s'] ", i, list.get(i).getEquivText()));
+		for ( int i=0; i<cont.size(); i++ ) {
+			System.out.print(String.format("[part(%d)='%s'] ", i, cont.get(i).getEquivText()));
 		}
 		System.out.println("");
 
@@ -81,31 +75,33 @@ public class Main {
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
 		cont.append("bold3_1bis");
 		cont.append(IContent.CODE_CLOSING, "b", "</b>");
+		printSegments(cont);
 
-		list = cont.getSegments();
-		System.out.println("List of the segments: ");
-		for ( int i=0; i<list.size(); i++ ) {
-			System.out.println(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
-		}
-
+/*		IContainer cont2 = new Container();
+		cont2.add(cont.getSegment(1));
+		System.out.println("cont:");
+		printSegments(cont);
+		System.out.println("cont2:");
+		printSegments(cont2);
+*/
 		cont.removeSegment(1);
-		list = cont.getSegments();
-		System.out.println("List of the segments: ");
-		for ( int i=0; i<list.size(); i++ ) {
-			System.out.println(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
-		}
+		printSegments(cont);
 
 		codes = cont.getCodes();
 		String codedText = cont.getCodedText();
 		cont.setCodedText(modifyCodedText(codedText));
-		list = cont.getSegments();
-		System.out.println("List of the segments after setCodedText(): ");
-		for ( int i=0; i<list.size(); i++ ) {
-			System.out.println(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
-		}
-		
+		printSegments(cont);
 	}
 
+	private static void printSegments (IContainer container) {
+		List<IContent> list = container.getSegments();
+		System.out.println("List of the segments:");
+		for ( int i=0; i<list.size(); i++ ) {
+			System.out.println(String.format("seg(%d)=\"%s\"", i, list.get(i).getEquivText()));
+		}
+		System.out.println("");
+	}
+	
 	private static String modifyCodedText (String codedText) {
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<codedText.length(); i++ ) {
