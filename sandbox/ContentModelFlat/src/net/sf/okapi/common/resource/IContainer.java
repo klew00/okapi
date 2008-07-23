@@ -2,7 +2,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.List;
 
-public interface IContainer extends IContent {
+public interface IContainer extends List<IContent>, IContent {
 
 	public IContent addPart (boolean isSegment);
 	
@@ -23,11 +23,5 @@ public interface IContainer extends IContent {
 	public void setSegment (int index, IContent content);
 
 	public void removeSegment (int index);
-
-	public IContent getPart (int index);
-	
-	public void setPart (int index, IContent content);
-
-	public void removePart (int index);
 
 }

@@ -94,8 +94,36 @@ public class Main {
 		for ( int i=0; i<list.size(); i++ ) {
 			System.out.println(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
 		}
-		
+
+		codes = cont.getCodes();
+		String codedText = cont.getCodedText();
+		cont.setCodedText(modifyCodedText(codedText));
+		list = cont.getSegments();
+		System.out.println("List of the segments after setCodedText(): ");
+		for ( int i=0; i<list.size(); i++ ) {
+			System.out.println(String.format("[seg(%d)='%s'] ", i, list.get(i).getEquivText()));
+		}
 		
 	}
-	
+
+	private static String modifyCodedText (String codedText) {
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case IContent.CODE_CLOSING:
+			case IContent.CODE_OPENING:
+			case IContent.CODE_ISOLATED:
+				tmp.append(codedText.charAt(i++));
+				tmp.append(codedText.charAt(i));
+				break;
+			default:
+				if ( Character.isLowerCase(codedText.charAt(i)) )
+					tmp.append(Character.toUpperCase(codedText.charAt(i)));
+				else
+					tmp.append(Character.toLowerCase(codedText.charAt(i)));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
 }

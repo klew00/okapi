@@ -3,8 +3,10 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container implements IContainer {
+public class Container extends ArrayList<IContent> implements IContainer {
 
+	private static final long     serialVersionUID = 1L;
+	
 	private Content               lastPart;
 	private ArrayList<IContent>   parts;
 	private int                   lastID;
@@ -45,15 +47,18 @@ public class Container implements IContainer {
 		List<Code> newCodes = new ArrayList<Code>();
 		StringBuilder newText = new StringBuilder();
 		// Gather the segments data
+		int addition = 0;
 		for ( IContent part : parts ) {
-			// Add coded text
-			newText.append(part.getCodedText());
+			// Fix the code indices and add the coded text 
+			newText.append(updateCodeIndices(part.getCodedText(), addition));
 			// Add codes (no need for cloning here)
 			newCodes.addAll(part.getCodes());
+			addition = newCodes.size();
 		}
 		// Make sure setCodedText() won't be called recursively
 		// by setting lastPart to null
 		lastPart = null;
+		parts = new ArrayList<IContent>();
 		// Set the new data
 		setCodedText(newText.toString(), newCodes);
 	}
@@ -98,23 +103,6 @@ public class Container implements IContainer {
 		updateCodes();
 	}
 	
-	public IContent getPart (int index) {
-		return parts.get(index);
-	}
-	
-	public void setPart (int index,
-		IContent content)
-	{
-		content.setParent(this);
-		parts.set(index, content);
-		updateCodes();
-	}
-
-	public void removePart (int index) {
-		parts.remove(index);
-		updateCodes();
-	}
-
 	public void append (CharSequence sequence) {
 		if ( lastPart == null ) {
 			lastPart = new Content(this, sequence);
@@ -144,7 +132,7 @@ public class Container implements IContainer {
 		String data)
 	{
 		if ( lastPart == null ) {
-			lastPart = new Content(this, false);
+			lastPart = new Content(this, true);
 			parts.add(lastPart);
 		}
 		lastPart.append(codeType, label, data);
@@ -161,8 +149,11 @@ public class Container implements IContainer {
 		if ( lastPart == null ) return "";
 		if ( parts.size() == 1 ) return lastPart.getCodedText();
 		StringBuilder tmp = new StringBuilder();
+		int addition = 0;
 		for ( IContent part : parts ) {
-			tmp.append(part.getCodedText());
+			// Fix the code indices and append the coded text
+			tmp.append(updateCodeIndices(part.getCodedText(), addition));
+			addition += part.getCodes().size();
 		}
 		return tmp.toString();
 	}
@@ -191,6 +182,7 @@ public class Container implements IContainer {
 		if ( parts.size() == 1 ) return lastPart.getEquivText();
 		StringBuilder tmp = new StringBuilder();
 		for ( IContent part : parts ) {
+			//TODO: need to update the code indices!!!
 			tmp.append(part.getEquivText());
 		}
 		return tmp.toString();
@@ -216,14 +208,12 @@ public class Container implements IContainer {
 	public void setCodedText (String codedText,
 		List<Code> codes)
 	{
-		if ( lastPart == null ) {
-			lastPart = new Content(this, false);
-			parts.add(lastPart);
-		}
-		else joinParts();
-		//TODO: check for call from setcodedtext(text) if codes survive
+		lastPart = new Content(this, true);
 		lastPart.codes = new ArrayList<Code>(codes);
 		lastPart.text = new StringBuilder(codedText);
+		parts = new ArrayList<IContent>();
+		parts.add(lastPart);
+		lastPart.isBalanced = false;
 		updateCodes();
 	}
 
@@ -272,7 +262,33 @@ public class Container implements IContainer {
 			String.format("No segment part found at index %d.", index));
 	}
 
+	/**
+	 * Add a given value to the index value of every code in the coded text.
+	 * @param codedText The coded text to change.
+	 * @param addition The value to add.
+	 */
+	private String updateCodeIndices (String codedText,
+		int addition)
+	{
+		StringBuilder buffer = new StringBuilder(codedText);
+		for ( int i=0; i<buffer.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case CODE_OPENING:
+			case CODE_CLOSING:
+			case CODE_ISOLATED:
+				int n = Content.toIndex(buffer.charAt(i+1));
+				buffer.setCharAt(++i, Content.toChar(n+addition));
+				break;
+			}
+		}
+		return buffer.toString();
+	}
+	
 	private void updateCodes () {
+		//TODO:
+		/*
+		 * Need to update the codedtext when code list changes
+		 */
 		boolean needBalance = false;
 		int last = 0;
 		List<Code> codes = getCodes();
