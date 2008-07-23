@@ -18,7 +18,9 @@ public class Main {
 		RootContainer root = new RootContainer();
 
 		// 'Hello '
-		root.add(new TextFragment("Hello "));
+		TextFragment fragment = new TextFragment("He");
+		fragment.append("llo ");
+		root.add(fragment);
 		
 		// '<b>big</b>'
 		MarkupContainer markup = new MarkupContainer();

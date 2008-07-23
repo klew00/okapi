@@ -1,10 +1,7 @@
 package net.sf.okapi.resource;
 
-public class TextFragment implements IContent{
+public class TextFragment implements IContent, CharSequence, Appendable{
 	
-	// TODO we could expose a StringBuilder like interface for TextFragments to make them more efficient
-	// and easier to use.
-	// we can't subclass StringBuilder directly as it is declared final..
 	private StringBuilder builder;
 	
 	private int id;
@@ -30,7 +27,7 @@ public class TextFragment implements IContent{
 	}
 	
 	public void append(TextFragment other){
-		builder.append(other.toString());
+		builder.append(other.builder);
 	}
 	
 	public String getEquivText() {
@@ -46,6 +43,34 @@ public class TextFragment implements IContent{
 		TextFragment other = new TextFragment(builder.substring(charIndex));
 		builder.delete(charIndex, builder.length());
 		return other;
+	}
+
+	public char charAt(int index) {
+		return builder.charAt(index);
+	}
+
+	public int length() {
+		return builder.length();
+	}
+
+	public TextFragment subSequence(int start, int end) {
+		TextFragment other = new TextFragment(builder.subSequence(start, end));
+		return other;
+	}
+
+	public TextFragment append(CharSequence csq){
+		builder.append(csq);
+		return this;
+	}
+
+	public TextFragment append(char c){
+		builder.append(c);
+		return this;
+	}
+
+	public TextFragment append(CharSequence csq, int start, int end){
+		builder.append(csq, start, end);
+		return this;
 	}
 	
 }

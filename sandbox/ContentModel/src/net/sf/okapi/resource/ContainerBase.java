@@ -2,7 +2,7 @@ package net.sf.okapi.resource;
 
 import java.util.ArrayList;
 
-public class ContainerBase extends ArrayList<IContent> implements IContainer, CharSequence{
+public abstract class ContainerBase extends ArrayList<IContent> implements IContainer{
 
 	private int id;
 
@@ -46,30 +46,4 @@ public class ContainerBase extends ArrayList<IContent> implements IContainer, Ch
 			}
 		}
 	}
-
-	public char charAt(int index) {
-		int currentLength = 0;
-		for(IContent child: this){
-			if(child instanceof IContainer){
-				
-			}
-		}
-		
-		return ' ';
-	}
-
-	public int length() {
-		// TODO this is a very expensive operation unless cached somehow
-		int length = 0;
-		for(IContent child: this){
-			length += ((CharSequence)child).length();
-		}
-		return length;
-	}
-
-	public CharSequence subSequence(int start, int end) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }
