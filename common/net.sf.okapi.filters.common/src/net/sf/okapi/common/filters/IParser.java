@@ -29,19 +29,15 @@ import net.sf.okapi.common.resource.IGroupResource;
  */
 public interface IParser {
 
-	public static final int ENDINPUT = 0;
-	public static final int STARTGROUP = 1;
-	public static final int ENDGROUP = 2;
-	public static final int TRANSUNIT = 3;
-	public static final int SKELETON = 4;
-
+	public static enum PARSER_TOKEN_TYPE {ENDINPUT, STARTGROUP, ENDGROUP, TRANSUNIT, SKELETON};
+	
 	/**
 	 * Open a streamed byte source and prepare for parsing.
 	 * 
 	 * @param input
 	 *            streaming input source.
 	 */
-	public void open(InputStream input) throws IOException;
+	public void open(InputStream input);
 
 	/**
 	 * Open an in memory Unicode source and prepare for parsing.
@@ -59,7 +55,7 @@ public interface IParser {
 	 *            URL input source
 	 * @throws IOException
 	 */
-	public void open(URL input) throws IOException;
+	public void open(URL input);
 
 	/**
 	 * Get the current {@link IGroupResource} or {@link IExtractionItem} or
@@ -75,9 +71,9 @@ public interface IParser {
 	/**
 	 * Get the next parsed event.
 	 * 
-	 * @return int represents the event type as defined by the parser
+	 * @return PARSER_TOKEN_TYPE represents the token event type as defined by the parser
 	 */
-	public int parseNext();
+	public PARSER_TOKEN_TYPE parseNext();
 
 	/**
 	 * Close the source input and cleanup any other opened resources.
