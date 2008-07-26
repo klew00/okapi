@@ -42,6 +42,8 @@ public class Parser implements IParser {
 	private int                        startSkl;
 	private int                        nextAction;
 
+	private static final int NEXTACTION_TRANSUNIT     = 0;
+	private static final int NEXTACTION_ENDINPUT      = 1;
 	
 	public Parser () {
 		resource = new Resource();
@@ -61,7 +63,6 @@ public class Parser implements IParser {
 	}
 	
 	public void open (InputStream input)
-		throws IOException
 	{
 		try {
 			// Close any previously non-closed file
@@ -154,9 +155,9 @@ public class Parser implements IParser {
 		catch ( UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		//catch ( IOException e) {
-		//	throw new RuntimeException(e);
-		//}
+		catch ( IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public void open (CharSequence input) {
@@ -164,7 +165,6 @@ public class Parser implements IParser {
 	}
 
 	public void open (URL input)
-		throws IOException
 	{
 		// TODO open(URL input)
 	}
@@ -173,15 +173,15 @@ public class Parser implements IParser {
 		return resource.currentRes;
 	}
 	
-	public int parseNext () {
+	public PARSER_TOKEN_TYPE parseNext () {
 		//TODO: process outerString if needed for each skeleton part
 		switch ( nextAction ) {
-		case TRANSUNIT:
+		case NEXTACTION_TRANSUNIT:
 			nextAction = -1;
-			return TRANSUNIT;
-		case ENDINPUT:
+			return PARSER_TOKEN_TYPE.TRANSUNIT;
+		case NEXTACTION_ENDINPUT:
 			nextAction = -1;
-			return ENDINPUT;
+			return PARSER_TOKEN_TYPE.ENDINPUT;
 		case -2: // Pop group
 			nextAction = -1;
 			break;
@@ -223,9 +223,7 @@ public class Parser implements IParser {
 		
 		if ( bestRule != null ) {
 			// Process the match we just found
-			int n = processMatch(bestRule, startResult, endResult);
-			if ( n == -1 ) return nextEvent();
-			else return n;
+			return processMatch(bestRule, startResult, endResult);
 		}
 		
 		// Else: Send end of the skeleton if needed
@@ -234,15 +232,15 @@ public class Parser implements IParser {
 			skl.setData(inputText.substring(startSkl, inputText.length()));
 			skl.setID(String.format("%d", ++sklID));
 			resource.currentRes = skl;
-			nextAction = ENDINPUT;
-			return SKELETON;
+			nextAction = NEXTACTION_ENDINPUT;
+			return PARSER_TOKEN_TYPE.SKELETON;
 		}
 
 		// Else: we have reach the end
-		return ENDINPUT;
+		return PARSER_TOKEN_TYPE.ENDINPUT;
 	}
 
-	private int processMatch (Rule rule,
+	private PARSER_TOKEN_TYPE processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)
 	{
@@ -261,7 +259,7 @@ public class Parser implements IParser {
 			// If comment: process the comment for directives
 			//TODO: process the comment for directives
 			// Then just return one skeleton event
-			return SKELETON;
+			return PARSER_TOKEN_TYPE.SKELETON;
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
@@ -293,7 +291,7 @@ public class Parser implements IParser {
 			else { // Rule.RULETYPE_CLOSEGROUP
 				groupStack.pop();
 			}
-			return SKELETON;
+			return PARSER_TOKEN_TYPE.SKELETON;
 		}
 		
 		// Otherwise: process the item content
@@ -320,7 +318,7 @@ public class Parser implements IParser {
 			processStrings(rule, name, inputText.substring(
 				startResult.end(), endResult.start()));
 		}
-		return -1;
+		return nextEvent();
 	}
 
 	private String getMatch (String text,
@@ -557,15 +555,15 @@ public class Parser implements IParser {
 		resultQueue.add(skl);
 	}
 	
-	private int nextEvent () {
-		if ( resultQueue.size() == 0 ) return -1;
+	private PARSER_TOKEN_TYPE nextEvent () {
+		if ( resultQueue.size() == 0 ) return PARSER_TOKEN_TYPE.ENDGROUP; // TODO: Use PARSER_TOKEN_TYPE.NONE
 		if ( resultQueue.peek().getKind() == IBaseResource.KIND_SKELETON ) {
 			resource.currentRes = (ISkeletonResource)resultQueue.poll();
-			return SKELETON;
+			return PARSER_TOKEN_TYPE.SKELETON;
 		}
 		// Else: it's an item
 		resource.currentRes = (IExtractionItem)resultQueue.poll();
-		return TRANSUNIT;
+		return PARSER_TOKEN_TYPE.TRANSUNIT;
 	}
 
 }

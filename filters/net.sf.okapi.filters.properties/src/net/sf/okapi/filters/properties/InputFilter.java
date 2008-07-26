@@ -25,6 +25,7 @@ import java.io.InputStream;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.IParser.PARSER_TOKEN_TYPE;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.ISkeletonResource;
@@ -86,30 +87,21 @@ public class InputFilter implements IInputFilter {
 			output.startResource(parser.resource);
 			
 			// Process
-			int n;
+			PARSER_TOKEN_TYPE tok;
 			do {
-				switch ( (n = parser.parseNext()) ) {
-				case IParser.TRANSUNIT:
+				switch ( (tok = parser.parseNext()) ) {
+				case TRANSUNIT:
 					output.startExtractionItem((IExtractionItem)parser.getResource());
 					output.endExtractionItem((IExtractionItem)parser.getResource());
 					break;
-				case IParser.SKELETON:
+				case SKELETON:
 					output.skeletonContainer((ISkeletonResource)parser.getResource());
 					break;
-//				case IParser.STARTGROUP:
-//					output.startContainer((IGroupResource)parser.getResource());
-//					break;
-//				case IParser.ENDGROUP:
-//					output.endContainer((IGroupResource)parser.getResource());
-//					break;
 				}
 			}
-			while ( n > IParser.ENDINPUT );
+			while ( tok != PARSER_TOKEN_TYPE.ENDINPUT );
 
 			output.endResource(parser.resource);
-		}
-		catch ( IOException e) {
-			throw new RuntimeException(e);
 		}
 		finally {
 			close();

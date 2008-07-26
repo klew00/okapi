@@ -47,6 +47,9 @@ public class Parser implements IParser {
 	private static final int RESULT_ITEM         = 2;
 	private static final int RESULT_DATA         = 3;
 	
+	private static final int NEXTACTION_TRANSUNIT     = 0;
+	private static final int NEXTACTION_ENDINPUT      = 1;
+	
 	protected Resource       resource;
 	
 	private int              nextAction;
@@ -84,7 +87,6 @@ public class Parser implements IParser {
 	}
 
 	public void open (InputStream input)
-		throws IOException
 	{
 		try {
 			// Open the input reader from the provided stream
@@ -109,6 +111,9 @@ public class Parser implements IParser {
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
 		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void open (CharSequence input) {
@@ -116,22 +121,21 @@ public class Parser implements IParser {
 	}
 
 	public void open (URL input)
-		throws IOException
 	{
 		// TODO Auto-generated method stub
 	}
 
-	public int parseNext () {
+	public PARSER_TOKEN_TYPE parseNext () {
 		// Deal with next action
 		switch ( nextAction ) {
-		case TRANSUNIT:
+		case NEXTACTION_TRANSUNIT:
 			currentRes = item;
 			nextAction = -1;
-			return TRANSUNIT;
-		case ENDINPUT:
+			return PARSER_TOKEN_TYPE.TRANSUNIT;
+		case NEXTACTION_ENDINPUT:
 			currentRes = null;
 			nextAction = -1;
-			return ENDINPUT;
+			return PARSER_TOKEN_TYPE.ENDINPUT;
 		}
 		
 		// Continue the parsing
@@ -144,18 +148,18 @@ public class Parser implements IParser {
 				resetBuffer = false;
 				break;
 			case RESULT_ITEM:
-				nextAction = TRANSUNIT;
+				nextAction = NEXTACTION_TRANSUNIT;
 				currentRes = resource.sklRes;
-				return IParser.SKELETON;
+				return PARSER_TOKEN_TYPE.SKELETON;
 			default:
 				resetBuffer = true;
 				break;
 			}
 		} while ( n > RESULT_END );
 		
-		nextAction = ENDINPUT;
+		nextAction = NEXTACTION_ENDINPUT;
 		currentRes = resource.sklRes;
-		return SKELETON;
+		return PARSER_TOKEN_TYPE.SKELETON;
 	}
 
 	private int readItem (boolean resetBuffer) {
