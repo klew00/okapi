@@ -38,6 +38,7 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -61,6 +62,14 @@ public class UtilityDriver {
 		this.log = log;
 		fa = newFA;
 		plugins = newPlugins;
+	}
+	
+	/**
+	 * Gets the current utility.
+	 * @return The last utility loaded, or null.
+	 */
+	public IUtility getUtility () {
+		return util;
 	}
 
 	public void setData (Project project,
@@ -109,7 +118,7 @@ public class UtilityDriver {
 				dlg.setText(Util.getNameInCaption(shell.getText()));
 				if ( dlg.open() != SWT.YES ) return;
 			}
-			
+
 			//TODO: Implement multilist support (we use only list 0 here)
 			log.beginTask(pluginItem.name);
 			
@@ -118,6 +127,10 @@ public class UtilityDriver {
 			}
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
+
+			if ( prj.getList(0).size() == 0 ) {
+				log.warning("There is no input document.");
+			}
 			
 			for ( Input item : prj.getList(0) ) {
 				// Skip item without filter if the utility is filter-driven

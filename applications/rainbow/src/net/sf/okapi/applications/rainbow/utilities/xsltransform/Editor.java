@@ -20,9 +20,17 @@
 
 package net.sf.okapi.applications.rainbow.utilities.xsltransform;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 
@@ -31,6 +39,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -38,6 +47,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class Editor implements IParametersEditor {
 	
@@ -90,33 +102,63 @@ public class Editor implements IParametersEditor {
 		//--- Options tab
 
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(2, false));
+		cmpTmp.setLayout(new GridLayout(4, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Full path of the XSLT template to apply:");
+		label.setText("Path of the XSLT template to apply:");
 		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
 
 		edXsltPath = new Text(cmpTmp, SWT.BORDER);
-		edXsltPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		//TODO: getbutton
-		label = new Label(cmpTmp, SWT.NONE);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		edXsltPath.setLayoutData(gdTmp);
+		
+		Button btGetPath = new Button(cmpTmp, SWT.PUSH);
+		btGetPath.setText("...");
+		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		btGetPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Dialogs.browseFilenames(shell, "Select XSLT Template", false, null,
+					"XSLT Templates (*.xsl;*.xslt)", "*.sxl;*.xslt");
+			}
+		});
 
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Parameters (one per line):");
+		label.setText("Parameters (one per line, format: name=value):");
 		
+		int paramButtonsWidth = 120;
 		Button btGetDefaults = new Button(cmpTmp, SWT.PUSH);
-		btGetDefaults.setText("Get Default Parameters");
-		btGetDefaults.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		btGetDefaults.setText("Default Parameters");
+		gdTmp = new GridData();
+		gdTmp.widthHint = paramButtonsWidth;
+		btGetDefaults.setLayoutData(gdTmp);
+		btGetDefaults.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getParametersFromTemplate();
+			}
+		});
+		
+		Button btOpenFile = new Button(cmpTmp, SWT.PUSH);
+		btOpenFile.setText("Open Template");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		gdTmp.widthHint = paramButtonsWidth;
+		btOpenFile.setLayoutData(gdTmp);
+		btOpenFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch(edXsltPath.getText()); 
+			}
+		});
 		
 		edParameters = new Text(cmpTmp, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		edParameters.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons
@@ -163,16 +205,39 @@ public class Editor implements IParametersEditor {
 		//TODO: check path
 		params.setParameter("xsltPath", edXsltPath.getText());
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
-		// TODO split/format
 		params.setParameter("paramList", tmp.toString());
 		result = true;
 		return result;
 	}
 	
 	private void getParametersFromTemplate () {
-		String path = edXsltPath.getText();
-		if ( path.length() == 0 ) return;
-		//TODO
+		try {
+			String path = edXsltPath.getText();
+			if ( path.length() == 0 ) return;
+	
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+			domFactory.setNamespaceAware(true);
+		    DocumentBuilder builder = domFactory.newDocumentBuilder();
+		    Document doc = builder.parse(path);
+	
+		    XPathFactory factory = XPathFactory.newInstance();
+		    XPath xpath = factory.newXPath();
+		    xpath.setNamespaceContext(new NSContextManager());
+		    XPathExpression expr = xpath.compile("//xsl:param");
+	
+		    Object result = expr.evaluate(doc, XPathConstants.NODESET);
+		    NodeList nodes = (NodeList) result;
+		    ConfigurationString paramList = new ConfigurationString();
+		    Element elem;
+		    for (int i = 0; i < nodes.getLength(); i++) {
+		    	elem = (Element)nodes.item(i);
+		    	paramList.add(elem.getAttribute("name"), elem.getTextContent());
+		    }
+		    edParameters.setText(paramList.toString());
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 	
 }

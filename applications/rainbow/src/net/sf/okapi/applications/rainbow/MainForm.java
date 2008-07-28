@@ -869,7 +869,6 @@ public class MainForm implements IParametersProvider {
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
-		miUtilities.setEnabled(enabled);
 	}
 	
 	private void loadResources ()

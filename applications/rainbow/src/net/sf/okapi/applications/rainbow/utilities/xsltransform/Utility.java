@@ -126,9 +126,13 @@ public class Utility implements ISimpleUtility {
 
 	private void fillParameters () {
 		trans.clearParameters();
+		String value;
 		for ( String key : paramList.keySet() ) {
-			//TODO: do any macro-modif of value here
-			trans.setParameter(key, paramList.get(key));
+			//TODO: implement a common way to do lang-macros (see pathBuilder)
+			//TODO: implement macros for filename <$Input1>, etc.
+			value = paramList.get(key).replace("<$SrcLang>", srcLang);
+			value = value.replace("<$TrgLang>", trgLang);
+			trans.setParameter(key, value);
 		}
 	}
 }

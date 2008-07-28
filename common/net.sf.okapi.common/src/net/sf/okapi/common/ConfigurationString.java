@@ -179,7 +179,8 @@ public class ConfigurationString {
 		String[] pairs = tmp.split("\n");
 		for ( String pair : pairs ) {
 			String[] keyvalue = pair.split("=");
-			table.put(keyvalue[0], keyvalue[1]);
+			table.put(keyvalue[0], // Handle empty parameters
+				(( keyvalue.length > 1 ) ? keyvalue[1] : ""));
 		}
 		return table;
 	}
