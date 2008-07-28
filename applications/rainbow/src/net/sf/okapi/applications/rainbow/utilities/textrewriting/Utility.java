@@ -20,6 +20,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		params = new Parameters();
 	}
 	
+	public String getID () {
+		return "oku_textrewriting";
+	}
+	
 	public void doProlog (String sourceLanguage,
 		String targetLanguage) {
 	}

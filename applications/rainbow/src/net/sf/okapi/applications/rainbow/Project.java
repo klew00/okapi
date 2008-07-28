@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -39,6 +40,7 @@ public class Project {
 
 	protected ArrayList<ArrayList<Input>>   inputLists;
 	private ArrayList<String>               inputRoots;
+	private Hashtable<String, String>       utilityParams;
 	
 	protected String              path;
 	protected PathBuilder         pathBuilder;
@@ -67,6 +69,8 @@ public class Project {
 		inputRoots.add(System.getProperty("user.home"));
 		inputLists.add(new ArrayList<Input>());
 		inputRoots.add(System.getProperty("user.home"));
+		
+		utilityParams = new Hashtable<String, String>();
 		
 		pathBuilder = new PathBuilder();
 		pathBuilder.setExtension(".out");
@@ -197,6 +201,16 @@ public class Project {
 			
 			writer.writeElementString("parametersFolder", paramsFolder);
 			
+			writer.writeStartElement("utilities");
+			writer.writeAttributeString("xml:spaces", "preserve");
+			for ( String utilityID : utilityParams.keySet() ) {
+				writer.writeStartElement("params");
+				writer.writeAttributeString("id", utilityID);
+				writer.writeString(utilityParams.get(utilityID));
+				writer.writeEndElement(); // params
+			}
+			writer.writeEndElement(); // utilities
+			
 			writer.writeEndElement(); // rainbowProject
 			writer.writeEndDocument();
 			isModified = false;
@@ -311,6 +325,16 @@ public class Project {
 			elem1 = getFirstElement(rootElem, "parametersFolder");
 			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
 			paramsFolder = elem1.getTextContent();
+			
+			// Parameters for the utilities
+			elem1 = getFirstElement(rootElem, "utilities");
+			if ( elem1 != null ) {
+				n1 = rootElem.getElementsByTagName("params");
+				for ( int i=0; i<n1.getLength(); i++ ) {
+					elem2 = (Element)n1.item(i);
+					utilityParams.put(elem2.getAttribute("id"), elem2.getTextContent());
+				}
+			}
 
 			isModified = false;
 			path = newPath;
@@ -464,5 +488,16 @@ public class Project {
 			inputs[++i] = inputRoots.get(listIndex) + File.separator + item.relativePath;
 		}
 		return inputs;
+	}
+	
+	public String getUtilityParameters (String utilityID) {
+		if ( !utilityParams.containsKey(utilityID) ) return "";
+		else return utilityParams.get(utilityID);
+	}
+	
+	public void setUtilityParameters (String utilityID,
+		String parameters)
+	{
+		utilityParams.put(utilityID, parameters);
 	}
 }

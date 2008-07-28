@@ -90,8 +90,16 @@ public class UtilityDriver {
 			// If there are no options to ask for,
 			// ask confirmation to launch the utility
 			if ( util.hasParameters() ) {
+				// Get any existing parameters for the utility in the project
+				String tmp = prj.getUtilityParameters(util.getID());
+				if (( tmp != null ) && ( tmp.length() > 0 )) {
+					util.getParameters().fromString(tmp);
+				}
+				// Invoke the editor if there is one
 				if ( editor != null ) {
 					if ( !editor.edit(util.getParameters(), shell) ) return;
+					// Save the parameters in memory
+					prj.setUtilityParameters(util.getID(), util.getParameters().toString());
 				}
 			}
 			else {

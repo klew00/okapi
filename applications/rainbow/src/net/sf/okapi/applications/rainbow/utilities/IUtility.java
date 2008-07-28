@@ -28,6 +28,12 @@ import net.sf.okapi.common.IParameters;
 public interface IUtility {
 
 	/**
+	 * Gets the unique string that identifies the utility.
+	 * @return
+	 */
+	String getID ();
+	
+	/**
 	 * Executes any prolog steps needed by this utility.
 	 * This method should be called once, before processing each input.
 	 * @param sourceLanguage Language code for the source.

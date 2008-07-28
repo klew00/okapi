@@ -64,4 +64,17 @@
   </info>
  </plugin>
 
+ <plugin type="utility"
+  id="oku_xsltransform"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
+  updateUri="http://okapi.sf.net/updates/merging">
+  <info>
+   <name>XSLT Transformation</name>
+   <description>Process an input XML document with a given XSLT template.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
 </okapiPlugins>

@@ -27,6 +27,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		params = new Parameters();
 	}
 	
+	public String getID () {
+		return "oku_extraction";
+	}
+	
 	public void doEpilog () {
 		if ( writer != null ) {
 			writer.writeEndPackage(params.createZip);

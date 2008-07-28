@@ -22,6 +22,11 @@ public class Utility implements ISimpleUtility {
 	public Utility () {
 	}
 	
+	
+	public String getID () {
+		return "oku_merging";
+	}
+	
 	public void doEpilog () {
 	}
 
@@ -33,6 +38,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public IParameters getParameters () {
+		// Not used in this utility.
 		return null;
 	}
 
@@ -53,6 +59,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
+		// Not used in this utility.
 	}
 
 	public void setRoots (String inputRoot,
