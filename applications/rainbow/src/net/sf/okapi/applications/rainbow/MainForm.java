@@ -110,6 +110,7 @@ public class MainForm implements IParametersProvider {
 	private Text             edTargetEnc;
 	private List             lbTargetEnc;
 	private boolean          inTargetEncSelection;
+	private Button           chkUseCustomParametersFolder;
 	private Text             edParamsFolder;
 	private TabItem          tiInputList1;
 	private TabItem          tiInputList2;
@@ -628,13 +629,29 @@ public class MainForm implements IParametersProvider {
 		group.setLayout(new GridLayout(2, false));
 		group.setText("Filters Parameters");
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
+
 		label = new Label(group, SWT.NONE);
 		label.setText("Folder:");
 		
 		edParamsFolder = new Text(group, SWT.BORDER);
 		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+		// Space-holder
+		new Label(group, SWT.NONE);
+		
+		chkUseCustomParametersFolder = new Button(group, SWT.CHECK);
+		chkUseCustomParametersFolder.setText("Use custom parameters folder");
+		chkUseCustomParametersFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				// First save the custom folder if it was custom (so !was)
+				if ( !chkUseCustomParametersFolder.getSelection() ) {
+					prj.setCustomParametersFolder(edParamsFolder.getText());
+				}
+				edParamsFolder.setEditable(chkUseCustomParametersFolder.getSelection());
+				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection()));
+            }
+		});
+		
 		// Tabs change event (define here to avoid triggering it while creating the content)
 		tabFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -981,7 +998,9 @@ public class MainForm implements IParametersProvider {
 		
 		setSurfaceData();
 		updateCommands();
-		inputTables.get(currentInput).setFocus();
+		if ( currentInput != -1 ) {
+			inputTables.get(currentInput).setFocus();
+		}
 	}
 	
 	private void createProject () {
@@ -1027,8 +1046,12 @@ public class MainForm implements IParametersProvider {
 		edSourceEnc.setText(prj.getSourceEncoding());
 		edTargetLang.setText(prj.getTargetLanguage());
 		edTargetEnc.setText(prj.getTargetEncoding());
+		
+		chkUseCustomParametersFolder.setSelection(prj.useCustomParametersFolder());
+		edParamsFolder.setEditable(prj.useCustomParametersFolder());
 		edParamsFolder.setText(prj.getParametersFolder());
-
+		
+		// Updates
 		edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
 		updateInputRoot();
 		updateOutputRoot();
@@ -1056,7 +1079,11 @@ public class MainForm implements IParametersProvider {
 		prj.setSourceEncoding(edSourceEnc.getText());
 		prj.setTargetLanguage(edTargetLang.getText());
 		prj.setTargetEncoding(edTargetEnc.getText());
-		prj.setParametersFolder(edParamsFolder.getText());
+		
+		prj.setUseCustomParametersFolder(chkUseCustomParametersFolder.getSelection());
+		if ( prj.useCustomParametersFolder() ) {
+			prj.setCustomParametersFolder(edParamsFolder.getText());
+		}
 	}
 
 	private void addDocumentsFromList (String[] paths) {

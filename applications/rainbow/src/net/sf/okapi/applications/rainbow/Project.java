@@ -29,6 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.PathBuilder;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -52,11 +53,13 @@ public class Project {
 	private String                sourceEncoding;
 	private String                targetLanguage;
 	private String                targetEncoding;
-	private String                paramsFolder;
+	private boolean               useCustomParamsFolder;
+	private String                customParamsFolder;
 	
 
 	public Project (LanguageManager lm) {
-		paramsFolder = System.getProperty("user.home");
+		useCustomParamsFolder = false;
+		customParamsFolder = System.getProperty("user.home");
 		useOutputRoot = false;
 		outputRoot = "";
 		
@@ -199,7 +202,10 @@ public class Project {
 			writer.writeAttributeString("targetEncoding", targetEncoding);
 			writer.writeEndElement(); // options
 			
-			writer.writeElementString("parametersFolder", paramsFolder);
+			writer.writeStartElement("parametersFolder");
+			writer.writeAttributeString("useCustom", useCustomParamsFolder ? "1" : "0");
+			writer.writeString(customParamsFolder);
+			writer.writeEndElement(); // parametersFolder
 			
 			writer.writeStartElement("utilities");
 			writer.writeAttributeString("xml:spaces", "preserve");
@@ -324,7 +330,8 @@ public class Project {
 			
 			elem1 = getFirstElement(rootElem, "parametersFolder");
 			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
-			paramsFolder = elem1.getTextContent();
+			useCustomParamsFolder = elem1.getAttribute("useCustom").equals("1");
+			customParamsFolder = elem1.getTextContent();
 			
 			// Parameters for the utilities
 			elem1 = getFirstElement(rootElem, "utilities");
@@ -423,15 +430,34 @@ public class Project {
 		return targetEncoding;
 	}
 	
-	public void setParametersFolder (String newParameters) {
-		if ( !paramsFolder.equals(newParameters) ) {
-			paramsFolder = newParameters;
+	public void setCustomParametersFolder (String newParametersFolder) {
+		if ( !customParamsFolder.equals(newParametersFolder) ) {
+			customParamsFolder = newParametersFolder;
+			isModified = true;
+		}
+	}
+
+	public boolean useCustomParametersFolder () {
+		return useCustomParamsFolder;
+	}
+
+	public void setUseCustomParametersFolder (boolean value) {
+		if ( useCustomParamsFolder != value ) {
+			useCustomParamsFolder = value;	
 			isModified = true;
 		}
 	}
 	
 	public String getParametersFolder () {
-		return paramsFolder;
+		return getParametersFolder(useCustomParamsFolder);
+	}
+	
+	public String getParametersFolder (boolean useCustom) {
+		if ( useCustom ) return customParamsFolder;
+		// Else: use the same folder as the project
+		String prjFolder = path;
+		if ( prjFolder == null ) return System.getProperty("user.home");
+		return Util.getDirectoryName(prjFolder);
 	}
 	
 	/**

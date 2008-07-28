@@ -123,8 +123,11 @@ public class Editor implements IParametersEditor {
 		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		btGetPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Dialogs.browseFilenames(shell, "Select XSLT Template", false, null,
-					"XSLT Templates (*.xsl;*.xslt)", "*.sxl;*.xslt");
+				String[] paths = Dialogs.browseFilenames(shell, "Select XSLT Template",
+					false, null, "XSLT Templates (*.xsl;*.xslt)", "*.xsl;*.xslt");
+				if ( paths != null ) {
+					edXsltPath.setText(paths[0]);
+				}
 			}
 		});
 
@@ -214,17 +217,17 @@ public class Editor implements IParametersEditor {
 		try {
 			String path = edXsltPath.getText();
 			if ( path.length() == 0 ) return;
-	
+
 			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 			domFactory.setNamespaceAware(true);
 		    DocumentBuilder builder = domFactory.newDocumentBuilder();
 		    Document doc = builder.parse(path);
-	
+
 		    XPathFactory factory = XPathFactory.newInstance();
 		    XPath xpath = factory.newXPath();
 		    xpath.setNamespaceContext(new NSContextManager());
 		    XPathExpression expr = xpath.compile("//xsl:param");
-	
+
 		    Object result = expr.evaluate(doc, XPathConstants.NODESET);
 		    NodeList nodes = (NodeList) result;
 		    ConfigurationString paramList = new ConfigurationString();
