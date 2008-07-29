@@ -125,17 +125,17 @@ public class Parser implements IParser {
 		// TODO Auto-generated method stub
 	}
 
-	public PARSER_TOKEN_TYPE parseNext () {
+	public ParserTokenType parseNext () {
 		// Deal with next action
 		switch ( nextAction ) {
 		case NEXTACTION_TRANSUNIT:
 			currentRes = item;
 			nextAction = -1;
-			return PARSER_TOKEN_TYPE.TRANSUNIT;
+			return ParserTokenType.TRANSUNIT;
 		case NEXTACTION_ENDINPUT:
 			currentRes = null;
 			nextAction = -1;
-			return PARSER_TOKEN_TYPE.ENDINPUT;
+			return ParserTokenType.ENDINPUT;
 		}
 		
 		// Continue the parsing
@@ -150,7 +150,7 @@ public class Parser implements IParser {
 			case RESULT_ITEM:
 				nextAction = NEXTACTION_TRANSUNIT;
 				currentRes = resource.sklRes;
-				return PARSER_TOKEN_TYPE.SKELETON;
+				return ParserTokenType.SKELETON;
 			default:
 				resetBuffer = true;
 				break;
@@ -159,7 +159,7 @@ public class Parser implements IParser {
 		
 		nextAction = NEXTACTION_ENDINPUT;
 		currentRes = resource.sklRes;
-		return PARSER_TOKEN_TYPE.SKELETON;
+		return ParserTokenType.SKELETON;
 	}
 
 	private int readItem (boolean resetBuffer) {

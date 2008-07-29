@@ -29,7 +29,7 @@ import net.sf.okapi.common.resource.IGroupResource;
  */
 public interface IParser {
 
-	public static enum PARSER_TOKEN_TYPE {ENDINPUT, STARTGROUP, ENDGROUP, TRANSUNIT, SKELETON};
+	public static enum ParserTokenType {ENDINPUT, STARTGROUP, ENDGROUP, TRANSUNIT, SKELETON, NONE};
 	
 	/**
 	 * Open a streamed byte source and prepare for parsing.
@@ -73,7 +73,7 @@ public interface IParser {
 	 * 
 	 * @return PARSER_TOKEN_TYPE represents the token event type as defined by the parser
 	 */
-	public PARSER_TOKEN_TYPE parseNext();
+	public ParserTokenType parseNext();
 
 	/**
 	 * Close the source input and cleanup any other opened resources.

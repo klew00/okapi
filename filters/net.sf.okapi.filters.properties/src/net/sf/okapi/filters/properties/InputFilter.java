@@ -25,7 +25,7 @@ import java.io.InputStream;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.filters.IParser.PARSER_TOKEN_TYPE;
+import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.ISkeletonResource;
@@ -87,7 +87,7 @@ public class InputFilter implements IInputFilter {
 			output.startResource(parser.resource);
 			
 			// Process
-			PARSER_TOKEN_TYPE tok;
+			ParserTokenType tok;
 			do {
 				switch ( (tok = parser.parseNext()) ) {
 				case TRANSUNIT:
@@ -99,7 +99,7 @@ public class InputFilter implements IInputFilter {
 					break;
 				}
 			}
-			while ( tok != PARSER_TOKEN_TYPE.ENDINPUT );
+			while ( tok != ParserTokenType.ENDINPUT );
 
 			output.endResource(parser.resource);
 		}

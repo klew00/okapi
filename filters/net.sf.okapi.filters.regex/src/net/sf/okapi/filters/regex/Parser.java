@@ -173,15 +173,15 @@ public class Parser implements IParser {
 		return resource.currentRes;
 	}
 	
-	public PARSER_TOKEN_TYPE parseNext () {
+	public ParserTokenType parseNext () {
 		//TODO: process outerString if needed for each skeleton part
 		switch ( nextAction ) {
 		case NEXTACTION_TRANSUNIT:
 			nextAction = -1;
-			return PARSER_TOKEN_TYPE.TRANSUNIT;
+			return ParserTokenType.TRANSUNIT;
 		case NEXTACTION_ENDINPUT:
 			nextAction = -1;
-			return PARSER_TOKEN_TYPE.ENDINPUT;
+			return ParserTokenType.ENDINPUT;
 		case -2: // Pop group
 			nextAction = -1;
 			break;
@@ -233,14 +233,14 @@ public class Parser implements IParser {
 			skl.setID(String.format("%d", ++sklID));
 			resource.currentRes = skl;
 			nextAction = NEXTACTION_ENDINPUT;
-			return PARSER_TOKEN_TYPE.SKELETON;
+			return ParserTokenType.SKELETON;
 		}
 
 		// Else: we have reach the end
-		return PARSER_TOKEN_TYPE.ENDINPUT;
+		return ParserTokenType.ENDINPUT;
 	}
 
-	private PARSER_TOKEN_TYPE processMatch (Rule rule,
+	private ParserTokenType processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)
 	{
@@ -259,7 +259,7 @@ public class Parser implements IParser {
 			// If comment: process the comment for directives
 			//TODO: process the comment for directives
 			// Then just return one skeleton event
-			return PARSER_TOKEN_TYPE.SKELETON;
+			return ParserTokenType.SKELETON;
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
@@ -291,7 +291,7 @@ public class Parser implements IParser {
 			else { // Rule.RULETYPE_CLOSEGROUP
 				groupStack.pop();
 			}
-			return PARSER_TOKEN_TYPE.SKELETON;
+			return ParserTokenType.SKELETON;
 		}
 		
 		// Otherwise: process the item content
@@ -555,15 +555,15 @@ public class Parser implements IParser {
 		resultQueue.add(skl);
 	}
 	
-	private PARSER_TOKEN_TYPE nextEvent () {
-		if ( resultQueue.size() == 0 ) return PARSER_TOKEN_TYPE.ENDGROUP; // TODO: Use PARSER_TOKEN_TYPE.NONE
+	private ParserTokenType nextEvent () {
+		if ( resultQueue.size() == 0 ) return ParserTokenType.NONE;
 		if ( resultQueue.peek().getKind() == IBaseResource.KIND_SKELETON ) {
 			resource.currentRes = (ISkeletonResource)resultQueue.poll();
-			return PARSER_TOKEN_TYPE.SKELETON;
+			return ParserTokenType.SKELETON;
 		}
 		// Else: it's an item
 		resource.currentRes = (IExtractionItem)resultQueue.poll();
-		return PARSER_TOKEN_TYPE.TRANSUNIT;
+		return ParserTokenType.TRANSUNIT;
 	}
 
 }
