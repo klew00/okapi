@@ -23,6 +23,10 @@ public class Utility implements ISimpleUtility {
 	}
 	
 	
+	public void resetLists () {
+		// Not used for this utility
+	}
+	
 	public String getID () {
 		return "oku_merging";
 	}
@@ -94,7 +98,7 @@ public class Utility implements ISimpleUtility {
 		return false;
 	}
 	
-	public void setInputData (String path,
+	public void addInputData (String path,
 		String encoding,
 		String filterSettings)
 	{
@@ -102,9 +106,14 @@ public class Utility implements ISimpleUtility {
 		// Other information are not iused
 	}
 
-	public void setOutputData (String path,
+	public void addOutputData (String path,
 		String encoding)
 	{
 		// Not used in this utility.
 	}
+
+	public int getInputCount () {
+		return 1;
+	}
+	
 }

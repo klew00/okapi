@@ -27,6 +27,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		params = new Parameters();
 	}
 	
+	public void resetLists () {
+		// Not used for this utility
+	}
+	
 	public String getID () {
 		return "oku_extraction";
 	}
@@ -148,7 +152,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		return true;
 	}
 
-	public void setInputData (String path,
+	public void addInputData (String path,
 		String encoding,
 		String filterSettings)
 	{
@@ -156,12 +160,16 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		inputPath = path;
 	}
 
-	public void setOutputData (String path,
+	public void addOutputData (String path,
 		String encoding)
 	{
 		if ( path == null ) throw new NullPointerException();
 		// Not used: if ( encoding == null ) throw new NullPointerException();
 		outputPath = path;
 		// Not used: outputEncoding = encoding;
+	}
+
+	public int getInputCount () {
+		return 1;
 	}
 }

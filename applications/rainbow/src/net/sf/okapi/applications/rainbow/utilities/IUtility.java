@@ -32,6 +32,13 @@ public interface IUtility {
 	 * @return
 	 */
 	String getID ();
+
+	/**
+	 * Resets the input and output lists. This is to call when a utility 
+	 * uses more than one input list, before {@link #addInputData(String, String, String)}
+	 * and {@link #addOutputData(String, String)}. 
+	 */
+	void resetLists ();
 	
 	/**
 	 * Executes any prolog steps needed by this utility.
@@ -97,23 +104,29 @@ public interface IUtility {
 	 * @return True if the utility is filter-driven, false otherwise.
 	 */
 	boolean isFilterDriven ();
+	
+	/**
+	 * Gets the number of input documents needed for this utility.
+	 * @return The number of input documents needed.
+	 */
+	int getInputCount ();
 
 	/**
-	 * Sets the data for the input.
+	 * Adds an set of document information for the the input.
 	 * @param path The full path of the input to process.
 	 * @param encoding The default encoding.
 	 * @param filterSettings The filter settings to use.
 	 */
-	void setInputData (String path,
+	void addInputData (String path,
 		String encoding,
 		String filterSettings);
 	
 	/**
-	 * Sets the data for the output.
+	 * Adds an set of document information for the the output.
 	 * @param path The full path of the output.
 	 * @param encoding The encoding.
 	 */
-	void setOutputData (String path,
+	void addOutputData (String path,
 		String encoding);
 
 }

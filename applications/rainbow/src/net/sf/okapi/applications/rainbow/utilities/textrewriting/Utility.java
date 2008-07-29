@@ -20,15 +20,22 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		params = new Parameters();
 	}
 	
+	public void resetLists () {
+		// Not used for this utility
+	}
+	
 	public String getID () {
 		return "oku_textrewriting";
 	}
 	
 	public void doProlog (String sourceLanguage,
-		String targetLanguage) {
+		String targetLanguage)
+	{
+		// Not used for this utility
 	}
 	
 	public void doEpilog () {
+		// Not used for this utility
 	}
 	
 	public IParameters getParameters () {
@@ -144,14 +151,20 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		return true;
 	}
 
-	public void setInputData (String path,
+	public void addInputData (String path,
 		String encoding,
 		String filterSettings)
 	{
+		// Not used for this utility
 	}
 
-	public void setOutputData (String path,
+	public void addOutputData (String path,
 		String encoding)
 	{
+		// Not used for this utility
+	}
+
+	public int getInputCount () {
+		return 1;
 	}
 }

@@ -38,7 +38,6 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -128,21 +127,52 @@ public class UtilityDriver {
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 
+			util.resetLists();
 			if ( prj.getList(0).size() == 0 ) {
 				log.warning("There is no input document.");
 			}
 			
+			int f = -1;
 			for ( Input item : prj.getList(0) ) {
+				f++;
 				// Skip item without filter if the utility is filter-driven
 				if ( util.isFilterDriven() && ( item.filterSettings.length() == 0 )) continue;
 				// Otherwise: process
 				log.message("Input: "+item.relativePath);
 			
-				// Initialize the input/output data
+				// Initialize the main input
 				String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
+				util.addInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
+				// Initialize the main output
 				String outputPath = prj.buildTargetPath(0, item.relativePath);
-				util.setInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
-				util.setOutputData(outputPath, prj.buildTargetEncoding(item));
+				util.addOutputData(outputPath, prj.buildTargetEncoding(item));
+
+				// Add input/output info from other input lists if requested
+				for ( int j=1; j<prj.inputLists.size(); j++ ) {
+					// Does the utility requests this list?
+					if ( j >= util.getInputCount() ) break; // No need to loop more
+					// Do we have a corresponding input?
+					if ( prj.inputLists.get(j).size() >= f ) {
+						// Case of the data not available
+						// This is to allow some utility to a variable number of input
+						// depending on their own variable requirements. They ask for 3 inputs
+						// and Rainbow gives them as much as possible, and nulls otherwise.
+						util.addInputData(null, null, null);
+						util.addOutputData(null, null);
+					}
+					else { // Else: data available
+						Input addtem = prj.getList(j).get(f);
+						// Input
+						util.addInputData(
+							prj.getInputRoot(j) + File.separator + addtem.relativePath,
+							prj.buildSourceEncoding(addtem),
+							addtem.filterSettings);
+						// Output
+						util.addOutputData(
+							prj.buildTargetPath(j, addtem.relativePath),
+							prj.buildTargetEncoding(addtem));
+					}
+				}
 
 				if ( util.isFilterDriven() ) {
 					IFilterDrivenUtility filterUtil = (IFilterDrivenUtility)util;

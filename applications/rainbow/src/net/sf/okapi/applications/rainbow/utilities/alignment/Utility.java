@@ -1,5 +1,7 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import java.util.ArrayList;
+
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
@@ -21,6 +23,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	public Utility () {
 		writer = new TMXWriter();
 		params = new Parameters();
+	}
+	
+	public void resetLists () {
+		// Not used for this utility
 	}
 	
 	public String getID () {
@@ -121,16 +127,20 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		return true;
 	}
 
-	public void setInputData (String path,
+	public void addInputData (String path,
 		String encoding,
 		String filterSettings)
 	{
 		// Not used for this utility
 	}
 
-	public void setOutputData(String path,
+	public void addOutputData(String path,
 		String encoding)
 	{
 		// Not used for this utility
+	}
+
+	public int getInputCount () {
+		return 1;
 	}
 }
