@@ -137,6 +137,7 @@ class InputPropertiesForm {
 		try {
 			results = new String[3];
 			results[0] = pnlFilterSettings.getData();
+			//TODO: Check if the parameters are still OK.
 			results[1] = edSrcEncoding.getText();
 			results[2] = edTrgEncoding.getText();
 		}

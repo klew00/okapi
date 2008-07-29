@@ -54,6 +54,13 @@ public interface IParametersProvider {
 		throws Exception;
 	
 	/**
+	 * Deletes a parameters object at a given location. 
+	 * @param location The string that encodes the target location. The value depends
+	 * on each implementation. It can be a path, a filter setting string, etc.
+	 */
+	public void deleteParameters (String location);
+	
+	/**
 	 * Split a given location into its components.
 	 * @param location The string that encodes the location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.

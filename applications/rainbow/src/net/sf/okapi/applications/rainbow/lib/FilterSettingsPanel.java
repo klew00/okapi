@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 
 /**
  * Implements a common UI to select a filter settings string.
@@ -47,6 +48,7 @@ public class FilterSettingsPanel extends Composite {
 	private Combo                 cbParameters;
 	private Button                btEdit;
 	private Button                btCreate;
+	private Button                btDelete;
 	private IParametersProvider   paramsProv;
 	private String[]              paramsList;
 	
@@ -60,7 +62,7 @@ public class FilterSettingsPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(3, false);
+		GridLayout layTmp = new GridLayout(4, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
@@ -70,11 +72,11 @@ public class FilterSettingsPanel extends Composite {
 		
 		cbFilters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		cbFilters.setLayoutData(gdTmp);
 		cbFilters.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e1) {
-				fillParametersList(0);
+				fillParametersList(0, null);
 			}
 			public void widgetDefaultSelected(SelectionEvent e2) {}
 		});
@@ -84,11 +86,12 @@ public class FilterSettingsPanel extends Composite {
 		
 		cbParameters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		cbParameters.setLayoutData(gdTmp);
 		cbParameters.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e1) {
 				btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+				btDelete.setEnabled(btEdit.getEnabled());
 			}
 			public void widgetDefaultSelected(SelectionEvent e2) {}
 		});
@@ -121,6 +124,18 @@ public class FilterSettingsPanel extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
+		btDelete = new Button(this, SWT.PUSH);
+		btDelete.setText("&Delete...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = nWidth;
+		btDelete.setLayoutData(gdTmp);
+		btDelete.addSelectionListener(new SelectionListener () {
+			public void widgetSelected(SelectionEvent e) {
+				deleteParameters();
+			}
+			public void widgetDefaultSelected(SelectionEvent e) {};
+		});
+
 	}
 	
 	public void setData (String filterSettings,
@@ -148,7 +163,7 @@ public class FilterSettingsPanel extends Composite {
 			}
 		}
 		cbFilters.select((n>-1) ? n : 0);
-		fillParametersList(0);
+		fillParametersList(0, null);
 		
 		// Set the current parameters file
 		n = -1;
@@ -161,6 +176,7 @@ public class FilterSettingsPanel extends Composite {
 		if ( n == -1 ) n = 0;
 		cbParameters.select(n);
 		btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+		btDelete.setEnabled(btEdit.getEnabled());
 		btCreate.setEnabled(!cbFilters.getText().startsWith("<"));
 	}
 	
@@ -172,16 +188,26 @@ public class FilterSettingsPanel extends Composite {
 		return "";
 	}
 	
-	private void fillParametersList (int index) {
+	private void fillParametersList (int index,
+		String selection)
+	{
+		if ( selection != null ) index = 0;
+		
 		cbParameters.removeAll();
 		cbParameters.add("<None>");
+		int i = 1;
 		for ( String item : paramsList ) {
 			if ( item.startsWith(cbFilters.getText()) ) {
 				cbParameters.add(item);
+				if ( selection != null ) {
+					if ( selection.equals(item) ) index = i;
+				}
+				i++;
 			}
 		}
 		cbParameters.select(index);
 		btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
+		btDelete.setEnabled(btEdit.getEnabled());
 		btCreate.setEnabled(!cbFilters.getText().startsWith("<"));
 	}
 	
@@ -214,7 +240,7 @@ public class FilterSettingsPanel extends Composite {
 				paramsProv.save(filterSettings, params);
 			}
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getLocalizedMessage(), null);
 		}
 	}
@@ -253,10 +279,37 @@ public class FilterSettingsPanel extends Composite {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);
-				//TODO: Refresh the list of parameters and set the new one as the selected
+				// Refresh the list of parameters and set the new one as the selected
+				paramsList = paramsProv.getParametersList();
+				fillParametersList(-1, filterSettings);
 			}
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), e.getLocalizedMessage(), null);
+		}
+	}
+
+	private void deleteParameters () {
+		try {
+			String filterSettings = getData();
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(getParent().getShell(),
+				SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage(String.format("This command will delete the filter parameters %s\n"
+				+"Do you want to proceed with the deletion?", filterSettings));
+			dlg.setText("Rainbow");
+			switch  ( dlg.open() ) {
+			case SWT.NO:
+			case SWT.CANCEL:
+				return;
+			}
+			// Else: delete the parameters
+			paramsProv.deleteParameters(filterSettings);
+			// Refresh the list of parameters
+			paramsList = paramsProv.getParametersList();
+			fillParametersList(0, null);
+		}
+		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getLocalizedMessage(), null);
 		}
 	}

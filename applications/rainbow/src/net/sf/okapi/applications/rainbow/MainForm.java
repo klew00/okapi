@@ -1210,6 +1210,13 @@ public class MainForm implements IParametersProvider {
 			location);
 		paramsObject.save(aRes[3], null);
 	}
+	
+	public void deleteParameters (String location) {
+		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
+			location);
+		File file = new File(aRes[3]);
+		file.delete();
+	}
 
 	public String[] splitLocation (String location) {
 		return FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(), location);
