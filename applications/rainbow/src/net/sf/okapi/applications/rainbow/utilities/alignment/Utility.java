@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
@@ -16,6 +17,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
 	private TMXWriter   writer;
 	private Parameters  params;
+	private String      lastFolder;
 //	private Segmenter   srcSegmenter;
 //	private Segmenter   trgSegmenter;
 	
@@ -41,6 +43,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
+		lastFolder = null;
 		writer.create(params.tmxPath);
 		writer.writeStartDocument(sourceLanguage, targetLanguage);
 		
@@ -50,6 +53,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			//TODO: srcSegmenter = doc.applyLanguageRules(sourceLanguage, null);
 			//TODO: trgSegmenter = doc.applyLanguageRules(targetLanguage, null);
 		}
+		lastFolder = Util.getDirectoryName(params.tmxPath);
 	}
 
 	public IParameters getParameters () {
@@ -142,5 +146,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
 	public int getInputCount () {
 		return 1;
+	}
+	
+	public String getFolderAfterProcess () {
+		return lastFolder;
 	}
 }

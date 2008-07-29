@@ -116,4 +116,7 @@ public class Utility implements ISimpleUtility {
 		return 1;
 	}
 	
+	public String getFolderAfterProcess () {
+		return null;
+	}
 }

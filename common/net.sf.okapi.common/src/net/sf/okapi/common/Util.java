@@ -70,27 +70,27 @@ public class Util {
 
 	/**
 	 * Gets the directory name of a full path.
-	 * @param p_sPath Full path from where to extract the directory name.
+	 * @param path Full path from where to extract the directory name.
 	 * @return The directory name (without the final separator), or an empty
 	 * string if p_sPath is a filename.
 	 */
-	static public String getDirectoryName (String p_sPath) {
-		int n = p_sPath.lastIndexOf(File.separator);
-		if ( n > 0 ) return p_sPath.substring(0, n);
+	static public String getDirectoryName (String path) {
+		int n = path.lastIndexOf(File.separator);
+		if ( n > 0 ) return path.substring(0, n);
 		else return "";
 	}
 	
 	/**
 	 * Creates the directory tree for the give full path (dir+filename)
-	 * @param p_sPath Directory and filename. If you want to pass only a directory
+	 * @param path Directory and filename. If you want to pass only a directory
 	 * name make sure it has a trailing separator (e.g. "c:\project\tmp\").
 	 */
-	static public void createDirectories (String p_sPath) {
-		int n = p_sPath.lastIndexOf(File.separatorChar);
+	static public void createDirectories (String path) {
+		int n = path.lastIndexOf(File.separatorChar);
 		if ( n == -1 ) return; // Nothing to do
 		// Else, use the directory part and create the tree	
-		String sDir = p_sPath.substring(0, n);
-		File F = new File(sDir);
+		String dir = path.substring(0, n);
+		File F = new File(dir);
 		F.mkdirs();
 	}
 
@@ -215,5 +215,57 @@ public class Util {
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e); // UTF-8 should be always supported anyway
 		}
+	}
+	
+	/**
+	 * Gets the longest common path between an existing current directory
+	 * and a new one.
+	 * @param currentDir The current longest common path.
+	 * @param newDir The new directory to compare with.
+	 * @param ignoreCase True if the method should ignore cases differences.
+	 * @return The longest sub-directory that is common to both directories.
+	 * This can be a null or empty string.
+	 */
+	static public String longestCommonDir (String currentDir,
+		String newDir,
+		boolean ignoreCase)
+	{
+		if ( currentDir == null ) return newDir;
+		if ( currentDir.length() == 0 ) return currentDir;
+
+		// Get temporary copies
+		String currentLow = currentDir;
+		String newLow = newDir;
+		if ( ignoreCase ) {
+			currentLow = currentDir.toLowerCase();
+			newLow = newDir.toLowerCase();
+		}
+		
+		// The new path equals, or include the existing root: no change
+		if ( newLow.indexOf(currentLow) == 0 ) return currentDir;
+
+		// Search the common path
+		String tmp = currentLow;
+		int i = 0;
+		while ( newLow.indexOf(tmp) != 0 ) {
+			tmp = Util.getDirectoryName(tmp);
+			i++;
+			if ( tmp.length() == 0 ) return ""; // No common path at all
+		}
+
+		// Do not return currentDir.substring(0, tmp.length());
+		// because the lower-case string maybe of a different length than cased one
+		// (e.g. German Sz). Instead re-do the splitting as many time as needed.
+		tmp = currentDir;
+		for ( int j=0; j<i; j++ ) {
+			tmp = Util.getDirectoryName(tmp);
+		}
+		return tmp;
+	}
+	
+	static public boolean isOSCaseSensitive () {
+		// May not work on all platforms,
+		// But should on basic Windows, Mac and Linux
+		return File.separator.equals("\\"); // Windows line-types
 	}
 }

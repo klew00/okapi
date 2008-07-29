@@ -172,4 +172,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	public int getInputCount () {
 		return 1;
 	}
+
+	public String getFolderAfterProcess () {
+		return params.outputFolder;
+	}
 }

@@ -1,10 +1,13 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Container;
 import net.sf.okapi.common.resource.IContainer;
@@ -14,6 +17,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 
 	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private Parameters            params;
+	private String                commonFolder;
 
 	
 	public Utility () {
@@ -31,7 +35,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
-		// Not used for this utility
+		commonFolder = null;
 	}
 	
 	public void doEpilog () {
@@ -161,10 +165,16 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	public void addOutputData (String path,
 		String encoding)
 	{
-		// Not used for this utility
+		// Compute the longest common folder
+		commonFolder = Util.longestCommonDir(commonFolder,
+			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
 	}
 
 	public int getInputCount () {
 		return 1;
+	}
+
+	public String getFolderAfterProcess () {
+		return commonFolder;
 	}
 }

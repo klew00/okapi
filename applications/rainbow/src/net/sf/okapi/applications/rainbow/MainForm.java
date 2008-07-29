@@ -740,6 +740,18 @@ public class MainForm implements IParametersProvider {
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miUtilities.setMenu(dropMenu);
 		
+		// Add the default entries
+		MenuItem tmpMenu = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(tmpMenu, "utilities.openFolder");
+		tmpMenu.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( prj.getLastOutputFolder() == null ) return;
+				Program.launch(prj.getLastOutputFolder());
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
@@ -785,6 +797,8 @@ public class MainForm implements IParametersProvider {
 			// Run it
 			startWaiting("Processing files...", true);
 			ud.execute(shell);
+			// Gets the latest folder to open.
+			prj.setLastOutpoutFolder(ud.getUtility().getFolderAfterProcess());
 		}
 		catch ( Exception E ) {
 			Dialogs.showError(shell, E.getMessage(), null);

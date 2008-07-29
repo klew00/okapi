@@ -13,6 +13,7 @@ import javax.xml.transform.TransformerException;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 
 public class Utility implements ISimpleUtility {
 
@@ -25,6 +26,7 @@ public class Utility implements ISimpleUtility {
 	private Hashtable<String, String>  paramList;
 	private Transformer                trans;
 	private IParameters                params;
+	private String                     commonFolder;
 
 	
 	public Utility () {
@@ -65,6 +67,7 @@ public class Utility implements ISimpleUtility {
 		String targetLanguage)
 	{
 		try {
+			commonFolder = null; // Reset
 			// Store the languages
 			srcLang = sourceLanguage;
 			trgLang = targetLanguage;
@@ -115,12 +118,17 @@ public class Utility implements ISimpleUtility {
 		String encoding,
 		String filterSettings)
 	{
+		// Add the info to the list
 		inputPaths.add(path);
 	}
 
-	public void addOutputData(String path,
+	public void addOutputData (String path,
 		String encoding)
 	{
+		// Compute the longest common folder
+		commonFolder = Util.longestCommonDir(commonFolder,
+			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
+		// Add the info to the list
 		outputPaths.add(path);
 		outputEncodings.add(encoding);
 	}
@@ -157,5 +165,9 @@ public class Utility implements ISimpleUtility {
 
 	public int getInputCount () {
 		return 3; // between 1 and 3, depending on the template
+	}
+
+	public String getFolderAfterProcess () {
+		return commonFolder;
 	}
 }

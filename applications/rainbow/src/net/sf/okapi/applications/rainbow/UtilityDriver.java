@@ -53,6 +53,7 @@ public class UtilityDriver {
 	private PluginItem            pluginItem;
 	private PluginsAccess         plugins;
 	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private String                outputFolder;
 	
 	public UtilityDriver (ILog log,
 		FilterAccess newFA,
@@ -188,6 +189,7 @@ public class UtilityDriver {
 					// Initialize the output if needed
 					if ( filterUtil.needsOutputFilter() ) {
 						// Initialize the output
+						Util.createDirectories(outputPath);
 						OutputStream output = new FileOutputStream(outputPath);
 						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
 								prj.getTargetLanguage());
@@ -208,7 +210,14 @@ public class UtilityDriver {
 			logger.error("Error with utility.", e);
 		}
 		finally {
+			if ( util != null ) {
+				outputFolder = util.getFolderAfterProcess();
+			}
 			log.endTask(null);
 		}
+	}
+	
+	String getFolderAfterProcess () {
+		return outputFolder;
 	}
 }

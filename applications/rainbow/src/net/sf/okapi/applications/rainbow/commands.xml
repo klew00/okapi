@@ -22,7 +22,8 @@
  
  <!-- Utilities menu -->
  <command name="utilities">&amp;Utilities</command>
- 
+ <command name="utilities.openFolder" ctrl="1" key="L">&amp;Open Last Output Folder&#x9;Ctrl+L</command>
+  
  <!-- Tools menu -->
  <command name="tools">&amp;Tools</command>
  <command name="tools.editsegrules">Edit &amp;Segmentation Rules...</command>

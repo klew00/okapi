@@ -112,7 +112,7 @@ public interface IUtility {
 	int getInputCount ();
 
 	/**
-	 * Adds an set of document information for the the input.
+	 * Adds a set of document information for the the input.
 	 * @param path The full path of the input to process.
 	 * @param encoding The default encoding.
 	 * @param filterSettings The filter settings to use.
@@ -122,11 +122,19 @@ public interface IUtility {
 		String filterSettings);
 	
 	/**
-	 * Adds an set of document information for the the output.
+	 * Adds a set of document information for the the output.
 	 * @param path The full path of the output.
 	 * @param encoding The encoding.
 	 */
 	void addOutputData (String path,
 		String encoding);
 
+	/**
+	 * Gets the most useful folder for the given utility, or null if there is
+	 * no relevant folder. This folder is the one that make more sense for a user
+	 * to go after the utility has been processed, for example, the folder where
+	 * the output documents have been created.
+	 * @return The output folder for the utility, or null.
+	 */
+	String getFolderAfterProcess ();
 }

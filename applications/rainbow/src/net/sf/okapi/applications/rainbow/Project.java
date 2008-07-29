@@ -56,6 +56,8 @@ public class Project {
 	private boolean               useCustomParamsFolder;
 	private String                customParamsFolder;
 	
+	private String                lastOutputFolder;
+	
 
 	public Project (LanguageManager lm) {
 		useCustomParamsFolder = false;
@@ -525,5 +527,13 @@ public class Project {
 		String parameters)
 	{
 		utilityParams.put(utilityID, parameters);
+	}
+	
+	public String getLastOutputFolder () {
+		return lastOutputFolder;
+	}
+	
+	public void setLastOutpoutFolder (String value) {
+		lastOutputFolder = value;
 	}
 }
