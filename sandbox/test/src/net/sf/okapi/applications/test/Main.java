@@ -1,5 +1,6 @@
 package net.sf.okapi.applications.test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -16,6 +17,8 @@ import org.w3c.its.IProcessor;
 import org.w3c.its.ITSEngine;
 import org.w3c.its.ITraversal;
 
+import net.sf.okapi.common.ConfigurationString;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.CodeFragment;
@@ -342,13 +345,54 @@ public class Main {
 		tmp.append("["+input.substring(start)+"]");
 		return tmp.toString();
 	}
-	
+
+	private static void testConfigString () {
+		try {
+			System.out.println("---start testConfigString---");
+			
+			String s1 = "C:\\a\\b\\c\\d";
+			String s2 = "C:\\a\\B";
+			System.out.println(Util.longestCommonDir(s1, s2, !Util.isOSCaseSensitive()));
+			s1 = "C:\\a\\b\\c\\d";
+			s2 = "C:\\Z\\B";
+			System.out.println(Util.longestCommonDir(s1, s2, !Util.isOSCaseSensitive()));
+			s1 = "C:\\a\\b\\c\\d";
+			s2 = "A:\\a\\b";
+			System.out.println(Util.longestCommonDir(s1, s2, !Util.isOSCaseSensitive()));
+			
+			ConfigurationString cs = new ConfigurationString(); 
+			cs.add("string", "text\nline2");
+			cs.add("char", 'a');
+			String s = cs.toString();
+			System.out.println(s);
+			
+			cs = new ConfigurationString(s);
+			String tmp = cs.get("string", "def");
+			System.out.println(tmp);
+			tmp = cs.get("stringNotThere", "def");
+			System.out.println(tmp);
+			char x = cs.get("char", 'b');
+			System.out.println(x);
+			x = cs.get("charNotThere", 'b');
+			System.out.println(x);
+
+			cs.addGroup("group1", s);
+			System.out.println(cs.toString());
+			
+		}
+		catch ( Exception e ) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		System.out.println("---end testConfigString---");
+	}
+
 	public static void main (String[] args)
 		throws Exception
 	{
-		testContainer();
+		testConfigString();
 		
 		if ( args.length == 0 ) return;
+		testContainer();
 		testSegmentation();
 		testItem();
 		testITSEngine();

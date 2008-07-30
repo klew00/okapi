@@ -1,12 +1,16 @@
-package net.sf.okapi.common.resource;
+package net.sf.okapi.common.resource3.string;
 
 import java.util.List;
+
+import net.sf.okapi.common.resource3.Code;
 
 public interface IContent {
 
 	public static final int CODE_OPENING    = 0xE101;
 	public static final int CODE_CLOSING    = 0xE102;
 	public static final int CODE_ISOLATED   = 0xE103;
+	public static final int SEG_OPENING     = 0xE104;
+	public static final int SEG_CLOSING     = 0xE105;
 	public static final int CHARBASE        = 0xE110;
 	
 	public int getID ();
@@ -48,10 +52,10 @@ public interface IContent {
 	public int getLength ();
 
 	// Maybe specific for flat model
-	public IContainer getParent ();
+	public StringRootContainer getParent ();
 	
 	// Maybe specific for flat model
-	public void setParent (IContainer parent);
+	public void setParent (StringRootContainer parent);
 	
 	// Maybe specific for flat model 
 	public void balanceCodes ();
