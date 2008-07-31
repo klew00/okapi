@@ -977,7 +977,7 @@ public class MainForm implements IParametersProvider {
 			else {
 				// Ask confirmation
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-				dlg.setMessage("Do you want to save the project?");
+				dlg.setMessage("Some project information or properties have been modified.\nDo you want to save the project?");
 				dlg.setText("Rainbow");
 				switch  ( dlg.open() ) {
 				case SWT.NO:

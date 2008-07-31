@@ -126,8 +126,10 @@ public class Utility implements ISimpleUtility {
 		String encoding)
 	{
 		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
+		if ( path != null ) {
+			commonFolder = Util.longestCommonDir(commonFolder,
+				Util.getDirectoryName(path), !Util.isOSCaseSensitive());
+		}
 		// Add the info to the list
 		outputPaths.add(path);
 		outputEncodings.add(encoding);
