@@ -1,7 +1,5 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import java.util.ArrayList;
-
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
@@ -18,8 +16,6 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	private TMXWriter   writer;
 	private Parameters  params;
 	private String      lastFolder;
-//	private Segmenter   srcSegmenter;
-//	private Segmenter   trgSegmenter;
 	
 	
 	public Utility () {

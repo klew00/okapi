@@ -24,7 +24,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 
@@ -32,6 +34,10 @@ import java.nio.channels.FileChannel;
  * Collection of various all-purpose helper functions.
  */
 public class Util {
+	
+	static public final String    LINEBREAK_DOS  = "\r\n";
+	static public final String    LINEBREAK_UNIX = "\n";
+	static public final String    LINEBREAK_MAC  = "\r";
 
 	/**
 	 * Removes from the from of a string any of the specified characters. 
@@ -263,9 +269,46 @@ public class Util {
 		return tmp;
 	}
 	
+	/**
+	 * Indicates if the current OS is case-sensitive.
+	 * @return True if the current OS is case-sensitive, false if otherwise.
+	 */
 	static public boolean isOSCaseSensitive () {
 		// May not work on all platforms,
 		// But should on basic Windows, Mac and Linux
 		return File.separator.equals("\\"); // Windows line-types
+	}
+	
+	/**
+	 * Writes a Byte-Order-Mark if the encoding indicates it is needed.
+	 * This methods must be the first call after opening the writer.
+	 * @param writer Writer where to output the BOM.
+	 * @param bomOnUTF8 Indicates if we should use a BOM on UTF-8 files.
+	 * @param encoding Encoding of the output.
+	 */
+	static public void writeBOMIfNeeded (Writer writer,
+		boolean bomOnUTF8,
+		String encoding)
+	{
+		try {
+			String tmp = encoding.toLowerCase();
+			
+			// Check UTF-8 first (most cases)
+			if (( bomOnUTF8 ) && ( tmp.equals("utf-8") )) { 
+				writer.write("\ufeff");
+				return;
+			}
+			
+			if ( tmp.equals("utf-16be")
+				|| tmp.equals("utf-16le")
+				|| tmp.equals("utf-16") )
+			{
+				writer.write("\ufeff");
+				return;
+			}
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 }

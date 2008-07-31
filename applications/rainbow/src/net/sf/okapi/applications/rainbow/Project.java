@@ -466,11 +466,11 @@ public class Project {
 		String prjFolder = path;
 		String folder = "";
 		if ( prjFolder == null ) {
-			if ( displayMode ) folder = "<User's home>: ";
+			if ( displayMode ) folder = "<User's home>:  ";
 			folder += System.getProperty("user.home");
 		}
 		else {
-			if ( displayMode ) folder = "<This project's folder>: ";			
+			if ( displayMode ) folder = "<Project's folder>:  ";			
 			folder += Util.getDirectoryName(prjFolder);
 		}
 		return folder;

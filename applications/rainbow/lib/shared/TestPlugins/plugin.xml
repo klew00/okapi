@@ -6,9 +6,9 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
-  updateUri="http://okapi.sf.net/updates/textrewriting">
+  updateUri="http://okapi.sf.net/">
   <info>
-   <name>Text Rewriting</name>
+   <name>Extract And Rewrite</name>
    <description>Re-writes documents with different changes, for
     example: masking translatable text, etc.</description>
    <provider>Okapi Framework</provider>
@@ -26,7 +26,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
-  updateUri="http://okapi.sf.net/updates/alignment">
+  updateUri="http://okapi.sf.net/">
   <info>
    <name>Create TMX from Bilingual Document</name>
    <description>Creates a TMX file from a set of bilingual documents such as XLIFF files.</description>
@@ -39,7 +39,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.extraction.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
-  updateUri="http://okapi.sf.net/updates/extraction">
+  updateUri="http://okapi.sf.net/">
   <info>
    <name>Create Translation Package</name>
    <description>Creates a translation package.</description>
@@ -56,7 +56,7 @@
   id="oku_merging"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
-  updateUri="http://okapi.sf.net/updates/merging">
+  updateUri="http://okapi.sf.net/">
   <info>
    <name>Merge Translation Package</name>
    <description>Merges an existing translation package.</description>
@@ -69,10 +69,23 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
-  updateUri="http://okapi.sf.net/updates/merging">
+  updateUri="http://okapi.sf.net/">
   <info>
-   <name>XSLT Transformation</name>
-   <description>Process an input XML document with a given XSLT template.</description>
+   <name>Apply XSLT Templates</name>
+   <description>Processes an input XML document with a given XSLT template.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
+ <plugin type="utility"
+  id="oku_linebreakconversion"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Convert Line-Breaks</name>
+   <description>Converts the line-breaks of any text input file to a give type.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

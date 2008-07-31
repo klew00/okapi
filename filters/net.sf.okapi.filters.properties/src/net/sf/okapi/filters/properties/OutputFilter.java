@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
@@ -83,7 +84,8 @@ public class OutputFilter implements IOutputFilter {
 			// Create the output writer from the provided stream
 			writer = new OutputStreamWriter(
 				new BufferedOutputStream(output), encoding);
-			outputEncoder = Charset.forName(encoding).newEncoder(); 
+			outputEncoder = Charset.forName(encoding).newEncoder();
+			Util.writeBOMIfNeeded(writer, true, encoding);
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

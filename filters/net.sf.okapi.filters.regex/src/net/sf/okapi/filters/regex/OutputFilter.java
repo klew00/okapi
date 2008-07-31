@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.IExtractionItem;
 import net.sf.okapi.common.resource.IDocumentResource;
@@ -78,6 +79,7 @@ public class OutputFilter implements IOutputFilter {
 				new BufferedOutputStream(output), resource.getTargetEncoding());
 			//TODO: maybe the outputEncoder won't be needed?
 			//outputEncoder = Charset.forName(resource.getTargetEncoding()).newEncoder(); 
+			Util.writeBOMIfNeeded(writer, true, resource.getTargetEncoding());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

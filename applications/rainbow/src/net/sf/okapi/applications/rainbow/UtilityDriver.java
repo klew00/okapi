@@ -192,7 +192,7 @@ public class UtilityDriver {
 						Util.createDirectories(outputPath);
 						OutputStream output = new FileOutputStream(outputPath);
 						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
-								prj.getTargetLanguage());
+							prj.getTargetLanguage());
 						filterUtil.setOutput(fa.outputFilter);
 					}
 

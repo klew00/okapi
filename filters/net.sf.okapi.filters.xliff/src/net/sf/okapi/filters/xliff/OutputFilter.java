@@ -10,6 +10,7 @@ import java.nio.charset.CharsetEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.IContainer;
 import net.sf.okapi.common.resource.IExtractionItem;
@@ -121,6 +122,7 @@ public class OutputFilter implements IOutputFilter {
 			// Create the output writer from the provided stream
 			writer = new OutputStreamWriter(
 				new BufferedOutputStream(output), res.getTargetEncoding());
+			Util.writeBOMIfNeeded(writer, true, res.getTargetEncoding());
 			writer.write("<?xml version=\"1.0\" encoding=\""
 				+ res.getTargetEncoding() + "\"?>");
 			outputEncoder = Charset.forName(res.getTargetEncoding()).newEncoder(); 
