@@ -36,6 +36,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
@@ -132,13 +133,16 @@ public class Editor implements IParametersEditor {
 		//--- Name tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayout(new GridLayout(2, false));
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Package Location");
 		tiTmp.setControl(cmpTmp);
 
 		stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Root of the output folder:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 		
 		edOutputFolder = new Text(cmpTmp, SWT.BORDER);
 		edOutputFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -147,12 +151,32 @@ public class Editor implements IParametersEditor {
 				updateSample();
 			}
 		});
+
+		Button btGetOutputFolder = new Button(cmpTmp, SWT.PUSH);
+		btGetOutputFolder.setText("...");
+		btGetOutputFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				DirectoryDialog dlg = new DirectoryDialog(shell);
+				dlg.setFilterPath(edOutputFolder.getText());
+				String tmp = dlg.open();
+				if ( tmp != null ) {
+					edOutputFolder.setText(tmp);
+					edOutputFolder.selectAll();
+					edOutputFolder.setFocus();
+				}
+			}
+		});
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Package name:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 		
 		edName = new Text(cmpTmp, SWT.BORDER);
-		edName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edName.setLayoutData(gdTmp);
 		edName.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
 				updateSample();
@@ -161,10 +185,15 @@ public class Editor implements IParametersEditor {
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Full path of the directory name:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 		
 		edSample = new Text(cmpTmp, SWT.BORDER);
 		edSample.setEditable(false);
-		edSample.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edSample.setLayoutData(gdTmp);
 
 		//--- Options tab
 		
