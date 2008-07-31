@@ -35,7 +35,7 @@ public class Main {
 			shlMain.open();
 			MF.run();
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			e.printStackTrace();
 		}
 		finally {

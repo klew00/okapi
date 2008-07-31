@@ -39,10 +39,9 @@ class StatusBar extends Composite {
 	private void createContent () {
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
-		this.setLayoutData(gdTmp);
+		setLayoutData(gdTmp);
 		
 		GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		setLayout(layout);

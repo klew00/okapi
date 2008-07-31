@@ -4,11 +4,14 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
-	
+
 	/**
-	 * Path of the XSLT document.
+	 * Path of the XSLT template to apply.
 	 */
 	private String      xsltPath;
+	/**
+	 * List of parameters to pass to the template.
+	 */
 	private String      paramList;
 	
 
@@ -26,7 +29,7 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public void reset () {
-		xsltPath = "transform.xslt";
+		xsltPath = "";
 		paramList = "";
 	}
 
@@ -37,5 +40,5 @@ public class Parameters extends BaseParameters {
 		tmp.add("paramList", paramList);
 		return tmp.toString();
 	}
-	
+
 }

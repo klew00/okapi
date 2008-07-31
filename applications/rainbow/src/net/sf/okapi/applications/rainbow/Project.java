@@ -451,15 +451,29 @@ public class Project {
 	}
 	
 	public String getParametersFolder () {
-		return getParametersFolder(useCustomParamsFolder);
+		return getParametersFolder(useCustomParamsFolder, false);
 	}
 	
-	public String getParametersFolder (boolean useCustom) {
+	public String getParametersFolder (boolean displayMode) {
+		return getParametersFolder(useCustomParamsFolder, displayMode);
+	}
+	
+	public String getParametersFolder (boolean useCustom,
+		boolean displayMode)
+	{
 		if ( useCustom ) return customParamsFolder;
 		// Else: use the same folder as the project
 		String prjFolder = path;
-		if ( prjFolder == null ) return System.getProperty("user.home");
-		return Util.getDirectoryName(prjFolder);
+		String folder = "";
+		if ( prjFolder == null ) {
+			if ( displayMode ) folder = "<User's home>: ";
+			folder += System.getProperty("user.home");
+		}
+		else {
+			if ( displayMode ) folder = "<This project's folder>: ";			
+			folder += Util.getDirectoryName(prjFolder);
+		}
+		return folder;
 	}
 	
 	/**

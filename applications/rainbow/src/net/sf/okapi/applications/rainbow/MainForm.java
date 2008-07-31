@@ -59,6 +59,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -137,6 +139,7 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         cmiOpenInputDocument;
 	private MenuItem         miRemoveInputDocuments;
 	private MenuItem         cmiRemoveInputDocuments;
+	private MenuItem         miOpenFolder;
 	
 	public MainForm (Shell p_Shell) {
 		try {
@@ -144,9 +147,9 @@ public class MainForm implements IParametersProvider {
 			setDirectories();
 			loadResources();
 			createContent();
-			createProject();
+			createProject(false);
 		}
-		catch ( Exception E ) {
+		catch ( Throwable E ) {
 			Dialogs.showError(shell, E.getMessage(), null);			
 		}
 	}
@@ -157,6 +160,17 @@ public class MainForm implements IParametersProvider {
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
 		shell.setImage(rm.getImage("Rainbow"));
+		
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				if ( !canContinue() ) event.doit = false;
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
 
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION"));
@@ -180,7 +194,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "file.new");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				createProject();
+				createProject(true);
             }
 		});
 
@@ -216,8 +230,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "file.exit");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO: check at the close event level
-				if ( canContinue() ) shell.close();
+				shell.close();
             }
 		});
 
@@ -648,7 +661,7 @@ public class MainForm implements IParametersProvider {
 					prj.setCustomParametersFolder(edParamsFolder.getText());
 				}
 				edParamsFolder.setEditable(chkUseCustomParametersFolder.getSelection());
-				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection()));
+				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection(), true));
             }
 		});
 		
@@ -741,9 +754,9 @@ public class MainForm implements IParametersProvider {
 		miUtilities.setMenu(dropMenu);
 		
 		// Add the default entries
-		MenuItem tmpMenu = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(tmpMenu, "utilities.openFolder");
-		tmpMenu.addSelectionListener(new SelectionAdapter() {
+		miOpenFolder = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miOpenFolder, "utilities.openFolder");
+		miOpenFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( prj.getLastOutputFolder() == null ) return;
 				Program.launch(prj.getLastOutputFolder());
@@ -804,6 +817,7 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, E.getMessage(), null);
 		}
 		finally {
+			miOpenFolder.setEnabled(prj.getLastOutputFolder()!=null);
 			stopWaiting();
 		}
 	}
@@ -894,12 +908,17 @@ public class MainForm implements IParametersProvider {
 
 	private void updateCommands () {
 		boolean enabled = (( currentInput > -1 ) && ( currentInput < inputTables.size() ));
+		if ( enabled ) {
+			enabled = (inputTables.get(currentInput).getItemCount() > 0);
+		}
 		miEditInputProperties.setEnabled(enabled);
 		cmiEditInputProperties.setEnabled(enabled);
 		miOpenInputDocument.setEnabled(enabled);
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
+		
+		miOpenFolder.setEnabled(prj.getLastOutputFolder()!=null);
 	}
 	
 	private void loadResources ()
@@ -980,7 +999,8 @@ public class MainForm implements IParametersProvider {
 	private void saveProject (String path) {
 		try {
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null, null, null);
+				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null,
+					"Rainbow Project (*.rnb)", ".rnb");
 				if ( path == null ) return;
 			}
 			saveSurfaceData();
@@ -1017,7 +1037,11 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 	
-	private void createProject () {
+	private void createProject (boolean checkCanContinue ) {
+		if ( checkCanContinue ) {
+			if ( !canContinue() ) return;
+		}
+		
 		prj = new Project(lm);
 		currentInput = 0;
 		resetDisplay(-1);
@@ -1027,7 +1051,8 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( !canContinue() ) return;
 			if ( path == null ) {
-				String[] paths = Dialogs.browseFilenames(shell, "Open Project", false, null, null, null);
+				String[] paths = Dialogs.browseFilenames(shell, "Open Project", false, null,
+					"Rainbow Projects (*.rnb)\tAll Files (*.*)", "*.rnb\t*.*");
 				if ( paths == null ) return;
 				path = paths[0];
 			}
@@ -1063,7 +1088,7 @@ public class MainForm implements IParametersProvider {
 		
 		chkUseCustomParametersFolder.setSelection(prj.useCustomParametersFolder());
 		edParamsFolder.setEditable(prj.useCustomParametersFolder());
-		edParamsFolder.setText(prj.getParametersFolder());
+		edParamsFolder.setText(prj.getParametersFolder(true));
 		
 		// Updates
 		edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
