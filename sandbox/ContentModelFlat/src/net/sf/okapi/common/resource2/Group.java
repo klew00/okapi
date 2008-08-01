@@ -44,4 +44,14 @@ public class Group extends ResourceContainer implements ITranslationResource {
 		
 	}
 
+	public ITranslationResource getParent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setParent(ITranslationResource value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

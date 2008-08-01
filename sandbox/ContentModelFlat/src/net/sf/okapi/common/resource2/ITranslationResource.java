@@ -13,5 +13,9 @@ public interface ITranslationResource extends IResource {
 	public boolean preserveWhitespaces ();
 	
 	public void setPreserveWhitespaces (boolean value);
+	
+	public ITranslationResource getParent ();
+	
+	public void setParent (ITranslationResource value);
 
 }
