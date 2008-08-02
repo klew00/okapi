@@ -1,6 +1,6 @@
 package net.sf.okapi.common.resource2;
 
-public class SkeletonUnit implements IResource {
+public class SkeletonUnit implements IContainable {
 
 	private StringBuilder    data;
 	protected String         id;
@@ -25,11 +25,23 @@ public class SkeletonUnit implements IResource {
 		id = value;
 	}
 
+	/**
+	 * Sets the skeleton's data as a string. This method overrides any existing
+	 * data. Use {@link #appendData(String)} or {@link #appendData(StringBuilder)}
+	 * to add data to the existing one.
+	 * @param text The data to set.
+	 */
 	public void setData (String text) {
 		data = new StringBuilder(text);
 		offset = -1;
 	}
 
+	/**
+	 * Sets the skeleton data in the form of an offset and a length. This method
+	 * overrides any existing data.
+	 * @param offset The offset position.
+	 * @param length The length starting from the offset.
+	 */
 	public void setData (long offset,
 		int length)
 	{
@@ -39,19 +51,38 @@ public class SkeletonUnit implements IResource {
 		this.length = length;
 		data = null;
 	}
-		
+
+	/**
+	 * Appends skeleton data to the object. If previous data where set using
+	 * {@link #setData(long, int)} before, this new data overrides the offset
+	 * information. In short: you cannot have both direct data and offset at the
+	 * same time. 
+	 * @param text The data to set.
+	 */
 	public void appendData (String text) {
 		if ( data == null ) data = new StringBuilder(text);
 		else data.append(text);
 		offset = -1;
 	}
 	
+	/**
+	 * Appends skeleton data to the object. If previous data where set using
+	 * {@link #setData(long, int)} before, this new data overrides the offset
+	 * information. In short: you cannot have both direct data and offset at the
+	 * same time. 
+	 * @param text The data to set.
+	 */
 	public void appendData (StringBuilder text) {
 		if ( data == null ) data = new StringBuilder(text);
 		else data.append(text);
 		offset = -1;
 	}
-	
+
+	/**
+	 * Indicates if the current skeleton's data are offset-based or string.
+	 * @return True if the data are offset-based, false if there is no offset
+	 * information set.
+	 */
 	public boolean isOffsetBased () {
 		return (offset != -1);
 	}

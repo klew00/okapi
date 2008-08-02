@@ -1,20 +1,23 @@
 package net.sf.okapi.common.resource2;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-public class TextUnit implements ITranslationResource {
+public class TextUnit implements ITranslatable, IAnnotatable {
 
-	protected String                             id;
-	protected String                             name;
-	protected boolean                            isTranslatable;
-	protected boolean                            preserveWS;
-	protected SkeletonUnit                       sklBefore;
-	protected SkeletonUnit                       sklAfter;
-	protected ArrayList<ITranslationResource>    children;
-	protected ITranslationResource               parent;
-	protected String                             source; //Using a String until we get the "LocaleUnit" done
-	protected ArrayList<String>                  targets; //Using Strings until we get the "LocaleUnit" done
+	protected String                        id;
+	protected String                        name;
+	protected boolean                       isTranslatable;
+	protected boolean                       preserveWS;
+	protected SkeletonUnit                  sklBefore;
+	protected SkeletonUnit                  sklAfter;
+	protected ArrayList<ITranslatable>      children;
+	protected ITranslatable                 parent;
+	protected String                        source; //Using a String until we get the "LocaleUnit" done
+	protected ArrayList<String>             targets; //Using Strings until we get the "LocaleUnit" done
+	protected Hashtable<String, String>     propList;
+	protected Hashtable<String, IExtension> extList;
 
 
 	public TextUnit () {
@@ -26,20 +29,46 @@ public class TextUnit implements ITranslationResource {
 		return name;
 	}
 
-	public boolean isTranslatable () {
-		return isTranslatable;
-	}
-
-	public boolean preserveWhitespaces () {
-		return preserveWS;
-	}
-
-	public void setIsTranslatable (boolean value) {
-		isTranslatable = value;
-	}
-
 	public void setName (String value) {
 		name = value;
+	}
+
+	public String getProperty (String name) {
+		if ( propList == null ) return null;
+		return propList.get(name);
+	}
+
+	public void setProperty (String name,
+		String value)
+	{
+		if ( propList == null ) propList = new Hashtable<String, String>();
+		propList.put(name, value);
+	}
+
+	public Hashtable<String, String> getProperties () {
+		if ( propList == null ) propList = new Hashtable<String, String>();
+		return propList;
+	}
+
+	public IExtension getExtension (String name) {
+		if ( extList == null ) return null;
+		return extList.get(name);
+	}
+
+	public void setExtension (String name,
+		IExtension value)
+	{
+		if ( extList == null ) extList = new Hashtable<String, IExtension>();
+		extList.put(name, value);
+	}
+
+	public Hashtable<String, IExtension> getExtensions () {
+		if ( extList == null ) extList = new Hashtable<String, IExtension>();
+		return extList;
+	}
+
+	public boolean preserveWhitespaces() {
+		return preserveWS;
 	}
 
 	public void setPreserveWhitespaces (boolean value) {
@@ -50,13 +79,29 @@ public class TextUnit implements ITranslationResource {
 		return id;
 	}
 
+	public void setID (String value) {
+		id = value;
+	}
+
 	public boolean isEmpty () {
 		//TODO: Change for "LocaleUnit" later
 		return (( source != null ) && ( source.length() > 0 ));
 	}
 
-	public void setID (String value) {
-		id = value;
+	public boolean isTranslatable () {
+		return isTranslatable;
+	}
+
+	public void setIsTranslatable (boolean value) {
+		isTranslatable = value;
+	}
+
+	public ITranslatable getParent () {
+		return parent;
+	}
+
+	public void setParent (ITranslatable value) {
+		parent = value;
 	}
 
 	public SkeletonUnit getSkeletonBefore () {
@@ -115,9 +160,9 @@ public class TextUnit implements ITranslationResource {
 		return targets;
 	}
 	
-	public void addChild (ITranslationResource child) {
+	public void addChild (ITranslatable child) {
 		if ( children == null ) {
-			children = new ArrayList<ITranslationResource>();
+			children = new ArrayList<ITranslatable>();
 		}
 		child.setParent(this);
 		children.add(child);
@@ -128,19 +173,12 @@ public class TextUnit implements ITranslationResource {
 		else return !children.isEmpty();
 	}
 
-	public List<ITranslationResource> getChildren () {
+	public List<ITranslatable> getChildren () {
 		if ( children == null ) {
-			children = new ArrayList<ITranslationResource>();
+			children = new ArrayList<ITranslatable>();
 		}
 		return children;
 	}
 
-	public ITranslationResource getParent () {
-		return parent;
-	}
-
-	public void setParent (ITranslationResource value) {
-		parent = value;
-	}
 
 }

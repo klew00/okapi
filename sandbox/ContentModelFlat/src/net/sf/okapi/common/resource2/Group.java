@@ -1,12 +1,18 @@
 package net.sf.okapi.common.resource2;
 
-public class Group extends ResourceContainer implements ITranslationResource {
+public class Group extends ResourceContainer implements ITranslatable {
 
 	private static final long serialVersionUID = 1L;
+	
+	ITranslatable     parent;
 
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+
+	public ITranslatable getParent () {
+		return parent;
+	}
+
+	public void setParent (ITranslatable value) {
+		parent = value;
 	}
 
 	public boolean isTranslatable() {
@@ -14,22 +20,7 @@ public class Group extends ResourceContainer implements ITranslationResource {
 		return false;
 	}
 
-	public boolean preserveWhitespaces() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public void setIsTranslatable(boolean value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setName(String value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setPreserveWhitespaces(boolean value) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -43,15 +34,4 @@ public class Group extends ResourceContainer implements ITranslationResource {
 		// TODO Auto-generated method stub
 		
 	}
-
-	public ITranslationResource getParent() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setParent(ITranslationResource value) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
