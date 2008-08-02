@@ -18,6 +18,7 @@ public class Utility implements ISimpleUtility {
 	private String           inputPath;
 	private String           outputPath;
 	private boolean          removeBOM;
+	private boolean          alsoNonUTF8;
 	private byte[]           buffer;
 	
 
@@ -113,8 +114,14 @@ public class Utility implements ISimpleUtility {
 				int n = hasBOM(buffer, len);
 				if ( n > 0 ) { // A BOM is present
 					if ( removeBOM ) {
-						// Skip it, output the remaining bytes
-						output.write(buffer, n, len-n);
+						if (( n == 3 ) || ( alsoNonUTF8 )) {
+							// Skip it, output the remaining bytes
+							output.write(buffer, n, len-n);
+						}
+						else {
+							// Keep the BOM
+							output.write(buffer, 0, len);
+						}
 					}
 					else { // Add the BOM: It's there, just write the buffer 
 						output.write(buffer, 0, len);
@@ -168,6 +175,7 @@ public class Utility implements ISimpleUtility {
 	{
 		commonFolder = null; // Reset
 		removeBOM = (params.getParameter("removeBOM").equals("1"));
+		alsoNonUTF8 = (params.getParameter("alsoNonUTF8").equals("1"));
 		buffer = new byte[1024*2];
 	}
 

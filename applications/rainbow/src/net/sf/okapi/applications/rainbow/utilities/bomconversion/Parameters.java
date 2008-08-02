@@ -6,6 +6,7 @@ import net.sf.okapi.common.FieldsString;
 public class Parameters extends BaseParameters {
 
 	private boolean     removeBOM;
+	private boolean     alsoNonUTF8;
 
 	public Parameters () {
 		reset();
@@ -17,11 +18,13 @@ public class Parameters extends BaseParameters {
 		FieldsString tmp = new FieldsString(data);
 		// Parse the fields
 		removeBOM = tmp.get("removeBOM", removeBOM);
+		alsoNonUTF8 = tmp.get("alsoNonUTF8", alsoNonUTF8);
 	}
 
 	@Override
 	public void reset() {
-		removeBOM = false; // Default = Add it
+		removeBOM = false;
+		alsoNonUTF8 = false;
 	}
 
 	@Override
@@ -29,6 +32,7 @@ public class Parameters extends BaseParameters {
 		// Store the parameters in fields
 		FieldsString tmp = new FieldsString();
 		tmp.add("removeBOM", removeBOM);
+		tmp.add("alsoNonUTF8", alsoNonUTF8);
 		return tmp.toString();
 	}
 	

@@ -10,10 +10,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -30,6 +28,7 @@ public class Editor implements IParametersEditor {
 	private Label                 stAdd;
 	private Button                rdRemove;
 	private Label                 stRemove;
+	private Button                chkAlsoNonUTF8;
 
 
 	public boolean edit (IParameters params,
@@ -91,6 +90,12 @@ public class Editor implements IParametersEditor {
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		stRemove.setLayoutData(gdTmp);
+		
+		chkAlsoNonUTF8 = new Button(group, SWT.CHECK);
+		chkAlsoNonUTF8.setText("Remove also UTF-16 and UTF-32 BOMs (Not recommended)");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		chkAlsoNonUTF8.setLayoutData(gdTmp);
 
 		rdAdd = new Button(group, SWT.RADIO);
 		rdAdd.setText("Add the Byte-Order-Mark if it is not already present");
@@ -137,6 +142,7 @@ public class Editor implements IParametersEditor {
 	private void updateNotes () {
 		stRemove.setEnabled(rdRemove.getSelection());
 		stAdd.setEnabled(rdAdd.getSelection());
+		chkAlsoNonUTF8.setEnabled(rdRemove.getSelection());
 	}
 	
 	private boolean showDialog () {
@@ -151,11 +157,13 @@ public class Editor implements IParametersEditor {
 	private void setData () {
 		rdRemove.setSelection(params.getParameter("removeBOM").equals("1"));
 		rdAdd.setSelection(!rdRemove.getSelection());
+		chkAlsoNonUTF8.setSelection(params.getParameter("alsoNonUTF8").equals("1"));
 		updateNotes();
 	}
 
 	private boolean saveData () {
 		params.setParameter("removeBOM", (rdRemove.getSelection() ? "1" : "0"));
+		params.setParameter("alsoNonUTF8", (chkAlsoNonUTF8.getSelection() ? "1" : "0"));
 		result = true;
 		return result;
 	}

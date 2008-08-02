@@ -38,6 +38,7 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -93,9 +94,9 @@ public class UtilityDriver {
 		}
 	}
 	
-	public void execute (Shell shell) {
+	public boolean checkParameters (Shell shell) {
 		try {
-			if ( pluginItem == null ) return;
+			if ( pluginItem == null ) return false;
 			// If there are no options to ask for,
 			// ask confirmation to launch the utility
 			if ( util.hasParameters() ) {
@@ -106,7 +107,7 @@ public class UtilityDriver {
 				}
 				// Invoke the editor if there is one
 				if ( editor != null ) {
-					if ( !editor.edit(util.getParameters(), shell) ) return;
+					if ( !editor.edit(util.getParameters(), shell) ) return false;
 					// Save the parameters in memory
 					prj.setUtilityParameters(util.getID(), util.getParameters().toString());
 				}
@@ -116,9 +117,18 @@ public class UtilityDriver {
 				dlg.setMessage(String.format("You are about to execute the utility: %s\nDo you want to proceed?",
 					pluginItem.name));
 				dlg.setText(Util.getNameInCaption(shell.getText()));
-				if ( dlg.open() != SWT.YES ) return;
+				if ( dlg.open() != SWT.YES ) return false;
 			}
-
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
+	public void execute (Shell shell) {
+		try {
 			//TODO: Implement multilist support (we use only list 0 here)
 			log.beginTask(pluginItem.name);
 			

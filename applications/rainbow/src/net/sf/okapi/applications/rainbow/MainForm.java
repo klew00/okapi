@@ -808,6 +808,7 @@ public class MainForm implements IParametersProvider {
 			
 			ud.setData(prj, id);
 			// Run it
+			if ( !ud.checkParameters(shell) ) return;
 			startWaiting("Processing files...", true);
 			ud.execute(shell);
 			// Gets the latest folder to open.
