@@ -90,4 +90,17 @@
   </info>
  </plugin>
 
+ <plugin type="utility"
+  id="oku_bomconversion"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Convert Byte-Order-Marks</name>
+   <description>Adds or removes the Unicode Byte-Order-Mark of any text input file to a give type.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
 </okapiPlugins>

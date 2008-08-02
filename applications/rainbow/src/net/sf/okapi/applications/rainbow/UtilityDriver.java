@@ -153,15 +153,8 @@ public class UtilityDriver {
 					// Does the utility requests this list?
 					if ( j >= util.getInputCount() ) break; // No need to loop more
 					// Do we have a corresponding input?
-					if ( prj.inputLists.get(j).size() >= f ) {
-						// Case of the data not available
-						// This is to allow some utility to a variable number of input
-						// depending on their own variable requirements. They ask for 3 inputs
-						// and Rainbow gives them as much as possible, and nulls otherwise.
-						util.addInputData(null, null, null);
-						util.addOutputData(null, null);
-					}
-					else { // Else: data available
+					if ( prj.inputLists.get(j).size() > f ) {
+						// Data is available
 						Input addtem = prj.getList(j).get(f);
 						// Input
 						util.addInputData(
@@ -172,6 +165,14 @@ public class UtilityDriver {
 						util.addOutputData(
 							prj.buildTargetPath(j, addtem.relativePath),
 							prj.buildTargetEncoding(addtem));
+					}
+					else {
+						// Case of the data not available
+						// This is to allow some utility to a variable number of input
+						// depending on their own variable requirements. They ask for 3 inputs
+						// and Rainbow gives them as much as possible, and nulls otherwise.
+						util.addInputData(null, null, null);
+						util.addOutputData(null, null);
 					}
 				}
 

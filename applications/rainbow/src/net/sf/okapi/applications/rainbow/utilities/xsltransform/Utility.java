@@ -61,6 +61,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void doEpilog () {
+		// Not used in this utility.
 	}
 
 	public void doProlog (String sourceLanguage,
@@ -91,10 +92,12 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public String getInputRoot () {
+		// Not used in this utility.
 		return null;
 	}
 
 	public String getOutputRoot () {
+		// Not used in this utility.
 		return null;
 	}
 
@@ -151,15 +154,15 @@ public class Utility implements ISimpleUtility {
 		for ( String key : paramList.keySet() ) {
 			value = paramList.get(key).replace("<$SrcLang>", srcLang);
 			value = value.replace("<$TrgLang>", trgLang);
-			value = value.replace("<$Input1>", inputPaths.get(0));
-			value = value.replace("<$Output1>", outputPaths.get(0));
+			value = value.replace("<$Input1>", Util.makeURIFromPath(inputPaths.get(0)));
+			value = value.replace("<$Output1>", Util.makeURIFromPath(outputPaths.get(0)));
 			if ( inputPaths.get(1) != null ) {
-				value = value.replace("<$Input2>", inputPaths.get(1));
-				value = value.replace("<$Output2>", outputPaths.get(1));
+				value = value.replace("<$Input2>", Util.makeURIFromPath(inputPaths.get(1)));
+				value = value.replace("<$Output2>", Util.makeURIFromPath(outputPaths.get(1)));
 			}
 			if ( inputPaths.get(2) != null ) {
-				value = value.replace("<$Input3>", inputPaths.get(2));
-				value = value.replace("<$Output3>", outputPaths.get(2));
+				value = value.replace("<$Input3>", Util.makeURIFromPath(inputPaths.get(2)));
+				value = value.replace("<$Output3>", Util.makeURIFromPath(outputPaths.get(2)));
 			}
 			trans.setParameter(key, value);
 		}
