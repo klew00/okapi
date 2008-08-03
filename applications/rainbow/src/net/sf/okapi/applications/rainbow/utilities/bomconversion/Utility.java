@@ -5,14 +5,21 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
 public class Utility implements ISimpleUtility {
 
-	private final byte[]     UTF8BOM = {(byte)0xEF,(byte)0xBB,(byte)0xBF};
-	
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+
+	private final byte[]     BOM_UTF8       = {(byte)0xEF,(byte)0xBB,(byte)0xBF};
+	private final byte[]     BOM_UTF16BE    = {(byte)0xFE,(byte)0xFF};
+	private final byte[]     BOM_UTF16LE    = {(byte)0xFF,(byte)0xFE};
+
 	private IParameters      params;
 	private String           commonFolder;
 	private String           inputPath;
@@ -38,7 +45,8 @@ public class Utility implements ISimpleUtility {
 	 * Checks for BOM presence
 	 * @param buffer The buffer to check.
 	 * @param length The number of usable bytes in the buffer.
-	 * @return 0 if there is no BOM.
+	 * @return 0 if there is no BOM, or the number of bytes used by
+	 * the BOM if it is present.
 	 */
 	private int hasBOM (byte[] buffer,
 		int length)
@@ -48,11 +56,13 @@ public class Utility implements ISimpleUtility {
 			if (( buffer[0] == (byte)0xFE )
 				&& ( buffer[1] == (byte)0xFF )) {
 				// UTF-16BE
+				logger.info("UTF-16BE detected");
 				return 2;
 			}
 			else if (( buffer[0] == (byte)0xFF )
 				&& ( buffer[1] == (byte)0xFE )) {
 				// UTF-16LE
+				logger.info("UTF-16LE detected");
 				return 2;
 			}
 			// Check for UTF-8
@@ -61,6 +71,7 @@ public class Utility implements ISimpleUtility {
 					&& ( buffer[1] == (byte)0xBB )
 					&& ( buffer[2] == (byte)0xBF )) {
 					// UTF-8
+					logger.info("UTF-8 detected");
 					return 3;
 				}
 				// Check for UTF-32
@@ -70,6 +81,7 @@ public class Utility implements ISimpleUtility {
 						&& ( buffer[2] == (byte)0x00 )
 						&& ( buffer[3] == (byte)0x00 )) {
 						// UTF-32LE
+						logger.info("UTF-32LE detected");
 						return 4;
 					}
 					else if (( buffer[0] == (byte)0x00 )
@@ -77,10 +89,38 @@ public class Utility implements ISimpleUtility {
 						&& ( buffer[2] == (byte)0xFE )
 						&& ( buffer[3] == (byte)0xFF )) {
 						// UTF-32BE
+						logger.info("UTF-32BE detected");
 						return 4;
 					}
 				}
 			}
+		}
+		return 0;
+	}
+
+	/**
+	 * Tries to guess the type of endian from the byte patterns.
+	 * @param buffer The buffer to check.
+	 * @param length The number of usable bytes in the buffer.
+	 * @return 0=no detection, 1=UTF-16BE, 2=UTF-16LE
+	 */
+	private int guessByteOrder (byte[] buffer,
+		int length)
+	{
+		if ( length < 4 ) return 0;
+		if (( buffer[0] != (byte)0x00 )
+			&& ( buffer[1] == (byte)0x00 )
+			&& ( buffer[2] != (byte)0x00 )
+			&& ( buffer[3] == (byte)0x00 )) {
+			// Probably UTF-16BE 
+			return 1;
+		}
+		if (( buffer[0] == (byte)0x00 )
+			&& ( buffer[1] != (byte)0x00 )
+			&& ( buffer[2] == (byte)0x00 )
+			&& ( buffer[3] != (byte)0x00 )) {
+			// Probably UTF-16LE
+			return 2;
 		}
 		return 0;
 	}
@@ -106,8 +146,8 @@ public class Utility implements ISimpleUtility {
 			}
 			else if ( len == 0 ) { // Empty file
 				if ( !removeBOM ) { // Add the BOM
-					// Assume the file is UTF-8
-					output.write(UTF8BOM);
+					// Let's make that empty file a UTF-8 file
+					output.write(BOM_UTF8);
 				}
 			}
 			else { // Non-empty file
@@ -129,8 +169,17 @@ public class Utility implements ISimpleUtility {
 				}
 				else { // No BOM present
 					if ( !removeBOM ) { // If we add, do it 
-						// Assume the file is UTF-8
-						output.write(UTF8BOM);
+						switch ( guessByteOrder(buffer, len) ) {
+						case 1: // UTF-16BE
+							output.write(BOM_UTF16BE);
+							break;
+						case 2: // UTF-16LE
+							output.write(BOM_UTF16LE);
+							break;
+						default: // Assume the file is UTF-8 
+							output.write(BOM_UTF8);
+							break;
+						}
 					}
 					// Then write the buffer we checked
 					output.write(buffer, 0, len);

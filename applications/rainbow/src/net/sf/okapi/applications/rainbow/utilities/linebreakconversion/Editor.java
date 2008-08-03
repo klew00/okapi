@@ -78,7 +78,7 @@ public class Editor implements IParametersEditor {
 
 		Group group = new Group(cmpTmp, SWT.NONE);
 		group.setLayout(new RowLayout(SWT.VERTICAL));
-		group.setText("New type of line-break:");
+		group.setText("New type of line-break");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		rdDos = new Button(group, SWT.RADIO);

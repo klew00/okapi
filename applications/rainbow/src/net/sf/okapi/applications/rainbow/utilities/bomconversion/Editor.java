@@ -100,7 +100,7 @@ public class Editor implements IParametersEditor {
 		rdAdd = new Button(group, SWT.RADIO);
 		rdAdd.setText("Add the Byte-Order-Mark if it is not already present");
 		stAdd = new Label(group, SWT.NONE);
-		stAdd.setText("IMPORTANT: The input files without BOM are assumed to be already in UTF-8.");
+		stAdd.setText("IMPORTANT: The input files without BOM are assumed to be in UTF-8 or UTF-16.");
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		stAdd.setLayoutData(gdTmp);
