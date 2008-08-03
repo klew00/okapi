@@ -4,8 +4,18 @@ public class Group extends ResourceContainer implements ITranslatable {
 
 	private static final long serialVersionUID = 1L;
 	
-	ITranslatable     parent;
+	private String           id;
+	private ITranslatable    parent;
+	private boolean          isTranslatable;
 
+
+	public String getID () {
+		return id;
+	}
+
+	public void setID (String value) {
+		id = value;
+	}
 
 	public ITranslatable getParent () {
 		return parent;
@@ -15,23 +25,12 @@ public class Group extends ResourceContainer implements ITranslatable {
 		parent = value;
 	}
 
-	public boolean isTranslatable() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isTranslatable () {
+		return isTranslatable;
 	}
 
-	public void setIsTranslatable(boolean value) {
-		// TODO Auto-generated method stub
-		
+	public void setIsTranslatable (boolean value) {
+		isTranslatable = value;
 	}
 
-	public String getID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setID(String value) {
-		// TODO Auto-generated method stub
-		
-	}
 }

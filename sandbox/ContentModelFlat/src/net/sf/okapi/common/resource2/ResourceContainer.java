@@ -9,6 +9,7 @@ public class ResourceContainer extends ArrayList<IContainable>
 	private static final long serialVersionUID = 1L;
 
 	protected String                        name;
+	protected String                        type;
 	protected boolean                       preserveWS;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
@@ -20,6 +21,14 @@ public class ResourceContainer extends ArrayList<IContainable>
 
 	public void setName (String value) {
 		name = value;
+	}
+
+	public String getType () {
+		return type;
+	}
+
+	public void setType (String value) {
+		type = value;
 	}
 
 	public boolean preserveWhitespaces() {
