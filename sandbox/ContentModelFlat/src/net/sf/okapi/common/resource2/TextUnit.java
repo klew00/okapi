@@ -19,20 +19,25 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected ArrayList<String>             targets; //Using Strings until we get the "LocaleUnit" done
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
+	private ArrayList<ITranslatable>        allItems;
+	private int                             currentIndex;
 
 
-	public TextUnit (String sourceText) {
-		source = sourceText; //TODO: Change for "LocaleUnit" later
-		targets = new ArrayList<String>();
-		targets.add(null);
-	}
-	
 	public TextUnit () {
 		source = ""; //TODO: Change for "LocaleUnit" later
 		targets = new ArrayList<String>();
 		targets.add(null);
 	}
 
+	public TextUnit (String id,
+		String sourceText)
+	{
+		this.id = id;
+		source = sourceText; //TODO: Change for "LocaleUnit" later
+		targets = new ArrayList<String>();
+		targets.add(null);
+	}
+	
 	@Override
 	public String toString () {
 		//TODO: Modify for real output, this is test only
@@ -257,5 +262,10 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 
 	//TODO: some kind of iterator for the children. It should be recursive
 	// and inexpensive. getFirstChild() getNextChild()???
-
+	/*
+	 * Not sure how to provide simple access to all the children recursively
+	 * as the groups can have skeleton units, which make handling sub-text-unit
+	 * quite different from simply containers of groups or text-units.
+	 * So I wonder about the need to have group there...
+	 */
 }

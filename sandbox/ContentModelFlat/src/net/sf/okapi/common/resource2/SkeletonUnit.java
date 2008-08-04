@@ -12,13 +12,18 @@ public class SkeletonUnit implements IContainable {
 		offset = -1;
 	}
 	
-	public SkeletonUnit (String data) {
+	public SkeletonUnit (String id,
+		String data)
+	{
+		this.id = id;
 		setData(data);
 	}
 	
-	public SkeletonUnit (int offset,
+	public SkeletonUnit (String id,
+		int offset,
 		int length)
 	{
+		this.id = id;
 		setData(offset, length);
 	}
 	

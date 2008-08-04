@@ -6,26 +6,26 @@ public class Main {
 
 		Document doc = new Document();
 		
-		doc.add(new SkeletonUnit("<doc>"));
+		doc.add(new SkeletonUnit("s1", "<doc>"));
 		
-		TextUnit tu = new TextUnit("text unit 1");
-		tu.setSkeletonBefore(new SkeletonUnit("<p>"));
-		tu.setSkeletonAfter(new SkeletonUnit("</p>"));
+		TextUnit tu = new TextUnit("t1", "text unit 1");
+		tu.setSkeletonBefore(new SkeletonUnit("s2", "<p>"));
+		tu.setSkeletonAfter(new SkeletonUnit("s3", "</p>"));
 		doc.add(tu);
 		
 		Group group1 = new Group();
 		group1.setID("g1");
-		group1.add(new TextUnit("text unit 2"));
+		group1.add(new TextUnit("t2", "text unit 2"));
 		Group group2 = new Group();
-		tu = new TextUnit("text unit 3");
-		tu.setSkeletonBefore(new SkeletonUnit("<p>"));
-		tu.setSkeletonAfter(new SkeletonUnit("</p>"));
+		tu = new TextUnit("t3", "text unit 3");
+		tu.setSkeletonBefore(new SkeletonUnit("s4", "<p>"));
+		tu.setSkeletonAfter(new SkeletonUnit("s5", "</p>"));
 		
 		group2.add(tu);
 		group1.add(group2);
 		doc.add(group1);
 
-		doc.add(new SkeletonUnit("</doc>"));
+		doc.add(new SkeletonUnit("s6", "</doc>"));
 
 		show(doc, 0);
 	}
