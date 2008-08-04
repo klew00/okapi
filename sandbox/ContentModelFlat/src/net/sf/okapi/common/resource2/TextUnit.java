@@ -21,12 +21,26 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected Hashtable<String, IExtension> extList;
 
 
+	public TextUnit (String sourceText) {
+		source = sourceText; //TODO: Change for "LocaleUnit" later
+		targets = new ArrayList<String>();
+		targets.add(null);
+	}
+	
 	public TextUnit () {
 		source = ""; //TODO: Change for "LocaleUnit" later
 		targets = new ArrayList<String>();
 		targets.add(null);
 	}
 
+	@Override
+	public String toString () {
+		//TODO: Modify for real output, this is test only
+		return (sklBefore==null ? "" : sklBefore.toString())
+			+ source +
+			(sklAfter==null ? "" : sklAfter.toString());
+	}
+	
 	public String getID () {
 		return id;
 	}
@@ -37,7 +51,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 
 	public boolean isEmpty () {
 		//TODO: Change for "LocaleUnit" later
-		return (( source != null ) && ( source.length() > 0 ));
+		return (source.length() > 0);
 	}
 
 	public String getName () {

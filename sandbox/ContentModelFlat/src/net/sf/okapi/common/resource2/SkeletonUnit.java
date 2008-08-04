@@ -6,10 +6,29 @@ public class SkeletonUnit implements IContainable {
 	protected String         id;
 	private long             offset;
 	private int              length;
-	
-	
+
+
 	public SkeletonUnit () {
 		offset = -1;
+	}
+	
+	public SkeletonUnit (String data) {
+		setData(data);
+	}
+	
+	public SkeletonUnit (int offset,
+		int length)
+	{
+		setData(offset, length);
+	}
+	
+	@Override
+	public String toString () {
+		//TODO: Modify for real output, this is test only
+		if ( isEmpty() ) return "";
+		else if ( isOffsetBased() ) return "[offset-based]";
+		else if ( data == null ) return "";
+		else return data.toString();
 	}
 	
 	public String getID () {
