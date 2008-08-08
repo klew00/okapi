@@ -149,7 +149,7 @@ public class UtilityDriver {
 				// Skip item without filter if the utility is filter-driven
 				if ( util.isFilterDriven() && ( item.filterSettings.length() == 0 )) continue;
 				// Otherwise: process
-				log.message("Input: "+item.relativePath);
+				log.message("-- Input: "+item.relativePath);
 			
 				// Initialize the main input
 				String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;

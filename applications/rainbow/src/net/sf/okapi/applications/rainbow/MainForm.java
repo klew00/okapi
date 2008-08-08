@@ -21,8 +21,11 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
@@ -305,6 +308,13 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editSegmentationRules(null);
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.listencodings");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				listEncodings();
 			}
 		});
 
@@ -1288,6 +1298,38 @@ public class MainForm implements IParametersProvider {
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void listEncodings () {
+		try {
+			int count = 0;
+			int countAlias = 0;
+			startWaiting("List encodings...", true);
+			log.beginTask("List the encodings available on this machine:\n");
+			SortedMap<String, Charset> charsets = Charset.availableCharsets();
+			Set names = charsets.keySet();
+			for (Iterator e = names.iterator(); e.hasNext();) {
+				String name = (String)e.next();
+				Charset charset = (Charset) charsets.get(name);
+				log.message(charset.displayName());
+				count++;
+				Set<String> aliases = charset.aliases();
+				for (Iterator ee = aliases.iterator(); ee.hasNext();) {
+					log.message("\t" + ee.next());
+					countAlias++;
+				}
+			}
+			log.message(String.format("\nNumber of unique encodings available: %d", count));
+			log.message(String.format("and counting aliases: %d\n", count+countAlias));
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			log.endTask(null);
+			stopWaiting();
+			log.show();
 		}
 	}
 	

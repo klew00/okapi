@@ -16,7 +16,7 @@
  <encoding iana="iso-8859-6" cp="28596">
   <name>Arabic (ISO)</name>
  </encoding>
- <encoding iana="x-mac-arabic" cp="10004">
+ <encoding iana="MacArabic" cp="10004">
   <name>Arabic (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1256" cp="1256">
@@ -37,7 +37,7 @@
  <encoding iana="iso-8859-2" cp="28592">
   <name>Central European (ISO)</name>
  </encoding>
- <encoding iana="x-mac-ce" cp="10029">
+ <encoding iana="MacCentralEurope" cp="10029">
   <name>Central European (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1250" cp="1250">
@@ -61,19 +61,13 @@
  <encoding iana="x-cp50227" cp="50227">
   <name>Chinese Simplified (ISO-2022)</name>
  </encoding>
- <encoding iana="x-mac-chinesesimp" cp="10008">
-  <name>Chinese Simplified (Macintosh)</name>
- </encoding>
  <encoding iana="big5" cp="950">
   <name>Chinese Traditional (Big5)</name>
  </encoding>
  <encoding iana="x-Chinese-CNS" cp="2000">
   <name>Chinese Traditional (CNS)</name>
  </encoding>
- <encoding iana="x-mac-chinesetard" cp="10002">
-  <name>Chinese Traditional (Macintosh)</name>
- </encoding>
- <encoding iana="x-mac-croatian" cp="10082">
+ <encoding iana="MacCroatian" cp="10082">
   <name>Croatian (Macintosh)</name>
  </encoding>
  <encoding iana="cp866" cp="866">
@@ -91,7 +85,7 @@
  <encoding iana="koi8-u" cp="21866">
   <name>Cyrillic (KOI8-U)</name>
  </encoding>
- <encoding iana="x-mac-cyrillic" cp="10007">
+ <encoding iana="MacCyrillic" cp="10007">
   <name>Cyrillic (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1251" cp="1251">
@@ -115,7 +109,7 @@
  <encoding iana="iso-8859-7" cp="28597">
   <name>Greek (ISO)</name>
  </encoding>
- <encoding iana="x-mac-greek" cp="10006">
+ <encoding iana="MacGreek" cp="10006">
   <name>Greek (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1253" cp="1253">
@@ -130,7 +124,7 @@
  <encoding iana="iso-8859-8-i" cp="38598">
   <name>Hebrew (ISO-Logical)</name>
  </encoding>
- <encoding iana="x-mac-hebrew" cp="10005">
+ <encoding iana="MacHebrew" cp="10005">
   <name>Hebrew (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1255" cp="1255">
@@ -139,7 +133,7 @@
  <encoding iana="ibm861" cp="861">
   <name>Icelandic (DOS)</name>
  </encoding>
- <encoding iana="x-mac-icelandic" cp="10079">
+ <encoding iana="MacIcelandic" cp="10079">
   <name>Japanese (Macintosh)</name>
  </encoding>
  <encoding iana="euc-jp" cp="51932">
@@ -157,9 +151,6 @@
  <encoding iana="iso-2022-jp" cp="50222">
   <name>Japanese (JIS-Allow 1 byte Kana - SO/SI)</name>
  </encoding>
- <encoding iana="x-mac-japanese" cp="10001">
-  <name>Japanese (Macintosh)</name>
- </encoding>
  <encoding iana="shift_jis" cp="932">
   <name>Japanese (Shift-JIS)</name>
  </encoding>
@@ -175,9 +166,6 @@
  <encoding iana="Johab" cp="1362">
   <name>Korean (Johab)</name>
  </encoding>
- <encoding iana="x-mac-korean" cp="10003">
-  <name>Korean (Macintosh)</name>
- </encoding>
  <encoding iana="x-cp20949" cp="20949">
   <name>Korean (Wansung)</name>
  </encoding>
@@ -190,10 +178,7 @@
  <encoding iana="IBM865" cp="865">
   <name>Nordic (DOS)</name>
  </encoding>
- <encoding iana="x-cp20261" cp="20261">
-  <name>T.61</name>
- </encoding>
- <encoding iana="x-mac-thai" cp="10021">
+ <encoding iana="MacThai" cp="10021">
   <name>Thai (Macintosh)</name>
  </encoding>
  <encoding iana="windows-874" cp="874">
@@ -205,7 +190,7 @@
  <encoding iana="iso-8859-9" cp="28599">
   <name>Turkish (ISO)</name>
  </encoding>
- <encoding iana="x-mac-turkish" cp="10081">
+ <encoding iana="MacTurkish" cp="10081">
   <name>Turkish (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1254" cp="1254">
@@ -235,7 +220,7 @@
  <encoding iana="iso-8859-1" cp="28591">
   <name>Western European (ISO)</name>
  </encoding>
- <encoding iana="macintosh" cp="10000">
+ <encoding iana="MacRoman" cp="10000">
   <name>Western European (Macintosh)</name>
  </encoding>
  <encoding iana="windows-1252" cp="1252">

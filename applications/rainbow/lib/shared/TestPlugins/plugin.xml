@@ -103,4 +103,17 @@
   </info>
  </plugin>
 
+ <plugin type="utility"
+  id="oku_encodingconversion"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Convert Encoding</name>
+   <description>Converts a text input file from one encoding to another.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
 </okapiPlugins>
