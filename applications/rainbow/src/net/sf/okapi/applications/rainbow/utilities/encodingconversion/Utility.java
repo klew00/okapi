@@ -43,6 +43,7 @@ public class Utility implements ISimpleUtility {
 	private CharBuffer                      buffer;
 	private boolean                         reportUnsupported;
 	private Pattern                         pattern;
+	private String                          prevBuf;
 
 
 	public Utility () {
@@ -76,18 +77,35 @@ public class Utility implements ISimpleUtility {
 			
 			int n;
 			CharBuffer tmpBuf = CharBuffer.allocate(1);
-			String data;
 			ByteBuffer encBuf;
 			boolean canEncode;
 
 			while ( true ) {
-				// Read the next block
-				//TODO: fix issue with possible reads that split an escape sequence!
 				buffer.clear();
-				if ( (n = reader.read(buffer)) == -1 ) break; // End
-				
+				// Start with previous buffer remains if needed
+				if ( prevBuf != null ) {
+					buffer.append(prevBuf);
+				}
+				// Read the next block
+				n = reader.read(buffer);
+				// Check if we need to stop here
+				boolean needSplitCheck = true;
+				if ( n == -1 ) {
+					// Make sure we do not start an endless loop by
+					// re-checking the last previous buffer
+					if ( prevBuf != null ) {
+						needSplitCheck = false;
+						prevBuf = null;
+						buffer.limit(buffer.position());
+					}
+					else break; // No previous, no read: Done
+				}
+
 				// Un-escape if requested
-				if ( pattern != null ) unescape();
+				if ( pattern != null ) {
+					if ( needSplitCheck ) checkSplitSequence();
+					unescape();
+				}
 				
 				// Output
 				n = buffer.position();
@@ -163,7 +181,7 @@ public class Utility implements ISimpleUtility {
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
-		buffer = CharBuffer.allocate(1024);
+		buffer = CharBuffer.allocate(13); //TODO: change to real length
 		commonFolder = null; // Reset
 
 		String tmp = "";
@@ -276,6 +294,26 @@ public class Utility implements ISimpleUtility {
 		return 1;
 	}
 
+	private void checkSplitSequence () {
+		int len = buffer.position();
+		buffer.position(0);
+
+		// Search for the first & or \ in the last 10 (or less) characters
+		prevBuf = null;
+		int j = 0;
+		for ( int i=len-1; ((i>=0) && (j<10)); i-- ) {
+			if (( buffer.charAt(i) == '&' ) || ( buffer.charAt(i) == '\\' )) {
+				prevBuf = buffer.subSequence(i, len).toString();
+				len = i;
+				break;
+			}
+			j++;
+		}
+		
+		buffer.position(len);
+		buffer.limit(len);
+	}
+	
 	private void unescape () {
 		int len = buffer.position();
 		buffer.position(0);
@@ -336,8 +374,8 @@ public class Utility implements ISimpleUtility {
 				tmp.append(buffer.subSequence(pos, len));
 			}
 			// Reset the buffer
-			buffer = CharBuffer.allocate(tmp.length());
-			buffer.append(tmp.toString());
+			buffer.clear();
+			buffer.append(tmp.toString(), 0, tmp.length());
 		}
 		else { // Else: nothing to un-escape
 			buffer.position(len);

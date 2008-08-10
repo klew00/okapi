@@ -1308,15 +1308,12 @@ public class MainForm implements IParametersProvider {
 			startWaiting("List encodings...", true);
 			log.beginTask("List the encodings available on this machine:\n");
 			SortedMap<String, Charset> charsets = Charset.availableCharsets();
-			Set names = charsets.keySet();
-			for (Iterator e = names.iterator(); e.hasNext();) {
-				String name = (String)e.next();
-				Charset charset = (Charset) charsets.get(name);
-				log.message(charset.displayName());
+			for ( String key : charsets.keySet() ) {
+				log.message(charsets.get(key).displayName());
 				count++;
-				Set<String> aliases = charset.aliases();
-				for (Iterator ee = aliases.iterator(); ee.hasNext();) {
-					log.message("\t" + ee.next());
+				Set<String> aliases = charsets.get(key).aliases();
+				for ( String alias : aliases ) {
+					log.message("\t" + alias);
 					countAlias++;
 				}
 			}
