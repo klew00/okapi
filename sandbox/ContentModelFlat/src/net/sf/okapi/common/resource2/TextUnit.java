@@ -261,14 +261,61 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		return children;
 	}
 
-
-	
-	//TODO: some kind of iterator for the children. It should be recursive
-	// and inexpensive. getFirstUnit() getNextUnit()???
-	/*
-	 * Not sure how to provide simple access to all the children recursively
-	 * as the groups can have skeleton units, which make handling sub-text-unit
-	 * quite different from simply containers of groups or text-units.
-	 * So I wonder about the need to have group there...
+	/**
+	 * Stores recursively all TextUnit items in the children for the given object.
+	 * Only TextUnit objects are stored, Group and SkeletonUnit objects are not.
+	 * @param parent The parent object.
 	 */
+	private void storeItems (ITranslatable parent) {
+		// Check if it's a TextUnit
+		if ( parent instanceof TextUnit ) {
+			// Inner-most is stored first, for a reverse effect
+			if ( parent.hasChild() ) {
+				for ( ITranslatable item : ((TextUnit)parent).getChildren() ) {
+					storeItems(item);
+				}
+			}
+			allUnits.add((TextUnit)parent);
+			return;
+		}
+		// Else: it is a Group
+		if ( parent.hasChild() ) {
+			for ( IContainable item : (Group)parent ) {
+				if ( item instanceof ITranslatable ) { 
+					storeItems((ITranslatable)item);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Reset the list of all children TextUnit items for this TextUnit, then
+	 * return the first of the them.
+	 * @return The first children TextUnit object for this TextUnit, or itself
+	 * if it has not children.
+	 */
+	public TextUnit getFirstUnit () {
+		if ( this.hasChild() ) {
+			allUnits = new ArrayList<TextUnit>();
+			storeItems(this);
+			currentIndex = -1;
+			return getNextUnit();
+		}
+		else {
+			allUnits = null;
+			return this;
+		}
+	}
+	
+	/**
+	 * Gets the next TextUnit object for this TextUnit. It can be a children, itself,
+	 * or null when all possibilities have been exhausted.
+	 * @return A TextUnit object or null.
+	 */
+	public TextUnit getNextUnit () {
+		if ( allUnits == null ) return null;
+		if ( ++currentIndex < allUnits.size() ) return allUnits.get(currentIndex);
+		else return null;
+	}
+
 }

@@ -35,10 +35,20 @@ public class Main {
 		doc.add(tu);
 		
 		doc.add(new SkeletonUnit("sLast", "</doc>"));
-
 		show(doc, 0);
+		
+		// Try loop on TU
+		System.out.println("\n\nTry loop on TU:");
+		TextUnit tmp = tu.getFirstUnit();
+		do {
+			processTU(tmp);
+		} while (( tmp = tu.getNextUnit()) != null );
+
 	}
 	
+	private static void processTU (TextUnit tu) {
+		System.out.println("tu: id='" + tu.getID() + "' text='" +tu.getSource() + "'");
+	}
 	private static void show (IResourceContainer container,
 		int level)
 	{
