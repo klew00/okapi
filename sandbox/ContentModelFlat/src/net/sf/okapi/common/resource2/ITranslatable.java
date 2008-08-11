@@ -26,4 +26,10 @@ public interface ITranslatable extends IContainable {
 	 */
 	public void setParent (ITranslatable value);
 
+	/**
+	 * Indicates if the resource has at least one child.
+	 * @return True if the resource has one child or more, false if it has none.
+	 */
+	public boolean hasChild ();
+	
 }

@@ -20,12 +20,21 @@ public class Main {
 		tu = new TextUnit("t3", "text unit 3");
 		tu.setSkeletonBefore(new SkeletonUnit("s4", "<p>"));
 		tu.setSkeletonAfter(new SkeletonUnit("s5", "</p>"));
-		
 		group2.add(tu);
 		group1.add(group2);
 		doc.add(group1);
 
-		doc.add(new SkeletonUnit("s6", "</doc>"));
+		tu = new TextUnit("t4", "Text before footnote[ref fn1] Text after.");
+		tu.setSkeletonBefore(new SkeletonUnit("s6", "<para>"));
+		tu.setSkeletonAfter(new SkeletonUnit("s7", "</para>"));
+		group1 = new Group();
+		group1.setID("fn1");
+		TextUnit tu2 = new TextUnit("t5", "Text of the footnote");
+		group1.add(tu2);
+		tu.addChild(group1);
+		doc.add(tu);
+		
+		doc.add(new SkeletonUnit("sLast", "</doc>"));
 
 		show(doc, 0);
 	}

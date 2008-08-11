@@ -19,7 +19,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected ArrayList<String>             targets; //Using Strings until we get the "LocaleUnit" done
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
-	private ArrayList<ITranslatable>        allItems;
+	private ArrayList<TextUnit>             allUnits;
 	private int                             currentIndex;
 
 
@@ -41,6 +41,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	@Override
 	public String toString () {
 		//TODO: Modify for real output, this is test only
+		//TODO: support for children
 		return (sklBefore==null ? "" : sklBefore.toString())
 			+ source +
 			(sklAfter==null ? "" : sklAfter.toString());
@@ -260,8 +261,10 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		return children;
 	}
 
+
+	
 	//TODO: some kind of iterator for the children. It should be recursive
-	// and inexpensive. getFirstChild() getNextChild()???
+	// and inexpensive. getFirstUnit() getNextUnit()???
 	/*
 	 * Not sure how to provide simple access to all the children recursively
 	 * as the groups can have skeleton units, which make handling sub-text-unit

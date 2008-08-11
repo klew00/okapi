@@ -33,4 +33,8 @@ public class Group extends ResourceContainer implements ITranslatable {
 		isTranslatable = value;
 	}
 
+	public boolean hasChild () {
+		return !isEmpty();
+	}
+
 }
