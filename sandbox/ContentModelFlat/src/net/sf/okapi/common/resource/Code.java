@@ -1,6 +1,6 @@
 package net.sf.okapi.common.resource;
 
-import net.sf.okapi.common.resource.IContent.TagType;
+import net.sf.okapi.common.resource.ITextContent.TagType;
 
 public class Code {
 

@@ -2,13 +2,13 @@ package net.sf.okapi.common.resource;
 
 import java.util.Iterator;
 
-import net.sf.okapi.common.resource.IContent.TagType;
+import net.sf.okapi.common.resource.ITextContent.TagType;
 
 public class Main {
 
 	public static void main(String[] args) {
 
-		RootContainer cont = new RootContainer();
+		TextRootContainer cont = new TextRootContainer();
 		
 		cont.append('a');
 		cont.append("bc ");
@@ -36,8 +36,8 @@ public class Main {
 		cont.append("Before ");
 		Code code = cont.append(TagType.PLACEHOLDER, "image",
 			String.format("<img alt='%ssf1%s' title='%ssf2%s'/>",
-			IContent.SFMARKER_START, IContent.SFMARKER_END,
-			IContent.SFMARKER_START, IContent.SFMARKER_END));
+			ITextContent.SFMARKER_START, ITextContent.SFMARKER_END,
+			ITextContent.SFMARKER_START, ITextContent.SFMARKER_END));
 		code.setHasSubflow(true);
 		cont.append(" after");
 		System.out.println("-With subflow:");
