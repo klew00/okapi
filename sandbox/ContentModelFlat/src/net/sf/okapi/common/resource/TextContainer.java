@@ -173,7 +173,7 @@ public class TextContainer implements ITextContent {
 			case ITextContent.MARKER_ISOLATED:
 				code = codes.get(toIndex(text.charAt(++i)));
 				//tmp.append(checkForSubflows(code));
-				tmp.append(String.format("[id=%d:%s]", code.id, checkForSubflows(code))); // Debug
+				tmp.append(String.format("[id=%d:%s]", code.id, expendSubflows(code))); // Debug
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -203,7 +203,7 @@ public class TextContainer implements ITextContent {
 		}
 	}
 	
-	private String checkForSubflows (Code code) {
+	private String expendSubflows (Code code) {
 		if ( !code.hasSubflow ) return code.data;
 		if ( parent == null ) {
 			return code.data;

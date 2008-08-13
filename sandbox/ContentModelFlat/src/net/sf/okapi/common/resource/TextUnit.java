@@ -317,10 +317,37 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * been found.
 	 */
 	public ITranslatable getChild (String id) {
+		if ( id == null ) return null;
 		if ( !hasChild() ) return null;
-		for ( ITranslatable item : children ) {
-			//TODO: check for null IDs???
-			if ( id.equals(item.getID()) ) return item;
+		//TODO: Fix this so it cannot match the initial parent...
+		return findChild(this, id);
+	}
+	
+	private ITranslatable findChild (ITranslatable parent,
+		String id)
+	{
+		if ( parent instanceof TextUnit ) {
+			if ( parent.hasChild() ) {
+				for ( ITranslatable item : ((TextUnit)parent).children ) {
+					if ( id.equals(item.getID()) ) {
+						return item;
+					}
+					ITranslatable res = findChild(item, id);
+					if ( res != null ) return res;
+				}
+			}
+			else if ( id.equals(parent.getID()) ) {
+				return parent;
+			}
+		}
+		else if ( parent instanceof Group ) {
+			for ( IContainable item : (Group)parent ) {
+				if ( item instanceof ITranslatable ) { 
+					ITranslatable res = findChild((ITranslatable)item, id);
+					if ( res != null ) return res;
+				}
+			}
+			
 		}
 		return null;
 	}
