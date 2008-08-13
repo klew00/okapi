@@ -9,7 +9,8 @@ public class TextContainer implements ITextContent {
 	protected StringBuilder       text;
 	protected ArrayList<Code>     codes;
 	protected boolean             isBalanced;
-	protected int                 lastID;
+	protected String              id;
+	protected int                 lastCodeID;
 	protected TextUnit            parent;
 	
 
@@ -32,6 +33,21 @@ public class TextContainer implements ITextContent {
 		return ((int)index)-CHARBASE;
 	}
 
+	public TextContainer () {
+	}
+
+	public TextContainer (String text) {
+		append(text);
+	}
+	
+	public String getID () {
+		return id;
+	}
+	
+	public void setID (String value) {
+		id = value;
+	}
+	
 	public void append (char value) {
 		if ( text == null ) text = new StringBuilder(""+value);
 		else text.append(value);
@@ -66,7 +82,7 @@ public class TextContainer implements ITextContent {
 		}
 		// Create the code
 		codes.add(new Code(tagType, type, data));
-		if ( tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastID;
+		if ( tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
 		if ( tagType != TagType.PLACEHOLDER ) isBalanced = false;
 		return codes.get(codes.size()-1);
 	}
@@ -80,7 +96,7 @@ public class TextContainer implements ITextContent {
 	public void clear () {
 		text = null;
 		codes = null;
-		lastID = 0;
+		lastCodeID = 0;
 		isBalanced = true;
 	}
 

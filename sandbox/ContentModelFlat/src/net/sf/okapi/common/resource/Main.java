@@ -8,7 +8,8 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		TextRootContainer cont = new TextRootContainer();
+		TextUnit tu1 = new TextUnit("p1", "parent");
+		TextRootContainer cont = new TextRootContainer(tu1);
 		
 		cont.append('a');
 		cont.append("bc ");
@@ -27,12 +28,9 @@ public class Main {
 		System.out.println("-After clear:");
 		System.out.println(cont.toString());
 		
-		TextUnit tu1 = new TextUnit("p1", "parent");
-		TextUnit tu2 = new TextUnit("sf1", "Text of SF1");
-		TextUnit tu3 = new TextUnit("sf2", "Text of SF2");
-		tu1.addChild(tu2);
-		tu1.addChild(tu3);
-		cont.setParent(tu1);
+		
+		tu1.addChild(new TextUnit("sf1", "Text of SF1"));
+		tu1.addChild(new TextUnit("sf2", "Text of SF2"));
 		cont.append("Before ");
 		Code code = cont.append(TagType.PLACEHOLDER, "image",
 			String.format("<img alt='%ssf1%s' title='%ssf2%s'/>",
@@ -140,7 +138,7 @@ public class Main {
 		tu.setSkeletonAfter(new SkeletonUnit("s7", "</para>"));
 		group1 = new Group();
 		group1.setID("fn1");
-		tu2 = new TextUnit("t5", "Text of the footnote");
+		TextUnit tu2 = new TextUnit("t5", "Text of the footnote");
 		group1.add(tu2);
 		tu.addChild(group1);
 		doc.add(tu);

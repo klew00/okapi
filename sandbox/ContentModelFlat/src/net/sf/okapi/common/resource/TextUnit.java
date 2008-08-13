@@ -16,8 +16,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected SkeletonUnit                  sklAfter;
 	protected ArrayList<ITranslatable>      children;
 	protected ITranslatable                 parent;
-	protected String                        source; //Using a String until we get the "LocaleUnit" done
-	protected ArrayList<String>             targets; //Using Strings until we get the "LocaleUnit" done
+	protected TextRootContainer             source;
+	protected ArrayList<TextRootContainer>  targets;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
 	private ArrayList<TextUnit>             allUnits;
@@ -25,8 +25,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 
 
 	public TextUnit () {
-		source = ""; //TODO: Change for "LocaleUnit" later
-		targets = new ArrayList<String>();
+		source = new TextRootContainer(this);
+		targets = new ArrayList<TextRootContainer>();
 		targets.add(null);
 	}
 
@@ -34,8 +34,10 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		String sourceText)
 	{
 		this.id = id;
-		source = sourceText; //TODO: Change for "LocaleUnit" later
-		targets = new ArrayList<String>();
+		source = new TextRootContainer(this);
+		source.append(sourceText);
+		source.id = id;
+		targets = new ArrayList<TextRootContainer>();
 		targets.add(null);
 	}
 	
@@ -57,8 +59,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	}
 
 	public boolean isEmpty () {
-		//TODO: Change for "LocaleUnit" later
-		return (source.length() > 0);
+		return source.isEmpty();
 	}
 
 	public String getName () {
@@ -175,19 +176,19 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Gets the source object of the resource.
 	 * @return The source object of the resource, never null.
 	 */
-	public String getSource () {
-		//TODO: change for "LocaleUnit" later
+	public TextRootContainer getSource () {
 		return source;
 	}
 	
-	/** Sets the source object of the resource.
+	/** Sets the source object of the resource. This TextUnit becomes the parent
+	 * of the given source object.
 	 * @param value The object to set (must not be null).
 	 */
-	public void setSource (String value) {
+	public void setSource (TextRootContainer value) {
 		if ( value == null )
 			throw new IllegalArgumentException("Cannot set a source to null.");
-		//TODO: change for "LocaleUnit" later
 		source = value;
+		source.setParent(this);
 	}
 
 	/**
@@ -195,9 +196,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * @return True if the unit has a (first) target, false otherwise.
 	 */
 	public boolean hasTarget () {
-		//TODO: change for "LocaleUnit" later
 		return (( targets.get(0) != null )
-			&& ( targets.get(0).length() > 0 ));
+			&& ( !targets.get(0).isEmpty() ));
 	}
 
 	/**
@@ -205,8 +205,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * {@link #hasTarget()} to know if there is a target available.
 	 * @return The current (first) target object, or null.
 	 */
-	public String getTarget () {
-		//TODO: change for "LocaleUnit" later
+	public TextRootContainer getTarget () {
 		return targets.get(0); 
 	}
 
@@ -214,8 +213,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Sets the (first) target object of the resource.
 	 * @param value The object to assign (can be null).
 	 */
-	public void setTarget (String value) {
-		//TODO: change for "LocaleUnit" later
+	public void setTarget (TextRootContainer value) {
 		targets.set(0, value);
 	}
 
@@ -224,8 +222,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * @return The list of the targets.
 	 */
 	//For now the only way to access all targets
-	public List<String> getTargets () {
-		//TODO: change for "LocaleUnit" later
+	public List<TextRootContainer> getTargets () {
 		return targets;
 	}
 	

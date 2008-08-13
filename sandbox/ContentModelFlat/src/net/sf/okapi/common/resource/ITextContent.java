@@ -26,6 +26,10 @@ public interface ITextContent {
 	
 	public void setParent (TextUnit value);
 	
+	public String getID ();
+	
+	public void setID (String value);
+	
 	public String getCodedText ();
 	
 	public String getCodedText (int start, int end);
