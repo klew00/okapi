@@ -87,12 +87,6 @@ public class TextContainer implements ITextContent {
 		return codes.get(codes.size()-1);
 	}
 
-	public void append (int markerType,
-		String layerType)
-	{
-		// TODO Auto-generated method stub
-	}
-
 	public void clear () {
 		text = null;
 		codes = null;
@@ -102,21 +96,18 @@ public class TextContainer implements ITextContent {
 
 	public String getCodedText () {
 		if ( text == null ) return "";
-		else {
-			if ( !isBalanced ) balanceMarkers();
-			return text.toString();
-		}
+		if ( !isBalanced ) balanceMarkers();
+		return text.toString();
 	}
 
 	public String getCodedText (int start,
 		int end)
 	{
 		if ( text == null ) return "";
-		else {
-			//TODO: check that the start and end don't split markers
-			if ( !isBalanced ) balanceMarkers();
-			return text.substring(start, end);
-		}
+		checkPositionForMarker(start);
+		checkPositionForMarker(end);
+		if ( !isBalanced ) balanceMarkers();
+		return text.substring(start, end);
 	}
 
 	public List<Code> getCodes () {
@@ -130,6 +121,8 @@ public class TextContainer implements ITextContent {
 		int end)
 	{
 		// TODO Auto-generated method stub
+		checkPositionForMarker(start);
+		checkPositionForMarker(end);
 		return null;
 	}
 
@@ -141,7 +134,8 @@ public class TextContainer implements ITextContent {
 	public void remove (int start,
 		int end)
 	{
-		//TODO: Check if the start/end points split markers
+		checkPositionForMarker(start);
+		checkPositionForMarker(end);
 		for ( int i=start; i<end; i++ ) {
 			switch ( text.charAt(i) ) {
 			case ITextContent.MARKER_OPENING:
@@ -189,6 +183,26 @@ public class TextContainer implements ITextContent {
 		return tmp.toString();
 	}
 
+	public TextUnit getParent() {
+		return parent;
+	}
+
+	public void setParent (TextUnit value) {
+		parent = value;
+	}
+
+	private void checkPositionForMarker (int position) {
+		if ( position > 0 ) {
+			switch ( text.charAt(position-1) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				throw new RuntimeException(
+					String.format("Position %d is inside a marker.", position));
+			}
+		}
+	}
+	
 	private String checkForSubflows (Code code) {
 		if ( !code.hasSubflow ) return code.data;
 		if ( parent == null ) {
@@ -268,14 +282,6 @@ public class TextContainer implements ITextContent {
 		isBalanced = true;
 	}
 
-	public TextUnit getParent() {
-		return parent;
-	}
-
-	public void setParent (TextUnit value) {
-		parent = value;
-	}
-	
 	/*
 	private void balanceMarkers () {
 		//TODO: REDO this based on the markers

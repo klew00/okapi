@@ -35,7 +35,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	{
 		this.id = id;
 		source = new TextRootContainer(this);
-		source.append(sourceText);
+		if ( sourceText != null ) source.append(sourceText);
 		source.id = id;
 		targets = new ArrayList<TextRootContainer>();
 		targets.add(null);

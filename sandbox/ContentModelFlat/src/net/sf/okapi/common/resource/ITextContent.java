@@ -10,8 +10,8 @@ public interface ITextContent {
 	public static final int MARKER_ISOLATED = 0xE103;
 	public static final int CHARBASE        = 0xE110;
 
-	public static final String SFMARKER_START = "{@#$";
-	public static final String SFMARKER_END   = "}";
+	public static final String SFMARKER_START    = "{@#$";
+	public static final String SFMARKER_END      = "}";
 	
 	public static enum TagType {
 		OPENING,
@@ -51,8 +51,6 @@ public interface ITextContent {
 	public void append (ITextContent content);
 	
 	public Code append (TagType tagType, String type, String data);
-	
-	public void append (int markerType, String layerType);
 	
 	public void clear ();
 
