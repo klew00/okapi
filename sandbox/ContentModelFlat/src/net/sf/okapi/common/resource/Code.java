@@ -1,6 +1,6 @@
 package net.sf.okapi.common.resource;
 
-import net.sf.okapi.common.resource.ITextContent.TagType;
+import net.sf.okapi.common.resource.TextContainer.TagType;
 
 public class Code {
 
@@ -16,6 +16,12 @@ public class Code {
 		this.tagType = tagType;
 		this.type = type;
 		this.data = data;
+	}
+	
+	public Code clone () {
+		Code clone = new Code(tagType, type, data);
+		clone.id = id;
+		return clone;
 	}
 	
 	public TagType getTagType () {

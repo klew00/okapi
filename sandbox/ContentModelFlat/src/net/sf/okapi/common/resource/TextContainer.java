@@ -4,7 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TextContainer implements ITextContent {
+public class TextContainer implements Comparable {
+	
+	public static final int MARKER_OPENING  = 0xE101;
+	public static final int MARKER_CLOSING  = 0xE102;
+	public static final int MARKER_ISOLATED = 0xE103;
+	public static final int CHARBASE        = 0xE110;
+
+	public static final String SFMARKER_START    = "{@#$";
+	public static final String SFMARKER_END      = "}";
+	
+	public static enum TagType {
+		OPENING,
+		CLOSING,
+		PLACEHOLDER
+	};
 	
 	protected StringBuilder       text;
 	protected ArrayList<Code>     codes;
@@ -58,8 +72,23 @@ public class TextContainer implements ITextContent {
 		else this.text.append(text);
 	}
 
-	public void append (ITextContent content) {
-		// TODO Auto-generated method stub
+	public void append (TextContainer container) {
+		String tmp = container.getCodedText();
+		List<Code> newCodes = container.getCodes();
+		for ( int i=0; i<tmp.length(); i++ ) {
+			switch ( tmp.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				append(""+tmp.charAt(i)+toChar(codes.size()));
+				codes.add(newCodes.get(toIndex(tmp.charAt(++i))).clone());
+				break;
+			default:
+				text.append(tmp.charAt(i));
+				break;
+			}
+		}
+		if ( codes.size() > 0 ) isBalanced = false;
 	}
 
 	public Code append (TagType tagType,
@@ -120,15 +149,29 @@ public class TextContainer implements ITextContent {
 	public List<Code> getCodes (int start,
 		int end)
 	{
-		// TODO Auto-generated method stub
+		if ( codes == null ) return null;
+		ArrayList<Code> tmpCodes = new ArrayList<Code>();
+		if ( codes.isEmpty() ) return tmpCodes;
 		checkPositionForMarker(start);
 		checkPositionForMarker(end);
-		return null;
+
+		for ( int i=start; i<end; i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				Code ori = codes.get(toIndex(text.charAt(++i)));
+				tmpCodes.add(ori.clone());
+				break;
+			}
+		}
+	
+		return tmpCodes;
 	}
 
 	public boolean isEmpty () {
 		if ( text == null ) return true;
-		else return (text.length()>0);
+		else return (text.length()==0);
 	}
 
 	public void remove (int start,
@@ -138,9 +181,9 @@ public class TextContainer implements ITextContent {
 		checkPositionForMarker(end);
 		for ( int i=start; i<end; i++ ) {
 			switch ( text.charAt(i) ) {
-			case ITextContent.MARKER_OPENING:
-			case ITextContent.MARKER_CLOSING:
-			case ITextContent.MARKER_ISOLATED:
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
 				codes.remove(toIndex(text.charAt(++i)));
 				//TODO: need to update the index point in markers!!!
 				// and the index is not necessarily sequential
@@ -151,12 +194,52 @@ public class TextContainer implements ITextContent {
 		isBalanced = false;
 	}
 
+	/**
+	 * Gets a copy of a sub-sequence of this object.
+	 * @param start The start of the sequence (in the coded text representation).
+	 * @param end The position just after the last character to include in the 
+	 * sub-sequence (in the coded text representation).
+	 * @return A new TextContainer object with a copy of the given sub-sequence.
+	 */
+	public TextContainer subSequence (int start,
+		int end)
+	{
+		TextContainer sub = new TextContainer();
+		sub.parent = this.parent;
+		if ( isEmpty() ) return sub;
+		StringBuilder tmpText = new StringBuilder(getCodedText(start, end));
+		ArrayList<Code> tmpCodes = null;
+	
+		// Get the codes and adjust indices if needed
+		if ( codes.size() > 0 ) {
+			tmpCodes = new ArrayList<Code>(); 
+			for ( int i=0; i<tmpText.length(); i++ ) {
+				switch ( tmpText.charAt(i) ) {
+				case MARKER_OPENING:
+				case MARKER_CLOSING:
+				case MARKER_ISOLATED:
+					tmpCodes.add(codes.get(toIndex(tmpText.charAt(++i))).clone());
+					tmpText.setCharAt(i, toChar(tmpCodes.size()-1));
+					break;
+				}
+			}
+		}
+		sub.setCodedText(tmpText.toString(), tmpCodes);
+		return sub;
+	}
+	
 	public void setCodedText (String codedText) {
-		// TODO Auto-generated method stub
+		setCodedText(codedText, codes);
 	}
 
-	public void setCodedText (String codedText, List<Code> codes) {
-		// TODO Auto-generated method stub
+	public void setCodedText (String codedText,
+		List<Code> codes)
+	{
+		isBalanced = false;
+		this.text = new StringBuilder(codedText);
+		if ( codes == null ) codes = null;
+		else this.codes = new ArrayList<Code>(codes);
+		//TODO: do we need to reset the lastCodeID?
 	}
 	
 	@Override
@@ -168,12 +251,20 @@ public class TextContainer implements ITextContent {
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
-			case ITextContent.MARKER_OPENING:
-			case ITextContent.MARKER_CLOSING:
-			case ITextContent.MARKER_ISOLATED:
+			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
 				//tmp.append(checkForSubflows(code));
-				tmp.append(String.format("[id=%d:%s]", code.id, expendSubflows(code))); // Debug
+				tmp.append(String.format("[O:id=%d:%s]", code.id, expendSubflows(code))); // Debug
+				break;
+			case MARKER_CLOSING:
+				code = codes.get(toIndex(text.charAt(++i)));
+				//tmp.append(checkForSubflows(code));
+				tmp.append(String.format("[C:id=%d:%s]", code.id, expendSubflows(code))); // Debug
+				break;
+			case MARKER_ISOLATED:
+				code = codes.get(toIndex(text.charAt(++i)));
+				//tmp.append(checkForSubflows(code));
+				tmp.append(String.format("[I:id=%d:%s]", code.id, expendSubflows(code))); // Debug
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -189,6 +280,21 @@ public class TextContainer implements ITextContent {
 
 	public void setParent (TextUnit value) {
 		parent = value;
+	}
+	
+	public int compareTo (Object object) {
+		if ( object == null ) return -1;
+		if ( object instanceof TextContainer ) {
+			return getCodedText().compareTo(((TextContainer)object).getCodedText());
+		}
+		// Else, compare string representation
+		return toString().compareTo(object.toString());
+	}
+
+	@Override
+	public boolean equals (Object object) {
+		if ( object == null ) return false;
+		return (compareTo(object)==0);
 	}
 
 	private void checkPositionForMarker (int position) {
@@ -213,11 +319,10 @@ public class TextContainer implements ITextContent {
 		StringBuilder tmp = new StringBuilder(code.data);
 		int start;
 		int pos = 0;
-		while ( (start = tmp.indexOf(ITextContent.SFMARKER_START, pos)) > -1 ) {
-			int end = tmp.indexOf(ITextContent.SFMARKER_END, start);
+		while ( (start = tmp.indexOf(SFMARKER_START, pos)) > -1 ) {
+			int end = tmp.indexOf(SFMARKER_END, start);
 			if ( end != -1 ) {
-				String id = tmp.substring(
-					start+ITextContent.SFMARKER_START.length(), end);
+				String id = tmp.substring(start+SFMARKER_START.length(), end);
 				ITranslatable res = parent.getChild(id);
 				if ( res == null ) {
 					tmp.replace(start, end+1, "-Subflow not found-");
@@ -246,7 +351,7 @@ public class TextContainer implements ITextContent {
 				Code code = codes.get(index);
 				switch ( code.tagType ) {
 				case PLACEHOLDER:
-					text.setCharAt(i, (char)ITextContent.MARKER_ISOLATED);
+					text.setCharAt(i, (char)MARKER_ISOLATED);
 					break;
 				case OPENING:
 					// Search for corresponding closing code
@@ -266,14 +371,14 @@ public class TextContainer implements ITextContent {
 							}
 						}
 					}
-					if ( found ) text.setCharAt(i, (char)ITextContent.MARKER_OPENING);
-					else text.setCharAt(i, (char)ITextContent.MARKER_ISOLATED);
+					if ( found ) text.setCharAt(i, (char)MARKER_OPENING);
+					else text.setCharAt(i, (char)MARKER_ISOLATED);
 					break;
 				case CLOSING:
 					// If Id is -1, this closing code has no corresponding opening
 					// otherwise its ID is already set
-					if ( code.id == -1 ) text.setCharAt(i, (char)ITextContent.MARKER_ISOLATED);
-					else text.setCharAt(i, (char)ITextContent.MARKER_CLOSING);
+					if ( code.id == -1 ) text.setCharAt(i, (char)MARKER_ISOLATED);
+					else text.setCharAt(i, (char)MARKER_CLOSING);
 				}
 				i++; // Skip index part of the index
 				break;
@@ -283,50 +388,6 @@ public class TextContainer implements ITextContent {
 	}
 
 	/*
-	private void balanceMarkers () {
-		//TODO: REDO this based on the markers
-		if ( codes == null ) return;
-		Code code;
-		int lastID = 0;
-		//TODO: change isolated back to opening/closing
-		for ( int i=0; i<codes.size(); i++ ) {
-			switch ( codes.get(i).tagType ) {
-			case OPENING:
-				code = codes.get(i);
-				code.id = ++lastID;
-				boolean found = false;
-				int stack = 1;
-				for ( int j=i+1; j<codes.size(); j++ ) {
-					if ( codes.get(j).type.equals(code.type) ) {
-						if ( codes.get(j).tagType == TagType.OPENING ) {
-							stack++;
-						}
-						else if ( codes.get(j).tagType == TagType.CLOSING ) {
-							if ( --stack == 0 ) {
-								codes.get(j).id = code.id;
-								found = true;
-								break;
-							}
-						}
-					}
-				}
-				if ( !found ) {
-					changeMarkerType(i, MARKER_ISOLATED);
-				}
-				break;
-				
-			case CLOSING:
-				code = codes.get(i);
-				if ( code.id == -1 ) {
-					changeMarkerType(i, MARKER_ISOLATED);
-					code.id = ++lastID;
-				}
-				break;
-			}
-		}
-		isBalanced = true;
-	}
-
 	private void changeMarkerType (int index,
 		int newMarkerType)
 	{
