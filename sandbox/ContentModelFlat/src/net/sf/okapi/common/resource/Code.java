@@ -1,6 +1,6 @@
 package net.sf.okapi.common.resource;
 
-import net.sf.okapi.common.resource.TextContainer.TagType;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
 
@@ -14,6 +14,7 @@ public class Code {
 	public Code (TagType tagType, String type, String data) {
 		id = -1;
 		this.tagType = tagType;
+		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = data;
 	}
@@ -37,7 +38,8 @@ public class Code {
 	}
 	
 	public void setType (String value) {
-		type = value;
+		if ( value == null ) type = "null";
+		else type = value;
 	}
 	
 	/**
