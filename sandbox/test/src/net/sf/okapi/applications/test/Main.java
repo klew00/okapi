@@ -21,15 +21,8 @@ import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.IPart;
-import net.sf.okapi.common.resource.Part;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -38,7 +31,7 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Main {
 
-	private static void testContainer () {
+/*	private static void testContainer () {
 		try {
 			System.out.println("---start testContainer---");
 			IContainer cnt = new Container();
@@ -137,7 +130,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		System.out.println("---end testContainer---");
-	}
+	}*/
 	
 	private static void testXMLReader () {
 		try {
@@ -149,7 +142,7 @@ public class Main {
 			int n;
 			do {
 				n = reader.read();
-				IExtractionItem item = reader.getItem();
+				TextUnit item = reader.getItem();
 				switch ( n ) {
 				case XMLReader.RESULT_STARTTRANSUNIT:
 					System.out.println("sTU:"+item.getType()+",'"+item.getSource().toString()+"'");
@@ -221,7 +214,7 @@ public class Main {
 		System.out.println("---end testITSEngine---");
 	}
 	
-	private static void testItem () {
+/*	private static void testItem () {
 		try {
 			System.out.println("---start testItem---");
 			IExtractionItem item = new ExtractionItem();
@@ -248,7 +241,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		System.out.println("---end testItem---");
-	}
+	}*/
 	
 	private static void testFilter () {
 		try {
@@ -272,7 +265,7 @@ public class Main {
 		System.out.println("---end testFilter---");
 	}
 
-	private static void testSegmentation () {
+/*	private static void testSegmentation () {
 		try {
 			System.out.println("---start testSegmentation---");
 			SRXDocument srxDoc = new SRXDocument();
@@ -344,7 +337,7 @@ public class Main {
 		// Last one
 		tmp.append("["+input.substring(start)+"]");
 		return tmp.toString();
-	}
+	}*/
 
 	private static void testConfigString () {
 		try {
@@ -392,9 +385,9 @@ public class Main {
 		testConfigString();
 		
 		if ( args.length == 0 ) return;
-		testContainer();
-		testSegmentation();
-		testItem();
+//		testContainer();
+//		testSegmentation();
+//		testItem();
 		testITSEngine();
 		testXMLReader();
 		testFilter();

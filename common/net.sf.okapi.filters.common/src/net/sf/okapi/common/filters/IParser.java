@@ -1,27 +1,31 @@
-/*******************************************************************************
- * Copyright 2008 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/*===========================================================================*/
+/* Copyright (C) 2008 Jim Hargrave                                           */
+/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.common.filters;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import net.sf.okapi.common.resource.IBaseResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IGroupResource;
+import net.sf.okapi.common.resource.IContainable;
 
 /**
  * Parsers open up a data source and break the content down into chunks useful
@@ -58,15 +62,15 @@ public interface IParser {
 	public void open(URL input);
 
 	/**
-	 * Get the current {@link IGroupResource} or {@link IExtractionItem} or
-	 * {@link ISkeletonResource}.
+	 * Get the current {@link Group} or {@link TextUnit} or
+	 * {@link SkeletonUnit}.
 	 * 
-	 * @return {@link IGroupResource} or {@link IExtractionItem} or
-	 *         {@link ISkeletonResource} or null if there is no current
+	 * @return {@link Group} or {@link TextUnit} or
+	 *         {@link SkeletonUnit} or null if there is no current
 	 *         resource. May return null if there is no associated resource for
 	 *         the current parsed event.
 	 */
-	public IBaseResource getResource();
+	public IContainable getResource();
 
 	/**
 	 * Get the next parsed event.

@@ -21,9 +21,9 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides a common way create a translation package. 
@@ -62,18 +62,18 @@ public interface IWriter {
 		String filterSettings,
 		IParameters filterParams);
 	
-	public void writeStartDocument (IDocumentResource resource);
+	public void writeStartDocument (Document resource);
 	
-	public void writeSkeletonPart (ISkeletonResource resource);
+	public void writeSkeletonPart (SkeletonUnit resource);
 	
 	/**
 	 * Writes an item in the current document. 
 	 * @param item The item to write.
 	 * @param p_nStatus The current target status (same values as Borneo DB TSTATUS_*)
 	 */
-	public void writeItem (IExtractionItem item,
+	public void writeItem (TextUnit item,
 		int p_nStatus);
 	
-	public void writeEndDocument (IDocumentResource resource);
+	public void writeEndDocument (Document resource);
 
 }

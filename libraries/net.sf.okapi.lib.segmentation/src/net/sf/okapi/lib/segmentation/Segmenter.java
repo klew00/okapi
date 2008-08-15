@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IPart;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 
 public class Segmenter {
 	
@@ -91,7 +90,7 @@ public class Segmenter {
 	 * @return The number of segment found.
 	 */
 	public int computeSegments (String text) {
-		Container tmp = new Container(text);
+		TextContainer tmp = new TextContainer(null);
 		return computeSegments(tmp);
 	}
 	
@@ -100,7 +99,7 @@ public class Segmenter {
 	 * @param original The object to segment.
 	 * @return The number of segment found.
 	 */
-	public int computeSegments (IContainer original) {
+	public int computeSegments (TextContainer original) {
 		if ( currentLanguageCode == null ) {
 			// Need to call selectLanguageRule()
 			throw new RuntimeException("No language defined for the segmeter.");
@@ -108,7 +107,7 @@ public class Segmenter {
 		
 		// Remove any existing segmentation
 		//TODO: Handle case to allow secondary segmentation (segment the segments)
-		original.joinParts();
+		//original.joinParts();
 		
 		// Build the list of split positions
 		String codedText = original.getCodedText();
@@ -185,11 +184,11 @@ public class Segmenter {
 	}
 
 	/**
-	 * Segments a given IContainer object.
+	 * Segments a given TextContainer object.
 	 * @param original The container to segment.
 	 * @return The same container passed as parameter, but now segmented if needed.
 	 */
-	public IContainer segment (IContainer original) {
+	public TextContainer segment (TextContainer original) {
 		if ( computeSegments(original) < 2 ) {
 			// No more than 1 segment
 			return original;
@@ -197,7 +196,7 @@ public class Segmenter {
 		
 		// Otherwise we have at least two segments:
 		// Build a temporary list of these segments
-		ArrayList<IPart> newParts = new ArrayList<IPart>();
+		ArrayList<TextFragment> newParts = new ArrayList<TextFragment>();
 		int start = 0;
 		int textStart;
 		// Note: Always drive with starts (as ends has one extra value)
@@ -205,23 +204,24 @@ public class Segmenter {
 		for ( i=0; i<starts.size(); i++ ) {
 			textStart = starts.get(i);
 			if ( start < textStart ) {
-				newParts.add(original.copy(start, textStart));
-				newParts.get(newParts.size()-1).setIsSegment(false);
+				newParts.add(original.subSequence(start, textStart));
+				//newParts.get(newParts.size()-1).setIsSegment(false);
 			}
-			newParts.add(original.copy(textStart, ends.get(i)));
+			newParts.add(original.subSequence(textStart, ends.get(i)));
 			start = ends.get(i);
 		}
 		// The last extra value in ends contains the coded text length
 		// We use it here to add the possible last non-segment part.
 		if ( start < ends.get(i) ) {
 			// Avoid copy(start) to avoid extra cost of copy(start, -1)
-			newParts.add(original.copy(start, ends.get(i)));
-			newParts.get(newParts.size()-1).setIsSegment(false);
+			newParts.add(original.subSequence(start, ends.get(i)));
+			//newParts.get(newParts.size()-1).setIsSegment(false);
 		}
 		
 		// And rebuild the original container, this time segmented
-		original.reset();
-		for ( IPart part : newParts ) {
+		original.clear();
+		for ( TextFragment part : newParts ) {
+			//TODO: handle segmentation setting
 			original.append(part);
 		}
 		return original;

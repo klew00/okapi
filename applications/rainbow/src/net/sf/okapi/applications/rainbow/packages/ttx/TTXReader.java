@@ -29,11 +29,9 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,11 +57,11 @@ class TTXReader {
 	private static final int      TARGET              = 0x02;
 	private static final int      BOTH                = 0x03;
 
-	protected IExtractionItem     item;
+	protected TextUnit       item;
 	
 	private String           sourceLang;
-	private IContainer       srcCont;
-	private IContainer       trgCont;
+	private TextContainer    srcCont;
+	private TextContainer    trgCont;
 	private int              textType;
 	private NodeList         nodeList = null;
 	private Node             node;
@@ -186,7 +184,7 @@ class TTXReader {
 	}
 	
 	private void resetItem () {
-		item = new ExtractionItem();
+		item = new TextUnit();
 	}
 	
 	private void processUserSettings () {
@@ -199,8 +197,8 @@ class TTXReader {
 		if ( text.indexOf("<u ") == 0 ) {
 			inText = true;
 			textType = SOURCE;
-			srcCont = new Container();
-			trgCont = new Container();
+			srcCont = new TextContainer(item);
+			trgCont = new TextContainer(item);
 			Matcher M = idPattern.matcher(text);
 			if ( M.find() ) {
 				item.setIsTranslatable(false);
@@ -210,9 +208,9 @@ class TTXReader {
 		}
 		else if ( text.equals("</u>") ) {
 			inText = false;
-			item.setSource(srcCont);
+			item.setSourceContent(srcCont);
 			if ( !trgCont.isEmpty() ) {
-				item.setTarget(trgCont);
+				item.setTargetContent(trgCont);
 			}
 			// If <ut> contains a </u> tag, that's the end of the item
 			result = true;
@@ -266,7 +264,7 @@ class TTXReader {
 				// Else: It's a start of element
 				if ( name.equals("ut") ) {
 					//TODO: Handle open/close tags
-					appendCode(IContainer.CODE_ISOLATED, name);
+					appendCode(TagType.PLACEHOLDER, name);
 					inline++;
 				}
 				break;
@@ -274,12 +272,12 @@ class TTXReader {
 		}
 	}
 	
-	private void appendCode (int type,
+	private void appendCode (TagType tagType,
 		String code)
 	{
 		if ( (textType & SOURCE) == SOURCE )
-			srcCont.append(new CodeFragment(type, 1, code));
+			srcCont.append(tagType, code, code);
 		if ( (textType & TARGET) == TARGET )
-			trgCont.append(new CodeFragment(type, 1, code));
+			trgCont.append(tagType, code, code);
 	}
 }

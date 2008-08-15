@@ -3,11 +3,8 @@ package net.sf.okapi.applications.rainbow.lib;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.IPart;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Handles the conversion between a abstract content (IContainer)
@@ -15,18 +12,18 @@ import net.sf.okapi.common.resource.IPart;
  */
 public class TMXContent {
 
-	private String           codedText;
-	private List<IFragment>  codes;
+	private String      codedText;
+	private List<Code>  codes;
 	
 	public TMXContent () {
 		codedText = "";
 	}
 	
-	public TMXContent (IPart content) {
+	public TMXContent (TextFragment content) {
 		setContent(content);
 	}
 	
-	public TMXContent setContent (IPart content) {
+	public TMXContent setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;
@@ -52,23 +49,23 @@ public class TMXContent {
 		int id;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
-			case IContainer.CODE_OPENING:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				tmp.append(String.format("<bpt i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</bpt>");
 				break;
-			case IContainer.CODE_CLOSING:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				tmp.append(String.format("<ept i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ept>");
 				break;
-			case IContainer.CODE_ISOLATED:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();				
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				tmp.append(String.format("<ph i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ph>");

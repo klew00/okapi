@@ -1,24 +1,24 @@
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public interface IResourceBuilder {
 
-    public void startResource (IDocumentResource resource);
+    public void startResource (Document resource);
 
-    public void endResource (IDocumentResource resource);
+    public void endResource (Document resource);
     
-    public void startExtractionItem (IExtractionItem item);
+    public void startExtractionItem (TextUnit item);
     
-    public void endExtractionItem (IExtractionItem item);
+    public void endExtractionItem (TextUnit item);
     
-    public void startContainer (IGroupResource resource);
+    public void startContainer (Group resource);
     
-    public void endContainer (IGroupResource resource);
+    public void endContainer (Group resource);
 
-    public void skeletonContainer (ISkeletonResource resource);
+    public void skeletonContainer (SkeletonUnit resource);
 }
 

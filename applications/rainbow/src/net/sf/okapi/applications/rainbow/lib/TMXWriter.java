@@ -1,10 +1,8 @@
 package net.sf.okapi.applications.rainbow.lib;
 
-import java.util.List;
-
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IPart;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class TMXWriter {
 	
@@ -65,7 +63,7 @@ public class TMXWriter {
 		writer.writeEndDocument();
 	}
 	
-	public void writeItem (IExtractionItem item)
+	public void writeItem (TextUnit item)
 	{
 		if ( item == null ) throw new NullPointerException();
 		itemCount++;
@@ -74,8 +72,9 @@ public class TMXWriter {
 		if (( tuid == null ) || ( tuid.length() == 0 )) {
 			tuid = String.format("autoID%d", itemCount);
 		}
-		writeTU(item.getSource(), item.getTarget(), tuid);
-		
+		writeTU(item.getSourceContent(), item.getTargetContent(), tuid);
+	
+		/*TODO: handle segmentation
 		if ( item.getSource().isSegmented() ) {
 			List<IPart> srcList = item.getSourceSegments();
 			List<IPart> trgList = item.getTargetSegments();
@@ -84,11 +83,11 @@ public class TMXWriter {
 					(i>trgList.size()-1) ? null : trgList.get(i),
 					String.format("%s_s%d", tuid, i+1));
 			}
-		}
+		}*/
 	}
 	
-	private void writeTU (IPart source,
-		IPart target,
+	private void writeTU (TextFragment source,
+		TextFragment target,
 		String tuid)
 	{
 		writer.writeStartElement("tu");

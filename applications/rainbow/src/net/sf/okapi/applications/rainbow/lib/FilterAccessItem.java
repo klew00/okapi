@@ -24,6 +24,7 @@ class FilterAccessItem {
 
 	public String       name;
 	public String       description;
+	public String       parserClass;
 	public String       inputFilterClass;
 	public String       outputFilterClass;
 	public String       editorClass;

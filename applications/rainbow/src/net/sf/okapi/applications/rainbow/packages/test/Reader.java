@@ -1,14 +1,14 @@
 package net.sf.okapi.applications.rainbow.packages.test;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Reader implements IReader {
 	
 	public void closeDocument () {
 	}
 
-	public IExtractionItem getItem () {
+	public TextUnit getItem () {
 		return null;
 	}
 

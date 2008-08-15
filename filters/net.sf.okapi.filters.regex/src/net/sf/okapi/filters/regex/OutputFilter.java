@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters.regex;
 
 import java.io.BufferedOutputStream;
@@ -7,10 +27,10 @@ import java.io.OutputStreamWriter;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class OutputFilter implements IOutputFilter {
 	
@@ -39,10 +59,10 @@ public class OutputFilter implements IOutputFilter {
 		this.output = output;
 	}
 
-	public void endContainer (IGroupResource resourceContainer) {
+	public void endContainer (Group resourceContainer) {
 	}
 
-	private void buildContent (IExtractionItem item) {
+	private void buildContent (TextUnit item) {
 		try {
 			if ( item.hasTarget() ) {
 				writer.write(item.getTarget().toString());
@@ -56,23 +76,23 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 	
-	public void endExtractionItem (IExtractionItem item) {
+	public void endExtractionItem (TextUnit item) {
 		if ( item.isTranslatable() ) {
 			buildContent(item);
 		}
 	}
 
-	public void endResource (IDocumentResource resource) {
+	public void endResource (Document resource) {
 		close();
 	}
 
-	public void startContainer (IGroupResource resource) {
+	public void startContainer (Group resource) {
 	}
 
-	public void startExtractionItem (IExtractionItem item) {
+	public void startExtractionItem (TextUnit item) {
 	}
 
-	public void startResource (IDocumentResource resource) {
+	public void startResource (Document resource) {
 		try {
 			// Create the output writer from the provided stream
 			writer = new OutputStreamWriter(
@@ -86,7 +106,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-    public void skeletonContainer (ISkeletonResource resource) {
+    public void skeletonContainer (SkeletonUnit resource) {
     	try {
     		//TODO: Handle line-break type, we need to output the original
     		writer.write(resource.toString());

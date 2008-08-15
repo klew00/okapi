@@ -12,15 +12,13 @@ import javax.xml.stream.XMLStreamReader;
 import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.GroupResource;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.ISkeletonResource;
-import net.sf.okapi.common.resource.SkeletonResource;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.LocaleData;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class XLIFFReader {
 
@@ -42,19 +40,19 @@ public class XLIFFReader {
 	
 
 	protected Resource            resource;
-	protected GroupResource       fileRes;
-	protected Stack<GroupResource> groupResStack;
-	protected IExtractionItem     item;
+	protected Group               fileRes;
+	protected Stack<Group>        groupResStack;
+	protected TextUnit            item;
 
-	private SkeletonResource      sklBefore;
-	private SkeletonResource      sklAfter;
-	private SkeletonResource      currentSkl;
+	private SkeletonUnit          sklBefore;
+	private SkeletonUnit          sklAfter;
+	private SkeletonUnit          currentSkl;
 	private int                   itemID;
 	private int                   sklID;
 	private boolean               sourceDone;
 	private boolean               targetDone;
 	private XMLStreamReader       reader; 
-	private IContainer            content;
+	private TextContainer         content;
 	private int                   nextAction;
 //	private Pattern               pattern;
 	
@@ -65,8 +63,8 @@ public class XLIFFReader {
 
 	public XLIFFReader () {
 		resource = new Resource();
-		sklBefore = new SkeletonResource();
-		groupResStack = new Stack<GroupResource>();
+		sklBefore = new SkeletonUnit();
+		groupResStack = new Stack<Group>();
 	}
 	
 	public void close () {
@@ -91,7 +89,7 @@ public class XLIFFReader {
 			nextAction = -1;
 			sklID = 0;
 			itemID = 0;
-			sklAfter = new SkeletonResource();
+			sklAfter = new SkeletonUnit();
 /*			if ( resource.params.useStateValues ) {
 				pattern = Pattern.compile(resource.params.stateValues);
 			}*/
@@ -105,7 +103,7 @@ public class XLIFFReader {
 	 * Gets the last item read.
 	 * @return The last item read.
 	 */
-	public IExtractionItem getItem () {
+	public TextUnit getItem () {
 		return item;
 	}
 
@@ -113,7 +111,7 @@ public class XLIFFReader {
 	 * Gets the last skeleton part read.
 	 * @return
 	 */
-	public ISkeletonResource getSkeleton () {
+	public SkeletonUnit getSkeleton () {
 		return currentSkl;
 	}
 	
@@ -225,11 +223,11 @@ public class XLIFFReader {
 	}*/
 	
 	private void resetItem () {
-		item = new ExtractionItem();
+		item = new TextUnit();
 	}
 	
 	private int processFile () {
-		fileRes = new GroupResource();
+		fileRes = new Group();
 		storeStartElement();
 		String tmp = reader.getAttributeValue("", "original");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'original'.");
@@ -382,8 +380,8 @@ public class XLIFFReader {
 	private void processNote () {
 		try {
 			StringBuilder tmp = new StringBuilder();
-			if ( item.hasNote() ) {
-				tmp.append(item.getNote());
+			if ( item.getProperties().containsKey("note") ) {
+				tmp.append(item.getProperty("note"));
 				tmp.append("\n---\n");
 			}
 			int eventType;
@@ -401,7 +399,7 @@ public class XLIFFReader {
 					String name = reader.getLocalName();
 					if ( name.equals("note") ) {
 						//TODO: Handle 'annotates', etc.
-						item.setNote(tmp.toString());
+						item.setProperty("note", tmp.toString());
 						return;
 					}
 					// Else: This should be an error as note are text only.
@@ -426,8 +424,8 @@ public class XLIFFReader {
 	 */
 	private void processContent (String tagName,
 		boolean store,
-		IContainer content,
-		ArrayList<IFragment> inlineCodes)
+		TextContainer content,
+		ArrayList<Code> inlineCodes)
 	{
 		try {
 			int id = 0;
@@ -459,17 +457,15 @@ public class XLIFFReader {
 					}
 					else if ( name.equals("g") || name.equals("mrk") ) {
 						if ( store ) storeEndElement();
-						int tmpID = idStack.pop();
-						content.append(
-							new CodeFragment(IContainer.CODE_CLOSING, tmpID, name));
+						//TODO: was int tmpID = idStack.pop();
+						content.append(TagType.CLOSING, name, name); 
 						if ( inlineCodes != null ) {
 							String tmp = reader.getPrefix();
 							if (( tmp != null ) && ( tmp.length()>0 )) {
 								tmp = tmp+":";
 							}
 							inlineCodes.add(
-								new CodeFragment(IContainer.CODE_CLOSING, tmpID,
-									"</"+tmp+name+">"));
+								new Code(TagType.CLOSING, name, "</"+tmp+name+">"));
 						}
 					}
 					break;
@@ -479,8 +475,7 @@ public class XLIFFReader {
 					name = reader.getLocalName();
 					if ( name.equals("g") || name.equals("mrk") ) {
 						idStack.push(++id);
-						content.append(
-							new CodeFragment(IContainer.CODE_OPENING, id, name));
+						content.append(TagType.OPENING, name, name);
 						if ( inlineCodes != null ) {
 							String prefix = reader.getPrefix();
 							StringBuilder tmpg = new StringBuilder();
@@ -508,24 +503,24 @@ public class XLIFFReader {
 							}
 							tmpg.append(">");
 							inlineCodes.add(
-								new CodeFragment(IContainer.CODE_OPENING, id, tmpg.toString()));
+								new Code(TagType.OPENING, name, tmpg.toString()));
 						}
 					}
 					else if ( name.equals("x") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("bpt") ) {
 						idStack.push(++id);
-						appendCode(IContainer.CODE_OPENING, id, name, store, content, inlineCodes);
+						appendCode(TagType.OPENING, id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("ept") ) {
-						appendCode(IContainer.CODE_CLOSING, idStack.pop(), name, store, content, inlineCodes);
+						appendCode(TagType.CLOSING, idStack.pop(), name, store, content, inlineCodes);
 					}
 					else if ( name.equals("ph") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
 					}
 					else if ( name.equals("it") ) {
-						appendCode(IContainer.CODE_ISOLATED, ++id, name, store, content, inlineCodes);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
 					}
 					break;
 				}
@@ -546,12 +541,12 @@ public class XLIFFReader {
 	 * @param inlineCodes Array where to save the original in-line code.
 	 * Do not save if this parameter is null.
 	 */
-	private void appendCode (int type,
+	private void appendCode (TagType tagType,
 		int id,
 		String tagName,
 		boolean store,
-		IContainer content,
-		ArrayList<IFragment> inlineCodes)
+		TextContainer content,
+		ArrayList<Code> inlineCodes)
 	{
 		try {
 			StringBuilder tmp = new StringBuilder();
@@ -572,13 +567,6 @@ public class XLIFFReader {
 				outerCode.append(">");
 			}
 			
-/*			if ( useInlineIDs ) { // Try to use existing id of inline code
-				String ilID = reader.getAttributeValue("", "id");
-				if (( ilID != null ) && ( ilID.length()>0 )) {
-					
-				}
-			}
-*/				
 			int eventType;
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -621,9 +609,9 @@ public class XLIFFReader {
 						if ( inlineCodes != null ) {
 							outerCode.append("</"+tagName+">");
 							inlineCodes.add(
-								new CodeFragment(type, id, outerCode.toString()));
+								new Code(tagType, tagName, outerCode.toString()));
 						}
-						content.append(new CodeFragment(type, id, tmp.toString()));
+						content.append(tagType, tagName, tagName); //TODO: was: tmp.toString());
 						return;	
 					}
 					break;
@@ -649,13 +637,13 @@ public class XLIFFReader {
 	private void processSource () {
 		if ( sourceDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-			Container tmpCont = new Container();
+			TextContainer tmpCont = new TextContainer(null);
 			processContent("source", true, tmpCont, null);
 			return;
 		}
-		content = new Container();
+		content = item.getSourceContent();
+		content.clear();
 		processContent("source", true, content, resource.srcCodes);
-		item.setSource(content);
 		sklAfter.setData("");
 		sourceDone = true;
 	}
@@ -663,12 +651,12 @@ public class XLIFFReader {
 	private void processTarget () {
 		if ( targetDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-			Container tmpCont = new Container();
+			TextContainer tmpCont = new TextContainer(null);
 			processContent("target", true, tmpCont, null);
 			return;
 		}
 		
-		item.setTarget(new Container());
+		LocaleData ld = new LocaleData(item);
 		//String tmp = reader.getAttributeValue("", "state");
 		/*if ( tmp != null ) {
 			item.getTarget().setProperty("state", tmp);
@@ -677,13 +665,13 @@ public class XLIFFReader {
 			else if ( tmp.equals("translated") ) resource.status = STATUS_TOEDIT;
 			else if ( tmp.equals("needs-review-translation") ) resource.status = STATUS_TOREVIEW;
 		}*/
-		content = new Container();
+		content = ld.getContent();
 		processContent("target", false, content, resource.trgCodes);
 		resource.needTargetElement = false;
-		if ( !item.isEmpty() && !content.isEmpty() )
-			item.setTarget(content);
-		else
-			item.setTarget(null);
+		item.setTarget(ld);
+		if ( item.isEmpty() || content.isEmpty() ) {
+			item.setTargetContent(null);
+		}
 	}
 	
 /*	private boolean isExtractable () {

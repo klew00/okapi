@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends BaseWriter {
 	
@@ -69,34 +69,38 @@ public class Writer extends BaseWriter {
 		}
 	}
 
-	public void writeEndDocument (IDocumentResource resource) {
-		buffer.append(resource.endToXML());
+	public void writeEndDocument (Document resource) {
+		//buffer.append(resource.endToXML());
 		writer.print(buffer.toString());
 		writer.close();
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (IExtractionItem item,
+	public void writeItem (TextUnit item,
 		int status)
 	{
-		// Write the item in the TM if needed
-		IExtractionItem current = item.getFirstItem();
-		do {
-			if ( current.hasTarget() ) {
-				tmxWriter.writeItem(current);
+		// Write the items in the TM if needed
+		if ( item.hasTarget() ) {
+			tmxWriter.writeItem(item);
+		}
+		if ( item.hasChild() ) {
+			for ( TextUnit tu : item.childTextUnitIterator() ) {
+				if ( tu.hasTarget() ) {
+					tmxWriter.writeItem(tu);
+				}
 			}
-		} while ( (current = item.getNextItem()) != null );
+		}
 
 		// toXML() is recursive already, so just call it.
-		buffer.append(item.toXML());
+		buffer.append(item.toString());
 	}
 	
-	public void writeSkeletonPart (ISkeletonResource resource) {
-		buffer.append(resource.toXML());
+	public void writeSkeletonPart (SkeletonUnit resource) {
+		buffer.append(resource.toString());
 	}
 	
-	public void writeStartDocument (IDocumentResource resource) {
-		buffer.append(resource.startToXML());
+	public void writeStartDocument (Document resource) {
+		//buffer.append(resource.startToXML());
 	}
 }

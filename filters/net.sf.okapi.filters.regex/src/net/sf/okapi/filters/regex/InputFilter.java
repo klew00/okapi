@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters.regex;
 
 import java.io.InputStream;
@@ -6,9 +26,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class InputFilter implements IInputFilter {
 
@@ -71,17 +91,17 @@ public class InputFilter implements IInputFilter {
 			do {
 				switch ( (tok = parser.parseNext()) ) {
 				case TRANSUNIT:
-					output.startExtractionItem((IExtractionItem)parser.getResource());
-					output.endExtractionItem((IExtractionItem)parser.getResource());
+					output.startExtractionItem((TextUnit)parser.getResource());
+					output.endExtractionItem((TextUnit)parser.getResource());
 					break;
 				case SKELETON:
-					output.skeletonContainer((ISkeletonResource)parser.getResource());
+					output.skeletonContainer((SkeletonUnit)parser.getResource());
 					break;
 				case STARTGROUP:
-					output.startContainer((IGroupResource)parser.getResource());
+					output.startContainer((Group)parser.getResource());
 					break;
 				case ENDGROUP:
-					output.endContainer((IGroupResource)parser.getResource());
+					output.endContainer((Group)parser.getResource());
 					break;
 				}
 			}

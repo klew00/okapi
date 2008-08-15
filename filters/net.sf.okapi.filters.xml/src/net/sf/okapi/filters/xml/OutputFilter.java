@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,12 +27,13 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class OutputFilter implements IOutputFilter {
 	
@@ -42,7 +41,7 @@ public class OutputFilter implements IOutputFilter {
 	private OutputStream                    output;
 	private DocumentBuilderFactory          fact;
 	private DocumentBuilder                 docBuilder;
-	private HashMap<String, IContainer>     subItems;
+	private HashMap<String, TextContainer>  subItems;
 	private final Logger                    logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 
@@ -64,7 +63,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void endContainer (IGroupResource resource) {
+	public void endContainer (Group resource) {
 	}
 
 	private void buildContent (Node node,
@@ -95,7 +94,7 @@ public class OutputFilter implements IOutputFilter {
 			}
 		}
 
-		Document doc = node.getOwnerDocument();
+		org.w3c.dom.Document doc = node.getOwnerDocument();
 		DocumentFragment df = parseXMLString(doc, content);
 
 		if ( df.hasChildNodes() ) {
@@ -108,71 +107,73 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 	
-	public void endExtractionItem (IExtractionItem item) {
-		// Set the target text
-		IExtractionItem current = item.getFirstItem();
-		do {
-			if ( current.isTranslatable() ) {
-				if ( current.hasTarget() ) {
-					// Check for attribute sub-item case
-					String siFlag = current.getProperty("subItem");
-					if ( siFlag != null ) {
-						if ( siFlag.startsWith(XMLReader.ILMARKER) ) {
-							// This is an item extracted from an in-line code
-							// We have to wait the parent to be merged to set it
-							subItems.put(current.getID(), current.getTarget());
-						}
-						else { // Not in in-line code, set it now
-							Element elem = (Element)res.srcNode;
-							Attr attr = elem.getAttributeNode(siFlag);
-							if ( attr != null ) attr.setNodeValue(current.getTarget().toString());
-							else {
-								logger.warn(String.format("Cannot found mergeable attribute '%s' in item id='%s'",
-									siFlag, current.getID()));
-							}
+	public void endExtractionItem (TextUnit item) {
+		processTU(item);
+		for ( TextUnit tu : item.childTextUnitIterator() ) {
+			processTU(tu);
+		}
+	}
+	
+	public void processTU (TextUnit tu) {
+		if ( tu.isTranslatable() ) {
+			if ( tu.hasTarget() ) {
+				// Check for attribute sub-item case
+				String siFlag = tu.getProperty("subItem");
+				if ( siFlag != null ) {
+					if ( siFlag.startsWith(XMLReader.ILMARKER) ) {
+						// This is an item extracted from an in-line code
+						// We have to wait the parent to be merged to set it
+						subItems.put(tu.getID(), tu.getTargetContent());
+					}
+					else { // Not in in-line code, set it now
+						Element elem = (Element)res.srcNode;
+						Attr attr = elem.getAttributeNode(siFlag);
+						if ( attr != null ) attr.setNodeValue(tu.getTargetContent().toString());
+						else {
+							logger.warn(String.format("Cannot found mergeable attribute '%s' in item id='%s'",
+								siFlag, tu.getID()));
 						}
 					}
-					else {
-						String tmp = makeXMLString(current.getTarget());
-						// Merge items extracted from in-line codes if there are any
-						if ( subItems.size() > 0 ) {
-							Iterator<String> iter = subItems.keySet().iterator();
-							while ( iter.hasNext() ) {
-								String id = iter.next();
-								String mark = XMLReader.ILMARKER + id;
-								IContainer cont = subItems.get(id);
-								if ( tmp.indexOf(mark) > -1 ) {
-									//TODO: We risk double-escape if the sub-item has in-line code
-									tmp = tmp.replace(mark, Util.escapeToXML(
-										cont.toString(), 3, false));
-								}
-								else {
-									logger.warn(String.format("Cannot found marker for sub-item id='%s' in item id='%s'",
-										id, current.getID()));
-								}
+				}
+				else {
+					String tmp = makeXMLString(tu.getTargetContent());
+					// Merge items extracted from in-line codes if there are any
+					if ( subItems.size() > 0 ) {
+						Iterator<String> iter = subItems.keySet().iterator();
+						while ( iter.hasNext() ) {
+							String id = iter.next();
+							String mark = XMLReader.ILMARKER + id;
+							TextContainer cont = subItems.get(id);
+							if ( tmp.indexOf(mark) > -1 ) {
+								//TODO: We risk double-escape if the sub-item has in-line code
+								tmp = tmp.replace(mark, Util.escapeToXML(
+									cont.toString(), 3, false));
 							}
-							subItems.clear();
+							else {
+								logger.warn(String.format("Cannot found marker for sub-item id='%s' in item id='%s'",
+									id, tu.getID()));
+							}
 						}
-						// Merge the content
-						try {
-							buildContent(res.srcNode, tmp);
-						}
-						catch ( IOException e ) {
-							logger.error(String.format("Problem in new content of item id='%s'.",
-								current.getID()), e);
-						}
-						catch ( SAXException e ) {
-							logger.error(String.format("Problem in new content of item id='%s'.",
-								current.getID()), e);
-						}
+						subItems.clear();
+					}
+					// Merge the content
+					try {
+						buildContent(res.srcNode, tmp);
+					}
+					catch ( IOException e ) {
+						logger.error(String.format("Problem in new content of item id='%s'.",
+							tu.getID()), e);
+					}
+					catch ( SAXException e ) {
+						logger.error(String.format("Problem in new content of item id='%s'.",
+							tu.getID()), e);
 					}
 				}
 			}
 		}
-		while ( (current = item.getNextItem()) != null );
 	}
 	
-	public void endResource (IDocumentResource resource) {
+	public void endResource (Document resource) {
 		try {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(res.doc), new StreamResult(output));
@@ -185,37 +186,56 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-	public void startContainer (IGroupResource resource) {
+	public void startContainer (Group resource) {
 	}
 
-	public void startExtractionItem (IExtractionItem item) {
+	public void startExtractionItem (TextUnit item) {
 	}
 
-	public void startResource (IDocumentResource resource) {
+	public void startResource (Document resource) {
 		res = (Resource)resource;
-		subItems = new HashMap<String, IContainer>();
+		subItems = new HashMap<String, TextContainer>();
 	}
 
-    public void skeletonContainer (ISkeletonResource resource) {
+    public void skeletonContainer (SkeletonUnit resource) {
     }
     
-	private String makeXMLString (IContainer item) {
+	private String makeXMLString (TextContainer item) {
+		String text = item.getCodedText();
 		StringBuilder tmp = new StringBuilder();
-		List<IFragment> fragList = item.getFragments();
-		for ( IFragment frag : fragList ) {
-			if ( frag.isText() ) {
-				tmp.append(Util.escapeToXML(frag.toString(), 0, false));
-			}
-			else { // Re-use the original code
-				// Attribute values should be escaped correctly already
-				//TODO: What about escape for code frags that are text not attrinute?
-				tmp.append(frag.toString());
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				code = item.getCode(TextFragment.toIndex(text.charAt(++i)));
+				tmp.append(code.getData());
+				break;
+			case '>':
+				tmp.append("&gt;");
+				break;
+			case '<':
+				tmp.append("&lt;");
+				break;
+			case '&':
+				tmp.append("&amp;");
+				break;
+			case '"':
+				tmp.append("&quot;");
+				break;
+			case '\'':
+				tmp.append("&apos;");
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
 			}
 		}
 		return tmp.toString();
 	}
 	
-	private DocumentFragment parseXMLString (Document doc,
+	private DocumentFragment parseXMLString (org.w3c.dom.Document doc,
 		String fragment)
 		throws SAXException, IOException
 	{
@@ -223,7 +243,7 @@ public class OutputFilter implements IOutputFilter {
 		fragment = "<F>"+fragment+"</F>";
 
 		// Parse the fragment
-		Document tmpDoc = docBuilder.parse(
+		org.w3c.dom.Document tmpDoc = docBuilder.parse(
 			new InputSource(new StringReader(fragment)));
 		// Import the nodes of the new document into the destination
 		// document so that they will be compatible with the it

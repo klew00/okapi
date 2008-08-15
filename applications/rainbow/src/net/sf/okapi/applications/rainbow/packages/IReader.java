@@ -20,7 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides a common way to read a translation package generated with an implementation 
@@ -34,6 +34,6 @@ public interface IReader {
 
 	public boolean readItem ();
 	
-	public IExtractionItem getItem ();
+	public TextUnit getItem ();
 	
 }

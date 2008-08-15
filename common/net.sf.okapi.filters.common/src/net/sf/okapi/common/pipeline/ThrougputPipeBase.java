@@ -1,40 +1,40 @@
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe {
 
     private IResourceBuilder outputPipe;
     
     
-    public void startResource(IDocumentResource resource) {
+    public void startResource(Document resource) {
         outputPipe.startResource(resource);
     }
 
-    public void endResource(IDocumentResource resource) {
+    public void endResource(Document resource) {
         outputPipe.endResource(resource);        
     }
 
-    public void startContainer(IGroupResource resource) {
+    public void startContainer(Group resource) {
         outputPipe.startContainer(resource);
     }
 
-    public void endContainer(IGroupResource resource) {
+    public void endContainer(Group resource) {
         outputPipe.endContainer(resource);
     }
 
-    public void startExtractionItem (IExtractionItem item) {
+    public void startExtractionItem (TextUnit item) {
         outputPipe.startExtractionItem(item);
     }
 
-    public void endExtractionItem(IExtractionItem item) {
+    public void endExtractionItem(TextUnit item) {
         outputPipe.endExtractionItem(item);
     }
 
-    public void skeletonContainer (ISkeletonResource resource) {
+    public void skeletonContainer (SkeletonUnit resource) {
     	outputPipe.skeletonContainer(resource);
     }
     

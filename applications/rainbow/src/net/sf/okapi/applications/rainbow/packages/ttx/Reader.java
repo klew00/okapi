@@ -21,7 +21,7 @@
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Implements IReader for TTX-based translation packages.
@@ -38,7 +38,7 @@ public class Reader implements IReader {
 		reader.close();
 	}
 
-	public IExtractionItem getItem () {
+	public TextUnit getItem () {
 		return reader.item;
 	}
 

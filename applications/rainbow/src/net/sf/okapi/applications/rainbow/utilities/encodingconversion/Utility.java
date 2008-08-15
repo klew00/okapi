@@ -67,12 +67,14 @@ public class Utility implements ISimpleUtility {
 				new FileInputStream(inputPath), inputEncoding);
 			inputEncoding = bis.detectEncoding();
 			reader = new BufferedReader(new InputStreamReader(bis, inputEncoding));
+			logger.info("Input encoding: " + inputEncoding);
 			
 			// Open the output document
 			Util.createDirectories(outputPath);
 			writer = new OutputStreamWriter(new BufferedOutputStream(
 				new FileOutputStream(outputPath)), outputEncoding);
 			outputEncoder = Charset.forName(outputEncoding).newEncoder();
+			logger.info("Output encoding: " + outputEncoding);
 			Util.writeBOMIfNeeded(writer, params.getBoolean("BOMonUTF8"), outputEncoding);
 			
 			int n;

@@ -1,12 +1,29 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IPart;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -48,7 +65,7 @@ public class SRXEditor {
 	private SRXDocument      srxDoc;
 	private Segmenter        segmenter;
 	private String           srxPath;
-	private IContainer       sampleText;
+	private TextContainer    sampleText;
 	private Button           btSRXDocs;
 	private Menu             popupSRXDocs;
 	private Button           btAddRule;
@@ -66,7 +83,7 @@ public class SRXEditor {
 		srxDoc = new SRXDocument();
 		segmenter = new Segmenter();
 		srxPath = null;
-		sampleText = new Container();
+		sampleText = new TextContainer(null);
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Segmentation Rules Editor");
@@ -426,15 +443,16 @@ public class SRXEditor {
 		//processInlineCodes();
 		
 		String oriText = edSampleText.getText();
-		sampleText.setContent(oriText);
+		sampleText.setCodedText(oriText);
 		if ( segmenter.getLanguage() != null ) {
 			segmenter.segment(sampleText);
 			StringBuilder tmp = new StringBuilder();
-			List<IPart> segList = sampleText.getSegments();
+			/*TODO: List<IPart> segList = sampleText.getSegments();
 			tmp.append(String.format("%d: ", segList.size()));
 			for ( IPart seg : segList ) {
 				tmp.append("["+seg.toString()+"] ");
-			}
+			}*/
+			tmp.append("TODO: getSegments from container");
 			edResults.setText(tmp.toString());
 		}
 		else {

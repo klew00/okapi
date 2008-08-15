@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
@@ -6,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.regex.MatchResult;
@@ -15,27 +34,20 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.GroupResource;
-import net.sf.okapi.common.resource.IBaseResource;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IPart;
-import net.sf.okapi.common.resource.ISkeletonResource;
-import net.sf.okapi.common.resource.Part;
-import net.sf.okapi.common.resource.SkeletonResource;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Parser implements IParser {
 
 	protected Resource                 resource;
 	
-	private Stack<GroupResource>       groupStack;
+	private Stack<Group>               groupStack;
 	private int                        sklID;
 	private int                        groupID;
 	private int                        itemID;
-	private LinkedList<IBaseResource>  resultQueue;
+	private LinkedList<IContainable>   resultQueue;
 	private BufferedReader             reader;
 	private String                     inputText;
 	private int                        startSearch;
@@ -44,6 +56,7 @@ public class Parser implements IParser {
 
 	private static final int NEXTACTION_TRANSUNIT     = 0;
 	private static final int NEXTACTION_ENDINPUT      = 1;
+	
 	
 	public Parser () {
 		resource = new Resource();
@@ -61,9 +74,23 @@ public class Parser implements IParser {
 			throw new RuntimeException(e);
 		}
 	}
+
+	//TODO: remove after test
+	private void tempSetStringInfoRules () {
+		resource.params.rules.clear();
+		Rule r = new Rule();
+		r.ruleName = "r2";
+		r.start = "^(.*?)\\t";
+		r.end = "1$";
+		//r.splitters = "(\\\\[ntr])";
+		r.nameStart = "^";
+		r.nameEnd = "\\t";
+		r.ruleType = Rule.RULETYPE_STRING;
+		r.preserveWS = true;
+		resource.params.rules.add(r);
+	}
 	
-	public void open (InputStream input)
-	{
+	public void open (InputStream input) {
 		try {
 			// Close any previously non-closed file
 			close();
@@ -87,67 +114,17 @@ public class Parser implements IParser {
 			// Make sure to close before inputText is set
 			// so it does not get reset to null
 			inputText = tmp.toString();
-			resultQueue = new LinkedList<IBaseResource>();
-			groupStack = new Stack<GroupResource>();
+			resultQueue = new LinkedList<IContainable>();
+			groupStack = new Stack<Group>();
 			startSearch = 0;
 			startSkl = 0;
 			itemID = 0;
 			sklID = 0;
 			groupID = 0;
 			nextAction = -1;
-			
-//start test
-			resource.params.rules.clear();
-/*			Rule r = new Rule();
-			r.name = "r3";
-			r.start = "^(.*?)\\t\"";
-			r.end = "\"\\t(.*?)\\t(.*?)\\t(.*?)\\t(.*?)\\t(.*?)\\t(.*?)\\t(\\d*?)\\t(.*?)\\t1$";
-			r.splitters = "(\\\\[ntr])";
-			r.startName = "^";
-			r.endName = "\\t";
-			r.ruleType = Rule.RULETYPE_CONTENT;
-			r.preserveWS = true;
-			resource.params.rules.add(r);*/
 
-/*			Rule r = new Rule();
-			r.name = "r3";
-			r.start = "^(.*?)\\t";
-			r.end = "1$";
-			r.splitters = "(\\\\[ntr])";
-			r.startName = "^";
-			r.endName = "\\t";
-			r.ruleType = Rule.RULETYPE_STRING;
-			r.preserveWS = true;
-			resource.params.rules.add(r);*/
-			
-			Rule r = new Rule();
-			r.ruleName = "Start string";
-			r.start = "^(.+?)\\t";
-			r.end = "";
-			r.nameStart = "^";
-			r.nameEnd = "\\t";
-			r.ruleType = Rule.RULETYPE_OPENGROUP;
-			resource.params.rules.add(r);
-
-			r = new Rule();
-			r.ruleName = "Segment";
-			r.start = "\\#\\!\\[BeginSeg (\\d+?)\\]";
-			r.end = "\\#\\!\\[EndSeg\\]";
-			r.splitters = null; 
-			r.nameStart = "BeginSeg ";
-			r.nameEnd = "\\]";
-			r.nameFormat = "<parentName>_<self>";
-			r.ruleType = Rule.RULETYPE_CONTENT;
-			r.preserveWS = true;
-			resource.params.rules.add(r);
-			
-			r = new Rule();
-			r.ruleName = "Close String";
-			r.start = "1$";
-			r.end = "";
-			r.ruleType = Rule.RULETYPE_CLOSEGROUP;
-			resource.params.rules.add(r);
-			//end test			
+			//For test
+			tempSetStringInfoRules();
 			
 			// Compile the rules
 			resource.params.compileRules();
@@ -169,7 +146,7 @@ public class Parser implements IParser {
 		// TODO open(URL input)
 	}
 	
-	public IBaseResource getResource() {
+	public IContainable getResource() {
 		return resource.currentRes;
 	}
 	
@@ -228,7 +205,7 @@ public class Parser implements IParser {
 		
 		// Else: Send end of the skeleton if needed
 		if ( startSearch < inputText.length() ) {
-			SkeletonResource skl = new SkeletonResource();
+			SkeletonUnit skl = new SkeletonUnit();
 			skl.setData(inputText.substring(startSkl, inputText.length()));
 			skl.setID(String.format("%d", ++sklID));
 			resource.currentRes = skl;
@@ -244,12 +221,12 @@ public class Parser implements IParser {
 		MatchResult startResult,
 		MatchResult endResult)
 	{
-		SkeletonResource skl;
+		SkeletonUnit skl;
 		switch ( rule.ruleType ) {
 		case Rule.RULETYPE_NOTRANS:
 		case Rule.RULETYPE_COMMENT:
 			// Skeleton data include the content
-			skl = new SkeletonResource();
+			skl = new SkeletonUnit();
 			skl.setData(inputText.substring(startSkl, endResult.start()));
 			skl.setID(String.format("%d", ++sklID));
 			resource.currentRes = skl;
@@ -264,7 +241,7 @@ public class Parser implements IParser {
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
 			// Skeleton data include the content
-			skl = new SkeletonResource();
+			skl = new SkeletonUnit();
 			skl.setData(inputText.substring(startSkl, endResult.start()));
 			skl.setID(String.format("%d", ++sklID));
 			resource.currentRes = skl;
@@ -273,8 +250,8 @@ public class Parser implements IParser {
 			startSkl = endResult.start();
 			//TODO: return group event, and deal with skeleton
 			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
-				GroupResource groupRes = new GroupResource();
-				groupRes.setID(String.format("%d", ++groupID));
+				Group groupRes = new Group();
+				groupRes.setID(String.valueOf(++groupID));
 				if ( rule.nameStart.length() > 0 ) {
 					String name = getMatch(startResult.group(), rule.nameStart, rule.nameEnd);
 					if ( name != null ) {
@@ -344,10 +321,8 @@ public class Parser implements IParser {
 		String name,
 		String data)
 	{
-		ExtractionItem item = new ExtractionItem();
-		item.setSource(new Container(data));
-		item.setID(String.format("%d", ++itemID));
-		item.setPreserveSpace(rule.preserveWS);
+		TextUnit item = new TextUnit(String.valueOf(++itemID), data);
+		item.setPreserveWhitespaces(rule.preserveWS);
 		splitItem(item, rule.splitters);
 		if ( name != null ) {
 			if ( rule.nameFormat.length() > 0 ) {
@@ -360,14 +335,17 @@ public class Parser implements IParser {
 		resultQueue.add(item);
 	}
 	
-	private void splitItem (IExtractionItem item,
+	private void splitItem (TextUnit item,
 		String pattern)
 	{
 		if (( pattern == null ) || ( pattern.length() == 0 )) return;
+		return;
+		//TODO: REDO splitItem
 		
+		/*
 		//TODO: optimize by compiling once
 		Pattern p = Pattern.compile(pattern, Pattern.MULTILINE);
-		IContainer src = item.getSource();
+		TextContainer src = item.getSourceContent();
 		String codedText = src.getCodedText();
 		Matcher m = p.matcher(codedText);
 		ArrayList<IPart> tmpList = new ArrayList<IPart>();
@@ -415,7 +393,7 @@ public class Parser implements IParser {
 			for ( IPart part : tmpList ) {
 				src.append(part);
 			}
-		}
+		}*/
 	}
 	
 	private void processStrings (Rule rule,
@@ -511,10 +489,9 @@ public class Parser implements IParser {
 			}
 			
 			// Item to extract
-			ExtractionItem item = new ExtractionItem();
-			item.setSource(new Container(data.substring(start, end)));
-			item.setID(String.format("%d", ++itemID));
-			item.setPreserveSpace(rule.preserveWS);
+			TextUnit item = new TextUnit(String.valueOf(++itemID),
+				data.substring(start, end));
+			item.setPreserveWhitespaces(rule.preserveWS);
 			//splitItem(item, rule.splitters);
 			if ( name != null ) {
 				if ( rule.nameFormat.length() > 0 ) {
@@ -539,30 +516,28 @@ public class Parser implements IParser {
 	private void addSkeletonToQueue (String data,
 		boolean forceNewEntry)
 	{
-		ISkeletonResource skl;
+		SkeletonUnit skl;
 		if ( !forceNewEntry && ( resultQueue.size() > 0 )) {
-			if ( resultQueue.getLast().getKind() == IBaseResource.KIND_SKELETON ) {
+			if ( resultQueue.getLast() instanceof SkeletonUnit ) {
 				// Append to the last queue entry if possible
-				skl = (ISkeletonResource)resultQueue.getLast();
+				skl = (SkeletonUnit)resultQueue.getLast();
 				skl.appendData(data);
 				return;
 			}
 		}
 		// Else: create a new skeleton entry
-		skl = new SkeletonResource();
-		skl.setData(data);
-		skl.setID(String.format("%d", ++sklID));
+		skl = new SkeletonUnit(String.valueOf(++sklID), data);
 		resultQueue.add(skl);
 	}
 	
 	private ParserTokenType nextEvent () {
 		if ( resultQueue.size() == 0 ) return ParserTokenType.NONE;
-		if ( resultQueue.peek().getKind() == IBaseResource.KIND_SKELETON ) {
-			resource.currentRes = (ISkeletonResource)resultQueue.poll();
+		if ( resultQueue.peek() instanceof SkeletonUnit ) {
+			resource.currentRes = (SkeletonUnit)resultQueue.poll();
 			return ParserTokenType.SKELETON;
 		}
 		// Else: it's an item
-		resource.currentRes = (IExtractionItem)resultQueue.poll();
+		resource.currentRes = (TextUnit)resultQueue.poll();
 		return ParserTokenType.TRANSUNIT;
 	}
 

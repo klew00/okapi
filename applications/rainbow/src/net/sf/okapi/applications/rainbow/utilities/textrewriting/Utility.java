@@ -7,9 +7,9 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.LocaleData;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
@@ -74,44 +74,50 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 
 	@Override
-    public void endExtractionItem(IExtractionItem item) {
+    public void endExtractionItem(TextUnit item) {
 		try {
-			IExtractionItem currentItem = item.getFirstItem();
-			do {
-				// Skip non-translatable
-				if ( !currentItem.isTranslatable() ) continue;
-				// Skip if already translate (only if required)
-				if ( currentItem.hasTarget() && !params.applyToExistingTarget ) continue;
-				// Else: do the requested modifications
-				// Make sure we have a target where to set data
-				if ( !currentItem.hasTarget() ) {
-					currentItem.setTarget(new Container());
-					currentItem.getTarget().setContent(
-						currentItem.getSource().getCodedText(),
-						currentItem.getSource().getCodes());
+			processTU(item);
+			if ( item.hasChild() ) {
+				for ( TextUnit tu : item.childTextUnitIterator() ) {
+					processTU(tu);
 				}
-				switch ( params.type ) {
-				case Parameters.TYPE_XNREPLACE:
-					replaceWithXN(currentItem);
-					break;
-				}
-				if ( params.addPrefix || params.addSuffix || params.addName ) {
-					addText(currentItem);
-				}
-			} while ( (currentItem = item.getNextItem()) != null ); 
+			}
 		}
 		finally {
 			super.endExtractionItem(item);
 		}
     }
 	
-	private void replaceWithXN (IExtractionItem item) {
+	private void processTU (TextUnit tu) {
+		// Skip non-translatable
+		if ( !tu.isTranslatable() ) return;
+		// Skip if already translate (only if required)
+		if ( tu.hasTarget() && !params.applyToExistingTarget ) return;
+		// Else: do the requested modifications
+		// Make sure we have a target where to set data
+		if ( !tu.hasTarget() ) {
+			tu.setTarget(new LocaleData(tu));
+			tu.getTargetContent().setCodedText(
+				tu.getSourceContent().getCodedText(),
+				tu.getSourceContent().getCodes());
+		}
+		switch ( params.type ) {
+		case Parameters.TYPE_XNREPLACE:
+			replaceWithXN(tu);
+			break;
+		}
+		if ( params.addPrefix || params.addSuffix || params.addName ) {
+			addText(tu);
+		}
+	}
+	
+	private void replaceWithXN (TextUnit item) {
 		String tmp = null;
 		try {
-			tmp = item.getTarget().getCodedText().replaceAll("\\p{L}", "X");
+			tmp = item.getTargetContent().getCodedText().replaceAll("\\p{L}", "X");
 			tmp = tmp.replaceAll("\\d", "N");
-			IContainer cnt = item.getTarget(); 
-			cnt.setContent(tmp, item.getSource().getCodes());
+			TextContainer cnt = item.getTargetContent(); 
+			cnt.setCodedText(tmp, item.getSourceContent().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
@@ -123,16 +129,16 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	 * the item has gone through the first transformation already.
 	 * @param item The item to process.
 	 */
-	private void addText (IExtractionItem item) {
+	private void addText (TextUnit item) {
 		String tmp = null;
 		try {
 			// Use the target as the text to change.
-			tmp = item.getTarget().getCodedText();
+			tmp = item.getTargetContent().getCodedText();
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
 			if ( params.addName ) {
-				if ( item.getName().length() > 0 ) tmp += "."+item.getName();
+				if ( item.getName().length() > 0 ) tmp += "_"+item.getName();
 				else tmp += "_"+item.getID();
 			}
 			if ( params.addID ) {
@@ -141,8 +147,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			if ( params.addSuffix ) {
 				tmp += params.suffix;
 			}
-			IContainer cnt = item.getTarget(); 
-			cnt.setContent(tmp, item.getSource().getCodes());
+			TextContainer cnt = item.getTargetContent(); 
+			cnt.setCodedText(tmp, item.getSourceContent().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);

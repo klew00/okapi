@@ -7,10 +7,10 @@ import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
@@ -102,7 +102,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
 
 	@Override
-    public void startResource (IDocumentResource resource) {
+    public void startResource (Document resource) {
 		String relativeInput = inputPath.substring(inputRoot.length()+1);
 		String relativeOutput = outputPath.substring(outputRoot.length()+1);
 		String[] res = FilterAccess.splitFilterSettingsType1("", resource.getFilterSettings());
@@ -113,16 +113,16 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
     }
 	
 	@Override
-    public void endResource (IDocumentResource resource) {
+    public void endResource (Document resource) {
 		writer.writeEndDocument(resource);
 	}
 	
 	@Override
-    public void startExtractionItem (IExtractionItem item) {
+    public void startExtractionItem (TextUnit item) {
 	}
 	
 	@Override
-    public void endExtractionItem (IExtractionItem item ) {
+    public void endExtractionItem (TextUnit item ) {
 		//int status = IFilterItem.TSTATUS_TOTRANS;
 		//if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
 		//else if ( sourceItem.hasTarget() ) status = IFilterItem.TSTATUS_TOEDIT;
@@ -136,15 +136,15 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	}
     
 	@Override
-    public void startContainer (IGroupResource resource) {
+    public void startContainer (Group resource) {
 	}
 
 	@Override
-	public void endContainer (IGroupResource resource) {
+	public void endContainer (Group resource) {
 	}
 
 	@Override
-	public void skeletonContainer (ISkeletonResource resource) {
+	public void skeletonContainer (SkeletonUnit resource) {
 		writer.writeSkeletonPart(resource);
 	}
 	

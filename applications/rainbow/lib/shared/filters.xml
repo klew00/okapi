@@ -2,6 +2,7 @@
 <okapiFilters>
  
  <filter id="okf_regex"
+  parserClass="net.sf.okapi.filters.regex.Parser"
   inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
   outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.regex.Editor"

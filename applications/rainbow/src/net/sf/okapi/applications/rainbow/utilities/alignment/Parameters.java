@@ -5,9 +5,11 @@ import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
-	public String       tmxPath;
-	public boolean      segment;
-	public String       srxPath;
+	protected String    tmxPath;
+	protected boolean   segment;
+	protected String    srxPath;
+	protected boolean   singleInput;   
+	protected boolean   allowEmptyTarget;   
 	
 
 	public Parameters () {
@@ -21,7 +23,9 @@ public class Parameters extends BaseParameters {
 		// Parse the fields
 		tmxPath = tmp.get("tmxPath", tmxPath);
 		segment = tmp.get("segment", segment);
-		srxPath = tmp.get("srxPath", tmxPath);
+		srxPath = tmp.get("srxPath", srxPath);
+		singleInput = tmp.get("singleInput", singleInput);
+		allowEmptyTarget = tmp.get("allowEmptyTarget", allowEmptyTarget);
 	}
 
 	@Override
@@ -29,6 +33,8 @@ public class Parameters extends BaseParameters {
 		tmxPath = "output.tmx";
 		segment = false;
 		srxPath = "default.srx";
+		singleInput = true;
+		allowEmptyTarget = false;
 	}
 
 	@Override
@@ -38,6 +44,8 @@ public class Parameters extends BaseParameters {
 		tmp.add("tmxPath", tmxPath);
 		tmp.add("srxPath", srxPath);
 		tmp.add("segment", segment);
+		tmp.add("singleInput", singleInput);
+		tmp.add("allowEmptyTarget", allowEmptyTarget);
 		return tmp.toString();
 	}
 }

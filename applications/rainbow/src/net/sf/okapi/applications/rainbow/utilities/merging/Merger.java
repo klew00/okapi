@@ -16,8 +16,8 @@ import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.LocaleData;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Merger extends ThrougputPipeBase {
 
@@ -108,17 +108,19 @@ public class Merger extends ThrougputPipeBase {
 	}
 
 	@Override
-    public void endExtractionItem (IExtractionItem item) {
-		IExtractionItem current = item.getFirstItem();
-		do {
-			processItem(current);
-		} while ( (current = item.getNextItem()) != null );
+    public void endExtractionItem (TextUnit item) {
+		processItem(item);
+		if ( item.hasChild() ) {
+			for ( TextUnit tu : item.childTextUnitIterator() ) {
+				processItem(tu);
+			}
+		}
 
 		// Call output filter
 		super.endExtractionItem(item);
 	}
 
-	private void processItem (IExtractionItem item) {
+	private void processItem (TextUnit item) {
 		// Skip the non-translatable if they are not included in the package
 		if ( skipNoTranslate && !item.isTranslatable() ) return;
 			
@@ -133,7 +135,7 @@ public class Merger extends ThrougputPipeBase {
 
 		// Update the item if needed
 		if ( item.isTranslatable() ) {
-			IExtractionItem srcPkgItem = reader.getItem();
+			TextUnit srcPkgItem = reader.getItem();
 			
 			if ( !item.getID().equals(srcPkgItem.getID()) ) {
 				// Problem: different IDs
@@ -146,14 +148,14 @@ public class Merger extends ThrougputPipeBase {
 			if ( srcPkgItem.hasTarget() ) {
 				if ( !item.hasTarget() ) {
 					// Create the target entry for the output if it does not exist yet
-					item.setTarget(new Container());
+					item.setTarget(new LocaleData(item));
 				}
 				// Set the codedText part of the content only. Do not modify the codes.
 				//TODO: in-line could be clones: the code should come from the translation not the original then.
 				try {
-					item.getTarget().setContent(
-						srcPkgItem.getTarget().getCodedText(),
-						item.getSource().getCodes());
+					item.getTargetContent().setCodedText(
+						srcPkgItem.getTargetContent().getCodedText(),
+						item.getSourceContent().getCodes());
 				}
 				catch ( RuntimeException e ) {
 					logger.error("Error with item id=\"{}\".", item.getID());

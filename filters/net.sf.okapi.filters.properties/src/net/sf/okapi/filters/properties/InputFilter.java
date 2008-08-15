@@ -1,4 +1,5 @@
-/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -12,7 +13,7 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
@@ -25,8 +26,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class InputFilter implements IInputFilter {
 
@@ -89,11 +90,11 @@ public class InputFilter implements IInputFilter {
 			do {
 				switch ( (tok = parser.parseNext()) ) {
 				case TRANSUNIT:
-					output.startExtractionItem((IExtractionItem)parser.getResource());
-					output.endExtractionItem((IExtractionItem)parser.getResource());
+					output.startExtractionItem((TextUnit)parser.getResource());
+					output.endExtractionItem((TextUnit)parser.getResource());
 					break;
 				case SKELETON:
-					output.skeletonContainer((ISkeletonResource)parser.getResource());
+					output.skeletonContainer((SkeletonUnit)parser.getResource());
 					break;
 				}
 			}

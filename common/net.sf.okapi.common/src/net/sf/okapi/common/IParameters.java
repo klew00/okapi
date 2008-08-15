@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation                   */
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -60,6 +60,36 @@ public interface IParameters {
 	 */
 	public void setParameter (String name,
 		String value);
+
+	/**
+	 * Sets the boolean value of a given parameter.
+	 * @param name The name of the parameter (ignores cases).
+	 * @param value The new value. 
+	 */
+	public void setParameter (String name,
+		boolean value);
+
+	/**
+	 * Sets the int value of a given parameter.
+	 * @param name The name of the parameter.
+	 * @param value The new value. 
+	 */
+	public void setParameter (String name,
+		int value);
+
+	/**
+	 * Gets the boolean value of the given parameter.
+	 * @param name Name of the parameter.
+	 * @return Value of the given parameter (false if it does not exists).
+	 */
+	public boolean getBoolean (String name);
+	
+	/**
+	 * Gets the int value of the given parameter.
+	 * @param name Name of the parameter.
+	 * @return Value of the given parameter (0 if it does not exists).
+	 */
+	public int getInt (String name);
 	
 	/**
 	 * Loads the parameters from a file.

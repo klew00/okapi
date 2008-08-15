@@ -3,10 +3,8 @@ package net.sf.okapi.filters.xliff;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IFragment;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Handles the conversion between a abstract content (IContainer)
@@ -14,18 +12,18 @@ import net.sf.okapi.common.resource.IFragment;
  */
 public class XLIFFContent {
 
-	private String           codedText;
-	private List<IFragment>  codes;
+	private String      codedText;
+	private List<Code>  codes;
 	
 	public XLIFFContent () {
 		codedText = "";
 	}
 	
-	public XLIFFContent (IContainer content) {
+	public XLIFFContent (TextFragment content) {
 		setContent(content);
 	}
 	
-	public XLIFFContent setContent (IContainer content) {
+	public XLIFFContent setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;
@@ -41,8 +39,8 @@ public class XLIFFContent {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt
-	 * @param codeOnlyMode True when the inline codes are to be set as raw-values.
-	 * This option is to be used when the inline code is an XLIFF-inline code itself.
+	 * @param codeOnlyMode True when the in-line codes are to be set as raw-values.
+	 * This option is to be used when the in-line code is an XLIFF-in-line code itself.
 	 * @return The coded string.
 	 */
 	public String toString (int quoteMode,
@@ -54,9 +52,9 @@ public class XLIFFContent {
 		int id;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
-			case IContainer.CODE_OPENING:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}
@@ -66,9 +64,9 @@ public class XLIFFContent {
 					tmp.append("</bpt>");
 				}
 				break;
-			case IContainer.CODE_CLOSING:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}
@@ -78,9 +76,9 @@ public class XLIFFContent {
 					tmp.append("</ept>");
 				}
 				break;
-			case IContainer.CODE_ISOLATED:
-				index = Container.CtoI(codedText.charAt(++i));
-				id = ((CodeFragment)codes.get(index)).getID();
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}

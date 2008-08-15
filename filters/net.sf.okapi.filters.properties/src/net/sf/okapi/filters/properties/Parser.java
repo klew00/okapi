@@ -1,4 +1,5 @@
-/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -12,7 +13,7 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
@@ -34,11 +35,9 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.IBaseResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.SkeletonResource;
+import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Parser implements IParser {
 
@@ -53,9 +52,9 @@ public class Parser implements IParser {
 	protected Resource       resource;
 	
 	private int              nextAction;
-	private IBaseResource    currentRes;
+	private IContainable     currentRes;
 	private BufferedReader   reader;
-	private IExtractionItem  item;
+	private TextUnit         item;
 	private String           textLine;
 	private int              lineNumber;
 	private int              lineSince;
@@ -82,7 +81,7 @@ public class Parser implements IParser {
 		}
 	}
 
-	public IBaseResource getResource () {
+	public IContainable getResource () {
 		return currentRes;
 	}
 
@@ -90,7 +89,8 @@ public class Parser implements IParser {
 	{
 		try {
 			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, resource.getSourceEncoding());
+			BOMAwareInputStream bis = new BOMAwareInputStream(input,
+				resource.getSourceEncoding());
 			reader = new BufferedReader(
 				new InputStreamReader(bis, bis.detectEncoding()));
 			
@@ -166,7 +166,7 @@ public class Parser implements IParser {
 		int result = RESULT_ERROR;
 		try {
 			if ( resetBuffer ) {
-				resource.sklRes = new SkeletonResource();
+				resource.sklRes = new SkeletonUnit();
 				resource.sklRes.setID(String.format("s%d", ++sklID));
 			}
 			
@@ -309,9 +309,10 @@ public class Parser implements IParser {
 				}
 
 				if ( bExtract ) {
-					item = new ExtractionItem();
-					item.setSource(new Container(unescape(sValue)));
+					item = new TextUnit(String.valueOf(++itemID),
+						unescape(sValue));
 					item.setName(sKey);
+					item.setPreserveWhitespaces(true);
 				}
 
 				if ( bExtract ) {
@@ -330,12 +331,6 @@ public class Parser implements IParser {
 					return RESULT_DATA;
 				}
 
-				item.setPreserveSpace(true);
-				item.setID(String.valueOf(++itemID));
-//For test
-				item.setExtension("TestExtension",
-					new TestExtension("Data of the extension for item " + item.getID()));
-//end for test				
 				result = RESULT_ITEM;
 				item.setProperty("start", String.valueOf(lS));
 

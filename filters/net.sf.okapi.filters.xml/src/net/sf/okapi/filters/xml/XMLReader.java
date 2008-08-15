@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.Container;
-import net.sf.okapi.common.resource.ExtractionItem;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -37,14 +34,12 @@ public class XMLReader {
 	protected Resource       resource;
 	
 	private boolean          sendEndEvent;
-	private IExtractionItem  item;
-	private IContainer       content;
+	private TextUnit         item;
+	private TextContainer    content;
 	private int              itemID;
 	private boolean          hasText;
 	private Node             node;
 	private ITSEngine        itsEng;
-	private int              codeID;
-	private Stack<Integer>   codeIDStack;
 	
 	
 	public XMLReader () {
@@ -64,7 +59,6 @@ public class XMLReader {
 			applyITSRules();
 			itsEng.startTraversal();
 			sendEndEvent = false;
-			codeIDStack = new Stack<Integer>();
 			itemID = 0;
 		}
 		catch ( ParserConfigurationException e ) {
@@ -78,7 +72,7 @@ public class XMLReader {
 		}
 	}
 
-	public IExtractionItem getItem () {
+	public TextUnit getItem () {
 		return item;
 	}
 
@@ -87,8 +81,8 @@ public class XMLReader {
 			sendEndEvent = false;
 			return RESULT_ENDTRANSUNIT;
 		}
-		item = new ExtractionItem();
-		resetStorage();
+		item = new TextUnit();
+		resetStorage(item);
 
 		while ( true ) {
 			if ( (node = itsEng.nextNode()) == null ) {
@@ -100,8 +94,7 @@ public class XMLReader {
 				if ( itsEng.backTracking() ) { // Closing tag
 					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
-						content.append(new CodeFragment(IContainer.CODE_CLOSING, codeIDStack.pop(),
-							tagToString(node, false)));
+						content.append(TagType.CLOSING, node.getLocalName(), tagToString(node, false));
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
 					default:
@@ -110,7 +103,7 @@ public class XMLReader {
 							return RESULT_STARTTRANSUNIT;
 						}
 						else {
-							resetStorage();
+							resetStorage(item);
 						}
 						break;
 					}
@@ -120,11 +113,9 @@ public class XMLReader {
 					switch ( itsEng.getWithinText() ) {
 					case ITraversal.WITHINTEXT_YES:
 						if ( node.hasChildNodes() )
-							content.append(new CodeFragment(IContainer.CODE_OPENING, codeIDStack.push(++codeID),
-								tagToString(node, true)));
+							content.append(TagType.OPENING, node.getLocalName(), tagToString(node, true));
 						else // Empty element
-							content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-								tagToString(node, true)));
+							content.append(TagType.PLACEHOLDER, node.getLocalName(), tagToString(node, true));
 						node.setUserData("toDel", true, null);
 						break;
 					//TODO: case ITraversal.WITHINTEXT_NESTED:
@@ -142,7 +133,7 @@ public class XMLReader {
 //								setItemInfo(node.getParentNode());
 //								return RESULT_STARTTRANSUNIT;
 							}
-							resetStorage();
+							resetStorage(item);
 						}
 						break;
 					}
@@ -164,8 +155,8 @@ public class XMLReader {
 				}
 				else {
 					//TODO: Need to escape text (?)
-					content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-						node.getNodeValue()));
+					content.append(TagType.PLACEHOLDER, node.getNodeName(),
+						node.getNodeValue());
 				}
 				node.setUserData("toDel", true, null);
 				break;
@@ -176,13 +167,12 @@ public class XMLReader {
 				//TODO: ENTITY_REFERENCE_NODE
 				break;
 			case Node.COMMENT_NODE:
-				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-					"<!--"+node.getNodeValue()+"-->"));
+				content.append(TagType.PLACEHOLDER, null, "<!--"+node.getNodeValue()+"-->");
 				node.setUserData("toDel", true, null);
 				break;
 			case Node.PROCESSING_INSTRUCTION_NODE:
-				content.append(new CodeFragment(IContainer.CODE_ISOLATED, ++codeID,
-					"<?"+node.getNodeName()+" "+node.getNodeValue()+"?>"));
+				content.append(TagType.PLACEHOLDER, null,
+					"<?"+node.getNodeName()+" "+node.getNodeValue()+"?>");
 				node.setUserData("toDel", true, null);
 				break;
 			}
@@ -199,8 +189,8 @@ public class XMLReader {
 		for ( int i=0; i<list.getLength(); i++ ) {
 			attr = list.item(i);
 			if ( itsEng.translate(attr.getNodeName()) ) {
-				ExtractionItem attrItem = new ExtractionItem();
-				attrItem.getSource().setContent(attr.getNodeValue());
+				TextUnit attrItem = new TextUnit();
+				attrItem.getSourceContent().append(attr.getNodeValue());
 				attrItem.setID(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
 				if ( itsEng.getWithinText() == ITraversal.WITHINTEXT_YES ) {
@@ -219,18 +209,15 @@ public class XMLReader {
 		}
 	}
 	
-	private void resetStorage () {
-		codeID = 0;
-		codeIDStack.clear();
-		codeIDStack.push(codeID);
+	private void resetStorage (TextUnit tu) {
 		hasText = false;
-		content = new Container();
+		content = new TextContainer(tu);
 	}
 	
 	private void setItemInfo (Node node) {
 		if ( node == null ) throw new NullPointerException();
 		item.setType("x-"+node.getLocalName());
-		item.setSource(content);
+		item.setSourceContent(content);
 		item.setID(String.valueOf(++itemID));
 		item.setName(((Element)node).getAttribute("xml:id"));
 		sendEndEvent = true;

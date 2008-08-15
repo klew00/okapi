@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.resource.IContainer;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class InlineCodeFinder {
 
@@ -38,12 +39,12 @@ public class InlineCodeFinder {
 		pattern = Pattern.compile(tmp.toString(), Pattern.MULTILINE);
 	}
 
-	public void process (IContainer segment) {
+	public void process (TextContainer segment) {
 		String tmp = segment.getCodedText();
 		Matcher m = pattern.matcher(tmp);
 		int start = 0;
 		while ( m.find(start) ) {
-			//segment.changeToCode(m.start(), m.end(), IContainer2.CODE_ISOLATED, ++id)
+			segment.changeToCode(m.start(), m.end(), TagType.PLACEHOLDER, null);
 			start = m.end();
 			if ( start >= tmp.length() ) break;
 		}

@@ -33,6 +33,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
+import net.sf.okapi.common.filters.IParser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -138,10 +139,12 @@ public class FilterAccess {
 	 * Loads the list of accessible filters.
 	 * The list is stored in an XML file of the following format:
 	 * <okapiFilters>
-	 *  <filter id="okf_json"
-	 *   filterClass="net.sf.okapi.Filter.JSON.Filter">
-	 *   editorClass="net.sf.okapi.Filter.JSON.ParametersForm"
-	 *  >JSON files</filter>
+	 *  <filter id="okf_regex"
+	 *   parserClass="net.sf.okapi.filters.regex.Parser"
+	 *   inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
+	 *   outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
+	 *   editorClass="net.sf.okapi.filters.ui.regex.Editor"
+	 *  >Regular Expressions</filter>
 	 * </okapiFilters>
 	 * @param p_sPath Full path of the list file to load.
 	 */
@@ -168,6 +171,8 @@ public class FilterAccess {
 				FAI.outputFilterClass = N.getTextContent();
 				N = NL.item(i).getAttributes().getNamedItem("editorClass");
 				if ( N != null ) FAI.editorClass = N.getTextContent();
+				N = NL.item(i).getAttributes().getNamedItem("parserClass");
+				if ( N != null ) FAI.parserClass = N.getTextContent();
 				m_htFilters.put(sID, FAI);
 			}
 		}
@@ -245,6 +250,37 @@ public class FilterAccess {
 		}
 	}
 
+	public IParser loadParser (String filterID,
+		String paramPath)
+	{
+		try {
+			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
+			// we remove the NNN. part. That part is reserved for multi-file storage info
+			if ( Character.isDigit(filterID.charAt(0)) ) {
+				int n = filterID.indexOf('.');
+				if ( n != -1 ) filterID = filterID.substring(n+1);
+			}
+
+			// Map the ID to the class, and instantiate the filter
+			if ( !m_htFilters.containsKey(filterID) )
+				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID));
+			
+			// Load the class
+			IParser parser = (IParser)Class.forName(m_htFilters.get(filterID).parserClass).newInstance();
+			
+			return parser;
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public void loadFilterFromFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings)
 	{

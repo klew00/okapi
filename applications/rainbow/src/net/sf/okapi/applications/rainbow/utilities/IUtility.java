@@ -132,7 +132,7 @@ public interface IUtility {
 	/**
 	 * Gets the most useful folder for the given utility, or null if there is
 	 * no relevant folder. This folder is the one that make more sense for a user
-	 * to go after the utility has been processed, for example, the folder where
+	 * to go after the utility has been executed, for example, the folder where
 	 * the output documents have been created.
 	 * @return The output folder for the utility, or null.
 	 */

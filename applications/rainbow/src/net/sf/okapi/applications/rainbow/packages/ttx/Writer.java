@@ -32,12 +32,11 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.resource.CodeFragment;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IFragment;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Implements IWriter for TTX-based translation packages.
@@ -118,7 +117,7 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument (IDocumentResource resource) {
+	public void writeEndDocument (Document resource) {
 		try {
 			writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;/okapiTTX&gt;</ut>");
 			writer.writeEndElement(); // Raw
@@ -133,54 +132,60 @@ public class Writer extends BaseWriter {
 		}
 	}
 
-	private void writeContent (IContainer content) {
-		List<IFragment> fragList = content.getFragments();
-		for ( IFragment frag : fragList ) {
-			if ( frag.isText() ) {
-				writer.writeString(frag.toString());
-			}
-			else {
-				switch ( ((CodeFragment)frag).getType() ) {
-				case IContainer.CODE_OPENING:
-					writer.writeStartElement("ut");
-					writer.writeAttributeString("Type", "start");
-					writer.writeAttributeString("RightEdge", "angle");
-					writer.writeAttributeString("DisplayText", frag.toString());
-					writer.writeString(frag.toString());
-					writer.writeEndElement(); // ut
-					break;
-				case IContainer.CODE_CLOSING:
-					writer.writeStartElement("ut");
-					writer.writeAttributeString("Type", "end");
-					writer.writeAttributeString("LeftEdge", "angle");
-					writer.writeAttributeString("DisplayText", frag.toString());
-					writer.writeString(frag.toString());
-					writer.writeEndElement(); // ut
-					break;
-				case IContainer.CODE_ISOLATED:
-					writer.writeStartElement("ut");
-					writer.writeAttributeString("DisplayText", frag.toString());
-					writer.writeString(frag.toString());
-					writer.writeEndElement(); // ut
-					break;
-				}
+	private void writeContent (TextFragment content) {
+		String text = content.getCodedText();
+		List<Code> codes = content.getCodes();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+				writer.writeStartElement("ut");
+				writer.writeAttributeString("Type", "start");
+				writer.writeAttributeString("RightEdge", "angle");
+				writer.writeAttributeString("DisplayText", code.getData());
+				writer.writeString(code.getData());
+				writer.writeEndElement(); // ut
+				break;
+			case TextFragment.MARKER_CLOSING:
+				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+				writer.writeStartElement("ut");
+				writer.writeAttributeString("Type", "end");
+				writer.writeAttributeString("LeftEdge", "angle");
+				writer.writeAttributeString("DisplayText", code.getData());
+				writer.writeString(code.getData());
+				writer.writeEndElement(); // ut
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+				writer.writeStartElement("ut");
+				writer.writeAttributeString("DisplayText", code.getData());
+				writer.writeString(code.getData());
+				writer.writeEndElement(); // ut
+				break;
+			default:
+				//TODO: Use a content object like XLIFF and TMX, too slow here
+				writer.writeString(String.valueOf(text.charAt(i)));
 			}
 		}
 	}
 	
-	public void writeItem (IExtractionItem item,
+	public void writeItem (TextUnit item,
 		int status)
 	{
-		IExtractionItem current = item.getFirstItem();
-		do {
-			processItem(current);
-		} while ( (current = item.getNextItem()) != null );
+		processItem(item);
+		if ( item.hasChild() ) {
+			for ( TextUnit tu : item.childTextUnitIterator() ) {
+				processItem(tu);
+			}
+		}
 	}
 	
-	private void processItem (IExtractionItem item) {
+	private void processItem (TextUnit item) {
+		String name = item.getName();
 		writer.writeRawXML(String.format(
-			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'&gt;</ut>",
-			item.getID()));
+			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
+			item.getID(), (name.length()>0 ? " rn='"+name+"'" : "") ));
 		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
 		if ( item.hasTarget() ) {
 			//TODO: Info about the match
@@ -189,11 +194,11 @@ public class Writer extends BaseWriter {
 			//TODO: writer.writeAttributeString("MatchPercent", "100");
 			writer.writeStartElement("Tuv");
 			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
-			writeContent(item.getSource());
+			writeContent(item.getSourceContent());
 			writer.writeEndElement(); //Tuv
 			writer.writeStartElement("Tuv");
 			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
-			writeContent(item.getTarget());
+			writeContent(item.getTargetContent());
 			writer.writeEndElement(); //Tuv
 			writer.writeEndElement(); //Tu
 
@@ -201,7 +206,7 @@ public class Writer extends BaseWriter {
 			tmxWriter.writeItem(item);
 		}
 		else {
-			writeContent(item.getSource());
+			writeContent(item.getSourceContent());
 		}
 		
 		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"u\">&lt;/u&gt;</ut>");
@@ -221,11 +226,11 @@ public class Writer extends BaseWriter {
 		return relation.toString() + DTD_SETTINGS_FILE;
 	}
 
-	public void writeSkeletonPart (ISkeletonResource resource) {
+	public void writeSkeletonPart (SkeletonUnit resource) {
 		// Nothing to do
 	}
 	
-	public void writeStartDocument (IDocumentResource resource) {
+	public void writeStartDocument (Document resource) {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("TRADOStag");

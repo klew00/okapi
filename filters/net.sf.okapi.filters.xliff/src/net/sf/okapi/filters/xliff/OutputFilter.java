@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.IContainer;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IGroupResource;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.InvalidContentException;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class OutputFilter implements IOutputFilter {
 	
@@ -48,10 +48,10 @@ public class OutputFilter implements IOutputFilter {
 		xliffCont = new XLIFFContent();
 	}
 
-	public void endContainer (IGroupResource resourceContainer) {
+	public void endContainer (Group resourceContainer) {
 	}
 
-	private void buildContent (IExtractionItem item) {
+	private void buildContent (TextUnit item) {
 		try {
 			if ( res.needTargetElement ) {
 				writer.write(String.format("<target xml:lang=\"%s\">", res.getTargetLanguage()));
@@ -60,17 +60,18 @@ public class OutputFilter implements IOutputFilter {
 				//TODO: This does not resolve all case, some target may be generated from another file, need to handle that
 				res.trgCodes = res.srcCodes;
 			}
+
+			// We reset the in-line code here to use the full-outer XML, rather than
+			// the codes with just the inner portion
 			try {
-				// We reset the in-line code here to use the full-outer XML, rather than
-				// the codes in the fragments that are just the inner portion
-				IContainer content;
+				TextContainer content;
 				if ( item.hasTarget() ) {
-					content = item.getTarget();
-					content.setContent(content.getCodedText(), res.trgCodes);
+					content = item.getTargetContent();
+					content.setCodedText(content.getCodedText(), res.trgCodes);
 				}
 				else {
-					content = item.getSource();
-					content.setContent(content.getCodedText(), res.srcCodes);
+					content = item.getSourceContent();
+					content.setCodedText(content.getCodedText(), res.srcCodes);
 				}
 				String tmp = xliffCont.setContent(content).toString(0, false, true);
 				writer.write(escapeChars(tmp));
@@ -80,6 +81,7 @@ public class OutputFilter implements IOutputFilter {
 					item.getID(), item.getName()), e);
 				logger.info("Content: ["+item.toString()+"]");
 			}
+				
 			if ( res.needTargetElement ) {
 				writer.write("</target>\n");
 			}
@@ -100,23 +102,23 @@ public class OutputFilter implements IOutputFilter {
 		return escaped.toString();
 	}
 	
-	public void endExtractionItem (IExtractionItem item) {
+	public void endExtractionItem (TextUnit item) {
 		if ( item.isTranslatable() ) {
 			buildContent(item);
 		}
 	}
 
-	public void endResource (IDocumentResource resource) {
+	public void endResource (Document resource) {
 		close();
 	}
 
-	public void startContainer (IGroupResource resource) {
+	public void startContainer (Group resource) {
 	}
 
-	public void startExtractionItem (IExtractionItem item) {
+	public void startExtractionItem (TextUnit item) {
 	}
 
-	public void startResource (IDocumentResource resource) {
+	public void startResource (Document resource) {
 		try {
 			res = (Resource)resource;
 			// Create the output writer from the provided stream
@@ -132,7 +134,7 @@ public class OutputFilter implements IOutputFilter {
 		}
 	}
 
-    public void skeletonContainer (ISkeletonResource resource) {
+    public void skeletonContainer (SkeletonUnit resource) {
     	try {
     		writer.write(escapeChars(resource.toString()));
     	}

@@ -26,9 +26,9 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.resource.IDocumentResource;
-import net.sf.okapi.common.resource.IExtractionItem;
-import net.sf.okapi.common.resource.ISkeletonResource;
+import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
 /**
@@ -116,7 +116,7 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument (IDocumentResource resource) {
+	public void writeEndDocument (Document resource) {
 		writer.writeEndElement(); // body
 		writer.writeEndElement(); // file
 		writer.writeEndElement(); // xliff
@@ -126,16 +126,18 @@ public class Writer extends BaseWriter {
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (IExtractionItem item,
+	public void writeItem (TextUnit item,
 		int status)
 	{
-		IExtractionItem current = item.getFirstItem();
-		do {
-			processItem(current);
-		} while ( (current = item.getNextItem()) != null );
+		processItem(item);
+		if ( item.hasChild() ) {
+			for ( TextUnit tu : item.childTextUnitIterator() ) {
+				processItem(tu);
+			}
+		}
 	}
 	
-	private void processItem (IExtractionItem item) {
+	private void processItem (TextUnit item) {
 		if ( excludeNoTranslate ) {
 			if ( !item.isTranslatable() ) return;
 		}
@@ -148,7 +150,7 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("restype", item.getType());
 		if ( !item.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
-		if ( item.preserveSpaces() )
+		if ( item.preserveWhitespaces() )
 			writer.writeAttributeString("xml:space", "preserve");
 //TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
 //			m_XW.writeAttributeString("approved", "yes");
@@ -160,7 +162,7 @@ public class Writer extends BaseWriter {
 		writer.writeLineBreak();
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
+		writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
 		writer.writeEndElementLineBreak(); // source
 
 		// Target (if needed)
@@ -184,10 +186,10 @@ public class Writer extends BaseWriter {
 			}
 */
 			if ( item.hasTarget() && !useSourceForTranslated ) {
-				writer.writeRawXML(xliffCont.setContent(item.getTarget()).toString());
+				writer.writeRawXML(xliffCont.setContent(item.getTargetContent()).toString());
 			}
 			else {
-				writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
+				writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
 			}
 
 			writer.writeEndElementLineBreak(); // target
@@ -197,25 +199,25 @@ public class Writer extends BaseWriter {
 		else { // Use the source 
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-			writer.writeRawXML(xliffCont.setContent(item.getSource()).toString());
+			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
 			writer.writeEndElementLineBreak(); // target
 		}
 
 		// Note
-		if ( item.hasNote() ) {
+		if ( item.getProperties().containsKey("note") ) {
 			writer.writeStartElement("note");
-			writer.writeString(item.getNote());
+			writer.writeString(item.getProperty("note"));
 			writer.writeEndElementLineBreak(); // note
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
-	public void writeSkeletonPart (ISkeletonResource resource) {
+	public void writeSkeletonPart (SkeletonUnit resource) {
 		// Nothing to do
 	}
 	
-	public void writeStartDocument (IDocumentResource resource) {
+	public void writeStartDocument (Document resource) {
 		writer.writeStartDocument();
 
 		writer.writeStartElement("xliff");

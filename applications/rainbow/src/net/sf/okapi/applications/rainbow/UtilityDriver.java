@@ -74,7 +74,7 @@ public class UtilityDriver {
 	}
 
 	public void setData (Project project,
-		String utilityID)
+		String utilityID) 
 	{
 		try {
 			prj = project;
@@ -89,7 +89,13 @@ public class UtilityDriver {
 			}
 			else editor = null;
 		}
-		catch ( Exception e ) {
+		catch ( InstantiationException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -129,7 +135,6 @@ public class UtilityDriver {
 	
 	public void execute (Shell shell) {
 		try {
-			//TODO: Implement multilist support (we use only list 0 here)
 			log.beginTask(pluginItem.name);
 			
 			if ( util.needsRoots() ) {
@@ -178,14 +183,14 @@ public class UtilityDriver {
 					}
 					else {
 						// Case of the data not available
-						// This is to allow some utility to a variable number of input
-						// depending on their own variable requirements. They ask for 3 inputs
-						// and Rainbow gives them as much as possible, and nulls otherwise.
+						// This is to allow some utilities to use a variable number of input
+						// depending on their requirements. They ask for 3 inputs
+						// and Rainbow gives them as much as possible or nulls otherwise.
 						util.addInputData(null, null, null);
 						util.addOutputData(null, null);
 					}
 				}
-
+				
 				if ( util.isFilterDriven() ) {
 					IFilterDrivenUtility filterUtil = (IFilterDrivenUtility)util;
 					// Load the filter

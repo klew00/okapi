@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel (at ENLASO Corporation)                  */
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -59,12 +59,42 @@ public abstract class BaseParameters implements IParameters {
 		return FS.get(name, null);
 	}
 
+	public boolean getBoolean (String name) {
+		//TODO: Find a faster/better way to implement getOption()
+		FieldsString FS = new FieldsString(toString());
+		return (FS.get(name, "").equals("1"));
+	}
+
+	public int getInt (String name) {
+		//TODO: Find a faster/better way to implement getOption()
+		FieldsString FS = new FieldsString(toString());
+		return Integer.parseInt(FS.get(name, "0"));
+	}
+
 	public void setParameter (String name,
 		String value)
 	{
 		//TODO: Find a faster/better way to implement setOption()
 		FieldsString FS = new FieldsString(toString());
 		FS.set(name, value);
+		fromString(FS.toString());
+	}
+
+	public void setParameter (String name,
+		boolean value)
+	{
+		//TODO: Find a faster/better way to implement setOption()
+		FieldsString FS = new FieldsString(toString());
+		FS.set(name, (value ? "1" : "0"));
+		fromString(FS.toString());
+	}
+
+	public void setParameter (String name,
+		int value)
+	{
+		//TODO: Find a faster/better way to implement setOption()
+		FieldsString FS = new FieldsString(toString());
+		FS.set(name, String.format("%d", value));
 		fromString(FS.toString());
 	}
 

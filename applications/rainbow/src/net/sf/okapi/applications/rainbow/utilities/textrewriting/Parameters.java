@@ -30,7 +30,7 @@ public class Parameters extends BaseParameters {
 		type = tmp.get("type", type);
 		addPrefix = tmp.get("addPrefix", addPrefix);
 		prefix = tmp.get("prefix", prefix);
-		addSuffix = tmp.get("addPrefix", addSuffix);
+		addSuffix = tmp.get("addSuffix", addSuffix);
 		suffix = tmp.get("suffix", suffix);
 		applyToExistingTarget = tmp.get("applyToExistingTarget", applyToExistingTarget);
 		addName = tmp.get("addName", addName);

@@ -32,7 +32,7 @@ import net.htmlparser.jericho.PHPTagTypes;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.resource.IBaseResource;
+import net.sf.okapi.common.resource.IContainable;
 import static net.sf.okapi.filters.html.ElementExtractionRule.EXTRACTION_RULE_TYPE.*;
 import static net.sf.okapi.filters.html.ConditionalAttribute.CONDITIONAL_ATTRIBUTE_TYPE.*;
 
@@ -87,7 +87,7 @@ public class HtmlParser implements IParser {
 		MasonTagTypes.register();
 	}
 
-	public IBaseResource getResource() {
+	public IContainable getResource() {
 		return null;
 	}
 
