@@ -35,7 +35,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param index The index value to encode.
 	 * @return The corresponding character value.
 	 */
-	static char toChar (int index) {
+	public static char toChar (int index) {
 		return (char)(index+CHARBASE);
 	}
 
@@ -44,11 +44,12 @@ public class TextFragment implements Comparable<Object> {
 	 * @param index The character to decode.
 	 * @return The corresponding index value.
 	 */
-	static int toIndex (char index) {
+	public static int toIndex (char index) {
 		return ((int)index)-CHARBASE;
 	}
 
 	public TextFragment () {
+		text = new StringBuilder();
 	}
 
 	public TextFragment (String text) {
@@ -64,13 +65,11 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	public void append (char value) {
-		if ( text == null ) text = new StringBuilder(""+value);
-		else text.append(value);
+		text.append(value);
 	}
 
 	public void append (String text) {
-		if ( this.text == null ) this.text = new StringBuilder(text);
-		else this.text.append(text);
+		this.text.append(text);
 	}
 
 	public void append (TextFragment container) {
@@ -94,6 +93,13 @@ public class TextFragment implements Comparable<Object> {
 		if ( codes.size() > 0 ) isBalanced = false;
 	}
 	
+	/**
+	 * Appends a new code to the text.
+	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
+	 * @param type The type of the code (e.g. "bold").
+	 * @param data The raw code itself. (e.g. "<b>").
+	 * @return The new code that was added to the text.
+	 */
 	public Code append (TagType tagType,
 		String type,
 		String data)
@@ -120,14 +126,13 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	public void clear () {
-		text = null;
+		text = new StringBuilder();
 		codes = null;
 		lastCodeID = 0;
 		isBalanced = true;
 	}
 
 	public String getCodedText () {
-		if ( text == null ) return "";
 		if ( !isBalanced ) balanceMarkers();
 		return text.toString();
 	}
@@ -143,7 +148,6 @@ public class TextFragment implements Comparable<Object> {
 	public String getCodedText (int start,
 		int end)
 	{
-		if ( text == null ) return "";
 		if ( end == -1 ) end = text.length();
 		checkPositionForMarker(start);
 		checkPositionForMarker(end);
@@ -202,12 +206,10 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	public boolean isEmpty () {
-		if ( text == null ) return true;
-		else return (text.length()==0);
+		return (text.length()==0);
 	}
 	
 	public boolean hasText (boolean whiteSpacesAreText) {
-		if ( text == null ) return false;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch (text.charAt(i)) {
 			case MARKER_OPENING:
@@ -311,7 +313,6 @@ public class TextFragment implements Comparable<Object> {
 	
 	@Override
 	public String toString () {
-		if ( text == null ) return "";
 		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
 		if ( !isBalanced ) balanceMarkers();
 		StringBuilder tmp = new StringBuilder();
@@ -381,8 +382,6 @@ public class TextFragment implements Comparable<Object> {
 	{
 		// Get the subsequence
 		TextFragment sub = subSequence(start, end);
-		// Make sure text is not null
-		if ( text == null ) text = new StringBuilder();
 		// Store the length of the coded text before the operation
 		int before = text.length();
 		// Create the new code, using the text of the subsequence as the data
@@ -462,7 +461,7 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	private void balanceMarkers () {
-		if (( codes == null ) || ( text == null )) return;
+		if ( codes == null ) return;
 		for ( Code item : codes ) {
 			// Void all IDs of closing codes
 			if ( item.tagType == TagType.CLOSING ) item.id = -1;

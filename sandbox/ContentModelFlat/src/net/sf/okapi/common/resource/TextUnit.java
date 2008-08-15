@@ -16,8 +16,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected SkeletonUnit                  sklAfter;
 	protected ArrayList<ITranslatable>      children;
 	protected ITranslatable                 parent;
-	protected TextContainer             source;
-	protected ArrayList<TextContainer>  targets;
+	protected LocaleData                    source;
+	protected ArrayList<LocaleData>         targets;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
 	private ArrayList<TextUnit>             allUnits;
@@ -25,8 +25,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 
 
 	public TextUnit () {
-		source = new TextContainer(this);
-		targets = new ArrayList<TextContainer>();
+		source = new LocaleData(this);
+		targets = new ArrayList<LocaleData>();
 		targets.add(null);
 	}
 
@@ -34,19 +34,24 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		String sourceText)
 	{
 		this.id = id;
-		source = new TextContainer(this);
-		if ( sourceText != null ) source.append(sourceText);
-		source.id = id;
-		targets = new ArrayList<TextContainer>();
+		source = new LocaleData(this);
+		source.container = new TextContainer(this);
+		if ( sourceText != null ) source.container.append(sourceText);
+		source.container.id = id;
+		targets = new ArrayList<LocaleData>();
 		targets.add(null);
 	}
-	
+
+	/** 
+	 * Get the text representation of the source of this text unit.
+	 * @return The text representation of the source of this text unit.
+	 */
 	@Override
 	public String toString () {
 		//TODO: Modify for real output, this is test only
 		//TODO: support for children
 		return (sklBefore==null ? "" : sklBefore.toString())
-			+ source +
+			+ source.container.toString() +
 			(sklAfter==null ? "" : sklAfter.toString());
 	}
 	
@@ -59,7 +64,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	}
 
 	public boolean isEmpty () {
-		return source.isEmpty();
+		return source.container.isEmpty();
 	}
 
 	public String getName () {
@@ -176,44 +181,51 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Gets the source object of the resource.
 	 * @return The source object of the resource, never null.
 	 */
-	public TextContainer getSource () {
+	public LocaleData getSource () {
 		return source;
 	}
 	
-	/** Sets the source object of the resource. This TextUnit becomes the parent
-	 * of the given source object.
-	 * @param value The object to set (must not be null).
+	/**
+	 * Gets the source content of the resource.
+	 * @return The source content of the resource.
 	 */
-	public void setSource (TextContainer value) {
-		if ( value == null )
-			throw new IllegalArgumentException("Cannot set a source to null.");
-		source = value;
-		source.setParent(this);
+	public TextContainer getSourceContent () {
+		return source.container;
 	}
-
+	
 	/**
 	 * Indicates if the text unit has a (first) target.
 	 * @return True if the unit has a (first) target, false otherwise.
 	 */
 	public boolean hasTarget () {
 		return (( targets.get(0) != null )
-			&& ( !targets.get(0).isEmpty() ));
+			&& ( !targets.get(0).container.isEmpty() ));
 	}
 
 	/**
 	 * Gets the (first) target object of the resource. You can use
 	 * {@link #hasTarget()} to know if there is a target available.
-	 * @return The current (first) target object, or null.
+	 * @return The (first) target object, or null.
 	 */
-	public TextContainer getTarget () {
+	public LocaleData getTarget () {
 		return targets.get(0); 
+	}
+	
+	/**
+	 * Gets the (first) target content of the resource. You can use
+	 * {@link #hasTarget()} to know if there is a target available.
+	 * @return The (first) target content, or null.
+	 */
+	public TextContainer getTargetContent () {
+		if ( targets.get(0) == null ) return null;
+		return targets.get(0).container;
 	}
 
 	/**
 	 * Sets the (first) target object of the resource.
 	 * @param value The object to assign (can be null).
 	 */
-	public void setTarget (TextContainer value) {
+	public void setTarget (LocaleData value) {
 		targets.set(0, value);
 	}
 
@@ -222,7 +234,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * @return The list of the targets.
 	 */
 	//For now the only way to access all targets
-	public List<TextContainer> getTargets () {
+	public List<LocaleData> getTargets () {
 		return targets;
 	}
 	
@@ -282,35 +294,6 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	}
 	
 	/**
-	 * Reset the list of all TextUnit items for this TextUnit, including itself,
-	 * then return the first of the them.
-	 * @return Itself (the parent TextUnit is always the first of the list).
-	 */
-	public TextUnit getFirstTextUnit () {
-		if ( this.hasChild() ) {
-			allUnits = new ArrayList<TextUnit>();
-			storeTextUnits(this);
-			currentIndex = -1;
-			return getNextTextUnit();
-		}
-		else {
-			allUnits = null;
-			return this;
-		}
-	}
-	
-	/**
-	 * Gets the next TextUnit object for this TextUnit. It can be a descendant,
-	 * itself, or null when all possibilities have been exhausted.
-	 * @return A TextUnit object or null.
-	 */
-	public TextUnit getNextTextUnit () {
-		if ( allUnits == null ) return null;
-		if ( ++currentIndex < allUnits.size() ) return allUnits.get(currentIndex);
-		else return null;
-	}
-
-	/**
 	 * Gets the child object with a given ID.
 	 * @param id The ID value of the child to return.
 	 * @return The child object for the given ID, or null if it has not
@@ -321,6 +304,20 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		if ( !hasChild() ) return null;
 		//TODO: Fix this so it cannot match the initial parent...
 		return findChild(this, id);
+	}
+	
+	public Iterable<TextUnit> childTextUnitIterator () {
+		if (( allUnits == null ) || ( currentIndex > -1 )) {
+			// currentIndex > -1 means allUnits is used by getFirst/Next
+			// and includes the parent.
+			currentIndex = -1;
+			allUnits = new ArrayList<TextUnit>();
+			if ( hasChild() ) {
+				// Children only
+				storeTextUnits(getChildren().get(0));
+			}
+		}
+		return Collections.unmodifiableList(allUnits);
 	}
 	
 	private ITranslatable findChild (ITranslatable parent,
@@ -350,20 +347,6 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 			
 		}
 		return null;
-	}
-	
-	public Iterable<TextUnit> childTextUnitIterator () {
-		if (( allUnits == null ) || ( currentIndex > -1 )) {
-			// currentIndex > -1 means allUnits is used by getFirst/Next
-			// and includes the parent.
-			currentIndex = -1;
-			allUnits = new ArrayList<TextUnit>();
-			if ( hasChild() ) {
-				// Children only
-				storeTextUnits(getChildren().get(0));
-			}
-		}
-		return Collections.unmodifiableList(allUnits);
 	}
 	
 }

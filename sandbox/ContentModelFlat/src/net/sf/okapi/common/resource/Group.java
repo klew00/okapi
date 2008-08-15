@@ -8,7 +8,7 @@ public class Group extends ResourceContainer implements ITranslatable {
 	private ITranslatable    parent;
 	private boolean          isTranslatable;
 
-
+	
 	public String getID () {
 		return id;
 	}

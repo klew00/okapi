@@ -19,7 +19,7 @@ public class Main {
 		tu = new TextUnit("t2", "a");
 		tu.setSkeletonBefore(new SkeletonUnit("s4", "<p>"));
 		tu.setSkeletonAfter(new SkeletonUnit("s5", "</p>"));
-		TextContainer src = tu.getSource();
+		TextContainer src = tu.getSource().getContent();
 		src.append('b');
 		src.append("c ");
 		src.append(TagType.OPENING, "b", "<b1>");
@@ -35,7 +35,7 @@ public class Main {
 		tu = new TextUnit("t3", "Image1: ");
 		tu.setSkeletonBefore(new SkeletonUnit("s6", "<p>"));
 		tu.setSkeletonAfter(new SkeletonUnit("s7", "</p>"));
-		src = tu.getSource();
+		src = tu.getSourceContent();
 		src.append(TagType.PLACEHOLDER, "image",
 			String.format("<img alt='%sSF1%s' title='%sSF2%s'/>",
 			TextFragment.SFMARKER_START, TextFragment.SFMARKER_END,
@@ -51,7 +51,7 @@ public class Main {
 		tu = new TextUnit("t3", "Image2: ");
 		tu.setSkeletonBefore(new SkeletonUnit("s8", "<p>"));
 		tu.setSkeletonAfter(new SkeletonUnit("s9", "</p>"));
-		src = tu.getSource();
+		src = tu.getSourceContent();
 		src.append(TagType.PLACEHOLDER, "image",
 			String.format("%sSF1%s",
 			TextFragment.SFMARKER_START, TextFragment.SFMARKER_END)
@@ -65,10 +65,20 @@ public class Main {
 		doc.add(new SkeletonUnit("sLast", "</doc>"));
 		show(doc, 0);
 		
+		System.out.println("\nTest for iteration:\n");
+		
+		System.out.println("\nTest type 1:");
+		processTU(tu);
+		if ( tu.hasChild() ) {
+			for ( TextUnit item : tu.childTextUnitIterator() ) {
+				processTU(item);
+			}
+		}
+		
 		System.out.println("\nTest for content:\n");
 		
 		tu = new TextUnit("t1", "ABCDEF ");
-		src = tu.getSource();
+		src = tu.getSourceContent();
 		src.append(TagType.OPENING, "b", "<b1>");
 		src.append("bold");
 		src.append(TagType.OPENING, "b", "<b2>");
@@ -163,9 +173,18 @@ public class Main {
 		src2.setCodedText(tmp.toString());
 		System.out.println("src2 after : "+src2.toString());
 		
+		System.out.println("\nTest target\n");
 		
+		tu = new TextUnit("tu1", "Source text");
+		tu.setTarget(tu.getSource());
+		System.out.println("src : "+tu.getSource().toString());
+		System.out.println("trg : "+tu.getTarget().toString());
 	}
 
+	private static void processTU (TextUnit tu) {
+		System.out.println("'"+ tu.toString() + "'");
+	}
+	
 	private static void show (IResourceContainer container,
 		int level)
 	{
