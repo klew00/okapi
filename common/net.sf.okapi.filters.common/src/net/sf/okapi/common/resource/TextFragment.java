@@ -34,7 +34,10 @@ public class TextFragment implements Comparable<Object> {
 
 	public static final String SFMARKER_START    = "{@#$";
 	public static final String SFMARKER_END      = "}";
-	
+
+	/**
+	 * List of the types of tag useable for in-line codes.
+	 */
 	public static enum TagType {
 		OPENING,
 		CLOSING,
@@ -68,30 +71,57 @@ public class TextFragment implements Comparable<Object> {
 		return ((int)index)-CHARBASE;
 	}
 
+	/**
+	 * Creates an empty TextFragment.
+	 */
 	public TextFragment () {
 		text = new StringBuilder();
 	}
 
+	/**
+	 * Creates a TextFragment with a given text.
+	 * @param text The text to use.
+	 */
 	public TextFragment (String text) {
 		append(text);
 	}
 	
+	/**
+	 * Gets the ID of the fragment.
+	 * @return The ID of the fragment.
+	 */
 	public String getID () {
 		return id;
 	}
 	
+	/**
+	 * sets the ID of the fragment.
+	 * @param value The new value to apply (can be null).
+	 */
 	public void setID (String value) {
 		id = value;
 	}
 	
+	/**
+	 * Appends a character to the fragment.
+	 * @param value The character to append.
+	 */
 	public void append (char value) {
 		text.append(value);
 	}
 
+	/**
+	 * Appends a string to the fragment.
+	 * @param text The string to append.
+	 */
 	public void append (String text) {
 		this.text.append(text);
 	}
 
+	/**
+	 * Appends a TextFragment object to this fragment.
+	 * @param container The TextFragment to append.
+	 */
 	public void append (TextFragment container) {
 		//TODO: maybe a smarter way to implement this would
 		// be to do an insert() and treat this as insert(afterlast);
@@ -145,6 +175,9 @@ public class TextFragment implements Comparable<Object> {
 		return codes.get(codes.size()-1);
 	}
 
+	/**
+	 * Clears the fragment of all content. The parent is not modified.
+	 */
 	public void clear () {
 		text = new StringBuilder();
 		codes = null;
@@ -152,18 +185,25 @@ public class TextFragment implements Comparable<Object> {
 		isBalanced = true;
 	}
 
+	/**
+	 * Gets the coded text representation of the fragment.
+	 * @return The coded text for the fragment.
+	 */
 	public String getCodedText () {
 		if ( !isBalanced ) balanceMarkers();
 		return text.toString();
 	}
 
 	/**
-	 * Gets the portion of coded text for a given range.
-	 * @param start The start position of the range.
-	 * @param end The postion just after the last character of the range.
-	 * You can use -1 for 'until the end'.
+	 * Gets the portion of coded text for a given section of the coded text.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
+	 * You can use -1 for ending the section at the end of the fragment.
 	 * @return The portion of coded text for the given range. It can be 
 	 * empty but never null.
+	 * @throws InvalidPositionException
 	 */
 	public String getCodedText (int start,
 		int end)
@@ -185,10 +225,21 @@ public class TextFragment implements Comparable<Object> {
 		return codes.get(toIndex(indexAsChar)); 
 	}
 	
+	/**
+	 * Gets the code for a given index.
+	 * @param index the index of the code.
+	 * @return The code for the given index.
+	 * @throws IndexOutOfBoundsException
+	 */
 	public Code getCode (int index) {
 		return codes.get(index);
 	}
 	
+	/**
+	 * Gets the list of all codes for the fragment.
+	 * @return The list of all codes for the fragment. If there is no code, an empty
+	 * list is returned.
+	 */
 	public List<Code> getCodes () {
 		if ( codes == null ) codes = new ArrayList<Code>();
 		if ( !isBalanced ) balanceMarkers();
@@ -196,11 +247,14 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Gets a copy of the list of the codes that are between a give 
-	 * start and end position.
-	 * @param start The start of the range to look at (in the coded text representation).
-	 * @param end The position just after the last character of the range to look at. 
+	 * Gets a copy of the list of the codes that are within a given section of
+	 * coded text.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
 	 * @return A new list of all codes within the given range.
+	 * @throws InvalidPositionException
 	 */
 	public List<Code> getCodes (int start,
 		int end)
@@ -225,10 +279,21 @@ public class TextFragment implements Comparable<Object> {
 		return tmpCodes;
 	}
 
+	/**
+	 * Indicates if the fragment is empty (no text and no codes).
+	 * @return True if the fragment is empty.
+	 */
 	public boolean isEmpty () {
 		return (text.length()==0);
 	}
 	
+	/**
+	 * Indicates if the fragment contains at least one character (markers do not
+	 * count as characters).
+	 * @param whiteSpacesAreText Indicates if white-spaces should be considered 
+	 * characters or not for the purpose of checking if this fragment is empty.
+	 * @return True if the fragment contains at least one character.
+	 */
 	public boolean hasText (boolean whiteSpacesAreText) {
 		for ( int i=0; i<text.length(); i++ ) {
 			switch (text.charAt(i)) {
@@ -247,11 +312,23 @@ public class TextFragment implements Comparable<Object> {
 		return false;
 	}
 	
+	/**
+	 * Indicates if the fragment contains at least one code.
+	 * @return True if the fragment contains at least one code.
+	 */
 	public boolean hasCode () {
 		if ( codes == null ) return false;
 		return (codes.size()>0);
 	}
 
+	/**
+	 * Removes a portion of the fragment (including its codes).
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
+	 * @throws InvalidPositionException
+	 */
 	public void remove (int start,
 		int end)
 	{
@@ -283,10 +360,11 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Gets a copy of a sub-sequence of this object.
-	 * @param start The start of the sequence (in the coded text representation).
-	 * @param end The position just after the last character to include in the 
-	 * sub-sequence (in the coded text representation). You can use -1 for ending
-	 * the range at the end of the coded text.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
+	 * You can use -1 for ending the section at the end of the fragment.
 	 * @return A new TextContainer object with a copy of the given sub-sequence.
 	 */
 	public TextFragment subSequence (int start,
@@ -317,10 +395,22 @@ public class TextFragment implements Comparable<Object> {
 		return sub;
 	}
 	
-	public void setCodedText (String codedText) {
-		setCodedText(codedText, codes);
+	/**
+	 * Sets the coded text of the fragment, using its the existing codes. The coded
+	 * text must be valid for the existing codes.
+	 * @param newCodedText The coded text to apply.
+	 * @throws InvalidContentException
+	 */
+	public void setCodedText (String newCodedText) {
+		setCodedText(newCodedText, codes);
 	}
 
+	/**
+	 * Sets the coded text of the fragment and its corresponding codes.
+	 * @param newCodedText The coded text to apply.
+	 * @param newCodes the list of the corresponding codes.
+	 * @throws InvalidContentException
+	 */
 	public void setCodedText (String newCodedText,
 		List<Code> newCodes)
 	{
@@ -388,10 +478,18 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 
+	/**
+	 * Gets the parent of the fragment.
+	 * @return the parent of the fragment or null if none is assigned.
+	 */
 	public TextUnit getParent() {
 		return parent;
 	}
 
+	/**
+	 * Sets the parent of the fragment.
+	 * @param value The new parent to assign (can be null).
+	 */
 	public void setParent (TextUnit value) {
 		parent = value;
 	}
@@ -458,19 +556,43 @@ public class TextFragment implements Comparable<Object> {
 		return text.length()-before;
 		
 	}
+
+	/**
+	 * Renumbers the IDs of the codes in the fragment.
+	 */
+	public void renumberCodes () {
+		lastCodeID = 0;
+		if ( codes == null ) return;
+		for ( Code code : codes ) {
+			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
+		}
+		isBalanced = false;
+	}
 	
+	/**
+	 * Verifies if a given position in the coded text is on the second special
+	 * character of a marker sequence.
+	 * @param position The position to text.
+	 * @throws InvalidPositionException
+	 */
 	private void checkPositionForMarker (int position) {
 		if ( position > 0 ) {
 			switch ( text.charAt(position-1) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
-				throw new RuntimeException(
+				throw new InvalidPositionException (
 					String.format("Position %d is inside a marker.", position));
 			}
 		}
 	}
 	
+	/**
+	 * Creates a complete text representation of the code data including any text
+	 * coming from sub-flows.
+	 * @param code The code to process.
+	 * @return The data for the code, including any sub-flows data.
+	 */
 	private String expendSubflows (Code code) {
 		if ( !code.hasSubflow ) return code.data;
 		if ( parent == null ) {
@@ -497,15 +619,9 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 	
-	public void renumberCodes () {
-		lastCodeID = 0;
-		if ( codes == null ) return;
-		for ( Code code : codes ) {
-			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
-		}
-		isBalanced = false;
-	}
-	
+	/**
+	 * Balances the markers based on the tag type of the codes.
+	 */
 	private void balanceMarkers () {
 		if ( codes == null ) return;
 		for ( Code item : codes ) {
