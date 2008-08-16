@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
@@ -87,6 +89,13 @@ public class Parser implements IParser {
 		r.nameEnd = "\\t";
 		r.ruleType = Rule.RULETYPE_STRING;
 		r.preserveWS = true;
+		
+		r.useFinder = true;
+		List<String> list = r.finder.getRules();
+		list.add("#!\\[.*?\\]");
+		list.add("#!\\{.*?\\}");
+		r.finder.compile();
+		
 		resource.params.rules.add(r);
 	}
 	
@@ -323,7 +332,13 @@ public class Parser implements IParser {
 	{
 		TextUnit item = new TextUnit(String.valueOf(++itemID), data);
 		item.setPreserveWhitespaces(rule.preserveWS);
+
+		if ( rule.useFinder ) {
+			rule.finder.process(item.getSourceContent());
+		}
+
 		splitItem(item, rule.splitters);
+		
 		if ( name != null ) {
 			if ( rule.nameFormat.length() > 0 ) {
 				String tmp = rule.nameFormat.replace("<parentName>",
@@ -332,6 +347,7 @@ public class Parser implements IParser {
 			}
 			else item.setName(name);
 		}
+
 		resultQueue.add(item);
 	}
 	
@@ -492,7 +508,13 @@ public class Parser implements IParser {
 			TextUnit item = new TextUnit(String.valueOf(++itemID),
 				data.substring(start, end));
 			item.setPreserveWhitespaces(rule.preserveWS);
+			
+			if ( rule.useFinder ) {
+				rule.finder.process(item.getSourceContent());
+			}
+
 			//splitItem(item, rule.splitters);
+			
 			if ( name != null ) {
 				if ( rule.nameFormat.length() > 0 ) {
 					String tmp = rule.nameFormat.replace("<parentName>",

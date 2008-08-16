@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.regex;
 
 import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Rule {
 
@@ -40,6 +41,8 @@ public class Rule {
 	protected String              splitters;
 	protected int                 ruleType;
 	protected boolean             preserveWS;
+	protected boolean             useFinder;
+	protected InlineCodeFinder    finder;
 
 	public Rule () {
 		start = "";
@@ -47,6 +50,7 @@ public class Rule {
 		nameStart = "";
 		nameEnd = "";
 		nameFormat = "";
+		finder = new InlineCodeFinder();
 	}
 	
 	public Rule (Rule obj) {
@@ -59,6 +63,8 @@ public class Rule {
 		splitters = obj.splitters;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
+		useFinder = obj.useFinder;
+		finder = obj.finder.clone();
 	}
 	
 	public String getRuleName () {
@@ -139,8 +145,7 @@ public class Rule {
 	}
 
 	@Override
-	public String toString ()
-	{
+	public String toString () {
 		FieldsString tmp = new FieldsString();
 		tmp.add("ruleName", ruleName);
 		tmp.add("ruleType", ruleType);
@@ -150,6 +155,7 @@ public class Rule {
 		tmp.add("nameEnd", nameEnd);
 		tmp.add("nameFormat", nameFormat);
 		tmp.add("preserveWS", preserveWS);
+		tmp.add("useFinder", useFinder);
 		return tmp.toString();
 	}
 	
@@ -163,6 +169,7 @@ public class Rule {
 		nameEnd = tmp.get("nameEnd", nameEnd);
 		nameFormat = tmp.get("nameFormat", nameFormat);
 		preserveWS = tmp.get("preserveWS", preserveWS);
+		useFinder = tmp.get("useFinder", useFinder);
 	}
 	
 }

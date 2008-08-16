@@ -27,11 +27,10 @@ import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean        extractOuterStrings;
-	protected String         startString;
-	protected String         endString;
-	protected boolean        useBSlashEscape;
-	
+	protected boolean             extractOuterStrings;
+	protected String              startString;
+	protected String              endString;
+	protected boolean             useBSlashEscape;
 	protected ArrayList<Rule>     rules;
 	protected String              expression;
 	

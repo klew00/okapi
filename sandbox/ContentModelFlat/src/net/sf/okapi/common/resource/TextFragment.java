@@ -405,7 +405,7 @@ public class TextFragment implements Comparable<Object> {
 		ArrayList<Code> tmpCodes = null;
 	
 		// Get the codes and adjust indices if needed
-		if ( codes.size() > 0 ) {
+		if (( codes != null ) && ( codes.size() > 0 )) {
 			tmpCodes = new ArrayList<Code>(); 
 			for ( int i=0; i<tmpText.length(); i++ ) {
 				switch ( tmpText.charAt(i) ) {
@@ -471,9 +471,11 @@ public class TextFragment implements Comparable<Object> {
 				break;
 			}
 		}
-		if ( j < codes.size() ) {
-			throw new InvalidContentException(
-				String.format("Markers in coded text: %d. Listed codes: %d ", j, codes.size()));
+		if ( j > 0 ) {
+			if (( codes == null ) || ( j < codes.size() )) {
+				throw new InvalidContentException(
+					String.format("Markers in coded text: %d. Listed codes: %d ", j, codes.size()));
+			}
 		}
 	}
 	
@@ -487,18 +489,18 @@ public class TextFragment implements Comparable<Object> {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				//tmp.append(expendSubflows(code));
-				tmp.append(String.format("[%d:%s]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expendSubflows(code));
+				//tmp.append(String.format("[%d:%s]", code.id, expendSubflows(code))); // Debug
 				break;
 			case MARKER_CLOSING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				//tmp.append(expendSubflows(code));
-				tmp.append(String.format("[/%d:%s]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expendSubflows(code));
+				//tmp.append(String.format("[/%d:%s]", code.id, expendSubflows(code))); // Debug
 				break;
 			case MARKER_ISOLATED:
 				code = codes.get(toIndex(text.charAt(++i)));
-				//tmp.append(expendSubflows(code));
-				tmp.append(String.format("[%d:%s/]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expendSubflows(code));
+				//tmp.append(String.format("[%d:%s/]", code.id, expendSubflows(code))); // Debug
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -564,6 +566,7 @@ public class TextFragment implements Comparable<Object> {
 		int before = text.length();
 		// Create the new code, using the text of the subsequence as the data
 		Code code = new Code(tagType, type, sub.toString());
+		if ( codes == null ) codes = new ArrayList<Code>();
 		// Remove the section that will be code, this takes care of the codes too
 		remove(start, end);
 		// Create the new marker

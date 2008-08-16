@@ -21,14 +21,15 @@
 package net.sf.okapi.filters.regex;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.IContainable;
 
 public class Resource extends net.sf.okapi.common.resource.Document {
 
 	private static final long serialVersionUID = 1L;
 	
-	public IContainable      currentRes;
-	protected Parameters     params;
+	protected IContainable        currentRes;
+	protected Parameters          params;
 	
 
 	public Resource () {

@@ -17,7 +17,15 @@ public class InlineCodeFinder {
 	public InlineCodeFinder () {
 		rules = new ArrayList<String>();
 	}
-	
+
+	@Override
+	public InlineCodeFinder clone () {
+		InlineCodeFinder tmp = new InlineCodeFinder();
+		tmp.setSample(sample);
+		tmp.getRules().addAll(getRules());
+		return tmp;
+	}
+
 	public ArrayList<String> getRules () {
 		return rules;
 	}
@@ -39,12 +47,13 @@ public class InlineCodeFinder {
 		pattern = Pattern.compile(tmp.toString(), Pattern.MULTILINE);
 	}
 
-	public void process (TextContainer segment) {
-		String tmp = segment.getCodedText();
+	public void process (TextContainer fragment) {
+		String tmp = fragment.getCodedText();
 		Matcher m = pattern.matcher(tmp);
 		int start = 0;
+		int diff = 0;
 		while ( m.find(start) ) {
-			segment.changeToCode(m.start(), m.end(), TagType.PLACEHOLDER, null);
+			diff += fragment.changeToCode(m.start()+diff, m.end()+diff, TagType.PLACEHOLDER, null);
 			start = m.end();
 			if ( start >= tmp.length() ) break;
 		}

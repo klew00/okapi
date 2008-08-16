@@ -27,16 +27,25 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
 
 /**
  * Collection of various all-purpose helper functions.
  */
 public class Util {
 	
-	static public final String    LINEBREAK_DOS  = "\r\n";
-	static public final String    LINEBREAK_UNIX = "\n";
-	static public final String    LINEBREAK_MAC  = "\r";
+	public static final String   LINEBREAK_DOS   = "\r\n";
+	public static final String   LINEBREAK_UNIX  = "\n";
+	public static final String   LINEBREAK_MAC   = "\r";
+
+	public static final String   RTF_STARTCODE   = "{\\cs5\\f1\\cf15\\lang1024 ";
+	public static final String   RTF_ENDCODE     = "}";
+	public static final String   RTF_STARTINLINE = "{\\cs6\\f1\\cf6\\lang1024 ";
+	public static final String   RTF_ENDINLINE   = "}";
 
 	/**
 	 * Removes from the from of a string any of the specified characters. 
@@ -153,6 +162,130 @@ public class Util {
 		return sbTmp.toString();
 	}
 
+	/**
+	 * Escapes a given string into RTF format.
+	 * @param text the string to convert.
+	 * @param convertLineBreaks Indicates if the line-breaks should be converted.
+	 * @param lineBreakStyle Type of line-break conversion. 0=do nothing special,
+	 * 1=close then re-open as external, 2=close then re-open as internal.
+	 * @param encoder Encoder to use for the extended characters.
+	 * @return The input string escaped to RTF.
+	 */
+	static public String escapeToRTF (String text,
+		boolean convertLineBreaks,
+		int lineBreakStyle,
+		CharsetEncoder encoder)
+	{
+		try {
+			if ( text == null ) return "";
+			StringBuffer tmp = new StringBuffer(text.length());
+			CharBuffer tmpBuf = CharBuffer.allocate(1);
+			ByteBuffer encBuf;
+			
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.charAt(i) ) {
+				case '{':
+				case '}':
+				case '\\':
+					tmp.append("\\"+text.charAt(i));
+					break;
+				case '\r': // to skip
+					break;
+				case '\n':
+					if ( convertLineBreaks ) {
+						switch ( lineBreakStyle ) {
+						case 1: // Outside external
+							tmp.append(RTF_ENDCODE);
+							tmp.append("\r\n\\par ");
+							tmp.append(RTF_STARTCODE);
+							continue;
+						case 2:
+							tmp.append(RTF_ENDINLINE);
+							tmp.append("\r\n\\par ");
+							tmp.append(RTF_STARTINLINE);
+							continue;
+						case 0: // Just convert
+						default:
+							tmp.append("\r\n\\par ");
+							continue;
+						}
+					}
+					else tmp.append("\n");
+					break;
+				case '\u00a0': // Non-breaking space
+					tmp.append("\\~"); // No extra space (it's a control word)
+					break;
+				case '\t':
+					tmp.append("\\tab ");
+					break;
+				case '\u2022':
+					tmp.append("\\bullet ");
+					break;
+				case '\u2018':
+					tmp.append("\\lquote ");
+					break;
+				case '\u2019':
+					tmp.append("\\rquote ");
+					break;
+				case '\u201c':
+					tmp.append("\\ldblquote ");
+					break;
+				case '\u201d':
+					tmp.append("\\rdblquote ");
+					break;
+				case '\u2013':
+					tmp.append("\\endash ");
+					break;
+				case '\u2014':
+					tmp.append("\\emdash ");
+					break;
+				case '\u200d':
+					tmp.append("\\zwj ");
+					break;
+				case '\u200c':
+					tmp.append("\\zwnj ");
+					break;
+				case '\u200e':
+					tmp.append("\\ltrmark ");
+					break;
+				case '\u200f':
+					tmp.append("\\rtlmark ");
+					break;
+					
+				default:
+					if ( text.charAt(i) > 127 ) {
+						tmpBuf.put(0, text.charAt(i));
+						tmpBuf.position(0);
+						encBuf = encoder.encode(tmpBuf);
+						if ( encBuf.limit() > 1 ) {
+							tmp.append(String.format("{{\\uc{0:d}",
+								encBuf.limit()));
+							tmp.append(String.format("\\u{0:d}",
+								text.charAt(i)));
+							for ( int j=0; j<encBuf.limit(); j++ ) {
+								tmp.append(String.format("\\'{0:x}",
+									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+							}
+							tmp.append("}");
+						}
+						else {
+							tmp.append(String.format("\\u{0:d}",
+								text.charAt(i)));
+							tmp.append(String.format("\\'{0:x}",
+								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
+						}
+					}
+					else tmp.append(text.charAt(i));
+					break;
+				}
+			}
+			return tmp.toString();
+		}
+		catch (  CharacterCodingException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public static void copyFile (String fromPath,
 		String toPath,
 		boolean move)
