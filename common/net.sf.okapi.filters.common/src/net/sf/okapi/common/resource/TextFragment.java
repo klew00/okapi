@@ -25,6 +25,35 @@ import java.util.Collections;
 import java.util.List;
 
 
+/**
+ * This class implements the methods for creating and manipulating a pre-parsed
+ * flat representation of a content with in-line codes.
+ * 
+ * <p>The model uses two objects to store the data:
+ * <ul><li>a coded text string
+ * <li>a list of {@link Code} object.</ul>
+ * 
+ * <p>The coded text string is composed of normal characters and <b>markers</b>.
+ * 
+ * <p>A marker is a sequence of two special characters (in the Unicode PUA)
+ * that indicate the type of underlying code (opening, closing, isolated), and an index
+ * pointing to its corresponding Code object where more information can be found.
+ * The value of the index is encoded as a Unicode PUA character. You can use the
+ * {@link #toChar(int)} and {@link #toIndex(char)} methods to encoded and decode
+ * the index value.
+ * 
+ * <p>To get the coded text of a TextFragment object use {@link #getCodedText()}, and
+ * to get its list of codes use {@link #getCodes()}.
+ * 
+ * <p>You can modify directly the coded text or the codes and re-apply them to the
+ * TextFragment object using {@link #setCodedText(String)} and
+ * {@link #setCodedText(String, List)}.
+ *
+ * <p>Adding a code to the coded text can be done by:
+ * <ul><li>appending the code with {@link #append(TagType, String, String)}
+ * <li>changing a section of existing text to code with
+ * {@link #changeToCode(int, int, TagType, String)}<ul>
+ */
 public class TextFragment implements Comparable<Object> {
 	
 	public static final int MARKER_OPENING  = 0xE101;
@@ -36,7 +65,7 @@ public class TextFragment implements Comparable<Object> {
 	public static final String SFMARKER_END      = "}";
 
 	/**
-	 * List of the types of tag useable for in-line codes.
+	 * List of the types of tag usable for in-line codes.
 	 */
 	public static enum TagType {
 		OPENING,
@@ -147,7 +176,7 @@ public class TextFragment implements Comparable<Object> {
 	 * Appends a new code to the text.
 	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
 	 * @param type The type of the code (e.g. "bold").
-	 * @param data The raw code itself. (e.g. "<b>").
+	 * @param data The raw code itself. (e.g. "&lt;b>").
 	 * @return The new code that was added to the text.
 	 */
 	public Code append (TagType tagType,
@@ -203,7 +232,7 @@ public class TextFragment implements Comparable<Object> {
 	 * You can use -1 for ending the section at the end of the fragment.
 	 * @return The portion of coded text for the given range. It can be 
 	 * empty but never null.
-	 * @throws InvalidPositionException
+	 * @throws InvalidPositionException When start or end points inside a marker.
 	 */
 	public String getCodedText (int start,
 		int end)
@@ -229,7 +258,6 @@ public class TextFragment implements Comparable<Object> {
 	 * Gets the code for a given index.
 	 * @param index the index of the code.
 	 * @return The code for the given index.
-	 * @throws IndexOutOfBoundsException
 	 */
 	public Code getCode (int index) {
 		return codes.get(index);
@@ -254,7 +282,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param end The position just after the last character or marker of the section
 	 * (in the coded text representation).
 	 * @return A new list of all codes within the given range.
-	 * @throws InvalidPositionException
+	 * @throws InvalidPositionException When start or end points inside a marker.
 	 */
 	public List<Code> getCodes (int start,
 		int end)
@@ -327,7 +355,7 @@ public class TextFragment implements Comparable<Object> {
 	 * (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section
 	 * (in the coded text representation).
-	 * @throws InvalidPositionException
+	 * @throws InvalidPositionException When start or end points inside a marker.
 	 */
 	public void remove (int start,
 		int end)
@@ -399,7 +427,8 @@ public class TextFragment implements Comparable<Object> {
 	 * Sets the coded text of the fragment, using its the existing codes. The coded
 	 * text must be valid for the existing codes.
 	 * @param newCodedText The coded text to apply.
-	 * @throws InvalidContentException
+	 * @throws InvalidContentException When the coded text is not valid, or does
+	 * not correspond to the existing codes.
 	 */
 	public void setCodedText (String newCodedText) {
 		setCodedText(newCodedText, codes);
@@ -409,7 +438,8 @@ public class TextFragment implements Comparable<Object> {
 	 * Sets the coded text of the fragment and its corresponding codes.
 	 * @param newCodedText The coded text to apply.
 	 * @param newCodes the list of the corresponding codes.
-	 * @throws InvalidContentException
+	 * @throws InvalidContentException When the coded text is not valid or does 
+	 * not correspond to the new codes.
 	 */
 	public void setCodedText (String newCodedText,
 		List<Code> newCodes)
@@ -510,14 +540,18 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Changes a portion of the coded text into a single code. Any code already
+	 * Changes a section of the coded text into a single code. Any code already
 	 * existing that is within the range will be included in the new code.
-	 * @param start Position where to start the code.
-	 * @param end Position after the last part of the code.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
 	 * @param tagType Tag type of the new code.
 	 * @param type Type of the new code.
 	 * @return The different between the coded text length before and after 
-	 * the operation.
+	 * the operation. This value can be used to adjust further start and end positions
+	 * that have been calculated on the coded text before the changes are applied.
+	 * @throws InvalidPositionException When start or end points inside a marker.
 	 */
 	public int changeToCode (int start,
 		int end,
@@ -573,7 +607,7 @@ public class TextFragment implements Comparable<Object> {
 	 * Verifies if a given position in the coded text is on the second special
 	 * character of a marker sequence.
 	 * @param position The position to text.
-	 * @throws InvalidPositionException
+	 * @throws InvalidPositionException When position points inside a marker.
 	 */
 	private void checkPositionForMarker (int position) {
 		if ( position > 0 ) {
