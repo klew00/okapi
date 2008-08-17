@@ -3,21 +3,26 @@ package net.sf.okapi.applications.rainbow.packages.rtf;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends BaseWriter {
 	
 	private static final String   EXTENSION = ".rtf";
 
-	private StringBuilder    buffer;
 	private PrintWriter      writer;     
 	private CharsetEncoder   outputEncoder;
 
@@ -61,7 +66,6 @@ public class Writer extends BaseWriter {
 			if ( writer != null ) {
 				writer.close();
 			}
-			buffer = new StringBuilder();
 			String path = manifest.getRoot() + File.separator
 				+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
 				+ relativeWorkPath;
@@ -95,7 +99,119 @@ public class Writer extends BaseWriter {
 			}
 		}
 
-		buffer.append(item.toString());
+		// Output the text unit
+		StringBuilder tmp = new StringBuilder();
+		tmp.append(Util.RTF_ENDCODE);
+		if ( item.hasTarget() ) {
+			//TODO
+		}
+		else {
+			processContent(item.getSourceContent(), tmp);
+		}
+		tmp.append(Util.RTF_STARTCODE);
+		writer.write(tmp.toString());
+	}
+
+	private String processContent (TextContainer content,
+		StringBuilder buffer)
+	{
+		try {
+			String text = content.getCodedText();
+			CharBuffer tmpBuf = CharBuffer.allocate(1);
+			ByteBuffer encBuf;
+			Code code;
+			
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.charAt(i) ) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+					buffer.append(Util.RTF_STARTINLINE);
+					code = content.getCode(text.charAt(++i));
+					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
+					buffer.append(Util.RTF_ENDINLINE);
+					break;
+				case '{':
+				case '}':
+				case '\\':
+					buffer.append("\\"+text.charAt(i));
+					break;
+				case '\r': // to skip
+					break;
+				case '\n':
+					buffer.append("\r\n\\par ");
+					break;
+				case '\u00a0': // Non-breaking space
+					buffer.append("\\~"); // No extra space (it's a control word)
+					break;
+				case '\t':
+					buffer.append("\\tab ");
+					break;
+				case '\u2022':
+					buffer.append("\\bullet ");
+					break;
+				case '\u2018':
+					buffer.append("\\lquote ");
+					break;
+				case '\u2019':
+					buffer.append("\\rquote ");
+					break;
+				case '\u201c':
+					buffer.append("\\ldblquote ");
+					break;
+				case '\u201d':
+					buffer.append("\\rdblquote ");
+					break;
+				case '\u2013':
+					buffer.append("\\endash ");
+					break;
+				case '\u2014':
+					buffer.append("\\emdash ");
+					break;
+				case '\u200d':
+					buffer.append("\\zwj ");
+					break;
+				case '\u200c':
+					buffer.append("\\zwnj ");
+					break;
+				case '\u200e':
+					buffer.append("\\ltrmark ");
+					break;
+				case '\u200f':
+					buffer.append("\\rtlmark ");
+					break;
+				default:
+					if ( text.charAt(i) > 127 ) {
+						tmpBuf.put(0, text.charAt(i));
+						tmpBuf.position(0);
+						encBuf = outputEncoder.encode(tmpBuf);
+						if ( encBuf.limit() > 1 ) {
+							buffer.append(String.format("{{\\uc{0:d}",
+								encBuf.limit()));
+							buffer.append(String.format("\\u{0:d}",
+								text.charAt(i)));
+							for ( int j=0; j<encBuf.limit(); j++ ) {
+								buffer.append(String.format("\\'{0:x}",
+									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+							}
+							buffer.append("}");
+						}
+						else {
+							buffer.append(String.format("\\u{0:d}",
+								text.charAt(i)));
+							buffer.append(String.format("\\'{0:x}",
+								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
+						}
+					}
+					else buffer.append(text.charAt(i));
+					break;
+				}
+			}
+			return buffer.toString();
+		}
+		catch ( CharacterCodingException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public void writeSkeletonPart (SkeletonUnit resource) {
@@ -130,6 +246,5 @@ public class Writer extends BaseWriter {
 			"}\n"+
 			"\\paperw11907\\paperh16840\\viewkind4\\viewscale100\\pard\\plain\\s0\\sb80\\slmult1\\widctlpar\\fs20\\f1 \n"+
 			Util.RTF_STARTCODE);
-		
 	}
 }

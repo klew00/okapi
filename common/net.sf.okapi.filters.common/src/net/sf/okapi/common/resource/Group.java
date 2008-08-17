@@ -28,6 +28,10 @@ public class Group extends ResourceContainer implements ITranslatable {
 	private ITranslatable    parent;
 	private boolean          isTranslatable;
 
+
+	public Group () {
+		isTranslatable = true;
+	}
 	
 	public String getID () {
 		return id;
