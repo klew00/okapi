@@ -1,0 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<script language="javascript" type="text/javascript">
+ //<![CDATA[
+  document.writeln("<p>This P element is ignored by the parser in parse-on-demand mode because of the enclosing CDATA section.</p>");
+  document.writeln("<p>Both the P element and the CDATA section are ignored by the parser during a full sequental parse, which automatically treats script element content as CDATA.</p>");
+ //]]>
+</script>
+<p> This is a  test of the <i><a>Link</a>Jericho HTML</i> parser.
+</html>
