@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -77,6 +78,7 @@ public class SRXEditor {
 	private Button           rdApplySampleForMappedRules;
 	private Button           rdApplySampleForCurrentSet;
 	private Text             edSampleLanguage;
+	private GenericContent   sampleOutput;
 	
 
 	public SRXEditor (Shell parent) {
@@ -84,6 +86,7 @@ public class SRXEditor {
 		segmenter = new Segmenter();
 		srxPath = null;
 		sampleText = new TextContainer(null);
+		sampleOutput = new GenericContent();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Segmentation Rules Editor");
@@ -386,92 +389,70 @@ public class SRXEditor {
 		}
 	}
 	
-/*	private void processInlineCodes () {
-		try {
-			String text = edSampleText.getText().replaceAll("<x>", String.valueOf((char)IContainer.CODE_OPENING));
-			text = text.replaceAll("</x>", String.valueOf((char)IContainer.CODE_CLOSING));
-			text = text.replaceAll("<x/>", String.valueOf((char)IContainer.CODE_ISOLATED));
-	
-			sampleText.reset();
-			Stack<Integer> stackID = new Stack<Integer>();
-			int id = 0;
-			for ( int i=0; i<text.length(); i++ ) {
-				switch ( text.codePointAt(i) ) {
-				case IContainer.CODE_OPENING:
-					sampleText.append(new CodeFragment(IContainer.CODE_OPENING,
-						stackID.push(++id), "<x>"));
-					break;
-				case IContainer.CODE_CLOSING:
-					sampleText.append(new CodeFragment(IContainer.CODE_CLOSING,
-						stackID.pop(), "</x>"));
-					break;
-				case IContainer.CODE_ISOLATED:
-					sampleText.append(new CodeFragment(IContainer.CODE_OPENING,
-						++id, "<x/>"));
-					break;
-				default:
-					sampleText.append(text.charAt(i));
-				}
-			}
-		}
-		catch ( Exception e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
-		}
-	}*/
-	
 	private void updateResults (boolean forceReset) {
-		// Check if we need to re-build the list of applicable rules
-		if ( cbGroup.getSelectionIndex() != -1 ) {
-			// Both methods applies new rules only if the 
-			// parameter passed is different from the current identifier
-			// or if forceReset is true.
-			if ( rdApplySampleForCurrentSet.getSelection() ) {
-				segmenter = srxDoc.applySingleLanguageRule(cbGroup.getText(),
-					(forceReset ? null : segmenter));
-			}
-			else { // Applies all the matching rules
-				// Make sure we have a language code
-				if ( edSampleLanguage.getText().length() == 0 ) {
-					edSampleLanguage.setText("en");
+		try {
+			// Check if we need to re-build the list of applicable rules
+			if ( cbGroup.getSelectionIndex() != -1 ) {
+				// Both methods applies new rules only if the 
+				// parameter passed is different from the current identifier
+				// or if forceReset is true.
+				if ( rdApplySampleForCurrentSet.getSelection() ) {
+					segmenter = srxDoc.applySingleLanguageRule(cbGroup.getText(),
+						(forceReset ? null : segmenter));
 				}
-				segmenter = srxDoc.applyLanguageRules(edSampleLanguage.getText(),
-					(forceReset ? null : segmenter));
+				else { // Applies all the matching rules
+					// Make sure we have a language code
+					if ( edSampleLanguage.getText().length() == 0 ) {
+						edSampleLanguage.setText("en");
+					}
+					segmenter = srxDoc.applyLanguageRules(edSampleLanguage.getText(),
+						(forceReset ? null : segmenter));
+				}
+			}
+			
+			if ( segmenter.getLanguage() != null ) {
+				// Converts the <x>/</x>/etc. into real inline codes
+				processInlineCodes();
+				// Segment
+				segmenter.segment(sampleText);
+				// Create the output in generic format
+				edResults.setText(sampleOutput.setContent(sampleText).toString());
+			}
+			else {
+				edResults.setText("");
 			}
 		}
-		
-		// Convert the sample field content into an parsed item
-		//processInlineCodes();
-		
-		String oriText = edSampleText.getText();
-		sampleText.setCodedText(oriText);
-		if ( segmenter.getLanguage() != null ) {
-			segmenter.segment(sampleText);
-			StringBuilder tmp = new StringBuilder();
-			/*TODO: List<IPart> segList = sampleText.getSegments();
-			tmp.append(String.format("%d: ", segList.size()));
-			for ( IPart seg : segList ) {
-				tmp.append("["+seg.toString()+"] ");
-			}*/
-			tmp.append("TODO: getSegments from container");
-			edResults.setText(tmp.toString());
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
-		else {
-			edResults.setText("");
-		}
-			
-		/*
-		StringBuilder tmp = new StringBuilder();
-		ArrayList<Integer> list = segmenter.getSplitPositions();
-		tmp.append(String.format("%d: ", list.size()+1));
+	}
+	
+	/**
+	 * Converts the sample edit field content to sampleText.
+	 */
+	private void processInlineCodes () {
+		sampleText.clear();
+		String text = edSampleText.getText().replace("\r", "");
+		sampleText.setCodedText(text);
+		int n;
 		int start = 0;
-		for ( int pos : list ) {
-			tmp.append("["+oriText.substring(start, pos)+"] ");
-				start = pos;
+		int diff = 0;
+		while ( (n = text.indexOf("<x>", start)) != -1 ) {
+			diff += sampleText.changeToCode(n+diff, (n+diff)+3, TagType.OPENING, "x");
+			start = (n+3);
 		}
-		// Last one
-		tmp.append("["+oriText.substring(start)+"]");
-		edResults.setText(tmp.toString());*/
-		
+		text = sampleText.getCodedText();
+		start = diff = 0;
+		while ( (n = text.indexOf("</x>", start)) != -1 ) {
+			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.CLOSING, "x");
+			start = (n+4);
+		}
+		text = sampleText.getCodedText();
+		start = diff = 0;
+		while ( (n = text.indexOf("<x/>", start)) != -1 ) {
+			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.PLACEHOLDER, null);
+			start = (n+4);
+		}
 	}
 	
 	private void updateLanguageRuleList () {

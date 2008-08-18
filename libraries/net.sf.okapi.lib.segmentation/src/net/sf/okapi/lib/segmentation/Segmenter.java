@@ -148,7 +148,8 @@ public class Segmenter {
 		}
 
 		// Now build the lists of start and end of each segment
-		// but trim them of any white-spaces
+		// but trim them of any white-spaces.
+		// Deal also with including or not the in-line codes.
 		starts = new ArrayList<Integer>();
 		ends = new ArrayList<Integer>();
 		int textEnd;
@@ -165,10 +166,45 @@ public class Segmenter {
 					continue;
 				}
 				textEnd = pos;
-				// There is at least one non-space char before pos: find it
-				// and store the range.
-				while ( Character.isSpaceChar(codedText.charAt(textEnd)) ) {
-					textEnd--;
+				boolean done = false;
+				while ( !done ) {
+					switch ( codedText.charAt(textEnd) ) {
+					case TextFragment.MARKER_OPENING:
+						if ( includeStartCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					case TextFragment.MARKER_CLOSING:
+						if ( includeEndCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					case TextFragment.MARKER_ISOLATED:
+						if ( includeIsolatedCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					default:
+						if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
+						done = true; // Probably done
+						// Else: Check if it's the index of a marker
+						if ( textEnd > 1 ) {
+							switch ( codedText.charAt(textEnd-1) ) {
+							case TextFragment.MARKER_OPENING:
+							case TextFragment.MARKER_CLOSING:
+							case TextFragment.MARKER_ISOLATED:
+								done = false;
+								break;
+							}
+						}
+						break;
+					}
+					if ( !done ) {
+						if ( --textEnd < 0 ) break;
+					}
 				}
 				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
@@ -186,8 +222,45 @@ public class Segmenter {
 			}
 			if ( textStart < lastPos ) {
 				textEnd = lastPos-1;
-				while ( Character.isSpaceChar(codedText.charAt(textEnd)) ) {
-					textEnd--;
+				boolean done = false;
+				while ( !done ) {
+					switch ( codedText.charAt(textEnd) ) {
+					case TextFragment.MARKER_OPENING:
+						if ( includeStartCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					case TextFragment.MARKER_CLOSING:
+						if ( includeEndCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					case TextFragment.MARKER_ISOLATED:
+						if ( includeIsolatedCodes ) {
+							textEnd += 2; // Includes the marker index too
+							done = true;
+						}
+						break;
+					default:
+						if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
+						done = true; // Probably done
+						// Else: Check if it's the index of a marker
+						if ( textEnd > 1 ) {
+							switch ( codedText.charAt(textEnd-1) ) {
+							case TextFragment.MARKER_OPENING:
+							case TextFragment.MARKER_CLOSING:
+							case TextFragment.MARKER_ISOLATED:
+								done = false;
+								break;
+							}
+						}
+						break;
+					}
+					if ( !done ) {
+						if ( --textEnd < 0 ) break;
+					}
 				}
 				if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
@@ -219,6 +292,7 @@ public class Segmenter {
 		ArrayList<TextFragment> newParts = new ArrayList<TextFragment>();
 		int start = 0;
 		int textStart;
+		TextFragment tc;
 		// Note: Always drive with starts (as ends has one extra value)
 		int i;
 		for ( i=0; i<starts.size(); i++ ) {
@@ -227,13 +301,15 @@ public class Segmenter {
 				newParts.add(original.subSequence(start, textStart));
 				//newParts.get(newParts.size()-1).setIsSegment(false);
 			}
-			newParts.add(original.subSequence(textStart, ends.get(i)));
+			tc = original.subSequence(textStart, ends.get(i));
+			//TODO: Change for real markup, this is for test 
+			tc.setCodedText("["+tc.getCodedText()+"]");
+			newParts.add(tc);
 			start = ends.get(i);
 		}
 		// The last extra value in ends contains the coded text length
 		// We use it here to add the possible last non-segment part.
 		if ( start < ends.get(i) ) {
-			// Avoid copy(start) to avoid extra cost of copy(start, -1)
 			newParts.add(original.subSequence(start, ends.get(i)));
 			//newParts.get(newParts.size()-1).setIsSegment(false);
 		}

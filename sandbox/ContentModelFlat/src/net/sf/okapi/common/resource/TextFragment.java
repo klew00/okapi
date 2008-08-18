@@ -156,6 +156,7 @@ public class TextFragment implements Comparable<Object> {
 		// be to do an insert() and treat this as insert(afterlast);
 		String tmp = container.getCodedText();
 		List<Code> newCodes = container.getCodes();
+		if ( codes == null ) codes = new ArrayList<Code>();
 		for ( int i=0; i<tmp.length(); i++ ) {
 			switch ( tmp.charAt(i) ) {
 			case MARKER_OPENING:

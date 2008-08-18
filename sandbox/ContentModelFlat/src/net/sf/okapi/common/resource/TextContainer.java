@@ -20,10 +20,13 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TextContainer extends TextFragment {
 
+	ArrayList<TextFragment>  segments;
+	
 	/**
 	 * Creates an empty TextContainer object.
 	 */
@@ -38,10 +41,12 @@ public class TextContainer extends TextFragment {
 		setParent(parent);
 	}
 	
-	public List<TextFragment> getSegments () {
-		//TODO: getSegments
-		return null;
+	public boolean isSegmented () {
+		return (segments != null);
 	}
 	
-	
+	public List<TextFragment> getSegments () {
+		return segments;
+	}
+
 }

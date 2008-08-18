@@ -40,13 +40,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.resource.TextFragment;
 
 public class SRXDocument {
 	
-//	private final String     NSURI_SRX10 = "http://www.lisa.org/srx10";
 	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
 	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	
+	static String INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*?)",
+		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
+			
 	private boolean     cascade;
 	private boolean     segmentSubFlows;
 	private boolean     includeStartCodes;
@@ -371,8 +374,9 @@ public class SRXDocument {
 		ArrayList<Rule> langRule = langRules.get(ruleName);
 		for ( Rule rule : langRule ) {
 			segmenter.addRule(
-				//TODO: new CompiledRule("("+rule.before+")("+inlineCodes+rule.after+")", rule.isBreak));
-				new CompiledRule("("+rule.before+")("+rule.after+")", rule.isBreak));
+				// The compiled rule is made of two groups: the pattern before and the pattern after
+				// the break. A special pattern for in-line codes is also added transparently.
+				new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
 		}
 	}
 	

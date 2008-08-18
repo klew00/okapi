@@ -56,7 +56,7 @@ public class Main {
 		grp.add(new TextUnit("SF2", "Text of SF2 in image1"));
 		tu2.addChild(grp);
 		doc.add(tu2);
-		
+		 
 		tu = new TextUnit("t3", "Image2: ");
 		tu.setSkeletonBefore(new SkeletonUnit("s8", "<p>"));
 		tu.setSkeletonAfter(new SkeletonUnit("s9", "</p>"));
