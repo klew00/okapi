@@ -148,6 +148,7 @@ public class Writer extends BaseWriter {
 				case TextFragment.MARKER_ISOLATED:
 					buffer.append(Util.RTF_STARTINLINE);
 					code = content.getCode(text.charAt(++i));
+					//TODO: handle sub-flows!!!
 					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
 					buffer.append(Util.RTF_ENDINLINE);
 					break;

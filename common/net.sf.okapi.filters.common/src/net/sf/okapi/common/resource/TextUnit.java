@@ -26,6 +26,18 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+/**
+ * This class implements the methods to manipulate a unit of extracted text.
+ * 
+ * <p>The TextUnit object includes a source content ({@link #getSourceContent()})
+ * and one or more target content ({@link #getTargets()}). You can access
+ * the first target with {@link #getTarget()}.
+ * 
+ * <p>A TextUnit may have children TextUnit objects. You can add child TextUnit
+ * child (or {@link Group}) with the {@link #addChild(ITranslatable)} method.
+ * You can retrieve these children with the {@link #getChild(String)} method or the 
+ * iteratable returned by {@link #childTextUnitIterator()}.
+ */
 public class TextUnit implements ITranslatable, IAnnotatable {
 
 	protected String                        id;
@@ -78,11 +90,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 */
 	@Override
 	public String toString () {
-		//TODO: Modify for real output, this is test only
-		//TODO: support for children
-		return (sklBefore==null ? "" : sklBefore.toString())
-			+ source.container.toString() +
-			(sklAfter==null ? "" : sklAfter.toString());
+		return source.container.toString();
 	}
 	
 	public String getID () {
@@ -94,6 +102,10 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		id = value;
 	}
 
+	/**
+	 * Indicates if the source content of this resource is empty.
+	 * @return True if the source content is empty, false otherwise.
+	 */
 	public boolean isEmpty () {
 		return source.container.isEmpty();
 	}

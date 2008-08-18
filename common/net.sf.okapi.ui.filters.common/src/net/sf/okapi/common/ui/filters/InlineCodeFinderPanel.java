@@ -48,7 +48,7 @@ public class InlineCodeFinderPanel extends Composite {
 	private Button           btDiscard;
 	private Button           btInsertPattern;
 	private Button           btTest;
-	private Button           btDelete;
+	private Button           btRemove;
 	private Button           btMoveDown;
 	
 
@@ -68,12 +68,13 @@ public class InlineCodeFinderPanel extends Composite {
 		lbRules = new List(this, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
-		gdTmp.verticalSpan = 3;
+		gdTmp.verticalSpan = 4;
 		lbRules.setLayoutData(gdTmp);
 		
 		edExpression = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
+		gdTmp.heightHint = 40;
 		edExpression.setLayoutData(gdTmp);
 
 		int normalButtonWidth = 80;
@@ -126,8 +127,16 @@ public class InlineCodeFinderPanel extends Composite {
 		edSample = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
+		gdTmp.heightHint = 40;
 		edSample.setLayoutData(gdTmp);
 
+		edResults = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 4;
+		gdTmp.heightHint = 40;
+		edResults.setLayoutData(gdTmp);
+		edResults.setEditable(false);
+		
 		Button btAdd = new Button(this, SWT.PUSH);
 		btAdd.setText("Add");
 		gdTmp = new GridData();
@@ -150,13 +159,7 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
-		edResults = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
-		edResults.setLayoutData(gdTmp);
-		edResults.setEditable(false);
-		
-		Button btRemove = new Button(this, SWT.PUSH);
+		btRemove = new Button(this, SWT.PUSH);
 		btRemove.setText("Remove");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
