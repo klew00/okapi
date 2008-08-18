@@ -1,12 +1,9 @@
 package net.sf.okapi.applications.test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -21,13 +18,8 @@ import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xml.XMLReader;
-import net.sf.okapi.lib.segmentation.LanguageMap;
-import net.sf.okapi.lib.segmentation.Rule;
-import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Main {
 

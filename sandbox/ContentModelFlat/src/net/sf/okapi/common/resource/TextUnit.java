@@ -48,6 +48,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Creates a TextUnit object with an empty source content and no target content.
 	 */
 	public TextUnit () {
+		isTranslatable = true;
 		source = new LocaleData(this);
 		targets = new ArrayList<LocaleData>();
 		targets.add(null);
@@ -61,6 +62,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	public TextUnit (String id,
 		String sourceText)
 	{
+		isTranslatable = true;
 		this.id = id;
 		source = new LocaleData(this);
 		source.container = new TextContainer(this);

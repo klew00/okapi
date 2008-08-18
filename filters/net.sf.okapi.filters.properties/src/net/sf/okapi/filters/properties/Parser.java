@@ -172,10 +172,10 @@ public class Parser implements IParser {
 			
 			StringBuilder keyBuffer = new StringBuilder();
 			StringBuilder textBuffer = new StringBuilder();
-			String sValue = "";
-			String sKey = "";
+			String value = "";
+			String key = "";
 			boolean isMultiline = false;
-			int nStartText = 0;
+			int startText = 0;
 			long lS = -1;
 
 			while ( true ) {
@@ -189,28 +189,28 @@ public class Parser implements IParser {
 				// Else: process the line
 
 				// Remove any leading white-spaces
-				String sTmp = Util.trimStart(textLine, "\t\r\n \f");
+				String tmp = Util.trimStart(textLine, "\t\r\n \f");
 
 				if ( isMultiline ) {
-					sValue += sTmp;
+					value += tmp;
 				}
 				else {
 					// Empty lines
-					if ( sTmp.length() == 0 ) {
+					if ( tmp.length() == 0 ) {
 						resource.sklRes.appendData(textLine);
 						resource.sklRes.appendData(resource.lineBreak);
 						continue;
 					}
 
 					// Comments
-					boolean isComment = (( sTmp.charAt(0) == '#' ) || ( sTmp.charAt(0) == '!' ));
+					boolean isComment = (( tmp.charAt(0) == '#' ) || ( tmp.charAt(0) == '!' ));
 					if ( !isComment &&  resource.params.extraComments ) {
-						isComment = (sTmp.charAt(0) == ';'); // .NET style
-						if ( sTmp.startsWith("//") ) isComment = true; // C++/Java-style
+						isComment = (tmp.charAt(0) == ';'); // .NET style
+						if ( tmp.startsWith("//") ) isComment = true; // C++/Java-style
 					}
 
 					if ( isComment ) {
-						resource.params.locDir.process(sTmp);
+						resource.params.locDir.process(tmp);
 						resource.sklRes.appendData(textLine);
 						resource.sklRes.appendData(resource.lineBreak);
 						continue;
@@ -219,15 +219,15 @@ public class Parser implements IParser {
 					// Get the key
 					boolean bEscape = false;
 					int n = 0;
-					for ( int i=0; i<sTmp.length(); i++ ) {
+					for ( int i=0; i<tmp.length(); i++ ) {
 						if ( bEscape ) bEscape = false;
 						else {
-							if ( sTmp.charAt(i) == '\\' ) {
+							if ( tmp.charAt(i) == '\\' ) {
 								bEscape = true;
 								continue;
 							}
-							if (( sTmp.charAt(i) == ':' ) || ( sTmp.charAt(i) == '=' )
-								|| ( Character.isWhitespace(sTmp.charAt(i)) )) {
+							if (( tmp.charAt(i) == ':' ) || ( tmp.charAt(i) == '=' )
+								|| ( Character.isWhitespace(tmp.charAt(i)) )) {
 								// That the first white-space after the key
 								n = i;
 								break;
@@ -238,20 +238,20 @@ public class Parser implements IParser {
 					// Get the key
 					if ( n == 0 ) {
 						// Line empty after the key
-						n = sTmp.length();
+						n = tmp.length();
 					}
-					sKey = sTmp.substring(0, n);
+					key = tmp.substring(0, n);
 
 					// Gets the value
 					boolean bEmpty = true;
 					boolean bCheckEqual = true;
-					for ( int i=n; i<sTmp.length(); i++ ) {
-						if ( bCheckEqual && (( sTmp.charAt(i) == ':' )
-							|| ( sTmp.charAt(i) == '=' ))) {
+					for ( int i=n; i<tmp.length(); i++ ) {
+						if ( bCheckEqual && (( tmp.charAt(i) == ':' )
+							|| ( tmp.charAt(i) == '=' ))) {
 							bCheckEqual = false;
 							continue;
 						}
-						if ( !Character.isWhitespace(sTmp.charAt(i)) ) {
+						if ( !Character.isWhitespace(tmp.charAt(i)) ) {
 							// That the first white-space after the key
 							n = i;
 							bEmpty = false;
@@ -259,67 +259,67 @@ public class Parser implements IParser {
 						}
 					}
 
-					if ( bEmpty ) n = sTmp.length();
-					sValue = sTmp.substring(n);
+					if ( bEmpty ) n = tmp.length();
+					value = tmp.substring(n);
 					// Real text start point (adjusted for trimmed characters)
-					nStartText = n + (textLine.length() - sTmp.length());
+					startText = n + (textLine.length() - tmp.length());
 					// Use m_nLineSince-1 to not count the current one
-					lS = (position-(textLine.length()+(lineSince-1))) + nStartText;
+					lS = (position-(textLine.length()+(lineSince-1))) + startText;
 					lineSince = 0; // Reset the line counter for next time
 				}
 
 				// Is it a multi-lines entry?
-				if ( sValue.endsWith("\\") ) {
+				if ( value.endsWith("\\") ) {
 					// Make sure we have an odd number of ending '\'
 					int n = 0;
-					for ( int i=sValue.length()-1;
-						(( i > -1 ) && ( sValue.charAt(i) == '\\' ));
+					for ( int i=value.length()-1;
+						(( i > -1 ) && ( value.charAt(i) == '\\' ));
 						i-- ) n++;
 
 					if ( (n % 2) != 0 ) { // Continue onto the next line
-						sValue = sValue.substring(0, sValue.length()-1);
+						value = value.substring(0, value.length()-1);
 						isMultiline = true;
 						// Preserve parsed text in case we do not extract
 						if ( keyBuffer.length() == 0 ) {
-							keyBuffer.append(textLine.substring(0, nStartText));
-							nStartText = 0; // Next time we get the whole line
+							keyBuffer.append(textLine.substring(0, startText));
+							startText = 0; // Next time we get the whole line
 						}
-						textBuffer.append(textLine.substring(nStartText));
+						textBuffer.append(textLine.substring(startText));
 						continue; // Read next line
 					}
 				}
 
 				// Check for key condition
 				// Directives overwrite the key condition
-				boolean bExtract = true;
+				boolean extract = true;
 				if ( resource.params.locDir.isWithinScope() ) {
-					bExtract = resource.params.locDir.isLocalizable(true);
+					extract = resource.params.locDir.isLocalizable(true);
 				}
 				else { // Check for key condition
 					if (  keyConditionPattern != null ) {
 						if ( resource.params.extractOnlyMatchingKey ) {
-							if ( !keyConditionPattern.matcher(sKey).matches() )
-								bExtract = false;
+							if ( !keyConditionPattern.matcher(key).matches() )
+								extract = false;
 						}
 						else { // Extract all but items with matching keys
-							if ( keyConditionPattern.matcher(sKey).matches() )
-								bExtract = false;
+							if ( keyConditionPattern.matcher(key).matches() )
+								extract = false;
 						}
 					}
 				}
 
-				if ( bExtract ) {
+				if ( extract ) {
 					item = new TextUnit(String.valueOf(++itemID),
-						unescape(sValue));
-					item.setName(sKey);
+						unescape(value));
+					item.setName(key);
 					item.setPreserveWhitespaces(true);
 				}
 
-				if ( bExtract ) {
+				if ( extract ) {
 					// Parts before the text
 					if ( keyBuffer.length() == 0 ) {
 						// Single-line case
-						keyBuffer.append(textLine.substring(0, nStartText));
+						keyBuffer.append(textLine.substring(0, startText));
 					}
 					resource.sklRes.appendData(keyBuffer);
 				}

@@ -24,18 +24,21 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean             extractOuterStrings;
-	protected String              startString;
-	protected String              endString;
-	protected boolean             useBSlashEscape;
-	protected ArrayList<Rule>     rules;
-	protected String              expression;
+	protected boolean                  extractOuterStrings;
+	protected String                   startString;
+	protected String                   endString;
+	protected boolean                  useBSlashEscape;
+	protected ArrayList<Rule>          rules;
+	protected String                   expression;
+	protected LocalizationDirectives   locDir;
 	
 
 	public Parameters () {
+		locDir = new LocalizationDirectives();
 		reset();
 	}
 	
@@ -46,11 +49,14 @@ public class Parameters extends BaseParameters {
 		endString = "\"";
 		extractOuterStrings = false;
 		useBSlashEscape = true;
+		locDir.reset();
 	}
 
 	public String toString ()
 	{
 		FieldsString tmp = new FieldsString();
+		tmp.add("useLD", locDir.useLD());
+		tmp.add("localizeOutside", locDir.localizeOutside());
 		tmp.add("startString", startString);
 		tmp.add("endString", endString);
 		tmp.add("extractOuterStrings", extractOuterStrings);
@@ -64,6 +70,10 @@ public class Parameters extends BaseParameters {
 	
 	public void fromString (String data) {
 		FieldsString tmp = new FieldsString(data);
+		reset();
+		boolean tmpBool1 = tmp.get("useLD", locDir.useLD());
+		boolean tmpBool2 = tmp.get("localizeOutside", locDir.localizeOutside());
+		locDir.setOptions(tmpBool1, tmpBool2);
 		startString = tmp.get("startString", startString);
 		endString = tmp.get("endString", endString);
 		extractOuterStrings = tmp.get("extractOuterStrings", extractOuterStrings);

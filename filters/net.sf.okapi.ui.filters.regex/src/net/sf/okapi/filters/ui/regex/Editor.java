@@ -25,8 +25,9 @@ import java.util.ArrayList;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.LDPanel;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.filters.InlineCodeFinderDialog;
+import net.sf.okapi.common.ui.filters.LDPanel;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.Rule;
 
@@ -66,6 +67,8 @@ public class Editor implements IParametersEditor {
 	private int              ruleIndex = -1;
 	private Combo            cbRuleType;
 	private Button           chkPreserveWS;
+	private Button           chkUseCodeFinder;
+	private Button           btEditFinderRules;
 
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -208,6 +211,29 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkPreserveWS.setLayoutData(gdTmp);
+		
+		chkUseCodeFinder = new Button(propGroup, SWT.CHECK);
+		chkUseCodeFinder.setText("Has in-line codes");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseCodeFinder.setLayoutData(gdTmp);
+		chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateEditFinderRulesButton();
+			};
+		});
+		
+		btEditFinderRules = new Button(propGroup, SWT.PUSH);
+		btEditFinderRules.setText("  Edit In-line Codes Patterns...  ");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = 16;
+		gdTmp.horizontalSpan = 2;
+		btEditFinderRules.setLayoutData(gdTmp);
+		btEditFinderRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editFinderRules();
+			};
+		});
 
 		//--- end rule properties
 		
@@ -313,18 +339,39 @@ public class Editor implements IParametersEditor {
 		boolean enabled = (newRuleIndex > -1 );
 		cbRuleType.setEnabled(enabled);
 		chkPreserveWS.setEnabled(enabled);
+		chkUseCodeFinder.setEnabled(enabled);
+		if ( enabled ) updateEditFinderRulesButton();
+		else btEditFinderRules.setEnabled(enabled);
 
 		ruleIndex = newRuleIndex;
 		if ( ruleIndex < 0 ) return;
 		
 		Rule rule = rules.get(ruleIndex);
 		chkPreserveWS.setSelection(rule.preserveSpace());
+		chkUseCodeFinder.setSelection(rule.useCodeFinder());
+	}
+
+	private void updateEditFinderRulesButton () {
+		btEditFinderRules.setEnabled(chkUseCodeFinder.getSelection());
+	}
+	
+	
+	private void editFinderRules () {
+		try {
+			InlineCodeFinderDialog dlg = 
+				new InlineCodeFinderDialog(shell, "In-Line Codes Patterns", null);
+			dlg.showDialog();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 	
 	private void saveRuleData (int index) {
 		if ( index < 0 ) return;
 		Rule rule = rules.get(index);
 		rule.setPreserveSpace(chkPreserveWS.getSelection());
+		rule.setUseCodeFinder(chkUseCodeFinder.getSelection());
 	}
 	
 	private void updateRuleButtons () {
@@ -374,6 +421,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
+		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
 		chkExtractOuterStrings.setSelection(
 			"1".equals(params.getParameter("extractOuterStrings")));
 		edStartString.setText(params.getParameter("startString"));
@@ -381,12 +429,15 @@ public class Editor implements IParametersEditor {
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
+		pnlLD.updateDisplay();
 		updateRule();
 		updateRuleButtons();
 	}
 	
 	private void saveData () {
 		//TODO: validation
+		params.setParameter("useLD", pnlLD.getUseLD());
+		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
 		params.setParameter("extractOuterStrings",
 			chkExtractOuterStrings.getSelection() ? "1" : "0");
 		params.setParameter("startString", edStartString.getText());

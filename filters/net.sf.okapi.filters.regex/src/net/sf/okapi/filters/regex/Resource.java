@@ -21,7 +21,6 @@
 package net.sf.okapi.filters.regex;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.IContainable;
 
 public class Resource extends net.sf.okapi.common.resource.Document {

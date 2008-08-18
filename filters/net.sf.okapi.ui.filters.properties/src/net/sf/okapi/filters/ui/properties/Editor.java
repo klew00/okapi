@@ -23,8 +23,9 @@ package net.sf.okapi.filters.ui.properties;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.LDPanel;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
+import net.sf.okapi.common.ui.filters.LDPanel;
 import net.sf.okapi.filters.properties.Parameters;
 
 import org.eclipse.swt.SWT;
@@ -44,17 +45,19 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell            shell;
-	private boolean          result = false;
-	private Button           chkUseKeyFilter;
-	private Button           rdExtractOnlyMatchingKey;
-	private Button           rdExcludeMatchingKey;
-	private Text             edKeyCondition;
-	private Button           chkExtraComments;
-	private LDPanel          pnlLD;
-	private OKCancelPanel    pnlActions;
-	private Parameters       params;
-	private Button           chkEscapeExtendedChars;
+	private Shell                 shell;
+	private boolean               result = false;
+	private Button                chkUseKeyFilter;
+	private Button                rdExtractOnlyMatchingKey;
+	private Button                rdExcludeMatchingKey;
+	private Text                  edKeyCondition;
+	private Button                chkExtraComments;
+	private LDPanel               pnlLD;
+	private OKCancelPanel         pnlActions;
+	private Parameters            params;
+	private Button                chkEscapeExtendedChars;
+	private Button                chkUseCodeFinder;
+	private InlineCodeFinderPanel pnlCodeFinder;
 
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -158,7 +161,26 @@ public class Editor implements IParametersEditor {
 		tiTmp.setControl(cmpTmp);
 		
 		//--- Inline tab
-		//TODO: Inline tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+		
+		chkUseCodeFinder = new Button(cmpTmp, SWT.CHECK);
+		chkUseCodeFinder.setText("Has in-line codes as defined below:");
+		chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateInlineCodes();
+			};
+		});
+		
+		pnlCodeFinder = new InlineCodeFinderPanel(cmpTmp, SWT.NONE);
+		pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("In-line Codes");
+		tiTmp.setControl(cmpTmp);
+			
 
 		//--- Output tab
 		
@@ -215,19 +237,22 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
+		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
 		edKeyCondition.setText(params.keyCondition);
 		rdExtractOnlyMatchingKey.setSelection(params.extractOnlyMatchingKey);
 		rdExcludeMatchingKey.setSelection(!params.extractOnlyMatchingKey);
 		chkUseKeyFilter.setSelection(params.useKeyCondition);
 		chkExtraComments.setSelection(params.extraComments);
 		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
+		updateInlineCodes();
+		pnlCodeFinder.updateDisplay();
 		pnlLD.updateDisplay();
 		updateKeyFilter();
 	}
 	
 	private void saveData () {
-		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
+		params.setParameter("useLD", pnlLD.getUseLD());
+		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
 		params.useKeyCondition = chkUseKeyFilter.getSelection();
 		params.keyCondition = edKeyCondition.getText();
 		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
@@ -240,5 +265,9 @@ public class Editor implements IParametersEditor {
 		edKeyCondition.setEnabled(chkUseKeyFilter.getSelection());
 		rdExtractOnlyMatchingKey.setEnabled(chkUseKeyFilter.getSelection());
 		rdExcludeMatchingKey.setEnabled(chkUseKeyFilter.getSelection());
+	}
+	
+	private void updateInlineCodes () {
+		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
 	}
 }

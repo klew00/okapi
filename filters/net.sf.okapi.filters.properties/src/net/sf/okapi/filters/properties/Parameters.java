@@ -22,11 +22,13 @@ package net.sf.okapi.filters.properties;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
 	public boolean                useCodeFinder;
+	protected InlineCodeFinder    codeFinder;
 	public boolean                escapeExtendedChars;
 	public boolean                useKeyCondition;
 	public boolean                extractOnlyMatchingKey;
@@ -36,14 +38,21 @@ public class Parameters extends BaseParameters {
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
+		codeFinder = new InlineCodeFinder();
 		reset();
 	}
 	
 	public void reset () {
 		super.reset();
 		locDir.reset();
-		useCodeFinder = true;
 		escapeExtendedChars = true;
+
+		useCodeFinder = true;
+		// Default in-line codes: special escaped-chars and printf-style variable
+		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
+		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+		//TODO: Add Java-style variables. this is too basic
+		codeFinder.addRule("\\{\\d.*?\\}");
 		
 		useKeyCondition = false;
 		extractOnlyMatchingKey = true;
@@ -51,39 +60,33 @@ public class Parameters extends BaseParameters {
 
 		extraComments = true;
 
-		// Default inline codes: special escaped-chars and printf-style variable
-/*		m_CodeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
-		m_CodeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
-		//TODO: Add Java-style variables. this is too basic
-		m_CodeFinder.addRule("\\{\\d.*?\\}");
-*/ //		m_CodeFinder.createExpression();
 	}
 
 	public String toString () {
 		// Store the parameters in fields
-		FieldsString Tmp = new FieldsString();
-		Tmp.add("useld", locDir.useLD());
-		Tmp.add("localizeoutside", locDir.localizeOutside());
-		Tmp.add("userules", useCodeFinder);
-		Tmp.add("usekeycondition", useKeyCondition);
-		Tmp.add("extractonlykeycond", extractOnlyMatchingKey);
-		Tmp.add("keycondition", keyCondition);
-		Tmp.add("escapechars", escapeExtendedChars);
-		return Tmp.toString();
+		FieldsString tmp = new FieldsString();
+		tmp.add("useLD", locDir.useLD());
+		tmp.add("localizeOutside", locDir.localizeOutside());
+		tmp.add("useCodeFinder", useCodeFinder);
+		tmp.add("useKeyCondition", useKeyCondition);
+		tmp.add("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		tmp.add("keyCondition", keyCondition);
+		tmp.add("escapeExtendedChars", escapeExtendedChars);
+		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
 		// Read the file content as a set of fields
-		FieldsString Tmp = new FieldsString(data);
+		FieldsString tmp = new FieldsString(data);
 		reset();
 		// Parse the fields
-		boolean bTmp1 = Tmp.get("useld", locDir.useLD());
-		boolean bTmp2 = Tmp.get("localizeoutside", locDir.localizeOutside());
-		locDir.setOptions(bTmp1, bTmp2);
-		useCodeFinder = Tmp.get("userules", useCodeFinder);
-		useKeyCondition = Tmp.get("usekeycondition", useKeyCondition);
-		extractOnlyMatchingKey = Tmp.get("extractonlykeycond", extractOnlyMatchingKey);
-		keyCondition = Tmp.get("keycondition", keyCondition);
-		escapeExtendedChars = Tmp.get("escapechars", escapeExtendedChars);
+		boolean tmpBool1 = tmp.get("useLD", locDir.useLD());
+		boolean tmpBool2 = tmp.get("localizeOutside", locDir.localizeOutside());
+		locDir.setOptions(tmpBool1, tmpBool2);
+		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
+		useKeyCondition = tmp.get("useKeyCondition", useKeyCondition);
+		extractOnlyMatchingKey = tmp.get("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		keyCondition = tmp.get("keyCondition", keyCondition);
+		escapeExtendedChars = tmp.get("escapeExtendedChars", escapeExtendedChars);
 	}
 }

@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
@@ -90,11 +89,11 @@ public class Parser implements IParser {
 		r.ruleType = Rule.RULETYPE_STRING;
 		r.preserveWS = true;
 		
-		r.useFinder = true;
-		List<String> list = r.finder.getRules();
+		r.useCodeFinder = true;
+		List<String> list = r.codeFinder.getRules();
 		list.add("#!\\[.*?\\]");
 		list.add("#!\\{.*?\\}");
-		r.finder.compile();
+		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
 	}
@@ -243,7 +242,9 @@ public class Parser implements IParser {
 			startSearch = endResult.end();
 			startSkl = endResult.start();
 			// If comment: process the comment for directives
-			//TODO: process the comment for directives
+			if ( rule.ruleType == Rule.RULETYPE_COMMENT ) {
+				resource.params.locDir.process(skl.toString());
+			}
 			// Then just return one skeleton event
 			return ParserTokenType.SKELETON;
 			
@@ -280,22 +281,34 @@ public class Parser implements IParser {
 			return ParserTokenType.SKELETON;
 		}
 		
-		// Otherwise: process the item content
+		// Otherwise: process the content
 
 		// Set skeleton data if needed
 		if ( startResult.end() > startSkl ) {
 			addSkeletonToQueue(inputText.substring(startSkl, startResult.end()), false);
 		}
+		
+		// Set start positions for next read
+		startSearch = endResult.end();
+		startSkl = endResult.start();
+
+		// Check localization directives
+		if (( !resource.params.locDir.isWithinScope() )
+			|| ( !resource.params.locDir.isLocalizable(true) )) {
+			// If not to be localized: make it a skeleton unit
+			addSkeletonToQueue(inputText.substring(startResult.end(),
+				endResult.start()), false);
+			// And return
+			return nextEvent();
+		}
+
+		//--- Else: We extract
 
 		// Any resname we can use?
 		String name = getMatch(startResult.group(), rule.nameStart,
 			rule.nameEnd);
 
-		// Set start positions for next read
-		startSearch = endResult.end();
-		startSkl = endResult.start();
-
-		// Process the data, this will create a queue of event if needed
+		// Process the data, this will create a queue of events if needed
 		if ( rule.ruleType == Rule.RULETYPE_CONTENT ) {
 			processContent(rule, name, inputText.substring(
 				startResult.end(), endResult.start()));
@@ -333,8 +346,8 @@ public class Parser implements IParser {
 		TextUnit item = new TextUnit(String.valueOf(++itemID), data);
 		item.setPreserveWhitespaces(rule.preserveWS);
 
-		if ( rule.useFinder ) {
-			rule.finder.process(item.getSourceContent());
+		if ( rule.useCodeFinder ) {
+			rule.codeFinder.process(item.getSourceContent());
 		}
 
 		splitItem(item, rule.splitters);
@@ -509,8 +522,8 @@ public class Parser implements IParser {
 				data.substring(start, end));
 			item.setPreserveWhitespaces(rule.preserveWS);
 			
-			if ( rule.useFinder ) {
-				rule.finder.process(item.getSourceContent());
+			if ( rule.useCodeFinder ) {
+				rule.codeFinder.process(item.getSourceContent());
 			}
 
 			//splitItem(item, rule.splitters);

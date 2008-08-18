@@ -41,8 +41,8 @@ public class Rule {
 	protected String              splitters;
 	protected int                 ruleType;
 	protected boolean             preserveWS;
-	protected boolean             useFinder;
-	protected InlineCodeFinder    finder;
+	protected boolean             useCodeFinder;
+	protected InlineCodeFinder    codeFinder;
 
 	public Rule () {
 		start = "";
@@ -50,7 +50,7 @@ public class Rule {
 		nameStart = "";
 		nameEnd = "";
 		nameFormat = "";
-		finder = new InlineCodeFinder();
+		codeFinder = new InlineCodeFinder();
 	}
 	
 	public Rule (Rule obj) {
@@ -63,8 +63,8 @@ public class Rule {
 		splitters = obj.splitters;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
-		useFinder = obj.useFinder;
-		finder = obj.finder.clone();
+		useCodeFinder = obj.useCodeFinder;
+		codeFinder = obj.codeFinder.clone();
 	}
 	
 	public String getRuleName () {
@@ -144,6 +144,14 @@ public class Rule {
 		preserveWS = value;
 	}
 
+	public boolean useCodeFinder () {
+		return useCodeFinder;
+	}
+	
+	public void setUseCodeFinder (boolean value) {
+		useCodeFinder = value;
+	}
+
 	@Override
 	public String toString () {
 		FieldsString tmp = new FieldsString();
@@ -155,7 +163,8 @@ public class Rule {
 		tmp.add("nameEnd", nameEnd);
 		tmp.add("nameFormat", nameFormat);
 		tmp.add("preserveWS", preserveWS);
-		tmp.add("useFinder", useFinder);
+		tmp.add("useCodeFinder", useCodeFinder);
+		//TODO: save finder rules
 		return tmp.toString();
 	}
 	
@@ -169,7 +178,8 @@ public class Rule {
 		nameEnd = tmp.get("nameEnd", nameEnd);
 		nameFormat = tmp.get("nameFormat", nameFormat);
 		preserveWS = tmp.get("preserveWS", preserveWS);
-		useFinder = tmp.get("useFinder", useFinder);
+		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
+		//TODO: get rules for finder
 	}
 	
 }

@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry kind="lib" path="lib/windows/swt.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
