@@ -80,7 +80,7 @@ public class SRXDocument {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 
-		sampleText = "Mr. Holmes is from the U.K. Is Dr. Watson from there too? Yes: both are.";
+		sampleText = "Mr. Holmes is from the <A>U.K.</A> <B>Is Dr. Watson from there too?</B> Yes: both are.<C/>";
 		sampleLanguage = "en";
 	}
 	

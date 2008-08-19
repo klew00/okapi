@@ -112,7 +112,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param text The text to use.
 	 */
 	public TextFragment (String text) {
-		append(text);
+		this.text = new StringBuilder(text);
 	}
 	
 	/**
@@ -152,25 +152,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param container The TextFragment to append.
 	 */
 	public void append (TextFragment container) {
-		//TODO: maybe a smarter way to implement this would
-		// be to do an insert() and treat this as insert(afterlast);
-		String tmp = container.getCodedText();
-		List<Code> newCodes = container.getCodes();
-		if ( codes == null ) codes = new ArrayList<Code>();
-		for ( int i=0; i<tmp.length(); i++ ) {
-			switch ( tmp.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				append(""+tmp.charAt(i)+toChar(codes.size()));
-				codes.add(newCodes.get(toIndex(tmp.charAt(++i))).clone());
-				break;
-			default:
-				text.append(tmp.charAt(i));
-				break;
-			}
-		}
-		if ( codes.size() > 0 ) isBalanced = false;
+		insert(-1, container);
 	}
 	
 	/**
@@ -204,6 +186,43 @@ public class TextFragment implements Comparable<Object> {
 		if ( tagType != TagType.PLACEHOLDER ) isBalanced = false;
 		return codes.get(codes.size()-1);
 	}
+
+	/**
+	 * Inserts a TextFragment object to this fragment.
+	 * @param offset Position in the coded text where to insert the new fragment.
+	 * You can use -1 to append at the end of the current content.
+	 * @param container The TextFragment to insert.
+	 * @throws InvalidPositionException When offset points inside a marker.
+	 */
+	public void insert (int offset,
+		TextFragment container)
+	{
+		checkPositionForMarker(offset);
+		StringBuilder tmp = new StringBuilder(container.getCodedText());
+		List<Code> newCodes = container.getCodes();
+		if (( codes == null ) && ( newCodes.size() > 0 )) {
+			codes = new ArrayList<Code>();
+		}
+
+		// Update the coded text to use new code indices
+		for ( int i=0; i<tmp.length(); i++ ) {
+			switch ( tmp.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				codes.add(newCodes.get(toIndex(tmp.charAt(++i))).clone());
+				tmp.setCharAt(i, toChar(codes.size()-1));
+				break;
+			}
+		}
+
+		// Insert the new text in one chunk
+		if ( offset < 0 ) text.append(tmp);
+		else text.insert(offset, tmp);
+		// If there was new codes we will need to re-balance
+		if ( newCodes.size() > 0 ) isBalanced = false;
+	}
+	
 
 	/**
 	 * Clears the fragment of all content. The parent is not modified.
@@ -351,7 +370,7 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Removes a portion of the fragment (including its codes).
+	 * Removes a section of the fragment (including its codes).
 	 * @param start The position of the first character or marker of the section
 	 * (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section
@@ -490,18 +509,18 @@ public class TextFragment implements Comparable<Object> {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expendSubflows(code));
-				//tmp.append(String.format("[%d:%s]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expandCodeContent(code));
+				//tmp.append(String.format("[%d:%s]", code.id, expandCodeContent(code))); // Debug
 				break;
 			case MARKER_CLOSING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expendSubflows(code));
-				//tmp.append(String.format("[/%d:%s]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expandCodeContent(code));
+				//tmp.append(String.format("[/%d:%s]", code.id, expandCodeContent(code))); // Debug
 				break;
 			case MARKER_ISOLATED:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expendSubflows(code));
-				//tmp.append(String.format("[%d:%s/]", code.id, expendSubflows(code))); // Debug
+				tmp.append(expandCodeContent(code));
+				//tmp.append(String.format("[%d:%s/]", code.id, expandCodeContent(code))); // Debug
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -631,11 +650,15 @@ public class TextFragment implements Comparable<Object> {
 	 * @param code The code to process.
 	 * @return The data for the code, including any sub-flows data.
 	 */
-	private String expendSubflows (Code code) {
+	private String expandCodeContent (Code code) {
 		if ( !code.hasSubflow ) return code.data;
 		if ( parent == null ) {
 			return code.data;
 			//TODO: log a warning
+		}
+		// Check for segment
+		if ( code.type.equals(TextContainer.CODETYPE_SEGMENT) ) {
+			return "[SEG-"+code.data+"]";
 		}
 		// Else: look for place-holders
 		StringBuilder tmp = new StringBuilder(code.data);

@@ -22,8 +22,13 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
@@ -79,6 +84,9 @@ public class SRXEditor {
 	private Button           rdApplySampleForCurrentSet;
 	private Text             edSampleLanguage;
 	private GenericContent   sampleOutput;
+	private Pattern          patternOpening;
+	private Pattern          patternClosing;
+	private Pattern          patternPlaceholder;
 	
 
 	public SRXEditor (Shell parent) {
@@ -87,6 +95,10 @@ public class SRXEditor {
 		srxPath = null;
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericContent();
+		
+		patternOpening = Pattern.compile("\\<(\\p{Alpha})\\>");
+		patternClosing = Pattern.compile("\\</(\\p{Alpha})\\>");
+		patternPlaceholder = Pattern.compile("\\<\\p{Alpha}/\\>");
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Segmentation Rules Editor");
@@ -414,9 +426,11 @@ public class SRXEditor {
 				// Converts the <x>/</x>/etc. into real inline codes
 				processInlineCodes();
 				// Segment
-				segmenter.segment(sampleText);
+				segmenter.computeSegments(sampleText);
+				List<java.awt.Point> ranges = segmenter.getSegmentRanges();
+				sampleText.createSegments(ranges);
 				// Create the output in generic format
-				edResults.setText(sampleOutput.setContent(sampleText).toString());
+				showSegmentedOutput();
 			}
 			else {
 				edResults.setText("");
@@ -426,7 +440,44 @@ public class SRXEditor {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
-	
+
+	private void showSegmentedOutput () {
+		if ( !sampleText.isSegmented() ) {
+			edResults.setText(sampleOutput.setContent(sampleText).toString());
+		}
+		
+		Code code;
+		String text = sampleText.getCodedText();
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				code = sampleText.getCode(text.charAt(++i));
+				tmp.append(String.format("<%d>", code.getID()));
+				break;
+			case TextFragment.MARKER_CLOSING:
+				code = sampleText.getCode(text.charAt(++i));
+				tmp.append(String.format("</%d>", code.getID()));
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				code = sampleText.getCode(text.charAt(++i));
+				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
+					tmp.append("[");
+					int index = Integer.parseInt(code.getData());
+					tmp.append(sampleOutput.setContent(sampleText.getSegments().get(index)).toString());
+					tmp.append("]");
+				}
+				else {
+					tmp.append(String.format("<%d/>", code.getID()));
+				}
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		edResults.setText(tmp.toString());
+	}
 	/**
 	 * Converts the sample edit field content to sampleText.
 	 */
@@ -437,10 +488,37 @@ public class SRXEditor {
 		int n;
 		int start = 0;
 		int diff = 0;
-		while ( (n = text.indexOf("<x>", start)) != -1 ) {
+		
+		Matcher m = patternOpening.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += sampleText.changeToCode(n+diff, (n+diff)+3, TagType.OPENING, m.group(1));
+			start = (n+3);
+		}
+		
+		text = sampleText.getCodedText();
+		start = diff = 0;
+		m = patternClosing.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.CLOSING, m.group(1));
+			start = (n+4);
+		}
+		
+		text = sampleText.getCodedText();
+		start = diff = 0;
+		m = patternPlaceholder.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.PLACEHOLDER, null);
+			start = (n+4);
+		}
+		
+		/*while ( (n = text.indexOf("<x>", start)) != -1 ) {
 			diff += sampleText.changeToCode(n+diff, (n+diff)+3, TagType.OPENING, "x");
 			start = (n+3);
 		}
+		
 		text = sampleText.getCodedText();
 		start = diff = 0;
 		while ( (n = text.indexOf("</x>", start)) != -1 ) {
@@ -452,7 +530,7 @@ public class SRXEditor {
 		while ( (n = text.indexOf("<x/>", start)) != -1 ) {
 			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.PLACEHOLDER, null);
 			start = (n+4);
-		}
+		}*/
 	}
 	
 	private void updateLanguageRuleList () {

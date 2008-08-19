@@ -30,7 +30,9 @@ public class Main {
 		tu.setSkeletonAfter(new SkeletonUnit("s5", "</p>"));
 		TextContainer src = tu.getSource().getContent();
 		src.append('b');
-		src.append("c ");
+		src.append("c []");
+		TextFragment tf = new TextFragment("INSERT");
+		src.insert(5, tf);
 		src.append(TagType.OPENING, "b", "<b1>");
 		src.append("bold");
 		src.append(TagType.OPENING, "b", "<b2>");
@@ -188,6 +190,9 @@ public class Main {
 		tu.setTarget(tu.getSource());
 		System.out.println("src : "+tu.getSource().toString());
 		System.out.println("trg : "+tu.getTarget().toString());
+		
+		//=== Test Segmenter
+		
 	}
 
 	private static void processTU (TextUnit tu) {

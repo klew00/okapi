@@ -20,8 +20,10 @@
 
 package net.sf.okapi.lib.segmentation;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 
 import net.sf.okapi.common.resource.TextContainer;
@@ -331,7 +333,7 @@ public class Segmenter {
 	 * in the coded text that was segmented. The split position between two segments
 	 * is the first character position of the second segment.
 	 */
-	public ArrayList<Integer> getSplitPositions () {
+	public List<Integer> getSplitPositions () {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		if ( splits == null ) return list;
 		for ( int pos : splits.keySet() ) {
@@ -341,6 +343,16 @@ public class Segmenter {
 		}
 		return list;
 	}
+	
+	public List<Point> getSegmentRanges () {
+		ArrayList<Point> list = new ArrayList<Point>();
+		if ( starts == null ) return null;
+		for ( int i=0; i<starts.size(); i++ ) {
+			list.add(new Point(starts.get(i), ends.get(i)));
+		}
+		return list;
+	}
+	
 	
 	/**
 	 * Gets the language used to apply the rules.
