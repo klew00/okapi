@@ -19,16 +19,10 @@
 
 package net.sf.okapi.filters.html;
 
-import java.security.acl.Group;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.okapi.common.resource.SkeletonUnit;
-import net.sf.okapi.common.resource.TextUnit;
-
-import com.sun.java_cup.internal.lalr_item;
 
 /**
  * General HTML extraction rule can handle the following cases:<br/><br/>
@@ -132,7 +126,7 @@ public class ExtractionRule {
 	
 	/**
 	 * Convenience rule factory for extractable elements where the start and end tags belong 
-	 * to a {@link TextUnit} rather than a {@link SkeletonUnit. 
+	 * to a {@link TextUnit} rather than a {@link SkeletonUnit}. 
 	 * @param elementName lowercase element name
 	 * @return {@link ExtractionRule}
 	 */
@@ -197,7 +191,7 @@ public class ExtractionRule {
 	}
 	
 	/**
-	 * Add a property to the rule which is passed to the {@link Group} or {@link TextUnit} amtching the rule.
+	 * Add a property to the rule which is passed to the {@link Group} or {@link TextUnit} matching the rule.
 	 * @param key property 
 	 * @param value additional information on the property.
 	 */
