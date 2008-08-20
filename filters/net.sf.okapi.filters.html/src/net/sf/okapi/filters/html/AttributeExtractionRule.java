@@ -26,22 +26,16 @@ import java.util.Map;
 
 public class AttributeExtractionRule {
 	private String attributeName;
-	private List<ConditionalAttribute> extractionConditions;
+	private List<ConditionalAttributeRule> extractionConditions;
 	private Map<String, String> properties;
 	
 	public AttributeExtractionRule(String attributeName) {
 		this.attributeName = attributeName;
-		this.extractionConditions = new LinkedList<ConditionalAttribute>();
+		this.extractionConditions = new LinkedList<ConditionalAttributeRule>();
 		this.properties = new HashMap<String, String>();
 	}
-	
-	public AttributeExtractionRule(String attributeName, List<ConditionalAttribute> extractionConditions) {
-		this.attributeName = attributeName;
-		this.extractionConditions = extractionConditions;
-		this.properties = new HashMap<String, String>();
-	}
-	
-	public void addExtractionCondition(ConditionalAttribute conditionalAttribute) {
+		
+	public void addConditionalAttributeRule(ConditionalAttributeRule conditionalAttribute) {
 		this.extractionConditions.add(conditionalAttribute);
 		this.properties = new HashMap<String, String>();
 	}

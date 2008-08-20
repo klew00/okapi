@@ -31,7 +31,7 @@ import net.htmlparser.jericho.Attribute;
  * Rules are evaluated in context which means the values passed in may will be
  * interpreteted as elements or attributes based on the context of evaluation.
  */
-public class ConditionalAttribute {
+public class ConditionalAttributeRule {
 
 	public static enum CONDITIONAL_ATTRIBUTE_TYPE {
 		ALWAYS_EQUALS, EQUALS, NOT_EQUALS, MATCH
@@ -42,7 +42,7 @@ public class ConditionalAttribute {
 	private CONDITIONAL_ATTRIBUTE_TYPE matchType;
 	private Pattern matchPattern;
 
-	public ConditionalAttribute(String ruleAttributeName) {
+	public ConditionalAttributeRule(String ruleAttributeName) {
 		this.ruleAttributeName = ruleAttributeName;
 		this.ruleAttributeValue = null;
 		this.matchType = CONDITIONAL_ATTRIBUTE_TYPE.ALWAYS_EQUALS;
@@ -52,7 +52,7 @@ public class ConditionalAttribute {
 	 * Create a conditional rule with the following values.
 	 * 
 	 */
-	public ConditionalAttribute(String ruleAttributeName,
+	public ConditionalAttributeRule(String ruleAttributeName,
 			CONDITIONAL_ATTRIBUTE_TYPE matchType, String ruleAttributeValue) {		
 		this.ruleAttributeName = ruleAttributeName;
 		this.ruleAttributeValue = ruleAttributeValue;
