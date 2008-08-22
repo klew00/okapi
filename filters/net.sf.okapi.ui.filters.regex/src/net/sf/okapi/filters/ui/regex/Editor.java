@@ -69,7 +69,11 @@ public class Editor implements IParametersEditor {
 	private Button           chkPreserveWS;
 	private Button           chkUseCodeFinder;
 	private Button           btEditFinderRules;
+	private Button           chkIgnoreCase;
+	private Button           chkDotAll;
+	private Button           chkMultiline;
 
+	
 	/**
 	 * Invokes the editor for the Properties filter parameters.
 	 * @param p_Options The option object of the action.
@@ -172,6 +176,8 @@ public class Editor implements IParametersEditor {
 		lbRules = new List(cmpTmp, SWT.BORDER | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
+		gdTmp.grabExcessHorizontalSpace = true;
+		gdTmp.verticalSpan = 3;
 		lbRules.setLayoutData(gdTmp);
 		lbRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -260,10 +266,32 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
+		//--- Options
+		
+		Group optionsGroup = new Group(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		optionsGroup.setLayout(layTmp);
+		optionsGroup.setText("Options");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.verticalSpan = 2;
+		optionsGroup.setLayoutData(gdTmp);
+		
+		chkDotAll = new Button(optionsGroup, SWT.CHECK);
+		chkDotAll.setText("Dot also matches line-feed");
+
+		chkMultiline = new Button(optionsGroup, SWT.CHECK);
+		chkMultiline.setText("Multi-line");
+		
+		chkIgnoreCase = new Button(optionsGroup, SWT.CHECK);
+		chkIgnoreCase.setText("Ignore case differences");
+		
+		//--- end Options
+		
 		btRemove = new Button(cmpTmp, SWT.PUSH);
 		btRemove.setText("Remove...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
+		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
 		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -274,6 +302,7 @@ public class Editor implements IParametersEditor {
 		btMoveDown = new Button(cmpTmp, SWT.PUSH);
 		btMoveDown.setText("Move Down");
 		gdTmp = new GridData();
+		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
 		gdTmp.widthHint = buttonWidth;
 		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
@@ -281,7 +310,7 @@ public class Editor implements IParametersEditor {
 				moveDownRule();
 			};
 		});
-		
+
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Rules");
 		tiTmp.setControl(cmpTmp);

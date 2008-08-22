@@ -152,6 +152,70 @@ public class TextContainer extends TextFragment {
 	}
 	
 	/**
+	 * Adds a new segment to the container. If the container is
+	 * not segmented, the current content remain part of the
+	 * main coded text, and the new fragment becomes the first
+	 * segment and is appended at the end of the existing content.
+	 * @param fragment The fragment to add.
+	 *
+	public void addSegment (TextFragment fragment) {
+		if ( segments == null ) {
+			segments = new ArrayList<TextFragment>();
+			// Any existing content stays in the main coded text
+		}
+		if ( codes == null ) {
+			codes = new ArrayList<Code>();
+		}
+		
+		// Add the segment to the list
+		segments.add(fragment);
+		// Create the segment marker in the main coded text
+		codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT,
+			String.valueOf(segments.size()-1)));
+		text.append(""+(char)MARKER_ISOLATED+toChar(codes.size()-1));
+	}*/
+	
+	/**
+	 * Creates a new segment from a section of the container text.
+	 * Any existing segmentation remains in place, but the section 
+	 * must not contain existing segment markers.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation).
+	 * @return The segment just created.
+	 */
+	public TextFragment createSegment (int start,
+		int end)
+	{
+		//TODO: Check if the section contain existing segment markers
+		if ( segments == null ) {
+			segments = new ArrayList<TextFragment>();
+		}
+		if ( codes == null ) {
+			codes = new ArrayList<Code>();
+		}
+
+		// Add the new segment in the list
+		segments.add(subSequence(start, end));
+		// Remove it from the main content
+		int width = end-start;
+		if ( width > 2 ) remove(start, end-2);
+		else if ( width == 1 ) insert(start, new TextFragment("Z"));
+		else if ( width == 0 ) insert(start, new TextFragment("ZZ"));
+		// Else width == 2 : Do nothing
+			
+		// Add the segment marker and its corresponding code
+		codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT,
+			String.valueOf(segments.size()-1)));
+		text.setCharAt(start, (char)MARKER_ISOLATED);
+		text.setCharAt(start+1, toChar(codes.size()-1));
+		
+		// Return the created segment
+		return segments.get(segments.size()-1);
+	}
+	
+	/**
 	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
 	 * Note that the merging is driven by the coded text of the object, so any 

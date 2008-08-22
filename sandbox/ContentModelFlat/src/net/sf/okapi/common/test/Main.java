@@ -46,7 +46,7 @@ public class Main {
 		TextUnit tu2 = new TextUnit("t3", "Image1: ");
 		tu2.setSkeletonBefore(new SkeletonUnit("s6", "<p>"));
 		tu2.setSkeletonAfter(new SkeletonUnit("s7", "</p>"));
-		src = tu.getSourceContent();
+		src = tu2.getSourceContent();
 		src.append(TagType.PLACEHOLDER, "image",
 			String.format("<img alt='%sSF1%s' title='%sSF2%s'/>",
 			TextFragment.SFMARKER_START, TextFragment.SFMARKER_END,
@@ -184,7 +184,7 @@ public class Main {
 		src2.setCodedText(tmp.toString());
 		System.out.println("src2 after : "+src2.toString());
 		
-		System.out.println("\nTest target\n");
+		System.out.println("\nTest target:");
 		
 		tu = new TextUnit("tu1", "Source text");
 		tu.setTarget(tu.getSource());
@@ -192,6 +192,17 @@ public class Main {
 		System.out.println("trg : "+tu.getTarget().toString());
 		
 		//=== Test Segmenter
+		
+		System.out.println("\n=== Segmenter Tests");
+		TextContainer tc = new TextContainer();
+		tc.append("Seg1. Seg2. ");
+		tc.append(TagType.OPENING, "b", "<b>");
+		tc.append("Bold seg3.");
+		tc.append(TagType.CLOSING, "b", "</b>");
+		System.out.println(tc.toString());
+
+		
+		
 		
 	}
 

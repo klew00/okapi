@@ -1,9 +1,12 @@
 package net.sf.okapi.applications.test;
 
+import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -18,8 +21,14 @@ import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xml.XMLReader;
+import net.sf.okapi.lib.segmentation.LanguageMap;
+import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Main {
 
@@ -257,7 +266,7 @@ public class Main {
 		System.out.println("---end testFilter---");
 	}
 
-/*	private static void testSegmentation () {
+	private static void testSegmentation () {
 		try {
 			System.out.println("---start testSegmentation---");
 			SRXDocument srxDoc = new SRXDocument();
@@ -267,9 +276,9 @@ public class Main {
 			srxDoc.addLanguageRule("french", langRule);
 
 			langRule = new ArrayList<Rule>();
+			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
 			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "", true));
 			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
-			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
 			srxDoc.addLanguageRule("default", langRule);
 
 			srxDoc.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
@@ -278,36 +287,52 @@ public class Main {
 			srxDoc.setCascade(true);
 			Segmenter seg = srxDoc.applyLanguageRules("fr", null);
 			
-			IContainer cont = new Container(" Mr. XYZ. (Test.) and more test.  ");
-			int segCount = seg.computeSegments(cont);
-			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
-				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
-			cont = seg.segment(cont);
-			System.out.println("xml: ["+cont.toXML()+"]");
-
-			cont = new Container("One... Two... ");
-			segCount = seg.computeSegments(cont);
-			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
-				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
-
-			cont = new Container("Mr. XYZ. One...");
-			segCount = seg.computeSegments(cont);
-			System.out.println(String.format("[%s]\nnb seg: %d\n%s",
-				cont.toString(), segCount, printSplits(seg, cont.getCodedText())));
-
-			String text = "Test! (And more?) Etc. And the last without period";
-			segCount = seg.computeSegments(text);
-			System.out.println(String.format("[%s]\nnb seg %d\n%s",
-				text, segCount, printSplits(seg, text)));
-
-			srxDoc.loadRules("example.srx");
-			seg = srxDoc.applyLanguageRules("en", null);
-			text = "The U.K. Prime Minister, Mr. Blair, was seen out with his family today.  Not the Queen.\tNo?";
-			segCount = seg.computeSegments(text);
-			System.out.println(String.format("[%s]\nnb seg %d\n%s",
-				text, segCount, printSplits(seg, text)));
+			TextContainer cont = new TextContainer(null);
+			cont.append(" Mr. XYZ. (Test.)   and more test.  ");
+			System.out.println(cont.toString());
 			
-			srxDoc.saveRules("output.srx");
+			// All segments
+			seg.computeSegments(cont);
+			List<Point> list = seg.getSegmentRanges();
+			cont.createSegments(list);
+			System.out.println("---all segs:");
+			for ( TextFragment tf : cont.getSegments() ) {
+				System.out.println("s='"+tf.toString()+"'");
+			}
+
+			System.out.println("---Seg one by one:");
+			cont.mergeAllSegments();
+			Point range;
+			while ( (range = seg.getNextSegmentRange(cont)) != null ) {
+				System.out.println(cont.toString());
+				System.out.println(range);
+				cont.createSegment(range.x, range.y);
+				for ( TextFragment tf : cont.getSegments() ) {
+					System.out.println("s='"+tf.toString()+"'");
+				}
+			}
+			System.out.println("last=["+cont.toString()+"]");
+			cont.mergeAllSegments();
+			System.out.println("merged=["+cont.toString()+"]");
+
+			cont = new TextContainer(null);
+			cont.append("One... Two... ");
+			int segCount = seg.computeSegments(cont);
+			System.out.println(cont.toString());
+			System.out.println(seg.getSegmentRanges());
+			
+			System.out.println("---Translation steps:");
+			TextUnit tu = new TextUnit("tu1", " Mr. XYZ. Segment 2.   Segment 3.  ");
+			TextContainer srcCont = tu.getSourceContent();
+			
+			TextContainer trgCont = new TextContainer();
+			tu.setTargetContent(trgCont);
+
+			range = seg.getNextSegmentRange(srcCont);
+			TextFragment srcSeg = srcCont.createSegment(range.x, range.y);
+			TextFragment trgSeg = new TextFragment(srcSeg);
+			
+			
 			
 		}
 		catch ( Exception e ) {
@@ -316,7 +341,7 @@ public class Main {
 		System.out.println("---end testSegmentation---");
 	}
 
-	static private String printSplits (Segmenter segmenter,
+/*	static private String printSplits (Segmenter segmenter,
 		String input)
 	{
 		ArrayList<Integer> list = segmenter.getSplitPositions();
@@ -374,11 +399,11 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testConfigString();
+		testSegmentation();
 		
 		if ( args.length == 0 ) return;
 //		testContainer();
-//		testSegmentation();
+		testConfigString();
 //		testItem();
 		testITSEngine();
 		testXMLReader();

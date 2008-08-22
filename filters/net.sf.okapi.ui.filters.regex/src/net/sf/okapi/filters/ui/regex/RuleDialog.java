@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.ui.regex;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
@@ -27,6 +28,8 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.filters.regex.Rule;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -41,10 +44,14 @@ public class RuleDialog {
 	private Shell            shell;
 	private Text             edStart;
 	private Text             edEnd;
+	private Text             edSample;
+	private Text             edResult;
 	private Text             edNameStart;
 	private Text             edNameEnd;
 	private Text             edNameFormat;
 	private boolean          result = false;
+	private Pattern          pattern1;
+	private Pattern          pattern2;
 	private Rule             rule = null;
 	private OKCancelPanel    pnlActions;
 
@@ -80,6 +87,24 @@ public class RuleDialog {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edEnd.setLayoutData(gdTmp);
 		edEnd.setText(rule.getEnd());
+		
+		edSample = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 64;
+		edSample.setLayoutData(gdTmp);
+		edSample.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
+
+		edResult = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 64;
+		edResult.setLayoutData(gdTmp);
+		edResult.setEditable(false);
 		
 		grpTmp = new Group(shell, SWT.NONE);
 		grpTmp.setText("Resource name (inside the start expression)");
@@ -142,6 +167,26 @@ public class RuleDialog {
 				shell.getDisplay().sleep();
 		}
 		return result;
+	}
+
+	private void updateResults () {
+		try {
+			pattern1 = Pattern.compile(edStart.getText(), Pattern.DOTALL);
+			Matcher m1 = pattern1.matcher(edSample.getText());
+			if ( m1.find() ) {
+				pattern2 = Pattern.compile(edEnd.getText(), Pattern.DOTALL);
+				Matcher m2 = pattern2.matcher(edSample.getText());
+				if ( m2.find(m1.end()) ) {
+					edResult.setText("start='" + m1.group() + "'\ncontent='"
+						+ edSample.getText().substring(m1.end(), m2.start())
+						+ "'\nend='" + m2.group() + "'");
+				}
+			}
+			else edResult.setText("<No match>");
+		}
+		catch ( Throwable e ) {
+			edResult.setText("Error: "+e.getMessage());
+		}
 	}
 
 	private boolean saveData () {

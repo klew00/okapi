@@ -77,13 +77,12 @@ public class Parser implements IParser {
 	}
 
 	//TODO: remove after test
-	private void tempSetStringInfoRules () {
+	private void tempSetStringInfoRules_set1 () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
 		r.ruleName = "r2";
 		r.start = "^(.*?)\\t";
 		r.end = "1$";
-		//r.splitters = "(\\\\[ntr])";
 		r.nameStart = "^";
 		r.nameEnd = "\\t";
 		r.ruleType = Rule.RULETYPE_STRING;
@@ -93,6 +92,25 @@ public class Parser implements IParser {
 		List<String> list = r.codeFinder.getRules();
 		list.add("#!\\[.*?\\]");
 		list.add("#!\\{.*?\\}");
+		r.codeFinder.compile();
+		
+		resource.params.rules.add(r);
+	}
+	
+	//TODO: remove after test
+	private void tempSetStringInfoRules_set2 () {
+		resource.params.rules.clear();
+		Rule r = new Rule();
+		r.ruleName = "r2";
+		r.start = "\\[.*?\\](\\t*)";
+		r.end = "\\n(?=\\[.*?\\])|$";
+		r.ruleType = Rule.RULETYPE_CONTENT;
+		r.preserveWS = true;
+		
+		r.useCodeFinder = true;
+		List<String> list = r.codeFinder.getRules();
+		list.add("\\^|\\n|\\t|\\r");
+		list.add("%(([-0+ #]?)[-0+ #]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
@@ -132,7 +150,7 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-			tempSetStringInfoRules();
+			tempSetStringInfoRules_set2();
 			
 			// Compile the rules
 			resource.params.compileRules();
@@ -188,12 +206,12 @@ public class Parser implements IParser {
 		MatchResult endResult = null;
 		int i = 0;
 		for ( Rule rule : resource.params.rules ) {
-			Pattern p = Pattern.compile(rule.start, Pattern.MULTILINE);
+			Pattern p = Pattern.compile(rule.start, Pattern.DOTALL); //Pattern.MULTILINE);
 			Matcher m = p.matcher(inputText);
 			if ( m.find(startSearch) ) {
 				if ( m.start() < bestPosition ) {
 					// Try to find the corresponding end
-					p = Pattern.compile(rule.end, Pattern.MULTILINE);
+					p = Pattern.compile(rule.end, Pattern.DOTALL); //Pattern.MULTILINE);
 					Matcher me = p.matcher(inputText);
 					if ( me.find(m.end()) ) {
 						bestPosition = m.start();
@@ -293,8 +311,7 @@ public class Parser implements IParser {
 		startSkl = endResult.start();
 
 		// Check localization directives
-		if (( !resource.params.locDir.isWithinScope() )
-			|| ( !resource.params.locDir.isLocalizable(true) )) {
+		if ( !resource.params.locDir.isLocalizable(true) ) {
 			// If not to be localized: make it a skeleton unit
 			addSkeletonToQueue(inputText.substring(startResult.end(),
 				endResult.start()), false);
@@ -327,10 +344,10 @@ public class Parser implements IParser {
 		if (( start == null ) || ( start.length() == 0 )) return null;
 		if (( end == null ) || ( end.length() == 0 )) return null;
 		
-		Pattern p = Pattern.compile(start, Pattern.MULTILINE);
+		Pattern p = Pattern.compile(start, Pattern.DOTALL); //Pattern.MULTILINE);
 		Matcher m1 = p.matcher(text);
 		if ( m1.find() ) {
-			p = Pattern.compile(end, Pattern.MULTILINE);
+			p = Pattern.compile(end, Pattern.DOTALL); //Pattern.MULTILINE);
 			Matcher m2 = p.matcher(text);
 			if ( m2.find(m1.end()) ) {
 				return text.substring(m1.end(), m2.start());

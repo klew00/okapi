@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -118,10 +119,10 @@ public class Segmenter {
 	
 	/**
 	 * calculate the segmentation of a given IContainer object.
-	 * @param original The object to segment.
+	 * @param container The object to segment.
 	 * @return The number of segment found.
 	 */
-	public int computeSegments (TextContainer original) {
+	public int computeSegments (TextContainer container) {
 		if ( currentLanguageCode == null ) {
 			// Need to call selectLanguageRule()
 			throw new RuntimeException("No language defined for the segmeter.");
@@ -132,7 +133,7 @@ public class Segmenter {
 		//original.joinParts();
 		
 		// Build the list of split positions
-		String codedText = original.getCodedText();
+		String codedText = container.getCodedText();
 		splits = new LinkedHashMap<Integer, Boolean>();
 		Matcher m;
 		for ( CompiledRule rule : rules ) {
@@ -158,6 +159,7 @@ public class Segmenter {
 		int textStart = 0;
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
+				// Trim white-spaces at the front
 				while ( true ) {
 					if ( textStart == pos ) break;
 					if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
@@ -167,47 +169,9 @@ public class Segmenter {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
-				textEnd = pos;
-				boolean done = false;
-				while ( !done ) {
-					switch ( codedText.charAt(textEnd) ) {
-					case TextFragment.MARKER_OPENING:
-						if ( includeStartCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					case TextFragment.MARKER_CLOSING:
-						if ( includeEndCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					case TextFragment.MARKER_ISOLATED:
-						if ( includeIsolatedCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					default:
-						if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
-						done = true; // Probably done
-						// Else: Check if it's the index of a marker
-						if ( textEnd > 1 ) {
-							switch ( codedText.charAt(textEnd-1) ) {
-							case TextFragment.MARKER_OPENING:
-							case TextFragment.MARKER_CLOSING:
-							case TextFragment.MARKER_ISOLATED:
-								done = false;
-								break;
-							}
-						}
-						break;
-					}
-					if ( !done ) {
-						if ( --textEnd < 0 ) break;
-					}
-				}
+				// Trim white-spaces and code as required at the back
+				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
+					pos, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
 				ends.add(textEnd);
@@ -217,53 +181,16 @@ public class Segmenter {
 		// Last one
 		int lastPos = codedText.length();
 		if ( textStart < lastPos ) {
+			// Trim white-spaces at the front
 			while ( true ) {
 				if ( textStart == lastPos ) break;
 				if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
 				else break;
 			}
 			if ( textStart < lastPos ) {
-				textEnd = lastPos-1;
-				boolean done = false;
-				while ( !done ) {
-					switch ( codedText.charAt(textEnd) ) {
-					case TextFragment.MARKER_OPENING:
-						if ( includeStartCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					case TextFragment.MARKER_CLOSING:
-						if ( includeEndCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					case TextFragment.MARKER_ISOLATED:
-						if ( includeIsolatedCodes ) {
-							textEnd += 2; // Includes the marker index too
-							done = true;
-						}
-						break;
-					default:
-						if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
-						done = true; // Probably done
-						// Else: Check if it's the index of a marker
-						if ( textEnd > 1 ) {
-							switch ( codedText.charAt(textEnd-1) ) {
-							case TextFragment.MARKER_OPENING:
-							case TextFragment.MARKER_CLOSING:
-							case TextFragment.MARKER_ISOLATED:
-								done = false;
-								break;
-							}
-						}
-						break;
-					}
-					if ( !done ) {
-						if ( --textEnd < 0 ) break;
-					}
-				}
+				// Trim white-spaces and code as required at the back
+				textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
+					0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
 				ends.add(textEnd);
@@ -277,52 +204,77 @@ public class Segmenter {
 		// (ends contains one extra value, so make sure to use starts for this)
 		return starts.size();
 	}
-
+	
 	/**
-	 * Segments a given TextContainer object.
-	 * @param original The container to segment.
-	 * @return The same container passed as parameter, but now segmented if needed.
+	 * Compute the range of the next segment for a given TextContainer content.
+	 * The next segment is searched from the first character after the last
+	 * segment marker found in the container.
+	 * @param container The text container where to look for the next segment. 
+	 * @return A range corresponding to the start and end position of the found
+	 * segment, or null if no more segments are found.
 	 */
-	public TextContainer segment (TextContainer original) {
-		if ( computeSegments(original) < 2 ) {
-			// No more than 1 segment
-			return original;
-		}
-		
-		// Otherwise we have at least two segments:
-		// Build a temporary list of these segments
-		ArrayList<TextFragment> newParts = new ArrayList<TextFragment>();
+	public Point getNextSegmentRange (TextContainer container) {
+		String text = container.getCodedText();
 		int start = 0;
-		int textStart;
-		TextFragment tc;
-		// Note: Always drive with starts (as ends has one extra value)
-		int i;
-		for ( i=0; i<starts.size(); i++ ) {
-			textStart = starts.get(i);
-			if ( start < textStart ) {
-				newParts.add(original.subSequence(start, textStart));
-				//newParts.get(newParts.size()-1).setIsSegment(false);
+		Code code;
+		if ( container.isSegmented() ) {
+			// Find the last segment marker in the main coded text
+			for ( int i=text.length()-1; i>=0; i-- ) {
+				if ( text.charAt(i) == TextContainer.MARKER_ISOLATED ) {
+					code = container.getCode(text.charAt(i+1));
+					if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
+						start = i+2; // Just after the marker
+						break;
+					}
+				}
 			}
-			tc = original.subSequence(textStart, ends.get(i));
-			//TODO: Change for real markup, this is for test 
-			tc.setCodedText("["+tc.getCodedText()+"]");
-			newParts.add(tc);
-			start = ends.get(i);
 		}
-		// The last extra value in ends contains the coded text length
-		// We use it here to add the possible last non-segment part.
-		if ( start < ends.get(i) ) {
-			newParts.add(original.subSequence(start, ends.get(i)));
-			//newParts.get(newParts.size()-1).setIsSegment(false);
-		}
+
+		// Do we have reach the end?
+		if ( start >= text.length() ) return null;
 		
-		// And rebuild the original container, this time segmented
-		original.clear();
-		for ( TextFragment part : newParts ) {
-			//TODO: handle segmentation setting
-			original.append(part);
+		// Else: search for next segment
+		Matcher m;
+		CompiledRule rule;
+		int end = -1;
+		int pos = start;
+		for ( int i=0; i<rules.size(); i++ ) {
+			rule = rules.get(i);
+			m = rule.pattern.matcher(text.substring(pos));
+			if ( m.find() ) {
+				if ( !rule.isBreak ) {
+					pos = pos+m.start()+m.group(1).length()+1;
+					if ( pos == text.length() ) break;
+					i = 0; // Look at all rules again
+				}
+				else {
+					end = pos+m.start()+m.group(1).length();
+					break;
+				}
+			}
 		}
-		return original;
+
+		// If not found: take all the remainder as the fragment
+		if ( end < 0 ) end = text.length()-1;
+		
+		// Trim the white-spaces at the front of the segment
+		while ( true ) {
+			if ( start > end ) break;
+			if ( Character.isSpaceChar(text.charAt(start)) ) start++;
+			else break;
+		}
+
+		// Trim the white-spaces and required codes at the end of the segment
+		end = TextFragment.getLastNonWhitespacePosition(text, end, start,
+			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+		
+		// Adjust for +1 position (it's a range)
+		if ( end == -1 ) return null;
+		else end++;
+
+		// Return the range
+		if ( start == end ) return null;
+		return new Point(start, end);
 	}
 
 	/**
@@ -343,7 +295,14 @@ public class Segmenter {
 		}
 		return list;
 	}
-	
+
+	/**
+	 * Gets the list off all segments ranges calculated when
+	 * calling {@link #computeSegments(String)}, or
+	 * {@link #computeSegments(TextContainer)}.
+	 * @return The list of all segments ranges. each range is stored in
+	 * a {@link Point} object where x is the start and y the end of the range.
+	 */
 	public List<Point> getSegmentRanges () {
 		ArrayList<Point> list = new ArrayList<Point>();
 		if ( starts == null ) return null;
@@ -352,7 +311,6 @@ public class Segmenter {
 		}
 		return list;
 	}
-	
 	
 	/**
 	 * Gets the language used to apply the rules.

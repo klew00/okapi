@@ -82,7 +82,7 @@ public class TextFragment implements Comparable<Object> {
 	
 
 	/**
-	 * Converts a marker index to its character value in the
+	 * Helper method to convert a marker index to its character value in the
 	 * coded text string.
 	 * @param index The index value to encode.
 	 * @return The corresponding character value.
@@ -92,12 +92,85 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Converts the index-coded-as-character part of a marker into its index value.
+	 * Helper method to convert the index-coded-as-character part of a marker into 
+	 * its index value.
 	 * @param index The character to decode.
 	 * @return The corresponding index value.
 	 */
 	public static int toIndex (char index) {
 		return ((int)index)-CHARBASE;
+	}
+	
+	/**
+	 * Helper method to find, from the back, the first non-whitespace character
+	 * of a coded text, starting at a given position and no farther than another
+	 * given position.
+	 * @param codedText The coded text to process.
+	 * @param fromIndex The first position to check (must be greater or equal to
+	 * untilIndex). Use -1 to point to the last position of the text.
+	 * @param untilIndex The last position to check (must be lesser or equal to
+	 * fromIndex).
+	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
+	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
+	 * @param isolatedMarkerisWS Indicates if isolated markers count as whitespace.
+	 * @return
+	 */
+	public static int getLastNonWhitespacePosition (String codedText,
+		int fromIndex,
+		int untilIndex,
+		boolean openingMarkerIsWS,
+		boolean closingMarkerIsWS,
+		boolean isolatedMarkerisWS)
+	{
+		// Empty text
+		if (( codedText == null ) || ( codedText.length() == 0 )) return -1;
+		
+		// Set variables
+		if ( fromIndex == -1 ) fromIndex = codedText.length()-1;
+		int textEnd = fromIndex;
+		boolean done = false;
+
+		while ( !done ) {
+			switch ( codedText.charAt(textEnd) ) {
+			case TextFragment.MARKER_OPENING:
+				if ( !openingMarkerIsWS ) {
+					textEnd += 2;
+					done = true;
+				}
+				break;
+			case TextFragment.MARKER_CLOSING:
+				if ( !closingMarkerIsWS ) {
+					textEnd += 2;
+					done = true;
+				}
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				if ( !isolatedMarkerisWS ) {
+					textEnd += 2;
+					done = true;
+				}
+				break;
+			default:
+				if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
+				done = true; // Else: Probably done
+				// But check if it's the index of a marker
+				if ( textEnd > 1 ) {
+					switch ( codedText.charAt(textEnd-1) ) {
+					case TextFragment.MARKER_OPENING:
+					case TextFragment.MARKER_CLOSING:
+					case TextFragment.MARKER_ISOLATED:
+						done = false; // Not done yet
+						break;
+					}
+				}
+				break;
+			}
+			if ( !done ) {
+				if ( textEnd-1 < untilIndex ) break;
+				textEnd--;
+			}
+		}
+		return textEnd;
 	}
 
 	/**
@@ -114,7 +187,15 @@ public class TextFragment implements Comparable<Object> {
 	public TextFragment (String text) {
 		this.text = new StringBuilder(text);
 	}
-	
+
+	/**
+	 * Creates a TextFragment with the content of a given TextFragment.
+	 * @param fragment The content to use.
+	 */
+	public TextFragment (TextFragment fragment) {
+		insert(-1, fragment);
+	}
+
 	/**
 	 * Gets the ID of the fragment.
 	 * @return The ID of the fragment.
