@@ -193,6 +193,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param fragment The content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
+		text = new StringBuilder();
 		insert(-1, fragment);
 	}
 
@@ -221,19 +222,21 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Appends a string to the fragment.
+	 * Appends a string to the fragment. If the string is null, it is ignored.
 	 * @param text The string to append.
 	 */
 	public void append (String text) {
+		if ( text == null ) return;
 		this.text.append(text);
 	}
 
 	/**
-	 * Appends a TextFragment object to this fragment.
-	 * @param container The TextFragment to append.
+	 * Appends a TextFragment object to this fragment. If the fragment is null,
+	 * it is ignored.
+	 * @param fragment The TextFragment to append.
 	 */
-	public void append (TextFragment container) {
-		insert(-1, container);
+	public void append (TextFragment fragment) {
+		insert(-1, fragment);
 	}
 	
 	/**
@@ -278,6 +281,7 @@ public class TextFragment implements Comparable<Object> {
 	public void insert (int offset,
 		TextFragment container)
 	{
+		if ( container == null ) return;
 		checkPositionForMarker(offset);
 		StringBuilder tmp = new StringBuilder(container.getCodedText());
 		List<Code> newCodes = container.getCodes();

@@ -57,6 +57,17 @@ public class Main {
 		grp.add(new TextUnit("SF1", "Text of SF1 in image1"));
 		grp.add(new TextUnit("SF2", "Text of SF2 in image1"));
 		tu2.addChild(grp);
+		src.append(", img2: ");
+		src.append(TagType.PLACEHOLDER, "image",
+				String.format("<img2 alt='%sSF3%s' title='%sSF4%s'/>",
+				TextFragment.SFMARKER_START, TextFragment.SFMARKER_END,
+				TextFragment.SFMARKER_START, TextFragment.SFMARKER_END)
+			).setHasSubflow(true);
+			grp = new Group();
+			grp.setID("g2");
+			grp.add(new TextUnit("SF3", "Text of SF3 in image2"));
+			grp.add(new TextUnit("SF4", "Text of SF4 in image2"));
+			tu2.addChild(grp);
 		doc.add(tu2);
 		 
 		tu = new TextUnit("t3", "Image2: ");

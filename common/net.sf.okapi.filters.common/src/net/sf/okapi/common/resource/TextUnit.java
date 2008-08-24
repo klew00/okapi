@@ -298,10 +298,14 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	}
 
 	/**
-	 * Sets the (first) target content of the resource.
+	 * Sets the (first) target content of the resource. If there is no target
+	 * object yet, it is created automatically.
 	 * @param value The new content (can be null).
 	 */
 	public void setTargetContent (TextContainer value) {
+		if ( targets.get(0) == null ) {
+			targets.set(0, new LocaleData(this));
+		}
 		targets.get(0).container = value;
 	}
 
@@ -387,11 +391,12 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * @return An iteratable list of all the children TextUnit objects.
 	 */
 	public Iterable<TextUnit> childTextUnitIterator () {
-		if ( allUnits == null ) {
-			allUnits = new ArrayList<TextUnit>();
-			if ( hasChild() ) {
-				// Children only
-				storeTextUnits(getChildren().get(0));
+		// Rebuild the list each time
+		allUnits = new ArrayList<TextUnit>();
+		if ( hasChild() ) {
+			// Children only
+			for ( int i=0; i<children.size(); i++ ) {
+				storeTextUnits(getChildren().get(i));
 			}
 		}
 		return Collections.unmodifiableList(allUnits);

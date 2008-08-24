@@ -61,6 +61,55 @@ public class TextContainer extends TextFragment {
 	}
 
 	/**
+	 * Gets the fragment before a given segment marker.
+	 * @param segmentIndex The index of the segment to look for.
+	 * @return The fragment between the given segment and the previous one, or the start
+	 * of the text if the given fragment is the first one, or null if the fragment
+	 * is not found.
+	 */
+	public TextFragment getFragmentBeforeSegment(int segmentIndex) {
+		int start = 0;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+				i++;
+				break;
+			case MARKER_ISOLATED:
+				Code code = codes.get(toIndex(text.charAt(++i)));
+				if ( code.type.equals(CODETYPE_SEGMENT) ) {
+					if ( Integer.parseInt(code.data) == segmentIndex ) {
+						return subSequence(start, i-1);
+					}
+					else start = i+1; // Reset the start of the fragment
+				}
+			}
+		}
+		return null;
+	}
+	
+	public TextFragment getFragmentAfterSegment (int segmentIndex) {
+		int start = 0;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+				i++;
+				break;
+			case MARKER_ISOLATED:
+				Code code = codes.get(toIndex(text.charAt(++i)));
+				if ( code.type.equals(CODETYPE_SEGMENT) ) {
+					if ( Integer.parseInt(code.data) == segmentIndex ) {
+						start = i+1;
+					}
+					else start = i+1; // Reset the start of the fragment
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Segment this object into one or more segments corresponding to given ranges in 
 	 * the coded text. If the object is already segmented, it will be automatically
 	 * un-segmented first. Use {@link #mergeAllSegments()} to rebuild the original 
@@ -157,7 +206,7 @@ public class TextContainer extends TextFragment {
 	 * main coded text, and the new fragment becomes the first
 	 * segment and is appended at the end of the existing content.
 	 * @param fragment The fragment to add.
-	 *
+	 */
 	public void addSegment (TextFragment fragment) {
 		if ( segments == null ) {
 			segments = new ArrayList<TextFragment>();
@@ -173,7 +222,7 @@ public class TextContainer extends TextFragment {
 		codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT,
 			String.valueOf(segments.size()-1)));
 		text.append(""+(char)MARKER_ISOLATED+toChar(codes.size()-1));
-	}*/
+	}
 	
 	/**
 	 * Creates a new segment from a section of the container text.

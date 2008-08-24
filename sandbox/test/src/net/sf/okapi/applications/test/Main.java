@@ -328,17 +328,39 @@ public class Main {
 			TextContainer trgCont = new TextContainer();
 			tu.setTargetContent(trgCont);
 
-			range = seg.getNextSegmentRange(srcCont);
-			TextFragment srcSeg = srcCont.createSegment(range.x, range.y);
-			TextFragment trgSeg = new TextFragment(srcSeg);
-			
-			
+			System.out.println("src='"+srcCont.toString()+"'");
+			System.out.println("trg='"+trgCont.toString()+"'");
+			TextFragment srcSeg;
+			TextFragment trgSeg;
+			int i = 0;
+			while ( (range = seg.getNextSegmentRange(srcCont)) != null ) {
+				srcSeg = srcCont.createSegment(range.x, range.y);
+				trgSeg = new TextFragment(srcSeg);
+				translate(trgSeg);
+				trgCont.append(srcCont.getFragmentBeforeSegment(i));
+				trgCont.addSegment(trgSeg);
+				i++;
+			}
+			//trgCont.append(srcCont.getFragmentAfterSegment(0));
+			System.out.println("src='"+srcCont.toString()+"'");
+			for ( TextFragment tf : srcCont.getSegments() ) {
+				System.out.println("s='"+tf.toString()+"'");
+			}
+			System.out.println("trg='"+trgCont.toString()+"'");
+			for ( TextFragment tf : trgCont.getSegments() ) {
+				System.out.println("t='"+tf.toString()+"'");
+			}
 			
 		}
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());
 		}
 		System.out.println("---end testSegmentation---");
+	}
+	
+	// fake translation
+	static private void translate (TextFragment fragment) {
+		fragment.append("_trans");
 	}
 
 /*	static private String printSplits (Segmenter segmenter,
