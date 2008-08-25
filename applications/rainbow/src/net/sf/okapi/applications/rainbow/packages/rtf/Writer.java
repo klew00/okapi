@@ -110,11 +110,11 @@ public class Writer extends BaseWriter {
 		// Write the items in the TM if needed
 		if ( item.hasTarget() ) {
 			tmxWriter.writeItem(item);
-		}
-		if ( item.hasChild() ) {
-			for ( TextUnit tu : item.childTextUnitIterator() ) {
-				if ( tu.hasTarget() ) {
-					tmxWriter.writeItem(tu);
+			if ( item.hasChild() ) {
+				for ( TextUnit tu : item.childTextUnitIterator() ) {
+					if ( tu.hasTarget() ) {
+						tmxWriter.writeItem(tu);
+					}
 				}
 			}
 		}
@@ -124,8 +124,17 @@ public class Writer extends BaseWriter {
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
 			//TODO
+			int srcSegCount = 0;
+			int trgSegCount = 0;
+			if ( item.getSourceContent().isSegmented() ) {
+				srcSegCount = item.getSourceContent().getSegments().size();
+			}
+			if ( item.getTargetContent().isSegmented() ) {
+				trgSegCount = item.getTargetContent().getSegments().size();
+			}
 		}
 		else {
+			
 			processContent(item.getSourceContent(), tmp);
 		}
 		tmp.append(Util.RTF_STARTCODE);

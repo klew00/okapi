@@ -112,7 +112,7 @@ public class TextFragment implements Comparable<Object> {
 	 * fromIndex).
 	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
 	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
-	 * @param isolatedMarkerisWS Indicates if isolated markers count as whitespace.
+	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
 	 * @return
 	 */
 	public static int getLastNonWhitespacePosition (String codedText,
@@ -120,7 +120,7 @@ public class TextFragment implements Comparable<Object> {
 		int untilIndex,
 		boolean openingMarkerIsWS,
 		boolean closingMarkerIsWS,
-		boolean isolatedMarkerisWS)
+		boolean isolatedMarkerIsWS)
 	{
 		// Empty text
 		if (( codedText == null ) || ( codedText.length() == 0 )) return -1;
@@ -145,13 +145,13 @@ public class TextFragment implements Comparable<Object> {
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
-				if ( !isolatedMarkerisWS ) {
+				if ( !isolatedMarkerIsWS ) {
 					textEnd += 2;
 					done = true;
 				}
 				break;
 			default:
-				if ( Character.isSpaceChar(codedText.charAt(textEnd)) ) break;
+				if ( Character.isWhitespace(codedText.charAt(textEnd)) ) break;
 				done = true; // Else: Probably done
 				// But check if it's the index of a marker
 				if ( textEnd > 1 ) {

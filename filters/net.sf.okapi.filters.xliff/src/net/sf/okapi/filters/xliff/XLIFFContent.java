@@ -161,7 +161,7 @@ public class XLIFFContent {
 		Code code;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
-			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_ISOLATED:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
@@ -175,11 +175,20 @@ public class XLIFFContent {
 					tmp.append("</mrk>");
 				}
 				else {
-					id = code.getID();
-					tmp.append(String.format("<bpt id=\"%d\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
-					tmp.append("</bpt>");
+					id = codes.get(index).getID();
+					tmp.append(String.format("<ph id=\"%d\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(),
+						quoteMode, escapeGT));
+					tmp.append("</ph>");
 				}
+				break;
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
+				tmp.append(String.format("<bpt id=\"%d\">", id));
+				tmp.append(Util.escapeToXML(codes.get(index).toString(),
+					quoteMode, escapeGT));
+				tmp.append("</bpt>");
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
@@ -188,14 +197,6 @@ public class XLIFFContent {
 				tmp.append(Util.escapeToXML(codes.get(index).toString(),
 					quoteMode, escapeGT));
 				tmp.append("</ept>");
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
-				tmp.append(String.format("<ph id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(),
-					quoteMode, escapeGT));
-				tmp.append("</ph>");
 				break;
 			case '>':
 				if ( escapeGT ) tmp.append("&gt;");

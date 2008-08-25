@@ -99,9 +99,9 @@ public class SRXEditor {
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericContent();
 		
-		patternOpening = Pattern.compile("\\<(\\w+.*)\\>");
-		patternClosing = Pattern.compile("\\</(\\w+.*)\\>");
-		patternPlaceholder = Pattern.compile("\\<(\\w+.*)/\\>");
+		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>");
+		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
+		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setImage(parent.getImage());
@@ -656,6 +656,7 @@ public class SRXEditor {
 			getSurfaceData();
 			srxDoc.saveRules(path);
 			srxPath = path;
+			updateCaption();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);

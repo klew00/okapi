@@ -165,12 +165,16 @@ public class Writer extends BaseWriter {
 		writer.writeLineBreak();
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
-		writer.writeEndElementLineBreak(); // source
 		if ( item.getSourceContent().isSegmented() ) {
+			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+			writer.writeEndElementLineBreak(); // source
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(item.getSourceContent(), 1, true));
 			writer.writeEndElementLineBreak(); // seg-source
+		}
+		else {
+			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+			writer.writeEndElementLineBreak(); // source
 		}
 
 		// Target (if needed)

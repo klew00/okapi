@@ -22,7 +22,7 @@ package net.sf.okapi.lib.segmentation;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -40,7 +40,7 @@ public class Segmenter {
 	private String      currentLanguageCode;
 	
 	private ArrayList<CompiledRule>         rules;
-	private LinkedHashMap<Integer, Boolean> splits;
+	private TreeMap<Integer, Boolean>       splits;
 	private ArrayList<Integer>              starts;
 	private ArrayList<Integer>              ends;
 
@@ -134,7 +134,7 @@ public class Segmenter {
 		
 		// Build the list of split positions
 		String codedText = container.getCodedText();
-		splits = new LinkedHashMap<Integer, Boolean>();
+		splits = new TreeMap<Integer, Boolean>();
 		Matcher m;
 		for ( CompiledRule rule : rules ) {
 			m = rule.pattern.matcher(codedText);
@@ -149,6 +149,7 @@ public class Segmenter {
 				splits.put(n, rule.isBreak);
 			}
 		}
+		
 
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
@@ -162,7 +163,7 @@ public class Segmenter {
 				// Trim white-spaces at the front
 				while ( true ) {
 					if ( textStart == pos ) break;
-					if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
+					if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
 					else break;
 				}
 				if ( textStart == pos ) {
@@ -171,7 +172,7 @@ public class Segmenter {
 				}
 				// Trim white-spaces and code as required at the back
 				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
-					pos, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+					pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
 				ends.add(textEnd);
@@ -184,7 +185,7 @@ public class Segmenter {
 			// Trim white-spaces at the front
 			while ( true ) {
 				if ( textStart == lastPos ) break;
-				if ( Character.isSpaceChar(codedText.charAt(textStart)) ) textStart++;
+				if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
 				else break;
 			}
 			if ( textStart < lastPos ) {
@@ -260,7 +261,7 @@ public class Segmenter {
 		// Trim the white-spaces at the front of the segment
 		while ( true ) {
 			if ( start > end ) break;
-			if ( Character.isSpaceChar(text.charAt(start)) ) start++;
+			if ( Character.isWhitespace(text.charAt(start)) ) start++;
 			else break;
 		}
 

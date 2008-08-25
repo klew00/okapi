@@ -77,8 +77,8 @@ public class Parser implements IParser {
 	}
 
 	//TODO: remove after test
-	/*
-	private void tempSetStringInfoRules_set1 () {
+	// INFOSTRING rules
+	private void tempSetStringInfoRules () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
 		r.ruleName = "r2";
@@ -93,18 +93,22 @@ public class Parser implements IParser {
 		List<String> list = r.codeFinder.getRules();
 		list.add("#!\\[.*?\\]");
 		list.add("#!\\{.*?\\}");
+		list.add("\\\\[nrt]");
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
-	}*/
+	}
 	
 	//TODO: remove after test
-	private void tempSetStringInfoRules_set2 () {
+	/*// AZADA rules
+	private void tempSetStringInfoRules () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
 		r.ruleName = "r2";
 		r.start = "\\[.*?\\](\\t*)";
 		r.end = "\\n(?=\\[.*?\\])|$";
+		r.nameStart = "\\[";
+		r.nameEnd = "\\]";
 		r.ruleType = Rule.RULETYPE_CONTENT;
 		r.preserveWS = true;
 		
@@ -115,7 +119,7 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
-	}
+	}*/
 	
 	public void open (InputStream input) {
 		try {
@@ -151,7 +155,7 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-			tempSetStringInfoRules_set2();
+			tempSetStringInfoRules();
 			
 			// Compile the rules
 			resource.params.compileRules();
@@ -207,12 +211,12 @@ public class Parser implements IParser {
 		MatchResult endResult = null;
 		int i = 0;
 		for ( Rule rule : resource.params.rules ) {
-			Pattern p = Pattern.compile(rule.start, Pattern.DOTALL); //Pattern.MULTILINE);
+			Pattern p = Pattern.compile(rule.start, Pattern.DOTALL | Pattern.MULTILINE);
 			Matcher m = p.matcher(inputText);
 			if ( m.find(startSearch) ) {
 				if ( m.start() < bestPosition ) {
 					// Try to find the corresponding end
-					p = Pattern.compile(rule.end, Pattern.DOTALL); //Pattern.MULTILINE);
+					p = Pattern.compile(rule.end, Pattern.DOTALL | Pattern.MULTILINE);
 					Matcher me = p.matcher(inputText);
 					if ( me.find(m.end()) ) {
 						bestPosition = m.start();

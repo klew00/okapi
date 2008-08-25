@@ -148,10 +148,14 @@ public class TextContainer extends TextFragment {
 			segments.add(subSequence(ranges.get(i).x+diff, ranges.get(i).y+diff));
 			// Remove it from the main content
 			int width = ranges.get(i).y-ranges.get(i).x;
-			if ( width > 2 ) remove(ranges.get(i).x+diff, ranges.get(i).y+diff-2);
-			else if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment("Z"));
+			// For chunk <s 2 there is no codes so we can just add the needed room for insertion
+			if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment("Z"));
 			else if ( width == 0 ) insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
-			// Else width == 2 : Do nothing
+			else { // Otherwise: we need to remove the chunk of coded text and its codes
+				remove(ranges.get(i).x+diff, ranges.get(i).y+diff);
+				// then re-insert room for the code
+				insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
+			}
 			
 			// Add the segment marker and its corresponding code
 			codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT, String.valueOf(i)));
