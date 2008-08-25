@@ -1,4 +1,5 @@
-/* Copyright (C) 2008 Jim Hargrave
+/*===========================================================================*/
+/* Copyright (C) 2008 Jim Hargrave                                           */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -19,117 +20,117 @@
 
 package net.sf.okapi.filters.html;
 
-import static net.sf.okapi.filters.html.ConditionalAttribute.CONDITIONAL_ATTRIBUTE_TYPE.EQUALS;
-import static net.sf.okapi.filters.html.ElementExtractionRule.EXTRACTION_RULE_TYPE.EXCLUDED_ELEMENT;
-import static net.sf.okapi.filters.html.ElementExtractionRule.EXTRACTION_RULE_TYPE.EXTRACTABLE_ATTRIBUTES;
-import static net.sf.okapi.filters.html.ElementExtractionRule.EXTRACTION_RULE_TYPE.INLINE_ELEMENT;
+import static net.sf.okapi.filters.html.ConditionalAttributeRule.CONDITIONAL_ATTRIBUTE_TYPE.EQUALS;
+import static net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE.EXTRACTABLE_ATTRIBUTES;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import net.htmlparser.jericho.MasonTagTypes;
+import net.htmlparser.jericho.MicrosoftTagTypes;
+import net.htmlparser.jericho.PHPTagTypes;
+
 public class HtmlFilterConfiguration {
 	private static final String LOCALIZABLE_PROPERTY = "localizable";
 	
-	private Map<String, ElementExtractionRule> ruleMap;
+	private Map<String, ExtractionRule> ruleMap;
 	
 	public HtmlFilterConfiguration() {
-		ruleMap = new HashMap<String, ElementExtractionRule>();
+		ruleMap = new HashMap<String, ExtractionRule>();
 	}
 	
-	public ElementExtractionRule getRule(String ruleName) {
+	public ExtractionRule getRule(String ruleName) {
 		return ruleMap.get(ruleName);
 	}
 	
-	public void addRule(String ruleName, ElementExtractionRule rule) {
+	public void addRule(String ruleName, ExtractionRule rule) {
 		ruleMap.put(ruleName, rule);
 	}
 	
 	public void clearRules() {
 		ruleMap.clear();
+		//TODO How to unregister custom Jericho tags??
 	}
-	
+		
 	public void initializeDefaultRules() {
-		ElementExtractionRule rule;
+		// register custom tags
+		MicrosoftTagTypes.register();
+		PHPTagTypes.register();
+		PHPTagTypes.PHP_SHORT.deregister(); // remove PHP short tags, otherwise
+											// they override processing
+											// instructions
+		MasonTagTypes.register();		
+		ExtractionRule rule;
 		
 		// default inline elements with option extractable attributes
-		rule = new ElementExtractionRule("a", INLINE_ELEMENT);
-		rule.addExtractionCondition(new ConditionalAttribute("title"));
-		ruleMap.put("a", rule);
+		ruleMap.put("a", ExtractionRule.createInlineWithAttributeRule("a", "title"));
 		
-		ruleMap.put("b", new ElementExtractionRule("b", INLINE_ELEMENT));		
-		ruleMap.put("big", new ElementExtractionRule("big", INLINE_ELEMENT));		
-		ruleMap.put("em", new ElementExtractionRule("em", INLINE_ELEMENT));		
-		ruleMap.put("font", new ElementExtractionRule("font", INLINE_ELEMENT));		
-		ruleMap.put("i", new ElementExtractionRule("i", INLINE_ELEMENT));
+		ruleMap.put("b", ExtractionRule.createInlineRule("b"));		
+		ruleMap.put("big", ExtractionRule.createInlineRule("big"));		
+		ruleMap.put("em", ExtractionRule.createInlineRule("em"));		
+		ruleMap.put("font", ExtractionRule.createInlineRule("font"));		
+		ruleMap.put("i", ExtractionRule.createInlineRule("i"));
 		
-		rule = new ElementExtractionRule("img", INLINE_ELEMENT);
-		rule.addExtractionCondition(new ConditionalAttribute("title"));
-		rule.addExtractionCondition(new ConditionalAttribute("alt"));
+		rule = ExtractionRule.createInlineRule("img");
+		rule.addExtractableAttribute(new AttributeExtractionRule("title"));
+		rule.addExtractableAttribute(new AttributeExtractionRule("alt"));
 		ruleMap.put("img", rule);
 		
-		ruleMap.put("s", new ElementExtractionRule("s", INLINE_ELEMENT));		
-		ruleMap.put("samp", new ElementExtractionRule("samp", INLINE_ELEMENT));
-		ruleMap.put("small", new ElementExtractionRule("small", INLINE_ELEMENT));		
-		ruleMap.put("span", new ElementExtractionRule("span", INLINE_ELEMENT));		
-		ruleMap.put("strike", new ElementExtractionRule("strike", INLINE_ELEMENT));		
-		ruleMap.put("strong", new ElementExtractionRule("strong", INLINE_ELEMENT));		
-		ruleMap.put("sub", new ElementExtractionRule("sub", INLINE_ELEMENT));		
-		ruleMap.put("sup", new ElementExtractionRule("sup", INLINE_ELEMENT));		
-		ruleMap.put("u", new ElementExtractionRule("u", INLINE_ELEMENT));
+		ruleMap.put("s", ExtractionRule.createInlineRule("s"));		
+		ruleMap.put("samp", ExtractionRule.createInlineRule("samp"));
+		ruleMap.put("small", ExtractionRule.createInlineRule("small"));		
+		ruleMap.put("span", ExtractionRule.createInlineRule("span"));		
+		ruleMap.put("strike", ExtractionRule.createInlineRule("strike"));		
+		ruleMap.put("strong", ExtractionRule.createInlineRule("strong"));		
+		ruleMap.put("sub", ExtractionRule.createInlineRule("sub"));		
+		ruleMap.put("sup", ExtractionRule.createInlineRule("sup"));		
+		ruleMap.put("u", ExtractionRule.createInlineRule("u"));
 		
 		// Ruby inline	
-		ruleMap.put("ruby", new ElementExtractionRule("ruby", INLINE_ELEMENT));
-		ruleMap.put("rt", new ElementExtractionRule("rc", INLINE_ELEMENT));
-		ruleMap.put("rc", new ElementExtractionRule("rc", INLINE_ELEMENT));
-		ruleMap.put("rp", new ElementExtractionRule("rp", INLINE_ELEMENT));
-		ruleMap.put("rbc", new ElementExtractionRule("rbc", INLINE_ELEMENT));
-		ruleMap.put("rtc", new ElementExtractionRule("rtc", INLINE_ELEMENT));
+		ruleMap.put("ruby", ExtractionRule.createInlineRule("ruby"));
+		ruleMap.put("rt", ExtractionRule.createInlineRule("rt"));
+		ruleMap.put("rc", ExtractionRule.createInlineRule("rc"));
+		ruleMap.put("rp", ExtractionRule.createInlineRule("rp"));
+		ruleMap.put("rbc", ExtractionRule.createInlineRule("rbc"));
+		ruleMap.put("rtc", ExtractionRule.createInlineRule("rtc"));
 		
 		// RoboHelp specific
-		ruleMap.put("u", new ElementExtractionRule("symbol", INLINE_ELEMENT));
-		ruleMap.put("u", new ElementExtractionRule("face", INLINE_ELEMENT));
+		ruleMap.put("symbol", ExtractionRule.createInlineRule("symbol"));
+		ruleMap.put("face", ExtractionRule.createInlineRule("face"));
 		
 		// excluded elements (includes children)
-		ruleMap.put("style", new ElementExtractionRule("style", EXCLUDED_ELEMENT));		
-		ruleMap.put("stylesheet", new ElementExtractionRule("stylesheet", EXCLUDED_ELEMENT));
+		ruleMap.put("style", ExtractionRule.createExcludedRule("style"));		
+		ruleMap.put("stylesheet", ExtractionRule.createExcludedRule("stylesheet"));
 		
 		// extractable attributes (not inline)
-		rule = new ElementExtractionRule("div", EXTRACTABLE_ATTRIBUTES);
-		rule.addExtractionCondition(new ConditionalAttribute("title"));
-		ruleMap.put("div", rule);
+		ruleMap.put("div", ExtractionRule.createExtractableAttributeRule("div", "title"));
 		
-		rule = new ElementExtractionRule("table", EXTRACTABLE_ATTRIBUTES);
-		rule.addExtractionCondition(new ConditionalAttribute("summary"));
-		ruleMap.put("table", rule);
+		ruleMap.put("table", ExtractionRule.createExtractableAttributeRule("table", "summary"));
 		
-		// input attributes
+		// input conditional extractable attributes
 		AttributeExtractionRule attrRule;
-		rule = new ElementExtractionRule("input", EXTRACTABLE_ATTRIBUTES);
+		rule = new ExtractionRule("input", EXTRACTABLE_ATTRIBUTES);
 		attrRule = new AttributeExtractionRule("title");
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "button"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "default"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "submit"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "reset"));				
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "button"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "default"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "submit"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "reset"));				
 		rule.addExtractableAttribute(attrRule);
 		
 		attrRule = new AttributeExtractionRule("value");
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "button"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "default"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "submit"));
-		attrRule.addExtractionCondition(new ConditionalAttribute("type", EQUALS, "reset"));				
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "button"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "default"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "submit"));
+		attrRule.addConditionalAttributeRule(new ConditionalAttributeRule("type", EQUALS, "reset"));				
 		rule.addExtractableAttribute(attrRule);
 		
 		// localizable - but not translatable
-		rule = new ElementExtractionRule("href", EXTRACTABLE_ATTRIBUTES);
+		rule = ExtractionRule.createExtractableAttributeAnyElementRule("href");
 		rule.addProperty(LOCALIZABLE_PROPERTY, LOCALIZABLE_PROPERTY);
 		ruleMap.put("href", rule);
 		
-		rule = new ElementExtractionRule("meta", EXTRACTABLE_ATTRIBUTES);
+		rule = ExtractionRule.createExtractableAttributeRule("meta", "content");
 		rule.addProperty(LOCALIZABLE_PROPERTY, LOCALIZABLE_PROPERTY);
-		ruleMap.put("content", rule);
-		
-		rule = new ElementExtractionRule("table", EXTRACTABLE_ATTRIBUTES);
-		rule.addProperty(LOCALIZABLE_PROPERTY, LOCALIZABLE_PROPERTY);
-		ruleMap.put("summary", rule);
+		ruleMap.put("meta", rule);		
 	}
 }
