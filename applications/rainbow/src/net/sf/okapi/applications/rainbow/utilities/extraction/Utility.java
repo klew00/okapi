@@ -22,6 +22,9 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
@@ -30,17 +33,23 @@ import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
-	private String      inputRoot;
-	private String      inputPath;
-	private String      outputRoot;
-	private String      outputPath;
-	private Parameters  params;
-	private IWriter     writer;
-	private int         id;
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private String           inputRoot;
+	private String           inputPath;
+	private String           outputRoot;
+	private String           outputPath;
+	private Parameters       params;
+	private IWriter          writer;
+	private int              id;
+	private Segmenter        sourceSeg;
+	private Segmenter        targetSeg;
 	
 	
 	public Utility () {
@@ -77,6 +86,17 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.test.Writer();
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
+	
+		// Load SRX file(s) and create segmenters if required
+		if ( params.presegment ) {
+			SRXDocument doc = new SRXDocument();
+			doc.loadRules(params.sourceSRX);
+			sourceSeg = doc.applyLanguageRules(sourceLanguage, null);
+			if ( !params.sourceSRX.equalsIgnoreCase(params.targetSRX) ) {
+				doc.loadRules(params.targetSRX);
+			}
+			targetSeg = doc.applyLanguageRules(targetLanguage, null);
+		}
 		
 		id = 0;
 		writer.setParameters(sourceLanguage, targetLanguage,
@@ -152,6 +172,24 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		if ( params.includeTargets ) {
 			//TODO: Find a solution to not output item with
 			// existing target
+		}
+		
+		if ( params.presegment ) {
+			try {
+				TextContainer cont;
+				cont = item.getSourceContent();
+				sourceSeg.computeSegments(cont);
+				cont.createSegments(sourceSeg.getSegmentRanges());
+				if ( item.hasTarget() ) {
+					cont = item.getTargetContent();
+					targetSeg.computeSegments(cont);
+					cont.createSegments(targetSeg.getSegmentRanges());
+				}
+			}
+			catch ( Throwable e ) {
+				logger.error(String.format("Error segmenting text unit id=%s: "
+					+e.getMessage(), item.getID()));
+			}
 		}
 		//TODO: Status
 		writer.writeItem(item, 0);

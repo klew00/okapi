@@ -43,21 +43,21 @@ public class Parameters extends BaseParameters {
 		// Read the file content as a set of fields
 		FieldsString tmp = new FieldsString(data);
 		// Parse the fields
-		xsltPath = tmp.get("xsltPath", xsltPath);
-		paramList = tmp.get("paramList", paramList);
+		xsltPath = tmp.get("xsltPath", xsltPath); //$NON-NLS-1$
+		paramList = tmp.get("paramList", paramList); //$NON-NLS-1$
 	}
 
 	@Override
 	public void reset () {
-		xsltPath = "";
-		paramList = "";
+		xsltPath = ""; //$NON-NLS-1$
+		paramList = ""; //$NON-NLS-1$
 	}
 
 	public String toString () {
 		// Store the parameters in fields
 		FieldsString tmp = new FieldsString();
-		tmp.add("xsltPath", xsltPath);
-		tmp.add("paramList", paramList);
+		tmp.add("xsltPath", xsltPath); //$NON-NLS-1$
+		tmp.add("paramList", paramList); //$NON-NLS-1$
 		return tmp.toString();
 	}
 

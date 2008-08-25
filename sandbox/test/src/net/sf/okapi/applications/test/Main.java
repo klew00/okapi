@@ -317,7 +317,6 @@ public class Main {
 
 			cont = new TextContainer(null);
 			cont.append("One... Two... ");
-			int segCount = seg.computeSegments(cont);
 			System.out.println(cont.toString());
 			System.out.println(seg.getSegmentRanges());
 			
@@ -341,7 +340,7 @@ public class Main {
 				trgCont.addSegment(trgSeg);
 				i++;
 			}
-			//trgCont.append(srcCont.getFragmentAfterSegment(0));
+			trgCont.append(srcCont.getFragmentAfterSegment(i-1));
 			System.out.println("src='"+srcCont.toString()+"'");
 			for ( TextFragment tf : srcCont.getSegments() ) {
 				System.out.println("s='"+tf.toString()+"'");

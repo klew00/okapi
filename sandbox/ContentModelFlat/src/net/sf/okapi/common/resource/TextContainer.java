@@ -88,8 +88,15 @@ public class TextContainer extends TextFragment {
 		return null;
 	}
 	
+	/**
+	 * Gets the fragment after a given segment marker.
+	 * @param segmentIndex The index of the segment to look for.
+	 * @return The fragment between the given segment and the next one, or the end
+	 * of the text if the given fragment is the last one, or null if the fragment
+	 * is not found.
+	 */
 	public TextFragment getFragmentAfterSegment (int segmentIndex) {
-		int start = 0;
+		int start = -1;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
@@ -102,11 +109,15 @@ public class TextContainer extends TextFragment {
 					if ( Integer.parseInt(code.data) == segmentIndex ) {
 						start = i+1;
 					}
-					else start = i+1; // Reset the start of the fragment
+					else if ( Integer.parseInt(code.data) == segmentIndex+1 ) {
+						return subSequence(start, i-1);
+					}
 				}
 			}
 		}
-		return null;
+		if ( start == -1 ) return null; // Not found such segment
+		// Else: was the last segment marker
+		return subSequence(start, text.length());
 	}
 
 	/**

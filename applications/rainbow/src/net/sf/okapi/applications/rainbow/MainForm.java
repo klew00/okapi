@@ -1293,10 +1293,9 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		try {
 			SRXEditor dlg = new SRXEditor(shell);
-			//TODO: implement case where SRX file is provided as parameter
-			dlg.showDialog();
+			dlg.showDialog(path);
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}

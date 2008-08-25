@@ -60,7 +60,7 @@ public class Utility implements ISimpleUtility {
 	}
 	
 	public String getID () {
-		return "oku_xsltransform";
+		return "oku_xsltransform"; //$NON-NLS-1$
 	}
 	
 	public void processInput () {
@@ -76,7 +76,7 @@ public class Utility implements ISimpleUtility {
 			trans.transform(xmlInput, result);
 		}
 		catch ( TransformerException e ) {
-			throw new RuntimeException("Error when transforming.", e);
+			throw new RuntimeException(Res.getString("utility.errorTransforming"), e); //$NON-NLS-1$
 		}
 	}
 
@@ -94,12 +94,12 @@ public class Utility implements ISimpleUtility {
 			trgLang = targetLanguage;
 			
 			ConfigurationString cfgString = new ConfigurationString(
-				params.getParameter("paramList"));
+				params.getParameter("paramList")); //$NON-NLS-1$
 			paramList = cfgString.toHashtable();
 			
 			// Create the source for the XSLT
 			xsltInput = new javax.xml.transform.stream.StreamSource(
-				new File(params.getParameter("xsltPath")));
+				new File(params.getParameter("xsltPath"))); //$NON-NLS-1$
 			
 			// Create an instance of TransformerFactory
 			javax.xml.transform.TransformerFactory fact =
@@ -107,7 +107,7 @@ public class Utility implements ISimpleUtility {
 			trans = fact.newTransformer(xsltInput);
 		}
 		catch ( TransformerConfigurationException e ) {
-			throw new RuntimeException("Error in the XSLT input.", e);
+			throw new RuntimeException(Res.getString("utility.errorInXSLT"), e); //$NON-NLS-1$
 		}
 	}
 
@@ -172,17 +172,17 @@ public class Utility implements ISimpleUtility {
 		trans.clearParameters();
 		String value;
 		for ( String key : paramList.keySet() ) {
-			value = paramList.get(key).replace("<$SrcLang>", srcLang);
-			value = value.replace("<$TrgLang>", trgLang);
-			value = value.replace("<$Input1>", Util.makeURIFromPath(inputPaths.get(0)));
-			value = value.replace("<$Output1>", Util.makeURIFromPath(outputPaths.get(0)));
+			value = paramList.get(key).replace("<$SrcLang>", srcLang); //$NON-NLS-1$
+			value = value.replace("<$TrgLang>", trgLang); //$NON-NLS-1$
+			value = value.replace("<$Input1>", Util.makeURIFromPath(inputPaths.get(0))); //$NON-NLS-1$
+			value = value.replace("<$Output1>", Util.makeURIFromPath(outputPaths.get(0))); //$NON-NLS-1$
 			if ( inputPaths.get(1) != null ) {
-				value = value.replace("<$Input2>", Util.makeURIFromPath(inputPaths.get(1)));
-				value = value.replace("<$Output2>", Util.makeURIFromPath(outputPaths.get(1)));
+				value = value.replace("<$Input2>", Util.makeURIFromPath(inputPaths.get(1))); //$NON-NLS-1$
+				value = value.replace("<$Output2>", Util.makeURIFromPath(outputPaths.get(1))); //$NON-NLS-1$
 			}
 			if ( inputPaths.get(2) != null ) {
-				value = value.replace("<$Input3>", Util.makeURIFromPath(inputPaths.get(2)));
-				value = value.replace("<$Output3>", Util.makeURIFromPath(outputPaths.get(2)));
+				value = value.replace("<$Input3>", Util.makeURIFromPath(inputPaths.get(2))); //$NON-NLS-1$
+				value = value.replace("<$Output3>", Util.makeURIFromPath(outputPaths.get(2))); //$NON-NLS-1$
 			}
 			trans.setParameter(key, value);
 		}

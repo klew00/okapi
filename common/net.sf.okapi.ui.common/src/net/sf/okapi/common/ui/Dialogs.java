@@ -37,9 +37,10 @@ public class Dialogs {
 	 * @param allowMultiple True if the user can select more than one file.
 	 * @param root Directory where to start. Use null for default directory.
 	 * @param filterNames List of filter names (tab-separated) to use. Can be null.
+	 * Example: <code>"Rainbow Projects (*.rnb)\tAll Files (*.*)"</code>
 	 * @param filterExtensions List of filter extensions (tab-separated) to use.
-	 * Can be null.
-	 * Must be the same number of items as for p_aFilterNames.
+	 * Can be null. Must be the same number of items as for filterNames.
+	 * Example: <code>"*.rnb\t*.*"</code>
 	 * @return An array of strings, where each string is the full path for one 
 	 * of the selected files. Returns null if the user canceled the command or
 	 * an error occurred.

@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -31,8 +32,9 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class XLIFFContent {
 
-	private String      codedText;
-	private List<Code>  codes;
+	private String           codedText;
+	private List<Code>       codes;
+	private XLIFFContent     innerContent;
 	
 	public XLIFFContent () {
 		codedText = "";
@@ -106,6 +108,94 @@ public class XLIFFContent {
 					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 					tmp.append("</ph>");
 				}
+				break;
+			case '>':
+				if ( escapeGT ) tmp.append("&gt;");
+				else {
+					if (( i > 0 ) && ( codedText.charAt(i-1) == ']' )) 
+						tmp.append("&gt;");
+					else
+						tmp.append('>');
+				}
+				break;
+			case '<':
+				tmp.append("&lt;");
+				break;
+			case '&':
+				tmp.append("&amp;");
+				break;
+			case '"':
+				if ( quoteMode > 0 ) tmp.append("&quot;");
+				else tmp.append('"');
+				break;
+			case '\'':
+				switch ( quoteMode ) {
+				case 1:
+					tmp.append("&apos;");
+					break;
+				case 2:
+					tmp.append("&#39;");
+					break;
+				default:
+					tmp.append(codedText.charAt(i));
+					break;
+				}
+				break;
+			default:
+				tmp.append(codedText.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+	
+	public String toSegmentedString (TextContainer container,
+		int quoteMode,
+		boolean escapeGT)
+	{
+		codedText = container.getCodedText();
+		codes = container.getCodes();
+		StringBuilder tmp = new StringBuilder();
+		int index;
+		int id;
+		Code code;
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				code = codes.get(index);
+				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
+					tmp.append("<mrk mtype=\"seg\">"); //TODO: mid attribute
+					if ( innerContent == null ) {
+						innerContent = new XLIFFContent();
+					}
+					index = Integer.valueOf(code.getData());
+					innerContent.setContent(container.getSegments().get(index));
+					tmp.append(innerContent.toString(quoteMode, escapeGT, false));
+					tmp.append("</mrk>");
+				}
+				else {
+					id = code.getID();
+					tmp.append(String.format("<bpt id=\"%d\">", id));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+					tmp.append("</bpt>");
+				}
+				break;
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
+				tmp.append(String.format("<ept id=\"%d\">", id));
+				tmp.append(Util.escapeToXML(codes.get(index).toString(),
+					quoteMode, escapeGT));
+				tmp.append("</ept>");
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				id = codes.get(index).getID();
+				tmp.append(String.format("<ph id=\"%d\">", id));
+				tmp.append(Util.escapeToXML(codes.get(index).toString(),
+					quoteMode, escapeGT));
+				tmp.append("</ph>");
 				break;
 			case '>':
 				if ( escapeGT ) tmp.append("&gt;");

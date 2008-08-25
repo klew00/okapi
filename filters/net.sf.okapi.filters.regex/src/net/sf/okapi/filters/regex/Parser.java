@@ -77,6 +77,7 @@ public class Parser implements IParser {
 	}
 
 	//TODO: remove after test
+	/*
 	private void tempSetStringInfoRules_set1 () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
@@ -95,7 +96,7 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
-	}
+	}*/
 	
 	//TODO: remove after test
 	private void tempSetStringInfoRules_set2 () {

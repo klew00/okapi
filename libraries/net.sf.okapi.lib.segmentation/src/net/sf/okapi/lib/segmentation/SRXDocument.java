@@ -302,6 +302,8 @@ public class SRXDocument {
 	 * selected if {@link #cascade()} is true.
 	 * @param languageCode The language code. the value should be a 
 	 * BCP-47 value (e.g. "de", "fr-ca", etc.)
+	 * @param existingSegmenter Optional existing segmenter object to re-use.
+	 * Use null for not re-using anything.
 	 */
 	public Segmenter applyLanguageRules (String languageCode,
 		Segmenter existingSegmenter)

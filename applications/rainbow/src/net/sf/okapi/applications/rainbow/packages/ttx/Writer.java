@@ -35,6 +35,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -173,6 +174,21 @@ public class Writer extends BaseWriter {
 	public void writeItem (TextUnit item,
 		int status)
 	{
+/*		boolean isSrcSeg = item.getSourceContent().isSegmented();
+		boolean isTrgSeg = false;
+		if ( item.hasTarget() ) {
+			isTrgSeg = item.getTargetContent().isSegmented();
+			if ( isTrgSeg ) {
+				int srcSegCount = item.getSourceContent().getSegments().size();
+				int trgsegCount = item.getTargetContent().getSegments().size();
+				if ( srcSegCount != trgsegCount ) {
+					
+				}
+				
+			}
+		}
+*/		
+		
 		processItem(item);
 		if ( item.hasChild() ) {
 			for ( TextUnit tu : item.childTextUnitIterator() ) {
@@ -180,6 +196,62 @@ public class Writer extends BaseWriter {
 			}
 		}
 	}
+	
+	/*
+	 * case:
+	 *  src segmented, trg segmented
+	 * 	src segmented trg segmented but not the same
+	 * 	src segmented not trg
+	 * 	trg segmented not src
+	 */
+	/*
+	private void processSegmentedItem (TextUnit item) {
+		TextContainer trgCont = item.getTargetContent();
+		String text = trgCont.getCodedText();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				code = trgCont.getCode(text.charAt(++i));
+				writer.writeStartElement("ut");
+				writer.writeAttributeString("Type", "start");
+				writer.writeAttributeString("RightEdge", "angle");
+				writer.writeAttributeString("DisplayText", code.getData());
+				writer.writeString(code.getData());
+				writer.writeEndElement(); // ut
+				break;
+			case TextFragment.MARKER_CLOSING:
+				code = trgCont.getCode(text.charAt(++i));
+				writer.writeStartElement("ut");
+				writer.writeAttributeString("Type", "end");
+				writer.writeAttributeString("LeftEdge", "angle");
+				writer.writeAttributeString("DisplayText", code.getData());
+				writer.writeString(code.getData());
+				writer.writeEndElement(); // ut
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				code = trgCont.getCode(text.charAt(++i));
+				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
+					writer.writeStartElement("Tuv");
+					writer.writeAttributeString("Lang", manifest.getTargetLanguage());
+					writeContent(item.getTargetContent());
+					writer.writeEndElement(); //Tuv
+				}
+				else { // Normal isolated code
+					writer.writeStartElement("ut");
+					writer.writeAttributeString("DisplayText", code.getData());
+					writer.writeString(code.getData());
+					writer.writeEndElement(); // ut
+				}
+				break;
+			default:
+				//TODO: Use a content object like XLIFF and TMX, too slow here
+				writer.writeString(String.valueOf(text.charAt(i)));
+				break;
+			}
+		}
+		
+	}*/
 	
 	private void processItem (TextUnit item) {
 		String name = item.getName();

@@ -30,33 +30,49 @@ public class Parameters extends BaseParameters {
 	/**
 	 * Type of package.
 	 */
-	public String       pkgType;
+	protected String    pkgType;
 	
 	/**
 	 * True to zip the package. 
 	 */
-	public boolean      createZip;
+	protected boolean   createZip;
 	
 	/**
 	 * True to generate also the data needed to merge back the
 	 * extracted data.
 	 */
-	public boolean      includeMergeData;
+	protected boolean   includeMergeData;
 	
 	/**
 	 * Base-name of the package. 
 	 */
-	public String       pkgName;
+	protected String    pkgName;
 	
 	/**
 	 * Folder where to output the package.
 	 */
-	public String       outputFolder;
+	protected String    outputFolder;
 	
 	/**
 	 * When possible, include target items in package.
 	 */
-	public boolean      includeTargets;
+	protected boolean   includeTargets;
+
+	/**
+	 * Pre-segment the output when possible.
+	 */
+	protected boolean   presegment;
+	
+	/**
+	 * Path of the SRX file to use for source segmentation.
+	 */
+	protected String    sourceSRX;
+	
+	/**
+	 * Path of the SRX file to use for target segmentation.
+	 */
+	protected String    targetSRX;
+
 
 	public Parameters () {
 		reset();
@@ -73,6 +89,9 @@ public class Parameters extends BaseParameters {
 		outputFolder = tmp.get("outputfolder", pkgName);
 		includeMergeData = tmp.get("includemergedata", includeMergeData);
 		includeTargets = tmp.get("includetargets", includeTargets);
+		presegment = tmp.get("presegment", presegment);
+		sourceSRX = tmp.get("sourceSRX", sourceSRX);
+		targetSRX = tmp.get("targetSRX", targetSRX);
 	}
 
 	@Override
@@ -84,6 +103,9 @@ public class Parameters extends BaseParameters {
 		outputFolder = System.getProperty("user.home") + File.separator
 			+ "Localization Projects";
 		includeTargets = true;
+		presegment = false;
+		sourceSRX = "";
+		targetSRX = "";
 	}
 
 	@Override
@@ -96,6 +118,9 @@ public class Parameters extends BaseParameters {
 		tmp.add("outputfolder", outputFolder);
 		tmp.add("includemergedata", includeMergeData);
 		tmp.add("includetargets", includeTargets);
+		tmp.add("presegment", presegment);
+		tmp.add("sourceSRX", sourceSRX);
+		tmp.add("targetSRX", targetSRX);
 		return tmp.toString();
 	}
 	

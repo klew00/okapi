@@ -37,12 +37,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
+
+import sf.okapi.lib.ui.segmentation.SRXEditor;
 
 public class Editor implements IParametersEditor {
 	
@@ -58,6 +61,15 @@ public class Editor implements IParametersEditor {
 	private Button                chkIncludeMergeData;
 	private Text                  edSample;
 	private boolean               inInit = true;
+	private Button                chkPresegment;
+	private Label                 stSourceSRX;
+	private Text                  edSourceSRX;
+	private Button                btGetSourceSRX;
+	private Button                btEditSourceSRX;
+	private Label                 stTargetSRX;
+	private Text                  edTargetSRX;
+	private Button                btGetTargetSRX;
+	private Button                btEditTargetSRX;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -209,7 +221,67 @@ public class Editor implements IParametersEditor {
 
 		chkIncludeMergeData = new Button(cmpTmp, SWT.CHECK);
 		chkIncludeMergeData.setText("Includes the data to merge back the files");
+		
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Segmentation");
+		grpTmp.setLayout(new GridLayout(4, false));
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		chkPresegment = new Button(grpTmp, SWT.CHECK);
+		chkPresegment.setText("Pre-segment the extracted text units");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 4;
+		chkPresegment.setLayoutData(gdTmp);
+		chkPresegment.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateSRX();
+			}
+		});
 
+		stSourceSRX = new Label(grpTmp, SWT.NONE);
+		stSourceSRX.setText("SRX file for the source:");
+		
+		edSourceSRX = new Text(grpTmp, SWT.BORDER);
+		edSourceSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		btGetSourceSRX = new Button(grpTmp, SWT.PUSH);
+		btGetSourceSRX.setText("...");
+		btGetSourceSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getSRXFile(edSourceSRX);
+			}
+		});
+		
+		btEditSourceSRX = new Button(grpTmp, SWT.PUSH);
+		btEditSourceSRX.setText("Edit...");
+		btEditSourceSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSRXFile(edSourceSRX);
+			}
+		});
+		
+		stTargetSRX = new Label(grpTmp, SWT.NONE);
+		stTargetSRX.setText("SRX file for the target:");
+		
+		edTargetSRX = new Text(grpTmp, SWT.BORDER);
+		edTargetSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		btGetTargetSRX = new Button(grpTmp, SWT.PUSH);
+		btGetTargetSRX.setText("...");
+		btGetTargetSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getSRXFile(edTargetSRX);
+			}
+		});
+		
+		btEditTargetSRX = new Button(grpTmp, SWT.PUSH);
+		btEditTargetSRX.setText("Edit...");
+		btEditTargetSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSRXFile(edTargetSRX);
+			}
+		});
+		
 
 		//--- References tab
 		
@@ -241,6 +313,49 @@ public class Editor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void getSRXFile (Text edTextField) {
+		String caption;
+		if ( edTextField == edSourceSRX ) caption = "Select SRX for Source";
+		else  caption = "Select SRX for Target";
+		String[] paths = Dialogs.browseFilenames(shell, caption, false, null,
+			"SRX Documents (*.srx)\tAll Files (*.*)",
+			"*.srx\t*.*");
+		if ( paths == null ) return;
+		edTextField.setText(paths[0]);
+		edTextField.selectAll();
+		edTextField.setFocus();
+	}
+	
+	private void editSRXFile (Text edTextField) {
+		try {
+			SRXEditor editor = new SRXEditor(shell);
+			String path = edTextField.getText();
+			if ( path.length() == 0 ) path = null;
+			editor.showDialog(path);
+			path = editor.getPath();
+			if ( path != null ) {
+				edTextField.setText(path); 
+				edTextField.selectAll();
+				edTextField.setFocus();
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void updateSRX () {
+		boolean enabled = chkPresegment.getSelection();
+		stSourceSRX.setEnabled(enabled);
+		edSourceSRX.setEnabled(enabled);
+		btGetSourceSRX.setEnabled(enabled);
+		btEditSourceSRX.setEnabled(enabled);
+		stTargetSRX.setEnabled(enabled);
+		edTargetSRX.setEnabled(enabled);
+		btGetTargetSRX.setEnabled(enabled);
+		btEditTargetSRX.setEnabled(enabled);
+	}
+	
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -264,6 +379,10 @@ public class Editor implements IParametersEditor {
 		edOutputFolder.setText(params.outputFolder);
 		edName.setText(params.pkgName);
 		chkCreateZip.setSelection(params.createZip);
+		chkPresegment.setSelection(params.presegment);
+		edSourceSRX.setText(params.sourceSRX);
+		edTargetSRX.setText(params.targetSRX);
+		updateSRX();
 		updateSample();
 	}
 
@@ -275,6 +394,9 @@ public class Editor implements IParametersEditor {
 		params.createZip = chkCreateZip.getSelection();
 		params.pkgName = edName.getText();
 		params.outputFolder = edOutputFolder.getText();
+		params.presegment = chkPresegment.getSelection();
+		params.sourceSRX = edSourceSRX.getText();
+		params.targetSRX = edTargetSRX.getText();
 		result = true;
 		return true;
 	}

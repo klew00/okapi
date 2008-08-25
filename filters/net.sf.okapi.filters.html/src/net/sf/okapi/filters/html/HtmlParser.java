@@ -33,13 +33,12 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.filters.IParser;
 import net.sf.okapi.common.resource.IContainable;
-import static net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE.*;
-import static net.sf.okapi.filters.html.ConditionalAttributeRule.CONDITIONAL_ATTRIBUTE_TYPE.*;
+import static net.sf.okapi.filters.html.ElementExtractionRule.EXTRACTION_RULE_TYPE.*;
+import static net.sf.okapi.filters.html.ConditionalAttribute.CONDITIONAL_ATTRIBUTE_TYPE.*;
 
 
 public class HtmlParser implements IParser {
 	private Source htmlDocument;
-	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private boolean first = true;
 
@@ -73,20 +72,19 @@ public class HtmlParser implements IParser {
 		}
 		initialize();
 	}
-	
-	public void setHtmlFilterConfiguration(HtmlFilterConfiguration configuration) {
-		this.configuration = configuration;
-	}
 
 	private void initialize() {
-		
-		if (configuration == null) { 
-			configuration = new HtmlFilterConfiguration();
-			configuration.initializeDefaultRules();
-		}
-		
 		// Segment iterator
-		nodeIterator = htmlDocument.getNodeIterator();		
+		nodeIterator = htmlDocument.getNodeIterator();
+
+		// register custom tags
+		// TODO: Make a parameter, How to create custom tags in bulk?
+		MicrosoftTagTypes.register();
+		PHPTagTypes.register();
+		PHPTagTypes.PHP_SHORT.deregister(); // remove PHP short tags, otherwise
+											// they override processing
+											// instructions
+		MasonTagTypes.register();
 	}
 
 	public IContainable getResource() {
@@ -97,7 +95,6 @@ public class HtmlParser implements IParser {
 		boolean endExtraction;
 		if (nodeIterator.hasNext()) {
 			Segment segment = nodeIterator.next();
-			
 			endExtraction = false;
 			do {
 

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -41,6 +42,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
@@ -96,12 +99,11 @@ public class SRXEditor {
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericContent();
 		
-		patternOpening = Pattern.compile("\\<(\\p{Alpha})\\>");
-		patternClosing = Pattern.compile("\\</(\\p{Alpha})\\>");
-		patternPlaceholder = Pattern.compile("\\<\\p{Alpha}/\\>");
+		patternOpening = Pattern.compile("\\<(\\w+.*)\\>");
+		patternClosing = Pattern.compile("\\</(\\w+.*)\\>");
+		patternPlaceholder = Pattern.compile("\\<(\\w+.*)/\\>");
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Segmentation Rules Editor");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		
@@ -172,6 +174,13 @@ public class SRXEditor {
 				tblRules.getColumn(1).setWidth(nHalf);
 				tblRules.getColumn(2).setWidth(nHalf);
 		    }
+		});
+		tblRules.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+				editRule(false);
+			}
+			public void mouseDown(MouseEvent e) {}
+			public void mouseUp(MouseEvent e) {}
 		});
 		tblRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -349,6 +358,7 @@ public class SRXEditor {
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 		
+		updateCaption();
 		updateAll();
 	}
 	
@@ -391,14 +401,28 @@ public class SRXEditor {
 				saveSRXDocument(null);
             }
 		});
-}
+	}
 
-	public void showDialog () {
+	/**
+	 * Opens the dialog box, loads an SRX document if one is specified.
+	 * @param path Optional SRX document to load. Use null to load nothing.
+	 */
+	public void showDialog (String path) {
 		shell.open();
+		if ( path != null ) loadSRXDocument(path);
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+	}
+	
+	/**
+	 * Gets the full path of the last SRX document loaded.
+	 * @return The full path of the last SRX document loaded, or null
+	 * if not has been loaded.
+	 */
+	public String getPath () {
+		return srxPath;
 	}
 	
 	private void updateResults (boolean forceReset) {
@@ -437,7 +461,7 @@ public class SRXEditor {
 			}
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			edResults.setText("Error: "+ e.getMessage());
 		}
 	}
 
@@ -492,8 +516,9 @@ public class SRXEditor {
 		Matcher m = patternOpening.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+3, TagType.OPENING, m.group(1));
-			start = (n+3);
+			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.OPENING, m.group(1));
+			start = (n+m.group().length());
 		}
 		
 		text = sampleText.getCodedText();
@@ -501,8 +526,9 @@ public class SRXEditor {
 		m = patternClosing.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.CLOSING, m.group(1));
-			start = (n+4);
+			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.CLOSING, m.group(1));
+			start = (n+m.group().length());
 		}
 		
 		text = sampleText.getCodedText();
@@ -510,27 +536,10 @@ public class SRXEditor {
 		m = patternPlaceholder.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.PLACEHOLDER, null);
-			start = (n+4);
+			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.PLACEHOLDER, null);
+			start = (n+m.group().length());
 		}
-		
-		/*while ( (n = text.indexOf("<x>", start)) != -1 ) {
-			diff += sampleText.changeToCode(n+diff, (n+diff)+3, TagType.OPENING, "x");
-			start = (n+3);
-		}
-		
-		text = sampleText.getCodedText();
-		start = diff = 0;
-		while ( (n = text.indexOf("</x>", start)) != -1 ) {
-			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.CLOSING, "x");
-			start = (n+4);
-		}
-		text = sampleText.getCodedText();
-		start = diff = 0;
-		while ( (n = text.indexOf("<x/>", start)) != -1 ) {
-			diff += sampleText.changeToCode(n+diff, (n+diff)+4, TagType.PLACEHOLDER, null);
-			start = (n+4);
-		}*/
 	}
 	
 	private void updateLanguageRuleList () {
@@ -591,6 +600,16 @@ public class SRXEditor {
 		srxDoc.setSampleOnMappedRules(rdApplySampleForMappedRules.getSelection());
 	}
 	
+	private void updateCaption () {
+		if ( srxPath == null ) {
+			shell.setText("Segmentation Rules Editor");
+		}
+		else {
+			shell.setText("Segmentation Rules Editor - "
+				+ Util.getFilename(srxPath, true));
+		}
+	}
+	
 	private void updateAll () {
 		cbGroup.removeAll();
 		setSurfaceData();
@@ -601,6 +620,7 @@ public class SRXEditor {
 		if ( !checkIfRulesNeedSaving() ) return;
 		srxDoc = new SRXDocument();
 		srxPath = null;
+		updateCaption();
 		updateAll();
 	}
 	
@@ -608,17 +628,20 @@ public class SRXEditor {
 		try {
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open SRX Document",
-					false, null, "SRX Documents (*.srx)", "*.srx");
+					false, null, "SRX Documents (*.srx)\tAll Files (*.*)",
+					"*.srx\t*.*");
 				if ( paths == null ) return; // Cancel
 				else path = paths[0];
 			}
+			srxPath = null; // In case an error occurs
 			srxDoc.loadRules(path);
-			srxPath = path;
+			srxPath = path; // Set the path only after the load is fine
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 		finally {
+			updateCaption();
 			updateAll();
 		}
 	}
@@ -641,6 +664,7 @@ public class SRXEditor {
 	}
 	
 	private void editRule (boolean createNewRule) {
+		if ( cbGroup.getSelectionIndex() < 0 ) return;
 		Rule rule;
 		String caption;
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());

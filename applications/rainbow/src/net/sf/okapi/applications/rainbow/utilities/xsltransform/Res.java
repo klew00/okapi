@@ -1,4 +1,5 @@
-/* Copyright (C) 2008 Jim Hargrave
+/*===========================================================================*/
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -12,41 +13,38 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.html;
+package net.sf.okapi.applications.rainbow.utilities.xsltransform;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-public class AttributeExtractionRule {
-	private String attributeName;
-	private List<ConditionalAttribute> extractionConditions;
-	private Map<String, String> properties;
-	
-	public AttributeExtractionRule(String attributeName) {
-		this.attributeName = attributeName;
-		this.extractionConditions = new LinkedList<ConditionalAttribute>();
-		this.properties = new HashMap<String, String>();
+public class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.applications.rainbow.utilities.xsltransform.Res"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME);
+
+	private Res() {
+	}
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 	
-	public AttributeExtractionRule(String attributeName, List<ConditionalAttribute> extractionConditions) {
-		this.attributeName = attributeName;
-		this.extractionConditions = extractionConditions;
-		this.properties = new HashMap<String, String>();
-	}
-	
-	public void addExtractionCondition(ConditionalAttribute conditionalAttribute) {
-		this.extractionConditions.add(conditionalAttribute);
-		this.properties = new HashMap<String, String>();
-	}
-	
-	public void addProperty(String key, String value) {
-		properties.put(key, value);
+	public static int getInt (String key) {
+		try {
+			return Integer.valueOf(RESOURCE_BUNDLE.getString(key));
+		} catch (MissingResourceException e) {
+			return 10;
+		}
 	}
 }

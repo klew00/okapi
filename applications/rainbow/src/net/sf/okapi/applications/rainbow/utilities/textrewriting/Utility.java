@@ -27,7 +27,6 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.LocaleData;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -116,11 +115,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
 		if ( !tu.hasTarget() ) {
-			tu.setTarget(new LocaleData(tu));
-			tu.getTargetContent().setCodedText(
-				tu.getSourceContent().getCodedText(),
-				tu.getSourceContent().getCodes());
+			tu.setTargetContent(tu.getSourceContent());
 		}
+
 		switch ( params.type ) {
 		case Parameters.TYPE_XNREPLACE:
 			replaceWithXN(tu);
@@ -131,13 +128,18 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		}
 	}
 	
-	private void replaceWithXN (TextUnit item) {
+	/**
+	 * Replaces letters with Xs and digits with Ns.
+	 * @param tu the text unit to process.
+	 */
+	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
 		try {
-			tmp = item.getTargetContent().getCodedText().replaceAll("\\p{L}", "X");
+			tmp = tu.getTargetContent().getCodedText().replaceAll("\\p{Lu}", "X");
+			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
-			TextContainer cnt = item.getTargetContent(); 
-			cnt.setCodedText(tmp, item.getSourceContent().getCodes());
+			TextContainer cnt = tu.getTargetContent(); 
+			cnt.setCodedText(tmp, tu.getSourceContent().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
@@ -147,28 +149,28 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	/**
 	 * Adds prefix and/or suffix to the target. This method assumes that
 	 * the item has gone through the first transformation already.
-	 * @param item The item to process.
+	 * @param tu The text unit to process.
 	 */
-	private void addText (TextUnit item) {
+	private void addText (TextUnit tu) {
 		String tmp = null;
 		try {
 			// Use the target as the text to change.
-			tmp = item.getTargetContent().getCodedText();
+			tmp = tu.getTargetContent().getCodedText();
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
 			if ( params.addName ) {
-				if ( item.getName().length() > 0 ) tmp += "_"+item.getName();
-				else tmp += "_"+item.getID();
+				if ( tu.getName().length() > 0 ) tmp += "_"+tu.getName();
+				else tmp += "_"+tu.getID();
 			}
 			if ( params.addID ) {
-				tmp += "_"+item.getID();
+				tmp += "_"+tu.getID();
 			}
 			if ( params.addSuffix ) {
 				tmp += params.suffix;
 			}
-			TextContainer cnt = item.getTargetContent(); 
-			cnt.setCodedText(tmp, item.getSourceContent().getCodes());
+			TextContainer cnt = tu.getTargetContent(); 
+			cnt.setCodedText(tmp, tu.getSourceContent().getCodes());
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);

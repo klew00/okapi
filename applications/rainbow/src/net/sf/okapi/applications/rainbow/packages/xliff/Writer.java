@@ -97,15 +97,18 @@ public class Writer extends BaseWriter {
 			// and make sure identical filename do not clash
 			relativeWorkPath = String.format("%d.%s", docID,
 				Util.getFilename(relativeSourcePath, true));
+			
 			// Do not export items with translate='no'
 			excludeNoTranslate = true;
+			
 			// If translated found: replace the target text by the source.
 			// Trusting the target will be gotten from the TMX from original
-			// This to allow editing of pre-translated items.
+			// This to allow editing of pre-translated items in XLIFF editors
+			// that use directly the <target> element.
 			useSourceForTranslated = true;
 		}
+		
 		relativeWorkPath += EXTENSION;
-
 		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filtersettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
@@ -164,12 +167,17 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
 		writer.writeEndElementLineBreak(); // source
+		if ( item.getSourceContent().isSegmented() ) {
+			writer.writeStartElement("seg-source");
+			writer.writeRawXML(xliffCont.toSegmentedString(item.getSourceContent(), 1, true));
+			writer.writeEndElementLineBreak(); // seg-source
+		}
 
 		// Target (if needed)
 		if ( item.hasTarget() ) {
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-			
+//TODO: segmented target			
 /*			switch ( p_nStatus ) {
 				case IExtractionItem.TSTATUS_OK:
 					m_XW.writeAttributeString("state", "final");

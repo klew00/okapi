@@ -89,7 +89,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("XSLT Transformation");
+		shell.setText(Res.getString("editor.caption")); //$NON-NLS-1$
 		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -104,11 +104,11 @@ public class Editor implements IParametersEditor {
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout(4, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
+		tiTmp.setText(Res.getString("editor.tabOptions")); //$NON-NLS-1$
 		tiTmp.setControl(cmpTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Path of the XSLT template to apply:");
+		label.setText(Res.getString("editor.stXsltPath")); //$NON-NLS-1$
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
@@ -119,12 +119,15 @@ public class Editor implements IParametersEditor {
 		edXsltPath.setLayoutData(gdTmp);
 		
 		Button btGetPath = new Button(cmpTmp, SWT.PUSH);
-		btGetPath.setText("...");
+		btGetPath.setText("..."); //$NON-NLS-1$
 		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		btGetPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell, "Select XSLT Template",
-					false, null, "XSLT Templates (*.xsl;*.xslt)", "*.xsl;*.xslt");
+				String[] paths = Dialogs.browseFilenames(shell,
+					Res.getString("editor.captionSelectTemplate"), //$NON-NLS-1$
+					false, null,
+					Res.getString("editor.filterSelectTemplate"), //$NON-NLS-1$
+					"*.xsl;*.xslt\t*.*"); //$NON-NLS-1$
 				if ( paths != null ) {
 					edXsltPath.setText(paths[0]);
 				}
@@ -132,13 +135,13 @@ public class Editor implements IParametersEditor {
 		});
 
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Parameters (one per line, format: name=value):");
+		label.setText(Res.getString("editor.stParameters")); //$NON-NLS-1$
 		
-		int paramButtonsWidth = 120;
+		int wideButtonWidth = Res.getInt("editor.wideButtonWidth"); //$NON-NLS-1$
 		Button btGetDefaults = new Button(cmpTmp, SWT.PUSH);
-		btGetDefaults.setText("Default Parameters");
+		btGetDefaults.setText(Res.getString("editor.btGetDefaults")); //$NON-NLS-1$
 		gdTmp = new GridData();
-		gdTmp.widthHint = paramButtonsWidth;
+		gdTmp.widthHint = wideButtonWidth;
 		btGetDefaults.setLayoutData(gdTmp);
 		btGetDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -147,10 +150,10 @@ public class Editor implements IParametersEditor {
 		});
 		
 		Button btOpenFile = new Button(cmpTmp, SWT.PUSH);
-		btOpenFile.setText("Open Template");
+		btOpenFile.setText(Res.getString("editor.btOpenTemplate")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
-		gdTmp.widthHint = paramButtonsWidth;
+		gdTmp.widthHint = wideButtonWidth;
 		btOpenFile.setLayoutData(gdTmp);
 		btOpenFile.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -169,11 +172,11 @@ public class Editor implements IParametersEditor {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					//TODO: Call help
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();
@@ -199,16 +202,16 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		edXsltPath.setText(params.getParameter("xsltPath"));
-		ConfigurationString tmp = new ConfigurationString(params.getParameter("paramList"));
+		edXsltPath.setText(params.getParameter("xsltPath")); //$NON-NLS-1$
+		ConfigurationString tmp = new ConfigurationString(params.getParameter("paramList")); //$NON-NLS-1$
 		edParameters.setText(tmp.toString());
 	}
 
 	private boolean saveData () {
 		//TODO: check path
-		params.setParameter("xsltPath", edXsltPath.getText());
+		params.setParameter("xsltPath", edXsltPath.getText()); //$NON-NLS-1$
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
-		params.setParameter("paramList", tmp.toString());
+		params.setParameter("paramList", tmp.toString()); //$NON-NLS-1$
 		result = true;
 		return result;
 	}
@@ -226,7 +229,7 @@ public class Editor implements IParametersEditor {
 		    XPathFactory factory = XPathFactory.newInstance();
 		    XPath xpath = factory.newXPath();
 		    xpath.setNamespaceContext(new NSContextManager());
-		    XPathExpression expr = xpath.compile("//xsl:param");
+		    XPathExpression expr = xpath.compile("//xsl:param"); //$NON-NLS-1$
 
 		    Object result = expr.evaluate(doc, XPathConstants.NODESET);
 		    NodeList nodes = (NodeList) result;
@@ -234,7 +237,7 @@ public class Editor implements IParametersEditor {
 		    Element elem;
 		    for (int i = 0; i < nodes.getLength(); i++) {
 		    	elem = (Element)nodes.item(i);
-		    	paramList.add(elem.getAttribute("name"), elem.getTextContent());
+		    	paramList.add(elem.getAttribute("name"), elem.getTextContent()); //$NON-NLS-1$
 		    }
 		    edParameters.setText(paramList.toString());
 		}
