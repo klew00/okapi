@@ -11,6 +11,11 @@
 
  <!-- View menu -->
  <command name="view">&amp;View</command>
+ <command name="view.inputList1" ctrl="1" key="1">Input List &amp;1&#x9;Ctrl+1</command>
+ <command name="view.inputList2" ctrl="1" key="2">Input List &amp;2&#x9;Ctrl+2</command>
+ <command name="view.inputList3" ctrl="1" key="3">Input List &amp;3&#x9;Ctrl+3</command>
+ <command name="view.langAndEnc" ctrl="1" key="4">&amp;Languages and Encodings&#x9;Ctrl+4</command>
+ <command name="view.otherSettings" ctrl="1" key="5">&amp;Other Settings&#x9;Ctrl+5</command>
  <command name="view.log" key="F9">&amp;Log&#x9;F9</command>
 
  <!-- Input menu -->
@@ -19,10 +24,11 @@
  <command name="input.removeDocuments">&amp;Remove Documents...</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
+ <command name="input.openFolder">&amp;Open Containing Folder</command>
  
  <!-- Utilities menu -->
  <command name="utilities">&amp;Utilities</command>
- <command name="utilities.openFolder" ctrl="1" key="L">&amp;Open Last Output Folder&#x9;Ctrl+L</command>
+ <command name="utilities.openOutputFolder" ctrl="1" key="L">&amp;Open Last Output Folder&#x9;Ctrl+L</command>
   
  <!-- Tools menu -->
  <command name="tools">&amp;Tools</command>

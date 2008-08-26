@@ -99,6 +99,7 @@ public class MainForm implements IParametersProvider {
 	private String           sharedFolder;
 	private Project          prj;
 	private StatusBar        statusBar;
+	private TabFolder        tabFolder;
 	private Text             edInputRoot;
 	private Button           btGetRoot;
 	private Button           chkUseOutputRoot;
@@ -143,6 +144,8 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         miRemoveInputDocuments;
 	private MenuItem         cmiRemoveInputDocuments;
 	private MenuItem         miOpenFolder;
+	private MenuItem         cmiOpenFolder;
+	private MenuItem         miOpenOutputFolder;
 	
 	public MainForm (Shell p_Shell) {
 		try {
@@ -244,6 +247,53 @@ public class MainForm implements IParametersProvider {
 		topItem.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.inputList1");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tabFolder.setSelection(0);
+				updateTabInfo();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.inputList2");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tabFolder.setSelection(1);
+				updateTabInfo();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.inputList3");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tabFolder.setSelection(2);
+				updateTabInfo();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.langAndEnc");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tabFolder.setSelection(3);
+				updateTabInfo();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.otherSettings");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tabFolder.setSelection(4);
+				updateTabInfo();
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "view.log");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -283,6 +333,16 @@ public class MainForm implements IParametersProvider {
 				openDocument(-1);
             }
 		});
+		
+		miOpenFolder = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miOpenFolder, "input.openFolder");
+		miOpenFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openContainingFolder(-1);
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		miEditInputProperties = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miEditInputProperties, "input.editProperties");
@@ -329,6 +389,7 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help main topics
+				Dialogs.showError(shell, "Not implemented yet.", null);
 			}
 		});
 
@@ -336,7 +397,8 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO Help 'hot to use...'
+				//TODO Help 'how to use...'
+				Dialogs.showError(shell, "Not implemented yet.", null);
 			}
 		});
 		
@@ -347,6 +409,7 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
+				Dialogs.showError(shell, "Not implemented yet.", null);
 			}
 		});
 
@@ -398,7 +461,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		// Tab control
-		final TabFolder tabFolder = new TabFolder(shell, SWT.NONE);
+		tabFolder = new TabFolder(shell, SWT.NONE);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 3;
 		tabFolder.setLayoutData(gdTmp);
@@ -459,6 +522,16 @@ public class MainForm implements IParametersProvider {
 				openDocument(-1);
             }
 		});
+		
+		cmiOpenFolder = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiOpenFolder, "input.openFolder");
+		cmiOpenFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openContainingFolder(-1);
+            }
+		});
+		
+		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
 		cmiEditInputProperties = new MenuItem(inputTableMenu, SWT.PUSH);
 		rm.setCommand(cmiEditInputProperties, "input.editProperties");
@@ -678,13 +751,7 @@ public class MainForm implements IParametersProvider {
 		// Tabs change event (define here to avoid triggering it while creating the content)
 		tabFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
-					currentInput = tabFolder.getSelectionIndex();
-				}
-				else currentInput = -1;
-				updateCommands();
-				updateInputRoot();
-				miInput.setEnabled(currentInput!=-1);
+				updateTabInfo();
             }
 		});
 
@@ -697,7 +764,17 @@ public class MainForm implements IParametersProvider {
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(origSize);
 	}
-	
+
+	private void updateTabInfo () {
+		if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
+			currentInput = tabFolder.getSelectionIndex();
+		}
+		else currentInput = -1;
+		updateCommands();
+		updateInputRoot();
+		miInput.setEnabled(currentInput!=-1);
+	}
+
 	private void buildInputTab (int index,
 		Composite comp)
 	{
@@ -764,9 +841,9 @@ public class MainForm implements IParametersProvider {
 		miUtilities.setMenu(dropMenu);
 		
 		// Add the default entries
-		miOpenFolder = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miOpenFolder, "utilities.openFolder");
-		miOpenFolder.addSelectionListener(new SelectionAdapter() {
+		miOpenOutputFolder = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miOpenOutputFolder, "utilities.openOutputFolder");
+		miOpenOutputFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( prj.getLastOutputFolder() == null ) return;
 				Program.launch(prj.getLastOutputFolder());
@@ -828,7 +905,7 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, E.getMessage(), null);
 		}
 		finally {
-			miOpenFolder.setEnabled(prj.getLastOutputFolder()!=null);
+			miOpenOutputFolder.setEnabled(prj.getLastOutputFolder()!=null);
 			stopWaiting();
 		}
 	}
@@ -928,8 +1005,10 @@ public class MainForm implements IParametersProvider {
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
+		miOpenFolder.setEnabled(enabled);
+		cmiOpenFolder.setEnabled(enabled);
 		
-		miOpenFolder.setEnabled(prj.getLastOutputFolder()!=null);
+		miOpenOutputFolder.setEnabled(prj.getLastOutputFolder()!=null);
 	}
 	
 	private void loadResources ()
@@ -1284,6 +1363,21 @@ public class MainForm implements IParametersProvider {
 			Input inp = prj.getItemFromRelativePath(currentInput,
 				inputTables.get(currentInput).getItem(index).getText(0));
 			Program.launch(prj.getInputRoot(currentInput) + File.separator + inp.relativePath); 
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void openContainingFolder (int index) {
+		try {
+			if ( index < 0 ) {
+				if ( (index = getFocusedInputIndex()) < 0 ) return;
+			}
+			Input inp = prj.getItemFromRelativePath(currentInput,
+				inputTables.get(currentInput).getItem(index).getText(0));
+			Program.launch(Util.getDirectoryName(
+				prj.getInputRoot(currentInput) + File.separator + inp.relativePath)); 
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
