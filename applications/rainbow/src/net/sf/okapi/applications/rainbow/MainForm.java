@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -961,10 +963,10 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 	
-	private void setDirectories () {
+	private void setDirectories () throws UnsupportedEncodingException {
     	// Get the location of the main class source
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-    	rootFolder = file.getAbsolutePath();
+    	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8");
     	// Remove the JAR file if running an installed version
     	if ( rootFolder.endsWith(".jar") ) rootFolder = Util.getDirectoryName(rootFolder);
     	// Remove the application folder in all cases
