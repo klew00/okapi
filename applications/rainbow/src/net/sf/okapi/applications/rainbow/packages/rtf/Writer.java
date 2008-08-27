@@ -216,20 +216,20 @@ public class Writer extends BaseWriter {
 						tmpBuf.position(0);
 						encBuf = outputEncoder.encode(tmpBuf);
 						if ( encBuf.limit() > 1 ) {
-							buffer.append(String.format("{{\\uc{0:d}",
+							buffer.append(String.format("{\\uc%d",
 								encBuf.limit()));
-							buffer.append(String.format("\\u{0:d}",
-								text.charAt(i)));
+							buffer.append(String.format("\\u%d",
+								(int)text.charAt(i)));
 							for ( int j=0; j<encBuf.limit(); j++ ) {
-								buffer.append(String.format("\\'{0:x}",
+								buffer.append(String.format("\\'%x",
 									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
 							}
 							buffer.append("}");
 						}
 						else {
-							buffer.append(String.format("\\u{0:d}",
-								text.charAt(i)));
-							buffer.append(String.format("\\'{0:x}",
+							buffer.append(String.format("\\u%d",
+								(int)text.charAt(i)));
+							buffer.append(String.format("\\'%x",
 								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
 						}
 					}

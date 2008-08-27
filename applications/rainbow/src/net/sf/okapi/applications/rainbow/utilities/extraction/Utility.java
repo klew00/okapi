@@ -174,7 +174,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			// existing target
 		}
 		
-		if ( params.presegment ) {
+		if (( params.presegment ) && !"no".equals(item.getProperty("canSegment")) ) {
 			try {
 				TextContainer cont;
 				cont = item.getSourceContent();

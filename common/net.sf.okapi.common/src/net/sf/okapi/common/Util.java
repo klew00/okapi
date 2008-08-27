@@ -258,20 +258,20 @@ public class Util {
 						tmpBuf.position(0);
 						encBuf = encoder.encode(tmpBuf);
 						if ( encBuf.limit() > 1 ) {
-							tmp.append(String.format("{{\\uc{0:d}",
+							tmp.append(String.format("{\\uc%d",
 								encBuf.limit()));
-							tmp.append(String.format("\\u{0:d}",
-								text.charAt(i)));
+							tmp.append(String.format("\\u%d",
+								(int)text.charAt(i)));
 							for ( int j=0; j<encBuf.limit(); j++ ) {
-								tmp.append(String.format("\\'{0:x}",
+								tmp.append(String.format("\\'%x",
 									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
 							}
 							tmp.append("}");
 						}
 						else {
-							tmp.append(String.format("\\u{0:d}",
-								text.charAt(i)));
-							tmp.append(String.format("\\'{0:x}",
+							tmp.append(String.format("\\u%d",
+								(int)text.charAt(i)));
+							tmp.append(String.format("\\'%x",
 								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
 						}
 					}
