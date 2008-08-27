@@ -80,24 +80,32 @@ public class Parser implements IParser {
 	// INFOSTRING rules
 	private void tempSetStringInfoRules () {
 		resource.params.rules.clear();
+
 		Rule r = new Rule();
-		r.ruleName = "r2";
+		r.ruleName = "r1";
 		r.start = "^(.*?)\\t";
 		r.end = "1$";
 		r.nameStart = "^";
 		r.nameEnd = "\\t";
 		r.ruleType = Rule.RULETYPE_STRING;
 		r.preserveWS = true;
-		
 		r.useCodeFinder = true;
 		List<String> list = r.codeFinder.getRules();
 		list.add("#!\\[.*?\\]");
 		list.add("#!\\{.*?\\}");
 		list.add("\\\\[nrt]");
 		r.codeFinder.compile();
-		
 		resource.params.rules.add(r);
-	}
+//TODO: Fix case of translatable string not taken after no-trans string
+		r = new Rule();
+		r.ruleName = "r2";
+		r.start = "^(.*?)\\t";
+		r.end = "0$";
+		r.nameStart = "^";
+		r.nameEnd = "\\t";
+		r.ruleType = Rule.RULETYPE_NOTRANS;
+		resource.params.rules.add(r);
+}
 	
 	//TODO: remove after test
 	/*// AZADA rules
@@ -172,8 +180,7 @@ public class Parser implements IParser {
 		// TODO open(CharSequence input)
 	}
 
-	public void open (URL input)
-	{
+	public void open (URL input) {
 		// TODO open(URL input)
 	}
 	
@@ -211,12 +218,12 @@ public class Parser implements IParser {
 		MatchResult endResult = null;
 		int i = 0;
 		for ( Rule rule : resource.params.rules ) {
-			Pattern p = Pattern.compile(rule.start, Pattern.DOTALL | Pattern.MULTILINE);
+			Pattern p = Pattern.compile(rule.start, resource.params.regexOptions);
 			Matcher m = p.matcher(inputText);
 			if ( m.find(startSearch) ) {
 				if ( m.start() < bestPosition ) {
 					// Try to find the corresponding end
-					p = Pattern.compile(rule.end, Pattern.DOTALL | Pattern.MULTILINE);
+					p = Pattern.compile(rule.end, resource.params.regexOptions);
 					Matcher me = p.matcher(inputText);
 					if ( me.find(m.end()) ) {
 						bestPosition = m.start();
@@ -349,10 +356,10 @@ public class Parser implements IParser {
 		if (( start == null ) || ( start.length() == 0 )) return null;
 		if (( end == null ) || ( end.length() == 0 )) return null;
 		
-		Pattern p = Pattern.compile(start, Pattern.DOTALL); //Pattern.MULTILINE);
+		Pattern p = Pattern.compile(start, resource.params.regexOptions);
 		Matcher m1 = p.matcher(text);
 		if ( m1.find() ) {
-			p = Pattern.compile(end, Pattern.DOTALL); //Pattern.MULTILINE);
+			p = Pattern.compile(end, resource.params.regexOptions);
 			Matcher m2 = p.matcher(text);
 			if ( m2.find(m1.end()) ) {
 				return text.substring(m1.end(), m2.start());

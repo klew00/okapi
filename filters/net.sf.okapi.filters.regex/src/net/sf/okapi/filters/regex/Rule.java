@@ -41,8 +41,12 @@ public class Rule {
 	protected String              splitters;
 	protected int                 ruleType;
 	protected boolean             preserveWS;
+	protected boolean             unwrap;
 	protected boolean             useCodeFinder;
 	protected InlineCodeFinder    codeFinder;
+	protected String              propertyName;
+	protected String              propertyValue;
+	protected String              sample;
 
 	public Rule () {
 		start = "";
@@ -51,6 +55,9 @@ public class Rule {
 		nameEnd = "";
 		nameFormat = "";
 		codeFinder = new InlineCodeFinder();
+		preserveWS = true;
+		unwrap = false;
+		sample = "";
 	}
 	
 	public Rule (Rule obj) {
@@ -63,8 +70,12 @@ public class Rule {
 		splitters = obj.splitters;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
+		unwrap = obj.unwrap;
 		useCodeFinder = obj.useCodeFinder;
 		codeFinder = obj.codeFinder.clone();
+		propertyName = obj.propertyName;
+		propertyValue = obj.propertyValue;
+		sample = obj.sample;
 	}
 	
 	public String getRuleName () {
@@ -91,6 +102,15 @@ public class Rule {
 	public void setEnd (String value) {
 		if ( value == null ) throw new NullPointerException();
 		end = value;
+	}
+
+	public String getSample () {
+		return sample;
+	}
+	
+	public void setSample (String value) {
+		if ( value == null ) sample = "";
+		else sample = value;
 	}
 
 	public String getNameStart () {
@@ -136,12 +156,36 @@ public class Rule {
 		ruleType = value;
 	}
 	
-	public boolean preserveSpace () {
+	public boolean preserveWS () {
 		return preserveWS;
 	}
 	
-	public void setPreserveSpace (boolean value) {
+	public void setPreserveWS (boolean value) {
 		preserveWS = value;
+	}
+
+	public boolean unwrap () {
+		return unwrap;
+	}
+	
+	public void setUnwrap (boolean value) {
+		unwrap = value;
+	}
+	
+	public String getPropertyName () {
+		return propertyName;
+	}
+	
+	public void setPropertyName (String value) {
+		propertyName = value;
+	}
+
+	public String getPropertyValue () {
+		return propertyValue;
+	}
+	
+	public void setPropertyValue (String value) {
+		propertyValue = value;
 	}
 
 	public boolean useCodeFinder () {
@@ -163,7 +207,10 @@ public class Rule {
 		tmp.add("nameEnd", nameEnd);
 		tmp.add("nameFormat", nameFormat);
 		tmp.add("preserveWS", preserveWS);
+		tmp.add("unwrap", unwrap);
 		tmp.add("useCodeFinder", useCodeFinder);
+		tmp.add("propertyName", propertyName);
+		tmp.add("propertyValue", propertyValue);
 		//TODO: save finder rules
 		return tmp.toString();
 	}
@@ -178,6 +225,9 @@ public class Rule {
 		nameEnd = tmp.get("nameEnd", nameEnd);
 		nameFormat = tmp.get("nameFormat", nameFormat);
 		preserveWS = tmp.get("preserveWS", preserveWS);
+		unwrap = tmp.get("unwrap", unwrap);
+		propertyName = tmp.get("propertyName", propertyName);
+		propertyValue = tmp.get("propertyValue", propertyValue);
 		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
 		//TODO: get rules for finder
 	}

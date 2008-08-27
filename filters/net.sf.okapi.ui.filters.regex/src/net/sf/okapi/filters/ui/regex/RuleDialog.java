@@ -78,7 +78,11 @@ public class RuleDialog {
 		edStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edStart.setLayoutData(gdTmp);
-		edStart.setText(rule.getStart());
+		edStart.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
 		
 		label = new Label(grpTmp, SWT.NONE);
 		label.setText("End:");
@@ -86,7 +90,11 @@ public class RuleDialog {
 		edEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edEnd.setLayoutData(gdTmp);
-		edEnd.setText(rule.getEnd());
+		edEnd.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
 		
 		edSample = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -118,7 +126,6 @@ public class RuleDialog {
 		edNameStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edNameStart.setLayoutData(gdTmp);
-		edNameStart.setText(rule.getNameStart());
 		
 		label = new Label(grpTmp, SWT.NONE);
 		label.setText("After the name:");
@@ -126,15 +133,13 @@ public class RuleDialog {
 		edNameEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edNameEnd.setLayoutData(gdTmp);
-		edNameEnd.setText(rule.getNameEnd());
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Format (optional):");
+		label.setText("Format:");
 		
 		edNameFormat = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edNameFormat.setLayoutData(gdTmp);
-		edNameFormat.setText(rule.getNameFormat());
 		
 		//--- Dialog-level buttons
 
@@ -157,6 +162,7 @@ public class RuleDialog {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		setData();
 		Dialogs.centerWindow(shell, parent);
 	}
 	
@@ -199,8 +205,14 @@ public class RuleDialog {
 			}
 			Pattern.compile(edStart.getText());
 			Pattern.compile(edEnd.getText());
+			Pattern.compile(edNameStart.getText());
+			Pattern.compile(edNameEnd.getText());
 			rule.setStart(edStart.getText());
 			rule.setEnd(edEnd.getText());
+			rule.setNameStart(edNameStart.getText());
+			rule.setNameEnd(edNameEnd.getText());
+			rule.setNameFormat(edNameFormat.getText());
+			rule.setSample(edSample.getText());
 			result = true;
 			return result;
 		}
@@ -208,6 +220,15 @@ public class RuleDialog {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			return false;
 		}
+	}
+	
+	public void setData () {
+		edStart.setText(rule.getStart());
+		edEnd.setText(rule.getEnd());
+		edNameFormat.setText(rule.getNameFormat());
+		edNameEnd.setText(rule.getNameEnd());
+		edNameStart.setText(rule.getNameStart());
+		edSample.setText(rule.getSample());
 	}
 	
 	public Rule getRule () {

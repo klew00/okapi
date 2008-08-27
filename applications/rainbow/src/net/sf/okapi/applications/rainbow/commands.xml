@@ -14,7 +14,7 @@
  <command name="view.inputList1" ctrl="1" key="1">Input List &amp;1&#x9;Ctrl+1</command>
  <command name="view.inputList2" ctrl="1" key="2">Input List &amp;2&#x9;Ctrl+2</command>
  <command name="view.inputList3" ctrl="1" key="3">Input List &amp;3&#x9;Ctrl+3</command>
- <command name="view.langAndEnc" ctrl="1" key="4">&amp;Languages and Encodings&#x9;Ctrl+4</command>
+ <command name="view.langAndEnc" ctrl="1" key="4">Languages and &amp;Encodings&#x9;Ctrl+4</command>
  <command name="view.otherSettings" ctrl="1" key="5">&amp;Other Settings&#x9;Ctrl+5</command>
  <command name="view.log" key="F9">&amp;Log&#x9;F9</command>
 

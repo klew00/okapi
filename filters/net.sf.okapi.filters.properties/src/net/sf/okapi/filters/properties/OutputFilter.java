@@ -42,6 +42,7 @@ public class OutputFilter implements IOutputFilter {
 	private OutputStreamWriter    writer;
 	private CharsetEncoder        outputEncoder;
 	
+
 	public void initialize (OutputStream output,
 		String encoding,
 		String targetLanguage) {

@@ -21,10 +21,12 @@
 package net.sf.okapi.filters.ui.regex;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderDialog;
 import net.sf.okapi.common.ui.filters.LDPanel;
@@ -32,6 +34,8 @@ import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.Rule;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -52,11 +56,14 @@ public class Editor implements IParametersEditor {
 	
 	private Shell            shell;
 	private boolean          result = false;
+	private Text             edExpression;
 	private Button           chkExtractOuterStrings;
 	private Text             edStartString;
 	private Text             edEndString;
 	private List             lbRules;
 	private Button           btAdd;
+	private Button           btEdit;
+	private Button           btRename;
 	private Button           btRemove;
 	private Button           btMoveUp;
 	private Button           btMoveDown;
@@ -67,6 +74,7 @@ public class Editor implements IParametersEditor {
 	private int              ruleIndex = -1;
 	private Combo            cbRuleType;
 	private Button           chkPreserveWS;
+	private Button           chkUnwrap;
 	private Button           chkUseCodeFinder;
 	private Button           btEditFinderRules;
 	private Button           chkIgnoreCase;
@@ -124,65 +132,30 @@ public class Editor implements IParametersEditor {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		tfTmp.setLayoutData(gdTmp);
 
-		//--- Options tab
-		
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		layTmp = new GridLayout();
-		cmpTmp.setLayout(layTmp);
-		
-		Group grpTmp = new Group(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout();
-		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Localization directives");
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		grpTmp.setLayoutData(gdTmp);
-		pnlLD = new LDPanel(grpTmp, SWT.NONE);
-
-		grpTmp = new Group(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(2, false);
-		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Strings");
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		grpTmp.setLayoutData(gdTmp);
-		
-		chkExtractOuterStrings = new Button(grpTmp, SWT.CHECK);
-		chkExtractOuterStrings.setText("Extract strings outside the rules");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkExtractOuterStrings.setLayoutData(gdTmp);
-
-		Label label = new Label(grpTmp, SWT.NONE);
-		label.setText("Beginning of string:");
-		edStartString = new Text(grpTmp, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edStartString.setLayoutData(gdTmp);
-
-		label = new Label(grpTmp, SWT.NONE);
-		label.setText("End of string:");
-		edEndString = new Text(grpTmp, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edEndString.setLayoutData(gdTmp);
-
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp);
-		
 		//--- Rules tab
 		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
-		layTmp = new GridLayout(3, false);
+		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
 		cmpTmp.setLayout(layTmp);
 		
 		lbRules = new List(cmpTmp, SWT.BORDER | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 1;
 		gdTmp.grabExcessHorizontalSpace = true;
 		gdTmp.verticalSpan = 3;
 		lbRules.setLayoutData(gdTmp);
 		lbRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateRule();
+				updateMoveButtons();
 			};
+		});
+		lbRules.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+				editRule(false);
+			}
+			public void mouseDown(MouseEvent e) {}
+			public void mouseUp(MouseEvent e) {}
 		});
 		
 		//--- Rule properties
@@ -195,14 +168,14 @@ public class Editor implements IParametersEditor {
 		gdTmp.verticalSpan = 3;
 		propGroup.setLayoutData(gdTmp);
 		
-		Text edExpression = new Text(propGroup, SWT.BORDER | SWT.V_SCROLL);
+		edExpression = new Text(propGroup, SWT.BORDER | SWT.V_SCROLL);
 		edExpression.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 50;
 		edExpression.setLayoutData(gdTmp);
 		
-		label = new Label(propGroup, SWT.NONE);
+		Label label = new Label(propGroup, SWT.NONE);
 		label.setText("Action:");
 		
 		cbRuleType = new Combo(propGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -217,6 +190,12 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkPreserveWS.setLayoutData(gdTmp);
+		
+		chkUnwrap = new Button(propGroup, SWT.CHECK);
+		chkUnwrap.setText("Unwrap text");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUnwrap.setLayoutData(gdTmp);
 		
 		chkUseCodeFinder = new Button(propGroup, SWT.CHECK);
 		chkUseCodeFinder.setText("Has in-line codes");
@@ -241,10 +220,17 @@ public class Editor implements IParametersEditor {
 			};
 		});
 
-		//--- end rule properties
+		//--- Buttons
+		
+		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		layTmp.marginWidth = 0;
+		cmpButtons.setLayout(layTmp);
+		cmpButtons.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		
 		int buttonWidth = 80;
-		btAdd = new Button(cmpTmp, SWT.PUSH);
+		
+		btAdd = new Button(cmpButtons, SWT.PUSH);
 		btAdd.setText("Add...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
@@ -255,7 +241,29 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
-		btMoveUp = new Button(cmpTmp, SWT.PUSH);
+		btEdit = new Button(cmpButtons, SWT.PUSH);
+		btEdit.setText("Edit...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = buttonWidth;
+		btEdit.setLayoutData(gdTmp);
+		btEdit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRule(false);
+			};
+		});
+		
+		btRename = new Button(cmpButtons, SWT.PUSH);
+		btRename.setText("Rename...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = buttonWidth;
+		btRename.setLayoutData(gdTmp);
+		btRename.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				renameRule();
+			};
+		});
+		
+		btMoveUp = new Button(cmpButtons, SWT.PUSH);
 		btMoveUp.setText("Move Up");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
@@ -266,14 +274,38 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
+		btRemove = new Button(cmpButtons, SWT.PUSH);
+		btRemove.setText("Remove...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = buttonWidth;
+		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
+		btRemove.setLayoutData(gdTmp);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeRule();
+			};
+		});
+		
+		btMoveDown = new Button(cmpButtons, SWT.PUSH);
+		btMoveDown.setText("Move Down");
+		gdTmp = new GridData();
+		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
+		gdTmp.widthHint = buttonWidth;
+		btMoveDown.setLayoutData(gdTmp);
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDownRule();
+			};
+		});
+
 		//--- Options
 		
 		Group optionsGroup = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		optionsGroup.setLayout(layTmp);
-		optionsGroup.setText("Options");
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 2;
+		optionsGroup.setText("Regular expression options");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
+		gdTmp.verticalSpan = 1;
 		optionsGroup.setLayoutData(gdTmp);
 		
 		chkDotAll = new Button(optionsGroup, SWT.CHECK);
@@ -287,32 +319,52 @@ public class Editor implements IParametersEditor {
 		
 		//--- end Options
 		
-		btRemove = new Button(cmpTmp, SWT.PUSH);
-		btRemove.setText("Remove...");
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
-		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
-		btRemove.setLayoutData(gdTmp);
-		btRemove.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				removeRule();
-			};
-		});
+		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Rules");
+		tiTmp.setControl(cmpTmp);
 		
-		btMoveDown = new Button(cmpTmp, SWT.PUSH);
-		btMoveDown.setText("Move Down");
+		
+		//--- Options tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+		
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout();
+		grpTmp.setLayout(layTmp);
+		grpTmp.setText("Localization directives");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		pnlLD = new LDPanel(grpTmp, SWT.NONE);
+
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		grpTmp.setLayout(layTmp);
+		grpTmp.setText("Strings");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkExtractOuterStrings = new Button(grpTmp, SWT.CHECK);
+		chkExtractOuterStrings.setText("Extract strings outside the rules");
 		gdTmp = new GridData();
-		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
-		gdTmp.widthHint = buttonWidth;
-		btMoveDown.setLayoutData(gdTmp);
-		btMoveDown.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveDownRule();
-			};
-		});
+		gdTmp.horizontalSpan = 2;
+		chkExtractOuterStrings.setLayoutData(gdTmp);
+
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Beginning of string:");
+		edStartString = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edStartString.setLayoutData(gdTmp);
+
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("End of string:");
+		edEndString = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edEndString.setLayoutData(gdTmp);
 
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Rules");
+		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 		
 		//--- Inline tab
@@ -345,11 +397,11 @@ public class Editor implements IParametersEditor {
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
 
-		setData();
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, p_Parent);
+		setData();
 	}
 	
 	private boolean showDialog () {
@@ -368,22 +420,31 @@ public class Editor implements IParametersEditor {
 		boolean enabled = (newRuleIndex > -1 );
 		cbRuleType.setEnabled(enabled);
 		chkPreserveWS.setEnabled(enabled);
+		chkUnwrap.setEnabled(enabled);
 		chkUseCodeFinder.setEnabled(enabled);
-		if ( enabled ) updateEditFinderRulesButton();
-		else btEditFinderRules.setEnabled(enabled);
 
 		ruleIndex = newRuleIndex;
-		if ( ruleIndex < 0 ) return;
-		
+		if ( ruleIndex < 0 ) {
+			edExpression.setText("");
+			cbRuleType.select(0);
+			chkPreserveWS.setSelection(false);
+			chkUnwrap.setSelection(false);
+			chkUseCodeFinder.setSelection(false);
+			btEditFinderRules.setEnabled(false);
+			return;
+		}
 		Rule rule = rules.get(ruleIndex);
-		chkPreserveWS.setSelection(rule.preserveSpace());
+		edExpression.setText("(("+rule.getStart()+")(.*?)("+rule.getEnd()+"))");
+		cbRuleType.select(rule.getRuleType());
+		chkPreserveWS.setSelection(rule.preserveWS());
+		chkUnwrap.setSelection(rule.unwrap());
 		chkUseCodeFinder.setSelection(rule.useCodeFinder());
+		updateEditFinderRulesButton();
 	}
 
 	private void updateEditFinderRulesButton () {
 		btEditFinderRules.setEnabled(chkUseCodeFinder.getSelection());
 	}
-	
 	
 	private void editFinderRules () {
 		try {
@@ -399,78 +460,165 @@ public class Editor implements IParametersEditor {
 	private void saveRuleData (int index) {
 		if ( index < 0 ) return;
 		Rule rule = rules.get(index);
-		rule.setPreserveSpace(chkPreserveWS.getSelection());
+		rule.setRuleType(cbRuleType.getSelectionIndex());
+		rule.setPreserveWS(chkPreserveWS.getSelection());
+		rule.setUnwrap(chkUnwrap.getSelection());
 		rule.setUseCodeFinder(chkUseCodeFinder.getSelection());
 	}
-	
-	private void updateRuleButtons () {
+
+	private void updateMoveButtons () {
 		int n = lbRules.getSelectionIndex();
 		btMoveUp.setEnabled(n > 0);
-		btMoveDown.setEnabled((n != -1) && ( n < lbRules.getItemCount()-2 ));
+		btMoveDown.setEnabled((n != -1) && ( n < lbRules.getItemCount()-1 ));
+	}
+
+	private void updateRuleButtons () {
+		int n = lbRules.getSelectionIndex();
 		btRemove.setEnabled(n != -1);
+		btEdit.setEnabled(n != -1);
+		btRename.setEnabled(n != -1);
+		updateMoveButtons();
+	}
+	
+	private void renameRule () {
+		try {
+			int n = lbRules.getSelectionIndex();
+			if ( n == -1 ) return;
+			Rule rule = rules.get(n);
+			String name = rule.getRuleName();
+			InputDialog dlg = new InputDialog(shell, "Rename Rule",
+				"New name of the rule:", name, null);
+			if ( (name = dlg.showDialog()) == null ) return;
+			rule.setRuleName(name);
+			lbRules.setItem(n, name);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 	
 	private void editRule (boolean newRule) {
-		Rule rule;
-		String caption;
-		if ( newRule ) {
-			rule = new Rule();
-			rule.setRuleName("newRule");
-			caption = "Add New Rule";
+		try {
+			Rule rule;
+			String caption;
+			if ( newRule ) {
+				// Get the name
+				String name = "newRule";
+				InputDialog dlg = new InputDialog(shell, "New Rule",
+					"Name of the new rule:", name, null);
+				if ( (name = dlg.showDialog()) == null ) return;
+				rule = new Rule();
+				rule.setRuleName(name);
+				caption = "Add New Rule";
+			}
+			else {
+				int n = lbRules.getSelectionIndex();
+				if ( n == -1 ) return;
+				rule = rules.get(n);
+				caption = "Edit Rule";
+			}
+			
+			RuleDialog dlg = new RuleDialog(shell, caption, rule);
+			if ( !dlg.showDialog() ) return;
+			rule = dlg.getRule();
+			
+			if ( newRule ) {
+				rules.add(rule);
+				lbRules.add(rule.getRuleName());
+				lbRules.select(lbRules.getItemCount()-1);
+			}
 		}
-		else {
-			int n = lbRules.getSelectionIndex();
-			if ( n == -1 ) return;
-			rule = rules.get(n);
-			caption = "Edit Rule";
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
-		
-		RuleDialog dlg = new RuleDialog(shell, caption, rule);
-		if ( !dlg.showDialog() ) return;
-		rule = dlg.getRule();
-		
-		if ( newRule ) {
-			rules.add(rule);
-			lbRules.add(rule.getRuleName());
-			lbRules.select(lbRules.getItemCount()-1);
+		finally {
+			updateRule();
+			updateRuleButtons();
 		}
-		updateRule();
 	}
 	
 	private void removeRule () {
-		
+		int n = lbRules.getSelectionIndex();
+		if ( n == -1 ) return;
+		ruleIndex = -1;
+		rules.remove(n);
+		lbRules.remove(n);
+		if ( n > lbRules.getItemCount()-1  ) n = lbRules.getItemCount()-1;
+		lbRules.select(n);
+		updateRule();
+		updateRuleButtons();
 	}
 	
 	private void moveUpRule () {
-		
+		int n = lbRules.getSelectionIndex();
+		if ( n < 1 ) return;
+		saveRuleData(ruleIndex);
+		ruleIndex = -1;
+		// Move in the rules array
+		Rule tmp = rules.get(n);
+		rules.set(n, rules.get(n-1));
+		rules.set(n-1, tmp);
+		// Refresh the list box
+		lbRules.setItem(n, rules.get(n).getRuleName());
+		lbRules.setItem(n-1, rules.get(n-1).getRuleName());
+		lbRules.select(n-1);
+		updateRule();
+		updateRuleButtons();
 	}
 	
 	private void moveDownRule () {
-		
+		int n = lbRules.getSelectionIndex();
+		if ( n < 0 ) return;
+		saveRuleData(ruleIndex);
+		ruleIndex = -1;
+		// Move in the rules array
+		Rule tmp = rules.get(n);
+		rules.set(n, rules.get(n+1));
+		rules.set(n+1, tmp);
+		// Refresh the list box
+		lbRules.setItem(n, rules.get(n).getRuleName());
+		lbRules.setItem(n+1, rules.get(n+1).getRuleName());
+		lbRules.select(n+1);
+		updateRule();
+		updateRuleButtons();
 	}
 	
 	private void setData () {
 		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
-		chkExtractOuterStrings.setSelection(
-			"1".equals(params.getParameter("extractOuterStrings")));
+		chkExtractOuterStrings.setSelection(params.getBoolean("extractOuterStrings"));
 		edStartString.setText(params.getParameter("startString"));
 		edEndString.setText(params.getParameter("endString"));
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
+		int tmp = params.getInt("regexOptions");
+		chkDotAll.setSelection((tmp & Pattern.DOTALL)==Pattern.DOTALL);
+		chkIgnoreCase.setSelection((tmp & Pattern.CASE_INSENSITIVE)==Pattern.CASE_INSENSITIVE);
+		chkMultiline.setSelection((tmp & Pattern.MULTILINE)==Pattern.MULTILINE);
 		pnlLD.updateDisplay();
+		if ( lbRules.getItemCount() > 0 ) lbRules.select(0);
 		updateRule();
 		updateRuleButtons();
 	}
 	
 	private void saveData () {
+		saveRuleData(ruleIndex);
 		//TODO: validation
 		params.setParameter("useLD", pnlLD.getUseLD());
 		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
-		params.setParameter("extractOuterStrings",
-			chkExtractOuterStrings.getSelection() ? "1" : "0");
+		params.setParameter("extractOuterStrings", chkExtractOuterStrings.getSelection());
 		params.setParameter("startString", edStartString.getText());
 		params.setParameter("endString", edEndString.getText());
+		
+		ArrayList<Rule> paramRules = params.getRules();
+		paramRules.clear();
+		for ( Rule rule : rules ) {
+			paramRules.add(rule);
+		}
+		int tmp = 0;
+		if ( chkDotAll.getSelection() ) tmp |= Pattern.DOTALL;
+		if ( chkIgnoreCase.getSelection() ) tmp |= Pattern.CASE_INSENSITIVE;
+		if ( chkMultiline.getSelection() ) tmp |= Pattern.MULTILINE;
 		result = true;
 	}
 	
