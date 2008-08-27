@@ -1452,6 +1452,7 @@ public class MainForm implements IParametersProvider {
 				inp = prj.getItemFromRelativePath(currentInput, table.getItem(index).getText(0));
 				prj.getList(currentInput).remove(inp);
 			}
+			prj.isModified = true;
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

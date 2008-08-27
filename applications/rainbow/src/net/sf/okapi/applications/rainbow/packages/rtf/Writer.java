@@ -124,39 +124,65 @@ public class Writer extends BaseWriter {
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
 			//TODO
-			int srcSegCount = 0;
+/*			int srcSegCount = 0;
 			int trgSegCount = 0;
 			if ( item.getSourceContent().isSegmented() ) {
 				srcSegCount = item.getSourceContent().getSegments().size();
 			}
 			if ( item.getTargetContent().isSegmented() ) {
 				trgSegCount = item.getTargetContent().getSegments().size();
-			}
+			}*/
 		}
-		else {
-			
-			processContent(item.getSourceContent(), tmp);
+		else { // No target
+			processContent(item.getSourceContent(), tmp,
+				item.getSourceContent().isSegmented());
 		}
 		tmp.append(Util.RTF_STARTCODE);
 		writer.write(tmp.toString());
 	}
 
-	private String processContent (TextContainer content,
-		StringBuilder buffer)
+	private String processContent (TextFragment content,
+		StringBuilder buffer,
+		boolean isSegmented)
 	{
 		try {
 			String text = content.getCodedText();
 			CharBuffer tmpBuf = CharBuffer.allocate(1);
 			ByteBuffer encBuf;
 			Code code;
+			// Cast to a TextContainer if needed
+			TextContainer tc = null;
+			if ( isSegmented ) {
+				tc = (TextContainer)content;
+			}
 			
 			for ( int i=0; i<text.length(); i++ ) {
 				switch ( text.charAt(i) ) {
 				case TextFragment.MARKER_OPENING:
 				case TextFragment.MARKER_CLOSING:
-				case TextFragment.MARKER_ISOLATED:
 					buffer.append(Util.RTF_STARTINLINE);
 					code = content.getCode(text.charAt(++i));
+					//TODO: handle sub-flows!!!
+					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
+					buffer.append(Util.RTF_ENDINLINE);
+					break;
+				case TextFragment.MARKER_ISOLATED:
+					code = content.getCode(text.charAt(++i));
+					if ( isSegmented ) {
+						if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
+							int index = Integer.valueOf(code.getData());
+							buffer.append(Util.RTF_STARTMARKER);
+							processContent(tc.getSegments().get(index), buffer, false);
+							buffer.append(Util.RTF_MIDMARKER1+"0"+Util.RTF_MIDMARKER2);
+							buffer.append("{\\highlight7 ");
+							processContent(tc.getSegments().get(index), buffer, false);
+							buffer.append("}");
+							buffer.append(Util.RTF_ENDMARKER);
+							break;
+						}
+						// Else: fall back to normal isolated inline 
+					}
+					buffer.append(Util.RTF_STARTINLINE);
 					//TODO: handle sub-flows!!!
 					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
 					buffer.append(Util.RTF_ENDINLINE);

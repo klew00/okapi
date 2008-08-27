@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -166,6 +167,10 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		if ( item.getSourceContent().isSegmented() ) {
+			//TextUnit tmpTU = new TextUnit();
+			//tmpTU.setSourceContent(item.getSourceContent());
+			//tmpTU.getSourceContent().mergeAllSegments();
+			//writer.writeRawXML(xliffCont.setContent(tmpTU.getSourceContent()).toString());
 			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
 			writer.writeEndElementLineBreak(); // source
 			writer.writeStartElement("seg-source");

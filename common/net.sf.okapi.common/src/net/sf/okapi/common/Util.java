@@ -46,6 +46,11 @@ public class Util {
 	public static final String   RTF_ENDCODE     = "}";
 	public static final String   RTF_STARTINLINE = "{\\cs6\\f1\\cf6\\lang1024 ";
 	public static final String   RTF_ENDINLINE   = "}";
+	public static final String   RTF_STARTMARKER = "{\\cs15\\v\\cf12\\sub\\f2 \\{0>}{\\v\\f1 ";
+	public static final String   RTF_MIDMARKER1  = "}{\\cs15\\v\\cf12\\sub\\f2 <\\}";
+	public static final String   RTF_MIDMARKER2  = "\\{>}";
+	public static final String   RTF_ENDMARKER   = "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
+
 
 	/**
 	 * Removes from the from of a string any of the specified characters. 

@@ -141,15 +141,12 @@ public class Segmenter {
 			while ( m.find() ) {
 				int n = m.start()+m.group(1).length();
 				if ( n >= codedText.length() ) continue; // Match the end
-				if ( splits.containsKey(n) ) {
-					// Do not update if we found a no-break before
-					if ( !splits.get(n) ) continue;
-				}
-				// Add or update split
+				// Already a match: Per SRX algorithm, we use the first one only
+				if ( splits.containsKey(n) ) continue;
+				// Else add a split marker
 				splits.put(n, rule.isBreak);
 			}
 		}
-		
 
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
@@ -191,10 +188,13 @@ public class Segmenter {
 			if ( textStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
 				textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
-					0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
-				if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
-				starts.add(textStart);
-				ends.add(textEnd);
+					textStart, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				//TODO: fix case of last seg is single letter char surrounded by WS 
+				if ( textEnd > textStart ) { // Only if there is something
+					if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
+					starts.add(textStart);
+					ends.add(textEnd);
+				}
 			}
 		}
 		// Add an extra value in ends to hold the total length of the coded text
