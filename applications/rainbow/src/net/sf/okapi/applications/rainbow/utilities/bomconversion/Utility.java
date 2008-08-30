@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -305,5 +306,11 @@ public class Utility implements ISimpleUtility {
 
 	public int getInputCount() {
 		return 1;
+	}
+
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
 	}
 }

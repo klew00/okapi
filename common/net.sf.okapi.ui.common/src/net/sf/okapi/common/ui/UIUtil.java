@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.ui;
 
+import java.io.IOException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
 
@@ -36,6 +38,26 @@ public class UIUtil {
 	 */
 	static public void start (String command) {
 		Program.launch(command); 
+	}
+	
+	/**
+	 * Executes a given program with a given parameter.
+	 * @param program The program to execute.
+	 * @param parameter The parameter of the program.
+	 */
+	static public void execute (String program,
+		String parameter)
+	{
+		try {
+			Runtime rt = Runtime.getRuntime();
+			String[] command = new String[2];
+			command[0] = program;
+			command[1] = parameter;
+			rt.exec(command);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**

@@ -20,8 +20,10 @@
 
 package net.sf.okapi.common.resource;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 public class ResourceContainer extends ArrayList<IContainable>
 	implements IResourceContainer, IAnnotatable
@@ -33,8 +35,16 @@ public class ResourceContainer extends ArrayList<IContainable>
 	protected boolean                       preserveWS;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
+	private LocaleProperties                source;
+	private ArrayList<LocaleProperties>     targets;
 
-	
+
+	public ResourceContainer () {
+		source = new LocaleProperties();
+		targets = new ArrayList<LocaleProperties>();
+		targets.add(null);
+	}
+
 	public String getName () {
 		return name;
 	}
@@ -93,4 +103,29 @@ public class ResourceContainer extends ArrayList<IContainable>
 		return extList;
 	}
 
+	public LocaleProperties getSource () {
+		return source;
+	}
+	
+	public void setSource (LocaleProperties value) {
+		if ( value == null ) throw new InvalidParameterException();
+		source = value;
+	}
+
+	public boolean hasTarget () {
+		return (targets.get(0) == null);
+	}
+
+	public LocaleProperties getTarget () {
+		return targets.get(0);
+	}
+	
+	public void setTarget (LocaleProperties value) {
+		if ( value == null ) throw new InvalidParameterException();
+		targets.set(0, value);
+	}
+
+	public List<LocaleProperties> getTargets () {
+		return targets;
+	}
 }

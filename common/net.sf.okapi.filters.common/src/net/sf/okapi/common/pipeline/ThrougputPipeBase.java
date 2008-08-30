@@ -31,35 +31,35 @@ public abstract class ThrougputPipeBase implements IResourceBuilder, IOutputPipe
     
     
     public void startResource(Document resource) {
-        outputPipe.startResource(resource);
+    	if ( outputPipe != null ) outputPipe.startResource(resource);
     }
 
     public void endResource(Document resource) {
-        outputPipe.endResource(resource);        
+    	if ( outputPipe != null ) outputPipe.endResource(resource);        
     }
 
     public void startContainer(Group resource) {
-        outputPipe.startContainer(resource);
+    	if ( outputPipe != null ) outputPipe.startContainer(resource);
     }
 
     public void endContainer(Group resource) {
-        outputPipe.endContainer(resource);
+    	if ( outputPipe != null ) outputPipe.endContainer(resource);
     }
 
     public void startExtractionItem (TextUnit item) {
-        outputPipe.startExtractionItem(item);
+    	if ( outputPipe != null ) outputPipe.startExtractionItem(item);
     }
 
     public void endExtractionItem(TextUnit item) {
-        outputPipe.endExtractionItem(item);
+    	if ( outputPipe != null ) outputPipe.endExtractionItem(item);
     }
 
     public void skeletonContainer (SkeletonUnit resource) {
-    	outputPipe.skeletonContainer(resource);
+    	if ( outputPipe != null ) outputPipe.skeletonContainer(resource);
     }
     
     public void setOutput(IResourceBuilder inputBuilder) {
-        this.outputPipe = inputBuilder;
+    	this.outputPipe = inputBuilder;
     }
 
 }

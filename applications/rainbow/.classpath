@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.properties"/>
 	<classpathentry kind="lib" path="lib/win32-x86/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.regex"/>
+	<classpathentry kind="lib" path="C:/OkapiJava/trunk/applications/rainbow/lib/shared/h2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

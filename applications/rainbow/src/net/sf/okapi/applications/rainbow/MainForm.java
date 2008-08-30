@@ -46,6 +46,7 @@ import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
@@ -187,6 +188,8 @@ public class MainForm implements IParametersProvider {
 
 		fa = new FilterAccess();
 		fa.loadList(sharedFolder + File.separator + "filters.xml");
+		//TODO: Define default editor in user preferences!
+		fa.setDefaultEditor("notepad");
 
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -1320,8 +1323,8 @@ public class MainForm implements IParametersProvider {
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
-		fa.loadFilter(aRes[1], null);
-		return fa.inputFilter.getParameters();
+		Object[] filters = fa.loadFilter(aRes[1], null, null, null);
+		return ((IInputFilter)filters[0]).getParameters();
 	}
 
 	public IParameters load (String location)
@@ -1329,8 +1332,8 @@ public class MainForm implements IParametersProvider {
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
-		fa.loadFilter(aRes[1], aRes[3]);
-		return fa.inputFilter.getParameters();
+		Object[] filters = fa.loadFilter(aRes[1], aRes[3], null, null);
+		return ((IInputFilter)filters[0]).getParameters();
 	}
 
 	public void save (String location,

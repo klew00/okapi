@@ -233,8 +233,8 @@ public class FilterSettingsPanel extends Composite {
 				Dialogs.showError(getShell(), "Error when trying to load the parameters file.", null);
 				return;
 			}
-			// Now call the editor (from the client side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell()) ) {
+			// Now call the editor (from the UI side)
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);
@@ -275,7 +275,7 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the client side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell()) ) {
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);

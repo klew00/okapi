@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
@@ -668,5 +669,10 @@ public class Utility implements ISimpleUtility {
 		CharEntities.put("diams",	'\u2666');
 	}
 
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
+	}
 	
 }

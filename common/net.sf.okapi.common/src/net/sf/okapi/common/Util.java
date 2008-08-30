@@ -319,6 +319,39 @@ public class Util {
 			catch ( IOException e ) {};
 		}
 	}
+
+	/**
+	 * Recursive function to delete the content of a given directory
+	 * (including all its sub-directories. This does not delete the 
+	 * original parent directory.
+	 * @param directory Directory of the content to delete.
+	 */
+	private static void deleteDirectory (File directory) {
+		for ( File f : directory.listFiles() ) {
+			if ( f.isDirectory() ) {
+				deleteDirectory(f);
+			}
+			f.delete();
+		}
+	}
+	
+	/**
+	 * Delete the content of a given directory, and if requested, the
+	 * directory itself. Sub-directories and their content are part of the
+	 * deleted content.
+	 * @param directory The path of the directory to delete
+	 * @param contentOnly Indicates if the directory itself should be
+	 * removed. If this flag is false, only the content is deleted.
+	 */
+	public static void deleteDirectory (String directory,
+		boolean contentOnly)
+	{
+		File f = new File(directory);
+		// Make sure this is a directory
+		if ( !f.isDirectory() ) return;
+		deleteDirectory(f);
+		if ( !contentOnly ) f.delete();
+	}
 	
 	/**
 	 * Gets the filename of a path.
@@ -447,5 +480,19 @@ public class Util {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * Gets the default system temporary directory to use for the current
+	 * user. The directory path returned has never a trailing separator.
+	 * @return The directory path of the temporary directory to use, without
+	 * trailing separator.
+	 */
+	public static String getTempDirectory () {
+		String tmp = System.getProperty("java.io.tmpdir");
+		// Normalize for all platforms: no trailing separator
+		if ( tmp.endsWith(File.separator) )
+			tmp = tmp.substring(0, tmp.length()-1);
+		return tmp;
 	}
 }

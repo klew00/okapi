@@ -236,4 +236,10 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	public String getFolderAfterProcess () {
 		return params.outputFolder;
 	}
+
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
+	}
 }

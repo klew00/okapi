@@ -35,6 +35,8 @@ import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.LocaleData;
 import net.sf.okapi.common.resource.TextUnit;
@@ -44,6 +46,8 @@ public class Merger extends ThrougputPipeBase {
 	private Manifest         manifest;
 	private IReader          reader;
 	private FilterAccess     fa;
+	private IInputFilter     inpFilter;
+	private IOutputFilter    outFilter;
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private boolean          skipNoTranslate;
 
@@ -94,36 +98,47 @@ public class Merger extends ThrougputPipeBase {
 			String paramsFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
 				+ File.separator + String.format("%d.fprm", docID);
 			// Load the relevant filter
-			fa.loadFilter(item.getFilterID(), paramsFile);
+			Object[] filters = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter, outFilter);
+			inpFilter = (IInputFilter)filters[0];
+			outFilter = (IOutputFilter)filters[0];
 			
 			reader.openDocument(fileToMerge);
 			
 			// Initializes the input
 			InputStream input = new FileInputStream(originalFile);
-			fa.inputFilter.initialize(input, originalFile, "TODO:filterSettings???", item.getInputEncoding(),
+			inpFilter.initialize(input, originalFile, "TODO:filterSettings???", item.getInputEncoding(),
 				manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);
 			Util.createDirectories(outputFile);
 			OutputStream output = new FileOutputStream(outputFile);
-			fa.outputFilter.initialize(output, item.getOutputEncoding(), manifest.getTargetLanguage());
+			outFilter.initialize(output, item.getOutputEncoding(), manifest.getTargetLanguage());
 
 			// Set the pipeline: inputFilter -> merger -> outputFilter 
-			fa.inputFilter.setOutput(this);
-			this.setOutput(fa.outputFilter);
+			inpFilter.setOutput(this);
+			this.setOutput(outFilter);
 			
 			// Do it
-			fa.inputFilter.process();
+			inpFilter.process();
 		}
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			logger.error("Merging error. " + e.getCause().getLocalizedMessage(), e);
 		}
 		finally {
-			if ( fa.outputFilter != null ) fa.outputFilter.close();
-			if ( reader != null ) reader.closeDocument();
-			if ( fa.inputFilter != null ) fa.inputFilter.close();
+			if ( outFilter != null ) {
+				outFilter.close();
+				outFilter = null;
+			}
+			if ( reader != null ) {
+				reader.closeDocument();
+				reader = null;
+			}
+			if ( inpFilter != null ) {
+				inpFilter.close();
+				inpFilter = null;
+			}
 		}
 	}
 

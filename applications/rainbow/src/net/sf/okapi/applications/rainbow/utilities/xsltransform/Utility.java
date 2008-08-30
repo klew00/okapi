@@ -30,6 +30,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
@@ -194,5 +195,11 @@ public class Utility implements ISimpleUtility {
 
 	public String getFolderAfterProcess () {
 		return commonFolder;
+	}
+
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
 	}
 }

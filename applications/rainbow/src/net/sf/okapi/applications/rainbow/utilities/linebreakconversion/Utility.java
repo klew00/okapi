@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
@@ -209,5 +210,11 @@ public class Utility implements ISimpleUtility {
 
 	public int getInputCount() {
 		return 1;
+	}
+
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
 	}
 }

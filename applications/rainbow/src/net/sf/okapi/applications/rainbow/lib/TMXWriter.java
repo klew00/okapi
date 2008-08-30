@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -92,7 +93,17 @@ public class TMXWriter {
 		if (( tuid == null ) || ( tuid.length() == 0 )) {
 			tuid = String.format("autoID%d", itemCount);
 		}
-		writeTU(item.getSourceContent(), item.getTargetContent(), tuid);
+		
+		TextContainer srcTC = item.getSourceContent();
+		TextContainer trgTC = item.getTargetContent();
+		if ( srcTC.isSegmented() ) {
+			
+			//TODO: Replace by segmented
+			writeTU(srcTC, item.getTargetContent(), tuid);
+		}
+		else {
+			writeTU(srcTC, item.getTargetContent(), tuid);
+		}
 	
 		/*TODO: handle segmentation
 		if ( item.getSource().isSegmented() ) {

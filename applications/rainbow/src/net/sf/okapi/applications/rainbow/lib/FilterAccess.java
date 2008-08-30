@@ -34,6 +34,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -43,12 +44,8 @@ import org.xml.sax.SAXException;
 public class FilterAccess {
 	
 	private Hashtable<String, FilterAccessItem>  m_htFilters;
-	private String                               currentInFlt;
-	private String                               currentOutFlt;
-
-	public IInputFilter                          inputFilter;
-	public IOutputFilter                         outputFilter;
-	public IParametersEditor                     paramsEditor;
+	private String                               defaultEditor;
+	
 	
 	/**
 	 * Construct a filter settings string.
@@ -75,7 +72,8 @@ public class FilterAccess {
 	 * and 3=full parameters file path (folder + parameters name + extension).
 	 */
 	static public String[] splitFilterSettingsType1 (String projectParamsFolder,
-		String filterSettings) {
+		String filterSettings)
+	{
 		String[] aOutput = new String[4];
 		for ( int i=0; i<4; i++ ) aOutput[i] = "";
 
@@ -150,8 +148,6 @@ public class FilterAccess {
 	 */
 	public void loadList (String p_sPath) {
 		try {
-			currentInFlt = null;
-			currentOutFlt = null;
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Document doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
@@ -186,6 +182,15 @@ public class FilterAccess {
 			throw new RuntimeException(e);
 		}
 	}
+
+	/**
+	 * Sets the default program to use to edit parameters file when
+	 * they do not have a dedicated editor.
+	 * @param editor The default program to use to edit parameters files.
+	 */
+	public void setDefaultEditor (String editor) {
+		defaultEditor = editor;
+	}
 	
 	/**
 	 * Loads a filter and its parameters (if necessary). If the filter is the 
@@ -193,10 +198,22 @@ public class FilterAccess {
 	 * @param filterID Identifier of the filter to load.
 	 * @param paramPath Full path of the parameters file to load. Use null
 	 * for not loading any parameters file.
+	 * @param previousInputFilter An optional previous instance of the input filter
+	 * it will be re-used if the one requested is the same. Use null to force
+	 * reloading the filter or if there is no previous instance available.
+	 * @param previousOutputFilter An optional previous instance of the input filter
+	 * it will be re-used if the one requested is the same. Use null to force
+	 * reloading the filter or if there is no previous instance available.
+	 * @return An array of two object: 0=input filter, 1=output filter.
 	 */
-	public void loadFilter (String filterID,
-		String paramPath)
+	public Object[] loadFilter (String filterID,
+		String paramPath,
+		IInputFilter previousInputFilter,
+		IOutputFilter previousOutputFilter)
 	{
+		Object result[] = new Object[2];
+		result[0] = previousInputFilter;
+		result[1] = previousOutputFilter;
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
 			// we remove the NNN. part. That part is reserved for multi-file storage info
@@ -211,25 +228,25 @@ public class FilterAccess {
 
 			// Load if not already done
 			boolean bLoad = true;
-			if (( inputFilter != null ) && ( currentInFlt != null )) {
-				bLoad = !currentInFlt.equals(m_htFilters.get(filterID).inputFilterClass);
+			if ( previousInputFilter != null ) {
+				String s = previousInputFilter.getClass().getName();
+				bLoad = !s.equals(m_htFilters.get(filterID).inputFilterClass);
 			}
 			if ( bLoad ) {
-				inputFilter = (IInputFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
-				currentInFlt = m_htFilters.get(filterID).inputFilterClass;
+				result[0] = (IInputFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
 			}
 
 			bLoad = true;
-			if (( outputFilter != null ) && ( currentOutFlt != null )) {
-				bLoad = !currentOutFlt.equals(m_htFilters.get(filterID).outputFilterClass);
+			if ( previousOutputFilter != null ) {
+				String s = previousOutputFilter.getClass().getName();
+				bLoad = !s.equals(m_htFilters.get(filterID).outputFilterClass);
 			}
 			if ( bLoad ) {
-				outputFilter = (IOutputFilter)Class.forName(m_htFilters.get(filterID).outputFilterClass).newInstance();
-				currentOutFlt = m_htFilters.get(filterID).outputFilterClass;
+				result[1] = (IOutputFilter)Class.forName(m_htFilters.get(filterID).outputFilterClass).newInstance();
 			}
 
 			// Load the parameters
-			IParameters params = inputFilter.getParameters();
+			IParameters params = ((IInputFilter)result[0]).getParameters();
 			if ( params != null ) { // Not all filters have parameters
 				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
 					params.load(paramPath, false);
@@ -248,6 +265,7 @@ public class FilterAccess {
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
 		}
+		return result;
 	}
 
 	public IParser loadParser (String filterID,
@@ -281,14 +299,16 @@ public class FilterAccess {
 		}
 	}
 	
-	public void loadFilterFromFilterSettingsType1 (String projectParamsFolder,
-		String filterSettings)
+	public Object[] loadFilterFromFilterSettingsType1 (String projectParamsFolder,
+		String filterSettings,
+		IInputFilter previousInputFilter,
+		IOutputFilter previousOutputFilter)
 	{
 		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
-		loadFilter(aRes[1], aRes[3]);
+		return loadFilter(aRes[1], aRes[3], previousInputFilter, previousOutputFilter);
 	}
 	
-	public void loadEditor (String filterID) {
+	public IParametersEditor loadEditor (String filterID) {
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
 			// we remove the NNN. part. That part is reserved for multi-file storage info
@@ -297,10 +317,12 @@ public class FilterAccess {
 				if ( n != -1 ) filterID = filterID.substring(n+1);
 			}
 	
-			// Map the ID to the class, and instantiate the filter
+			// Map the ID to the class, and instantiate the editor
 			if ( !m_htFilters.containsKey(filterID) )
 				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID));
-			paramsEditor = (IParametersEditor)Class.forName(m_htFilters.get(filterID).editorClass).newInstance();
+			String classPath = m_htFilters.get(filterID).editorClass;
+			if ( classPath == null ) return null;
+			return (IParametersEditor)Class.forName(classPath).newInstance();
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -327,11 +349,18 @@ public class FilterAccess {
 	//TODO: Rethink the error handling
 	public boolean editParameters (String filterID,
 		IParameters paramObject,
-		Object uiContext)
+		Object uiContext,
+		String paramsPath)
 	{
-		loadEditor(filterID);
-		if ( paramsEditor == null ) return false;
-		return paramsEditor.edit(paramObject, uiContext);
+		IParametersEditor paramsEditor = loadEditor(filterID);
+		boolean result = false;
+		if ( paramsEditor == null ) {
+			if ( defaultEditor != null ) {
+				UIUtil.execute(defaultEditor, paramsPath);
+			}
+		}
+		else result = paramsEditor.edit(paramObject, uiContext);
+		return result;
 	}
 	
 	public Map<String, FilterAccessItem> getItems () {

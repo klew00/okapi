@@ -24,9 +24,9 @@ public class Group extends ResourceContainer implements ITranslatable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String           id;
-	private ITranslatable    parent;
-	private boolean          isTranslatable;
+	private String                          id;
+	private ITranslatable                   parent;
+	private boolean                         isTranslatable;
 
 
 	public Group () {

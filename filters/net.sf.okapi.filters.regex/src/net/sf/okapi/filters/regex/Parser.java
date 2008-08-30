@@ -90,6 +90,7 @@ public class Parser implements IParser {
 		r.ruleType = Rule.RULETYPE_STRING;
 		r.preserveWS = true;
 		r.useCodeFinder = true;
+		resource.params.regexOptions = Pattern.MULTILINE;
 		List<String> list = r.codeFinder.getRules();
 		list.add("#!\\[.*?\\]");
 		list.add("#!\\{.*?\\}");
@@ -97,14 +98,14 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
 //TODO: Fix case of translatable string not taken after no-trans string
-		r = new Rule();
+	/*	r = new Rule();
 		r.ruleName = "r2";
 		r.start = "^(.*?)\\t";
 		r.end = "0$";
 		r.nameStart = "^";
 		r.nameEnd = "\\t";
 		r.ruleType = Rule.RULETYPE_NOTRANS;
-		resource.params.rules.add(r);
+		resource.params.rules.add(r);*/
 }
 	
 	//TODO: remove after test

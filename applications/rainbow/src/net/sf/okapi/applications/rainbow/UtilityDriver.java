@@ -38,6 +38,8 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
@@ -49,6 +51,8 @@ public class UtilityDriver {
 	private ILog                  log;
 	private Project               prj;
 	private FilterAccess          fa;
+	private IInputFilter          inpFilter;
+	private IOutputFilter         outFilter;
 	private IUtility              util;
 	private IParametersEditor     editor;
 	private PluginItem            pluginItem;
@@ -140,6 +144,7 @@ public class UtilityDriver {
 			if ( util.needsRoots() ) {
 				util.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}
+			util.setFilterAccess(fa, prj.getParametersFolder());
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 
@@ -194,26 +199,29 @@ public class UtilityDriver {
 				if ( util.isFilterDriven() ) {
 					IFilterDrivenUtility filterUtil = (IFilterDrivenUtility)util;
 					// Load the filter
-					fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
-						item.filterSettings);
+					Object[] filters = fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
+						item.filterSettings, inpFilter, outFilter);
+					inpFilter = (IInputFilter)filters[0];
+					outFilter = (IOutputFilter)filters[1];
+					
 					InputStream input = new FileInputStream(inputPath);
-					fa.inputFilter.initialize(input, inputPath,
+					inpFilter.initialize(input, inputPath,
 						item.filterSettings, prj.buildSourceEncoding(item),
 						prj.getSourceLanguage(), prj.getTargetLanguage());
-					fa.inputFilter.setOutput(filterUtil);
+					inpFilter.setOutput(filterUtil);
 					
 					// Initialize the output if needed
 					if ( filterUtil.needsOutputFilter() ) {
 						// Initialize the output
 						Util.createDirectories(outputPath);
 						OutputStream output = new FileOutputStream(outputPath);
-						fa.outputFilter.initialize(output, prj.buildTargetEncoding(item),
+						outFilter.initialize(output, prj.buildTargetEncoding(item),
 							prj.getTargetLanguage());
-						filterUtil.setOutput(fa.outputFilter);
+						filterUtil.setOutput(outFilter);
 					}
 
 					// Process the input 
-					fa.inputFilter.process();
+					inpFilter.process();
 				}
 				else { // Not filter-driven, just execute with input file
 					 ((ISimpleUtility)util).processInput();

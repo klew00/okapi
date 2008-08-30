@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -27,6 +28,9 @@ import net.sf.okapi.common.IParameters;
  */
 public interface IUtility {
 
+	void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder);
+	
 	/**
 	 * Gets the unique string that identifies the utility.
 	 * @return

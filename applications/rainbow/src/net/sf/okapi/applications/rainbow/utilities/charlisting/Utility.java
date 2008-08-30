@@ -28,6 +28,7 @@ import java.util.Hashtable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -187,5 +188,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 
 	public String getFolderAfterProcess () {
 		return Util.getDirectoryName(params.getParameter("outputPath"));
+	}
+
+	public void setFilterAccess (FilterAccess filterAccess,
+		String paramsFolder)
+	{
+		// Not used
 	}
 }
