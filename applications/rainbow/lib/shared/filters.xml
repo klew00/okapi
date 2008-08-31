@@ -11,7 +11,7 @@
  <filter id="okf_properties"
   inputFilterClass="net.sf.okapi.filters.properties.InputFilter"
   outputFilterClass="net.sf.okapi.filters.properties.OutputFilter"
-  
+  editorClass="net.sf.okapi.filters.ui.properties.Editor"
  >Properties</filter>
   
  <filter id="okf_xliff"

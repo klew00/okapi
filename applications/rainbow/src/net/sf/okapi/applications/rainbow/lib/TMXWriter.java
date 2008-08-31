@@ -95,7 +95,7 @@ public class TMXWriter {
 		}
 		
 		TextContainer srcTC = item.getSourceContent();
-		TextContainer trgTC = item.getTargetContent();
+		//TextContainer trgTC = item.getTargetContent();
 		if ( srcTC.isSegmented() ) {
 			
 			//TODO: Replace by segmented

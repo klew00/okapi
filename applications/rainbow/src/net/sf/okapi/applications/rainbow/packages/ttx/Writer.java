@@ -35,7 +35,6 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.SkeletonUnit;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 

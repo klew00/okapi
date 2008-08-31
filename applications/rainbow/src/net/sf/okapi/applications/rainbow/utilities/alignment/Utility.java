@@ -75,8 +75,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		// Load the segmentation rules
 		if ( params.segment ) {
 			SRXDocument doc = new SRXDocument();
-			doc.loadRules(params.srxPath);
+			doc.loadRules(params.sourceSrxPath);
 			srcSeg = doc.applyLanguageRules(sourceLanguage, null);
+			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
+				doc.loadRules(params.targetSrxPath);
+			}
 			trgSeg = doc.applyLanguageRules(targetLanguage, null);
 		}
 		

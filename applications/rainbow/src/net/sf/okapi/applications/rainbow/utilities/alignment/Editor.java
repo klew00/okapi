@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -28,10 +29,12 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
@@ -45,8 +48,7 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel         pnlActions;
 	private Parameters            params;
 	private Text                  edTMXPath;
-	private Button                chkSegment;
-	private Text                  edSRXPath;
+	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
 	
 	/**
@@ -95,22 +97,44 @@ public class Editor implements IParametersEditor {
 		//--- Main tab
 		
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayout(new GridLayout(2, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Full path of the TMX document to generate:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 		
 		edTMXPath = new Text(cmpTmp, SWT.BORDER);
 		edTMXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		chkSegment = new Button(cmpTmp, SWT.CHECK);
-		chkSegment.setText("Segment the items using the following SRX document:");
+		Button btTmp = new Button(cmpTmp, SWT.PUSH);
+		btTmp.setText("...");
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
+					"TMX Documents (*.tmx)\tAll Files (*.*)",
+					"*.tmx\t*.*");
+				if ( path == null ) return;
+				edTMXPath.setText(path);
+				edTMXPath.selectAll();
+				edTMXPath.setFocus();
+			}
+		});
 		
-		edSRXPath = new Text(cmpTmp, SWT.BORDER);
-		edSRXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Segmentation");
+		grpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		grpTmp.setLayoutData(gdTmp);
+		
+		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
+			"Segment the extracted text using the following SRX rules:");
+		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Dialog-level buttons
 
@@ -129,10 +153,13 @@ public class Editor implements IParametersEditor {
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
-		setData();
-		inInit = false;
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 600 ) startSize.x = 600;
+		shell.setSize(startSize);
+		setData();
+		inInit = false;
 		Dialogs.centerWindow(shell, parent);
 	}
 	
@@ -147,15 +174,15 @@ public class Editor implements IParametersEditor {
 
 	private void setData () {
 		edTMXPath.setText(params.tmxPath);
-		chkSegment.setSelection(params.segment);
-		edSRXPath.setText(params.srxPath);
+		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
 	private boolean saveData () {
 		if ( inInit ) return true;
 		params.tmxPath = edTMXPath.getText();
-		params.segment = chkSegment.getSelection();
-		params.srxPath = edSRXPath.getText();
+		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
+		params.targetSrxPath = pnlSegmentation.getTargetSRX();
+		params.segment = pnlSegmentation.getSegment();
 		result = true;
 		return true;
 	}

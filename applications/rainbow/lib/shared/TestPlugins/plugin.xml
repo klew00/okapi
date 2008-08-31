@@ -28,8 +28,8 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Create TMX from Bilingual Document</name>
-   <description>Creates a TMX file from a set of bilingual documents such as XLIFF files.</description>
+   <name>Simple Alignment</name>
+   <description>Aligns pairs of files to create a TMX output.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

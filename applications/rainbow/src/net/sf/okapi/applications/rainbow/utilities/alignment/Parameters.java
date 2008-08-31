@@ -27,7 +27,8 @@ public class Parameters extends BaseParameters {
 	
 	protected String    tmxPath;
 	protected boolean   segment;
-	protected String    srxPath;
+	protected String    sourceSrxPath;
+	protected String    targetSrxPath;
 	protected boolean   singleInput;   
 	protected boolean   allowEmptyTarget;   
 	
@@ -43,7 +44,8 @@ public class Parameters extends BaseParameters {
 		// Parse the fields
 		tmxPath = tmp.get("tmxPath", tmxPath);
 		segment = tmp.get("segment", segment);
-		srxPath = tmp.get("srxPath", srxPath);
+		sourceSrxPath = tmp.get("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = tmp.get("targetSrxPath", targetSrxPath);
 		singleInput = tmp.get("singleInput", singleInput);
 		allowEmptyTarget = tmp.get("allowEmptyTarget", allowEmptyTarget);
 	}
@@ -52,7 +54,8 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		tmxPath = "output.tmx";
 		segment = false;
-		srxPath = "default.srx";
+		sourceSrxPath = "";
+		targetSrxPath = "";
 		singleInput = true;
 		allowEmptyTarget = false;
 	}
@@ -62,7 +65,8 @@ public class Parameters extends BaseParameters {
 		// Store the parameters in fields
 		FieldsString tmp = new FieldsString();
 		tmp.add("tmxPath", tmxPath);
-		tmp.add("srxPath", srxPath);
+		tmp.add("sourceSrxPath", sourceSrxPath);
+		tmp.add("targetSrxPath", targetSrxPath);
 		tmp.add("segment", segment);
 		tmp.add("singleInput", singleInput);
 		tmp.add("allowEmptyTarget", allowEmptyTarget);
