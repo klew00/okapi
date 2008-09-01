@@ -196,6 +196,18 @@ public class TextFragment implements Comparable<Object> {
 		text = new StringBuilder();
 		insert(-1, fragment);
 	}
+	
+	/**
+	 * Creates a TextFragment with the content made of a given coded text
+	 * and a list of codes.
+	 * @param newCodedText The new coded text.
+	 * @param newCodes The list of codes.
+	 */
+	public TextFragment (String newCodedText,
+		List<Code> newCodes)
+	{
+		setCodedText(newCodedText, newCodes);
+	}
 
 	/**
 	 * Gets the ID of the fragment.

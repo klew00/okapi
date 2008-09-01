@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
+import java.util.List;
+
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -76,6 +78,7 @@ public class TMXWriter {
 		writer.writeEndElement(); // header
 		
 		writer.writeStartElement("body");
+		writer.writeLineBreak();
 	}
 	
 	public void writeEndDocument () {
@@ -97,24 +100,20 @@ public class TMXWriter {
 		TextContainer srcTC = item.getSourceContent();
 		//TextContainer trgTC = item.getTargetContent();
 		if ( srcTC.isSegmented() ) {
-			
-			//TODO: Replace by segmented
-			writeTU(srcTC, item.getTargetContent(), tuid);
-		}
-		else {
-			writeTU(srcTC, item.getTargetContent(), tuid);
-		}
-	
-		/*TODO: handle segmentation
-		if ( item.getSource().isSegmented() ) {
-			List<IPart> srcList = item.getSourceSegments();
-			List<IPart> trgList = item.getTargetSegments();
+			//TODO: Optionally, write the paragraph-level entry
+			//writeTU(srcTC, item.getTargetContent(), tuid);
+			// Write the segments
+			List<TextFragment> srcList = item.getSourceContent().getSegments();
+			List<TextFragment> trgList = item.getTargetContent().getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
 					String.format("%s_s%d", tuid, i+1));
 			}
-		}*/
+		}
+		else { // Un-segmented entry
+			writeTU(srcTC, item.getTargetContent(), tuid);
+		}
 	}
 	
 	private void writeTU (TextFragment source,
@@ -124,6 +123,7 @@ public class TMXWriter {
 		writer.writeStartElement("tu");
 		if (( tuid != null ) && ( tuid.length() > 0 ))
 			writer.writeAttributeString("tuid", tuid);
+		writer.writeLineBreak();
 
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);

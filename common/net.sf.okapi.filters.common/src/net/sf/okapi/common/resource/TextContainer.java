@@ -59,6 +59,16 @@ public class TextContainer extends TextFragment {
 	public List<TextFragment> getSegments () {
 		return segments;
 	}
+	
+	/**
+	 * Sets the list of segments for this object. No change is made to the
+	 * content itself, so it must already match the given list at the end, or it
+	 * must be build separately.
+	 * @param segments The new list of segments.
+	 */
+	public void setSegments (ArrayList<TextFragment> segments) {
+		this.segments = segments;
+	}
 
 	/**
 	 * Gets the fragment before a given segment marker.

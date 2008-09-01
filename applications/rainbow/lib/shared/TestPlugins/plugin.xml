@@ -8,7 +8,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Extract And Rewrite</name>
+   <name>Rewrite Text</name>
    <description>Re-writes documents with different changes, for
     example: masking translatable text, etc.</description>
    <provider>Okapi Framework</provider>
@@ -28,7 +28,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Simple Alignment</name>
+   <name>Align Source and Target (ID-driven)</name>
    <description>Aligns pairs of files to create a TMX output.</description>
    <provider>Okapi Framework</provider>
   </info>
