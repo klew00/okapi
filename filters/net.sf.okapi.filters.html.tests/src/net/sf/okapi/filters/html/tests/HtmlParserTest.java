@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
+import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.filters.html.HtmlParser;
 
 import org.junit.Before;
@@ -41,19 +43,22 @@ public class HtmlParserTest {
 		htmlParser = new HtmlParser();
 	}
 
-/*	@Test
+	@Test
 	public void getNextItem() {
 		try {
 			InputStream htmlStream = HtmlParserTest.class
 					.getResourceAsStream("simpleTest.html");
 			InputStreamReader htmlReader = new InputStreamReader(htmlStream,
 					"iso-8859-1");
-			htmlParser.open(htmlReader);
-			IBaseResource item = htmlParser.getCurrentItem();
+			htmlParser.open(htmlStream);
+			 do {
+				 
+			 } while (IParser.ParserTokenType.ENDINPUT != htmlParser.parseNext());
+			
+			IContainable item = htmlParser.getResource();
 			htmlParser.close();
 		} catch (UnsupportedEncodingException e) {
 		} catch (IOException e) {
-
 		}
-	} */
+	} 
 }
