@@ -144,5 +144,8 @@ public class SkeletonUnit implements IContainable {
 	public boolean isOffsetBased () {
 		return (offset != -1);
 	}
-
+	
+	public void addToLength(int length) {
+		this.length += length;
+	}
 }
