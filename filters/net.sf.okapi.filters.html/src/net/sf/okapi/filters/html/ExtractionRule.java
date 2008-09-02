@@ -28,45 +28,64 @@ import java.util.Map;
 /**
  * General HTML extraction rule can handle the following cases:<br/><br/>
  * 
- * INLINE - Elements that are included with text.<br/>
- * EXCLUDED -Element and children that should be excluded from extraction.<br/>
- * INCLUDED - Elements and children within EXLCUDED ranges that should be extracted.<br/>
- * GROUP - Elements that are grouped together structurally such as lists, tables etc..<br/> 
- * ATTRIBUTES - Attributes on specific elements which should be extracted. May be translatable or localizable. <br/>
- * ATTRIBUTES ANY ELEMENT - Convenience rule for attributes which can occur on any element. May be translatable or localizable. <br/>
- * TEXT UNIT - Elements whose start and end tags become part of a {@link TextUnit} rather than {@link SkeletonUnit}.<br/>  
- * <br/>
- * Any of the above rules may have conditional rules based on attribute names and/or values. Conditional rules 
- * ({@link ConditionalAttributeRule}) may be attached to both elements and attributes. More than one 
- * conditional rules are evaluated as OR expressions. For example, "type=button" OR "type=default".
+ * INLINE - Elements that are included with text.<br/> EXCLUDED -Element and
+ * children that should be excluded from extraction.<br/> INCLUDED - Elements
+ * and children within EXLCUDED ranges that should be extracted.<br/> GROUP -
+ * Elements that are grouped together structurally such as lists, tables
+ * etc..<br/> ATTRIBUTES - Attributes on specific elements which should be
+ * extracted. May be translatable or localizable. <br/> ATTRIBUTES ANY ELEMENT -
+ * Convenience rule for attributes which can occur on any element. May be
+ * translatable or localizable. <br/> TEXT UNIT - Elements whose start and end
+ * tags become part of a {@link TextUnit} rather than {@link SkeletonUnit}.<br/>
+ * <br/> Any of the above rules may have conditional rules based on attribute
+ * names and/or values. Conditional rules ({@link ConditionalAttributeRule}) may
+ * be attached to both elements and attributes. More than one conditional rules
+ * are evaluated as OR expressions. For example, "type=button" OR
+ * "type=default".
  */
 public class ExtractionRule {
 
 	public static enum EXTRACTION_RULE_TYPE {
-		EXTRACTABLE_ATTRIBUTES, EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT, INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT
+		EXTRACTABLE_ATTRIBUTES, EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT, INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE
 	};
 
 	private String elementName;
 	private String attributeName;
 	private List<ConditionalAttributeRule> extractionConditions;
 	private List<AttributeExtractionRule> extractableAttributes;
-	private EXTRACTION_RULE_TYPE ruleType;	
+	private EXTRACTION_RULE_TYPE ruleType;
 	private Map<String, String> properties;
+
+	/**
+	 * Convenience rule factory for elements that must preserve whitespace.
+	 * 
+	 * @param elementName
+	 *            lowercase element name.
+	 * @return {@link ExtractionRule}
+	 */
+	public static ExtractionRule createPreserveWhiteSpaceRule(String elementName) {
+		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE);
+	}
 	
 	/**
-	 * Convenience rule factory inline elements.
-	 * @param elementName lowercase element name.
+	 * Convenience rule factory for inline elements.
+	 * 
+	 * @param elementName
+	 *            lowercase element name.
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createInlineRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INLINE_ELEMENT);
 	}
-	
+
 	/**
-	 * Convenience rule factory for inline elements with a single extractable attribute. 
-	 * No conditions apply to the attribute. 
-	 * @param elementName lowercase element name.
-	 * @param attributeName lowercase attribute name.
+	 * Convenience rule factory for inline elements with a single extractable
+	 * attribute. No conditions apply to the attribute.
+	 * 
+	 * @param elementName
+	 *            lowercase element name.
+	 * @param attributeName
+	 *            lowercase attribute name.
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createInlineWithAttributeRule(String elementName, String attributeName) {
@@ -74,42 +93,53 @@ public class ExtractionRule {
 		rule.addExtractableAttribute(new AttributeExtractionRule(attributeName));
 		return rule;
 	}
-	
+
 	/**
-	 * Convenience rule factory for excluded elements. Conditions can be applied after rule creation.
-	 * @param elementName lowercase element name
+	 * Convenience rule factory for excluded elements. Conditions can be applied
+	 * after rule creation.
+	 * 
+	 * @param elementName
+	 *            lowercase element name
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createExcludedRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.EXCLUDED_ELEMENT);
 	}
-	
+
 	/**
-	 * Convenience rule factory for included elements. Conditions can be applied after rule creation.
-	 * @param elementName lowercase element name
+	 * Convenience rule factory for included elements. Conditions can be applied
+	 * after rule creation.
+	 * 
+	 * @param elementName
+	 *            lowercase element name
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createIncludedRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT);
 	}
-	
-	
+
 	/**
-	 * Convenience rule factory for non-extractable elements with extractable attributes.. 
-	 * No conditions apply to the attribute. 
-	 * @param elementName lowercase element name.
-	 * @param attributeName lowercase attribute name.
+	 * Convenience rule factory for non-extractable elements with extractable
+	 * attributes.. No conditions apply to the attribute.
+	 * 
+	 * @param elementName
+	 *            lowercase element name.
+	 * @param attributeName
+	 *            lowercase attribute name.
 	 * @return {@link ExtractionRule}
 	 */
-	public static ExtractionRule createExtractableAttributeRule(String elementName, String attributeName ) {
-		ExtractionRule rule =  new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT);
+	public static ExtractionRule createExtractableAttributeRule(String elementName, String attributeName) {
+		ExtractionRule rule = new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT);
 		rule.addExtractableAttribute(new AttributeExtractionRule(attributeName));
 		return rule;
 	}
-	
+
 	/**
-	 * Convenience rule factory for extractable attributes that may appear on any element. 
-	 * @param attributeName lowercase attribute name
+	 * Convenience rule factory for extractable attributes that may appear on
+	 * any element.
+	 * 
+	 * @param attributeName
+	 *            lowercase attribute name
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createExtractableAttributeAnyElementRule(String attributeName) {
@@ -117,28 +147,35 @@ public class ExtractionRule {
 	}
 
 	/**
-	 * Convenience rule factory for extractable elements that start groups. 
-	 * @param elementName lowercase element name
+	 * Convenience rule factory for extractable elements that start groups.
+	 * 
+	 * @param elementName
+	 *            lowercase element name
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createGroupRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.GROUP_ELEMENT);
 	}
-	
+
 	/**
-	 * Convenience rule factory for extractable elements where the start and end tags belong 
-	 * to a {@link TextUnit} rather than a {@link SkeletonUnit}. 
-	 * @param elementName lowercase element name
+	 * Convenience rule factory for extractable elements where the start and end
+	 * tags belong to a {@link TextUnit} rather than a {@link SkeletonUnit}.
+	 * 
+	 * @param elementName
+	 *            lowercase element name
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createTextUnitRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT);
 	}
-	
+
 	/**
 	 * Default constructor for all element rules.
-	 * @param elementName lowercase element name.
-	 * @param ruleType One of EXTRACTION_RULE_TYPE's.
+	 * 
+	 * @param elementName
+	 *            lowercase element name.
+	 * @param ruleType
+	 *            One of EXTRACTION_RULE_TYPE's.
 	 */
 	public ExtractionRule(String elementName, EXTRACTION_RULE_TYPE ruleType) {
 		this.setElementName(elementName);
@@ -148,10 +185,13 @@ public class ExtractionRule {
 		this.extractableAttributes = new LinkedList<AttributeExtractionRule>();
 		this.properties = new HashMap<String, String>();
 	}
-	
+
 	/**
-	 * Default constructor for attribute rule where attribute can occur on many elements.
-	 * @param attributeName lowercase attribute name.
+	 * Default constructor for attribute rule where attribute can occur on many
+	 * elements.
+	 * 
+	 * @param attributeName
+	 *            lowercase attribute name.
 	 */
 	public ExtractionRule(String attributeName) {
 		this.setElementName(null);
@@ -164,6 +204,7 @@ public class ExtractionRule {
 
 	/**
 	 * Does this rule contain extractable attributes of any kind?
+	 * 
 	 * @return true if any extractable attributes, false otherwise.
 	 */
 	public boolean hasExtractableAttributes() {
@@ -175,33 +216,41 @@ public class ExtractionRule {
 
 	/**
 	 * Add a condition to this rule.
-	 * @param conditionalAttribute The conditional rule. {@link ConditionalAttributeRule}
+	 * 
+	 * @param conditionalAttribute
+	 *            The conditional rule. {@link ConditionalAttributeRule}
 	 */
 	public void addConditionalAttributeRule(ConditionalAttributeRule conditionalAttribute) {
 		this.extractionConditions.add(conditionalAttribute);
 	}
-	
+
 	/**
-	 * Add an extractable attribute to the rule. Conditions may be applied to 
+	 * Add an extractable attribute to the rule. Conditions may be applied to
 	 * attributeExtractionRule.
-	 * @param attributeExtractionRule extractable attribute {@link AttributeExtractionRule}
+	 * 
+	 * @param attributeExtractionRule
+	 *            extractable attribute {@link AttributeExtractionRule}
 	 */
-	public void addExtractableAttribute(
-			AttributeExtractionRule attributeExtractionRule) {
+	public void addExtractableAttribute(AttributeExtractionRule attributeExtractionRule) {
 		this.extractableAttributes.add(attributeExtractionRule);
 	}
-	
+
 	/**
-	 * Add a property to the rule which is passed to the {@link Group} or {@link TextUnit} matching the rule.
-	 * @param key property 
-	 * @param value additional information on the property.
+	 * Add a property to the rule which is passed to the {@link Group} or
+	 * {@link TextUnit} matching the rule.
+	 * 
+	 * @param key
+	 *            property
+	 * @param value
+	 *            additional information on the property.
 	 */
 	public void addProperty(String key, String value) {
 		properties.put(key, value);
 	}
 
 	/**
-	 * @param elementName the elementName to set
+	 * @param elementName
+	 *            the elementName to set
 	 */
 	public void setElementName(String elementName) {
 		this.elementName = elementName;
@@ -213,7 +262,7 @@ public class ExtractionRule {
 	public String getElementName() {
 		return elementName;
 	}
-	
+
 	public String getAttributeName() {
 		return attributeName;
 	}
@@ -221,7 +270,7 @@ public class ExtractionRule {
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
 	}
-	
+
 	public EXTRACTION_RULE_TYPE getRuleType() {
 		return ruleType;
 	}

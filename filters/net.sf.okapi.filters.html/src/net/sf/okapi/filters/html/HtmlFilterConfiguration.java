@@ -73,6 +73,9 @@ public class HtmlFilterConfiguration {
 		MasonTagTypes.register();		
 		ExtractionRule rule;
 		
+		// preserve whitespace for these tags
+		ruleMap.put("pre", ExtractionRule.createPreserveWhiteSpaceRule("pre"));
+		
 		// default inline elements with option extractable attributes
 		ruleMap.put("a", ExtractionRule.createInlineWithAttributeRule("a", "title"));
 		
