@@ -50,7 +50,7 @@ public class ExtractionRule {
 	private String attributeName;
 	private List<ConditionalAttributeRule> extractionConditions;
 	private List<AttributeExtractionRule> extractableAttributes;
-	private EXTRACTION_RULE_TYPE ruleType;
+	private EXTRACTION_RULE_TYPE ruleType;	
 	private Map<String, String> properties;
 	
 	/**
@@ -220,5 +220,9 @@ public class ExtractionRule {
 
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
+	}
+	
+	public EXTRACTION_RULE_TYPE getRuleType() {
+		return ruleType;
 	}
 }

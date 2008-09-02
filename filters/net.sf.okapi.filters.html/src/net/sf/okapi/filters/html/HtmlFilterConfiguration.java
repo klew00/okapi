@@ -34,9 +34,18 @@ public class HtmlFilterConfiguration {
 	private static final String LOCALIZABLE_PROPERTY = "localizable";
 	
 	private Map<String, ExtractionRule> ruleMap;
+	private boolean preserveWhitespace;
 	
+	public boolean isPreserveWhitespace() {
+		return preserveWhitespace;
+	}
+
+	public void setPreserveWhitespace(boolean preserveWhitespace) {
+		this.preserveWhitespace = preserveWhitespace;
+	}
+
 	public HtmlFilterConfiguration() {
-		ruleMap = new HashMap<String, ExtractionRule>();
+		ruleMap = new HashMap<String, ExtractionRule>();		
 	}
 	
 	public ExtractionRule getRule(String ruleName) {
@@ -53,6 +62,8 @@ public class HtmlFilterConfiguration {
 	}
 		
 	public void initializeDefaultRules() {
+		preserveWhitespace = false;
+		
 		// register custom tags
 		MicrosoftTagTypes.register();
 		PHPTagTypes.register();
