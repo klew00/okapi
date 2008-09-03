@@ -21,10 +21,14 @@
  <!-- Input menu -->
  <command name="input">&amp;Input</command>
  <command name="input.addDocuments" ctrl="1" key="Insert">&amp;Add Documents...&#x9;Ctrl+Insert</command>
- <command name="input.removeDocuments">&amp;Remove Documents...</command>
+ <!-- Delete is a shortcut, but defined from the tables not from the menu -->
+ <command name="input.removeDocuments">&amp;Remove Documents...&#x9;Delete</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
  <command name="input.openFolder">&amp;Open Containing Folder</command>
+ <command name="input.moveDocumentsUp" alt="1" key="Up">Move &amp;Up&#x9;Alt+Up</command>
+ <command name="input.moveDocumentsDown" alt="1" key="Down">Move &amp;Down&#x9;Alt+Down</command>
+ 
  
  <!-- Utilities menu -->
  <command name="utilities">&amp;Utilities</command>

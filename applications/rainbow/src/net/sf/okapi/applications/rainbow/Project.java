@@ -229,8 +229,15 @@ public class Project {
 		}
 	}
 
+	/**
+	 * Gets the first element of a given name for a given parent.
+	 * @param parent The parent element.
+	 * @param name The name of the element to search for.
+	 * @return The first element fount, or null if none is found.
+	 */
 	private Element getFirstElement (Element parent,
-		String name) {
+		String name)
+	{
 		NodeList nl = parent.getElementsByTagName(name);
 		if (( nl == null ) || ( nl.getLength() == 0 )) return null;
 		else return (Element)nl.item(0);

@@ -44,6 +44,11 @@ class InputTableModel {
 		this.inputList = inputList;
 	}
 	
+	/**
+	 * Refresh the items iun the table, ans optionally, select some of them.
+	 * @param selection The list of the indices of the items to select after refresh,
+	 * or null to use the specified index.
+	 */
 	void updateTable (int[] selection) {
 		table.removeAll();
 		for ( Input inp : inputList ) {

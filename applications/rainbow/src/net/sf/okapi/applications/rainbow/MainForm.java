@@ -146,6 +146,10 @@ public class MainForm implements IParametersProvider {
 	private MenuItem         cmiOpenInputDocument;
 	private MenuItem         miRemoveInputDocuments;
 	private MenuItem         cmiRemoveInputDocuments;
+	private MenuItem         miMoveDocumentsUp;
+	private MenuItem         cmiMoveDocumentsUp;
+	private MenuItem         miMoveDocumentsDown;
+	private MenuItem         cmiMoveDocumentsDown;
 	private MenuItem         miOpenFolder;
 	private MenuItem         cmiOpenFolder;
 	private MenuItem         miOpenOutputFolder;
@@ -349,6 +353,24 @@ public class MainForm implements IParametersProvider {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
+		miMoveDocumentsUp = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miMoveDocumentsUp, "input.moveDocumentsUp");
+		miMoveDocumentsUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsUp();
+			}
+		});
+		
+		miMoveDocumentsDown = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miMoveDocumentsDown, "input.moveDocumentsDown");
+		miMoveDocumentsDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsDown();
+			}
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
 		miEditInputProperties = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miEditInputProperties, "input.editProperties");
 		miEditInputProperties.addSelectionListener(new SelectionAdapter() {
@@ -356,7 +378,7 @@ public class MainForm implements IParametersProvider {
 				editInputProperties(-1);
 			}
 		});
-
+		
 		// Utilities menu
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
 		miUtilities.setText(rm.getCommandLabel("utilities"));
@@ -536,6 +558,24 @@ public class MainForm implements IParametersProvider {
             }
 		});
 		
+		new MenuItem(inputTableMenu, SWT.SEPARATOR);
+		
+		cmiMoveDocumentsUp = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiMoveDocumentsUp, "input.moveDocumentsUp");
+		cmiMoveDocumentsUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsUp();
+			}
+		});
+		
+		cmiMoveDocumentsDown = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiMoveDocumentsDown, "input.moveDocumentsDown");
+		cmiMoveDocumentsDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsDown();
+			}
+		});
+
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
 		cmiEditInputProperties = new MenuItem(inputTableMenu, SWT.PUSH);
@@ -802,8 +842,11 @@ public class MainForm implements IParametersProvider {
 		});
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (e.character == ' ') {
+				if ( e.character == ' ' ) {
 					editInputProperties(-1);
+				}
+				else if ( e.keyCode == SWT.DEL ) {
+					removeDocuments(-1);
 				}
 			}
 		});
@@ -1010,10 +1053,15 @@ public class MainForm implements IParametersProvider {
 		cmiOpenInputDocument.setEnabled(enabled);
 		miRemoveInputDocuments.setEnabled(enabled);
 		cmiRemoveInputDocuments.setEnabled(enabled);
+
 		miOpenFolder.setEnabled(enabled);
 		cmiOpenFolder.setEnabled(enabled);
-		
 		miOpenOutputFolder.setEnabled(prj.getLastOutputFolder()!=null);
+		
+		miMoveDocumentsUp.setEnabled(enabled);
+		cmiMoveDocumentsUp.setEnabled(enabled);
+		miMoveDocumentsDown.setEnabled(enabled);
+		cmiMoveDocumentsDown.setEnabled(enabled);
 	}
 	
 	private void loadResources ()
@@ -1429,18 +1477,18 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void removeDocuments (int index) {
+		boolean refresh = false;
 		try {
-			int n = index;
-			if ( n < 0 ) {
-				if ( (n = getFocusedInputIndex()) < 0 ) return;
+			if ( index < 0 ) {
+				if ( getFocusedInputIndex() < 0 ) return;
 			}
-			
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 			dlg.setMessage("You are going to remove the selected document(s) from the list.\nDo you want to proceed?");
 			dlg.setText("Rainbow");
 			if ( dlg.open() != SWT.YES ) return;
 
+			refresh = true;
 			Input inp;
 			startWaiting("Updating project...", false);
 			Table table = inputTables.get(currentInput);
@@ -1461,10 +1509,74 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMods.get(currentInput).updateTable(null);
-			updateCommands();
-			stopWaiting();
+			if ( refresh ) {
+				inputTableMods.get(currentInput).updateTable(null);
+				updateCommands();
+				stopWaiting();
+			}
 		}
 	}
 
+	private void moveDocumentsUp () {
+		try {
+			if ( getFocusedInputIndex() < 0 ) return;
+			// Get the selected documents
+			Table table = inputTables.get(currentInput);
+			int[] indices = table.getSelectionIndices();
+			
+			// Make sure the selection covers all items from first to last
+			int first = indices[0];
+			if ( first == 0 ) return; // Already at the top
+			int last = indices[indices.length-1];
+			table.select(first, last);
+			indices = table.getSelectionIndices();
+
+			// Move the document before first to position after last
+			Input inp = prj.getItemFromRelativePath(currentInput, table.getItem(first-1).getText(0));
+			prj.getList(currentInput).remove(inp);
+			prj.getList(currentInput).add(last, inp);
+			prj.isModified = true;
+
+			// Update the selection
+			for ( int i=0; i<indices.length; i++ ) {
+				indices[i] = indices[i]-1;
+			}
+			inputTableMods.get(currentInput).updateTable(indices);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void moveDocumentsDown () {
+		try {
+			if ( getFocusedInputIndex() < 0 ) return;
+			// Get the selected documents
+			Table table = inputTables.get(currentInput);
+			int[] indices = table.getSelectionIndices();
+			
+			// Make sure the selection covers all items from first to last
+			int last = indices[indices.length-1];
+			if ( last >= table.getItemCount()-1 ) return; // Already at the bottom
+			int first = indices[0];
+			table.select(first, last);
+			indices = table.getSelectionIndices();
+
+			// Move the document after last to position before first
+			Input inp = prj.getItemFromRelativePath(currentInput, table.getItem(last+1).getText(0));
+			prj.getList(currentInput).remove(inp);
+			prj.getList(currentInput).add(first, inp);
+			prj.isModified = true;
+
+			// Update the selection
+			for ( int i=0; i<indices.length; i++ ) {
+				indices[i] = indices[i]+1;
+			}
+			inputTableMods.get(currentInput).updateTable(indices);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 }
