@@ -38,6 +38,7 @@ import net.sf.okapi.common.filters.IParser;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
@@ -111,7 +112,7 @@ public class HtmlParser implements IParser {
 
 	public ParserTokenType parseNext() {
 		boolean finished = false;
-		
+
 		// reset state flags
 		inline = false;
 
@@ -124,20 +125,19 @@ public class HtmlParser implements IParser {
 		while (nodeIterator.hasNext()) {
 			Segment segment = nodeIterator.next();
 			lastSegmentRead = segment;
-			
+
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
 				if (currentSkeleton.isEmpty()) {
 					currentSkeleton = createSkeletonUnit(segment.toString(), segment.getBegin(), segment.length());
-				}
-				else {
+				} else {
 					currentSkeleton.appendData(segment.toString());
 					currentSkeleton.addToLength(segment.length());
-				}					
+				}
 			}
-			
+
 			if (segment instanceof Tag) {
-				final Tag tag = (Tag)segment;
+				final Tag tag = (Tag) segment;
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 					finished = handleStartTag((StartTag) tag);
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -168,12 +168,14 @@ public class HtmlParser implements IParser {
 			} else {
 				finished = handleText(segment);
 			}
-			
+
 			// done with current chunk (token)
-			if (finished) break;
+			if (finished)
+				break;
 		}
-		
-		if (!nodeIterator.hasNext()) return ParserTokenType.ENDINPUT;
+
+		if (!nodeIterator.hasNext())
+			return ParserTokenType.ENDINPUT;
 		return currentTokenType;
 	}
 
@@ -183,9 +185,9 @@ public class HtmlParser implements IParser {
 
 	private boolean handleText(Segment text) {
 		// possible ignorable whitespace
-		if (text.isWhiteSpace()) {			
+		if (text.isWhiteSpace()) {
 		}
-		
+
 		return false;
 	}
 
@@ -209,10 +211,10 @@ public class HtmlParser implements IParser {
 			ruleState.pushGroupRule(startTag.getName());
 			break;
 		case EXCLUDED_ELEMENT:
-			ruleState.pushExcludedRule(startTag.getName());		
+			ruleState.pushExcludedRule(startTag.getName());
 			break;
 		case INCLUDED_ELEMENT:
-			ruleState.pushIncludedRule(startTag.getName());	
+			ruleState.pushIncludedRule(startTag.getName());
 			break;
 		case TEXT_UNIT_ELEMENT:
 			break;
@@ -221,8 +223,8 @@ public class HtmlParser implements IParser {
 			break;
 		default: // non-inline element break current inline run if exists.
 			inline = false;
-			if (inline)				
-				return true;			
+			if (inline)
+				return true;
 		}
 
 		/*
@@ -255,7 +257,7 @@ public class HtmlParser implements IParser {
 
 		case TEXT_UNIT_ELEMENT:
 			break;
-			
+
 		case PRESERVE_WHITESPACE:
 			ruleState.popPreserverWhitespaceRule();
 			break;
@@ -264,7 +266,7 @@ public class HtmlParser implements IParser {
 			inline = false;
 			break;
 		}
-		
+
 		return false;
 	}
 
@@ -272,7 +274,7 @@ public class HtmlParser implements IParser {
 		ExtractionRule rule = configuration.getRule(ruleName);
 		return rule.getRuleType();
 	}
-	
+
 	private SkeletonUnit createSkeletonUnit(String skeleton, int offset, int length) {
 		SkeletonUnit skeletonUnit = new SkeletonUnit();
 		skeletonUnit.setID(String.format("s%d", ++sklId));
@@ -280,38 +282,48 @@ public class HtmlParser implements IParser {
 		skeletonUnit.setData(offset, length);
 		return skeletonUnit;
 	}
-	
-	private void addToCurrentTextUnit(String text) {		
+
+	private void addToCurrentTextUnit(String text) {
 		if (currentText.isEmpty()) {
-			currentText = createTranslatableTextUnit(text);			
-		}
-		else {
-			
+			currentText = createTranslatableTextUnit(text);
+		} else {
+			currentText.getSourceContent().append(text);
 		}
 	}
 
-	private void addToCurrentTextUnit(Tag tag) {		
+	private void addToCurrentTextUnit(Tag tag) {
 		if (currentText.isEmpty()) {
-			currentText = createTranslatableTextUnit("");			
-		}
-		else {
-			
+			currentText = createTranslatableTextUnit("");
 		} 
+		TextFragment.TagType tagType;
+		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
+			if (((StartTag)tag).isSyntacticalEmptyElementTag()) 
+				tagType = TextFragment.TagType.PLACEHOLDER;
+			else
+				tagType = TextFragment.TagType.OPENING;
+		} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+			tagType = TextFragment.TagType.CLOSING;
+		}
+		else {
+			tagType = TextFragment.TagType.PLACEHOLDER;
+		}
+		String type = tag.getName();
+		String data = tag.toString();
+		currentText.getSource().getContent().append(tagType, type, data);
 	}
 
-	private void addToCurrentTextUnit(TextUnit child) {		
+	private void addToCurrentTextUnit(TextUnit child) {
 		if (currentText.isEmpty()) {
 			currentText = createTranslatableTextUnit("");
 			currentText.addChild(child);
-		}
-		else {
+		} else {
 			child.setParent(currentText);
 			currentText.addChild(child);
-		} 
+		}
 	}
 
 	private TextUnit createTranslatableTextUnit(String text) {
-		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);		
+		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);
 		textUnit.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 		return textUnit;
 	}
