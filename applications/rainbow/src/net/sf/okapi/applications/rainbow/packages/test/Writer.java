@@ -97,7 +97,7 @@ public class Writer extends BaseWriter {
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (TextUnit item,
+	public void writeTextUnit (TextUnit item,
 		int status)
 	{
 		// Write the items in the TM if needed
@@ -116,7 +116,7 @@ public class Writer extends BaseWriter {
 		buffer.append(item.toString());
 	}
 	
-	public void writeSkeletonPart (SkeletonUnit resource) {
+	public void writeSkeletonUnit (SkeletonUnit resource) {
 		buffer.append(resource.toString());
 	}
 	

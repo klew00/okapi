@@ -27,14 +27,15 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	public boolean                useCodeFinder;
-	protected InlineCodeFinder    codeFinder;
-	public boolean                escapeExtendedChars;
-	public boolean                useKeyCondition;
-	public boolean                extractOnlyMatchingKey;
-	public String                 keyCondition;
-	public boolean                extraComments;
-	public LocalizationDirectives locDir;
+	protected boolean                  useCodeFinder;
+	protected InlineCodeFinder         codeFinder;
+	protected boolean                  escapeExtendedChars;
+	protected boolean                  useKeyCondition;
+	protected boolean                  extractOnlyMatchingKey;
+	protected String                   keyCondition;
+	protected boolean                  extraComments;
+	protected LocalizationDirectives   locDir;
+
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -59,7 +60,6 @@ public class Parameters extends BaseParameters {
 		keyCondition = ".*text.*";
 
 		extraComments = true;
-
 	}
 
 	public String toString () {

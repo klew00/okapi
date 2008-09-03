@@ -60,15 +60,16 @@ public class InlineCodeFinderPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(6, false);
+		GridLayout layTmp = new GridLayout(5, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
 		
 		lbRules = new List(this, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
-		gdTmp.verticalSpan = 4;
+		gdTmp.horizontalSpan = 1;
+		gdTmp.verticalSpan = 3;
+		gdTmp.grabExcessVerticalSpace = true;
 		lbRules.setLayoutData(gdTmp);
 		
 		edExpression = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
@@ -130,14 +131,15 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp.heightHint = 40;
 		edSample.setLayoutData(gdTmp);
 
-		edResults = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
-		gdTmp.heightHint = 40;
-		edResults.setLayoutData(gdTmp);
-		edResults.setEditable(false);
+		// Panel for rules list buttons
+		Composite cmpRulesButtons = new Composite(this, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		cmpRulesButtons.setLayout(layout);
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_END | GridData.FILL_HORIZONTAL);
+		cmpRulesButtons.setLayoutData(gdTmp);
 		
-		Button btAdd = new Button(this, SWT.PUSH);
+		Button btAdd = new Button(cmpRulesButtons, SWT.PUSH);
 		btAdd.setText("Add");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
@@ -148,7 +150,7 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 	
-		btMoveUp = new Button(this, SWT.PUSH);
+		btMoveUp = new Button(cmpRulesButtons, SWT.PUSH);
 		btMoveUp.setText("Move Up");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
@@ -159,7 +161,7 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
-		btRemove = new Button(this, SWT.PUSH);
+		btRemove = new Button(cmpRulesButtons, SWT.PUSH);
 		btRemove.setText("Remove");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
@@ -170,7 +172,7 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 
-		btMoveDown = new Button(this, SWT.PUSH);
+		btMoveDown = new Button(cmpRulesButtons, SWT.PUSH);
 		btMoveDown.setText("Move Down");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
@@ -181,6 +183,13 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 
+		edResults = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 4;
+		//gdTmp.heightHint = 40;
+		edResults.setLayoutData(gdTmp);
+		edResults.setEditable(false);
+		
 		updateDisplay();
 	}
 	
@@ -188,12 +197,13 @@ public class InlineCodeFinderPanel extends Composite {
 		//TODO
 	}
 	
-	public void setOptions (InlineCodeFinder codeFinder) {
+	public void setData (InlineCodeFinder codeFinder) {
 //		this.codeFinder = codeFinder;
 		lbRules.removeAll();
 		for ( String pattern : codeFinder.getRules() ) {
 			lbRules.add(pattern);
 		}
+		
 		if ( lbRules.getItemCount() > 0 ) {
 			lbRules.select(0);
 			updateDisplay();

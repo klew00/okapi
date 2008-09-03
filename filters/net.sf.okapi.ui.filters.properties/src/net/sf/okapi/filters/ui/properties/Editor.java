@@ -238,12 +238,12 @@ public class Editor implements IParametersEditor {
 	
 	private void setData () {
 		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
-		edKeyCondition.setText(params.keyCondition);
-		rdExtractOnlyMatchingKey.setSelection(params.extractOnlyMatchingKey);
-		rdExcludeMatchingKey.setSelection(!params.extractOnlyMatchingKey);
-		chkUseKeyFilter.setSelection(params.useKeyCondition);
-		chkExtraComments.setSelection(params.extraComments);
-		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
+		edKeyCondition.setText(params.getParameter("keyCondition"));
+		rdExtractOnlyMatchingKey.setSelection(params.getBoolean("extractOnlyMatchingKey"));
+		rdExcludeMatchingKey.setSelection(!params.getBoolean("extractOnlyMatchingKey"));
+		chkUseKeyFilter.setSelection(params.getBoolean("useKeyCondition"));
+		chkExtraComments.setSelection(params.getBoolean("extraComments"));
+		chkEscapeExtendedChars.setSelection(params.getBoolean("escapeExtendedChars"));
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
 		pnlLD.updateDisplay();
@@ -253,11 +253,11 @@ public class Editor implements IParametersEditor {
 	private void saveData () {
 		params.setParameter("useLD", pnlLD.getUseLD());
 		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
-		params.useKeyCondition = chkUseKeyFilter.getSelection();
-		params.keyCondition = edKeyCondition.getText();
-		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
-		params.extraComments = chkExtraComments.getSelection();
-		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
+		params.setParameter("useKeyCondition", chkUseKeyFilter.getSelection());
+		params.setParameter("keyCondition", edKeyCondition.getText());
+		params.setParameter("extractOnlyMatchingKey", rdExtractOnlyMatchingKey.getSelection());
+		params.setParameter("extraComments", chkExtraComments.getSelection());
+		params.setParameter("escapeExtendedChars", chkEscapeExtendedChars.getSelection());
 		result = true;
 	}
 	

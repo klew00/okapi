@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sf.okapi.common.FieldsString;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -40,9 +41,14 @@ public class InlineCodeFinder {
 
 	
 	public InlineCodeFinder () {
-		rules = new ArrayList<String>();
+		reset();
 	}
 
+	public void reset () {
+		rules = new ArrayList<String>();
+		sample = "";
+	}
+	
 	@Override
 	public InlineCodeFinder clone () {
 		InlineCodeFinder tmp = new InlineCodeFinder();
@@ -117,4 +123,26 @@ public class InlineCodeFinder {
 		}
 	}
 
+	@Override
+	public String toString () {
+		FieldsString tmp = new FieldsString();
+		tmp.add("count", rules.size());
+		int i = 0;
+		for ( String rule : rules ) {
+			tmp.add(String.format("rule%d", i), rule);
+		}
+		tmp.add("sample", sample);
+		return tmp.toString();
+	}
+	
+	public void fromString (String data) {
+		FieldsString tmp = new FieldsString(data);
+		reset();
+		int count = tmp.get("count", 0);
+		for ( int i=0; i<count; i++ ) {
+			String rule = tmp.get(String.format("rule%d", i), "");
+			if ( rule.length() > 0 ) rules.add(rule);
+		}
+		sample = tmp.get("sample", sample);
+	}
 }

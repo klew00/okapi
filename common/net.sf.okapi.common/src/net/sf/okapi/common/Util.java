@@ -259,25 +259,31 @@ public class Util {
 					
 				default:
 					if ( text.charAt(i) > 127 ) {
-						tmpBuf.put(0, text.charAt(i));
-						tmpBuf.position(0);
-						encBuf = encoder.encode(tmpBuf);
-						if ( encBuf.limit() > 1 ) {
-							tmp.append(String.format("{\\uc%d",
-								encBuf.limit()));
-							tmp.append(String.format("\\u%d",
-								(int)text.charAt(i)));
-							for ( int j=0; j<encBuf.limit(); j++ ) {
-								tmp.append(String.format("\\'%x",
-									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+						if ( encoder.canEncode(text.charAt(i)) ) {
+							tmpBuf.put(0, text.charAt(i));
+							tmpBuf.position(0);
+							encBuf = encoder.encode(tmpBuf);
+							if ( encBuf.limit() > 1 ) {
+								tmp.append(String.format("{\\uc%d",
+									encBuf.limit()));
+								tmp.append(String.format("\\u%d",
+									(int)text.charAt(i)));
+								for ( int j=0; j<encBuf.limit(); j++ ) {
+									tmp.append(String.format("\\'%x",
+										(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+								}
+								tmp.append("}");
 							}
-							tmp.append("}");
+							else {
+								tmp.append(String.format("\\u%d",
+									(int)text.charAt(i)));
+								tmp.append(String.format("\\'%x",
+									(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
+							}
 						}
-						else {
-							tmp.append(String.format("\\u%d",
+						else { // Cannot encode in the RTF encoding, so use just Unicode
+							tmp.append(String.format("\\u%d ?",
 								(int)text.charAt(i)));
-							tmp.append(String.format("\\'%x",
-								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
 						}
 					}
 					else tmp.append(text.charAt(i));

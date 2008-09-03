@@ -76,7 +76,6 @@ public class Writer extends BaseWriter {
 	{
 		relativeWorkPath = relativeSourcePath;
 		relativeWorkPath += EXTENSION;
-		
 		outputEncoder = Charset.forName(targetEncoding).newEncoder();
 
 		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
@@ -104,7 +103,7 @@ public class Writer extends BaseWriter {
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (TextUnit item,
+	public void writeTextUnit (TextUnit item,
 		int status)
 	{
 		// Write the items in the TM if needed
@@ -124,14 +123,6 @@ public class Writer extends BaseWriter {
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
 			//TODO
-/*			int srcSegCount = 0;
-			int trgSegCount = 0;
-			if ( item.getSourceContent().isSegmented() ) {
-				srcSegCount = item.getSourceContent().getSegments().size();
-			}
-			if ( item.getTargetContent().isSegmented() ) {
-				trgSegCount = item.getTargetContent().getSegments().size();
-			}*/
 		}
 		else { // No target
 			processContent(item.getSourceContent(), tmp,
@@ -174,9 +165,9 @@ public class Writer extends BaseWriter {
 							buffer.append(Util.RTF_STARTMARKER);
 							processContent(tc.getSegments().get(index), buffer, false);
 							buffer.append(Util.RTF_MIDMARKER1+"0"+Util.RTF_MIDMARKER2);
-							buffer.append("{\\highlight7 ");
+							//debug: buffer.append("{\\highlight7 ");
 							processContent(tc.getSegments().get(index), buffer, false);
-							buffer.append("}");
+							//debug: buffer.append("}");
 							buffer.append(Util.RTF_ENDMARKER);
 							break;
 						}
@@ -238,25 +229,31 @@ public class Writer extends BaseWriter {
 					break;
 				default:
 					if ( text.charAt(i) > 127 ) {
-						tmpBuf.put(0, text.charAt(i));
-						tmpBuf.position(0);
-						encBuf = outputEncoder.encode(tmpBuf);
-						if ( encBuf.limit() > 1 ) {
-							buffer.append(String.format("{\\uc%d",
-								encBuf.limit()));
-							buffer.append(String.format("\\u%d",
-								(int)text.charAt(i)));
-							for ( int j=0; j<encBuf.limit(); j++ ) {
-								buffer.append(String.format("\\'%x",
-									(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+						if ( outputEncoder.canEncode(text.charAt(i)) ) {
+							tmpBuf.put(0, text.charAt(i));
+							tmpBuf.position(0);
+							encBuf = outputEncoder.encode(tmpBuf);
+							if ( encBuf.limit() > 1 ) {
+								buffer.append(String.format("{\\uc%d",
+									encBuf.limit()));
+								buffer.append(String.format("\\u%d",
+									(int)text.charAt(i)));
+								for ( int j=0; j<encBuf.limit(); j++ ) {
+									buffer.append(String.format("\\'%x",
+										(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
+								}
+								buffer.append("}");
 							}
-							buffer.append("}");
+							else {
+								buffer.append(String.format("\\u%d",
+									(int)text.charAt(i)));
+								buffer.append(String.format("\\'%x",
+									(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
+							}
 						}
-						else {
-							buffer.append(String.format("\\u%d",
+						else { // Cannot encode in the RTF encoding, so use just Unicode
+							buffer.append(String.format("\\u%d ?",
 								(int)text.charAt(i)));
-							buffer.append(String.format("\\'%x",
-								(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
 						}
 					}
 					else buffer.append(text.charAt(i));
@@ -270,7 +267,8 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
-	public void writeSkeletonPart (SkeletonUnit resource) {
+	@Override
+	public void writeSkeletonUnit (SkeletonUnit resource) {
 		writer.write(Util.escapeToRTF(resource.toString(), true, 0, outputEncoder));
 	}
 	

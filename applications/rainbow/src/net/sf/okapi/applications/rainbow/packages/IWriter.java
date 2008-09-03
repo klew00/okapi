@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -64,16 +65,19 @@ public interface IWriter {
 	
 	public void writeStartDocument (Document resource);
 	
-	public void writeSkeletonPart (SkeletonUnit resource);
+	public void writeEndDocument (Document resource);
+	
+	public void writeStartGroup (Group resource);
+	
+	public void writeEndGroup (Group resource);
+
+	public void writeSkeletonUnit (SkeletonUnit resource);
 	
 	/**
-	 * Writes an item in the current document. 
-	 * @param item The item to write.
+	 * Writes a text unit in the current document. 
+	 * @param tu The text unit to write.
 	 * @param p_nStatus The current target status (same values as Borneo DB TSTATUS_*)
 	 */
-	public void writeItem (TextUnit item,
+	public void writeTextUnit (TextUnit tu,
 		int p_nStatus);
-	
-	public void writeEndDocument (Document resource);
-
 }

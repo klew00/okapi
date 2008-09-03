@@ -23,6 +23,8 @@ package net.sf.okapi.applications.rainbow.utilities.alignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sf.okapi.lib.ui.segmentation.SegmentsAligner;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -42,7 +44,7 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
-	private final Logger                    logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private Parameters       params;
 	private String           trgPath;
 	private String           trgEncoding;
@@ -57,8 +59,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private Segmenter        trgSeg;
 	private int              aligned;
 	private int              alignedTotal;
+	private int              noText;
+	private int              noTextTotal;
 	private int              count;
 	private int              countTotal;
+	private SegmentsAligner  aligner;
 
 	
 	public Utility () {
@@ -96,16 +101,22 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		tmxWriter.create(params.getParameter("tmxPath"));
 		tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
 		
-		// Prepare the Db store
+		// Prepare the db store
 		dbStoreBuilder = new DbStoreBuilder();
 		dbStoreBuilder.setSegmenters(srcSeg, trgSeg);
 		
+		if ( aligner == null ) {
+			aligner = new SegmentsAligner(null);
+		}
+		
 		alignedTotal = 0;
+		noTextTotal = 0;
 		countTotal = 0;
 	}
 	
 	public void doEpilog () {
     	logger.info(String.format("Total text units = %d", countTotal));
+    	logger.info(String.format("Total without text = %d", noTextTotal));
     	logger.info(String.format("Total aligned = %d", alignedTotal));
     	
 		if ( tmxWriter != null ) {
@@ -173,6 +184,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			trgFilter.close();
 			dbStore = dbStoreBuilder.getDbStore();
 			aligned = 0;
+			noText = 0;
 			count = 0;
 		}
 		catch ( FileNotFoundException e ) {
@@ -183,23 +195,20 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	@Override
     public void endResource(Document resource) {
     	alignedTotal += aligned;
+    	noTextTotal += noText;
     	countTotal += count;
     	logger.info(String.format("Text units = %d", count));
+    	logger.info(String.format("Without text = %d", noText));
     	logger.info(String.format("Aligned = %d", aligned));
     }
 
 	@Override
     public void endExtractionItem(TextUnit item) {
-		try {
-			processTU(item);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					processTU(tu);
-				}
+		processTU(item);
+		if ( item.hasChild() ) {
+			for ( TextUnit tu : item.childTextUnitIterator() ) {
+				processTU(tu);
 			}
-		}
-		finally {
-			super.endExtractionItem(item);
 		}
     }
 	
@@ -209,15 +218,24 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		if ( params.segment ) {
 			srcSeg.computeSegments(tu.getSourceContent());
 			tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+			if ( !tu.getSourceContent().isSegmented() ) {
+				noText++;
+				return;
+			}
 		}
 		// Retrieve the corresponding target(s)
 		TextContainer trgTC = dbStore.findEntry(tu.getName(), true);
 		if ( trgTC != null ) {
-			//TODO: Check alignment and fix it if needed
-			aligned++;
+			// Check alignment and fix it if needed
 			tu.setTargetContent(trgTC);
-			tmxWriter.writeItem(tu);
+			if ( aligner.align(tu) ) {
+				aligned++;
+				tmxWriter.writeItem(tu);
+				return;
+			}
 		}
+		// Else: track the item not aligned
+		logger.info("Not aligned: "+tu.getName());
 	}
 	
 	public boolean isFilterDriven () {

@@ -27,7 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -120,16 +120,24 @@ public class Writer extends BaseWriter {
 	}
 
 	public void writeEndDocument (Document resource) {
-		writer.writeEndElement(); // body
-		writer.writeEndElement(); // file
-		writer.writeEndElement(); // xliff
+		writer.writeEndElementLineBreak(); // body
+		writer.writeEndElementLineBreak(); // file
+		writer.writeEndElementLineBreak(); // xliff
 		writer.writeEndDocument();
 		writer.close();
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeItem (TextUnit item,
+	public void writeStartGroup (Group resource) {
+		writer.writeStartElement("group");
+	}
+	
+	public void writeEndGroup (Group resource) {
+		writer.writeEndElementLineBreak(); // group
+	}
+	
+	public void writeTextUnit (TextUnit item,
 		int status)
 	{
 		processItem(item);
@@ -229,10 +237,6 @@ public class Writer extends BaseWriter {
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
-	public void writeSkeletonPart (SkeletonUnit resource) {
-		// Nothing to do
-	}
-	
 	public void writeStartDocument (Document resource) {
 		writer.writeStartDocument();
 

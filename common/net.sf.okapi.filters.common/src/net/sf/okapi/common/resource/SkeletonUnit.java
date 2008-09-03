@@ -145,7 +145,11 @@ public class SkeletonUnit implements IContainable {
 		return (offset != -1);
 	}
 	
-	public void addToLength(int length) {
+	/**
+	 * Adds a given length to the current length of the offset-based skeleton.
+	 * @param length The length to add to the current one.
+	 */
+	public void addToLength (int length) {
 		this.length += length;
 	}
 }

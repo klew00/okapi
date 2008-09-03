@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.ui.filters;
 
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -40,6 +41,7 @@ public class InlineCodeFinderDialog {
 	private OKCancelPanel         pnlActions;
 	private InlineCodeFinderPanel pnlCodeFinder;
 
+	
 	public InlineCodeFinderDialog (Shell parent,
 		String captionText,
 		String helpFile)
@@ -93,5 +95,7 @@ public class InlineCodeFinderDialog {
 		return true;
 	}
 
-	
+	public void setData (InlineCodeFinder codeFinder) {
+		pnlCodeFinder.setData(codeFinder);
+	}
 }

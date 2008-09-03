@@ -34,7 +34,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -170,7 +169,7 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
-	public void writeItem (TextUnit item,
+	public void writeTextUnit (TextUnit item,
 		int status)
 	{
 /*		boolean isSrcSeg = item.getSourceContent().isSegmented();
@@ -297,10 +296,6 @@ public class Writer extends BaseWriter {
 		return relation.toString() + DTD_SETTINGS_FILE;
 	}
 
-	public void writeSkeletonPart (SkeletonUnit resource) {
-		// Nothing to do
-	}
-	
 	public void writeStartDocument (Document resource) {
 		writer.writeStartDocument();
 

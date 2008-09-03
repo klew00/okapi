@@ -27,10 +27,10 @@ public class Resource extends net.sf.okapi.common.resource.Document {
 
 	private static final long serialVersionUID = 1L;
 
-	public boolean           endingLB;
-	public String            lineBreak;
-	public SkeletonUnit      sklRes;
-	public Parameters        params;
+	protected boolean        endingLB;
+	protected String         lineBreak;
+	protected SkeletonUnit   sklRes;
+	protected Parameters     params;
 	
 	public Resource () {
 		sklRes = new SkeletonUnit();

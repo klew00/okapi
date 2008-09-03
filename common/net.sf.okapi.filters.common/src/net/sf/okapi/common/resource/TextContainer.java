@@ -49,7 +49,7 @@ public class TextContainer extends TextFragment {
 	 * @return True if the content of this object is segmented.
 	 */
 	public boolean isSegmented () {
-		return (segments != null);
+		return ((segments != null) && (segments.size() > 0));
 	}
 	
 	/**

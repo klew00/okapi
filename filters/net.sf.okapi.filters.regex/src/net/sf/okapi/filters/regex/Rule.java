@@ -211,7 +211,7 @@ public class Rule {
 		tmp.add("useCodeFinder", useCodeFinder);
 		tmp.add("propertyName", propertyName);
 		tmp.add("propertyValue", propertyValue);
-		//TODO: save finder rules
+		tmp.addGroup("codeFinderRules", codeFinder.toString());
 		return tmp.toString();
 	}
 	
@@ -229,7 +229,7 @@ public class Rule {
 		propertyName = tmp.get("propertyName", propertyName);
 		propertyValue = tmp.get("propertyValue", propertyValue);
 		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
-		//TODO: get rules for finder
+		codeFinder.fromString(tmp.getGroup("codeFinderRules", ""));
 	}
 	
 }

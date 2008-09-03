@@ -106,7 +106,9 @@ public class Parser implements IParser {
 			if ( resource.params.useKeyCondition ) {
 				keyConditionPattern = Pattern.compile(resource.params.keyCondition); 
 			}
-			else keyConditionPattern = null;
+			else {
+				keyConditionPattern = null;
+			}
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);

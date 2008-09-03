@@ -192,7 +192,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			}
 		}
 		//TODO: Status
-		writer.writeItem(item, 0);
+		writer.writeTextUnit(item, 0);
 	}
     
 	@Override
@@ -205,7 +205,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 
 	@Override
 	public void skeletonContainer (SkeletonUnit resource) {
-		writer.writeSkeletonPart(resource);
+		writer.writeSkeletonUnit(resource);
 	}
 	
 	public boolean isFilterDriven () {

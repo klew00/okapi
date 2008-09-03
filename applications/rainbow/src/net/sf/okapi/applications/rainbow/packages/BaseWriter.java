@@ -26,6 +26,8 @@ import java.io.IOException;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.SkeletonUnit;
 
 public abstract class BaseWriter implements IWriter {
 	
@@ -156,4 +158,15 @@ public abstract class BaseWriter implements IWriter {
 		}
 	}
 	
+	public void writeStartGroup (Group resource) {
+		// Do nothing
+	}
+	
+	public void writeEndGroup (Group resource) {
+		// Do nothing
+	}
+	
+	public void writeSkeletonUnit (SkeletonUnit resource) {
+		// Do nothing)
+	}
 }

@@ -67,7 +67,9 @@ public class TMXContent {
 		StringBuilder tmp = new StringBuilder();
 		int index;
 		int id;
+		Code code;
 		for ( int i=0; i<codedText.length(); i++ ) {
+			//TODO: output attribute 'type' whenever possible
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
@@ -85,10 +87,27 @@ public class TMXContent {
 				break;
 			case TextFragment.MARKER_ISOLATED:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
-				tmp.append(String.format("<ph i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</ph>");
+				code = codes.get(index);
+				id = code.getID();
+				// Use <ph> or <it> depending on underlying tagType
+				switch ( code.getTagType() ) {
+				case PLACEHOLDER:
+					tmp.append(String.format("<ph x=\"%d\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</ph>");
+					break;
+				case OPENING:
+					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</it>");
+					break;
+				case CLOSING:
+					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</it>");
+					break;
+				}
+				
 				break;
 			case '>':
 				if ( escapeGT ) tmp.append("&gt;");
