@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Stack;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
@@ -49,8 +50,9 @@ public class HtmlParser implements IParser {
 	private Group currentGroup;
 	private SkeletonUnit currentSkeleton;
 	private ParserTokenType currentTokenType;
+	private Segment lastSegmentRead;
 	private boolean inline = false;
-	private boolean excluded = false;
+	private ExtractionRuleState ruleState;
 	private int groupID = 0;
 	private int itemId = 0;
 	private int sklId = 0;
@@ -98,6 +100,8 @@ public class HtmlParser implements IParser {
 		}
 
 		// Segment iterator
+		ruleState = new ExtractionRuleState();
+		htmlDocument.fullSequentialParse();
 		nodeIterator = htmlDocument.getNodeIterator();
 	}
 
@@ -106,9 +110,10 @@ public class HtmlParser implements IParser {
 	}
 
 	public ParserTokenType parseNext() {
+		boolean finished = false;
+		
 		// reset state flags
 		inline = false;
-		excluded = false;
 
 		// reset our text and skeleton units for a new pass
 		if (currentText == null || !currentText.isEmpty())
@@ -118,12 +123,12 @@ public class HtmlParser implements IParser {
 
 		while (nodeIterator.hasNext()) {
 			Segment segment = nodeIterator.next();
-			// if in excluded state everything is skeleton
-			if (excluded) {
+			lastSegmentRead = segment;
+			
+			// if in excluded state everything is skeleton including text
+			if (ruleState.isExludedState()) {
 				if (currentSkeleton.isEmpty()) {
-					currentSkeleton.setID(String.format("s%d", ++sklId));
-					currentSkeleton.setData(segment.toString());
-					currentSkeleton.setData(segment.getBegin(), segment.length());
+					currentSkeleton = createSkeletonUnit(segment.toString(), segment.getBegin(), segment.length());
 				}
 				else {
 					currentSkeleton.appendData(segment.toString());
@@ -132,90 +137,92 @@ public class HtmlParser implements IParser {
 			}
 			
 			if (segment instanceof Tag) {
-				final Tag tag = (Tag) segment;
+				final Tag tag = (Tag)segment;
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-					handleStartTag((StartTag) tag);
+					finished = handleStartTag((StartTag) tag);
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-					handleEndTag((EndTag) tag);
+					finished = handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.CDATA_SECTION) {
-					handleCdataSection(tag);
+					finished = handleCdataSection(tag);
 				} else if (tag.getTagType() == StartTagType.COMMENT) {
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.XML_DECLARATION) {
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.MARKUP_DECLARATION) {
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON) {
 					// TODO: Handle server formats
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON_ESCAPED) {
 					// TODO: Handle server formats
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				} else {
 					// something we didn't expect default to skeleton
 					// TODO: Add warning?
-					handleSkeleton(tag);
+					finished = handleSkeleton(tag);
 				}
 			} else {
-				handleText(segment);
+				finished = handleText(segment);
 			}
+			
+			// done with current chunk (token)
+			if (finished) break;
 		}
-
+		
+		if (!nodeIterator.hasNext()) return ParserTokenType.ENDINPUT;
 		return currentTokenType;
 	}
 
-	private void handleCdataSection(Tag tag) {		
+	private boolean handleCdataSection(Tag tag) {
+		return false;
 	}
 
-	private void handleText(Segment text) {
+	private boolean handleText(Segment text) {
 		// possible ignorable whitespace
-		if (text.isWhiteSpace()) {
-			// SkeletonUnit skeleton = new SkeletonUnit(
-			// String.format("s%d", ++sklId), segment.getBegin(),
-			// segment.length());
+		if (text.isWhiteSpace()) {			
 		}
+		
+		return false;
 	}
 
-	private void handleSkeleton(Tag tag) {
-
+	private boolean handleSkeleton(Tag tag) {
+		return false;
 	}
 
-	private void handleStartTag(StartTag startTag) {
+	private boolean handleStartTag(StartTag startTag) {
 		switch (getRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
-			excluded = false;
+			inline = true;
+			addToCurrentTextUnit(startTag);
 			break;
-
 		case EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT:
-			excluded = false;
+			inline = true;
 			break;
-
 		case EXTRACTABLE_ATTRIBUTES:
-			excluded = false;
+			inline = true;
 			break;
-
 		case GROUP_ELEMENT:
-			excluded = false;
+			ruleState.pushGroupRule(startTag.getName());
 			break;
-
 		case EXCLUDED_ELEMENT:
-			inline = false;
-			excluded = true;
+			ruleState.pushExcludedRule(startTag.getName());		
 			break;
-
 		case INCLUDED_ELEMENT:
-			excluded = false;
+			ruleState.pushIncludedRule(startTag.getName());	
 			break;
-
 		case TEXT_UNIT_ELEMENT:
 			break;
-
-		default:
+		case PRESERVE_WHITESPACE:
+			ruleState.pushPreserverWhitespaceRule(startTag.getName());
 			break;
+		default: // non-inline element break current inline run if exists.
+			inline = false;
+			if (inline)				
+				return true;			
 		}
 
 		/*
@@ -224,58 +231,95 @@ public class HtmlParser implements IParser {
 		 * 
 		 * }
 		 */
+		return false;
 	}
 
-	private void handleEndTag(EndTag endTag) {
+	private boolean handleEndTag(EndTag endTag) {
 		switch (getRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
-			excluded = false;
-			break;
-
-		case EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT:
-			excluded = false;
-			break;
-
-		case EXTRACTABLE_ATTRIBUTES:
-			excluded = false;
+			inline = true;
+			addToCurrentTextUnit(endTag);
 			break;
 
 		case GROUP_ELEMENT:
-			excluded = false;
+			ruleState.popGroupRule();
 			break;
 
 		case EXCLUDED_ELEMENT:
-			excluded = false;
+			ruleState.popExcludedIncludedRule();
 			break;
 
 		case INCLUDED_ELEMENT:
-			excluded = false;
+			ruleState.popExcludedIncludedRule();
 			break;
 
 		case TEXT_UNIT_ELEMENT:
 			break;
+			
+		case PRESERVE_WHITESPACE:
+			ruleState.popPreserverWhitespaceRule();
+			break;
 
-		default:
+		default: // non-inline end element
+			inline = false;
 			break;
 		}
+		
+		return false;
 	}
 
 	private EXTRACTION_RULE_TYPE getRuleType(String ruleName) {
 		ExtractionRule rule = configuration.getRule(ruleName);
 		return rule.getRuleType();
 	}
+	
+	private SkeletonUnit createSkeletonUnit(String skeleton, int offset, int length) {
+		SkeletonUnit skeletonUnit = new SkeletonUnit();
+		skeletonUnit.setID(String.format("s%d", ++sklId));
+		skeletonUnit.setData(skeleton);
+		skeletonUnit.setData(offset, length);
+		return skeletonUnit;
+	}
+	
+	private void addToCurrentTextUnit(String text) {		
+		if (currentText.isEmpty()) {
+			currentText = createTranslatableTextUnit(text);			
+		}
+		else {
+			
+		}
+	}
+
+	private void addToCurrentTextUnit(Tag tag) {		
+		if (currentText.isEmpty()) {
+			currentText = createTranslatableTextUnit("");			
+		}
+		else {
+			
+		} 
+	}
+
+	private void addToCurrentTextUnit(TextUnit child) {		
+		if (currentText.isEmpty()) {
+			currentText = createTranslatableTextUnit("");
+			currentText.addChild(child);
+		}
+		else {
+			child.setParent(currentText);
+			currentText.addChild(child);
+		} 
+	}
 
 	private TextUnit createTranslatableTextUnit(String text) {
-		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);
-		textUnit.setIsTranslatable(true);
-		textUnit.setPreserveWhitespaces(configuration.isPreserveWhitespace());
+		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);		
+		textUnit.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 		return textUnit;
 	}
 
 	private TextUnit createLocalizableTextUnit(String text) {
 		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);
 		textUnit.setIsTranslatable(false);
-		textUnit.setPreserveWhitespaces(configuration.isPreserveWhitespace());
+		textUnit.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 		// TODO: textUnit.setProperty(name, value);
 		return textUnit;
 	}
