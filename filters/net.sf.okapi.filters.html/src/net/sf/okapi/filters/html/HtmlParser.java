@@ -34,7 +34,8 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
-import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.BaseParser;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
@@ -42,7 +43,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
-public class HtmlParser implements IParser {
+public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
 	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
@@ -54,9 +55,6 @@ public class HtmlParser implements IParser {
 	private Segment lastSegmentRead;
 	private boolean inline = false;
 	private ExtractionRuleState ruleState;
-	private int groupID = 0;
-	private int itemId = 0;
-	private int sklId = 0;
 
 	public HtmlParser() {
 	}
@@ -116,11 +114,7 @@ public class HtmlParser implements IParser {
 		// reset state flags
 		inline = false;
 
-		// reset our text and skeleton units for a new pass
-		if (currentText == null || !currentText.isEmpty())
-			currentText = new TextUnit();
-		if (currentSkeleton == null || !currentSkeleton.isEmpty())
-			currentSkeleton = new SkeletonUnit();
+		reset();
 
 		while (nodeIterator.hasNext()) {
 			Segment segment = nodeIterator.next();
@@ -128,12 +122,7 @@ public class HtmlParser implements IParser {
 
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
-				if (currentSkeleton.isEmpty()) {
-					currentSkeleton = createSkeletonUnit(segment.toString(), segment.getBegin(), segment.length());
-				} else {
-					currentSkeleton.appendData(segment.toString());
-					currentSkeleton.addToLength(segment.length());
-				}
+				appendToSkeletonUnit(segment.toString(), segment.getBegin(), segment.length());				
 			}
 
 			if (segment instanceof Tag) {
@@ -275,26 +264,7 @@ public class HtmlParser implements IParser {
 		return rule.getRuleType();
 	}
 
-	private SkeletonUnit createSkeletonUnit(String skeleton, int offset, int length) {
-		SkeletonUnit skeletonUnit = new SkeletonUnit();
-		skeletonUnit.setID(String.format("s%d", ++sklId));
-		skeletonUnit.setData(skeleton);
-		skeletonUnit.setData(offset, length);
-		return skeletonUnit;
-	}
-
-	private void addToCurrentTextUnit(String text) {
-		if (currentText.isEmpty()) {
-			currentText = createTranslatableTextUnit(text);
-		} else {
-			currentText.getSourceContent().append(text);
-		}
-	}
-
-	private void addToCurrentTextUnit(Tag tag) {
-		if (currentText.isEmpty()) {
-			currentText = createTranslatableTextUnit("");
-		} 
+	private void addToCurrentTextUnit(Tag tag) {		
 		TextFragment.TagType tagType;
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 			if (((StartTag)tag).isSyntacticalEmptyElementTag()) 
@@ -306,33 +276,7 @@ public class HtmlParser implements IParser {
 		}
 		else {
 			tagType = TextFragment.TagType.PLACEHOLDER;
-		}
-		String type = tag.getName();
-		String data = tag.toString();
-		currentText.getSource().getContent().append(tagType, type, data);
-	}
-
-	private void addToCurrentTextUnit(TextUnit child) {
-		if (currentText.isEmpty()) {
-			currentText = createTranslatableTextUnit("");
-			currentText.addChild(child);
-		} else {
-			child.setParent(currentText);
-			currentText.addChild(child);
-		}
-	}
-
-	private TextUnit createTranslatableTextUnit(String text) {
-		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);
-		textUnit.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
-		return textUnit;
-	}
-
-	private TextUnit createLocalizableTextUnit(String text) {
-		TextUnit textUnit = new TextUnit(String.format("s%d", ++itemId), text);
-		textUnit.setIsTranslatable(false);
-		textUnit.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
-		// TODO: textUnit.setProperty(name, value);
-		return textUnit;
+		}		
+		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
 	}
 }
