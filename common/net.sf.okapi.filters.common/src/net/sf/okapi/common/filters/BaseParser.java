@@ -34,110 +34,134 @@ import net.sf.okapi.common.resource.TextUnit;
  * 
  */
 public abstract class BaseParser implements IParser {
-	protected int groupId = 0;
-	protected int textUnitId = 0;
-	protected int skeleltonUnitId = 0;
+	private int groupId = 0;
+	private int textUnitId = 0;
+	private int skeleltonUnitId = 0;
+	private TextUnit textUnit;
+	private SkeletonUnit skeletonUnit;
+	private Group group;
 
 	public BaseParser() {
 	}
 
-	public SkeletonUnit appendToSkeletonUnit(SkeletonUnit skeletonUnit, int offset, int length) {
-		if (skeletonUnit == null) {
-			skeletonUnit = createSkeletonUnit(offset, length);
-		} else {			
-			skeletonUnit.addToLength(length);
-		}
+	protected TextUnit getTextUnit() {
+		return textUnit;
+	}
+
+	protected SkeletonUnit getSkeletonUnit() {
 		return skeletonUnit;
 	}
 
-	public SkeletonUnit appendToSkeletonUnit(SkeletonUnit skeletonUnit, String skeleton) {
+	protected Group getGroup() {
+		return group;
+	}
+
+	protected int getGroupId() {
+		return groupId;
+	}
+
+	protected int getTextUnitId() {
+		return textUnitId;
+	}
+
+	protected int getSkeleltonUnitId() {
+		return skeleltonUnitId;
+	}
+
+	/**
+	 * Reset our internal buffers. Force creation of new ones on the next
+	 * append.
+	 */
+	protected void reset() {
+		textUnit = null;
+		skeletonUnit = null;
+		group = null;
+	}
+
+	/**
+	 * Append to the current SkeletonUnit. If skeletonUnit already created
+	 * ignore offset and increase length.
+	 * 
+	 * @param offset
+	 * @param length
+	 */
+	protected void appendToSkeletonUnit(int offset, int length) {
 		if (skeletonUnit == null) {
-			skeletonUnit = createSkeletonUnit(skeleton);
+			createSkeletonUnit(offset, length);
+		} else {
+			skeletonUnit.addToLength(length);
+		}
+	}
+
+	protected void appendToSkeletonUnit(String skeleton) {
+		if (skeletonUnit == null) {
+			createSkeletonUnit(skeleton);
 		} else {
 			skeletonUnit.appendData(skeleton);
 		}
-		return skeletonUnit;
 	}
 
-	public SkeletonUnit appendToSkeletonUnit(SkeletonUnit skeletonUnit, String skeleton, int offset, int length) {
+	protected void appendToSkeletonUnit(String skeleton, int offset, int length) {
 		if (skeletonUnit == null) {
-			skeletonUnit = createSkeletonUnit(skeleton, offset, length);
+			createSkeletonUnit(skeleton, offset, length);
 		} else {
 			skeletonUnit.appendData(skeleton);
 			skeletonUnit.addToLength(length);
 		}
-		return skeletonUnit;
 	}
 
-	public TextUnit appendToTextUnit(TextUnit textUnit, Code code) {
+	protected void appendToTextUnit(Code code) {
 		if (textUnit == null) {
-			textUnit = createTextUnit(code);
+			createTextUnit(code);
 		} else {
 			textUnit.getSourceContent().append(code.getTagType(), code.getType(), code.getData());
 		}
-		return textUnit;
 	}
 
-	public TextUnit appendToTextUnit(TextUnit textUnit, String text) {
+	protected void appendToTextUnit(String text) {
 		if (textUnit == null) {
-			textUnit = createTextUnit(text);
+			createTextUnit(text);
 		} else {
 			textUnit.getSourceContent().append(text);
 		}
-		return textUnit;
 	}
 
-	public TextUnit appendToTextUnit(TextUnit textUnit, TextUnit child) {
+	protected void appendToTextUnit(TextUnit child) {
 		if (textUnit == null) {
-			textUnit = createTextUnit(child);
+			createTextUnit(child);
 		} else {
 			textUnit.addChild(child);
 		}
-
-		return textUnit;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#close()
-	 */
-	abstract public void close();
-
-	private SkeletonUnit createSkeletonUnit(int offset, int length) {
-		SkeletonUnit skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
-		return skeletonUnit;
+	private void createSkeletonUnit(int offset, int length) {
+		skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
 	}
 
-	private SkeletonUnit createSkeletonUnit(String skeleton) {
-		SkeletonUnit skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), skeleton);
-		return skeletonUnit;
+	private void createSkeletonUnit(String skeleton) {
+		skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), skeleton);
 	}
 
-	private SkeletonUnit createSkeletonUnit(String skeleton, int offset, int length) {
+	private void createSkeletonUnit(String skeleton, int offset, int length) {
 		SkeletonUnit skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
 		skeletonUnit.setData(skeleton);
-		return skeletonUnit;
 	}
 
-	private TextUnit createTextUnit(Code code) {
-		TextUnit textUnit = new TextUnit();
+	private void createTextUnit(Code code) {
+		textUnit = new TextUnit();
 		textUnit.setID(String.format("s%d", ++textUnitId));
 		textUnit.getSource().getContent().append(code.getTagType(), code.getType(), code.getData());
-		return textUnit;
 	}
 
-	private TextUnit createTextUnit(String text) {
-		TextUnit textUnit = new TextUnit(String.format("s%d", ++textUnitId), text);
-		return textUnit;
+	private void createTextUnit(String text) {
+		textUnit = new TextUnit(String.format("s%d", ++textUnitId), text);
 	}
 
-	private TextUnit createTextUnit(TextUnit child) {
-		TextUnit textUnit = new TextUnit();
+	private void createTextUnit(TextUnit child) {
+		textUnit = new TextUnit();
 		textUnit.setID(String.format("s%d", ++textUnitId));
 		child.setParent(textUnit);
 		textUnit.addChild(child);
-		return textUnit;
 	}
 
 	/*
@@ -160,7 +184,7 @@ public abstract class BaseParser implements IParser {
 	 * @see net.sf.okapi.common.filters.IParser#open(java.io.InputStream)
 	 */
 	abstract public void open(InputStream input);
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -174,4 +198,11 @@ public abstract class BaseParser implements IParser {
 	 * @see net.sf.okapi.common.filters.IParser#parseNext()
 	 */
 	abstract public ParserTokenType parseNext();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IParser#close()
+	 */
+	abstract public void close();
 }
