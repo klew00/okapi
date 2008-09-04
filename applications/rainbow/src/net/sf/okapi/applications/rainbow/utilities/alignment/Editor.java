@@ -48,6 +48,7 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel         pnlActions;
 	private Parameters            params;
 	private Text                  edTMXPath;
+	private Button                chkUseTradosWorkarounds;
 	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
 	
@@ -125,6 +126,12 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		chkUseTradosWorkarounds = new Button(cmpTmp, SWT.CHECK);
+		chkUseTradosWorkarounds.setText("Generate Trados workarounds");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseTradosWorkarounds.setLayoutData(gdTmp);
+		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("Segmentation");
 		grpTmp.setLayout(new GridLayout());
@@ -174,6 +181,7 @@ public class Editor implements IParametersEditor {
 
 	private void setData () {
 		edTMXPath.setText(params.tmxPath);
+		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
@@ -183,6 +191,7 @@ public class Editor implements IParametersEditor {
 		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
 		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		params.segment = pnlSegmentation.getSegment();
+		params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
 		result = true;
 		return true;
 	}

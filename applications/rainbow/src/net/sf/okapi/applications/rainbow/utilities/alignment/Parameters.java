@@ -30,7 +30,8 @@ public class Parameters extends BaseParameters {
 	protected String    sourceSrxPath;
 	protected String    targetSrxPath;
 	protected boolean   singleInput;   
-	protected boolean   allowEmptyTarget;   
+	protected boolean   allowEmptyTarget;
+	protected boolean   useTradosWorkarounds;
 	
 
 	public Parameters () {
@@ -48,6 +49,7 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = tmp.get("targetSrxPath", targetSrxPath);
 		singleInput = tmp.get("singleInput", singleInput);
 		allowEmptyTarget = tmp.get("allowEmptyTarget", allowEmptyTarget);
+		useTradosWorkarounds = tmp.get("useTradosWorkarounds", useTradosWorkarounds);
 	}
 
 	@Override
@@ -58,6 +60,7 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 		singleInput = true;
 		allowEmptyTarget = false;
+		useTradosWorkarounds = true;
 	}
 
 	@Override
@@ -70,6 +73,7 @@ public class Parameters extends BaseParameters {
 		tmp.add("segment", segment);
 		tmp.add("singleInput", singleInput);
 		tmp.add("allowEmptyTarget", allowEmptyTarget);
+		tmp.add("useTradosWorkarounds", useTradosWorkarounds);
 		return tmp.toString();
 	}
 }

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class TextContainer extends TextFragment {
 
-	static public final String CODETYPE_SEGMENT  = "$segment";
+	static public final String CODETYPE_SEGMENT  = "$seg$";
 	
 	ArrayList<TextFragment>  segments;
 	

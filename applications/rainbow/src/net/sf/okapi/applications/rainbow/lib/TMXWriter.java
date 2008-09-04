@@ -34,6 +34,7 @@ public class TMXWriter {
 	private String      sourceLang;
 	private String      targetLang;
 	private int         itemCount;
+	private boolean     withTradosWorkarounds;
 
 
 	public void close () {
@@ -52,7 +53,15 @@ public class TMXWriter {
 		itemCount = 0;
 		writer = new XMLWriter();
 		tmxCont = new TMXContent();
+		tmxCont.setTradosWorkarounds(withTradosWorkarounds);
 		writer.create(path);
+	}
+	
+	public void setTradosWorkarounds (boolean value) {
+		withTradosWorkarounds = value;
+		if ( tmxCont != null ) {
+			tmxCont.setTradosWorkarounds(withTradosWorkarounds);
+		}
 	}
 	
 	public void writeStartDocument (String sourceLanguage,

@@ -99,6 +99,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		}
 		tmxWriter = new TMXWriter();
 		tmxWriter.create(params.getParameter("tmxPath"));
+		tmxWriter.setTradosWorkarounds(params.getBoolean("useTradosWorkarounds"));
 		tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
 		
 		// Prepare the db store

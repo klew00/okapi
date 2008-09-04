@@ -29,6 +29,7 @@ import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.Group;
@@ -98,10 +99,24 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 			targetSeg = doc.applyLanguageRules(targetLanguage, null);
 		}
 		
+		String outputDir = params.outputFolder + File.separator + params.pkgName;
+		/*if ( (new File(outputDir)).exists() ) {
+			// Ask confirmation for cleaning existing folder
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage("\nDo you want to save the project?");
+			dlg.setText("Rainbow");
+			switch  ( dlg.open() ) {
+			case SWT.NO:
+				return true;
+			case SWT.CANCEL:
+				return false;
+			}
+		}*/
+		Util.deleteDirectory(outputDir, false);
+		
 		id = 0;
 		writer.setParameters(sourceLanguage, targetLanguage,
-			"TODO:projectID", params.outputFolder + File.separator + params.pkgName,
-			params.makePackageID(), inputRoot);
+			"TODO:projectID", outputDir, params.makePackageID(), inputRoot);
 		writer.writeStartPackage();
 	}
 

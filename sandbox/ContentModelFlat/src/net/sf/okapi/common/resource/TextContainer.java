@@ -26,7 +26,7 @@ import java.util.List;
 
 public class TextContainer extends TextFragment {
 
-	static public final String CODETYPE_SEGMENT  = "$segment";
+	static public final String CODETYPE_SEGMENT  = "$seg$";
 	
 	ArrayList<TextFragment>  segments;
 	
@@ -49,7 +49,7 @@ public class TextContainer extends TextFragment {
 	 * @return True if the content of this object is segmented.
 	 */
 	public boolean isSegmented () {
-		return (segments != null);
+		return ((segments != null) && (segments.size() > 0));
 	}
 	
 	/**
@@ -58,6 +58,16 @@ public class TextContainer extends TextFragment {
 	 */
 	public List<TextFragment> getSegments () {
 		return segments;
+	}
+	
+	/**
+	 * Sets the list of segments for this object. No change is made to the
+	 * content itself, so it must already match the given list at the end, or it
+	 * must be build separately.
+	 * @param segments The new list of segments.
+	 */
+	public void setSegments (ArrayList<TextFragment> segments) {
+		this.segments = segments;
 	}
 
 	/**

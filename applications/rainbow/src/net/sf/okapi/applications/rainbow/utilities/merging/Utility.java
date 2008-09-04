@@ -29,10 +29,12 @@ import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 
 
 public class Utility implements ISimpleUtility {
 
+	private String           commonFolder;
 	private String           inputRoot;
 	private String           outputRoot;
 	private String           manifestPath;
@@ -58,6 +60,7 @@ public class Utility implements ISimpleUtility {
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
+		commonFolder = null; // Reset
 		manifest = new Manifest();
 		merger = new Merger();
 	}
@@ -123,6 +126,9 @@ public class Utility implements ISimpleUtility {
 		String encoding,
 		String filterSettings)
 	{
+		// Compute the longest common folder
+		commonFolder = Util.longestCommonDir(manifestPath,
+			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
 		manifestPath = path;
 		// Other information are not iused
 	}
@@ -138,7 +144,7 @@ public class Utility implements ISimpleUtility {
 	}
 	
 	public String getFolderAfterProcess () {
-		return null;
+		return commonFolder;
 	}
 
 	public void setFilterAccess (FilterAccess filterAccess,

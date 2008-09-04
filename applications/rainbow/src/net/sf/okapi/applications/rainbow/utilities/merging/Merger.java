@@ -100,7 +100,7 @@ public class Merger extends ThrougputPipeBase {
 			// Load the relevant filter
 			Object[] filters = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter, outFilter);
 			inpFilter = (IInputFilter)filters[0];
-			outFilter = (IOutputFilter)filters[0];
+			outFilter = (IOutputFilter)filters[1];
 			
 			reader.openDocument(fileToMerge);
 			

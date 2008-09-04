@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
@@ -31,6 +34,37 @@ public class Code {
 	protected boolean   hasSubflow;
 
 
+	/**
+	 * Helper method to convert a list of codes into a string.
+	 * @param list List of the codes to flatten into a string.
+	 * @return The string with all the codes.
+	 */
+	public static String codesToString (List<Code> list) {
+		StringBuilder tmp = new StringBuilder();
+		for ( Code code : list ) {
+			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
+				code.tagType, code.id, code.type, code.data,
+				(code.hasSubflow ? "1" : "0")));
+		}
+		return tmp.toString();
+	}
+	
+	public static List<Code> stringToCodes (String data) {
+		ArrayList<Code> list = new ArrayList<Code>();
+		if ( data != null ) {
+			String[] tmpCodes = data.split("\u009D");
+			for ( String tmp : tmpCodes ) {
+				if ( tmp.length() == 0 ) continue;
+				String[] tmpFields = tmp.split("\u009C");
+				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
+				code.id = Integer.valueOf(tmpFields[1]);
+				code.hasSubflow = (tmpFields[4].charAt(0)=='1');
+				list.add(code);
+			}
+		}
+		return list;
+	}
+	
 	public Code (TagType tagType, String type, String data) {
 		id = -1;
 		this.tagType = tagType;

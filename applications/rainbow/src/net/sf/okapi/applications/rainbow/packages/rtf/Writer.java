@@ -119,6 +119,7 @@ public class Writer extends BaseWriter {
 		}
 
 		// Output the text unit
+		//TODO: Handle tu-skeleton-before/after
 		StringBuilder tmp = new StringBuilder();
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
@@ -158,23 +159,24 @@ public class Writer extends BaseWriter {
 					buffer.append(Util.RTF_ENDINLINE);
 					break;
 				case TextFragment.MARKER_ISOLATED:
+					//TODO: handle sub-flows!!!
 					code = content.getCode(text.charAt(++i));
 					if ( isSegmented ) {
 						if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
 							int index = Integer.valueOf(code.getData());
 							buffer.append(Util.RTF_STARTMARKER);
 							processContent(tc.getSegments().get(index), buffer, false);
+							//TODO: case when a target is available (what kind of match?)
 							buffer.append(Util.RTF_MIDMARKER1+"0"+Util.RTF_MIDMARKER2);
 							//debug: buffer.append("{\\highlight7 ");
-							processContent(tc.getSegments().get(index), buffer, false);
+							//processContent(tc.getSegments().get(index), buffer, false);
 							//debug: buffer.append("}");
 							buffer.append(Util.RTF_ENDMARKER);
 							break;
 						}
-						// Else: fall back to normal isolated inline 
+						// Else: fall back to normal isolated in-line 
 					}
 					buffer.append(Util.RTF_STARTINLINE);
-					//TODO: handle sub-flows!!!
 					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
 					buffer.append(Util.RTF_ENDINLINE);
 					break;
@@ -269,7 +271,7 @@ public class Writer extends BaseWriter {
 	
 	@Override
 	public void writeSkeletonUnit (SkeletonUnit resource) {
-		writer.write(Util.escapeToRTF(resource.toString(), true, 0, outputEncoder));
+		writer.write(Util.escapeToRTF(resource.toString(), true, 1, outputEncoder));
 	}
 	
 	public void writeStartDocument (Document resource) {
@@ -288,13 +290,13 @@ public class Writer extends BaseWriter {
 			"{\\stylesheet \n"+
 			"{\\s0 \\sb80\\slmult1\\widctlpar\\fs20\\f1 \\snext0 Normal;}\n"+
 			"{\\cs1 \\additive \\v\\cf12\\sub\\f1 tw4winMark;}\n"+
-			"{\\cs2 \\cf4\\fs40\\f1 tw4winError;}\n"+
-			"{\\cs3 \\f1\\cf11 tw4winPopup;}\n"+
-			"{\\cs4 \\f1\\cf10 tw4winJump;}\n"+
-			"{\\cs5 \\additive \\cf15\\f1\\lang1024 tw4winExternal;}\n"+
-			"{\\cs6 \\additive \\cf6\\f1\\lang1024 tw4winInternal;}\n"+
-			"{\\cs7 \\cf2 tw4winTerm;}\n"+
-			"{\\cs8 \\additive \\cf13\\f1\\lang1024 DO_NOT_TRANSLATE;}\n"+
+			"{\\cs2 \\additive \\cf4\\fs40\\f1 tw4winError;}\n"+
+			"{\\cs3 \\additive \\f1\\cf11 tw4winPopup;}\n"+
+			"{\\cs4 \\additive \\f1\\cf10 tw4winJump;}\n"+
+			"{\\cs5 \\additive \\cf15\\f1\\lang1024\\noproof tw4winExternal;}\n"+
+			"{\\cs6 \\additive \\cf6\\f1\\lang1024\\noproof tw4winInternal;}\n"+
+			"{\\cs7 \\additive \\cf2 tw4winTerm;}\n"+
+			"{\\cs8 \\additive \\cf13\\f1\\lang1024\\noproof DO_NOT_TRANSLATE;}\n"+
 			"{\\cs9 \\additive Default Paragraph Font;}"+
 			"{\\cs15 \\additive \\v\\f1\\cf12\\sub tw4winMark;}"+
 			"}\n"+

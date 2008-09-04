@@ -34,6 +34,7 @@ public class TMXContent {
 
 	private String      codedText;
 	private List<Code>  codes;
+	private boolean     withTradosWorkarounds = false;
 	
 	public TMXContent () {
 		codedText = "";
@@ -41,6 +42,10 @@ public class TMXContent {
 	
 	public TMXContent (TextFragment content) {
 		setContent(content);
+	}
+	
+	public void setTradosWorkarounds (boolean value) {
+		withTradosWorkarounds = value;
 	}
 	
 	public TMXContent setContent (TextFragment content) {
@@ -92,18 +97,25 @@ public class TMXContent {
 				// Use <ph> or <it> depending on underlying tagType
 				switch ( code.getTagType() ) {
 				case PLACEHOLDER:
-					tmp.append(String.format("<ph x=\"%d\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-					tmp.append("</ph>");
+					if ( withTradosWorkarounds && code.getData().startsWith("\\") ) {
+						tmp.append("<ut>{\\cs6\\f1\\cf6\\lang1024 </ut>");
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append("<ut>}</ut>");
+					}
+					else {
+						tmp.append(String.format("<ph x=\"%d\">", id));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append("</ph>");
+					}
 					break;
 				case OPENING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
 					tmp.append("</it>");
 					break;
 				case CLOSING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
 					tmp.append("</it>");
 					break;
 				}

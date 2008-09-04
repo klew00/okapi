@@ -265,7 +265,6 @@ public class Project {
 			Element elem1;
 			Element elem2;
 			NodeList n1 = rootElem.getElementsByTagName("fileSet");
-			//TODO: Allow for un-ordered list of fileSet ???
 			for ( int i=0; i<n1.getLength(); i++ ) {
 				elem1 = (Element)n1.item(i);
 
