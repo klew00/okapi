@@ -47,10 +47,7 @@ public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
 	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
-	protected IContainable currentResource;
-	private TextUnit currentText;
-	private Group currentGroup;
-	private SkeletonUnit currentSkeleton;
+	private IContainable currentResource;
 	private ParserTokenType currentTokenType;
 	private Segment lastSegmentRead;
 	private boolean inline = false;
@@ -111,9 +108,8 @@ public class HtmlParser extends BaseParser {
 	public ParserTokenType parseNext() {
 		boolean finished = false;
 
-		// reset state flags
+		// reset state flags and buffers
 		inline = false;
-
 		reset();
 
 		while (nodeIterator.hasNext()) {
