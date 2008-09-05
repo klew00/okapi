@@ -22,7 +22,6 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.common.resource.TextContainer;
