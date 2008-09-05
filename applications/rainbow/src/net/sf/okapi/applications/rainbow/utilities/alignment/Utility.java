@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private int              count;
 	private int              countTotal;
 	private SegmentsAligner  aligner;
+	private Shell            shell;
 
 	
 	public Utility () {
@@ -107,7 +109,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		dbStoreBuilder.setSegmenters(srcSeg, trgSeg);
 		
 		if ( aligner == null ) {
-			aligner = new SegmentsAligner(null);
+			aligner = new SegmentsAligner(shell);
 		}
 		
 		alignedTotal = 0;
@@ -120,6 +122,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     	logger.info(String.format("Total without text = %d", noTextTotal));
     	logger.info(String.format("Total aligned = %d", alignedTotal));
     	
+		if ( aligner != null ) {
+			aligner = null;
+		}
 		if ( tmxWriter != null ) {
 			tmxWriter.writeEndDocument();
 			tmxWriter.close();
@@ -187,6 +192,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			aligned = 0;
 			noText = 0;
 			count = 0;
+			
+			aligner.setDocumentName(resource.getName());
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
@@ -273,5 +280,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	{
 		fa = filterAccess;
 		this.paramsFolder = paramsFolder;
+	}
+	
+	public void setContextUI (Object contextUI) {
+		shell = (Shell)contextUI;
 	}
 }

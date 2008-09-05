@@ -74,6 +74,7 @@ public class FilterSettingsPanel extends Composite {
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
 		cbFilters.setLayoutData(gdTmp);
+		cbFilters.setVisibleItemCount(15);
 		cbFilters.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e1) {
 				fillParametersList(0, null);
@@ -88,6 +89,7 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
 		cbParameters.setLayoutData(gdTmp);
+		cbParameters.setVisibleItemCount(15);
 		cbParameters.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e1) {
 				btEdit.setEnabled(!cbParameters.getText().startsWith("<"));

@@ -23,7 +23,10 @@ package net.sf.okapi.common.ui;
 import java.io.IOException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 
 public class UIUtil {
 
@@ -71,6 +74,26 @@ public class UIUtil {
 		if ( "motif".equals(SWT.getPlatform()) ) return PFTYPE_UNIX;
 		return -1; // Unknown
 	}
-	
+
+	/**
+	 * Creates a new button on a GridLayout layout.
+	 * @param parent Composite parent widget.
+	 * @param style Style of the button.
+	 * @param label Text of the button.
+	 * @param width width of the button.
+	 * @return The new button.
+	 */
+	public static Button createGridButton (Composite parent,
+		int style,
+		String label,
+		int width)
+	{
+		Button newButton = new Button(parent, style);
+		newButton.setText(label);
+		GridData gdTmp = new GridData();
+		gdTmp.widthHint = width;
+		newButton.setLayoutData(gdTmp);
+		return newButton;
+	}
 	
 }

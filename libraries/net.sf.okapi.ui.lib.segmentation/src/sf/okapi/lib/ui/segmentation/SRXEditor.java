@@ -38,6 +38,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
@@ -48,8 +49,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -59,6 +63,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
@@ -90,7 +95,13 @@ public class SRXEditor {
 	private Pattern          patternOpening;
 	private Pattern          patternClosing;
 	private Pattern          patternPlaceholder;
+	private Font             sampleFont; 
 	
+
+	@Override
+	protected void finalize () {
+		dispose();
+	}
 
 	public SRXEditor (Shell parent) {
 		srxDoc = new SRXDocument();
@@ -103,11 +114,16 @@ public class SRXEditor {
 		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
 		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
 		
-		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		shell.setImage(parent.getImage());
-		shell.setLayout(new GridLayout());
+		GridLayout layout = new GridLayout();
+		shell.setLayout(layout);
 		
-		Composite cmpTmp = new Composite(shell, SWT.BORDER);
+		SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
+		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashForm.setSashWidth(layout.verticalSpacing);
+		
+		Composite cmpTmp = new Composite(sashForm, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layTmp = new GridLayout(6, false);
 		cmpTmp.setLayout(layTmp);
@@ -122,6 +138,7 @@ public class SRXEditor {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		cbGroup.setLayoutData(gdTmp);
+		cbGroup.setVisibleItemCount(15);
 		cbGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateRules(0, false);
@@ -259,26 +276,33 @@ public class SRXEditor {
 			}
 		});
 
+		
 		//--- Sample block
+
+		Composite cmpSample = new Composite(sashForm, SWT.BORDER);
+		cmpSample.setLayoutData(new GridData(GridData.FILL_BOTH));
+		cmpSample.setLayout(new GridLayout(3, false));
 		
-		cmpTmp = new Composite(shell, SWT.BORDER);
-		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		cmpTmp.setLayout(new GridLayout(3, false));
-		
-		label = new Label(cmpTmp, SWT.None);
+		label = new Label(cmpSample, SWT.None);
 		label.setText("Sample text (use <x>...</x> and <x/> for inline codes):");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 3;
 		label.setLayoutData(gdTmp);
 		
 		int sampleMinHeight = 40;
-		edSampleText = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
+		edSampleText = new Text(cmpSample, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.minimumHeight = sampleMinHeight;
 		gdTmp.horizontalSpan = 3;
 		edSampleText.setLayoutData(gdTmp);
+
+		Font font = edSampleText.getFont();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(10);
+		sampleFont = new Font(font.getDevice(), fontData[0]);
+		edSampleText.setFont(sampleFont);
 		
-		rdApplySampleForCurrentSet = new Button(cmpTmp, SWT.RADIO);
+		rdApplySampleForCurrentSet = new Button(cmpSample, SWT.RADIO);
 		rdApplySampleForCurrentSet.setText("Test on the current set of rules only");
 		rdApplySampleForCurrentSet.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -287,7 +311,7 @@ public class SRXEditor {
 			};
 		});
 
-		rdApplySampleForMappedRules = new Button(cmpTmp, SWT.RADIO);
+		rdApplySampleForMappedRules = new Button(cmpSample, SWT.RADIO);
 		rdApplySampleForMappedRules.setText("Test on the rules for this language code:");
 		rdApplySampleForMappedRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -296,7 +320,7 @@ public class SRXEditor {
 			};
 		});
 		
-		edSampleLanguage = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
+		edSampleLanguage = new Text(cmpSample, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData();
 		edSampleLanguage.setLayoutData(gdTmp);
 		edSampleLanguage.addModifyListener(new ModifyListener () {
@@ -306,12 +330,13 @@ public class SRXEditor {
 		});
 
 
-		edResults = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
+		edResults = new Text(cmpSample, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		edResults.setLayoutData(gdTmp);
 		gdTmp.minimumHeight = sampleMinHeight;
 		gdTmp.horizontalSpan = 3;
 		edResults.setEditable(false);
+		edResults.setFont(sampleFont);
 
 		edSampleText.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
@@ -360,6 +385,13 @@ public class SRXEditor {
 		
 		updateCaption();
 		updateAll();
+	}
+	
+	public void dispose () {
+		if ( sampleFont != null ) {
+			sampleFont.dispose();
+			sampleFont = null;
+		}
 	}
 	
 	private void setFileMenu (Shell shell,
@@ -626,6 +658,7 @@ public class SRXEditor {
 	
 	private void loadSRXDocument (String path) {
 		try {
+			getSurfaceData(); // To get back the original data in case of escape: 
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open SRX Document",
 					false, null, "SRX Documents (*.srx)\tAll Files (*.*)",

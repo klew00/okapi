@@ -141,10 +141,12 @@ public class UtilityDriver {
 		try {
 			log.beginTask(pluginItem.name);
 			
+			util.setFilterAccess(fa, prj.getParametersFolder());
+			util.setContextUI(shell);
+
 			if ( util.needsRoots() ) {
 				util.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}
-			util.setFilterAccess(fa, prj.getParametersFolder());
 
 			util.doProlog(prj.getSourceLanguage(), prj.getTargetLanguage());
 

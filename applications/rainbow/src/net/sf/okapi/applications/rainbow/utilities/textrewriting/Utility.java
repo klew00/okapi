@@ -210,4 +210,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	{
 		// Not used
 	}
+
+	public void setContextUI (Object contextUI) {
+		// Not used
+	}
 }

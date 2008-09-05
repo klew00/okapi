@@ -473,9 +473,12 @@ public class GroupsAndOptionsDialog {
 	private boolean validate () {
 		try {
 			int nonexistingRules = 0;
+			StringBuilder notMapped = new StringBuilder();
 			LinkedHashMap<String, ArrayList<Rule>> list = srxDoc.getAllLanguageRules();
 			for ( LanguageMap langRule : srxDoc.getAllLanguagesMaps() ) {
 				if ( !list.containsKey(langRule.getRuleName()) ) {
+					if ( nonexistingRules > 0 ) notMapped.append(", ");
+					notMapped.append(langRule.getRuleName());
 					nonexistingRules++;
 				}
 			}
@@ -485,7 +488,8 @@ public class GroupsAndOptionsDialog {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
 			dlg.setMessage(String.format("Number of language maps associated with non-existing rules: %d\n"
-				+ "Do you want to proceed closing the dialog?", nonexistingRules));
+				+ "(%s)\n"
+				+ "Do you want to proceed closing the dialog?", nonexistingRules, notMapped.toString()));
 			switch ( dlg.open() ) {
 			case SWT.CANCEL:
 			case SWT.NO:

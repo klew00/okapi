@@ -152,4 +152,8 @@ public class Utility implements ISimpleUtility {
 	{
 		// Not used
 	}
+
+	public void setContextUI (Object contextUI) {
+		// Not used
+	}
 }

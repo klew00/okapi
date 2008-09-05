@@ -28,8 +28,23 @@ import net.sf.okapi.common.IParameters;
  */
 public interface IUtility {
 
+	/**
+	 * Sets the filter access information to use with the utility.
+	 * This allows utilities to re-use loaded filter access objects to instantiate
+	 * filters or readers.
+	 * @param filterAccess The filter access object to use.
+	 * @param paramsFolder The parameters folder to use.
+	 */
 	void setFilterAccess (FilterAccess filterAccess,
 		String paramsFolder);
+	
+	/**
+	 * Sets the context UI to use with the utility.
+	 * This allows utilities to create UI elements during the process that are
+	 * attached to the main UI shell from where the utilities are called.
+	 * @param contextUI The shell object to use.
+	 */
+	void setContextUI (Object contextUI);
 	
 	/**
 	 * Gets the unique string that identifies the utility.

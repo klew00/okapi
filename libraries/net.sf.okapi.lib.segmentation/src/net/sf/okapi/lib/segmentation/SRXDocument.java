@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -39,6 +40,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -390,7 +392,9 @@ public class SRXDocument {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document doc = Fact.newDocumentBuilder().parse(new File(rulesPath));
+			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
+			docBuilder.setEntityResolver(new DefaultEntityResolver());
+			Document doc = docBuilder.parse(new File(rulesPath));
 			resetAll();
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();

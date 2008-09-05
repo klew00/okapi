@@ -22,6 +22,7 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.common.resource.TextContainer;
@@ -32,12 +33,25 @@ public class SegmentsAligner {
 	
 	private AlignmentDialog  alignDlg;
 	private Shell            shell;
+	private String           currentDocument;
 	
+	
+	@Override
+	protected void finalize () {
+		if ( alignDlg != null ) {
+			alignDlg.close();
+			alignDlg = null;
+		}
+	}
 	
 	public SegmentsAligner (Shell shell) {
 		this.shell = shell;
 	}
 
+	public void setDocumentName (String documentName) {
+		currentDocument = documentName;
+	}
+	
 	/**
 	 * Verifies the alignment of the segments of a given TextUnit object.
 	 * @param tu The text unit containing the segments to verify.
@@ -64,8 +78,8 @@ public class SegmentsAligner {
 		
 		// Check the number of segments
 		if ( source.getSegments().size() != target.getSegments().size() ) {
-			//TODO: optional visual alignment to fix the problems
-			return false;
+			// Optional visual alignment to fix the problems
+			return visualAlignment(source, target, "Different number of segments.");
 		}
 		// Assumes the list have same number of segments now
 		// Sanity check using common anchors
@@ -73,8 +87,9 @@ public class SegmentsAligner {
 		List<TextFragment> trgList = target.getSegments();
 		for ( int i=0; i<srcList.size(); i++ ) {
 			if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
-				//TODO: Optional visual check
-				return false;
+				// Optional visual check
+				return visualAlignment(source, target,
+					"Different number of in-line codes in at least one segment.");
 			}
 		}
 		return true;
@@ -88,12 +103,14 @@ public class SegmentsAligner {
 	 * is canceled or if no alignment is possible.
 	 */
 	public boolean visualAlignment (TextContainer source,
-		TextContainer target)
+		TextContainer target,
+		String cause)
 	{
 		if ( alignDlg == null ) {
 			alignDlg = new AlignmentDialog(shell);
 		}
-		
-		return alignDlg.showDialog();
+		alignDlg.showDialog(source, target, currentDocument, cause);
+		//TODO: return real result later (debug now)
+		return false;
 	}
 }

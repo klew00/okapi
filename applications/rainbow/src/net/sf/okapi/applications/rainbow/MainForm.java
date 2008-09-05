@@ -89,6 +89,7 @@ import org.eclipse.swt.widgets.Text;
 
 import sf.okapi.lib.ui.segmentation.SRXEditor;
 
+
 public class MainForm implements IParametersProvider {
 	
 	private int                        currentInput;
@@ -1438,12 +1439,16 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void editSegmentationRules (String path) {
+		SRXEditor dlg = null;
 		try {
-			SRXEditor dlg = new SRXEditor(shell);
+			dlg = new SRXEditor(shell);
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			if ( dlg != null ) dlg.dispose();
 		}
 	}
 	
