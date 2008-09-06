@@ -53,7 +53,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -63,7 +62,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
@@ -668,6 +666,12 @@ public class SRXEditor {
 			}
 			srxPath = null; // In case an error occurs
 			srxDoc.loadRules(path);
+			if ( srxDoc.hasWarning() ) {
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES| SWT.CANCEL);
+				dlg.setText(shell.getText());
+				dlg.setMessage(srxDoc.getWarning());
+				dlg.open();
+			}
 			srxPath = path; // Set the path only after the load is fine
 		}
 		catch ( Throwable e ) {
@@ -681,6 +685,13 @@ public class SRXEditor {
 	
 	private boolean saveSRXDocument (String path) {
 		try {
+			if ( !srxDoc.getVersion().equals("2.0") ) {
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+				dlg.setText(shell.getText());
+				dlg.setMessage("The file will be saved as SRX 2.0.\n"
+					+"Do you want to proceed?");
+				if ( dlg.open() != SWT.YES ) return false;
+			}
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save SRX Document", null,
 					"SRX Documents (*.srx)", "*.srx");

@@ -57,6 +57,8 @@ public class SRXDocument {
 	private boolean     includeStartCodes;
 	private boolean     includeEndCodes;
 	private boolean     includeIsolatedCodes;
+	private String      version = "2.0";
+	private String      warning;
 	
 	private String      sampleText;
 	private String      sampleLanguage;
@@ -71,6 +73,19 @@ public class SRXDocument {
 		resetAll();
 	}
 
+	public String getVersion () {
+		return version;
+	}
+	
+	public boolean hasWarning () {
+		return (( warning != null ) && ( warning.length() > 0 ));
+	}
+
+	public String getWarning () {
+		if ( warning == null ) return "";
+		else return warning;
+	}
+	
 	public void resetAll () {
 		langMaps = new ArrayList<LanguageMap>();
 		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
@@ -399,14 +414,26 @@ public class SRXDocument {
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();
 //TODO: Handle namespaces (e.g. to allow nested SRX rules)
+
 			XPathExpression xpe = xpath.compile("//srx");
 			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
 			if ( srxList.getLength() < 1 ) return;
 			
 			// Treat the first occurrence (we assume there is never more in one file)
 			Element srxElem = (Element)srxList.item(0);
+			String tmp = srxElem.getAttribute("version");
+			if ( tmp.equals("1.0") ) {
+				version = tmp;
+				warning = "SRX version 1.0 rules are subject to different interpretation.\nRead the help for more information.";
+			}
+			else if ( tmp.equals("2.0") ) {
+				version = tmp;
+				warning = null;
+			}
+			else throw new RuntimeException("Invalid version.");
+			
 			Element elem1 = getFirstElementByTagName("header", srxElem);
-			String tmp = elem1.getAttribute("segmentsubflows");
+			tmp = elem1.getAttribute("segmentsubflows");
 			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
 			tmp = elem1.getAttribute("cascade");
 			if ( tmp.length() > 0 ) cascade = "yes".equals(tmp);
@@ -521,6 +548,7 @@ public class SRXDocument {
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
 			writer.writeAttributeString("version", "2.0");
+			version = "2.0";
 			writer.writeLineBreak();
 			
 			writer.writeStartElement("header");

@@ -24,8 +24,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sf.okapi.lib.ui.segmentation.SegmentsAligner;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -87,9 +85,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		if ( params.segment ) {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(params.sourceSrxPath);
+			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			srcSeg = doc.applyLanguageRules(sourceLanguage, null);
 			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
 				doc.loadRules(params.targetSrxPath);
+				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			trgSeg = doc.applyLanguageRules(targetLanguage, null);
 		}

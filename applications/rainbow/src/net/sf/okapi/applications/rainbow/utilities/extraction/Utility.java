@@ -92,9 +92,11 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		if ( params.presegment ) {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(params.sourceSRX);
+			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			sourceSeg = doc.applyLanguageRules(sourceLanguage, null);
 			if ( !params.sourceSRX.equalsIgnoreCase(params.targetSRX) ) {
 				doc.loadRules(params.targetSRX);
+				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			targetSeg = doc.applyLanguageRules(targetLanguage, null);
 		}
