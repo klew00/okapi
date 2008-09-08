@@ -35,6 +35,10 @@ public class ConfigurationString {
 	}
 	
 	public ConfigurationString (String data) {
+		fromString(data);
+	}
+	
+	public void fromString (String data) {
 		if ( data != null ) {
 			// Make sure all types of line-breaks are reduced to one or more \n
 			this.data = new StringBuilder(prependMarker(data.replace('\r', '\n')));
@@ -47,23 +51,6 @@ public class ConfigurationString {
 		data.append("\n");
 	}
 
-	private String prependMarker (String data) {
-		if ( data == null ) return data;
-		if ( data.length() == 0 ) return "\n";
-		if ( data.charAt(0) != '\n' ) return "\n"+data;
-		else return data;
-	}
-	
-	private String escape (String text) {
-		String escapedText = text.replace("\r", "{0xD}");
-		return escapedText.replace("\n", "{0xA}");
-	}
-	
-	private String unescape (String text) {
-		String escapedText = text.replace("{0xD}", "\r");
-		return escapedText.replace("{0xA}", "\n");
-	}
-	
 	public String toString () {
 		String tmp = data.toString().replaceAll("\n\n", "\n");
 		return tmp.trim();
@@ -204,4 +191,22 @@ public class ConfigurationString {
 		}
 		return table;
 	}
+
+	private String prependMarker (String data) {
+		if ( data == null ) return data;
+		if ( data.length() == 0 ) return "\n";
+		if ( data.charAt(0) != '\n' ) return "\n"+data;
+		else return data;
+	}
+	
+	private String escape (String text) {
+		String escapedText = text.replace("\r", "{0xD}");
+		return escapedText.replace("\n", "{0xA}");
+	}
+	
+	private String unescape (String text) {
+		String escapedText = text.replace("{0xD}", "\r");
+		return escapedText.replace("{0xA}", "\n");
+	}
+	
 }

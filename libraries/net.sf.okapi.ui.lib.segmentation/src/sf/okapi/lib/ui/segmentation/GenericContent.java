@@ -22,7 +22,11 @@ package sf.okapi.lib.ui.segmentation;
 
 import java.util.List;
 
+import org.eclipse.swt.graphics.Point;
+
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.InvalidPositionException;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -33,6 +37,7 @@ public class GenericContent {
 	private String      codedText;
 	private List<Code>  codes;
 	
+
 	public GenericContent () {
 		codedText = "";
 	}
@@ -46,6 +51,53 @@ public class GenericContent {
 		codes = content.getCodes();
 		return this;
 	}
+
+	/**
+	 * Prints a string representation of a given segmented text, with optional
+	 * markers to indicate the segments boundaries.
+	 * @param container The container to output.
+	 * @param showSegments True if segment boundaries should be shown.
+	 * @return A string with the segmented text output.
+	 */
+	public String printSegmentedContent (TextContainer container,
+		boolean showSegments)
+	{
+		if ( !container.isSegmented() ) {
+			return setContent(container).toString();
+		}
+		
+		Code code;
+		String text = container.getCodedText();
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				code = container.getCode(text.charAt(++i));
+				tmp.append(String.format("<%d>", code.getID()));
+				break;
+			case TextFragment.MARKER_CLOSING:
+				code = container.getCode(text.charAt(++i));
+				tmp.append(String.format("</%d>", code.getID()));
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				code = container.getCode(text.charAt(++i));
+				tmp.append(String.format("<%d/>", code.getID()));
+				break;
+			case TextFragment.MARKER_SEGMENT:
+				code = container.getCode(text.charAt(++i));
+				int index = Integer.parseInt(code.getData());
+				if ( showSegments ) tmp.append("[");
+				tmp.append(setContent(container.getSegments().get(index)).toString());
+				if ( showSegments ) tmp.append("]");
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+	
 	
 	/**
 	 * Generates an generic coded string from the content.
@@ -67,6 +119,7 @@ public class GenericContent {
 				tmp.append(String.format("</%d>", codes.get(index).getID()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				tmp.append(String.format("<%d/>", codes.get(index).getID()));
 				break;
@@ -78,4 +131,54 @@ public class GenericContent {
 		return tmp.toString();
 	}
 
+	/**
+	 * Gets the matching position in the coded text string of a given 
+	 * position in the generic text output.
+	 * @param position Generic text position to convert to coded text position.
+	 * @return Calculated coded text position.
+	 */
+	public Point getCodedTextPosition (Point position) {
+		Point result = new Point(0, 0);
+		int genericPos = 0;
+		int codedPos = 0;
+		int index;
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				genericPos += String.format("<%d>", codes.get(index).getID()).length();
+				codedPos += 2;
+				break;
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				genericPos += String.format("</%d>", codes.get(index).getID()).length();
+				codedPos += 2;
+				break;
+			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				genericPos += String.format("<%d/>", codes.get(index).getID()).length();
+				codedPos += 2;
+				break;
+			default:
+				genericPos++;
+				codedPos++;
+				break;
+			}
+			if ( genericPos == position.x ) {
+				result.x = codedPos;
+				if ( position.x == position.y ) {
+					result.y = result.x;
+					return result;
+				}
+			}
+			if ( genericPos == position.y ) {
+				result.y = codedPos;
+				return result;
+			}
+		}
+		// Else: out-of-bounds or within an in-line code
+		throw new InvalidPositionException (
+			String.format("Position %d or %d is invalid.", position.x, position.y));
+	}
 }

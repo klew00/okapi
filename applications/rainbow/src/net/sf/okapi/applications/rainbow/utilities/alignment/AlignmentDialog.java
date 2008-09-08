@@ -39,10 +39,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import sf.okapi.lib.ui.segmentation.GenericContent;
 
 public class AlignmentDialog {
 	
@@ -57,14 +60,19 @@ public class AlignmentDialog {
 	private Button           btMoveUp; 
 	private Button           btMoveDown; 
 	private Button           btMerge; 
-	private Button           btSync;
+	private Button           btSplit;
 	private Text             edSource;
 	private Text             edTarget;
+	private Text             edSrcSeg;
+	private Text             edTrgSeg;
 	private Font             textFont;
 	private Button           chkShowInlineCodes;
 	private Button           chkSyncScrolling;
 	private TextContainer    source;
 	private TextContainer    target;
+	private boolean          splitMode = false;
+	private int              indexSegToResplit;
+	private GenericContent   genericCont;
 
 
 	@Override
@@ -85,6 +93,7 @@ public class AlignmentDialog {
 
 	public AlignmentDialog (Shell parent)
 	{
+		genericCont = new GenericContent();
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		shell.setText("Alignment Verification");
@@ -122,7 +131,7 @@ public class AlignmentDialog {
 		srcList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromSource();
-				else updateSourceDisplay();
+				else updateSourceSegmentDisplay();
 			}
 		});
 		
@@ -131,7 +140,7 @@ public class AlignmentDialog {
 		trgList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
-				else updateTargetDisplay();
+				else updateTargetSegmentDisplay();
 			}
 		});
 
@@ -155,8 +164,8 @@ public class AlignmentDialog {
 		chkShowInlineCodes.setText("Display generic inline codes");
 		chkShowInlineCodes.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateSourceDisplay();
-				updateTargetDisplay();
+				fillSourceList(srcList.getSelectionIndex());
+				fillTargetList(trgList.getSelectionIndex());
 			}
 		});
 
@@ -189,14 +198,41 @@ public class AlignmentDialog {
 			}
 		});
 		
-		btSync = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Synchronize", buttonWidth);
-		btSync.addSelectionListener(new SelectionAdapter() {
+		btSplit = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Split...", buttonWidth);
+		btSplit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				moveToSynchronize();
+				if ( splitMode ) endSplitMode(true);
+				else startSplitMode();
 			}
 		});
 
 		//--- Edit boxes
+		
+		edSrcSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		edSrcSeg.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 16;
+		edSrcSeg.setLayoutData(gdTmp);
+		Font font = edSrcSeg.getFont();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(10);
+		textFont = new Font(font.getDevice(), fontData[0]);
+		edSrcSeg.setFont(textFont);
+		
+		edTrgSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		edTrgSeg.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 16;
+		edTrgSeg.setLayoutData(gdTmp);
+		edTrgSeg.setFont(textFont);
+
+		Label label = new Label(shell, SWT.NONE);
+		label.setText("Full text unit:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		label.setLayoutData(gdTmp);
 		
 		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSource.setEditable(false);
@@ -204,11 +240,6 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 32;
 		edSource.setLayoutData(gdTmp);
-		Font font = edSource.getFont();
-		FontData[] fontData = font.getFontData();
-		fontData[0].setHeight(10);
-		textFont = new Font(font.getDevice(), fontData[0]);
-		edSource.setFont(textFont);
 		
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTarget.setEditable(false);
@@ -216,7 +247,6 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 32;
 		edTarget.setLayoutData(gdTmp);
-		edTarget.setFont(textFont);
 		
 		//--- Dialog-level buttons
 
@@ -250,54 +280,145 @@ public class AlignmentDialog {
 	}
 	
 	private void synchronizeFromSource () {
-		updateSourceDisplay();
+		updateSourceSegmentDisplay();
 		int n = srcList.getSelectionIndex();
 		if ( n >= trgList.getItemCount() ) return; // Cannot synchronize
 		trgList.select(n);
-		updateTargetDisplay();
+		updateTargetSegmentDisplay();
 	}
 
 	private void synchronizeFromTarget () {
-		updateTargetDisplay();
+		updateTargetSegmentDisplay();
 		int n = trgList.getSelectionIndex();
 		if ( n >= srcList.getItemCount() ) return; // Cannot synchronize
 		srcList.select(n);
-		updateSourceDisplay();
+		updateSourceSegmentDisplay();
 	}
 
 	private void updateSourceDisplay () {
-		int n = srcList.getSelectionIndex();
-		if ( n < 0 ) edSource.setText("");
-		edSource.setText(srcList.getItem(n));
+		edSource.setText(genericCont.printSegmentedContent(source, true));
 	}
 	
 	private void updateTargetDisplay () {
+		edTarget.setText(genericCont.printSegmentedContent(target, true));
+	}
+	
+	private void updateSourceSegmentDisplay () {
+		int n = srcList.getSelectionIndex();
+		if ( n < 0 ) edSrcSeg.setText("");
+		edSrcSeg.setText(srcList.getItem(n));
+	}
+	
+	private void updateTargetSegmentDisplay () {
 		int n = trgList.getSelectionIndex();
-		if ( n < 0 ) edTarget.setText("");
-		edTarget.setText(trgList.getItem(n));
+		if ( n < 0 ) edTrgSeg.setText("");
+		edTrgSeg.setText(trgList.getItem(n));
 
 		n = trgList.getSelectionIndex();
 		int count = trgList.getItemCount();
 		btMoveUp.setEnabled(n>0);
 		btMoveDown.setEnabled(( n < count-1 ) && ( n > -1 ));
 		btMerge.setEnabled(n>0);
-		btSync.setEnabled(( count > 1 ) && ( n > -1 ));
+		btSplit.setEnabled(( count > 1 ) && ( n > -1 ));
 	}
 	
 	private void moveUp () {
-		updateTargetDisplay();
+		updateTargetSegmentDisplay();
 	}
 	
 	private void moveDown () {
-		updateTargetDisplay();
+		updateTargetSegmentDisplay();
 	}
 	
 	private void mergeWithAbove () {
-		updateTargetDisplay();
+		try {
+			if ( splitMode ) {
+				endSplitMode(false);
+				return;
+			}
+			int n = trgList.getSelectionIndex();
+			if ( n < 1  ) return;
+			target.joinSegmentWithNext(n-1);
+			updateTargetDisplay();
+			fillTargetList(n-1);
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 	
-	private void moveToSynchronize () {
-		updateTargetDisplay();
+	private void startSplitMode () {
+		indexSegToResplit = trgList.getSelectionIndex();
+		if ( indexSegToResplit == -1 ) return;
+		splitMode = true;
+		
+		genericCont.setContent(target.getSegments().get(indexSegToResplit));
+		edTrgSeg.setText(genericCont.toString());
+		
+		edTrgSeg.setEditable(true);
+		edTrgSeg.setFocus();
+		edSrcSeg.setText("To split: Place the cursor between the characters where you want to split the target segment, and press \"Accept\"\n"
+			+ "To cancel: Press \"Discard\"");
+		btSplit.setText("Accept");
+		shell.setDefaultButton(btSplit);
+		btMerge.setText("Discard");
+		btMerge.setEnabled(true); // Make sure it's enabled
+		srcList.setEnabled(false);
+		trgList.setEnabled(false);
+		btMoveUp.setVisible(false);
+		btMoveDown.setVisible(false);
+		chkShowInlineCodes.setVisible(false);
+		chkSyncScrolling.setVisible(false);
+	}
+	
+	private void endSplitMode (boolean accept) {
+		try {
+			// Compute the new segmentation
+			if ( accept ) {
+				// genericCont is already set with the proper text
+				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
+				splitSegment(indexSegToResplit, sel.x, sel.y);
+			}
+			// Reset the controls
+			edTrgSeg.setEditable(false);
+			btSplit.setText("Split...");
+			btMerge.setText("Merge with Above");
+			srcList.setEnabled(true);
+			trgList.setEnabled(true);
+			btMoveUp.setVisible(true);
+			btMoveDown.setVisible(true);
+			chkShowInlineCodes.setVisible(true);
+			chkSyncScrolling.setVisible(true);
+			splitMode = false;
+			// Update the display
+			if ( accept ) {
+				updateTargetDisplay();
+				fillTargetList(indexSegToResplit);
+			}
+			else updateTargetSegmentDisplay();
+			
+			shell.setDefaultButton(pnlActions.btOK);
+			trgList.setFocus();
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void splitSegment (int segIndex,
+		int start,
+		int end)
+	{
+		// No split if location is not a range and is not inside text
+		if (( start == end ) && ( start == 0 )) return;
+		// Merge the segment to re-split
+		int pos = target.mergeSegment(segIndex);
+		// Now pos value is the position 0 of the segment character indices
+		if ( pos == -1 ) return; // Segment index not found
+		// First new segment goes from start of original to start selection
+		target.createSegment(pos, pos+start);
+		// Second new segment goes from end selection to end of original segment
+		target.createSegment(pos+end, -1);
 	}
 	
 	public void close () {
@@ -337,25 +458,39 @@ public class AlignmentDialog {
 		if ( shell.getMinimized() ) shell.setMinimized(false);
 	}
 
-	private void setData ()
-	{
-		srcList.removeAll();
+	private void fillTargetList (int selection) {
 		trgList.removeAll();
-		for ( TextFragment tf : source.getSegments() ) {
-			srcList.add(tf.toString());
-		}
-		if ( srcList.getItemCount() > 0 ) srcList.select(0);
-		
+		boolean useGeneric = chkShowInlineCodes.getSelection();
 		for ( TextFragment tf : target.getSegments() ) {
-			trgList.add(tf.toString());
+			if ( useGeneric ) trgList.add(genericCont.setContent(tf).toString());
+			else trgList.add(tf.toString());
 		}
-		if ( trgList.getItemCount() > 0 ) trgList.select(0);
+		if (( trgList.getItemCount() > 0 ) && ( selection < trgList.getItemCount() )) 
+			trgList.select(selection);
+		updateTargetSegmentDisplay();
+	}
+	
+	private void fillSourceList (int selection) {
+		srcList.removeAll();
+		boolean useGeneric = chkShowInlineCodes.getSelection();
+		for ( TextFragment tf : source.getSegments() ) {
+			if ( useGeneric ) srcList.add(genericCont.setContent(tf).toString());
+			else srcList.add(tf.toString());
+		}
+		if (( srcList.getItemCount() > 0 ) && ( selection < srcList.getItemCount() )) 
+			srcList.select(selection);
+		updateSourceSegmentDisplay();
+	}
+	
+	private void setData () {
 		updateSourceDisplay();
+		fillSourceList(0);
 		updateTargetDisplay();
+		fillTargetList(0);
 	}
 	
 	private boolean saveData () {
-		
+		if ( splitMode ) return false;
 		return true;
 	}
 }

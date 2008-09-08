@@ -36,6 +36,9 @@ public class Parameters extends BaseParameters {
 	protected boolean   applyToExistingTarget;
 	protected boolean   addName;
 	protected boolean   addID;
+	protected boolean   segment;
+	protected String    sourceSrxPath;
+	protected String    targetSrxPath;
 	
 	
 	public Parameters () {
@@ -55,6 +58,9 @@ public class Parameters extends BaseParameters {
 		applyToExistingTarget = tmp.get("applyToExistingTarget", applyToExistingTarget);
 		addName = tmp.get("addName", addName);
 		addID = tmp.get("addID", addID);
+		segment = tmp.get("segment", segment);
+		sourceSrxPath = tmp.get("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = tmp.get("targetSrxPath", targetSrxPath);
 	}
 
 	@Override
@@ -67,6 +73,9 @@ public class Parameters extends BaseParameters {
 		applyToExistingTarget = false;
 		addName = false;
 		addID = false;
+		segment = false;
+		sourceSrxPath = "";
+		targetSrxPath = "";
 	}
 
 	@Override
@@ -81,6 +90,9 @@ public class Parameters extends BaseParameters {
 		tmp.add("applyToExistingTarget", applyToExistingTarget);
 		tmp.add("addName", addName);
 		tmp.add("addID", addID);
+		tmp.add("segment", segment);
+		tmp.add("sourceSrxPath", sourceSrxPath);
+		tmp.add("targetSrxPath", targetSrxPath);
 		return tmp.toString();
 	}
 	

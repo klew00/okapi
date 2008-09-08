@@ -159,6 +159,7 @@ public class Writer extends BaseWriter {
 					buffer.append(Util.RTF_ENDINLINE);
 					break;
 				case TextFragment.MARKER_ISOLATED:
+				case TextFragment.MARKER_SEGMENT:
 					//TODO: handle sub-flows!!!
 					code = content.getCode(text.charAt(++i));
 					if ( isSegmented ) {

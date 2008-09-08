@@ -91,6 +91,7 @@ public class TMXContent {
 				tmp.append("</ept>");
 				break;
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				id = code.getID();
@@ -117,6 +118,11 @@ public class TMXContent {
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
 					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
 					tmp.append("</it>");
+					break;
+				case SEGMENTHOLDER: // Should not really be used
+					tmp.append(String.format("<ph x=\"%d\">", id));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+					tmp.append("</ph>");
 					break;
 				}
 				

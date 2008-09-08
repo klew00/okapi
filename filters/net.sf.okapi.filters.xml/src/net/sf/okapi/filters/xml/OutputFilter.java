@@ -229,6 +229,7 @@ public class OutputFilter implements IOutputFilter {
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				code = item.getCode(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(code.getData());
 				break;

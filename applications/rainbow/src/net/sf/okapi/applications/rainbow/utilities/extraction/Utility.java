@@ -182,7 +182,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 	
 	@Override
     public void endExtractionItem (TextUnit item ) {
-		//int status = IFilterItem.TSTATUS_TOTRANS;
+		//TODO: int status = IFilterItem.TSTATUS_TOTRANS;
 		//if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
 		//else if ( sourceItem.hasTarget() ) status = IFilterItem.TSTATUS_TOEDIT;
 

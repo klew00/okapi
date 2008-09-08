@@ -98,6 +98,7 @@ public class XLIFFContent {
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				id = codes.get(index).getID();
 				if ( codeOnlyMode ) {
@@ -162,6 +163,7 @@ public class XLIFFContent {
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {

@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -217,16 +216,12 @@ public class Segmenter {
 	public Point getNextSegmentRange (TextContainer container) {
 		String text = container.getCodedText();
 		int start = 0;
-		Code code;
 		if ( container.isSegmented() ) {
 			// Find the last segment marker in the main coded text
 			for ( int i=text.length()-1; i>=0; i-- ) {
-				if ( text.charAt(i) == TextContainer.MARKER_ISOLATED ) {
-					code = container.getCode(text.charAt(i+1));
-					if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-						start = i+2; // Just after the marker
-						break;
-					}
+				if ( text.charAt(i) == TextContainer.MARKER_SEGMENT ) {
+					start = i+2; // Just after the marker
+					break;
 				}
 			}
 		}

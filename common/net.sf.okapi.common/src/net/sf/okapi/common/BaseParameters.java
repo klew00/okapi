@@ -111,7 +111,7 @@ public abstract class BaseParameters implements IParameters {
 
 			// Read the file in one string
 			StringBuilder sbTmp = new StringBuilder(1024);
-			char[] aBuf = new char[10];
+			char[] aBuf = new char[100];
 			int nCount;
 			while ((nCount = SR.read(aBuf)) > -1) {
 				sbTmp.append(aBuf, 0, nCount);	

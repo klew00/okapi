@@ -448,7 +448,7 @@ public class Editor implements IParametersEditor {
 	
 	private void editFinderRules () {
 		try {
-			Rule rule = rules.get(ruleIndex);
+			//Rule rule = rules.get(ruleIndex);
 			InlineCodeFinderDialog dlg = 
 				new InlineCodeFinderDialog(shell, "In-Line Codes Patterns", null);
 			//TODO: dlg.setData(rule.);

@@ -83,16 +83,15 @@ public class TextContainer extends TextFragment {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
 				i++;
 				break;
-			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				Code code = codes.get(toIndex(text.charAt(++i)));
-				if ( code.type.equals(CODETYPE_SEGMENT) ) {
-					if ( Integer.parseInt(code.data) == segmentIndex ) {
-						return subSequence(start, i-1);
-					}
-					else start = i+1; // Reset the start of the fragment
+				if ( Integer.parseInt(code.data) == segmentIndex ) {
+					return subSequence(start, i-1);
 				}
+				else start = i+1; // Reset the start of the fragment
 			}
 		}
 		return null;
@@ -111,17 +110,16 @@ public class TextContainer extends TextFragment {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
 				i++;
 				break;
-			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				Code code = codes.get(toIndex(text.charAt(++i)));
-				if ( code.type.equals(CODETYPE_SEGMENT) ) {
-					if ( Integer.parseInt(code.data) == segmentIndex ) {
-						start = i+1;
-					}
-					else if ( Integer.parseInt(code.data) == segmentIndex+1 ) {
-						return subSequence(start, i-1);
-					}
+				if ( Integer.parseInt(code.data) == segmentIndex ) {
+					start = i+1;
+				}
+				else if ( Integer.parseInt(code.data) == segmentIndex+1 ) {
+					return subSequence(start, i-1);
 				}
 			}
 		}
@@ -131,12 +129,11 @@ public class TextContainer extends TextFragment {
 	}
 
 	/**
-	 * Segment this object into one or more segments corresponding to given ranges in 
+	 * Segments this object into one or more segments corresponding to given ranges in 
 	 * the coded text. If the object is already segmented, it will be automatically
-	 * un-segmented first. Use {@link #mergeAllSegments()} to rebuild the original 
-	 * un-segmented object.
+	 * un-segmented first.
 	 * <p>The segments are accessible with {@link #getSegments()}. The coded text
-	 * of the main object, becomes a place holder strings for the inter-segment content. 
+	 * of the main object, becomes a place-holder string for the inter-segment content. 
 	 * @param ranges List of the ranges corresponding to the segments. They must be
 	 * expressed in coded text units, never overlap, and be ordered from the left-most
 	 * to the right-most.
@@ -158,23 +155,22 @@ public class TextContainer extends TextFragment {
 			segments.add(subSequence(ranges.get(i).x+diff, ranges.get(i).y+diff));
 			// Remove it from the main content
 			int width = ranges.get(i).y-ranges.get(i).x;
-			// For chunk <s 2 there is no codes so we can just add the needed room for insertion
+			// For chunks < 2 there is no codes so we can just add the needed room for the segment marker
 			if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment("Z"));
 			else if ( width == 0 ) insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
 			else { // Otherwise: we need to remove the chunk of coded text and its codes
 				remove(ranges.get(i).x+diff, ranges.get(i).y+diff);
-				// then re-insert room for the code
+				// then re-insert room for the segment marker
 				insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
 			}
 			
-			// Add the segment marker and its corresponding code
-			codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT, String.valueOf(i)));
-			text.setCharAt(ranges.get(i).x+diff, (char)MARKER_ISOLATED);
+			// Set the segment marker and its corresponding code
+			codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, String.valueOf(i)));
+			text.setCharAt(ranges.get(i).x+diff, (char)MARKER_SEGMENT);
 			text.setCharAt(ranges.get(i).x+diff+1, toChar(codes.size()-1));
 			// Compute the adjustment to take in account
 			diff = (text.length()-oriLength);
 		}
-		// Set the new coded text
 		// Return the number of segments
 		return segments.size();
 	}
@@ -192,18 +188,17 @@ public class TextContainer extends TextFragment {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
 				i++; // Skip
 				break;
-			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				code = getCode(text.charAt(++i));
-				if ( !code.type.equals(CODETYPE_SEGMENT) ) break;
-				// Else: it's a segment marker
-				if ( pos1 > -1 ) {
+				if ( pos1 == -1 ) { // Search for left segment
 					if ( segmentIndex == Integer.parseInt(code.data) ) {
 						pos1 = i-1;
 					}
 				}
-				else {
+				else { // Search for right segment
 					seg2Index = Integer.parseInt(code.data);
 					pos2 = i-1;
 					i = text.length(); // Stop the loop
@@ -212,17 +207,54 @@ public class TextContainer extends TextFragment {
 			}
 		}
 		
+		if ( seg2Index == -1 ) return;
+		
 		// Assumes pos1 and pos2 are > -1 now
 		// Get the inter-segment part and add it to first segment
 		segments.get(segmentIndex).append(subSequence(pos1+2, pos2));
 		// Remove inter-segment part and marker for second segment
-		remove(pos1+2, pos2+1);
+		remove(pos1+2, pos2+2);
 		// Update the indices of the remaining segments
-		//TODO: Update the indices of the remaining segments
+		renumberSegmentMarkers(pos1+2, segmentIndex+1);
 		// Add second segment to first one
 		segments.get(segmentIndex).append(segments.get(seg2Index));
 		// Remove second segment
 		segments.remove(seg2Index);
+	}
+	
+	/**
+	 * Merges a given segment back into the main coded text.
+	 * @param segmentIndex Index of the segment to merge.
+	 * @return The position (in the coded text) of the start of the merged
+	 * segment, or -1 if the segment index was not found.
+	 */
+	public int mergeSegment (int segmentIndex) {
+		Code code;
+		int pos = -1;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip
+				break;
+			case MARKER_SEGMENT:
+				code = getCode(text.charAt(++i));
+				if ( segmentIndex == Integer.parseInt(code.data) ) {
+					pos = i-1;
+					// Remove the segment marker
+					remove(pos, i+1);
+					// Insert the segment
+					insert(pos, segments.get(segmentIndex));
+					// Remove the segment from the segment list
+					segments.remove(segmentIndex);
+					// Renumber the remaining segment
+					renumberSegmentMarkers(pos, segmentIndex+1);
+					return pos;
+				}
+			}
+		}
+		return -1; // Segment index not found
 	}
 	
 	/**
@@ -244,9 +276,9 @@ public class TextContainer extends TextFragment {
 		// Add the segment to the list
 		segments.add(fragment);
 		// Create the segment marker in the main coded text
-		codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT,
+		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
 			String.valueOf(segments.size()-1)));
-		text.append(""+(char)MARKER_ISOLATED+toChar(codes.size()-1));
+		text.append(""+(char)MARKER_SEGMENT+toChar(codes.size()-1));
 	}
 	
 	/**
@@ -256,19 +288,24 @@ public class TextContainer extends TextFragment {
 	 * @param start The position of the first character or marker of the section
 	 * (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section
-	 * (in the coded text representation).
+	 * (in the coded text representation). You can use -1 to indicate the end of the
+	 * text.
 	 * @return The segment just created.
 	 */
 	public TextFragment createSegment (int start,
 		int end)
 	{
-		//TODO: Check if the section contain existing segment markers
+		// Compute end for -1
+		if ( end == -1 ) end = text.length();
+		
+		// Create lists if needed
 		if ( segments == null ) {
 			segments = new ArrayList<TextFragment>();
 		}
 		if ( codes == null ) {
 			codes = new ArrayList<Code>();
 		}
+		//TODO: Check if the section contain existing segment markers (it should not)
 
 		// Add the new segment in the list
 		segments.add(subSequence(start, end));
@@ -279,10 +316,10 @@ public class TextContainer extends TextFragment {
 		else if ( width == 0 ) insert(start, new TextFragment("ZZ"));
 		// Else width == 2 : Do nothing
 			
-		// Add the segment marker and its corresponding code
-		codes.add(new Code(TagType.PLACEHOLDER, CODETYPE_SEGMENT,
+		// Set the segment marker and its corresponding code
+		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
 			String.valueOf(segments.size()-1)));
-		text.setCharAt(start, (char)MARKER_ISOLATED);
+		text.setCharAt(start, (char)MARKER_SEGMENT);
 		text.setCharAt(start+1, toChar(codes.size()-1));
 		
 		// Return the created segment
@@ -303,12 +340,11 @@ public class TextContainer extends TextFragment {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
 				i++; // Skip
 				break;
-			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				code = getCode(text.charAt(++i));
-				if ( !code.type.equals(CODETYPE_SEGMENT) ) break;
-				// Else: it's a segment marker
 				int index = Integer.parseInt(code.data);
 				int add = segments.get(index).getCodedText().length();
 				// Remove the segment marker
@@ -324,5 +360,31 @@ public class TextContainer extends TextFragment {
 		// Re-initialize the list of segments
 		segments.clear();
 		segments = null;
+	}
+	
+	/**
+	 * Renumbers, from a given value, the segment indices associated to the 
+	 * segment markers located after a given position. 
+	 * @param start Start position (in coded text) where the renumbering should start.
+	 * @param indexValue Value to use as first index value of the renumbering.
+	 */
+	private void renumberSegmentMarkers (int start,
+		int indexValue)
+	{
+		Code code;
+		for ( int i=start; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip
+				break;
+			case MARKER_SEGMENT:
+				code = getCode(text.charAt(++i));
+				code.data = String.valueOf(indexValue++);
+				break;
+			}
+		}
+		
 	}
 }

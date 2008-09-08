@@ -96,72 +96,85 @@ public class MainForm implements IParametersProvider {
 	private ArrayList<Table>           inputTables;
 	private ArrayList<InputTableModel> inputTableMods;
 
-	private Shell            shell;
-	private ILog             log;
-	private LogHandler       logHandler;
-	private String           rootFolder;
-	private String           sharedFolder;
-	private Project          prj;
-	private StatusBar        statusBar;
-	private TabFolder        tabFolder;
-	private Text             edInputRoot;
-	private Button           btGetRoot;
-	private Button           chkUseOutputRoot;
-	private Text             edOutputRoot;
-	private Text             edSourceLang;
-	private List             lbSourceLang;
-	private boolean          inSourceLangSelection;
-	private Text             edSourceEnc;
-	private List             lbSourceEnc;
-	private boolean          inSourceEncSelection;
-	private Text             edTargetLang;
-	private List             lbTargetLang;
-	private boolean          inTargetLangSelection;
-	private Text             edTargetEnc;
-	private List             lbTargetEnc;
-	private boolean          inTargetEncSelection;
-	private Button           chkUseCustomParametersFolder;
-	private Text             edParamsFolder;
-	private TabItem          tiInputList1;
-	private TabItem          tiInputList2;
-	private TabItem          tiInputList3;
-	private TabItem          tiOptions;
-	private PathBuilderPanel pnlPathBuilder;
-	private int              waitCount;
-	private boolean          startLogWasRequested;
-	private LanguageManager  lm;
-	private ResourceManager  rm;
-	private FormatManager    fm;
-	private FilterAccess     fa;
-	private EncodingManager  em;
-	private PluginsAccess    plugins;
-	private UtilityDriver    ud;
-	private MenuItem         miInput;
-	private MenuItem         miUtilities;
-	private MenuItem         miHelp;
-	private MenuItem         miSave;
-	private MenuItem         miTools;
-	private MenuItem         miEditInputProperties;
-	private MenuItem         cmiEditInputProperties;
-	private MenuItem         miOpenInputDocument;
-	private MenuItem         cmiOpenInputDocument;
-	private MenuItem         miRemoveInputDocuments;
-	private MenuItem         cmiRemoveInputDocuments;
-	private MenuItem         miMoveDocumentsUp;
-	private MenuItem         cmiMoveDocumentsUp;
-	private MenuItem         miMoveDocumentsDown;
-	private MenuItem         cmiMoveDocumentsDown;
-	private MenuItem         miOpenFolder;
-	private MenuItem         cmiOpenFolder;
-	private MenuItem         miOpenOutputFolder;
-	
+	private Shell                 shell;
+	private ILog                  log;
+	private LogHandler            logHandler;
+	private UserConfiguration     config;
+	private String                rootFolder;
+	private String                sharedFolder;
+	private Project               prj;
+	private StatusBar             statusBar;
+	private TabFolder             tabFolder;
+	private Text                  edInputRoot;
+	private Button                btGetRoot;
+	private Button                chkUseOutputRoot;
+	private Text                  edOutputRoot;
+	private Text                  edSourceLang;
+	private List                  lbSourceLang;
+	private boolean               inSourceLangSelection;
+	private Text                  edSourceEnc;
+	private List                  lbSourceEnc;
+	private boolean               inSourceEncSelection;
+	private Text                  edTargetLang;
+	private List                  lbTargetLang;
+	private boolean               inTargetLangSelection;
+	private Text                  edTargetEnc;
+	private List                  lbTargetEnc;
+	private boolean               inTargetEncSelection;
+	private Button                chkUseCustomParametersFolder;
+	private Text                  edParamsFolder;
+	private TabItem               tiInputList1;
+	private TabItem               tiInputList2;
+	private TabItem               tiInputList3;
+	private TabItem               tiOptions;
+	private PathBuilderPanel      pnlPathBuilder;
+	private int                   waitCount;
+	private boolean               startLogWasRequested;
+	private LanguageManager       lm;
+	private ResourceManager       rm;
+	private FormatManager         fm;
+	private FilterAccess          fa;
+	private EncodingManager       em;
+	private PluginsAccess         plugins;
+	private UtilityDriver         ud;
+	private MenuItem              miInput;
+	private MenuItem              miUtilities;
+	private MenuItem              miHelp;
+	private MenuItem              miSave;
+	private MenuItem              miTools;
+	private MenuItem              miEditInputProperties;
+	private MenuItem              cmiEditInputProperties;
+	private MenuItem              miOpenInputDocument;
+	private MenuItem              cmiOpenInputDocument;
+	private MenuItem              miRemoveInputDocuments;
+	private MenuItem              cmiRemoveInputDocuments;
+	private MenuItem              miMoveDocumentsUp;
+	private MenuItem              cmiMoveDocumentsUp;
+	private MenuItem              miMoveDocumentsDown;
+	private MenuItem              cmiMoveDocumentsDown;
+	private MenuItem              miOpenFolder;
+	private MenuItem              cmiOpenFolder;
+	private MenuItem              miOpenOutputFolder;
+
+	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+
 	public MainForm (Shell p_Shell) {
 		try {
 			shell = p_Shell;
+			
 			setDirectories();
 			loadResources();
+
+			config = new UserConfiguration();
+			config.load();
+			
 			createContent();
+
 			createProject(false);
+			if ( config.getBoolean("loadLastFile") ) { //$NON-NLS-1$
+				String path = config.getProperty("lastFile"); //$NON-NLS-1$
+				if ( path != null ) openProject(path);
+			}
 		}
 		catch ( Throwable E ) {
 			Dialogs.showError(shell, E.getMessage(), null);			
@@ -173,12 +186,13 @@ public class MainForm implements IParametersProvider {
 	{
 		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
-		shell.setImage(rm.getImage("Rainbow"));
+		shell.setImage(rm.getImage("Rainbow")); //$NON-NLS-1$
 		
 		// Handling of the closing event
 		shell.addShellListener(new ShellListener() {
 			public void shellActivated(ShellEvent event) {}
 			public void shellClosed(ShellEvent event) {
+				saveUserConfiguration();
 				if ( !canContinue() ) event.doit = false;
 			}
 			public void shellDeactivated(ShellEvent event) {}
@@ -187,14 +201,16 @@ public class MainForm implements IParametersProvider {
 		});
 
 		log = new LogForm(shell);
-		log.setTitle(Res.getString("LOG_CAPTION"));
+		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
 		logHandler = new LogHandler(log);
-	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler);
+	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler); //$NON-NLS-1$
 
 		fa = new FilterAccess();
-		fa.loadList(sharedFolder + File.separator + "filters.xml");
+		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		//TODO: Define default editor in user preferences!
-		fa.setDefaultEditor("notepad");
+		String tmp = config.getProperty("defaultEditor"); //$NON-NLS-1$
+		//TODO: get default text editor from system if possible
+		fa.setDefaultEditor(tmp==null ? "notepad" : tmp); //$NON-NLS-1$
 
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -202,12 +218,12 @@ public class MainForm implements IParametersProvider {
 
 		// File menu
 		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText(rm.getCommandLabel("file"));
+		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 		
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "file.new");
+		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				createProject(true);
@@ -215,7 +231,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "file.open");
+		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openProject(null);
@@ -225,7 +241,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		miSave = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miSave, "file.save");
+		rm.setCommand(miSave, "file.save"); //$NON-NLS-1$
 		miSave.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
             	saveProject(prj.path);
@@ -233,7 +249,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		miSave = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miSave, "file.saveas");
+		rm.setCommand(miSave, "file.saveas"); //$NON-NLS-1$
 		miSave.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
             	saveProject(null);
@@ -243,7 +259,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "file.exit");
+		rm.setCommand(menuItem, "file.exit"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				shell.close();
@@ -252,12 +268,12 @@ public class MainForm implements IParametersProvider {
 
 		// View menu
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText(rm.getCommandLabel("view"));
+		topItem.setText(rm.getCommandLabel("view")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.inputList1");
+		rm.setCommand(menuItem, "view.inputList1"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(0);
@@ -266,7 +282,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.inputList2");
+		rm.setCommand(menuItem, "view.inputList2"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(1);
@@ -275,7 +291,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.inputList3");
+		 rm.setCommand(menuItem, "view.inputList3"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(2);
@@ -284,7 +300,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.langAndEnc");
+		rm.setCommand(menuItem, "view.langAndEnc"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(3);
@@ -293,7 +309,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.otherSettings");
+		rm.setCommand(menuItem, "view.otherSettings"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(4);
@@ -304,7 +320,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.log");
+		rm.setCommand(menuItem, "view.log"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( log.isVisible() ) log.hide();
@@ -314,12 +330,12 @@ public class MainForm implements IParametersProvider {
 		
 		// Input menu
 		miInput = new MenuItem(menuBar, SWT.CASCADE);
-		miInput.setText(rm.getCommandLabel("input"));
+		miInput.setText(rm.getCommandLabel("input")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miInput.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "input.addDocuments");
+		rm.setCommand(menuItem, "input.addDocuments"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				addDocumentsFromList(null);
@@ -327,7 +343,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		miRemoveInputDocuments = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miRemoveInputDocuments, "input.removeDocuments");
+		rm.setCommand(miRemoveInputDocuments, "input.removeDocuments"); //$NON-NLS-1$
 		miRemoveInputDocuments.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				removeDocuments(-1);
@@ -337,7 +353,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		miOpenInputDocument = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miOpenInputDocument, "input.openDocument");
+		rm.setCommand(miOpenInputDocument, "input.openDocument"); //$NON-NLS-1$
 		miOpenInputDocument.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openDocument(-1);
@@ -345,7 +361,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		miOpenFolder = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miOpenFolder, "input.openFolder");
+		rm.setCommand(miOpenFolder, "input.openFolder"); //$NON-NLS-1$
 		miOpenFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openContainingFolder(-1);
@@ -355,7 +371,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		miMoveDocumentsUp = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miMoveDocumentsUp, "input.moveDocumentsUp");
+		rm.setCommand(miMoveDocumentsUp, "input.moveDocumentsUp"); //$NON-NLS-1$
 		miMoveDocumentsUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsUp();
@@ -363,7 +379,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		miMoveDocumentsDown = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miMoveDocumentsDown, "input.moveDocumentsDown");
+		rm.setCommand(miMoveDocumentsDown, "input.moveDocumentsDown"); //$NON-NLS-1$
 		miMoveDocumentsDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsDown();
@@ -373,7 +389,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		miEditInputProperties = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miEditInputProperties, "input.editProperties");
+		rm.setCommand(miEditInputProperties, "input.editProperties"); //$NON-NLS-1$
 		miEditInputProperties.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editInputProperties(-1);
@@ -382,24 +398,24 @@ public class MainForm implements IParametersProvider {
 		
 		// Utilities menu
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
-		miUtilities.setText(rm.getCommandLabel("utilities"));
+		miUtilities.setText(rm.getCommandLabel("utilities")); //$NON-NLS-1$
 		buildUtilitiesMenu();
 
 		// Tools menu
 		miTools = new MenuItem(menuBar, SWT.CASCADE);
-		miTools.setText(rm.getCommandLabel("tools"));
+		miTools.setText(rm.getCommandLabel("tools")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miTools.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "tools.editsegrules");
+		rm.setCommand(menuItem, "tools.editsegrules"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editSegmentationRules(null);
 			}
 		});
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "tools.listencodings");
+		rm.setCommand(menuItem, "tools.listencodings"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				listEncodings();
@@ -408,12 +424,12 @@ public class MainForm implements IParametersProvider {
 
 		// Help menu
 		miHelp = new MenuItem(menuBar, SWT.CASCADE);
-		miHelp.setText(rm.getCommandLabel("help"));
+		miHelp.setText(rm.getCommandLabel("help")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miHelp.setMenu(dropMenu);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.topics");
+		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help main topics
@@ -422,7 +438,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.howtouse");
+		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help 'how to use...'
@@ -433,7 +449,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.update");
+		rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
@@ -442,7 +458,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.feedback");
+		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Rainbow)");
@@ -450,23 +466,24 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.users");
+		rm.setCommand(menuItem, "help.users"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("http://groups.yahoo.com/group/okapitools/");
+				UIUtil.start("http://groups.yahoo.com/group/okapitools/"); //$NON-NLS-1$
 			}
 		});
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "help.about");
+		rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
 				dlg.setText("About Rainbow");
 				dlg.setMessage("Rainbow - Okapi Localization Toolbox\n"
-					+"Version "+Res.getString("VERSION"));
+					+"Version "
+					+Res.getString("VERSION")); //$NON-NLS-1$
 				dlg.open();
 			}
 		});
@@ -474,14 +491,14 @@ public class MainForm implements IParametersProvider {
 		
 		// Root panel
 		Label label = new Label(shell, SWT.NONE);
-		label.setText(Res.getString("MAIN_INPUTROOT"));
+		label.setText(Res.getString("MAIN_INPUTROOT")); //$NON-NLS-1$
 		
 		edInputRoot = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		edInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edInputRoot.setEditable(false);
 		
 		btGetRoot = new Button(shell, SWT.PUSH);
-		btGetRoot.setText(" ... ");
+		btGetRoot.setText(" ... "); //$NON-NLS-1$
 		btGetRoot.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				changeRoot();
@@ -502,7 +519,7 @@ public class MainForm implements IParametersProvider {
 		Composite comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiInputList1 = new TabItem(tabFolder, SWT.NONE);
-		tiInputList1.setText(Res.getString("tiInputList1"));
+		tiInputList1.setText(Res.getString("tiInputList1")); //$NON-NLS-1$
 		tiInputList1.setControl(comp);
 		buildInputTab(0, comp);
 		
@@ -510,7 +527,7 @@ public class MainForm implements IParametersProvider {
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiInputList2 = new TabItem(tabFolder, SWT.NONE);
-		tiInputList2.setText(Res.getString("tiInputList2"));
+		tiInputList2.setText(Res.getString("tiInputList2")); //$NON-NLS-1$
 		tiInputList2.setControl(comp);
 		buildInputTab(1, comp);
 		
@@ -518,7 +535,7 @@ public class MainForm implements IParametersProvider {
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiInputList3 = new TabItem(tabFolder, SWT.NONE);
-		tiInputList3.setText(Res.getString("tiInputList3"));
+		tiInputList3.setText(Res.getString("tiInputList3")); //$NON-NLS-1$
 		tiInputList3.setControl(comp);
 		buildInputTab(2, comp);
 		
@@ -526,7 +543,7 @@ public class MainForm implements IParametersProvider {
 		Menu inputTableMenu = new Menu(shell, SWT.POP_UP);
 		
 		menuItem = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "input.addDocuments");
+		rm.setCommand(menuItem, "input.addDocuments"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				addDocumentsFromList(null);
@@ -534,7 +551,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		cmiRemoveInputDocuments = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiRemoveInputDocuments, "input.removeDocuments");
+		rm.setCommand(cmiRemoveInputDocuments, "input.removeDocuments"); //$NON-NLS-1$
 		cmiRemoveInputDocuments.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				removeDocuments(-1);
@@ -544,7 +561,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
 		cmiOpenInputDocument = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiOpenInputDocument, "input.openDocument");
+		rm.setCommand(cmiOpenInputDocument, "input.openDocument"); //$NON-NLS-1$
 		cmiOpenInputDocument.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openDocument(-1);
@@ -552,7 +569,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		cmiOpenFolder = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiOpenFolder, "input.openFolder");
+		rm.setCommand(cmiOpenFolder, "input.openFolder"); //$NON-NLS-1$
 		cmiOpenFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openContainingFolder(-1);
@@ -562,7 +579,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
 		cmiMoveDocumentsUp = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiMoveDocumentsUp, "input.moveDocumentsUp");
+		rm.setCommand(cmiMoveDocumentsUp, "input.moveDocumentsUp"); //$NON-NLS-1$
 		cmiMoveDocumentsUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsUp();
@@ -570,7 +587,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		cmiMoveDocumentsDown = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiMoveDocumentsDown, "input.moveDocumentsDown");
+		rm.setCommand(cmiMoveDocumentsDown, "input.moveDocumentsDown"); //$NON-NLS-1$
 		cmiMoveDocumentsDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsDown();
@@ -580,7 +597,7 @@ public class MainForm implements IParametersProvider {
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
 		cmiEditInputProperties = new MenuItem(inputTableMenu, SWT.PUSH);
-		rm.setCommand(cmiEditInputProperties, "input.editProperties");
+		rm.setCommand(cmiEditInputProperties, "input.editProperties"); //$NON-NLS-1$
 		cmiEditInputProperties.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editInputProperties(-1);
@@ -596,16 +613,16 @@ public class MainForm implements IParametersProvider {
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiOptions = new TabItem(tabFolder, SWT.NONE);
-		tiOptions.setText(Res.getString("OPTTAB_CAPTION"));
+		tiOptions.setText(Res.getString("OPTTAB_CAPTION")); //$NON-NLS-1$
 		tiOptions.setControl(comp);
 		
 		Group group = new Group(comp, SWT.NONE);
-		group.setText(Res.getString("OPTTAB_GRPSOURCE"));
+		group.setText(Res.getString("OPTTAB_GRPSOURCE")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout(4, false));
 		
 		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_LANG"));
+		label.setText(Res.getString("OPTTAB_LANG")); //$NON-NLS-1$
 		
 		edSourceLang = new Text(group, SWT.BORDER);
 		edSourceLang.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -616,7 +633,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_ENC"));
+		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
 		
 		edSourceEnc = new Text(group, SWT.BORDER);
 		edSourceEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -660,12 +677,12 @@ public class MainForm implements IParametersProvider {
 		});
 
 		group = new Group(comp, SWT.NONE);
-		group.setText(Res.getString("OPTTAB_GRPTARGET"));
+		group.setText(Res.getString("OPTTAB_GRPTARGET")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout(4, false));
 		
 		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_LANG"));
+		label.setText(Res.getString("OPTTAB_LANG")); //$NON-NLS-1$
 		
 		edTargetLang = new Text(group, SWT.BORDER);
 		edTargetLang.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -676,7 +693,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_ENC"));
+		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
 		
 		edTargetEnc = new Text(group, SWT.BORDER);
 		edTargetEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -722,15 +739,15 @@ public class MainForm implements IParametersProvider {
 		LanguageItem li;
 		for ( int i=0; i<lm.getCount(); i++ ) {
 			li = lm.getItem(i);
-			lbSourceLang.add(li.name + "  -  " + li.code);
-			lbTargetLang.add(li.name + "  -  " + li.code);
+			lbSourceLang.add(li.name + "  -  " + li.code); //$NON-NLS-1$
+			lbTargetLang.add(li.name + "  -  " + li.code); //$NON-NLS-1$
 		}
 		
 		EncodingItem ei;
 		for ( int i=0; i<em.getCount(); i++ ) {
 			ei = em.getItem(i);
-			lbSourceEnc.add(ei.name + "  -  " + ei.ianaName);
-			lbTargetEnc.add(ei.name + "  -  " + ei.ianaName);
+			lbSourceEnc.add(ei.name + "  -  " + ei.ianaName); //$NON-NLS-1$
+			lbTargetEnc.add(ei.name + "  -  " + ei.ianaName); //$NON-NLS-1$
 		}
 		
 		// Other settings tab
@@ -865,7 +882,8 @@ public class MainForm implements IParametersProvider {
 					String[] paths = (String[])e.data;
 					if ( paths != null ) {
 						if ( paths.length == 1 ) {
-							//if ( Utils.getFilename(aPaths[0], true).toLowerCase().equals("manifest.xml") ) {
+							//TODO: implement list of input for manifest
+							//if ( Utils.getFilename(aPaths[0], true).toLowerCase().equals("manifest.xml") ) {  //$NON-NLS-1$
 							//	m_C.importPackage(aPaths[0]);
 							//	return;
 							//}
@@ -891,7 +909,7 @@ public class MainForm implements IParametersProvider {
 		
 		// Add the default entries
 		miOpenOutputFolder = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miOpenOutputFolder, "utilities.openOutputFolder");
+		rm.setCommand(miOpenOutputFolder, "utilities.openOutputFolder"); //$NON-NLS-1$
 		miOpenOutputFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( prj.getLastOutputFolder() == null ) return;
@@ -906,7 +924,7 @@ public class MainForm implements IParametersProvider {
 		while ( iter.hasNext() ) {
 			PluginItem item = plugins.getItem(iter.next());
 			MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
-			menuItem.setText(item.name+"...");
+			menuItem.setText(item.name+"..."); //$NON-NLS-1$
 			menuItem.setData(item.id);
 			menuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
@@ -1013,9 +1031,9 @@ public class MainForm implements IParametersProvider {
 	private void setDirectories () throws UnsupportedEncodingException {
     	// Get the location of the main class source
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-    	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8");
+    	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
     	// Remove the JAR file if running an installed version
-    	if ( rootFolder.endsWith(".jar") ) rootFolder = Util.getDirectoryName(rootFolder);
+    	if ( rootFolder.endsWith(".jar") ) rootFolder = Util.getDirectoryName(rootFolder); //$NON-NLS-1$
     	// Remove the application folder in all cases
     	rootFolder = Util.getDirectoryName(rootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
@@ -1069,13 +1087,14 @@ public class MainForm implements IParametersProvider {
 		throws Exception 
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
-		rm.addImage("Rainbow");
-		rm.loadCommands("commands.xml"); //TODO: deal with localization
+		rm.addImage("Rainbow"); //$NON-NLS-1$
+		//TODO: deal with commands localization
+		rm.loadCommands("commands.xml"); //$NON-NLS-1$
 		fm = new FormatManager();
 		lm = new LanguageManager();
-		lm.loadList(sharedFolder + File.separator + "languages.xml");
+		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		em = new EncodingManager();
-		em.loadList(sharedFolder + File.separator + "encodings.xml");
+		em.loadList(sharedFolder + File.separator + "encodings.xml"); //$NON-NLS-1$
 		plugins = new PluginsAccess();
 		//TODO: Choose a better location 
 		plugins.addAllPackages(sharedFolder);
@@ -1087,7 +1106,7 @@ public class MainForm implements IParametersProvider {
 				"New root folder:", prj.getInputRoot(currentInput), null);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return;
-			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home");
+			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home"); //$NON-NLS-1$
 			//TODO: additional check, dir exists, no trailing separator, etc.
 			prj.setInputRoot(currentInput, newRoot);
 			resetDisplay(currentInput);
@@ -1114,6 +1133,13 @@ public class MainForm implements IParametersProvider {
 		return inputTables.get(currentInput).getSelectionIndex();
 	}
 	
+	private void saveUserConfiguration () {
+		if ( prj != null ) {
+			config.setProperty("lastFile", prj.path); //$NON-NLS-1$
+		}
+		config.save();
+	}
+
 	private boolean canContinue () {
 		try {
 			saveSurfaceData();
@@ -1122,7 +1148,7 @@ public class MainForm implements IParametersProvider {
 				// Ask confirmation
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 				dlg.setMessage("Some project information or properties have been modified.\nDo you want to save the project?");
-				dlg.setText("Rainbow");
+				dlg.setText(APPNAME);
 				switch  ( dlg.open() ) {
 				case SWT.NO:
 					return true;
@@ -1144,7 +1170,7 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null,
-					"Rainbow Project (*.rnb)", ".rnb");
+					"Rainbow Project (*.rnb)", ".rnb"); //$NON-NLS-2$
 				if ( path == null ) return;
 			}
 			saveSurfaceData();
@@ -1158,9 +1184,12 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateTitle () {
 		shell.setText(((prj.path == null)
-			? Res.getString("UNTITLED")
+			? Res.getString("UNTITLED") //$NON-NLS-1$
 			: Util.getFilename(prj.path, true))
-			+ " - Rainbow "+Res.getString("VERSION"));
+			+ " - " //$NON-NLS-1$ 
+			+ APPNAME
+			+ " " //$NON-NLS-1$
+			+ Res.getString("VERSION")); //$NON-NLS-1$
 	}
 
 	// Use -1 for all lists
@@ -1196,7 +1225,7 @@ public class MainForm implements IParametersProvider {
 			if ( !canContinue() ) return;
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open Project", false, null,
-					"Rainbow Projects (*.rnb)\tAll Files (*.*)", "*.rnb\t*.*");
+					"Rainbow Projects (*.rnb)\tAll Files (*.*)", "*.rnb\t*.*"); //$NON-NLS-2$
 				if ( paths == null ) return;
 				path = paths[0];
 			}
@@ -1220,7 +1249,7 @@ public class MainForm implements IParametersProvider {
 		
 		//TODO: select the list to build output 
 		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
-			prj.getOutputRoot(), "en", "fr");
+			prj.getOutputRoot(), "en", "fr"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());
 		edOutputRoot.setText(prj.getOutputRoot());
@@ -1464,7 +1493,7 @@ public class MainForm implements IParametersProvider {
 				count++;
 				Set<String> aliases = charsets.get(key).aliases();
 				for ( String alias : aliases ) {
-					log.message("\t" + alias);
+					log.message("\t" + alias); //$NON-NLS-1$
 					countAlias++;
 				}
 			}
@@ -1490,7 +1519,7 @@ public class MainForm implements IParametersProvider {
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 			dlg.setMessage("You are going to remove the selected document(s) from the list.\nDo you want to proceed?");
-			dlg.setText("Rainbow");
+			dlg.setText(APPNAME);
 			if ( dlg.open() != SWT.YES ) return;
 
 			refresh = true;

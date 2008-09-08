@@ -27,9 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
@@ -484,7 +482,7 @@ public class SRXEditor {
 				List<java.awt.Point> ranges = segmenter.getSegmentRanges();
 				sampleText.createSegments(ranges);
 				// Create the output in generic format
-				showSegmentedOutput();
+				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true));
 			}
 			else {
 				edResults.setText("");
@@ -495,43 +493,6 @@ public class SRXEditor {
 		}
 	}
 
-	private void showSegmentedOutput () {
-		if ( !sampleText.isSegmented() ) {
-			edResults.setText(sampleOutput.setContent(sampleText).toString());
-		}
-		
-		Code code;
-		String text = sampleText.getCodedText();
-		StringBuilder tmp = new StringBuilder();
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_OPENING:
-				code = sampleText.getCode(text.charAt(++i));
-				tmp.append(String.format("<%d>", code.getID()));
-				break;
-			case TextFragment.MARKER_CLOSING:
-				code = sampleText.getCode(text.charAt(++i));
-				tmp.append(String.format("</%d>", code.getID()));
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				code = sampleText.getCode(text.charAt(++i));
-				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-					tmp.append("[");
-					int index = Integer.parseInt(code.getData());
-					tmp.append(sampleOutput.setContent(sampleText.getSegments().get(index)).toString());
-					tmp.append("]");
-				}
-				else {
-					tmp.append(String.format("<%d/>", code.getID()));
-				}
-				break;
-			default:
-				tmp.append(text.charAt(i));
-				break;
-			}
-		}
-		edResults.setText(tmp.toString());
-	}
 	/**
 	 * Converts the sample edit field content to sampleText.
 	 */

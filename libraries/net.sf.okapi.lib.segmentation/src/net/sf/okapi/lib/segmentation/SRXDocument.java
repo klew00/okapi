@@ -49,8 +49,8 @@ public class SRXDocument {
 	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
 	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	
-	static String INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*?)",
-		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
+	static String INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X\\u%X].)*?)",
+		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED, TextFragment.MARKER_SEGMENT);
 			
 	private boolean     cascade;
 	private boolean     segmentSubFlows;

@@ -28,14 +28,19 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
 
-	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-	private Parameters            params;
-	private String                commonFolder;
+	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private Parameters       params;
+	private String           commonFolder;
+	private Segmenter        srcSeg;
+	private Segmenter        trgSeg;
 
 	
 	public Utility () {
@@ -54,6 +59,19 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		String targetLanguage)
 	{
 		commonFolder = null;
+
+		// Load the segmentation rules
+		if ( params.segment ) {
+			SRXDocument doc = new SRXDocument();
+			doc.loadRules(params.sourceSrxPath);
+			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+			srcSeg = doc.applyLanguageRules(sourceLanguage, null);
+			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
+				doc.loadRules(params.targetSrxPath);
+				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+			}
+			trgSeg = doc.applyLanguageRules(targetLanguage, null);
+		}
 	}
 	
 	public void doEpilog () {
@@ -94,7 +112,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 
 	@Override
-    public void endExtractionItem(TextUnit item) {
+    public void endExtractionItem (TextUnit item) {
 		try {
 			processTU(item);
 			if ( item.hasChild() ) {
@@ -113,6 +131,21 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		if ( !tu.isTranslatable() ) return;
 		// Skip if already translate (only if required)
 		if ( tu.hasTarget() && !params.applyToExistingTarget ) return;
+		
+		// mark the segments if requested
+		if ( params.segment ) {
+			if ( tu.hasTarget() ) {
+				trgSeg.computeSegments(tu.getTargetContent());
+				tu.getTargetContent().createSegments(trgSeg.getSegmentRanges());
+				mergeSegments(tu.getTargetContent());
+			}
+			else {
+				srcSeg.computeSegments(tu.getSourceContent());
+				tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+				mergeSegments(tu.getSourceContent());
+			}
+		}
+		
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
 		if ( !tu.hasTarget() ) {
@@ -127,6 +160,39 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		if ( params.addPrefix || params.addSuffix || params.addName ) {
 			addText(tu);
 		}
+	}
+	
+	/**
+	 * Merges back segments into a single content, while adding brackets
+	 * to denote the segments. 
+	 * @param container The TextContainer object to un-segment.
+	 */
+	private void mergeSegments (TextContainer container) {
+		if ( !container.isSegmented() ) return;
+		Code code;
+		StringBuilder text = new StringBuilder(container.getCodedText());
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextContainer.MARKER_OPENING:
+			case TextContainer.MARKER_CLOSING:
+				i++; // Skip
+				break;
+			case TextContainer.MARKER_ISOLATED:
+			case TextContainer.MARKER_SEGMENT:
+				code = container.getCode(text.charAt(i+1));
+				if ( !code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) break;
+				// Else: it's a segment marker: add the brakets
+				text.insert(i, '[');
+				i += 3; // The bracket, the marker, the code index
+				text.insert(i, ']');
+				// Next i++ will skip over the closing bracket
+				break;
+			}
+		}
+		// Replace the original coded text by the one with brackets
+		container.setCodedText(text.toString());
+		// Merge all segments
+		container.mergeAllSegments();
 	}
 	
 	/**

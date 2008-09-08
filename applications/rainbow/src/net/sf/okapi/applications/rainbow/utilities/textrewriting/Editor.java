@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
+import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -28,10 +29,12 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
@@ -54,6 +57,7 @@ public class Editor implements IParametersEditor {
 	private Button                chkApplyToExistingTarget;
 	private Button                chkAddID;
 	private Button                chkAddName;
+	private SegmentationPanel     pnlSegmentation;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -122,9 +126,19 @@ public class Editor implements IParametersEditor {
 		
 		chkAddPrefix = new Button(cmpTmp, SWT.CHECK);
 		chkAddPrefix.setText("Add the following prefix:");
+		chkAddPrefix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edPrefix.setEnabled(chkAddPrefix.getSelection());
+			}
+		});
 		
 		chkAddSuffix = new Button(cmpTmp, SWT.CHECK);
 		chkAddSuffix.setText("Add the following suffix:");
+		chkAddSuffix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edSuffix.setEnabled(chkAddSuffix.getSelection());
+			}
+		});
 		
 		edPrefix = new Text(cmpTmp, SWT.BORDER);
 		edPrefix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -150,6 +164,17 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		chkApplyToExistingTarget.setLayoutData(gdTmp);
 
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Segmentation");
+		grpTmp.setLayout(new GridLayout(4, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		grpTmp.setLayoutData(gdTmp);
+
+		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
+			"Mark the segmentation according the following rules:");
+		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -167,10 +192,13 @@ public class Editor implements IParametersEditor {
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
-		setData();
-		inInit = false;
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 600 ) startSize.x = 600;
+		shell.setSize(startSize);
+		setData();
+		inInit = false;
 		Dialogs.centerWindow(shell, parent);
 	}
 	
@@ -192,6 +220,9 @@ public class Editor implements IParametersEditor {
 		chkApplyToExistingTarget.setSelection(params.applyToExistingTarget);
 		chkAddName.setSelection(params.addName);
 		chkAddID.setSelection(params.addID);
+		edPrefix.setEnabled(chkAddPrefix.getSelection());
+		edSuffix.setEnabled(chkAddSuffix.getSelection());
+		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
 	private boolean saveData () {
@@ -204,7 +235,10 @@ public class Editor implements IParametersEditor {
 		params.applyToExistingTarget = chkApplyToExistingTarget.getSelection();
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();
-		result = true;
+		params.segment = pnlSegmentation.getSegment();
+		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
+		params.targetSrxPath = pnlSegmentation.getTargetSRX();
+	result = true;
 		return true;
 	}
 	

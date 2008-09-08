@@ -156,6 +156,7 @@ public class Writer extends BaseWriter {
 				writer.writeEndElement(); // ut
 				break;
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				writer.writeStartElement("ut");
 				writer.writeAttributeString("DisplayText", code.getData());

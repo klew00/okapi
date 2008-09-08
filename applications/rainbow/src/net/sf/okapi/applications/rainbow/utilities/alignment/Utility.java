@@ -118,7 +118,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 	
 	public void doEpilog () {
-    	logger.info(String.format("Total text units = %d", countTotal));
+    	logger.info(String.format("Total translatable text units = %d", countTotal));
     	logger.info(String.format("Total without text = %d", noTextTotal));
     	logger.info(String.format("Total aligned = %d", alignedTotal));
     	
@@ -205,7 +205,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     	alignedTotal += aligned;
     	noTextTotal += noText;
     	countTotal += count;
-    	logger.info(String.format("Text units = %d", count));
+    	logger.info(String.format("Translatable text units = %d", count));
     	logger.info(String.format("Without text = %d", noText));
     	logger.info(String.format("Aligned = %d", aligned));
     }
@@ -221,6 +221,8 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     }
 	
 	private void processTU (TextUnit tu) {
+		// Skip non-translatable
+		if ( !tu.isTranslatable() ) return;
 		count++;
 		// Segment the source if needed
 		if ( params.segment ) {

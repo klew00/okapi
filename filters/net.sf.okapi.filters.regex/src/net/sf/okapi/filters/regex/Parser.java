@@ -380,7 +380,7 @@ public class Parser implements IParser {
 			rule.codeFinder.process(item.getSourceContent());
 		}
 
-		splitItem(item, rule.splitters);
+		//splitItem(item, rule.splitters);
 		
 		if ( name != null ) {
 			if ( rule.nameFormat.length() > 0 ) {
@@ -394,6 +394,7 @@ public class Parser implements IParser {
 		resultQueue.add(item);
 	}
 	
+	/*
 	private void splitItem (TextUnit item,
 		String pattern)
 	{
@@ -401,7 +402,6 @@ public class Parser implements IParser {
 		return;
 		//TODO: REDO splitItem
 		
-		/*
 		//TODO: optimize by compiling once
 		Pattern p = Pattern.compile(pattern, Pattern.MULTILINE);
 		TextContainer src = item.getSourceContent();
@@ -452,8 +452,8 @@ public class Parser implements IParser {
 			for ( IPart part : tmpList ) {
 				src.append(part);
 			}
-		}*/
-	}
+		}
+	}*/
 	
 	private void processStrings (Rule rule,
 		String name,

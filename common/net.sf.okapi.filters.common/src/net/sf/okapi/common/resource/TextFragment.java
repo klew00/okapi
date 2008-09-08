@@ -59,6 +59,7 @@ public class TextFragment implements Comparable<Object> {
 	public static final int MARKER_OPENING  = 0xE101;
 	public static final int MARKER_CLOSING  = 0xE102;
 	public static final int MARKER_ISOLATED = 0xE103;
+	public static final int MARKER_SEGMENT  = 0xE104;
 	public static final int CHARBASE        = 0xE110;
 
 	public static final String SFMARKER_START    = "{@#$";
@@ -70,7 +71,8 @@ public class TextFragment implements Comparable<Object> {
 	public static enum TagType {
 		OPENING,
 		CLOSING,
-		PLACEHOLDER
+		PLACEHOLDER,
+		SEGMENTHOLDER
 	};
 	
 	protected StringBuilder       text;
@@ -145,6 +147,7 @@ public class TextFragment implements Comparable<Object> {
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				if ( !isolatedMarkerIsWS ) {
 					textEnd += 2;
 					done = true;
@@ -159,6 +162,7 @@ public class TextFragment implements Comparable<Object> {
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
+					case TextFragment.MARKER_SEGMENT:
 						done = false; // Not done yet
 						break;
 					}
@@ -275,11 +279,15 @@ public class TextFragment implements Comparable<Object> {
 		case PLACEHOLDER:
 			append(""+((char)MARKER_ISOLATED)+toChar(codes.size()));
 			break;
+		case SEGMENTHOLDER:
+			append(""+((char)MARKER_SEGMENT)+toChar(codes.size()));
+			break;
 		}
 		// Create the code
 		codes.add(new Code(tagType, type, data));
 		if ( tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
-		if ( tagType != TagType.PLACEHOLDER ) isBalanced = false;
+		if (( tagType != TagType.PLACEHOLDER )
+			&& ( tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
 		return codes.get(codes.size()-1);
 	}
 
@@ -307,6 +315,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				codes.add(newCodes.get(toIndex(tmp.charAt(++i))).clone());
 				tmp.setCharAt(i, toChar(codes.size()-1));
 				break;
@@ -415,6 +424,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				Code ori = codes.get(toIndex(text.charAt(++i)));
 				tmpCodes.add(ori.clone());
 				break;
@@ -445,6 +455,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				i++; // Skip over the marker, they are not text
 				continue;
 			}
@@ -491,6 +502,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				// Copy the remaining codes into the new list
 				remaining.add(codes.get(toIndex(text.charAt(++i))));
 				// And update the index in the coded text
@@ -529,6 +541,7 @@ public class TextFragment implements Comparable<Object> {
 				case MARKER_OPENING:
 				case MARKER_CLOSING:
 				case MARKER_ISOLATED:
+				case MARKER_SEGMENT:
 					tmpCodes.add(codes.get(toIndex(tmpText.charAt(++i))).clone());
 					tmpText.setCharAt(i, toChar(tmpCodes.size()-1));
 					break;
@@ -574,6 +587,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				j++;
 				if ( codes == null ) {
 					throw new InvalidContentException("Invalid index for marker "+j);
@@ -615,6 +629,7 @@ public class TextFragment implements Comparable<Object> {
 				//tmp.append(String.format("[/%d:%s]", code.id, expandCodeContent(code))); // Debug
 				break;
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				code = codes.get(toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code));
 				//tmp.append(String.format("[%d:%s/]", code.id, expandCodeContent(code))); // Debug
@@ -701,6 +716,10 @@ public class TextFragment implements Comparable<Object> {
 			marker = ""+((char)MARKER_ISOLATED)+toChar(codes.size());
 			code.id = ++lastCodeID;
 			break;
+		case SEGMENTHOLDER:
+			marker = ""+((char)MARKER_SEGMENT)+toChar(codes.size());
+			code.id = ++lastCodeID;
+			break;
 		}
 		// Insert the new marker into the coded text
 		text.insert(start, marker);
@@ -708,7 +727,6 @@ public class TextFragment implements Comparable<Object> {
 		codes.add(code);
 		isBalanced = false;
 		return text.length()-before;
-		
 	}
 
 	/**
@@ -735,6 +753,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				throw new InvalidPositionException (
 					String.format("Position %d is inside a marker.", position));
 			}
@@ -792,9 +811,13 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				int index = toIndex(text.charAt(i+1));
 				Code code = codes.get(index);
 				switch ( code.tagType ) {
+				case SEGMENTHOLDER:
+					text.setCharAt(i, (char)MARKER_SEGMENT);
+					break;
 				case PLACEHOLDER:
 					text.setCharAt(i, (char)MARKER_ISOLATED);
 					break;
@@ -845,6 +868,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
 				if ( toIndex(text.charAt(++i)) == index ) {
 					text.setCharAt(i-1, (char)newMarkerType);
 					return; // Done

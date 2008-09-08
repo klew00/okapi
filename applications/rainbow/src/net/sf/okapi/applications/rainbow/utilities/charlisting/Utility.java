@@ -151,6 +151,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
 			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
 				i++;
 				break;
 			default:
