@@ -28,25 +28,25 @@ import java.util.Map;
 /**
  * General HTML extraction rule can handle the following cases:<br/><br/>
  * 
- * INLINE - Elements that are included with text.<br/> EXCLUDED -Element and
- * children that should be excluded from extraction.<br/> INCLUDED - Elements
- * and children within EXLCUDED ranges that should be extracted.<br/> GROUP -
- * Elements that are grouped together structurally such as lists, tables
- * etc..<br/> ATTRIBUTES - Attributes on specific elements which should be
- * extracted. May be translatable or localizable. <br/> ATTRIBUTES ANY ELEMENT -
- * Convenience rule for attributes which can occur on any element. May be
- * translatable or localizable. <br/> TEXT UNIT - Elements whose start and end
- * tags become part of a {@link TextUnit} rather than {@link SkeletonUnit}.<br/>
- * <br/> Any of the above rules may have conditional rules based on attribute
- * names and/or values. Conditional rules ({@link ConditionalAttributeRule}) may
- * be attached to both elements and attributes. More than one conditional rules
- * are evaluated as OR expressions. For example, "type=button" OR
- * "type=default".
+ * NON EXTRACTABLE - Default rule - don't extract it.<br/> INLINE - Elements
+ * that are included with text.<br/> EXCLUDED -Element and children that should
+ * be excluded from extraction.<br/> INCLUDED - Elements and children within
+ * EXLCUDED ranges that should be extracted.<br/> GROUP - Elements that are
+ * grouped together structurally such as lists, tables etc..<br/> ATTRIBUTES -
+ * Attributes on specific elements which should be extracted. May be
+ * translatable or localizable. <br/> ATTRIBUTES ANY ELEMENT - Convenience rule
+ * for attributes which can occur on any element. May be translatable or
+ * localizable. <br/> TEXT UNIT - Elements whose start and end tags become part
+ * of a {@link TextUnit} rather than {@link SkeletonUnit}.<br/> <br/> Any of the
+ * above rules may have conditional rules based on attribute names and/or
+ * values. Conditional rules ({@link ConditionalAttributeRule}) may be attached
+ * to both elements and attributes. More than one conditional rules are
+ * evaluated as OR expressions. For example, "type=button" OR "type=default".
  */
 public class ExtractionRule {
 
 	public static enum EXTRACTION_RULE_TYPE {
-		EXTRACTABLE_ATTRIBUTES, EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT, INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE
+		NON_EXTRACTABLE, EXTRACTABLE_ATTRIBUTES, EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT, INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE
 	};
 
 	private String elementName;
@@ -66,7 +66,7 @@ public class ExtractionRule {
 	public static ExtractionRule createPreserveWhiteSpaceRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE);
 	}
-	
+
 	/**
 	 * Convenience rule factory for inline elements.
 	 * 
@@ -129,7 +129,7 @@ public class ExtractionRule {
 	 * @return {@link ExtractionRule}
 	 */
 	public static ExtractionRule createExtractableAttributeRule(String elementName, String attributeName) {
-		ExtractionRule rule = new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT);
+		ExtractionRule rule = new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.EXTRACTABLE_ATTRIBUTES);
 		rule.addExtractableAttribute(new AttributeExtractionRule(attributeName));
 		return rule;
 	}
