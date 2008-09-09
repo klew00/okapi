@@ -113,6 +113,8 @@ public class HtmlFilterConfiguration {
 		ruleMap.put("face", ExtractionRule.createInlineRule("face"));
 		
 		// excluded elements (includes children)
+		// TODO: we want to handle script sections with sub-filters
+		ruleMap.put("script", ExtractionRule.createExcludedRule("script"));		
 		ruleMap.put("style", ExtractionRule.createExcludedRule("style"));		
 		ruleMap.put("stylesheet", ExtractionRule.createExcludedRule("stylesheet"));
 		
