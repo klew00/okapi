@@ -25,7 +25,10 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlParser;
 
 import org.junit.Before;
@@ -46,19 +49,25 @@ public class HtmlParserTest {
 	@Test
 	public void getNextItem() {
 		try {
-			InputStream htmlStream = HtmlParserTest.class
-					.getResourceAsStream("simpleTest.html");
-			InputStreamReader htmlReader = new InputStreamReader(htmlStream,
-					"iso-8859-1");
+			IParser.ParserTokenType tokenType;
+			InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("simpleTest.html");
+			InputStreamReader htmlReader = new InputStreamReader(htmlStream, "utf-8");
 			htmlParser.open(htmlStream);
-			 do {
-				 
-			 } while (IParser.ParserTokenType.ENDINPUT != htmlParser.parseNext());
-			
-			IContainable item = htmlParser.getResource();
+			while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
+				IContainable item = htmlParser.getResource();
+				if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
+					System.out.println("Text");
+				} else if (tokenType == IParser.ParserTokenType.SKELETON) {
+					System.out.println("Skeleton");
+				} else if (tokenType == IParser.ParserTokenType.STARTGROUP
+						|| tokenType == IParser.ParserTokenType.ENDGROUP) {
+					System.out.println("Group");
+				}
+				System.out.println(item.toString());
+			}
 			htmlParser.close();
 		} catch (UnsupportedEncodingException e) {
 		} catch (IOException e) {
 		}
-	} 
+	}
 }
