@@ -155,7 +155,7 @@ public abstract class BaseParser implements IParser {
 	}
 
 	private void createSkeletonUnit(String skeleton, int offset, int length) {
-		SkeletonUnit skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
+		skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
 		skeletonUnit.setData(skeleton);
 	}
 
