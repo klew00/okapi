@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.Stack;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
@@ -36,11 +35,8 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.filters.BaseParser;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
-import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
