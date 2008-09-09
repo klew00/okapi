@@ -42,6 +42,7 @@ public class ExtractionRuleState {
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
 	private Stack<RuleType> groupRuleStack;
+	private boolean isInline = false;
 
 	/**
 	 * 
@@ -50,6 +51,10 @@ public class ExtractionRuleState {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
 		excludedIncludedRuleStack = new Stack<RuleType>();
 		groupRuleStack = new Stack<RuleType>();
+	}
+	
+	public void reset() {		
+		isInline = false;
 	}
 
 	public boolean isExludedState() {
@@ -105,5 +110,13 @@ public class ExtractionRuleState {
 
 	public void popGroupRule() {
 		groupRuleStack.pop();
+	}
+
+	protected boolean isInline() {
+		return isInline;
+	}
+
+	protected void setInline(boolean isInline) {
+		this.isInline = isInline;
 	}
 }
