@@ -23,8 +23,8 @@ package net.sf.okapi.applications.rainbow.utilities.alignment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
@@ -51,7 +51,7 @@ public class AlignmentDialog {
 	
 	private Shell            shell;
 	private int              result = 0;
-	private OKCancelPanel    pnlActions;
+	private ClosePanel       pnlActions;
 	private List             srcList;
 	private List             trgList;
 	private Text             edDocument;
@@ -61,6 +61,8 @@ public class AlignmentDialog {
 	private Button           btMoveDown; 
 	private Button           btMerge; 
 	private Button           btSplit;
+	private Button           btAccept; 
+	private Button           btSkip;
 	private Text             edSource;
 	private Text             edTarget;
 	private Text             edSrcSeg;
@@ -104,6 +106,7 @@ public class AlignmentDialog {
 		shell.addListener(SWT.Close, new Listener() {
 			public void handleEvent(Event event) {
 				event.doit = false;
+				result = 0;
 				hide();
 			}
 		});
@@ -172,7 +175,7 @@ public class AlignmentDialog {
 		//--- Target buttons
 		
 		Composite cmpButtons = new Composite(shell, SWT.NONE);
-		cmpButtons.setLayout(new GridLayout(2, false));
+		cmpButtons.setLayout(new GridLayout(3, false));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cmpButtons.setLayoutData(gdTmp);
 		
@@ -184,13 +187,25 @@ public class AlignmentDialog {
 			}
 		});
 	
-		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Merge with Above", buttonWidth);
+		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Merge With Next", buttonWidth);
 		btMerge.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				mergeWithAbove();
+				mergeWithNext();
 			}
 		});
 		
+		btAccept = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Accept", buttonWidth);
+		btAccept.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( splitMode ) endSplitMode(true);
+				else { // Accept this text unit
+					result = 1;
+					if ( !saveData() ) return;
+					hide();
+				}
+			}
+		});
+
 		btMoveDown = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Down", buttonWidth);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -206,6 +221,19 @@ public class AlignmentDialog {
 			}
 		});
 
+		btSkip = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Skip", buttonWidth);
+		btSkip.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( splitMode ) {
+					endSplitMode(false);
+					return;
+				}
+				// Else: Skip this text unit
+				result = 2;
+				hide();
+			}
+		});
+		
 		//--- Edit boxes
 		
 		edSrcSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -250,25 +278,24 @@ public class AlignmentDialog {
 		
 		//--- Dialog-level buttons
 
-		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				result = 0;
 				if ( e.widget.getData().equals("h") ) {
 					//TODO: UIUtil.start(help);
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
-					result = 1;
-					if ( !saveData() ) return;
+				if ( e.widget.getData().equals("c") ) {
+					result = 0;
+					hide();
 				}
-				hide();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btClose.setText("Cancel");
+		shell.setDefaultButton(btAccept);
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
@@ -283,7 +310,7 @@ public class AlignmentDialog {
 		updateSourceSegmentDisplay();
 		int n = srcList.getSelectionIndex();
 		if ( n >= trgList.getItemCount() ) return; // Cannot synchronize
-		trgList.select(n);
+		trgList.setSelection(n);
 		updateTargetSegmentDisplay();
 	}
 
@@ -291,7 +318,7 @@ public class AlignmentDialog {
 		updateTargetSegmentDisplay();
 		int n = trgList.getSelectionIndex();
 		if ( n >= srcList.getItemCount() ) return; // Cannot synchronize
-		srcList.select(n);
+		srcList.setSelection(n);
 		updateSourceSegmentDisplay();
 	}
 
@@ -318,7 +345,7 @@ public class AlignmentDialog {
 		int count = trgList.getItemCount();
 		btMoveUp.setEnabled(n>0);
 		btMoveDown.setEnabled(( n < count-1 ) && ( n > -1 ));
-		btMerge.setEnabled(n>0);
+		btMerge.setEnabled(( n < count-1 ) && ( n > -1 ));
 		btSplit.setEnabled(( count > 1 ) && ( n > -1 ));
 	}
 	
@@ -330,17 +357,13 @@ public class AlignmentDialog {
 		updateTargetSegmentDisplay();
 	}
 	
-	private void mergeWithAbove () {
+	private void mergeWithNext () {
 		try {
-			if ( splitMode ) {
-				endSplitMode(false);
-				return;
-			}
 			int n = trgList.getSelectionIndex();
-			if ( n < 1  ) return;
-			target.joinSegmentWithNext(n-1);
+			if ( n < 0  ) return;
+			target.joinSegmentWithNext(n);
 			updateTargetDisplay();
-			fillTargetList(n-1);
+			fillTargetList(n);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -359,16 +382,15 @@ public class AlignmentDialog {
 		edTrgSeg.setFocus();
 		edSrcSeg.setText("To split: Place the cursor between the characters where you want to split the target segment, and press \"Accept\"\n"
 			+ "To cancel: Press \"Discard\"");
-		btSplit.setText("Accept");
-		shell.setDefaultButton(btSplit);
-		btMerge.setText("Discard");
-		btMerge.setEnabled(true); // Make sure it's enabled
 		srcList.setEnabled(false);
 		trgList.setEnabled(false);
 		btMoveUp.setVisible(false);
 		btMoveDown.setVisible(false);
+		btMerge.setVisible(false);
+		btSplit.setVisible(false);
 		chkShowInlineCodes.setVisible(false);
 		chkSyncScrolling.setVisible(false);
+		btSkip.setText("Discard");
 	}
 	
 	private void endSplitMode (boolean accept) {
@@ -381,14 +403,15 @@ public class AlignmentDialog {
 			}
 			// Reset the controls
 			edTrgSeg.setEditable(false);
-			btSplit.setText("Split...");
-			btMerge.setText("Merge with Above");
 			srcList.setEnabled(true);
 			trgList.setEnabled(true);
 			btMoveUp.setVisible(true);
 			btMoveDown.setVisible(true);
+			btMerge.setVisible(true);
+			btSplit.setVisible(true);
 			chkShowInlineCodes.setVisible(true);
 			chkSyncScrolling.setVisible(true);
+			btSkip.setText("Skip");
 			splitMode = false;
 			// Update the display
 			if ( accept ) {
@@ -397,7 +420,6 @@ public class AlignmentDialog {
 			}
 			else updateTargetSegmentDisplay();
 			
-			shell.setDefaultButton(pnlActions.btOK);
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
@@ -425,6 +447,15 @@ public class AlignmentDialog {
 		shell.close();
 	}
 	
+	/**
+	 * Calls the form to align a text unit visually.
+	 * @param sourceContainer The source entry.
+	 * @param targetContainer The target entry.
+	 * @param document The name of the document.
+	 * @param cause The reason to check this alignment.
+	 * @return 1=the segments are deemed aligned, 2=skip this entry,
+	 * 0=stop the process.
+	 */
 	public int showDialog (TextContainer sourceContainer,
 		TextContainer targetContainer,
 		String document,

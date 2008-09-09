@@ -63,6 +63,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private int              count;
 	private int              countTotal;
 	private SegmentsAligner  aligner;
+	private boolean          stopProcess;
 	private Shell            shell;
 
 	
@@ -201,7 +202,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     }
 	
 	@Override
-    public void endResource(Document resource) {
+    public void endResource (Document resource) {
     	alignedTotal += aligned;
     	noTextTotal += noText;
     	countTotal += count;
@@ -211,7 +212,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     }
 
 	@Override
-    public void endExtractionItem(TextUnit item) {
+    public void endExtractionItem (TextUnit item) {
 		processTU(item);
 		if ( item.hasChild() ) {
 			for ( TextUnit tu : item.childTextUnitIterator() ) {
@@ -221,6 +222,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
     }
 	
 	private void processTU (TextUnit tu) {
+		//TODO: Find a way to stop the filter
+		if ( stopProcess ) return;
+		
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		count++;
@@ -238,10 +242,18 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
 			tu.setTargetContent(trgTC);
-			if ( aligner.align(tu) ) {
+			switch ( aligner.align(tu) ) {
+			case 1:
 				aligned++;
 				tmxWriter.writeItem(tu);
 				return;
+			case 2:
+				// Do nothing (skip entry)
+				break;
+			case 0:
+				logger.warn("Process interrupted by user.");
+				stopProcess = true;
+				break;
 			}
 		}
 		// Else: track the item not aligned

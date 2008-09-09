@@ -53,11 +53,12 @@ public class OKCancelPanel extends Composite {
 		boolean showHelp)
 	{
 		super(parent, SWT.NONE);
-		createContent(action, showHelp);
+		createContent(action, showHelp, null);
 	}
 	
 	private void createContent (SelectionAdapter action,
-		boolean showHelp)
+		boolean showHelp,
+		String fourthButtonText)
 	{
 		GridLayout layTmp = new GridLayout(2, true);
 		layTmp.marginHeight = 0;

@@ -254,11 +254,11 @@ public class LogForm implements ILog {
 	{
 		switch ( p_nType ) {
 		case LogType.ERROR:
-			edLog.append("Error: " + p_sValue + "\n");
+			edLog.append("ERROR: " + p_sValue + "\n");
 			errorCount++;
 			break;
 		case LogType.WARNING:
-			edLog.append("Warning: " + p_sValue + "\n");
+			edLog.append("WARNING: " + p_sValue + "\n");
 			warningCount++;
 			break;
 		case LogType.MESSAGE:

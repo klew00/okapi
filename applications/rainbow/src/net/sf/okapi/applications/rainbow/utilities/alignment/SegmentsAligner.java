@@ -54,11 +54,11 @@ public class SegmentsAligner {
 	/**
 	 * Verifies the alignment of the segments of a given TextUnit object.
 	 * @param tu The text unit containing the segments to verify.
-	 * @return True if the segments are deemed aligned correctly, false if there
-	 * is no target or if the segments are not deemed correctly aligned.
+	 * @return 1=the segments are deemed aligned, 2=skip this entry,
+	 * 0=stop the process.
 	 */
-	public boolean align (TextUnit tu) {
-		if ( !tu.hasTarget() ) return false;
+	public int align (TextUnit tu) {
+		if ( !tu.hasTarget() ) return 2;
 		return align(tu.getSourceContent(), tu.getTargetContent());
 	}
 	
@@ -67,18 +67,19 @@ public class SegmentsAligner {
 	 * TextContainer objects.
 	 * @param source The source container.
 	 * @param target The target container.
-	 * @return True if the segments are deemed aligned correctly, false otherwise.
+	 * @return 1=the segments are deemed aligned, 2=skip this entry,
+	 * 0=stop the process.
 	 */
-	public boolean align (TextContainer source,
+	public int align (TextContainer source,
 		TextContainer target)
 	{
 		// Check if both are segmented
-		if ( !source.isSegmented() || !target.isSegmented() ) return false;
+		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		
 		// Check the number of segments
 		if ( source.getSegments().size() != target.getSegments().size() ) {
 			// Optional visual alignment to fix the problems
-			return visualAlignment(source, target, "Different number of segments.");
+			return alignVisually(source, target, "Different number of segments.");
 		}
 		// Assumes the list have same number of segments now
 		// Sanity check using common anchors
@@ -87,29 +88,27 @@ public class SegmentsAligner {
 		for ( int i=0; i<srcList.size(); i++ ) {
 			if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
 				// Optional visual check
-				return visualAlignment(source, target,
+				return alignVisually(source, target,
 					"Different number of in-line codes in at least one segment.");
 			}
 		}
-		return true;
+		return 1; // Aligned
 	}
 	
 	/**
 	 * Aligns interactively two sets of segments in TextContainer objects.
 	 * @param source The source segments.
 	 * @param target The target segments.
-	 * @return True if the segments are deemed aligned, false if the operation
-	 * is canceled or if no alignment is possible.
+	 * @return 1=the segments are deemed aligned, 2=skip this entry,
+	 * 0=stop the process.
 	 */
-	public boolean visualAlignment (TextContainer source,
+	public int alignVisually (TextContainer source,
 		TextContainer target,
 		String cause)
 	{
 		if ( alignDlg == null ) {
 			alignDlg = new AlignmentDialog(shell);
 		}
-		alignDlg.showDialog(source, target, currentDocument, cause);
-		//TODO: return real result later (debug now)
-		return false;
+		return alignDlg.showDialog(source, target, currentDocument, cause);
 	}
 }

@@ -175,9 +175,9 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		rdRemove.setSelection(params.getParameter("removeBOM").equals("1"));
+		rdRemove.setSelection(params.getBoolean("removeBOM"));
 		rdAdd.setSelection(!rdRemove.getSelection());
-		chkAlsoNonUTF8.setSelection(params.getParameter("alsoNonUTF8").equals("1"));
+		chkAlsoNonUTF8.setSelection(params.getBoolean("alsoNonUTF8"));
 		updateNotes();
 	}
 

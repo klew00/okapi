@@ -28,7 +28,6 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -169,19 +168,15 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	 */
 	private void mergeSegments (TextContainer container) {
 		if ( !container.isSegmented() ) return;
-		Code code;
 		StringBuilder text = new StringBuilder(container.getCodedText());
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case TextContainer.MARKER_OPENING:
 			case TextContainer.MARKER_CLOSING:
+			case TextContainer.MARKER_ISOLATED:
 				i++; // Skip
 				break;
-			case TextContainer.MARKER_ISOLATED:
 			case TextContainer.MARKER_SEGMENT:
-				code = container.getCode(text.charAt(i+1));
-				if ( !code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) break;
-				// Else: it's a segment marker: add the brakets
 				text.insert(i, '[');
 				i += 3; // The bracket, the marker, the code index
 				text.insert(i, ']');

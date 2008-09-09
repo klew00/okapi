@@ -205,7 +205,7 @@ public class InlineCodeFinderPanel extends Composite {
 		}
 		
 		if ( lbRules.getItemCount() > 0 ) {
-			lbRules.select(0);
+			lbRules.setSelection(0);
 			updateDisplay();
 		}
 		//TODO
