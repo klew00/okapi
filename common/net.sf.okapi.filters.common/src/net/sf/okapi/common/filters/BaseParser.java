@@ -47,13 +47,25 @@ public abstract class BaseParser implements IParser {
 	protected TextUnit getTextUnit() {
 		return textUnit;
 	}
+	
+	protected boolean isTextUnitEmtpy() {
+		return (textUnit == null || textUnit.isEmpty());
+	}
 
 	protected SkeletonUnit getSkeletonUnit() {
 		return skeletonUnit;
 	}
+	
+	protected boolean isSkeletonUnitEmtpy() {
+		return (skeletonUnit == null || skeletonUnit.isEmpty());
+	}
 
 	protected Group getGroup() {
 		return group;
+	}
+	
+	protected boolean isGroupEmtpy() {
+		return (group == null || group.isEmpty());
 	}
 
 	protected int getGroupId() {
