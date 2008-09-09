@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
 
-import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
@@ -41,12 +40,10 @@ import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
+	private Segment lastSegment;
 	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private IContainable currentResource;
-	private ParserTokenType currentTokenType;
-	private Segment lastSegmentRead;
-	private boolean inline = false;
 	private ExtractionRuleState ruleState;
 
 	public HtmlParser() {
@@ -105,20 +102,20 @@ public class HtmlParser extends BaseParser {
 		boolean finished = false;
 
 		// reset state flags and buffers
-		inline = false;
+		ruleState.reset();
 		reset();
 
-		while (nodeIterator.hasNext()) {
-			Segment segment = nodeIterator.next();
-			lastSegmentRead = segment;
-
-			// if in excluded state everything is skeleton including text
-			if (ruleState.isExludedState()) {
-				appendToSkeletonUnit(segment.toString(), segment.getBegin(), segment.length());				
-			}
+		if (!nodeIterator.hasNext()) {
+			currentResource = null;
+			return ParserTokenType.ENDINPUT;
+		}
+		
+		while (!finished && nodeIterator.hasNext()) {
+			Segment segment = nodeIterator.next();		
 
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
+				
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 					finished = handleStartTag((StartTag) tag);
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -149,44 +146,102 @@ public class HtmlParser extends BaseParser {
 			} else {
 				finished = handleText(segment);
 			}
-
-			// done with current chunk (token)
-			if (finished)
-				break;
 		}
 
-		if (!nodeIterator.hasNext())
-			return ParserTokenType.ENDINPUT;
-		return currentTokenType;
+		// should be only one instance of textUnit, skeletonUnit and group,
+		// all others must be empty.
+		if (!isTextUnitEmtpy()) {
+			assert (isSkeletonUnitEmtpy());
+			assert (isGroupEmtpy());
+			currentResource = getTextUnit();
+			return ParserTokenType.TRANSUNIT;
+		} else if (!isSkeletonUnitEmtpy()) {
+			assert (isTextUnitEmtpy());
+			assert (isGroupEmtpy());
+			currentResource = getSkeletonUnit();
+			return ParserTokenType.SKELETON;
+		} else if (!isGroupEmtpy()) {
+			assert (isSkeletonUnitEmtpy());
+			assert (isTextUnitEmtpy());
+			currentResource = getGroup();
+			if (ruleState.isGroupState()) {
+				return ParserTokenType.STARTGROUP;
+			} else {
+				return ParserTokenType.ENDGROUP;
+			}
+		} 		
+
+		// default token type
+		return ParserTokenType.NONE;
 	}
 
 	private boolean handleCdataSection(Tag tag) {
+		// if in excluded state everything is skeleton including text
+		if (ruleState.isExludedState()) {
+			appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
+			return false;
+		}
+
+		// TODO: special handling for CDATA sections
 		return false;
 	}
 
 	private boolean handleText(Segment text) {
-		// possible ignorable whitespace
-		if (text.isWhiteSpace()) {
+		// if in excluded state everything is skeleton including text
+		if (ruleState.isExludedState()) {
+			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
+			return false;
+		}
+
+		// check for ignorable whitespace, if not then we are possibly starting a text run
+		if (!text.isWhiteSpace()) {
+			ruleState.setInline(true);
+		}
+
+		if (ruleState.isInline()) {
+			if (!isSkeletonUnitEmtpy()) {
+				// stop and return the skeleton, save text for next parse loop 
+				lastSegment = text;
+				return true;
+			}
+			appendToTextUnit(text.toString());
+		} else {
+			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
 		}
 
 		return false;
 	}
 
 	private boolean handleSkeleton(Tag tag) {
+		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
 		return false;
 	}
 
 	private boolean handleStartTag(StartTag startTag) {
+		// if in excluded state everything is skeleton including text
+		if (ruleState.isExludedState()) {
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+		}
+
 		switch (getRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
-			inline = true;
+			if (ruleState.isExludedState()) {
+				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+				return false;
+			}
+
+			ruleState.setInline(true);
 			addToCurrentTextUnit(startTag);
-			break;
-		case EXTRACTABLE_ATTRIBUTE_ANY_ELEMENT:
-			inline = true;
-			break;
+			// break current skeleton run
+			if (!isSkeletonUnitEmtpy()) {
+				return true;
+			}
+			return false;
+
 		case EXTRACTABLE_ATTRIBUTES:
-			inline = true;
+			if (!ruleState.isExludedState()) {
+				addToCurrentTextUnit(startTag);
+			}
 			break;
 		case GROUP_ELEMENT:
 			ruleState.pushGroupRule(startTag.getName());
@@ -202,10 +257,17 @@ public class HtmlParser extends BaseParser {
 		case PRESERVE_WHITESPACE:
 			ruleState.pushPreserverWhitespaceRule(startTag.getName());
 			break;
-		default: // non-inline element break current inline run if exists.
-			inline = false;
-			if (inline)
+		default:
+			ruleState.setInline(false);
+			// non-extractable element break current extractable run if exists.
+			if (!isTextUnitEmtpy()) {
+				lastSegment = startTag;
 				return true;
+			} else {
+				
+			}
+			
+			return false;
 		}
 
 		/*
@@ -218,34 +280,40 @@ public class HtmlParser extends BaseParser {
 	}
 
 	private boolean handleEndTag(EndTag endTag) {
+		// if in excluded state everything is skeleton including text
+		if (ruleState.isExludedState()) {
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+		}
+
 		switch (getRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
-			inline = true;
-			addToCurrentTextUnit(endTag);
+			if (!ruleState.isExludedState()) {
+				ruleState.setInline(true);
+				addToCurrentTextUnit(endTag);
+			}
 			break;
-
 		case GROUP_ELEMENT:
 			ruleState.popGroupRule();
-			break;
-
+			return true;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
 			break;
-
 		case INCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
 			break;
-
 		case TEXT_UNIT_ELEMENT:
 			break;
-
 		case PRESERVE_WHITESPACE:
 			ruleState.popPreserverWhitespaceRule();
 			break;
-
-		default: // non-inline end element
-			inline = false;
-			break;
+		default:
+			ruleState.setInline(false);
+			// non-extractable element break current extractable run if exists.
+			if (!isTextUnitEmtpy()) {
+				lastSegment = endTag;
+				return true;
+			}
+			return false;
 		}
 
 		return false;
@@ -253,22 +321,24 @@ public class HtmlParser extends BaseParser {
 
 	private EXTRACTION_RULE_TYPE getRuleType(String ruleName) {
 		ExtractionRule rule = configuration.getRule(ruleName);
+		if (rule == null) {
+			return EXTRACTION_RULE_TYPE.NON_EXTRACTABLE;
+		}
 		return rule.getRuleType();
 	}
 
-	private void addToCurrentTextUnit(Tag tag) {		
+	private void addToCurrentTextUnit(Tag tag) {
 		TextFragment.TagType tagType;
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-			if (((StartTag)tag).isSyntacticalEmptyElementTag()) 
+			if (((StartTag) tag).isSyntacticalEmptyElementTag())
 				tagType = TextFragment.TagType.PLACEHOLDER;
 			else
 				tagType = TextFragment.TagType.OPENING;
 		} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 			tagType = TextFragment.TagType.CLOSING;
-		}
-		else {
+		} else {
 			tagType = TextFragment.TagType.PLACEHOLDER;
-		}		
+		}
 		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
 	}
 }
