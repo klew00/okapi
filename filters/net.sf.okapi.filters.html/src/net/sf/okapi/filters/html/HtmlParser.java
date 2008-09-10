@@ -40,10 +40,8 @@ import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
-	private Segment lastSegment;
 	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
-	private IContainable currentResource;
 	private ExtractionRuleState ruleState;
 
 	public HtmlParser() {
@@ -95,179 +93,182 @@ public class HtmlParser extends BaseParser {
 	}
 
 	public IContainable getResource() {
-		return currentResource;
+		return getFinalizedToken();
 	}
 
 	public ParserTokenType parseNext() {
-		boolean finished = false;
+		if (isFinishedParsing()) {
+			return ParserTokenType.ENDINPUT;
+		}
 
 		// reset state flags and buffers
 		ruleState.reset();
 		reset();
 
-		if (!nodeIterator.hasNext()) {
-			currentResource = null;
-			return ParserTokenType.ENDINPUT;
-		}
-		
-		while (!finished && nodeIterator.hasNext()) {
-			Segment segment = nodeIterator.next();		
+		while (!isFinishedToken() && nodeIterator.hasNext()) {
+			Segment segment = nodeIterator.next();
 
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
-				
+
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-					finished = handleStartTag((StartTag) tag);
+					handleStartTag((StartTag) tag);
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-					finished = handleEndTag((EndTag) tag);
+					handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.CDATA_SECTION) {
-					finished = handleCdataSection(tag);
+					handleCdataSection(tag);
 				} else if (tag.getTagType() == StartTagType.COMMENT) {
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.XML_DECLARATION) {
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.MARKUP_DECLARATION) {
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON) {
 					// TODO: Handle server formats
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON_ESCAPED) {
 					// TODO: Handle server formats
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				} else {
 					// something we didn't expect default to skeleton
 					// TODO: Add warning?
-					finished = handleSkeleton(tag);
+					handleSkeleton(tag);
 				}
 			} else {
-				finished = handleText(segment);
+				handleText(segment);
 			}
 		}
 
-		// should be only one instance of textUnit, skeletonUnit and group,
-		// all others must be empty.
-		if (!isTextUnitEmtpy()) {
-			assert (isSkeletonUnitEmtpy());
-			assert (isGroupEmtpy());
-			currentResource = getTextUnit();
-			return ParserTokenType.TRANSUNIT;
-		} else if (!isSkeletonUnitEmtpy()) {
-			assert (isTextUnitEmtpy());
-			assert (isGroupEmtpy());
-			currentResource = getSkeletonUnit();
-			return ParserTokenType.SKELETON;
-		} else if (!isGroupEmtpy()) {
-			assert (isSkeletonUnitEmtpy());
-			assert (isTextUnitEmtpy());
-			currentResource = getGroup();
-			if (ruleState.isGroupState()) {
-				return ParserTokenType.STARTGROUP;
-			} else {
-				return ParserTokenType.ENDGROUP;
-			}
-		} 		
+		if (!nodeIterator.hasNext()) {
+			// take care of the token from the previous run
+			finalizeCurrentToken();
+			setFinishedParsing(true);
+		}
 
-		// default token type
-		return ParserTokenType.NONE;
+		// return our finalized token
+		return getFinalizedTokenType();
 	}
 
-	private boolean handleCdataSection(Tag tag) {
+	private void handleCdataSection(Tag tag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
-			return false;
+			return;
 		}
 
-		// TODO: special handling for CDATA sections
-		return false;
+		// does this trigger the end of a textUnit?
+		if (!isTextUnitEmtpy()) {
+			finalizeCurrentToken();
+		}
+
+		// TODO: special handling for CDATA sections (may call sub-filters
+		// or unescape content etc.)
+		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
 	}
 
-	private boolean handleText(Segment text) {
+	private void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
-			return false;
+			return;
 		}
 
-		// check for ignorable whitespace, if not then we are possibly starting a text run
-		if (!text.isWhiteSpace()) {
-			ruleState.setInline(true);
-		}
-
-		if (ruleState.isInline()) {
-			if (!isSkeletonUnitEmtpy()) {
-				// stop and return the skeleton, save text for next parse loop 
-				lastSegment = text;
-				return true;
-			}
-			appendToTextUnit(text.toString());
-		} else {
+		// check for ignorable whitespace and add it to the skeleton
+		// The Jericho html parser always pulls out the largest stretch of text
+		// so standalone whitespace should always be ignorable if we are not
+		// already processing inline text
+		if (text.isWhiteSpace() && !ruleState.isInline()) {
 			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
+			return;
 		}
 
-		return false;
+		// its not pure whitespace so we are now processing inline text
+		ruleState.setInline(true);
+
+		// does this trigger the end of a skeletonUnit?
+		if (isTextUnitEmtpy()) {
+			finalizeCurrentToken();
+		}
+
+		appendToTextUnit(text.toString());
 	}
 
-	private boolean handleSkeleton(Tag tag) {
+	private void handleSkeleton(Tag tag) {
+		// does this trigger the end of a textUnit?
+		if (!isTextUnitEmtpy()) {
+			finalizeCurrentToken();
+		}
 		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
-		return false;
 	}
 
-	private boolean handleStartTag(StartTag startTag) {
+	private void handleStartTag(StartTag startTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+
+			// process these tag types to update parser state
+			switch (getRuleType(startTag.getName())) {
+			case EXCLUDED_ELEMENT:
+				ruleState.pushExcludedRule(startTag.getName());
+				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+				break;
+			case INCLUDED_ELEMENT:
+				ruleState.pushIncludedRule(startTag.getName());
+				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+				break;
+			case PRESERVE_WHITESPACE:
+				ruleState.pushPreserverWhitespaceRule(startTag.getName());
+				break;
+			}
+			return;
 		}
 
 		switch (getRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
-			if (ruleState.isExludedState()) {
-				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
-				return false;
-			}
-
 			ruleState.setInline(true);
-			addToCurrentTextUnit(startTag);
-			// break current skeleton run
+			// does this trigger the end of a skeletonUnit?
 			if (!isSkeletonUnitEmtpy()) {
-				return true;
+				finalizeCurrentToken();
 			}
-			return false;
+			addToCurrentTextUnit(startTag);
+			break;
 
 		case EXTRACTABLE_ATTRIBUTES:
-			if (!ruleState.isExludedState()) {
-				addToCurrentTextUnit(startTag);
-			}
+			// TODO: test for extractable attributes and create subflow
 			break;
 		case GROUP_ELEMENT:
+			// TODO: ignore groups for now till main logic is stable
 			ruleState.pushGroupRule(startTag.getName());
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.pushIncludedRule(startTag.getName());
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			break;
 		case TEXT_UNIT_ELEMENT:
+			// TODO: I'm wondering if we really need before and after skeleton.
+			// If we do need it I need to know which tags to apply it to.
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.pushPreserverWhitespaceRule(startTag.getName());
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			break;
 		default:
 			ruleState.setInline(false);
-			// non-extractable element break current extractable run if exists.
+			// does this trigger the end of a textUnit?
 			if (!isTextUnitEmtpy()) {
-				lastSegment = startTag;
-				return true;
-			} else {
-				
+				finalizeCurrentToken();
 			}
-			
-			return false;
+			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 		}
 
 		/*
@@ -276,47 +277,69 @@ public class HtmlParser extends BaseParser {
 		 * 
 		 * }
 		 */
-		return false;
 	}
 
-	private boolean handleEndTag(EndTag endTag) {
+	private void handleEndTag(EndTag endTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+
+			// process these tag types to update parser state
+			switch (getRuleType(endTag.getName())) {
+			case EXCLUDED_ELEMENT:
+				ruleState.popExcludedIncludedRule();
+				break;
+			case INCLUDED_ELEMENT:
+				ruleState.popExcludedIncludedRule();
+				break;
+			case PRESERVE_WHITESPACE:
+				ruleState.popPreserverWhitespaceRule();
+				break;
+			}
+
+			return;
 		}
 
 		switch (getRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
-			if (!ruleState.isExludedState()) {
-				ruleState.setInline(true);
-				addToCurrentTextUnit(endTag);
+			ruleState.setInline(true);
+			// does this trigger the end of a skeletonUnit?
+			if (!isSkeletonUnitEmtpy()) {
+				finalizeCurrentToken();
 			}
+			addToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
+			// TODO: ignore groups for now till main logic is stable
 			ruleState.popGroupRule();
-			return true;
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		case TEXT_UNIT_ELEMENT:
+			// TODO: if we really need before and after skeleton I need to know
+			// which tags to apply it to.
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.popPreserverWhitespaceRule();
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		default:
 			ruleState.setInline(false);
-			// non-extractable element break current extractable run if exists.
+			// does this trigger the end of a textUnit?
 			if (!isTextUnitEmtpy()) {
-				lastSegment = endTag;
-				return true;
+				finalizeCurrentToken();
 			}
-			return false;
+			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			break;
 		}
-
-		return false;
 	}
 
 	private EXTRACTION_RULE_TYPE getRuleType(String ruleName) {
