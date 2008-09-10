@@ -30,8 +30,7 @@ import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
- * @author HargraveJE
- * 
+ * Abstract helper class for filter writers. 
  */
 public abstract class BaseParser implements IParser {
 	private int groupId = 0;
@@ -40,14 +39,18 @@ public abstract class BaseParser implements IParser {
 	private TextUnit textUnit;
 	private SkeletonUnit skeletonUnit;
 	private Group group;
-	
+	private IContainable finalizedToken;
+	private ParserTokenType finalizedTokenType;
+	private boolean finishedToken = false;
+	private boolean finishedParsing = false;
+
 	public BaseParser() {
 	}
 
 	protected TextUnit getTextUnit() {
 		return textUnit;
 	}
-	
+
 	protected boolean isTextUnitEmtpy() {
 		return (textUnit == null || textUnit.isEmpty());
 	}
@@ -55,7 +58,7 @@ public abstract class BaseParser implements IParser {
 	protected SkeletonUnit getSkeletonUnit() {
 		return skeletonUnit;
 	}
-	
+
 	protected boolean isSkeletonUnitEmtpy() {
 		return (skeletonUnit == null || skeletonUnit.isEmpty());
 	}
@@ -63,7 +66,7 @@ public abstract class BaseParser implements IParser {
 	protected Group getGroup() {
 		return group;
 	}
-	
+
 	protected boolean isGroupEmtpy() {
 		return (group == null || group.isEmpty());
 	}
@@ -80,14 +83,58 @@ public abstract class BaseParser implements IParser {
 		return skeleltonUnitId;
 	}
 
-	/**
-	 * Reset our internal buffers. Force creation of new ones on the next
-	 * append.
-	 */
+	protected IContainable getFinalizedToken() {
+		return finalizedToken;
+	}
+
+	protected ParserTokenType getFinalizedTokenType() {
+		return finalizedTokenType;
+	}
+
 	protected void reset() {
-		textUnit = null;
-		skeletonUnit = null;
-		group = null;
+		finishedToken = false;
+	}
+
+	protected void finalizeCurrentToken() {
+		// should be only one instance of textUnit, skeletonUnit and group,
+		// all others must be empty.
+		finishedToken = true;
+		if (!isTextUnitEmtpy()) {
+			assert (isSkeletonUnitEmtpy());
+			assert (isGroupEmtpy());
+			finalizedToken = getTextUnit();
+			finalizedTokenType = ParserTokenType.TRANSUNIT;
+			textUnit = null;
+		} else if (!isSkeletonUnitEmtpy()) {
+			assert (isTextUnitEmtpy());
+			assert (isGroupEmtpy());
+			finalizedToken = getSkeletonUnit();
+			finalizedTokenType = ParserTokenType.SKELETON;
+			skeletonUnit = null;
+		} else if (!isGroupEmtpy()) {
+			assert (isSkeletonUnitEmtpy());
+			assert (isTextUnitEmtpy());
+			finalizedToken = getGroup();
+			// since we are starting the next token we assume Group is finished
+			// and set ENDGROUP as the token type, STARTGROUP should have been
+			// returned earlier.
+			finalizedTokenType = ParserTokenType.ENDGROUP;
+			group = null;
+		} else {
+			// TODO: throw exception
+		}
+	}
+
+	protected boolean isFinishedToken() {
+		return finishedToken;
+	}
+
+	protected boolean isFinishedParsing() {
+		return finishedParsing;
+	}
+
+	protected void setFinishedParsing(boolean finishedParsing) {
+		this.finishedParsing = finishedParsing;
 	}
 
 	/**
