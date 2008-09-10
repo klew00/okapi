@@ -22,15 +22,12 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.SkeletonUnit;
@@ -39,9 +36,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
-public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
+public class Utility extends BaseUtility implements IFilterDrivenUtility {
 
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String           inputRoot;
 	private String           inputPath;
 	private String           outputRoot;
@@ -254,13 +250,4 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility {
 		return params.outputFolder;
 	}
 
-	public void setFilterAccess (FilterAccess filterAccess,
-		String paramsFolder)
-	{
-		// Not used
-	}
-
-	public void setContextUI (Object contextUI) {
-		// Not used
-	}
 }

@@ -71,4 +71,11 @@ public interface IInputFilter extends IOutputPipe {
 	 * Process the input and feed it to the output pipe.
 	 */
 	void process ();
+	
+	/**
+	 * Cancels the process. The caller can this method in listener event to
+	 * cancel the process. The actual cancellation may occur next time the process
+	 * method send a resource to the output (instead of immediately).
+	 */
+	void cancel ();
 }

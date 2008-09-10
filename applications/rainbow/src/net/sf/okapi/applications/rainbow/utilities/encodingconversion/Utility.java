@@ -36,10 +36,14 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.event.EventListenerList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
+import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
@@ -65,6 +69,7 @@ public class Utility implements ISimpleUtility {
 	private boolean                         reportUnsupported;
 	private Pattern                         pattern;
 	private String                          prevBuf;
+	private EventListenerList               listenerList = new EventListenerList();
 
 
 	public Utility () {
@@ -678,4 +683,22 @@ public class Utility implements ISimpleUtility {
 	public void setContextUI (Object contextUI) {
 		// Not used
 	}
+
+	public void addCancelListener (CancelListener listener) {
+		listenerList.add(CancelListener.class, listener);
+	}
+
+	public void removeCancelListener (CancelListener listener) {
+		listenerList.remove(CancelListener.class, listener);
+	}
+
+	private void fireCancelEvent (CancelEvent event) {
+		Object[] listeners = listenerList.getListenerList();
+		for ( int i=0; i<listeners.length; i+=2 ) {
+			if ( listeners[i] == CancelListener.class ) {
+				((CancelListener)listeners[i+1]).cancelOccurred(event);
+			}
+		}
+	}
+
 }

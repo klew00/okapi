@@ -22,11 +22,15 @@ package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.util.Iterator;
 
+import javax.swing.event.EventListenerList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
+import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
+import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -41,6 +45,7 @@ public class Utility implements ISimpleUtility {
 	private Manifest         manifest;
 	private Merger           merger;
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private EventListenerList     listenerList = new EventListenerList();
 	
 	public Utility () {
 	}
@@ -156,4 +161,22 @@ public class Utility implements ISimpleUtility {
 	public void setContextUI (Object contextUI) {
 		// Not used
 	}
+
+	public void addCancelListener (CancelListener listener) {
+		listenerList.add(CancelListener.class, listener);
+	}
+
+	public void removeCancelListener (CancelListener listener) {
+		listenerList.remove(CancelListener.class, listener);
+	}
+
+	private void fireCancelEvent (CancelEvent event) {
+		Object[] listeners = listenerList.getListenerList();
+		for ( int i=0; i<listeners.length; i+=2 ) {
+			if ( listeners[i] == CancelListener.class ) {
+				((CancelListener)listeners[i+1]).cancelOccurred(event);
+			}
+		}
+	}
+
 }

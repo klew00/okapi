@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import javax.swing.event.EventListenerList;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -31,6 +32,8 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
+import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
@@ -48,6 +51,7 @@ public class Utility implements ISimpleUtility {
 	private Transformer                trans;
 	private IParameters                params;
 	private String                     commonFolder;
+	private EventListenerList     listenerList = new EventListenerList();
 
 	
 	public Utility () {
@@ -206,4 +210,22 @@ public class Utility implements ISimpleUtility {
 	public void setContextUI (Object contextUI) {
 		// Not used
 	}
+
+	public void addCancelListener (CancelListener listener) {
+		listenerList.add(CancelListener.class, listener);
+	}
+
+	public void removeCancelListener (CancelListener listener) {
+		listenerList.remove(CancelListener.class, listener);
+	}
+
+	private void fireCancelEvent (CancelEvent event) {
+		Object[] listeners = listenerList.getListenerList();
+		for ( int i=0; i<listeners.length; i+=2 ) {
+			if ( listeners[i] == CancelListener.class ) {
+				((CancelListener)listeners[i+1]).cancelOccurred(event);
+			}
+		}
+	}
+
 }

@@ -40,7 +40,7 @@ public abstract class BaseParser implements IParser {
 	private TextUnit textUnit;
 	private SkeletonUnit skeletonUnit;
 	private Group group;
-
+	
 	public BaseParser() {
 	}
 

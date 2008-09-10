@@ -156,4 +156,17 @@ public interface IUtility {
 	 * @return The output folder for the utility, or null.
 	 */
 	String getFolderAfterProcess ();
+	
+	/**
+	 * Adds a CancelListener to the object listener list.
+	 * @param listener The listener to add.
+	 */
+	void addCancelListener (CancelListener listener);
+
+	/**
+	 * Removes a CancelListener from the object listener list.
+	 * @param listener The listener to add.
+	 */
+	void removeCancelListener (CancelListener listener);
+
 }

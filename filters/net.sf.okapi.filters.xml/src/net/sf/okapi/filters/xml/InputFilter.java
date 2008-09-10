@@ -109,4 +109,7 @@ public class InputFilter implements IInputFilter {
 		this.output = builder;
 	}
 
+	public void cancel () {
+		// TODO implement cancel()
+	}
 }

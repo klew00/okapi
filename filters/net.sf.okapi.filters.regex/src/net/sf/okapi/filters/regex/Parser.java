@@ -54,6 +54,7 @@ public class Parser implements IParser {
 	private int                        startSearch;
 	private int                        startSkl;
 	private int                        nextAction;
+	private boolean                    stop;
 
 	private static final int NEXTACTION_TRANSUNIT     = 0;
 	private static final int NEXTACTION_ENDINPUT      = 1;
@@ -134,6 +135,7 @@ public class Parser implements IParser {
 		try {
 			// Close any previously non-closed file
 			close();
+			stop = false;
 			
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, resource.getSourceEncoding());
@@ -190,6 +192,11 @@ public class Parser implements IParser {
 	}
 	
 	public ParserTokenType parseNext () {
+		if ( stop ) {
+			nextAction = -1;
+			return ParserTokenType.ENDINPUT;
+		}
+		
 		//TODO: process outerString if needed for each skeleton part
 		switch ( nextAction ) {
 		case NEXTACTION_TRANSUNIT:
@@ -606,4 +613,7 @@ public class Parser implements IParser {
 		return ParserTokenType.TRANSUNIT;
 	}
 
+	public void cancel () {
+		stop = true;
+	}
 }

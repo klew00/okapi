@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -33,6 +33,8 @@ import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
+import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
@@ -46,7 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class UtilityDriver {
+public class UtilityDriver implements CancelListener {
 
 	private ILog                  log;
 	private Project               prj;
@@ -59,6 +61,8 @@ public class UtilityDriver {
 	private PluginsAccess         plugins;
 	private final Logger          logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String                outputFolder;
+	private boolean               stopProcess;
+
 	
 	public UtilityDriver (ILog log,
 		FilterAccess newFA,
@@ -140,6 +144,7 @@ public class UtilityDriver {
 	public void execute (Shell shell) {
 		try {
 			log.beginTask(pluginItem.name);
+			stopProcess = false;
 			
 			util.setFilterAccess(fa, prj.getParametersFolder());
 			util.setContextUI(shell);
@@ -206,6 +211,9 @@ public class UtilityDriver {
 					inpFilter = (IInputFilter)filters[0];
 					outFilter = (IOutputFilter)filters[1];
 					
+					// Feedback event handling
+					util.addCancelListener(this);
+					
 					InputStream input = new FileInputStream(inputPath);
 					inpFilter.initialize(input, inputPath,
 						item.filterSettings, prj.buildSourceEncoding(item),
@@ -228,6 +236,7 @@ public class UtilityDriver {
 				else { // Not filter-driven, just execute with input file
 					 ((ISimpleUtility)util).processInput();
 				}
+				if ( stopProcess ) break;
 			}
 
 			util.doEpilog();
@@ -236,6 +245,9 @@ public class UtilityDriver {
 			logger.error("Error with utility.", e);
 		}
 		finally {
+			if ( stopProcess ) {
+				logger.warn("Process interrupted by user.");
+			}
 			if ( util != null ) {
 				outputFolder = util.getFolderAfterProcess();
 			}
@@ -245,5 +257,10 @@ public class UtilityDriver {
 	
 	String getFolderAfterProcess () {
 		return outputFolder;
+	}
+
+	public void cancelOccurred (CancelEvent event) {
+		stopProcess = true;
+		if ( inpFilter != null ) inpFilter.cancel();
 	}
 }

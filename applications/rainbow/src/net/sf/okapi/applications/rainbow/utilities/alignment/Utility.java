@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,30 +20,25 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
+import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.pipeline.ThrougputPipeBase;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
-public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  {
+public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private Parameters       params;
 	private String           trgPath;
 	private String           trgEncoding;
@@ -51,8 +46,6 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private DbStoreBuilder   dbStoreBuilder;
 	private DbStore          dbStore;
 	private TMXWriter        tmxWriter = null;
-	private FilterAccess     fa;
-	private String           paramsFolder;
 	private IInputFilter     trgFilter;
 	private Segmenter        srcSeg;
 	private Segmenter        trgSeg;
@@ -64,8 +57,6 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	private int              countTotal;
 	private SegmentsAligner  aligner;
 	private boolean          stopProcess;
-	private Shell            shell;
-
 	
 	public Utility () {
 		params = new Parameters();
@@ -119,14 +110,9 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 	
 	public void doEpilog () {
-		if ( stopProcess ) {
-			logger.warn("Process interrupted by user.");
-		}
-		else {
-			logger.info(String.format("Total translatable text units = %d", countTotal));
-			logger.info(String.format("Total without text = %d", noTextTotal));
-			logger.info(String.format("Total aligned = %d", alignedTotal));
-		}
+		logger.info(String.format("Total translatable text units = %d", countTotal));
+		logger.info(String.format("Total without text = %d", noTextTotal));
+		logger.info(String.format("Total aligned = %d", alignedTotal));
     	
 		if ( aligner != null ) {
 			aligner = null;
@@ -257,6 +243,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 				break;
 			case 0:
 				stopProcess = true;
+				fireCancelEvent(new CancelEvent(this));
 				break;
 			}
 		}
@@ -293,14 +280,5 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 		return Util.getDirectoryName(params.getParameter("tmxPath"));
 	}
 
-	public void setFilterAccess (FilterAccess filterAccess,
-		String paramsFolder)
-	{
-		fa = filterAccess;
-		this.paramsFolder = paramsFolder;
-	}
-	
-	public void setContextUI (Object contextUI) {
-		shell = (Shell)contextUI;
-	}
+
 }

@@ -117,4 +117,8 @@ public class InputFilter implements IInputFilter {
 	public void setOutput (IResourceBuilder builder) {
 		output = builder;
 	}
+
+	public void cancel () {
+		if ( parser != null ) parser.cancel();
+	}
 }
