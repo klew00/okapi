@@ -133,10 +133,14 @@ public class HtmlParser extends BaseParser {
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON_ESCAPED) {
 					// TODO: Handle server formats
 					handleSkeleton(tag);
-				} else {
-					// something we didn't expect default to skeleton
-					// TODO: Add warning?
-					handleSkeleton(tag);
+				} else { // not classified explicitly by Jericho
+					if (tag instanceof StartTag) {
+						handleStartTag((StartTag) tag);
+					} else if (tag instanceof StartTag) {
+						handleEndTag((EndTag) tag);
+					} else {
+						handleSkeleton(tag);
+					}					
 				}
 			} else {
 				handleText(segment);
