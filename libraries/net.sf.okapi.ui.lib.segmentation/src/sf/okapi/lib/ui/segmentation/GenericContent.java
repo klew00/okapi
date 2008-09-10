@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.eclipse.swt.graphics.Point;
 
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.InvalidPositionException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -216,14 +217,24 @@ public class GenericContent {
 			String.format("Position %d or %d is invalid.", position.x, position.y));
 	}
 	
+	/**
+	 * Updates a text fragment from a generic representation.
+	 * @param genericText The generic text to use to update the fragment.
+	 * @param fragment The text fragment to update.
+	 * @param allowCodeDeletion True when missing in-line codes in the generic text
+	 * means the corresponding codes should be deleted from the fragment.
+	 * @throws InvalidContentException When the generic text is not valid, or does
+	 * not correspond to the existing codes.
+	 */
 	public void updateFragment (String genericText,
-		TextFragment fragment)
+		TextFragment fragment,
+		boolean allowCodeDeletion)
 	{
 		if ( genericText == null )
 			throw new NullPointerException("Parameter genericText is null");
 
 		// Case with no in-line codes
-		if ( !fragment.hasCode() ) {
+		if ( !fragment.hasCode() && ( genericText.indexOf('<') == -1 )) {
 			fragment.setCodedText(genericText);
 			return;
 		}
@@ -239,6 +250,8 @@ public class GenericContent {
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			if ( index == -1 )
+				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
@@ -249,6 +262,8 @@ public class GenericContent {
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			if ( index == -1 )
+				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
@@ -259,6 +274,8 @@ public class GenericContent {
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			if ( index == -1 )
+				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
@@ -266,6 +283,6 @@ public class GenericContent {
 		}
 		
 		// Allow deletion of codes
-		fragment.setCodedText(tmp.toString(), true);
+		fragment.setCodedText(tmp.toString(), allowCodeDeletion);
 	}
 }

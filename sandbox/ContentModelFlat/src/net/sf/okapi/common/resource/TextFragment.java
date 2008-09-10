@@ -210,7 +210,7 @@ public class TextFragment implements Comparable<Object> {
 	public TextFragment (String newCodedText,
 		List<Code> newCodes)
 	{
-		setCodedText(newCodedText, newCodes);
+		setCodedText(newCodedText, newCodes, false);
 	}
 
 	/**
@@ -433,6 +433,22 @@ public class TextFragment implements Comparable<Object> {
 	
 		return tmpCodes;
 	}
+	
+	/**
+	 * Gets the index value for the first in-line code (in the codes list)
+	 * with a given ID.
+	 * @param id The ID to look for.
+	 * @return The index of the found code, or -1 if none is found. 
+	 */
+	public int getIndex (int id) {
+		if ( codes == null ) return -1;
+		int i = 0;
+		for ( Code code : codes ) {
+			if ( code.id == id ) return i;
+			i++;
+		}
+		return -1;
+	}
 
 	/**
 	 * Indicates if the fragment is empty (no text and no codes).
@@ -548,7 +564,7 @@ public class TextFragment implements Comparable<Object> {
 				}
 			}
 		}
-		sub.setCodedText(tmpText.toString(), tmpCodes);
+		sub.setCodedText(tmpText.toString(), tmpCodes, false);
 		sub.lastCodeID = lastCodeID;
 		return sub;
 	}
@@ -560,25 +576,62 @@ public class TextFragment implements Comparable<Object> {
 	 * @throws InvalidContentException When the coded text is not valid, or does
 	 * not correspond to the existing codes.
 	 */
-	public void setCodedText (String newCodedText) {
-		setCodedText(newCodedText, codes);
+	public void setCodedText (String newCodedText)
+	{
+		setCodedText(newCodedText, codes, false);
+	}
+
+	/**
+	 * Sets the coded text of the fragment, using its the existing codes. The coded
+	 * text must be valid for the existing codes.
+	 * @param newCodedText The coded text to apply.
+	 * @param allowCodeDeletion True when missing in-line codes in the coded text
+	 * means the corresponding codes should be deleted from the fragment.
+	 * @throws InvalidContentException When the coded text is not valid, or does
+	 * not correspond to the existing codes.
+	 */
+	public void setCodedText (String newCodedText,
+		boolean allowCodeDeletion)
+	{
+		setCodedText(newCodedText, codes, allowCodeDeletion);
 	}
 
 	/**
 	 * Sets the coded text of the fragment and its corresponding codes.
 	 * @param newCodedText The coded text to apply.
-	 * @param newCodes the list of the corresponding codes.
+	 * @param newCodes The list of the corresponding codes.
 	 * @throws InvalidContentException When the coded text is not valid or does 
 	 * not correspond to the new codes.
 	 */
 	public void setCodedText (String newCodedText,
 		List<Code> newCodes)
 	{
+		setCodedText(newCodedText, newCodes, false);
+	}
+	
+	/**
+	 * Sets the coded text of the fragment and its corresponding codes.
+	 * @param newCodedText The coded text to apply.
+	 * @param newCodes The list of the corresponding codes.
+	 * @param allowCodeDeletion True when missing in-line codes in the coded text
+	 * means the corresponding codes should be deleted from the fragment.
+	 * @throws InvalidContentException When the coded text is not valid or does 
+	 * not correspond to the new codes.
+	 */
+	public void setCodedText (String newCodedText,
+		List<Code> newCodes,
+		boolean allowCodeDeletion)
+	{
 		isBalanced = false;
 		text = new StringBuilder(newCodedText);
 		if ( newCodes == null ) codes = null;
 		else codes = new ArrayList<Code>(newCodes);
+		if (( codes == null ) || ( codes.size() == 0 )) {
+			lastCodeID = 0;
+			return; // No codes, all done.
+		}
 		//TODO: do we need to reset the lastCodeID?
+		ArrayList<Code> activeCodes = new ArrayList<Code>();
 		
 		// Validate the codes and coded text
 		int j = 0;
@@ -594,7 +647,7 @@ public class TextFragment implements Comparable<Object> {
 				}
 				try {
 					// Just try to access the code
-					codes.get(toIndex(text.charAt(++i)));
+					activeCodes.add(codes.get(toIndex(text.charAt(++i))));
 				}
 				catch ( IndexOutOfBoundsException e ) {
 					throw new InvalidContentException("Invalid index for marker "+j);
@@ -602,10 +655,16 @@ public class TextFragment implements Comparable<Object> {
 				break;
 			}
 		}
-		if ( j > 0 ) {
-			if (( codes == null ) || ( j < codes.size() )) {
-				throw new InvalidContentException(
-					String.format("Markers in coded text: %d. Listed codes: %d ", j, codes.size()));
+		
+		if ( allowCodeDeletion ) {
+			codes.retainAll(activeCodes);
+		}
+		else { // No deletion allowed: check the numbers
+			if ( j > 0 ) {
+				if (( codes == null ) || ( j < codes.size() )) {
+					throw new InvalidContentException(
+						String.format("Markers in coded text: %d. Listed codes: %d ", j, codes.size()));
+				}
 			}
 		}
 	}

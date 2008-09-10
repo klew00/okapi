@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -199,7 +200,7 @@ public class AlignmentDialog {
 		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
 		btEditRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				editRules();
+				startEditMode();
 			}
 		});
 		
@@ -510,16 +511,6 @@ public class AlignmentDialog {
 		return true;
 	}
 	
-	private void editRules () {
-		try
-		{
-			
-		}
-		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}
-	
 	private void startSplitMode () {
 		indexActiveSegment = trgList.getSelectionIndex();
 		if ( indexActiveSegment == -1 ) return;
@@ -564,9 +555,16 @@ public class AlignmentDialog {
 		try {
 			// Update the content
 			if ( accept ) {
-				// genericCont is already set with the proper text
-				genericCont.updateFragment(edTrgSeg.getText(),
-					target.getSegments().get(indexActiveSegment));
+				try {
+					// genericCont is already set with the proper text
+					genericCont.updateFragment(edTrgSeg.getText(),
+						target.getSegments().get(indexActiveSegment), true);
+				}
+				catch ( InvalidContentException e ) {
+					Dialogs.showError(shell, e.getMessage(), null);
+					//TODO: recover by resetting the original, or prevent end of
+					//edit mode
+				}
 			}
 			
 			// Reset the controls
