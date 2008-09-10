@@ -190,7 +190,7 @@ public class Merger extends ThrougputPipeBase {
 				try {
 					item.getTargetContent().setCodedText(
 						srcPkgItem.getTargetContent().getCodedText(),
-						item.getSourceContent().getCodes());
+						item.getSourceContent().getCodes(), false);
 				}
 				catch ( RuntimeException e ) {
 					logger.error("Error with item id=\"{}\".", item.getID());

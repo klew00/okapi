@@ -21,6 +21,8 @@
 package sf.okapi.lib.ui.segmentation;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.graphics.Point;
 
@@ -36,6 +38,9 @@ public class GenericContent {
 
 	private String      codedText;
 	private List<Code>  codes;
+	private Pattern     patternOpening = Pattern.compile("\\<(\\d*?)\\>");
+	private Pattern     patternClosing = Pattern.compile("\\</(\\d*?)\\>");
+	private Pattern     patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
 	
 
 	public GenericContent () {
@@ -53,7 +58,7 @@ public class GenericContent {
 	}
 
 	/**
-	 * Prints a string representation of a given segmented text, with optional
+	 * Prints a generic string representation of a given segmented text, with optional
 	 * markers to indicate the segments boundaries.
 	 * @param container The container to output.
 	 * @param showSegments True if segment boundaries should be shown.
@@ -61,6 +66,21 @@ public class GenericContent {
 	 */
 	public String printSegmentedContent (TextContainer container,
 		boolean showSegments)
+	{
+		return printSegmentedContent(container, showSegments, false);
+	}
+	
+	/**
+	 * Prints a string representation of a given segmented text, with optional
+	 * markers to indicate the segments boundaries.
+	 * @param container The container to output.
+	 * @param showSegments True if segment boundaries should be shown.
+	 * @param normalText True to show in-line real data instead of generic codes.
+	 * @return A string with the segmented text output.
+	 */
+	public String printSegmentedContent (TextContainer container,
+		boolean showSegments,
+		boolean normalText)
 	{
 		if ( !container.isSegmented() ) {
 			return setContent(container).toString();
@@ -73,21 +93,24 @@ public class GenericContent {
 			switch ( text.charAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				code = container.getCode(text.charAt(++i));
-				tmp.append(String.format("<%d>", code.getID()));
+				if ( normalText ) tmp.append(code.toString());
+				else tmp.append(String.format("<%d>", code.getID()));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				code = container.getCode(text.charAt(++i));
-				tmp.append(String.format("</%d>", code.getID()));
+				if ( normalText ) tmp.append(code.toString());
+				else tmp.append(String.format("</%d>", code.getID()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 				code = container.getCode(text.charAt(++i));
-				tmp.append(String.format("<%d/>", code.getID()));
+				if ( normalText ) tmp.append(code.toString());
+				else tmp.append(String.format("<%d/>", code.getID()));
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				code = container.getCode(text.charAt(++i));
 				int index = Integer.parseInt(code.getData());
 				if ( showSegments ) tmp.append("[");
-				tmp.append(setContent(container.getSegments().get(index)).toString());
+				tmp.append(setContent(container.getSegments().get(index)).toString(normalText));
 				if ( showSegments ) tmp.append("]");
 				break;
 			default:
@@ -98,13 +121,21 @@ public class GenericContent {
 		return tmp.toString();
 	}
 	
-	
 	/**
 	 * Generates an generic coded string from the content.
 	 * @return The generic string.
 	 */
 	@Override
-	public String toString ()
+	public String toString () {
+		return toString(false);
+	}
+	
+	/**
+	 * Generates a generic coded string or an normal output from the content.
+	 * @param normalText True to show in-line real data instead of generic codes.
+	 * @return The output string.
+	 */
+	public String toString (boolean normalText)
 	{
 		StringBuilder tmp = new StringBuilder();
 		int index;
@@ -112,16 +143,19 @@ public class GenericContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				tmp.append(String.format("<%d>", codes.get(index).getID()));
+				if ( normalText ) tmp.append(codes.get(index).toString());
+				else tmp.append(String.format("<%d>", codes.get(index).getID()));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				tmp.append(String.format("</%d>", codes.get(index).getID()));
+				if ( normalText ) tmp.append(codes.get(index).toString());
+				else tmp.append(String.format("</%d>", codes.get(index).getID()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				tmp.append(String.format("<%d/>", codes.get(index).getID()));
+				if ( normalText ) tmp.append(codes.get(index).toString());
+				else tmp.append(String.format("<%d/>", codes.get(index).getID()));
 				break;
 			default:
 				tmp.append(codedText.charAt(i));
@@ -180,5 +214,58 @@ public class GenericContent {
 		// Else: out-of-bounds or within an in-line code
 		throw new InvalidPositionException (
 			String.format("Position %d or %d is invalid.", position.x, position.y));
+	}
+	
+	public void updateFragment (String genericText,
+		TextFragment fragment)
+	{
+		if ( genericText == null )
+			throw new NullPointerException("Parameter genericText is null");
+
+		// Case with no in-line codes
+		if ( !fragment.hasCode() ) {
+			fragment.setCodedText(genericText);
+			return;
+		}
+		
+		// Otherwise: we have in-line codes
+		StringBuilder tmp = new StringBuilder(genericText);
+		
+		int n;
+		int start = 0;
+		int diff = 0;
+		int index;
+		Matcher m = patternOpening.matcher(genericText);
+		while ( m.find(start) ) {
+			n = m.start();
+			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(index)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternClosing.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternIsolated.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		
+		// Allow deletion of codes
+		fragment.setCodedText(tmp.toString(), true);
 	}
 }

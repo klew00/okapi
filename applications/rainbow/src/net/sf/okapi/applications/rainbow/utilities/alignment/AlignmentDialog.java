@@ -63,6 +63,8 @@ public class AlignmentDialog {
 	private Button           btSplit;
 	private Button           btAccept; 
 	private Button           btSkip;
+	private Button           btEditRules;
+	private Button           btEditSeg;
 	private Text             edSource;
 	private Text             edTarget;
 	private Text             edSrcSeg;
@@ -73,7 +75,8 @@ public class AlignmentDialog {
 	private TextContainer    source;
 	private TextContainer    target;
 	private boolean          splitMode = false;
-	private int              indexSegToResplit;
+	private boolean          editMode = false;
+	private int              indexActiveSegment;
 	private GenericContent   genericCont;
 
 
@@ -100,7 +103,7 @@ public class AlignmentDialog {
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		shell.setText("Alignment Verification");
 		shell.setImage(parent.getImage());
-		shell.setLayout(new GridLayout(2, true));
+		shell.setLayout(new GridLayout(4, true));
 		
 		// On close: Hide instead of closing
 		shell.addListener(SWT.Close, new Listener() {
@@ -113,24 +116,26 @@ public class AlignmentDialog {
 
 		edDocument = new Text(shell, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		edDocument.setLayoutData(gdTmp);
 		edDocument.setEditable(false);
 		
 		edName = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		edName.setLayoutData(gdTmp);
 		edName.setEditable(false);
 		
 		edCause = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		edCause.setLayoutData(gdTmp);
 		edCause.setEditable(false);
 		
 		srcList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		srcList.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		srcList.setLayoutData(gdTmp);
 		srcList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromSource();
@@ -139,7 +144,9 @@ public class AlignmentDialog {
 		});
 		
 		trgList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		trgList.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		trgList.setLayoutData(gdTmp);
 		trgList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
@@ -150,7 +157,9 @@ public class AlignmentDialog {
 		//-- Options
 		
 		Composite cmpOptions = new Composite(shell, SWT.NONE);
-		cmpOptions.setLayout(new GridLayout());
+		GridLayout layout = new GridLayout();
+		layout.marginWidth = 0;
+		cmpOptions.setLayout(layout);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cmpOptions.setLayoutData(gdTmp);
 		
@@ -168,18 +177,32 @@ public class AlignmentDialog {
 		chkShowInlineCodes.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				fillSourceList(srcList.getSelectionIndex());
+				updateSourceDisplay();
 				fillTargetList(trgList.getSelectionIndex());
+				updateTargetDisplay();
 			}
 		});
 
-		//--- Target buttons
-		
-		Composite cmpButtons = new Composite(shell, SWT.NONE);
-		cmpButtons.setLayout(new GridLayout(3, false));
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		cmpButtons.setLayoutData(gdTmp);
+
+		//--- Main buttons
 		
 		int buttonWidth = 120;
+		
+		Composite cmpButtons = new Composite(shell, SWT.NONE);
+		layout = new GridLayout(4, false);
+		layout.marginWidth = 0;
+		cmpButtons.setLayout(layout);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
+		gdTmp.horizontalSpan = 3;
+		cmpButtons.setLayoutData(gdTmp);
+
+		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
+		btEditRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRules();
+			}
+		});
+		
 		btMoveUp = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Up", buttonWidth);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -198,6 +221,7 @@ public class AlignmentDialog {
 		btAccept.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( splitMode ) endSplitMode(true);
+				else if ( editMode ) endEditMode(true);
 				else { // Accept this text unit
 					result = 1;
 					if ( !saveData() ) return;
@@ -205,7 +229,14 @@ public class AlignmentDialog {
 				}
 			}
 		});
-
+		
+		btEditSeg = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Segment...", buttonWidth);
+		btEditSeg.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				startEditMode();
+			}
+		});
+		
 		btMoveDown = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Down", buttonWidth);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -216,8 +247,7 @@ public class AlignmentDialog {
 		btSplit = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Split...", buttonWidth);
 		btSplit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if ( splitMode ) endSplitMode(true);
-				else startSplitMode();
+				startSplitMode();
 			}
 		});
 
@@ -226,6 +256,10 @@ public class AlignmentDialog {
 			public void widgetSelected(SelectionEvent e) {
 				if ( splitMode ) {
 					endSplitMode(false);
+					return;
+				}
+				else if ( editMode ) {
+					endEditMode(false);
 					return;
 				}
 				// Else: Skip this text unit
@@ -239,7 +273,7 @@ public class AlignmentDialog {
 		edSrcSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSrcSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edSrcSeg.setLayoutData(gdTmp);
 		Font font = edSrcSeg.getFont();
@@ -251,7 +285,7 @@ public class AlignmentDialog {
 		edTrgSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTrgSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edTrgSeg.setLayoutData(gdTmp);
 		edTrgSeg.setFont(textFont);
@@ -265,14 +299,14 @@ public class AlignmentDialog {
 		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSource.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edSource.setLayoutData(gdTmp);
 		
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTarget.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edTarget.setLayoutData(gdTmp);
 		
@@ -292,7 +326,7 @@ public class AlignmentDialog {
 		};
 		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 4;
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btClose.setText("Cancel");
 		shell.setDefaultButton(btAccept);
@@ -323,11 +357,13 @@ public class AlignmentDialog {
 	}
 
 	private void updateSourceDisplay () {
-		edSource.setText(genericCont.printSegmentedContent(source, true));
+		edSource.setText(genericCont.printSegmentedContent(source, true,
+			!chkShowInlineCodes.getSelection()));
 	}
 	
 	private void updateTargetDisplay () {
-		edTarget.setText(genericCont.printSegmentedContent(target, true));
+		edTarget.setText(genericCont.printSegmentedContent(target, true,
+			!chkShowInlineCodes.getSelection()));
 	}
 	
 	private void updateSourceSegmentDisplay () {
@@ -364,62 +400,6 @@ public class AlignmentDialog {
 			target.joinSegmentWithNext(n);
 			updateTargetDisplay();
 			fillTargetList(n);
-		}
-		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}
-	
-	private void startSplitMode () {
-		indexSegToResplit = trgList.getSelectionIndex();
-		if ( indexSegToResplit == -1 ) return;
-		splitMode = true;
-		
-		genericCont.setContent(target.getSegments().get(indexSegToResplit));
-		edTrgSeg.setText(genericCont.toString());
-		
-		edTrgSeg.setEditable(true);
-		edTrgSeg.setFocus();
-		edSrcSeg.setText("To split: Place the cursor between the characters where you want to split the target segment, and press \"Accept\"\n"
-			+ "To cancel: Press \"Discard\"");
-		srcList.setEnabled(false);
-		trgList.setEnabled(false);
-		btMoveUp.setVisible(false);
-		btMoveDown.setVisible(false);
-		btMerge.setVisible(false);
-		btSplit.setVisible(false);
-		chkShowInlineCodes.setVisible(false);
-		chkSyncScrolling.setVisible(false);
-		btSkip.setText("Discard");
-	}
-	
-	private void endSplitMode (boolean accept) {
-		try {
-			// Compute the new segmentation
-			if ( accept ) {
-				// genericCont is already set with the proper text
-				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
-				splitSegment(indexSegToResplit, sel.x, sel.y);
-			}
-			// Reset the controls
-			edTrgSeg.setEditable(false);
-			srcList.setEnabled(true);
-			trgList.setEnabled(true);
-			btMoveUp.setVisible(true);
-			btMoveDown.setVisible(true);
-			btMerge.setVisible(true);
-			btSplit.setVisible(true);
-			chkShowInlineCodes.setVisible(true);
-			chkSyncScrolling.setVisible(true);
-			btSkip.setText("Skip");
-			splitMode = false;
-			// Update the display
-			if ( accept ) {
-				updateTargetDisplay();
-				fillTargetList(indexSegToResplit);
-			}
-			else updateTargetSegmentDisplay();
-			
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
@@ -463,6 +443,8 @@ public class AlignmentDialog {
 	{
 		this.source = sourceContainer;
 		this.target = targetContainer;
+//		originalTarget = targetContainer.clone();
+		
 		edDocument.setText(document);
 		TextUnit tu = source.getParent();
 		edName.setText("");
@@ -498,7 +480,10 @@ public class AlignmentDialog {
 		}
 		if (( trgList.getItemCount() > 0 ) && ( selection < trgList.getItemCount() )) 
 			trgList.select(selection);
-		updateTargetSegmentDisplay();
+		
+		if ( !edTrgSeg.getEditable() ) { // Not while the field can be edited
+			updateTargetSegmentDisplay();
+		}
 	}
 	
 	private void fillSourceList (int selection) {
@@ -524,4 +509,110 @@ public class AlignmentDialog {
 		if ( splitMode ) return false;
 		return true;
 	}
+	
+	private void editRules () {
+		try
+		{
+			
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void startSplitMode () {
+		indexActiveSegment = trgList.getSelectionIndex();
+		if ( indexActiveSegment == -1 ) return;
+		splitMode = true;
+		toggleFields(true);
+	}
+	
+	private void endSplitMode (boolean accept) {
+		try {
+			// Compute the new segmentation
+			if ( accept ) {
+				// genericCont is already set with the proper text
+				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
+				splitSegment(indexActiveSegment, sel.x, sel.y);
+			}
+			
+			// Reset the controls
+			splitMode = false;
+			toggleFields(false);
+			
+			// Update the display
+			if ( accept ) {
+				updateTargetDisplay();
+				fillTargetList(indexActiveSegment);
+			}
+			else updateTargetSegmentDisplay();
+			trgList.setFocus();
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void startEditMode () {
+		indexActiveSegment = trgList.getSelectionIndex();
+		if ( indexActiveSegment == -1 ) return;
+		editMode = true;
+		toggleFields(true);
+	}
+	
+	private void endEditMode (boolean accept) {
+		try {
+			// Update the content
+			if ( accept ) {
+				// genericCont is already set with the proper text
+				genericCont.updateFragment(edTrgSeg.getText(),
+					target.getSegments().get(indexActiveSegment));
+			}
+			
+			// Reset the controls
+			editMode = false;
+			toggleFields(false);
+			
+			// Update the display
+			if ( accept ) {
+				updateTargetDisplay();
+				fillTargetList(indexActiveSegment);
+			}
+			else updateTargetSegmentDisplay();
+			trgList.setFocus();
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void toggleFields (boolean specialMode) {
+		if ( specialMode ) {
+			genericCont.setContent(target.getSegments().get(indexActiveSegment));
+			edTrgSeg.setText(genericCont.toString());
+			edTrgSeg.setFocus();
+		}
+		edTrgSeg.setEditable(specialMode);
+
+		srcList.setEnabled(!specialMode);
+		trgList.setEnabled(!specialMode);
+		btEditRules.setVisible(!specialMode);
+		btEditSeg.setVisible(!specialMode);
+		btMoveUp.setVisible(!specialMode);
+		btMoveDown.setVisible(!specialMode);
+		btMerge.setVisible(!specialMode);
+		btSplit.setVisible(!specialMode);
+		chkSyncScrolling.setVisible(!specialMode);
+		
+		if ( specialMode ) {
+			if ( splitMode ) btAccept.setText("Accept Split");
+			else btAccept.setText("Accept Changes");
+			btSkip.setText("Discard");
+		}
+		else {
+			btAccept.setText("Accept");
+			btSkip.setText("Skip");
+		}
+	}
+	
 }

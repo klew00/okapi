@@ -87,11 +87,11 @@ public class OutputFilter implements IOutputFilter {
 				TextContainer content;
 				if ( item.hasTarget() ) {
 					content = item.getTargetContent();
-					content.setCodedText(content.getCodedText(), res.trgCodes);
+					content.setCodedText(content.getCodedText(), res.trgCodes, false);
 				}
 				else {
 					content = item.getSourceContent();
-					content.setCodedText(content.getCodedText(), res.srcCodes);
+					content.setCodedText(content.getCodedText(), res.srcCodes, false);
 				}
 				String tmp = xliffCont.setContent(content).toString(0, false, true);
 				writer.write(escapeChars(tmp));

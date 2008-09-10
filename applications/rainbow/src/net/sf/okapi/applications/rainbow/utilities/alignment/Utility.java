@@ -119,9 +119,14 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 	}
 	
 	public void doEpilog () {
-    	logger.info(String.format("Total translatable text units = %d", countTotal));
-    	logger.info(String.format("Total without text = %d", noTextTotal));
-    	logger.info(String.format("Total aligned = %d", alignedTotal));
+		if ( stopProcess ) {
+			logger.warn("Process interrupted by user.");
+		}
+		else {
+			logger.info(String.format("Total translatable text units = %d", countTotal));
+			logger.info(String.format("Total without text = %d", noTextTotal));
+			logger.info(String.format("Total aligned = %d", alignedTotal));
+		}
     	
 		if ( aligner != null ) {
 			aligner = null;
@@ -251,7 +256,6 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 				// Do nothing (skip entry)
 				break;
 			case 0:
-				logger.warn("Process interrupted by user.");
 				stopProcess = true;
 				break;
 			}

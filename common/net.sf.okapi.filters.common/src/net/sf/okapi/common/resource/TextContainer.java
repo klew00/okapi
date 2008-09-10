@@ -43,6 +43,21 @@ public class TextContainer extends TextFragment {
 	public TextContainer (TextUnit parent) {
 		setParent(parent);
 	}
+
+	/**
+	 * Clones this object.
+	 */
+	@Override
+	public TextContainer clone () {
+		TextContainer newCont = new TextContainer(parent);
+		newCont.setCodedText(getCodedText(), getCodes(), false);
+		newCont.id = id;
+		newCont.lastCodeID = lastCodeID;
+		if ( isSegmented() ) {
+			newCont.segments = new ArrayList<TextFragment>(segments);
+		}
+		return newCont;
+	}
 	
 	/**
 	 * Indicates if this TextContainer is segmented.

@@ -217,7 +217,7 @@ public class DbStore {
 			if ( !result.first() ) return null;
 			TextContainer tc = new TextContainer();
 			tc.setCodedText(result.getString(1),
-				Code.stringToCodes(result.getString(2)));
+				Code.stringToCodes(result.getString(2)), false);
 			// Return now if the segments are not requested
 			if ( !includeSegments ) return tc;
 			

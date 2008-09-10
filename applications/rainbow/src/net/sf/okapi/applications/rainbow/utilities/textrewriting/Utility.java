@@ -201,7 +201,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
 			TextContainer cnt = tu.getTargetContent(); 
-			cnt.setCodedText(tmp, tu.getSourceContent().getCodes());
+			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
@@ -232,7 +232,7 @@ public class Utility extends ThrougputPipeBase implements IFilterDrivenUtility  
 				tmp += params.suffix;
 			}
 			TextContainer cnt = tu.getTargetContent(); 
-			cnt.setCodedText(tmp, tu.getSourceContent().getCodes());
+			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);
