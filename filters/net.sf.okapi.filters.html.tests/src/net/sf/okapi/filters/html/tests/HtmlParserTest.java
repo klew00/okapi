@@ -31,8 +31,10 @@ import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlParser;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author HargraveJE
@@ -47,7 +49,7 @@ public class HtmlParserTest {
 	}
 
 	@Test
-	public void getNextItem() {
+	public void parse() {
 		try {
 			IParser.ParserTokenType tokenType;
 			InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("simpleTest.html");
@@ -56,13 +58,17 @@ public class HtmlParserTest {
 			while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
 				IContainable item = htmlParser.getResource();
 				if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
-					System.out.println("Text");
+					assertTrue(item instanceof TextUnit);
+					System.out.println("Text:");
 				} else if (tokenType == IParser.ParserTokenType.SKELETON) {
-					System.out.println("Skeleton");
+					assertTrue(item instanceof SkeletonUnit);
+					System.out.println("Skeleton:");
 				} else if (tokenType == IParser.ParserTokenType.STARTGROUP
 						|| tokenType == IParser.ParserTokenType.ENDGROUP) {
-					System.out.println("Group");
+					assertTrue(item instanceof Group);
+					System.out.println("Group:");
 				}
+				assertNotNull(item);
 				System.out.println(item.toString());
 			}
 			htmlParser.close();
