@@ -31,7 +31,6 @@ import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlParser;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -50,30 +49,25 @@ public class HtmlParserTest {
 
 	@Test
 	public void parse() {
-		try {
-			IParser.ParserTokenType tokenType;
-			InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("simpleTest.html");
-			InputStreamReader htmlReader = new InputStreamReader(htmlStream, "utf-8");
-			htmlParser.open(htmlStream);
-			while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
-				IContainable item = htmlParser.getResource();
-				if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
-					assertTrue(item instanceof TextUnit);
-					System.out.println("Text:");
-				} else if (tokenType == IParser.ParserTokenType.SKELETON) {
-					assertTrue(item instanceof SkeletonUnit);
-					System.out.println("Skeleton:");
-				} else if (tokenType == IParser.ParserTokenType.STARTGROUP
-						|| tokenType == IParser.ParserTokenType.ENDGROUP) {
-					assertTrue(item instanceof Group);
-					System.out.println("Group:");
-				}
-				assertNotNull(item);
-				System.out.println(item.toString());
+
+		IParser.ParserTokenType tokenType;
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("test.html");
+		htmlParser.open(htmlStream);
+		while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
+			IContainable item = htmlParser.getResource();
+			if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
+				assertTrue(item instanceof TextUnit);
+				System.out.println("Text:");
+			} else if (tokenType == IParser.ParserTokenType.SKELETON) {
+				assertTrue(item instanceof SkeletonUnit);
+				System.out.println("Skeleton:");
+			} else if (tokenType == IParser.ParserTokenType.STARTGROUP || tokenType == IParser.ParserTokenType.ENDGROUP) {
+				assertTrue(item instanceof Group);
+				System.out.println("Group:");
 			}
-			htmlParser.close();
-		} catch (UnsupportedEncodingException e) {
-		} catch (IOException e) {
+			assertNotNull(item);
+			System.out.println(item.toString());
 		}
+		htmlParser.close();
 	}
 }
