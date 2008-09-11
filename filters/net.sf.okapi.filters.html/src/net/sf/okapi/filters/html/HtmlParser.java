@@ -105,7 +105,7 @@ public class HtmlParser extends BaseParser {
 		ruleState.reset();
 		reset();
 
-		while (!isFinishedToken() && nodeIterator.hasNext()) {
+		while (!isFinishedToken() && nodeIterator.hasNext() && !isCanceled()) {
 			Segment segment = nodeIterator.next();
 
 			if (segment instanceof Tag) {
@@ -145,6 +145,10 @@ public class HtmlParser extends BaseParser {
 			} else {
 				handleText(segment);
 			}
+		}
+		
+		if (isCanceled()) {
+			return getFinalizedTokenType();
 		}
 
 		if (!nodeIterator.hasNext()) {
