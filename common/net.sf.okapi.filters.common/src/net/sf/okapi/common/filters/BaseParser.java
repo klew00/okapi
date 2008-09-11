@@ -20,9 +20,6 @@
 
 package net.sf.okapi.common.filters;
 
-import java.io.InputStream;
-import java.net.URL;
-
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
@@ -43,6 +40,7 @@ public abstract class BaseParser implements IParser {
 	private ParserTokenType finalizedTokenType;
 	private boolean finishedToken = false;
 	private boolean finishedParsing = false;
+	private boolean cancel = false;
 
 	public BaseParser() {
 	}
@@ -93,6 +91,7 @@ public abstract class BaseParser implements IParser {
 
 	protected void reset() {
 		finishedToken = false;
+		cancel = false;
 	}
 
 	protected void finalizeCurrentToken() {
@@ -192,6 +191,16 @@ public abstract class BaseParser implements IParser {
 			textUnit.addChild(child);
 		}
 	}
+	
+	public void cancel() {
+		finalizeCurrentToken();
+		setFinishedParsing(true);
+		cancel = true;
+	}
+	
+	protected boolean isCanceled() {
+		return cancel;
+	}
 
 	private void createSkeletonUnit(int offset, int length) {
 		skeletonUnit = new SkeletonUnit(String.format("s%d", ++skeleltonUnitId), offset, length);
@@ -223,45 +232,5 @@ public abstract class BaseParser implements IParser {
 		textUnit.addChild(child);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#getResource()
-	 */
-	abstract public IContainable getResource();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#open(java.lang.CharSequence)
-	 */
-	abstract public void open(CharSequence input);
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#open(java.io.InputStream)
-	 */
-	abstract public void open(InputStream input);
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#open(java.net.URL)
-	 */
-	abstract public void open(URL input);
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#parseNext()
-	 */
-	abstract public ParserTokenType parseNext();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IParser#close()
-	 */
-	abstract public void close();
+	
 }
