@@ -82,4 +82,10 @@ public interface IParser {
 	 * Close the source input and cleanup any other opened resources.
 	 */
 	public void close();
+
+	/**
+	 * Cancels the process. The caller can this method in listener event to
+	 * cancel the process.
+	 */
+	void cancel ();
 }
