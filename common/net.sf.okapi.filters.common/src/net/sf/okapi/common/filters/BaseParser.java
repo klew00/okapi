@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.filters;
 
+import java.util.Stack;
+
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
@@ -36,6 +38,7 @@ public abstract class BaseParser implements IParser {
 	private TextUnit textUnit;
 	private SkeletonUnit skeletonUnit;
 	private Group group;
+	private Stack<Group> groupStack;
 	private IContainable finalizedToken;
 	private ParserTokenType finalizedTokenType;
 	private boolean finishedToken = false;
@@ -43,6 +46,7 @@ public abstract class BaseParser implements IParser {
 	private boolean cancel = false;
 
 	public BaseParser() {
+		groupStack = new Stack<Group>();
 	}
 
 	protected TextUnit getTextUnit() {
@@ -66,7 +70,7 @@ public abstract class BaseParser implements IParser {
 	}
 
 	protected boolean isGroupEmtpy() {
-		return (group == null || group.isEmpty());
+		return (group == null || groupStack.isEmpty() || group.isEmpty());
 	}
 
 	protected int getGroupId() {
@@ -95,51 +99,37 @@ public abstract class BaseParser implements IParser {
 	}
 
 	private void finalizeToken(TextUnit textUnit) {
-		finishedToken = true;
-		finalizedToken = textUnit;
-		finalizedTokenType = ParserTokenType.TRANSUNIT;
+		if (group != null) {
+			appendTextUnitToGroup();
+		} else {
+			finishedToken = true;
+			finalizedToken = textUnit;
+			finalizedTokenType = ParserTokenType.TRANSUNIT;
+		}
 		this.textUnit = null;
 	}
 
 	private void finalizeToken(SkeletonUnit skeletonUnit) {
-		finishedToken = true;
-		finalizedToken = skeletonUnit;
-		finalizedTokenType = ParserTokenType.SKELETON;
+		if (group != null) {
+			appendSkeletonUnitToGroup();
+		} else {
+			finishedToken = true;
+			finalizedToken = skeletonUnit;
+			finalizedTokenType = ParserTokenType.SKELETON;
+		}
 		this.skeletonUnit = null;
-	}
-
-	private void finalizeToken(Group group) {
-		finishedToken = true;
-		finalizedToken = group;
-		finalizedTokenType = ParserTokenType.ENDGROUP;
-		this.group = null;
 	}
 
 	protected void finalizeCurrentToken() {
 		finishedToken = true;
-		if (!isGroupEmtpy()) {			
-			finalizedToken = getGroup();
-			// since we are starting the next token we assume Group is finished
-			// and set ENDGROUP as the token type, STARTGROUP should have been
-			// returned earlier.
-			finalizedTokenType = ParserTokenType.ENDGROUP;
-			group = null;
-		} else if (!isSkeletonUnitEmtpy()) {
+		if (!isSkeletonUnitEmtpy()) {
 			// should be only one instance of textUnit, skeletonUnit
 			assert (isTextUnitEmtpy());
-			assert (isGroupEmtpy());
-			finalizedToken = getSkeletonUnit();
-			finalizedTokenType = ParserTokenType.SKELETON;
-			skeletonUnit = null;
+			finalizeToken(skeletonUnit);
 		} else if (!isTextUnitEmtpy()) {
 			// should be only one instance of textUnit, skeletonUnit
 			assert (isSkeletonUnitEmtpy());
-			assert (isGroupEmtpy());
-			finalizedToken = getTextUnit();
-			finalizedTokenType = ParserTokenType.TRANSUNIT;
-			textUnit = null;
-		} else {
-			// TODO: throw exception
+			finalizeToken(textUnit);
 		}
 	}
 
@@ -228,27 +218,27 @@ public abstract class BaseParser implements IParser {
 			finalizeToken(skeletonUnit);
 		}
 	}
-	
-	protected void appendToGroup(TextUnit textUnit) {
-		if (group == null) {
-			createGroup(textUnit);
-		} else {
+
+	private void appendTextUnitToGroup() {
+		assert (group != null);
+		if (isGroupEmtpy()) {
 			group.add(textUnit);
-		}
-		if (skeletonUnit != null && !skeletonUnit.isEmpty()) {
-			finalizeToken(skeletonUnit);
-		}
-	}
-	
-	protected void appendToGroup(SkeletonUnit skeletonUnit) {
-		if (group == null) {
-			createGroup(skeletonUnit);
 		} else {
+			Group currentGroup = groupStack.get(groupStack.size() - 1);
+			currentGroup.add(textUnit);
+		}
+		textUnit = null;
+	}
+
+	private void appendSkeletonUnitToGroup() {
+		assert (group != null);
+		if (isGroupEmtpy()) {
 			group.add(skeletonUnit);
+		} else {
+			Group currentGroup = groupStack.get(groupStack.size() - 1);
+			currentGroup.add(skeletonUnit);
 		}
-		if (textUnit != null && !textUnit.isEmpty()) {
-			finalizeToken(textUnit);
-		}
+		skeletonUnit = null;
 	}
 
 	public void cancel() {
@@ -290,27 +280,56 @@ public abstract class BaseParser implements IParser {
 		child.setParent(textUnit);
 		textUnit.addChild(child);
 	}
-	
-	private void createGroup(TextUnit textUnit) {
-		group = new Group();
-		group.setID(String.format("s%d", ++groupId));
-		group.add(textUnit);
+
+	private boolean isGroupState() {
+		if (groupStack.isEmpty())
+			return false;
+		return true;
 	}
-	
-	private void createGroup(SkeletonUnit skeletonUnit) {
-		group = new Group();
-		group.setID(String.format("s%d", ++groupId));
-		group.add(skeletonUnit);
+
+	private boolean parentGroupHasChildGroup() {
+		if (groupStack.size() >= 2)
+			return true;
+		return false;
 	}
-	
-	private void createGroup(Group group) {
-		group = new Group();
-		group.setID(String.format("s%d", ++groupId));
-		group.add(group);
+
+	private void pushGroup(Group group) {
+		groupStack.push(group);
 	}
-	
-	protected void createGroup() {
-		group = new Group();
-		group.setID(String.format("s%d", ++groupId));		
+
+	private Group popGroup() {
+		return groupStack.pop();
+	}
+
+	private Group createGroup() {
+		Group group = new Group();
+		group.setID(String.format("s%d", ++groupId));
+		return group;
+	}
+
+	protected void startGroup() {
+		if (group == null) {
+			group = createGroup();
+		} else {
+			Group childGroup = createGroup();
+			pushGroup(childGroup);
+			group.add(childGroup);
+		}
+	}
+
+	protected void endGroup() {
+		assert (group != null);
+		if (parentGroupHasChildGroup()) {			
+			finalizeCurrentToken();
+			return;
+		}
+
+		finishedToken = true;
+		finalizedToken = getGroup();
+		// since we are starting the next token we assume Group is finished
+		// and set ENDGROUP as the token type, STARTGROUP should have been
+		// returned earlier.
+		finalizedTokenType = ParserTokenType.ENDGROUP;
+		group = null;
 	}
 }

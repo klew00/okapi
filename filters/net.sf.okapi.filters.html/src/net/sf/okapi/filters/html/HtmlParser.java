@@ -226,9 +226,8 @@ public class HtmlParser extends BaseParser {
 		case EXTRACTABLE_ATTRIBUTES:
 			// TODO: test for extractable attributes and create subflow
 			break;
-		case GROUP_ELEMENT:
-			// TODO: ignore groups for now till main logic is stable
-			ruleState.pushGroupRule(startTag.getName());			
+		case GROUP_ELEMENT:							
+			startGroup();
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
@@ -285,10 +284,8 @@ public class HtmlParser extends BaseParser {
 			ruleState.setInline(true);
 			addToCurrentTextUnit(endTag);
 			break;
-		case GROUP_ELEMENT:
-			// TODO: ignore groups for now till main logic is stable
-			ruleState.popGroupRule();
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+		case GROUP_ELEMENT:					
+			endGroup();
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();

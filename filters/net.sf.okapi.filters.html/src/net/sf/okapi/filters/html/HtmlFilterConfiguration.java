@@ -76,6 +76,9 @@ public class HtmlFilterConfiguration implements IHtmlFilterConfiguration {
 		// preserve whitespace for these tags
 		ruleMap.put("pre", ExtractionRule.createPreserveWhiteSpaceRule("pre"));
 		
+		// default Group rules
+		ruleMap.put("group", ExtractionRule.createGroupRule("group"));
+		
 		// default inline elements with option extractable attributes
 		ruleMap.put("a", ExtractionRule.createInlineWithAttributeRule("a", "title"));
 		

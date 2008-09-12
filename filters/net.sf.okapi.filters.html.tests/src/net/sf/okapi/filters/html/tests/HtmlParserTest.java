@@ -51,7 +51,7 @@ public class HtmlParserTest {
 		htmlParser = new HtmlParser();
 		//htmlParser.setHtmlFilterConfiguration(new ExcludeIncludeConfiguration());
 		IParser.ParserTokenType tokenType;
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("test.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("simpleTest.html");
 		htmlParser.open(htmlStream);
 		while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
 			IContainable item = htmlParser.getResource();

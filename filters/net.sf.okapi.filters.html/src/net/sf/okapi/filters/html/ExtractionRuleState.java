@@ -41,7 +41,6 @@ public class ExtractionRuleState {
 
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
-	private Stack<RuleType> groupRuleStack;
 	private boolean isInline = false;
 
 	/**
@@ -49,8 +48,7 @@ public class ExtractionRuleState {
 	 */
 	public ExtractionRuleState() {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
-		excludedIncludedRuleStack = new Stack<RuleType>();
-		groupRuleStack = new Stack<RuleType>();
+		excludedIncludedRuleStack = new Stack<RuleType>();		
 	}
 	
 	public void reset() {		
@@ -75,15 +73,6 @@ public class ExtractionRuleState {
 		return false;		
 	}
 
-	public boolean isGroupState() {
-		if (groupRuleStack.isEmpty())
-			return false;
-		if (groupRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.GROUP_ELEMENT)
-			return true;
-
-		return false;
-	}
-
 	public void pushPreserverWhitespaceRule(String ruleName) {
 		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE));
 	}
@@ -102,14 +91,6 @@ public class ExtractionRuleState {
 
 	public void popExcludedIncludedRule() {
 		excludedIncludedRuleStack.pop();
-	}
-
-	public void pushGroupRule(String ruleName) {
-		groupRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.GROUP_ELEMENT));
-	}
-
-	public void popGroupRule() {
-		groupRuleStack.pop();
 	}
 
 	protected boolean isInline() {
