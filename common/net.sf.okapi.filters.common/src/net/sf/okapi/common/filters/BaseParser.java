@@ -27,7 +27,7 @@ import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
- * Abstract helper class for filter writers. 
+ * Abstract helper class for filter writers.
  */
 public abstract class BaseParser implements IParser {
 	private int groupId = 0;
@@ -94,31 +94,50 @@ public abstract class BaseParser implements IParser {
 		cancel = false;
 	}
 
-	protected void finalizeCurrentToken() {
-		// should be only one instance of textUnit, skeletonUnit and group,
-		// all others must be empty.
+	private void finalizeToken(TextUnit textUnit) {
 		finishedToken = true;
-		if (!isTextUnitEmtpy()) {
-			assert (isSkeletonUnitEmtpy());
-			assert (isGroupEmtpy());
-			finalizedToken = getTextUnit();
-			finalizedTokenType = ParserTokenType.TRANSUNIT;
-			textUnit = null;
-		} else if (!isSkeletonUnitEmtpy()) {
-			assert (isTextUnitEmtpy());
-			assert (isGroupEmtpy());
-			finalizedToken = getSkeletonUnit();
-			finalizedTokenType = ParserTokenType.SKELETON;
-			skeletonUnit = null;
-		} else if (!isGroupEmtpy()) {
-			assert (isSkeletonUnitEmtpy());
-			assert (isTextUnitEmtpy());
+		finalizedToken = textUnit;
+		finalizedTokenType = ParserTokenType.TRANSUNIT;
+		this.textUnit = null;
+	}
+
+	private void finalizeToken(SkeletonUnit skeletonUnit) {
+		finishedToken = true;
+		finalizedToken = skeletonUnit;
+		finalizedTokenType = ParserTokenType.SKELETON;
+		this.skeletonUnit = null;
+	}
+
+	private void finalizeToken(Group group) {
+		finishedToken = true;
+		finalizedToken = group;
+		finalizedTokenType = ParserTokenType.ENDGROUP;
+		this.group = null;
+	}
+
+	protected void finalizeCurrentToken() {
+		finishedToken = true;
+		if (!isGroupEmtpy()) {			
 			finalizedToken = getGroup();
 			// since we are starting the next token we assume Group is finished
 			// and set ENDGROUP as the token type, STARTGROUP should have been
 			// returned earlier.
 			finalizedTokenType = ParserTokenType.ENDGROUP;
 			group = null;
+		} else if (!isSkeletonUnitEmtpy()) {
+			// should be only one instance of textUnit, skeletonUnit
+			assert (isTextUnitEmtpy());
+			assert (isGroupEmtpy());
+			finalizedToken = getSkeletonUnit();
+			finalizedTokenType = ParserTokenType.SKELETON;
+			skeletonUnit = null;
+		} else if (!isTextUnitEmtpy()) {
+			// should be only one instance of textUnit, skeletonUnit
+			assert (isSkeletonUnitEmtpy());
+			assert (isGroupEmtpy());
+			finalizedToken = getTextUnit();
+			finalizedTokenType = ParserTokenType.TRANSUNIT;
+			textUnit = null;
 		} else {
 			// TODO: throw exception
 		}
@@ -149,6 +168,9 @@ public abstract class BaseParser implements IParser {
 		} else {
 			skeletonUnit.addToLength(length);
 		}
+		if (textUnit != null && !textUnit.isEmpty()) {
+			finalizeToken(textUnit);
+		}
 	}
 
 	protected void appendToSkeletonUnit(String skeleton) {
@@ -156,6 +178,9 @@ public abstract class BaseParser implements IParser {
 			createSkeletonUnit(skeleton);
 		} else {
 			skeletonUnit.appendData(skeleton);
+		}
+		if (textUnit != null && !textUnit.isEmpty()) {
+			finalizeToken(textUnit);
 		}
 	}
 
@@ -166,6 +191,9 @@ public abstract class BaseParser implements IParser {
 			skeletonUnit.appendData(skeleton);
 			skeletonUnit.addToLength(length);
 		}
+		if (textUnit != null && !textUnit.isEmpty()) {
+			finalizeToken(textUnit);
+		}
 	}
 
 	protected void appendToTextUnit(Code code) {
@@ -173,6 +201,9 @@ public abstract class BaseParser implements IParser {
 			createTextUnit(code);
 		} else {
 			textUnit.getSourceContent().append(code.getTagType(), code.getType(), code.getData());
+		}
+		if (skeletonUnit != null && !skeletonUnit.isEmpty()) {
+			finalizeToken(skeletonUnit);
 		}
 	}
 
@@ -182,6 +213,9 @@ public abstract class BaseParser implements IParser {
 		} else {
 			textUnit.getSourceContent().append(text);
 		}
+		if (skeletonUnit != null && !skeletonUnit.isEmpty()) {
+			finalizeToken(skeletonUnit);
+		}
 	}
 
 	protected void appendToTextUnit(TextUnit child) {
@@ -190,14 +224,39 @@ public abstract class BaseParser implements IParser {
 		} else {
 			textUnit.addChild(child);
 		}
+		if (skeletonUnit != null && !skeletonUnit.isEmpty()) {
+			finalizeToken(skeletonUnit);
+		}
 	}
 	
+	protected void appendToGroup(TextUnit textUnit) {
+		if (group == null) {
+			createGroup(textUnit);
+		} else {
+			group.add(textUnit);
+		}
+		if (skeletonUnit != null && !skeletonUnit.isEmpty()) {
+			finalizeToken(skeletonUnit);
+		}
+	}
+	
+	protected void appendToGroup(SkeletonUnit skeletonUnit) {
+		if (group == null) {
+			createGroup(skeletonUnit);
+		} else {
+			group.add(skeletonUnit);
+		}
+		if (textUnit != null && !textUnit.isEmpty()) {
+			finalizeToken(textUnit);
+		}
+	}
+
 	public void cancel() {
 		finalizeCurrentToken();
 		setFinishedParsing(true);
 		cancel = true;
 	}
-	
+
 	protected boolean isCanceled() {
 		return cancel;
 	}
@@ -231,6 +290,27 @@ public abstract class BaseParser implements IParser {
 		child.setParent(textUnit);
 		textUnit.addChild(child);
 	}
-
 	
+	private void createGroup(TextUnit textUnit) {
+		group = new Group();
+		group.setID(String.format("s%d", ++groupId));
+		group.add(textUnit);
+	}
+	
+	private void createGroup(SkeletonUnit skeletonUnit) {
+		group = new Group();
+		group.setID(String.format("s%d", ++groupId));
+		group.add(skeletonUnit);
+	}
+	
+	private void createGroup(Group group) {
+		group = new Group();
+		group.setID(String.format("s%d", ++groupId));
+		group.add(group);
+	}
+	
+	protected void createGroup() {
+		group = new Group();
+		group.setID(String.format("s%d", ++groupId));		
+	}
 }

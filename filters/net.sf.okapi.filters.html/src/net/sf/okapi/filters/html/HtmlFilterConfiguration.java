@@ -30,7 +30,7 @@ import net.htmlparser.jericho.MasonTagTypes;
 import net.htmlparser.jericho.MicrosoftTagTypes;
 import net.htmlparser.jericho.PHPTagTypes;
 
-public class HtmlFilterConfiguration {
+public class HtmlFilterConfiguration implements IHtmlFilterConfiguration {
 	private static final String LOCALIZABLE_PROPERTY = "localizable";
 	
 	private Map<String, ExtractionRule> ruleMap;

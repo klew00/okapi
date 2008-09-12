@@ -43,13 +43,39 @@ public class HtmlParserTest {
 	private HtmlParser htmlParser;
 
 	@Before
-	public void setUp() {
-		htmlParser = new HtmlParser();
+	public void setUp() {		
 	}
 
 	@Test
-	public void parse() {
+	public void excludeInclude() {
+		htmlParser = new HtmlParser();
+		//htmlParser.setHtmlFilterConfiguration(new ExcludeIncludeConfiguration());
+		IParser.ParserTokenType tokenType;
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("test.html");
+		htmlParser.open(htmlStream);
+		while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
+			IContainable item = htmlParser.getResource();
+			if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
+				assertTrue(item instanceof TextUnit);
+				//assertEquals(item.toString(), "Text should be included. <b>");
+				System.out.println("Text:");
+			} else if (tokenType == IParser.ParserTokenType.SKELETON) {
+				assertTrue(item instanceof SkeletonUnit);
+				System.out.println("Skeleton:");
+			} else if (tokenType == IParser.ParserTokenType.STARTGROUP || tokenType == IParser.ParserTokenType.ENDGROUP) {
+				assertTrue(item instanceof Group);
+				System.out.println("Group:");
+			}
+			assertNotNull(item);
+			System.out.println(item.toString());
+		}
+		htmlParser.close();
+	}
 
+	/*
+	@Test
+	public void parse() {
+		htmlParser = new HtmlParser();
 		IParser.ParserTokenType tokenType;
 		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("test.html");
 		htmlParser.open(htmlStream);
@@ -70,4 +96,5 @@ public class HtmlParserTest {
 		}
 		htmlParser.close();
 	}
+*/
 }

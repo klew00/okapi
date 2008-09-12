@@ -40,7 +40,7 @@ import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
-	private HtmlFilterConfiguration configuration;
+	private IHtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
 
@@ -75,16 +75,16 @@ public class HtmlParser extends BaseParser {
 		initialize();
 	}
 
-	public void setHtmlFilterConfiguration(HtmlFilterConfiguration configuration) {
+	public void setHtmlFilterConfiguration(IHtmlFilterConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
 	private void initialize() {
 
 		if (configuration == null) {
-			configuration = new HtmlFilterConfiguration();
-			configuration.initializeDefaultRules();
+			configuration = new HtmlFilterConfiguration();		
 		}
+		configuration.initializeDefaultRules();
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
@@ -136,7 +136,7 @@ public class HtmlParser extends BaseParser {
 				} else { // not classified explicitly by Jericho
 					if (tag instanceof StartTag) {
 						handleStartTag((StartTag) tag);
-					} else if (tag instanceof StartTag) {
+					} else if (tag instanceof EndTag) {
 						handleEndTag((EndTag) tag);
 					} else {
 						handleSkeleton(tag);
@@ -168,11 +168,6 @@ public class HtmlParser extends BaseParser {
 			return;
 		}
 
-		// does this trigger the end of a textUnit?
-		if (!isTextUnitEmtpy()) {
-			finalizeCurrentToken();
-		}
-
 		// TODO: special handling for CDATA sections (may call sub-filters
 		// or unescape content etc.)
 		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
@@ -196,20 +191,10 @@ public class HtmlParser extends BaseParser {
 
 		// its not pure whitespace so we are now processing inline text
 		ruleState.setInline(true);
-
-		// does this trigger the end of a skeletonUnit?
-		if (isTextUnitEmtpy()) {
-			finalizeCurrentToken();
-		}
-
 		appendToTextUnit(text.toString());
 	}
 
 	private void handleSkeleton(Tag tag) {
-		// does this trigger the end of a textUnit?
-		if (!isTextUnitEmtpy()) {
-			finalizeCurrentToken();
-		}
 		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
 	}
 
@@ -217,16 +202,13 @@ public class HtmlParser extends BaseParser {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
-
 			// process these tag types to update parser state
 			switch (getRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
-				ruleState.pushExcludedRule(startTag.getName());
-				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+				ruleState.pushExcludedRule(startTag.getName());				
 				break;
 			case INCLUDED_ELEMENT:
-				ruleState.pushIncludedRule(startTag.getName());
-				appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+				ruleState.pushIncludedRule(startTag.getName());				
 				break;
 			case PRESERVE_WHITESPACE:
 				ruleState.pushPreserverWhitespaceRule(startTag.getName());
@@ -238,10 +220,6 @@ public class HtmlParser extends BaseParser {
 		switch (getRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
-			// does this trigger the end of a skeletonUnit?
-			if (!isSkeletonUnitEmtpy()) {
-				finalizeCurrentToken();
-			}
 			addToCurrentTextUnit(startTag);
 			break;
 
@@ -250,8 +228,7 @@ public class HtmlParser extends BaseParser {
 			break;
 		case GROUP_ELEMENT:
 			// TODO: ignore groups for now till main logic is stable
-			ruleState.pushGroupRule(startTag.getName());
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			ruleState.pushGroupRule(startTag.getName());			
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
@@ -272,10 +249,6 @@ public class HtmlParser extends BaseParser {
 			break;
 		default:
 			ruleState.setInline(false);
-			// does this trigger the end of a textUnit?
-			if (!isTextUnitEmtpy()) {
-				finalizeCurrentToken();
-			}
 			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 		}
 
@@ -291,7 +264,6 @@ public class HtmlParser extends BaseParser {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
-
 			// process these tag types to update parser state
 			switch (getRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
@@ -311,10 +283,6 @@ public class HtmlParser extends BaseParser {
 		switch (getRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
-			// does this trigger the end of a skeletonUnit?
-			if (!isSkeletonUnitEmtpy()) {
-				finalizeCurrentToken();
-			}
 			addToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
@@ -341,10 +309,6 @@ public class HtmlParser extends BaseParser {
 			break;
 		default:
 			ruleState.setInline(false);
-			// does this trigger the end of a textUnit?
-			if (!isTextUnitEmtpy()) {
-				finalizeCurrentToken();
-			}
 			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		}
