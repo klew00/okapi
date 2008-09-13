@@ -23,7 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities;
 import net.sf.okapi.common.pipeline.IOutputPipe;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
 
-public interface IFilterDrivenUtility extends  IUtility, IResourceBuilder, IOutputPipe{
+public interface IFilterDrivenUtility extends IUtility, IResourceBuilder, IOutputPipe {
 
 	/**
 	 * Indicates if the utility has to use the output filter

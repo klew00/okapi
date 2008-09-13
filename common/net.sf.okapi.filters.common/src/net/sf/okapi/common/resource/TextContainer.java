@@ -264,7 +264,7 @@ public class TextContainer extends TextFragment {
 					// Remove the segment from the segment list
 					segments.remove(segmentIndex);
 					// Renumber the remaining segment
-					renumberSegmentMarkers(pos, segmentIndex+1);
+					renumberSegmentMarkers(pos, segmentIndex);
 					return pos;
 				}
 			}
@@ -295,7 +295,7 @@ public class TextContainer extends TextFragment {
 			String.valueOf(segments.size()-1)));
 		text.append(""+(char)MARKER_SEGMENT+toChar(codes.size()-1));
 	}
-	
+
 	/**
 	 * Creates a new segment from a section of the container text.
 	 * Any existing segmentation remains in place, but the section 
@@ -305,14 +305,17 @@ public class TextContainer extends TextFragment {
 	 * @param end The position just after the last character or marker of the section
 	 * (in the coded text representation). You can use -1 to indicate the end of the
 	 * text.
-	 * @return The segment just created.
+	 * @return The segment just created, or null if no segment was created (for
+	 * example when the width provided was 0).
 	 */
 	public TextFragment createSegment (int start,
 		int end)
 	{
 		// Compute end for -1
 		if ( end == -1 ) end = text.length();
-		
+		// Check if the segment is empty
+		if ( start == end ) return null;
+
 		// Create lists if needed
 		if ( segments == null ) {
 			segments = new ArrayList<TextFragment>();
@@ -320,10 +323,36 @@ public class TextContainer extends TextFragment {
 		if ( codes == null ) {
 			codes = new ArrayList<Code>();
 		}
-		//TODO: Check if the section contain existing segment markers (it should not)
+
+		// Get the segment index value for the first segment to create
+		// (where it goes in the list of existing segments)
+		int segIndex = 0;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip
+				break;
+			case MARKER_SEGMENT:
+				// Are we after the start of the segment to insert?
+				if ( i >= start ) i = text.length(); // Then stop here
+				else segIndex++; // Else wait for next marker or end of text
+				break;
+			}
+		}
 
 		// Add the new segment in the list
-		segments.add(subSequence(start, end));
+		boolean inserted = true;
+		if ( segIndex > segments.size()-1 ) {
+			segments.add(subSequence(start, end));
+			segIndex = segments.size()-1;
+			inserted = false; // new segment was added
+		}
+		else {
+			segments.add(segIndex, subSequence(start, end));
+		}
+		
 		// Remove it from the main content
 		int width = end-start;
 		if ( width > 2 ) remove(start, end-2);
@@ -332,13 +361,17 @@ public class TextContainer extends TextFragment {
 		// Else width == 2 : Do nothing
 			
 		// Set the segment marker and its corresponding code
-		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
-			String.valueOf(segments.size()-1)));
 		text.setCharAt(start, (char)MARKER_SEGMENT);
+		// Add the segment marker
+		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
+			String.valueOf(segIndex)));
+		// Index of the marker is independent of its location
 		text.setCharAt(start+1, toChar(codes.size()-1));
-		
+
+		// If required: update the indices of the segment markers after the new one
+		if ( inserted ) renumberSegmentMarkers(start+2, segIndex+1);
 		// Return the created segment
-		return segments.get(segments.size()-1);
+		return segments.get(segIndex);
 	}
 	
 	/**

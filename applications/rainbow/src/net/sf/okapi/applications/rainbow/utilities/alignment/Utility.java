@@ -101,7 +101,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		dbStoreBuilder.setSegmenters(srcSeg, trgSeg);
 		
 		if ( aligner == null ) {
-			aligner = new SegmentsAligner(shell);
+			aligner = new SegmentsAligner(shell, params.targetSrxPath, trgSeg);
 		}
 		
 		alignedTotal = 0;

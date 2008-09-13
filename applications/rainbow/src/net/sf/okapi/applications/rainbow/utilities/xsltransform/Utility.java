@@ -32,7 +32,6 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
-import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.ConfigurationString;
@@ -219,13 +218,13 @@ public class Utility implements ISimpleUtility {
 		listenerList.remove(CancelListener.class, listener);
 	}
 
-	private void fireCancelEvent (CancelEvent event) {
+	/*private void fireCancelEvent (CancelEvent event) {
 		Object[] listeners = listenerList.getListenerList();
 		for ( int i=0; i<listeners.length; i+=2 ) {
 			if ( listeners[i] == CancelListener.class ) {
 				((CancelListener)listeners[i+1]).cancelOccurred(event);
 			}
 		}
-	}
+	}*/
 
 }

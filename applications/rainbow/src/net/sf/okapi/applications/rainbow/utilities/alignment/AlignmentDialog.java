@@ -27,10 +27,14 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -47,6 +51,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import sf.okapi.lib.ui.segmentation.GenericContent;
+import sf.okapi.lib.ui.segmentation.SRXEditor;
 
 public class AlignmentDialog {
 	
@@ -79,6 +84,8 @@ public class AlignmentDialog {
 	private boolean          editMode = false;
 	private int              indexActiveSegment;
 	private GenericContent   genericCont;
+	private String           targetSrxPath;
+	private Segmenter        targetSegmenter;
 
 
 	@Override
@@ -132,11 +139,17 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 4;
 		edCause.setLayoutData(gdTmp);
 		edCause.setEditable(false);
+
+		Font font = edCause.getFont();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(10);
+		textFont = new Font(font.getDevice(), fontData[0]);
 		
 		srcList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		srcList.setLayoutData(gdTmp);
+		srcList.setFont(textFont);
 		srcList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromSource();
@@ -148,6 +161,7 @@ public class AlignmentDialog {
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		trgList.setLayoutData(gdTmp);
+		trgList.setFont(textFont);
 		trgList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
@@ -200,7 +214,7 @@ public class AlignmentDialog {
 		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
 		btEditRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				startEditMode();
+				editRules();
 			}
 		});
 		
@@ -277,10 +291,6 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edSrcSeg.setLayoutData(gdTmp);
-		Font font = edSrcSeg.getFont();
-		FontData[] fontData = font.getFontData();
-		fontData[0].setHeight(10);
-		textFont = new Font(font.getDevice(), fontData[0]);
 		edSrcSeg.setFont(textFont);
 		
 		edTrgSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -290,6 +300,13 @@ public class AlignmentDialog {
 		gdTmp.heightHint = 16;
 		edTrgSeg.setLayoutData(gdTmp);
 		edTrgSeg.setFont(textFont);
+		edTrgSeg.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if ( e.keyCode == SWT.CR ) {
+					e.doit = true;
+				}
+			}
+		});
 
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Full text unit:");
@@ -341,6 +358,13 @@ public class AlignmentDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	public void setInfo (String targetSrxPath,
+		Segmenter targetSegmenter)
+	{
+		this.targetSrxPath = targetSrxPath;
+		this.targetSegmenter = targetSegmenter;
+	}
+	
 	private void synchronizeFromSource () {
 		updateSourceSegmentDisplay();
 		int n = srcList.getSelectionIndex();
@@ -383,7 +407,7 @@ public class AlignmentDialog {
 		btMoveUp.setEnabled(n>0);
 		btMoveDown.setEnabled(( n < count-1 ) && ( n > -1 ));
 		btMerge.setEnabled(( n < count-1 ) && ( n > -1 ));
-		btSplit.setEnabled(( count > 1 ) && ( n > -1 ));
+		btSplit.setEnabled(( count > 0 ) && ( n > -1 ));
 	}
 	
 	private void moveUp () {
@@ -414,14 +438,33 @@ public class AlignmentDialog {
 	{
 		// No split if location is not a range and is not inside text
 		if (( start == end ) && ( start == 0 )) return;
+		// Get the length of the segment to re-split
+		int len = target.getSegments().get(segIndex).getCodedText().length();
+		//TODO: case for if (( start == 0 ) && ( end == len ))
+
 		// Merge the segment to re-split
 		int pos = target.mergeSegment(segIndex);
 		// Now pos value is the position 0 of the segment character indices
 		if ( pos == -1 ) return; // Segment index not found
-		// First new segment goes from start of original to start selection
-		target.createSegment(pos, pos+start);
-		// Second new segment goes from end selection to end of original segment
-		target.createSegment(pos+end, -1);
+		
+		// Create the new segment(s)
+		if ( start == 0 ) {
+			// Only one new segment: From the end of selection
+			// up to the end of the original segment.
+			target.createSegment(pos+end, pos+len);
+		}
+		else if ( end == len ) {
+			// Only one new segment: From the start of the original segment
+			// up to the start of the selection 
+			target.createSegment(pos, pos+start);
+		}
+		else { 
+			// First new segment goes from start of original to start selection
+			target.createSegment(pos, pos+start);
+			// Second new segment goes from end of previous segment marker
+			// plus the length of the selection to end of original segment minus length of first segment
+			target.createSegment(pos+2+(end-start), pos+(len-(start-2)));
+		}
 	}
 	
 	public void close () {
@@ -538,6 +581,20 @@ public class AlignmentDialog {
 			}
 			else updateTargetSegmentDisplay();
 			trgList.setFocus();
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void editRules () {
+		try {
+			SRXEditor editor = new SRXEditor(shell);
+			editor.showDialog(targetSrxPath);
+			//TODO: Update the segmenter
+			SRXDocument doc = new SRXDocument();
+			doc.loadRules(targetSrxPath);
+			targetSegmenter = doc.applyLanguageRules(targetSegmenter.getLanguage(), null);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);

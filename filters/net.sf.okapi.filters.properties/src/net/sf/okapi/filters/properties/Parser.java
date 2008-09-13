@@ -436,4 +436,7 @@ public class Parser implements IParser {
 		}
 	}
 
+	public void cancel() {
+		//TODO
+	}
 }

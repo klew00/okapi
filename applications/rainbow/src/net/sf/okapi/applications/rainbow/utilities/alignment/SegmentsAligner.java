@@ -27,13 +27,15 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class SegmentsAligner {
 	
 	private AlignmentDialog  alignDlg;
 	private Shell            shell;
 	private String           currentDocument;
-	
+	private String           targetSrxPath;
+	private Segmenter        targetSegmenter;
 	
 	@Override
 	protected void finalize () {
@@ -43,8 +45,13 @@ public class SegmentsAligner {
 		}
 	}
 	
-	public SegmentsAligner (Shell shell) {
+	public SegmentsAligner (Shell shell,
+		String targetSrxPath,
+		Segmenter targetSegmenter)
+	{
 		this.shell = shell;
+		this.targetSrxPath = targetSrxPath;
+		this.targetSegmenter = targetSegmenter;
 	}
 
 	public void setDocumentName (String documentName) {
@@ -108,6 +115,7 @@ public class SegmentsAligner {
 	{
 		if ( alignDlg == null ) {
 			alignDlg = new AlignmentDialog(shell);
+			alignDlg.setInfo(targetSrxPath, targetSegmenter);
 		}
 		return alignDlg.showDialog(source, target, currentDocument, cause);
 	}
