@@ -7,7 +7,7 @@ package net.sf.okapi.common.pipeline2;
  * @author HargraveJE
  *
  */
-public interface ILinearPipeline {
+public interface ILinearPipeline extends Runnable {
 	
 	public void start();
 	
