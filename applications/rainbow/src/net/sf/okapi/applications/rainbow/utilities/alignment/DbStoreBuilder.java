@@ -40,7 +40,7 @@ public class DbStoreBuilder implements IResourceBuilder {
 	}
 
 	public void endExtractionItem (TextUnit tu) {
-		// segment if requested
+		// Segment if requested
 		if ( srcSeg != null ) {
 			srcSeg.computeSegments(tu.getSourceContent());
 			tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());

@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class SegmentsAligner {
 	
@@ -35,7 +34,6 @@ public class SegmentsAligner {
 	private Shell            shell;
 	private String           currentDocument;
 	private String           targetSrxPath;
-	private Segmenter        targetSegmenter;
 	
 	@Override
 	protected void finalize () {
@@ -46,12 +44,10 @@ public class SegmentsAligner {
 	}
 	
 	public SegmentsAligner (Shell shell,
-		String targetSrxPath,
-		Segmenter targetSegmenter)
+		String targetSrxPath)
 	{
 		this.shell = shell;
 		this.targetSrxPath = targetSrxPath;
-		this.targetSegmenter = targetSegmenter;
 	}
 
 	public void setDocumentName (String documentName) {
@@ -86,7 +82,7 @@ public class SegmentsAligner {
 		// Check the number of segments
 		if ( source.getSegments().size() != target.getSegments().size() ) {
 			// Optional visual alignment to fix the problems
-			return alignVisually(source, target, "Different number of segments.");
+			return alignVisually(source, target, 1);
 		}
 		// Assumes the list have same number of segments now
 		// Sanity check using common anchors
@@ -95,8 +91,7 @@ public class SegmentsAligner {
 		for ( int i=0; i<srcList.size(); i++ ) {
 			if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
 				// Optional visual check
-				return alignVisually(source, target,
-					"Different number of in-line codes in at least one segment.");
+				return alignVisually(source, target, 2);
 			}
 		}
 		return 1; // Aligned
@@ -111,11 +106,11 @@ public class SegmentsAligner {
 	 */
 	public int alignVisually (TextContainer source,
 		TextContainer target,
-		String cause)
+		int cause)
 	{
 		if ( alignDlg == null ) {
 			alignDlg = new AlignmentDialog(shell);
-			alignDlg.setInfo(targetSrxPath, targetSegmenter);
+			alignDlg.setInfo(targetSrxPath);
 		}
 		return alignDlg.showDialog(source, target, currentDocument, cause);
 	}

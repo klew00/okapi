@@ -46,11 +46,12 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class SRXDocument {
 	
-	private final String     NSURI_SRX20 = "http://www.lisa.org/srx20";
-	private final String     NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
-	
-	static String INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X\\u%X].)*?)",
-		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED, TextFragment.MARKER_SEGMENT);
+	private static final String   NSURI_SRX20 = "http://www.lisa.org/srx20";
+	private static final String   NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
+
+	// Do not include segment markers because they should not be present on text to segment
+	private static final String   INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*)",
+		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
 			
 	private boolean     cascade;
 	private boolean     segmentSubFlows;
@@ -461,6 +462,10 @@ public class SRXDocument {
 			Element elem2 = getFirstElementByTagName("okpsrx:sample", elem1);
 			if ( elem2 != null ) {
 				setSampleText(elem2.getTextContent());
+				tmp = elem2.getAttribute("language");
+				if ( tmp.length() > 0 ) setSampleLanguage(tmp);
+				tmp = elem2.getAttribute("useMappedRules");
+				if ( tmp.length() > 0 ) setSampleOnMappedRules("yes".equals(tmp));
 			}
 			
 			// Get the body element
@@ -573,6 +578,8 @@ public class SRXDocument {
 			
 			writer.writeStartElement("okpsrx:sample");
 			writer.writeAttributeString("xmlns:okpsrx", NSURI_OKPSRX);
+			writer.writeAttributeString("language", getSampleLanguage());
+			writer.writeAttributeString("useMappedRules", (sampleOnMappedRules() ? "yes" : "no"));
 			writer.writeString(getSampleText());
 			writer.writeEndElementLineBreak(); // okpsrx:sample
 			

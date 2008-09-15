@@ -98,10 +98,11 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		
 		// Prepare the db store
 		dbStoreBuilder = new DbStoreBuilder();
-		dbStoreBuilder.setSegmenters(srcSeg, trgSeg);
+		// We use the source part only, and it contains the target language of the alignment task
+		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
-			aligner = new SegmentsAligner(shell, params.targetSrxPath, trgSeg);
+			aligner = new SegmentsAligner(shell, params.targetSrxPath);
 		}
 		
 		alignedTotal = 0;

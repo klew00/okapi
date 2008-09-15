@@ -98,8 +98,9 @@ public class Parser implements IParser {
 		list.add("\\\\[nrt]");
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
-//TODO: Fix case of translatable string not taken after no-trans string
-	/*	r = new Rule();
+
+	//TODO: Fix case of translatable string not taken after no-trans string
+/*		r = new Rule();
 		r.ruleName = "r2";
 		r.start = "^(.*?)\\t";
 		r.end = "0$";

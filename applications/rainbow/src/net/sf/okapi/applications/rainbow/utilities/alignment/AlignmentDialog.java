@@ -27,14 +27,13 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -85,7 +84,11 @@ public class AlignmentDialog {
 	private int              indexActiveSegment;
 	private GenericContent   genericCont;
 	private String           targetSrxPath;
-	private Segmenter        targetSegmenter;
+	private Color            colorWhite;
+	private Color            colorGreen;
+	private Color            colorAmber;
+	private Color            colorRed;
+	private boolean          canAcceptUnit;
 
 
 	@Override
@@ -102,10 +105,31 @@ public class AlignmentDialog {
 			shell.close();
 			shell = null;
 		}
+		if ( colorGreen != null ) {
+			colorGreen.dispose();
+			colorGreen = null;
+		}
+		if ( colorAmber != null ) {
+			colorAmber.dispose();
+			colorAmber = null;
+		}
+		if ( colorRed != null ) {
+			colorRed.dispose();
+			colorRed = null;
+		}
+		if ( colorWhite != null ) {
+			colorWhite.dispose();
+			colorWhite = null;
+		}
 	}
 
 	public AlignmentDialog (Shell parent)
 	{
+		colorGreen = new Color(null, 0, 204, 0);
+		colorAmber = new Color(null, 255, 153, 0);
+		colorRed = new Color(null, 220, 20, 60);
+		colorWhite = new Color(null, 255, 255, 255);
+		
 		genericCont = new GenericContent();
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
@@ -139,6 +163,7 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 4;
 		edCause.setLayoutData(gdTmp);
 		edCause.setEditable(false);
+		edCause.setForeground(colorWhite);
 
 		Font font = edCause.getFont();
 		FontData[] fontData = font.getFontData();
@@ -358,11 +383,9 @@ public class AlignmentDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public void setInfo (String targetSrxPath,
-		Segmenter targetSegmenter)
+	public void setInfo (String targetSrxPath)
 	{
 		this.targetSrxPath = targetSrxPath;
-		this.targetSegmenter = targetSegmenter;
 	}
 	
 	private void synchronizeFromSource () {
@@ -411,10 +434,12 @@ public class AlignmentDialog {
 	}
 	
 	private void moveUp () {
+		//TODO: move up
 		updateTargetSegmentDisplay();
 	}
 	
 	private void moveDown () {
+		//TODO: move down
 		updateTargetSegmentDisplay();
 	}
 	
@@ -426,6 +451,7 @@ public class AlignmentDialog {
 			updateTargetDisplay();
 			fillTargetList(n);
 			trgList.setFocus();
+			verifyAlignment();
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -483,11 +509,10 @@ public class AlignmentDialog {
 	public int showDialog (TextContainer sourceContainer,
 		TextContainer targetContainer,
 		String document,
-		String cause)
+		int cause)
 	{
 		this.source = sourceContainer;
 		this.target = targetContainer;
-//		originalTarget = targetContainer.clone();
 		
 		edDocument.setText(document);
 		TextUnit tu = source.getParent();
@@ -497,7 +522,7 @@ public class AlignmentDialog {
 				edName.setText(tu.getName());
 			}
 		}
-		edCause.setText(cause);
+		setIssue(cause);
 		setData();
 		
 		shell.setVisible(true);
@@ -569,6 +594,7 @@ public class AlignmentDialog {
 				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
 				splitSegment(indexActiveSegment, sel.x, sel.y);
 			}
+			verifyAlignment();
 			
 			// Reset the controls
 			splitMode = false;
@@ -591,10 +617,6 @@ public class AlignmentDialog {
 		try {
 			SRXEditor editor = new SRXEditor(shell);
 			editor.showDialog(targetSrxPath);
-			//TODO: Update the segmenter
-			SRXDocument doc = new SRXDocument();
-			doc.loadRules(targetSrxPath);
-			targetSegmenter = doc.applyLanguageRules(targetSegmenter.getLanguage(), null);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -623,6 +645,7 @@ public class AlignmentDialog {
 					//edit mode
 				}
 			}
+			verifyAlignment();
 			
 			// Reset the controls
 			editMode = false;
@@ -646,9 +669,12 @@ public class AlignmentDialog {
 			genericCont.setContent(target.getSegments().get(indexActiveSegment));
 			edTrgSeg.setText(genericCont.toString());
 			edTrgSeg.setFocus();
+			btAccept.setEnabled(true);
+		}
+		else {
+			btAccept.setEnabled(canAcceptUnit);
 		}
 		edTrgSeg.setEditable(specialMode);
-
 		srcList.setEnabled(!specialMode);
 		trgList.setEnabled(!specialMode);
 		btEditRules.setVisible(!specialMode);
@@ -669,5 +695,50 @@ public class AlignmentDialog {
 			btSkip.setText("Skip");
 		}
 	}
+
+	public void verifyAlignment () {
+		try {
+			// Check the number of segments
+			if ( source.getSegments().size() != target.getSegments().size() ) {
+				// Optional visual alignment to fix the problems
+				setIssue(1);
+				return;
+			}
+			
+			// Assumes the list have same number of segments now
+			// Sanity check using common anchors
+			java.util.List<TextFragment> srcList = source.getSegments();
+			java.util.List<TextFragment> trgList = target.getSegments();
+			for ( int i=0; i<srcList.size(); i++ ) {
+				if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
+					setIssue(2);
+					return;
+				}
+			}
+			setIssue(0);
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
 	
+	private void setIssue (int type) {
+		canAcceptUnit = true;
+		switch ( type ) {
+		case 0:
+			edCause.setText("No issue automatically detected.");
+			edCause.setBackground(colorGreen);
+			break;
+		case 1:
+			edCause.setText("Different number of segments in target.");
+			edCause.setBackground(colorRed);
+			canAcceptUnit = false;
+			break;
+		case 2:
+			edCause.setText("At least one target segment has a different number on in-line codes.");
+			edCause.setBackground(colorAmber);
+			break;
+		}
+		btAccept.setEnabled(canAcceptUnit);
+	}
 }
