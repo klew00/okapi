@@ -275,6 +275,10 @@ public abstract class BaseParser implements IParser {
 		group.setParent(parent);
 		return group;
 	}
+	
+	private Group createGroup(String name, String data) {
+		return createGroup(name, data, null);
+	}
 
 	protected void startGroup(String name, String data, ITranslatable parent) {
 		if (group == null) {
@@ -282,12 +286,19 @@ public abstract class BaseParser implements IParser {
 		}
 		pushGroup(group);
 	}
+	
+	protected void startGroup(String name, String data) {
+		if (group == null) {
+			group = createGroup(name, data, null);
+		}
+		pushGroup(group);
+	}
 
-	protected void endGroup() {
+	protected void endGroup(String data) {
 		assert (group != null);
-		popGroup();
+		Group p = popGroup();		
 		finishedToken = true;
-		finalizedToken = getGroup();
+		finalizedToken = createGroup(p.getName(), data);
 		// since we are starting the next token we assume Group is finished
 		// and set ENDGROUP as the token type, STARTGROUP should have been
 		// returned earlier.
