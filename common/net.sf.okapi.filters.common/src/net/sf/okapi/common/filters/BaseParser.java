@@ -25,6 +25,7 @@ import java.util.Stack;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.ITranslatable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -99,24 +100,18 @@ public abstract class BaseParser implements IParser {
 	}
 
 	private void finalizeToken(TextUnit textUnit) {
-		if (group != null) {
-			appendTextUnitToGroup();
-		} else {
-			finishedToken = true;
-			finalizedToken = textUnit;
-			finalizedTokenType = ParserTokenType.TRANSUNIT;
-		}
+		finishedToken = true;
+		finalizedToken = textUnit;
+		finalizedTokenType = ParserTokenType.TRANSUNIT;
+
 		this.textUnit = null;
 	}
 
 	private void finalizeToken(SkeletonUnit skeletonUnit) {
-		if (group != null) {
-			appendSkeletonUnitToGroup();
-		} else {
-			finishedToken = true;
-			finalizedToken = skeletonUnit;
-			finalizedTokenType = ParserTokenType.SKELETON;
-		}
+		finishedToken = true;
+		finalizedToken = skeletonUnit;
+		finalizedTokenType = ParserTokenType.SKELETON;
+
 		this.skeletonUnit = null;
 	}
 
@@ -219,28 +214,6 @@ public abstract class BaseParser implements IParser {
 		}
 	}
 
-	private void appendTextUnitToGroup() {
-		assert (group != null);
-		if (isGroupEmtpy()) {
-			group.add(textUnit);
-		} else {
-			Group currentGroup = groupStack.get(groupStack.size() - 1);
-			currentGroup.add(textUnit);
-		}
-		textUnit = null;
-	}
-
-	private void appendSkeletonUnitToGroup() {
-		assert (group != null);
-		if (isGroupEmtpy()) {
-			group.add(skeletonUnit);
-		} else {
-			Group currentGroup = groupStack.get(groupStack.size() - 1);
-			currentGroup.add(skeletonUnit);
-		}
-		skeletonUnit = null;
-	}
-
 	public void cancel() {
 		finalizeCurrentToken();
 		setFinishedParsing(true);
@@ -287,12 +260,6 @@ public abstract class BaseParser implements IParser {
 		return true;
 	}
 
-	private boolean parentGroupHasChildGroup() {
-		if (groupStack.size() >= 2)
-			return true;
-		return false;
-	}
-
 	private void pushGroup(Group group) {
 		groupStack.push(group);
 	}
@@ -301,29 +268,24 @@ public abstract class BaseParser implements IParser {
 		return groupStack.pop();
 	}
 
-	private Group createGroup() {
+	private Group createGroup(String name, String data, ITranslatable parent) {
 		Group group = new Group();
 		group.setID(String.format("s%d", ++groupId));
+		group.setData(data);
+		group.setParent(parent);
 		return group;
 	}
 
-	protected void startGroup() {
+	protected void startGroup(String name, String data, ITranslatable parent) {
 		if (group == null) {
-			group = createGroup();
-		} else {
-			Group childGroup = createGroup();
-			pushGroup(childGroup);
-			group.add(childGroup);
+			group = createGroup(name, data, parent);
 		}
+		pushGroup(group);
 	}
 
 	protected void endGroup() {
 		assert (group != null);
-		if (parentGroupHasChildGroup()) {			
-			finalizeCurrentToken();
-			return;
-		}
-
+		popGroup();
 		finishedToken = true;
 		finalizedToken = getGroup();
 		// since we are starting the next token we assume Group is finished
