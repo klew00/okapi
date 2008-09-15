@@ -11,6 +11,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public interface IProducer {
 	
-	public void setProducerQueue(BlockingQueue<OkapiEvent> producerQueue);
+	public void setProducerQueue(BlockingQueue<PipelineEvent> producerQueue);
 	
 }

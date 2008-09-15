@@ -11,6 +11,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public interface IConsumer {
 
-	public void setConsumerQueue(BlockingQueue<OkapiEvent> consumerQueue);
+	public void setConsumerQueue(BlockingQueue<PipelineEvent> consumerQueue);
 	
 }
