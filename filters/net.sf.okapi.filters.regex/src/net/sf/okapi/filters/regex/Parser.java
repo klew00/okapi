@@ -84,9 +84,9 @@ public class Parser implements IParser {
 
 		Rule r = new Rule();
 		r.ruleName = "r1";
-		r.start = "^(.*?)\\t";
-		r.end = "1$";
-		r.nameStart = "^";
+		r.start = "\\n(.*?)\\t";
+		r.end = "\\t1$";
+		r.nameStart = "\\n";
 		r.nameEnd = "\\t";
 		r.ruleType = Rule.RULETYPE_STRING;
 		r.preserveWS = true;
@@ -98,17 +98,7 @@ public class Parser implements IParser {
 		list.add("\\\\[nrt]");
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
-
-	//TODO: Fix case of translatable string not taken after no-trans string
-/*		r = new Rule();
-		r.ruleName = "r2";
-		r.start = "^(.*?)\\t";
-		r.end = "0$";
-		r.nameStart = "^";
-		r.nameEnd = "\\t";
-		r.ruleType = Rule.RULETYPE_NOTRANS;
-		resource.params.rules.add(r);*/
-}
+	}
 	
 	//TODO: remove after test
 	/*// AZADA rules
@@ -169,7 +159,9 @@ public class Parser implements IParser {
 			//For test
 			tempSetStringInfoRules();
 			
-			// Compile the rules
+			// Prepare the filter rules
+			preparePatterns();
+			// Compile the in-lines rules
 			resource.params.compileRules();
 		}
 		catch ( UnsupportedEncodingException e) {
@@ -190,6 +182,23 @@ public class Parser implements IParser {
 	
 	public IContainable getResource() {
 		return resource.currentRes;
+	}
+	
+	private void preparePatterns () {
+		for ( Rule rule : resource.params.rules ) {
+			// Compile the full pattern
+			rule.pattern = Pattern.compile(
+				"("+rule.start+")(.*?)("+rule.end+")",
+				resource.params.regexOptions);
+			// Calculate the group for the content
+			rule.contentIndex = 2; // For start and content themselves
+			for ( int i=0; i<rule.start.length(); i++ ) {
+				if ( rule.start.charAt(i) == '(' ) rule.contentIndex++;
+			}
+			// start group index = 1
+			// content group index = rule.contentIndex
+			// end group index = rule.contentIndex+1
+		}
 	}
 	
 	public ParserTokenType parseNext () {
@@ -219,8 +228,10 @@ public class Parser implements IParser {
 		 * We have to calculate which rule matches the closer from the
 		 * start position, one by one.
 		 */
-		//TODO: optimize by flagging and not re-using rules that never match
-		//TODO: optimize by having the rules with pre-compiled pattern
+		
+		//TODO: Evaluate if the contentIndex can be used instead of start/endResult
+		
+/*OLD		
 		Rule bestRule = null;
 		int bestPosition = inputText.length()+9;
 		MatchResult startResult = null;
@@ -244,8 +255,39 @@ public class Parser implements IParser {
 			}
 			i++;
 		}
+*/
+
+		Rule bestRule = null;
+		int bestPosition = inputText.length()+99;
+		MatchResult startResult = null;
+		MatchResult endResult = null;
+		int i = 0;
+		for ( Rule rule : resource.params.rules ) {
+			Matcher m = rule.pattern.matcher(inputText);
+			if ( m.find(startSearch) ) {
+				if ( m.start() < bestPosition ) {
+					bestPosition = m.start();
+					bestRule = rule;
+				}
+			}
+			i++;
+		}
 		
 		if ( bestRule != null ) {
+			// Find the start pattern
+			Pattern p = Pattern.compile(bestRule.start, resource.params.regexOptions);
+			Matcher m = p.matcher(inputText);
+			if ( m.find(bestPosition) ) {
+				startResult = m.toMatchResult();
+			}
+			else throw new RuntimeException("Inconsistant rule finding.");
+			// Find the end pattern
+			p = Pattern.compile(bestRule.end, resource.params.regexOptions);
+			m = p.matcher(inputText);
+			if ( m.find(startResult.end()) ) {
+				endResult = m.toMatchResult();
+			}
+			else throw new RuntimeException("Inconsistant rule finding.");
 			// Process the match we just found
 			return processMatch(bestRule, startResult, endResult);
 		}

@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.regex;
 
+import java.util.regex.Pattern;
+
 import net.sf.okapi.common.FieldsString;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
@@ -47,6 +49,9 @@ public class Rule {
 	protected String              propertyName;
 	protected String              propertyValue;
 	protected String              sample;
+	
+	protected Pattern             pattern;
+	protected int                 contentIndex;
 
 	public Rule () {
 		start = "";
@@ -76,6 +81,8 @@ public class Rule {
 		propertyName = obj.propertyName;
 		propertyValue = obj.propertyValue;
 		sample = obj.sample;
+		pattern = obj.pattern;
+		contentIndex = obj.contentIndex;
 	}
 	
 	public String getRuleName () {
