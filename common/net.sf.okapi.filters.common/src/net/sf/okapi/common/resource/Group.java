@@ -25,7 +25,6 @@ public class Group extends ResourceContainer implements ITranslatable {
 	private static final long serialVersionUID = 1L;
 	
 	private String                          id;
-	private String							name;
 	private String							data;
 	private ITranslatable                   parent;
 	private boolean                         isTranslatable;
@@ -51,14 +50,6 @@ public class Group extends ResourceContainer implements ITranslatable {
 		return data;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
 	public ITranslatable getParent () {
 		return parent;
 	}
