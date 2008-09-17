@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import net.sf.okapi.filters.html.HtmlFilterConfiguration;
+import net.sf.okapi.filters.html.ConfigurationReader;
 import net.sf.okapi.filters.html.ExtractionRule;
 
 /**
@@ -44,7 +44,7 @@ public class HtmlConfigurationTest {
 	@Test
 	public void defaultConfiguration() {
 		ExtractionRule rule;
-		HtmlFilterConfiguration rules = new HtmlFilterConfiguration();
+		ConfigurationReader rules = new ConfigurationReader();
 		rules.initializeDefaultRules();
 		
 		rule = rules.getRule("a");
