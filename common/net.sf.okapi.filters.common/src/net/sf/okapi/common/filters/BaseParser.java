@@ -254,7 +254,7 @@ public abstract class BaseParser implements IParser {
 		textUnit.addChild(child);
 	}
 
-	private boolean isGroupState() {
+	protected boolean isGroupState() {
 		if (groupStack.isEmpty())
 			return false;
 		return true;
