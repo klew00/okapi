@@ -499,6 +499,7 @@ public class SRXEditor {
 	private void processInlineCodes () {
 		sampleText.clear();
 		String text = edSampleText.getText().replace("\r", "");
+		sampleText.clear();
 		sampleText.setCodedText(text);
 		int n;
 		int start = 0;

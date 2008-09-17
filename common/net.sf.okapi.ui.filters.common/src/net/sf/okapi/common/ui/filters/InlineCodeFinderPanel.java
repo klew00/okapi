@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -21,6 +21,7 @@
 package net.sf.okapi.common.ui.filters;
 
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,7 +39,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class InlineCodeFinderPanel extends Composite {
 
-//	private InlineCodeFinder codeFinder;
+	private InlineCodeFinder codeFinder;
 	private List             lbRules;
 	private Text             edExpression;
 	private Text             edSample;
@@ -48,14 +49,18 @@ public class InlineCodeFinderPanel extends Composite {
 	private Button           btDiscard;
 	private Button           btInsertPattern;
 	private Button           btTest;
+	private Button           btAdd;
 	private Button           btRemove;
 	private Button           btMoveDown;
+	private boolean          editMode;
+	private boolean          wasNew;
 	
 
 	public InlineCodeFinderPanel (Composite parent,
 		int flags)
 	{
 		super(parent, flags);
+		codeFinder = new InlineCodeFinder();
 		createContent();
 	}
 	
@@ -71,12 +76,18 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp.verticalSpan = 3;
 		gdTmp.grabExcessVerticalSpace = true;
 		lbRules.setLayoutData(gdTmp);
+		lbRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateDisplay();
+			};
+		});
 		
 		edExpression = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 40;
 		edExpression.setLayoutData(gdTmp);
+		edExpression.setEditable(false);
 
 		int normalButtonWidth = 80;
 		int largeButtonWidth = 80;
@@ -88,7 +99,8 @@ public class InlineCodeFinderPanel extends Composite {
 		btModify.setLayoutData(gdTmp);
 		btModify.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO:
+				if ( editMode ) endEditMode(true);
+				else startEditMode(false);
 			};
 		});
 		
@@ -97,9 +109,10 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = largeButtonWidth;
 		btDiscard.setLayoutData(gdTmp);
+		btDiscard.setEnabled(false);
 		btDiscard.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO:
+				endEditMode(false);
 			};
 		});
 		
@@ -108,9 +121,11 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = largeButtonWidth;
 		btInsertPattern.setLayoutData(gdTmp);
+		btInsertPattern.setEnabled(false);
 		btInsertPattern.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO:
+				//TODO
+				Dialogs.showError(getShell(), "Not implemented yet", null);
 			};
 		});
 		
@@ -121,7 +136,8 @@ public class InlineCodeFinderPanel extends Composite {
 		btTest.setLayoutData(gdTmp);
 		btTest.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO:
+				//TODO
+				Dialogs.showError(getShell(), "Not implemented yet", null);
 			};
 		});
 		
@@ -139,14 +155,14 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_END | GridData.FILL_HORIZONTAL);
 		cmpRulesButtons.setLayoutData(gdTmp);
 		
-		Button btAdd = new Button(cmpRulesButtons, SWT.PUSH);
+		btAdd = new Button(cmpRulesButtons, SWT.PUSH);
 		btAdd.setText("Add");
 		gdTmp = new GridData();
 		gdTmp.widthHint = normalButtonWidth;
 		btAdd.setLayoutData(gdTmp);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO: add();
+				startEditMode(true);
 			};
 		});
 	
@@ -168,7 +184,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO: btRemove();
+				removeExpression();
 			};
 		});
 
@@ -193,23 +209,93 @@ public class InlineCodeFinderPanel extends Composite {
 		updateDisplay();
 	}
 	
-	public void updateDisplay () {
-		//TODO
+	private void startEditMode (boolean createNew) {
+		try {
+			wasNew = createNew;
+			if ( createNew ) {
+				lbRules.add("");
+				lbRules.setSelection(lbRules.getItemCount()-1);
+				updateDisplay();
+			}
+			int n = lbRules.getSelectionIndex();
+			if ( n == -1 ) return;
+			toggleMode(true);
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(getShell(), e.getMessage(), null);
+		}
 	}
 	
-	public void setData (InlineCodeFinder codeFinder) {
-//		this.codeFinder = codeFinder;
+	private void endEditMode (boolean accept) {
+		if ( accept ) {
+			lbRules.setItem(lbRules.getSelectionIndex(), edExpression.getText());
+		}
+		else {
+			if ( wasNew ) removeExpression();
+		}
+		toggleMode(false);
+	}
+	
+	private void toggleMode (boolean editMode) {
+		this.editMode = editMode;
+		lbRules.setEnabled(!editMode);
+		edExpression.setEditable(editMode);
+		btDiscard.setEnabled(editMode);
+		btInsertPattern.setEnabled(editMode);
+		btAdd.setEnabled(!editMode);
+		
+		if ( editMode ) {
+			btRemove.setEnabled(false);
+			btMoveUp.setEnabled(false);
+			btMoveDown.setEnabled(false);
+			btModify.setEnabled(true);
+			btModify.setText("Accept");
+			edExpression.setFocus();
+		}
+		else {
+			btModify.setText("Modify");
+			updateDisplay();
+		}
+	}
+	
+	public void removeExpression () {
+		int n = lbRules.getSelectionIndex();
+		if ( n == -1 ) return;
+		lbRules.remove(n);
+		if ( n >= lbRules.getItemCount() ) n = lbRules.getItemCount()-1;
+		if ( n > -1 ) lbRules.setSelection(n);
+		updateDisplay();
+	}
+	
+	public void updateDisplay () {
+		int n = lbRules.getSelectionIndex();
+		btRemove.setEnabled(n>-1);
+		btMoveUp.setEnabled(n>0);
+		btMoveDown.setEnabled(n<lbRules.getItemCount()-1);
+		btModify.setEnabled(n>-1);
+		if ( n == -1 ) edExpression.setText("");
+		else edExpression.setText(lbRules.getItem(n));
+	}
+	
+	public void setData (String codeFinderRules) {
+		codeFinder.fromString(codeFinderRules);
 		lbRules.removeAll();
 		for ( String pattern : codeFinder.getRules() ) {
 			lbRules.add(pattern);
 		}
-		
 		if ( lbRules.getItemCount() > 0 ) {
 			lbRules.setSelection(0);
 			updateDisplay();
 		}
-		//TODO
-		
+		edSample.setText(codeFinder.getSample());
 	}
-	
+
+	public String getData () {
+		codeFinder.getRules().clear();
+		for ( String pattern : lbRules.getItems() ) {
+			codeFinder.addRule(pattern);
+		}
+		codeFinder.setSample(edSample.getText());
+		return codeFinder.toString();
+	}
 }

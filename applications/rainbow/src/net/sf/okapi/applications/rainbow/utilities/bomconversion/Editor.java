@@ -106,7 +106,7 @@ public class Editor implements IParametersEditor {
 		rdRemove = new Button(group, SWT.RADIO);
 		rdRemove.setText("Remove the Byte-Order-Mark if it is present");
 		stRemove = new Label(group, SWT.NONE);
-		stRemove.setText("Only UTF-8 files with BOM are modified.");
+		stRemove.setText("By default, only UTF-8 files with BOM are modified.");
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		stRemove.setLayoutData(gdTmp);

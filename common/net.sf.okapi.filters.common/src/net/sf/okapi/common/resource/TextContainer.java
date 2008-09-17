@@ -375,6 +375,14 @@ public class TextContainer extends TextFragment {
 	}
 	
 	/**
+	 * Clears the container of all content. The parent is not modified.
+	 */
+	public void clear () {
+		super.clear();
+		if ( segments != null ) segments.clear();
+	}
+	
+	/**
 	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
 	 * Note that the merging is driven by the coded text of the object, so any 

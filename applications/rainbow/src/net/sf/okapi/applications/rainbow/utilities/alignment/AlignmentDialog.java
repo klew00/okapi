@@ -123,9 +123,8 @@ public class AlignmentDialog {
 		}
 	}
 
-	public AlignmentDialog (Shell parent)
-	{
-		colorGreen = new Color(null, 0, 204, 0);
+	public AlignmentDialog (Shell parent) {
+		colorGreen = new Color(null, 0, 128, 0);
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
 		colorWhite = new Color(null, 255, 255, 255);
@@ -345,6 +344,7 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edSource.setLayoutData(gdTmp);
+		edSource.setFont(textFont);
 		
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTarget.setEditable(false);
@@ -352,6 +352,7 @@ public class AlignmentDialog {
 		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edTarget.setLayoutData(gdTmp);
+		edTarget.setFont(textFont);
 		
 		//--- Dialog-level buttons
 
@@ -435,11 +436,13 @@ public class AlignmentDialog {
 	
 	private void moveUp () {
 		//TODO: move up
+		Dialogs.showError(shell, "Not implemented yet", null);
 		updateTargetSegmentDisplay();
 	}
 	
 	private void moveDown () {
 		//TODO: move down
+		Dialogs.showError(shell, "Not implemented yet", null);
 		updateTargetSegmentDisplay();
 	}
 	

@@ -49,7 +49,7 @@ public class Rule {
 	protected String              propertyName;
 	protected String              propertyValue;
 	protected String              sample;
-	
+	// Runtime-only variable (don't serialize)
 	protected Pattern             pattern;
 	protected int                 contentIndex;
 
@@ -202,7 +202,15 @@ public class Rule {
 	public void setUseCodeFinder (boolean value) {
 		useCodeFinder = value;
 	}
-
+	
+	public String getCodeFinderRules () {
+		return codeFinder.toString();
+	}
+	
+	public void setCodeFinderRules (String value) {
+		codeFinder.fromString(value);
+	}
+	
 	@Override
 	public String toString () {
 		FieldsString tmp = new FieldsString();

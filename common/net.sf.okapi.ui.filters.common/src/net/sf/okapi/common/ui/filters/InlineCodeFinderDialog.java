@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -40,6 +40,7 @@ public class InlineCodeFinderDialog {
 	private String                help;
 	private OKCancelPanel         pnlActions;
 	private InlineCodeFinderPanel pnlCodeFinder;
+	private String                result;
 
 	
 	public InlineCodeFinderDialog (Shell parent,
@@ -63,13 +64,13 @@ public class InlineCodeFinderDialog {
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//result = null;
+				result = null;
 				if ( e.widget.getData().equals("h") ) {
 					UIUtil.start(help);
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
-					//if ( !saveData() ) return;
+					if ( !saveData() ) return;
 				}
 				shell.close();
 			};
@@ -86,16 +87,21 @@ public class InlineCodeFinderDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public boolean showDialog () {
+	public String showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
-		return true;
+		return result;
 	}
 
-	public void setData (InlineCodeFinder codeFinder) {
-		pnlCodeFinder.setData(codeFinder);
+	public void setData (String codeFinderRules) {
+		pnlCodeFinder.setData(codeFinderRules);
+	}
+
+	private boolean saveData () {
+		result = pnlCodeFinder.getData();
+		return (result != null);
 	}
 }

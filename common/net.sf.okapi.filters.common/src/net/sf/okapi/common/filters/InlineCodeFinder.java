@@ -130,6 +130,7 @@ public class InlineCodeFinder {
 		int i = 0;
 		for ( String rule : rules ) {
 			tmp.add(String.format("rule%d", i), rule);
+			i++;
 		}
 		tmp.add("sample", sample);
 		return tmp.toString();

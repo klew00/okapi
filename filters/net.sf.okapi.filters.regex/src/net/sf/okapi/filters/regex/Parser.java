@@ -99,9 +99,9 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
 	}
-	
-	//TODO: remove after test
-	/*// AZADA rules
+
+/*	//TODO: remove after test
+// AZADA rules
 	private void tempSetStringInfoRules () {
 		resource.params.rules.clear();
 		Rule r = new Rule();

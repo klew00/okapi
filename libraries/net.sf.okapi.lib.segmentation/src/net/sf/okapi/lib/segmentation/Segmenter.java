@@ -117,7 +117,8 @@ public class Segmenter {
 	}
 	
 	/**
-	 * calculate the segmentation of a given IContainer object.
+	 * Calculates the segmentation of a given IContainer object. The assumption is that the container
+	 * is not segmented yet.
 	 * @param container The object to segment.
 	 * @return The number of segment found.
 	 */
@@ -126,10 +127,10 @@ public class Segmenter {
 			// Need to call selectLanguageRule()
 			throw new RuntimeException("No language defined for the segmeter.");
 		}
-		
-		// Remove any existing segmentation
-		//TODO: Handle case to allow secondary segmentation (segment the segments)
-		//original.joinParts();
+		if ( container.isSegmented() ) {
+			// Assumes the text is not already segmented
+			throw new RuntimeException("Text already segmented.");
+		}
 		
 		// Build the list of split positions
 		String codedText = container.getCodedText();
@@ -169,9 +170,11 @@ public class Segmenter {
 				// Trim white-spaces and code as required at the back
 				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
 					pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
-				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
-				starts.add(textStart);
-				ends.add(textEnd);
+				if ( textEnd > textStart ) { // Only if there is something
+					if ( textEnd < pos ) textEnd++; // Adjust for +1 position
+					starts.add(textStart);
+					ends.add(textEnd);
+				}
 				textStart = pos;
 			}
 		}
