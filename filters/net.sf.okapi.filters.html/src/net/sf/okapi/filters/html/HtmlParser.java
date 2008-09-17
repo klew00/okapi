@@ -20,10 +20,18 @@
 
 package net.sf.okapi.filters.html;
 
+import groovy.util.ConfigObject;
+import groovy.util.ConfigSlurper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
@@ -79,10 +87,9 @@ public class HtmlParser extends BaseParser {
 		this.configuration = configuration;
 	}
 
-	private void initialize() {
-
+	private void initialize() {		
 		if (configuration == null) {
-			configuration = new HtmlFilterConfiguration();		
+			configuration = new ConfigurationReader();		
 		}
 		configuration.initializeDefaultRules();
 
@@ -227,7 +234,7 @@ public class HtmlParser extends BaseParser {
 			// TODO: test for extractable attributes and create subflow
 			break;
 		case GROUP_ELEMENT:							
-			startGroup();
+			startGroup(startTag.getName(), startTag.toString());
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
@@ -285,7 +292,7 @@ public class HtmlParser extends BaseParser {
 			addToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:					
-			endGroup();
+			endGroup(endTag.toString());
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
