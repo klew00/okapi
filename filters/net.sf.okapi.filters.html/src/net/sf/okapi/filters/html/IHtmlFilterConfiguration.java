@@ -3,7 +3,7 @@
  */
 package net.sf.okapi.filters.html;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author HargraveJE
@@ -15,9 +15,9 @@ public interface IHtmlFilterConfiguration {
 
 	public void setPreserveWhitespace(boolean preserveWhitespace);
 
-	public ExtractionRule getRule(String ruleName);
+	public Map getRule(String ruleName);
 	
-	public void addRule(String ruleName, ExtractionRule rule);
+	public void addRule(String ruleName, Map rule);
 	
 	public void clearRules();
 		

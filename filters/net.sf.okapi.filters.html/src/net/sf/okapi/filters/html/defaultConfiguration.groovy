@@ -25,14 +25,10 @@ Multiple attribute values may be included in a list:
 
 This rule would be read: 
 extract the value of 'content' if the value of 'http-equiv' equals 'content-language' or 'content-type' 
-
-ALWAYS means the attribute is always extracted.
-
 ********************************************************************************************/
 EQUALS = 0
 NOT_EQUALS = 1 
 MATCH = 3 // regex match. Must match the entire attribute value
-ALWAYS = 4
 
 // attributes that occur on many elements
 title  {
@@ -44,7 +40,7 @@ title  {
 // inline tags
 a {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['title':ALWAYS, 'accesskey':ALWAYS]
+	translatableAttributes = ['title', 'accesskey']
 }
 
 abbr {
@@ -61,7 +57,7 @@ acronym {
 
 applet {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['alt':ALWAYS]
+	translatableAttributes = ['alt']
 }
 
 acronym {
@@ -70,7 +66,7 @@ acronym {
 
 area {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['accesskey':ALWAYS, 'area':ALWAYS]
+	translatableAttributes = ['accesskey', 'area']
 } 
 
 b {
@@ -95,7 +91,7 @@ br {
 
 button {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['accesskey':ALWAYS, 'value':ALWAYS]
+	translatableAttributes = ['accesskey', 'value']
 } 
 
 cite {
@@ -136,12 +132,14 @@ iframe {
 
 img {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['title':ALWAYS, 'alt':ALWAYS]
+	translatableAttributes = ['title', 'alt']
 }
 
 input {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['accesskey':ALWAYS, 'alt':ALWAYS, 'value':ALWAYS]
+	translatableAttributes = ['accesskey', 'alt', 'value']
+	// value if type equals button, default, submit, reset
+	// title if type equals button, default, submit, reset
 } 
 
 ins {
@@ -150,7 +148,7 @@ ins {
 
 isindex {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['prompt':ALWAYS]
+	translatableAttributes = ['prompt']
 }
 
 acronym {
@@ -163,17 +161,17 @@ kbd {
 
 label {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['accesskey':ALWAYS]
+	translatableAttributes = ['accesskey']
 } 
 
 legend {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['accesskey':ALWAYS]
+	translatableAttributes = ['accesskey']
 }
 
 li {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['value':ALWAYS]
+	translatableAttributes = ['value']
 }
 
 map {
@@ -182,7 +180,7 @@ map {
 
 meta {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['content':['http-equiv', EQUALS, 'keywords'], 'name':ALWAYS]
+	translatableAttributes = ['content':['http-equiv', EQUALS, 'keywords'], 'name':null]
 	localizableAttributes = ['content':['http-equiv', EQUALS, ['content-language', 'content-type']]]
 }
 
@@ -192,22 +190,22 @@ nobr {
 
 object {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['standby':ALWAYS]
+	translatableAttributes = ['standby']
 } 
 
 option {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['label':ALWAYS, 'value':ALWAYS]
+	translatableAttributes = ['label', 'value']
 }
 
 optgroup {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['label':ALWAYS]
+	translatableAttributes = ['label']
 }
 
 param {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['value':ALWAYS]
+	translatableAttributes = ['value']
 } 
 
 q {
@@ -260,12 +258,12 @@ symbol {
 
 table {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['summary':ALWAYS]
+	translatableAttributes = ['summary']
 } 
 
 textarea {
 	ruleTypes = [INLINE]
-	translatableAttributes = ['accesskey':ALWAYS]
+	translatableAttributes = ['accesskey']
 } 
 
 tt {
@@ -274,12 +272,12 @@ tt {
 
 td {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['abbr':ALWAYS]
+	translatableAttributes = ['abbr']
 } 
 
 th {
 	ruleTypes = [ATTRIBUTES_ONLY]
-	translatableAttributes = ['abbr':ALWAYS]
+	translatableAttributes = ['abbr']
 } 
 
 u {
