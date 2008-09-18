@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.Text;
 import sf.okapi.lib.ui.segmentation.GenericContent;
 import sf.okapi.lib.ui.segmentation.SRXEditor;
 
-public class AlignmentDialog {
+public class Aligner {
 	
 	private Shell            shell;
 	private int              result = 0;
@@ -123,7 +123,7 @@ public class AlignmentDialog {
 		}
 	}
 
-	public AlignmentDialog (Shell parent) {
+	public Aligner (Shell parent) {
 		colorGreen = new Color(null, 0, 128, 0);
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
@@ -384,8 +384,7 @@ public class AlignmentDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public void setInfo (String targetSrxPath)
-	{
+	public void setInfo (String targetSrxPath) {
 		this.targetSrxPath = targetSrxPath;
 	}
 	
@@ -454,7 +453,8 @@ public class AlignmentDialog {
 			updateTargetDisplay();
 			fillTargetList(n);
 			trgList.setFocus();
-			verifyAlignment();
+			// Re-check for issues
+			hasIssue();
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -509,15 +509,8 @@ public class AlignmentDialog {
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
-	public int showDialog (TextContainer sourceContainer,
-		TextContainer targetContainer,
-		String document,
-		int cause)
+	private int showDialog ()
 	{
-		this.source = sourceContainer;
-		this.target = targetContainer;
-		
-		edDocument.setText(document);
 		TextUnit tu = source.getParent();
 		edName.setText("");
 		if ( tu != null ) {
@@ -525,7 +518,6 @@ public class AlignmentDialog {
 				edName.setText(tu.getName());
 			}
 		}
-		setIssue(cause);
 		setData();
 		
 		shell.setVisible(true);
@@ -538,7 +530,34 @@ public class AlignmentDialog {
 		return result;
 	}
 	
-	public void hide () {
+	public void setDocumentName (String name) {
+		edDocument.setText(name);
+	}
+
+	/**
+	 * Verifies the alignment of the segments of a given TextUnit object.
+	 * @param tu The text unit containing the segments to verify.
+	 * @return 1=the segments are deemed aligned, 2=skip this entry,
+	 * 0=stop the process.
+	 */
+	public int align (TextUnit tu) {
+		// Make sure we do have a target to align
+		if ( !tu.hasTarget() ) return 2;
+		// Set the new values
+		source = tu.getSourceContent();
+		target = tu.getTargetContent();
+		// Check if both are segmented
+		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
+		// Check for issues
+		if ( hasIssue() ) {
+			// Correct manually
+			return showDialog();
+		}
+		// Else: assumes correct alignment
+		return 1;
+	}
+
+	private void hide () {
 		shell.setVisible(false);
 		if ( shell.getMinimized() ) shell.setMinimized(false);
 	}
@@ -597,7 +616,8 @@ public class AlignmentDialog {
 				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
 				splitSegment(indexActiveSegment, sel.x, sel.y);
 			}
-			verifyAlignment();
+			// Re-check for issues
+			hasIssue();
 			
 			// Reset the controls
 			splitMode = false;
@@ -648,7 +668,8 @@ public class AlignmentDialog {
 					//edit mode
 				}
 			}
-			verifyAlignment();
+			// Re-check for issues
+			hasIssue();
 			
 			// Reset the controls
 			editMode = false;
@@ -699,13 +720,13 @@ public class AlignmentDialog {
 		}
 	}
 
-	public void verifyAlignment () {
+	private boolean hasIssue () {
 		try {
 			// Check the number of segments
 			if ( source.getSegments().size() != target.getSegments().size() ) {
 				// Optional visual alignment to fix the problems
 				setIssue(1);
-				return;
+				return true;
 			}
 			
 			// Assumes the list have same number of segments now
@@ -715,13 +736,15 @@ public class AlignmentDialog {
 			for ( int i=0; i<srcList.size(); i++ ) {
 				if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
 					setIssue(2);
-					return;
+					return true;
 				}
 			}
 			setIssue(0);
+			return false;
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
+			return true;
 		}
 	}
 	

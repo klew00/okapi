@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -55,9 +55,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private int              noTextTotal;
 	private int              count;
 	private int              countTotal;
-	private SegmentsAligner  aligner;
+	private Aligner  aligner;
 	private boolean          stopProcess;
 	
+
 	public Utility () {
 		params = new Parameters();
 	}
@@ -102,7 +103,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
-			aligner = new SegmentsAligner(shell, params.targetSrxPath);
+			//TODO: make info part of constructor
+			//aligner = new SegmentsAligner(shell, params.targetSrxPath);
+			aligner = new Aligner(shell);
+			aligner.setInfo(params.targetSrxPath);
 		}
 		
 		alignedTotal = 0;
@@ -116,6 +120,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		logger.info(String.format("Total aligned = %d", alignedTotal));
     	
 		if ( aligner != null ) {
+			aligner.close();
 			aligner = null;
 		}
 		if ( tmxWriter != null ) {
