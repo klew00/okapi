@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -37,6 +37,7 @@ public class Segmenter {
 	private boolean     includeEndCodes;
 	private boolean     includeIsolatedCodes;
 	private String      currentLanguageCode;
+	private boolean     oneSegmentIncludesAll;
 	
 	private ArrayList<CompiledRule>         rules;
 	private TreeMap<Integer, Boolean>       splits;
@@ -61,19 +62,26 @@ public class Segmenter {
 		includeStartCodes = false; // SRX default
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
+		oneSegmentIncludesAll = false; // Extension
 	}
 
 	public void setOptions (boolean segmentSubFlows,
 		boolean includeStartCodes,
 		boolean includeEndCodes,
-		boolean includeIsolatedCodes)
+		boolean includeIsolatedCodes,
+		boolean oneSegmentIncludesAll)
 	{
 		this.segmentSubFlows = segmentSubFlows;
 		this.includeStartCodes = includeStartCodes;
 		this.includeEndCodes = includeEndCodes;
 		this.includeIsolatedCodes = includeIsolatedCodes;
+		this.oneSegmentIncludesAll = oneSegmentIncludesAll;
 	}
 	
+	public boolean oneSegmentIncludesAll () {
+		return oneSegmentIncludesAll;
+	}
+
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
@@ -199,6 +207,13 @@ public class Segmenter {
 				}
 			}
 		}
+
+		// Check for single-segment text case
+		if (( starts.size() == 1 ) && ( oneSegmentIncludesAll )) {
+			starts.set(0, 0);
+			ends.clear(); // lastPos is added just after
+		}
+
 		// Add an extra value in ends to hold the total length of the coded text
 		// to avoid having to re-create it when segmenting.
 		ends.add(lastPos);

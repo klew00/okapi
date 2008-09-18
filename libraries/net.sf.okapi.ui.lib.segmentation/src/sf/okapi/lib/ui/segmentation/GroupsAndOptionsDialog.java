@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -40,7 +40,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -64,7 +63,9 @@ public class GroupsAndOptionsDialog {
 	private Button           chkIncludeOpeningCodes;
 	private Button           chkIncludeClosingCodes;
 	private Button           chkIncludeIsolatedCodes;
+	private Button           chkOneSegmentIncludesAll;
 	private ClosePanel       pnlActions;	
+
 
 	public GroupsAndOptionsDialog (Shell parent,
 		SRXDocument srxDoc)
@@ -96,8 +97,8 @@ public class GroupsAndOptionsDialog {
 		chkIncludeClosingCodes = new Button(grpTmp, SWT.CHECK);
 		chkIncludeClosingCodes.setText("Include closing in-line codes");
 
-		// Place-holder for empty spot
-		new Label(grpTmp, SWT.NONE);
+		chkOneSegmentIncludesAll = new Button(grpTmp, SWT.CHECK);
+		chkOneSegmentIncludesAll.setText("Include all text for single segment (extension)");
 		
 		chkIncludeIsolatedCodes = new Button(grpTmp, SWT.CHECK);
 		chkIncludeIsolatedCodes.setText("Include isolated in-line codes");
@@ -289,6 +290,7 @@ public class GroupsAndOptionsDialog {
 		chkIncludeOpeningCodes.setSelection(srxDoc.includeStartCodes());
 		chkIncludeClosingCodes.setSelection(srxDoc.includeEndCodes());
 		chkIncludeIsolatedCodes.setSelection(srxDoc.includeIsolatedCodes());
+		chkOneSegmentIncludesAll.setSelection(srxDoc.oneSegmentIncludesAll());
 	}
 	
 	private void getOptions () {
@@ -297,6 +299,7 @@ public class GroupsAndOptionsDialog {
 		srxDoc.setIncludeStartCodes(chkIncludeOpeningCodes.getSelection());
 		srxDoc.setIncludeEndCodes(chkIncludeClosingCodes.getSelection());
 		srxDoc.setIncludeIsolatedCodes(chkIncludeIsolatedCodes.getSelection());
+		srxDoc.setOneSegmentIncludesAll(chkOneSegmentIncludesAll.getSelection());
 	}
 	
 	private void updateRulesButtons () {

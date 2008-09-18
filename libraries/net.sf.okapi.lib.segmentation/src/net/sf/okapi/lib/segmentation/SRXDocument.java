@@ -41,13 +41,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class SRXDocument {
 	
 	private static final String   NSURI_SRX20 = "http://www.lisa.org/srx20";
+	private static final String   NSURI_SRX10 = "http://www.lisa.org/srx10";
 	private static final String   NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
+	private static final String   NSPREFIX_OKPSRX = "okpsrx";
 
 	// Do not include segment markers because they should not be present on text to segment
 	private static final String   INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*)",
@@ -58,6 +61,7 @@ public class SRXDocument {
 	private boolean     includeStartCodes;
 	private boolean     includeEndCodes;
 	private boolean     includeIsolatedCodes;
+	private boolean     oneSegmentIncludesAll;
 	private String      version = "2.0";
 	private String      warning;
 	
@@ -97,6 +101,7 @@ public class SRXDocument {
 		includeStartCodes = false; // SRX default
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
+		oneSegmentIncludesAll = false; // Extension
 
 		sampleText = "Mr. Holmes is from the <A>U.K.</A> <B>Is Dr. Watson from there too?</B> Yes: both are.<C/>";
 		sampleLanguage = "en";
@@ -129,6 +134,28 @@ public class SRXDocument {
 	public void setCascade (boolean value) {
 		if ( value != cascade ) {
 			cascade = value;
+			modified = true;
+		}
+	}
+	
+	/**
+	 * Indicates if when there is a single segment in a text it should include
+	 * the whole text (no spaces or codes trim left/right)
+	 * @return True if a text with a single segment should include the whole
+	 * text.
+	 */
+	public boolean oneSegmentIncludesAll () {
+		return oneSegmentIncludesAll;
+	}
+	
+	/**
+	 * Sets the indicator that tells if when there is a single segment in a 
+	 * text it should include the whole text (no spaces or codes trim left/right)
+	 * text.
+	 */
+	public void setOneSegmentIncludesAll (boolean value) {
+		if ( value != oneSegmentIncludesAll ) {
+			oneSegmentIncludesAll = value;
 			modified = true;
 		}
 	}
@@ -342,7 +369,7 @@ public class SRXDocument {
 		
 		segmenter.setCascade(cascade);
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
-			includeEndCodes, includeIsolatedCodes);
+			includeEndCodes, includeIsolatedCodes, 	oneSegmentIncludesAll);
 		
 		for ( LanguageMap langMap : langMaps ) {
 			if ( Pattern.matches(langMap.pattern, languageCode) ) {
@@ -375,7 +402,7 @@ public class SRXDocument {
 		}
 
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
-			includeEndCodes, includeIsolatedCodes);
+			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll);
 		compileRules(segmenter, ruleName);
 		segmenter.setLanguage("__"+ruleName);
 		return segmenter;
@@ -408,17 +435,36 @@ public class SRXDocument {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
+			Fact.setNamespaceAware(true);
 			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
 			docBuilder.setEntityResolver(new DefaultEntityResolver());
 			Document doc = docBuilder.parse(new File(rulesPath));
 			resetAll();
+			
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();
-//TODO: Handle namespaces (e.g. to allow nested SRX rules)
+			NSContextManager nsContext = new NSContextManager();
+			nsContext.add("srx", NSURI_SRX20);
+			nsContext.add(NSPREFIX_OKPSRX, NSURI_OKPSRX);
+			nsContext.add("srx1", NSURI_SRX10);
+			xpath.setNamespaceContext(nsContext);
 
-			XPathExpression xpe = xpath.compile("//srx");
+			String ns = NSURI_SRX20;
+			XPathExpression xpe = xpath.compile("//srx:srx");
 			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
-			if ( srxList.getLength() < 1 ) return;
+			if ( srxList.getLength() < 1 ) {
+				xpe = xpath.compile("//srx1:srx");
+				srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
+				if ( srxList.getLength() < 1 ) {
+					xpe = xpath.compile("//srx");
+					srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);
+					if ( srxList.getLength() < 1 ) {
+						return;
+					}
+					ns = "";
+				}
+				else ns = NSURI_SRX10;
+			}
 			
 			// Treat the first occurrence (we assume there is never more in one file)
 			Element srxElem = (Element)srxList.item(0);
@@ -433,13 +479,16 @@ public class SRXDocument {
 			}
 			else throw new RuntimeException("Invalid version.");
 			
-			Element elem1 = getFirstElementByTagName("header", srxElem);
+			Element elem1 = getFirstElementByTagNameNS(ns, "header", srxElem);
 			tmp = elem1.getAttribute("segmentsubflows");
 			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
 			tmp = elem1.getAttribute("cascade");
 			if ( tmp.length() > 0 ) cascade = "yes".equals(tmp);
+			tmp = elem1.getAttributeNS(NSURI_OKPSRX, "oneSegmentIncludesAll");
+			if ( tmp.length() > 0 ) oneSegmentIncludesAll = "yes".equals(tmp);
+
 			// formathandle elements
-			NodeList list2 = elem1.getElementsByTagName("formathandle");
+			NodeList list2 = elem1.getElementsByTagNameNS(ns, "formathandle");
 			for ( int i=0; i<list2.getLength(); i++ ) {
 				Element elem2 = (Element)list2.item(i);
 				tmp = elem2.getAttribute("type");
@@ -458,8 +507,7 @@ public class SRXDocument {
 			}
 			
 			// Extensions
-			//TODO: Handle namespace to read sample text
-			Element elem2 = getFirstElementByTagName("okpsrx:sample", elem1);
+			Element elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "sample", elem1);
 			if ( elem2 != null ) {
 				setSampleText(elem2.getTextContent());
 				tmp = elem2.getAttribute("language");
@@ -469,26 +517,26 @@ public class SRXDocument {
 			}
 			
 			// Get the body element
-			elem1 = getFirstElementByTagName("body", srxElem);
+			elem1 = getFirstElementByTagNameNS(ns, "body", srxElem);
 			
 			// languagerules
-			elem2 = getFirstElementByTagName("languagerules", elem1);
+			elem2 = getFirstElementByTagNameNS(ns, "languagerules", elem1);
 			// For each languageRule
-			list2 = elem2.getElementsByTagName("languagerule");
+			list2 = elem2.getElementsByTagNameNS(ns, "languagerule");
 			for ( int i=0; i<list2.getLength(); i++ ) {
 				Element elem3 = (Element)list2.item(i);
 				ArrayList<Rule> tmpList = new ArrayList<Rule>();
 				String ruleName = elem3.getAttribute("languagerulename");
 				// For each rule
-				NodeList list3 = elem3.getElementsByTagName("rule");
+				NodeList list3 = elem3.getElementsByTagNameNS(ns, "rule");
 				for ( int j=0; j<list3.getLength(); j++ ) {
 					Element elem4 = (Element)list3.item(j);
 					Rule newRule = new Rule();
 					tmp = elem4.getAttribute("break");
 					if ( tmp.length() > 0 ) newRule.isBreak = "yes".equals(tmp);
-					Element elem5 = getFirstElementByTagName("beforebreak", elem4);
+					Element elem5 = getFirstElementByTagNameNS(ns, "beforebreak", elem4);
 					if ( elem5 != null ) newRule.before = elem5.getTextContent();
-					elem5 = getFirstElementByTagName("afterbreak", elem4);
+					elem5 = getFirstElementByTagNameNS(ns, "afterbreak", elem4);
 					if ( elem5 != null ) newRule.after = elem5.getTextContent();
 					tmpList.add(newRule);
 				}
@@ -496,9 +544,9 @@ public class SRXDocument {
 			}
 
 			// maprules
-			elem2 = getFirstElementByTagName("maprules", elem1);
+			elem2 = getFirstElementByTagNameNS(ns, "maprules", elem1);
 			// For each languagemap
-			list2 = elem2.getElementsByTagName("languagemap");
+			list2 = elem2.getElementsByTagNameNS(ns, "languagemap");
 			for ( int i=0; i<list2.getLength(); i++ ) {
 				Element elem3 = (Element)list2.item(i);
 				LanguageMap langMap = new LanguageMap();
@@ -525,16 +573,18 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Gets the first occurrence of a given element from a given
-	 * element.
+	 * Gets the first occurrence of a given element in a given namespace
+	 * from a given element.
+	 * @param ns The namespace URI to look for.
 	 * @param tagName Name of the element to look for.
 	 * @param elem Element where to look for.
 	 * @return The first found element, or null.
 	 */
-	private Element getFirstElementByTagName (String tagName,
+	private Element getFirstElementByTagNameNS (String ns,
+		String tagName,
 		Element elem)
 	{
-		NodeList list = (NodeList)elem.getElementsByTagName(tagName);
+		NodeList list = (NodeList)elem.getElementsByTagNameNS(ns, tagName);
 		if (( list == null ) || ( list.getLength() < 1 )) return null;
 		return (Element)list.item(0);
 	}
@@ -552,6 +602,7 @@ public class SRXDocument {
 
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
+			writer.writeAttributeString("xmlns:"+NSPREFIX_OKPSRX, NSURI_OKPSRX);
 			writer.writeAttributeString("version", "2.0");
 			version = "2.0";
 			writer.writeLineBreak();
@@ -559,6 +610,8 @@ public class SRXDocument {
 			writer.writeStartElement("header");
 			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
 			writer.writeAttributeString("cascade", (cascade ? "yes": "no"));
+			writer.writeAttributeString(NSPREFIX_OKPSRX+":oneSegmentIncludesAll",
+				(oneSegmentIncludesAll ? "yes" : "no"));
 			writer.writeLineBreak();
 
 			writer.writeStartElement("formathandle");
@@ -576,8 +629,7 @@ public class SRXDocument {
 			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
 			writer.writeEndElementLineBreak(); // formathandle
 			
-			writer.writeStartElement("okpsrx:sample");
-			writer.writeAttributeString("xmlns:okpsrx", NSURI_OKPSRX);
+			writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
 			writer.writeAttributeString("language", getSampleLanguage());
 			writer.writeAttributeString("useMappedRules", (sampleOnMappedRules() ? "yes" : "no"));
 			writer.writeString(getSampleText());
