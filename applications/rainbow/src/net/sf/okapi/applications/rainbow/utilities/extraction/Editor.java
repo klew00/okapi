@@ -96,7 +96,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("Export Translation Package");
+		shell.setText("Translation Package Creation");
 		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;

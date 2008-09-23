@@ -28,8 +28,6 @@ public class Parameters extends BaseParameters {
 	protected boolean   segment;
 	protected String    sourceSrxPath;
 	protected String    targetSrxPath;
-	protected boolean   singleInput;   
-	protected boolean   allowEmptyTarget;
 	protected boolean   useTradosWorkarounds;
 	protected boolean   checkSingleSegUnit;
 	
@@ -46,8 +44,6 @@ public class Parameters extends BaseParameters {
 		segment = getParameter("segment", segment);
 		sourceSrxPath = getParameter("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = getParameter("targetSrxPath", targetSrxPath);
-		singleInput = getParameter("singleInput", singleInput);
-		allowEmptyTarget = getParameter("allowEmptyTarget", allowEmptyTarget);
 		useTradosWorkarounds = getParameter("useTradosWorkarounds", useTradosWorkarounds);
 		checkSingleSegUnit = getParameter("checkSingleSegUnit", checkSingleSegUnit);
 	}
@@ -59,8 +55,6 @@ public class Parameters extends BaseParameters {
 		segment = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
-		singleInput = true;
-		allowEmptyTarget = false;
 		useTradosWorkarounds = true;
 		checkSingleSegUnit = true;
 	}
@@ -71,8 +65,6 @@ public class Parameters extends BaseParameters {
 		setParameter("sourceSrxPath", sourceSrxPath);
 		setParameter("targetSrxPath", targetSrxPath);
 		setParameter("segment", segment);
-		setParameter("singleInput", singleInput);
-		setParameter("allowEmptyTarget", allowEmptyTarget);
 		setParameter("useTradosWorkarounds", useTradosWorkarounds);
 		setParameter("checkSingleSegUnit", checkSingleSegUnit);
 		return super.toString();

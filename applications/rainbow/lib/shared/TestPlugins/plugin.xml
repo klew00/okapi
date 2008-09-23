@@ -8,7 +8,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Rewrite Text</name>
+   <name>Text Rewriting</name>
    <description>Re-writes documents with different changes, for
     example: masking translatable text, etc.</description>
    <provider>Okapi Framework</provider>
@@ -28,7 +28,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Align Source and Target (ID-driven)</name>
+   <name>ID-Based Alignment</name>
    <description>Aligns pairs of files to create a TMX output.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -41,7 +41,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Create Translation Package</name>
+   <name>Translation Package Creation</name>
    <description>Creates a translation package.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -58,7 +58,7 @@
   pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Merge Translation Package</name>
+   <name>Translation Package Merging</name>
    <description>Merges an existing translation package.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -71,7 +71,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Apply XSLT Templates</name>
+   <name>XSLT Transformation</name>
    <description>Processes an input XML document with a given XSLT template.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -84,7 +84,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Convert Line-Breaks</name>
+   <name>Line-Breaks Conversion</name>
    <description>Converts the line-breaks of any text input file to a give type.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -97,7 +97,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Convert Byte-Order-Marks</name>
+   <name>Byte-Order-Marks Conversion</name>
    <description>Adds or removes the Unicode Byte-Order-Mark of any text input file to a give type.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -110,7 +110,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Convert Encoding</name>
+   <name>Encoding Conversion</name>
    <description>Converts a text input file from one encoding to another.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -123,7 +123,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>List Used Characters</name>
+   <name>Used Characters Listing</name>
    <description>Provides a list of all characters used in the translatable parts of the input file.</description>
    <provider>Okapi Framework</provider>
   </info>

@@ -79,7 +79,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("Convert Byte-Order-Marks");
+		shell.setText("Byte-Order-Marks Conversion");
 		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;

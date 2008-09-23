@@ -84,9 +84,8 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell parent)
-	{
-		shell.setText("Align Source and Target");
+	private void create (Shell parent) {
+		shell.setText("ID-Based Alignment");
 		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -145,7 +144,7 @@ public class Editor implements IParametersEditor {
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		chkCheckSingleSegUnit = new Button(cmpTmp, SWT.CHECK);
-		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
+		chkCheckSingleSegUnit.setText("Verify in-line codes for text units with a single segment");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkCheckSingleSegUnit.setLayoutData(gdTmp);

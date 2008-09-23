@@ -78,7 +78,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("Convert Line-Breaks");
+		shell.setText("Line-Breaks Conversion");
 		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
