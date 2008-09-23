@@ -1,50 +1,77 @@
 package net.sf.okapi.common.pipeline2;
 
-import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class LinearPipeline implements ILinearPipeline {
-	private LinkedList<Thread> pipelineSteps;
+	private static final int DEFAULT_THREADPOOL_SIZE = 25;
+	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
+
+	private final ExecutorService executor;
+	private final CompletionService<PipelineReturnValue> pipelineSteps;
+	private final int blockingQueueSize;
+	private int totalThreads;
+
 	private BlockingQueue<IPipelineEvent> previousQueue;
-	private int queueSize;
-	private boolean stop;
-	
-	public LinearPipeline(int queueSize) {
-		pipelineSteps = new LinkedList<Thread>();
-		this.queueSize = queueSize;		
+
+	public LinearPipeline() {
+		this(Executors.newFixedThreadPool(DEFAULT_THREADPOOL_SIZE), DEFAULT_BLOCKING_QUEUE_SIZE);
 	}
-	
+
+	public LinearPipeline(ExecutorService executor, int blockingQueueSize) {
+		totalThreads = 0;
+		this.executor = executor;
+		this.blockingQueueSize = blockingQueueSize;
+		this.pipelineSteps = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
+	}
+
 	public void addPipleLineStep(IPipelineStep step) {
-		BlockingQueue<IPipelineEvent> queue = null;		
+		BlockingQueue<IPipelineEvent> queue = null;
 		if (step instanceof IConsumer && step instanceof IProducer) {
-			queue = new ArrayBlockingQueue<IPipelineEvent>(queueSize, false);
-			((IProducer)step).setProducerQueue(queue);
-			((IConsumer)step).setConsumerQueue(queue);			
-		} else if (step instanceof IProducer) {
-			queue = new ArrayBlockingQueue<IPipelineEvent>(queueSize, false);
-			((IProducer)step).setProducerQueue(queue);
-		} else if (step instanceof IConsumer) {
-			if (previousQueue != null) {
-				((IConsumer)step).setConsumerQueue(previousQueue);
-			} else {
+			if (previousQueue == null) {
 				// TODO: wrap exception
-				throw new RuntimeException();
+				throw new RuntimeException("Previous queue should not be null");
 			}
-			
+
+			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
+
+			((IProducer) step).setProducerQueue(queue);
+			((IConsumer) step).setConsumerQueue(previousQueue);
+		} else if (step instanceof IProducer) {
+			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
+
+			((IProducer) step).setProducerQueue(queue);
+		} else if (step instanceof IConsumer) {
+			if (previousQueue == null) {
+				// TODO: wrap exception
+				throw new RuntimeException("Previous queue should not be null");
+			}
+
+			((IConsumer) step).setConsumerQueue(previousQueue);
+
 		} else {
 			// TODO: wrap exception
 			throw new RuntimeException();
 		}
-		pipelineSteps.add(new Thread(step));		
+
+		pipelineSteps.submit(step);
+		totalThreads += 1;
+
 		previousQueue = queue;
 	}
 
 	public void addPipleLineStep(IPipelineStep step, int numThreads) {
+		
 	}
 
 	public void cancel() {
-		stop = true;
+		executor.shutdownNow();
 	}
 
 	public void pause() {
@@ -53,20 +80,17 @@ public class LinearPipeline implements ILinearPipeline {
 	public void resume() {
 	}
 
-	public void start() {		
-		for (Thread step : pipelineSteps) {
-			step.start();		
-		}
-	}
-
-	public void run() {
-		while(!stop){
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void start() {
+		try {
+			for (int t = 0, n = totalThreads; t < n; t++) {
+				Future<PipelineReturnValue> f = pipelineSteps.take();
+				PipelineReturnValue result = f.get();								
 			}
-		}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();	
+			return;
+		} catch (ExecutionException e) {
+			return;
+		}		
 	}
 }

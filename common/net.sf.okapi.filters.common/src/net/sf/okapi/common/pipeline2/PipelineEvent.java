@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class PipelineEvent implements IPipelineEvent {
 
 	public static enum PipelineEventType {
-		START_RESOURCE, END_RESOURCE, TEXTUNIT, SKELETON, START_GROUP, END_GROUP, FINISHED
+		START_RESOURCE, END_RESOURCE, TEXTUNIT, SKELETON, START_GROUP, END_GROUP, START, FINISHED
 	};
 
 	private final int order;
