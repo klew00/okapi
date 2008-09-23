@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.encodingconversion;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
@@ -49,19 +48,18 @@ public class Parameters extends BaseParameters {
 	}
 	
 	@Override
-	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		unescapeNCR = tmp.get("unescapeNCR", unescapeNCR);
-		unescapeCER = tmp.get("unescapeCER", unescapeCER);
-		unescapeJava = tmp.get("unescapeJava", unescapeJava);
-		escapeAll = tmp.get("escapeAll", escapeAll);
-		escapeNotation = tmp.get("escapeNotation", escapeNotation);
-		userFormat = tmp.get("userFormat", userFormat);
-		useBytes = tmp.get("useBytes", useBytes);
-		BOMonUTF8 = tmp.get("BOMonUTF8", BOMonUTF8);
-		reportUnsupported = tmp.get("reportUnsupported", reportUnsupported);
+	public void fromString (String data) {
+		reset();
+		super.fromString(data);
+		unescapeNCR = getBoolean("unescapeNCR", unescapeNCR);
+		unescapeCER = getBoolean("unescapeCER", unescapeCER);
+		unescapeJava = getBoolean("unescapeJava", unescapeJava);
+		escapeAll = getBoolean("escapeAll", escapeAll);
+		escapeNotation = getInteger("escapeNotation", escapeNotation);
+		userFormat = getString("userFormat", userFormat);
+		useBytes = getBoolean("useBytes", useBytes);
+		BOMonUTF8 = getBoolean("BOMonUTF8", BOMonUTF8);
+		reportUnsupported = getBoolean("reportUnsupported", reportUnsupported);
 	}
 
 	@Override
@@ -79,18 +77,16 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("unescapeNCR", unescapeNCR);
-		tmp.add("unescapeCER", unescapeCER);
-		tmp.add("unescapeJava", unescapeJava);
-		tmp.add("escapeAll", escapeAll);
-		tmp.add("escapeNotation", escapeNotation);
-		tmp.add("userFormat", userFormat);
-		tmp.add("useBytes", useBytes);
-		tmp.add("BOMonUTF8", BOMonUTF8);
-		tmp.add("reportUnsupported", reportUnsupported);
-		return tmp.toString();
+		setBoolean("unescapeNCR", unescapeNCR);
+		setBoolean("unescapeCER", unescapeCER);
+		setBoolean("unescapeJava", unescapeJava);
+		setBoolean("escapeAll", escapeAll);
+		setInteger("escapeNotation", escapeNotation);
+		setString("userFormat", userFormat);
+		setBoolean("useBytes", useBytes);
+		setBoolean("BOMonUTF8", BOMonUTF8);
+		setBoolean("reportUnsupported", reportUnsupported);
+		return super.toString();
 	}
 	
 }

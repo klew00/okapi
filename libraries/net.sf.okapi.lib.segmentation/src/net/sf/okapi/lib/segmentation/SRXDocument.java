@@ -42,6 +42,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.NSContextManager;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -429,16 +430,17 @@ public class SRXDocument {
 	
 	/**
 	 * Loads an SRX rules file.
-	 * @param rulesPath The full path of the rules file to load.
+	 * @param pathOrURL The full path or URL of the rules file to load.
+	 * The rules can be embedded inside another vocabulary.
 	 */
-	public void loadRules (String rulesPath) {
+	public void loadRules (String pathOrURL) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Fact.setNamespaceAware(true);
 			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
 			docBuilder.setEntityResolver(new DefaultEntityResolver());
-			Document doc = docBuilder.parse(new File(rulesPath));
+			Document doc = docBuilder.parse(new File(Util.toURI(pathOrURL)));
 			resetAll();
 			
 			XPathFactory xpathFac = XPathFactory.newInstance();
@@ -449,6 +451,7 @@ public class SRXDocument {
 			nsContext.add("srx1", NSURI_SRX10);
 			xpath.setNamespaceContext(nsContext);
 
+			// Try to get the root and detect if namespaces are used or not. 
 			String ns = NSURI_SRX20;
 			XPathExpression xpe = xpath.compile("//srx:srx");
 			NodeList srxList = (NodeList)xpe.evaluate(doc, XPathConstants.NODESET);

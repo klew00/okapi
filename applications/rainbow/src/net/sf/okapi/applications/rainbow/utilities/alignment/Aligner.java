@@ -77,6 +77,7 @@ public class Aligner {
 	private Font             textFont;
 	private Button           chkShowInlineCodes;
 	private Button           chkSyncScrolling;
+	private Button           chkCheckSingleSegUnit;
 	private TextContainer    source;
 	private TextContainer    target;
 	private boolean          splitMode = false;
@@ -221,7 +222,9 @@ public class Aligner {
 				updateTargetDisplay();
 			}
 		});
-
+		
+		chkCheckSingleSegUnit = new Button(cmpOptions, SWT.CHECK);
+		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
 
 		//--- Main buttons
 		
@@ -384,8 +387,17 @@ public class Aligner {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public void setInfo (String targetSrxPath) {
+	/**
+	 * Sets information data for the visual verification.
+	 * @param targetSrxPath The full path of the SRX document to use for the target.
+	 * @param checkSingleSegUnit True if unit with a single segment should be checked, false to accept
+	 * them as aligned without checking.
+	 */
+	public void setInfo (String targetSrxPath,
+		boolean checkSingleSegUnit)
+	{
 		this.targetSrxPath = targetSrxPath;
+		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
 	}
 	
 	private void synchronizeFromSource () {
@@ -454,7 +466,7 @@ public class Aligner {
 			fillTargetList(n);
 			trgList.setFocus();
 			// Re-check for issues
-			hasIssue();
+			hasIssue(true);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -502,10 +514,6 @@ public class Aligner {
 	
 	/**
 	 * Calls the form to align a text unit visually.
-	 * @param sourceContainer The source entry.
-	 * @param targetContainer The target entry.
-	 * @param document The name of the document.
-	 * @param cause The reason to check this alignment.
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
@@ -549,7 +557,7 @@ public class Aligner {
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
-		if ( hasIssue() ) {
+		if ( hasIssue(false) ) {
 			// Correct manually
 			return showDialog();
 		}
@@ -617,7 +625,7 @@ public class Aligner {
 				splitSegment(indexActiveSegment, sel.x, sel.y);
 			}
 			// Re-check for issues
-			hasIssue();
+			hasIssue(true);
 			
 			// Reset the controls
 			splitMode = false;
@@ -669,7 +677,7 @@ public class Aligner {
 				}
 			}
 			// Re-check for issues
-			hasIssue();
+			hasIssue(true);
 			
 			// Reset the controls
 			editMode = false;
@@ -720,7 +728,14 @@ public class Aligner {
 		}
 	}
 
-	private boolean hasIssue () {
+	/**
+	 * Tries to find some issue with the current alignment.
+	 * @param forceIssueDisplay True if we need to set the issue display.
+	 * Such display is not needed when calling the function when the dialog is hidden
+	 * and no issues are found. 
+	 * @return True if an issue has been found. False if no issue has been found.
+	 */
+	private boolean hasIssue (boolean forceIssueDisplay) {
 		try {
 			// Check the number of segments
 			if ( source.getSegments().size() != target.getSegments().size() ) {
@@ -728,8 +743,15 @@ public class Aligner {
 				setIssue(1);
 				return true;
 			}
-			
 			// Assumes the list have same number of segments now
+			
+			// Check if we do further verification for single-segment unit
+			if (( source.getSegments().size() == 1 ) && !chkCheckSingleSegUnit.getSelection() ) {
+				// We assume it's ok to align
+				if ( forceIssueDisplay ) setIssue(0);
+				return false;
+			}
+			
 			// Sanity check using common anchors
 			java.util.List<TextFragment> srcList = source.getSegments();
 			java.util.List<TextFragment> trgList = target.getSegments();
@@ -739,7 +761,7 @@ public class Aligner {
 					return true;
 				}
 			}
-			setIssue(0);
+			if ( forceIssueDisplay ) setIssue(0);
 			return false;
 		}
 		catch ( Throwable e) {

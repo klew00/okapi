@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.bomconversion;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
@@ -33,12 +32,11 @@ public class Parameters extends BaseParameters {
 	}
 	
 	@Override
-	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		removeBOM = tmp.get("removeBOM", removeBOM);
-		alsoNonUTF8 = tmp.get("alsoNonUTF8", alsoNonUTF8);
+	public void fromString (String data) {
+		reset();
+		super.fromString(data);
+		removeBOM = getBoolean("removeBOM", removeBOM);
+		alsoNonUTF8 = getBoolean("alsoNonUTF8", alsoNonUTF8);
 	}
 
 	@Override
@@ -49,11 +47,9 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("removeBOM", removeBOM);
-		tmp.add("alsoNonUTF8", alsoNonUTF8);
-		return tmp.toString();
+		setBoolean("removeBOM", removeBOM);
+		setBoolean("alsoNonUTF8", alsoNonUTF8);
+		return super.toString();
 	}
-	
+
 }

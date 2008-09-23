@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -383,19 +385,42 @@ public class Util {
 	 * Makes a URI string from a path. If the path itself can be recognized as a string
 	 * URI already, it is passed unchanged. For example "C:\test" and "file:///C:/test"
 	 * will both return "file:///C:/test" encoded as URI.
-	 * @param path The path to change to URI string.
+	 * @param pathOrUri The path to change to URI string.
 	 * @return The URI string.
 	 */
-	static public String makeURIFromPath (String path) {
-		if ( path.startsWith("file:///") ) return path;
-		if ( path.startsWith("http://") ) return path;
-		if ( path.startsWith("https://") ) return path;
-		if ( path.startsWith("ftp://") ) return path;
+	static public String makeURIFromPath (String pathOrUri) {
+		if ( pathOrUri.startsWith("file:///") ) return pathOrUri;
+		if ( pathOrUri.startsWith("http://") ) return pathOrUri;
+		if ( pathOrUri.startsWith("https://") ) return pathOrUri;
+		if ( pathOrUri.startsWith("ftp://") ) return pathOrUri;
 		try {
-			return "file:///"+URLEncoder.encode(path.replace('\\', '/'), "UTF-8");
+			return "file:///"+URLEncoder.encode(pathOrUri.replace('\\', '/'), "UTF-8");
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e); // UTF-8 should be always supported anyway
+		}
+	}
+
+	/**
+	 * Creates a new URI object from a path or a URI string.
+	 * @param pathOrUri The path or URI string to use.
+	 * @return The new URI object for the given path or URI string.
+	 */
+	static public URI toURI(String pathOrUri) {
+		try {
+			if (( !pathOrUri.startsWith("file:///") ) && 
+				( !pathOrUri.startsWith("http://") ) &&
+				( !pathOrUri.startsWith("https://") ) &&
+				( !pathOrUri.startsWith("ftp://") )) {
+				pathOrUri = "file:///"+URLEncoder.encode(pathOrUri.replace('\\', '/'), "UTF-8");
+			}
+			return new URI(makeURIFromPath(pathOrUri));
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new RuntimeException(e); // UTF-8 should be always supported anyway
+		}
+		catch ( URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -501,4 +526,5 @@ public class Util {
 			tmp = tmp.substring(0, tmp.length()-1);
 		return tmp;
 	}
+
 }

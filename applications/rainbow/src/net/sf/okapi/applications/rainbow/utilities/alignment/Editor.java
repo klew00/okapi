@@ -49,9 +49,10 @@ public class Editor implements IParametersEditor {
 	private Parameters            params;
 	private Text                  edTMXPath;
 	private Button                chkUseTradosWorkarounds;
+	private Button                chkCheckSingleSegUnit;
 	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
-	
+
 	/**
 	 * Invokes the editor for the parameters of this utility.
 	 * @param p_Options The option object of the action.
@@ -143,6 +144,12 @@ public class Editor implements IParametersEditor {
 			"Segment the extracted text using the following SRX rules:");
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		chkCheckSingleSegUnit = new Button(cmpTmp, SWT.CHECK);
+		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkCheckSingleSegUnit.setLayoutData(gdTmp);
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -183,6 +190,7 @@ public class Editor implements IParametersEditor {
 		edTMXPath.setText(params.tmxPath);
 		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
+		chkCheckSingleSegUnit.setSelection(params.checkSingleSegUnit);
 	}
 
 	private boolean saveData () {
@@ -192,6 +200,7 @@ public class Editor implements IParametersEditor {
 		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		params.segment = pnlSegmentation.getSegment();
 		params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
+		params.checkSingleSegUnit = chkCheckSingleSegUnit.getSelection();
 		result = true;
 		return true;
 	}

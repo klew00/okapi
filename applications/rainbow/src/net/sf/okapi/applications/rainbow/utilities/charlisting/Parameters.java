@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.charlisting;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
@@ -33,12 +32,11 @@ public class Parameters extends BaseParameters {
 	}
 	
 	@Override
-	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		outputPath = tmp.get("outputPath", outputPath);
-		autoOpen = tmp.get("autoOpen", autoOpen);
+	public void fromString (String data) {
+		reset();
+		super.fromString(data);
+		outputPath = getString("outputPath", outputPath);
+		autoOpen = getBoolean("autoOpen", autoOpen);
 	}
 
 	@Override
@@ -49,11 +47,9 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("outputPath", outputPath);
-		tmp.add("autoOpen", autoOpen);
-		return tmp.toString();
+		setString("outputPath", outputPath);
+		setBoolean("autoOpen", autoOpen);
+		return super.toString();
 	}
 	
 }

@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 import java.io.File;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
@@ -80,18 +79,17 @@ public class Parameters extends BaseParameters {
 	
 	@Override
 	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		pkgType = tmp.get("pkgtype", pkgType);
-		createZip = tmp.get("createzip", createZip);
-		pkgName = tmp.get("pkgname", pkgName);
-		outputFolder = tmp.get("outputfolder", pkgName);
-		includeMergeData = tmp.get("includemergedata", includeMergeData);
-		includeTargets = tmp.get("includetargets", includeTargets);
-		presegment = tmp.get("presegment", presegment);
-		sourceSRX = tmp.get("sourceSRX", sourceSRX);
-		targetSRX = tmp.get("targetSRX", targetSRX);
+		reset();
+		super.fromString(data);
+		pkgType = getString("pkgtype", pkgType);
+		createZip = getBoolean("createzip", createZip);
+		pkgName = getString("pkgname", pkgName);
+		outputFolder = getString("outputfolder", pkgName);
+		includeMergeData = getBoolean("includemergedata", includeMergeData);
+		includeTargets = getBoolean("includetargets", includeTargets);
+		presegment = getBoolean("presegment", presegment);
+		sourceSRX = getString("sourceSRX", sourceSRX);
+		targetSRX = getString("targetSRX", targetSRX);
 	}
 
 	@Override
@@ -110,18 +108,16 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("pkgType", pkgType);
-		tmp.add("createZip", createZip);
-		tmp.add("pkgname", pkgName);
-		tmp.add("outputfolder", outputFolder);
-		tmp.add("includemergedata", includeMergeData);
-		tmp.add("includetargets", includeTargets);
-		tmp.add("presegment", presegment);
-		tmp.add("sourceSRX", sourceSRX);
-		tmp.add("targetSRX", targetSRX);
-		return tmp.toString();
+		setString("pkgType", pkgType);
+		setBoolean("createZip", createZip);
+		setString("pkgname", pkgName);
+		setString("outputfolder", outputFolder);
+		setBoolean("includemergedata", includeMergeData);
+		setBoolean("includetargets", includeTargets);
+		setBoolean("presegment", presegment);
+		setString("sourceSRX", sourceSRX);
+		setString("targetSRX", targetSRX);
+		return super.toString();
 	}
 	
 	public String makePackageID () {

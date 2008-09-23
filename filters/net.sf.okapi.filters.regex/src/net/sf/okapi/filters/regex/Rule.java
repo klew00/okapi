@@ -22,7 +22,7 @@ package net.sf.okapi.filters.regex;
 
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Rule {
@@ -213,37 +213,39 @@ public class Rule {
 	
 	@Override
 	public String toString () {
-		FieldsString tmp = new FieldsString();
-		tmp.add("ruleName", ruleName);
-		tmp.add("ruleType", ruleType);
-		tmp.add("start", start);
-		tmp.add("end", end);
-		tmp.add("nameStart", nameStart);
-		tmp.add("nameEnd", nameEnd);
-		tmp.add("nameFormat", nameFormat);
-		tmp.add("preserveWS", preserveWS);
-		tmp.add("unwrap", unwrap);
-		tmp.add("useCodeFinder", useCodeFinder);
-		tmp.add("propertyName", propertyName);
-		tmp.add("propertyValue", propertyValue);
-		tmp.addGroup("codeFinderRules", codeFinder.toString());
+		ParametersString tmp = new ParametersString();
+		tmp.setString("ruleName", ruleName);
+		tmp.setInteger("ruleType", ruleType);
+		tmp.setString("start", start);
+		tmp.setString("end", end);
+		tmp.setString("nameStart", nameStart);
+		tmp.setString("nameEnd", nameEnd);
+		tmp.setString("nameFormat", nameFormat);
+		tmp.setBoolean("preserveWS", preserveWS);
+		tmp.setBoolean("unwrap", unwrap);
+		tmp.setBoolean("useCodeFinder", useCodeFinder);
+		tmp.setString("propertyName", propertyName);
+		tmp.setString("propertyValue", propertyValue);
+		tmp.setString("sample", sample);
+		tmp.setGroup("codeFinderRules", codeFinder.toString());
 		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
-		FieldsString tmp = new FieldsString(data);
-		ruleName = tmp.get("ruleName", ruleName);
-		ruleType = tmp.get("ruleType", ruleType);
-		start = tmp.get("start", start);
-		end = tmp.get("end", end);
-		nameStart = tmp.get("nameStart", nameStart);
-		nameEnd = tmp.get("nameEnd", nameEnd);
-		nameFormat = tmp.get("nameFormat", nameFormat);
-		preserveWS = tmp.get("preserveWS", preserveWS);
-		unwrap = tmp.get("unwrap", unwrap);
-		propertyName = tmp.get("propertyName", propertyName);
-		propertyValue = tmp.get("propertyValue", propertyValue);
-		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
+		ParametersString tmp = new ParametersString(data);
+		ruleName = tmp.getString("ruleName", ruleName);
+		ruleType = tmp.getInteger("ruleType", ruleType);
+		start = tmp.getString("start", start);
+		end = tmp.getString("end", end);
+		nameStart = tmp.getString("nameStart", nameStart);
+		nameEnd = tmp.getString("nameEnd", nameEnd);
+		nameFormat = tmp.getString("nameFormat", nameFormat);
+		preserveWS = tmp.getBoolean("preserveWS", preserveWS);
+		unwrap = tmp.getBoolean("unwrap", unwrap);
+		propertyName = tmp.getString("propertyName", propertyName);
+		propertyValue = tmp.getString("propertyValue", propertyValue);
+		sample = tmp.getString("sample", sample);
+		useCodeFinder = tmp.getBoolean("useCodeFinder", useCodeFinder);
 		codeFinder.fromString(tmp.getGroup("codeFinderRules", ""));
 	}
 	

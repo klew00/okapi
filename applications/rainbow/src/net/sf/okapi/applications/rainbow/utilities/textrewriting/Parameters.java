@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
@@ -47,20 +46,19 @@ public class Parameters extends BaseParameters {
 	
 	@Override
 	public void fromString (String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		type = tmp.get("type", type);
-		addPrefix = tmp.get("addPrefix", addPrefix);
-		prefix = tmp.get("prefix", prefix);
-		addSuffix = tmp.get("addSuffix", addSuffix);
-		suffix = tmp.get("suffix", suffix);
-		applyToExistingTarget = tmp.get("applyToExistingTarget", applyToExistingTarget);
-		addName = tmp.get("addName", addName);
-		addID = tmp.get("addID", addID);
-		segment = tmp.get("segment", segment);
-		sourceSrxPath = tmp.get("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = tmp.get("targetSrxPath", targetSrxPath);
+		reset();
+		super.fromString(data);
+		type = getInteger("type", type);
+		addPrefix = getBoolean("addPrefix", addPrefix);
+		prefix = getString("prefix", prefix);
+		addSuffix = getBoolean("addSuffix", addSuffix);
+		suffix = getString("suffix", suffix);
+		applyToExistingTarget = getBoolean("applyToExistingTarget", applyToExistingTarget);
+		addName = getBoolean("addName", addName);
+		addID = getBoolean("addID", addID);
+		segment = getBoolean("segment", segment);
+		sourceSrxPath = getString("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = getString("targetSrxPath", targetSrxPath);
 	}
 
 	@Override
@@ -80,20 +78,18 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("type", type);
-		tmp.add("addPrefix", addPrefix);
-		tmp.add("prefix", prefix);
-		tmp.add("addSuffix", addSuffix);
-		tmp.add("suffix", suffix);
-		tmp.add("applyToExistingTarget", applyToExistingTarget);
-		tmp.add("addName", addName);
-		tmp.add("addID", addID);
-		tmp.add("segment", segment);
-		tmp.add("sourceSrxPath", sourceSrxPath);
-		tmp.add("targetSrxPath", targetSrxPath);
-		return tmp.toString();
+		setInteger("type", type);
+		setBoolean("addPrefix", addPrefix);
+		setString("prefix", prefix);
+		setBoolean("addSuffix", addSuffix);
+		setString("suffix", suffix);
+		setBoolean("applyToExistingTarget", applyToExistingTarget);
+		setBoolean("addName", addName);
+		setBoolean("addID", addID);
+		setBoolean("segment", segment);
+		setString("sourceSrxPath", sourceSrxPath);
+		setString("targetSrxPath", targetSrxPath);
+		return super.toString();
 	}
 	
 }

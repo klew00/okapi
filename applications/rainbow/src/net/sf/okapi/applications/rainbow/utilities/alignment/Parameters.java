@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 	
@@ -32,6 +31,7 @@ public class Parameters extends BaseParameters {
 	protected boolean   singleInput;   
 	protected boolean   allowEmptyTarget;
 	protected boolean   useTradosWorkarounds;
+	protected boolean   checkSingleSegUnit;
 	
 
 	public Parameters () {
@@ -40,20 +40,21 @@ public class Parameters extends BaseParameters {
 	
 	@Override
 	public void fromString (String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		tmxPath = tmp.get("tmxPath", tmxPath);
-		segment = tmp.get("segment", segment);
-		sourceSrxPath = tmp.get("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = tmp.get("targetSrxPath", targetSrxPath);
-		singleInput = tmp.get("singleInput", singleInput);
-		allowEmptyTarget = tmp.get("allowEmptyTarget", allowEmptyTarget);
-		useTradosWorkarounds = tmp.get("useTradosWorkarounds", useTradosWorkarounds);
+		reset();
+		super.fromString(data);
+		tmxPath = getParameter("tmxPath", tmxPath);
+		segment = getParameter("segment", segment);
+		sourceSrxPath = getParameter("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = getParameter("targetSrxPath", targetSrxPath);
+		singleInput = getParameter("singleInput", singleInput);
+		allowEmptyTarget = getParameter("allowEmptyTarget", allowEmptyTarget);
+		useTradosWorkarounds = getParameter("useTradosWorkarounds", useTradosWorkarounds);
+		checkSingleSegUnit = getParameter("checkSingleSegUnit", checkSingleSegUnit);
 	}
 
 	@Override
 	public void reset () {
+		super.reset();
 		tmxPath = "output.tmx";
 		segment = false;
 		sourceSrxPath = "";
@@ -61,19 +62,19 @@ public class Parameters extends BaseParameters {
 		singleInput = true;
 		allowEmptyTarget = false;
 		useTradosWorkarounds = true;
+		checkSingleSegUnit = true;
 	}
 
 	@Override
 	public String toString () {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("tmxPath", tmxPath);
-		tmp.add("sourceSrxPath", sourceSrxPath);
-		tmp.add("targetSrxPath", targetSrxPath);
-		tmp.add("segment", segment);
-		tmp.add("singleInput", singleInput);
-		tmp.add("allowEmptyTarget", allowEmptyTarget);
-		tmp.add("useTradosWorkarounds", useTradosWorkarounds);
-		return tmp.toString();
+		setParameter("tmxPath", tmxPath);
+		setParameter("sourceSrxPath", sourceSrxPath);
+		setParameter("targetSrxPath", targetSrxPath);
+		setParameter("segment", segment);
+		setParameter("singleInput", singleInput);
+		setParameter("allowEmptyTarget", allowEmptyTarget);
+		setParameter("useTradosWorkarounds", useTradosWorkarounds);
+		setParameter("checkSingleSegUnit", checkSingleSegUnit);
+		return super.toString();
 	}
 }

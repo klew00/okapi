@@ -21,7 +21,6 @@
 package net.sf.okapi.filters.properties;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filters.LocalizationDirectives;
 
@@ -63,30 +62,26 @@ public class Parameters extends BaseParameters {
 	}
 
 	public String toString () {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("useLD", locDir.useLD());
-		tmp.add("localizeOutside", locDir.localizeOutside());
-		tmp.add("useCodeFinder", useCodeFinder);
-		tmp.add("useKeyCondition", useKeyCondition);
-		tmp.add("extractOnlyMatchingKey", extractOnlyMatchingKey);
-		tmp.add("keyCondition", keyCondition);
-		tmp.add("escapeExtendedChars", escapeExtendedChars);
-		return tmp.toString();
+		setBoolean("useLD", locDir.useLD());
+		setBoolean("localizeOutside", locDir.localizeOutside());
+		setBoolean("useCodeFinder", useCodeFinder);
+		setBoolean("useKeyCondition", useKeyCondition);
+		setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		setString("keyCondition", keyCondition);
+		setBoolean("escapeExtendedChars", escapeExtendedChars);
+		return super.toString();
 	}
 	
 	public void fromString (String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
 		reset();
-		// Parse the fields
-		boolean tmpBool1 = tmp.get("useLD", locDir.useLD());
-		boolean tmpBool2 = tmp.get("localizeOutside", locDir.localizeOutside());
+		super.fromString(data);
+		boolean tmpBool1 = getBoolean("useLD", locDir.useLD());
+		boolean tmpBool2 = getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
-		useCodeFinder = tmp.get("useCodeFinder", useCodeFinder);
-		useKeyCondition = tmp.get("useKeyCondition", useKeyCondition);
-		extractOnlyMatchingKey = tmp.get("extractOnlyMatchingKey", extractOnlyMatchingKey);
-		keyCondition = tmp.get("keyCondition", keyCondition);
-		escapeExtendedChars = tmp.get("escapeExtendedChars", escapeExtendedChars);
+		useCodeFinder = getBoolean("useCodeFinder", useCodeFinder);
+		useKeyCondition = getBoolean("useKeyCondition", useKeyCondition);
+		extractOnlyMatchingKey = getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		keyCondition = getString("keyCondition", keyCondition);
+		escapeExtendedChars = getBoolean("escapeExtendedChars", escapeExtendedChars);
 	}
 }

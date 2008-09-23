@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.linebreakconversion;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
@@ -33,11 +32,10 @@ public class Parameters extends BaseParameters {
 	}
 	
 	@Override
-	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		lineBreak = tmp.get("lineBreak", lineBreak);
+	public void fromString (String data) {
+		reset();
+		super.fromString(data);
+		lineBreak = getString("lineBreak", lineBreak);
 	}
 
 	@Override
@@ -48,10 +46,8 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public String toString() {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("lineBreak", lineBreak);
-		return tmp.toString();
+		setString("lineBreak", lineBreak);
+		return super.toString();
 	}
 	
 }

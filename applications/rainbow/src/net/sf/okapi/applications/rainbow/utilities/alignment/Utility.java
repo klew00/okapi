@@ -55,7 +55,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private int              noTextTotal;
 	private int              count;
 	private int              countTotal;
-	private Aligner  aligner;
+	private Aligner          aligner;
 	private boolean          stopProcess;
 	
 
@@ -106,7 +106,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			//TODO: make info part of constructor
 			//aligner = new SegmentsAligner(shell, params.targetSrxPath);
 			aligner = new Aligner(shell);
-			aligner.setInfo(params.targetSrxPath);
+			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit);
 		}
 		
 		alignedTotal = 0;

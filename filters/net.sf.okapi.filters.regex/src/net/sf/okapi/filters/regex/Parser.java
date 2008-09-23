@@ -79,7 +79,7 @@ public class Parser implements IParser {
 
 	//TODO: remove after test
 	// INFOSTRING rules
-	private void tempSetStringInfoRules () {
+	private void tempSetHCRules () {
 		resource.params.rules.clear();
 
 		Rule r = new Rule();
@@ -99,19 +99,20 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
 	}
-
-/*	//TODO: remove after test
+/*
+	//TODO: remove after test
 // AZADA rules
-	private void tempSetStringInfoRules () {
+	private void tempSetHCRules () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
 		r.ruleName = "r2";
-		r.start = "\\[.*?\\](\\t*)";
+		r.start = "\\[.*?\\](\\t*?)";
 		r.end = "\\n(?=\\[.*?\\])|$";
 		r.nameStart = "\\[";
 		r.nameEnd = "\\]";
 		r.ruleType = Rule.RULETYPE_CONTENT;
 		r.preserveWS = true;
+		resource.params.regexOptions = Pattern.DOTALL | Pattern.MULTILINE;
 		
 		r.useCodeFinder = true;
 		List<String> list = r.codeFinder.getRules();
@@ -157,7 +158,7 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-			tempSetStringInfoRules();
+			tempSetHCRules();
 			
 			// Prepare the filter rules
 			preparePatterns();

@@ -98,6 +98,11 @@ public class LogForm implements ILog {
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btStop.setLayoutData(gdTmp);
+		btStop.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				cancel(true);
+			}
+		});
 		
 		button = new Button(shell, SWT.PUSH);
 		button.setText("&Close");

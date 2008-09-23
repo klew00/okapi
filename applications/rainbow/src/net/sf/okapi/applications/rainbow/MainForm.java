@@ -454,6 +454,7 @@ public class MainForm implements IParametersProvider {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
 				Dialogs.showError(shell, "Not implemented yet.", null);
+				//testRunnable();
 			}
 		});
 
@@ -1612,5 +1613,16 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
-	
+
+/*	private void testRunnable () {
+		try {
+//			startWaiting("Test", true);
+//			RunnableTest test = new RunnableTest(shell.getDisplay(), log);
+//			Thread T = new Thread(test);
+//			T.start();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}*/
 }

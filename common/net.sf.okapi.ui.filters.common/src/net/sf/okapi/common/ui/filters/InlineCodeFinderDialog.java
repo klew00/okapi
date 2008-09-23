@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.ui.filters;
 
-import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;

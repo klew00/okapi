@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.sf.okapi.common.FieldsString;
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -125,25 +125,25 @@ public class InlineCodeFinder {
 
 	@Override
 	public String toString () {
-		FieldsString tmp = new FieldsString();
-		tmp.add("count", rules.size());
+		ParametersString tmp = new ParametersString();
+		tmp.setInteger("count", rules.size());
 		int i = 0;
 		for ( String rule : rules ) {
-			tmp.add(String.format("rule%d", i), rule);
+			tmp.setString(String.format("rule%d", i), rule);
 			i++;
 		}
-		tmp.add("sample", sample);
+		tmp.setString("sample", sample);
 		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
-		FieldsString tmp = new FieldsString(data);
+		ParametersString tmp = new ParametersString(data);
 		reset();
-		int count = tmp.get("count", 0);
+		int count = tmp.getInteger("count", 0);
 		for ( int i=0; i<count; i++ ) {
-			String rule = tmp.get(String.format("rule%d", i), "");
+			String rule = tmp.getString(String.format("rule%d", i), "");
 			if ( rule.length() > 0 ) rules.add(rule);
 		}
-		sample = tmp.get("sample", sample);
+		sample = tmp.getString("sample", sample);
 	}
 }

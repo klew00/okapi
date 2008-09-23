@@ -18,6 +18,7 @@ import org.w3c.its.ITSEngine;
 import org.w3c.its.ITraversal;
 
 import net.sf.okapi.common.ConfigurationString;
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
@@ -416,13 +417,75 @@ public class Main {
 		}
 		System.out.println("---end testConfigString---");
 	}
+	
+	private static void testParams () {
+		System.out.println("---start testParams---");
+		try {
+			ParametersString p1 = new ParametersString();
+			String p1s1 = "value of p1s1";
+			boolean p1b1 = true;
+			int p1i1 = 100;
+			p1.setString("p1s1", p1s1);
+			p1.setBoolean("p1b1", p1b1);
+			p1.setInteger("p1i1", p1i1);
+			
+			if ( p1.getString("p1s1").equals(p1s1) ) System.out.println(p1s1);
+			else System.out.println("error");
+			if ( p1.getBoolean("p1b1") == p1b1 ) System.out.println(p1b1);
+			else System.out.println("error");
+			if ( p1.getInteger("p1i1") == p1i1 ) System.out.println(p1i1);
+			else System.out.println("error");
+
+			String data = p1.toString();
+			System.out.println("--first output:");
+			System.out.println("p1='"+data+"'");
+			
+			p1 = new ParametersString();
+			p1.fromString(data);
+			if ( p1.getString("p1s1").equals(p1s1) ) System.out.println(p1s1);
+			else System.out.println("error");
+			if ( p1.getBoolean("p1b1") == p1b1 ) System.out.println(p1b1);
+			else System.out.println("error");
+			if ( p1.getInteger("p1i1") == p1i1 ) System.out.println(p1i1);
+			else System.out.println("error");
+
+			ParametersString p2 = new ParametersString();
+			p2.fromString("\np2s1=value of p2s1");
+			
+			System.out.println("--after p2 added:");
+			p1.setGroup("p2grp", p2.toString());
+			data = p1.toString();
+			System.out.println("p1='"+data+"'");
+			
+			System.out.println("--p2 after reset and setGroup from p1:");
+			p2.reset();
+			p2.fromString(p1.getGroup("p2grp"));
+			System.out.println("p2='"+p2.toString()+"'");
+			
+			System.out.println("--p1 after removing p2:");
+			p1.removeGroup("p2grp");
+			System.out.println("p1='"+p1.toString()+"'");
+			
+			System.out.println("--p3:");
+			p1.setGroup("p2grp", p2.toString());
+			ParametersString p3 = new ParametersString();
+			p3.setGroup("p1grp", p1);
+			System.out.println("p3='"+p3.toString()+"'");
+			
+		}
+		catch ( Exception e ) {
+			System.out.println(e.getLocalizedMessage());
+		}
+		System.out.println("---end testParams---");
+	}
 
 	public static void main (String[] args)
 		throws Exception
 	{
-		testSegmentation();
+		testParams();
 		
 		if ( args.length == 0 ) return;
+		testSegmentation();
 //		testContainer();
 		testConfigString();
 //		testItem();

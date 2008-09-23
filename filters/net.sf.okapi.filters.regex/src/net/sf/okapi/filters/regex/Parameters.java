@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
@@ -55,39 +54,38 @@ public class Parameters extends BaseParameters {
 		locDir.reset();
 	}
 
-	public String toString ()
-	{
-		FieldsString tmp = new FieldsString();
-		tmp.add("useLD", locDir.useLD());
-		tmp.add("localizeOutside", locDir.localizeOutside());
-		tmp.add("startString", startString);
-		tmp.add("endString", endString);
-		tmp.add("extractOuterStrings", extractOuterStrings);
-		tmp.add("useBSlashEscape", useBSlashEscape);
-		tmp.add("regexOptions", regexOptions);
-		tmp.add("ruleCount", rules.size());
+	@Override
+	public String toString () {
+		setBoolean("useLD", locDir.useLD());
+		setBoolean("localizeOutside", locDir.localizeOutside());
+		setString("startString", startString);
+		setString("endString", endString);
+		setBoolean("extractOuterStrings", extractOuterStrings);
+		setBoolean("useBSlashEscape", useBSlashEscape);
+		setInteger("regexOptions", regexOptions);
+		setInteger("ruleCount", rules.size());
 		for ( int i=0; i<rules.size(); i++ ) {
-			tmp.addGroup(String.format("rule%d", i), rules.get(i).toString());
+			setGroup(String.format("rule%d", i), rules.get(i).toString());
 		}
-		return tmp.toString();
+		return super.toString();
 	}
 	
 	public void fromString (String data) {
-		FieldsString tmp = new FieldsString(data);
 		reset();
-		boolean tmpBool1 = tmp.get("useLD", locDir.useLD());
-		boolean tmpBool2 = tmp.get("localizeOutside", locDir.localizeOutside());
+		super.fromString(data);
+		boolean tmpBool1 = getBoolean("useLD", locDir.useLD());
+		boolean tmpBool2 = getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
-		startString = tmp.get("startString", startString);
-		endString = tmp.get("endString", endString);
-		extractOuterStrings = tmp.get("extractOuterStrings", extractOuterStrings);
-		useBSlashEscape = tmp.get("useBSlashEscape", useBSlashEscape);
-		regexOptions = tmp.get("regexOptions", regexOptions);
+		startString = getString("startString", startString);
+		endString = getString("endString", endString);
+		extractOuterStrings = getBoolean("extractOuterStrings", extractOuterStrings);
+		useBSlashEscape = getBoolean("useBSlashEscape", useBSlashEscape);
+		regexOptions = getInteger("regexOptions", regexOptions);
 		Rule rule;
-		int count = tmp.get("ruleCount", 0);
+		int count = getInteger("ruleCount", 0);
 		for ( int i=0; i<count; i++ ) {
 			rule = new Rule();
-			rule.fromString(tmp.getGroup(String.format("rule%d", i), null));
+			rule.fromString(getGroup(String.format("rule%d", i), null));
 			rules.add(rule);
 		}
 	}

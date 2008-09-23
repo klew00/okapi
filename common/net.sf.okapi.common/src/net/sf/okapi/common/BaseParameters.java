@@ -31,71 +31,66 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-public abstract class BaseParameters implements IParameters {
+public abstract class BaseParameters extends ParametersString implements IParameters {
 
-	protected String    path;
+	protected String              path;
 
-	/* Do not define BaseParameters() constructor 
-	 * calling reset(), as some derived classes may need to 
-	 * create object before calling reset
-	 */
-	// public BaseParameters()
-	
-	public void reset () {
+	public BaseParameters () {
 		path = null;
 	}
-	
-	public abstract String toString ();
-	
-	public abstract void fromString (String data);
 	
 	public String getPath () {
 		return path;
 	}
 	
-	public String getParameter (String name) {
-		//TODO: Find a faster/better way to implement getOption()
-		FieldsString FS = new FieldsString(toString());
-		return FS.get(name, null);
-	}
-
-	public boolean getBoolean (String name) {
-		//TODO: Find a faster/better way to implement getOption()
-		FieldsString FS = new FieldsString(toString());
-		return (FS.get(name, "").equals("1"));
-	}
-
-	public int getInt (String name) {
-		//TODO: Find a faster/better way to implement getOption()
-		FieldsString FS = new FieldsString(toString());
-		return Integer.parseInt(FS.get(name, "0"));
-	}
-
 	public void setParameter (String name,
 		String value)
 	{
-		//TODO: Find a faster/better way to implement setOption()
-		FieldsString FS = new FieldsString(toString());
-		FS.set(name, value);
-		fromString(FS.toString());
+		setString(name, value);
 	}
 
 	public void setParameter (String name,
 		boolean value)
 	{
-		//TODO: Find a faster/better way to implement setOption()
-		FieldsString FS = new FieldsString(toString());
-		FS.set(name, (value ? "1" : "0"));
-		fromString(FS.toString());
+		setBoolean(name, value);
 	}
 
 	public void setParameter (String name,
 		int value)
 	{
-		//TODO: Find a faster/better way to implement setOption()
-		FieldsString FS = new FieldsString(toString());
-		FS.set(name, String.format("%d", value));
-		fromString(FS.toString());
+		setInteger(name, value);
+	}
+
+	public String getParameter (String name,
+		String defaultValue)
+	{
+		return getString(name, defaultValue);
+	}
+		
+	public boolean getParameter (String name,
+		boolean defaultValue)
+	{
+		return getBoolean(name, defaultValue);
+	}
+		
+	public int getParameter (String name,
+		int defaultValue)
+	{
+		return getInteger(name, defaultValue);
+	}
+	
+	public String getParameter (String name) {
+		return getString(name);
+	}
+
+	public int getInt (String name,
+		int defaultValue)
+	{
+		return getInteger(name, defaultValue);
+	}
+	
+	public int getInt (String name) {
+		return getInteger(name);
 	}
 
 	public void load (String filePath,

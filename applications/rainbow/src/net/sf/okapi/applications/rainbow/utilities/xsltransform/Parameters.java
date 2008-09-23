@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.xsltransform;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
@@ -40,11 +39,10 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void fromString (String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		xsltPath = tmp.get("xsltPath", xsltPath); //$NON-NLS-1$
-		paramList = tmp.get("paramList", paramList); //$NON-NLS-1$
+		reset();
+		super.fromString(data);
+		xsltPath = getString("xsltPath", xsltPath); //$NON-NLS-1$
+		paramList = getString("paramList", paramList); //$NON-NLS-1$
 	}
 
 	@Override
@@ -54,11 +52,9 @@ public class Parameters extends BaseParameters {
 	}
 
 	public String toString () {
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("xsltPath", xsltPath); //$NON-NLS-1$
-		tmp.add("paramList", paramList); //$NON-NLS-1$
-		return tmp.toString();
+		setString("xsltPath", xsltPath); //$NON-NLS-1$
+		setString("paramList", paramList); //$NON-NLS-1$
+		return super.toString();
 	}
 
 }

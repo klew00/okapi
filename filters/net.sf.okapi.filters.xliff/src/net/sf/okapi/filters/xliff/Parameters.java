@@ -21,7 +21,6 @@
 package net.sf.okapi.filters.xliff;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
@@ -47,29 +46,24 @@ public class Parameters extends BaseParameters {
 		escapeGT = false;
 	}
 
-	public String toString ()
-	{
-		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("useStateValues", useStateValues);
-		tmp.add("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		tmp.add("stateValues", stateValues);
-		tmp.add("extractNoState", extractNoState);
-		tmp.add("fallbackToID", fallbackToID);
-		tmp.add("escapeGT", escapeGT);
-		return tmp.toString();
+	public String toString () {
+		setBoolean("useStateValues", useStateValues);
+		setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		setString("stateValues", stateValues);
+		setBoolean("extractNoState", extractNoState);
+		setBoolean("fallbackToID", fallbackToID);
+		setBoolean("escapeGT", escapeGT);
+		return super.toString();
 	}
 	
 	public void fromString (String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-
-		// Parse the fields
-		useStateValues = tmp.get("useStateValues", useStateValues);
-		extractOnlyMatchingValues = tmp.get("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		stateValues = tmp.get("stateValues", stateValues);
-		extractNoState = tmp.get("extractNoState", extractNoState);
-		fallbackToID = tmp.get("fallbackToID", fallbackToID);
-		escapeGT = tmp.get("escapeGT", escapeGT);
+		reset();
+		super.fromString(data);
+		useStateValues = getBoolean("useStateValues", useStateValues);
+		extractOnlyMatchingValues = getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		stateValues = getString("stateValues", stateValues);
+		extractNoState = getBoolean("extractNoState", extractNoState);
+		fallbackToID = getBoolean("fallbackToID", fallbackToID);
+		escapeGT = getBoolean("escapeGT", escapeGT);
 	}
 }
