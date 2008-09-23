@@ -2,7 +2,7 @@ package net.sf.okapi.common.pipeline2;
 
 public interface ILinearPipeline {
 	
-	public void start();
+	public boolean execute();
 	
 	public void cancel();
 	

@@ -26,7 +26,7 @@ public class Producer implements IProducer, IPipelineStep {
 		for (int i = 0; i < 10; i++) {
 			order = i;
 			try {
-				Thread.sleep(500);
+				Thread.sleep(2000);
 				producerQueue.put(new PipelineEvent(PipelineEventType.TEXTUNIT, null, order));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
