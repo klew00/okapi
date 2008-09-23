@@ -13,7 +13,7 @@ public class LinearPipelineTest {
 	
 	@Before
 	public void setUp() {
-		pipeline = new LinearPipeline(4);
+		pipeline = new LinearPipeline();
 	}
 	
 	@Test
@@ -21,12 +21,9 @@ public class LinearPipelineTest {
 		pipeline.addPipleLineStep(new Producer());
 		pipeline.addPipleLineStep(new ConsumerProducer());
 		pipeline.addPipleLineStep(new Consumer());
-		
-		Thread pipelineThread = new Thread(pipeline);
-		pipelineThread.start();
-		
-		pipeline.start();
+			
 		System.out.println("START PIPELINE");
+		pipeline.start();	
 	}
 	
 	@After

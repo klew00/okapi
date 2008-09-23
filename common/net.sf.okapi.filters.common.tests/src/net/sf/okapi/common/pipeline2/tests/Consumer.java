@@ -8,6 +8,8 @@ import java.util.concurrent.BlockingQueue;
 import net.sf.okapi.common.pipeline2.IConsumer;
 import net.sf.okapi.common.pipeline2.IPipelineEvent;
 import net.sf.okapi.common.pipeline2.IPipelineStep;
+import net.sf.okapi.common.pipeline2.PipelineReturnValue;
+import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
 
 /**
  * @author HargraveJE
@@ -15,27 +17,28 @@ import net.sf.okapi.common.pipeline2.IPipelineStep;
  */
 public class Consumer implements IConsumer, IPipelineStep {
 	private BlockingQueue<IPipelineEvent> consumerQueue;
-	private boolean stop = false; 
-	
+
 	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue) {
 		this.consumerQueue = consumerQueue;
 	}
 
-	public void run() {
+	public String getName() {
+		return "Consumer";
+	}
+
+	public PipelineReturnValue call() throws Exception {
 		while (true) {
-			try {
-				if (stop) return;
-				IPipelineEvent event = consumerQueue.take();
+			try {				
+				IPipelineEvent event = consumerQueue.take();				
 				System.out.println("EventType: " + event.getEventType().name());
 				System.out.println("Order: " + Integer.valueOf(event.getOrder()));
 				System.out.println();
-			} catch (InterruptedException e) {				
-				e.printStackTrace();
+				if (event.getEventType() == PipelineEventType.FINISHED) {
+					return PipelineReturnValue.SUCCEDED;
+				}
+			} catch (InterruptedException e) {
+				return PipelineReturnValue.INTERRUPTED;
 			}
-		}	
-	}
-
-	public void stop() {
-		stop = true;		
+		}
 	}
 }
