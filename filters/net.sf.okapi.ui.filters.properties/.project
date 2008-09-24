@@ -3,7 +3,6 @@
 	<name>net.sf.okapi.ui.filters.properties</name>
 	<comment></comment>
 	<projects>
-		<project>net.sf.okapi.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

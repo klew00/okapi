@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -31,8 +32,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-
-import sf.okapi.lib.ui.segmentation.SRXEditor;
 
 /**
  * Implements a common UI to select a filter settings string.

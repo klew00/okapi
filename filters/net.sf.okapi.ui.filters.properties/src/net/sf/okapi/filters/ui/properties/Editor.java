@@ -54,7 +54,7 @@ public class Editor implements IParametersEditor {
 	private Button                chkExtraComments;
 	private LDPanel               pnlLD;
 	private OKCancelPanel         pnlActions;
-	private Parameters            params;
+	private IParameters           params;
 	private Button                chkEscapeExtendedChars;
 	private Button                chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
@@ -69,7 +69,7 @@ public class Editor implements IParametersEditor {
 	{
 		boolean bRes = false;
 		shell = null;
-		params = (Parameters)p_Options;
+		params = p_Options;
 		try {
 			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);

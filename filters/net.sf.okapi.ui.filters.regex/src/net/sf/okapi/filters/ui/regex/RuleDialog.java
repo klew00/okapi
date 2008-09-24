@@ -178,13 +178,13 @@ public class RuleDialog {
 	private void updateResults () {
 		try {
 			pattern1 = Pattern.compile(edStart.getText(), Pattern.DOTALL);
-			Matcher m1 = pattern1.matcher(edSample.getText());
+			Matcher m1 = pattern1.matcher(getSampleText());
 			if ( m1.find() ) {
 				pattern2 = Pattern.compile(edEnd.getText(), Pattern.DOTALL);
-				Matcher m2 = pattern2.matcher(edSample.getText());
+				Matcher m2 = pattern2.matcher(getSampleText());
 				if ( m2.find(m1.end()) ) {
 					edResult.setText("start='" + m1.group() + "'\ncontent='"
-						+ edSample.getText().substring(m1.end(), m2.start())
+						+ getSampleText().substring(m1.end(), m2.start())
 						+ "'\nend='" + m2.group() + "'");
 				}
 			}
@@ -195,6 +195,14 @@ public class RuleDialog {
 		}
 	}
 
+	private String getSampleText() {
+		// Change different line breaks type into \n cases
+		String tmp = edSample.getText();
+		tmp = tmp.replaceAll("\r\r\n", "\n");
+		tmp = tmp.replace("\r\n", "\n");
+		return tmp.replace("\r", "\n"); 
+	}
+	
 	private boolean saveData () {
 		try {
 			if (( edStart.getText().length() == 0 )
@@ -212,7 +220,7 @@ public class RuleDialog {
 			rule.setNameStart(edNameStart.getText());
 			rule.setNameEnd(edNameEnd.getText());
 			rule.setNameFormat(edNameFormat.getText());
-			rule.setSample(edSample.getText());
+			rule.setSample(getSampleText());
 			result = true;
 			return result;
 		}

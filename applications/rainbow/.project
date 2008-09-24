@@ -3,8 +3,6 @@
 	<name>rainbow</name>
 	<comment></comment>
 	<projects>
-		<project>net.sf.okapi.common</project>
-		<project>net.sf.okapi.filters.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -27,6 +27,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.ui.segmentation.GenericContent;
+import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,9 +50,6 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import sf.okapi.lib.ui.segmentation.GenericContent;
-import sf.okapi.lib.ui.segmentation.SRXEditor;
 
 public class Aligner {
 	
