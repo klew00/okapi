@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package sf.okapi.lib.ui.segmentation;
+package net.sf.okapi.lib.ui.segmentation;
 
 import java.util.List;
 import java.util.regex.Matcher;
