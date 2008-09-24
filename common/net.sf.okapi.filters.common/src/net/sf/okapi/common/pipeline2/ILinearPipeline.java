@@ -2,7 +2,9 @@ package net.sf.okapi.common.pipeline2;
 
 public interface ILinearPipeline {
 	
-	public boolean execute();
+	public PipelineReturnValue execute();
+	
+	public PipelineReturnValue getState();
 	
 	public void cancel();
 	

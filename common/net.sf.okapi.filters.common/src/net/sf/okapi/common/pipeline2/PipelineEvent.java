@@ -1,6 +1,6 @@
 package net.sf.okapi.common.pipeline2;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PipelineEvent implements IPipelineEvent {
 
@@ -11,13 +11,13 @@ public class PipelineEvent implements IPipelineEvent {
 	private final int order;
 	private final PipelineEventType pipelineEventType;
 	private final Object data; // TextUnit, Skeleton, Group or other data object
-	private final HashMap<String, Object> metadata; // annotations
+	private final ConcurrentHashMap<String, Object> metadata; // annotations
 	
 	public PipelineEvent(PipelineEventType pipelineEventType, Object data, int order) {
 		this.pipelineEventType = pipelineEventType;
 		this.data = data;
 		this.order = order;
-		this.metadata = new HashMap<String, Object>();
+		this.metadata = new ConcurrentHashMap<String, Object>();
 	}
 	
 	public Object getData() {	
@@ -28,7 +28,7 @@ public class PipelineEvent implements IPipelineEvent {
 		return pipelineEventType;
 	}
 	
-	public HashMap<String, Object> getMetadata() {		
+	public ConcurrentHashMap<String, Object> getMetadata() {		
 		return metadata;
 	}
 	
