@@ -44,6 +44,7 @@ public class LinearPipelineTest {
 			case FAILED:
 			case INTERRUPTED:
 				stop = true;
+				e.shutdownNow();
 				break;
 
 			default:
@@ -53,7 +54,7 @@ public class LinearPipelineTest {
 		}
 	}
 
-	// @Test
+	//@Test
 	public void runPipeline() {
 		ILinearPipeline pipeline = new LinearPipeline();
 		pipeline.addPipleLineStep(new Producer());
