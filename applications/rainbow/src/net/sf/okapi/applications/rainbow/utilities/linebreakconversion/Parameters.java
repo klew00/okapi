@@ -45,7 +45,7 @@ public class Parameters extends BaseParameters {
 	public String toString() {
 		buffer.reset();
 		buffer.setString("lineBreak", lineBreak);
-		return super.toString();
+		return buffer.toString();
 	}
 	
 }

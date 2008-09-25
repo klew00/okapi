@@ -87,7 +87,7 @@ public class Parameters extends BaseParameters {
 		for ( int i=0; i<rules.size(); i++ ) {
 			buffer.setGroup(String.format("rule%d", i), rules.get(i).toString());
 		}
-		return super.toString();
+		return buffer.toString();
 	}
 	
 	public void compileRules () {

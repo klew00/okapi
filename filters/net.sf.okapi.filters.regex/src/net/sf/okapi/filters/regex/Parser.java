@@ -158,7 +158,7 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-			tempSetHCRules();
+			//tempSetHCRules();
 			
 			// Prepare the filter rules
 			preparePatterns();

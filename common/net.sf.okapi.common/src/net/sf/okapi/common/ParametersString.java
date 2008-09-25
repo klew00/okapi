@@ -20,19 +20,19 @@
 
 package net.sf.okapi.common;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class ParametersString {
 
-	private Hashtable<String, Object>  list;
+	private LinkedHashMap<String, Object>    list;
 	
 	public ParametersString () {
-		list = new Hashtable<String, Object>();
+		list = new LinkedHashMap<String, Object>();
 	}
 
 	public ParametersString (String data) {
-		list = new Hashtable<String, Object>();
+		list = new LinkedHashMap<String, Object>();
 		buildList(null, data);
 	}
 
@@ -58,10 +58,10 @@ public class ParametersString {
 	
 	public void removeGroup (String groupName) {
 		groupName += ".";
-		Enumeration<String> en = list.keys();
+		Iterator<String> iter = list.keySet().iterator();
 		String key;
-		while ( en.hasMoreElements() ) {
-			key = en.nextElement();
+		while ( iter.hasNext() ) {
+			key = iter.next();
 			if ( key.startsWith(groupName) ) {
 				list.remove(key);
 			}
