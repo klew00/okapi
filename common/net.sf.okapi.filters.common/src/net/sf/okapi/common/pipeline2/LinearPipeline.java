@@ -73,6 +73,8 @@ public class LinearPipeline implements ILinearPipeline {
 	}
 
 	public void cancel() {
+		pause(); // pause all threads to make sure they are a good stopping point for destruction
+		//TODO : how do we wait for pause to happen for all tasks? Does shutdown throw a interrupted exception?
 		executor.shutdownNow();
 		state = PipelineReturnValue.CANCELLED;
 	}
