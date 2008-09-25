@@ -16,43 +16,37 @@ class PausableThreadPoolExecutor extends ThreadPoolExecutor {
 	private Condition unpaused = pauseLock.newCondition();
 
 	/**
-     * Creates a thread pool that creates new threads as needed, but
-     * will reuse previously constructed threads when they are
-     * available.  These pools will typically improve the performance
-     * of programs that execute many short-lived asynchronous tasks.
-     * Calls to <tt>execute</tt> will reuse previously constructed
-     * threads if available. If no existing thread is available, a new
-     * thread will be created and added to the pool. Threads that have
-     * not been used for sixty seconds are terminated and removed from
-     * the cache. Thus, a pool that remains idle for long enough will
-     * not consume any resources. Note that pools with similar
-     * properties but different details (for example, timeout parameters)
-     * may be created using {@link ThreadPoolExecutor} constructors.
-     *
-     * @return the newly created thread pool
-     */
-    public static PausableThreadPoolExecutor newCachedThreadPool() {
-        return new PausableThreadPoolExecutor(0, Integer.MAX_VALUE,
-                                      60L, TimeUnit.SECONDS,
-                                      new SynchronousQueue<Runnable>());
-    }
-    
+	 * Creates a thread pool that creates new threads as needed, but will reuse
+	 * previously constructed threads when they are available. These pools will
+	 * typically improve the performance of programs that execute many
+	 * short-lived asynchronous tasks. Calls to <tt>execute</tt> will reuse
+	 * previously constructed threads if available. If no existing thread is
+	 * available, a new thread will be created and added to the pool. Note that
+	 * pools with similar properties but different details (for example, timeout
+	 * parameters) may be created using {@link ThreadPoolExecutor} constructors.
+	 * 
+	 * @return the newly created thread pool
+	 */
+	public static PausableThreadPoolExecutor newCachedThreadPool() {
+		return new PausableThreadPoolExecutor(0, Integer.MAX_VALUE, 0L, TimeUnit.MILLISECONDS,
+				new SynchronousQueue<Runnable>());
+	}
+
 	/**
-     * Creates a thread pool that reuses a fixed set of threads
-     * operating off a shared unbounded queue. If any thread
-     * terminates due to a failure during execution prior to shutdown,
-     * a new one will take its place if needed to execute subsequent
-     * tasks.
-     *
-     * @param nThreads the number of threads in the pool
-     * @return the newly created thread pool
-     */
-    public static PausableThreadPoolExecutor newFixedThreadPool(int nThreads) {
-        return new PausableThreadPoolExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS,
-                                      new LinkedBlockingQueue<Runnable>());
-    }
-    
+	 * Creates a thread pool that reuses a fixed set of threads operating off a
+	 * shared unbounded queue. If any thread terminates due to a failure during
+	 * execution prior to shutdown, a new one will take its place if needed to
+	 * execute subsequent tasks.
+	 * 
+	 * @param nThreads
+	 *            the number of threads in the pool
+	 * @return the newly created thread pool
+	 */
+	public static PausableThreadPoolExecutor newFixedThreadPool(int nThreads) {
+		return new PausableThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<Runnable>());
+	}
+
 	/**
 	 * @param corePoolSize
 	 * @param maximumPoolSize
