@@ -175,15 +175,15 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		rdRemove.setSelection(params.getBoolean("removeBOM"));
+		rdRemove.setSelection(params.removeBOM);
 		rdAdd.setSelection(!rdRemove.getSelection());
-		chkAlsoNonUTF8.setSelection(params.getBoolean("alsoNonUTF8"));
+		chkAlsoNonUTF8.setSelection(params.alsoNonUTF8);
 		updateNotes();
 	}
 
 	private boolean saveData () {
-		params.setParameter("removeBOM", (rdRemove.getSelection() ? "1" : "0"));
-		params.setParameter("alsoNonUTF8", (chkAlsoNonUTF8.getSelection() ? "1" : "0"));
+		params.removeBOM = rdRemove.getSelection();
+		params.alsoNonUTF8 = chkAlsoNonUTF8.getSelection();
 		result = true;
 		return result;
 	}

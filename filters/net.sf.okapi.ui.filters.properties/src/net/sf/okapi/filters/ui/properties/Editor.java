@@ -54,7 +54,7 @@ public class Editor implements IParametersEditor {
 	private Button                chkExtraComments;
 	private LDPanel               pnlLD;
 	private OKCancelPanel         pnlActions;
-	private IParameters           params;
+	private Parameters            params;
 	private Button                chkEscapeExtendedChars;
 	private Button                chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
@@ -69,7 +69,7 @@ public class Editor implements IParametersEditor {
 	{
 		boolean bRes = false;
 		shell = null;
-		params = p_Options;
+		params = (Parameters)p_Options;
 		try {
 			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);
@@ -237,13 +237,13 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
-		edKeyCondition.setText(params.getParameter("keyCondition"));
-		rdExtractOnlyMatchingKey.setSelection(params.getBoolean("extractOnlyMatchingKey"));
-		rdExcludeMatchingKey.setSelection(!params.getBoolean("extractOnlyMatchingKey"));
-		chkUseKeyFilter.setSelection(params.getBoolean("useKeyCondition"));
-		chkExtraComments.setSelection(params.getBoolean("extraComments"));
-		chkEscapeExtendedChars.setSelection(params.getBoolean("escapeExtendedChars"));
+		pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
+		edKeyCondition.setText(params.keyCondition);
+		rdExtractOnlyMatchingKey.setSelection(params.extractOnlyMatchingKey);
+		rdExcludeMatchingKey.setSelection(!params.extractOnlyMatchingKey);
+		chkUseKeyFilter.setSelection(params.useKeyCondition);
+		chkExtraComments.setSelection(params.extraComments);
+		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
 		pnlLD.updateDisplay();
@@ -251,13 +251,12 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void saveData () {
-		params.setParameter("useLD", pnlLD.getUseLD());
-		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
-		params.setParameter("useKeyCondition", chkUseKeyFilter.getSelection());
-		params.setParameter("keyCondition", edKeyCondition.getText());
-		params.setParameter("extractOnlyMatchingKey", rdExtractOnlyMatchingKey.getSelection());
-		params.setParameter("extraComments", chkExtraComments.getSelection());
-		params.setParameter("escapeExtendedChars", chkEscapeExtendedChars.getSelection());
+		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
+		params.useKeyCondition = chkUseKeyFilter.getSelection();
+		params.keyCondition = edKeyCondition.getText();
+		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
+		params.extraComments = chkExtraComments.getSelection();
+		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
 		result = true;
 	}
 	

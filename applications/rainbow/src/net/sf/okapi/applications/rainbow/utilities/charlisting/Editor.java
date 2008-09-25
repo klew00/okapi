@@ -142,14 +142,14 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		edOutputPath.setText(params.getParameter("outputPath"));
-		chkAutoOpen.setSelection(params.getBoolean("autoOpen"));
+		edOutputPath.setText(params.outputPath);
+		chkAutoOpen.setSelection(params.autoOpen);
 	}
 
 	private boolean saveData () {
 		if ( inInit ) return true;
-		params.setParameter("outputPath", edOutputPath.getText());
-		params.setParameter("autoOpen", chkAutoOpen.getSelection());
+		params.outputPath = edOutputPath.getText();
+		params.autoOpen = chkAutoOpen.getSelection();
 		result = true;
 		return true;
 	}

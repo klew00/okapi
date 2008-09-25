@@ -26,14 +26,14 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean                  useCodeFinder;
-	protected InlineCodeFinder         codeFinder;
-	protected boolean                  escapeExtendedChars;
-	protected boolean                  useKeyCondition;
-	protected boolean                  extractOnlyMatchingKey;
-	protected String                   keyCondition;
-	protected boolean                  extraComments;
-	protected LocalizationDirectives   locDir;
+	public boolean                useCodeFinder;
+	public InlineCodeFinder       codeFinder;
+	public boolean                escapeExtendedChars;
+	public boolean                useKeyCondition;
+	public boolean                extractOnlyMatchingKey;
+	public String                 keyCondition;
+	public boolean                extraComments;
+	public LocalizationDirectives locDir;
 
 
 	public Parameters () {
@@ -43,7 +43,6 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		super.reset();
 		locDir.reset();
 		escapeExtendedChars = true;
 
@@ -61,27 +60,29 @@ public class Parameters extends BaseParameters {
 		extraComments = true;
 	}
 
+	@Override
 	public String toString () {
-		setBoolean("useLD", locDir.useLD());
-		setBoolean("localizeOutside", locDir.localizeOutside());
-		setBoolean("useCodeFinder", useCodeFinder);
-		setBoolean("useKeyCondition", useKeyCondition);
-		setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
-		setString("keyCondition", keyCondition);
-		setBoolean("escapeExtendedChars", escapeExtendedChars);
-		return super.toString();
+		buffer.reset();
+		buffer.setBoolean("useLD", locDir.useLD());
+		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
+		buffer.setBoolean("useCodeFinder", useCodeFinder);
+		buffer.setBoolean("useKeyCondition", useKeyCondition);
+		buffer.setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		buffer.setString("keyCondition", keyCondition);
+		buffer.setBoolean("escapeExtendedChars", escapeExtendedChars);
+		return buffer.toString();
 	}
 	
 	public void fromString (String data) {
 		reset();
-		super.fromString(data);
-		boolean tmpBool1 = getBoolean("useLD", locDir.useLD());
-		boolean tmpBool2 = getBoolean("localizeOutside", locDir.localizeOutside());
+		buffer.fromString(data);
+		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
+		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
-		useCodeFinder = getBoolean("useCodeFinder", useCodeFinder);
-		useKeyCondition = getBoolean("useKeyCondition", useKeyCondition);
-		extractOnlyMatchingKey = getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
-		keyCondition = getString("keyCondition", keyCondition);
-		escapeExtendedChars = getBoolean("escapeExtendedChars", escapeExtendedChars);
+		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
+		useKeyCondition = buffer.getBoolean("useKeyCondition", useKeyCondition);
+		extractOnlyMatchingKey = buffer.getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
+		keyCondition = buffer.getString("keyCondition", keyCondition);
+		escapeExtendedChars = buffer.getBoolean("escapeExtendedChars", escapeExtendedChars);
 	}
 }

@@ -37,7 +37,6 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		super.reset();
 		useStateValues = true;
 		stateValues = "new|needs-translation";
 		extractOnlyMatchingValues = true;
@@ -46,24 +45,27 @@ public class Parameters extends BaseParameters {
 		escapeGT = false;
 	}
 
-	public String toString () {
-		setBoolean("useStateValues", useStateValues);
-		setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		setString("stateValues", stateValues);
-		setBoolean("extractNoState", extractNoState);
-		setBoolean("fallbackToID", fallbackToID);
-		setBoolean("escapeGT", escapeGT);
-		return super.toString();
-	}
-	
 	public void fromString (String data) {
 		reset();
-		super.fromString(data);
-		useStateValues = getBoolean("useStateValues", useStateValues);
-		extractOnlyMatchingValues = getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		stateValues = getString("stateValues", stateValues);
-		extractNoState = getBoolean("extractNoState", extractNoState);
-		fallbackToID = getBoolean("fallbackToID", fallbackToID);
-		escapeGT = getBoolean("escapeGT", escapeGT);
+		buffer.fromString(data);
+		useStateValues = buffer.getBoolean("useStateValues", useStateValues);
+		extractOnlyMatchingValues = buffer.getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		stateValues = buffer.getString("stateValues", stateValues);
+		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
+		fallbackToID = buffer.getBoolean("fallbackToID", fallbackToID);
+		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
 	}
+
+	@Override
+	public String toString () {
+		buffer.reset();
+		buffer.setBoolean("useStateValues", useStateValues);
+		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+		buffer.setString("stateValues", stateValues);
+		buffer.setBoolean("extractNoState", extractNoState);
+		buffer.setBoolean("fallbackToID", fallbackToID);
+		buffer.setBoolean("escapeGT", escapeGT);
+		return buffer.toString();
+	}
+	
 }

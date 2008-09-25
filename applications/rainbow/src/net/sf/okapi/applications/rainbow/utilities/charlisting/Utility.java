@@ -61,7 +61,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
-			String path = params.getParameter("outputPath");
+			String path = params.outputPath;
 			logger.info("Output: " + path);
 			Util.createDirectories(path);
 			writer = new PrintWriter(path, "UTF-8");
@@ -70,7 +70,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			for ( char key : charList.keySet() ) {
 				writer.println(String.format("U+%04X\t'%c'\t%d", (int)key, key, charList.get(key)));
 			}
-			if ( params.getBoolean("autoOpen") ) {
+			if ( params.autoOpen ) {
 				UIUtil.start(path);
 			}
 		}
@@ -183,7 +183,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	}
 
 	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.getParameter("outputPath"));
+		return Util.getDirectoryName(params.outputPath);
 	}
 
 }

@@ -79,7 +79,7 @@ public class Parser implements IParser {
 
 	//TODO: remove after test
 	// INFOSTRING rules
-	private void tempSetHCRules () {
+/*	private void tempSetHCRules () {
 		resource.params.rules.clear();
 
 		Rule r = new Rule();
@@ -99,7 +99,7 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		resource.params.rules.add(r);
 	}
-/*
+*/
 	//TODO: remove after test
 // AZADA rules
 	private void tempSetHCRules () {
@@ -121,7 +121,7 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
-	}*/
+	}
 	
 	public void open (InputStream input) {
 		try {

@@ -47,51 +47,6 @@ public interface IParameters {
 	public void fromString (String data);
 	
 	/**
-	 * Gets the string value of a given parameter.
-	 * @param name Name of the parameter (ignores cases).
-	 * @return The value of the given parameter.
-	 */
-	public String getParameter (String name);
-
-	/**
-	 * Sets the value of a given parameter.
-	 * @param name The name of the parameter (ignores cases).
-	 * @param value The new value. 
-	 */
-	public void setParameter (String name,
-		String value);
-
-	/**
-	 * Sets the boolean value of a given parameter.
-	 * @param name The name of the parameter (ignores cases).
-	 * @param value The new value. 
-	 */
-	public void setParameter (String name,
-		boolean value);
-
-	/**
-	 * Sets the int value of a given parameter.
-	 * @param name The name of the parameter.
-	 * @param value The new value. 
-	 */
-	public void setParameter (String name,
-		int value);
-
-	/**
-	 * Gets the boolean value of the given parameter.
-	 * @param name Name of the parameter.
-	 * @return Value of the given parameter (false if it does not exists).
-	 */
-	public boolean getBoolean (String name);
-	
-	/**
-	 * Gets the int value of the given parameter.
-	 * @param name Name of the parameter.
-	 * @return Value of the given parameter (0 if it does not exists).
-	 */
-	public int getInt (String name);
-	
-	/**
 	 * Loads the parameters from a file.
 	 * @param filePath The full path of the parameters file to load.
 	 * @param ignoreErrors True if the load should ignore any error

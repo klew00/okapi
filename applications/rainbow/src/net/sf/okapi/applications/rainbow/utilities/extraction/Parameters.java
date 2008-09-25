@@ -77,22 +77,6 @@ public class Parameters extends BaseParameters {
 		reset();
 	}
 	
-	@Override
-	public void fromString(String data) {
-		reset();
-		super.fromString(data);
-		pkgType = getString("pkgtype", pkgType);
-		createZip = getBoolean("createzip", createZip);
-		pkgName = getString("pkgname", pkgName);
-		outputFolder = getString("outputfolder", pkgName);
-		includeMergeData = getBoolean("includemergedata", includeMergeData);
-		includeTargets = getBoolean("includetargets", includeTargets);
-		presegment = getBoolean("presegment", presegment);
-		sourceSRX = getString("sourceSRX", sourceSRX);
-		targetSRX = getString("targetSRX", targetSRX);
-	}
-
-	@Override
 	public void reset() {
 		pkgType = "xliff";
 		createZip = false;
@@ -106,18 +90,32 @@ public class Parameters extends BaseParameters {
 		targetSRX = "";
 	}
 
-	@Override
+	public void fromString(String data) {
+		reset();
+		buffer.fromString(data);
+		pkgType = buffer.getString("pkgtype", pkgType);
+		createZip = buffer.getBoolean("createzip", createZip);
+		pkgName = buffer.getString("pkgname", pkgName);
+		outputFolder = buffer.getString("outputfolder", pkgName);
+		includeMergeData = buffer.getBoolean("includemergedata", includeMergeData);
+		includeTargets = buffer.getBoolean("includetargets", includeTargets);
+		presegment = buffer.getBoolean("presegment", presegment);
+		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
+		targetSRX = buffer.getString("targetSRX", targetSRX);
+	}
+
 	public String toString() {
-		setString("pkgType", pkgType);
-		setBoolean("createZip", createZip);
-		setString("pkgname", pkgName);
-		setString("outputfolder", outputFolder);
-		setBoolean("includemergedata", includeMergeData);
-		setBoolean("includetargets", includeTargets);
-		setBoolean("presegment", presegment);
-		setString("sourceSRX", sourceSRX);
-		setString("targetSRX", targetSRX);
-		return super.toString();
+		buffer.reset();
+		buffer.setString("pkgType", pkgType);
+		buffer.setBoolean("createZip", createZip);
+		buffer.setString("pkgname", pkgName);
+		buffer.setString("outputfolder", outputFolder);
+		buffer.setBoolean("includemergedata", includeMergeData);
+		buffer.setBoolean("includetargets", includeTargets);
+		buffer.setBoolean("presegment", presegment);
+		buffer.setString("sourceSRX", sourceSRX);
+		buffer.setString("targetSRX", targetSRX);
+		return buffer.toString();
 	}
 	
 	public String makePackageID () {

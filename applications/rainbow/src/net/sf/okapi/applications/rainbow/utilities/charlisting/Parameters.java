@@ -24,32 +24,30 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 
-	private String      outputPath;
-	private boolean     autoOpen;
+	public String       outputPath;
+	public boolean      autoOpen;
 
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		outputPath = getString("outputPath", outputPath);
-		autoOpen = getBoolean("autoOpen", autoOpen);
-	}
-
-	@Override
 	public void reset() {
 		outputPath = "";
 		autoOpen = true;
 	}
 
-	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		outputPath = buffer.getString("outputPath", outputPath);
+		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
+	}
+
 	public String toString() {
-		setString("outputPath", outputPath);
-		setBoolean("autoOpen", autoOpen);
-		return super.toString();
+		buffer.reset();
+		buffer.setParameter("outputPath", outputPath);
+		buffer.setParameter("autoOpen", autoOpen);
+		return buffer.toString();
 	}
 	
 }

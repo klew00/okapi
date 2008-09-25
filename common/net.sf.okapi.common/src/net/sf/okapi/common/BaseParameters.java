@@ -31,68 +31,21 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-public abstract class BaseParameters extends ParametersString implements IParameters {
+public abstract class BaseParameters implements IParameters {
 
 	protected String              path;
+	protected ParametersString    buffer;
+
 
 	public BaseParameters () {
 		path = null;
+		buffer = new ParametersString();
 	}
 	
 	public String getPath () {
 		return path;
 	}
 	
-	public void setParameter (String name,
-		String value)
-	{
-		setString(name, value);
-	}
-
-	public void setParameter (String name,
-		boolean value)
-	{
-		setBoolean(name, value);
-	}
-
-	public void setParameter (String name,
-		int value)
-	{
-		setInteger(name, value);
-	}
-
-	public String getParameter (String name,
-		String defaultValue)
-	{
-		return getString(name, defaultValue);
-	}
-		
-	public boolean getParameter (String name,
-		boolean defaultValue)
-	{
-		return getBoolean(name, defaultValue);
-	}
-		
-	public int getParameter (String name,
-		int defaultValue)
-	{
-		return getInteger(name, defaultValue);
-	}
-	
-	public String getParameter (String name) {
-		return getString(name);
-	}
-
-	public int getInt (String name,
-		int defaultValue)
-	{
-		return getInteger(name, defaultValue);
-	}
-	
-	public int getInt (String name) {
-		return getInteger(name);
-	}
-
 	public void load (String filePath,
 		boolean p_bIgnoreErrors)
 	{

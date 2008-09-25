@@ -93,8 +93,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			tmxWriter = null;
 		}
 		tmxWriter = new TMXWriter();
-		tmxWriter.create(params.getParameter("tmxPath"));
-		tmxWriter.setTradosWorkarounds(params.getBoolean("useTradosWorkarounds"));
+		tmxWriter.create(params.tmxPath);
+		tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
 		tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
 		
 		// Prepare the db store
@@ -283,7 +283,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	}
 
 	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.getParameter("tmxPath"));
+		return Util.getDirectoryName(params.tmxPath);
 	}
 
 

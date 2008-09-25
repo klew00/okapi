@@ -28,14 +28,14 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean                  extractOuterStrings;
-	protected String                   startString;
-	protected String                   endString;
-	protected boolean                  useBSlashEscape;
-	protected ArrayList<Rule>          rules;
-	protected int                      regexOptions;
-	protected String                   expression;
-	protected LocalizationDirectives   locDir;
+	public boolean                extractOuterStrings;
+	public String                 startString;
+	public String                 endString;
+	public boolean                useBSlashEscape;
+	public ArrayList<Rule>        rules;
+	public int                    regexOptions;
+	public String                 expression;
+	public LocalizationDirectives locDir;
 	
 
 	public Parameters () {
@@ -44,7 +44,6 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		super.reset();
 		rules = new ArrayList<Rule>();
 		regexOptions = Pattern.DOTALL | Pattern.MULTILINE;
 		startString = "\"";
@@ -54,40 +53,41 @@ public class Parameters extends BaseParameters {
 		locDir.reset();
 	}
 
-	@Override
-	public String toString () {
-		setBoolean("useLD", locDir.useLD());
-		setBoolean("localizeOutside", locDir.localizeOutside());
-		setString("startString", startString);
-		setString("endString", endString);
-		setBoolean("extractOuterStrings", extractOuterStrings);
-		setBoolean("useBSlashEscape", useBSlashEscape);
-		setInteger("regexOptions", regexOptions);
-		setInteger("ruleCount", rules.size());
-		for ( int i=0; i<rules.size(); i++ ) {
-			setGroup(String.format("rule%d", i), rules.get(i).toString());
-		}
-		return super.toString();
-	}
-	
 	public void fromString (String data) {
 		reset();
-		super.fromString(data);
-		boolean tmpBool1 = getBoolean("useLD", locDir.useLD());
-		boolean tmpBool2 = getBoolean("localizeOutside", locDir.localizeOutside());
+		buffer.fromString(data);
+		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
+		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
-		startString = getString("startString", startString);
-		endString = getString("endString", endString);
-		extractOuterStrings = getBoolean("extractOuterStrings", extractOuterStrings);
-		useBSlashEscape = getBoolean("useBSlashEscape", useBSlashEscape);
-		regexOptions = getInteger("regexOptions", regexOptions);
+		startString = buffer.getString("startString", startString);
+		endString = buffer.getString("endString", endString);
+		extractOuterStrings = buffer.getBoolean("extractOuterStrings", extractOuterStrings);
+		useBSlashEscape = buffer.getBoolean("useBSlashEscape", useBSlashEscape);
+		regexOptions = buffer.getInteger("regexOptions", regexOptions);
 		Rule rule;
-		int count = getInteger("ruleCount", 0);
+		int count = buffer.getInteger("ruleCount", 0);
 		for ( int i=0; i<count; i++ ) {
 			rule = new Rule();
-			rule.fromString(getGroup(String.format("rule%d", i), null));
+			rule.fromString(buffer.getGroup(String.format("rule%d", i), null));
 			rules.add(rule);
 		}
+	}
+	
+	@Override
+	public String toString () {
+		buffer.reset();
+		buffer.setBoolean("useLD", locDir.useLD());
+		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
+		buffer.setString("startString", startString);
+		buffer.setString("endString", endString);
+		buffer.setBoolean("extractOuterStrings", extractOuterStrings);
+		buffer.setBoolean("useBSlashEscape", useBSlashEscape);
+		buffer.setInteger("regexOptions", regexOptions);
+		buffer.setInteger("ruleCount", rules.size());
+		for ( int i=0; i<rules.size(); i++ ) {
+			buffer.setGroup(String.format("rule%d", i), rules.get(i).toString());
+		}
+		return super.toString();
 	}
 	
 	public void compileRules () {

@@ -27,34 +27,35 @@ public class Parameters extends BaseParameters {
 	/**
 	 * Path of the XSLT template to apply.
 	 */
-	private String      xsltPath;
+	public String       xsltPath;
 	/**
 	 * List of parameters to pass to the template.
 	 */
-	private String      paramList;
+	public String       paramList;
 	
 
 	public Parameters () {
 		reset();
 	}
 	
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		xsltPath = getString("xsltPath", xsltPath); //$NON-NLS-1$
-		paramList = getString("paramList", paramList); //$NON-NLS-1$
-	}
-
-	@Override
 	public void reset () {
 		xsltPath = ""; //$NON-NLS-1$
 		paramList = ""; //$NON-NLS-1$
 	}
 
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		xsltPath = buffer.getString("xsltPath", xsltPath); //$NON-NLS-1$
+		paramList = buffer.getString("paramList", paramList); //$NON-NLS-1$
+	}
+
+	@Override
 	public String toString () {
-		setString("xsltPath", xsltPath); //$NON-NLS-1$
-		setString("paramList", paramList); //$NON-NLS-1$
-		return super.toString();
+		buffer.reset();
+		buffer.setString("xsltPath", xsltPath); //$NON-NLS-1$
+		buffer.setString("paramList", paramList); //$NON-NLS-1$
+		return buffer.toString();
 	}
 
 }

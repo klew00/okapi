@@ -25,28 +25,26 @@ import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
 
-	private String      lineBreak;
+	public String       lineBreak;
 
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		lineBreak = getString("lineBreak", lineBreak);
-	}
-
-	@Override
 	public void reset() {
 		if ( (lineBreak = System.getProperty("line.separator") )
 			== null ) lineBreak = Util.LINEBREAK_DOS;
 	}
 
-	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		lineBreak = buffer.getString("lineBreak", lineBreak);
+	}
+
 	public String toString() {
-		setString("lineBreak", lineBreak);
+		buffer.reset();
+		buffer.setString("lineBreak", lineBreak);
 		return super.toString();
 	}
 	

@@ -256,11 +256,11 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		chkUnescapeNCR.setSelection(params.getBoolean("unescapeNCR"));
-		chkUnescapeCER.setSelection(params.getBoolean("unescapeCER"));
-		chkUnescapeJava.setSelection(params.getBoolean("unescapeJava"));
+		chkUnescapeNCR.setSelection(params.unescapeNCR);
+		chkUnescapeCER.setSelection(params.unescapeCER);
+		chkUnescapeJava.setSelection(params.unescapeJava);
 
-		switch ( params.getInt("escapeNotation") ) {
+		switch ( params.escapeNotation ) {
 		case Parameters.ESCAPE_NCRDECI:
 			rdEscapeToNCRDeci.setSelection(true);
 			break;
@@ -284,26 +284,26 @@ public class Editor implements IParametersEditor {
 			rdEscapeToNCRHexaU.setSelection(true);
 			break;
 		}
-		edUserFormat.setText(params.getParameter("userFormat"));
-		chkUseBytes.setSelection(params.getBoolean("useBytes"));
-		rdEscapeAll.setSelection(params.getBoolean("escapeAll"));
-		rdEscapeUnsupported.setSelection(!params.getBoolean("escapeAll"));
-		chkBOMonUTF8.setSelection(params.getBoolean("BOMonUTF8"));
-		chkReportUnsupported.setSelection(params.getBoolean("reportUnsupported"));
+		edUserFormat.setText(params.userFormat);
+		chkUseBytes.setSelection(params.useBytes);
+		rdEscapeAll.setSelection(params.escapeAll);
+		rdEscapeUnsupported.setSelection(!params.escapeAll);
+		chkBOMonUTF8.setSelection(params.BOMonUTF8);
+		chkReportUnsupported.setSelection(params.reportUnsupported);
 	}
 
 	private boolean saveData () {
-		params.setParameter("unescapeNCR", chkUnescapeNCR.getSelection());
-		params.setParameter("unescapeCER", chkUnescapeCER.getSelection());
-		params.setParameter("unescapeJava", chkUnescapeJava.getSelection());
-		params.setParameter("escapeAll", rdEscapeAll.getSelection());
-		params.setParameter("escapeNotation", getEscapeNotation());
+		params.unescapeNCR = chkUnescapeNCR.getSelection();
+		params.unescapeCER = chkUnescapeCER.getSelection();
+		params.unescapeJava = chkUnescapeJava.getSelection();
+		params.escapeAll = rdEscapeAll.getSelection();
+		params.escapeNotation = getEscapeNotation();
 		String tmp = edUserFormat.getText();
 		//TODO: check format
-		params.setParameter("userFormat", tmp);
-		params.setParameter("useBytes", chkUseBytes.getSelection());
-		params.setParameter("BOMonUTF8", chkBOMonUTF8.getSelection());
-		params.setParameter("reportUnsupported", chkReportUnsupported.getSelection());
+		params.userFormat= tmp;
+		params.useBytes = chkUseBytes.getSelection();
+		params.BOMonUTF8 = chkBOMonUTF8.getSelection();
+		params.reportUnsupported = chkReportUnsupported.getSelection();
 		result = true;
 		return result;
 	}

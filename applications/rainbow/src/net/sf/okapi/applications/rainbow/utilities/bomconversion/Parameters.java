@@ -24,32 +24,30 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 
-	private boolean     removeBOM;
-	private boolean     alsoNonUTF8;
+	public boolean      removeBOM;
+	public boolean      alsoNonUTF8;
 
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		removeBOM = getBoolean("removeBOM", removeBOM);
-		alsoNonUTF8 = getBoolean("alsoNonUTF8", alsoNonUTF8);
-	}
-
-	@Override
 	public void reset() {
 		removeBOM = false;
 		alsoNonUTF8 = false;
 	}
 
-	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		removeBOM = buffer.getBoolean("removeBOM", removeBOM);
+		alsoNonUTF8 = buffer.getBoolean("alsoNonUTF8", alsoNonUTF8);
+	}
+
 	public String toString() {
-		setBoolean("removeBOM", removeBOM);
-		setBoolean("alsoNonUTF8", alsoNonUTF8);
-		return super.toString();
+		buffer.reset();
+		buffer.setParameter("removeBOM", removeBOM);
+		buffer.setParameter("alsoNonUTF8", alsoNonUTF8);
+		return buffer.toString();
 	}
 
 }

@@ -44,24 +44,6 @@ public class Parameters extends BaseParameters {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		type = getInteger("type", type);
-		addPrefix = getBoolean("addPrefix", addPrefix);
-		prefix = getString("prefix", prefix);
-		addSuffix = getBoolean("addSuffix", addSuffix);
-		suffix = getString("suffix", suffix);
-		applyToExistingTarget = getBoolean("applyToExistingTarget", applyToExistingTarget);
-		addName = getBoolean("addName", addName);
-		addID = getBoolean("addID", addID);
-		segment = getBoolean("segment", segment);
-		sourceSrxPath = getString("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = getString("targetSrxPath", targetSrxPath);
-	}
-
-	@Override
 	public void reset() {
 		type = 0;
 		addPrefix = false;
@@ -76,20 +58,37 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 	}
 
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		type = buffer.getInteger("type", type);
+		addPrefix = buffer.getBoolean("addPrefix", addPrefix);
+		prefix = buffer.getString("prefix", prefix);
+		addSuffix = buffer.getBoolean("addSuffix", addSuffix);
+		suffix = buffer.getString("suffix", suffix);
+		applyToExistingTarget = buffer.getBoolean("applyToExistingTarget", applyToExistingTarget);
+		addName = buffer.getBoolean("addName", addName);
+		addID = buffer.getBoolean("addID", addID);
+		segment = buffer.getBoolean("segment", segment);
+		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
+	}
+
 	@Override
 	public String toString() {
-		setInteger("type", type);
-		setBoolean("addPrefix", addPrefix);
-		setString("prefix", prefix);
-		setBoolean("addSuffix", addSuffix);
-		setString("suffix", suffix);
-		setBoolean("applyToExistingTarget", applyToExistingTarget);
-		setBoolean("addName", addName);
-		setBoolean("addID", addID);
-		setBoolean("segment", segment);
-		setString("sourceSrxPath", sourceSrxPath);
-		setString("targetSrxPath", targetSrxPath);
-		return super.toString();
+		buffer.reset();
+		buffer.setInteger("type", type);
+		buffer.setBoolean("addPrefix", addPrefix);
+		buffer.setString("prefix", prefix);
+		buffer.setBoolean("addSuffix", addSuffix);
+		buffer.setString("suffix", suffix);
+		buffer.setBoolean("applyToExistingTarget", applyToExistingTarget);
+		buffer.setBoolean("addName", addName);
+		buffer.setBoolean("addID", addID);
+		buffer.setBoolean("segment", segment);
+		buffer.setString("sourceSrxPath", sourceSrxPath);
+		buffer.setString("targetSrxPath", targetSrxPath);
+		return buffer.toString();
 	}
 	
 }

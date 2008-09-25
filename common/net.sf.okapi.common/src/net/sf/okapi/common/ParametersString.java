@@ -223,4 +223,23 @@ public class ParametersString {
 	{
 		list.put(name, value);
 	}
+
+	public void setParameter (String name,
+		String value)
+	{
+		setString(name, value);
+	}
+
+	public void setParameter (String name,
+		boolean value)
+	{
+		setBoolean(name, value);
+	}
+
+	public void setParameter (String name,
+		int value)
+	{
+		setInteger(name, value);
+	}
+
 }

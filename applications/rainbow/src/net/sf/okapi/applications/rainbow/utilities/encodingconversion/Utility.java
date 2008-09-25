@@ -52,7 +52,7 @@ public class Utility implements ISimpleUtility {
 
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
-	private IParameters                     params;
+	private Parameters                      params;
 	private String                          commonFolder;
 	private String                          inputPath;
 	private String                          inputEncoding;
@@ -60,12 +60,9 @@ public class Utility implements ISimpleUtility {
 	private String                          outputEncoding;
 	private String                          outFormat;
 	private CharsetEncoder                  outputEncoder;
-	private boolean                         escapeAll;
-	private boolean                         useBytes;
 	private boolean                         useCER;
 	private Hashtable<String, Character>    CharEntities;
 	private CharBuffer                      buffer;
-	private boolean                         reportUnsupported;
 	private Pattern                         pattern;
 	private String                          prevBuf;
 	private EventListenerList               listenerList = new EventListenerList();
@@ -100,7 +97,7 @@ public class Utility implements ISimpleUtility {
 				new FileOutputStream(outputPath)), outputEncoding);
 			outputEncoder = Charset.forName(outputEncoding).newEncoder();
 			logger.info("Output encoding: " + outputEncoding);
-			Util.writeBOMIfNeeded(writer, params.getBoolean("BOMonUTF8"), outputEncoding);
+			Util.writeBOMIfNeeded(writer, params.BOMonUTF8, outputEncoding);
 			
 			int n;
 			CharBuffer tmpBuf = CharBuffer.allocate(1);
@@ -139,12 +136,12 @@ public class Utility implements ISimpleUtility {
 				buffer.position(0);
 				for ( int i=0; i<n; i++ ) {
 					if ( !(canEncode = outputEncoder.canEncode(buffer.get(i))) ) {
-						if ( reportUnsupported ) {
+						if ( params.reportUnsupported ) {
 							logger.warn(String.format("Un-supported character: U+%04X", (int)buffer.get(i)));
 						}
 					}
 					
-					if (( escapeAll && ( buffer.get(i) > 127 )) || !canEncode ) {
+					if (( params.escapeAll && ( buffer.get(i) > 127 )) || !canEncode ) {
 						boolean fallBack = false;
 						// Write escape form
 						if ( useCER ) {
@@ -153,7 +150,7 @@ public class Utility implements ISimpleUtility {
 							else writer.write("&"+tmp+";");
 						}
 						else {
-							if ( useBytes ) { // Escape bytes
+							if ( params.useBytes ) { // Escape bytes
 								if ( canEncode ) {
 									tmpBuf.put(0, buffer.get(i));
 									tmpBuf.position(0);
@@ -212,14 +209,14 @@ public class Utility implements ISimpleUtility {
 		commonFolder = null; // Reset
 
 		String tmp = "";
-		if ( params.getBoolean("unescapeNCR") ) {
+		if ( params.unescapeNCR ) {
 			tmp += "&#([0-9]*?);|&#[xX]([0-9a-fA-F]*?);";
 		}
-		if ( params.getBoolean("unescapeCER") ) {
+		if ( params.unescapeCER ) {
 			if ( tmp.length() > 0 ) tmp += "|";
 			tmp += "(&\\w*?;)";
 		}
-		if ( params.getBoolean("unescapeJava") ) {
+		if ( params.unescapeJava ) {
 			if ( tmp.length() > 0 ) tmp += "|";
 			tmp += "(\\\\[Uu]([0-9a-fA-F]{1,4}))";
 		}
@@ -229,12 +226,8 @@ public class Utility implements ISimpleUtility {
 		}
 		else pattern = null;
         		
-		reportUnsupported = params.getBoolean("reportUnsupported");
-		useBytes = params.getBoolean("useBytes");
-		escapeAll = params.getBoolean("escapeAll");
-
 		useCER = false;
-		switch ( params.getInt("escapeNotation") ) {
+		switch ( params.escapeNotation ) {
 		case Parameters.ESCAPE_CER:
 			useCER = true;
 			outFormat = "&#x%X;"; // Here outFormat is used only if no CER can be used
@@ -252,7 +245,7 @@ public class Utility implements ISimpleUtility {
 			outFormat = "&#x%x;";
 			break;
 		case Parameters.ESCAPE_USERFORMAT:
-			outFormat = params.getParameter("userFormat");
+			outFormat = params.userFormat;
 			break;
 		case Parameters.ESCAPE_NCRHEXAU:
 		default:
@@ -304,7 +297,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		params = paramsObject;
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,

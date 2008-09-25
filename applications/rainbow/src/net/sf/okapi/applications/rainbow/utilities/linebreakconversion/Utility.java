@@ -43,12 +43,11 @@ import net.sf.okapi.common.Util;
 
 public class Utility implements ISimpleUtility {
 
-	private IParameters                params;
+	private Parameters                 params;
 	private String                     commonFolder;
 	private String                     inputPath;
 	private String                     outputPath;
 	private String                     encoding;
-	private String                     lineBreak;
 	private EventListenerList          listenerList = new EventListenerList();
 	
 
@@ -96,13 +95,13 @@ public class Utility implements ISimpleUtility {
 					if ( buffer.charAt(i) == '\n') {
 						if (( i != 0 ) || ( done == 0 )) {
 							writer.write(buffer.array(), start, i-start);
-							writer.write(lineBreak);
+							writer.write(params.lineBreak);
 						}
 						start = i+1;
 					}
 					else if ( buffer.charAt(i) == '\r') {
 						writer.write(buffer.array(), start, i-start);
-						writer.write(lineBreak);
+						writer.write(params.lineBreak);
 						// Check if it's a \r\n
 						if ( i+1 < length ) {
 							if ( buffer.charAt(i+1) == '\n' ) {
@@ -153,7 +152,6 @@ public class Utility implements ISimpleUtility {
 		String targetLanguage)
 	{
 		commonFolder = null; // Reset
-		lineBreak = params.getParameter("lineBreak");
 	}
 
 	public String getInputRoot () {
@@ -199,7 +197,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		params = paramsObject;
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,

@@ -202,16 +202,16 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		edXsltPath.setText(params.getParameter("xsltPath")); //$NON-NLS-1$
-		ConfigurationString tmp = new ConfigurationString(params.getParameter("paramList")); //$NON-NLS-1$
+		edXsltPath.setText(params.xsltPath);
+		ConfigurationString tmp = new ConfigurationString(params.paramList);
 		edParameters.setText(tmp.toString());
 	}
 
 	private boolean saveData () {
 		//TODO: check path
-		params.setParameter("xsltPath", edXsltPath.getText()); //$NON-NLS-1$
+		params.xsltPath = edXsltPath.getText();
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
-		params.setParameter("paramList", tmp.toString()); //$NON-NLS-1$
+		params.paramList = tmp.toString();
 		result = true;
 		return result;
 	}

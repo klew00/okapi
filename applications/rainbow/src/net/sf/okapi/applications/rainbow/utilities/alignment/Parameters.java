@@ -24,33 +24,19 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	protected String    tmxPath;
-	protected boolean   segment;
-	protected String    sourceSrxPath;
-	protected String    targetSrxPath;
-	protected boolean   useTradosWorkarounds;
-	protected boolean   checkSingleSegUnit;
+	public String       tmxPath;
+	public boolean      segment;
+	public String       sourceSrxPath;
+	public String       targetSrxPath;
+	public boolean      useTradosWorkarounds;
+	public boolean      checkSingleSegUnit;
 	
 
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		tmxPath = getParameter("tmxPath", tmxPath);
-		segment = getParameter("segment", segment);
-		sourceSrxPath = getParameter("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = getParameter("targetSrxPath", targetSrxPath);
-		useTradosWorkarounds = getParameter("useTradosWorkarounds", useTradosWorkarounds);
-		checkSingleSegUnit = getParameter("checkSingleSegUnit", checkSingleSegUnit);
-	}
-
-	@Override
 	public void reset () {
-		super.reset();
 		tmxPath = "output.tmx";
 		segment = false;
 		sourceSrxPath = "";
@@ -59,14 +45,25 @@ public class Parameters extends BaseParameters {
 		checkSingleSegUnit = true;
 	}
 
-	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		tmxPath = buffer.getString("tmxPath", tmxPath);
+		segment = buffer.getBoolean("segment", segment);
+		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
+		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
+		useTradosWorkarounds = buffer.getBoolean("useTradosWorkarounds", useTradosWorkarounds);
+		checkSingleSegUnit = buffer.getBoolean("checkSingleSegUnit", checkSingleSegUnit);
+	}
+
 	public String toString () {
-		setParameter("tmxPath", tmxPath);
-		setParameter("sourceSrxPath", sourceSrxPath);
-		setParameter("targetSrxPath", targetSrxPath);
-		setParameter("segment", segment);
-		setParameter("useTradosWorkarounds", useTradosWorkarounds);
-		setParameter("checkSingleSegUnit", checkSingleSegUnit);
-		return super.toString();
+		buffer.reset();
+		buffer.setParameter("tmxPath", tmxPath);
+		buffer.setParameter("sourceSrxPath", sourceSrxPath);
+		buffer.setParameter("targetSrxPath", targetSrxPath);
+		buffer.setParameter("segment", segment);
+		buffer.setParameter("useTradosWorkarounds", useTradosWorkarounds);
+		buffer.setParameter("checkSingleSegUnit", checkSingleSegUnit);
+		return buffer.toString();
 	}
 }

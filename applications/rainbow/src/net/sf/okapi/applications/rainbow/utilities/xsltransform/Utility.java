@@ -48,7 +48,7 @@ public class Utility implements ISimpleUtility {
 	private ArrayList<String>          outputPaths;
 	private Hashtable<String, String>  paramList;
 	private Transformer                trans;
-	private IParameters                params;
+	private Parameters                 params;
 	private String                     commonFolder;
 	private EventListenerList     listenerList = new EventListenerList();
 
@@ -98,12 +98,12 @@ public class Utility implements ISimpleUtility {
 			trgLang = targetLanguage;
 			
 			ConfigurationString cfgString = new ConfigurationString(
-				params.getParameter("paramList")); //$NON-NLS-1$
+				params.paramList);
 			paramList = cfgString.toHashtable();
 			
 			// Create the source for the XSLT
 			xsltInput = new javax.xml.transform.stream.StreamSource(
-				new File(params.getParameter("xsltPath"))); //$NON-NLS-1$
+				new File(params.xsltPath));
 			
 			// Create an instance of TransformerFactory
 			javax.xml.transform.TransformerFactory fact =
@@ -163,7 +163,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		params = paramsObject;
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,
@@ -217,14 +217,5 @@ public class Utility implements ISimpleUtility {
 	public void removeCancelListener (CancelListener listener) {
 		listenerList.remove(CancelListener.class, listener);
 	}
-
-	/*private void fireCancelEvent (CancelEvent event) {
-		Object[] listeners = listenerList.getListenerList();
-		for ( int i=0; i<listeners.length; i+=2 ) {
-			if ( listeners[i] == CancelListener.class ) {
-				((CancelListener)listeners[i+1]).cancelOccurred(event);
-			}
-		}
-	}*/
 
 }

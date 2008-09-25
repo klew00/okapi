@@ -32,37 +32,21 @@ public class Parameters extends BaseParameters {
 	public static final int  ESCAPE_JAVAL        = 5;
 	public static final int  ESCAPE_USERFORMAT   = 6;
 
-	private boolean     unescapeNCR;
-	private boolean     unescapeCER;
-	private boolean     unescapeJava;
-	private boolean     escapeAll;
-	private int         escapeNotation;
-	private String      userFormat;
-	private boolean     useBytes;
-	private boolean     BOMonUTF8;
-	private boolean     reportUnsupported;
+	public boolean      unescapeNCR;
+	public boolean      unescapeCER;
+	public boolean      unescapeJava;
+	public boolean      escapeAll;
+	public int          escapeNotation;
+	public String       userFormat;
+	public boolean      useBytes;
+	public boolean      BOMonUTF8;
+	public boolean      reportUnsupported;
 
 
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString (String data) {
-		reset();
-		super.fromString(data);
-		unescapeNCR = getBoolean("unescapeNCR", unescapeNCR);
-		unescapeCER = getBoolean("unescapeCER", unescapeCER);
-		unescapeJava = getBoolean("unescapeJava", unescapeJava);
-		escapeAll = getBoolean("escapeAll", escapeAll);
-		escapeNotation = getInteger("escapeNotation", escapeNotation);
-		userFormat = getString("userFormat", userFormat);
-		useBytes = getBoolean("useBytes", useBytes);
-		BOMonUTF8 = getBoolean("BOMonUTF8", BOMonUTF8);
-		reportUnsupported = getBoolean("reportUnsupported", reportUnsupported);
-	}
-
-	@Override
 	public void reset() {
 		unescapeNCR = true;
 		unescapeCER = true;
@@ -75,18 +59,32 @@ public class Parameters extends BaseParameters {
 		reportUnsupported = true;
 	}
 
-	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		unescapeNCR = buffer.getBoolean("unescapeNCR", unescapeNCR);
+		unescapeCER = buffer.getBoolean("unescapeCER", unescapeCER);
+		unescapeJava = buffer.getBoolean("unescapeJava", unescapeJava);
+		escapeAll = buffer.getBoolean("escapeAll", escapeAll);
+		escapeNotation = buffer.getInteger("escapeNotation", escapeNotation);
+		userFormat = buffer.getString("userFormat", userFormat);
+		useBytes = buffer.getBoolean("useBytes", useBytes);
+		BOMonUTF8 = buffer.getBoolean("BOMonUTF8", BOMonUTF8);
+		reportUnsupported = buffer.getBoolean("reportUnsupported", reportUnsupported);
+	}
+
 	public String toString() {
-		setBoolean("unescapeNCR", unescapeNCR);
-		setBoolean("unescapeCER", unescapeCER);
-		setBoolean("unescapeJava", unescapeJava);
-		setBoolean("escapeAll", escapeAll);
-		setInteger("escapeNotation", escapeNotation);
-		setString("userFormat", userFormat);
-		setBoolean("useBytes", useBytes);
-		setBoolean("BOMonUTF8", BOMonUTF8);
-		setBoolean("reportUnsupported", reportUnsupported);
-		return super.toString();
+		buffer.reset();
+		buffer.setBoolean("unescapeNCR", unescapeNCR);
+		buffer.setBoolean("unescapeCER", unescapeCER);
+		buffer.setBoolean("unescapeJava", unescapeJava);
+		buffer.setBoolean("escapeAll", escapeAll);
+		buffer.setInteger("escapeNotation", escapeNotation);
+		buffer.setString("userFormat", userFormat);
+		buffer.setBoolean("useBytes", useBytes);
+		buffer.setBoolean("BOMonUTF8", BOMonUTF8);
+		buffer.setBoolean("reportUnsupported", reportUnsupported);
+		return buffer.toString();
 	}
 	
 }

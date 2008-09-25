@@ -588,14 +588,14 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		pnlLD.setOptions(params.getBoolean("useLD"), params.getBoolean("localizeOutside"));
-		chkExtractOuterStrings.setSelection(params.getBoolean("extractOuterStrings"));
-		edStartString.setText(params.getParameter("startString"));
-		edEndString.setText(params.getParameter("endString"));
+		pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
+		chkExtractOuterStrings.setSelection(params.extractOuterStrings);
+		edStartString.setText(params.startString);
+		edEndString.setText(params.endString);
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
-		int tmp = params.getInt("regexOptions");
+		int tmp = params.regexOptions;
 		chkDotAll.setSelection((tmp & Pattern.DOTALL)==Pattern.DOTALL);
 		chkIgnoreCase.setSelection((tmp & Pattern.CASE_INSENSITIVE)==Pattern.CASE_INSENSITIVE);
 		chkMultiline.setSelection((tmp & Pattern.MULTILINE)==Pattern.MULTILINE);
@@ -608,11 +608,10 @@ public class Editor implements IParametersEditor {
 	private void saveData () {
 		saveRuleData(ruleIndex);
 		//TODO: validation
-		params.setParameter("useLD", pnlLD.getUseLD());
-		params.setParameter("localizeOutside", pnlLD.getLocalizeOutside());
-		params.setParameter("extractOuterStrings", chkExtractOuterStrings.getSelection());
-		params.setParameter("startString", edStartString.getText());
-		params.setParameter("endString", edEndString.getText());
+		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
+		params.extractOuterStrings = chkExtractOuterStrings.getSelection();
+		params.startString = edStartString.getText();
+		params.endString = edEndString.getText();
 		
 		ArrayList<Rule> paramRules = params.getRules();
 		paramRules.clear();

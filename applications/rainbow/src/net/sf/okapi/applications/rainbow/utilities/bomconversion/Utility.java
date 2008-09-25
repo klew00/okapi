@@ -44,12 +44,10 @@ public class Utility implements ISimpleUtility {
 	private final byte[]     BOM_UTF16BE    = {(byte)0xFE,(byte)0xFF};
 	private final byte[]     BOM_UTF16LE    = {(byte)0xFF,(byte)0xFE};
 
-	private IParameters      params;
+	private Parameters       params;
 	private String           commonFolder;
 	private String           inputPath;
 	private String           outputPath;
-	private boolean          removeBOM;
-	private boolean          alsoNonUTF8;
 	private byte[]           buffer;
 	private EventListenerList     listenerList = new EventListenerList();
 	
@@ -170,7 +168,7 @@ public class Utility implements ISimpleUtility {
 				// Do nothing yet
 			}
 			else if ( len == 0 ) { // Empty file
-				if ( !removeBOM ) { // Add the BOM
+				if ( !params.removeBOM ) { // Add the BOM
 					// Let's make that empty file a UTF-8 file
 					output.write(BOM_UTF8);
 				}
@@ -178,8 +176,8 @@ public class Utility implements ISimpleUtility {
 			else { // Non-empty file
 				int n = hasBOM(buffer, len);
 				if ( n > 0 ) { // A BOM is present
-					if ( removeBOM ) {
-						if (( n == 3 ) || ( alsoNonUTF8 )) {
+					if ( params.removeBOM ) {
+						if (( n == 3 ) || ( params.alsoNonUTF8 )) {
 							// Skip it, output the remaining bytes
 							output.write(buffer, n, len-n);
 						}
@@ -193,7 +191,7 @@ public class Utility implements ISimpleUtility {
 					}
 				}
 				else { // No BOM present
-					if ( !removeBOM ) { // If we add, do it 
+					if ( !params.removeBOM ) { // If we add, do it 
 						switch ( guessByteOrder(buffer, len) ) {
 						case 1: // UTF-16BE
 							output.write(BOM_UTF16BE);
@@ -248,8 +246,6 @@ public class Utility implements ISimpleUtility {
 		String targetLanguage)
 	{
 		commonFolder = null; // Reset
-		removeBOM = (params.getParameter("removeBOM").equals("1"));
-		alsoNonUTF8 = (params.getParameter("alsoNonUTF8").equals("1"));
 		buffer = new byte[1024*2];
 	}
 
@@ -295,7 +291,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		params = paramsObject;
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,
