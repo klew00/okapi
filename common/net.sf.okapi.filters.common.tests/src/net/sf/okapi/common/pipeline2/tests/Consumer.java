@@ -17,6 +17,7 @@ import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
  */
 public class Consumer implements IConsumer, IPipelineStep {
 	private BlockingQueue<IPipelineEvent> consumerQueue;
+	private volatile boolean pause;
 
 	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue) {
 		this.consumerQueue = consumerQueue;
@@ -36,9 +37,26 @@ public class Consumer implements IConsumer, IPipelineStep {
 				if (event.getEventType() == PipelineEventType.FINISHED) {
 					return PipelineReturnValue.SUCCEDED;
 				}
+				
+				if (pause) {
+                    synchronized(this) {
+                        while (pause)
+                            wait();
+                    }
+                }
+				
 			} catch (InterruptedException e) {
 				return PipelineReturnValue.INTERRUPTED;
 			}
 		}
+	}
+
+	public void pause() {
+		pause = true;
+	}
+
+	public synchronized void resume() {
+		pause = false;
+		notify();	
 	}
 }

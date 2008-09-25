@@ -1,5 +1,6 @@
 package net.sf.okapi.common.pipeline2;
 
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletionService;
@@ -15,8 +16,8 @@ public class LinearPipeline implements ILinearPipeline {
 	private final CompletionService<PipelineReturnValue> completionService;
 	private final int blockingQueueSize;
 	private int totalThreads;
-	private boolean first = true;
 	private PipelineReturnValue state;
+	private LinkedList<IPipelineStep> steps;
 
 	private BlockingQueue<IPipelineEvent> previousQueue;
 
@@ -30,8 +31,8 @@ public class LinearPipeline implements ILinearPipeline {
 		this.blockingQueueSize = blockingQueueSize;
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
 		this.executor.pause();
-		first = true;
 		state = PipelineReturnValue.PAUSED;
+		steps = new LinkedList<IPipelineStep>();
 	}
 
 	public void addPipleLineStep(IPipelineStep step) {
@@ -62,6 +63,7 @@ public class LinearPipeline implements ILinearPipeline {
 		}
 
 		completionService.submit(step);
+		steps.add(step);
 		totalThreads += 1;
 		previousQueue = queue;
 	}
@@ -76,40 +78,34 @@ public class LinearPipeline implements ILinearPipeline {
 	}
 
 	public void pause() {
-		synchronized (completionService) {
-			try {
-				completionService.wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		executor.pause();
+		for (IPipelineStep step : steps) {
+			step.pause();
 		}
 		state = PipelineReturnValue.PAUSED;
-		executor.pause();
 	}
 
 	public void resume() {
-		synchronized (completionService) {
-			completionService.notifyAll();
+		executor.resume();
+		for (IPipelineStep step : steps) {
+			step.resume();
 		}
+		state = PipelineReturnValue.RUNNING;
+	}
+
+	public void execute() {
 		executor.resume();
 		state = PipelineReturnValue.RUNNING;
 	}
 
-	public PipelineReturnValue execute() {
-		if (first) {
-			first = false;
-			executor.resume();
-			state = PipelineReturnValue.RUNNING;
-		}
-		
+	public PipelineReturnValue getState() {
 		if (state == PipelineReturnValue.CANCELLED) {
 			return PipelineReturnValue.CANCELLED;
 		}
 
 		if (state == PipelineReturnValue.PAUSED) {
 			try {
-				Thread.sleep(100);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				return PipelineReturnValue.INTERRUPTED;
 			}
@@ -136,9 +132,5 @@ public class LinearPipeline implements ILinearPipeline {
 		} catch (ExecutionException e) {
 			return PipelineReturnValue.FAILED;
 		}
-	}
-
-	public PipelineReturnValue getState() {
-		return state;
 	}
 }

@@ -12,6 +12,7 @@ import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
 public class Producer implements IProducer, IPipelineStep {
 	private BlockingQueue<IPipelineEvent> producerQueue;
 	private int order = -1;
+	private volatile boolean pause;
 
 	public void setProducerQueue(BlockingQueue<IPipelineEvent> producerQueue) {
 		this.producerQueue = producerQueue;
@@ -22,6 +23,7 @@ public class Producer implements IProducer, IPipelineStep {
 	}
 
 	public PipelineReturnValue call() throws Exception {
+		pause = false;
 		try {
 			producerQueue.put(new PipelineEvent(PipelineEventType.START, null,
 					order));
@@ -31,6 +33,14 @@ public class Producer implements IProducer, IPipelineStep {
 				Thread.sleep(2000);
 				producerQueue.put(new PipelineEvent(PipelineEventType.TEXTUNIT,
 						null, order));
+				
+				if (pause) {
+                    synchronized(this) {
+                        while (pause)
+                            wait();
+                    }
+                }
+
 			}
 			producerQueue.put(new PipelineEvent(PipelineEventType.FINISHED,
 					null, ++order));
@@ -38,5 +48,14 @@ public class Producer implements IProducer, IPipelineStep {
 			return PipelineReturnValue.INTERRUPTED;
 		}
 		return PipelineReturnValue.SUCCEDED;
+	}
+
+	public void pause() {
+		pause = true;
+	}
+
+	public synchronized void resume() {
+		pause = false;
+		notify();		
 	}
 }
