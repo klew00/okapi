@@ -2,17 +2,16 @@ package net.sf.okapi.common.pipeline2.tests;
 
 import java.util.concurrent.BlockingQueue;
 
+import net.sf.okapi.common.pipeline2.BasePipelineStep;
 import net.sf.okapi.common.pipeline2.IPipelineEvent;
-import net.sf.okapi.common.pipeline2.IPipelineStep;
 import net.sf.okapi.common.pipeline2.IProducer;
 import net.sf.okapi.common.pipeline2.PipelineEvent;
 import net.sf.okapi.common.pipeline2.PipelineReturnValue;
 import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
 
-public class Producer implements IProducer, IPipelineStep {
+public class Producer extends BasePipelineStep implements IProducer {
 	private BlockingQueue<IPipelineEvent> producerQueue;
 	private int order = -1;
-	private volatile boolean pause;
 
 	public void setProducerQueue(BlockingQueue<IPipelineEvent> producerQueue) {
 		this.producerQueue = producerQueue;
@@ -22,40 +21,22 @@ public class Producer implements IProducer, IPipelineStep {
 		return "Producer";
 	}
 
-	public PipelineReturnValue call() throws Exception {
-		pause = false;
-		try {
-			producerQueue.put(new PipelineEvent(PipelineEventType.START, null,
-					order));
-			for (int i = 0; i < 10; i++) {
-				order = i;
+	public void finish() throws InterruptedException {
+		producerQueue.put(new PipelineEvent(PipelineEventType.FINISHED, null, ++order));
+	}
 
-				Thread.sleep(2000);
-				producerQueue.put(new PipelineEvent(PipelineEventType.TEXTUNIT,
-						null, order));
-				
-				if (pause) {
-                    synchronized(this) {
-                        while (pause)
-                            wait();
-                    }
-                }
+	public void initialize() throws InterruptedException {
+		producerQueue.put(new PipelineEvent(PipelineEventType.START, null, ++order));
+	}
 
-			}
-			producerQueue.put(new PipelineEvent(PipelineEventType.FINISHED,
-					null, ++order));
-		} catch (InterruptedException e) {
-			return PipelineReturnValue.INTERRUPTED;
+	public PipelineReturnValue process() throws InterruptedException {
+		if (order >= 10) {
+			return PipelineReturnValue.SUCCEDED;
 		}
-		return PipelineReturnValue.SUCCEDED;
-	}
 
-	public void pause() {
-		pause = true;
-	}
+		Thread.sleep(2000);
+		producerQueue.put(new PipelineEvent(PipelineEventType.TEXTUNIT, null, ++order));
 
-	public synchronized void resume() {
-		pause = false;
-		notify();		
+		return PipelineReturnValue.RUNNING;
 	}
 }

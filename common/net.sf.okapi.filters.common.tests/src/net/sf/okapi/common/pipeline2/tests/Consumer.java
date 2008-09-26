@@ -5,9 +5,9 @@ package net.sf.okapi.common.pipeline2.tests;
 
 import java.util.concurrent.BlockingQueue;
 
+import net.sf.okapi.common.pipeline2.BasePipelineStep;
 import net.sf.okapi.common.pipeline2.IConsumer;
 import net.sf.okapi.common.pipeline2.IPipelineEvent;
-import net.sf.okapi.common.pipeline2.IPipelineStep;
 import net.sf.okapi.common.pipeline2.PipelineReturnValue;
 import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
 
@@ -15,10 +15,9 @@ import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
  * @author HargraveJE
  * 
  */
-public class Consumer implements IConsumer, IPipelineStep {
+public class Consumer extends BasePipelineStep implements IConsumer {
 	private BlockingQueue<IPipelineEvent> consumerQueue;
-	private volatile boolean pause;
-
+	
 	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue) {
 		this.consumerQueue = consumerQueue;
 	}
@@ -27,36 +26,20 @@ public class Consumer implements IConsumer, IPipelineStep {
 		return "Consumer";
 	}
 
-	public PipelineReturnValue call() throws Exception {
-		while (true) {
-			try {				
-				IPipelineEvent event = consumerQueue.take();				
-				System.out.println("EventType: " + event.getEventType().name());
-				System.out.println("Order: " + Integer.valueOf(event.getOrder()));
-				System.out.println();
-				if (event.getEventType() == PipelineEventType.FINISHED) {
-					return PipelineReturnValue.SUCCEDED;
-				}
-				
-				if (pause) {
-                    synchronized(this) {
-                        while (pause)
-                            wait();
-                    }
-                }
-				
-			} catch (InterruptedException e) {
-				return PipelineReturnValue.INTERRUPTED;
-			}
+	public void finish() throws InterruptedException {
+	}
+
+	public void initialize() throws InterruptedException {
+	}
+
+	public PipelineReturnValue process() throws InterruptedException {		
+		IPipelineEvent event = consumerQueue.take();
+		System.out.println("EventType: " + event.getEventType().name());
+		System.out.println("Order: " + Integer.valueOf(event.getOrder()));
+		System.out.println();
+		if (event.getEventType() == PipelineEventType.FINISHED) {
+			return PipelineReturnValue.SUCCEDED;
 		}
-	}
-
-	public void pause() {
-		pause = true;
-	}
-
-	public synchronized void resume() {
-		pause = false;
-		notify();	
+		return PipelineReturnValue.RUNNING;
 	}
 }

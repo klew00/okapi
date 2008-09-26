@@ -4,7 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline2.ILinearPipeline;
-import net.sf.okapi.common.pipeline2.IPipelineStep;
 import net.sf.okapi.common.pipeline2.LinearPipeline;
 import net.sf.okapi.common.pipeline2.PipelineReturnValue;
 
