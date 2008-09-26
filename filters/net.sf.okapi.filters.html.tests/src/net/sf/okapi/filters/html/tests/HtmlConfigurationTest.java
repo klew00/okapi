@@ -19,13 +19,14 @@
 package net.sf.okapi.filters.html.tests;
 
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import net.sf.okapi.filters.html.ConfigurationReader;
-import net.sf.okapi.filters.html.ExtractionRule;
+import net.sf.okapi.common.filters.ParserConfigurationReader;
 
 /**
  * @author HargraveJE
@@ -42,16 +43,9 @@ public class HtmlConfigurationTest {
 	}
 	
 	@Test
-	public void defaultConfiguration() {
-		ExtractionRule rule;
-		ConfigurationReader rules = new ConfigurationReader();
-		rules.initializeDefaultRules();
-		
-		rule = rules.getRule("a");
-		assertEquals(rule.getElementName(), "a");
-		
-		rule = rules.getRule("img");
-		assertEquals(rule.getElementName(), "img");
-		assertTrue(rule.hasExtractableAttributes());
+	public void defaultConfiguration() {		
+		ParserConfigurationReader rules = new ParserConfigurationReader("/net/sf/okapi/filters/html/defaultConfiguration.groovy");					
+		Map rule = rules.getRule("a");		
+		rule = rules.getRule("img");		
 	}
 }
