@@ -20,9 +20,6 @@
 
 package net.sf.okapi.filters.html;
 
-import groovy.util.ConfigObject;
-import groovy.util.ConfigSlurper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -41,6 +38,7 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.filters.BaseParser;
+import net.sf.okapi.common.filters.ParserConfigurationReader;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment;
@@ -48,7 +46,7 @@ import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
-	private IHtmlFilterConfiguration configuration;
+	private ParserConfigurationReader configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
 
@@ -83,15 +81,14 @@ public class HtmlParser extends BaseParser {
 		initialize();
 	}
 
-	public void setHtmlFilterConfiguration(IHtmlFilterConfiguration configuration) {
+	public void setHtmlFilterConfiguration(ParserConfigurationReader configuration) {
 		this.configuration = configuration;
 	}
 
 	private void initialize() {		
 		if (configuration == null) {
-			configuration = new ConfigurationReader();		
+			configuration = new ParserConfigurationReader("/net/sf/okapi/filters/html/defaultConfiguration.groovy");		
 		}
-		configuration.initializeDefaultRules();
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
@@ -319,11 +316,11 @@ public class HtmlParser extends BaseParser {
 	}
 
 	private EXTRACTION_RULE_TYPE getRuleType(String ruleName) {
-		ExtractionRule rule = configuration.getRule(ruleName);
-		if (rule == null) {
-			return EXTRACTION_RULE_TYPE.NON_EXTRACTABLE;
-		}
-		return rule.getRuleType();
+//		ExtractionRule rule = configuration.getRule(ruleName);
+//		if (rule == null) {
+//			return EXTRACTION_RULE_TYPE.NON_EXTRACTABLE;
+//		}
+		return null;
 	}
 
 	private void addToCurrentTextUnit(Tag tag) {
