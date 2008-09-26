@@ -92,7 +92,6 @@ public class ParametersString {
 			// Add to the string
 			value = list.get(key);
 			if ( value instanceof String ) {
-				//TODO: escape the string content
 				tmp.append("="+escape((String)value));
 			}
 			else if ( value instanceof Integer ) {
@@ -114,7 +113,7 @@ public class ParametersString {
 		if ( prefix == null ) prefix = "";
 		else prefix += ".";
 		
-		String[] lines = unescape(data).split("\n", 0);
+		String[] lines = data.split("\n", 0);
 		int n;
 		String name;
 		
@@ -132,7 +131,7 @@ public class ParametersString {
 					(int)Integer.valueOf(line.substring(n+1)));
 			}
 			else {
-				list.put(prefix+name, line.substring(n+1));
+				list.put(prefix+name, unescape(line.substring(n+1)));
 			}
 		}
 	}

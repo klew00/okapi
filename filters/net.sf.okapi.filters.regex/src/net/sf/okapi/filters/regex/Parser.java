@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -27,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -77,9 +76,9 @@ public class Parser implements IParser {
 		}
 	}
 
-	//TODO: remove after test
+/*	//TODO: remove after test
 	// INFOSTRING rules
-/*	private void tempSetHCRules () {
+	private void tempSetHCRules () {
 		resource.params.rules.clear();
 
 		Rule r = new Rule();
@@ -102,7 +101,7 @@ public class Parser implements IParser {
 */
 	//TODO: remove after test
 // AZADA rules
-	private void tempSetHCRules () {
+/*	private void tempSetHCRules () {
 		resource.params.rules.clear();
 		Rule r = new Rule();
 		r.ruleName = "r2";
@@ -121,7 +120,7 @@ public class Parser implements IParser {
 		r.codeFinder.compile();
 		
 		resource.params.rules.add(r);
-	}
+	}*/
 	
 	public void open (InputStream input) {
 		try {
@@ -158,11 +157,9 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-			//tempSetHCRules();
+		//	tempSetHCRules();
 			
 			// Prepare the filter rules
-			preparePatterns();
-			// Compile the in-lines rules
 			resource.params.compileRules();
 		}
 		catch ( UnsupportedEncodingException e) {
@@ -183,23 +180,6 @@ public class Parser implements IParser {
 	
 	public IContainable getResource() {
 		return resource.currentRes;
-	}
-	
-	private void preparePatterns () {
-		for ( Rule rule : resource.params.rules ) {
-			// Compile the full pattern
-			rule.pattern = Pattern.compile(
-				"("+rule.start+")(.*?)("+rule.end+")",
-				resource.params.regexOptions);
-			// Calculate the group for the content
-			rule.contentIndex = 2; // For start and content themselves
-			for ( int i=0; i<rule.start.length(); i++ ) {
-				if ( rule.start.charAt(i) == '(' ) rule.contentIndex++;
-			}
-			// start group index = 1
-			// content group index = rule.contentIndex
-			// end group index = rule.contentIndex+1
-		}
 	}
 	
 	public ParserTokenType parseNext () {
@@ -223,41 +203,9 @@ public class Parser implements IParser {
 		
 		// Return from the queue if needed
 		if ( resultQueue.size() > 0 ) return nextEvent();
-		
-		/* No support for named group means we cannot use a big 'ORed' expression
-		 * and just get the first rule that was matched.
-		 * We have to calculate which rule matches the closer from the
-		 * start position, one by one.
-		 */
-		
-		//TODO: Evaluate if the contentIndex can be used instead of start/endResult
-		
-/*OLD		
-		Rule bestRule = null;
-		int bestPosition = inputText.length()+9;
-		MatchResult startResult = null;
-		MatchResult endResult = null;
-		int i = 0;
-		for ( Rule rule : resource.params.rules ) {
-			Pattern p = Pattern.compile(rule.start, resource.params.regexOptions);
-			Matcher m = p.matcher(inputText);
-			if ( m.find(startSearch) ) {
-				if ( m.start() < bestPosition ) {
-					// Try to find the corresponding end
-					p = Pattern.compile(rule.end, resource.params.regexOptions);
-					Matcher me = p.matcher(inputText);
-					if ( me.find(m.end()) ) {
-						bestPosition = m.start();
-						bestRule = rule;
-						startResult = m.toMatchResult();
-						endResult = me.toMatchResult();
-					}
-				}
-			}
-			i++;
-		}
-*/
 
+		// Get the first best match among the rules
+		// trying to match ((start)(.*?)(end))
 		Rule bestRule = null;
 		int bestPosition = inputText.length()+99;
 		MatchResult startResult = null;

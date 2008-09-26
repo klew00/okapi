@@ -91,12 +91,16 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void compileRules () {
-		StringBuilder tmp = new StringBuilder();
 		for ( Rule rule : rules ) {
-			if ( tmp.length() > 0 ) tmp.append("|");
-			tmp.append("("+rule.start+")");
+			// Compile the full pattern
+			rule.pattern = Pattern.compile(
+				"("+rule.start+")(.*?)("+rule.end+")",
+				regexOptions);
+			// Compile any used in-line code rules for this rule
+			if ( rule.useCodeFinder ) {
+				rule.codeFinder.compile();
+			}
 		}
-		expression = tmp.toString();
 	}
 	
 	public ArrayList<Rule> getRules () {

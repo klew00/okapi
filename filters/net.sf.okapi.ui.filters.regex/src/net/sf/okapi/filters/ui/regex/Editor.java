@@ -522,7 +522,7 @@ public class Editor implements IParametersEditor {
 				caption = "Edit Rule";
 			}
 			
-			RuleDialog dlg = new RuleDialog(shell, caption, rule);
+			RuleDialog dlg = new RuleDialog(shell, caption, rule, getRegexOptions());
 			if ( !dlg.showDialog() ) return;
 			rule = dlg.getRule();
 			
@@ -618,11 +618,15 @@ public class Editor implements IParametersEditor {
 		for ( Rule rule : rules ) {
 			paramRules.add(rule);
 		}
+		params.regexOptions = getRegexOptions();
+		result = true;
+	}
+
+	private int getRegexOptions () {
 		int tmp = 0;
 		if ( chkDotAll.getSelection() ) tmp |= Pattern.DOTALL;
 		if ( chkIgnoreCase.getSelection() ) tmp |= Pattern.CASE_INSENSITIVE;
 		if ( chkMultiline.getSelection() ) tmp |= Pattern.MULTILINE;
-		result = true;
+		return tmp;
 	}
-	
 }

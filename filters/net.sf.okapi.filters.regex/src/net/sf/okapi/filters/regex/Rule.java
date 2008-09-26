@@ -51,7 +51,6 @@ public class Rule {
 	protected String              sample;
 	// Runtime-only variable (don't serialize)
 	protected Pattern             pattern;
-	protected int                 contentIndex;
 
 	public Rule () {
 		start = "";
@@ -82,7 +81,6 @@ public class Rule {
 		propertyValue = obj.propertyValue;
 		sample = obj.sample;
 		pattern = obj.pattern;
-		contentIndex = obj.contentIndex;
 	}
 	
 	public String getRuleName () {

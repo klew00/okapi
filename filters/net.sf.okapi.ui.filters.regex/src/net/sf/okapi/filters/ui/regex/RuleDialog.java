@@ -50,17 +50,21 @@ public class RuleDialog {
 	private Text             edNameEnd;
 	private Text             edNameFormat;
 	private boolean          result = false;
-	private Pattern          pattern1;
-	private Pattern          pattern2;
+	private Pattern          fullPattern;
+	private Pattern          startPattern;
+	private Pattern          endPattern;
 	private Rule             rule = null;
 	private OKCancelPanel    pnlActions;
+	private int              regexOptions;
 
 
 	public RuleDialog (Shell parent,
 		String caption,
-		Rule rule)
+		Rule rule,
+		int regexOptions)
 	{
 		this.rule = rule;
+		this.regexOptions = regexOptions;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( caption != null ) shell.setText(caption);
 		shell.setImage(parent.getImage());
@@ -177,15 +181,20 @@ public class RuleDialog {
 
 	private void updateResults () {
 		try {
-			pattern1 = Pattern.compile(edStart.getText(), Pattern.DOTALL);
-			Matcher m1 = pattern1.matcher(getSampleText());
+			fullPattern = Pattern.compile("("+edStart.getText()+")(.*?)("+edEnd.getText()+")",
+				regexOptions);
+			Matcher m1 = fullPattern.matcher(getSampleText());
 			if ( m1.find() ) {
-				pattern2 = Pattern.compile(edEnd.getText(), Pattern.DOTALL);
-				Matcher m2 = pattern2.matcher(getSampleText());
-				if ( m2.find(m1.end()) ) {
-					edResult.setText("start='" + m1.group() + "'\ncontent='"
-						+ getSampleText().substring(m1.end(), m2.start())
-						+ "'\nend='" + m2.group() + "'");
+				startPattern = Pattern.compile(edStart.getText(), regexOptions);
+				Matcher m2 = startPattern.matcher(m1.group());
+				if ( m2.find() ) {
+					endPattern = Pattern.compile(edEnd.getText(), regexOptions);
+					Matcher m3 = endPattern.matcher(m1.group());
+					if ( m3.find(m2.end()) ) {
+						edResult.setText("start=[" + m2.group() + "]\ncontent=["
+							+ m1.group().substring(m2.end(), m3.start())
+							+ "]\nend=[" + m3.group() + "]");
+					}
 				}
 			}
 			else edResult.setText("<No match>");
