@@ -175,7 +175,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		pnlCodeFinder = new InlineCodeFinderPanel(cmpTmp, SWT.NONE);
-		pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("In-line Codes");
@@ -220,11 +220,11 @@ public class Editor implements IParametersEditor {
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
 
-		setData();
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, p_Parent);
+		setData();
 	}
 	
 	private boolean showDialog () {
@@ -244,6 +244,9 @@ public class Editor implements IParametersEditor {
 		chkUseKeyFilter.setSelection(params.useKeyCondition);
 		chkExtraComments.setSelection(params.extraComments);
 		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
+		chkUseCodeFinder.setSelection(params.useCodeFinder);
+		pnlCodeFinder.setData(params.codeFinder.toString());
+		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
 		pnlLD.updateDisplay();
@@ -257,6 +260,14 @@ public class Editor implements IParametersEditor {
 		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
 		params.extraComments = chkExtraComments.getSelection();
 		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
+		params.useCodeFinder = chkUseCodeFinder.getSelection();
+		String tmp = pnlCodeFinder.getData();
+		if ( tmp == null ) {
+			result = false;
+		}
+		else {
+			params.codeFinder.fromString(tmp);
+		}
 		result = true;
 	}
 	
@@ -267,6 +278,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updateInlineCodes () {
-		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
+		pnlCodeFinder.enable(chkUseCodeFinder.getSelection());
 	}
+
 }

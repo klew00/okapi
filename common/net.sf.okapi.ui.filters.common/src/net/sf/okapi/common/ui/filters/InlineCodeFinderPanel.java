@@ -173,7 +173,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btMoveUp.setLayoutData(gdTmp);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO: moveup
+				moveUp();
 			};
 		});
 		
@@ -195,7 +195,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO: btMoveDown
+				moveDown();
 			};
 		});
 
@@ -206,6 +206,27 @@ public class InlineCodeFinderPanel extends Composite {
 		edResults.setLayoutData(gdTmp);
 		edResults.setEditable(false);
 		
+		updateDisplay();
+	}
+	
+	private void moveUp () {
+		int n = lbRules.getSelectionIndex();
+		if ( n < 1 ) return;
+		// Move in the rules array
+		String tmp = lbRules.getItem(n);
+		lbRules.setItem(n, lbRules.getItem(n-1));
+		lbRules.setItem(n-1, tmp);
+		lbRules.select(n-1);
+		updateDisplay();
+	}
+	
+	private void moveDown () {
+		int n = lbRules.getSelectionIndex();
+		if ( n == -1 ) return;
+		String tmp = lbRules.getItem(n);
+		lbRules.setItem(n, lbRules.getItem(n+1));
+		lbRules.setItem(n+1, tmp);
+		lbRules.select(n+1);
 		updateDisplay();
 	}
 	
@@ -297,5 +318,21 @@ public class InlineCodeFinderPanel extends Composite {
 		}
 		codeFinder.setSample(edSample.getText());
 		return codeFinder.toString();
+	}
+	
+	public void enable (boolean enabled) {
+		this.setEnabled(enabled);
+		btAdd.setEnabled(enabled);
+		btTest.setEnabled(enabled);
+		if ( enabled ) {
+			updateDisplay();
+		}
+		else {
+			btDiscard.setEnabled(false);
+			btRemove.setEnabled(false);
+			btMoveUp.setEnabled(false);
+			btMoveDown.setEnabled(false);
+			btModify.setEnabled(false);
+		}
 	}
 }

@@ -367,19 +367,6 @@ public class Editor implements IParametersEditor {
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 		
-		//--- Inline tab
-		
-		//cmpTmp = new Composite(tfTmp, SWT.NONE);
-		//layTmp = new GridLayout();
-		//cmpTmp.setLayout(layTmp);
-		
-/*TODO		m_CFPanel = new CodeFinderPanel(tfTmp, SWT.NONE);
-		
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Inline Codes");
-		tiTmp.setControl(m_CFPanel);
-*/
-		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {

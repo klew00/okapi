@@ -65,11 +65,12 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setBoolean("useLD", locDir.useLD());
 		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
-		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setBoolean("useKeyCondition", useKeyCondition);
 		buffer.setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		buffer.setString("keyCondition", keyCondition);
 		buffer.setBoolean("escapeExtendedChars", escapeExtendedChars);
+		buffer.setBoolean("useCodeFinder", useCodeFinder);
+		buffer.setGroup("codeFinderRules", codeFinder.toString());
 		return buffer.toString();
 	}
 	
@@ -79,10 +80,11 @@ public class Parameters extends BaseParameters {
 		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
 		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
-		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
 		useKeyCondition = buffer.getBoolean("useKeyCondition", useKeyCondition);
 		extractOnlyMatchingKey = buffer.getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		keyCondition = buffer.getString("keyCondition", keyCondition);
 		escapeExtendedChars = buffer.getBoolean("escapeExtendedChars", escapeExtendedChars);
+		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
+		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
 	}
 }
