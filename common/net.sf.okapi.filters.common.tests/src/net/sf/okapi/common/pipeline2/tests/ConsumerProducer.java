@@ -41,7 +41,7 @@ public class ConsumerProducer extends BasePipelineStep implements IConsumer, IPr
 
 	public PipelineReturnValue process() throws InterruptedException {
 		IPipelineEvent event = consumerQueue.take();
-		producerQueue.add(event);
+		producerQueue.put(event);
 		if (event.getEventType() == PipelineEventType.FINISHED) {
 			return PipelineReturnValue.SUCCEDED;
 		}
