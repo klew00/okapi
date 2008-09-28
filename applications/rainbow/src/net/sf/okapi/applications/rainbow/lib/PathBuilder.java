@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and Okapi Framework contributors         */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -22,11 +22,10 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
 
 public class PathBuilder {
-	public static final char      FLDSEP = '\b';
-	public static final String    FLDSEPSTR = "\b";
 
 	public static final int       EXTTYPE_PREPEND     = 0;
 	public static final int       EXTTYPE_APPEND      = 1;
@@ -205,50 +204,41 @@ public class PathBuilder {
 		m_bUseReplace = p_bValue;
 	}
 	
+	@Override
 	public String toString () {
-		StringBuilder sbTmp = new StringBuilder();
-		
-		sbTmp.append((useSubfolder()?"1":"0")+FLDSEP);
-		sbTmp.append(getSubfolder()+FLDSEP);
-
-		sbTmp.append((useExtension()?"1":"0")+FLDSEP);
-		sbTmp.append(String.format("%d", getExtensionType())+FLDSEP);
-		sbTmp.append(getExtension()+FLDSEP);
-
-		sbTmp.append((usePrefix()?"1":"0")+FLDSEP);
-		sbTmp.append(getPrefix()+FLDSEP);
-		sbTmp.append((useSuffix()?"1":"0")+FLDSEP);
-		sbTmp.append(getSuffix()+FLDSEP);
-
-		sbTmp.append((useReplace()?"1":"0")+FLDSEP);
-		sbTmp.append(getSearch()+FLDSEP);
-		sbTmp.append(getReplace()+FLDSEP);
-
-		return sbTmp.toString();
+		ParametersString tmp = new ParametersString();
+		tmp.setBoolean("useSubFolder", useSubfolder());
+		tmp.setString("subFolder", getSubfolder());
+		tmp.setBoolean("useExtension", useExtension());
+		tmp.setInteger("extensionType", getExtensionType());
+		tmp.setString("extension", getExtension());
+		tmp.setBoolean("usePrefix", usePrefix());
+		tmp.setString("prefix", getPrefix());
+		tmp.setBoolean("useSuffix", useSuffix());
+		tmp.setString("suffix", getSuffix());
+		tmp.setBoolean("useReplace", useReplace());
+		tmp.setString("search", getSearch());
+		tmp.setString("replace", getReplace());
+		return tmp.toString();
 	}
 
-
-	public void fromString (String p_sData) {
+	/* Not used currently
+	public void fromString (String data) {
 		reset();
-		if (( p_sData == null ) || ( p_sData.length() == 0 )) return;
-		String[] aFld = p_sData.split(FLDSEPSTR, -2);
-
-		setUseSubfolder(aFld[0].equals("1"));
-		setSubfolder(aFld[1]);
-
-		setUseExtension(aFld[2].equals("1"));
-		setExtensionType(Integer.valueOf(aFld[3]));
-		setExtension(aFld[4]);
-
-		setUsePrefix(aFld[5].equals("1"));
-		setPrefix(aFld[6]);
-		setUseSuffix(aFld[7].equals("1"));
-		setSuffix(aFld[8]);
-
-		setUseReplace(aFld[9].equals("1"));
-		setSearch(aFld[10]);
-		setReplace(aFld[11]);
-	}
+		ParametersString tmp = new ParametersString(data);
+		setUseSubfolder(tmp.getBoolean("useSubFolder", m_bUseSubfolder));
+		setSubfolder(tmp.getString("subFolder", m_sSubfolder));
+		setUseExtension(tmp.getBoolean("useExtension", m_bUseExt));
+		setExtensionType(tmp.getInteger("extensionType", m_nExtType));
+		setExtension(tmp.getString("extension", m_sExt));
+		setUsePrefix(tmp.getBoolean("usePrefix", m_bUsePrefix));
+		setPrefix(tmp.getString("prefix", m_sPrefix));
+		setUseSuffix(tmp.getBoolean("useSuffix", m_bUseSuffix));
+		setSuffix(tmp.getString("suffix", m_sSuffix));
+		setUseReplace(tmp.getBoolean("useReplace", m_bUseReplace));
+		setSearch(tmp.getString("search", m_sSearch));
+		setReplace(tmp.getString("replace", m_sReplace));
+	}*/
 
 	/**
 	 * Transforms a given full path to a new path.

@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -156,6 +157,22 @@ public class MainForm implements IParametersProvider {
 
 	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
 
+	protected static void showHelp (Shell shell,
+		String helpFile)
+	{
+		try {
+			URL url = MainForm.class.getResource("help/"+helpFile); //$NON-NLS-1$
+			if ( url == null ) {
+				throw new RuntimeException("Help file not found: "+helpFile);
+			}
+			else UIUtil.start(url.toString());
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	
 	public MainForm (Shell p_Shell) {
 		try {
 			shell = p_Shell;
@@ -430,8 +447,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO Help main topics
-				Dialogs.showError(shell, "Not implemented yet.", null);
+				showHelp(shell, "index.html");
 			}
 		});
 
@@ -439,8 +455,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//TODO Help 'how to use...'
-				Dialogs.showError(shell, "Not implemented yet.", null);
+				showHelp(shell, "howto.html");
 			}
 		});
 		
@@ -836,7 +851,7 @@ public class MainForm implements IParametersProvider {
 		updateInputRoot();
 		miInput.setEnabled(currentInput!=-1);
 	}
-
+	
 	private void buildInputTab (int index,
 		Composite comp)
 	{

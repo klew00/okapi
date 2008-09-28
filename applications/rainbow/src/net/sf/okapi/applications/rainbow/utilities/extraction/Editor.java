@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Yves Savourel and Okapi Framework contributors         */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -216,7 +216,7 @@ public class Editor implements IParametersEditor {
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("Segmentation");
-		grpTmp.setLayout(new GridLayout(4, false));
+		grpTmp.setLayout(new GridLayout());
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,

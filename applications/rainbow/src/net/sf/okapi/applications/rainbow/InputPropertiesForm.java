@@ -93,7 +93,7 @@ class InputPropertiesForm {
 			public void widgetSelected(SelectionEvent e) {
 				results = null;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					MainForm.showHelp(shell, "inputDocProp.html");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
