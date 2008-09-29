@@ -94,7 +94,7 @@ public class Editor implements IParametersEditor {
 		shell = null;
 		
 		params = (Parameters)p_Options;
-		// Make a copy (in case of escape)
+		// Make a work copy (in case of escape)
 		rules = new ArrayList<Rule>();
 		for ( Rule rule : params.getRules() ) {
 			rules.add(new Rule(rule));

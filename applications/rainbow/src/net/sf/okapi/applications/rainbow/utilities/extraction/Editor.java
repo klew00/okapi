@@ -122,9 +122,8 @@ public class Editor implements IParametersEditor {
 		lbTypes.add("OmegaT");
 		lbTypes.add("TagEditor TTX");
 		lbTypes.add("Original + RTF layer");
-		lbTypes.add("Test: Okapi-XML-Test");
-		// To use neutral access to the list
-		lbTypes.setData("xliff\tomegat\tttx\trtf\ttest");
+		// Access the list through key rather than index
+		lbTypes.setData("xliff\tomegat\tttx\trtf");
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		lbTypes.setLayoutData(gdTmp);

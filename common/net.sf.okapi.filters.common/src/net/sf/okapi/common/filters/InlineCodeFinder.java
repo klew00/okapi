@@ -37,6 +37,7 @@ public class InlineCodeFinder {
 
 	private ArrayList<String>     rules;
 	private String                sample;
+	private boolean               useAllRulesWhenTesting;
 	private Pattern               pattern;
 
 	
@@ -47,12 +48,14 @@ public class InlineCodeFinder {
 	public void reset () {
 		rules = new ArrayList<String>();
 		sample = "";
+		useAllRulesWhenTesting = false;
 	}
 	
 	@Override
 	public InlineCodeFinder clone () {
 		InlineCodeFinder tmp = new InlineCodeFinder();
 		tmp.setSample(sample);
+		tmp.setUseAllRulesWhenTesting(useAllRulesWhenTesting);
 		tmp.getRules().addAll(getRules());
 		return tmp;
 	}
@@ -90,6 +93,25 @@ public class InlineCodeFinder {
 		sample = value;
 	}
 	
+	/**
+	 * Indicates if all rules should be used when testing the patterns
+	 * in a regular expression editor.
+	 * @return True if all rules should be used when testing,
+	 * false when only the current rule should be used.
+	 */
+	public boolean useAllRulesWhenTesting () {
+		return useAllRulesWhenTesting;
+	}
+	
+	/**
+	 * Set the flag that indicates if all rules should be used when testing the patterns
+	 * in a regular expression editor.
+	 * @param value True to use all rules, false to use only the current rule.
+	 */
+	public void setUseAllRulesWhenTesting (boolean value) {
+		useAllRulesWhenTesting = value;
+	}
+
 	/**
 	 * Compiles all the rules into a single compiled pattern.
 	 * @throws PatternSyntaxException When there is a syntax error in one of the rules. 
@@ -133,17 +155,19 @@ public class InlineCodeFinder {
 			i++;
 		}
 		tmp.setString("sample", sample);
+		tmp.setBoolean("useAllRulesWhenTesting", useAllRulesWhenTesting);
 		return tmp.toString();
 	}
 	
 	public void fromString (String data) {
-		ParametersString tmp = new ParametersString(data);
 		reset();
+		ParametersString tmp = new ParametersString(data);
 		int count = tmp.getInteger("count", 0);
 		for ( int i=0; i<count; i++ ) {
 			String rule = tmp.getString(String.format("rule%d", i), "");
 			if ( rule.length() > 0 ) rules.add(rule);
 		}
 		sample = tmp.getString("sample", sample);
+		useAllRulesWhenTesting = tmp.getBoolean("useAllRulesWhenTesting", useAllRulesWhenTesting);
 	}
 }

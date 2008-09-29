@@ -31,6 +31,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.filters.GenericContent;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;

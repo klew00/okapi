@@ -21,9 +21,12 @@
 package net.sf.okapi.common.ui.filters;
 
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -48,12 +51,14 @@ public class InlineCodeFinderPanel extends Composite {
 	private Button           btModify;
 	private Button           btDiscard;
 	private Button           btInsertPattern;
-	private Button           btTest;
 	private Button           btAdd;
 	private Button           btRemove;
 	private Button           btMoveDown;
+	private Button           chkTestAllRules;
 	private boolean          editMode;
 	private boolean          wasNew;
+	private TextContainer    textCont;
+	private GenericContent   genericCont;
 	
 
 	public InlineCodeFinderPanel (Composite parent,
@@ -61,6 +66,8 @@ public class InlineCodeFinderPanel extends Composite {
 	{
 		super(parent, flags);
 		codeFinder = new InlineCodeFinder();
+		textCont = new TextContainer();
+		genericCont = new GenericContent();
 		createContent();
 	}
 	
@@ -70,10 +77,19 @@ public class InlineCodeFinderPanel extends Composite {
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
 		
-		lbRules = new List(this, SWT.BORDER | SWT.V_SCROLL);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 1;
-		gdTmp.verticalSpan = 3;
+		Composite cmpRules = new Composite(this, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		layTmp.marginHeight = 0;
+		layTmp.marginWidth = 0;
+		cmpRules.setLayout(layTmp);
+		GridData gdTmp = new GridData(GridData.FILL_VERTICAL);
+		gdTmp.verticalSpan = 4;
+		cmpRules.setLayoutData(gdTmp);
+		
+		lbRules = new List(cmpRules, SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		//gdTmp.verticalSpan = 4;
 		gdTmp.grabExcessVerticalSpace = true;
 		lbRules.setLayoutData(gdTmp);
 		lbRules.addSelectionListener(new SelectionAdapter() {
@@ -82,16 +98,69 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
+		int normalButtonWidth = 80;
+		int largeButtonWidth = 80;
+
+		// Buttons for the rules list
+
+		btAdd = new Button(cmpRules, SWT.PUSH);
+		btAdd.setText("Add");
+		gdTmp = new GridData();
+		gdTmp.widthHint = normalButtonWidth;
+		btAdd.setLayoutData(gdTmp);
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				startEditMode(true);
+			};
+		});
+	
+		btMoveUp = new Button(cmpRules, SWT.PUSH);
+		btMoveUp.setText("Move Up");
+		gdTmp = new GridData();
+		gdTmp.widthHint = normalButtonWidth;
+		btMoveUp.setLayoutData(gdTmp);
+		btMoveUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveUp();
+			};
+		});
+		
+		btRemove = new Button(cmpRules, SWT.PUSH);
+		btRemove.setText("Remove");
+		gdTmp = new GridData();
+		gdTmp.widthHint = normalButtonWidth;
+		btRemove.setLayoutData(gdTmp);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeExpression();
+			};
+		});
+
+		btMoveDown = new Button(cmpRules, SWT.PUSH);
+		btMoveDown.setText("Move Down");
+		gdTmp = new GridData();
+		gdTmp.widthHint = normalButtonWidth;
+		btMoveDown.setLayoutData(gdTmp);
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDown();
+			};
+		});
+
+		// Expression sides
+		
 		edExpression = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
-		gdTmp.heightHint = 40;
+		gdTmp.heightHint = 60;
 		edExpression.setLayoutData(gdTmp);
 		edExpression.setEditable(false);
+		edExpression.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateTest();
+			}
+		});
 
-		int normalButtonWidth = 80;
-		int largeButtonWidth = 80;
-		
 		btModify = new Button(this, SWT.PUSH);
 		btModify.setText("Modify");
 		gdTmp = new GridData();
@@ -129,83 +198,34 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
-		btTest = new Button(this, SWT.PUSH);
-		btTest.setText("Test");
+		chkTestAllRules = new Button(this, SWT.CHECK);
+		chkTestAllRules.setText("Test using all rules");
 		gdTmp = new GridData();
-		gdTmp.widthHint = largeButtonWidth;
-		btTest.setLayoutData(gdTmp);
-		btTest.addSelectionListener(new SelectionAdapter() {
+		chkTestAllRules.setLayoutData(gdTmp);
+		chkTestAllRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO
-				Dialogs.showError(getShell(), "Not implemented yet", null);
+				updateTest();
 			};
 		});
 		
 		edSample = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
-		gdTmp.heightHint = 40;
+		gdTmp.heightHint = 60;
 		edSample.setLayoutData(gdTmp);
-
-		// Panel for rules list buttons
-		Composite cmpRulesButtons = new Composite(this, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		cmpRulesButtons.setLayout(layout);
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_END | GridData.FILL_HORIZONTAL);
-		cmpRulesButtons.setLayoutData(gdTmp);
-		
-		btAdd = new Button(cmpRulesButtons, SWT.PUSH);
-		btAdd.setText("Add");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
-		btAdd.setLayoutData(gdTmp);
-		btAdd.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				startEditMode(true);
-			};
-		});
-	
-		btMoveUp = new Button(cmpRulesButtons, SWT.PUSH);
-		btMoveUp.setText("Move Up");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
-		btMoveUp.setLayoutData(gdTmp);
-		btMoveUp.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveUp();
-			};
-		});
-		
-		btRemove = new Button(cmpRulesButtons, SWT.PUSH);
-		btRemove.setText("Remove");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
-		btRemove.setLayoutData(gdTmp);
-		btRemove.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				removeExpression();
-			};
-		});
-
-		btMoveDown = new Button(cmpRulesButtons, SWT.PUSH);
-		btMoveDown.setText("Move Down");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
-		btMoveDown.setLayoutData(gdTmp);
-		btMoveDown.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveDown();
-			};
+		edSample.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateTest();
+			}
 		});
 
 		edResults = new Text(this, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
-		//gdTmp.heightHint = 40;
+		gdTmp.heightHint = 60;
 		edResults.setLayoutData(gdTmp);
 		edResults.setEditable(false);
-		
+
 		updateDisplay();
 	}
 	
@@ -296,6 +316,41 @@ public class InlineCodeFinderPanel extends Composite {
 		btModify.setEnabled(n>-1);
 		if ( n == -1 ) edExpression.setText("");
 		else edExpression.setText(lbRules.getItem(n));
+		updateTest();
+	}
+	
+	private void updateTest () {
+		try {
+			int n = lbRules.getSelectionIndex();
+			if ( n == -1 ) return;
+			codeFinder.getRules().clear();
+			if ( chkTestAllRules.getSelection() ) {
+				for ( String pattern : lbRules.getItems() ) {
+					codeFinder.addRule(pattern);
+				}
+				codeFinder.getRules().set(n, edExpression.getText());
+			}
+			else {
+				codeFinder.addRule(edExpression.getText());
+			}
+			codeFinder.compile();
+			textCont.clear();
+			textCont.setCodedText(getSampleText());
+			codeFinder.process(textCont);
+			genericCont.setContent(textCont);
+			edResults.setText(genericCont.toString());
+		}
+		catch ( Throwable e ) {
+			edResults.setText(e.getMessage());
+		}
+	}
+	
+	private String getSampleText () {
+		// Change different line breaks type into \n cases
+		String tmp = edSample.getText();
+		tmp = tmp.replaceAll("\r\r\n", "\n");
+		tmp = tmp.replace("\r\n", "\n");
+		return tmp.replace("\r", "\n"); 
 	}
 	
 	public void setData (String codeFinderRules) {
@@ -304,11 +359,12 @@ public class InlineCodeFinderPanel extends Composite {
 		for ( String pattern : codeFinder.getRules() ) {
 			lbRules.add(pattern);
 		}
+		edSample.setText(codeFinder.getSample());
+		chkTestAllRules.setSelection(codeFinder.useAllRulesWhenTesting());
 		if ( lbRules.getItemCount() > 0 ) {
 			lbRules.setSelection(0);
 			updateDisplay();
 		}
-		edSample.setText(codeFinder.getSample());
 	}
 
 	public String getData () {
@@ -316,14 +372,14 @@ public class InlineCodeFinderPanel extends Composite {
 		for ( String pattern : lbRules.getItems() ) {
 			codeFinder.addRule(pattern);
 		}
-		codeFinder.setSample(edSample.getText());
+		codeFinder.setSample(getSampleText());
+		codeFinder.setUseAllRulesWhenTesting(chkTestAllRules.getSelection());
 		return codeFinder.toString();
 	}
 	
 	public void enable (boolean enabled) {
 		this.setEnabled(enabled);
 		btAdd.setEnabled(enabled);
-		btTest.setEnabled(enabled);
 		if ( enabled ) {
 			updateDisplay();
 		}

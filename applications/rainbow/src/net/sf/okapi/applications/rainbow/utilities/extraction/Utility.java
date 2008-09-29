@@ -79,8 +79,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else if ( params.pkgType.equals("rtf") )
 			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
-		else if ( params.pkgType.equals("test") )
-			writer = new net.sf.okapi.applications.rainbow.packages.test.Writer();
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 	
