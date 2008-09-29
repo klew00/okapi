@@ -23,12 +23,8 @@ package net.sf.okapi.filters.html;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
@@ -46,7 +42,7 @@ import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
-	private ParserConfigurationReader configuration;
+	private HtmlFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
 
@@ -81,13 +77,13 @@ public class HtmlParser extends BaseParser {
 		initialize();
 	}
 
-	public void setHtmlFilterConfiguration(ParserConfigurationReader configuration) {
+	public void setHtmlFilterConfiguration(HtmlFilterConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
 	private void initialize() {		
 		if (configuration == null) {
-			configuration = new ParserConfigurationReader("/net/sf/okapi/filters/html/defaultConfiguration.groovy");		
+			configuration = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");		
 		}
 
 		// Segment iterator
@@ -207,7 +203,7 @@ public class HtmlParser extends BaseParser {
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 			// process these tag types to update parser state
-			switch (getRuleType(startTag.getName())) {
+			switch (configuration.getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.pushExcludedRule(startTag.getName());				
 				break;
@@ -221,13 +217,13 @@ public class HtmlParser extends BaseParser {
 			return;
 		}
 
-		switch (getRuleType(startTag.getName())) {
+		switch (configuration.getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
 			addToCurrentTextUnit(startTag);
 			break;
 
-		case EXTRACTABLE_ATTRIBUTES:
+		case ATTRIBUTES_ONLY:
 			// TODO: test for extractable attributes and create subflow
 			break;
 		case GROUP_ELEMENT:							
@@ -268,7 +264,7 @@ public class HtmlParser extends BaseParser {
 		if (ruleState.isExludedState()) {
 			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			// process these tag types to update parser state
-			switch (getRuleType(endTag.getName())) {
+			switch (configuration.getMainRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.popExcludedIncludedRule();
 				break;
@@ -283,7 +279,7 @@ public class HtmlParser extends BaseParser {
 			return;
 		}
 
-		switch (getRuleType(endTag.getName())) {
+		switch (configuration.getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
 			addToCurrentTextUnit(endTag);
@@ -313,14 +309,6 @@ public class HtmlParser extends BaseParser {
 			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
 			break;
 		}
-	}
-
-	private EXTRACTION_RULE_TYPE getRuleType(String ruleName) {
-//		ExtractionRule rule = configuration.getRule(ruleName);
-//		if (rule == null) {
-//			return EXTRACTION_RULE_TYPE.NON_EXTRACTABLE;
-//		}
-		return null;
 	}
 
 	private void addToCurrentTextUnit(Tag tag) {

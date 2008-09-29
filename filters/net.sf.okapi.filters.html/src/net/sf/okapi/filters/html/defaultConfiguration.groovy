@@ -1,14 +1,14 @@
 //Rule types that drive HTML parser behavior
-INLINE = 0  // inline element
+INLINE = 1  // inline element
 GROUP = 2 // group element
-ATTRIBUTE = 3 // the rule lists an attribute, not an element
-ATTRIBUTES_ONLY = 4 // only attribute is translatable or localizable 
-EXCLUDE = 5 // exclude this element and all children
-INCLUDE = 6 // exceptions to the exclude rules
-TEXTUNIT = 7 // make this element a textunit with skeleton before/after
-PRESERVE_WHITESPACE = 8 // turn on preserve whitespace.
-SCRIPT = 9 // Embedded scripting languatge - pass to another extractor
-SERVER = 10 // Embedded server language tags such as JSP, PHP, Mason etc.
+EXCLUDE = 3 // exclude this element and all children
+INCLUDE = 4 // exceptions to the exclude rules
+TEXTUNIT = 5 // make this element a textunit with skeleton before/after
+PRESERVE_WHITESPACE = 6 // turn on preserve whitespace.
+SCRIPT = 7 // Embedded scripting languatge - pass to another extractor
+SERVER = 8 // Embedded server language tags such as JSP, PHP, Mason etc.
+ATTRIBUTE = 9 // the rule lists an attribute, not an element
+ATTRIBUTES_ONLY = 10 // only attribute is translatable or localizable 
 
 /********************************************************************************************* 
 Operators for attribute value compare
@@ -26,8 +26,8 @@ Multiple attribute values may be included in a list:
 This rule would be read: 
 extract the value of 'content' if the value of 'http-equiv' equals 'content-language' or 'content-type' 
 ********************************************************************************************/
-EQUALS = 0
-NOT_EQUALS = 1 
+EQUALS = 1
+NOT_EQUALS = 2 
 MATCH = 3 // regex match. Must match the entire attribute value
 
 // attributes that occur on many elements
