@@ -267,7 +267,7 @@ public class InlineCodeFinderPanel extends Composite {
 		}
 	}
 	
-	private void endEditMode (boolean accept) {
+	public void endEditMode (boolean accept) {
 		if ( accept ) {
 			lbRules.setItem(lbRules.getSelectionIndex(), edExpression.getText());
 		}
@@ -368,6 +368,7 @@ public class InlineCodeFinderPanel extends Composite {
 	}
 
 	public String getData () {
+		// TODO: check/compile the rules for errors 
 		codeFinder.getRules().clear();
 		for ( String pattern : lbRules.getItems() ) {
 			codeFinder.addRule(pattern);
@@ -375,6 +376,10 @@ public class InlineCodeFinderPanel extends Composite {
 		codeFinder.setSample(getSampleText());
 		codeFinder.setUseAllRulesWhenTesting(chkTestAllRules.getSelection());
 		return codeFinder.toString();
+	}
+	
+	public boolean inEditMode () {
+		return editMode;
 	}
 	
 	public void enable (boolean enabled) {

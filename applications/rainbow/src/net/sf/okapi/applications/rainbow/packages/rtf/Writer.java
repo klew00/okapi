@@ -119,11 +119,16 @@ public class Writer extends BaseWriter {
 		}
 
 		// Output the text unit
-		//TODO: Handle tu-skeleton-before/after
+		
+		if ( item.getSkeletonBefore() != null ) {
+			writer.write(Util.escapeToRTF(item.getSkeletonBefore().toString(),
+				true, 1, outputEncoder));
+		}
+		
 		StringBuilder tmp = new StringBuilder();
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
-			//TODO
+			//TODO: handle pre-populated target
 		}
 		else { // No target
 			processContent(item.getSourceContent(), tmp,
@@ -131,6 +136,11 @@ public class Writer extends BaseWriter {
 		}
 		tmp.append(Util.RTF_STARTCODE);
 		writer.write(tmp.toString());
+		
+		if ( item.getSkeletonAfter() != null ) {
+			writer.write(Util.escapeToRTF(item.getSkeletonAfter().toString(),
+				true, 1, outputEncoder));
+		}
 	}
 
 	private String processContent (TextFragment content,

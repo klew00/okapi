@@ -112,6 +112,6 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void cancel () {
-		// TODO implement cancel()
+		if ( parser != null ) parser.cancel();
 	}
 }

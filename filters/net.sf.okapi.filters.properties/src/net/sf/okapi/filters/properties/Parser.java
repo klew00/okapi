@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
@@ -63,7 +64,7 @@ public class Parser implements IParser {
 	private int              sklID;
 	private Pattern          keyConditionPattern;
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-
+	private boolean          stop;
 
 	public Parser () {
 		resource = new Resource();
@@ -88,6 +89,7 @@ public class Parser implements IParser {
 	public void open (InputStream input)
 	{
 		try {
+			stop = false;
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input,
 				resource.getSourceEncoding());
@@ -103,11 +105,16 @@ public class Parser implements IParser {
 			lineSince = 0;
 			position = 0;
 			nextAction = -1;
+			// Compile conditions
 			if ( resource.params.useKeyCondition ) {
 				keyConditionPattern = Pattern.compile(resource.params.keyCondition); 
 			}
 			else {
 				keyConditionPattern = null;
+			}
+			// Compile code finder rules
+			if ( resource.params.useCodeFinder ) {
+				resource.params.codeFinder.compile();
 			}
 		}
 		catch ( UnsupportedEncodingException e ) {
@@ -128,6 +135,10 @@ public class Parser implements IParser {
 	}
 
 	public ParserTokenType parseNext () {
+		if ( stop ) {
+			nextAction = -1;
+			return ParserTokenType.ENDINPUT;
+		}
 		// Deal with next action
 		switch ( nextAction ) {
 		case NEXTACTION_TRANSUNIT:
@@ -338,9 +349,8 @@ public class Parser implements IParser {
 
 //TODO: handle {0,choice...} cases
 //http://java.sun.com/j2se/1.4.2/docs/api/java/text/MessageFormat.html
-
-//				if ( m_Opt.m_bUseCodeFinder )
-//					m_Opt.m_CodeFinder.processFilterItem(srcItem);
+				if ( resource.params.useCodeFinder )
+					resource.params.codeFinder.process(item.getSourceContent());
 
 				return result;
 			}
@@ -436,7 +446,7 @@ public class Parser implements IParser {
 		}
 	}
 
-	public void cancel() {
-		//TODO
+	public void cancel () {
+		stop = true;
 	}
 }

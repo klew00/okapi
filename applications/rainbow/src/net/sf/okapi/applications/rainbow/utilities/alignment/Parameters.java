@@ -37,7 +37,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		tmxPath = "output.tmx";
+		tmxPath = "";
 		segment = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";

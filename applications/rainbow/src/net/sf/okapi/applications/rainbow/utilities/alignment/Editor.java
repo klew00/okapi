@@ -158,7 +158,10 @@ public class Editor implements IParametersEditor {
 					//TODO: Call help
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) {
+					if ( !saveData() ) return;
+					else result = true;
+				}
 				shell.close();
 			};
 		};
@@ -194,13 +197,25 @@ public class Editor implements IParametersEditor {
 
 	private boolean saveData () {
 		if ( inInit ) return true;
+		if ( edTMXPath.getText().length() == 0 ) {
+			Dialogs.showError(shell, "You must specify an output file.", null);
+			edTMXPath.setFocus();
+			return false;
+		}
 		params.tmxPath = edTMXPath.getText();
-		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
-		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		params.segment = pnlSegmentation.getSegment();
+		if ( params.segment && pnlSegmentation.getSourceSRX().length() == 0 ) {
+			Dialogs.showError(shell, "You must specify an SRX document for the source.", null);
+			return false;
+		}
+		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
+		if ( params.segment && pnlSegmentation.getTargetSRX().length() == 0 ) {
+			Dialogs.showError(shell, "You must specify an SRX document for the target.", null);
+			return false;
+		}
+		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
 		params.checkSingleSegUnit = chkCheckSingleSegUnit.getSelection();
-		result = true;
 		return true;
 	}
 

@@ -207,11 +207,18 @@ public class Editor implements IParametersEditor {
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				result = false;
 				if ( e.widget.getData().equals("h") ) {
 					//TODO: Call help
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) {
+					if ( pnlCodeFinder.inEditMode() ) {
+						pnlCodeFinder.endEditMode(true);
+					}
+					if ( !saveData() ) return;
+					result = true;
+				}
 				shell.close();
 			};
 		};
@@ -253,7 +260,7 @@ public class Editor implements IParametersEditor {
 		updateKeyFilter();
 	}
 	
-	private void saveData () {
+	private boolean saveData () {
 		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
 		params.useKeyCondition = chkUseKeyFilter.getSelection();
 		params.keyCondition = edKeyCondition.getText();
@@ -261,14 +268,15 @@ public class Editor implements IParametersEditor {
 		params.extraComments = chkExtraComments.getSelection();
 		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
 		params.useCodeFinder = chkUseCodeFinder.getSelection();
+		//TODO: check regexp
 		String tmp = pnlCodeFinder.getData();
 		if ( tmp == null ) {
-			result = false;
+			return false;
 		}
 		else {
 			params.codeFinder.fromString(tmp);
 		}
-		result = true;
+		return true;
 	}
 	
 	private void updateKeyFilter () {

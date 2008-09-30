@@ -47,6 +47,9 @@ public class Parameters extends BaseParameters {
 		escapeExtendedChars = true;
 
 		useCodeFinder = true;
+		codeFinder.reset();
+		codeFinder.setSample("%s, %d, {1}, \\n, \\r, \\t, etc.");
+		codeFinder.setUseAllRulesWhenTesting(true);
 		// Default in-line codes: special escaped-chars and printf-style variable
 		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");

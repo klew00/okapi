@@ -173,9 +173,9 @@ public class MainForm implements IParametersProvider {
 	}
 
 	
-	public MainForm (Shell p_Shell) {
+	public MainForm (Shell shell) {
 		try {
-			shell = p_Shell;
+			this.shell = shell;
 			
 			setDirectories();
 			loadResources();

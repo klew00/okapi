@@ -63,9 +63,8 @@ public class SkeletonUnit implements IContainable {
 	
 	@Override
 	public String toString () {
-		//TODO: Modify for real output, this is test only
 		if ( isEmpty() ) return "";
-		else if ( isOffsetBased() ) return "[offset-based]";
+		else if ( isOffsetBased() ) return "[offset-based]"; //TODO: Modify for real output, this is test only
 		else if ( data == null ) return "";
 		else return data.toString();
 	}
