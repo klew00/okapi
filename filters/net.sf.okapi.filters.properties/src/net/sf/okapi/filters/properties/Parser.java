@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.properties;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
@@ -126,12 +126,17 @@ public class Parser implements IParser {
 	}
 
 	public void open (CharSequence input) {
-		// TODO Auto-generated method stub
+		//TODO: Check for better solution, going from char to byte to read char is just not good
+		open(new ByteArrayInputStream(input.toString().getBytes())); 
 	}
 
-	public void open (URL input)
-	{
-		// TODO Auto-generated method stub
+	public void open (URL input) {
+		try { //TODO: Make sure this is actually working (encoding?, etc.)
+			open(input.openStream());
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public ParserTokenType parseNext () {

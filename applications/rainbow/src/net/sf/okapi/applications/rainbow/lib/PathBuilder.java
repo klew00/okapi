@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel and Okapi Framework contributors         */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -31,30 +31,30 @@ public class PathBuilder {
 	public static final int       EXTTYPE_APPEND      = 1;
 	public static final int       EXTTYPE_REPLACE     = 2;
 
-	private boolean     m_bUseSubfolder;
-	private String      m_sSubfolder;
-	private boolean     m_bUseExt;
-	private String      m_sExt;
-	private int         m_nExtType;
-	private String      m_sPrefix;
-	private boolean     m_bUsePrefix;
-	private String      m_sSuffix;
-	private boolean     m_bUseSuffix;
-	private boolean     m_bUseReplace;
-	private String      m_sSearch;
-	private String      m_sReplace;
+	private boolean     useSubFolder;
+	private String      subFolder;
+	private boolean     useExt;
+	private String      ext;
+	private int         extType;
+	private String      prefix;
+	private boolean     usePrefix;
+	private String      suffix;
+	private boolean     useSuffix;
+	private boolean     useReplace;
+	private String      search;
+	private String      replace;
 
 	static public String replaceVariables (String p_sInput,
 		String srcLang,
 		String trgLang)
 	{
 		// Macros
-		if ( p_sInput.indexOf("<$") == -1 ) return p_sInput;
+		if ( p_sInput.indexOf("${") == -1 ) return p_sInput;
 
-		p_sInput = p_sInput.replace("<$SrcLangU>", srcLang.toUpperCase());
-		p_sInput = p_sInput.replace("<$SrcLang>", srcLang.toLowerCase());
-		p_sInput = p_sInput.replace("<$TrgLangU>", trgLang.toUpperCase());
-		p_sInput = p_sInput.replace("<$TrgLang>", trgLang.toLowerCase());
+		p_sInput = p_sInput.replace("${SrcLangU}", srcLang.toUpperCase());
+		p_sInput = p_sInput.replace("${$SrcLang}", srcLang.toLowerCase());
+		p_sInput = p_sInput.replace("${TrgLangU}", trgLang.toUpperCase());
+		p_sInput = p_sInput.replace("${$TrgLang}", trgLang.toLowerCase());
 
 //TODO		Locale LC;
 		try {
@@ -63,15 +63,15 @@ public class PathBuilder {
 		}
 		catch (Exception E ) {
 			// On error, replace by error place-holder
-			p_sInput = p_sInput.replace("<$SrcLangNameE>", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("<$SrcLangWin3>", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("<$SrcLCID>", Res.getString("BLDPATH_NOVARVALUE"));
-			return p_sInput.replace("<$SrcLangNameN>", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("${SrcLangNameE}", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("${SrcLangWin3}", Res.getString("BLDPATH_NOVARVALUE"));
+			p_sInput = p_sInput.replace("${SrcLCID}", Res.getString("BLDPATH_NOVARVALUE"));
+			return p_sInput.replace("${SrcLangNameN}", Res.getString("BLDPATH_NOVARVALUE"));
 		}
-		p_sInput = p_sInput.replace("<$SrcLangNameE>", "TODO"); //CI.EnglishName);
-		//TODO p_sInput = p_sInput.replace("<$LWin3>", "TODO"); //CI.ThreeLetterWindowsLanguageName);
-		//TODO p_sInput = p_sInput.replace("<$LCID>", "TODO"); //CI.LCID.ToString());
-		return p_sInput.replace("<$SrcLangNameN>", "TODO"); //CI.NativeName);
+		p_sInput = p_sInput.replace("${SrcLangNameE}", "TODO"); //CI.EnglishName);
+		//TODO p_sInput = p_sInput.replace("${LWin3}", "TODO"); //CI.ThreeLetterWindowsLanguageName);
+		//TODO p_sInput = p_sInput.replace("${LCID}", "TODO"); //CI.LCID.ToString());
+		return p_sInput.replace("${SrcLangNameN}", "TODO"); //CI.NativeName);
 	}
 
 	public PathBuilder () {
@@ -79,129 +79,129 @@ public class PathBuilder {
 	}
 	
 	public void reset () {
-		m_bUseSubfolder = false;
-		m_sSubfolder = "";
-		m_bUseExt = true;
-		m_sExt = ".<$LCode>";
-		m_nExtType = EXTTYPE_PREPEND;
-		m_sPrefix = "";
-		m_sSuffix = "";
-		m_bUsePrefix = false;
-		m_bUseSuffix = false;
-		m_bUseReplace = false;
-		m_sSearch = "";
-		m_sReplace = "";
+		useSubFolder = false;
+		subFolder = "";
+		useExt = true;
+		ext = ".${TrgLang}";
+		extType = EXTTYPE_PREPEND;
+		prefix = "";
+		suffix = "";
+		usePrefix = false;
+		useSuffix = false;
+		useReplace = false;
+		search = "";
+		replace = "";
 	}
 
 	public void copyFrom (PathBuilder pathBuilder) {
-		m_bUseSubfolder = pathBuilder.m_bUseSubfolder;
-		m_sSubfolder = pathBuilder.m_sSubfolder;
-		m_bUseExt = pathBuilder.m_bUseExt;
-		m_sExt = pathBuilder.m_sExt;
-		m_nExtType = pathBuilder.m_nExtType;
-		m_sPrefix = pathBuilder.m_sPrefix;
-		m_sSuffix = pathBuilder.m_sSuffix;
-		m_bUsePrefix = pathBuilder.m_bUsePrefix;
-		m_bUseSuffix = pathBuilder.m_bUseSuffix;
-		m_bUseReplace = pathBuilder.m_bUseReplace;
-		m_sSearch = pathBuilder.m_sSearch;
-		m_sReplace = pathBuilder.m_sReplace;
+		useSubFolder = pathBuilder.useSubFolder;
+		subFolder = pathBuilder.subFolder;
+		useExt = pathBuilder.useExt;
+		ext = pathBuilder.ext;
+		extType = pathBuilder.extType;
+		prefix = pathBuilder.prefix;
+		suffix = pathBuilder.suffix;
+		usePrefix = pathBuilder.usePrefix;
+		useSuffix = pathBuilder.useSuffix;
+		useReplace = pathBuilder.useReplace;
+		search = pathBuilder.search;
+		replace = pathBuilder.replace;
 	}
 
 	public String getSubfolder () {
-		return m_sSubfolder;
+		return subFolder;
 	}
 	
 	public void setSubfolder (String p_sValue) {
-		m_sSubfolder = p_sValue;
+		subFolder = p_sValue;
 	}
 
 	public boolean useSubfolder () {
-		return m_bUseSubfolder;
+		return useSubFolder;
 	}
 	
 	public void setUseSubfolder (boolean p_bValue) {
-		m_bUseSubfolder = p_bValue;
+		useSubFolder = p_bValue;
 	}
 
 	public String getExtension () {
-		return m_sExt;
+		return ext;
 	}
 	
 	public void setExtension (String p_sValue) {
-		m_sExt = p_sValue;
+		ext = p_sValue;
 	}
 
 	public boolean useExtension () {
-		return m_bUseExt;
+		return useExt;
 	}
 	
 	public void setUseExtension (boolean p_bValue) {
-		m_bUseExt = p_bValue;
+		useExt = p_bValue;
 	}
 
 	public int getExtensionType () {
-		return m_nExtType;
+		return extType;
 	}
 	
 	public void setExtensionType (int p_nValue) {
-		m_nExtType = p_nValue;
+		extType = p_nValue;
 	}
 
 	public String getPrefix () {
-		return m_sPrefix;
+		return prefix;
 	}
 	
 	public void setPrefix (String p_sValue) {
-		m_sPrefix = p_sValue;
+		prefix = p_sValue;
 	}
 
 	public boolean usePrefix () {
-		return m_bUsePrefix;
+		return usePrefix;
 	}
 	
 	public void setUsePrefix (boolean p_bValue) {
-		m_bUsePrefix = p_bValue;
+		usePrefix = p_bValue;
 	}
 
 	public String getSuffix () {
-		return m_sSuffix;
+		return suffix;
 	}
 	
 	public void setSuffix (String p_sValue) {
-		m_sSuffix = p_sValue;
+		suffix = p_sValue;
 	}
 
 	public boolean useSuffix () {
-		return m_bUseSuffix;
+		return useSuffix;
 	}
 	
 	public void setUseSuffix (boolean p_bValue) {
-		m_bUseSuffix = p_bValue;
+		useSuffix = p_bValue;
 	}
 
 	public String getSearch () {
-		return m_sSearch;
+		return search;
 	}
 	
 	public void setSearch (String p_sValue) {
-		m_sSearch = p_sValue;
+		search = p_sValue;
 	}
 
 	public String getReplace () {
-		return m_sReplace;
+		return replace;
 	}
 	
 	public void setReplace (String p_sValue) {
-		m_sReplace = p_sValue;
+		replace = p_sValue;
 	}
 
 	public boolean useReplace () {
-		return m_bUseReplace;
+		return useReplace;
 	}
 	
 	public void setUseReplace (boolean p_bValue) {
-		m_bUseReplace = p_bValue;
+		useReplace = p_bValue;
 	}
 	
 	@Override

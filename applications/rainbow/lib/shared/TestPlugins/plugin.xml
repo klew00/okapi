@@ -129,4 +129,16 @@
   </info>
  </plugin>
 
+<plugin type="utility"
+  id="oku_twbbatchanalysis"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.twbbatchanalysis.Utility"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Trados Batch Analysis</name>
+   <description>Execute a batch TM analysis on the provided input files.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
 </okapiPlugins>

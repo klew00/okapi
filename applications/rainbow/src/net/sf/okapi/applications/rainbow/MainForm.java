@@ -850,6 +850,7 @@ public class MainForm implements IParametersProvider {
 		updateCommands();
 		updateInputRoot();
 		miInput.setEnabled(currentInput!=-1);
+		btGetRoot.setEnabled(currentInput!=-1);
 	}
 	
 	private void buildInputTab (int index,
