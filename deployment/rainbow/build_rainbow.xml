@@ -1,0 +1,88 @@
+<?xml version="1.0"?> 
+<project name="rainbow" default="all" basedir="."> 
+
+	<property name="platform" value="win32-x86"/>
+	<property name="proj" value="../../applications/rainbow"/> 
+	<property name="src" value="${proj}/src"/> 
+	<property name="build" value="build"/>
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="dist-bin" value="${dist}/lib"/>
+ 
+	<condition property="is_win32-x86">
+		<equals arg1="${platform}" arg2="win32-x86"/>
+	</condition>
+	<condition property="is_carbon-macosx">
+		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	</condition>
+	<condition property="is_gtk2-linux-x86">
+		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+	</condition>
+
+	<path id="mainClassPath">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${proj}/lib/${platform}/swt.jar"/>
+		<pathelement location="${proj}/lib/slf4j-api-1.5.0.jar"/>
+		<pathelement location="${proj}/lib/slf4j-jdk14-1.5.0.jar"/>
+		<pathelement location="${proj}/lib/h2.jar"/>
+	</path>
+	
+	<target name="init">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+			<fileset dir="${dist}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<mkdir dir="${dist-bin}"/>
+ 	</target>
+
+	<target name="all" depends="init"> 
+		<ant antfile="build_common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.properties.xml" inheritAll="false"/>
+		<ant antfile="build_filters.regex.xml" inheritAll="false"/>
+		<ant antfile="build_filters.xliff.xml" inheritAll="false"/>
+		<ant antfile="build_filters.xml.xml" inheritAll="false"/>
+		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
+		<ant antfile="build_ui.common.xml" inheritAll="false"/>
+		<ant antfile="build_ui.filters.common.xml" inheritAll="false"/>
+		<ant antfile="build_ui.filters.properties.xml" inheritAll="false"/>
+		<ant antfile="build_ui.filters.regex.xml" inheritAll="false"/>
+		<ant antfile="build_ui.lib.segmentation.xml" inheritAll="false"/>
+ 		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src}" excludes="**/*.java"/>
+		</copy>
+ 		<copy todir="${dist-bin}">
+			<fileset dir="${proj}/lib"/>
+		</copy>
+		
+		<copy todir="${dist-bin}">
+			<fileset dir="${dist-bin}/${platform}"/>
+		</copy>
+		<copy todir="${dist}">
+			<fileset dir="data/${platform}"/>
+		</copy>
+
+		<delete includeEmptyDirs="true">
+			<fileset dir="${dist-bin}/win32-x86"/>
+			<fileset dir="${dist-bin}/gtk2-linux-x86"/>
+			<fileset dir="${dist-bin}/carbon-macosx"/>
+		</delete>
+		
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Main-Class" value="net.sf.okapi.applications.rainbow.Main"/>
+			<attribute name="Class-Path" value="swt.jar h2.jar slf4j-api-1.5.0.jar slf4j-jdk14-1.5.0.jar"/>
+  		</manifest>
+
+		<jar jarfile="${dist-bin}/rainbow.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+			excludes="MANIFEST.MF"
+  		/>
+
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+
+	</target>
+
+</project>

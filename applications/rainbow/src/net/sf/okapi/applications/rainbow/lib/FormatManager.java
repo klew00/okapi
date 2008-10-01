@@ -37,7 +37,6 @@ public class FormatManager {
 		aRes[1] = null; 
 		String sExt = Utils.getExtension(p_sPath).toLowerCase();
 		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";
-		else if ( sExt.equals(".json") ) aRes[1] = "okf_json";
 		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
 		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
 		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
