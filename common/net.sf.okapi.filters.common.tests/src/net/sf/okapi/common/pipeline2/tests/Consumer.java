@@ -29,7 +29,6 @@ import net.sf.okapi.common.pipeline2.PipelineReturnValue;
 import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
 
 /**
- * @author HargraveJE
  * 
  */
 public class Consumer extends BasePipelineStep implements IConsumer {
