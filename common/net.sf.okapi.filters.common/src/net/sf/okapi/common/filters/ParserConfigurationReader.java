@@ -57,6 +57,7 @@ public class ParserConfigurationReader  {
 		}		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Map getRule(String ruleName) {
 		return (Map)config.get(ruleName);
 	}
@@ -69,6 +70,7 @@ public class ParserConfigurationReader  {
 		config.setProperty(property, value);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void addRule(String ruleName, Map rule) {
 		config.putAll(rule);
 	}
