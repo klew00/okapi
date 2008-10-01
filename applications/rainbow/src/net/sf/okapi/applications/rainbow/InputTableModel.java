@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -45,11 +45,14 @@ class InputTableModel {
 	}
 	
 	/**
-	 * Refresh the items iun the table, ans optionally, select some of them.
+	 * Refresh the items in the table, and optionally, select some of them.
 	 * @param selection The list of the indices of the items to select after refresh,
 	 * or null to use the specified index.
+	 * @param index The index to select.
 	 */
-	void updateTable (int[] selection) {
+	void updateTable (int[] selection,
+		int index)
+	{
 		table.removeAll();
 		for ( Input inp : inputList ) {
 			TableItem item = new TableItem(table, SWT.NONE);
@@ -57,8 +60,16 @@ class InputTableModel {
 			item.setText(1, inp.filterSettings);
 		}
 		if ( selection == null ) {
-			if ( table.getItemCount() > 0 )
-				table.setSelection(0);
+			if ( table.getItemCount() > 0 ) {
+				if ( index > -1 ) {
+					if ( index > table.getItemCount()-1 ) {
+						index = table.getItemCount()-1;
+					}
+				}
+				else index = 0;
+				table.setSelection(index);
+			}
+			// Else: nothing to select	
 		}
 		else table.setSelection(selection);
 	}

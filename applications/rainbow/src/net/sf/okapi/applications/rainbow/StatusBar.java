@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 
 class StatusBar extends Composite {
 
+	private CLabel      counterLabel;
 	private CLabel      infoLabel;
 	
 	StatusBar (Composite p_Parent,
@@ -41,11 +42,17 @@ class StatusBar extends Composite {
 		gdTmp.horizontalSpan = 3;
 		setLayoutData(gdTmp);
 		
-		GridLayout layout = new GridLayout();
+		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
+		layout.horizontalSpacing = 2;
 		setLayout(layout);
 		
+		counterLabel = new CLabel(this, SWT.BORDER | SWT.CENTER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 100;
+		counterLabel.setLayoutData(gdTmp);
+
 		infoLabel = new CLabel(this, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		infoLabel.setLayoutData(gdTmp);
@@ -57,5 +64,12 @@ class StatusBar extends Composite {
 	
 	void clearInfo () {
 		infoLabel.setText("");
+	}
+	
+	void setCounter (int current,
+		int total)
+	{
+		if ( current < 0 ) counterLabel.setText("");
+		else counterLabel.setText(String.format("%d / %d", current+1, total));
 	}
 }

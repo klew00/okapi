@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -846,7 +846,9 @@ public class MainForm implements IParametersProvider {
 		if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
 			currentInput = tabFolder.getSelectionIndex();
 		}
-		else currentInput = -1;
+		else {
+			currentInput = -1;
+		}
 		updateCommands();
 		updateInputRoot();
 		miInput.setEnabled(currentInput!=-1);
@@ -856,7 +858,7 @@ public class MainForm implements IParametersProvider {
 	private void buildInputTab (int index,
 		Composite comp)
 	{
-		Table table = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		final Table table = new Table(comp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
@@ -882,6 +884,12 @@ public class MainForm implements IParametersProvider {
 					removeDocuments(-1);
 				}
 			}
+		});
+		table.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				statusBar.setCounter(table.getSelectionIndex(),
+					table.getItemCount());
+            }
 		});
 
 		InputTableModel model = new InputTableModel();
@@ -1079,8 +1087,14 @@ public class MainForm implements IParametersProvider {
 	private void updateCommands () {
 		boolean enabled = (( currentInput > -1 ) && ( currentInput < inputTables.size() ));
 		if ( enabled ) {
-			enabled = (inputTables.get(currentInput).getItemCount() > 0);
+			int total = inputTables.get(currentInput).getItemCount();
+			enabled = ( total > 0);
+			statusBar.setCounter(inputTables.get(currentInput).getSelectionIndex(), total);
 		}
+		else {
+			statusBar.setCounter(-1, 0);
+		}
+
 		miEditInputProperties.setEnabled(enabled);
 		cmiEditInputProperties.setEnabled(enabled);
 		miOpenInputDocument.setEnabled(enabled);
@@ -1255,7 +1269,7 @@ public class MainForm implements IParametersProvider {
 
 	private void setSurfaceData () {
 		for ( InputTableModel model : inputTableMods ) {
-			model.updateTable(null);
+			model.updateTable(null, 0);
 		}
 		
 		//TODO: select the list to build output 
@@ -1329,7 +1343,7 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMods.get(currentInput).updateTable(null);
+			inputTableMods.get(currentInput).updateTable(null, 0);
 			updateCommands();
 			stopWaiting();
 		}
@@ -1406,7 +1420,7 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMods.get(currentInput).updateTable(table.getSelectionIndices());
+			inputTableMods.get(currentInput).updateTable(table.getSelectionIndices(), 0);
 			stopWaiting();
 		}
 	}
@@ -1543,6 +1557,7 @@ public class MainForm implements IParametersProvider {
 			Table table = inputTables.get(currentInput);
 			if ( index < 0 ) {
 				int[] indices = table.getSelectionIndices();
+				index = indices[0];
 				for ( int i=0; i<indices.length; i++ ) {
 					inp = prj.getItemFromRelativePath(currentInput, table.getItem(indices[i]).getText(0));
 					prj.getList(currentInput).remove(inp);
@@ -1559,7 +1574,7 @@ public class MainForm implements IParametersProvider {
 		}
 		finally {
 			if ( refresh ) {
-				inputTableMods.get(currentInput).updateTable(null);
+				inputTableMods.get(currentInput).updateTable(null, index);
 				updateCommands();
 				stopWaiting();
 			}
@@ -1590,7 +1605,7 @@ public class MainForm implements IParametersProvider {
 			for ( int i=0; i<indices.length; i++ ) {
 				indices[i] = indices[i]-1;
 			}
-			inputTableMods.get(currentInput).updateTable(indices);
+			inputTableMods.get(currentInput).updateTable(indices, 0);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1621,7 +1636,7 @@ public class MainForm implements IParametersProvider {
 			for ( int i=0; i<indices.length; i++ ) {
 				indices[i] = indices[i]+1;
 			}
-			inputTableMods.get(currentInput).updateTable(indices);
+			inputTableMods.get(currentInput).updateTable(indices, 0);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
