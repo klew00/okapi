@@ -36,7 +36,7 @@
 		<mkdir dir="${dist-bin}"/>
  	</target>
 
-	<target name="all" depends="init"> 
+	<target name="compile" depends="init"> 
 		<ant antfile="build_common.xml" inheritAll="false"/>
 		<ant antfile="build_filters.common.xml" inheritAll="false"/>
 		<ant antfile="build_filters.properties.xml" inheritAll="false"/>
@@ -82,7 +82,19 @@
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
-
+		
 	</target>
+
+	<target name="zipAll" unless="is_gtk2-linux-x86">
+		<zip destfile="${dist}/rainbow_${platform}.zip" basedir="${dist}"/>
+	</target>
+
+	<target name="gzipAll" if="is_gtk2-linux-x86">
+		<tar destfile="${dist}/rainbow_${platform}.tar" basedir="${dist}"/>
+		<gzip destfile="${dist}/rainbow_${platform}.tar.gz" src="${dist}/rainbow_${platform}.tar"/>
+		<delete file="${dist}/rainbow_${platform}.tar"/>
+	</target>
+	
+	<target name="all" depends="compile, zipAll, gzipAll"/>
 
 </project>
