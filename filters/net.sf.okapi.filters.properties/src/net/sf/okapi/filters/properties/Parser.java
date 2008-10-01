@@ -52,6 +52,7 @@ public class Parser implements IParser {
 	
 	protected Resource       resource;
 	
+	private SkeletonUnit     lbSkel;
 	private int              nextAction;
 	private IContainable     currentRes;
 	private BufferedReader   reader;
@@ -65,6 +66,7 @@ public class Parser implements IParser {
 	private Pattern          keyConditionPattern;
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private boolean          stop;
+	private String           lineBreak;
 
 	public Parser () {
 		resource = new Resource();
@@ -97,8 +99,8 @@ public class Parser implements IParser {
 				new InputStreamReader(bis, bis.detectEncoding()));
 			
 			// Initializes the variables
-			resource.endingLB = true;
-			resource.lineBreak = "\n"; //TODO: Auto-detection of line-break type
+			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
+			lbSkel = new SkeletonUnit("after", lineBreak); 
 			itemID = 0;
 			sklID = 0;
 			lineNumber = 0;
@@ -198,10 +200,6 @@ public class Parser implements IParser {
 
 			while ( true ) {
 				if ( !getNextLine() ) {
-					if ( !resource.sklRes.isEmpty() ) {
-						// Some data still to pass along
-						resource.endingLB = false; // No ending line-break;
-					}
 					return RESULT_END;
 				}
 				// Else: process the line
@@ -216,7 +214,7 @@ public class Parser implements IParser {
 					// Empty lines
 					if ( tmp.length() == 0 ) {
 						resource.sklRes.appendData(textLine);
-						resource.sklRes.appendData(resource.lineBreak);
+						resource.sklRes.appendData(lineBreak);
 						continue;
 					}
 
@@ -230,7 +228,7 @@ public class Parser implements IParser {
 					if ( isComment ) {
 						resource.params.locDir.process(tmp);
 						resource.sklRes.appendData(textLine);
-						resource.sklRes.appendData(resource.lineBreak);
+						resource.sklRes.appendData(lineBreak);
 						continue;
 					}
 
@@ -340,12 +338,14 @@ public class Parser implements IParser {
 						keyBuffer.append(textLine.substring(0, startText));
 					}
 					resource.sklRes.appendData(keyBuffer);
+					// Line-break
+					item.setSkeletonAfter(lbSkel);
 				}
 				else {
 					resource.sklRes.appendData(keyBuffer);
 					resource.sklRes.appendData(textBuffer);
 					resource.sklRes.appendData(textLine);
-					resource.sklRes.appendData(resource.lineBreak);
+					resource.sklRes.appendData(lineBreak);
 					return RESULT_DATA;
 				}
 

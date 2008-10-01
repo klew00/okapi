@@ -27,8 +27,6 @@ public class Resource extends net.sf.okapi.common.resource.Document {
 
 	private static final long serialVersionUID = 1L;
 
-	protected boolean        endingLB;
-	protected String         lineBreak;
 	protected SkeletonUnit   sklRes;
 	protected Parameters     params;
 	

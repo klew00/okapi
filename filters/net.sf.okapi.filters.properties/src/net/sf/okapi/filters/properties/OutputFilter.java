@@ -75,7 +75,9 @@ public class OutputFilter implements IOutputFilter {
 			else {
 				writer.write(escape(item.getSource().toString()));
 			}
-			if ( res.endingLB ) writer.write(res.lineBreak);
+			if ( item.getSkeletonAfter() != null ) {
+				writer.write(item.getSkeletonAfter().toString());
+			}
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
