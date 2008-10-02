@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 The Okapi framework contributors                       */
+/* Copyright (C) 2008 by the Okapi framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -82,7 +82,6 @@ public class Util {
 	 * @param text The full caption where to take the name from.
 	 * @return The name of the application.
 	 */
-	//TODO: Move to the UI library maybe (when there is one)
 	static public String getNameInCaption (String text) {
 		int n = text.indexOf("- ");
 		if ( n > -1 ) return text.substring(n+1);

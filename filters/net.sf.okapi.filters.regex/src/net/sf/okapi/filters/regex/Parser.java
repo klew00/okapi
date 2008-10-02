@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -157,7 +158,7 @@ public class Parser implements IParser {
 			nextAction = -1;
 
 			//For test
-		//	tempSetHCRules();
+			//tempSetHCRules();
 			
 			// Prepare the filter rules
 			resource.params.compileRules();
@@ -171,11 +172,17 @@ public class Parser implements IParser {
 	}
 	
 	public void open (CharSequence input) {
-		// TODO open(CharSequence input)
+		//TODO: Check for better solution, going from char to byte to read char is just not good
+		open(new ByteArrayInputStream(input.toString().getBytes())); 
 	}
 
 	public void open (URL input) {
-		// TODO open(URL input)
+		try { //TODO: Make sure this is actually working (encoding?, etc.)
+			open(input.openStream());
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public IContainable getResource() {
@@ -188,7 +195,6 @@ public class Parser implements IParser {
 			return ParserTokenType.ENDINPUT;
 		}
 		
-		//TODO: process outerString if needed for each skeleton part
 		switch ( nextAction ) {
 		case NEXTACTION_TRANSUNIT:
 			nextAction = -1;

@@ -275,7 +275,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btRemove = new Button(cmpButtons, SWT.PUSH);
-		btRemove.setText("Remove...");
+		btRemove.setText("Remove");
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
