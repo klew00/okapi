@@ -200,6 +200,7 @@ public class Aligner {
 		layout.marginWidth = 0;
 		cmpOptions.setLayout(layout);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
 		cmpOptions.setLayoutData(gdTmp);
 		
 		chkSyncScrolling = new Button(cmpOptions, SWT.CHECK);
@@ -212,7 +213,7 @@ public class Aligner {
 		});
 		
 		chkShowInlineCodes = new Button(cmpOptions, SWT.CHECK);
-		chkShowInlineCodes.setText("Display generic inline codes");
+		chkShowInlineCodes.setText("Display in-line codes with generic markers");
 		chkShowInlineCodes.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				fillSourceList(srcList.getSelectionIndex());
@@ -234,7 +235,7 @@ public class Aligner {
 		layout.marginWidth = 0;
 		cmpButtons.setLayout(layout);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 2;
 		cmpButtons.setLayoutData(gdTmp);
 
 		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
@@ -381,7 +382,7 @@ public class Aligner {
 		shell.setMinimumSize(shell.getSize());
 		Point startSize = shell.getMinimumSize();
 		if ( startSize.x < 700 ) startSize.x = 700; 
-		if ( startSize.y < 600 ) startSize.y = 600; 
+		if ( startSize.y < 700 ) startSize.y = 700; 
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}

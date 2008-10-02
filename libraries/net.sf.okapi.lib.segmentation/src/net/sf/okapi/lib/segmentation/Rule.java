@@ -45,6 +45,7 @@ public class Rule {
 		else this.after = after;
 		
 		this.isBreak = isBreak;
+		isActive = true;
 	}
 	
 	public String getBefore () {

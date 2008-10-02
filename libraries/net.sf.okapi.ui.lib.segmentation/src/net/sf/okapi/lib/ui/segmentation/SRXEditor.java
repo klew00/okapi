@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.filters.GenericContent;
@@ -93,8 +94,7 @@ public class SRXEditor {
 	private Pattern          patternOpening;
 	private Pattern          patternClosing;
 	private Pattern          patternPlaceholder;
-	private Font             sampleFont; 
-	
+	private Font             sampleFont;
 
 	@Override
 	protected void finalize () {
@@ -215,7 +215,7 @@ public class SRXEditor {
 		rulesTableMod.linkTable(tblRules);
 		
 		Composite cmpGroup = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(5, true);
+		layTmp = new GridLayout(6, true);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		cmpGroup.setLayout(layTmp);
@@ -283,6 +283,18 @@ public class SRXEditor {
 			}
 		});
 
+		Button btCharInfo = new Button(cmpGroup, SWT.PUSH);
+		btCharInfo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btCharInfo.setText("Char Info...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = ruleButtonsWidth;
+		btCharInfo.setLayoutData(gdTmp);
+		btCharInfo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				showCharInfo();
+			}
+		});
+
 		
 		//--- Sample block
 
@@ -291,7 +303,7 @@ public class SRXEditor {
 		cmpSample.setLayout(new GridLayout(3, false));
 		
 		label = new Label(cmpSample, SWT.None);
-		label.setText("Sample text (use <x>...</x> and <x/> for inline codes):");
+		label.setText("Sample text (use <x>...</x> and <x/> to represent in-line codes):");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 3;
 		label.setLayoutData(gdTmp);
@@ -400,7 +412,22 @@ public class SRXEditor {
 			sampleFont = null;
 		}
 	}
-	
+
+	private void showCharInfo () {
+		try {
+			CharacterInfoDialog charInfoDlg = new CharacterInfoDialog(shell, "Character Information", null);
+			int codePoint = 225;
+			String tmp = edSampleText.getSelectionText();
+			if ( tmp.length() > 0 ) {
+				codePoint = tmp.codePointAt(0);
+			}
+			charInfoDlg.showDialog(codePoint);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
 	private void setFileMenu (Shell shell,
 		Button fileButton)
 	{
