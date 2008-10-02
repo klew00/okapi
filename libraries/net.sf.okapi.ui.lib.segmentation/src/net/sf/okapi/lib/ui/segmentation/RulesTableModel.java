@@ -54,6 +54,7 @@ class RulesTableModel {
 		if ( list == null ) return;
 		for ( Rule rule : list ) {
 			TableItem item = new TableItem(table, SWT.NONE);
+			item.setChecked(rule.isActive());
 			item.setText(0, rule.isBreak() ? "Break" : "No-Break");
 			item.setText(1, rule.getBefore());
 			item.setText(2, rule.getAfter());

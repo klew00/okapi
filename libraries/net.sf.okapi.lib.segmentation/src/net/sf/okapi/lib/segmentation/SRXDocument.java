@@ -421,10 +421,12 @@ public class SRXDocument {
 		}
 		ArrayList<Rule> langRule = langRules.get(ruleName);
 		for ( Rule rule : langRule ) {
-			segmenter.addRule(
-				// The compiled rule is made of two groups: the pattern before and the pattern after
-				// the break. A special pattern for in-line codes is also added transparently.
-				new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
+			if ( rule.isActive ) {
+				segmenter.addRule(
+					// The compiled rule is made of two groups: the pattern before and the pattern after
+					// the break. A special pattern for in-line codes is also added transparently.
+					new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
+			}
 		}
 	}
 	
@@ -487,8 +489,6 @@ public class SRXDocument {
 			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
 			tmp = elem1.getAttribute("cascade");
 			if ( tmp.length() > 0 ) cascade = "yes".equals(tmp);
-			tmp = elem1.getAttributeNS(NSURI_OKPSRX, "oneSegmentIncludesAll");
-			if ( tmp.length() > 0 ) oneSegmentIncludesAll = "yes".equals(tmp);
 
 			// formathandle elements
 			NodeList list2 = elem1.getElementsByTagNameNS(ns, "formathandle");
@@ -509,8 +509,15 @@ public class SRXDocument {
 				}
 			}
 			
-			// Extensions
-			Element elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "sample", elem1);
+			// Extension: options
+			Element elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "options", elem1);
+			if ( elem2 != null ) {
+				tmp = elem2.getAttribute("oneSegmentIncludesAll");
+				if ( tmp.length() > 0 ) oneSegmentIncludesAll = "yes".equals(tmp);
+			}
+
+			// Extension: sample
+			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "sample", elem1);
 			if ( elem2 != null ) {
 				setSampleText(elem2.getTextContent());
 				tmp = elem2.getAttribute("language");
@@ -537,6 +544,8 @@ public class SRXDocument {
 					Rule newRule = new Rule();
 					tmp = elem4.getAttribute("break");
 					if ( tmp.length() > 0 ) newRule.isBreak = "yes".equals(tmp);
+					tmp = elem4.getAttributeNS(NSURI_OKPSRX, "active");
+					if ( tmp.length() > 0 ) newRule.isActive = "yes".equals(tmp);
 					Element elem5 = getFirstElementByTagNameNS(ns, "beforebreak", elem4);
 					if ( elem5 != null ) newRule.before = elem5.getTextContent();
 					elem5 = getFirstElementByTagNameNS(ns, "afterbreak", elem4);
@@ -596,7 +605,9 @@ public class SRXDocument {
 	 * Saves the current rules to an SRX rules file.
 	 * @param rulesPath The full path of the file where to save the rules.
 	 */
-	public void saveRules (String rulesPath) {
+	public void saveRules (String rulesPath,
+		boolean saveRulesExtraInfo)
+	{
 		XMLWriter writer = null;
 		try {
 			writer = new XMLWriter();
@@ -613,8 +624,6 @@ public class SRXDocument {
 			writer.writeStartElement("header");
 			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
 			writer.writeAttributeString("cascade", (cascade ? "yes": "no"));
-			writer.writeAttributeString(NSPREFIX_OKPSRX+":oneSegmentIncludesAll",
-				(oneSegmentIncludesAll ? "yes" : "no"));
 			writer.writeLineBreak();
 
 			writer.writeStartElement("formathandle");
@@ -632,12 +641,17 @@ public class SRXDocument {
 			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
 			writer.writeEndElementLineBreak(); // formathandle
 			
+			writer.writeStartElement(NSPREFIX_OKPSRX+":options");
+			writer.writeAttributeString("oneSegmentIncludesAll",
+				(oneSegmentIncludesAll ? "yes" : "no"));
+			writer.writeEndElementLineBreak(); // okpsrx:options
+
 			writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
 			writer.writeAttributeString("language", getSampleLanguage());
 			writer.writeAttributeString("useMappedRules", (sampleOnMappedRules() ? "yes" : "no"));
 			writer.writeString(getSampleText());
 			writer.writeEndElementLineBreak(); // okpsrx:sample
-			
+
 			writer.writeEndElementLineBreak(); // header
 
 			writer.writeStartElement("body");
@@ -653,6 +667,11 @@ public class SRXDocument {
 				for ( Rule rule : langRule ) {
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
+					// Start of non-standard SRX 2.0 (non-SRX attributes not allowed)
+					if ( saveRulesExtraInfo ) {
+						writer.writeAttributeString(NSPREFIX_OKPSRX+":active", (rule.isActive ? "yes" : "no"));
+					}
+					// End of non-Standard SRX
 					writer.writeLineBreak();
 					writer.writeElementString("beforebreak", rule.before);
 					writer.writeLineBreak();					

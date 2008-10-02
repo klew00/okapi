@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
@@ -171,7 +172,7 @@ public class SRXEditor {
 			}}
 		});
 		
-		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
+		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.CHECK);
 		tblRules.setHeaderVisible(true);
 		tblRules.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -182,7 +183,7 @@ public class SRXEditor {
 		    public void controlResized(ControlEvent e) {
 		    	Rectangle rect = tblRules.getClientArea();
 				//TODO: Check behavior when manual resize a column width out of client area
-		    	int typeColWidth = 60;
+		    	int typeColWidth = 75;
 				int nHalf = (int)((rect.width-typeColWidth) / 2);
 				tblRules.getColumn(0).setWidth(typeColWidth);
 				tblRules.getColumn(1).setWidth(nHalf);
@@ -198,9 +199,18 @@ public class SRXEditor {
 		});
 		tblRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				if (e.detail == SWT.CHECK) {
+					int n = tblRules.getSelectionIndex();
+					if ( n < 1 ) return;
+					String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
+					srxDoc.getLanguageRules(ruleName).get(n).setIsActive(((TableItem)e.item).getChecked());
+					srxDoc.setIsModified(true);
+					updateResults(true);
+				}
 				updateRulesButtons();
 			};
 		});
+		
 		rulesTableMod = new RulesTableModel();
 		rulesTableMod.linkTable(tblRules);
 		
@@ -661,7 +671,8 @@ public class SRXEditor {
 				if ( path == null ) return false;
 			}
 			getSurfaceData();
-			srxDoc.saveRules(path);
+			// Save, but not the rules extra info: active/non-active (not standard) 
+			srxDoc.saveRules(path, false);
 			srxPath = path;
 			updateCaption();
 		}

@@ -25,12 +25,13 @@ public class Rule {
 	protected String    before;
 	protected String    after;
 	protected boolean   isBreak;
-	
+	protected boolean   isActive;
 	
 	public Rule () {
 		before = "";
 		after = "";
 		isBreak = false;
+		isActive = true;
 	}
 	
 	public Rule (String before,
@@ -68,5 +69,13 @@ public class Rule {
 	
 	public void setIsBreak (boolean value) {
 		isBreak = value;
+	}
+	
+	public boolean isActive () {
+		return isActive;
+	}
+	
+	public void setIsActive (boolean value) {
+		isActive = value;
 	}
 }
