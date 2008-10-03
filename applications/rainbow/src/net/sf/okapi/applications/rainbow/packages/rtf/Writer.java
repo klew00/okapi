@@ -34,6 +34,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -120,11 +121,10 @@ public class Writer extends BaseWriter {
 
 		// Output the text unit
 		
-		if ( item.getSkeletonBefore() != null ) {
+/*		if ( item.getSkeletonBefore() != null ) {
 			writer.write(Util.escapeToRTF(item.getSkeletonBefore().toString(),
 				true, 1, outputEncoder));
 		}
-		
 		StringBuilder tmp = new StringBuilder();
 		tmp.append(Util.RTF_ENDCODE);
 		if ( item.hasTarget() ) {
@@ -141,6 +141,52 @@ public class Writer extends BaseWriter {
 			writer.write(Util.escapeToRTF(item.getSkeletonAfter().toString(),
 				true, 1, outputEncoder));
 		}
+*/
+
+		StringBuilder tmp = new StringBuilder();
+		tmp.append(Util.RTF_ENDCODE);
+		TextUnit tu;
+		if ( item.hasChild() ) {
+			for ( IContainable part : item.childUnitIterator() ) {
+				if ( part instanceof TextUnit ) {
+					tu = (TextUnit)part;
+					if ( tu.hasTarget() ) {
+						//TODO
+					}
+					else {
+						processContent(tu.getSourceContent(), tmp,
+							tu.getSourceContent().isSegmented());
+					}
+				}
+				else if ( part instanceof SkeletonUnit ) {
+					if ( SkeletonUnit.MAINTEXT.equals(part.getID()) ) {
+						if ( item.hasTarget() ) {
+							//TODO
+						}
+						else {
+							processContent(item.getSourceContent(), tmp,
+								item.getSourceContent().isSegmented());
+						}
+					}
+					else {
+						writer.write(Util.escapeToRTF(part.toString(),
+							true, 1, outputEncoder));
+					}
+				}
+			}
+		}
+		else {
+			if ( item.hasTarget() ) {
+				//TODO
+			}
+			else {
+				processContent(item.getSourceContent(), tmp,
+					item.getSourceContent().isSegmented());
+			}
+			
+		}
+		tmp.append(Util.RTF_STARTCODE);
+		writer.write(tmp.toString());
 	}
 
 	private String processContent (TextFragment content,

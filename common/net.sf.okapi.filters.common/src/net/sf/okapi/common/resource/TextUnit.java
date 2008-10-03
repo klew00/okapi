@@ -47,7 +47,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected boolean                       preserveWS;
 	protected SkeletonUnit                  sklBefore;
 	protected SkeletonUnit                  sklAfter;
-	protected ArrayList<ITranslatable>      children;
+	protected ArrayList<IContainable>      children;
 	protected ITranslatable                 parent;
 	protected LocaleData                    source;
 	protected ArrayList<LocaleData>         targets;
@@ -191,36 +191,36 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * in a HTML paragraph. 
 	 * @return The skeleton unit before the resource or null.
 	 */
-	public SkeletonUnit getSkeletonBefore () {
-		return sklBefore;
-	}
+//	public SkeletonUnit getSkeletonBefore () {
+//		return sklBefore;
+//	}
 	
 	/**
 	 * Sets the skeleton unit just before the resource. For example a "<p>"
 	 * in a HTML paragraph. 
 	 * @param value The skeleton unit to set.
 	 */
-	public void setSkeletonBefore (SkeletonUnit value) {
-		sklBefore = value;
-	}
+//	public void setSkeletonBefore (SkeletonUnit value) {
+//		sklBefore = value;
+//	}
 
 	/**
 	 * Gets the skeleton unit just after the resource. For example a "</p>"
 	 * in a HTML paragraph. 
 	 * @return The skeleton unit after the resource or null.
 	 */
-	public SkeletonUnit getSkeletonAfter () {
-		return sklAfter;
-	}
+//	public SkeletonUnit getSkeletonAfter () {
+//		return sklAfter;
+//	}
 	
 	/**
 	 * Sets the skeleton unit just after the resource. For example a "</p>"
 	 * in a HTML paragraph. 
 	 * @param value The skeleton unit to set.
 	 */
-	public void setSkeletonAfter (SkeletonUnit value) {
-		sklAfter = value;
-	}
+//	public void setSkeletonAfter (SkeletonUnit value) {
+//		sklAfter = value;
+//	}
 
 	/**
 	 * Gets the source object of the resource.
@@ -322,9 +322,9 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Adds a child resource to the resource.
 	 * @param child The child resource to add.
 	 */
-	public void addChild (ITranslatable child) {
+	public void addChild (IContainable child) {
 		if ( children == null ) {
-			children = new ArrayList<ITranslatable>();
+			children = new ArrayList<IContainable>();
 		}
 		child.setParent(this);
 		children.add(child);
@@ -339,9 +339,9 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	 * Gets the list of all the children of the resource.
 	 * @return The list of all the children of the resource.
 	 */
-	public List<ITranslatable> getChildren () {
+	public List<IContainable> getChildren () {
 		if ( children == null ) {
-			children = new ArrayList<ITranslatable>();
+			children = new ArrayList<IContainable>();
 		}
 		return children;
 	}
@@ -356,8 +356,8 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		if ( parent instanceof TextUnit ) {
 			allUnits.add((TextUnit)parent);
 			if ( parent.hasChild() ) {
-				for ( ITranslatable item : ((TextUnit)parent).getChildren() ) {
-					storeTextUnits(item);
+				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
+					storeTextUnits((ITranslatable)item);
 				}
 			}
 			return;
@@ -371,6 +371,34 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 			}
 		}
 	}
+
+	private void storeUnits (ArrayList<IContainable> list,
+		IContainable unit)
+	{
+		// Check if it's a TextUnit
+		if ( unit instanceof TextUnit ) {
+			list.add(unit);
+			if ( ((TextUnit)unit).hasChild() ) {
+				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
+					storeUnits(list, item);
+				}
+			}
+			return;
+		}
+		else if ( unit instanceof SkeletonUnit ) {
+			list.add(unit);
+			return;
+		}
+		// Else: it is a Group
+		if ( parent.hasChild() ) {
+			for ( IContainable item : (Group)unit ) {
+				if ( item instanceof ITranslatable ) { 
+					storeUnits(list, item);
+				}
+			}
+		}
+	}
+	
 	
 	/**
 	 * Gets the child object with a given ID.
@@ -396,11 +424,31 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		if ( hasChild() ) {
 			// Children only
 			for ( int i=0; i<children.size(); i++ ) {
-				storeTextUnits(getChildren().get(i));
+				// Skip over skeleton units
+				if ( getChildren().get(i) instanceof SkeletonUnit ) continue;
+				storeTextUnits((ITranslatable)getChildren().get(i));
 			}
 		}
 		return Collections.unmodifiableList(allUnits);
 	}
+
+	/**
+	 * Creates an iteratable flattened list of all children TextUnit and SkeletonUnit
+	 * objects for this TextUnit.
+	 * @return An iteratable flattened list of all children TextUnit and SkeletonUnit
+	 * objects.
+	 */
+	public Iterable<IContainable> childUnitIterator () {
+		ArrayList<IContainable> unitList = new ArrayList<IContainable>();
+		if ( hasChild() ) {
+			// Children only
+			for ( int i=0; i<children.size(); i++ ) {
+				storeUnits(unitList, getChildren().get(i));
+			}
+		}
+		return Collections.unmodifiableList(unitList);
+	}
+	
 	
 	/**
 	 * Finds the child of this text unit that corresponds to the given ID.
@@ -414,11 +462,11 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	{
 		if ( parent instanceof TextUnit ) {
 			if ( parent.hasChild() ) {
-				for ( ITranslatable item : ((TextUnit)parent).children ) {
+				for ( IContainable item : ((TextUnit)parent).children ) {
 					if ( id.equals(item.getID()) ) {
-						return item;
+						return (ITranslatable)item;
 					}
-					ITranslatable res = findChild(item, id);
+					ITranslatable res = findChild((ITranslatable)item, id);
 					if ( res != null ) return res;
 				}
 			}

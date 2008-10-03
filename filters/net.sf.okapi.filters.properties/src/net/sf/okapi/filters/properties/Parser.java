@@ -339,7 +339,9 @@ public class Parser implements IParser {
 					}
 					resource.sklRes.appendData(keyBuffer);
 					// Line-break
-					item.setSkeletonAfter(lbSkel);
+					//item.setSkeletonAfter(lbSkel);
+					item.addChild(new SkeletonUnit(SkeletonUnit.MAINTEXT, ""));
+					item.addChild(lbSkel);
 				}
 				else {
 					resource.sklRes.appendData(keyBuffer);

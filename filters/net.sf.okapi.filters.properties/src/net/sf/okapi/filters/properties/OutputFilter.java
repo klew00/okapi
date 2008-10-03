@@ -31,6 +31,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -68,16 +69,42 @@ public class OutputFilter implements IOutputFilter {
 
 	public void endExtractionItem (TextUnit item) {
 		try {
-			// Then write the item content
-			if ( item.hasTarget() ) {
-				writer.write(escape(item.getTarget().toString()));
+			if ( item.hasChild() ) {
+				TextUnit tu;
+				for ( IContainable part : item.childUnitIterator() ) {
+					if ( part instanceof TextUnit ) {
+						tu = (TextUnit)part;
+						if ( tu.hasTarget() ) {
+							writer.write(escape(tu.getTarget().toString()));
+						}
+						else {
+							writer.write(escape(tu.getSource().toString()));
+						}
+					}
+					else if ( part instanceof SkeletonUnit ) {
+						if ( SkeletonUnit.MAINTEXT.equals(part.getID()) ) {
+							if ( item.hasTarget() ) {
+								writer.write(escape(item.getTarget().toString()));
+							}
+							else {
+								writer.write(escape(item.getSource().toString()));
+							}
+						}
+						else writer.write(part.toString());
+					}
+				}
 			}
 			else {
-				writer.write(escape(item.getSource().toString()));
+				if ( item.hasTarget() ) {
+					writer.write(escape(item.getTarget().toString()));
+				}
+				else {
+					writer.write(escape(item.getSource().toString()));
+				}
 			}
-			if ( item.getSkeletonAfter() != null ) {
-				writer.write(item.getSkeletonAfter().toString());
-			}
+//			if ( item.getSkeletonAfter() != null ) {
+//				writer.write(item.getSkeletonAfter().toString());
+//			}
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

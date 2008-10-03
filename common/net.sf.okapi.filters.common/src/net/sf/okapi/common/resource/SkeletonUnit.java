@@ -22,10 +22,12 @@ package net.sf.okapi.common.resource;
 
 public class SkeletonUnit implements IContainable {
 
+	public static String     MAINTEXT = "$mainText$";
 	private StringBuilder    data;
 	protected String         id;
 	private long             offset;
 	private int              length;
+	protected ITranslatable  parent;
 
 
 	/**
@@ -151,4 +153,13 @@ public class SkeletonUnit implements IContainable {
 	public void addToLength (int length) {
 		this.length += length;
 	}
+
+	public ITranslatable getParent () {
+		return parent;
+	}
+
+	public void setParent (ITranslatable value) {
+		parent = value;
+	}
+
 }
