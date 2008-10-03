@@ -79,16 +79,28 @@ public class HtmlFilterConfiguration {
 		return false;
 	}
 
+	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
+
+	}
+
+	public boolean isLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("localizableAttributes", elementName, attribute, attributes);
+
+	}
+
 	@SuppressWarnings("unchecked")
-	public boolean isTranslatableAttribute(Map<String, Object> elementRule, String attribute, Attributes attributes) {
+	private boolean isActionableAttribute(String type, String elementName, String attribute,
+			Map<String, String> attributes) {
+		Map elementRule = configReader.getRule(elementName);
 		if (elementRule == null) {
 			return false;
 		}
 
-		Object ta = elementRule.get("translatableAttributes");
+		Object ta = elementRule.get(type);
 		if (ta instanceof List) {
-			List translatableAttributes = (List) elementRule.get("translatableAttributes");
-			for (Iterator<String> i = translatableAttributes.iterator(); i.hasNext();) {
+			List actionableAttributes = (List) elementRule.get(type);
+			for (Iterator<String> i = actionableAttributes.iterator(); i.hasNext();) {
 				String a = i.next();
 				if (a.equals(attribute)) {
 					return true;
@@ -96,9 +108,9 @@ public class HtmlFilterConfiguration {
 			}
 
 		} else if (ta instanceof Map) {
-			Map translatableAttributes = (Map) elementRule.get("translatableAttributes");
-			if (translatableAttributes.containsKey(attribute)) {
-				List condition = (List) translatableAttributes.get(attribute);
+			Map actionableAttributes = (Map) elementRule.get(type);
+			if (actionableAttributes.containsKey(attribute)) {
+				List condition = (List) actionableAttributes.get(attribute);
 				// case where there is no condition applied to attribute
 				if (condition == null) {
 					return true;
@@ -114,7 +126,7 @@ public class HtmlFilterConfiguration {
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean applyConditions(List<?> condition, String attribute, Attributes attributes) {
+	private boolean applyConditions(List<?> condition, String attribute, Map<String, String> attributes) {
 		// attribute that must have conditional value
 		String conditionalAttribute = (String) condition.get(0);
 
@@ -126,7 +138,7 @@ public class HtmlFilterConfiguration {
 			List conditionValues = (List) condition.get(2);
 			for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
 				String value = i.next();
-				if (applyCondition(attributes.getValue(conditionalAttribute), compareType, value)) {
+				if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
 					return true;
 				}
 			}
@@ -134,7 +146,7 @@ public class HtmlFilterConfiguration {
 		// single condition
 		else if (condition.get(2) instanceof String) {
 			String conditionValue = (String) condition.get(2);
-			return applyCondition(attributes.getValue(conditionalAttribute), compareType, conditionValue);
+			return applyCondition(attributes.get(conditionalAttribute), compareType, conditionValue);
 		} else {
 			throw new RuntimeException("Error reading attributes from config file");
 		}

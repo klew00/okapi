@@ -18,7 +18,7 @@
 /*===========================================================================*/
 package net.sf.okapi.filters.html.tests;
 
-
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -26,17 +26,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import net.sf.okapi.common.filters.ParserConfigurationReader;
+import net.sf.okapi.filters.html.HtmlFilterConfiguration;
 
 /**
  * @author HargraveJE
  *
  */
 public class HtmlConfigurationTest {
-
-	/**
-	 * @throws java.lang.Exception
-	 */
+	
 	@Before
 	public void setUp() throws Exception {
 		
@@ -44,8 +41,24 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void defaultConfiguration() {		
-		ParserConfigurationReader rules = new ParserConfigurationReader("/net/sf/okapi/filters/html/defaultConfiguration.groovy");					
-		Map rule = rules.getRule("a");		
-		rule = rules.getRule("img");		
+		HtmlFilterConfiguration rules = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");	
+		assertEquals(rules.getMainRuleType("title"), HtmlFilterConfiguration.RULE_TYPE.ATTRIBUTE);
+		assertEquals(rules.getMainRuleType("abbr"), HtmlFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
+		assertEquals(rules.getMainRuleType("area"), HtmlFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
+		assertEquals(rules.getMainRuleType("script"), HtmlFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);
+		assertEquals(rules.getMainRuleType("pre"), HtmlFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.put("http-equiv", "keywords");		
+		assertTrue(rules.isTranslatableAttribute("meta", "content", attributes));
+		assertFalse(rules.isTranslatableAttribute("dummy", "content", attributes));
+		
+		attributes.clear();
+		attributes.put("http-equiv", "content-language");
+		assertTrue(rules.isLocalizableAttribute("meta", "content", attributes));
+
+		attributes.clear();
+		attributes.put("http-equiv", "content-type");
+		assertTrue(rules.isLocalizableAttribute("meta", "content", attributes));
 	}
 }

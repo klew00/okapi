@@ -30,6 +30,11 @@ EQUALS = 1
 NOT_EQUALS = 2 
 MATCH = 3 // regex match. Must match the entire attribute value
 
+// test group rules
+group {
+	ruleTypes = [GROUP]	
+}
+
 // attributes that occur on many elements
 title  {
 	ruleTypes = [ATTRIBUTE]
