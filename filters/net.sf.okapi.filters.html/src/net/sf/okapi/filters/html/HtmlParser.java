@@ -23,9 +23,11 @@ package net.sf.okapi.filters.html;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
-
+import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
@@ -34,11 +36,9 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.filters.BaseParser;
-import net.sf.okapi.common.filters.ParserConfigurationReader;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.filters.html.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
@@ -81,9 +81,9 @@ public class HtmlParser extends BaseParser {
 		this.configuration = configuration;
 	}
 
-	private void initialize() {		
+	private void initialize() {
 		if (configuration == null) {
-			configuration = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");		
+			configuration = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");
 		}
 
 		// Segment iterator
@@ -140,13 +140,13 @@ public class HtmlParser extends BaseParser {
 						handleEndTag((EndTag) tag);
 					} else {
 						handleSkeleton(tag);
-					}					
+					}
 				}
 			} else {
 				handleText(segment);
 			}
 		}
-		
+
 		if (isCanceled()) {
 			return getFinalizedTokenType();
 		}
@@ -205,10 +205,10 @@ public class HtmlParser extends BaseParser {
 			// process these tag types to update parser state
 			switch (configuration.getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
-				ruleState.pushExcludedRule(startTag.getName());				
+				ruleState.pushExcludedRule(startTag.getName());
 				break;
 			case INCLUDED_ELEMENT:
-				ruleState.pushIncludedRule(startTag.getName());				
+				ruleState.pushIncludedRule(startTag.getName());
 				break;
 			case PRESERVE_WHITESPACE:
 				ruleState.pushPreserverWhitespaceRule(startTag.getName());
@@ -224,9 +224,10 @@ public class HtmlParser extends BaseParser {
 			break;
 
 		case ATTRIBUTES_ONLY:
-			// TODO: test for extractable attributes and create subflow
+			if (configuration.hasActionableAttributes(startTag.getName())) {				
+			}
 			break;
-		case GROUP_ELEMENT:							
+		case GROUP_ELEMENT:
 			startGroup(startTag.getName(), startTag.toString());
 			break;
 		case EXCLUDED_ELEMENT:
@@ -250,13 +251,6 @@ public class HtmlParser extends BaseParser {
 			ruleState.setInline(false);
 			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
 		}
-
-		/*
-		 * // check for translatable attributes for (Attribute attribute :
-		 * startTag.getAttributes()) {
-		 * 
-		 * }
-		 */
 	}
 
 	private void handleEndTag(EndTag endTag) {
@@ -284,7 +278,7 @@ public class HtmlParser extends BaseParser {
 			ruleState.setInline(true);
 			addToCurrentTextUnit(endTag);
 			break;
-		case GROUP_ELEMENT:					
+		case GROUP_ELEMENT:
 			endGroup(endTag.toString());
 			break;
 		case EXCLUDED_ELEMENT:
@@ -311,6 +305,18 @@ public class HtmlParser extends BaseParser {
 		}
 	}
 
+	private void addAttribute(StartTag startTag) {
+		// convert Jericho attributes to HashMap
+		Map<String, String> attrs = new HashMap<String, String>();
+		attrs = startTag.getAttributes().populateMap(attrs, true);
+		for (Attribute attribute : startTag.getAttributes()) {
+			if (configuration.isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+
+			} else if (configuration.isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+
+			}
+		}
+	}
 	private void addToCurrentTextUnit(Tag tag) {
 		TextFragment.TagType tagType;
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {

@@ -61,6 +61,10 @@ public class HtmlFilterConfiguration {
 		}
 	}
 
+	public boolean hasActionableAttributes(String ruleName) {
+		return hasTranslatableAttributes(ruleName) || hasLocalizableAttributes(ruleName);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean hasTranslatableAttributes(String ruleName) {
 		Map rule = configReader.getRule(ruleName);
