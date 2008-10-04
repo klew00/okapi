@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework Contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -49,7 +49,6 @@ public class XMLReader {
 	public static final int       RESULT_ENDTRANSUNIT      = 4;
 	
 	public static final String    ILMARKER  = "@MRK:";
-
 
 	protected Resource       resource;
 	

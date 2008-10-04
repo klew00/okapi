@@ -134,7 +134,7 @@ public class Editor implements IParametersEditor {
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-		cmpTmp0.setLayout(new GridLayout(4,false));
+		cmpTmp0.setLayout(new GridLayout(4, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp0);		
@@ -145,7 +145,7 @@ public class Editor implements IParametersEditor {
 		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);
 		table.setLinesVisible (true);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,3,1));
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 		table.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
 				//Make sure to remove this when done:
@@ -179,7 +179,6 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});		
-		
 		
 		// table headers
 		String[] titles = {"Use", "Search For", "Replace By"};
@@ -249,7 +248,7 @@ public class Editor implements IParametersEditor {
 		RowLayout rl2 = new RowLayout();
 		rl2.pack = false;
 		cmpTmp2.setLayout(rl2);
-		cmpTmp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,3,1));
+		cmpTmp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 		
 		Button btAdd = new Button(cmpTmp2, SWT.PUSH);
 		btAdd.setText("Add...");
@@ -285,18 +284,13 @@ public class Editor implements IParametersEditor {
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new RowLayout(SWT.VERTICAL));
 		group.setText("Options");
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,3,1));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
 		chkIgnoreCase = new Button(group, SWT.CHECK);
 		chkIgnoreCase.setText("Ignore case");
 		
 		chkMultiLine = new Button(group, SWT.CHECK);
 		chkMultiLine.setText("Multiline");
-		//table.setSize (400, 400);
-
-		//for (int i=0; i<titles.length; i++) {
-		//	table.getColumn (i).pack ();
-		//}	
 
 		//--- Dialog-level buttons
 

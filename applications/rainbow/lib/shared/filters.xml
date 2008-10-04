@@ -34,4 +34,9 @@
   outputFilterClass="net.sf.okapi.filters.tmx.OutputFilter"
  >TMX</filter>
   
+ <filter id="okf_openoffice"
+  inputFilterClass="net.sf.okapi.filters.openoffice.InputFilter"
+  outputFilterClass="net.sf.okapi.filters.openoffice.OutputFilter"
+ >Open Document</filter>
+  
 </okapiFilters>

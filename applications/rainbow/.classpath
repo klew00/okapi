@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/h2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.lib.segmentation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openoffice"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

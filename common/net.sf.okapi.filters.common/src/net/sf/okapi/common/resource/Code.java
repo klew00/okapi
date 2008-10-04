@@ -65,6 +65,12 @@ public class Code {
 		return list;
 	}
 	
+	/**
+	 * Creates a new code.
+	 * @param tagType The tag type.
+	 * @param type The type of code (e.g. the name of the tag).
+	 * @param data the content of the code.
+	 */
 	public Code (TagType tagType, String type, String data) {
 		id = -1;
 		this.tagType = tagType;
