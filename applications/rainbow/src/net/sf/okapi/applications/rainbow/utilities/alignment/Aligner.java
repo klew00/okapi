@@ -74,6 +74,7 @@ public class Aligner {
 	private Text             edSrcSeg;
 	private Text             edTrgSeg;
 	private Font             textFont;
+	private Text             edCounter;
 	private Button           chkShowInlineCodes;
 	private Button           chkSyncScrolling;
 	private Button           chkCheckSingleSegUnit;
@@ -151,9 +152,14 @@ public class Aligner {
 		edDocument.setLayoutData(gdTmp);
 		edDocument.setEditable(false);
 		
+		edCounter = new Text(shell, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);;
+		edCounter.setLayoutData(gdTmp);
+		edCounter.setEditable(false);
+		
 		edName = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		edName.setLayoutData(gdTmp);
 		edName.setEditable(false);
 		
@@ -545,10 +551,15 @@ public class Aligner {
 	/**
 	 * Verifies the alignment of the segments of a given TextUnit object.
 	 * @param tu The text unit containing the segments to verify.
+	 * @param currentSource The current source unit being verified.
+	 * @param totalTarget The total number of target units available.
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
-	public int align (TextUnit tu) {
+	public int align (TextUnit tu,
+		int currentSource,
+		int totalTarget)
+	{
 		// Make sure we do have a target to align
 		if ( !tu.hasTarget() ) return 2;
 		// Set the new values
@@ -559,6 +570,7 @@ public class Aligner {
 		// Check for issues
 		if ( hasIssue(false) ) {
 			// Correct manually
+			edCounter.setText(String.format("This source: #%d / Total targets: %d", currentSource, totalTarget));
 			return showDialog();
 		}
 		// Else: assumes correct alignment

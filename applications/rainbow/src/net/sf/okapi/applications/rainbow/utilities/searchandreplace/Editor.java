@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Fredrik Liden                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -19,9 +19,6 @@
 /*===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.searchandreplace;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -52,17 +49,10 @@ public class Editor implements IParametersEditor {
 
 	private Shell                 dialog;	
 	private OKCancelPanel         pnlActionsDialog;	
-	
 	private Shell                 shell;
 	private boolean               result = false;
 	private OKCancelPanel         pnlActions;
 	private Parameters            params;
-	private Button                rdAdd;
-	private Label                 stAdd;
-	private Button                rdRemove;
-	private Label                 stRemove;
-	private Button                chkAlsoNonUTF8;
-	
 	private Table                 table;
 	private Text                  searchText;
 	private Text                  replacementText;
@@ -72,7 +62,6 @@ public class Editor implements IParametersEditor {
 	private Button                btMoveDown;
 	private Button 				  chkIgnoreCase;
 	private Button 				  chkMultiLine;
-	private ArrayList			  rules;
 	private int 				  updateType;
 	
 	
@@ -113,16 +102,16 @@ public class Editor implements IParametersEditor {
 
         if(items>1){
 	        if (index==0){
-	        	firstSelected=true;			        	
+	        	firstSelected=true;  // Needed it's not used anywhere it seems			        	
 	        	btMoveUp.setEnabled(false);
 	        	btMoveDown.setEnabled(true);
 	        }else if((index+1)==items){
-	        	lastSelected=false;
+	        	lastSelected=false; // Needed???
 	        	btMoveDown.setEnabled(false);
 	        	btMoveUp.setEnabled(true);
 	        }else{
-	        	firstSelected=false;
-	        	lastSelected=false;
+	        	firstSelected=false; // Needed???
+	        	lastSelected=false; // Needed???
 	        	btMoveDown.setEnabled(true);
 	        	btMoveUp.setEnabled(true);
 	        }
@@ -159,10 +148,11 @@ public class Editor implements IParametersEditor {
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,3,1));
 		table.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
+				//Make sure to remove this when done:
 				String string = event.detail == SWT.CHECK ? "Checked" : "Selected";
 				System.out.println (event.item + " " + string);
 				
-				if(event.detail!=SWT.CHECK){
+				if ( event.detail!=SWT.CHECK ) {
 
 					updateUpDownBtnState();
 					
@@ -211,9 +201,9 @@ public class Editor implements IParametersEditor {
 		btMoveUp.setEnabled(false);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if(table.getSelectionIndex()!=-1){
+				if ( table.getSelectionIndex()!=-1 ) {
 
-					int items = table.getItemCount();
+					//Not used: int items = table.getItemCount();
 			        int index = table.getSelectionIndex();
 			        
 			        TableItem ti = table.getItem(index);
@@ -235,9 +225,9 @@ public class Editor implements IParametersEditor {
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
-				if(table.getSelectionIndex()!=-1){
+				if ( table.getSelectionIndex()!=-1 ) {
 					
-					int items = table.getItemCount();
+					//Not used: int items = table.getItemCount();
 			        int index = table.getSelectionIndex();
 			        
 			        TableItem ti = table.getItem(index);
@@ -254,8 +244,7 @@ public class Editor implements IParametersEditor {
 			}
 		});	
 
-		
-		// add, edit, delete buttons
+		// Add, edit, delete buttons
 		Composite cmpTmp2 = new Composite(cmpTmp0, SWT.NONE);
 		RowLayout rl2 = new RowLayout();
 		rl2.pack = false;
@@ -292,7 +281,6 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});	
-		
 		
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new RowLayout(SWT.VERTICAL));
@@ -345,14 +333,10 @@ public class Editor implements IParametersEditor {
 
 	
 	private boolean showAddItemsDialog (int action) {
-
-		OKCancelPanel pnlActions;		
-		
 		dialog = new Shell (shell);
 		dialog.setText ("Search And Replace Item");
 		dialog.setSize (400, 200);
 
-		
 		dialog.setLayout(new GridLayout());
 
 		// start - content
@@ -405,22 +389,21 @@ public class Editor implements IParametersEditor {
 				dialog.close();
 			};
 		};
+
 		pnlActionsDialog = new OKCancelPanel(dialog, SWT.NONE, OKCancelActions, true);
 		pnlActionsDialog.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		dialog.setDefaultButton(pnlActionsDialog.btOK);
 		// end - dialog level buttons
 		
 		// begin - initialize edit fields
-		if(action==EDIT_ITEM){
+		if ( action==EDIT_ITEM ) {
 			int index = table.getSelectionIndex();
 	        TableItem ti = table.getItem(index);
 	        searchText.setText(ti.getText(1));
 	        replacementText.setText(ti.getText(2));
-	        
 	        updateType=EDIT_ITEM;
 		}
 		// end - initialize edit fields
-		
 		
 		Dialogs.centerWindow(dialog, shell);
 		dialog.open ();
@@ -433,33 +416,22 @@ public class Editor implements IParametersEditor {
 	
 	
 	private void setData () {
-
-		chkIgnoreCase.setSelection(Boolean.parseBoolean(params.getParameter("ignoreCase")));
-		chkMultiLine.setSelection(Boolean.parseBoolean(params.getParameter("multiLine")));
-
+		chkIgnoreCase.setSelection(params.ignoreCase);
+		chkMultiLine.setSelection(params.multiLine);
 		table.clearAll();
-		
-		ArrayList rules = params.getRules();
-        Iterator it = rules.iterator();
-        while(it.hasNext()){
-        	
-        	String s[]=(String[])it.next();
-
+        for ( String[] s : params.rules ) {
         	TableItem item = new TableItem (table, SWT.NONE);
 			String [] strs ={"",s[1],s[2]};
 			item.setText(strs);
-			if(s[0].equals("true")){
+			if ( s[0].equals("true") ) {
 				item.setChecked(true);				
 			}
         }
-		return;
 	}
 
 	private boolean saveData () {
-
 		params.reset();
-		String items="";
-		for(int i=0; i<table.getItemCount(); i++){
+		for ( int i=0; i<table.getItemCount(); i++ ) {
 			TableItem ti = table.getItem(i);
 			String s[]=new String[3];
 			s[0]=Boolean.toString(ti.getChecked());
@@ -468,18 +440,9 @@ public class Editor implements IParametersEditor {
         	params.addRule(s);
 		};
 	
-		if(chkIgnoreCase.getSelection()){
-			params.setParameter("ignoreCase","true");			
-		}else{
-			params.setParameter("ignoreCase","false");
-		}
-		
-		if(chkMultiLine.getSelection()){
-			params.setParameter("multiLine","true");			
-		}else{
-			params.setParameter("multiLine","false");
-		}		
-		
+		params.ignoreCase = chkIgnoreCase.getSelection();
+		params.multiLine = chkMultiLine.getSelection();
+
 		result = true;
 		return result;
 	}

@@ -131,7 +131,6 @@ public class DbStore {
 				throw new RuntimeException(e);
 			}
 		}
-		
 	}
 	
 	public void open (String path) {
@@ -142,6 +141,30 @@ public class DbStore {
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public int getTextUnitCount () {
+		Statement stm = null;
+		try {
+			stm = conn.createStatement();
+			ResultSet result = stm.executeQuery("SELECT COUNT(" + SOURCE_NKEY + ") FROM " + TBLNAME_SOURCE);
+			if ( !result.first() ) return 0;
+			return result.getInt(1);
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

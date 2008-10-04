@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Fredrik Liden                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -24,74 +24,67 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.FieldsString;
 
 public class Parameters extends BaseParameters {
 
-	private String ignoreCase;
-	private String multiLine;
-	
-	private ArrayList rules;
+	protected boolean             ignoreCase;
+	protected boolean             multiLine;
+	protected ArrayList<String[]> rules;
 	
 	public Parameters () {
 		reset();
 	}
 	
-	@Override
-	public void fromString(String data) {
-		// Read the file content as a set of fields
-		FieldsString tmp = new FieldsString(data);
-		// Parse the fields
-		ignoreCase = tmp.get("ignoreCase", ignoreCase);
-		multiLine = tmp.get("multiLine", multiLine);
-		
+	public void fromString (String data) {
 		reset();
-		int count = tmp.get("count", 0);
+		// Read the file content as a set of fields
+		buffer.fromString(data);
+		// Parse the fields
+		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
+		multiLine = buffer.getBoolean("multiLine", multiLine);
+		
+		int count = buffer.getInteger("count", 0);
 		for ( int i=0; i<count; i++ ) {
-			
 			String []s=new String[3];
-			s[0] = tmp.get(String.format("use%d", i), "");
-			s[1] = tmp.get(String.format("search%d", i), "");
-			s[2] = tmp.get(String.format("replace%d", i), "");
+			s[0] = buffer.getString(String.format("use%d", i), "");
+			s[1] = buffer.getString(String.format("search%d", i), "");
+			s[2] = buffer.getString(String.format("replace%d", i), "");
 			rules.add(s);
 		}
 	}
 
-	@Override
-	public void reset() {
-//		ignoreCase = "";
-//		multiLine = "";
-		
-		rules = new ArrayList();
+	public void reset () {
+		ignoreCase = false;
+		multiLine = false;
+		rules = new ArrayList<String[]>();
 	}
 
 	public void addRule (String pattern[]) {
 		rules.add(pattern);
 	}	
 	
-	public ArrayList getRules () {
+	public ArrayList<String[]> getRules () {
 		return rules;
 	}	
-	
 	
 	@Override
 	public String toString() {
 		// Store the parameters in fields
-		FieldsString tmp = new FieldsString();
-		tmp.add("ignoreCase", ignoreCase);
-		tmp.add("multiLine", multiLine);
+		buffer.reset();
+		buffer.setBoolean("ignoreCase", ignoreCase);
+		buffer.setBoolean("multiLine", multiLine);
 		
-		tmp.add("count", rules.size());
+		buffer.setInteger("count", rules.size());
 		int i = 0;
-		Iterator it = rules.iterator();
-		while(it.hasNext() ) {
+		Iterator<String[]> it = rules.iterator();
+		while( it.hasNext() ) {
 			String[] temp = (String[])it.next();
-			tmp.add(String.format("use%d", i), temp[0]);
-			tmp.add(String.format("search%d", i), temp[1]);
-			tmp.add(String.format("replace%d", i), temp[2]);
+			buffer.setString(String.format("use%d", i), temp[0]);
+			buffer.setString(String.format("search%d", i), temp[1]);
+			buffer.setString(String.format("replace%d", i), temp[2]);
 			i++;
 		}
 		
-		return tmp.toString();
+		return buffer.toString();
 	}
 }

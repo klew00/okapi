@@ -226,7 +226,8 @@ public class Writer extends BaseWriter {
 							//TODO: case when a target is available (what kind of match?)
 							buffer.append(Util.RTF_MIDMARKER1+"0"+Util.RTF_MIDMARKER2);
 							//debug: buffer.append("{\\highlight7 ");
-							//processContent(tc.getSegments().get(index), buffer, false);
+//TODO: do we need to set the target as hidden							
+							processContent(tc.getSegments().get(index), buffer, false);
 							//debug: buffer.append("}");
 							buffer.append(Util.RTF_ENDMARKER);
 							break;

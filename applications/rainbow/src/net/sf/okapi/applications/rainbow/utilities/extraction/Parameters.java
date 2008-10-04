@@ -60,7 +60,7 @@ public class Parameters extends BaseParameters {
 	/**
 	 * Pre-segment the output when possible.
 	 */
-	protected boolean   presegment;
+	protected boolean   preSegment;
 	
 	/**
 	 * Path of the SRX file to use for source segmentation.
@@ -85,7 +85,7 @@ public class Parameters extends BaseParameters {
 		outputFolder = System.getProperty("user.home") + File.separator
 			+ "Localization Projects";
 		includeTargets = true;
-		presegment = false;
+		preSegment = false;
 		sourceSRX = "";
 		targetSRX = "";
 	}
@@ -93,13 +93,13 @@ public class Parameters extends BaseParameters {
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
-		pkgType = buffer.getString("pkgtype", pkgType);
-		createZip = buffer.getBoolean("createzip", createZip);
-		pkgName = buffer.getString("pkgname", pkgName);
-		outputFolder = buffer.getString("outputfolder", pkgName);
-		includeMergeData = buffer.getBoolean("includemergedata", includeMergeData);
-		includeTargets = buffer.getBoolean("includetargets", includeTargets);
-		presegment = buffer.getBoolean("presegment", presegment);
+		pkgType = buffer.getString("pkgType", pkgType);
+		createZip = buffer.getBoolean("createZip", createZip);
+		pkgName = buffer.getString("pkgName", pkgName);
+		outputFolder = buffer.getString("outputFolder", outputFolder);
+		includeMergeData = buffer.getBoolean("includeMergeData", includeMergeData);
+		includeTargets = buffer.getBoolean("includeTargets", includeTargets);
+		preSegment = buffer.getBoolean("preSegment", preSegment);
 		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
 		targetSRX = buffer.getString("targetSRX", targetSRX);
 	}
@@ -108,11 +108,11 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setString("pkgType", pkgType);
 		buffer.setBoolean("createZip", createZip);
-		buffer.setString("pkgname", pkgName);
-		buffer.setString("outputfolder", outputFolder);
-		buffer.setBoolean("includemergedata", includeMergeData);
-		buffer.setBoolean("includetargets", includeTargets);
-		buffer.setBoolean("presegment", presegment);
+		buffer.setString("pkgName", pkgName);
+		buffer.setString("outputFolder", outputFolder);
+		buffer.setBoolean("includeMergeData", includeMergeData);
+		buffer.setBoolean("includeTargets", includeTargets);
+		buffer.setBoolean("preSegment", preSegment);
 		buffer.setString("sourceSRX", sourceSRX);
 		buffer.setString("targetSRX", targetSRX);
 		return buffer.toString();

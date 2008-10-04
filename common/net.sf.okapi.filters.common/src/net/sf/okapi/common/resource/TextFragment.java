@@ -115,7 +115,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
 	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
 	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
-	 * @return
+	 * @return The first non-whitespace character position from the back, given the parameters.
 	 */
 	public static int getLastNonWhitespacePosition (String codedText,
 		int fromIndex,
@@ -176,6 +176,64 @@ public class TextFragment implements Comparable<Object> {
 		}
 		return textEnd;
 	}
+
+	/**
+	 * Helper method to find the first non-whitespace character
+	 * of a coded text, starting at a given position and no farther than another
+	 * given position.
+	 * @param codedText The coded text to process.
+	 * @param fromIndex The first position to check (must be lesser or equal to
+	 * untilIndex).
+	 * @param untilIndex The last position to check (must be greater or equal to
+	 * fromIndex). Use -1 to point to the last position of the text.
+	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
+	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
+	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
+	 * @return The first non-whitespace character position, given the parameters.
+	 */
+	public static int getFirstNonWhitespacePosition (String codedText,
+		int fromIndex,
+		int untilIndex,
+		boolean openingMarkerIsWS,
+		boolean closingMarkerIsWS,
+		boolean isolatedMarkerIsWS)
+	{
+		// Empty text
+		if (( codedText == null ) || ( codedText.length() == 0 )) return -1;
+		
+		// Set variables
+		if ( untilIndex == -1 ) untilIndex = codedText.length()-1;
+		int textStart = fromIndex;
+		boolean done = false;
+
+		while ( !done ) {
+			switch ( codedText.charAt(textStart) ) {
+			case TextFragment.MARKER_OPENING:
+				if ( openingMarkerIsWS ) textStart++;
+				else done = true;
+				break;
+			case TextFragment.MARKER_CLOSING:
+				if ( closingMarkerIsWS ) textStart++;
+				else done = true;
+				break;
+			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
+				if ( isolatedMarkerIsWS ) textStart++;
+				else done = true;
+				break;
+			default:
+				if ( Character.isWhitespace(codedText.charAt(textStart)) ) break;
+				done = true;
+				break;
+			}
+			if ( !done ) {
+				if ( textStart == untilIndex ) break;
+				else textStart++;
+			}
+		}
+		return textStart;
+	}
+
 
 	/**
 	 * Creates an empty TextFragment.

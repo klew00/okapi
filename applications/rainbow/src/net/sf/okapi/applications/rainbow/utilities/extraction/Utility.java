@@ -83,7 +83,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 	
 		// Load SRX file(s) and create segmenters if required
-		if ( params.presegment ) {
+		if ( params.preSegment ) {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(params.sourceSRX);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
@@ -185,7 +185,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 			// existing target
 		}
 		
-		if (( params.presegment ) && !"no".equals(item.getProperty("canSegment")) ) {
+		if (( params.preSegment ) && !"no".equals(item.getProperty("canSegment")) ) {
 			try {
 				TextContainer cont;
 				cont = item.getSourceContent();

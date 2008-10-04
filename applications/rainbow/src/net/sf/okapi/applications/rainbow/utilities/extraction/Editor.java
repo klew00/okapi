@@ -278,19 +278,18 @@ public class Editor implements IParametersEditor {
 		edOutputFolder.setText(params.outputFolder);
 		edName.setText(params.pkgName);
 		chkCreateZip.setSelection(params.createZip);
-		pnlSegmentation.setData(params.presegment, params.sourceSRX, params.targetSRX);
+		pnlSegmentation.setData(params.preSegment, params.sourceSRX, params.targetSRX);
 		updateSample();
 	}
 
 	private boolean saveData () {
 		if ( inInit ) return true;
-		//m_Opt.setName("TODO:Name"); //TODO "m_edName.getText());
 		String[] aItems = ((String)lbTypes.getData()).split("\t", -2);
 		params.pkgType = aItems[lbTypes.getSelectionIndex()];
 		params.createZip = chkCreateZip.getSelection();
 		params.pkgName = edName.getText();
 		params.outputFolder = edOutputFolder.getText();
-		params.presegment = pnlSegmentation.getSegment();
+		params.preSegment = pnlSegmentation.getSegment();
 		params.sourceSRX = pnlSegmentation.getSourceSRX();
 		params.targetSRX = pnlSegmentation.getTargetSRX();
 		result = true;

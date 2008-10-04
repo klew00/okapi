@@ -166,16 +166,19 @@ public class Segmenter {
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
 				// Trim white-spaces at the front
-				while ( true ) {
-					if ( textStart == pos ) break;
-					if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
-					else break;
-				}
+				//while ( true ) {
+				//	if ( textStart == pos ) break;
+				//	if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
+				//	else break;
+				//}
+				// Trim white-spaces and codes as required at the front
+				textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
+					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				if ( textStart == pos ) {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
-				// Trim white-spaces and code as required at the back
+				// Trim white-spaces and codes as required at the back
 				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
 					pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				if ( textEnd > textStart ) { // Only if there is something
@@ -190,11 +193,14 @@ public class Segmenter {
 		int lastPos = codedText.length();
 		if ( textStart < lastPos ) {
 			// Trim white-spaces at the front
-			while ( true ) {
-				if ( textStart == lastPos ) break;
-				if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
-				else break;
-			}
+			//while ( true ) {
+			//	if ( textStart == lastPos ) break;
+			//	if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
+			//	else break;
+			//}
+			// Trim white-spaces and codes as required at the front
+			textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
+				!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 			if ( textStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
 				textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,

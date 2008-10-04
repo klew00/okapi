@@ -47,14 +47,13 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	protected boolean                       preserveWS;
 	protected SkeletonUnit                  sklBefore;
 	protected SkeletonUnit                  sklAfter;
-	protected ArrayList<IContainable>      children;
+	protected ArrayList<IContainable>       children;
 	protected ITranslatable                 parent;
 	protected LocaleData                    source;
 	protected ArrayList<LocaleData>         targets;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
 	private ArrayList<TextUnit>             allUnits;
-
 
 	/**
 	 * Creates a TextUnit object with an empty source content and no target content.

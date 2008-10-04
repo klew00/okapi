@@ -57,6 +57,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private int              countTotal;
 	private Aligner          aligner;
 	private boolean          stopProcess;
+	private int              targetCount;
 	
 
 	public Utility () {
@@ -187,6 +188,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			trgFilter.process();
 			trgFilter.close();
 			dbStore = dbStoreBuilder.getDbStore();
+			targetCount = dbStore.getTextUnitCount();
 			aligned = 0;
 			noText = 0;
 			count = 0;
@@ -239,7 +241,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
 			tu.setTargetContent(trgTC);
-			switch ( aligner.align(tu) ) {
+			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
 				tmxWriter.writeItem(tu);

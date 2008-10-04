@@ -42,6 +42,7 @@ public class Parameters extends BaseParameters {
 		lineBreak = buffer.getString("lineBreak", lineBreak);
 	}
 
+	@Override
 	public String toString() {
 		buffer.reset();
 		buffer.setString("lineBreak", lineBreak);

@@ -116,7 +116,7 @@
   </info>
  </plugin>
 
-<plugin type="utility"
+ <plugin type="utility"
   id="oku_charlisting"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Utility"
@@ -125,6 +125,19 @@
   <info>
    <name>Used Characters Listing</name>
    <description>Provides a list of all characters used in the translatable parts of the input file.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
+ <plugin type="utility"
+  id="oku_searchandreplace"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Search And Replace</name>
+   <description>Performs a sreach and replace on the input file.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

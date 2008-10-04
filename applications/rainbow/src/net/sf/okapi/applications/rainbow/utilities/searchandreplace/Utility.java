@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 Fredrik Liden                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -32,9 +32,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,21 +51,13 @@ public class Utility implements ISimpleUtility {
 
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
-	private IParameters      params;
-	private String           commonFolder;
-	private String           inputPath;
-	private String           outputPath;
-	private byte[]           buffer;
+	private Parameters            params;
+	private String                commonFolder;
+	private String                inputPath;
+	private String                outputPath;
 	private EventListenerList     listenerList = new EventListenerList();
+	private String			      inputEncoding;
 	
-	private String			inputEncoding;
-	private String          outputEncoding;
-	private CharsetEncoder  outputEncoder;
-	private String          ignoreCase;	
-	private String          multiLine;
-	
-	private ArrayList       rules;
-
 	public Utility () {
 		params = new Parameters();
 	}
@@ -100,21 +89,15 @@ public class Utility implements ISimpleUtility {
 	        CharBuffer cbuf = Charset.forName(inputEncoding).newDecoder().decode(bbuf);
 	        String result = cbuf.toString();
 
-	        Iterator it = rules.iterator();
-	        while(it.hasNext()){
-	        	
-	        	String s[]=(String[])it.next();
-
-	        	if (s[0].equals("true")){
-	        	
+	        for ( String[] s : params.rules ) {
+	        	if ( s[0].equals("true") ) {
 		        	int flags = 0;
-		        	if(ignoreCase.equals("true")){
+		        	if ( params.ignoreCase ) {
 		        		flags = flags | Pattern.CASE_INSENSITIVE;
 		        	}
-		        	if(multiLine.equals("true")){
+		        	if ( params.multiLine ) {
 		        		flags = flags | Pattern.MULTILINE;
 		        	}
-		        	
 		        	Pattern pattern = Pattern.compile(s[1], flags);
 		            Matcher matcher = pattern.matcher(result);
 		            result = matcher.replaceAll(s[2]);	        		
@@ -157,17 +140,12 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void doEpilog () {
-		// Release the buffer
-		buffer = null;
 	}
 
 	public void doProlog (String sourceLanguage,
 		String targetLanguage)
 	{
 		commonFolder = null; // Reset
-		rules = ((Parameters)params).getRules();
-		multiLine = params.getParameter("multiLine");
-		ignoreCase = params.getParameter("ignoreCase");
 	}
 
 	public String getInputRoot () {
@@ -213,7 +191,7 @@ public class Utility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		params = paramsObject;
+		params = (Parameters)paramsObject;
 	}
 
 	public void setRoots (String inputRoot,
