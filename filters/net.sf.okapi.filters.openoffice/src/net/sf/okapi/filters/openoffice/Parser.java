@@ -22,6 +22,7 @@ package net.sf.okapi.filters.openoffice;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Stack;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -42,10 +43,11 @@ public class Parser extends BaseParser {
 
 	protected Document            resource;
 	private XMLStreamReader       reader;
-	private boolean               extract;
+	private Stack<Boolean>        extract;
 
 	public Parser () {
 		resource = new Document();
+		extract = new Stack<Boolean>();
 	}
 
 	public void close () {
@@ -72,9 +74,10 @@ public class Parser extends BaseParser {
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			reader = fact.createXMLStreamReader(input);
-			extract = false;
 			reset();
 			setFinishedParsing(false); //TODO: Should this be in reset()???
+			extract.clear();
+			extract.push(false);
 		}
 		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
@@ -101,12 +104,12 @@ public class Parser extends BaseParser {
 				switch ( reader.next() ) {
 				
 				case XMLStreamConstants.CHARACTERS:
-					if ( extract ) appendToTextUnit(reader.getText());
+					if ( extract.peek() ) appendToTextUnit(reader.getText());
 					else appendToSkeletonUnit(reader.getText());
 					break;
 					
 				case XMLStreamConstants.START_DOCUMENT:
-					// resource.setTargetEncoding(SET REAL ENCODING);
+					//TODO set resource.setTargetEncoding(SET REAL ENCODING);
 					appendToSkeletonUnit("<?xml version=\"1.0\" "
 						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
 						+ "?>");
@@ -192,9 +195,9 @@ public class Parser extends BaseParser {
 		String name = makePrintName();
 		if ( name.equals("text:p") ) {
 			appendToSkeletonUnit(buildStartTag(name));
-			extract = true;
+			extract.push(true);
 		}
-		else if ( extract && name.equals("text:s") ) {
+		else if ( extract.peek() && name.equals("text:s") ) {
 			String tmp = reader.getAttributeValue(NSURI_TEXT, "c");
 			if ( tmp != null ) {
 				int count = Integer.valueOf(tmp);
@@ -204,12 +207,12 @@ public class Parser extends BaseParser {
 			}
 			reader.nextTag(); // Eat the end-element event
 		}
-		else if ( extract && name.equals("text:tab") ) {
+		else if ( extract.peek() && name.equals("text:tab") ) {
 			appendToTextUnit("\t");
 			reader.nextTag(); // Eat the end-element event
 		}
 		else {
-			if ( extract ) {
+			if ( extract.peek() ) {
 				appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
 			}
 			else {
@@ -219,18 +222,26 @@ public class Parser extends BaseParser {
 	}
 
 	private void processEndElement () {
-		String name = reader.getPrefix()+":"+reader.getLocalName();
+		String name = makePrintName();
 		if ( name.equals("text:p") ) {
 			finalizeCurrentToken();
-			extract = false;
-			appendToSkeletonUnit(buildEndTag(name));
+			extract.pop();
+			// Add line break because ODT files don't have any
+			appendToSkeletonUnit(buildEndTag(name)+"\n");
 		}
 		else {
-			if ( extract ) {
+			if ( extract.peek() ) {
 				appendToTextUnit(new Code(TagType.CLOSING, name, buildEndTag(name)));
 			}
 			else {
 				appendToSkeletonUnit(buildEndTag(name));
+				if ( name.equals("style:style")
+					|| ( name.equals("text:list-style"))
+					|| ( name.equals("draw:frame"))
+					|| ( name.equals("text:list"))
+					|| ( name.equals("text:list-item")) ) {
+					appendToSkeletonUnit("\n");
+				}
 			}
 		}
 	}

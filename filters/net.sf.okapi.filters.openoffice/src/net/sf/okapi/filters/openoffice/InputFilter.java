@@ -20,7 +20,14 @@
 
 package net.sf.okapi.filters.openoffice;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
@@ -31,6 +38,8 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class InputFilter implements IInputFilter {
 
+	static final int         BUFFER_SIZE = 2048;
+	
 	private InputStream      input;
 	private IResourceBuilder output;
 	private Parser           parser;
@@ -113,5 +122,39 @@ public class InputFilter implements IInputFilter {
 
 	public void cancel () {
 		if ( parser != null ) parser.cancel();
+	}
+	
+	private void unzip (String path) {
+		BufferedOutputStream dest = null;
+		BufferedInputStream is = null;
+		try {
+			ZipEntry entry;
+			ZipFile zipfile = new ZipFile(path);
+			Enumeration e = zipfile.entries();
+			while( e.hasMoreElements() ) {
+				entry = (ZipEntry) e.nextElement();
+				is = new BufferedInputStream(zipfile.getInputStream(entry));
+				int count;
+				byte data[] = new byte[BUFFER_SIZE];
+				FileOutputStream fos = new FileOutputStream(entry.getName());
+				dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+				while ( (count = is.read(data, 0, BUFFER_SIZE)) != -1 ) {
+					dest.write(data, 0, count);
+				}
+				dest.flush();
+			}
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( dest != null ) dest.close();
+				if ( is != null ) is.close();
+			}
+			catch ( IOException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

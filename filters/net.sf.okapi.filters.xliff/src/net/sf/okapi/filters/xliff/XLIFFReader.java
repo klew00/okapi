@@ -303,18 +303,19 @@ public class XLIFFReader {
 	private int processStartTransUnit () {
 		try {
 			resetItem();
-			item.setID(String.format("%d", ++itemID));
 			storeStartElement();
 
 			String tmp = reader.getAttributeValue("", "translate");
 			if ( tmp != null ) item.setIsTranslatable(tmp.equals("yes"));
-		
+
+			tmp = reader.getAttributeValue("", "id");
+			if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
+			item.setID(tmp);
+			
 			tmp = reader.getAttributeValue("", "resname");
 			if ( tmp != null ) item.setName(tmp);
 			else if ( resource.params.fallbackToID ) {
-				tmp = reader.getAttributeValue("", "id");
-				if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
-				item.setName(tmp);
+				item.setName(item.getID());
 			}
 
 			tmp = reader.getAttributeValue("", "restype");
