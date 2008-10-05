@@ -128,4 +128,12 @@ public class ResourceContainer extends ArrayList<IContainable>
 	public List<LocaleProperties> getTargets () {
 		return targets;
 	}
+	
+	public LocaleProperties getSourceProperties () {
+		return source;
+	}
+	
+	public LocaleProperties getTargetProperties () {
+		return targets.get(0);
+	}
 }

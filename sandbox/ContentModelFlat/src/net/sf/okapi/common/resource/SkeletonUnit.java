@@ -20,12 +20,17 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SkeletonUnit implements IContainable {
 
+	public static String     MAINTEXT = "$mainText$";
 	private StringBuilder    data;
 	protected String         id;
 	private long             offset;
 	private int              length;
+	protected ITranslatable  parent;
 
 
 	/**
@@ -63,11 +68,10 @@ public class SkeletonUnit implements IContainable {
 	
 	@Override
 	public String toString () {
-		//TODO: Modify for real output, this is test only
 		if ( isEmpty() ) return "";
-		else if ( isOffsetBased() ) return "[offset-based]";
+		else if ( isOffsetBased() ) return "[offset-based]"; //TODO: Modify for real output, this is test only
 		else if ( data == null ) return "";
-		else return data.toString();
+		return data.toString();
 	}
 	
 	public String getID () {
@@ -151,5 +155,40 @@ public class SkeletonUnit implements IContainable {
 	 */
 	public void addToLength (int length) {
 		this.length += length;
+	}
+
+	public ITranslatable getParent () {
+		return parent;
+	}
+
+	public void setParent (ITranslatable value) {
+		parent = value;
+	}
+
+	public String toResolvedString (boolean useSource) {
+		if ( isEmpty() ) return "";
+		else if ( isOffsetBased() ) return "[offset-based]"; //TODO: Modify for real output, this is test only
+		else if ( data == null ) return "";
+		
+		// Else, check for properties
+		int n = data.indexOf("$P#");
+		if (( n == -1 ) || ( parent == null )) return data.toString();
+		
+		// Else: substitute the properties
+		Pattern pattern = Pattern.compile("\\$P#(.*?)@(.*?)#");
+		Matcher m = pattern.matcher(data);
+		while ( m.find() ) {
+			String name = m.group(1);
+			String id = m.group(2);
+
+			//TODO: get the text from the parent's properties
+			LocaleProperties lp;
+			if ( useSource ) lp = parent.getSourceProperties();
+			else lp = parent.getTargetProperties();
+
+			data.replace(m.start(), m.end(), lp.getProperty(name));
+		}
+		
+		return data.toString();
 	}
 }

@@ -20,11 +20,14 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.List;
+
 public class Group extends ResourceContainer implements ITranslatable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String                          id;
+	private String							data;
 	private ITranslatable                   parent;
 	private boolean                         isTranslatable;
 
@@ -40,7 +43,15 @@ public class Group extends ResourceContainer implements ITranslatable {
 	public void setID (String value) {
 		id = value;
 	}
+	
+	public void setData(String data) {
+		this.data = data;
+	}
 
+	public String getData() {
+		return data;
+	}
+	
 	public ITranslatable getParent () {
 		return parent;
 	}
@@ -59,6 +70,10 @@ public class Group extends ResourceContainer implements ITranslatable {
 
 	public boolean hasChild () {
 		return !isEmpty();
+	}
+
+	public List<IContainable> getChildren () {
+		return this;
 	}
 
 }

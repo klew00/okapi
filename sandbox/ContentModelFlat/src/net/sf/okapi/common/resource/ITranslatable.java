@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.List;
+
 public interface ITranslatable extends IContainable {
 
 	/**
@@ -51,5 +53,11 @@ public interface ITranslatable extends IContainable {
 	 * @return True if the resource has one child or more, false if it has none.
 	 */
 	public boolean hasChild ();
+
+	public List<IContainable> getChildren ();
+	
+	public LocaleProperties getSourceProperties ();
+	
+	public LocaleProperties getTargetProperties ();
 	
 }

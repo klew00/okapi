@@ -40,4 +40,15 @@ public interface IContainable {
 	 */
 	public boolean isEmpty ();
 
+	/**
+	 * Gets the current parent of the object.
+	 * @return The parent of the resource or null if it has no parent.
+	 */
+	public ITranslatable getParent ();
+	
+	/**
+	 * Sets the parent for the resource.
+	 * @param value The new parent of the resource.
+	 */
+	public void setParent (ITranslatable value);
 }
