@@ -97,6 +97,10 @@ public abstract class BaseParser implements IParser {
 	protected void reset() {
 		finishedToken = false;
 		cancel = false;
+		groupId = 0;
+		textUnitId = 0;
+		skeleltonUnitId = 0;
+		groupStack = new Stack<Group>();
 	}
 
 	private void finalizeToken(TextUnit textUnit) {
