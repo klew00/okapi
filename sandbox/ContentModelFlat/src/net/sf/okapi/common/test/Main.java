@@ -42,6 +42,7 @@ public class Main {
 		tu = new TextUnit("t1", "Main text with image: ");
 		tu.getSourceContent().append(TagType.PLACEHOLDER, "img",
 			"<img alt=\"{@#$t3}\"/>").setHasSubflow(true);
+		tu.getSourceContent().append(" etc.");
 		tu.getSource().setProperty("dir", "ltr");
 		tu.addChild(new SkeletonUnit("s1", "<p title'"));
 		tu.addChild(new TextUnit("t2", "Text of title"));
@@ -58,11 +59,15 @@ public class Main {
 		grp.getSource().setProperty("dir", "ltr");
 		grp.add(new SkeletonUnit("s1", "<p title'"));
 		grp.add(new TextUnit("t2", "Text of title"));
-		grp.add(new SkeletonUnit("s2", "' dir='$P#dir@g1#'>"));
+		SkeletonUnit su = new SkeletonUnit("s2", "' dir='$P#dir@g1#'>");
+		su.setParent(grp);
+		grp.add(su);
 		tu = new TextUnit("t1", "Main text with image: ");
 		tu.getSourceContent().append(TagType.PLACEHOLDER, "img",
 			"<img alt=\"{@#$t3}\"/>").setHasSubflow(true);
+		tu.getSourceContent().append(" etc.");
 		tu.addChild(new TextUnit("t3", "Text of alt"));
+		tu.setParent(grp);
 		grp.add(tu);
 		grp.add(new SkeletonUnit("s3", "</p>"));
 		System.out.println("--- grp:");
@@ -75,7 +80,9 @@ public class Main {
 	{
 		for ( IContainable item : grp.getChildren() ) {
 			if ( item instanceof TextUnit ) {
-				writeTU((TextUnit)item, useSource);
+				//writeTU((TextUnit)item, useSource);
+				if ( useSource ) System.out.print(((TextUnit)item).getSource().toString());
+				else System.out.print(((TextUnit)item).getTarget().toString());
 			}
 			else if ( item instanceof Group ) {
 				writeGroup((Group)item, useSource);

@@ -43,6 +43,7 @@
 		<ant antfile="build_filters.regex.xml" inheritAll="false"/>
 		<ant antfile="build_filters.xliff.xml" inheritAll="false"/>
 		<ant antfile="build_filters.xml.xml" inheritAll="false"/>
+		<ant antfile="build_filters.openoffice.xml" inheritAll="false"/>
 		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
 		<ant antfile="build_ui.common.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.common.xml" inheritAll="false"/>
@@ -72,7 +73,7 @@
 		
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Main-Class" value="net.sf.okapi.applications.rainbow.Main"/>
-			<attribute name="Class-Path" value="swt.jar h2.jar slf4j-api-1.5.0.jar slf4j-jdk14-1.5.0.jar"/>
+			<attribute name="Class-Path" value="swt.jar h2.jar slf4j-api-1.5.0.jar slf4j-jdk14-1.5.0.jar stax-api-1.0.1.jar wstx-lgpl-3.9.2.jar"/>
   		</manifest>
 
 		<jar jarfile="${dist-bin}/rainbow.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
