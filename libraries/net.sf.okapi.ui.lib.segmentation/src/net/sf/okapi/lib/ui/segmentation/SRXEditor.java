@@ -201,7 +201,7 @@ public class SRXEditor {
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
 					int n = tblRules.getSelectionIndex();
-					if ( n < 1 ) return;
+					if ( n < 0 ) return;
 					String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
 					srxDoc.getLanguageRules(ruleName).get(n).setIsActive(((TableItem)e.item).getChecked());
 					srxDoc.setIsModified(true);

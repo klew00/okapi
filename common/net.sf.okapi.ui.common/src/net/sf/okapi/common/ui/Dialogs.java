@@ -108,23 +108,25 @@ public class Dialogs {
 	 * Centers a given window on a given window.
 	 * @param target The window to center.
 	 * @param centerOn The window where to center target.
-	 * If p_CenterOn is null, the window is centered on the screen.
+	 * If p_CenterOn is null, the window is centered on the screen. If the x or y coordinates are
+	 * off screen after centering, they are forced to 0.
 	 */
 	static public void centerWindow (Shell target,
 		Shell centerOn)
 	{
-		Rectangle PRect;
-		Rectangle TRect = target.getBounds();
+		Rectangle parentRect;
+		Rectangle winRect = target.getBounds();
 		if ( centerOn == null ) {
 			Display Disp = target.getDisplay();
-			PRect = Disp.getClientArea();
+			parentRect = Disp.getClientArea();
 		}
-		else PRect = centerOn.getBounds();
+		else parentRect = centerOn.getBounds();
 		
 		// Compute the position and set the window
-		int x = PRect.x + (PRect.width - TRect.width) / 2;
-		int y = PRect.y + (PRect.height - TRect.height) / 2;
-		target.setLocation (x, y);
+		int x = parentRect.x + (parentRect.width - winRect.width) / 2;
+		int y = parentRect.y + (parentRect.height - winRect.height) / 2;
+		// Make sure it's at least set to (0,0)
+		target.setLocation(((x<0) ? 0 : x), ((y<0)? 0 : y));
 	}
 
 	static public void showError (Shell shell,

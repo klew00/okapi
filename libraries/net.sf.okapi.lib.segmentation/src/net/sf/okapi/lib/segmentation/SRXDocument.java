@@ -56,6 +56,7 @@ public class SRXDocument {
 	// Do not include segment markers because they should not be present on text to segment
 	private static final String   INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*)",
 		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
+	private static final String   NOAUTO = "[noauto]";
 			
 	private boolean     cascade;
 	private boolean     segmentSubFlows;
@@ -422,10 +423,18 @@ public class SRXDocument {
 		ArrayList<Rule> langRule = langRules.get(ruleName);
 		for ( Rule rule : langRule ) {
 			if ( rule.isActive ) {
-				segmenter.addRule(
-					// The compiled rule is made of two groups: the pattern before and the pattern after
-					// the break. A special pattern for in-line codes is also added transparently.
-					new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
+				if ( rule.before.endsWith(NOAUTO)) {
+					segmenter.addRule(
+						// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
+						new CompiledRule("("+rule.before.substring(0, rule.before.length()-NOAUTO.length())
+							+")("+rule.after+")", rule.isBreak));
+				}
+				else {
+					segmenter.addRule(
+						// The compiled rule is made of two groups: the pattern before and the pattern after
+						// the break. A special pattern for in-line codes is also added transparently.
+						new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
+				}
 			}
 		}
 	}

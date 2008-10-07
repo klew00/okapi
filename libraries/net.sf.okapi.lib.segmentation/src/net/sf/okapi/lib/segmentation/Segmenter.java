@@ -38,6 +38,7 @@ public class Segmenter {
 	private boolean     includeIsolatedCodes;
 	private String      currentLanguageCode;
 	private boolean     oneSegmentIncludesAll;
+	private boolean     trimWS;
 	
 	private ArrayList<CompiledRule>         rules;
 	private TreeMap<Integer, Boolean>       splits;
@@ -63,6 +64,7 @@ public class Segmenter {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
+		trimWS = false; // Extension
 	}
 
 	public void setOptions (boolean segmentSubFlows,
@@ -172,15 +174,20 @@ public class Segmenter {
 				//	else break;
 				//}
 				// Trim white-spaces and codes as required at the front
-				textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
-					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				if ( trimWS ) {
+					textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
+						!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				}
 				if ( textStart == pos ) {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
 				// Trim white-spaces and codes as required at the back
-				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
-					pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				if ( trimWS ) {
+					textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
+						pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				}
+				else textEnd = pos-1;
 				if ( textEnd > textStart ) { // Only if there is something
 					if ( textEnd < pos ) textEnd++; // Adjust for +1 position
 					starts.add(textStart);
@@ -199,12 +206,17 @@ public class Segmenter {
 			//	else break;
 			//}
 			// Trim white-spaces and codes as required at the front
-			textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
-				!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+			if ( trimWS ) {
+				textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
+					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+			}
 			if ( textStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
-				textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
-					textStart, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				if ( trimWS ) {
+					textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
+						textStart, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				}
+				else textEnd = lastPos-1;
 				//TODO: fix case of last seg is single letter char surrounded by WS 
 				if ( textEnd > textStart ) { // Only if there is something
 					if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
@@ -276,7 +288,7 @@ public class Segmenter {
 
 		// If not found: take all the remainder as the fragment
 		if ( end < 0 ) end = text.length()-1;
-		
+//TODO: implement same trimming at computeSegments()		
 		// Trim the white-spaces at the front of the segment
 		while ( true ) {
 			if ( start > end ) break;

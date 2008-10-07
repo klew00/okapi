@@ -409,7 +409,10 @@ public class Aligner {
 	private void synchronizeFromSource () {
 		updateSourceSegmentDisplay();
 		int n = srcList.getSelectionIndex();
-		if ( n >= trgList.getItemCount() ) return; // Cannot synchronize
+		if ( n >= trgList.getItemCount() ) {
+			edTrgSeg.setText("");
+			return; // Cannot synchronize
+		}
 		trgList.setSelection(n);
 		updateTargetSegmentDisplay();
 	}
@@ -417,7 +420,10 @@ public class Aligner {
 	private void synchronizeFromTarget () {
 		updateTargetSegmentDisplay();
 		int n = trgList.getSelectionIndex();
-		if ( n >= srcList.getItemCount() ) return; // Cannot synchronize
+		if ( n >= srcList.getItemCount() ) {
+			edSrcSeg.setText("");
+			return; // Cannot synchronize
+		}
 		srcList.setSelection(n);
 		updateSourceSegmentDisplay();
 	}
@@ -435,13 +441,13 @@ public class Aligner {
 	private void updateSourceSegmentDisplay () {
 		int n = srcList.getSelectionIndex();
 		if ( n < 0 ) edSrcSeg.setText("");
-		edSrcSeg.setText(srcList.getItem(n));
+		else edSrcSeg.setText(srcList.getItem(n));
 	}
 	
 	private void updateTargetSegmentDisplay () {
 		int n = trgList.getSelectionIndex();
 		if ( n < 0 ) edTrgSeg.setText("");
-		edTrgSeg.setText(trgList.getItem(n));
+		else edTrgSeg.setText(trgList.getItem(n));
 
 		n = trgList.getSelectionIndex();
 		int count = trgList.getItemCount();
