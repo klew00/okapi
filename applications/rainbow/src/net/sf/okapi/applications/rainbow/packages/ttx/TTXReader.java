@@ -73,7 +73,8 @@ class TTXReader {
 
 	//TODO: Implement case for multiple file in single doc
 	public TTXReader () {
-		idPattern = Pattern.compile("(\\d+)");
+		// pattern to match: id = 'ID'
+		idPattern = Pattern.compile("id\\s*?=\\s*?[\\\"\\'](.*?)[\\\"\\']");
 	}
 	
 	protected void finalize ()
@@ -199,10 +200,10 @@ class TTXReader {
 			textType = SOURCE;
 			srcCont = new TextContainer(item);
 			trgCont = new TextContainer(item);
-			Matcher M = idPattern.matcher(text);
-			if ( M.find() ) {
+			Matcher m = idPattern.matcher(text);
+			if ( m.find() ) {
 				item.setIsTranslatable(false);
-				item.setID(text.substring(M.start(), M.end()));
+				item.setID(m.group(1));
 			}
 			else throw new RuntimeException("ID value not found for <u> element: "+text);
 		}
