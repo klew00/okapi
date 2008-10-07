@@ -22,6 +22,7 @@ package net.sf.okapi.filters.openoffice;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
@@ -40,9 +42,9 @@ public class InputFilter implements IInputFilter {
 
 	static final int         BUFFER_SIZE = 2048;
 	
-	private InputStream      input;
-	private IResourceBuilder output;
-	private Parser           parser;
+	private InputStream           input;
+	private IResourceBuilder      output;
+	private Parser                parser;
 	
 
 	public InputFilter () {
@@ -89,6 +91,15 @@ public class InputFilter implements IInputFilter {
 	public void process () {
 		try {
 			close();
+			
+			// Unzip the content.xml and make it the input
+			/*NOT ready yet String[] contentPaths = unzipContent(parser.resource.getName());
+			
+			//TODO: stream need to be open in filter, not before
+			input.close();
+			input = new FileInputStream(contentPaths[0]); 
+			*/
+			
 			parser.open(input);
 			
 			// Get started
@@ -111,6 +122,9 @@ public class InputFilter implements IInputFilter {
 
 			output.endResource(parser.resource);
 		}
+//		catch ( IOException e ) {
+//			throw new RuntimeException(e);
+//		}
 		finally {
 			close();
 		}
@@ -124,25 +138,41 @@ public class InputFilter implements IInputFilter {
 		if ( parser != null ) parser.cancel();
 	}
 	
-	private void unzip (String path) {
+	
+	private String[] unzipContent (String path) {
 		BufferedOutputStream dest = null;
 		BufferedInputStream is = null;
+		String tmpDir = null;
 		try {
+			tmpDir = Util.getTempDirectory() + File.separator + Util.getFilename(path, true);
+			String[] outPaths = new String[2];
+			int out = 0;
 			ZipEntry entry;
 			ZipFile zipfile = new ZipFile(path);
 			Enumeration e = zipfile.entries();
+			
 			while( e.hasMoreElements() ) {
-				entry = (ZipEntry) e.nextElement();
+				entry = (ZipEntry)e.nextElement();
+				if ( entry.getName().equals("content.xml") ) {
+					out = 0;
+				}
+				else if ( entry.getName().equals("meta.xml") ) {
+					out = 1;
+				}
+				else continue; // Skip the others
+				outPaths[out] = tmpDir + File.separator + entry.getName();
+				Util.createDirectories(outPaths[out]);
 				is = new BufferedInputStream(zipfile.getInputStream(entry));
+				FileOutputStream fos = new FileOutputStream(outPaths[0]);
 				int count;
 				byte data[] = new byte[BUFFER_SIZE];
-				FileOutputStream fos = new FileOutputStream(entry.getName());
 				dest = new BufferedOutputStream(fos, BUFFER_SIZE);
 				while ( (count = is.read(data, 0, BUFFER_SIZE)) != -1 ) {
 					dest.write(data, 0, count);
 				}
 				dest.flush();
 			}
+			return outPaths;
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

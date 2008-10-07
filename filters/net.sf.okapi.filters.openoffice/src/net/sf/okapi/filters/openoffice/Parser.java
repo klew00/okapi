@@ -20,8 +20,11 @@
 
 package net.sf.okapi.filters.openoffice;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Hashtable;
 import java.util.Stack;
 
 import javax.xml.stream.XMLInputFactory;
@@ -40,14 +43,23 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 public class Parser extends BaseParser {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
+	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 
-	protected Document            resource;
-	private XMLStreamReader       reader;
-	private Stack<Boolean>        extract;
+	protected Document                 resource;
+	private XMLStreamReader            reader;
+	private Stack<Boolean>             extract;
+	private Hashtable<String, ElementRule>     toExtract;
 
 	public Parser () {
 		resource = new Document();
 		extract = new Stack<Boolean>();
+		
+		toExtract = new Hashtable<String, ElementRule>();
+		toExtract.put("text:p", new ElementRule("text:p", null));
+		toExtract.put("dc:title", new ElementRule("dc:title", null));
+		toExtract.put("dc:description", new ElementRule("dc:description", null));
+		toExtract.put("dc:subject", new ElementRule("dc:subject", null));
+		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
 	}
 
 	public void close () {
@@ -85,11 +97,17 @@ public class Parser extends BaseParser {
 	}
 
 	public void open (CharSequence input) {
-		// TODO Auto-generated method stub
+		//TODO: Check for better solution, going from char to byte to read char is just not good
+		open(new ByteArrayInputStream(input.toString().getBytes())); 
 	}
 
 	public void open (URL input) {
-		// TODO Auto-generated method stub
+		try { //TODO: Make sure this is actually working (encoding?, etc.)
+			open(input.openStream());
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public ParserTokenType parseNext () {
@@ -97,7 +115,7 @@ public class Parser extends BaseParser {
 			if ( isFinishedParsing() ) {
 				return ParserTokenType.ENDINPUT;
 			}
-			reset();
+			initializeLoop();
 
 			while ( !isFinishedToken() && reader.hasNext() && !isCanceled() ) {
 
@@ -193,8 +211,9 @@ public class Parser extends BaseParser {
 	
 	private void processStartElement () throws XMLStreamException {
 		String name = makePrintName();
-		if ( name.equals("text:p") ) {
+		if ( toExtract.containsKey(name) ) {
 			appendToSkeletonUnit(buildStartTag(name));
+			//TODO: need a way to set the TextUnit's name/id/restype/etc.
 			extract.push(true);
 		}
 		else if ( extract.peek() && name.equals("text:s") ) {
@@ -213,7 +232,8 @@ public class Parser extends BaseParser {
 		}
 		else {
 			if ( extract.peek() ) {
-				appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
+				if ( name.equals("text:a") ) processStartALink(name);
+				else appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
 			}
 			else {
 				appendToSkeletonUnit(buildStartTag(name));
@@ -221,12 +241,22 @@ public class Parser extends BaseParser {
 		}
 	}
 
+	private void processStartALink (String name) {
+		String data = buildStartTag(name);
+		String href = reader.getAttributeValue(NSURI_XLINK, "href");
+		if ( href != null ) {
+			//TODO: set the property, but where???
+		}
+		appendToTextUnit(new Code(TagType.OPENING, name, data));
+	}
+	
 	private void processEndElement () {
 		String name = makePrintName();
-		if ( name.equals("text:p") ) {
+		if ( toExtract.containsKey(name) ) {
 			finalizeCurrentToken();
 			extract.pop();
 			// Add line break because ODT files don't have any
+			// Note: we may keep adding extra line if processing a filter output!
 			appendToSkeletonUnit(buildEndTag(name)+"\n");
 		}
 		else {
