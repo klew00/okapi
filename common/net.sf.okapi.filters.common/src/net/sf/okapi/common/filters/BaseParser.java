@@ -94,11 +94,29 @@ public abstract class BaseParser implements IParser {
 		return finalizedTokenType;
 	}
 
-	protected void reset() {
+	/**
+	 * must call at the beginning of each parseNext
+	 */
+	protected void initializeLoop() {
 		finishedToken = false;
 		cancel = false;
 	}
 
+	/**
+	 * reset parser for new input
+	 */
+	protected void reset() {
+		finishedToken = false;
+		cancel = false;
+		finishedParsing = false;
+		
+		groupId = 0;
+		textUnitId = 0;
+		skeleltonUnitId = 0;
+		
+		groupStack = new Stack<Group>();
+	}
+	
 	private void finalizeToken(TextUnit textUnit) {
 		finishedToken = true;
 		finalizedToken = textUnit;

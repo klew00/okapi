@@ -103,7 +103,7 @@ public class HtmlParser extends BaseParser {
 
 		// reset state flags and buffers
 		ruleState.reset();
-		reset();
+		initializeLoop();
 
 		while (!isFinishedToken() && nodeIterator.hasNext() && !isCanceled()) {
 			Segment segment = nodeIterator.next();
