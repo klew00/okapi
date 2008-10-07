@@ -26,6 +26,8 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -56,8 +58,6 @@ public class Editor implements IParametersEditor {
 	private Table                 table;
 	private Text                  searchText;
 	private Text                  replacementText;
-	private boolean               firstSelected;
-	private boolean               lastSelected;
 	private Button                btMoveUp;
 	private Button                btMoveDown;
 	private Button 				  chkIgnoreCase;
@@ -99,24 +99,25 @@ public class Editor implements IParametersEditor {
 
 		int index = table.getSelectionIndex();
 		int items = table.getItemCount();
-
+		
         if(items>1){
-	        if (index==0){
-	        	firstSelected=true;  // Needed it's not used anywhere it seems			        	
+        	if (index==-1){
+	        	btMoveDown.setEnabled(false);
+	        	btMoveUp.setEnabled(false);
+        	}else if (index==0){
 	        	btMoveUp.setEnabled(false);
 	        	btMoveDown.setEnabled(true);
 	        }else if((index+1)==items){
-	        	lastSelected=false; // Needed???
 	        	btMoveDown.setEnabled(false);
 	        	btMoveUp.setEnabled(true);
 	        }else{
-	        	firstSelected=false; // Needed???
-	        	lastSelected=false; // Needed???
 	        	btMoveDown.setEnabled(true);
 	        	btMoveUp.setEnabled(true);
 	        }
+        }else{
+        	btMoveDown.setEnabled(false);
+        	btMoveUp.setEnabled(false);
         }
-
 	}
 	
 	
@@ -139,46 +140,41 @@ public class Editor implements IParametersEditor {
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp0);		
 		
-		//shell.setLayout(new GridLayout(4, false));
-		
 		// search and replace grid items
 		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);
 		table.setLinesVisible (true);
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+
+		//--click updates button states--
 		table.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
-				//Make sure to remove this when done:
-				String string = event.detail == SWT.CHECK ? "Checked" : "Selected";
-				System.out.println (event.item + " " + string);
-				
 				if ( event.detail!=SWT.CHECK ) {
-
 					updateUpDownBtnState();
-					
-					/*TableItem item = (TableItem) event.item;
-					int items = table.getItemCount();
-			        int index = table.indexOf (item);
-	        
-			        if(items>1){
-				        if (index==0){
-				        	firstSelected=true;			        	
-				        	btMoveUp.setEnabled(false);
-				        	btMoveDown.setEnabled(true);
-				        }else if((index+1)==items){
-				        	lastSelected=false;
-				        	btMoveDown.setEnabled(false);
-				        	btMoveUp.setEnabled(true);
-				        }else{
-				        	firstSelected=false;
-				        	lastSelected=false;
-				        	btMoveDown.setEnabled(true);
-				        	btMoveUp.setEnabled(true);
-				        }
-			        }*/
 				}
 			}
 		});		
+
+		//--double-click opens editor--
+		table.addListener (SWT.MouseDoubleClick, new Listener () {
+			public void handleEvent (Event event) {
+				if(table.getSelectionIndex()!=-1){
+					showAddItemsDialog(EDIT_ITEM);
+					updateUpDownBtnState();
+				}				
+			}
+		});		
+		
+		//--resizing the columns--
+		table.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+
+				int tableWidth = table.getBounds().width;
+				int remaining = tableWidth - table.getColumn(0).getWidth();
+				table.getColumn(1).setWidth(remaining/2-2);
+				table.getColumn(2).setWidth(remaining/2-2);
+			}
+		});
 		
 		// table headers
 		String[] titles = {"Use", "Search For", "Replace By"};
@@ -202,14 +198,16 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				if ( table.getSelectionIndex()!=-1 ) {
 
-					//Not used: int items = table.getItemCount();
 			        int index = table.getSelectionIndex();
+			        boolean isChecked=false;
 			        
 			        TableItem ti = table.getItem(index);
+			        isChecked = ti.getChecked();
 			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
 			        ti.dispose();
 
 					ti = new TableItem (table, SWT.NONE,index-1);
+					ti.setChecked(isChecked);
 					String [] strs =values;
 					ti.setText(strs);
 					table.select(index-1);
@@ -226,14 +224,16 @@ public class Editor implements IParametersEditor {
 
 				if ( table.getSelectionIndex()!=-1 ) {
 					
-					//Not used: int items = table.getItemCount();
 			        int index = table.getSelectionIndex();
+			        boolean isChecked=false;
 			        
 			        TableItem ti = table.getItem(index);
+			        isChecked = ti.getChecked();
 			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
 			        ti.dispose();
 
 					ti = new TableItem (table, SWT.NONE,index+1);
+					ti.setChecked(isChecked);
 					String [] strs =values;
 					ti.setText(strs);
 					table.select(index+1);
@@ -248,15 +248,13 @@ public class Editor implements IParametersEditor {
 		RowLayout rl2 = new RowLayout();
 		rl2.pack = false;
 		cmpTmp2.setLayout(rl2);
-		cmpTmp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		cmpTmp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
 		
 		Button btAdd = new Button(cmpTmp2, SWT.PUSH);
 		btAdd.setText("Add...");
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				showAddItemsDialog(ADD_ITEM);
-				btMoveDown.setEnabled(false);
-	        	btMoveUp.setEnabled(false);
 			}
 		});		
 		Button btEdit = new Button(cmpTmp2, SWT.PUSH);
@@ -265,7 +263,6 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				if(table.getSelectionIndex()!=-1){
 					showAddItemsDialog(EDIT_ITEM);
-					updateUpDownBtnState();
 				}				
 			}
 		});		
@@ -274,9 +271,10 @@ public class Editor implements IParametersEditor {
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(table.getSelectionIndex()!=-1){
-					table.remove(table.getSelectionIndex());
-					btMoveDown.setEnabled(false);
-		        	btMoveUp.setEnabled(false);
+					int index = table.getSelectionIndex();
+					table.remove(index);
+					table.setSelection(index);
+					updateUpDownBtnState();
 				}
 			}
 		});	
@@ -284,7 +282,7 @@ public class Editor implements IParametersEditor {
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new RowLayout(SWT.VERTICAL));
 		group.setText("Options");
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
 
 		chkIgnoreCase = new Button(group, SWT.CHECK);
 		chkIgnoreCase.setText("Ignore case");
@@ -313,6 +311,7 @@ public class Editor implements IParametersEditor {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Dialogs.centerWindow(shell, parent);
+		
 	}
 	
 	
@@ -377,6 +376,7 @@ public class Editor implements IParametersEditor {
 						String [] strs ={"",searchText.getText(),replacementText.getText()};
 						item.setText(strs);
 						item.setChecked(true);
+						updateUpDownBtnState();
 					}
 				}
 				

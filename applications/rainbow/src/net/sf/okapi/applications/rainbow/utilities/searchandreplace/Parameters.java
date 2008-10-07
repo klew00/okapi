@@ -21,8 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.searchandreplace;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -33,24 +31,6 @@ public class Parameters extends BaseParameters {
 	
 	public Parameters () {
 		reset();
-	}
-	
-	public void fromString (String data) {
-		reset();
-		// Read the file content as a set of fields
-		buffer.fromString(data);
-		// Parse the fields
-		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
-		multiLine = buffer.getBoolean("multiLine", multiLine);
-		
-		int count = buffer.getInteger("count", 0);
-		for ( int i=0; i<count; i++ ) {
-			String []s=new String[3];
-			s[0] = buffer.getString(String.format("use%d", i), "");
-			s[1] = buffer.getString(String.format("search%d", i), "");
-			s[2] = buffer.getString(String.format("replace%d", i), "");
-			rules.add(s);
-		}
 	}
 
 	public void reset () {
@@ -66,25 +46,39 @@ public class Parameters extends BaseParameters {
 	public ArrayList<String[]> getRules () {
 		return rules;
 	}	
+
+	public void fromString (String data) {
+
+		reset();
+		// Read the file content as a set of fields
+		buffer.fromString(data);
+		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
+		multiLine = buffer.getBoolean("multiLine", multiLine);
+		
+		int count = buffer.getInteger("count", 0);
+		for ( int i=0; i<count; i++ ) {
+			String []s = new String[3];
+			s[0] = buffer.getString(String.format("use%d", i), "");
+			s[1] = buffer.getString(String.format("search%d", i), "");
+			s[2] = buffer.getString(String.format("replace%d", i), "");
+			rules.add(s);
+		}
+	}
 	
-	@Override
 	public String toString() {
-		// Store the parameters in fields
+
 		buffer.reset();
 		buffer.setBoolean("ignoreCase", ignoreCase);
 		buffer.setBoolean("multiLine", multiLine);
-		
 		buffer.setInteger("count", rules.size());
 		int i = 0;
-		Iterator<String[]> it = rules.iterator();
-		while( it.hasNext() ) {
-			String[] temp = (String[])it.next();
+
+		for ( String[] temp : rules ) {
 			buffer.setString(String.format("use%d", i), temp[0]);
 			buffer.setString(String.format("search%d", i), temp[1]);
 			buffer.setString(String.format("replace%d", i), temp[2]);
 			i++;
 		}
-		
 		return buffer.toString();
 	}
 }
