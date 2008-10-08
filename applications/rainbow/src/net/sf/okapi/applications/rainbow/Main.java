@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -31,9 +31,16 @@ public class Main {
 		try {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
-			MainForm MF = new MainForm(shlMain);
+			
+			String projectFile = null;
+			if ( args.length > 0 ) {
+				//TODO: other arguments
+				projectFile = args[0];
+			}
+
+			MainForm mf = new MainForm(shlMain, projectFile);
 			shlMain.open();
-			MF.run();
+			mf.run();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

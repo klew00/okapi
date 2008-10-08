@@ -100,6 +100,7 @@ public class Parser implements IParser {
 		resource.params.rules.add(r);
 	}
 */
+	
 	//TODO: remove after test
 // AZADA rules
 /*	private void tempSetHCRules () {
@@ -157,9 +158,6 @@ public class Parser implements IParser {
 			groupID = 0;
 			nextAction = -1;
 
-			//For test
-			//tempSetHCRules();
-			
 			// Prepare the filter rules
 			resource.params.compileRules();
 		}
@@ -385,8 +383,6 @@ public class Parser implements IParser {
 			rule.codeFinder.process(item.getSourceContent());
 		}
 
-		//splitItem(item, rule.splitters);
-		
 		if ( name != null ) {
 			if ( rule.nameFormat.length() > 0 ) {
 				String tmp = rule.nameFormat.replace("<parentName>",
@@ -398,67 +394,6 @@ public class Parser implements IParser {
 
 		resultQueue.add(item);
 	}
-	
-	/*
-	private void splitItem (TextUnit item,
-		String pattern)
-	{
-		if (( pattern == null ) || ( pattern.length() == 0 )) return;
-		return;
-		//TODO: REDO splitItem
-		
-		//TODO: optimize by compiling once
-		Pattern p = Pattern.compile(pattern, Pattern.MULTILINE);
-		TextContainer src = item.getSourceContent();
-		String codedText = src.getCodedText();
-		Matcher m = p.matcher(codedText);
-		ArrayList<IPart> tmpList = new ArrayList<IPart>();
-		int start = 0;
-		int id = 0;
-		CodeFragment cf = new CodeFragment(IContainer.CODE_ISOLATED, ++id, null);
-		
-		while ( true ) {
-			if ( m.find(start) ) {
-				if ( start < m.start() ) {
-					// If there is a segment, add the code buffer
-					if ( cf.toString() != null ) tmpList.add(new Part(cf, false));
-					else --id; // Adjust ID value (we didn't use it)
-					// And add the segment
-					tmpList.add(src.copy(start, m.start()));
-					// New fragment buffer for next time
-					cf = new CodeFragment(IContainer.CODE_ISOLATED, ++id, m.group());
-				}
-				else {
-					// Else: the code is simply compiled with any previous
-					// in the code buffer. this allows to group matches and to have only
-					// one code fragment between segments.
-					cf.append(m.group());
-				}
-				// Set the new start position
-				start = m.end();
-			}
-			else { // End of the container
-				if ( tmpList.size() > 0 ) {
-					if ( start < codedText.length()-1 ) {
-						if ( cf.toString() != null ) tmpList.add(new Part(cf, false));
-						tmpList.add(src.copy(start));
-					}
-					else if ( cf.toString() != null ) {
-						tmpList.add(new Part(cf, false));
-					}
-				}
-				break; // Exit loop
-			}
-		}
-		
-		// Now update the item with the segments created (if there are any)
-		if ( tmpList.size() > 0 ) {
-			src.reset();
-			for ( IPart part : tmpList ) {
-				src.append(part);
-			}
-		}
-	}*/
 	
 	private void processStrings (Rule rule,
 		String name,
@@ -561,8 +496,6 @@ public class Parser implements IParser {
 				rule.codeFinder.process(item.getSourceContent());
 			}
 
-			//splitItem(item, rule.splitters);
-			
 			if ( name != null ) {
 				if ( rule.nameFormat.length() > 0 ) {
 					String tmp = rule.nameFormat.replace("<parentName>",

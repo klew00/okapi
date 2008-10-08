@@ -48,6 +48,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
@@ -173,7 +174,9 @@ public class MainForm implements IParametersProvider {
 	}
 
 	
-	public MainForm (Shell shell) {
+	public MainForm (Shell shell,
+		String projectFile)
+	{
 		try {
 			this.shell = shell;
 			
@@ -184,11 +187,16 @@ public class MainForm implements IParametersProvider {
 			config.load();
 			
 			createContent();
-
 			createProject(false);
-			if ( config.getBoolean("loadLastFile") ) { //$NON-NLS-1$
-				String path = config.getProperty("lastFile"); //$NON-NLS-1$
-				if ( path != null ) openProject(path);
+
+			if ( projectFile != null ) {
+				openProject(projectFile);
+			}
+			else { // Load MRU project if needed
+				if ( config.getBoolean("loadLastFile") ) { //$NON-NLS-1$
+					String path = config.getProperty("lastFile"); //$NON-NLS-1$
+					if ( path != null ) openProject(path);
+				}
 			}
 		}
 		catch ( Throwable E ) {
@@ -434,6 +442,13 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				listEncodings();
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.charinfo"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				showCharInfo();
 			}
 		});
 
@@ -951,7 +966,7 @@ public class MainForm implements IParametersProvider {
 			menuItem.setData(item.id);
 			menuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					launchUtility(event);
+					launchUtility((String)((MenuItem)event.getSource()).getData());
 				}
 			});
 		}
@@ -971,19 +986,17 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	private void launchUtility (SelectionEvent event) {
+	private void launchUtility (String utilityID) {
 		try {
+			if ( utilityID == null ) return;
 			// Save any pending data
 			saveSurfaceData();
 			// Create the utility driver if needed
 			if ( ud == null ) {
 				ud = new UtilityDriver(log, fa, plugins);
 			}
-			// Get the utility to run and instantiate it
-			String id = (String)((MenuItem)event.getSource()).getData();
-			if ( id == null ) return;
-			
-			ud.setData(prj, id);
+			// Get the data for the utility and instantiate it
+			ud.setData(prj, utilityID);
 			// Run it
 			if ( !ud.checkParameters(shell) ) return;
 			startWaiting("Processing files...", true);
@@ -1507,6 +1520,16 @@ public class MainForm implements IParametersProvider {
 		}
 		finally {
 			if ( dlg != null ) dlg.dispose();
+		}
+	}
+	
+	private void showCharInfo () {
+		try {
+			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, "Character Information", null);
+			dlg.showDialog(0x9F99);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	

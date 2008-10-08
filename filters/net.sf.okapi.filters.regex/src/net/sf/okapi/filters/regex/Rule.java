@@ -40,7 +40,6 @@ public class Rule {
 	protected String              nameStart;
 	protected String              nameEnd;
 	protected String              nameFormat;
-	protected String              splitters;
 	protected int                 ruleType;
 	protected boolean             preserveWS;
 	protected boolean             unwrap;
@@ -71,7 +70,6 @@ public class Rule {
 		nameStart = obj.nameStart;
 		nameEnd = obj.nameEnd;
 		nameFormat = obj.nameFormat;
-		splitters = obj.splitters;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
 		unwrap = obj.unwrap;
@@ -145,14 +143,6 @@ public class Rule {
 		nameFormat = value;
 	}
 
-	public String getSplitters () {
-		return splitters;
-	}
-	
-	public void setSplitters (String value) {
-		splitters = value;
-	}
-	
 	public int getRuleType () {
 		return ruleType;
 	}

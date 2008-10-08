@@ -22,8 +22,12 @@ package net.sf.okapi.common.ui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -38,10 +42,20 @@ public class CharacterInfoDialog {
 	private String           help;
 	private ClosePanel       pnlActions;
 	private int              codePoint;
-	private CLabel           rendering;
-	private CLabel           cpValue;
+	private CLabel           stRendering;
+	private Text             edCharacter;
+	private Text             edCodePoint;
 	private Text             edType;
 	private Text             edNumValue;
+	private Text             edIsJavaSpace;
+	private Text             edIsUnicodeSpace;
+	private boolean          settingCodePoint = false;
+	private Font             sampleFont;
+
+	@Override
+	protected void finalize () {
+		dispose();
+	}
 
 	public CharacterInfoDialog (Shell parent,
 		String captionText,
@@ -55,37 +69,78 @@ public class CharacterInfoDialog {
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout(2, false);
+		GridLayout layTmp = new GridLayout(3, false);
 		cmpTmp.setLayout(layTmp);
 		
-		rendering = new CLabel(cmpTmp, SWT.BORDER | SWT.CENTER);
+		stRendering = new CLabel(cmpTmp, SWT.BORDER | SWT.CENTER);
 		GridData gdTmp = new GridData();
 		gdTmp.widthHint = 60;
 		gdTmp.heightHint = 60;
-		rendering.setLayoutData(gdTmp);
+		gdTmp.verticalSpan = 2;
+		stRendering.setLayoutData(gdTmp);
 
-		cpValue = new CLabel(cmpTmp, SWT.BORDER | SWT.CENTER);
-		gdTmp = new GridData();
-		gdTmp.widthHint = 150;
-		gdTmp.heightHint = 20;
-		cpValue.setLayoutData(gdTmp);
-		
+		Font font = stRendering.getFont();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(20);
+		sampleFont = new Font(font.getDevice(), fontData[0]);
+		stRendering.setFont(sampleFont);
+
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Character type:");
+		label.setText("Code point:");
+		edCodePoint = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 60;
+		edCodePoint.setLayoutData(gdTmp);
+		edCodePoint.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateCodePoint();
+			}
+		});
 		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Character:");
+		edCharacter = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 30;
+		edCharacter.setLayoutData(gdTmp);
+		edCharacter.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateCharacter();
+			}
+		});
+		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Character type:");
 		edType = new Text(cmpTmp, SWT.BORDER);
 		edType.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
 		edType.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Numeric value:");
-		
 		edNumValue = new Text(cmpTmp, SWT.BORDER);
 		edNumValue.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
 		edNumValue.setLayoutData(gdTmp);
 		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Java isWhitespace():");
+		edIsJavaSpace = new Text(cmpTmp, SWT.BORDER);
+		edIsJavaSpace.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edIsJavaSpace.setLayoutData(gdTmp);
+
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Is Unicode whitespace:");
+		edIsUnicodeSpace = new Text(cmpTmp, SWT.BORDER);
+		edIsUnicodeSpace.setEditable(false);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edIsUnicodeSpace.setLayoutData(gdTmp);
+
 		//--- Dialog-level buttons
 
 		SelectionAdapter CloseActions = new SelectionAdapter() {
@@ -109,10 +164,45 @@ public class CharacterInfoDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	public void dispose () {
+		if ( sampleFont != null ) {
+			sampleFont.dispose();
+			sampleFont = null;
+		}
+	}
+
+	private void updateCodePoint () {
+		try {
+			if ( settingCodePoint ) return;
+			String tmp = edCodePoint.getText();
+			if ( tmp.length() != 4 ) return;
+			int cp = Integer.valueOf(tmp, 16);
+			setCodePoint(cp);
+			edCodePoint.setSelection(4, 4);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Invalid value: "+e.getMessage(), null);
+		}
+	}
+	
+	private void updateCharacter () {
+		try {
+			if ( settingCodePoint ) return;
+			String tmp = edCharacter.getText();
+			if ( tmp.length() < 1 ) return;
+			setCodePoint(tmp.codePointAt(0));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Invalid value: "+e.getMessage(), null);
+		}
+	}
+	
 	private void setCodePoint (int value) {
+		settingCodePoint = true;
 		codePoint = value;
-		rendering.setText(String.format("%c", codePoint));
-		cpValue.setText(String.format("U+%04X", codePoint));
+		stRendering.setText(String.format("%c", codePoint));
+		edCharacter.setText(stRendering.getText());
+		edCodePoint.setText(String.format("%04X", codePoint));
 		
 		int type = Character.getType(codePoint);
 		switch ( type ) {
@@ -152,7 +242,6 @@ public class CharacterInfoDialog {
 		case Character.LETTER_NUMBER:
 			edType.setText("Nl : LETTER_NUMBER");
 			break;
-
 		case Character.UPPERCASE_LETTER:
 			edType.setText("Lu : UPPERCASE_LETTER");
 			break;
@@ -209,7 +298,11 @@ public class CharacterInfoDialog {
 			break;
 		}
 		
+		edIsJavaSpace.setText(Character.isWhitespace(codePoint)? "YES" : "NO");
+		edIsUnicodeSpace.setText(Character.isSpaceChar(codePoint)? "YES" : "NO");
 		edNumValue.setText(String.valueOf(Character.getNumericValue(codePoint)));
+		
+		settingCodePoint = false;
 	}
 		
 /*	

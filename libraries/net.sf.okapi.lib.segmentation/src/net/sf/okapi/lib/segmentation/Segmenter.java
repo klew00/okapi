@@ -157,7 +157,7 @@ public class Segmenter {
 				splits.put(n, rule.isBreak);
 			}
 		}
-
+		
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
 		// Deal also with including or not the in-line codes.

@@ -192,7 +192,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
 		try {
-			tmp = tu.getTargetContent().getCodedText().replaceAll("\\p{Lu}", "X");
+			tmp = tu.getTargetContent().getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
 			TextContainer cnt = tu.getTargetContent(); 

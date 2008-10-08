@@ -38,6 +38,7 @@
  <command name="tools">&amp;Tools</command>
  <command name="tools.editsegrules">Edit &amp;Segmentation Rules...</command>
  <command name="tools.listencodings">&amp;List Available Encodings</command>
+ <command name="tools.charinfo">&amp;Character Information...</command>
  
  <!-- Help menu -->
  <command name="help">&amp;Help</command>
