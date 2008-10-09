@@ -92,15 +92,17 @@ public class Utility implements ISimpleUtility {
 	        for ( String[] s : params.rules ) {
 	        	if ( s[0].equals("true") ) {
 		        	int flags = 0;
-		        	if ( params.ignoreCase ) {
-		        		flags = flags | Pattern.CASE_INSENSITIVE;
+		        	if ( params.dotAll ) flags |=  Pattern.DOTALL;
+		        	if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
+		        	if ( params.multiLine ) flags |= Pattern.MULTILINE;
+		        	
+		        	if ( params.regEx ){
+		        		Pattern pattern = Pattern.compile(s[1], flags);
+		        		Matcher matcher = pattern.matcher(result);
+		        		result = matcher.replaceAll(s[2]);
+		        	}else{
+		        		result = result.replace(s[1],s[2]);
 		        	}
-		        	if ( params.multiLine ) {
-		        		flags = flags | Pattern.MULTILINE;
-		        	}
-		        	Pattern pattern = Pattern.compile(s[1], flags);
-		            Matcher matcher = pattern.matcher(result);
-		            result = matcher.replaceAll(s[2]);	        		
 	        	}
 	        }
 	        

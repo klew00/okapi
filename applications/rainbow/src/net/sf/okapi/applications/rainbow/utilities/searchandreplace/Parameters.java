@@ -25,6 +25,8 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 
+	protected boolean             regEx;
+	protected boolean             dotAll;
 	protected boolean             ignoreCase;
 	protected boolean             multiLine;
 	protected ArrayList<String[]> rules;
@@ -34,6 +36,8 @@ public class Parameters extends BaseParameters {
 	}
 
 	public void reset () {
+		regEx = false;
+		dotAll = false;
 		ignoreCase = false;
 		multiLine = false;
 		rules = new ArrayList<String[]>();
@@ -52,6 +56,8 @@ public class Parameters extends BaseParameters {
 		reset();
 		// Read the file content as a set of fields
 		buffer.fromString(data);
+		regEx = buffer.getBoolean("regEx", regEx);
+		dotAll = buffer.getBoolean("dotAll", dotAll);
 		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
 		multiLine = buffer.getBoolean("multiLine", multiLine);
 		
@@ -68,6 +74,8 @@ public class Parameters extends BaseParameters {
 	public String toString() {
 
 		buffer.reset();
+		buffer.setBoolean("regEx", regEx);		
+		buffer.setBoolean("dotAll", dotAll);
 		buffer.setBoolean("ignoreCase", ignoreCase);
 		buffer.setBoolean("multiLine", multiLine);
 		buffer.setInteger("count", rules.size());

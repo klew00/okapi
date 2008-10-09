@@ -20,11 +20,11 @@
 
 package net.sf.okapi.applications.rainbow.utilities.searchandreplace;
 
+import java.util.regex.Pattern;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -60,6 +60,8 @@ public class Editor implements IParametersEditor {
 	private Text                  replacementText;
 	private Button                btMoveUp;
 	private Button                btMoveDown;
+	private Button 				  chkRegEx;
+	private Button 				  chkDotAll;
 	private Button 				  chkIgnoreCase;
 	private Button 				  chkMultiLine;
 	private int 				  updateType;
@@ -159,7 +161,8 @@ public class Editor implements IParametersEditor {
 		table.addListener (SWT.MouseDoubleClick, new Listener () {
 			public void handleEvent (Event event) {
 				if(table.getSelectionIndex()!=-1){
-					showAddItemsDialog(EDIT_ITEM);
+					updateType=EDIT_ITEM;
+					showAddItemsDialog();
 					updateUpDownBtnState();
 				}				
 			}
@@ -254,7 +257,8 @@ public class Editor implements IParametersEditor {
 		btAdd.setText("Add...");
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				showAddItemsDialog(ADD_ITEM);
+				updateType = ADD_ITEM;
+				showAddItemsDialog();
 			}
 		});		
 		Button btEdit = new Button(cmpTmp2, SWT.PUSH);
@@ -262,7 +266,8 @@ public class Editor implements IParametersEditor {
 		btEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(table.getSelectionIndex()!=-1){
-					showAddItemsDialog(EDIT_ITEM);
+					updateType = EDIT_ITEM; 
+					showAddItemsDialog();
 				}				
 			}
 		});		
@@ -273,22 +278,40 @@ public class Editor implements IParametersEditor {
 				if(table.getSelectionIndex()!=-1){
 					int index = table.getSelectionIndex();
 					table.remove(index);
-					table.setSelection(index);
+					if(index == table.getItemCount())
+						table.setSelection(index-1);
+					else
+						table.setSelection(index);
 					updateUpDownBtnState();
 				}
 			}
 		});	
 		
+		chkRegEx = new Button(cmpTmp0, SWT.CHECK);
+		chkRegEx.setText("Use regular expression");
+		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		chkRegEx.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				chkDotAll.setEnabled(chkRegEx.getSelection());
+				chkMultiLine.setEnabled(chkRegEx.getSelection());
+				chkIgnoreCase.setEnabled(chkRegEx.getSelection());
+			}
+		});
+		
 		Group group = new Group(cmpTmp0, SWT.NONE);
-		group.setLayout(new RowLayout(SWT.VERTICAL));
-		group.setText("Options");
+		group.setLayout(new GridLayout(2, false));
+		group.setText("Regular expression options");
 		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
 
-		chkIgnoreCase = new Button(group, SWT.CHECK);
-		chkIgnoreCase.setText("Ignore case");
+		chkDotAll = new Button(group, SWT.CHECK);
+		chkDotAll.setText("Dot also matches line-feed");
 		
 		chkMultiLine = new Button(group, SWT.CHECK);
-		chkMultiLine.setText("Multiline");
+		chkMultiLine.setText("Multi-line");
+		
+		chkIgnoreCase = new Button(group, SWT.CHECK);
+		chkIgnoreCase.setText("Ignore case differences");
+		
 
 		//--- Dialog-level buttons
 
@@ -310,8 +333,8 @@ public class Editor implements IParametersEditor {
 		setData();
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		shell.setSize(shell.getSize().x,shell.getSize().y+50);
 		Dialogs.centerWindow(shell, parent);
-		
 	}
 	
 	
@@ -325,7 +348,7 @@ public class Editor implements IParametersEditor {
 	}
 
 	
-	private boolean showAddItemsDialog (int action) {
+	private boolean showAddItemsDialog () {
 		dialog = new Shell (shell);
 		dialog.setText ("Search And Replace Item");
 		dialog.setSize (400, 200);
@@ -365,6 +388,25 @@ public class Editor implements IParametersEditor {
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
+					
+					//--validating empty search string--
+					if(searchText.getText().trim().length()<1){
+						Dialogs.showError(shell, "You need to provide a search expression.", null);
+						return;
+					}					
+					
+					//--validating regEx--
+					if( chkRegEx.getSelection() ){
+						try{
+							Pattern.compile(searchText.getText());
+							Pattern.compile(replacementText.getText());
+
+						}catch(Exception ex){
+							Dialogs.showError(shell, ex.getLocalizedMessage(), null);
+							return;
+						}
+					}
+					
 					//saveData();
 					if(updateType==EDIT_ITEM){
 						int index = table.getSelectionIndex();
@@ -376,6 +418,7 @@ public class Editor implements IParametersEditor {
 						String [] strs ={"",searchText.getText(),replacementText.getText()};
 						item.setText(strs);
 						item.setChecked(true);
+						table.setSelection(table.getItemCount()-1);
 						updateUpDownBtnState();
 					}
 				}
@@ -390,12 +433,11 @@ public class Editor implements IParametersEditor {
 		// end - dialog level buttons
 		
 		// begin - initialize edit fields
-		if ( action==EDIT_ITEM ) {
+		if ( updateType==EDIT_ITEM ) {
 			int index = table.getSelectionIndex();
 	        TableItem ti = table.getItem(index);
 	        searchText.setText(ti.getText(1));
 	        replacementText.setText(ti.getText(2));
-	        updateType=EDIT_ITEM;
 		}
 		// end - initialize edit fields
 		
@@ -408,10 +450,17 @@ public class Editor implements IParametersEditor {
 		return result;
 	}
 	
-	
 	private void setData () {
+		
+		chkRegEx.setSelection(params.regEx);
+		chkDotAll.setSelection(params.dotAll);
 		chkIgnoreCase.setSelection(params.ignoreCase);
 		chkMultiLine.setSelection(params.multiLine);
+
+		chkDotAll.setEnabled(chkRegEx.getSelection());
+		chkMultiLine.setEnabled(chkRegEx.getSelection());
+		chkIgnoreCase.setEnabled(chkRegEx.getSelection());		
+		
 		table.clearAll();
         for ( String[] s : params.rules ) {
         	TableItem item = new TableItem (table, SWT.NONE);
@@ -434,6 +483,8 @@ public class Editor implements IParametersEditor {
         	params.addRule(s);
 		};
 	
+		params.regEx = chkRegEx.getSelection();
+		params.dotAll = chkDotAll.getSelection();		
 		params.ignoreCase = chkIgnoreCase.getSelection();
 		params.multiLine = chkMultiLine.getSelection();
 
