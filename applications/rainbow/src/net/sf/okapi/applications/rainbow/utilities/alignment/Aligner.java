@@ -20,6 +20,11 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -69,6 +74,7 @@ public class Aligner {
 	private Button           btSkip;
 	private Button           btEditRules;
 	private Button           btEditSeg;
+	private List             lbIssues;
 	private Text             edSource;
 	private Text             edTarget;
 	private Text             edSrcSeg;
@@ -90,6 +96,9 @@ public class Aligner {
 	private Color            colorAmber;
 	private Color            colorRed;
 	private boolean          canAcceptUnit;
+	private int              issueType;
+	private Pattern               anchors;
+	private ArrayList<String>     anchorList = new ArrayList<String>(); 
 
 
 	@Override
@@ -125,6 +134,8 @@ public class Aligner {
 	}
 
 	public Aligner (Shell parent) {
+		anchors = Pattern.compile("((\\d+[\\.,])*\\d+)");
+		
 		colorGreen = new Color(null, 0, 128, 0);
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
@@ -163,18 +174,11 @@ public class Aligner {
 		edName.setLayoutData(gdTmp);
 		edName.setEditable(false);
 		
-		edCause = new Text(shell, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
-		edCause.setLayoutData(gdTmp);
-		edCause.setEditable(false);
-		edCause.setForeground(colorWhite);
-
-		Font font = edCause.getFont();
+		Font font = edName.getFont(); // Get default font
 		FontData[] fontData = font.getFontData();
-		fontData[0].setHeight(10);
+		fontData[0].setHeight(11);
 		textFont = new Font(font.getDevice(), fontData[0]);
-		
+
 		srcList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
@@ -316,6 +320,26 @@ public class Aligner {
 			}
 		});
 		
+		//--- Error/warning list
+		
+		edCause = new Text(shell, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edCause.setLayoutData(gdTmp);
+		edCause.setEditable(false);
+		edCause.setForeground(colorWhite);
+
+		lbIssues = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 4;
+		gdTmp.heightHint = 12;
+		lbIssues.setLayoutData(gdTmp);
+		lbIssues.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				gotoIssue();
+			}
+		});
+		
 		//--- Edit boxes
 		
 		edSrcSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -404,6 +428,22 @@ public class Aligner {
 	{
 		this.targetSrxPath = targetSrxPath;
 		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
+	}
+	
+	private void gotoIssue () {
+		try {
+			int n = lbIssues.getSelectionIndex();
+			if ( n == -1 ) return;
+			int p = lbIssues.getItem(n).indexOf(':');
+			if ( p != -1 ) {
+				p = Integer.valueOf(lbIssues.getItem(n).substring(0, p));
+				trgList.select(p-1);
+				synchronizeFromTarget();
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 	
 	private void synchronizeFromSource () {
@@ -734,6 +774,7 @@ public class Aligner {
 		btMerge.setVisible(!specialMode);
 		btSplit.setVisible(!specialMode);
 		chkSyncScrolling.setVisible(!specialMode);
+		lbIssues.setEnabled(!specialMode);
 		
 		if ( specialMode ) {
 			if ( splitMode ) btAccept.setText("Accept Split");
@@ -755,19 +796,22 @@ public class Aligner {
 	 */
 	private boolean hasIssue (boolean forceIssueDisplay) {
 		try {
+			issueType = 0;
+			lbIssues.removeAll();
+			
 			// Check the number of segments
 			if ( source.getSegments().size() != target.getSegments().size() ) {
 				// Optional visual alignment to fix the problems
-				setIssue(1);
-				return true;
+				addIssue(2, "Different number of segments in source and target.");
+				return updateIssueStatus();
 			}
 			// Assumes the list have same number of segments now
 			
 			// Check if we do further verification for single-segment unit
 			if (( source.getSegments().size() == 1 ) && !chkCheckSingleSegUnit.getSelection() ) {
 				// We assume it's ok to align
-				if ( forceIssueDisplay ) setIssue(0);
-				return false;
+				if ( forceIssueDisplay ) addIssue(0, null);
+				return updateIssueStatus();
 			}
 			
 			// Sanity check using common anchors
@@ -775,36 +819,111 @@ public class Aligner {
 			java.util.List<TextFragment> trgList = target.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
-					setIssue(2);
-					return true;
+					addIssue(1, String.format("%d: Different number of inline codes in source and target.", i+1));
 				}
+				checkAnchors(srcList.get(i), trgList.get(i), i);
 			}
-			if ( forceIssueDisplay ) setIssue(0);
-			return false;
+			if ( forceIssueDisplay ) addIssue(0, null);
+			return updateIssueStatus();
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
-			return true;
+			return false;
+		}
+	}
+
+	private void checkAnchors (TextFragment source,
+		TextFragment target,
+		int index)
+	{
+		//--- Check the inline code data
+		anchorList.clear();
+		for ( Code code : source.getCodes() ) {
+			anchorList.add(code.getData());
+		}
+		for ( Code code : target.getCodes() ) {
+			if ( !anchorList.contains(code.getData()) ) {
+				// An inline code found in the target is not in the source
+				addIssue(1, String.format("%d: Target inline code '%s' is not in the source.", index+1, code.getData())); 
+			}
+			else { // Change matched entries so they don't match again
+				anchorList.set(anchorList.indexOf(code.getData()), "");
+			}
+		}
+		// List of the source inline codes not found in the target
+		boolean extra = false;
+		StringBuilder tmp = new StringBuilder();
+		for ( String str : anchorList ) {
+			if ( str.length() == 0 ) continue;
+			if ( tmp.length() > 0 ) tmp.append(", ");
+			tmp.append("\'" + str + "\'");
+			extra = true;
+		}
+		if ( extra ) {
+			addIssue(1, String.format("%d: Source inline codes not found in the target: %s", index+1,
+				tmp.toString()));
+		}
+		
+		//--- Check the patterns
+		Matcher m = anchors.matcher(source.getCodedText());
+		anchorList.clear();
+		// Get the list anchors for the source
+		while ( m.find() ) {
+			anchorList.add(m.group());
+		}
+		// Go through the anchors for the target
+		m = anchors.matcher(target.getCodedText());
+		while ( m.find() ) {
+			if ( !anchorList.contains(m.group()) ) {
+				// An anchor found in the target is not in the source
+				addIssue(1, String.format("%d: Extra pattern '%s' in target.", index+1, m.group())); 
+			}
+			else anchorList.remove(m.group());
+		}
+		// List of the anchors found in the source but not in the target
+		if ( anchorList.size() > 0 ) {
+			tmp = new StringBuilder();
+			for ( String str : anchorList ) {
+				if ( tmp.length() > 0 ) tmp.append(", ");
+				tmp.append("\'" + str + "\'");
+			}
+			addIssue(1, String.format("%d: One or more missing patterns in target: %s", index+1,
+				tmp.toString()));
 		}
 	}
 	
-	private void setIssue (int type) {
-		canAcceptUnit = true;
+	private void addIssue (int type,
+		String causeText)
+	{
 		switch ( type ) {
+		case 1:
+			lbIssues.add(causeText);
+			if ( issueType < 1 ) issueType = 1;
+			break;
+		case 2:
+			lbIssues.add(causeText);
+			issueType = 2;
+			break;
+		}
+	}
+	
+	private boolean updateIssueStatus () {
+		switch ( issueType ) {
 		case 0:
 			edCause.setText("No issue automatically detected.");
 			edCause.setBackground(colorGreen);
 			break;
 		case 1:
-			edCause.setText("Different number of segments in target.");
-			edCause.setBackground(colorRed);
-			canAcceptUnit = false;
-			break;
-		case 2:
-			edCause.setText("At least one target segment has a different number on in-line codes.");
+			edCause.setText("One or more WARNINGS detected.");
 			edCause.setBackground(colorAmber);
 			break;
+		case 2:
+			edCause.setText("One or more ERRORS detected.");
+			edCause.setBackground(colorRed);
+			break;
 		}
+		canAcceptUnit = (issueType<2);
 		btAccept.setEnabled(canAcceptUnit);
+		return (issueType>0);
 	}
 }

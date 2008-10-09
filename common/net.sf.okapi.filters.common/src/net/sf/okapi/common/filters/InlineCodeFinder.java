@@ -122,7 +122,10 @@ public class InlineCodeFinder {
 			if ( tmp.length() > 0 ) tmp.append("|");
 			tmp.append("("+rule+")");
 		}
-		pattern = Pattern.compile(tmp.toString(), Pattern.MULTILINE);
+		if ( tmp.length() == 2 )
+			pattern = Pattern.compile(""); // () = empty
+		else
+			pattern = Pattern.compile(tmp.toString(), Pattern.MULTILINE);
 	}
 
 	/**
@@ -131,6 +134,7 @@ public class InlineCodeFinder {
 	 * @param fragment The fragment where to apply the rules.
 	 */
 	public void process (TextContainer fragment) {
+		if ( pattern.pattern().length() == 0 ) return;
 		String tmp = fragment.getCodedText();
 		Matcher m = pattern.matcher(tmp);
 		int start = 0;

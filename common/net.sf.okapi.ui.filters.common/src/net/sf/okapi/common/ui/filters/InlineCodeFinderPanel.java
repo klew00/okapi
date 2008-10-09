@@ -59,6 +59,7 @@ public class InlineCodeFinderPanel extends Composite {
 	private boolean          wasNew;
 	private TextContainer    textCont;
 	private GenericContent   genericCont;
+	private boolean          skipTestUpdate = false;
 	
 
 	public InlineCodeFinderPanel (Composite parent,
@@ -316,7 +317,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btModify.setEnabled(n>-1);
 		if ( n == -1 ) edExpression.setText("");
 		else edExpression.setText(lbRules.getItem(n));
-		updateTest();
+		//updateTest();
 	}
 	
 	private void updateTest () {
