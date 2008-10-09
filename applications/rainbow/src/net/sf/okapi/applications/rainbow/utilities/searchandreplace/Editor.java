@@ -60,6 +60,7 @@ public class Editor implements IParametersEditor {
 	private Text                  replacementText;
 	private Button                btMoveUp;
 	private Button                btMoveDown;
+	private Button 				  chkPlainText;
 	private Button 				  chkRegEx;
 	private Button 				  chkDotAll;
 	private Button 				  chkIgnoreCase;
@@ -298,6 +299,10 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
+		chkPlainText.setText("Process the files as plain text (not using filters)");
+		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
 		group.setText("Regular expression options");
@@ -322,7 +327,11 @@ public class Editor implements IParametersEditor {
 					//TODO: Call help
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ){
+					if(!saveData()){
+						return;
+					}
+				}
 				shell.close();
 			};
 		};
@@ -391,7 +400,7 @@ public class Editor implements IParametersEditor {
 					
 					//--validating empty search string--
 					if(searchText.getText().trim().length()<1){
-						Dialogs.showError(shell, "You need to provide a search expression.", null);
+						Dialogs.showError(shell, "You need to provide a search expression", null);
 						return;
 					}					
 					
@@ -452,6 +461,7 @@ public class Editor implements IParametersEditor {
 	
 	private void setData () {
 		
+		chkPlainText.setSelection(params.plainText);
 		chkRegEx.setSelection(params.regEx);
 		chkDotAll.setSelection(params.dotAll);
 		chkIgnoreCase.setSelection(params.ignoreCase);
@@ -470,9 +480,21 @@ public class Editor implements IParametersEditor {
 				item.setChecked(true);				
 			}
         }
+        table.setSelection(0);
+        updateUpDownBtnState();
 	}
 
 	private boolean saveData () {
+		
+		// validate regular expressions
+		if(chkRegEx.getSelection() && !validRegEx()) return false;
+		
+		// make sure the list is not empty
+		if (table.getItemCount()==0){
+			Dialogs.showError(shell, "You need to provide a search expression", null);
+			return false;
+		}
+		
 		params.reset();
 		for ( int i=0; i<table.getItemCount(); i++ ) {
 			TableItem ti = table.getItem(i);
@@ -483,6 +505,7 @@ public class Editor implements IParametersEditor {
         	params.addRule(s);
 		};
 	
+		params.plainText = chkPlainText.getSelection();		
 		params.regEx = chkRegEx.getSelection();
 		params.dotAll = chkDotAll.getSelection();		
 		params.ignoreCase = chkIgnoreCase.getSelection();
@@ -491,5 +514,20 @@ public class Editor implements IParametersEditor {
 		result = true;
 		return result;
 	}
-	
+
+	private boolean validRegEx(){
+
+		for ( int i=0; i<table.getItemCount(); i++ ) {
+			TableItem ti = table.getItem(i);
+			try{
+				Pattern.compile(ti.getText(1));
+				Pattern.compile(ti.getText(1));
+
+			}catch(Exception ex){
+				Dialogs.showError(shell, ex.getLocalizedMessage(), null);
+				return false;
+			}			
+		};
+		return true;
+	}
 }

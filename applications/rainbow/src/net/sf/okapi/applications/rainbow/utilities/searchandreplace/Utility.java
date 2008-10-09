@@ -34,29 +34,30 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.event.EventListenerList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.CancelListener;
+import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
-public class Utility implements ISimpleUtility {
-
+public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrivenUtility { 
+	
 	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 
 	private Parameters            params;
 	private String                commonFolder;
 	private String                inputPath;
 	private String                outputPath;
-	private EventListenerList     listenerList = new EventListenerList();
 	private String			      inputEncoding;
+	private EventListenerList     listenerList = new EventListenerList();	
 	
 	public Utility () {
 		params = new Parameters();
@@ -64,12 +65,12 @@ public class Utility implements ISimpleUtility {
 	
 	public void resetLists () {
 		// Not used in this utility
+		// Not sure when to use this
 	}
 	
 	public String getID () {
 		return "oku_searchandreplace";
 	}
-	
 	
 	public void processInput () {
 		
@@ -141,15 +142,18 @@ public class Utility implements ISimpleUtility {
 		}
 	}
 
-	public void doEpilog () {
-	}
-
-	public void doProlog (String sourceLanguage,
-		String targetLanguage)
-	{
+	public void doProlog (String sourceLanguage, String targetLanguage){
 		commonFolder = null; // Reset
 	}
+	
+	public void doEpilog () {
+		// Not sure when to use this
+	}
 
+	public IParameters getParameters () {
+		return params;
+	}
+	
 	public String getInputRoot () {
 		return null;
 	}
@@ -158,56 +162,50 @@ public class Utility implements ISimpleUtility {
 		return null;
 	}
 
-	public IParameters getParameters () {
-		return params;
-	}
-
 	public boolean hasParameters () {
 		return true;
-	}
-
-	public boolean isFilterDriven () {
-		return false;
 	}
 
 	public boolean needsRoots () {
 		return false;
 	}
-
-	public void addInputData (String path,
-		String encoding,
-		String filterSettings)
-	{
-		inputPath = path;
-		inputEncoding = encoding;
-	}
-
-	public void addOutputData (String path,
-		String encoding)
-	{
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-		outputPath = path;
-		// Encoding stays the same as the input
-	}
+	
+	public boolean needsOutputFilter() {
+		return true;
+	}	
 
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
 	}
-
-	public void setRoots (String inputRoot,
-		String outputRoot)
-	{
+	
+	public void setRoots (String inputRoot, String outputRoot){
 		// Not used in this utility.
+	}
+	
+	public boolean isFilterDriven () {
+		return !params.plainText;
 	}
 
 	public String getFolderAfterProcess () {
 		return commonFolder;
 	}
-
+	
 	public int getInputCount() {
 		return 1;
+	}
+	
+	public void addInputData (String path, String encoding, String filterSettings){
+		// Not sure when to use this
+		inputPath = path;
+		inputEncoding = encoding;
+	}
+
+	public void addOutputData (String path, String encoding){
+		// Compute the longest common folder
+		commonFolder = Util.longestCommonDir(commonFolder,
+			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
+		outputPath = path;
+		// Encoding stays the same as the input
 	}
 
 	public void setFilterAccess (FilterAccess filterAccess,
@@ -237,4 +235,60 @@ public class Utility implements ISimpleUtility {
 		}
 	}*/
 
+	public void endExtractionItem (TextUnit item) {
+		try {
+			processTU(item);
+			if ( item.hasChild() ) {
+				for ( TextUnit tu : item.childTextUnitIterator() ) {
+					processTU(tu);
+				}
+			}
+		}
+		finally {
+			super.endExtractionItem(item);
+		}		
+	}
+	
+	private void processTU (TextUnit tu) {
+		
+		String tmp = null;
+		
+		// Skip non-translatable
+		if ( !tu.isTranslatable() ) 
+			return;
+
+		// Else: do the requested modifications
+		// Make sure we have a target where to set data
+		if ( !tu.hasTarget() ) {
+			tu.setTargetContent(tu.getSourceContent());
+		}
+
+		try {
+			String result = tu.getTargetContent().getCodedText();
+
+	        for ( String[] s : params.rules ) {
+	        	if ( s[0].equals("true") ) {
+		        	int flags = 0;
+		        	if ( params.dotAll ) flags |=  Pattern.DOTALL;
+		        	if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
+		        	if ( params.multiLine ) flags |= Pattern.MULTILINE;
+		        	
+		        	if ( params.regEx ){
+		        		Pattern pattern = Pattern.compile(s[1], flags);
+		        		Matcher matcher = pattern.matcher(result);
+		        		result = matcher.replaceAll(s[2]);
+		        	}else{
+		        		result = result.replace(s[1],s[2]);
+		        	}
+	        	}
+	        }			
+			
+			TextContainer cnt = tu.getTargetContent(); 
+			cnt.setCodedText(result, tu.getSourceContent().getCodes(), false);
+		}
+		catch ( Exception e ) {
+			logger.warn("Error when updating content: '"+tmp+"'", e);
+		}
+	}	
+	
 }
