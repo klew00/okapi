@@ -1,25 +1,26 @@
 package net.sf.okapi.apptest.utilities;
 
-import net.sf.okapi.common.pipeline2.BasePipelineStep;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
+import net.sf.okapi.common.pipeline2.IPipelineEvent;
+import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
+import net.sf.okapi.common.resource.TextUnit;
 
-public class PseudoTranslate extends BasePipelineStep {
+public class PseudoTranslate implements IUtility2 {
 
-	public void finish () throws InterruptedException {
-		// TODO Auto-generated method stub
+	public void process (IPipelineEvent event) {
+		if ( event.getEventType() != PipelineEventType.TEXTUNIT ) return;
+		TextUnit tu1 = (TextUnit)event.getData();
+		processTU(tu1);
+		if ( tu1.hasChild() ) {
+			for ( TextUnit tu : tu1.childTextUnitIterator() ) {
+				processTU(tu);
+			}
+		}
 	}
-
-	public String getName () {
-		return "pseudoTranslate";
-	}
-
-	public void initialize () throws InterruptedException {
-		// TODO Auto-generated method stub
-	}
-
-	public PipelineReturnValue process () throws InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
+	
+	private void processTU (TextUnit tu) {
+		tu.getSourceContent().setCodedText(
+			tu.getSourceContent().getCodedText().replace("e", "X"));
+		
 	}
 
 }

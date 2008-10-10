@@ -11,17 +11,25 @@ import org.eclipse.swt.widgets.Shell;
 
 public class MainForm {
 
-	private Shell       shell;
-	private Button      btStart;
-	private Button      btPause;
-	private Button      btResume;
-	private Button      btStop;
-	private int         progressStatus = 0;
+	public static enum ProgressType {
+		IDLE, IN_PROGRESSS, PAUSED, CANCELED, INACTIVE
+	}
+	
+	private Shell shell;
+	private Button btStart;
+	private Button btPause;
+	private Button btResume;
+	private Button btStop;
+	private ProgressType progressStatus = ProgressType.IDLE;
+	private UtilityDriver utilDriver;
 	
 	public MainForm (Shell shell) {
 		this.shell = shell;
 		GridLayout layTmp = new GridLayout();
 		shell.setLayout(layTmp);
+		
+		utilDriver = new UtilityDriver(shell, this);
+		
 		btStart = new Button(shell, SWT.PUSH);
 		btStart.setLayoutData(new GridData(GridData.CENTER | GridData.FILL_HORIZONTAL));
 		btStart.setText("Start");
@@ -75,30 +83,48 @@ public class MainForm {
 		}
 	}
 	
-	private void start () {
-		progressStatus = 2;
-		updateControls();
+	public boolean inProgress () {
+		return (progressStatus == ProgressType.IN_PROGRESSS);
 	}
 	
-	private void pause () {
-		progressStatus = 1;
+	public boolean isCanceled () {
+		return (progressStatus == ProgressType.CANCELED);
+	}
+	
+	public boolean isPaused () {
+		return (progressStatus == ProgressType.PAUSED);
+	}
+	
+	private void start () {
+		progressStatus = ProgressType.IN_PROGRESSS;
+		updateControls();
+		utilDriver.execute("test");
+	}
+
+	public void makeIdle () {
+		progressStatus = ProgressType.IDLE;
+		updateControls();
+	}
+
+	public void pause () {
+		progressStatus = ProgressType.PAUSED;
 		updateControls();
 	}
 	
 	private void resume () {
-		progressStatus = 2;
+		progressStatus = ProgressType.IN_PROGRESSS;
 		updateControls();
 	}
 	
 	private void stop () {
-		progressStatus = 0;
+		progressStatus = ProgressType.CANCELED;
 		updateControls();
 	}
 	
 	private void updateControls () {
-		btStart.setEnabled(progressStatus==0);
-		btPause.setEnabled(progressStatus==2);
-		btResume.setEnabled(progressStatus==1);
-		btStop.setEnabled(progressStatus==2);
+		btStart.setEnabled(progressStatus==ProgressType.IDLE);
+		btPause.setEnabled(progressStatus==ProgressType.IN_PROGRESSS);
+		btResume.setEnabled(progressStatus==ProgressType.PAUSED);
+		btStop.setEnabled(progressStatus==ProgressType.IN_PROGRESSS);
 	}
 }

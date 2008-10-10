@@ -126,11 +126,13 @@ public class LinearPipeline implements ILinearPipeline {
 		}
 
 		if (state == PipelineReturnValue.PAUSED) {
-			try {
+			//YS: assumes this try block was needed just for test, otherwise
+			// getState() prevent any real UI operation
+			/*try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				return PipelineReturnValue.INTERRUPTED;
-			}
+			}*/
 			return PipelineReturnValue.PAUSED;
 		}
 
