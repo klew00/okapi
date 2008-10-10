@@ -1,8 +1,8 @@
 package com.googlecode.okapi.resource.builder;
 
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Stack;
 
 import com.googlecode.okapi.resource.Document;
 import com.googlecode.okapi.resource.DocumentManager;
@@ -12,7 +12,7 @@ public abstract class BaseBuilder implements IResourceBuilder{
 
 	private boolean isFinished = false;
 	private Queue<ResourceEvent> eventQueue = new LinkedList<ResourceEvent>();
-	private Deque<ResourceEventType> eventStack = new LinkedList<ResourceEventType>(); 
+	private Stack<ResourceEventType> eventStack = new Stack<ResourceEventType>(); 
 
 	private DocumentManager documentManager;
 	
