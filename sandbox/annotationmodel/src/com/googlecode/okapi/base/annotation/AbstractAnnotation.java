@@ -1,6 +1,5 @@
 package com.googlecode.okapi.base.annotation;
 
-import com.googlecode.okapi.resource.Resource;
 import com.googlecode.okapi.resource.ResourceId;
 
 public abstract class AbstractAnnotation<T> implements IAnnotation<T>{

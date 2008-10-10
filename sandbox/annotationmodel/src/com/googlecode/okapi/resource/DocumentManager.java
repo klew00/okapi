@@ -1,7 +1,6 @@
 package com.googlecode.okapi.resource;
 
 import java.util.Map;
-import java.util.Set;
 
 import com.googlecode.okapi.base.annotation.IAnnotationManager;
 
