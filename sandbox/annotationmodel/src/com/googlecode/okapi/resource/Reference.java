@@ -17,10 +17,10 @@ public interface Reference extends DocumentPart, ContentTypeProvider{
 	public Type getType();
 	public void setType(Type type);
 
-	public PartId getResource();
-	public void setResource(PartId resource);
+	public PartId getPart();
+	public void setPart(PartId part);
 	
-	public PartId getDocument();
-	public void setDocument(PartId document);
+	public DocumentId getDocument();
+	public void setDocument(DocumentId document);
 	
 }

@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface Container extends DocumentPart{
 
-	public List<PartId> getChildren();
+	public List<PartId> getParts();
 }

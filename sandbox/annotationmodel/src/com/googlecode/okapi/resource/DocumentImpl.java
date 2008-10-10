@@ -1,5 +1,6 @@
 package com.googlecode.okapi.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 final class DocumentImpl implements Document{
@@ -21,6 +22,9 @@ final class DocumentImpl implements Document{
 	}
 
 	public List<PartId> getParts() {
+		if(parts == null){
+			parts = new ArrayList<PartId>();
+		}
 		return parts;
 	}
 

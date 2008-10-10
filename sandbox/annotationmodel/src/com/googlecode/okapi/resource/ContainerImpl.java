@@ -11,7 +11,7 @@ final class ContainerImpl extends DocumentPartImpl implements Container{
 		super(id);
 	}
 
-	public List<PartId> getChildren() {
+	public List<PartId> getParts() {
 		return children;
 	}
 	

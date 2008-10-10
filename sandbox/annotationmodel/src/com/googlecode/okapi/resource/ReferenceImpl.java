@@ -5,8 +5,11 @@ final class ReferenceImpl extends DocumentPartImpl implements Reference{
 
 	private Type type;
 	private String contentType;
-	private PartId resource;
-	private PartId document;
+	
+	// TODO How do we know a PartId in an external document before it is parsed?
+	//      Do we need a different way of referencing external resources?
+	private PartId part;
+	private DocumentId document;
 	
 	public ReferenceImpl(PartId id) {
 		super(id);
@@ -24,19 +27,19 @@ final class ReferenceImpl extends DocumentPartImpl implements Reference{
 		this.type = type;
 	}
 
-	public PartId getResource() {
-		return resource;
+	public PartId getPart() {
+		return part;
 	}
 
-	public void setResource(PartId resource) {
-		this.resource = resource;
+	public void setPart(PartId resource) {
+		this.part = resource;
 	}
 
-	public PartId getDocument() {
+	public DocumentId getDocument() {
 		return document;
 	}
 
-	public void setDocument(PartId document) {
+	public void setDocument(DocumentId document) {
 		this.document = document;
 	}
 
