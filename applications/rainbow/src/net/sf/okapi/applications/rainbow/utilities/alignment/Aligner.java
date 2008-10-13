@@ -36,6 +36,7 @@ import net.sf.okapi.common.ui.filters.GenericContent;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TraverseEvent;
@@ -74,6 +75,8 @@ public class Aligner {
 	private Button           btSkip;
 	private Button           btEditRules;
 	private Button           btEditSeg;
+	private Button           btOptions;
+	private Button           btAutoCorrect;
 	private List             lbIssues;
 	private Text             edSource;
 	private Text             edTarget;
@@ -91,7 +94,6 @@ public class Aligner {
 	private int              indexActiveSegment;
 	private GenericContent   genericCont;
 	private String           targetSrxPath;
-	private Color            colorWhite;
 	private Color            colorGreen;
 	private Color            colorAmber;
 	private Color            colorRed;
@@ -127,10 +129,6 @@ public class Aligner {
 			colorRed.dispose();
 			colorRed = null;
 		}
-		if ( colorWhite != null ) {
-			colorWhite.dispose();
-			colorWhite = null;
-		}
 	}
 
 	public Aligner (Shell parent) {
@@ -139,14 +137,16 @@ public class Aligner {
 		colorGreen = new Color(null, 0, 128, 0);
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
-		colorWhite = new Color(null, 255, 255, 255);
 		
 		genericCont = new GenericContent();
+		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		shell.setText("Alignment Verification");
 		shell.setImage(parent.getImage());
-		shell.setLayout(new GridLayout(4, true));
+		GridLayout layout = new GridLayout();
+		layout.verticalSpacing = 0;
+		shell.setLayout(layout);
 		
 		// On close: Hide instead of closing
 		shell.addListener(SWT.Close, new Listener() {
@@ -157,18 +157,31 @@ public class Aligner {
 			}
 		});
 
-		edDocument = new Text(shell, SWT.BORDER);
+		SashForm sashTop = new SashForm(shell, SWT.VERTICAL);
+		sashTop.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashTop.setSashWidth(3);
+		sashTop.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+		
+		//--- Top part
+		
+		Composite cmpTop = new Composite(sashTop, SWT.NONE);
+		layout = new GridLayout(4, true);
+		layout.marginWidth = 0;
+		cmpTop.setLayout(layout);
+		cmpTop.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		edDocument = new Text(cmpTop, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edDocument.setLayoutData(gdTmp);
 		edDocument.setEditable(false);
 		
-		edCounter = new Text(shell, SWT.BORDER);
+		edCounter = new Text(cmpTop, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);;
 		edCounter.setLayoutData(gdTmp);
 		edCounter.setEditable(false);
 		
-		edName = new Text(shell, SWT.BORDER);
+		edName = new Text(cmpTop, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
 		edName.setLayoutData(gdTmp);
@@ -179,7 +192,7 @@ public class Aligner {
 		fontData[0].setHeight(11);
 		textFont = new Font(font.getDevice(), fontData[0]);
 
-		srcList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		srcList = new List(cmpTop, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		srcList.setLayoutData(gdTmp);
@@ -191,7 +204,7 @@ public class Aligner {
 			}
 		});
 		
-		trgList = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		trgList = new List(cmpTop, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		trgList.setLayoutData(gdTmp);
@@ -203,14 +216,29 @@ public class Aligner {
 			}
 		});
 
-		//-- Options
+		//=== Bottom sash
 		
-		Composite cmpOptions = new Composite(shell, SWT.NONE);
-		GridLayout layout = new GridLayout();
+		SashForm sashBottom = new SashForm(sashTop, SWT.VERTICAL);
+		sashBottom.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashBottom.setSashWidth(3);
+		sashBottom.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+
+		//--- Middle part
+		
+		Composite cmpMiddle = new Composite(sashBottom, SWT.NONE);
+		layout = new GridLayout(4, false);
+		layout.marginWidth = 0;
+		cmpMiddle.setLayout(layout);
+		cmpMiddle.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		// Options
+		
+		Composite cmpOptions = new Composite(cmpMiddle, SWT.NONE);
+		layout = new GridLayout();
 		layout.marginWidth = 0;
 		cmpOptions.setLayout(layout);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 1;
 		cmpOptions.setLayoutData(gdTmp);
 		
 		chkSyncScrolling = new Button(cmpOptions, SWT.CHECK);
@@ -236,22 +264,29 @@ public class Aligner {
 		chkCheckSingleSegUnit = new Button(cmpOptions, SWT.CHECK);
 		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
 
-		//--- Main buttons
+		// Main buttons
 		
-		int buttonWidth = 120;
+		int buttonWidth = 100;
 		
-		Composite cmpButtons = new Composite(shell, SWT.NONE);
-		layout = new GridLayout(4, false);
+		Composite cmpButtons = new Composite(cmpMiddle, SWT.NONE);
+		layout = new GridLayout(5, false);
 		layout.marginWidth = 0;
 		cmpButtons.setLayout(layout);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		cmpButtons.setLayoutData(gdTmp);
 
 		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
 		btEditRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRules();
+			}
+		});
+		
+		btAutoCorrect = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Try Auto-Fix", buttonWidth);
+		btAutoCorrect.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				autoCorrect();
 			}
 		});
 		
@@ -262,7 +297,7 @@ public class Aligner {
 			}
 		});
 	
-		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Merge With Next", buttonWidth);
+		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Join Next", buttonWidth);
 		btMerge.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				mergeWithNext();
@@ -281,11 +316,18 @@ public class Aligner {
 				}
 			}
 		});
-		
+
 		btEditSeg = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Segment...", buttonWidth);
 		btEditSeg.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				startEditMode();
+			}
+		});
+		
+		btOptions = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Options...", buttonWidth);
+		btOptions.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editOptions();
 			}
 		});
 		
@@ -320,19 +362,20 @@ public class Aligner {
 			}
 		});
 		
-		//--- Error/warning list
 		
-		edCause = new Text(shell, SWT.BORDER);
+		// Error/warning list
+		
+		edCause = new Text(cmpMiddle, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edCause.setLayoutData(gdTmp);
 		edCause.setEditable(false);
-		edCause.setForeground(colorWhite);
+		edCause.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-		lbIssues = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		lbIssues = new List(cmpMiddle, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
-		gdTmp.heightHint = 12;
+		gdTmp.heightHint = 32;
 		lbIssues.setLayoutData(gdTmp);
 		lbIssues.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -340,20 +383,29 @@ public class Aligner {
 			}
 		});
 		
-		//--- Edit boxes
 		
-		edSrcSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		//--- Bottom part
+		
+		Composite cmpBottom = new Composite(sashBottom, SWT.NONE);
+		layout = new GridLayout();
+		layout.marginWidth = 0;
+		cmpBottom.setLayout(layout);
+		cmpBottom.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		// Edit boxes
+		
+		edSrcSeg = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSrcSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edSrcSeg.setLayoutData(gdTmp);
 		edSrcSeg.setFont(textFont);
 		
-		edTrgSeg = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		edTrgSeg = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTrgSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edTrgSeg.setLayoutData(gdTmp);
 		edTrgSeg.setFont(textFont);
@@ -365,24 +417,24 @@ public class Aligner {
 			}
 		});
 
-		Label label = new Label(shell, SWT.NONE);
+		Label label = new Label(cmpBottom, SWT.NONE);
 		label.setText("Full text unit:");
 		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
+		//gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
 		
-		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		edSource = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSource.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edSource.setLayoutData(gdTmp);
 		edSource.setFont(textFont);
 		
-		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+		edTarget = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTarget.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edTarget.setLayoutData(gdTmp);
 		edTarget.setFont(textFont);
@@ -403,7 +455,7 @@ public class Aligner {
 		};
 		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		//gdTmp.horizontalSpan = 4;
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btClose.setText("Cancel");
 		shell.setDefaultButton(btAccept);
@@ -496,6 +548,12 @@ public class Aligner {
 		btMerge.setEnabled(( n < count-1 ) && ( n > -1 ));
 		btSplit.setEnabled(( count > 0 ) && ( n > -1 ));
 	}
+
+	private void editOptions () {
+		//TODO: edit options (font, size, etc.)
+		Dialogs.showError(shell, "Not implemented yet", null);
+		updateTargetSegmentDisplay();
+	}
 	
 	private void moveUp () {
 		//TODO: move up
@@ -518,7 +576,7 @@ public class Aligner {
 			fillTargetList(n);
 			trgList.setFocus();
 			// Re-check for issues
-			hasIssue(true);
+			hasIssue(true, true);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -614,7 +672,7 @@ public class Aligner {
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
-		if ( hasIssue(false) ) {
+		if ( hasIssue(false, true) ) {
 			// Correct manually
 			edCounter.setText(String.format("This source: #%d / Total targets: %d", currentSource, totalTarget));
 			return showDialog();
@@ -683,7 +741,7 @@ public class Aligner {
 				splitSegment(indexActiveSegment, sel.x, sel.y);
 			}
 			// Re-check for issues
-			hasIssue(true);
+			hasIssue(true, true);
 			
 			// Reset the controls
 			splitMode = false;
@@ -735,7 +793,7 @@ public class Aligner {
 				}
 			}
 			// Re-check for issues
-			hasIssue(true);
+			hasIssue(true, true);
 			
 			// Reset the controls
 			editMode = false;
@@ -787,6 +845,11 @@ public class Aligner {
 		}
 	}
 
+	private void resetIssues () {
+		issueType = 0;
+		lbIssues.removeAll();
+	}
+	
 	/**
 	 * Tries to find some issue with the current alignment.
 	 * @param forceIssueDisplay True if we need to set the issue display.
@@ -794,15 +857,16 @@ public class Aligner {
 	 * and no issues are found. 
 	 * @return True if an issue has been found. False if no issue has been found.
 	 */
-	private boolean hasIssue (boolean forceIssueDisplay) {
+	private boolean hasIssue (boolean forceIssueDisplay,
+		boolean resetList)
+	{
 		try {
-			issueType = 0;
-			lbIssues.removeAll();
+			if ( resetList ) resetIssues();
 			
 			// Check the number of segments
 			if ( source.getSegments().size() != target.getSegments().size() ) {
 				// Optional visual alignment to fix the problems
-				addIssue(2, "Different number of segments in source and target.");
+				addIssue(2, "Error- Different number of segments in source and target.");
 				return updateIssueStatus();
 			}
 			// Assumes the list have same number of segments now
@@ -819,7 +883,7 @@ public class Aligner {
 			java.util.List<TextFragment> trgList = target.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
-					addIssue(1, String.format("%d: Different number of inline codes in source and target.", i+1));
+					addIssue(1, String.format("%d: Warning- Different number of inline codes in source and target.", i+1));
 				}
 				checkAnchors(srcList.get(i), trgList.get(i), i);
 			}
@@ -844,7 +908,7 @@ public class Aligner {
 		for ( Code code : target.getCodes() ) {
 			if ( !anchorList.contains(code.getData()) ) {
 				// An inline code found in the target is not in the source
-				addIssue(1, String.format("%d: Target inline code '%s' is not in the source.", index+1, code.getData())); 
+				addIssue(1, String.format("%d: Warning- Target inline code '%s' is not in the source.", index+1, code.getData())); 
 			}
 			else { // Change matched entries so they don't match again
 				anchorList.set(anchorList.indexOf(code.getData()), "");
@@ -860,7 +924,7 @@ public class Aligner {
 			extra = true;
 		}
 		if ( extra ) {
-			addIssue(1, String.format("%d: Source inline codes not found in the target: %s", index+1,
+			addIssue(1, String.format("%d: Warning- Source inline codes not found in the target: %s", index+1,
 				tmp.toString()));
 		}
 		
@@ -876,7 +940,7 @@ public class Aligner {
 		while ( m.find() ) {
 			if ( !anchorList.contains(m.group()) ) {
 				// An anchor found in the target is not in the source
-				addIssue(1, String.format("%d: Extra pattern '%s' in target.", index+1, m.group())); 
+				addIssue(1, String.format("%d: Warning- Extra pattern '%s' in target.", index+1, m.group())); 
 			}
 			else anchorList.remove(m.group());
 		}
@@ -887,9 +951,109 @@ public class Aligner {
 				if ( tmp.length() > 0 ) tmp.append(", ");
 				tmp.append("\'" + str + "\'");
 			}
-			addIssue(1, String.format("%d: One or more missing patterns in target: %s", index+1,
+			addIssue(1, String.format("%d: Warning- One or more missing patterns in target: %s", index+1,
 				tmp.toString()));
 		}
+	}
+
+	/**
+	 * Tries to automatically adjust mis-aligned segments.
+	 * @return True if some auto-fix was applied, false if the segments
+	 * have not been modified.
+	 */
+	private boolean autoCorrect () {
+		boolean modified = false;
+		int n = trgList.getSelectionIndex();
+		if ( n == -1 ) n = 0;
+		try {
+			resetIssues();
+			java.util.List<TextFragment> srcCol = source.getSegments();
+			java.util.List<TextFragment> trgCol = target.getSegments();
+			
+			int lastMatch = -1;
+			int trgStart = 0;
+			int srcNoMatchCount = 0;
+			boolean matchFound;
+			String srcText;
+
+			for ( int i=0; i<srcCol.size(); i++ ) {
+				matchFound = false;
+				srcText = srcCol.get(i).toString();
+				for ( int j=trgStart; j<trgCol.size(); j++ ) {
+					String s2 = trgCol.get(j).toString(); //TODO: replace by direct call after debug
+					if ( srcText.equals(s2) ) {
+						// We have a match
+						if ( srcNoMatchCount == 1 ) {
+							if ( lastMatch == -1 ) {
+								//TODO: case of starting joins
+								lastMatch = j;
+								trgStart = j+1;
+								srcNoMatchCount = 0;
+								matchFound = true;
+								break;
+							}
+							// We have only one source segment between this match and last
+							// Compute the number of target segments between matches
+							int toJoin = ((j-1) - lastMatch)-1;
+							if ( toJoin > 0 ) {
+								// We have more than one, so we can join them
+								// The target segment just after the last match is the base
+								for ( int k=0; k<toJoin; k++ ) {
+									target.joinSegmentWithNext(lastMatch+1);
+								}
+								modified = true;
+								addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
+									lastMatch+1+1)); // Show 1 for 0
+								// Correct the target position since we joined one or more segments
+								j -= toJoin;
+							}
+							// Then we reset the position for the next try
+							lastMatch = j;
+							trgStart = j+1;
+							srcNoMatchCount = 0;
+							matchFound = true;
+							break;
+						}
+						else {
+							// Can't auto-fix more than single source between two match.
+							// So we move on to the next case.
+							lastMatch = j;
+							trgStart = j+1;
+							srcNoMatchCount = 0;
+							matchFound = true;
+							break;
+						}
+					}
+				}
+				if ( !matchFound ) srcNoMatchCount++;
+			}
+			
+			// Case of one source with many target but no matches
+			if (( lastMatch == -1 ) && ( srcNoMatchCount == 1 )) {
+				if ( trgCol.size() > 1 ) {
+					// Several target for one source: merge them
+					while ( target.getSegments().size() > 1 ) {
+						target.joinSegmentWithNext(0);
+					}
+					modified = true;
+					addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
+				}
+			}
+			
+			updateTargetDisplay();
+			if ( modified ) {
+				fillTargetList(0);
+				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
+				trgList.setFocus();
+				// Re-check for issues
+				hasIssue(true, false);
+			}
+		}
+		catch ( Throwable e ) {
+			addIssue(2, "Error- Auto-correction error occured.");
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		return modified;
 	}
 	
 	private void addIssue (int type,

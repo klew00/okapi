@@ -119,7 +119,8 @@ public class SRXEditor {
 		
 		SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashForm.setSashWidth(layout.verticalSpacing);
+		sashForm.setSashWidth(3);
+		sashForm.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		
 		Composite cmpTmp = new Composite(sashForm, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
