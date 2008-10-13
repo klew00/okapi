@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Stack;
 
@@ -44,11 +45,13 @@ public class Parser extends BaseParser {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
+	//protected static final String NSURI_DC = "http://purl.org/dc/elements/1.1/";
 
-	protected Document                 resource;
-	private XMLStreamReader            reader;
-	private Stack<Boolean>             extract;
-	private Hashtable<String, ElementRule>     toExtract;
+	protected Document resource;
+	private XMLStreamReader reader;
+	private Stack<Boolean> extract;
+	private Hashtable<String, ElementRule> toExtract;
+	private ArrayList<String> inlineRef;
 
 	public Parser () {
 		resource = new Document();
@@ -59,7 +62,34 @@ public class Parser extends BaseParser {
 		toExtract.put("dc:title", new ElementRule("dc:title", null));
 		toExtract.put("dc:description", new ElementRule("dc:description", null));
 		toExtract.put("dc:subject", new ElementRule("dc:subject", null));
+		toExtract.put("meta:keyword", new ElementRule("meta:keyword", null));
 		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
+		
+		inlineRef = new ArrayList<String>();
+		inlineRef.add("text:initial-creator");
+		inlineRef.add("text:creation-date");
+		inlineRef.add("text:creation-time");
+		inlineRef.add("text:description");
+		inlineRef.add("text:user-defined");
+		inlineRef.add("text:print-time");
+		inlineRef.add("text:print-date");
+		inlineRef.add("text:printed-by");
+		inlineRef.add("text:title");
+		inlineRef.add("text:subject");
+		inlineRef.add("text:keywords");
+		inlineRef.add("text:editing-cycles");
+		inlineRef.add("text:editing-duration");
+		inlineRef.add("text:modification-time");
+		inlineRef.add("text:modification-date");
+		inlineRef.add("text:creator");
+		inlineRef.add("text:page-count");
+		inlineRef.add("text:paragraph-count");
+		inlineRef.add("text:word-count");
+		inlineRef.add("text:character-count");
+		inlineRef.add("text:table-count");
+		inlineRef.add("text:image-count");
+		inlineRef.add("text:object-count");
+		inlineRef.add("dc:date");
 	}
 
 	public void close () {
@@ -233,6 +263,7 @@ public class Parser extends BaseParser {
 		else {
 			if ( extract.peek() ) {
 				if ( name.equals("text:a") ) processStartALink(name);
+				else if ( inlineRef.contains(name) ) processReadOnlyInlineElement(name);
 				else appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
 			}
 			else {
@@ -248,6 +279,39 @@ public class Parser extends BaseParser {
 			//TODO: set the property, but where???
 		}
 		appendToTextUnit(new Code(TagType.OPENING, name, data));
+	}
+	
+	private void processReadOnlyInlineElement (String name) throws XMLStreamException {
+		StringBuilder tmp = new StringBuilder(buildStartTag(name));
+		while ( true ) {
+			switch ( reader.next() ) {
+			case XMLStreamConstants.CHARACTERS:
+				tmp.append(reader.getText());
+				break;
+			case XMLStreamConstants.START_ELEMENT:
+				tmp.append(buildStartTag(makePrintName()));
+				break;
+			case XMLStreamConstants.END_ELEMENT:
+				String tmpName = makePrintName();
+				tmp.append(buildEndTag(tmpName));
+				if ( tmpName.equals(name) ) {
+					appendToTextUnit(new Code(TagType.PLACEHOLDER, name, tmp.toString()));
+					return;
+				}
+				break;
+			case XMLStreamConstants.COMMENT:
+				tmp.append("<!--" + reader.getText() + "-->");
+				break;
+			case XMLStreamConstants.PROCESSING_INSTRUCTION:
+				tmp.append("<?" + reader.getPITarget() + " "
+					+ reader.getPIData() + "?>");
+				break;
+			case XMLStreamConstants.START_DOCUMENT:
+			case XMLStreamConstants.END_DOCUMENT:
+				// Should not occur
+				throw new RuntimeException("Invalid start or end document detected while processing inline element.");
+			}
+		}		
 	}
 	
 	private void processEndElement () {
