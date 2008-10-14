@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openoffice"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
+	<classpathentry kind="lib" path="lib/win32-x86/swt.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.common"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

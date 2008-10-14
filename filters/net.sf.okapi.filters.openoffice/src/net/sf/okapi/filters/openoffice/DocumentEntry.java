@@ -18,34 +18,11 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.lib;
+package net.sf.okapi.filters.openoffice;
 
-public class FormatManager {
+class DocumentEntry {
 
-	public void load (String p_sPath) {
-		//TODO: Load format manager data from external file
-	}
+	protected String path;
+	protected String docType;
 	
-	/**
-	 * Tries to guess the format and the encoding of a give document.
-	 * @param p_sPath Full path of the document to process.
-	 * @return An array of string: 0=guessed encoding or null,
-	 * 1=guessed filter settings or null,
-	 */
-	public String[] guessFormat (String p_sPath) {
-		String[] aRes = Utils.detectFileInformation(p_sPath, false);
-		aRes[1] = null; 
-		String sExt = Utils.getExtension(p_sPath).toLowerCase();
-		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";
-		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
-		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
-		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".htm") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".odt") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ods") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odp") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odg") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ott") ) aRes[1] = "okf_openoffice";
-		return aRes;
-	}
 }

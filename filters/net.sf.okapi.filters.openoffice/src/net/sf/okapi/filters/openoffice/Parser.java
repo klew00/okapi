@@ -37,7 +37,6 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.filters.BaseParser;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -45,25 +44,27 @@ public class Parser extends BaseParser {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
-	//protected static final String NSURI_DC = "http://purl.org/dc/elements/1.1/";
 
-	protected Document resource;
+	protected Resource resource;
+	protected Hashtable<String, ElementRule> toExtract;
+	protected ArrayList<String> inlineRef;
+	
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
-	private Hashtable<String, ElementRule> toExtract;
-	private ArrayList<String> inlineRef;
 
 	public Parser () {
-		resource = new Document();
+		resource = new Resource();
 		extract = new Stack<Boolean>();
 		
 		toExtract = new Hashtable<String, ElementRule>();
 		toExtract.put("text:p", new ElementRule("text:p", null));
+		toExtract.put("text:h", new ElementRule("text:h", null));
 		toExtract.put("dc:title", new ElementRule("dc:title", null));
 		toExtract.put("dc:description", new ElementRule("dc:description", null));
 		toExtract.put("dc:subject", new ElementRule("dc:subject", null));
 		toExtract.put("meta:keyword", new ElementRule("meta:keyword", null));
 		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
+		toExtract.put("text:index-title-template", new ElementRule("text:index-title-template", null));
 		
 		inlineRef = new ArrayList<String>();
 		inlineRef.add("text:initial-creator");

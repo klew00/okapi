@@ -37,6 +37,7 @@
  <filter id="okf_openoffice"
   inputFilterClass="net.sf.okapi.filters.openoffice.InputFilter"
   outputFilterClass="net.sf.okapi.filters.openoffice.OutputFilter"
+  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
  >Open Document</filter>
   
 </okapiFilters>

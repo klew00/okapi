@@ -24,17 +24,22 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
+	public boolean extractComments;
+	
 	public void reset () {
+		extractComments = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		extractComments = buffer.getBoolean("extractComments", extractComments);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean("extractComments", extractComments);
 		return buffer.toString();
 	}
 }

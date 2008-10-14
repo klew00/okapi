@@ -23,7 +23,6 @@ package net.sf.okapi.filters.openoffice;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +54,11 @@ public class OutputFilter implements IOutputFilter {
 	private String originalPath;
 	private String tmpUnzippedFolder;
 	private byte[] buffer;
+	private Escaper escaper;
+	
+	public OutputFilter () {
+		escaper = new Escaper();
+	}
 
 	public void initialize (OutputStream output,
 		String outputPath,
@@ -100,10 +104,10 @@ public class OutputFilter implements IOutputFilter {
 					if ( part instanceof TextUnit ) {
 						tu = (TextUnit)part;
 						if ( tu.hasTarget() ) {
-							writer.write(tu.getTarget().toString());
+							writer.write(escaper.escape(tu.getTarget().getContent(), false));
 						}
 						else {
-							writer.write(tu.getSource().toString());
+							writer.write(escaper.escape(tu.getSource().getContent(), false));
 						}
 					}
 					else if ( part instanceof SkeletonUnit ) {
@@ -121,10 +125,10 @@ public class OutputFilter implements IOutputFilter {
 			}
 			else {
 				if ( item.hasTarget() ) {
-					writer.write(item.getTarget().toString());
+					writer.write(escaper.escape(item.getTarget().getContent(), false));
 				}
 				else {
-					writer.write(item.getSource().toString());
+					writer.write(escaper.escape(item.getSource().getContent(), false));
 				}
 			}
 		}

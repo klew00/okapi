@@ -84,6 +84,17 @@ public class InputFilter implements IInputFilter {
 		parser.resource.setTargetEncoding(encoding);
 		// Set the location of the original file so the output filter can use it.
 		parser.resource.setProperty("originalPath", inputPath);
+
+		// Extract or no the comments
+		final String annotationTag = "office:annotation";
+		if ( parser.resource.params.extractComments ) {
+			parser.inlineRef.remove(annotationTag);
+		}
+		else {
+			if ( !parser.inlineRef.contains("parser.inlineRef") ) {
+				parser.inlineRef.add(annotationTag);
+			}
+		}
 	}
 
 	public boolean supports (int feature) {

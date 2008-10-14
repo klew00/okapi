@@ -18,34 +18,55 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.lib;
+package net.sf.okapi.filters.openoffice;
 
-public class FormatManager {
+import java.util.List;
 
-	public void load (String p_sPath) {
-		//TODO: Load format manager data from external file
-	}
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextFragment;
+
+public class Escaper {
+
+	String codedText;
+	private List<Code> codes;
 	
-	/**
-	 * Tries to guess the format and the encoding of a give document.
-	 * @param p_sPath Full path of the document to process.
-	 * @return An array of string: 0=guessed encoding or null,
-	 * 1=guessed filter settings or null,
-	 */
-	public String[] guessFormat (String p_sPath) {
-		String[] aRes = Utils.detectFileInformation(p_sPath, false);
-		aRes[1] = null; 
-		String sExt = Utils.getExtension(p_sPath).toLowerCase();
-		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";
-		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
-		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
-		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".htm") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".odt") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ods") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odp") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odg") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ott") ) aRes[1] = "okf_openoffice";
-		return aRes;
+	public String escape (TextFragment fragment,
+		boolean escapeDQ)
+	{
+		codedText = fragment.getCodedText();
+		codes = fragment.getCodes();
+		StringBuilder tmp = new StringBuilder();
+		int index;
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				tmp.append(codes.get(index).toString());
+				break;
+			case '>':
+				if (( i > 0 ) && ( codedText.charAt(i-1) == ']' )) 
+					tmp.append("&gt;");
+				else
+					tmp.append('>');
+				break;
+			case '<':
+				tmp.append("&lt;");
+				break;
+			case '&':
+				tmp.append("&amp;");
+				break;
+			case '"':
+				if ( escapeDQ ) tmp.append("&quot;");
+				else tmp.append('"');
+				break;
+			default:
+				tmp.append(codedText.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
 	}
 }
