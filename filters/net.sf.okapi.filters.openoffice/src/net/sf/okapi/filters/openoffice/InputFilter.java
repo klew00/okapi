@@ -82,6 +82,8 @@ public class InputFilter implements IInputFilter {
 		parser.resource.setTargetLanguage(targetLanguage);
 		//TODO: Get the real target/output encoding from parameters
 		parser.resource.setTargetEncoding(encoding);
+		// Set the location of the original file so the output filter can use it.
+		parser.resource.setProperty("originalPath", inputPath);
 	}
 
 	public boolean supports (int feature) {
@@ -181,33 +183,33 @@ public class InputFilter implements IInputFilter {
 		BufferedInputStream is = null;
 		ArrayList<DocumentEntry> list = new ArrayList<DocumentEntry>();
 		try {
-			// tempDir + filename.ext
+			//TODO: generate more unique temp
 			commonPart = Util.getTempDirectory() + File.separator + Util.getFilename(path, true);
 			ZipEntry entry;
 			ZipFile zipfile = new ZipFile(path);
-			Enumeration e = zipfile.entries();
+			Enumeration<? extends ZipEntry> entries = zipfile.entries();
 			
-			while( e.hasMoreElements() ) {
-				entry = (ZipEntry)e.nextElement();
+			while( entries.hasMoreElements() ) {
+				entry = entries.nextElement();
 				DocumentEntry docEntry = new DocumentEntry();
 				if ( entry.getName().equals("content.xml") ) {
 					docEntry.path = commonPart + "." + entry.getName();
-					docEntry.docType = "content.xml";
+					docEntry.docType = entry.getName();
 					list.add(docEntry);
 				}
 				else if ( entry.getName().equals("meta.xml") ) {
 					docEntry.path = commonPart + "." + entry.getName();
-					docEntry.docType = "meta.xml";
+					docEntry.docType = entry.getName();
 					list.add(docEntry);
 				}
-				else { // Not in the output list
-					docEntry.path = commonPart + File.separator + entry.getName();
-					docEntry.path = docEntry.path.replace('/', File.separatorChar);
+				else if ( entry.getName().equals("styles.xml") ) {
+					docEntry.path = commonPart + "." + entry.getName();
+					docEntry.docType = entry.getName();
+					list.add(docEntry);
 				}
+				else continue;
 				
 				Util.createDirectories(docEntry.path);
-				// Stop here for the sub-directory entries
-				if ( docEntry.path.endsWith(File.separator) ) continue;
 				
 				// If it's a file, unzip it
 				is = new BufferedInputStream(zipfile.getInputStream(entry));
