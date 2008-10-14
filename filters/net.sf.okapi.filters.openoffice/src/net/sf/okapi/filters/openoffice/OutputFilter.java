@@ -20,12 +20,18 @@
 
 package net.sf.okapi.filters.openoffice;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-//import java.nio.charset.Charset;
-//import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IOutputFilter;
@@ -37,18 +43,33 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class OutputFilter implements IOutputFilter {
 
-	private OutputStream          output;
-	private String                encoding;
-	private OutputStreamWriter    writer;
-//	private CharsetEncoder        outputEncoder;
-	
+	static final int BUFFER_SIZE = 2048;
+
+	private byte[] aBuf; 
+	private String encoding;
+	private OutputStreamWriter writer;
+	private String outputPath;
+	private ArrayList<String> subDocs;
+	private String tmpUnzippedFolder;
 
 	public void initialize (OutputStream output,
+		String outputPath,
 		String encoding,
-		String targetLanguage) {
-		this.output = output;
-		this.encoding = encoding;
-		// Not used: targetLanguage
+		String targetLanguage)
+	{
+		try {
+			// Make sure we don't have an output open
+			if ( output != null ) {
+				output.close();
+				output = null;
+			}
+			
+			this.outputPath = outputPath;
+			this.encoding = "UTF-8";
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void close () {
@@ -110,7 +131,14 @@ public class OutputFilter implements IOutputFilter {
 
 	public void endResource (Document resource) {
 		try {
-			writer.close();
+			// Make sure all is closed
+			if ( writer != null ) {
+				writer.close();
+				writer = null;
+			}
+			// Re-zip the files from the temporary unzipped folder
+			// and create the output zipped file
+			zipDirectory(tmpUnzippedFolder, outputPath);
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -118,22 +146,34 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	public void startContainer (Group resource) {
+		try {
+			//TODO: make distinction between groups and sub-documents at a high level
+			if ( writer != null ) {
+				writer.close();
+				writer = null;
+			}
+
+			// Temporary output file
+			String tmpOutputPath = tmpUnzippedFolder + File.separator + resource.getType();
+			subDocs.add(tmpOutputPath);
+			
+			// Create the output writer from the provided stream
+			OutputStream out = new FileOutputStream(tmpOutputPath);
+			writer = new OutputStreamWriter(
+				new BufferedOutputStream(out), encoding);
+			Util.writeBOMIfNeeded(writer, true, encoding);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void startExtractionItem (TextUnit item) {
 	}
 
 	public void startResource (Document resource) {
-		try {
-			// Create the output writer from the provided stream
-			writer = new OutputStreamWriter(
-				new BufferedOutputStream(output), encoding);
-//			outputEncoder = Charset.forName(encoding).newEncoder();
-			Util.writeBOMIfNeeded(writer, true, encoding);
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
+		subDocs = new ArrayList<String>();
+		tmpUnzippedFolder = resource.getProperty("tmpUnzippedFolder");
 	}
 
     public void skeletonContainer (SkeletonUnit resource) {
@@ -144,5 +184,59 @@ public class OutputFilter implements IOutputFilter {
 			throw new RuntimeException(e);
 		}
     }
+
+	public void zipDirectory (String dir,
+		String zipPath)
+		throws IOException
+	{
+		ZipOutputStream os = null;
+		try {
+			aBuf = new byte[BUFFER_SIZE];
+			File d = new File(dir); 
+			if( !d.isDirectory() ) return; 
+			os = new ZipOutputStream(new FileOutputStream(zipPath)); 
+            addDirectory(d, os, null); 
+        } 
+		finally {
+			if ( os != null ) os.close();
+		}
+	}
+	
+	private void addDirectory (File dir,
+		ZipOutputStream os,
+		String subDir)
+		throws FileNotFoundException, IOException
+	{
+        FileInputStream input = null;
+        try {
+        	File[] aFiles = dir.listFiles();
+        	if ( aFiles.length == 0 ) { // Empty folders
+        		ZipEntry ze = new ZipEntry(subDir.replace('\\', '/')+"/");
+        		os.putNextEntry(ze);
+        		os.closeEntry();
+        	}
+        	else for ( int i=0; i<aFiles.length; i++ ) {
+        		// Go recursively if the entry is a sub-directory
+        		if ( aFiles[i].isDirectory() ) {
+        			addDirectory(aFiles[i], os,
+        				((subDir==null)? "" : subDir + File.separator) + aFiles[i].getName().replace('\\', '/'));
+        			continue;
+        		}
+        		// Or add the file to the zip
+        		input = new FileInputStream(aFiles[i].getPath()); 
+        		os.putNextEntry(new ZipEntry(
+        			((subDir==null)? "" : subDir + File.separator) + aFiles[i].getName().replace('\\', '/'))); 
+
+        		int nCount; 
+        		while( (nCount = input.read(aBuf)) > 0 ) { 
+        			os.write(aBuf, 0, nCount); 
+        		}
+        		os.closeEntry();
+        	}
+        }
+        finally {
+        	if ( input != null ) input.close(); 
+        }
+	}
     
 }

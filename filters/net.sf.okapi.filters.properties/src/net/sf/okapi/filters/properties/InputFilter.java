@@ -51,6 +51,7 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void initialize (InputStream input,
+		String inputPath,
 		String name,
 		String filterSettings,
 		String encoding,

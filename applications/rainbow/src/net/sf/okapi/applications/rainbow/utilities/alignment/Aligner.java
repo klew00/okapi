@@ -151,6 +151,7 @@ public class Aligner {
 		// On close: Hide instead of closing
 		shell.addListener(SWT.Close, new Listener() {
 			public void handleEvent(Event event) {
+				//TODO: confirm cancellation
 				event.doit = false;
 				result = 0;
 				hide();

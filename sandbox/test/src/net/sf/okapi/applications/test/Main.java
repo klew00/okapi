@@ -252,11 +252,11 @@ public class Main {
 			String inputFile = "test.properties";
 			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
 			FileInputStream input = new FileInputStream(inputFile);
-			inputFlt.initialize(input, inputFile, null, "utf-16", null, null);
+			inputFlt.initialize(input, inputFile, inputFile, null, "utf-16", null, null);
 			
 			IOutputFilter outputFlt = new net.sf.okapi.filters.properties.OutputFilter();
 			FileOutputStream output = new FileOutputStream("test.out.properties");
-			outputFlt.initialize(output, "us-ascii", null);
+			outputFlt.initialize(output, "test.out.properties", "us-ascii", null);
 			
 			inputFlt.setOutput(outputFlt);
 			inputFlt.process();

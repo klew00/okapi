@@ -62,6 +62,7 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	public void initialize (OutputStream output,
+		String outputPath,
 		String encoding,
 		String targetLanguage) {
 		this.output = output;

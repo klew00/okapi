@@ -43,6 +43,7 @@ public interface IInputFilter extends IOutputPipe {
 	 * Initializes the input to process.
 	 * @param reader The reader to use for the input.
 	 * @param name The name associated with the input (e.g. file name).
+	 * @param inputPath The full path of the input.
 	 * @param filterSettings The filter settings.
 	 * @param params The parameters to use. 
 	 * @param encoding The default encoding for the input.
@@ -50,7 +51,9 @@ public interface IInputFilter extends IOutputPipe {
 	 * @param targeLanguage Language code of the target (can be null 
 	 * in monolingual input).
 	 */
+	//TODO: Need to resolve: either path or stream
 	void initialize (InputStream input,
+		String inputPath,
 		String name,
 		String filterSettings,
 		String encoding,

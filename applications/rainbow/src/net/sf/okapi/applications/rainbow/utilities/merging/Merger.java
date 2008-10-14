@@ -106,14 +106,14 @@ public class Merger extends ThrougputPipeBase {
 			
 			// Initializes the input
 			InputStream input = new FileInputStream(originalFile);
-			inpFilter.initialize(input, originalFile, "TODO:filterSettings???", item.getInputEncoding(),
+			inpFilter.initialize(input, originalFile, originalFile, "TODO:filterSettings???", item.getInputEncoding(),
 				manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);
 			Util.createDirectories(outputFile);
 			OutputStream output = new FileOutputStream(outputFile);
-			outFilter.initialize(output, item.getOutputEncoding(), manifest.getTargetLanguage());
+			outFilter.initialize(output, outputFile, item.getOutputEncoding(), manifest.getTargetLanguage());
 
 			// Set the pipeline: inputFilter -> merger -> outputFilter 
 			inpFilter.setOutput(this);

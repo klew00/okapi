@@ -215,7 +215,7 @@ public class UtilityDriver implements CancelListener {
 					util.addCancelListener(this);
 					
 					InputStream input = new FileInputStream(inputPath);
-					inpFilter.initialize(input, inputPath,
+					inpFilter.initialize(input, inputPath, inputPath,
 						item.filterSettings, prj.buildSourceEncoding(item),
 						prj.getSourceLanguage(), prj.getTargetLanguage());
 					inpFilter.setOutput(filterUtil);
@@ -225,8 +225,8 @@ public class UtilityDriver implements CancelListener {
 						// Initialize the output
 						Util.createDirectories(outputPath);
 						OutputStream output = new FileOutputStream(outputPath);
-						outFilter.initialize(output, prj.buildTargetEncoding(item),
-							prj.getTargetLanguage());
+						outFilter.initialize(output, outputPath,
+							prj.buildTargetEncoding(item), prj.getTargetLanguage());
 						filterUtil.setOutput(outFilter);
 					}
 

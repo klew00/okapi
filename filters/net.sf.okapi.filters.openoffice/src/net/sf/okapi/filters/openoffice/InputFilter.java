@@ -23,9 +23,11 @@ package net.sf.okapi.filters.openoffice;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -35,6 +37,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -42,9 +45,10 @@ public class InputFilter implements IInputFilter {
 
 	static final int         BUFFER_SIZE = 2048;
 	
-	private InputStream           input;
-	private IResourceBuilder      output;
-	private Parser                parser;
+	private InputStream input;
+	private IResourceBuilder output;
+	private Parser parser;
+	private String commonPart = null;
 	
 
 	public InputFilter () {
@@ -62,6 +66,7 @@ public class InputFilter implements IInputFilter {
 	}
 
 	public void initialize (InputStream input,
+		String inputPath,
 		String name,
 		String filterSettings,
 		String encoding,
@@ -92,18 +97,42 @@ public class InputFilter implements IInputFilter {
 		try {
 			close();
 			
-			// Unzip the content.xml and make it the input
-			/*NOT ready yet String[] contentPaths = unzipContent(parser.resource.getName());
+			// Unzip the meta file and get the sub-documents names
+			ArrayList<DocumentEntry> subDocs = unzipContent(parser.resource.getName());
+			// Set the location of the temporary unzipped folder, so the output filter can use it.
+			parser.resource.setProperty("tmpUnzippedFolder", commonPart);
 			
-			//TODO: stream need to be open in filter, not before
-			input.close();
-			input = new FileInputStream(contentPaths[0]); 
-			*/
+			// Send start doc event
+			output.startResource(parser.resource);
+
+			// process the sub-document
+			for ( DocumentEntry subDoc : subDocs ) {
+				processSubDocument(subDoc);
+			}
 			
+			// Send end doc event
+			output.endResource(parser.resource);
+		}
+		finally {
+			close();
+		}
+	}
+	
+	private void processSubDocument (DocumentEntry subDoc) {
+		try {
+			if ( input != null ) {
+				input.close();
+				input = null;
+			}
+			input = new FileInputStream(subDoc.path); 
 			parser.open(input);
 			
+			Group subDocResource = new Group();
+			subDocResource.setName(subDoc.path);
+			subDocResource.setType(subDoc.docType);
+			
 			// Get started
-			output.startResource(parser.resource);
+			output.startContainer(subDocResource);
 			
 			// Process
 			ParserTokenType tok;
@@ -120,13 +149,21 @@ public class InputFilter implements IInputFilter {
 			}
 			while ( tok != ParserTokenType.ENDINPUT );
 
-			output.endResource(parser.resource);
+			output.endContainer(subDocResource);
 		}
-//		catch ( IOException e ) {
-//			throw new RuntimeException(e);
-//		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
 		finally {
-			close();
+			if ( input != null ) {
+				try {
+					input.close();
+					input = null;
+				}
+				catch ( IOException e ) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
 
@@ -139,31 +176,42 @@ public class InputFilter implements IInputFilter {
 	}
 	
 	
-	private String[] unzipContent (String path) {
+	private ArrayList<DocumentEntry> unzipContent (String path) {
 		BufferedOutputStream dest = null;
 		BufferedInputStream is = null;
-		String tmpDir = null;
+		ArrayList<DocumentEntry> list = new ArrayList<DocumentEntry>();
 		try {
-			tmpDir = Util.getTempDirectory() + File.separator + Util.getFilename(path, true);
-			String[] outPaths = new String[2];
-			int out = 0;
+			// tempDir + filename.ext
+			commonPart = Util.getTempDirectory() + File.separator + Util.getFilename(path, true);
 			ZipEntry entry;
 			ZipFile zipfile = new ZipFile(path);
 			Enumeration e = zipfile.entries();
 			
 			while( e.hasMoreElements() ) {
 				entry = (ZipEntry)e.nextElement();
+				DocumentEntry docEntry = new DocumentEntry();
 				if ( entry.getName().equals("content.xml") ) {
-					out = 0;
+					docEntry.path = commonPart + "." + entry.getName();
+					docEntry.docType = "content.xml";
+					list.add(docEntry);
 				}
 				else if ( entry.getName().equals("meta.xml") ) {
-					out = 1;
+					docEntry.path = commonPart + "." + entry.getName();
+					docEntry.docType = "meta.xml";
+					list.add(docEntry);
 				}
-				else continue; // Skip the others
-				outPaths[out] = tmpDir + File.separator + entry.getName();
-				Util.createDirectories(outPaths[out]);
+				else { // Not in the output list
+					docEntry.path = commonPart + File.separator + entry.getName();
+					docEntry.path = docEntry.path.replace('/', File.separatorChar);
+				}
+				
+				Util.createDirectories(docEntry.path);
+				// Stop here for the sub-directory entries
+				if ( docEntry.path.endsWith(File.separator) ) continue;
+				
+				// If it's a file, unzip it
 				is = new BufferedInputStream(zipfile.getInputStream(entry));
-				FileOutputStream fos = new FileOutputStream(outPaths[0]);
+				FileOutputStream fos = new FileOutputStream(docEntry.path);
 				int count;
 				byte data[] = new byte[BUFFER_SIZE];
 				dest = new BufferedOutputStream(fos, BUFFER_SIZE);
@@ -172,7 +220,7 @@ public class InputFilter implements IInputFilter {
 				}
 				dest.flush();
 			}
-			return outPaths;
+			return list;
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -187,4 +235,5 @@ public class InputFilter implements IInputFilter {
 			}
 		}
 	}
+
 }

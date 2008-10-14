@@ -179,7 +179,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			trgFilter = (IInputFilter)filters[0];
 			trgFilter.setOutput(dbStoreBuilder);
 			InputStream input = new FileInputStream(trgPath);
-			trgFilter.initialize(input, trgPath, trgFilterSettings, trgEncoding,
+			trgFilter.initialize(input, trgPath, trgPath, trgFilterSettings, trgEncoding,
 				// Note we use the target language as the source, because we are
 				// processing the 'target' from the utility viewpoint
 				resource.getTargetLanguage(), resource.getTargetLanguage());

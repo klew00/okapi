@@ -29,10 +29,13 @@ public interface IOutputFilter extends IResourceBuilder {
 	/**
 	 * Initializes the output.
 	 * @param output Stream where to do the output.
+	 * @param outputPath Full path of the output.
 	 * @param encoding Encoding for the output.
 	 * @param targeLanguage Language code of the target.
 	 */
+	//TODO: Need to work out better init: either path or stream?
 	void initialize (OutputStream output,
+		String outputPath,
 		String encoding,
 		String targetLanguage);
 
