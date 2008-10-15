@@ -202,19 +202,19 @@ public class OutputFilter implements IOutputFilter {
 	private void rezipContent () throws ZipException, IOException {
 		ZipOutputStream zipout = null;
 		InputStream in = null;
+		File tmpFile = null;
 		try {
 			buffer = new byte[BUFFER_SIZE];
-			File inFile = new File(originalPath);
-			ZipFile zipfile = new ZipFile(inFile);
-			File outFile = new File(outputPath);
-			zipout = new ZipOutputStream(new FileOutputStream(outFile));
+			ZipFile zipfile = new ZipFile(new File(originalPath));
+			zipout = new ZipOutputStream(new FileOutputStream(new File(outputPath)));
 			Enumeration<? extends ZipEntry> entries = zipfile.entries();
 			
 			while ( entries.hasMoreElements() ) {
 				ZipEntry entry = entries.nextElement();
 				if ( subDocs.contains(entry.getName()) ) {
 					String transPath = tmpUnzippedFolder + ".out-" + entry.getName();
-					in = new FileInputStream(transPath);
+					tmpFile = new File(transPath);
+					in = new FileInputStream(tmpFile);
 				}
 				else {
 					in = zipfile.getInputStream(entry);
@@ -223,12 +223,20 @@ public class OutputFilter implements IOutputFilter {
 				ZipEntry outentry = new ZipEntry(entry.getName());
 				zipout.putNextEntry(outentry);
 				copy(in, zipout);
+				zipout.closeEntry();
+				// Close the input stream
 				in.close();
 				in = null;
-				zipout.closeEntry();
+				// Delete the temporary file if needed and possible
+				if ( tmpFile != null ) {
+					if ( !tmpFile.delete() ) {
+						tmpFile.deleteOnExit();
+					}
+					tmpFile = null;
+				}
 			}
 		}
-		finally {
+		finally { // Make sure we free resources
 			if ( in != null ) in.close();
 			if ( zipout != null ) zipout.close();
 		}

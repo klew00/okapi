@@ -27,7 +27,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -108,8 +110,6 @@ public class InputFilter implements IInputFilter {
 
 	public void process () {
 		try {
-			close();
-			
 			// Unzip the meta file and get the sub-documents names
 			ArrayList<DocumentEntry> subDocs = unzipContent(parser.resource.getName());
 			// Set the location of the temporary unzipped folder, so the output filter can use it.
@@ -125,9 +125,18 @@ public class InputFilter implements IInputFilter {
 			
 			// Send end doc event
 			output.endResource(parser.resource);
+			
+			close();
+			// Delete temporary files
+			for ( DocumentEntry subDoc : subDocs ) {
+				File f = new File(subDoc.path);
+				if ( !f.delete() ) {
+					f.deleteOnExit();
+				}
+			}
 		}
 		finally {
-			close();
+			close(); // Make sure we free resources
 		}
 	}
 	
@@ -195,7 +204,10 @@ public class InputFilter implements IInputFilter {
 		ArrayList<DocumentEntry> list = new ArrayList<DocumentEntry>();
 		try {
 			//TODO: generate more unique temp
-			commonPart = Util.getTempDirectory() + File.separator + Util.getFilename(path, true);
+			SimpleDateFormat dt = new SimpleDateFormat("_HHmmssS");
+			commonPart = Util.getTempDirectory() + File.separator
+				+ Util.getFilename(path, true)
+				+ dt.format(new Date());
 			ZipEntry entry;
 			ZipFile zipfile = new ZipFile(path);
 			Enumeration<? extends ZipEntry> entries = zipfile.entries();
