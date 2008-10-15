@@ -79,15 +79,15 @@ public class InputFilter implements IInputFilter {
 		this.input = input;
 		parser.resource.setName(name);
 		parser.resource.setFilterSettings(filterSettings);
-		parser.resource.setSourceEncoding(encoding);
+		parser.resource.setSourceEncoding("UTF-8"); // Always
 		parser.resource.setSourceLanguage(sourceLanguage);
 		parser.resource.setTargetLanguage(targetLanguage);
 		//TODO: Get the real target/output encoding from parameters
-		parser.resource.setTargetEncoding(encoding);
+		parser.resource.setTargetEncoding("UTF-8"); // Always
 		// Set the location of the original file so the output filter can use it.
 		parser.resource.setProperty("originalPath", inputPath);
 
-		// Extract or no the comments
+		// Set flags to extract or no the comments
 		final String annotationTag = "office:annotation";
 		if ( parser.resource.params.extractComments ) {
 			parser.inlineRef.remove(annotationTag);
@@ -166,6 +166,12 @@ public class InputFilter implements IInputFilter {
 					break;
 				case SKELETON:
 					output.skeletonContainer((SkeletonUnit)parser.getResource());
+					break;
+				case STARTGROUP:
+					output.startContainer((Group)parser.getResource());
+					break;
+				case ENDGROUP:
+					output.endContainer((Group)parser.getResource());
 					break;
 				}
 			}

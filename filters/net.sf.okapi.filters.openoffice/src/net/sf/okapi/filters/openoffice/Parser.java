@@ -37,6 +37,7 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.filters.BaseParser;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -51,10 +52,12 @@ public class Parser extends BaseParser {
 	
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
+	private Stack<Group> groupResources;
 
 	public Parser () {
 		resource = new Resource();
 		extract = new Stack<Boolean>();
+		groupResources = new Stack<Group>();
 		
 		toExtract = new Hashtable<String, ElementRule>();
 		toExtract.put("text:p", new ElementRule("text:p", null));
@@ -112,13 +115,17 @@ public class Parser extends BaseParser {
 	public void open (InputStream input) {
 		try {
 			close();
+			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			reader = fact.createXMLStreamReader(input);
+			
 			reset();
 			setFinishedParsing(false); //TODO: Should this be in reset()???
+			
+			groupResources.clear();
 			extract.clear();
 			extract.push(false);
 		}
@@ -255,10 +262,15 @@ public class Parser extends BaseParser {
 					appendToTextUnit(" ");
 				}
 			}
+			else appendToTextUnit(" "); // Default=1
 			reader.nextTag(); // Eat the end-element event
 		}
 		else if ( extract.peek() && name.equals("text:tab") ) {
 			appendToTextUnit("\t");
+			reader.nextTag(); // Eat the end-element event
+		}
+		else if ( extract.peek() && name.equals("text:line-break") ) {
+			appendToTextUnit(new Code(TagType.PLACEHOLDER, "lb", "<text:line-break/>"));
 			reader.nextTag(); // Eat the end-element event
 		}
 		else {

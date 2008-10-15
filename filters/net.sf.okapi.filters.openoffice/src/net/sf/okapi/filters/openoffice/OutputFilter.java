@@ -73,7 +73,7 @@ public class OutputFilter implements IOutputFilter {
 			}
 			
 			this.outputPath = outputPath;
-			this.encoding = "UTF-8";
+			this.encoding = "UTF-8"; // Always
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -93,6 +93,7 @@ public class OutputFilter implements IOutputFilter {
 	}
 
 	public void endContainer (Group resource) {
+		// All is done in startContainer
 	}
 
 	public void endExtractionItem (TextUnit item) {
@@ -155,20 +156,25 @@ public class OutputFilter implements IOutputFilter {
 
 	public void startContainer (Group resource) {
 		try {
-			//TODO: make distinction between groups and sub-documents at a high level
+			// Temporary test for detecting sub-documents from other types of 
+			// container.
+			//TODO: create sub-document resource/even types
+			String type = resource.getType();
+			if (( type == null ) || !type.endsWith(".xml") ) return;  
+
+			// Close possible previous sub-document
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
 			}
-
-			// Temporary output file
+			
+			// Get the path of the new temporary output file
 			String tmpOutputPath = tmpUnzippedFolder + ".out-" + resource.getType();
 			subDocs.add(resource.getType());
 			
 			// Create the output writer from the provided stream
 			OutputStream out = new FileOutputStream(tmpOutputPath);
-			writer = new OutputStreamWriter(
-				new BufferedOutputStream(out), encoding);
+			writer = new OutputStreamWriter(new BufferedOutputStream(out), encoding);
 			Util.writeBOMIfNeeded(writer, true, encoding);
 		}
 		catch ( IOException e ) {

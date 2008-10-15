@@ -832,6 +832,8 @@ public class Aligner {
 		btMoveDown.setVisible(!specialMode);
 		btMerge.setVisible(!specialMode);
 		btSplit.setVisible(!specialMode);
+		btAutoCorrect.setVisible(!specialMode);
+		btOptions.setVisible(!specialMode);
 		chkSyncScrolling.setVisible(!specialMode);
 		lbIssues.setEnabled(!specialMode);
 		
@@ -967,7 +969,6 @@ public class Aligner {
 		int n = trgList.getSelectionIndex();
 		if ( n == -1 ) n = 0;
 		try {
-			resetIssues();
 			java.util.List<TextFragment> srcCol = source.getSegments();
 			java.util.List<TextFragment> trgCol = target.getSegments();
 			
@@ -1002,7 +1003,10 @@ public class Aligner {
 								for ( int k=0; k<toJoin; k++ ) {
 									target.joinSegmentWithNext(lastMatch+1);
 								}
-								modified = true;
+								if ( !modified ) {
+									resetIssues();
+									modified = true;
+								}
 								addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
 									lastMatch+1+1)); // Show 1 for 0
 								// Correct the target position since we joined one or more segments
@@ -1036,7 +1040,10 @@ public class Aligner {
 					while ( target.getSegments().size() > 1 ) {
 						target.joinSegmentWithNext(0);
 					}
-					modified = true;
+					if ( !modified ) {
+						resetIssues();
+						modified = true;
+					}
 					addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
 				}
 			}
