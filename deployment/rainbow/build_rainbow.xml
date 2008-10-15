@@ -48,6 +48,7 @@
 		<ant antfile="build_ui.common.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.common.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.properties.xml" inheritAll="false"/>
+		<ant antfile="build_ui.filters.openoffice.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.regex.xml" inheritAll="false"/>
 		<ant antfile="build_ui.lib.segmentation.xml" inheritAll="false"/>
  		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
