@@ -48,7 +48,7 @@ public class Parser extends BaseParser {
 
 	protected Resource resource;
 	protected Hashtable<String, ElementRule> toExtract;
-	protected ArrayList<String> inlineRef;
+	protected ArrayList<String> toProtect;
 	
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
@@ -69,31 +69,31 @@ public class Parser extends BaseParser {
 		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
 		toExtract.put("text:index-title-template", new ElementRule("text:index-title-template", null));
 		
-		inlineRef = new ArrayList<String>();
-		inlineRef.add("text:initial-creator");
-		inlineRef.add("text:creation-date");
-		inlineRef.add("text:creation-time");
-		inlineRef.add("text:description");
-		inlineRef.add("text:user-defined");
-		inlineRef.add("text:print-time");
-		inlineRef.add("text:print-date");
-		inlineRef.add("text:printed-by");
-		inlineRef.add("text:title");
-		inlineRef.add("text:subject");
-		inlineRef.add("text:keywords");
-		inlineRef.add("text:editing-cycles");
-		inlineRef.add("text:editing-duration");
-		inlineRef.add("text:modification-time");
-		inlineRef.add("text:modification-date");
-		inlineRef.add("text:creator");
-		inlineRef.add("text:page-count");
-		inlineRef.add("text:paragraph-count");
-		inlineRef.add("text:word-count");
-		inlineRef.add("text:character-count");
-		inlineRef.add("text:table-count");
-		inlineRef.add("text:image-count");
-		inlineRef.add("text:object-count");
-		inlineRef.add("dc:date");
+		toProtect = new ArrayList<String>();
+		toProtect.add("text:initial-creator");
+		toProtect.add("text:creation-date");
+		toProtect.add("text:creation-time");
+		toProtect.add("text:description");
+		toProtect.add("text:user-defined");
+		toProtect.add("text:print-time");
+		toProtect.add("text:print-date");
+		toProtect.add("text:printed-by");
+		toProtect.add("text:title");
+		toProtect.add("text:subject");
+		toProtect.add("text:keywords");
+		toProtect.add("text:editing-cycles");
+		toProtect.add("text:editing-duration");
+		toProtect.add("text:modification-time");
+		toProtect.add("text:modification-date");
+		toProtect.add("text:creator");
+		toProtect.add("text:page-count");
+		toProtect.add("text:paragraph-count");
+		toProtect.add("text:word-count");
+		toProtect.add("text:character-count");
+		toProtect.add("text:table-count");
+		toProtect.add("text:image-count");
+		toProtect.add("text:object-count");
+		toProtect.add("dc:date");
 	}
 
 	public void close () {
@@ -276,7 +276,7 @@ public class Parser extends BaseParser {
 		else {
 			if ( extract.peek() ) {
 				if ( name.equals("text:a") ) processStartALink(name);
-				else if ( inlineRef.contains(name) ) processReadOnlyInlineElement(name);
+				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
 				else appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
 			}
 			else {

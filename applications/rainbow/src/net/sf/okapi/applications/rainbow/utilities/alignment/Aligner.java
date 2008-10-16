@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -87,6 +88,7 @@ public class Aligner {
 	private Button           chkShowInlineCodes;
 	private Button           chkSyncScrolling;
 	private Button           chkCheckSingleSegUnit;
+	private Button           chkUseAutoCorrection;
 	private TextContainer    source;
 	private TextContainer    target;
 	private boolean          splitMode = false;
@@ -99,6 +101,7 @@ public class Aligner {
 	private Color            colorRed;
 	private boolean          canAcceptUnit;
 	private int              issueType;
+	private boolean          warnOnClosing;
 	private Pattern               anchors;
 	private ArrayList<String>     anchorList = new ArrayList<String>(); 
 
@@ -130,8 +133,14 @@ public class Aligner {
 			colorRed = null;
 		}
 	}
+	
+	public void closeWithoutWarning () {
+		warnOnClosing = false;
+		close();
+	}
 
 	public Aligner (Shell parent) {
+		warnOnClosing = true;
 		anchors = Pattern.compile("((\\d+[\\.,])*\\d+)");
 		
 		colorGreen = new Color(null, 0, 128, 0);
@@ -151,8 +160,8 @@ public class Aligner {
 		// On close: Hide instead of closing
 		shell.addListener(SWT.Close, new Listener() {
 			public void handleEvent(Event event) {
-				//TODO: confirm cancellation
 				event.doit = false;
+				if ( !confirmCancel() ) return;
 				result = 0;
 				hide();
 			}
@@ -224,6 +233,8 @@ public class Aligner {
 		sashBottom.setSashWidth(3);
 		sashBottom.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 
+		sashTop.setWeights(new int[]{30,70});
+		
 		//--- Middle part
 		
 		Composite cmpMiddle = new Composite(sashBottom, SWT.NONE);
@@ -265,6 +276,9 @@ public class Aligner {
 		chkCheckSingleSegUnit = new Button(cmpOptions, SWT.CHECK);
 		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
 
+		chkUseAutoCorrection = new Button(cmpOptions, SWT.CHECK);
+		chkUseAutoCorrection.setText("Try an auto-correction automatically");
+
 		// Main buttons
 		
 		int buttonWidth = 100;
@@ -273,39 +287,39 @@ public class Aligner {
 		layout = new GridLayout(5, false);
 		layout.marginWidth = 0;
 		cmpButtons.setLayout(layout);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.horizontalSpan = 3;
 		cmpButtons.setLayoutData(gdTmp);
 
-		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth);
+		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth, -1);
 		btEditRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRules();
 			}
 		});
 		
-		btAutoCorrect = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Try Auto-Fix", buttonWidth);
+		btAutoCorrect = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Try Auto-Fix", buttonWidth, -1);
 		btAutoCorrect.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				autoCorrect();
 			}
 		});
 		
-		btMoveUp = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Up", buttonWidth);
+		btMoveUp = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Up", buttonWidth, -1);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveUp();
 			}
 		});
 	
-		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Join Next", buttonWidth);
+		btMerge = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Join Next", buttonWidth, -1);
 		btMerge.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				mergeWithNext();
 			}
 		});
 		
-		btAccept = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Accept", buttonWidth);
+		btAccept = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Accept", buttonWidth, -1);
 		btAccept.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( splitMode ) endSplitMode(true);
@@ -318,35 +332,35 @@ public class Aligner {
 			}
 		});
 
-		btEditSeg = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Segment...", buttonWidth);
+		btEditSeg = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Segment...", buttonWidth, -1);
 		btEditSeg.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				startEditMode();
 			}
 		});
 		
-		btOptions = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Options...", buttonWidth);
+		btOptions = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Options...", buttonWidth, -1);
 		btOptions.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editOptions();
 			}
 		});
 		
-		btMoveDown = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Down", buttonWidth);
+		btMoveDown = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Down", buttonWidth, -1);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDown();
 			}
 		});
 		
-		btSplit = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Split...", buttonWidth);
+		btSplit = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Split...", buttonWidth, -1);
 		btSplit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				startSplitMode();
 			}
 		});
 
-		btSkip = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Skip", buttonWidth);
+		btSkip = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Skip", buttonWidth, -1);
 		btSkip.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( splitMode ) {
@@ -388,6 +402,9 @@ public class Aligner {
 		//--- Bottom part
 		
 		Composite cmpBottom = new Composite(sashBottom, SWT.NONE);
+		sashBottom.setWeights(new int[]{14,86});
+		
+		
 		layout = new GridLayout();
 		layout.marginWidth = 0;
 		cmpBottom.setLayout(layout);
@@ -398,7 +415,6 @@ public class Aligner {
 		edSrcSeg = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSrcSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edSrcSeg.setLayoutData(gdTmp);
 		edSrcSeg.setFont(textFont);
@@ -406,7 +422,6 @@ public class Aligner {
 		edTrgSeg = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTrgSeg.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 16;
 		edTrgSeg.setLayoutData(gdTmp);
 		edTrgSeg.setFont(textFont);
@@ -421,13 +436,11 @@ public class Aligner {
 		Label label = new Label(cmpBottom, SWT.NONE);
 		label.setText("Full text unit:");
 		gdTmp = new GridData();
-		//gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
 		
 		edSource = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edSource.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edSource.setLayoutData(gdTmp);
 		edSource.setFont(textFont);
@@ -435,7 +448,6 @@ public class Aligner {
 		edTarget = new Text(cmpBottom, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 		edTarget.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		//gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 32;
 		edTarget.setLayoutData(gdTmp);
 		edTarget.setFont(textFont);
@@ -449,6 +461,7 @@ public class Aligner {
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) {
+					if ( !confirmCancel() ) return;
 					result = 0;
 					hide();
 				}
@@ -456,7 +469,6 @@ public class Aligner {
 		};
 		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		//gdTmp.horizontalSpan = 4;
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btClose.setText("Cancel");
 		shell.setDefaultButton(btAccept);
@@ -470,6 +482,21 @@ public class Aligner {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private boolean confirmCancel () {
+		try {
+			if ( !warnOnClosing ) return true;
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage("Do you really want to interrupt this alignment?");
+			dlg.setText(shell.getText());
+			return (dlg.open() == SWT.YES);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+		return false;
+	}
+	
 	/**
 	 * Sets information data for the visual verification.
 	 * @param targetSrxPath The full path of the SRX document to use for the target.
@@ -477,10 +504,12 @@ public class Aligner {
 	 * them as aligned without checking.
 	 */
 	public void setInfo (String targetSrxPath,
-		boolean checkSingleSegUnit)
+		boolean checkSingleSegUnit,
+		boolean useAutoCorrection)
 	{
 		this.targetSrxPath = targetSrxPath;
 		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
+		chkUseAutoCorrection.setSelection(useAutoCorrection);
 	}
 	
 	private void gotoIssue () {
@@ -495,7 +524,7 @@ public class Aligner {
 			}
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 	
@@ -580,7 +609,7 @@ public class Aligner {
 			hasIssue(true, true);
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 	
@@ -637,7 +666,6 @@ public class Aligner {
 				edName.setText(tu.getName());
 			}
 		}
-		setData();
 		
 		shell.setVisible(true);
 		trgList.setFocus();
@@ -674,6 +702,13 @@ public class Aligner {
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
 		if ( hasIssue(false, true) ) {
+			setData();
+			if ( issueType == 1 ) {
+				lbIssues.select(0);
+				gotoIssue();
+			}
+			// Try to auto-correct
+			if ( chkUseAutoCorrection.getSelection() ) autoCorrect();
 			// Correct manually
 			edCounter.setText(String.format("This source: #%d / Total targets: %d", currentSource, totalTarget));
 			return showDialog();
@@ -757,7 +792,7 @@ public class Aligner {
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 	
@@ -767,7 +802,7 @@ public class Aligner {
 			editor.showDialog(targetSrxPath);
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 
@@ -788,7 +823,7 @@ public class Aligner {
 						target.getSegments().get(indexActiveSegment), true);
 				}
 				catch ( InvalidContentException e ) {
-					Dialogs.showError(shell, e.getMessage(), null);
+					Dialogs.showError(shell, e.getLocalizedMessage(), null);
 					//TODO: recover by resetting the original, or prevent end of
 					//edit mode
 				}
@@ -809,7 +844,7 @@ public class Aligner {
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
 
@@ -894,7 +929,7 @@ public class Aligner {
 			return updateIssueStatus();
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			return false;
 		}
 	}
@@ -1059,7 +1094,7 @@ public class Aligner {
 		}
 		catch ( Throwable e ) {
 			addIssue(2, "Error- Auto-correction error occured.");
-			Dialogs.showError(shell, e.getMessage(), null);
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 		return modified;
 	}
@@ -1088,6 +1123,10 @@ public class Aligner {
 		case 1:
 			edCause.setText("One or more WARNINGS detected.");
 			edCause.setBackground(colorAmber);
+			if ( lbIssues.getItemCount() > 0 ) {
+				lbIssues.select(0);
+				gotoIssue();
+			}
 			break;
 		case 2:
 			edCause.setText("One or more ERRORS detected.");

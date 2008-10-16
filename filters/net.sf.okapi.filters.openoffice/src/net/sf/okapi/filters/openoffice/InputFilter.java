@@ -90,12 +90,10 @@ public class InputFilter implements IInputFilter {
 		// Set flags to extract or no the comments
 		final String annotationTag = "office:annotation";
 		if ( parser.resource.params.extractComments ) {
-			parser.inlineRef.remove(annotationTag);
+			parser.toProtect.remove(annotationTag);
 		}
-		else {
-			if ( !parser.inlineRef.contains("parser.inlineRef") ) {
-				parser.inlineRef.add(annotationTag);
-			}
+		else if ( !parser.toProtect.contains(annotationTag) ) {
+			parser.toProtect.add(annotationTag);
 		}
 	}
 

@@ -30,6 +30,7 @@ public class Parameters extends BaseParameters {
 	public String       targetSrxPath;
 	public boolean      useTradosWorkarounds;
 	public boolean      checkSingleSegUnit;
+	public boolean      useAutoCorrection;
 	
 
 	public Parameters () {
@@ -43,6 +44,7 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 		useTradosWorkarounds = true;
 		checkSingleSegUnit = true;
+		useAutoCorrection = true;
 	}
 
 	public void fromString (String data) {
@@ -54,16 +56,18 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		useTradosWorkarounds = buffer.getBoolean("useTradosWorkarounds", useTradosWorkarounds);
 		checkSingleSegUnit = buffer.getBoolean("checkSingleSegUnit", checkSingleSegUnit);
+		useAutoCorrection = buffer.getBoolean("useAutoCorrection", useAutoCorrection);
 	}
 
 	public String toString () {
 		buffer.reset();
-		buffer.setParameter("tmxPath", tmxPath);
-		buffer.setParameter("sourceSrxPath", sourceSrxPath);
-		buffer.setParameter("targetSrxPath", targetSrxPath);
-		buffer.setParameter("segment", segment);
-		buffer.setParameter("useTradosWorkarounds", useTradosWorkarounds);
-		buffer.setParameter("checkSingleSegUnit", checkSingleSegUnit);
+		buffer.setString("tmxPath", tmxPath);
+		buffer.setString("sourceSrxPath", sourceSrxPath);
+		buffer.setString("targetSrxPath", targetSrxPath);
+		buffer.setBoolean("segment", segment);
+		buffer.setBoolean("useTradosWorkarounds", useTradosWorkarounds);
+		buffer.setBoolean("checkSingleSegUnit", checkSingleSegUnit);
+		buffer.setBoolean("useAutoCorrection", useAutoCorrection);
 		return buffer.toString();
 	}
 }

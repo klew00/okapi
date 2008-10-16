@@ -107,7 +107,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			//TODO: make info part of constructor
 			//aligner = new SegmentsAligner(shell, params.targetSrxPath);
 			aligner = new Aligner(shell);
-			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit);
+			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit,
+				params.useAutoCorrection);
 		}
 		
 		alignedTotal = 0;
@@ -121,7 +122,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		logger.info(String.format("Total aligned = %d", alignedTotal));
     	
 		if ( aligner != null ) {
-			aligner.close();
+			aligner.closeWithoutWarning();
 			aligner = null;
 		}
 		if ( tmxWriter != null ) {

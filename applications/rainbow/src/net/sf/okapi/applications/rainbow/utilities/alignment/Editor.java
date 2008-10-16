@@ -25,6 +25,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -50,6 +51,7 @@ public class Editor implements IParametersEditor {
 	private Text                  edTMXPath;
 	private Button                chkUseTradosWorkarounds;
 	private Button                chkCheckSingleSegUnit;
+	private Button                chkUseAutoCorrection;
 	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
 
@@ -143,11 +145,10 @@ public class Editor implements IParametersEditor {
 			"Segment the extracted text using the following SRX rules:");
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		chkCheckSingleSegUnit = new Button(cmpTmp, SWT.CHECK);
-		chkCheckSingleSegUnit.setText("Verify in-line codes for text units with a single segment");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkCheckSingleSegUnit.setLayoutData(gdTmp);
+		chkCheckSingleSegUnit = UIUtil.createGridButton(cmpTmp, SWT.CHECK,
+			"Verify in-line codes for text units with a single segment", -1, 2);
+		chkUseAutoCorrection = UIUtil.createGridButton(cmpTmp, SWT.CHECK,
+			"Use auto-correction automatically", -1, 2);
 		
 		//--- Dialog-level buttons
 
@@ -193,6 +194,7 @@ public class Editor implements IParametersEditor {
 		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 		chkCheckSingleSegUnit.setSelection(params.checkSingleSegUnit);
+		chkUseAutoCorrection.setSelection(params.useAutoCorrection);
 	}
 
 	private boolean saveData () {
@@ -216,6 +218,7 @@ public class Editor implements IParametersEditor {
 		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
 		params.checkSingleSegUnit = chkCheckSingleSegUnit.getSelection();
+		params.useAutoCorrection = chkUseAutoCorrection.getSelection();
 		return true;
 	}
 

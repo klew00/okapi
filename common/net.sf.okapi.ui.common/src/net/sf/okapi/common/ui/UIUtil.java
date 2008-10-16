@@ -80,18 +80,21 @@ public class UIUtil {
 	 * @param parent Composite parent widget.
 	 * @param style Style of the button.
 	 * @param label Text of the button.
-	 * @param width width of the button.
+	 * @param width Width of the button. (Use -1 to not set it)
+	 * @param horizontalSpan Span of the button (Use -1 to not set it)
 	 * @return The new button.
 	 */
 	public static Button createGridButton (Composite parent,
 		int style,
 		String label,
-		int width)
+		int width,
+		int horizontalSpan)
 	{
 		Button newButton = new Button(parent, style);
 		newButton.setText(label);
 		GridData gdTmp = new GridData();
-		gdTmp.widthHint = width;
+		if ( width > -1 ) gdTmp.widthHint = width;
+		if ( horizontalSpan > 0 ) gdTmp.horizontalSpan = horizontalSpan;
 		newButton.setLayoutData(gdTmp);
 		return newButton;
 	}
