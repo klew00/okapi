@@ -1,37 +1,51 @@
-package net.sf.okapi.apptest.filters;
+package net.sf.okapi.apptest.pipelineutil;
 
 import java.util.concurrent.BlockingQueue;
 
-import net.sf.okapi.common.pipeline2.IPipelineEvent;
-import net.sf.okapi.common.pipeline2.IPipelineStep;
-import net.sf.okapi.common.pipeline2.IProducer;
-import net.sf.okapi.common.pipeline2.PipelineEvent;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
-import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
+import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.pipeline.PipelineEvent;
+import net.sf.okapi.apptest.pipeline.IPipelineEvent;
+import net.sf.okapi.apptest.pipeline.IPipelineStep;
+import net.sf.okapi.apptest.pipeline.IProducer;
+import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
 
-public abstract class BaseInputFilter implements IPipelineStep, IProducer {
+public class InputFilterStep implements IPipelineStep, IProducer {
 
 	protected BlockingQueue<IPipelineEvent> producerQueue;
 	protected int order;
 	protected volatile boolean pause;
 	protected PipelineReturnValue result;
+	protected IInputFilter inputFilter;
+	protected String inputPath;
 
-	public void finish () throws InterruptedException {
-		producerQueue.put(new PipelineEvent(PipelineEventType.FINISHED, null, ++order));
+	public String getName() {
+		return inputFilter.getName();
 	}
 
-	public abstract String getName();
+	public void setInput (String inputPath) {
+		this.inputPath = inputPath;
+	}
+	
+	public void setInputFilter (IInputFilter inputFilter) {
+		this.inputFilter = inputFilter;
+	}
+	
+	public IInputFilter getInputFilter () {
+		return inputFilter;
+	}
+	
+	public void finish () throws InterruptedException {
+		if ( inputFilter != null ) inputFilter.close();
+	}
 
 	public void initialize () throws InterruptedException {
 		order = -1;
-		producerQueue.put(new PipelineEvent(PipelineEventType.START, null, ++order));
+		inputFilter.open(inputPath);
 	}
 
 	public void pause () {
 		pause = true;
 	}
-
-	public abstract PipelineReturnValue process () throws InterruptedException;
 
 	public synchronized void resume () {
 		pause = false;
@@ -69,6 +83,15 @@ public abstract class BaseInputFilter implements IPipelineStep, IProducer {
 
 	public void setProducerQueue (BlockingQueue<IPipelineEvent> producerQueue) {
 		this.producerQueue = producerQueue;
+	}
+
+	public PipelineReturnValue process () throws InterruptedException {
+		if ( !inputFilter.hasNext() ) {
+			return PipelineReturnValue.SUCCEDED; // Done
+		}
+		int event = inputFilter.next();
+		producerQueue.put(new PipelineEvent(event, inputFilter.getResource(), ++order));
+		return PipelineReturnValue.RUNNING;
 	}
 
 }

@@ -1,22 +1,32 @@
 package net.sf.okapi.apptest;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import net.sf.okapi.common.ui.Dialogs;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class MainForm {
 
 	public static enum ProgressType {
-		IDLE, IN_PROGRESSS, PAUSED, CANCELED, INACTIVE
+		IDLE, IN_PROGRESSS, PAUSED, CANCELED
 	}
 	
 	private Shell shell;
 	private Button btStart;
+	private Button chkUsePipeline;
+	private Button chkAllowUIInteraction;
 	private Button btPause;
 	private Button btResume;
 	private Button btStop;
@@ -38,6 +48,20 @@ public class MainForm {
 				start();
 			}
 		});
+		
+		chkUsePipeline = new Button(shell, SWT.CHECK);
+		chkUsePipeline.setLayoutData(new GridData(GridData.CENTER | GridData.FILL_HORIZONTAL));
+		chkUsePipeline.setText("Use the pipeline");
+		chkUsePipeline.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				chkAllowUIInteraction.setEnabled(chkUsePipeline.getSelection());
+			}
+		});
+		
+		chkAllowUIInteraction = new Button(shell, SWT.CHECK);
+		chkAllowUIInteraction.setLayoutData(new GridData(GridData.CENTER | GridData.FILL_HORIZONTAL));
+		chkAllowUIInteraction.setText("Allow UI interaction");
+		chkAllowUIInteraction.setSelection(true);
 		
 		btPause = new Button(shell, SWT.PUSH);
 		btPause.setLayoutData(new GridData(GridData.CENTER | GridData.FILL_HORIZONTAL));
@@ -66,7 +90,13 @@ public class MainForm {
 			}
 		});
 		
+		shell.pack();
+		Rectangle Rect = shell.getBounds();
+		shell.setMinimumSize(Rect.width, Rect.height);
 		shell.setSize(300, 200);
+		Dialogs.centerWindow(shell, null);
+
+		chkAllowUIInteraction.setEnabled(chkUsePipeline.getSelection());
 		updateControls();
 	}
 	
@@ -95,13 +125,33 @@ public class MainForm {
 		return (progressStatus == ProgressType.PAUSED);
 	}
 	
+	private void showElapsedTime (Date start, Date end) {
+		try {
+			DateFormat timeOutput = new SimpleDateFormat("'Minutes='mm 'Seconds='ss 'Milliseconds='S"); 
+			long diff = (end.getTime() - start.getTime());
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
+			dlg.setMessage(timeOutput.format(diff));
+			dlg.setText("Done");
+			dlg.open();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
 	private void start () {
 		progressStatus = ProgressType.IN_PROGRESSS;
 		updateControls();
-		utilDriver.execute("test");
-	}
-
-	public void makeIdle () {
+		Date startDate = new Date();
+		
+		if ( chkUsePipeline.getSelection() ) {
+			utilDriver.pipelineExecute(chkAllowUIInteraction.getSelection());
+		}
+		else {
+			utilDriver.simpleExecute();
+		}
+		Date endDate = new Date();
+		showElapsedTime(startDate, endDate);
 		progressStatus = ProgressType.IDLE;
 		updateControls();
 	}
@@ -122,9 +172,10 @@ public class MainForm {
 	}
 	
 	private void updateControls () {
+		boolean allowed = chkAllowUIInteraction.getSelection();
 		btStart.setEnabled(progressStatus==ProgressType.IDLE);
-		btPause.setEnabled(progressStatus==ProgressType.IN_PROGRESSS);
+		btPause.setEnabled(allowed && (progressStatus==ProgressType.IN_PROGRESSS));
 		btResume.setEnabled(progressStatus==ProgressType.PAUSED);
-		btStop.setEnabled(progressStatus==ProgressType.IN_PROGRESSS);
+		btStop.setEnabled(allowed && (progressStatus==ProgressType.IN_PROGRESSS));
 	}
 }

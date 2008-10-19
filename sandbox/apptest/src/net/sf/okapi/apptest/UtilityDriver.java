@@ -2,14 +2,18 @@ package net.sf.okapi.apptest;
 
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.okapi.apptest.filters.DummyInputFilter;
-import net.sf.okapi.apptest.filters.DummyOutputFilter;
-import net.sf.okapi.apptest.filters.OutputFilterStep;
-import net.sf.okapi.apptest.utilities.PseudoTranslate;
-import net.sf.okapi.apptest.utilities.UtilityStep;
-import net.sf.okapi.common.pipeline2.ILinearPipeline;
-import net.sf.okapi.common.pipeline2.LinearPipeline;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
+import net.sf.okapi.apptest.dummyfilter.DummyInputFilter;
+import net.sf.okapi.apptest.dummyfilter.DummyOutputFilter;
+import net.sf.okapi.apptest.dummyutility.PseudoTranslate;
+import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.filters.IOutputFilter;
+import net.sf.okapi.apptest.pipeline.ILinearPipeline;
+import net.sf.okapi.apptest.pipeline.LinearPipeline;
+import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
+import net.sf.okapi.apptest.pipelineutil.InputFilterStep;
+import net.sf.okapi.apptest.pipelineutil.OutputFilterStep;
+import net.sf.okapi.apptest.pipelineutil.UtilityStep;
+import net.sf.okapi.apptest.utilities.IUtility;
 import net.sf.okapi.common.ui.Dialogs;
 
 public class UtilityDriver {
@@ -24,54 +28,97 @@ public class UtilityDriver {
 		mf = main;
 	}
 	
-	public void execute (String utilityId) {
+	public void simpleExecute () {
+		IInputFilter inFilter = null;
+		IUtility util = null;
+		IOutputFilter outFilter = null;
+		try {
+			inFilter = new DummyInputFilter();
+			util = new PseudoTranslate();
+			outFilter = new DummyOutputFilter();
+
+			// Set the options 
+			inFilter.setOptions("en", "UTF-8");
+			outFilter.setOptions("en-bz", "UTF-8");
+			outFilter.setOutput("myOutputFile");
+
+			// Process
+			inFilter.open("myFile");
+			while ( inFilter.hasNext() ) {
+				int event = inFilter.next();
+				util.handleEvent(event, inFilter.getResource());
+				outFilter.handleEvent(event, inFilter.getResource());
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			e.printStackTrace();
+		}
+		finally {
+			if ( util != null ) util.doEpilog();
+			if ( outFilter != null ) outFilter.close();
+			if ( inFilter != null ) inFilter.close();
+		}
+	}
+	
+	public void pipelineExecute (boolean allowUIInteraction) {
 		try {
 			ILinearPipeline pipeline = new LinearPipeline();
-			pipeline.addPipleLineStep(new DummyInputFilter());
+			
+			InputFilterStep inputStep = new InputFilterStep();
+			inputStep.setInputFilter(new DummyInputFilter());
+			pipeline.addPipleLineStep(inputStep);
+			inputStep.getInputFilter().setOptions("en", "UTF-8");
+			inputStep.setInput("myFile");
 			
 			UtilityStep utility = new UtilityStep();
 			utility.setUtility(new PseudoTranslate());
 			pipeline.addPipleLineStep(utility);
 			
-			OutputFilterStep outputFilter = new OutputFilterStep();
-			outputFilter.setOutputFilter(new DummyOutputFilter());
-			pipeline.addPipleLineStep(outputFilter);
+			OutputFilterStep outputStep = new OutputFilterStep();
+			outputStep.setOutputFilter(new DummyOutputFilter());
+			pipeline.addPipleLineStep(outputStep);
+			outputStep.getOutputFilter().setOptions("en-bz", "UTF-8");
+			outputStep.setOutput("myOutputFile");
 			
 			pipeline.execute();
 
-			String canceled = "";
-			int count = 0;
-			while ( pipeline.getState() == PipelineReturnValue.RUNNING
-				|| pipeline.getState() == PipelineReturnValue.PAUSED )
-			{
-				if ( !shell.isDisposed() ) {
-					if ( !shell.getDisplay().readAndDispatch() ) {
-						shell.getDisplay().sleep();
+			//String canceled = "";
+			//int count = 0;
+			if ( allowUIInteraction ) {
+				while ( pipeline.getState() == PipelineReturnValue.RUNNING
+					|| pipeline.getState() == PipelineReturnValue.PAUSED )
+				{
+					if ( !shell.isDisposed() ) {
+						if ( !shell.getDisplay().readAndDispatch() ) {
+							shell.getDisplay().sleep();
+						}
+					}
+					if ( pipeline.getState() == PipelineReturnValue.PAUSED ) {
+						if ( mf.inProgress() ) pipeline.resume();
+					}
+					else {
+						//count++;
+						if ( mf.isPaused() ) pipeline.pause();
+						else if ( mf.isCanceled() ) {
+							pipeline.cancel();
+							//canceled = " (Canceled)";
+						}
 					}
 				}
-				if ( pipeline.getState() == PipelineReturnValue.PAUSED ) {
-					if ( mf.inProgress() ) pipeline.resume();
-				}
-				else {
-					count++;
-					if ( mf.isPaused() ) pipeline.pause();
-					else if ( mf.isCanceled() ) {
-						pipeline.cancel();
-						canceled = " (Canceled)";
-					}
-					/*else if ( count == 1 ) {
-						mf.pause();
-						pipeline.pause();
-					}*/
-				}
+				//Dialogs.showError(shell, String.format("Done! count=%d"+canceled, count), null);
 			}
-			
-			Dialogs.showError(shell, String.format("Done! count=%d"+canceled, count), null);
-			mf.makeIdle();
+			else { // No UI interaction
+				while ( pipeline.getState() == PipelineReturnValue.RUNNING )
+				{
+					// Just wait for the end
+				}				
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 			e.printStackTrace();
 		}
 	}
+
 }

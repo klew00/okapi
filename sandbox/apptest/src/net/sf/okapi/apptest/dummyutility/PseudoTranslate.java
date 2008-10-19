@@ -1,0 +1,51 @@
+package net.sf.okapi.apptest.dummyutility;
+
+import net.sf.okapi.apptest.common.IResource;
+import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.resource.TextUnit;
+import net.sf.okapi.apptest.utilities.IUtility;
+
+public class PseudoTranslate implements IUtility {
+
+	public String getName () {
+		return "PseudoTranlate";
+	}
+	
+	public void handleEvent (int eventType,
+		IResource resource)
+	{
+		switch ( eventType ) {
+		case IInputFilter.TEXT_UNIT:
+			TextUnit tu1 = (TextUnit)resource;
+			processTU(tu1);
+			if ( tu1.hasChild() ) {
+				for ( TextUnit tu : tu1.childTextUnitIterator() ) {
+					processTU(tu);
+				}
+			}
+			break;
+		case IInputFilter.START_DOCUMENT:
+			doProlog();
+			break;
+		case IInputFilter.END_DOCUMENT:
+			doEpilog();
+			break;
+		}
+	}
+	
+	private void processTU (TextUnit tu) {
+		tu.getSourceContent().setCodedText(
+			tu.getSourceContent().getCodedText().replace("e", "X"));
+	}
+
+	public void doEpilog () {
+		// Nothing to do in this utility
+		System.out.println("PseudoTranlate: doEpilog() called");
+	}
+
+	public void doProlog () {
+		// Nothing to do in this utility
+		System.out.println("PseudoTranlate: doProlog() called");
+	}
+
+}

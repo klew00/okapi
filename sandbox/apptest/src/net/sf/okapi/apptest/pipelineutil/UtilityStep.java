@@ -1,21 +1,23 @@
-package net.sf.okapi.apptest.utilities;
+package net.sf.okapi.apptest.pipelineutil;
 
 import java.util.concurrent.BlockingQueue;
 
-import net.sf.okapi.common.pipeline2.BasePipelineStep;
-import net.sf.okapi.common.pipeline2.IConsumer;
-import net.sf.okapi.common.pipeline2.IPipelineEvent;
-import net.sf.okapi.common.pipeline2.IProducer;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
-import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
+import net.sf.okapi.apptest.common.IResource;
+import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.pipeline.BasePipelineStep;
+import net.sf.okapi.apptest.pipeline.IConsumer;
+import net.sf.okapi.apptest.pipeline.IPipelineEvent;
+import net.sf.okapi.apptest.pipeline.IProducer;
+import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
+import net.sf.okapi.apptest.utilities.IUtility;
 
 public class UtilityStep extends BasePipelineStep implements IConsumer, IProducer {
 
 	private BlockingQueue<IPipelineEvent> producerQueue;
 	private BlockingQueue<IPipelineEvent> consumerQueue;
-	private IUtility2 utility;
+	private IUtility utility;
 
-	public void setUtility (IUtility2 utility) {
+	public void setUtility (IUtility utility) {
 		this.utility = utility;
 	}
 	
@@ -28,22 +30,25 @@ public class UtilityStep extends BasePipelineStep implements IConsumer, IProduce
 	}
 
 	public void finish () throws InterruptedException {
+		if ( utility != null ) utility.doEpilog();
 	}
 
 	public String getName() {
-		return "UtilityStep";
+		return utility.getName();
 	}
 
 	public void initialize () throws InterruptedException {
 	}
 
 	public PipelineReturnValue process() throws InterruptedException {
+		// Get the event from the queue
 		IPipelineEvent event = consumerQueue.take();
-		
-		utility.process(event);
-		
+		// Feed it to the utility
+		utility.handleEvent(event.getEventType(), (IResource)event.getData());
+		// Pass it to the next step
 		producerQueue.add(event);
-		if ( event.getEventType() == PipelineEventType.FINISHED ) {
+		// End the process if it's the end of the document
+		if ( event.getEventType() == IInputFilter.END_DOCUMENT ) {
 			return PipelineReturnValue.SUCCEDED;
 		}
 		return PipelineReturnValue.RUNNING;
