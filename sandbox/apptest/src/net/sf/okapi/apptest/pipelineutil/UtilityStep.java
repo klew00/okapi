@@ -46,7 +46,7 @@ public class UtilityStep extends BasePipelineStep implements IConsumer, IProduce
 		// Feed it to the utility
 		utility.handleEvent(event.getEventType(), (IResource)event.getData());
 		// Pass it to the next step
-		producerQueue.add(event);
+		producerQueue.put(event);
 		// End the process if it's the end of the document
 		if ( event.getEventType() == IInputFilter.END_DOCUMENT ) {
 			return PipelineReturnValue.SUCCEDED;
