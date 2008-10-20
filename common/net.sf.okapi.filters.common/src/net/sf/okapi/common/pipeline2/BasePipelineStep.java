@@ -20,9 +20,19 @@
 
 package net.sf.okapi.common.pipeline2;
 
+import java.util.concurrent.BlockingQueue;
+
 public abstract class BasePipelineStep implements IPipelineStep {
 	private PipelineReturnValue result;
 	private volatile boolean pause;
+	
+	public void addToQueue(BlockingQueue<IPipelineEvent> producerQueue, IPipelineEvent event) throws InterruptedException {
+		producerQueue.put(event);
+	}
+
+	public IPipelineEvent takeFromQueue(BlockingQueue<IPipelineEvent> consumerQueue) throws InterruptedException {
+		return consumerQueue.take(); 
+	}
 
 	public void pause() {
 		pause = true;
