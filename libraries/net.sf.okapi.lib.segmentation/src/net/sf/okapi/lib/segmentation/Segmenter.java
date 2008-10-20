@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel and the Okapi Framework contributors     */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -31,21 +31,22 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class Segmenter {
 	
-	private boolean     segmentSubFlows;
-	private boolean     cascade;
-	private boolean     includeStartCodes;
-	private boolean     includeEndCodes;
-	private boolean     includeIsolatedCodes;
-	private String      currentLanguageCode;
-	private boolean     oneSegmentIncludesAll;
-	private boolean     trimWS;
-	
-	private ArrayList<CompiledRule>         rules;
-	private TreeMap<Integer, Boolean>       splits;
-	private ArrayList<Integer>              starts;
-	private ArrayList<Integer>              ends;
+	private boolean segmentSubFlows;
+	private boolean cascade;
+	private boolean includeStartCodes;
+	private boolean includeEndCodes;
+	private boolean includeIsolatedCodes;
+	private String currentLanguageCode;
+	private boolean oneSegmentIncludesAll;
+	private boolean trimWS;
+	private ArrayList<CompiledRule> rules;
+	private TreeMap<Integer, Boolean> splits;
+	private ArrayList<Integer> starts;
+	private ArrayList<Integer> ends;
 
-
+	/**
+	 * Creates a new segmenter object.
+	 */
 	public Segmenter () {
 		reset();
 	}
@@ -64,7 +65,7 @@ public class Segmenter {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
-		trimWS = false; // Extension
+		trimWS = false; // Extension IN TEST
 	}
 
 	public void setOptions (boolean segmentSubFlows,
@@ -165,23 +166,17 @@ public class Segmenter {
 		ends = new ArrayList<Integer>();
 		int textEnd;
 		int textStart = 0;
+		int trimmedTextStart;
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
-				// Trim white-spaces at the front
-				//while ( true ) {
-				//	if ( textStart == pos ) break;
-				//	if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
-				//	else break;
-				//}
 				// Trim white-spaces and codes as required at the front
-				if ( trimWS ) {
-					textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
-						!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
-				}
-				if ( textStart == pos ) {
+				trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
+					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				if ( trimmedTextStart == pos-1 ) {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
+				if ( trimWS ) textStart = trimmedTextStart;
 				// Trim white-spaces and codes as required at the back
 				if ( trimWS ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
@@ -199,25 +194,18 @@ public class Segmenter {
 		// Last one
 		int lastPos = codedText.length();
 		if ( textStart < lastPos ) {
-			// Trim white-spaces at the front
-			//while ( true ) {
-			//	if ( textStart == lastPos ) break;
-			//	if ( Character.isWhitespace(codedText.charAt(textStart)) ) textStart++;
-			//	else break;
-			//}
 			// Trim white-spaces and codes as required at the front
-			if ( trimWS ) {
-				textStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
-					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
-			}
-			if ( textStart < lastPos ) {
+			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
+				!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+			if ( trimWS ) textStart = trimmedTextStart;
+			if ( trimmedTextStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
 				if ( trimWS ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
 						textStart, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
 				}
 				else textEnd = lastPos-1;
-				//TODO: fix case of last seg is single letter char surrounded by WS 
+				//TODO: fix case of last segment is single letter char surrounded by WS 
 				if ( textEnd > textStart ) { // Only if there is something
 					if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
 					starts.add(textStart);

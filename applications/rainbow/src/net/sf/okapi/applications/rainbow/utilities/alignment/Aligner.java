@@ -1012,6 +1012,7 @@ public class Aligner {
 			int srcNoMatchCount = 0;
 			boolean matchFound;
 			String srcText;
+			int toJoin;
 
 			for ( int i=0; i<srcCol.size(); i++ ) {
 				matchFound = false;
@@ -1022,16 +1023,14 @@ public class Aligner {
 						// We have a match
 						if ( srcNoMatchCount == 1 ) {
 							if ( lastMatch == -1 ) {
-								//TODO: case of starting joins
-								lastMatch = j;
-								trgStart = j+1;
-								srcNoMatchCount = 0;
-								matchFound = true;
-								break;
+								toJoin = (j-1);
+								// lastMatch=-1 is ok with following calculations
 							}
-							// We have only one source segment between this match and last
-							// Compute the number of target segments between matches
-							int toJoin = ((j-1) - lastMatch)-1;
+							else {
+								// We have only one source segment between this match and last
+								// Compute the number of target segments between matches
+								toJoin = ((j-1) - lastMatch)-1;
+							}
 							if ( toJoin > 0 ) {
 								// We have more than one, so we can join them
 								// The target segment just after the last match is the base
@@ -1068,20 +1067,41 @@ public class Aligner {
 				if ( !matchFound ) srcNoMatchCount++;
 			}
 			
-			// Case of one source with many target but no matches
-			if (( lastMatch == -1 ) && ( srcNoMatchCount == 1 )) {
-				if ( trgCol.size() > 1 ) {
-					// Several target for one source: merge them
-					while ( target.getSegments().size() > 1 ) {
-						target.joinSegmentWithNext(0);
+			// Case of one source with no match left
+			if ( srcNoMatchCount == 1 ) {
+				// If there was no match at all: we group all targets into one
+				if ( lastMatch == -1 ) {
+					if ( trgCol.size() > 1 ) {
+						// Several target for one source: merge them
+						while ( target.getSegments().size() > 1 ) {
+							target.joinSegmentWithNext(0);
+						}
+						if ( !modified ) {
+							resetIssues();
+							modified = true;
+						}
+						addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
 					}
-					if ( !modified ) {
-						resetIssues();
-						modified = true;
-					}
-					addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
 				}
+				else { // There was at least one match, we group everything after it
+					toJoin = ((trgCol.size()-1) - lastMatch)-1;
+					if ( toJoin > 0 ) {
+						// We have more than one, so we can join them
+						// The target segment just after the last match is the base
+						for ( int k=0; k<toJoin; k++ ) {
+							target.joinSegmentWithNext(lastMatch+1);
+						}
+						if ( !modified ) {
+							resetIssues();
+							modified = true;
+						}
+						addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
+							lastMatch+1+1)); // Show 1 for 0
+					}
+				}
+				
 			}
+			// Case of one source with many target but no matches
 			
 			updateTargetDisplay();
 			if ( modified ) {

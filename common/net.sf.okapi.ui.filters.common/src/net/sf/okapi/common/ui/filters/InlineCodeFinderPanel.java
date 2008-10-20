@@ -369,7 +369,7 @@ public class InlineCodeFinderPanel extends Composite {
 	}
 
 	public String getData () {
-		// TODO: check/compile the rules for errors 
+		if ( editMode ) endEditMode(true);
 		codeFinder.getRules().clear();
 		for ( String pattern : lbRules.getItems() ) {
 			codeFinder.addRule(pattern);
