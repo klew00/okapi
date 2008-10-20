@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -187,8 +189,13 @@ public class OutputFilter implements IOutputFilter {
 
 	public void startResource (Document resource) {
 		subDocs = new ArrayList<String>();
-		tmpUnzippedFolder = resource.getProperty("tmpUnzippedFolder");
 		originalPath = resource.getProperty("originalPath");
+		
+		SimpleDateFormat dt = new SimpleDateFormat("_HHmmssS");
+		tmpUnzippedFolder = Util.getTempDirectory() + File.separator
+			+ Util.getFilename(originalPath, true)
+			+ dt.format(new Date());
+		//Util.createDirectories(tmpUnzippedFolder+File.separator+"f");
 	}
 
     public void skeletonContainer (SkeletonUnit resource) {
