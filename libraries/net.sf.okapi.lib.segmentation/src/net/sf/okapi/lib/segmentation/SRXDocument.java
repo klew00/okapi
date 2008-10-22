@@ -108,7 +108,7 @@ public class SRXDocument {
 		sampleLanguage = "en";
 		
 		//TEST
-		rangeRule = "(([\\uE101\\uE102\\uE103].)+)(([\\d\\p{Lu}]\\.)|\\u00B7|-)([\\uE101\\uE102\\uE103].)";
+		//rangeRule = "(([\\uE101\\uE102\\uE103].)+)(([\\d\\p{Lu}]\\.)|\\u00B7|-)([\\uE101\\uE102\\uE103].)";
 		//ENDTEST
 	}
 	
@@ -223,6 +223,30 @@ public class SRXDocument {
 			includeIsolatedCodes = value;
 			modified = true;
 		}
+	}
+
+	/**
+	 * Gets the current pattern of the range rule.
+	 * @return The current pattern of the range rule.
+	 */
+	public String getRangeRule () {
+		return rangeRule;
+	}
+	
+	/**
+	 * Sets the pattern for the range rule.
+	 * @param pattern The pattern to use for the range rule.
+	 */
+	public void setRangeRule (String pattern) {
+		if ( pattern != null ) {
+			if ( !pattern.equals(rangeRule) ) {
+				modified = true;
+			}
+		}
+		else if ( rangeRule != null ) {
+			modified = true;
+		}
+		rangeRule = pattern;
 	}
 	
 	/**
@@ -545,6 +569,12 @@ public class SRXDocument {
 				if ( tmp.length() > 0 ) setSampleOnMappedRules("yes".equals(tmp));
 			}
 			
+			// Extension: rangeRule
+			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "rangeRule", elem1);
+			if ( elem2 != null ) {
+				setRangeRule(elem2.getTextContent());
+			}
+			
 			// Get the body element
 			elem1 = getFirstElementByTagNameNS(ns, "body", srxElem);
 			
@@ -670,6 +700,10 @@ public class SRXDocument {
 			writer.writeAttributeString("useMappedRules", (sampleOnMappedRules() ? "yes" : "no"));
 			writer.writeString(getSampleText());
 			writer.writeEndElementLineBreak(); // okpsrx:sample
+			
+			writer.writeStartElement(NSPREFIX_OKPSRX+":rangeRule");
+			writer.writeString(getRangeRule());
+			writer.writeEndElementLineBreak(); // okpsrx:rangeRule
 
 			writer.writeEndElementLineBreak(); // header
 

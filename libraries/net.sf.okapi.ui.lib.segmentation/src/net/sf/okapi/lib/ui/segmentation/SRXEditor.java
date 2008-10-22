@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.filters.GenericContent;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -216,15 +217,15 @@ public class SRXEditor {
 		rulesTableMod.linkTable(tblRules);
 		
 		Composite cmpGroup = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(6, true);
+		layTmp = new GridLayout(7, true);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		cmpGroup.setLayout(layTmp);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 6;
 		cmpGroup.setLayoutData(gdTmp);
 
-		int ruleButtonsWidth = 80;
+		int ruleButtonsWidth = 95;
 		btAddRule = new Button(cmpGroup, SWT.PUSH);
 		btAddRule.setText("&Add...");
 		gdTmp = new GridData();
@@ -281,6 +282,18 @@ public class SRXEditor {
 		btMoveDownRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDownRule();
+			}
+		});
+
+		Button btRangeRule = new Button(cmpGroup, SWT.PUSH);
+		btRangeRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btRangeRule.setText("Range Rule...");
+		gdTmp = new GridData();
+		gdTmp.widthHint = ruleButtonsWidth;
+		btRangeRule.setLayoutData(gdTmp);
+		btRangeRule.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRangeRule();
 			}
 		});
 
@@ -782,6 +795,27 @@ public class SRXEditor {
 		srxDoc.setIsModified(true);
 		// Update
 		updateRules(n+1, true);
+	}
+	
+	/**
+	 * Edits the range rule of the document.
+	 */
+	private void editRangeRule () {
+		try {
+			InputDialog dlg = new InputDialog(shell, "Range Rule Expression",
+				"Enter the regular expression for the range rule. Use an empty field to not use any range rule.",
+				"", null);
+			dlg.setInputValue(srxDoc.getRangeRule());
+			dlg.setAllowEmptyValue(true);
+			String result = dlg.showDialog();
+			if ( result == null ) return; // Canceled
+			// Else: Set the new expression
+			srxDoc.setRangeRule(result);
+			updateResults(true);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
 	}
 	
 	/**

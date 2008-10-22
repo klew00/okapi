@@ -38,6 +38,7 @@ public class InputDialog {
 	private String           result = null;
 	private String           help;
 	private OKCancelPanel    pnlActions;
+	private boolean          allowEmptyValue = false;
 
 	/**
 	 * Creates a simple input dialog with one text field.
@@ -110,12 +111,18 @@ public class InputDialog {
 	}
 
 	public void setInputValue (String value) {
-		edField.setText(value);
+		if ( value == null ) edField.setText("");
+		else edField.setText(value);
+	}
+	
+	public void setAllowEmptyValue (boolean value) {
+		allowEmptyValue = value;
 	}
 	
 	private boolean saveData () {
 		result = edField.getText();
 		if ( result.length() == 0 ) {
+			if ( allowEmptyValue ) return true;
 			edField.selectAll();
 			edField.setFocus();
 			return false;
