@@ -24,16 +24,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PipelineEvent implements IPipelineEvent {
 
-	public static enum PipelineEventType {
-		START_RESOURCE, END_RESOURCE, TEXTUNIT, SKELETON, START_GROUP, END_GROUP, START, FINISHED
-	};
-
 	private final int order;
-	private final PipelineEventType pipelineEventType;
+	private final Enum<?> pipelineEventType;  // events types are defined outside i.e., FilterEvent.FilterEventType
 	private final Object data; // TextUnit, Skeleton, Group or other data object
 	private final ConcurrentHashMap<String, Object> metadata; // annotations
 	
-	public PipelineEvent(PipelineEventType pipelineEventType, Object data, int order) {
+	public PipelineEvent(Enum<?> pipelineEventType, Object data, int order) {
 		this.pipelineEventType = pipelineEventType;
 		this.data = data;
 		this.order = order;
