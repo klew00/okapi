@@ -7,7 +7,6 @@ import com.googlecode.okapi.resource.Document;
 import com.googlecode.okapi.resource.DocumentPart;
 import com.googlecode.okapi.resource.Reference;
 import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
 import com.googlecode.okapi.resource.textflow.ContainerFragment;
 import com.googlecode.okapi.resource.textflow.ContentFragment;
 import com.googlecode.okapi.resource.textflow.ResourceFragment;

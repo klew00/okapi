@@ -9,11 +9,11 @@ import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.resource.Container;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.Reference;
 import com.googlecode.okapi.resource.Reference.Type;
-import com.googlecode.okapi.resource.builder.BaseDocumentParser;
 
 public class OdfZipDocumentParser extends BaseDocumentParser {
 

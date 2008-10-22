@@ -1,9 +1,7 @@
 package com.googlecode.okapi.pipeline;
 
+import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
 import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.builder.IDocumentParser;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
-import com.googlecode.okapi.resource.builder.ResourceEvent.ResourceEventType;
 
 public class MySampleStep extends AbstractPipelineStep{
 

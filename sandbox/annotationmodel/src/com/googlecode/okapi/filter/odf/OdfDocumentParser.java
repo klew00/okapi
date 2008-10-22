@@ -3,11 +3,11 @@ package com.googlecode.okapi.filter.odf;
 import java.io.File;
 import java.io.IOException;
 
+import com.googlecode.okapi.pipeline.IDocumentParser;
+import com.googlecode.okapi.pipeline.ResourceEvent;
+import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.Reference;
-import com.googlecode.okapi.resource.builder.IDocumentParser;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
-import com.googlecode.okapi.resource.builder.ResourceEvent.ResourceEventType;
 
 public class OdfDocumentParser implements IDocumentParser{
 	

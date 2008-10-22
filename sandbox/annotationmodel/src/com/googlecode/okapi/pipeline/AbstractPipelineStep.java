@@ -1,8 +1,5 @@
 package com.googlecode.okapi.pipeline;
 
-import com.googlecode.okapi.resource.builder.IDocumentParser;
-import com.googlecode.okapi.resource.builder.IResourceProcessor;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
 
 public abstract class AbstractPipelineStep implements IResourceProcessor{
 	

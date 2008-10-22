@@ -8,8 +8,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.googlecode.okapi.pipeline.AbstractPipelineStep;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
-import com.googlecode.okapi.resource.builder.ResourceEvent.ResourceEventType;
+import com.googlecode.okapi.pipeline.ResourceEvent;
+import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
 
 public class OdfZipOutputWriter extends AbstractPipelineStep{
 	

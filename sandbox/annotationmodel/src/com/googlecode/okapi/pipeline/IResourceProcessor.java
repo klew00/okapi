@@ -1,4 +1,4 @@
-package com.googlecode.okapi.resource.builder;
+package com.googlecode.okapi.pipeline;
 
 public interface IResourceProcessor extends IDocumentParser{
 

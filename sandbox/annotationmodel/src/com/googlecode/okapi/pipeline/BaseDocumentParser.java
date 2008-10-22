@@ -1,16 +1,16 @@
-package com.googlecode.okapi.resource.builder;
+package com.googlecode.okapi.pipeline;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
+import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
 import com.googlecode.okapi.resource.Container;
 import com.googlecode.okapi.resource.DataPart;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.Reference;
 import com.googlecode.okapi.resource.ResourceFactory;
 import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.builder.ResourceEvent.ResourceEventType;
 import com.googlecode.okapi.resource.textflow.ContainerFragment;
 import com.googlecode.okapi.resource.textflow.ResourceFragment;
 import com.googlecode.okapi.resource.textflow.TextFragment;

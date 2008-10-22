@@ -8,13 +8,13 @@ import javax.xml.stream.events.StartElement;
 
 import com.googlecode.okapi.base.annotation.IAnnotation;
 import com.googlecode.okapi.pipeline.BaseEventHandler;
+import com.googlecode.okapi.pipeline.ResourceEvent;
 import com.googlecode.okapi.resource.Container;
 import com.googlecode.okapi.resource.DataPart;
 import com.googlecode.okapi.resource.Document;
 import com.googlecode.okapi.resource.DocumentPart;
 import com.googlecode.okapi.resource.Reference;
 import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.builder.ResourceEvent;
 import com.googlecode.okapi.resource.textflow.ContainerFragment;
 import com.googlecode.okapi.resource.textflow.ContentFragment;
 import com.googlecode.okapi.resource.textflow.ResourceFragment;

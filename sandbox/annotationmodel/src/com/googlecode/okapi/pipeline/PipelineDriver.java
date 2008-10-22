@@ -3,8 +3,6 @@ package com.googlecode.okapi.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.googlecode.okapi.resource.builder.IDocumentParser;
-import com.googlecode.okapi.resource.builder.IResourceProcessor;
 
 public class PipelineDriver {
 

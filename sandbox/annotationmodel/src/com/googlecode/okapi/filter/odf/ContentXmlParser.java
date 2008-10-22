@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
 
+import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
 import com.googlecode.okapi.resource.Container;
@@ -30,7 +31,6 @@ import com.googlecode.okapi.resource.ResourceFactory;
 import com.googlecode.okapi.resource.ResourceFactoryImpl;
 import com.googlecode.okapi.resource.TextFlow;
 import com.googlecode.okapi.resource.TextFlowProvider;
-import com.googlecode.okapi.resource.builder.BaseDocumentParser;
 import com.googlecode.okapi.resource.textflow.ContainerFragment;
 import com.googlecode.okapi.resource.textflow.ResourceFragment;
 import com.googlecode.okapi.resource.textflow.TextFragment;
