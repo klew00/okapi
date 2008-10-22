@@ -1,9 +1,7 @@
 package net.sf.okapi.common.filters;
 
-import java.io.Reader;
-import java.net.URL;
-
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.IResource;
 
 public interface IFilter {	
 
@@ -13,11 +11,7 @@ public interface IFilter {
 
 	public void open(String inputPath);
 
-	public void open(URL inputURL);
-
 	public void open(CharSequence inputText);
-	
-	public void open(Reader input);
 
 	public void close();
 
@@ -25,7 +19,7 @@ public interface IFilter {
 
 	public Enum<?> next();
 
-	public Object getResource();
+	public IResource getResource();
 
 	public void cancel();
 

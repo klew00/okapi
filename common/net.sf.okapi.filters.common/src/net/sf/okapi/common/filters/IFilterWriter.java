@@ -1,7 +1,6 @@
 package net.sf.okapi.common.filters;
 
 import java.io.OutputStream;
-import java.io.Writer;
 
 import net.sf.okapi.common.IParameters;
 
@@ -14,8 +13,6 @@ public interface IFilterWriter {
 	public void setOutput(String path);
 
 	public void setOutput(OutputStream output);
-	
-	public void setOutput(Writer output);
 
 	public void handleEvent(FilterEvent event);
 
