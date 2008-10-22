@@ -22,12 +22,12 @@ package net.sf.okapi.common.pipeline2.tests;
 
 import java.util.concurrent.BlockingQueue;
 
-import net.sf.okapi.common.pipeline2.BasePipelineStep;
-import net.sf.okapi.common.pipeline2.IConsumer;
-import net.sf.okapi.common.pipeline2.IPipelineEvent;
-import net.sf.okapi.common.pipeline2.IProducer;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
-import net.sf.okapi.common.pipeline2.PipelineEvent.PipelineEventType;
+import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
+import net.sf.okapi.common.threadedpipeline.IConsumer;
+import net.sf.okapi.common.threadedpipeline.IPipelineEvent;
+import net.sf.okapi.common.threadedpipeline.IProducer;
+import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
+import net.sf.okapi.common.threadedpipeline.PipelineEvent.PipelineEventType;
 
 /**
  * @author HargraveJE

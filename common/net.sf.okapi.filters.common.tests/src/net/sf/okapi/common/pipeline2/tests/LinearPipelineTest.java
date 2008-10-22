@@ -23,9 +23,9 @@ package net.sf.okapi.common.pipeline2.tests;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.sf.okapi.common.pipeline2.ILinearPipeline;
-import net.sf.okapi.common.pipeline2.LinearPipeline;
-import net.sf.okapi.common.pipeline2.PipelineReturnValue;
+import net.sf.okapi.common.threadedpipeline.ILinearPipeline;
+import net.sf.okapi.common.threadedpipeline.LinearPipeline;
+import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
 
 import org.junit.After;
 import org.junit.Before;
