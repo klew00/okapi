@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -39,7 +40,9 @@ public class Segmenter {
 	private String currentLanguageCode;
 	private boolean oneSegmentIncludesAll;
 	private boolean trimWS;
+	private boolean trimCodes;
 	private ArrayList<CompiledRule> rules;
+	private Pattern rangeRule;
 	private TreeMap<Integer, Boolean> splits;
 	private ArrayList<Integer> starts;
 	private ArrayList<Integer> ends;
@@ -58,6 +61,7 @@ public class Segmenter {
 	public void reset () {
 		currentLanguageCode = null;
 		rules = new ArrayList<CompiledRule>();
+		rangeRule = null;
 		splits = null;
 		segmentSubFlows = true; // SRX default
 		cascade = false; // There is no SRX default for this
@@ -65,7 +69,8 @@ public class Segmenter {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
-		trimWS = false; // Extension IN TEST
+		trimWS = true; // Extension IN TEST
+		trimCodes = false; // Extension IN TEST
 	}
 
 	public void setOptions (boolean segmentSubFlows,
@@ -143,6 +148,11 @@ public class Segmenter {
 			throw new RuntimeException("Text already segmented.");
 		}
 		
+		// Set the flag for trimming or not the in-line codes
+		boolean isECWS = (trimCodes ? !includeStartCodes : false); 
+		boolean isSCWS = (trimCodes ? !includeEndCodes : false); 
+		boolean isICWS = (trimCodes ? !includeIsolatedCodes : false); 
+
 		// Build the list of split positions
 		String codedText = container.getCodedText();
 		splits = new TreeMap<Integer, Boolean>();
@@ -159,6 +169,23 @@ public class Segmenter {
 			}
 		}
 		
+		// Set the additional split positions for rage-rules
+		if ( rangeRule != null ) {
+			m = rangeRule.matcher(codedText);
+			while ( m.find() ) {
+				// Remove any existing marker inside the range
+				for ( int n=m.start(); n<m.end(); n++ ) {
+					if ( splits.containsKey(n) ) {
+						splits.remove(n);
+					}
+				}
+				// Then set the start and end of the range as breaks
+				// Don't include a split at 0 because it's an implicit one
+				if ( m.start() > 0 ) splits.put(m.start(), true);
+				splits.put(m.end(), true);
+			}
+		}
+		
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
 		// Deal also with including or not the in-line codes.
@@ -170,17 +197,17 @@ public class Segmenter {
 		for ( int pos : splits.keySet() ) {
 			if ( splits.get(pos) ) {
 				// Trim white-spaces and codes as required at the front
-				trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, pos-1,
-					!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+				trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText,
+					textStart, pos-1, isSCWS, isECWS, isICWS, trimWS);
 				if ( trimmedTextStart == pos-1 ) {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
-				if ( trimWS ) textStart = trimmedTextStart;
+				if ( trimWS || trimCodes ) textStart = trimmedTextStart;
 				// Trim white-spaces and codes as required at the back
-				if ( trimWS ) {
+				if ( trimWS || trimCodes ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
-						pos-1, 0, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+						pos-1, 0, isSCWS, isECWS, isICWS, trimWS);
 				}
 				else textEnd = pos-1;
 				if ( textEnd > textStart ) { // Only if there is something
@@ -195,14 +222,14 @@ public class Segmenter {
 		int lastPos = codedText.length();
 		if ( textStart < lastPos ) {
 			// Trim white-spaces and codes as required at the front
-			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart, lastPos-1,
-				!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
-			if ( trimWS ) textStart = trimmedTextStart;
+			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart,
+				lastPos-1, isSCWS, isECWS, isICWS, trimWS);
+			if ( trimWS || trimCodes  ) textStart = trimmedTextStart;
 			if ( trimmedTextStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
-				if ( trimWS ) {
+				if ( trimWS || trimCodes ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
-						textStart, !includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+						textStart, isSCWS, isECWS, isICWS, trimWS);
 				}
 				else textEnd = lastPos-1;
 				//TODO: fix case of last segment is single letter char surrounded by WS 
@@ -252,6 +279,8 @@ public class Segmenter {
 
 		// Do we have reach the end?
 		if ( start >= text.length() ) return null;
+
+		//TODO: implement same trimming at computeSegments()		
 		
 		// Else: search for next segment
 		Matcher m;
@@ -286,7 +315,7 @@ public class Segmenter {
 
 		// Trim the white-spaces and required codes at the end of the segment
 		end = TextFragment.getLastNonWhitespacePosition(text, end, start,
-			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes);
+			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimWS);
 		
 		// Adjust for +1 position (it's a range)
 		if ( end == -1 ) return null;
@@ -351,6 +380,13 @@ public class Segmenter {
 	
 	protected void addRule (CompiledRule compiledRule) {
 		rules.add(compiledRule);
+	}
+	
+	protected void setRangeRule (String pattern) {
+		if (( pattern != null ) && ( pattern.length() > 0 ))
+			rangeRule = Pattern.compile(pattern);
+		else
+			rangeRule = null;
 	}
 
 }

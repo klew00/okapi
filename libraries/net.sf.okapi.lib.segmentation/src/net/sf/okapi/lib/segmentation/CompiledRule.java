@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 class CompiledRule {
 	
-	protected Pattern   pattern;
-	protected boolean   isBreak;
+	protected Pattern pattern;
+	protected boolean isBreak;
 	
 	CompiledRule (String pattern,
 		boolean isBreak)

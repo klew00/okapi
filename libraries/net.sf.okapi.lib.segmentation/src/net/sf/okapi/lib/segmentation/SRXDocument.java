@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework Contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -58,23 +58,21 @@ public class SRXDocument {
 		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
 	private static final String   NOAUTO = "[noauto]";
 			
-	private boolean     cascade;
-	private boolean     segmentSubFlows;
-	private boolean     includeStartCodes;
-	private boolean     includeEndCodes;
-	private boolean     includeIsolatedCodes;
-	private boolean     oneSegmentIncludesAll;
-	private String      version = "2.0";
-	private String      warning;
-	
-	private String      sampleText;
-	private String      sampleLanguage;
-	private boolean     modified;
-	private boolean     sampleOnMappedRules; 
-	
-	private ArrayList<LanguageMap>                    langMaps;
-	private LinkedHashMap<String, ArrayList<Rule>>    langRules;
-
+	private boolean cascade;
+	private boolean segmentSubFlows;
+	private boolean includeStartCodes;
+	private boolean includeEndCodes;
+	private boolean includeIsolatedCodes;
+	private boolean oneSegmentIncludesAll;
+	private String version = "2.0";
+	private String warning;
+	private String sampleText;
+	private String sampleLanguage;
+	private boolean modified;
+	private boolean sampleOnMappedRules; 
+	private ArrayList<LanguageMap> langMaps;
+	private LinkedHashMap<String, ArrayList<Rule>> langRules;
+	private String rangeRule;
 
 	public SRXDocument () {
 		resetAll();
@@ -96,6 +94,7 @@ public class SRXDocument {
 	public void resetAll () {
 		langMaps = new ArrayList<LanguageMap>();
 		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
+		rangeRule = null;
 		modified = false;
 
 		segmentSubFlows = true; // SRX default
@@ -107,6 +106,10 @@ public class SRXDocument {
 
 		sampleText = "Mr. Holmes is from the <A>U.K.</A> <B>Is Dr. Watson from there too?</B> Yes: both are.<C/>";
 		sampleLanguage = "en";
+		
+		//TEST
+		rangeRule = "(([\\uE101\\uE102\\uE103].)+)(([\\d\\p{Lu}]\\.)|\\u00B7|-)([\\uE101\\uE102\\uE103].)";
+		//ENDTEST
 	}
 	
 	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
@@ -379,6 +382,9 @@ public class SRXDocument {
 				if ( !segmenter.cascade() ) break; // Stop at the first matching map
 			}
 		}
+		
+		
+		
 		segmenter.setLanguage(languageCode);
 		return segmenter;
 	}
@@ -433,10 +439,14 @@ public class SRXDocument {
 					segmenter.addRule(
 						// The compiled rule is made of two groups: the pattern before and the pattern after
 						// the break. A special pattern for in-line codes is also added transparently.
-						new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")", rule.isBreak));
+						new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")",
+							rule.isBreak));
 				}
 			}
 		}
+		
+		// Range rules
+		segmenter.setRangeRule(rangeRule);
 	}
 	
 	/**
@@ -451,7 +461,7 @@ public class SRXDocument {
 			Fact.setNamespaceAware(true);
 			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
 			docBuilder.setEntityResolver(new DefaultEntityResolver());
-			Document doc = docBuilder.parse(new File(Util.toURI(pathOrURL)));
+			Document doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
 			resetAll();
 			
 			XPathFactory xpathFac = XPathFactory.newInstance();

@@ -519,7 +519,7 @@ public class Aligner {
 			int p = lbIssues.getItem(n).indexOf(':');
 			if ( p != -1 ) {
 				p = Integer.valueOf(lbIssues.getItem(n).substring(0, p));
-				trgList.select(p-1);
+				trgList.setSelection(p-1);
 				synchronizeFromTarget();
 			}
 		}
@@ -704,7 +704,7 @@ public class Aligner {
 		if ( hasIssue(false, true) ) {
 			setData();
 			if ( issueType == 1 ) {
-				lbIssues.select(0);
+				lbIssues.setSelection(0);
 				gotoIssue();
 			}
 			// Try to auto-correct
@@ -730,7 +730,7 @@ public class Aligner {
 			else trgList.add(tf.toString());
 		}
 		if (( trgList.getItemCount() > 0 ) && ( selection < trgList.getItemCount() )) 
-			trgList.select(selection);
+			trgList.setSelection(selection);
 		
 		if ( !edTrgSeg.getEditable() ) { // Not while the field can be edited
 			updateTargetSegmentDisplay();
@@ -745,7 +745,7 @@ public class Aligner {
 			else srcList.add(tf.toString());
 		}
 		if (( srcList.getItemCount() > 0 ) && ( selection < srcList.getItemCount() )) 
-			srcList.select(selection);
+			srcList.setSelection(selection);
 		updateSourceSegmentDisplay();
 	}
 	
@@ -1144,7 +1144,7 @@ public class Aligner {
 			edCause.setText("One or more WARNINGS detected.");
 			edCause.setBackground(colorAmber);
 			if ( lbIssues.getItemCount() > 0 ) {
-				lbIssues.select(0);
+				lbIssues.setSelection(0);
 				gotoIssue();
 			}
 			break;

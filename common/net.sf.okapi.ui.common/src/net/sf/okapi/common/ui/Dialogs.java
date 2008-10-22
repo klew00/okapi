@@ -95,7 +95,7 @@ public class Dialogs {
 			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2);
 			if ( filterNames != null ) aNames = filterNames.split("\t", -2);
 			String path = null;
-			
+			// Call the SaveAs dialog until we are done
 			while ( true ) {
 				FileDialog dlg = new FileDialog(parent, SWT.SAVE);
 				dlg.setFilterPath(root); // Can be null
@@ -109,9 +109,13 @@ public class Dialogs {
 				if ( file.exists() ) {
 					// Asks for confirmation
 					MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING
-						| SWT.YES | SWT.NO);
-					mb.setMessage(path + " already exists.\nDo you want to replace it?");
-					if ( mb.open() == SWT.YES ) return path;
+						| SWT.YES | SWT.NO | SWT.CANCEL);
+					mb.setText(title);
+					mb.setMessage(path + "\nThis file already exists.\nDo you want to replace it?");
+					int result = mb.open();
+					if ( result == SWT.YES ) return path;
+					if ( result == SWT.CANCEL ) return null;
+					// If NO: ask the path again
 				}
 				else return path;
 			}

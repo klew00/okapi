@@ -668,7 +668,7 @@ public class SRXEditor {
 			srxPath = null; // In case an error occurs
 			srxDoc.loadRules(path);
 			if ( srxDoc.hasWarning() ) {
-				MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES| SWT.CANCEL);
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.CANCEL);
 				dlg.setText(shell.getText());
 				dlg.setMessage(srxDoc.getWarning());
 				dlg.open();

@@ -388,12 +388,14 @@ public class Util {
 	 * @return The URI string.
 	 */
 	static public String makeURIFromPath (String pathOrUri) {
-		if ( pathOrUri.startsWith("file:///") ) return pathOrUri;
-		if ( pathOrUri.startsWith("http://") ) return pathOrUri;
-		if ( pathOrUri.startsWith("https://") ) return pathOrUri;
-		if ( pathOrUri.startsWith("ftp://") ) return pathOrUri;
+		// This should catch most of the URI forms
+		pathOrUri = pathOrUri.replace('\\', '/');
+		if ( pathOrUri.indexOf("://") != -1 ) return pathOrUri;
+		// If not that, then assume it's a file
 		try {
-			return "file:///"+URLEncoder.encode(pathOrUri.replace('\\', '/'), "UTF-8");
+			String tmp = URLEncoder.encode(pathOrUri, "UTF-8");
+			// Use '%20' instead of '+': '+ not working with File(uri) it seems
+			return "file:///"+tmp.replace("+", "%20");
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e); // UTF-8 should be always supported anyway
@@ -405,18 +407,9 @@ public class Util {
 	 * @param pathOrUri The path or URI string to use.
 	 * @return The new URI object for the given path or URI string.
 	 */
-	static public URI toURI(String pathOrUri) {
+	static public URI toURI (String pathOrUri) {
 		try {
-			if (( !pathOrUri.startsWith("file:///") ) && 
-				( !pathOrUri.startsWith("http://") ) &&
-				( !pathOrUri.startsWith("https://") ) &&
-				( !pathOrUri.startsWith("ftp://") )) {
-				pathOrUri = "file:///"+URLEncoder.encode(pathOrUri.replace('\\', '/'), "UTF-8");
-			}
 			return new URI(makeURIFromPath(pathOrUri));
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e); // UTF-8 should be always supported anyway
 		}
 		catch ( URISyntaxException e) {
 			throw new RuntimeException(e);
