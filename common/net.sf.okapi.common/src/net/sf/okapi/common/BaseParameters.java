@@ -76,17 +76,9 @@ public abstract class BaseParameters implements IParameters {
 		}
 	}
 
-	public void save (String newPath,
-		String multiFilesPrefix)
-	{
+	public void save (String newPath) {
 		Writer SW = null;
 		try {
-			// Set the output filename
-			if ( multiFilesPrefix != null ) {
-				String fname = Util.getFilename(newPath, true);
-				String dir = Util.getDirectoryName(newPath);
-				newPath = dir + File.separator + multiFilesPrefix + fname;
-			}
 			// Save the fields on file
 			SW = new OutputStreamWriter(
 				new BufferedOutputStream(new FileOutputStream(newPath)),

@@ -1462,7 +1462,7 @@ public class MainForm implements IParametersProvider {
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
-		paramsObject.save(aRes[3], null);
+		paramsObject.save(aRes[3]);
 	}
 	
 	public void deleteParameters (String location) {

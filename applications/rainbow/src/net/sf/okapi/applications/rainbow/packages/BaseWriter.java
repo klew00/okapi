@@ -154,7 +154,7 @@ public abstract class BaseWriter implements IWriter {
 		String paramsCopy = manifest.getRoot() + File.separator + subFolder
 			+ File.separator + "fprm";
 		if ( filterParams != null ) {
-			filterParams.save(paramsCopy, docPrefix);
+			filterParams.save(paramsCopy);
 		}
 	}
 	

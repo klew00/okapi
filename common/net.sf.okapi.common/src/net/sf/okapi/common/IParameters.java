@@ -59,13 +59,9 @@ public interface IParameters {
 	/**
 	 * Saves the parameters to a file.
 	 * @param filePath The full path of the parameters file to save.
-	 * @param multiFilesPrefix Optional prefix for saving multiple files. If not 
-	 * null, it must be placed in front of any settings-related additional file(s)
-	 * the that need to be saved along with the parameters file.
 	 * @throws Exception
 	 */
-	public void save (String filePath,
-		String multiFilesPrefix);
+	public void save (String filePath);
 
 	/**
 	 * Gets the full path of the last file where the parameters where loaded 
