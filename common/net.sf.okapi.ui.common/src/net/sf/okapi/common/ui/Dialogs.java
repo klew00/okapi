@@ -72,7 +72,8 @@ public class Dialogs {
 	}
 
 	/**
-	 * Browses for one or more files.
+	 * Browse to select a file to save to. If the selected file exists, the user is
+	 * prompted to confirm overwrite.
 	 * @param parent Parent of the dialog.
 	 * @param title Title of the dialog box.
 	 * @param root Directory where to start. Use null for default directory.
@@ -89,19 +90,31 @@ public class Dialogs {
 			String filterNames,
 			String filterExtensions)
 		{
-			FileDialog dlg = new FileDialog(parent, SWT.SAVE);
-			dlg.setFilterPath(root); // Can be null
-			if ( filterNames != null ) {
-				String[] aNames = filterNames.split("\t", -2);
-				dlg.setFilterNames(aNames);
+			String[] aExts = null;
+			String[] aNames = null;
+			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2);
+			if ( filterNames != null ) aNames = filterNames.split("\t", -2);
+			String path = null;
+			
+			while ( true ) {
+				FileDialog dlg = new FileDialog(parent, SWT.SAVE);
+				dlg.setFilterPath(root); // Can be null
+				if ( filterNames != null ) dlg.setFilterNames(aNames);
+				if ( filterExtensions != null ) dlg.setFilterExtensions(aExts);
+				dlg.setText(title);
+				path = dlg.open();
+				if ( path == null ) return null; // Canceled by user
+				// Else: Confirm overwriting if needed
+				File file = new File(path);
+				if ( file.exists() ) {
+					// Asks for confirmation
+					MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING
+						| SWT.YES | SWT.NO);
+					mb.setMessage(path + " already exists.\nDo you want to replace it?");
+					if ( mb.open() == SWT.YES ) return path;
+				}
+				else return path;
 			}
-			if ( filterExtensions != null ) {
-				String[] aExts = filterExtensions.split("\t", -2);
-				dlg.setFilterExtensions(aExts);
-			}
-			dlg.setText(title);
-			if ( dlg.open() == null ) return null;
-			return dlg.getFilterPath() + File.separator + dlg.getFileName();
 		}
 	
 	/**

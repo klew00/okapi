@@ -196,7 +196,7 @@ public class FilterSettingsPanel extends Composite {
 		if ( selection != null ) index = 0;
 		
 		cbParameters.removeAll();
-		cbParameters.add("<None>");
+		cbParameters.add("<Defaults>");
 		int i = 1;
 		for ( String item : paramsList ) {
 			if ( item.startsWith(cbFilters.getText()) ) {
