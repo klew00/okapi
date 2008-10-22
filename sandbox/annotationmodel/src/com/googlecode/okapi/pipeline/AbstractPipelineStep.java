@@ -1,15 +1,18 @@
 package com.googlecode.okapi.pipeline;
 
-import com.googlecode.okapi.resource.builder.IResourceBuilder;
+import com.googlecode.okapi.resource.builder.IDocumentParser;
+import com.googlecode.okapi.resource.builder.IResourceProcessor;
 import com.googlecode.okapi.resource.builder.ResourceEvent;
 
-public abstract class PipelineStep implements IResourceBuilder{
+public abstract class AbstractPipelineStep implements IResourceProcessor{
 	
-	private IResourceBuilder input;
+	private IDocumentParser input;
 	
-	public PipelineStep(IResourceBuilder input){
+	public AbstractPipelineStep(IDocumentParser input){
 		this.input = input;
 	}
+	
+	public AbstractPipelineStep(){}
 	
 	public final boolean hasNext() {
 		return input.hasNext();
@@ -27,4 +30,7 @@ public abstract class PipelineStep implements IResourceBuilder{
 		input.close();
 	}
 
+	public void setInput(IDocumentParser input){
+		this.input = input;
+	}
 }

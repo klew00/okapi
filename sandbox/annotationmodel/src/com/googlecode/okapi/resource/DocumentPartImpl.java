@@ -1,5 +1,6 @@
 package com.googlecode.okapi.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -53,6 +54,9 @@ abstract class DocumentPartImpl implements DocumentPart{
 	}
 	
 	public List<PartId> getProperties() {
+		if(properties == null){
+			properties = new ArrayList<PartId>();
+		}
 		return properties;
 	}
 	

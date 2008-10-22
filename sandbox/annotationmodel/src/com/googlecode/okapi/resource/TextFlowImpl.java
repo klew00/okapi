@@ -1,5 +1,6 @@
 package com.googlecode.okapi.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.googlecode.okapi.resource.textflow.ContentFragment;
@@ -32,6 +33,9 @@ final class TextFlowImpl extends DocumentPartImpl implements TextFlow{
 	}
 
 	public List<ContentFragment> getFlow() {
+		if(content == null){
+			content = new ArrayList<ContentFragment>();
+		}
 		return content;
 	}
 	

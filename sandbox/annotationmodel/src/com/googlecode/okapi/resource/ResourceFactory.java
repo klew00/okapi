@@ -16,5 +16,5 @@ public interface ResourceFactory {
 	public ContainerFragment createContainerFragment();
 	public ResourceFragment createResourceFragment();
 	public TextFragment createTextFragment();
-	
+
 }

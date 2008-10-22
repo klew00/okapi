@@ -1,5 +1,6 @@
 package com.googlecode.okapi.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,6 +13,9 @@ final class ContainerImpl extends DocumentPartImpl implements Container{
 	}
 
 	public List<PartId> getParts() {
+		if(children == null){
+			children = new ArrayList<PartId>();
+		}
 		return children;
 	}
 	

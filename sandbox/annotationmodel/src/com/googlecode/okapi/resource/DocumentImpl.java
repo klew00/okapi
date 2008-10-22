@@ -3,11 +3,12 @@ package com.googlecode.okapi.resource;
 import java.util.ArrayList;
 import java.util.List;
 
-final class DocumentImpl implements Document{
+public final class DocumentImpl implements Document{
 
 	private List<PartId> parts;
 	private String contentType;
 	private DocumentId id;
+	private String name;
 	
 	public DocumentImpl(DocumentId id) {
 		this.id = id;
@@ -17,6 +18,14 @@ final class DocumentImpl implements Document{
 		return id;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getContentType() {
 		return contentType;
 	}
