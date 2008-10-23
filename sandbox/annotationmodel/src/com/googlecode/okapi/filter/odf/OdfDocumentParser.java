@@ -3,6 +3,7 @@ package com.googlecode.okapi.filter.odf;
 import java.io.File;
 import java.io.IOException;
 
+import com.googlecode.okapi.filter.zip.ZipDocumentParser;
 import com.googlecode.okapi.pipeline.IDocumentParser;
 import com.googlecode.okapi.pipeline.ResourceEvent;
 import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
@@ -11,11 +12,11 @@ import com.googlecode.okapi.resource.Reference;
 
 public class OdfDocumentParser implements IDocumentParser{
 	
-	private OdfZipDocumentParser zipParser;
+	private ZipDocumentParser zipParser;
 	Reference currentReference = null;
 	
 	public OdfDocumentParser(DocumentManager documentManager, File inputFile) throws IOException{
-		zipParser = new OdfZipDocumentParser(documentManager, inputFile);
+		zipParser = new ZipDocumentParser(documentManager, inputFile);
 	}
 
 	public void close() {

@@ -1,20 +1,15 @@
-package com.googlecode.okapi.filter.odf;
+package com.googlecode.okapi.filter.zip;
 
 import java.util.zip.ZipEntry;
 
 class DomZipFile extends DomZipEntry{
 		
-		private ZipEntry entry;
 		private int position;
 		
 		public DomZipFile(String name, DomZipDir parent, ZipEntry entry, int position) {
 			super(name, parent);
-			this.entry = entry;
 			this.position = position;
-		}
-
-		public ZipEntry getEntry() {
-			return entry;
+			setEntry(entry);
 		}
 		
 		public int getPosition() {

@@ -1,9 +1,12 @@
-package com.googlecode.okapi.filter.odf;
+package com.googlecode.okapi.filter.zip;
+
+import java.util.zip.ZipEntry;
 
 abstract class DomZipEntry{
 		
 		private String name;
 		private DomZipDir parent;
+		private ZipEntry entry;
 		
 		public DomZipEntry(String name, DomZipDir parent) {
 			this.name = name;
@@ -19,6 +22,15 @@ abstract class DomZipEntry{
 		public DomZipDir getParent() {
 			return parent;
 		}
+		
+		public ZipEntry getEntry() {
+			return entry;
+		}
+
+		public void setEntry(ZipEntry entry) {
+			this.entry = entry;
+		}
+		
 		
 		public abstract boolean isDir();
 		

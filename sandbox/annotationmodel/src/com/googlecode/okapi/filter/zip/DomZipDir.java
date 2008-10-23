@@ -1,4 +1,4 @@
-package com.googlecode.okapi.filter.odf;
+package com.googlecode.okapi.filter.zip;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,8 @@ import java.util.List;
 class DomZipDir extends DomZipEntry{
 		
 		private List<DomZipEntry> children;
-
+		private boolean isVirtual = true;
+		
 		private DomZipDir(){
 			super("/", null);
 		}
@@ -15,6 +16,14 @@ class DomZipDir extends DomZipEntry{
 			super(name, parent);
 		}
 
+		public boolean isVirtual() {
+			return isVirtual;
+		}
+		
+		public void setVirtual(boolean isVirtual) {
+			this.isVirtual = isVirtual;
+		}
+		
 		public static DomZipDir createRoot(){
 			return new DomZipDir();
 		}

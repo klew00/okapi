@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-import com.googlecode.okapi.filter.odf.OdfZipDocumentParser;
+import com.googlecode.okapi.filter.zip.ZipDocumentParser;
 import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
 import com.googlecode.okapi.resource.Container;
 import com.googlecode.okapi.resource.DataPart;
@@ -162,9 +162,9 @@ public class EventWriter extends AbstractPipelineStep{
 		Document doc = new DocumentImpl(new DocumentId("xyz"));
 		ResourceFactory factory = new ResourceFactoryImpl();
 		DocumentManager docManager = new DocumentManager(doc, factory);
-		OdfZipDocumentParser input;
+		ZipDocumentParser input;
 		try{
-			input = new OdfZipDocumentParser(docManager, inputFile);
+			input = new ZipDocumentParser(docManager, inputFile);
 			EventWriter writer = new EventWriter(null, System.out);
 			PipelineDriver driver = new PipelineDriver();
 			driver.addStep(writer);
