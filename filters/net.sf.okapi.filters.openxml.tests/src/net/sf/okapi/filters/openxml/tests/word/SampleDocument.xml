@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:ve="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:o="urn:schemas-microsoft-com:office:office"
+	xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+	xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+	xmlns:v="urn:schemas-microsoft-com:vml"
+	xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+	xmlns:w10="urn:schemas-microsoft-com:office:word"
+	xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+	xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml">
+	<w:body>
+		<w:p w:rsidR="00D651BA" w:rsidRDefault="0053714B" w:rsidP="0053714B">
+			<w:pPr>
+				<w:jc w:val="center"/>
+			</w:pPr>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US" w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:drawing>
+					<wp:inline distT="0" distB="0" distL="0" distR="0">
+						<wp:extent cx="3674176" cy="1837089"/>
+						<wp:effectExtent l="19050" t="0" r="2474" b="0"/>
+						<wp:docPr id="2" name="Picture 1"
+							descr="http://tk1.storage.msn.com/x1pxOYwqu4SjF6R37sWRIshhEr9Nn1CkLP1XX_eTMvv543Iz1qw83D9dGcP1qH4RYacUUSMzZwc2t_E4Jtz60MYEiVdwnFVuXJukR6kaNwkMN4tI84mpvM_S-WY-khp2d6zmYNLiqChGghy-bEiUaDz4Q"/>
+						<wp:cNvGraphicFramePr>
+							<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+								noChangeAspect="1"/>
+						</wp:cNvGraphicFramePr>
+						<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+							<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+								<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+									<pic:nvPicPr>
+										<pic:cNvPr id="0" name="Picture 1"
+											descr="http://tk1.storage.msn.com/x1pxOYwqu4SjF6R37sWRIshhEr9Nn1CkLP1XX_eTMvv543Iz1qw83D9dGcP1qH4RYacUUSMzZwc2t_E4Jtz60MYEiVdwnFVuXJukR6kaNwkMN4tI84mpvM_S-WY-khp2d6zmYNLiqChGghy-bEiUaDz4Q"/>
+										<pic:cNvPicPr>
+											<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>
+										</pic:cNvPicPr>
+									</pic:nvPicPr>
+									<pic:blipFill>
+										<a:blip r:embed="rId4"/>
+										<a:srcRect/>
+										<a:stretch>
+											<a:fillRect/>
+										</a:stretch>
+									</pic:blipFill>
+									<pic:spPr bwMode="auto">
+										<a:xfrm>
+											<a:off x="0" y="0"/>
+											<a:ext cx="3678673" cy="1839338"/>
+										</a:xfrm>
+										<a:prstGeom prst="rect">
+											<a:avLst/>
+										</a:prstGeom>
+										<a:noFill/>
+										<a:ln w="9525">
+											<a:noFill/>
+											<a:miter lim="800000"/>
+											<a:headEnd/>
+											<a:tailEnd/>
+										</a:ln>
+									</pic:spPr>
+								</pic:pic>
+							</a:graphicData>
+						</a:graphic>
+					</wp:inline>
+				</w:drawing>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Maecenas porttitor congue
+					massa. Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit
+					amet commodo magna eros quis urna.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>Nunc viverra imperdiet enim. Fusce est. Vivamus a tellus.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595" w:rsidP="0000726E">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">Pellentesque </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00E975BE">
+				<w:rPr>
+					<w:b/>
+					<w:bCs/>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>habitant morbi tristique</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve"> senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. </w:t>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:fldChar w:fldCharType="begin"/>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:rFonts w:eastAsia="PMingLiU"/>
+					<w:noProof/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText xml:space="preserve"> </w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:rFonts w:eastAsia="PMingLiU" w:hint="eastAsia"/>
+					<w:noProof/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText>eq \o\ac(</w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:rFonts w:eastAsia="PMingLiU" w:hint="eastAsia"/>
+					<w:noProof/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText>◇</w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:rFonts w:eastAsia="PMingLiU" w:hint="eastAsia"/>
+					<w:noProof/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText>,</w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E" w:rsidRPr="0000726E">
+				<w:rPr>
+					<w:rFonts w:ascii="Times New Roman" w:eastAsia="PMingLiU" w:hint="eastAsia"/>
+					<w:noProof/>
+					<w:position w:val="4"/>
+					<w:sz w:val="12"/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText>M</w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:rFonts w:eastAsia="PMingLiU" w:hint="eastAsia"/>
+					<w:noProof/>
+					<w:lang w:eastAsia="zh-TW"/>
+				</w:rPr>
+				<w:instrText>)</w:instrText>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:fldChar w:fldCharType="end"/>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>auris et orci.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">Aenean nec lorem. </w:t>
+			</w:r>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t>In porttitor. Donec laoreet nonummy augue.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+			</w:pPr>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve">Suspendisse dui purus, scelerisque at, </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00473A99">
+				<w:rPr>
+					<w:noProof/>
+					<w:vertAlign w:val="superscript"/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t>vulputate</w:t>
+			</w:r>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve"> vitae, </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00473A99">
+				<w:rPr>
+					<w:noProof/>
+					<w:vertAlign w:val="subscript"/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t>pretium</w:t>
+			</w:r>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve"> mattis, nunc. </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00E975BE">
+				<w:rPr>
+					<w:i/>
+					<w:iCs/>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t>Mauris eget neque at sem venenatis eleifend. Ut nonummy.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve">Fusce aliquet pede non pede. </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>Suspendisse dapibus lorem pellentesque magna. Integer nulla.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">Donec blandit feugiat ligula. </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00E975BE">
+				<w:rPr>
+					<w:noProof/>
+					<w:u w:val="single"/>
+				</w:rPr>
+				<w:t>Donec hendrerit</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">, felis et imperdiet euismod, purus ipsum pretium metus, in lacinia nulla nisl eget sapien. Donec ut est in lectus </w:t>
+			</w:r>
+			<w:r w:rsidRPr="0000726E">
+				<w:rPr>
+					<w:noProof/>
+					<w:bdr w:val="single" w:sz="4" w:space="0" w:color="auto"/>
+				</w:rPr>
+				<w:t>consequat</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve"> consequat.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">Etiam eget dui. </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00473A99">
+				<w:rPr>
+					<w:strike/>
+					<w:noProof/>
+				</w:rPr>
+				<w:t>Aliquam erat volutpat.</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve"> Sed at lorem in nunc porta tristique.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595">
+			<w:pPr>
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+			</w:pPr>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve">Proin nec augue. </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00473A99">
+				<w:rPr>
+					<w:noProof/>
+					<w:highlight w:val="red"/>
+				</w:rPr>
+				<w:t>Quisque</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve"> aliquam </w:t>
+			</w:r>
+			<w:r w:rsidRPr="00473A99">
+				<w:rPr>
+					<w:noProof/>
+					<w:color w:val="00B0F0"/>
+				</w:rPr>
+				<w:t>tempor</w:t>
+			</w:r>
+			<w:r w:rsidRPr="00EA0595">
+				<w:rPr>
+					<w:noProof/>
+				</w:rPr>
+				<w:t xml:space="preserve"> magna. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</w:t>
+			</w:r>
+		</w:p>
+		<w:p w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidRDefault="00EA0595" w:rsidP="0000726E">
+			<w:pPr>
+				<w:rPr>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+			</w:pPr>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve">Nunc ac magna. Maecenas odio dolor, </w:t>
+			</w:r>
+			<w:r w:rsidRPr="0000726E">
+				<w:rPr>
+					<w:noProof/>
+					<w:sz w:val="28"/>
+					<w:szCs w:val="28"/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve">vulputate </w:t>
+			</w:r>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve">vel, auctor ac, accumsan id, felis. </w:t>
+			</w:r>
+			<w:r w:rsidR="0000726E">
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:ruby>
+					<w:rubyPr>
+						<w:rubyAlign w:val="distributeSpace"/>
+						<w:hps w:val="12"/>
+						<w:hpsRaise w:val="22"/>
+						<w:hpsBaseText w:val="24"/>
+						<w:lid w:val="fr-FR"/>
+					</w:rubyPr>
+					<w:rt>
+						<w:r w:rsidR="0000726E" w:rsidRPr="0000726E">
+							<w:rPr>
+								<w:noProof/>
+								<w:sz w:val="12"/>
+								<w:lang w:val="en-US"/>
+							</w:rPr>
+							<w:t>yeehah</w:t>
+						</w:r>
+					</w:rt>
+					<w:rubyBase>
+						<w:r w:rsidR="0000726E">
+							<w:rPr>
+								<w:noProof/>
+								<w:lang w:val="en-US"/>
+							</w:rPr>
+							<w:t>Pellentesque</w:t>
+						</w:r>
+					</w:rubyBase>
+				</w:ruby>
+			</w:r>
+			<w:r>
+				<w:rPr>
+					<w:noProof/>
+					<w:lang w:val="en-US"/>
+				</w:rPr>
+				<w:t xml:space="preserve"> cursus sagittis felis.</w:t>
+			</w:r>
+		</w:p>
+		<w:sectPr w:rsidR="00EA0595" w:rsidRPr="00EA0595" w:rsidSect="001A6335">
+			<w:pgSz w:w="12240" w:h="15840"/>
+			<w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" w:header="720"
+				w:footer="720" w:gutter="0"/>
+			<w:cols w:space="720"/>
+			<w:docGrid w:linePitch="360"/>
+		</w:sectPr>
+	</w:body>
+</w:document>
