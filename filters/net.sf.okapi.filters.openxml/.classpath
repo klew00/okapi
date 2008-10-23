@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.5.6.jar"/>
+	<classpathentry kind="lib" path="lib/jericho-html-3.0-beta1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="lib/openxml4j-bin-beta.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
