@@ -137,7 +137,20 @@
   updateUri="http://okapi.sf.net/">
   <info>
    <name>Search And Replace</name>
-   <description>Performs a sreach and replace on the input file.</description>
+   <description>Performs a search and replace on the input file.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ 
+  <plugin type="utility"
+  id="oku_uriconversion"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>URI Conversion</name>
+   <description>Performs a URI conversion on the input file.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
