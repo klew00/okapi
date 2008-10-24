@@ -20,24 +20,11 @@
 
 package net.sf.okapi.common.threadedpipeline.tests;
 
-import java.util.concurrent.BlockingQueue;
-
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
 import net.sf.okapi.common.threadedpipeline.IConsumer;
-import net.sf.okapi.common.threadedpipeline.IPipelineEvent;
-import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
 
-/**
- * 
- */
 public class Consumer extends BasePipelineStep implements IConsumer {
-	private BlockingQueue<IPipelineEvent> consumerQueue;
-	
-	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue) {
-		this.consumerQueue = consumerQueue;
-	}
-
 	public String getName() {
 		return "Consumer";
 	}
@@ -47,15 +34,10 @@ public class Consumer extends BasePipelineStep implements IConsumer {
 
 	public void initialize() throws InterruptedException {
 	}
-
-	public PipelineReturnValue process() throws InterruptedException {		
-		IPipelineEvent event = consumerQueue.take();
+	
+	@Override
+	protected void handleTextUnit(FilterEvent event) {
 		System.out.println("EventType: " + event.getEventType().name());
-		System.out.println("Order: " + Integer.valueOf(event.getOrder()));
 		System.out.println();
-		if (event.getEventType() == FilterEvent.FilterEventType.FINISHED) {
-			return PipelineReturnValue.SUCCEDED;
-		}
-		return PipelineReturnValue.RUNNING;
 	}
 }

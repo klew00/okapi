@@ -20,31 +20,11 @@
 
 package net.sf.okapi.common.threadedpipeline.tests;
 
-import java.util.concurrent.BlockingQueue;
-
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
 import net.sf.okapi.common.threadedpipeline.IConsumer;
-import net.sf.okapi.common.threadedpipeline.IPipelineEvent;
 import net.sf.okapi.common.threadedpipeline.IProducer;
-import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
 
-/**
- * @author HargraveJE
- * 
- */
 public class ConsumerProducer extends BasePipelineStep implements IConsumer, IProducer {
-	private BlockingQueue<IPipelineEvent> producerQueue;
-	private BlockingQueue<IPipelineEvent> consumerQueue;
-
-	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue) {
-		this.consumerQueue = consumerQueue;
-	}
-
-	public void setProducerQueue(BlockingQueue<IPipelineEvent> producerQueue) {
-		this.producerQueue = producerQueue;
-	}
-
 	public String getName() {
 		return "ProducerConsumer";
 	}
@@ -53,15 +33,5 @@ public class ConsumerProducer extends BasePipelineStep implements IConsumer, IPr
 	}
 
 	public void initialize() throws InterruptedException {
-
-	}
-
-	public PipelineReturnValue process() throws InterruptedException {
-		IPipelineEvent event = consumerQueue.take();
-		producerQueue.add(event);
-		if (event.getEventType() == FilterEvent.FilterEventType.FINISHED) {
-			return PipelineReturnValue.SUCCEDED;
-		}
-		return PipelineReturnValue.RUNNING;
-	}
+	}	
 }

@@ -17,46 +17,38 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
-
 package net.sf.okapi.common.threadedpipeline.tests;
 
-import java.util.concurrent.BlockingQueue;
-
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
-import net.sf.okapi.common.threadedpipeline.IPipelineEvent;
 import net.sf.okapi.common.threadedpipeline.IProducer;
-import net.sf.okapi.common.threadedpipeline.PipelineEvent;
 import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
 
-public class Producer extends BasePipelineStep implements IProducer {
-	private BlockingQueue<IPipelineEvent> producerQueue;
+public class Producer extends BasePipelineStep implements IProducer {	
 	private int order = -1;
-
-	public void setProducerQueue(BlockingQueue<IPipelineEvent> producerQueue) {
-		this.producerQueue = producerQueue;
-	}
 
 	public String getName() {
 		return "Producer";
 	}
 
 	public void finish() throws InterruptedException {
-		producerQueue.put(new PipelineEvent(FilterEvent.FilterEventType.FINISHED, null, ++order));
+		addToQueue(new FilterEvent(FilterEventType.FINISHED, null));
 	}
 
 	public void initialize() throws InterruptedException {
-		producerQueue.put(new PipelineEvent(FilterEvent.FilterEventType.START, null, ++order));
+		addToQueue(new FilterEvent(FilterEventType.START, null));
 	}
 
+	@Override
 	public PipelineReturnValue process() throws InterruptedException {
-		if (order >= 10) {
+		order++;
+		if (order >= 5) {
 			return PipelineReturnValue.SUCCEDED;
 		}
-
-		Thread.sleep(2000);
-		producerQueue.put(new PipelineEvent(FilterEvent.FilterEventType.TEXT_UNIT, null, ++order));
-
+		
+		Thread.sleep(1000);
+		addToQueue(new FilterEvent(FilterEventType.TEXT_UNIT, null));
 		return PipelineReturnValue.RUNNING;
 	}
 }

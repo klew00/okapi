@@ -22,16 +22,35 @@ package net.sf.okapi.common.threadedpipeline;
 
 import java.util.concurrent.BlockingQueue;
 
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
+
 public abstract class BasePipelineStep implements IPipelineStep {
 	private PipelineReturnValue result;
 	private volatile boolean pause;
-	
-	public void addToQueue(BlockingQueue<IPipelineEvent> producerQueue, IPipelineEvent event) throws InterruptedException {
+	private BlockingQueue<FilterEvent> producerQueue;
+	private BlockingQueue<FilterEvent> consumerQueue;
+
+	protected void addToQueue(FilterEvent event) throws InterruptedException {
+		if (producerQueue == null) {
+			throw new RuntimeException("This class is a consumer not a producer");
+		}
 		producerQueue.put(event);
 	}
 
-	public IPipelineEvent takeFromQueue(BlockingQueue<IPipelineEvent> consumerQueue) throws InterruptedException {
-		return consumerQueue.take(); 
+	protected FilterEvent takeFromQueue() throws InterruptedException {
+		if (consumerQueue == null) {
+			throw new RuntimeException("This class is a producer not a consumer");
+		}
+		return consumerQueue.take();
+	}
+
+	public void setConsumerQueue(BlockingQueue<FilterEvent> consumerQueue) {
+		this.consumerQueue = consumerQueue;
+	}
+
+	public void setProducerQueue(BlockingQueue<FilterEvent> producerQueue) {
+		this.producerQueue = producerQueue;
 	}
 
 	public void pause() {
@@ -41,6 +60,26 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public synchronized void resume() {
 		pause = false;
 		notify();
+	}
+
+	public PipelineReturnValue process() throws InterruptedException {
+		if (this instanceof IConsumer && this instanceof IProducer) {
+			FilterEvent event = takeFromQueue();			
+			handleEvent(event);
+			addToQueue(event);
+			if (event.getEventType() == FilterEventType.FINISHED) {
+				return PipelineReturnValue.SUCCEDED;
+			}
+		} else if (this instanceof IConsumer) {
+			FilterEvent event = takeFromQueue();			
+			handleEvent(event);
+			if (event.getEventType() == FilterEventType.FINISHED) {
+				return PipelineReturnValue.SUCCEDED;
+			}
+		} else if (this instanceof IProducer) { 
+			throw new RuntimeException("All intial pipeline steps (i.e., producers only) such as filters must override this method");
+		}
+		return PipelineReturnValue.RUNNING;
 	}
 
 	public PipelineReturnValue call() throws Exception {
@@ -70,5 +109,76 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		}
 
 		return result;
+	}
+
+	public final void handleEvent(FilterEvent event) {
+		switch (event.getEventType()) {
+		case START_DOCUMENT:
+			handleStartDocument(event);
+			break;
+
+		case END_DOCUMENT:
+			handleEndDocument(event);
+			break;
+
+		case START_SUBDOCUMENT:
+			handleStartSubDocument(event);
+			break;
+
+		case END_SUBDOCUMENT:
+			handleEndSubDocument(event);
+			break;
+
+		case START_GROUP:
+			handleStartGroup(event);
+			break;
+
+		case END_GROUP:
+			handleEndGroup(event);
+			break;
+
+		case TEXT_UNIT:
+			handleTextUnit(event);
+			break;
+
+		case TEXT_GROUP:
+			handleTextGroup(event);
+			break;
+
+		case SKELETON_UNIT:
+			handleSkeletonUnit(event);
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	// By default we eat all events - override if you want special processing
+	protected void handleStartDocument(FilterEvent event) {
+	}
+
+	protected void handleEndDocument(FilterEvent event) {
+	}
+
+	protected void handleStartSubDocument(FilterEvent event) {
+	}
+
+	protected void handleEndSubDocument(FilterEvent event) {
+	}
+
+	protected void handleStartGroup(FilterEvent event) {
+	}
+
+	protected void handleEndGroup(FilterEvent event) {
+	}
+
+	protected void handleTextUnit(FilterEvent event) {
+	}
+
+	protected void handleTextGroup(FilterEvent event) {
+	}
+
+	protected void handleSkeletonUnit(FilterEvent event) {
 	}
 }

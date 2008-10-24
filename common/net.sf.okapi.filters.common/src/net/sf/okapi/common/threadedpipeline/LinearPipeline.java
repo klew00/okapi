@@ -29,6 +29,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.okapi.common.filters.FilterEvent;
+
 public class LinearPipeline implements ILinearPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
 
@@ -39,7 +41,7 @@ public class LinearPipeline implements ILinearPipeline {
 	private PipelineReturnValue state;
 	private LinkedList<IPipelineStep> steps;
 
-	private BlockingQueue<IPipelineEvent> previousQueue;
+	private BlockingQueue<FilterEvent> previousQueue;
 
 	public LinearPipeline() {
 		this(PausableThreadPoolExecutor.newCachedThreadPool(), DEFAULT_BLOCKING_QUEUE_SIZE);
@@ -56,18 +58,18 @@ public class LinearPipeline implements ILinearPipeline {
 	}
 
 	public void addPipleLineStep(IPipelineStep step) {
-		BlockingQueue<IPipelineEvent> queue = null;
+		BlockingQueue<FilterEvent> queue = null;
 		if (step instanceof IConsumer && step instanceof IProducer) {
 			if (previousQueue == null) {
 				// TODO: wrap exception
 				throw new RuntimeException("Previous queue should not be null");
 			}
 
-			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
+			queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
 			((IProducer) step).setProducerQueue(queue);
 			((IConsumer) step).setConsumerQueue(previousQueue);
 		} else if (step instanceof IProducer) {
-			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
+			queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
 			((IProducer) step).setProducerQueue(queue);
 		} else if (step instanceof IConsumer) {
 			if (previousQueue == null) {
@@ -125,14 +127,7 @@ public class LinearPipeline implements ILinearPipeline {
 			return PipelineReturnValue.CANCELLED;
 		}
 
-		if (state == PipelineReturnValue.PAUSED) {
-			//YS: assumes this try block was needed just for test, otherwise
-			// getState() prevent any real UI operation
-			/*try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				return PipelineReturnValue.INTERRUPTED;
-			}*/
+		if (state == PipelineReturnValue.PAUSED) {			
 			return PipelineReturnValue.PAUSED;
 		}
 

@@ -22,11 +22,9 @@ package net.sf.okapi.common.threadedpipeline;
 
 import java.util.concurrent.BlockingQueue;
 
-/**
- * @author HargraveJE
- *
- */
-public interface IConsumer<T> {
+import net.sf.okapi.common.filters.FilterEvent;
 
-	public void setConsumerQueue(BlockingQueue<T> consumerQueue);
+public interface IConsumer {
+	public void setConsumerQueue(BlockingQueue<FilterEvent> consumerQueue);
+	public void handleEvent(FilterEvent event);
 }
