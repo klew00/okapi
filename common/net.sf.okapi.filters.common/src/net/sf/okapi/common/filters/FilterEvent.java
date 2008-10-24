@@ -7,10 +7,10 @@ public class FilterEvent {
 		START, START_DOCUMENT, END_DOCUMENT, START_SUBDOCUMENT, END_SUBDOCUMENT, START_GROUP, END_GROUP, TEXT_UNIT, TEXT_GROUP, SKELETON_UNIT, FINISHED
 	};
 	
-	private Enum<?> filterEventType;
+	private FilterEventType filterEventType;
 	private IResource resource; // TextUnit, Skeleton, Group or other data object
 	
-	public FilterEvent(Enum<?> filterEventType, IResource resource) {
+	public FilterEvent(FilterEventType filterEventType, IResource resource) {
 		this.filterEventType = filterEventType;
 		this.resource = resource;
 	}	

@@ -26,7 +26,7 @@ import java.util.concurrent.BlockingQueue;
  * @author HargraveJE
  *
  */
-public interface IProducer {
+public interface IProducer<T> {
 	
-	public void setProducerQueue(BlockingQueue<IPipelineEvent> producerQueue);	
+	public void setProducerQueue(BlockingQueue<T> producerQueue);	
 }
