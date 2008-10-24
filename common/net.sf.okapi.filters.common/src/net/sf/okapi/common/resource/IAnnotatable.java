@@ -22,7 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.Hashtable;
 
-public interface IAnnotatable {
+public interface IAnnotatable extends IResource {
 	
 	/**
 	 * Gets the name of the resource. This value is the same as the resname

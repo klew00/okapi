@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 The Okapi framework contributors                       */
+/* Copyright (C) 2008 by the Okapi framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -22,7 +22,6 @@ package net.sf.okapi.common;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

@@ -21,8 +21,9 @@
 package net.sf.okapi.filters.openoffice;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.Document;
 
-public class Resource extends net.sf.okapi.common.resource.Document {
+public class Resource extends Document {
 
 	private static final long serialVersionUID = 1L;
 

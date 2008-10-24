@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.resource;
 
-public interface IContainable {
+public interface IContainable extends IResource {
 
 	/**
 	 * Gets the extraction ID of the resource.

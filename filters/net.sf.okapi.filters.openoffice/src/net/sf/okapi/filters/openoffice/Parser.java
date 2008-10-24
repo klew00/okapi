@@ -120,6 +120,7 @@ public class Parser extends BaseParser {
 			fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 			reader = fact.createXMLStreamReader(input);
 			
 			reset();
