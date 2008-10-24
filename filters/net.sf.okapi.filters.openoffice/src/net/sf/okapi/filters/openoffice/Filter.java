@@ -10,7 +10,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.FilterEvent.FilterEventType;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IResource;
@@ -111,7 +111,7 @@ public class Filter implements IFilter {
 		entries = zipFile.entries();
 		event = new FilterEvent(FilterEventType.START_DOCUMENT, parser.resource);
 		nextAction = StateType.NEXTINZIP;
-		return event.getFilterEventType();
+		return event.getEventType();
 	}
 
 	private Enum<?> nextInZipFile () throws IOException {
@@ -132,7 +132,7 @@ public class Filter implements IFilter {
 		close();
 		event = new FilterEvent(FilterEventType.END_DOCUMENT, parser.resource);
 		nextAction = StateType.DONE;
-		return event.getFilterEventType();
+		return event.getEventType();
 	}
 
 	private Enum<?> openSubDocument (ZipEntry zipEntry) throws IOException {
@@ -146,7 +146,7 @@ public class Filter implements IFilter {
 		subDocResource.setType(zipEntry.getName());
 		event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocResource);
 		nextAction = StateType.NEXTINSUBDOC;
-		return event.getFilterEventType();
+		return event.getEventType();
 	}
 	
 	private Enum<?> nextInSubDocument () throws IOException {
@@ -155,16 +155,16 @@ public class Filter implements IFilter {
 			switch ( (tok = parser.parseNext()) ) {
 			case TRANSUNIT:
 				event = new FilterEvent(FilterEventType.TEXT_UNIT, parser.getResource());
-				return event.getFilterEventType();
+				return event.getEventType();
 			case SKELETON:
 				event = new FilterEvent(FilterEventType.SKELETON_UNIT, parser.getResource());
-				return event.getFilterEventType();
+				return event.getEventType();
 			case STARTGROUP:
 				event = new FilterEvent(FilterEventType.START_GROUP, parser.getResource());
-				return event.getFilterEventType();
+				return event.getEventType();
 			case ENDGROUP:
 				event = new FilterEvent(FilterEventType.END_GROUP, parser.getResource());
-				return event.getFilterEventType();
+				return event.getEventType();
 			default:
 				assert(false); // Catch problem
 			}
@@ -176,7 +176,7 @@ public class Filter implements IFilter {
 		// input.close(); Not needed as the reader is set to do it automatically
 		event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocResource);
 		nextAction = StateType.NEXTINZIP;
-		return event.getFilterEventType();
+		return event.getEventType();
 	}
 
 }
