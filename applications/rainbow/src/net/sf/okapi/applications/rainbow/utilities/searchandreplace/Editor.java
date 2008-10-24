@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -262,6 +263,11 @@ public class Editor implements IParametersEditor {
 				showAddItemsDialog();
 			}
 		});		
+		RowData rdTmp = new RowData();
+		rdTmp.width = 80;
+		btAdd.setLayoutData(rdTmp);
+
+		
 		Button btEdit = new Button(cmpTmp2, SWT.PUSH);
 		btEdit.setText("Edit...");
 		btEdit.addSelectionListener(new SelectionAdapter() {
@@ -272,6 +278,8 @@ public class Editor implements IParametersEditor {
 				}				
 			}
 		});		
+		btEdit.setLayoutData(rdTmp);
+		
 		Button btRemove = new Button(cmpTmp2, SWT.PUSH);
 		btRemove.setText("Remove");
 		btRemove.addSelectionListener(new SelectionAdapter() {
@@ -287,10 +295,15 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});	
+		btRemove.setLayoutData(rdTmp);
+
+		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
+		chkPlainText.setText("Process the files as plain text (not using filters)");
+		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		
 		chkRegEx = new Button(cmpTmp0, SWT.CHECK);
 		chkRegEx.setText("Use regular expression");
-		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		chkRegEx.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				chkDotAll.setEnabled(chkRegEx.getSelection());
@@ -298,10 +311,6 @@ public class Editor implements IParametersEditor {
 				chkIgnoreCase.setEnabled(chkRegEx.getSelection());
 			}
 		});
-		
-		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
-		chkPlainText.setText("Process the files as plain text (not using filters)");
-		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
