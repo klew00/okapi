@@ -5,25 +5,29 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.apptest.common.IParameters;
-import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.common.IResource;
+import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IParser;
-import net.sf.okapi.apptest.resource.Group;
-import net.sf.okapi.apptest.resource.IContainable;
+import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
+import net.sf.okapi.apptest.resource.Document2;
+import net.sf.okapi.apptest.resource.Group2;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
+import net.sf.okapi.apptest.resource.SubDocument;
 import net.sf.okapi.apptest.resource.TextUnit;
 
 public class DummyParser implements IParser {
 
-	ArrayList<IContainable> resList;
-	ArrayList<Integer> tokList;
+	ArrayList<FilterEvent> list;
 	private int current;
 	private boolean canceled;
+	private String language;
 	
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
 		// Not used in this parser
 		System.out.println("DummyParser: setOptions() called");
+		this.language = language;
 		System.out.println(" -output language = " + language);
 		System.out.println(" -output default encoding = " + defaultEncoding);
 	}
@@ -35,92 +39,92 @@ public class DummyParser implements IParser {
 	
 	public void close () {
 		System.out.println("DummyParser: close() called");
-		resList.clear();
-		resList = null;
+		list.clear();
+		list = null;
 	}
 	
 	public boolean hasNext () {
-		if ( resList == null ) return false;
-		return (current<resList.size()-1);
+		if ( list == null ) return false;
+		return (current<list.size()-1);
 	}
 	
-	public int next () {
+	public FilterEvent next () {
 		if ( canceled ) {
-			if ( current < resList.size()-1 ) {
-				current = resList.size()-2;
+			if ( current < list.size()-1 ) {
+				current = list.size()-2;
 			}
 		}
 		current++;
-		return tokList.get(current);
+		return list.get(current);
 	}
 	
-	public IContainable getResource () {
-		return resList.get(current);
+	public IResource getResource () {
+		return list.get(current).getResource();
 	}
 	
 	private void resetResources () {
 		canceled = false;
 		current = -1;
 		
-		resList = new ArrayList<IContainable>();
-		tokList = new ArrayList<Integer>();
+		list = new ArrayList<FilterEvent>();
 		
-		tokList.add(IInputFilter.START_DOCUMENT);
-		Group docRes = new Group();
+		Document2 docRes = new Document2();
 		docRes.setID("d1");
-		resList.add(docRes);
+		docRes.setEncoding("UTF-8"); // Always
+		docRes.setLanguage(language);
+		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 		
-		tokList.add(IInputFilter.START_SUBDOCUMENT);
-		Group subDocRes = new Group();
+		
+		SubDocument subDocRes = new SubDocument(docRes.getID());
 		subDocRes.setID("sd1");
-		resList.add(subDocRes);
+		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s0", "<main>")));
 		
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s1", "<t id='t1'>"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s1", "<t id='t1'>")));
 
-		tokList.add(IInputFilter.TEXT_UNIT);
-		resList.add(new TextUnit("t1", "Text 1"));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t1", "Text 1")));
 		
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s2", "</t>\n"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</t>")));
 
 		for ( int i=1; i<=10; i++ ) {
-			tokList.add(IInputFilter.SKELETON_UNIT);
-			resList.add(new SkeletonUnit("sa"+String.valueOf(i), "<t>"));
-			tokList.add(IInputFilter.TEXT_UNIT);
-			resList.add(new TextUnit("at"+String.valueOf(i), "Auto text "+String.valueOf(i)));
-			tokList.add(IInputFilter.SKELETON_UNIT);
-			resList.add(new SkeletonUnit("sa"+String.valueOf(i), "</t>\n"));
+			list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+				new SkeletonUnit("sa"+String.valueOf(i), "<t>")));
+			list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+				new TextUnit("at"+String.valueOf(i), "Auto text "+String.valueOf(i))));
+			list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+				new SkeletonUnit("sa"+String.valueOf(i), "</t>")));
 		}
 		
-		tokList.add(IInputFilter.START_GROUP);
-		Group grp = new Group();
+		Group2 grp = new Group2(subDocRes.getID());
 		grp.setID("g1");
-		resList.add(grp);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp));
 
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s3", "<grp>\n"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s3", "<grp>")));
 
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s4", "<t id='t2'>"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s4", "<t id='t2'>")));
 
-		tokList.add(IInputFilter.TEXT_UNIT);
-		resList.add(new TextUnit("t2", "Text 2"));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t2", "Text 2")));
 		
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s5", "</t>\n"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s5", "</t>")));
 
-		tokList.add(IInputFilter.SKELETON_UNIT);
-		resList.add(new SkeletonUnit("s6", "</grp>\n"));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s6", "</grp>")));
 
-		tokList.add(IInputFilter.END_GROUP);
-		resList.add(grp);
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp));
 		
-		tokList.add(IInputFilter.END_SUBDOCUMENT);
-		resList.add(subDocRes);
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s7", "</main>")));
+		list.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocRes));
 
-		tokList.add(IInputFilter.END_DOCUMENT);
-		resList.add(docRes);
+		list.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
 	}
 
 	public void cancel() {

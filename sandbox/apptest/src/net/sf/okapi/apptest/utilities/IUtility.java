@@ -1,6 +1,6 @@
 package net.sf.okapi.apptest.utilities;
 
-import net.sf.okapi.apptest.common.IResource;
+import net.sf.okapi.apptest.filters.FilterEvent;
 
 public interface IUtility {
 
@@ -8,8 +8,7 @@ public interface IUtility {
 	
 	public void doProlog ();
 	
-	public void handleEvent (int eventType,
-		IResource resource);
+	public void handleEvent (FilterEvent event);
 	
 	public void doEpilog ();
 	

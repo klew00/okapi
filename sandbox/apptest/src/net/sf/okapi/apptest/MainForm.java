@@ -37,7 +37,7 @@ public class MainForm {
 		this.shell = shell;
 		GridLayout layTmp = new GridLayout();
 		shell.setLayout(layTmp);
-		
+
 		utilDriver = new UtilityDriver(shell, this);
 		
 		btStart = new Button(shell, SWT.PUSH);

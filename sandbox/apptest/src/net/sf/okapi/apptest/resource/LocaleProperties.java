@@ -46,19 +46,3 @@ public class LocaleProperties {
 
 }
 
-/*
-Group
-	LocalizableProperties source;
-	List<LocalizableProperties> targets
-
-LocalizableData extends LocalizableProperties
-
-TextUnit
-	LocalizableData source
-	List<LocalizableData> targets;
-
-	source.getproperties();
-targets.get(0).getProperties
-
-	*/
-

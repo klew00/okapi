@@ -1,7 +1,6 @@
 package net.sf.okapi.apptest.dummyutility;
 
-import net.sf.okapi.apptest.common.IResource;
-import net.sf.okapi.apptest.filters.IInputFilter;
+import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.utilities.IUtility;
 
@@ -11,12 +10,11 @@ public class PseudoTranslate implements IUtility {
 		return "PseudoTranlate";
 	}
 	
-	public void handleEvent (int eventType,
-		IResource resource)
+	public void handleEvent (FilterEvent event)
 	{
-		switch ( eventType ) {
-		case IInputFilter.TEXT_UNIT:
-			TextUnit tu1 = (TextUnit)resource;
+		switch ( event.getEventType() ) {
+		case TEXT_UNIT:
+			TextUnit tu1 = (TextUnit)event.getResource();
 			processTU(tu1);
 			if ( tu1.hasChild() ) {
 				for ( TextUnit tu : tu1.childTextUnitIterator() ) {
@@ -24,11 +22,9 @@ public class PseudoTranslate implements IUtility {
 				}
 			}
 			break;
-		case IInputFilter.START_DOCUMENT:
-			doProlog();
+		case START_DOCUMENT:
 			break;
-		case IInputFilter.END_DOCUMENT:
-			doEpilog();
+		case END_DOCUMENT:
 			break;
 		}
 	}

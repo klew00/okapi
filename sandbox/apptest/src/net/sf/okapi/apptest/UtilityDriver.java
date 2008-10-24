@@ -2,16 +2,17 @@ package net.sf.okapi.apptest;
 
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.okapi.apptest.dummyfilter.DummyInputFilter;
-import net.sf.okapi.apptest.dummyfilter.DummyOutputFilter;
+import net.sf.okapi.apptest.dummyfilter.DummyFilter;
+import net.sf.okapi.apptest.dummyfilter.DummyFilterWriter;
 import net.sf.okapi.apptest.dummyutility.PseudoTranslate;
-import net.sf.okapi.apptest.filters.IInputFilter;
-import net.sf.okapi.apptest.filters.IOutputFilter;
+import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.filters.IFilter;
+import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.pipeline.ILinearPipeline;
 import net.sf.okapi.apptest.pipeline.LinearPipeline;
 import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
-import net.sf.okapi.apptest.pipelineutil.InputFilterStep;
-import net.sf.okapi.apptest.pipelineutil.OutputFilterStep;
+import net.sf.okapi.apptest.pipelineutil.FilterStep;
+import net.sf.okapi.apptest.pipelineutil.FilterWriterStep;
 import net.sf.okapi.apptest.pipelineutil.UtilityStep;
 import net.sf.okapi.apptest.utilities.IUtility;
 import net.sf.okapi.common.ui.Dialogs;
@@ -29,13 +30,13 @@ public class UtilityDriver {
 	}
 	
 	public void simpleExecute () {
-		IInputFilter inFilter = null;
+		IFilter inFilter = null;
 		IUtility util = null;
-		IOutputFilter outFilter = null;
+		IFilterWriter outFilter = null;
 		try {
-			inFilter = new DummyInputFilter();
+			inFilter = new DummyFilter();
 			util = new PseudoTranslate();
-			outFilter = new DummyOutputFilter();
+			outFilter = new DummyFilterWriter();
 
 			// Set the options 
 			inFilter.setOptions("en", "UTF-8");
@@ -43,11 +44,12 @@ public class UtilityDriver {
 			outFilter.setOutput("myOutputFile");
 
 			// Process
+			FilterEvent event;
 			inFilter.open("myFile");
 			while ( inFilter.hasNext() ) {
-				int event = inFilter.next();
-				util.handleEvent(event, inFilter.getResource());
-				outFilter.handleEvent(event, inFilter.getResource());
+				event = inFilter.next();
+				util.handleEvent(event);
+				outFilter.handleEvent(event);
 			}
 		}
 		catch ( Throwable e ) {
@@ -63,22 +65,20 @@ public class UtilityDriver {
 	
 	public void pipelineExecute (boolean allowUIInteraction) {
 		try {
-			ILinearPipeline pipeline = new LinearPipeline();
+			ILinearPipeline pipeline = new LinearPipeline<FilterEvent>();
 			
-			InputFilterStep inputStep = new InputFilterStep();
-			inputStep.setInputFilter(new DummyInputFilter());
+			FilterStep inputStep = new FilterStep(new DummyFilter());
 			pipeline.addPipleLineStep(inputStep);
-			inputStep.getInputFilter().setOptions("en", "UTF-8");
+			inputStep.getFilter().setOptions("en", "UTF-8");
 			inputStep.setInput("myFile");
 			
 			UtilityStep utility = new UtilityStep();
 			utility.setUtility(new PseudoTranslate());
 			pipeline.addPipleLineStep(utility);
 			
-			OutputFilterStep outputStep = new OutputFilterStep();
-			outputStep.setOutputFilter(new DummyOutputFilter());
+			FilterWriterStep outputStep = new FilterWriterStep(new DummyFilterWriter());
 			pipeline.addPipleLineStep(outputStep);
-			outputStep.getOutputFilter().setOptions("en-bz", "UTF-8");
+			outputStep.getFilterWriter().setOptions("en-bz", "UTF-8");
 			outputStep.setOutput("myOutputFile");
 			
 			pipeline.execute();

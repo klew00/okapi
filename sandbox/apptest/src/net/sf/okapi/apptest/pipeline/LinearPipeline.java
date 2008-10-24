@@ -30,7 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
-public class LinearPipeline implements ILinearPipeline {
+public class LinearPipeline<T> implements ILinearPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
 
 	private final PausableThreadPoolExecutor executor;
@@ -40,7 +40,7 @@ public class LinearPipeline implements ILinearPipeline {
 	private PipelineReturnValue state;
 	private LinkedList<IPipelineStep> steps;
 
-	private BlockingQueue<IPipelineEvent> previousQueue;
+	private BlockingQueue<T> previousQueue;
 
 	public LinearPipeline() {
 		this(PausableThreadPoolExecutor.newCachedThreadPool(), DEFAULT_BLOCKING_QUEUE_SIZE);
@@ -56,27 +56,27 @@ public class LinearPipeline implements ILinearPipeline {
 		steps = new LinkedList<IPipelineStep>();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void addPipleLineStep(IPipelineStep step) {
-		BlockingQueue<IPipelineEvent> queue = null;
+		BlockingQueue<T> queue = null;
 		if (step instanceof IConsumer && step instanceof IProducer) {
 			if (previousQueue == null) {
 				// TODO: wrap exception
 				throw new RuntimeException("Previous queue should not be null");
 			}
 
-			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
-			((IProducer) step).setProducerQueue(queue);
-			((IConsumer) step).setConsumerQueue(previousQueue);
+			queue = new ArrayBlockingQueue<T>(blockingQueueSize, false);
+			((IProducer<T>)step).setProducerQueue(queue);
+			((IConsumer<T>) step).setConsumerQueue(previousQueue);
 		} else if (step instanceof IProducer) {
-			queue = new ArrayBlockingQueue<IPipelineEvent>(blockingQueueSize, false);
-			((IProducer) step).setProducerQueue(queue);
+			queue = new ArrayBlockingQueue<T>(blockingQueueSize, false);
+			((IProducer<T>) step).setProducerQueue(queue);
 		} else if (step instanceof IConsumer) {
 			if (previousQueue == null) {
 				// TODO: wrap exception
 				throw new RuntimeException("Previous queue should not be null");
 			}
-
-			((IConsumer) step).setConsumerQueue(previousQueue);
+			((IConsumer<T>)step).setConsumerQueue(previousQueue);
 
 		} else {
 			// TODO: wrap exception

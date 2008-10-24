@@ -2,45 +2,44 @@ package net.sf.okapi.apptest.pipelineutil;
 
 import java.util.concurrent.BlockingQueue;
 
-import net.sf.okapi.apptest.filters.IInputFilter;
-import net.sf.okapi.apptest.pipeline.PipelineEvent;
-import net.sf.okapi.apptest.pipeline.IPipelineEvent;
+import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.filters.IFilter;
 import net.sf.okapi.apptest.pipeline.IPipelineStep;
 import net.sf.okapi.apptest.pipeline.IProducer;
 import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
 
-public class InputFilterStep implements IPipelineStep, IProducer {
+public class FilterStep implements IPipelineStep, IProducer<FilterEvent> {
 
-	protected BlockingQueue<IPipelineEvent> producerQueue;
+	protected BlockingQueue<FilterEvent> producerQueue;
 	protected int order;
 	protected volatile boolean pause;
 	protected PipelineReturnValue result;
-	protected IInputFilter inputFilter;
+	protected IFilter filter;
 	protected String inputPath;
+	
+	public FilterStep (IFilter filter) {
+		this.filter = filter;
+	}
 
 	public String getName() {
-		return inputFilter.getName();
+		return filter.getName();
 	}
 
 	public void setInput (String inputPath) {
 		this.inputPath = inputPath;
 	}
 	
-	public void setInputFilter (IInputFilter inputFilter) {
-		this.inputFilter = inputFilter;
-	}
-	
-	public IInputFilter getInputFilter () {
-		return inputFilter;
+	public IFilter getFilter () {
+		return filter;
 	}
 	
 	public void finish () throws InterruptedException {
-		if ( inputFilter != null ) inputFilter.close();
+		if ( filter != null ) filter.close();
 	}
 
 	public void initialize () throws InterruptedException {
 		order = -1;
-		inputFilter.open(inputPath);
+		filter.open(inputPath);
 	}
 
 	public void pause () {
@@ -81,16 +80,15 @@ public class InputFilterStep implements IPipelineStep, IProducer {
 		return result;
 	}
 
-	public void setProducerQueue (BlockingQueue<IPipelineEvent> producerQueue) {
+	public void setProducerQueue (BlockingQueue<FilterEvent> producerQueue) {
 		this.producerQueue = producerQueue;
 	}
 
 	public PipelineReturnValue process () throws InterruptedException {
-		if ( !inputFilter.hasNext() ) {
+		if ( !filter.hasNext() ) {
 			return PipelineReturnValue.SUCCEDED; // Done
 		}
-		int event = inputFilter.next();
-		producerQueue.put(new PipelineEvent(event, inputFilter.getResource(), ++order));
+		producerQueue.put(filter.next());
 		return PipelineReturnValue.RUNNING;
 	}
 

@@ -27,7 +27,7 @@ import java.util.concurrent.BlockingQueue;
  * @author HargraveJE
  *
  */
-public interface IConsumer {
+public interface IConsumer<T> {
 
-	public void setConsumerQueue(BlockingQueue<IPipelineEvent> consumerQueue);
+	public void setConsumerQueue(BlockingQueue<T> consumerQueue);
 }

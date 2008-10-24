@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.apptest.common.IParameters;
-import net.sf.okapi.apptest.resource.IContainable;
+import net.sf.okapi.apptest.common.IResource;
 
 public interface IParser {
 
@@ -16,11 +16,11 @@ public interface IParser {
 
 	public void open(URL inputURL);
 
-	public IContainable getResource();
+	public IResource getResource();
 
 	public boolean hasNext ();
 	
-	public int next();
+	public FilterEvent next();
 
 	public void close();
 
