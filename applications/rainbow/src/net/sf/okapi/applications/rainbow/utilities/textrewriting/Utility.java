@@ -25,6 +25,7 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -150,11 +151,42 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		case Parameters.TYPE_XNREPLACE:
 			replaceWithXN(tu);
 			break;
+		case Parameters.TYPE_KEEPINLINE:
+			removeText(tu);
+			break;
 		}
+	
 		if ( params.addPrefix || params.addSuffix || params.addName ) {
 			addText(tu);
 		}
 	}
+
+	/**
+	 * Removes the text but leaves the inline code.
+	 * @param tu the text unit to process.
+	 */
+	private void removeText (TextUnit tu) {
+	
+		String result = tu.getTargetContent().getCodedText();
+		StringBuilder sb = new StringBuilder();
+		
+		for ( int i=0; i<result.length(); i++ ) {
+			switch ( result.charAt(i) ) {
+			    case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+				case TextFragment.MARKER_SEGMENT:
+					sb.append(result.charAt(i));
+					i++;
+					sb.append(result.charAt(i));
+					break;
+				default:
+					break;
+			}
+		}
+		TextContainer cnt = tu.getTargetContent();
+		cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
+	}	
 	
 	/**
 	 * Merges back segments into a single content, while adding brackets

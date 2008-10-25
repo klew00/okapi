@@ -26,6 +26,7 @@ public class Parameters extends BaseParameters {
 	
 	public static final int  TYPE_KEEPORIGINAL   = 0;
 	public static final int  TYPE_XNREPLACE      = 1;
+	public static final int  TYPE_KEEPINLINE     = 2;
 	
 	protected int       type;
 	protected boolean   addPrefix;

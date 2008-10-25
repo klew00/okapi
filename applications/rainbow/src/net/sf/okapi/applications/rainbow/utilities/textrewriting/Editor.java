@@ -119,6 +119,7 @@ public class Editor implements IParametersEditor {
 		lbTypes = new List(cmpTmp, SWT.BORDER);
 		lbTypes.add("Keep the original text");
 		lbTypes.add("Replace letters by Xs and digits by Ns");
+		lbTypes.add("Remove text but keep inline codes");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
