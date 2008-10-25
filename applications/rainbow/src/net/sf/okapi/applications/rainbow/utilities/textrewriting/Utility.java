@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -32,11 +32,15 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
-	private Parameters       params;
-	private String           commonFolder;
-	private Segmenter        srcSeg;
-	private Segmenter        trgSeg;
-
+	private static final char TMPSTARTSEG = '\u0002';
+	private static final char TMPENDSEG = '\u0003';
+	private static final char STARTSEG = '[';
+	private static final char ENDSEG = ']';
+	
+	private Parameters params;
+	private String commonFolder;
+	private Segmenter srcSeg;
+	private Segmenter trgSeg;
 	
 	public Utility () {
 		params = new Parameters();
@@ -144,7 +148,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
 		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent());
+			tu.setTargetContent(tu.getSourceContent().clone());
 		}
 
 		switch ( params.type ) {
@@ -166,7 +170,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (TextUnit tu) {
-	
 		String result = tu.getTargetContent().getCodedText();
 		StringBuilder sb = new StringBuilder();
 		
@@ -180,16 +183,18 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 					i++;
 					sb.append(result.charAt(i));
 					break;
-				case '[':
-				case ']':
-					sb.append(result.charAt(i));
+				case TMPSTARTSEG: // Keep segment marks if needed
+					if ( params.segment ) sb.append(STARTSEG);
+					break;
+				case TMPENDSEG: // Keep segment marks if needed
+					if ( params.segment ) sb.append(ENDSEG);
 					break;					
 				default:
 					break;
 			}
 		}
 		TextContainer cnt = tu.getTargetContent();
-		cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
+		cnt.setCodedText(sb.toString());
 	}	
 	
 	/**
@@ -200,6 +205,15 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private void mergeSegments (TextContainer container) {
 		if ( !container.isSegmented() ) return;
 		StringBuilder text = new StringBuilder(container.getCodedText());
+		char start = STARTSEG;
+		char end = ENDSEG;
+		if ( params.type == Parameters.TYPE_KEEPINLINE ) {
+			// Use temporary marks if we need to remove the text after
+			// This way '[' and ']' is real text get removed too
+			start = TMPSTARTSEG;
+			end = TMPENDSEG;
+		}
+		// Insert the segment marks
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case TextContainer.MARKER_OPENING:
@@ -208,9 +222,9 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 				i++; // Skip
 				break;
 			case TextContainer.MARKER_SEGMENT:
-				text.insert(i, '[');
+				text.insert(i, start);
 				i += 3; // The bracket, the marker, the code index
-				text.insert(i, ']');
+				text.insert(i, end);
 				// Next i++ will skip over the closing bracket
 				break;
 			}

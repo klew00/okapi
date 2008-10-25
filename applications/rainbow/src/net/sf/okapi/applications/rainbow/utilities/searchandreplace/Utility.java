@@ -260,7 +260,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
 		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent());
+			tu.setTargetContent(tu.getSourceContent().clone());
 		}
 
 		try {
@@ -284,7 +284,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 	        }			
 			
 			TextContainer cnt = tu.getTargetContent(); 
-			cnt.setCodedText(result, tu.getSourceContent().getCodes(), false);
+			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);

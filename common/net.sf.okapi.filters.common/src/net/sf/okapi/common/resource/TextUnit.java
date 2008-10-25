@@ -259,13 +259,13 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	}
 	
 	/**
-	 * Indicates if the text unit has a (first) target.
+	 * Indicates if the text unit has a (first) target (even if it is empty)
 	 * @return True if the unit has a (first) target, false otherwise.
 	 */
 	public boolean hasTarget () {
 		if (( targets.get(0) == null )
 			|| ( !(targets.get(0).container != null) )) return false;
-		return !targets.get(0).container.isEmpty();
+		return true; // Can be empty
 	}
 
 	/**

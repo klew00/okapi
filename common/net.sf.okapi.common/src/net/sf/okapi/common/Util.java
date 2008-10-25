@@ -492,13 +492,14 @@ public class Util {
 				return;
 			}
 			
+			/* It seems writers add the BOM for UTF other than UTF-8 as they should.
 			if ( tmp.equals("utf-16be")
 				|| tmp.equals("utf-16le")
 				|| tmp.equals("utf-16") )
 			{
 				writer.write("\ufeff");
 				return;
-			}
+			}*/
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

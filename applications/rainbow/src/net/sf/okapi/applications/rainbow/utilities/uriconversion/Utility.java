@@ -185,7 +185,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
 		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent());
+			tu.setTargetContent(tu.getSourceContent().clone());
 		}
 
 		try {
