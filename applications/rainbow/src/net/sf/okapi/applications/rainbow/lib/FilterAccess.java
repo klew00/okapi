@@ -31,6 +31,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.filters.IParser;
@@ -268,6 +270,68 @@ public class FilterAccess {
 		return result;
 	}
 
+	public Object[] loadFilter2 (String filterID,
+		String paramPath,
+		IFilter previousInputFilter,
+		IFilterWriter previousOutputFilter)
+	{
+		Object result[] = new Object[2];
+		result[0] = previousInputFilter;
+		result[1] = previousOutputFilter;
+		try {
+			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
+			// we remove the NNN. part. That part is reserved for multi-file storage info
+			if ( Character.isDigit(filterID.charAt(0)) ) {
+				int n = filterID.indexOf('.');
+				if ( n != -1 ) filterID = filterID.substring(n+1);
+			}
+
+			// Map the ID to the class, and instantiate the filter
+			if ( !m_htFilters.containsKey(filterID) )
+				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID)); 
+
+			// Load if not already done
+			boolean bLoad = true;
+			if ( previousInputFilter != null ) {
+				String s = previousInputFilter.getClass().getName();
+				bLoad = !s.equals(m_htFilters.get(filterID).inputFilterClass);
+			}
+			if ( bLoad ) {
+				result[0] = (IFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
+			}
+
+			bLoad = true;
+			if ( previousOutputFilter != null ) {
+				String s = previousOutputFilter.getClass().getName();
+				bLoad = !s.equals(m_htFilters.get(filterID).outputFilterClass);
+			}
+			if ( bLoad ) {
+				result[1] = (IFilterWriter)Class.forName(m_htFilters.get(filterID).outputFilterClass).newInstance();
+			}
+
+			// Load the parameters
+			IParameters params = ((IInputFilter)result[0]).getParameters();
+			if ( params != null ) { // Not all filters have parameters
+				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
+					params.load(paramPath, false);
+				}
+				else {
+					params.reset();
+				}
+			}
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+	
 	public IParser loadParser (String filterID,
 		String paramPath)
 	{
@@ -307,7 +371,16 @@ public class FilterAccess {
 		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
 		return loadFilter(aRes[1], aRes[3], previousInputFilter, previousOutputFilter);
 	}
-	
+		
+	public Object[] loadFilterFromFilterSettingsType1 (String projectParamsFolder,
+		String filterSettings,
+		IFilter previousInputFilter,
+		IFilterWriter previousOutputFilter)
+	{
+		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
+		return loadFilter2(aRes[1], aRes[3], previousInputFilter, previousOutputFilter);
+	}
+		
 	public IParametersEditor loadEditor (String filterID) {
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)

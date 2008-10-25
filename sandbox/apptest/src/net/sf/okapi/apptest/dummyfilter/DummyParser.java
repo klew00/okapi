@@ -13,7 +13,9 @@ import net.sf.okapi.apptest.resource.Document2;
 import net.sf.okapi.apptest.resource.Group2;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.SubDocument;
+import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
+import net.sf.okapi.apptest.resource.TextFragment.TagType;
 
 public class DummyParser implements IParser {
 
@@ -74,7 +76,6 @@ public class DummyParser implements IParser {
 		docRes.setLanguage(language);
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 		
-		
 		SubDocument subDocRes = new SubDocument(docRes.getID());
 		subDocRes.setID("sd1");
 		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
@@ -85,8 +86,19 @@ public class DummyParser implements IParser {
 			new SkeletonUnit("s1", "<t id='t1'>")));
 
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t1", "Text 1")));
-		
+				new TextUnit("t1", "Text 1")));
+
+		TextUnit tu = new TextUnit();
+		tu.setID("t1bis");
+		TextContainer tc = new TextContainer(tu);
+		tc.append("Text before ");
+		tc.append(TagType.OPENING, "bold", "<b>");
+		tc.append("bolded text");
+		tc.append(TagType.CLOSING, "bold", "</b>");
+		tc.append(" and after.");
+		tu.setSourceContent(tc);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+			
 		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
 			new SkeletonUnit("s2", "</t>")));
 

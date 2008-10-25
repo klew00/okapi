@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.segmentation;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

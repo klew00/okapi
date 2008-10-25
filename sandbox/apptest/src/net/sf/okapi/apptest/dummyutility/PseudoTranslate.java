@@ -31,7 +31,7 @@ public class PseudoTranslate implements IUtility {
 	
 	private void processTU (TextUnit tu) {
 		tu.getSourceContent().setCodedText(
-			tu.getSourceContent().getCodedText().replace("e", "X"));
+			tu.getSourceContent().getCodedText().replace("e", "Z"));
 	}
 
 	public void doEpilog () {

@@ -59,8 +59,6 @@ public class InlineCodeFinderPanel extends Composite {
 	private boolean          wasNew;
 	private TextContainer    textCont;
 	private GenericContent   genericCont;
-	private boolean          skipTestUpdate = false;
-	
 
 	public InlineCodeFinderPanel (Composite parent,
 		int flags)

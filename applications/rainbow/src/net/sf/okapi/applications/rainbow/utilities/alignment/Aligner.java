@@ -60,51 +60,52 @@ import org.eclipse.swt.widgets.Text;
 
 public class Aligner {
 	
-	private Shell            shell;
-	private int              result = 0;
-	private ClosePanel       pnlActions;
-	private List             srcList;
-	private List             trgList;
-	private Text             edDocument;
-	private Text             edName;
-	private Text             edCause;
-	private Button           btMoveUp; 
-	private Button           btMoveDown; 
-	private Button           btMerge; 
-	private Button           btSplit;
-	private Button           btAccept; 
-	private Button           btSkip;
-	private Button           btEditRules;
-	private Button           btEditSeg;
-	private Button           btOptions;
-	private Button           btAutoCorrect;
-	private List             lbIssues;
-	private Text             edSource;
-	private Text             edTarget;
-	private Text             edSrcSeg;
-	private Text             edTrgSeg;
-	private Font             textFont;
-	private Text             edCounter;
-	private Button           chkShowInlineCodes;
-	private Button           chkSyncScrolling;
-	private Button           chkCheckSingleSegUnit;
-	private Button           chkUseAutoCorrection;
-	private TextContainer    source;
-	private TextContainer    target;
-	private boolean          splitMode = false;
-	private boolean          editMode = false;
-	private int              indexActiveSegment;
-	private GenericContent   genericCont;
-	private String           targetSrxPath;
-	private Color            colorGreen;
-	private Color            colorAmber;
-	private Color            colorRed;
-	private boolean          canAcceptUnit;
-	private int              issueType;
-	private boolean          warnOnClosing;
-	private Pattern               anchors;
-	private ArrayList<String>     anchorList = new ArrayList<String>(); 
-
+	private Shell shell;
+	private int result = 0;
+	private ClosePanel pnlActions;
+	private List srcList;
+	private List trgList;
+	private Text edDocument;
+	private Text edName;
+	private Text edCause;
+	private Button btMoveUp; 
+	private Button btMoveDown; 
+	private Button btMerge; 
+	private Button btSplit;
+	private Button btAccept; 
+	private Button btSkip;
+	private Button btEditRules;
+	private Button btEditSeg;
+	private Button btOptions;
+	private Button btAutoCorrect;
+	private List lbIssues;
+	private Text edSource;
+	private Text edTarget;
+	private Text edSrcSeg;
+	private Text edTrgSeg;
+	private Font textFont;
+	private Text edCounter;
+	private Button chkShowInlineCodes;
+	private Button chkSyncScrolling;
+	private Button chkCheckSingleSegUnit;
+	private Button chkUseAutoCorrection;
+	private TextContainer source;
+	private TextContainer target;
+	private boolean splitMode = false;
+	private boolean editMode = false;
+	private int indexActiveSegment;
+	private GenericContent genericCont;
+	private String targetSrxPath;
+	private Color colorGreen;
+	private Color colorAmber;
+	private Color colorRed;
+	private boolean canAcceptUnit;
+	private int issueType;
+	private boolean warnOnClosing;
+	private Pattern anchors;
+	private ArrayList<String> anchorList = new ArrayList<String>();
+	private boolean trimCodes = false;//TODO: take from SRX rules
+	private boolean trimWS = true;//TODO: take from SRX rules
 
 	@Override
 	protected void finalize () {
@@ -623,10 +624,15 @@ public class Aligner {
 		int len = target.getSegments().get(segIndex).getCodedText().length();
 		//TODO: case for if (( start == 0 ) && ( end == len ))
 
-		// Merge the segment to re-split
+		// Merge the segment to re-split into the main content
+		// All the other segments are still place-holders there
 		int pos = target.mergeSegment(segIndex);
 		// Now pos value is the position 0 of the segment character indices
 		if ( pos == -1 ) return; // Segment index not found
+		
+		if ( trimCodes || trimWS ) {
+			
+		}
 		
 		// Create the new segment(s)
 		if ( start == 0 ) {

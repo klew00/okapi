@@ -96,16 +96,14 @@ public class Editor implements IParametersEditor {
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-		cmpTmp0.setLayout(new GridLayout(4, false));
+		cmpTmp0.setLayout(new GridLayout(2, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp0);		
-		
-		
 	
 		chkUnescape = new Button (cmpTmp0, SWT.RADIO);
 		chkUnescape.setText ("Un-escape the URI escape sequence");
-		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
+		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkUnescape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(chkUnescape.getSelection()){
@@ -119,7 +117,7 @@ public class Editor implements IParametersEditor {
 	
 		chkEscape = new Button (cmpTmp0, SWT.RADIO);
 		chkEscape.setText ("Escape content to URI escape sequence");
-		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
+		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkEscape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(chkEscape.getSelection()){
@@ -131,21 +129,17 @@ public class Editor implements IParametersEditor {
 			}
 		});		
 		
-
-		Label lblEmpty = new Label (cmpTmp0,SWT.LEFT);
-		lblEmpty.setText ("    ");
-		lblEmpty.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		
 		Label lblList = new Label (cmpTmp0,SWT.LEFT);
 		lblList.setText ("List of the characters to escape:");
-		lblList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+		GridData gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+		int indent = 16;
+		gdTmp.horizontalIndent = indent;
+		lblList.setLayoutData(gdTmp);
 
-		lblEmpty = new Label (cmpTmp0,SWT.LEFT);
-		lblEmpty.setText ("    ");
-		lblEmpty.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		
 		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		gdTmp = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+		gdTmp.horizontalIndent = indent;
+		table.setLayoutData(gdTmp);
 
 		//--click updates button states--
 		table.addListener (SWT.Selection, new Listener () {
@@ -156,28 +150,21 @@ public class Editor implements IParametersEditor {
 			}
 		});		
 		
-		lblEmpty = new Label (cmpTmp0,SWT.LEFT);
-		lblEmpty.setText ("    ");
-		lblEmpty.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		
 		chkUpdateAll = new Button(cmpTmp0, SWT.CHECK);
 		chkUpdateAll.setText("Escape all extended characters");
-		chkUpdateAll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
-		chkUpdateAll.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
+		gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+		gdTmp.horizontalIndent = indent;
+		chkUpdateAll.setLayoutData(gdTmp);
 
-		lblEmpty = new Label (cmpTmp0,SWT.LEFT);
-		lblEmpty.setText ("    ");
-		lblEmpty.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		
+		int buttonWidth = 170;
 		btnFirstOption = new Button(cmpTmp0, SWT.PUSH);
-		btnFirstOption.setText("All but URI-marks");
-		btnFirstOption.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		btnFirstOption.setText("All But URI-Marks");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		gdTmp.widthHint = buttonWidth;
+		btnFirstOption.setLayoutData(gdTmp);
 		btnFirstOption.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-
 				String selectList = " `@#$^&+={}|[]\\:\";<>,?/";
 				for ( int i=0; i<table.getItemCount(); i++ ) {
 					TableItem ti = table.getItem(i);
@@ -191,11 +178,12 @@ public class Editor implements IParametersEditor {
 		});		
 
 		btnSecondOption = new Button(cmpTmp0, SWT.PUSH);
-		btnSecondOption.setText("All but marks and reserved");
-		btnSecondOption.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		btnSecondOption.setText("All But Marks And Reserved");
+		gdTmp = new GridData();
+		gdTmp.widthHint = buttonWidth;
+		btnSecondOption.setLayoutData(gdTmp);
 		btnSecondOption.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-
 				String selectList = " `#^{}|[]\\\"<>";
 				for ( int i=0; i<table.getItemCount(); i++ ) {
 					TableItem ti = table.getItem(i);

@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters.openoffice;
 
 import java.io.BufferedInputStream;
@@ -24,7 +44,7 @@ public class Filter implements IFilter {
 	private InputStream input;
 	private Parser parser;
 	private ZipFile zipFile;
-	private StateType nextAction = StateType.OPENZIP;
+	private StateType nextAction = StateType.DONE;
 	private String inputPath;
 	private Enumeration<? extends ZipEntry> entries;
 	private FilterEvent event;
@@ -60,8 +80,7 @@ public class Filter implements IFilter {
 	}
 
 	public IResource getResource () {
-		//TODO: fix type
-		return (IResource)parser.getResource();
+		return parser.getResource();
 	}
 
 	public boolean hasNext () {
@@ -69,7 +88,7 @@ public class Filter implements IFilter {
 	}
 
 	//TODO: need to change to event when interface changes
-	public Enum<?> next () {
+	public FilterEvent next () {
 		try {
 			switch ( nextAction ) {
 			case OPENZIP:
@@ -89,6 +108,7 @@ public class Filter implements IFilter {
 
 	public void open (String inputPath) {
 		this.inputPath = inputPath;
+		nextAction = StateType.OPENZIP;
 	}
 
 	public void open (CharSequence inputText) {
@@ -106,15 +126,15 @@ public class Filter implements IFilter {
 		parser.resource.params = (Parameters)params;
 	}
 
-	private Enum<?> openZipFile () throws IOException {
+	private FilterEvent openZipFile () throws IOException {
 		zipFile = new ZipFile(inputPath);
 		entries = zipFile.entries();
 		event = new FilterEvent(FilterEventType.START_DOCUMENT, parser.resource);
 		nextAction = StateType.NEXTINZIP;
-		return event.getEventType();
+		return event;
 	}
 
-	private Enum<?> nextInZipFile () throws IOException {
+	private FilterEvent nextInZipFile () throws IOException {
 		// Find the relevant zip entries and process them
 		ZipEntry entry;
 		while( entries.hasMoreElements() ) {
@@ -132,10 +152,10 @@ public class Filter implements IFilter {
 		close();
 		event = new FilterEvent(FilterEventType.END_DOCUMENT, parser.resource);
 		nextAction = StateType.DONE;
-		return event.getEventType();
+		return event;
 	}
 
-	private Enum<?> openSubDocument (ZipEntry zipEntry) throws IOException {
+	private FilterEvent openSubDocument (ZipEntry zipEntry) throws IOException {
 		// Start of the sub-document
 		// Get the input stream
 		input = new BufferedInputStream(zipFile.getInputStream(zipEntry));
@@ -146,25 +166,25 @@ public class Filter implements IFilter {
 		subDocResource.setType(zipEntry.getName());
 		event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocResource);
 		nextAction = StateType.NEXTINSUBDOC;
-		return event.getEventType();
+		return event;
 	}
 	
-	private Enum<?> nextInSubDocument () throws IOException {
+	private FilterEvent nextInSubDocument () throws IOException {
 		ParserTokenType tok;
 		do {
 			switch ( (tok = parser.parseNext()) ) {
 			case TRANSUNIT:
 				event = new FilterEvent(FilterEventType.TEXT_UNIT, parser.getResource());
-				return event.getEventType();
+				return event;
 			case SKELETON:
 				event = new FilterEvent(FilterEventType.SKELETON_UNIT, parser.getResource());
-				return event.getEventType();
+				return event;
 			case STARTGROUP:
 				event = new FilterEvent(FilterEventType.START_GROUP, parser.getResource());
-				return event.getEventType();
+				return event;
 			case ENDGROUP:
 				event = new FilterEvent(FilterEventType.END_GROUP, parser.getResource());
-				return event.getEventType();
+				return event;
 			default:
 				assert(false); // Catch problem
 			}
@@ -176,7 +196,7 @@ public class Filter implements IFilter {
 		// input.close(); Not needed as the reader is set to do it automatically
 		event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocResource);
 		nextAction = StateType.NEXTINZIP;
-		return event.getEventType();
+		return event;
 	}
 
 }

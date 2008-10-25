@@ -17,7 +17,7 @@ public interface IFilter {
 
 	public boolean hasNext();
 
-	public Enum<?> next();
+	public FilterEvent next();
 
 	public IResource getResource();
 
