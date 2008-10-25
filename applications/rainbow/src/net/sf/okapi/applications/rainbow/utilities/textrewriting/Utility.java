@@ -180,6 +180,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 					i++;
 					sb.append(result.charAt(i));
 					break;
+				case '[':
+				case ']':
+					sb.append(result.charAt(i));
+					break;					
 				default:
 					break;
 			}
