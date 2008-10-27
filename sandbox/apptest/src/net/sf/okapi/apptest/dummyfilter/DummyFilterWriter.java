@@ -57,13 +57,17 @@ public class DummyFilterWriter implements IFilterWriter {
 			break;
 		case SKELETON_UNIT:
 			System.out.print("DummyFilterWriter: skeleton-unit: [");
-			System.out.println(((SkeletonUnit)event.getResource()).toString()+"]");
+			System.out.println(out(((SkeletonUnit)event.getResource()).toString())+"]");
 			break;
 		case TEXT_UNIT:
 			System.out.print("DummyFilterWriter: text-unit: [");
-			System.out.println(((TextUnit)event.getResource()).toString()+"]");
+			System.out.println(out(((TextUnit)event.getResource()).toString())+"]");
 			break;
 		}
+	}
+	
+	private String out (String text) {
+		return text.replace("\n", "\\n");
 	}
 
 	public void setOptions(String language,

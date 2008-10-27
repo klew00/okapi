@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 /**
  * This class implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -62,8 +61,8 @@ public class TextFragment implements Comparable<Object> {
 	public static final int MARKER_SEGMENT  = 0xE104;
 	public static final int CHARBASE        = 0xE110;
 
-	public static final String SFMARKER_START    = "{@#$";
-	public static final String SFMARKER_END      = "}";
+	public static final String REFMARKER_START = "{@#$";
+	public static final String REFMARKER_END   = "}";
 
 	/**
 	 * List of the types of tag usable for in-line codes.
@@ -81,7 +80,6 @@ public class TextFragment implements Comparable<Object> {
 	protected String              id;
 	protected int                 lastCodeID;
 	protected TextUnit            parent;
-	
 
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -101,6 +99,23 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public static int toIndex (char index) {
 		return ((int)index)-CHARBASE;
+	}
+	
+	public static String makeRefMarker (String id) {
+		return REFMARKER_START+id+REFMARKER_END;
+	}
+	
+	public static Object[] getRefMarker (StringBuilder text) {
+		int start = text.indexOf(REFMARKER_START);
+		if ( start == -1 ) return null; // No marker
+		int end = text.indexOf(REFMARKER_END, start);
+		if ( end == -1 ) return null; // No ending found, we assume it's not a marker
+		String id = text.substring(start+REFMARKER_START.length(), end);
+		Object[] result = new Object[3];
+		result[0] = id;
+		result[1] = start;
+		result[2] = end+REFMARKER_END.length();
+		return result;
 	}
 	
 	/**
@@ -285,6 +300,14 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public void setID (String value) {
 		id = value;
+	}
+
+	public boolean hasReference () {
+		if ( codes == null ) return false;
+		for ( Code code : codes ) {
+			if ( code.hasReference ) return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -737,19 +760,16 @@ public class TextFragment implements Comparable<Object> {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[%d:%s]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			case MARKER_CLOSING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[/%d:%s]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			case MARKER_ISOLATED:
 			case MARKER_SEGMENT:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[%d:%s/]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -759,6 +779,35 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 
+	public String toString (BuilderData builderData)
+	{
+		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
+		if ( !isBalanced ) balanceMarkers();
+		StringBuilder tmp = new StringBuilder();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+				code = codes.get(toIndex(text.charAt(++i)));
+				tmp.append(expandCodeContent(code, builderData));
+				break;
+			case MARKER_CLOSING:
+				code = codes.get(toIndex(text.charAt(++i)));
+				tmp.append(expandCodeContent(code, builderData));
+				break;
+			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
+				code = codes.get(toIndex(text.charAt(++i)));
+				tmp.append(expandCodeContent(code, builderData));
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+	
 	/**
 	 * Gets the parent of the fragment.
 	 * @return the parent of the fragment or null if none is assigned.
@@ -883,8 +932,10 @@ public class TextFragment implements Comparable<Object> {
 	 * @param code The code to process.
 	 * @return The data for the code, including any sub-flows data.
 	 */
-	private String expandCodeContent (Code code) {
-		if ( !code.hasSubflow ) return code.data;
+	private String expandCodeContent (Code code,
+		BuilderData builderData)
+	{
+		if ( !code.hasReference ) return code.data;
 		if ( parent == null ) {
 			return code.data;
 			//TODO: log a warning
@@ -895,20 +946,61 @@ public class TextFragment implements Comparable<Object> {
 		}
 		// Else: look for place-holders
 		StringBuilder tmp = new StringBuilder(code.data);
-		int start;
-		int pos = 0;
-		while ( (start = tmp.indexOf(SFMARKER_START, pos)) > -1 ) {
-			int end = tmp.indexOf(SFMARKER_END, start);
-			if ( end != -1 ) {
-				String id = tmp.substring(start+SFMARKER_START.length(), end);
-				ITranslatable res = parent.getChild(id);
-				if ( res == null ) {
-					tmp.replace(start, end+1, "-Subflow not found-");
-				}
-				else tmp.replace(start, end+1, res.toString());
-				pos = end;
+		Object[] marker = null;
+		while ( (marker = getRefMarker(tmp)) != null ) {
+			int start = (Integer)marker[1];
+			int end = (Integer)marker[2];
+			if ( builderData.references == null ) {
+				tmp.replace(start, end, "-ERR:NO-REF-LIST-");
 			}
-			else pos = start;
+			else {
+				boolean found = false;
+				for ( IReferenceable ref : builderData.references ) {
+					if ( ref.getID().equals((String)marker[0]) ) {
+						TextContainer tc;
+						if ( ref instanceof TextUnit ) {
+							if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
+							else tc = ((TextUnit)ref).getSourceContent();
+							tmp.replace(start, end, tc.toString(builderData));
+						}
+						else if ( ref instanceof SkeletonUnit ) {
+							tmp.replace(start, end, ref.toString());
+						}
+						else if ( ref instanceof Group ) {
+							tmp.replace(start, end, mergeGroup((Group)ref, builderData));
+						}
+						found = true;
+						break;
+					}
+				}
+				if ( !found ) {
+					tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
+					//Need to move on too! add start pos or this will loop forever
+				}
+			}
+		}
+		return tmp.toString();
+	}
+	
+	private String mergeGroup (Group group,
+		BuilderData builderData)
+	{
+		StringBuilder tmp = new StringBuilder();
+		for ( IReferenceable ref : group ) {
+			if ( ref instanceof TextUnit ) {
+				if ( ref.isReference() )continue; // Skip entries that are references
+				TextContainer tc;
+				if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
+				else  tc = ((TextUnit)ref).getSourceContent();
+				tmp.append(tc.toString(builderData));
+			}
+			else if ( ref instanceof SkeletonUnit ) {
+				tmp.append(ref.toString());
+			}
+			else if ( ref instanceof Group ) {
+				// Call recursively
+				tmp.append(mergeGroup((Group)ref, builderData));
+			}
 		}
 		return tmp.toString();
 	}

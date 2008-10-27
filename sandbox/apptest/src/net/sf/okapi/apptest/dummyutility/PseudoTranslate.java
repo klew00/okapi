@@ -14,13 +14,7 @@ public class PseudoTranslate implements IUtility {
 	{
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
-			TextUnit tu1 = (TextUnit)event.getResource();
-			processTU(tu1);
-			if ( tu1.hasChild() ) {
-				for ( TextUnit tu : tu1.childTextUnitIterator() ) {
-					processTU(tu);
-				}
-			}
+			processTU((TextUnit)event.getResource());
 			break;
 		case START_DOCUMENT:
 			break;
@@ -30,8 +24,12 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		tu.getSourceContent().setCodedText(
-			tu.getSourceContent().getCodedText().replace("e", "Z"));
+		if ( !tu.isTranslatable() ) return;
+		if ( !tu.hasTarget() ) {
+			tu.setTargetContent(tu.getSourceContent().clone());
+		}
+		tu.getTargetContent().setCodedText(
+			tu.getTargetContent().getCodedText().replace("e", "Z"));
 	}
 
 	public void doEpilog () {

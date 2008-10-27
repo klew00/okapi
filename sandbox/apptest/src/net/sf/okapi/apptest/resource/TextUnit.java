@@ -22,38 +22,29 @@ package net.sf.okapi.apptest.resource;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.IResource;
+
 /**
  * This class implements the methods to manipulate a unit of extracted text.
- * 
  * <p>The TextUnit object includes a source content ({@link #getSourceContent()})
  * and one or more target content ({@link #getTargets()}). You can access
  * the first target with {@link #getTarget()}.
- * 
- * <p>A TextUnit may have children TextUnit objects. You can add child TextUnit
- * child (or {@link Group}) with the {@link #addChild(ITranslatable)} method.
- * You can retrieve these children with the {@link #getChild(String)} method or the 
- * iteratable returned by {@link #childTextUnitIterator()}.
  */
-public class TextUnit implements ITranslatable, IAnnotatable {
+public class TextUnit extends BaseResource implements IReferenceable {
 
-	protected String                        id;
 	protected String                        name;
 	protected String                        type;
 	protected boolean                       isTranslatable;
 	protected boolean                       preserveWS;
-	protected SkeletonUnit                  sklBefore;
-	protected SkeletonUnit                  sklAfter;
-	protected ArrayList<IContainable>       children;
-	protected ITranslatable                 parent;
+	protected IResource                     parent;
 	protected LocaleData                    source;
 	protected ArrayList<LocaleData>         targets;
 	protected Hashtable<String, String>     propList;
 	protected Hashtable<String, IExtension> extList;
-	private ArrayList<TextUnit>             allUnits;
+	protected boolean isReference = false;
 
 	/**
 	 * Creates a TextUnit object with an empty source content and no target content.
@@ -73,8 +64,30 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	public TextUnit (String id,
 		String sourceText)
 	{
+		create(id, sourceText, false);
+	}
+
+	/**
+	 * Creates a TextUnit object with given ID and source text, and a flag to indicate if
+	 * it is a reference or not.
+	 * @param id the ID to use.
+	 * @param sourceText The source text to use.
+	 * @param isReference Indicates if this text unit is a reference or not.
+	 */
+	public TextUnit (String id,
+		String sourceText,
+		boolean isReference)
+	{
+		create(id, sourceText, isReference);
+	}
+	
+	private void create (String id,
+		String sourceText,
+		boolean isReference)
+	{
 		isTranslatable = true;
 		this.id = id;
+		this.isReference = isReference;
 		source = new LocaleData(this);
 		source.container = new TextContainer(this);
 		if ( sourceText != null ) source.container.append(sourceText);
@@ -92,15 +105,19 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		return source.container.toString();
 	}
 	
-	public String getID () {
-		if ( id == null ) return "";
-		return id;
+	public void setIsReference (boolean value) {
+		isReference = value;
 	}
-
-	public void setID (String value) {
-		id = value;
+	
+	public boolean isReference () {
+		return isReference;
 	}
-
+	
+	public boolean hasReference () {
+		// If source has references, target does too
+		return source.container.hasReference();
+	}
+	
 	/**
 	 * Indicates if the source content of this resource is empty.
 	 * @return True if the source content is empty, false otherwise.
@@ -161,7 +178,7 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		return extList;
 	}
 
-	public boolean preserveWhitespaces() {
+	public boolean preserveWhitespaces () {
 		return preserveWS;
 	}
 
@@ -177,11 +194,11 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 		isTranslatable = value;
 	}
 
-	public ITranslatable getParent () {
+	public IResource getParent () {
 		return parent;
 	}
 
-	public void setParent (ITranslatable value) {
+	public void setParent (IResource value) {
 		parent = value;
 	}
 
@@ -315,173 +332,6 @@ public class TextUnit implements ITranslatable, IAnnotatable {
 	//For now the only way to access all targets
 	public List<LocaleData> getTargets () {
 		return targets;
-	}
-	
-	/**
-	 * Adds a child resource to the resource.
-	 * @param child The child resource to add.
-	 */
-	public void addChild (IContainable child) {
-		if ( children == null ) {
-			children = new ArrayList<IContainable>();
-		}
-		child.setParent(this);
-		children.add(child);
-	}
-
-	public boolean hasChild () {
-		if ( children == null ) return false;
-		else return !children.isEmpty();
-	}
-
-	/**
-	 * Gets the list of all the children of the resource.
-	 * @return The list of all the children of the resource.
-	 */
-	public List<IContainable> getChildren () {
-		if ( children == null ) {
-			children = new ArrayList<IContainable>();
-		}
-		return children;
-	}
-
-	/**
-	 * Stores recursively all TextUnit items in the children for the given object.
-	 * Only TextUnit objects are stored, Group and SkeletonUnit objects are not.
-	 * @param parent The parent object.
-	 */
-	private void storeTextUnits (ITranslatable parent) {
-		// Check if it's a TextUnit
-		if ( parent instanceof TextUnit ) {
-			allUnits.add((TextUnit)parent);
-			if ( parent.hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
-					storeTextUnits((ITranslatable)item);
-				}
-			}
-			return;
-		}
-		// Else: it is a Group
-		if ( parent.hasChild() ) {
-			for ( IContainable item : (Group)parent ) {
-				if ( item instanceof ITranslatable ) { 
-					storeTextUnits((ITranslatable)item);
-				}
-			}
-		}
-	}
-
-	private void storeUnits (ArrayList<IContainable> list,
-		IContainable unit)
-	{
-		// Check if it's a TextUnit
-		if ( unit instanceof TextUnit ) {
-			list.add(unit);
-			if ( ((TextUnit)unit).hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
-					storeUnits(list, item);
-				}
-			}
-			return;
-		}
-		else if ( unit instanceof SkeletonUnit ) {
-			list.add(unit);
-			return;
-		}
-		// Else: it is a Group
-		if ( parent.hasChild() ) {
-			for ( IContainable item : (Group)unit ) {
-				if ( item instanceof ITranslatable ) { 
-					storeUnits(list, item);
-				}
-			}
-		}
-	}
-	
-	
-	/**
-	 * Gets the child object with a given ID.
-	 * @param id The ID value of the child to return.
-	 * @return The child object for the given ID, or null if it has not
-	 * been found.
-	 */
-	public ITranslatable getChild (String id) {
-		if ( id == null ) return null;
-		if ( !hasChild() ) return null;
-		//TODO: Fix this so it cannot match the initial parent...
-		return findChild(this, id);
-	}
-	
-	/**
-	 * Creates an iteratable list of all children TextUnit objects for this
-	 * TextUnit.
-	 * @return An iteratable list of all the children TextUnit objects.
-	 */
-	public Iterable<TextUnit> childTextUnitIterator () {
-		// Rebuild the list each time
-		allUnits = new ArrayList<TextUnit>();
-		if ( hasChild() ) {
-			// Children only
-			for ( int i=0; i<children.size(); i++ ) {
-				// Skip over skeleton units
-				if ( getChildren().get(i) instanceof SkeletonUnit ) continue;
-				storeTextUnits((ITranslatable)getChildren().get(i));
-			}
-		}
-		return Collections.unmodifiableList(allUnits);
-	}
-
-	/**
-	 * Creates an iteratable flattened list of all children TextUnit and SkeletonUnit
-	 * objects for this TextUnit.
-	 * @return An iteratable flattened list of all children TextUnit and SkeletonUnit
-	 * objects.
-	 */
-	public Iterable<IContainable> childUnitIterator () {
-		ArrayList<IContainable> unitList = new ArrayList<IContainable>();
-		if ( hasChild() ) {
-			// Children only
-			for ( int i=0; i<children.size(); i++ ) {
-				storeUnits(unitList, getChildren().get(i));
-			}
-		}
-		return Collections.unmodifiableList(unitList);
-	}
-	
-	
-	/**
-	 * Finds the child of this text unit that corresponds to the given ID.
-	 * Only children that implement ITranslatable are searched.
-	 * @param parent The parent of the child to search for.
-	 * @param id The ID to search for.
-	 * @return The found child, or null if it not been found.
-	 */
-	private ITranslatable findChild (ITranslatable parent,
-		String id)
-	{
-		if ( parent instanceof TextUnit ) {
-			if ( parent.hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).children ) {
-					if ( id.equals(item.getID()) ) {
-						return (ITranslatable)item;
-					}
-					ITranslatable res = findChild((ITranslatable)item, id);
-					if ( res != null ) return res;
-				}
-			}
-			else if ( id.equals(parent.getID()) ) {
-				return parent;
-			}
-		}
-		else if ( parent instanceof Group ) {
-			for ( IContainable item : (Group)parent ) {
-				if ( item instanceof ITranslatable ) { 
-					ITranslatable res = findChild((ITranslatable)item, id);
-					if ( res != null ) return res;
-				}
-			}
-		}
-		return null;
 	}
 	
 }

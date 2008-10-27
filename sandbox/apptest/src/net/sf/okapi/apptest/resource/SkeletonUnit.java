@@ -20,15 +20,17 @@
 
 package net.sf.okapi.apptest.resource;
 
-public class SkeletonUnit implements IContainable {
+import net.sf.okapi.apptest.common.IResource;
+
+public class SkeletonUnit extends BaseResource implements IReferenceable {
 
 	public static String     MAINTEXT = "$mainText$";
 	private StringBuilder    data;
-	protected String         id;
 	private long             offset;
 	private int              length;
-	protected ITranslatable  parent;
-
+	protected IResource      parent;
+	private boolean          hasReference = false;
+	private boolean          isReference = false;
 
 	/**
 	 * Creates an empty SkeletonUnit object.
@@ -52,7 +54,7 @@ public class SkeletonUnit implements IContainable {
 	/**
 	 * Creates a SkeletonUnit with ID and offset information.
 	 * @param id The ID to use.
-	 * @param offset The offest value to use.
+	 * @param offset The offset value to use.
 	 * @param length The length value to use.
 	 */
 	public SkeletonUnit (String id,
@@ -71,19 +73,27 @@ public class SkeletonUnit implements IContainable {
 		else return data.toString();
 	}
 	
-	public String getID () {
-		return id;
-	}
-
 	public boolean isEmpty () {
 		if (  offset != -1 ) return (length==0);
 		return (( data == null ) || ( data.length() == 0 ));
 	}
 
-	public void setID (String value) {
-		id = value;
+	public void setHasReference (boolean value) {
+		hasReference = value;
 	}
-
+	
+	public boolean hasReference () {
+		return hasReference;
+	}
+	
+	public void setIsReference (boolean value) {
+		isReference = value;
+	}
+	
+	public boolean isReference () {
+		return isReference;
+	}
+	
 	/**
 	 * Sets the skeleton's data as a string. This method overrides any existing
 	 * data. Use {@link #appendData(String)} or {@link #appendData(StringBuilder)}
@@ -154,11 +164,11 @@ public class SkeletonUnit implements IContainable {
 		this.length += length;
 	}
 
-	public ITranslatable getParent () {
+	public IResource getParent () {
 		return parent;
 	}
 
-	public void setParent (ITranslatable value) {
+	public void setParent (IResource value) {
 		parent = value;
 	}
 

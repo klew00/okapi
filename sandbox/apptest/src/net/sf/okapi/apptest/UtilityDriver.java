@@ -6,6 +6,7 @@ import net.sf.okapi.apptest.dummyfilter.DummyFilter;
 import net.sf.okapi.apptest.dummyfilter.DummyFilterWriter;
 import net.sf.okapi.apptest.dummyutility.PseudoTranslate;
 import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.filters.GenericFilterWriter;
 import net.sf.okapi.apptest.filters.IFilter;
 import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.pipeline.ILinearPipeline;
@@ -33,15 +34,20 @@ public class UtilityDriver {
 		IFilter inFilter = null;
 		IUtility util = null;
 		IFilterWriter outFilter = null;
+		IFilterWriter genWriter = null;
 		try {
 			inFilter = new DummyFilter();
 			util = new PseudoTranslate();
 			outFilter = new DummyFilterWriter();
+			genWriter = new GenericFilterWriter();
 
 			// Set the options 
 			inFilter.setOptions("en", "UTF-8");
 			outFilter.setOptions("en-bz", "UTF-8");
 			outFilter.setOutput("myOutputFile");
+			genWriter.setOptions("en-bz", "UTF-16");
+			genWriter.setOutput("genericOutput.txt");
+			((GenericFilterWriter)genWriter).setOutputTarget(true);
 
 			// Process
 			FilterEvent event;
@@ -50,6 +56,7 @@ public class UtilityDriver {
 				event = inFilter.next();
 				util.handleEvent(event);
 				outFilter.handleEvent(event);
+				genWriter.handleEvent(event);
 			}
 		}
 		catch ( Throwable e ) {
@@ -60,6 +67,7 @@ public class UtilityDriver {
 			if ( util != null ) util.doEpilog();
 			if ( outFilter != null ) outFilter.close();
 			if ( inFilter != null ) inFilter.close();
+			if ( genWriter != null ) genWriter.close();
 		}
 	}
 	
