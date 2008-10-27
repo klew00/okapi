@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
+import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.TextUnit;
 
@@ -28,46 +29,65 @@ public class DummyFilterWriter implements IFilterWriter {
 	}
 
 	public void handleEvent(FilterEvent event) {
+		Group grp;
+		TextUnit tu;
+		SkeletonUnit su;
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			System.out.println("DummyFilterWriter: start-of-document");
-			System.out.println(" -open output: " + outputPath);
-			System.out.println(" -output language = " + language);
-			System.out.println(" -output default encoding = " + defaultEncoding);
+			System.out.println("start-document");
 			break;
 		case END_DOCUMENT:
-			System.out.println("DummyFilterWriter: end-of-document");
+			System.out.println("end-document");
 			close();
 			break;
 		case START_SUBDOCUMENT:
-			System.out.println("DummyFilterWriter: start-of-sub-document");
+			System.out.println("start-sub-document");
 			break;
 		case END_SUBDOCUMENT:
-			System.out.println("DummyFilterWriter: end-of-sub-document");
+			System.out.println("end-sub-document");
 			break;
 		case START_GROUP:
-			System.out.println("DummyFilterWriter: start-of-group");
+			grp = (Group)event.getResource();
+			System.out.println("start-group={");
+			System.out.println("   id="+grp.getID());
+			if ( grp.isReference() ) {
+				System.out.println("   isReference="+grp.isReference());
+			}
+			System.out.println("}");
+			//level++;
 			break;
 		case END_GROUP:
-			System.out.println("DummyFilterWriter: end-of-group");
-			break;
-		case TEXT_GROUP:
-			System.out.print("DummyFilterWriter: text-group: ");
-			System.out.println("TODO");
+			//level--;
+			grp = (Group)event.getResource();
+			System.out.println("end-group={");
+			System.out.println("   id="+grp.getID());
+			System.out.println("}");
 			break;
 		case SKELETON_UNIT:
-			System.out.print("DummyFilterWriter: skeleton-unit: [");
-			System.out.println(out(((SkeletonUnit)event.getResource()).toString())+"]");
+			su = (SkeletonUnit)event.getResource();
+			System.out.println("skeleton-unit={");
+			System.out.println("   id="+su.getID());
+			if ( su.isReference() ) {
+				System.out.println("   isReference="+su.isReference());
+			}
+			System.out.println("   data="+out(su.toString()));
+			System.out.println("}");
 			break;
 		case TEXT_UNIT:
-			System.out.print("DummyFilterWriter: text-unit: [");
-			System.out.println(out(((TextUnit)event.getResource()).toString())+"]");
+			tu = (TextUnit)event.getResource();
+			System.out.println("text-unit={");
+			System.out.println("   id="+tu.getID());
+			if ( tu.isReference() ) {
+				System.out.println("   isReference="+tu.isReference());
+			}
+			System.out.println("   text="+out(tu.toString()));
+			System.out.println("}");
 			break;
 		}
 	}
 	
 	private String out (String text) {
-		return text.replace("\n", "\\n");
+		return "["+text.replace("\n", "\\n")+"]";
 	}
 
 	public void setOptions(String language,
@@ -76,8 +96,8 @@ public class DummyFilterWriter implements IFilterWriter {
 		this.language = language;
 		this.defaultEncoding = defaultEncoding;
 		System.out.println("DummyFilterWriter: setOptions() called");
-		System.out.println(" -output language = " + language);
-		System.out.println(" -output default encoding = " + defaultEncoding);
+		System.out.println(" -output language = " + this.language);
+		System.out.println(" -output default encoding = " + this.defaultEncoding);
 	}
 
 	public void setOutput(String path) {

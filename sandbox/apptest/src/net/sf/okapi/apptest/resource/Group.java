@@ -12,6 +12,26 @@ public class Group extends ArrayList<IReferenceable>
 	protected String name;
 	protected String parentId;
 	
+	public Group (String parentId) {
+		this.parentId = parentId;
+	}
+
+	public Group (String parentId,
+		String id)
+	{
+		this.parentId = parentId;
+		this.id = id;
+	}
+
+	public Group (String parentId,
+		String id,
+		boolean isReference)
+	{
+		this.parentId = parentId;
+		this.id = id;
+		this.isReference = isReference;
+	}
+
 	public String getName () {
 		return name;
 	}
@@ -28,10 +48,6 @@ public class Group extends ArrayList<IReferenceable>
 		this.parentId = parentId;
 	}
 	
-	public Group (String parentId) {
-		setParentID(parentId);
-	}
-
 	public boolean isReference () {
 		return isReference;
 	}

@@ -15,7 +15,6 @@ import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.SubDocument;
 import net.sf.okapi.apptest.resource.TextContainer;
-import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
 
@@ -66,6 +65,57 @@ public class DummyParser implements IParser {
 		return list.get(current).getResource();
 	}
 	
+	private void makeCase004 () {
+
+		Group grp1 = new Group(null, "g1");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+				new SkeletonUnit("s1", "<p>")));
+		
+		Group grp2 = new Group(null, "g2", true);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "<ul>")));
+		
+		Group grp3 = new Group(null, "g3", false);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s3", "\n  <li>")));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t1", "Text of item 1")));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s4", "</li>")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp3));
+		
+		Group grp4 = new Group(null, "g4", false);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp4));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s5", "\n  <li>")));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t1", "Text of item 2")));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s6", "</li>")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp4));
+		
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s7", "\n </ul>")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp2));
+
+		TextUnit tu = new TextUnit();
+		tu.setID("t2");
+		TextContainer tc = new TextContainer(tu);
+		tc.append("Text before list: \n ");
+		Code code = tc.append(TagType.PLACEHOLDER, "list", TextContainer.makeRefMarker("g2"));
+		code.setHasReference(true);
+		tc.append("\n and text after the list.");
+		tu.setSourceContent(tc);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s8", "</p>\n")));
+
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
+	}
+	
 	private void resetResources () {
 		canceled = false;
 		current = -1;
@@ -77,72 +127,13 @@ public class DummyParser implements IParser {
 		docRes.setEncoding("UTF-8"); // Always
 		docRes.setLanguage(language);
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
-		
 		SubDocument subDocRes = new SubDocument(docRes.getID());
 		subDocRes.setID("sd1");
 		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s0", "<main>\n")));
 		
-		Group grp = new Group(subDocRes.getID());
-		grp.setID("g1");
-		grp.setIsReference(true);
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp));
+		makeCase004();
 
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s6", "<list>\n")));
-
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s7", "<t id='t2'>")));
-
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t2", "Text 2")));
-		
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s8", "</t>\n")));
-
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s3", "<t id='t1bis'>")));
-		TextUnit tu = new TextUnit();
-		tu.setID("t1bis");
-		TextContainer tc = new TextContainer(tu);
-		tc.append("Text before ");
-		TextUnit tu2 = new TextUnit("talt", "Alt text", true);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
-		Code code = tc.append(TagType.PLACEHOLDER, "image",
-			"<img href='img.png' alt='" + TextFragment.makeRefMarker("talt") + "'/>");
-		code.setHasReference(true);
-		tc.append(" and after.");
-		tu.setSourceContent(tc);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s4", "</t>\n")));
-
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s9", "</list>\n")));
-
-		list.add(new FilterEvent(FilterEventType.END_GROUP, grp));
-
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-				new SkeletonUnit("s5", "<p>")));
-
-		tu = new TextUnit();
-		tu.setID("twithlist");
-		tc = new TextContainer(tu);
-		tc.append("Before list ");
-		code = tc.append(TagType.PLACEHOLDER, "list", TextContainer.makeRefMarker("g1"));
-		code.setHasReference(true);
-		tc.append(" after list");
-		tu.setSourceContent(tc);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-		
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-				new SkeletonUnit("s10", "</p>\n")));
-		
-		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
-			new SkeletonUnit("s11", "</main>")));
 		list.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocRes));
-
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
 	}
 
