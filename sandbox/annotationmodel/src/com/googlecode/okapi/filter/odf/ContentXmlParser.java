@@ -439,9 +439,7 @@ public class ContentXmlParser extends BaseDocumentParser{
 			"  </text:note>\n" +
 			"</text:p>\n";
 					
-		Document doc = new DocumentImpl(new DocumentId("xyz"));
-		ResourceFactory factory = new ResourceFactoryImpl();
-		DocumentManager manager = new DocumentManager(doc, factory);
+		DocumentManager manager = DocumentManager.create("doc-id.xml");
 		ByteArrayInputStream bs = new ByteArrayInputStream(documentString.getBytes());
 		ContentXmlParser parser = new ContentXmlParser(manager,bs);
 		

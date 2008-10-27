@@ -8,8 +8,8 @@ final class ContainerImpl extends DocumentPartImpl implements Container{
 
 	private List<PartId> children;
 	
-	public ContainerImpl(PartId id) {
-		super(id);
+	public ContainerImpl(PartId id, DocumentManager documentManager) {
+		super(id, documentManager);
 	}
 
 	public List<PartId> getParts() {

@@ -157,22 +157,4 @@ public class EventWriter extends AbstractPipelineStep{
 		}
 	}
 	
-	public static void main(String[] args) {
-		String inputFile = "/home/asgeirf/jdev/netbeans-6.5beta/mobility8/sources/netbeans_databindingme-src.zip";
-		Document doc = new DocumentImpl(new DocumentId("xyz"));
-		ResourceFactory factory = new ResourceFactoryImpl();
-		DocumentManager docManager = new DocumentManager(doc, factory);
-		ZipDocumentParser input;
-		try{
-			input = new ZipDocumentParser(docManager, inputFile);
-			EventWriter writer = new EventWriter(null, System.out);
-			PipelineDriver driver = new PipelineDriver();
-			driver.addStep(writer);
-			driver.setInput(input);
-			driver.run();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-	}
 }

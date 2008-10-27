@@ -11,8 +11,8 @@ final class ReferenceImpl extends DocumentPartImpl implements Reference{
 	private PartId part;
 	private DocumentId document;
 	
-	public ReferenceImpl(PartId id) {
-		super(id);
+	public ReferenceImpl(PartId id, DocumentManager documentManager) {
+		super(id, documentManager);
 	}
 	
 	public String getContentType() {

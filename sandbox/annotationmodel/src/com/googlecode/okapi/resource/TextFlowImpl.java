@@ -12,8 +12,8 @@ final class TextFlowImpl extends DocumentPartImpl implements TextFlow{
 
 	private List<ContentFragment> content;
 	
-	public TextFlowImpl(PartId id) {
-		super(id);
+	public TextFlowImpl(PartId id, DocumentManager documentManager) {
+		super(id, documentManager);
 	}
 	
 	public boolean isStandalone() {

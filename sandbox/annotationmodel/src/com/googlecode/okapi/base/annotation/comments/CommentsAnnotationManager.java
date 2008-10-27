@@ -9,7 +9,6 @@ public class CommentsAnnotationManager extends AbstractAnnotationManager<Comment
 	public static final String ID = "com.googlecode.okapi.base.annotation.comments";
 	public static final int VERSION = 1;
 	
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAdapterList() {
 		return new Class[]{
 				DocumentPart.class

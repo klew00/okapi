@@ -21,7 +21,6 @@ public class SkeletonAnnotationManager extends AbstractAnnotationManager<Skeleto
 		return VERSION;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Class<?>[] getAdapterList() {
 		return new Class[]{
 				DataPart.class

@@ -11,12 +11,17 @@ public class DocumentManager {
 	private ResourceFactory factory;
 	private Map<PartId, DocumentPart> parts;
 	private Map<String, IAnnotationManager<?>> annotationManagers;
-	
-	public DocumentManager(Document document, ResourceFactory factory) {
+
+	private DocumentManager(Document document) {
 		this.document = document;
-		this.factory = factory;
 		parts = new HashMap<PartId, DocumentPart>();
 		annotationManagers = new HashMap<String, IAnnotationManager<?>>();
+		factory = new ResourceFactoryImpl(this);
+	}
+
+	public static DocumentManager create(String docId){
+		return new DocumentManager( 
+				new DocumentImpl(new DocumentId(docId)	));
 	}
 	
 	public ResourceFactory getFactory(){

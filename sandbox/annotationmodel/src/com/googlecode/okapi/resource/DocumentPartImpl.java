@@ -14,9 +14,11 @@ abstract class DocumentPartImpl implements DocumentPart{
 	private long version;
 	private String structuralFeature;
 	private String semanticFeature;
+	private DocumentManager documentManager;
 
-	public DocumentPartImpl(PartId id) {
+	public DocumentPartImpl(PartId id, DocumentManager documentManager) {
 		this.id = id;
+		this.documentManager = documentManager;
 	}
 	
 	public PartId getId() {

@@ -10,9 +10,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.googlecode.okapi.pipeline.BaseDocumentParser;
+import com.googlecode.okapi.pipeline.EventWriter;
+import com.googlecode.okapi.pipeline.PipelineDriver;
 import com.googlecode.okapi.resource.Container;
+import com.googlecode.okapi.resource.Document;
+import com.googlecode.okapi.resource.DocumentId;
+import com.googlecode.okapi.resource.DocumentImpl;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.Reference;
+import com.googlecode.okapi.resource.ResourceFactory;
+import com.googlecode.okapi.resource.ResourceFactoryImpl;
 import com.googlecode.okapi.resource.Reference.Type;
 
 public class ZipDocumentParser extends BaseDocumentParser {
@@ -82,21 +89,21 @@ public class ZipDocumentParser extends BaseDocumentParser {
 		addEndContainerEvent(); //zip-entry-list
 	}
 
-	protected void onVirtualZipDirEntry(String name){
+	protected void onVirtualZipDirEntry(String localName){
 		Container c = getResourceFactory().createContainer();
-		c.setName(name);
+		c.setName(localName);
+		c.setStructuralFeature("zip-virtual-dir");
+		addStartContainerEvent(c);
+	}
+	
+	protected void onZipDirEntry(String localName, ZipEntry entry){
+		Container c = getResourceFactory().createContainer();
+		c.setName(localName);
 		c.setStructuralFeature("zip-dir");
 		addStartContainerEvent(c);
 	}
 	
-	protected void onZipDirEntry(String name, ZipEntry entry){
-		Container c = getResourceFactory().createContainer();
-		c.setName(name);
-		c.setStructuralFeature("zip-dir");
-		addStartContainerEvent(c);
-	}
-	
-	protected void onZipFileEntry(ZipEntry entry){
+	protected void onZipFileEntry(String localName, ZipEntry entry){
 		Reference ref = getResourceFactory().createReference();
 		ref.setName(entry.getName());
 		ref.setType(Type.Internal);
@@ -140,7 +147,7 @@ public class ZipDocumentParser extends BaseDocumentParser {
 			}
 			else{ // file
 				DomZipFile file = (DomZipFile) current;
-				onZipFileEntry(file.getEntry());
+				onZipFileEntry(file.getName(), file.getEntry());
 			}
 		}
 		else{ // end of current iterator
@@ -172,11 +179,32 @@ public class ZipDocumentParser extends BaseDocumentParser {
 		}
 		
 		if(entry.isDirectory()){
-			parent.setVirtual(false);
-			parent.setEntry(entry);
+			DomZipDir dir = (DomZipDir) parent.getChild(path[path.length-1]);
+			if(dir == null){
+				dir = new DomZipDir(path[path.length-1],parent);
+			}
+			dir.setVirtual(false);
+			dir.setEntry(entry);
 		}
 		else{
 			new DomZipFile(path[path.length-1], parent, entry, pos);
+		}
+	}
+	
+	public static void main(String[] args) {
+		String inputFile = "/home/asgeirf/jdev/netbeans-6.5beta/mobility8/sources/netbeans_databindingme-src.zip";
+		DocumentManager docManager = DocumentManager.create("xyz.xml");
+		ZipDocumentParser input;
+		try{
+			input = new ZipDocumentParser(docManager, inputFile);
+			EventWriter writer = new EventWriter(null, System.out);
+			PipelineDriver driver = new PipelineDriver();
+			driver.addStep(writer);
+			driver.setInput(input);
+			driver.run();
+		}
+		catch(IOException e){
+			e.printStackTrace();
 		}
 	}
 
