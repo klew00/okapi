@@ -125,6 +125,37 @@ public class DummyParser implements IParser {
 		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
 	}
 	
+	private void makeCase003 () {
+		// <table id=100> <tr><td>text</td></tr><table>
+		Group grp1 = new Group(null, "g1");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s1", "<table id=100>\n ")));
+
+		Group grp2 = new Group("g1", "g2");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "<tr>")));
+		
+		Group grp3 = new Group("g2", "g3");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s3", "<td>")));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t1", "text")));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</td>")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp3));
+
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</tr>\n")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp2));
+		
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</table>\n")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
+	}
+
 	private void makeCase004 () {
 		Group grp1 = new Group(null, "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
@@ -190,8 +221,9 @@ public class DummyParser implements IParser {
 		subDocRes.setID("sd1");
 		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
 		
-		makeCase001();
+		//makeCase001();
 		//makeCase002();
+		makeCase003();
 		//makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocRes));
