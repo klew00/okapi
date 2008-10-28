@@ -26,7 +26,6 @@ public class LocaleProperties {
 
 	private Hashtable<String, String>  props;
 	
-	
 	public String getProperty (String name) {
 		if ( props == null ) return null;
 		return props.get(name);

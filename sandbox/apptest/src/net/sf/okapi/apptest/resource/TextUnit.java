@@ -203,42 +203,6 @@ public class TextUnit extends BaseResource implements IReferenceable {
 	}
 
 	/**
-	 * Gets the skeleton unit just before the resource. For example a "<p>"
-	 * in a HTML paragraph. 
-	 * @return The skeleton unit before the resource or null.
-	 */
-//	public SkeletonUnit getSkeletonBefore () {
-//		return sklBefore;
-//	}
-	
-	/**
-	 * Sets the skeleton unit just before the resource. For example a "<p>"
-	 * in a HTML paragraph. 
-	 * @param value The skeleton unit to set.
-	 */
-//	public void setSkeletonBefore (SkeletonUnit value) {
-//		sklBefore = value;
-//	}
-
-	/**
-	 * Gets the skeleton unit just after the resource. For example a "</p>"
-	 * in a HTML paragraph. 
-	 * @return The skeleton unit after the resource or null.
-	 */
-//	public SkeletonUnit getSkeletonAfter () {
-//		return sklAfter;
-//	}
-	
-	/**
-	 * Sets the skeleton unit just after the resource. For example a "</p>"
-	 * in a HTML paragraph. 
-	 * @param value The skeleton unit to set.
-	 */
-//	public void setSkeletonAfter (SkeletonUnit value) {
-//		sklAfter = value;
-//	}
-
-	/**
 	 * Gets the source object of the resource.
 	 * @return The source object of the resource, never null.
 	 */

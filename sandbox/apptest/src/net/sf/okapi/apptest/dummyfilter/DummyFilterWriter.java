@@ -6,6 +6,8 @@ import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.Group;
+import net.sf.okapi.apptest.resource.LocaleProperties;
+import net.sf.okapi.apptest.resource.PropertiesUnit;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.TextUnit;
 
@@ -32,6 +34,7 @@ public class DummyFilterWriter implements IFilterWriter {
 		Group grp;
 		TextUnit tu;
 		SkeletonUnit su;
+		PropertiesUnit pu;
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			System.out.println("start-document");
@@ -81,6 +84,20 @@ public class DummyFilterWriter implements IFilterWriter {
 				System.out.println("   isReference="+tu.isReference());
 			}
 			System.out.println("   text="+out(tu.toString()));
+			System.out.println("}");
+			break;
+		case PROPERTIES_UNIT:
+			pu = (PropertiesUnit)event.getResource();
+			System.out.println("properties-unit={");
+			System.out.println("   id="+pu.getID());
+			if ( pu.isReference() ) {
+				System.out.println("   isReference="+pu.isReference());
+			}
+			LocaleProperties lp = pu.getSourceProperties();
+			for ( String key : lp.getProperties().keySet() ) {
+				System.out.println("   prop: key="+key+" value='"+lp.getProperty(key)+"'");
+			}
+			// TODO: values
 			System.out.println("}");
 			break;
 		}

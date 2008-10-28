@@ -4,28 +4,25 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Document extends BaseContainer {
+public class PropertiesUnit extends BaseResource implements IReferenceable {
 
-	protected String language;
-	protected String encoding;
-	
+	private boolean isReference;
 	private LocaleProperties srcProp;
 	private ArrayList<LocaleProperties> trgPropList;
-	
-	public String getLanguage () {
-		return language;
+
+	public PropertiesUnit (String id,
+		boolean isReference)
+	{
+		this.id = id;
+		this.isReference = isReference;
 	}
 	
-	public void setLanguage (String language) {
-		this.language = language;
+	public boolean isReference() {
+		return isReference;
 	}
 
-	public String getEncoding () {
-		return encoding;
-	}
-	
-	public void setEncoding (String encoding) {
-		this.encoding = encoding;
+	public void setIsReference(boolean value) {
+		isReference = value;
 	}
 
 	public LocaleProperties getSourceProperties () {

@@ -12,6 +12,7 @@ import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.Document;
 import net.sf.okapi.apptest.resource.Group;
+import net.sf.okapi.apptest.resource.PropertiesUnit;
 import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.SubDocument;
 import net.sf.okapi.apptest.resource.TextContainer;
@@ -64,9 +65,67 @@ public class DummyParser implements IParser {
 	public IResource getResource () {
 		return list.get(current).getResource();
 	}
+
+	private void makeCase001 () {
+		// <p>Before <img href='img.png' alt='text'/> after.</p>
+		Group grp1 = new Group(null, "g1");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s1", "<p>")));
+
+		PropertiesUnit pu = new PropertiesUnit("p1", true);
+		pu.getSourceProperties().setProperty("href", "img.png");
+		list.add(new FilterEvent(FilterEventType.PROPERTIES_UNIT, pu));
+		
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
+			new TextUnit("t1", "text", true)));
+
+		TextUnit tu = new TextUnit();
+		tu.setID("t2");
+		TextContainer tc = new TextContainer(tu);
+		tc.append("Before ");
+		Code code = tc.append(TagType.PLACEHOLDER, "image",
+			"<img href='" + TextContainer.makeRefMarker("p1","href") +
+			"' alt='" + TextContainer.makeRefMarker("t1") + "'/>");
+		code.setHasReference(true);
+		tc.append(" after.");
+		tu.setSourceContent(tc);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</p>\n")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
+		
+	}
+	
+	private void makeCase002 () {
+		// <p>Before <a href='link.htm'/> after.</p>
+		Group grp1 = new Group(null, "g1");
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s1", "<p>")));
+
+		PropertiesUnit pu = new PropertiesUnit("p1", true);
+		pu.getSourceProperties().setProperty("href", "link.htm");
+		list.add(new FilterEvent(FilterEventType.PROPERTIES_UNIT, pu));
+
+		TextUnit tu = new TextUnit();
+		tu.setID("t1");
+		TextContainer tc = new TextContainer(tu);
+		tc.append("Before ");
+		Code code = tc.append(TagType.PLACEHOLDER, "link",
+			"<a href='" + TextContainer.makeRefMarker("p1","href") + "'/>");
+		code.setHasReference(true);
+		tc.append(" after.");
+		tu.setSourceContent(tc);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+
+		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
+			new SkeletonUnit("s2", "</p>\n")));
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
+	}
 	
 	private void makeCase004 () {
-
 		Group grp1 = new Group(null, "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1));
 		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
@@ -110,9 +169,9 @@ public class DummyParser implements IParser {
 		tc.append("\n and text after the list.");
 		tu.setSourceContent(tc);
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+
 		list.add(new FilterEvent(FilterEventType.SKELETON_UNIT,
 			new SkeletonUnit("s8", "</p>\n")));
-
 		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1));
 	}
 	
@@ -131,8 +190,10 @@ public class DummyParser implements IParser {
 		subDocRes.setID("sd1");
 		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
 		
-		makeCase004();
-
+		makeCase001();
+		//makeCase002();
+		//makeCase004();
+	
 		list.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocRes));
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
 	}

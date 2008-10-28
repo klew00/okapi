@@ -61,8 +61,9 @@ public class TextFragment implements Comparable<Object> {
 	public static final int MARKER_SEGMENT  = 0xE104;
 	public static final int CHARBASE        = 0xE110;
 
-	public static final String REFMARKER_START = "{#T$";
+	public static final String REFMARKER_START = "{#$";
 	public static final String REFMARKER_END   = "}";
+	public static final String REFMARKER_SEP   = "@%";
 
 	/**
 	 * List of the types of tag usable for in-line codes.
@@ -105,19 +106,33 @@ public class TextFragment implements Comparable<Object> {
 		return REFMARKER_START+id+REFMARKER_END;
 	}
 	
+	public static String makeRefMarker (String id,
+		String propertyName)
+	{
+		return REFMARKER_START+id+REFMARKER_SEP+propertyName+REFMARKER_END;
+	}
+	
 	public static Object[] getRefMarker (StringBuilder text) {
 		int start = text.indexOf(REFMARKER_START);
 		if ( start == -1 ) return null; // No marker
 		int end = text.indexOf(REFMARKER_END, start);
 		if ( end == -1 ) return null; // No ending found, we assume it's not a marker
 		String id = text.substring(start+REFMARKER_START.length(), end);
-		Object[] result = new Object[3];
-		result[0] = id;
+		Object[] result = new Object[4];
 		result[1] = start;
 		result[2] = end+REFMARKER_END.length();
+		// Check for property name
+		int sep = id.indexOf(REFMARKER_SEP);
+		if ( sep > -1 ) {
+			String propName = id.substring(sep+REFMARKER_SEP.length());
+			id = id.substring(0, sep);
+			result[3] = propName;
+		}
+		// Else: result[3] is null: it's not a property marker
+		result[0] = id;
 		return result;
 	}
-	
+
 	/**
 	 * Helper method to find, from the back, the first non-whitespace character
 	 * of a coded text, starting at a given position and no farther than another
@@ -955,19 +970,38 @@ public class TextFragment implements Comparable<Object> {
 			}
 			else {
 				boolean found = false;
+				String propName = (String)marker[3];
 				for ( IReferenceable ref : builderData.references ) {
 					if ( ref.getID().equals((String)marker[0]) ) {
 						TextContainer tc;
 						if ( ref instanceof TextUnit ) {
 							if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
 							else tc = ((TextUnit)ref).getSourceContent();
-							tmp.replace(start, end, tc.toString(builderData));
+							if ( propName == null )
+								tmp.replace(start, end, tc.toString(builderData));
+							else
+								tmp.replace(start, end, "propVALUE-TODO");
 						}
 						else if ( ref instanceof SkeletonUnit ) {
-							tmp.replace(start, end, ref.toString());
+							if ( propName == null )
+								tmp.replace(start, end, ref.toString());
+							else
+								tmp.replace(start, end, "propValue-TODO");
 						}
 						else if ( ref instanceof Group ) {
-							tmp.replace(start, end, mergeGroup((Group)ref, builderData));
+							if ( propName == null )
+								tmp.replace(start, end, mergeGroup((Group)ref, builderData));
+							else
+								tmp.replace(start, end, "propValue-TODO");
+						}
+						else if ( ref instanceof PropertiesUnit ) {
+							if ( propName == null )
+								tmp.replace(start, end, "-ERR-");
+							else {
+								tmp.replace(start, end,
+									mergeProperty((PropertiesUnit)ref, propName, builderData.outputTarget));
+							}
+								
 						}
 						found = true;
 						break;
@@ -975,11 +1009,24 @@ public class TextFragment implements Comparable<Object> {
 				}
 				if ( !found ) {
 					tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
-					//Need to move on too! add start pos or this will loop forever
 				}
 			}
 		}
 		return tmp.toString();
+	}
+	
+	private String mergeProperty (PropertiesUnit unit,
+		String name,
+		boolean outputTarget)
+	{
+		LocaleProperties lp;
+		if ( outputTarget && unit.hasTargetProperties() )
+			lp = unit.getTargetProperties();
+		else
+			lp = unit.getSourceProperties();
+		String value = lp.getProperty(name);
+		if ( value == null ) return "-ERR:PROP-NOT-FOUND-";
+		else return value;
 	}
 	
 	private String mergeGroup (Group group,
