@@ -10,6 +10,10 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 		this.filter = filter;
 	}
 	
+	public IFilter getFilter() {
+		return filter;
+	}
+	
 	public String getName() {		
 		return filter.getName();
 	}		

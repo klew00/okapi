@@ -9,6 +9,10 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	public FilterWriterPipelineStepAdaptor(IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;
 	}
+	
+	public IFilterWriter getFilterWriter() {
+		return filterWriter;
+	}
 
 	public void cancel() {
 	}
