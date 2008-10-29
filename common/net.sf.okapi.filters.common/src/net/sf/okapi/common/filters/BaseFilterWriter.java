@@ -33,9 +33,9 @@ public abstract class BaseFilterWriter implements IFilterWriter {
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.filters.IFilterWriter#handleEvent(net.sf.okapi.common.filters.FilterEvent)
 	 */
-	public void handleEvent(FilterEvent event) {
+	public FilterEvent handleEvent(FilterEvent event) {
 		// TODO Auto-generated method stub
-
+		return event;
 	}
 
 	/* (non-Javadoc)

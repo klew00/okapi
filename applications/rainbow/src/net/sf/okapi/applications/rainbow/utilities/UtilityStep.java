@@ -1,47 +1,41 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
-import net.sf.okapi.common.threadedpipeline.IConsumer;
-import net.sf.okapi.common.threadedpipeline.IProducer;
-import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class UtilityStep extends BasePipelineStep implements IConsumer, IProducer {
+public class UtilityStep extends BasePipelineStep {
 
 	private IFilterDrivenUtility2 utility;
 
 	public UtilityStep (IFilterDrivenUtility2 utility) {
 		this.utility = utility;
 	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		//TODO: IFilterWriter handleEvent should probably return its own event
+		utility.handleEvent(event);
+		return event;
+	}
 	
-	public void finish () throws InterruptedException {
-		utility.finish();
+	public void cancel () {
+		// Cancel needed here
 	}
 
 	public String getName () {
 		return utility.getName();
 	}
 
-	public void initialize () throws InterruptedException {
+	public void pause () {
 	}
 
-	public PipelineReturnValue process () throws InterruptedException {
-		// Get the event
-		FilterEvent event = takeFromQueue();
-		//FilterEvent event = (FilterEvent)takeFromQueue(consumerQueue);
-
-		// Handle the event
-		//utility.handleEvent(event);
-		
-		// Pass it to the next step
-		addToQueue(event);
-		
-		// Return a proper status
-		if (event.getEventType() == FilterEventType.FINISHED) {
-			return PipelineReturnValue.SUCCEDED;
-		}
-		return PipelineReturnValue.RUNNING;
+	public void postprocess () {
+		utility.finish();
 	}
 
+	public void preprocess () {
+	}
+
+	public void resume() {
+	}
+	
 }

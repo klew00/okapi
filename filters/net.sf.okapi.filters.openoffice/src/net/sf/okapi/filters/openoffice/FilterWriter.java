@@ -53,9 +53,9 @@ public class FilterWriter implements IFilterWriter {
 		return params;
 	}
 
-	public void handleEvent (FilterEvent event) {
+	public FilterEvent handleEvent (FilterEvent event) {
 		// TODO Auto-generated method stub
-		
+		return event;
 	}
 
 	public void setOptions (String language,

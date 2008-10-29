@@ -34,6 +34,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -131,9 +132,9 @@ public class Writer extends BaseWriter {
 		}
 	}
 
-	private void writeContent (TextFragment content) {
-		String text = content.getCodedText();
-		List<Code> codes = content.getCodes();
+	private void writeContent (TextFragment srcContent) {
+		String text = srcContent.getCodedText();
+		List<Code> codes = srcContent.getCodes();
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
@@ -170,24 +171,39 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
+	private void writeSegment (boolean isSegment,
+		TextFragment srcFragment,
+		TextFragment trgFragment)
+	{
+		if ( isSegment ) { // Start the segment and the source
+			writer.writeStartElement("Tu");
+			//TODO: writer.writeAttributeString("Origin", "manual");
+			//TODO: writer.writeAttributeString("MatchPercent", "100");
+			writer.writeStartElement("Tuv");
+			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
+		}
+		// Write the source content
+		writeContent(srcFragment);
+		if ( isSegment ) { // End the source segment if needed
+			writer.writeEndElement(); //Tuv
+		}
+		
+		// Target: if it is a segment and we have a target
+		if ( isSegment && ( trgFragment != null )) { // Has a target
+			writer.writeStartElement("Tuv");
+			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
+			writeContent(trgFragment);
+			writer.writeEndElement(); //Tuv
+		}
+		// Write end of segment if needed
+		if ( isSegment ) {
+			writer.writeEndElement(); //Tu
+		}
+	}
+	
 	public void writeTextUnit (TextUnit item,
 		int status)
 	{
-/*		boolean isSrcSeg = item.getSourceContent().isSegmented();
-		boolean isTrgSeg = false;
-		if ( item.hasTarget() ) {
-			isTrgSeg = item.getTargetContent().isSegmented();
-			if ( isTrgSeg ) {
-				int srcSegCount = item.getSourceContent().getSegments().size();
-				int trgsegCount = item.getTargetContent().getSegments().size();
-				if ( srcSegCount != trgsegCount ) {
-					
-				}
-				
-			}
-		}
-*/		
-		
 		processItem(item);
 		if ( item.hasChild() ) {
 			for ( TextUnit tu : item.childTextUnitIterator() ) {
@@ -195,62 +211,6 @@ public class Writer extends BaseWriter {
 			}
 		}
 	}
-	
-	/*
-	 * case:
-	 *  src segmented, trg segmented
-	 * 	src segmented trg segmented but not the same
-	 * 	src segmented not trg
-	 * 	trg segmented not src
-	 */
-	/*
-	private void processSegmentedItem (TextUnit item) {
-		TextContainer trgCont = item.getTargetContent();
-		String text = trgCont.getCodedText();
-		Code code;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_OPENING:
-				code = trgCont.getCode(text.charAt(++i));
-				writer.writeStartElement("ut");
-				writer.writeAttributeString("Type", "start");
-				writer.writeAttributeString("RightEdge", "angle");
-				writer.writeAttributeString("DisplayText", code.getData());
-				writer.writeString(code.getData());
-				writer.writeEndElement(); // ut
-				break;
-			case TextFragment.MARKER_CLOSING:
-				code = trgCont.getCode(text.charAt(++i));
-				writer.writeStartElement("ut");
-				writer.writeAttributeString("Type", "end");
-				writer.writeAttributeString("LeftEdge", "angle");
-				writer.writeAttributeString("DisplayText", code.getData());
-				writer.writeString(code.getData());
-				writer.writeEndElement(); // ut
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				code = trgCont.getCode(text.charAt(++i));
-				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-					writer.writeStartElement("Tuv");
-					writer.writeAttributeString("Lang", manifest.getTargetLanguage());
-					writeContent(item.getTargetContent());
-					writer.writeEndElement(); //Tuv
-				}
-				else { // Normal isolated code
-					writer.writeStartElement("ut");
-					writer.writeAttributeString("DisplayText", code.getData());
-					writer.writeString(code.getData());
-					writer.writeEndElement(); // ut
-				}
-				break;
-			default:
-				//TODO: Use a content object like XLIFF and TMX, too slow here
-				writer.writeString(String.valueOf(text.charAt(i)));
-				break;
-			}
-		}
-		
-	}*/
 	
 	private void processItem (TextUnit item) {
 		String name = item.getName();
