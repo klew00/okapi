@@ -18,20 +18,9 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline.tests;
+package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
-import net.sf.okapi.common.threadedpipeline.IConsumer;
-import net.sf.okapi.common.threadedpipeline.IProducer;
 
-public class ConsumerProducer extends BasePipelineStep implements IConsumer, IProducer {
-	public String getName() {
-		return "ProducerConsumer";
-	}
-
-	public void finish() throws InterruptedException {
-	}
-
-	public void initialize() throws InterruptedException {
-	}	
+public enum PipelineReturnValue {
+	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED
 }

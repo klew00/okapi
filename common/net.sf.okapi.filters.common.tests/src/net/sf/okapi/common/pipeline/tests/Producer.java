@@ -17,22 +17,48 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
+package net.sf.okapi.common.pipeline.tests;
 
-package net.sf.okapi.common.threadedpipeline;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-import java.util.concurrent.Callable;
+public class Producer extends BasePipelineStep {	
+	private int eventCount = -1;
 
-public interface IPipelineStep extends Callable<PipelineReturnValue> {
+	public String getName() {
+		return "Producer";
+	}
 
-	public String getName();
-	
-	void initialize() throws InterruptedException;
-	
-	PipelineReturnValue process() throws InterruptedException;
-	
-	void finish() throws InterruptedException;
+	public void postprocess() {	
+		System.out.println(getName() + " postprocess");
+	}
 
-	void pause();
+	public void preprocess() {
+		System.out.println(getName() + " preprocess");		
+	}
 
-	void resume();
+	public FilterEvent handleEvent(FilterEvent event) {		
+		eventCount++;
+		if (eventCount >= 10) {
+			event = new FilterEvent(FilterEventType.FINISHED, null); 				
+			return event;
+		}
+		
+		event = new FilterEvent(FilterEventType.TEXT_UNIT, null);		
+		return event;
+	}
+
+	public void pause() {
+	}
+
+	public void resume() {
+	}
+
+	public void cancel() {
+	}
+
+	public boolean hasNext() {
+		return false;
+	}
 }

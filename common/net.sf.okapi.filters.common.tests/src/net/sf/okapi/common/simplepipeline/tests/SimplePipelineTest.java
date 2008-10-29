@@ -17,38 +17,40 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
-package net.sf.okapi.common.threadedpipeline.tests;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.threadedpipeline.BasePipelineStep;
-import net.sf.okapi.common.threadedpipeline.IProducer;
-import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
+package net.sf.okapi.common.simplepipeline.tests;
 
-public class Producer extends BasePipelineStep implements IProducer {	
-	private int order = -1;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.tests.Consumer;
+import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
+import net.sf.okapi.common.pipeline.tests.Producer;
+import net.sf.okapi.common.simplepipeline.SimplePipeline;
 
-	public String getName() {
-		return "Producer";
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+public class SimplePipelineTest {
+
+	@Before
+	public void setUp() {
+
+	}
+	
+	@Test
+	public void runPipeline() {
+		IPipeline pipeline = new SimplePipeline();
+		pipeline.addStep(new Producer());
+		pipeline.addStep(new ConsumerProducer());
+		pipeline.addStep(new Consumer());
+
+		System.out.println("START PIPELINE");
+		pipeline.execute();		
 	}
 
-	public void finish() throws InterruptedException {
-		addToQueue(new FilterEvent(FilterEventType.FINISHED, null));
+	@After
+	public void cleanUp() {
+		System.out.println("CLEANUP PIPELINE");
 	}
 
-	public void initialize() throws InterruptedException {
-		addToQueue(new FilterEvent(FilterEventType.START, null));
-	}
-
-	@Override
-	public PipelineReturnValue process() throws InterruptedException {
-		order++;
-		if (order >= 5) {
-			return PipelineReturnValue.SUCCEDED;
-		}
-		
-		Thread.sleep(1000);
-		addToQueue(new FilterEvent(FilterEventType.TEXT_UNIT, null));
-		return PipelineReturnValue.RUNNING;
-	}
 }

@@ -30,8 +30,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class LinearPipeline implements ILinearPipeline {
+public class ThreadedPipeline implements IPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
 
 	private final PausableThreadPoolExecutor executor;
@@ -39,71 +42,78 @@ public class LinearPipeline implements ILinearPipeline {
 	private final int blockingQueueSize;
 	private int totalThreads;
 	private PipelineReturnValue state;
-	private LinkedList<IPipelineStep> steps;
+	private LinkedList<IPipelineStep> threadedSteps;
+	private LinkedList<IPipelineStep> nonThreadedSteps;
 
 	private BlockingQueue<FilterEvent> previousQueue;
 
-	public LinearPipeline() {
+	public ThreadedPipeline() {
 		this(PausableThreadPoolExecutor.newCachedThreadPool(), DEFAULT_BLOCKING_QUEUE_SIZE);
 	}
 
-	public LinearPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
+	public ThreadedPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
 		totalThreads = 0;
 		this.executor = executor;
 		this.blockingQueueSize = blockingQueueSize;
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
 		this.executor.pause();
 		state = PipelineReturnValue.PAUSED;
-		steps = new LinkedList<IPipelineStep>();
+		threadedSteps = new LinkedList<IPipelineStep>();
+		nonThreadedSteps = new LinkedList<IPipelineStep>();
 	}
 
-	public void addPipleLineStep(IPipelineStep step) {
+	public void execute() {
 		BlockingQueue<FilterEvent> queue = null;
-		if (step instanceof IConsumer && step instanceof IProducer) {
-			if (previousQueue == null) {
-				// TODO: wrap exception
-				throw new RuntimeException("Previous queue should not be null");
+		for (IPipelineStep step : nonThreadedSteps) {
+			if (threadedSteps.isEmpty()) {
+				// first step is a producer wrap it with threaded adaptor
+				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
+				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
+				producerStep.setProducerQueue(queue);
+				completionService.submit(producerStep);
+				threadedSteps.add(producerStep);
+			} else if (step == nonThreadedSteps.getLast()) {
+				// last step it is a consumer
+				if (previousQueue == null) {					
+					throw new RuntimeException("Previous queue should not be null");
+				}
+				ConsumerPipelineStepAdaptor consumerStep = new ConsumerPipelineStepAdaptor(step);
+				consumerStep.setConsumerQueue(previousQueue);
+				completionService.submit(consumerStep);
+				threadedSteps.add(consumerStep);
+			} else {
+				// this is a middle step it is a Producer and Consumer
+				if (previousQueue == null) {
+					throw new RuntimeException("Previous queue should not be null");
+				}
+				ProducerConsumerPipelineStepAdaptor producerConsumerStep = new ProducerConsumerPipelineStepAdaptor(step);
+				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
+				producerConsumerStep.setProducerQueue(queue);
+				producerConsumerStep.setConsumerQueue(previousQueue);
+				completionService.submit(producerConsumerStep);
+				threadedSteps.add(producerConsumerStep);
 			}
-
-			queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
-			((IProducer) step).setProducerQueue(queue);
-			((IConsumer) step).setConsumerQueue(previousQueue);
-		} else if (step instanceof IProducer) {
-			queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
-			((IProducer) step).setProducerQueue(queue);
-		} else if (step instanceof IConsumer) {
-			if (previousQueue == null) {
-				// TODO: wrap exception
-				throw new RuntimeException("Previous queue should not be null");
-			}
-
-			((IConsumer) step).setConsumerQueue(previousQueue);
-
-		} else {
-			// TODO: wrap exception
-			throw new RuntimeException();
+			totalThreads += 1;
+			previousQueue = queue;
 		}
 
-		completionService.submit(step);
-		steps.add(step);
-		totalThreads += 1;
-		previousQueue = queue;
+		executor.resume();
+		state = PipelineReturnValue.RUNNING;
 	}
 
-	public void addPipleLineStep(IPipelineStep step, int numThreads) {
-		throw new RuntimeException("Not implemented");
+	public void addStep(IPipelineStep step) {
+		nonThreadedSteps.add(step);
 	}
 
 	public void cancel() {
-		pause(); // pause all threads to make sure they are a good stopping point for destruction
-		//TODO : how do we wait for pause to happen for all tasks? Does shutdown throw a interrupted exception?
+		pause(); 
 		executor.shutdownNow();
 		state = PipelineReturnValue.CANCELLED;
 	}
 
 	public void pause() {
 		executor.pause();
-		for (IPipelineStep step : steps) {
+		for (IPipelineStep step : threadedSteps) {
 			step.pause();
 		}
 		state = PipelineReturnValue.PAUSED;
@@ -111,14 +121,9 @@ public class LinearPipeline implements ILinearPipeline {
 
 	public void resume() {
 		executor.resume();
-		for (IPipelineStep step : steps) {
+		for (IPipelineStep step : threadedSteps) {
 			step.resume();
 		}
-		state = PipelineReturnValue.RUNNING;
-	}
-
-	public void execute() {
-		executor.resume();
 		state = PipelineReturnValue.RUNNING;
 	}
 
@@ -127,7 +132,7 @@ public class LinearPipeline implements ILinearPipeline {
 			return PipelineReturnValue.CANCELLED;
 		}
 
-		if (state == PipelineReturnValue.PAUSED) {			
+		if (state == PipelineReturnValue.PAUSED) {
 			return PipelineReturnValue.PAUSED;
 		}
 

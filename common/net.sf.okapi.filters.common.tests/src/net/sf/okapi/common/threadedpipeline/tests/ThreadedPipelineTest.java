@@ -23,15 +23,18 @@ package net.sf.okapi.common.threadedpipeline.tests;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.sf.okapi.common.threadedpipeline.ILinearPipeline;
-import net.sf.okapi.common.threadedpipeline.LinearPipeline;
-import net.sf.okapi.common.threadedpipeline.PipelineReturnValue;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
+import net.sf.okapi.common.pipeline.tests.Consumer;
+import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
+import net.sf.okapi.common.pipeline.tests.Producer;
+import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LinearPipelineTest {
+public class ThreadedPipelineTest {
 
 	@Before
 	public void setUp() {
@@ -40,13 +43,13 @@ public class LinearPipelineTest {
 
 	@Test
 	public void runPipelineAsThread() {
-		final ILinearPipeline pipeline = new LinearPipeline();
+		final IPipeline pipeline = new ThreadedPipeline();
 
 		Runnable runnable = new Runnable() {
 			public void run() {
-				pipeline.addPipleLineStep(new Producer());
-				pipeline.addPipleLineStep(new ConsumerProducer());
-				pipeline.addPipleLineStep(new Consumer());
+				pipeline.addStep(new Producer());
+				pipeline.addStep(new ConsumerProducer());
+				pipeline.addStep(new Consumer());
 				pipeline.execute();
 			}
 		};
@@ -74,10 +77,10 @@ public class LinearPipelineTest {
 
 	//@Test
 	public void runPipeline() {
-		ILinearPipeline pipeline = new LinearPipeline();
-		pipeline.addPipleLineStep(new Producer());
-		pipeline.addPipleLineStep(new ConsumerProducer());
-		pipeline.addPipleLineStep(new Consumer());
+		IPipeline pipeline = new ThreadedPipeline();
+		pipeline.addStep(new Producer());
+		pipeline.addStep(new ConsumerProducer());
+		pipeline.addStep(new Consumer());
 
 		System.out.println("START PIPELINE");
 		pipeline.execute();

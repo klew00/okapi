@@ -18,9 +18,35 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.pipeline.tests;
+
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
+
+public class Consumer extends BasePipelineStep {
+	public String getName() {
+		return "Consumer";
+	}
+
+	public void postprocess() {
+		System.out.println(getName() + " postprocess");
+	}
+
+	public void preprocess() {
+		System.out.println(getName() + " preprocess");
+	}
+	
+	protected void handleTextUnit(FilterEvent event) {
+		System.out.println("EventType: " + event.getEventType().name());
+	}
+
+	public void pause() {
+	}
+
+	public void resume() {
+	}
 
 
-public enum PipelineReturnValue {
-	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED
+	public void cancel() {
+	}
 }

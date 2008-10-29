@@ -18,21 +18,39 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.pipeline.tests;
 
-public interface ILinearPipeline {
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
+
+public class ConsumerProducer extends BasePipelineStep {
+	public String getName() {
+		return "ProducerConsumer";
+	}
+
+	public void postprocess() {
+		System.out.println(getName() + " postprocess");
+	}
+
+	public void preprocess() {
+		System.out.println(getName() + " preprocess");
+	}
 	
-	public void execute();
-	
-	public PipelineReturnValue getState();
-	
-	public void cancel();
-	
-	public void pause();
-	
-	public void resume();
-	
-	public void addPipleLineStep(IPipelineStep step);
-	
-	public void addPipleLineStep(IPipelineStep step, int numThreads);
+	protected void handleTextUnit(FilterEvent event) {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void pause() {
+	}
+
+	public void resume() {
+	}
+
+	public void cancel() {
+	}
 }

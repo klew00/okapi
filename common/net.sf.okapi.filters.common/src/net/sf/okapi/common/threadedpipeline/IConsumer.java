@@ -26,5 +26,4 @@ import net.sf.okapi.common.filters.FilterEvent;
 
 public interface IConsumer {
 	public void setConsumerQueue(BlockingQueue<FilterEvent> consumerQueue);
-	public void handleEvent(FilterEvent event);
 }
