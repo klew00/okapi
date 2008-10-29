@@ -1,5 +1,7 @@
 package net.sf.okapi.common.simplepipeline;
 
+import groovyjarjarasm.asm.tree.IntInsnNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class SimplePipeline implements IPipeline {
 
 	public void execute() {
 		// preprocess
+		initialStep.preprocess();
 		for (IPipelineStep step : steps) {
 			if (cancel)
 				return;
@@ -55,6 +58,7 @@ public class SimplePipeline implements IPipeline {
 		}
 
 		// postprocess (cleanup)
+		initialStep.postprocess();
 		for (IPipelineStep step : steps) {
 			step.postprocess();
 		}
