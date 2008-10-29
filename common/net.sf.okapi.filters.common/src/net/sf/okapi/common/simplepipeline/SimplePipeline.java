@@ -25,9 +25,9 @@ public class SimplePipeline implements IPipeline {
 		if (first) {
 			initialStep = step;
 			first = false;
-			return;
-		} 
-		steps.add(step);
+		} else {
+			steps.add(step);
+		}
 	}
 
 	public void cancel() {
@@ -52,7 +52,7 @@ public class SimplePipeline implements IPipeline {
 			}
 			if (event.getEventType() == FilterEventType.FINISHED) {
 				stop = true;
-			}			
+			}
 		}
 
 		// postprocess (cleanup)
