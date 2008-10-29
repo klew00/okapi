@@ -1,7 +1,5 @@
 package net.sf.okapi.common.simplepipeline;
 
-import groovyjarjarasm.asm.tree.IntInsnNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
