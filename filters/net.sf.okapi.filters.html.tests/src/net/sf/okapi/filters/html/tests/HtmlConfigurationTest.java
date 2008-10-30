@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import net.sf.okapi.filters.html.HtmlFilterConfiguration;
+import net.sf.okapi.common.filters.GroovyFilterConfiguration;
 
 /**
  * @author HargraveJE
@@ -41,12 +41,12 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void defaultConfiguration() {		
-		HtmlFilterConfiguration rules = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");	
-		assertEquals(rules.getMainRuleType("title"), HtmlFilterConfiguration.RULE_TYPE.ATTRIBUTE);
-		assertEquals(rules.getMainRuleType("abbr"), HtmlFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
-		assertEquals(rules.getMainRuleType("area"), HtmlFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
-		assertEquals(rules.getMainRuleType("script"), HtmlFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);
-		assertEquals(rules.getMainRuleType("pre"), HtmlFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		GroovyFilterConfiguration rules = new GroovyFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");	
+		assertEquals(rules.getMainRuleType("title"), GroovyFilterConfiguration.RULE_TYPE.ATTRIBUTE);
+		assertEquals(rules.getMainRuleType("abbr"), GroovyFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
+		assertEquals(rules.getMainRuleType("area"), GroovyFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
+		assertEquals(rules.getMainRuleType("script"), GroovyFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);
+		assertEquals(rules.getMainRuleType("pre"), GroovyFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
 		
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put("http-equiv", "keywords");		
