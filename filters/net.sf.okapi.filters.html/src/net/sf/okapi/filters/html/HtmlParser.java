@@ -36,13 +36,14 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.filters.BaseParser;
+import net.sf.okapi.common.filters.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class HtmlParser extends BaseParser {
 	private Source htmlDocument;
-	private HtmlFilterConfiguration configuration;
+	private GroovyFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
 
@@ -77,13 +78,13 @@ public class HtmlParser extends BaseParser {
 		initialize();
 	}
 
-	public void setHtmlFilterConfiguration(HtmlFilterConfiguration configuration) {
+	public void setHtmlFilterConfiguration(GroovyFilterConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
 	private void initialize() {
 		if (configuration == null) {
-			configuration = new HtmlFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");
+			configuration = new GroovyFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");
 		}
 
 		// Segment iterator

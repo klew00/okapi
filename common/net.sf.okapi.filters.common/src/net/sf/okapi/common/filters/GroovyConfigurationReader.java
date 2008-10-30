@@ -28,7 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-public class ParserConfigurationReader  {	
+public class GroovyConfigurationReader  {	
 	private boolean preserveWhitespace;
 	private ConfigSlurper configSlurper;
 	private ConfigObject config;
@@ -41,13 +41,13 @@ public class ParserConfigurationReader  {
 		this.preserveWhitespace = preserveWhitespace;
 	}
 
-	public ParserConfigurationReader(String configurationPathAsResource) {
+	public GroovyConfigurationReader(String configurationPathAsResource) {
 		configSlurper = new ConfigSlurper();
-		URL url = ParserConfigurationReader.class.getResource(configurationPathAsResource);
+		URL url = GroovyConfigurationReader.class.getResource(configurationPathAsResource);
 		config = configSlurper.parse(url);		
 	}
 	
-	public ParserConfigurationReader(File configurationFile) {
+	public GroovyConfigurationReader(File configurationFile) {
 		configSlurper = new ConfigSlurper();		
 		try {
 			config = configSlurper.parse(configurationFile.toURL());

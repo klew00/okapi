@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html;
+package net.sf.okapi.common.filters;
 
 import java.io.File;
 import java.util.Iterator;
@@ -8,22 +8,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.htmlparser.jericho.Attributes;
-import net.sf.okapi.common.filters.ParserConfigurationReader;
+import net.sf.okapi.common.filters.IllegalConditionalAttributeMatchTypeException;
 
-public class HtmlFilterConfiguration {
+public class GroovyFilterConfiguration {
 	public static enum RULE_TYPE {
 		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE, ATTRIBUTES_ONLY, UNKOWN
 	};
 
-	private ParserConfigurationReader configReader;
+	private GroovyConfigurationReader configReader;
 
-	public HtmlFilterConfiguration(String configurationPathAsResource) {
-		configReader = new ParserConfigurationReader(configurationPathAsResource);
+	public GroovyFilterConfiguration(String configurationPathAsResource) {
+		configReader = new GroovyConfigurationReader(configurationPathAsResource);
 	}
 
-	public HtmlFilterConfiguration(File configurationFile) {
-		configReader = new ParserConfigurationReader(configurationFile);
+	public GroovyFilterConfiguration(File configurationFile) {
+		configReader = new GroovyConfigurationReader(configurationFile);
 	}
 
 	@SuppressWarnings("unchecked")
