@@ -44,9 +44,9 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.filters.GroovyFilterConfiguration;
 import net.sf.okapi.common.filters.IParser;
 import net.sf.okapi.common.filters.BaseParser;
-import net.sf.okapi.common.filters.IParser;
 import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
@@ -56,7 +56,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 //import net.sf.okapi.filters.openxml.tests.OpenXMLParserTest;
 import net.sf.okapi.filters.openxml.ExtractionRuleState;
-import net.sf.okapi.filters.openxml.HtmlFilterConfiguration;
 import net.sf.okapi.filters.openxml.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 public class OpenXMLParser extends BaseParser {
@@ -65,7 +64,7 @@ public class OpenXMLParser extends BaseParser {
 	public final static int MSPOWERPOINT=3;
 
 	private Source htmlDocument;
-	private HtmlFilterConfiguration configuration;
+	private GroovyFilterConfiguration configuration;
 	private int configurationType; // DWH 10-23-08
 	private int oldConfigurationType=0; // DWH 10-23-08
 	private Iterator<Segment> nodeIterator;
@@ -227,7 +226,7 @@ public class OpenXMLParser extends BaseParser {
 	
 	private void initialize() { // DWH 10-15-08 use sConfigFileName	
 		if (configuration == null || oldConfigurationType!=configurationType) {
-			configuration = new HtmlFilterConfiguration(sConfigFileName); // DWH 10-15-08 sConfigFileName
+			configuration = new GroovyFilterConfiguration(sConfigFileName); // DWH 10-15-08 sConfigFileName
 			// DWH was defaultConfiguration under html
 			oldConfigurationType = configurationType; // DWH 10-23-08
 		}
@@ -263,7 +262,7 @@ public class OpenXMLParser extends BaseParser {
 		initialize();
 	}
 
-	public void setHtmlFilterConfiguration(HtmlFilterConfiguration configuration) {
+	public void setHtmlFilterConfiguration(GroovyFilterConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
