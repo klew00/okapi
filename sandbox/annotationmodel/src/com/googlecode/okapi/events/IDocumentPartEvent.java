@@ -1,10 +1,10 @@
-package com.googlecode.okapi.resource;
+package com.googlecode.okapi.events;
 
-import java.util.List;
+import com.googlecode.okapi.resource.PartId;
 
-public abstract interface DocumentPart extends Resource<PartId>{
-	
-	public List<PartId> getProperties();
+public interface IDocumentPartEvent extends Event{
+
+	public PartId getId();
 
 	public String getName();
 	public void setName(String name);
@@ -17,5 +17,6 @@ public abstract interface DocumentPart extends Resource<PartId>{
 	
 	public long getVersion();
 	public void setVersion(long version);
+	
 	
 }

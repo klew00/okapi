@@ -2,15 +2,15 @@ package com.googlecode.okapi.base.serializer.xml;
 
 import java.io.IOException;
 
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.PartId;
-import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.textflow.ContentFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
-
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nux.xom.io.StreamingSerializer;
+
+import com.googlecode.okapi.resource.ContentFragment;
+import com.googlecode.okapi.resource.Document;
+import com.googlecode.okapi.resource.PartId;
+import com.googlecode.okapi.resource.TextFlow;
+import com.googlecode.okapi.resource.TextFragmentImpl;
 
 public class XmlResourceSerializer {
 
@@ -37,13 +37,13 @@ public class XmlResourceSerializer {
 	
 	public void serialize(ContentFragment cf) throws IOException {
 
-		if(cf instanceof TextFragment){
-			serialize((TextFragment)cf);
+		if(cf instanceof TextFragmentImpl){
+			serialize((TextFragmentImpl)cf);
 		}
 		// TODO other fragments
 	}
 	
-	public void serialize(TextFragment tf) throws IOException {
+	public void serialize(TextFragmentImpl tf) throws IOException {
 		Element tfElem = new Element("tf");
 		PartId part = tf.getPart();
 		tfElem.addAttribute(

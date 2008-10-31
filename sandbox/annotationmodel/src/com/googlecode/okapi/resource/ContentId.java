@@ -1,6 +1,5 @@
-package com.googlecode.okapi.resource.textflow;
+package com.googlecode.okapi.resource;
 
-import com.googlecode.okapi.resource.ResourceId;
 
 public final class ContentId extends ResourceId{
 	

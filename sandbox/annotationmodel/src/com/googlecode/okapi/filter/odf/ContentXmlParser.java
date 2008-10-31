@@ -5,35 +5,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
 
+import com.googlecode.okapi.events.ContainerEvent;
+import com.googlecode.okapi.events.ContainerFragmentEvent;
+import com.googlecode.okapi.events.DataPartEvent;
+import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.EventFactory;
+import com.googlecode.okapi.events.IDocumentPartEvent;
+import com.googlecode.okapi.events.ResourceFragmentEvent;
+import com.googlecode.okapi.events.TextFlowEvent;
+import com.googlecode.okapi.events.TextFragmentEvent;
 import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
-import com.googlecode.okapi.resource.Container;
-import com.googlecode.okapi.resource.DataPart;
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.DocumentId;
-import com.googlecode.okapi.resource.DocumentImpl;
 import com.googlecode.okapi.resource.DocumentManager;
-import com.googlecode.okapi.resource.DocumentPart;
-import com.googlecode.okapi.resource.Resource;
-import com.googlecode.okapi.resource.ResourceFactory;
+import com.googlecode.okapi.resource.DomEventFactory;
 import com.googlecode.okapi.resource.ResourceFactoryImpl;
-import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.TextFlowProvider;
-import com.googlecode.okapi.resource.textflow.ContainerFragment;
-import com.googlecode.okapi.resource.textflow.ResourceFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
 
 public class ContentXmlParser extends BaseDocumentParser{
 	
@@ -52,16 +45,13 @@ public class ContentXmlParser extends BaseDocumentParser{
 	private InputStream inputStream;
 	private XMLStreamReader reader;
 
-	Stack<Resource<?>> resources;
+	private enum State{Flow,Container, None};
 	
-	private Resource<?> getCurrentElement(){
-		return resources.isEmpty() ? null : resources.peek();
-	}
+	private State state = State.None;
 	
-	public ContentXmlParser(DocumentManager documentManager, InputStream inputStream) {
-		super(documentManager);
+	public ContentXmlParser(EventFactory factory, InputStream inputStream) {
+		super(factory);
 		this.inputStream = inputStream;
-		resources = new Stack<Resource<?>>();
 
 		setupOdfRules();
 		
@@ -74,8 +64,10 @@ public class ContentXmlParser extends BaseDocumentParser{
 			e.printStackTrace();
 		}
 
+		DocumentEvent docEvent = getEventFactory().createStartDocumentEvent();
+		docEvent.setName("blah");
 		// StaX doesn't seem to report the START_DOCUMENT event.
-		addStartDocumentEvent();
+		addEvent(docEvent);
 	}
 	
 	private void setupOdfRules(){
@@ -187,7 +179,7 @@ public class ContentXmlParser extends BaseDocumentParser{
 	}
 	
 	private void handleEndDocument() {
-		addEndDocumentEvent();
+		addEndEvent(); // Document
 		setEndOfDocument();
 		hasProcessedEvent = true;
 	}
@@ -225,130 +217,98 @@ public class ContentXmlParser extends BaseDocumentParser{
 	}
 
 	private void handleCharacters() {
-		Resource<?> currentElement = getCurrentElement();
-		if(currentElement instanceof TextFlowProvider){
-			TextFlowProvider textFlowProvider = (TextFlowProvider) currentElement;
-			
-			TextFragment textFragment = getResourceFactory().createTextFragment();
+		if(state == State.Flow){
+			TextFragmentEvent textFragment = getEventFactory().createStartTextFragmentEvent();
 			textFragment.setContent(reader.getText());
-			textFlowProvider.getFlow().add(textFragment);
-			
-			addTextFragmentEvent(textFragment);
+			addEvent(textFragment);
 		}
-		else if(currentElement instanceof Container){
-			Container container = (Container) currentElement;
-			DataPart dataPart = getResourceFactory().createDataPart();
+		else if(state == State.Container){
+			DataPartEvent dataPart = getEventFactory().createStartDataPartEvent();
 			dataPart.setStructuralFeature(FEATURE_XML_CHARACTERS);
-			container.getParts().add(dataPart.getId());
-			addDataPartEvent(dataPart);
+			addEvent(dataPart);
 		}
 		else{
-			System.err.println(currentElement);
 			throw new RuntimeException("Programming error");
 		}
 	}
 
 	private void handleCData() {
-		Resource<?> currentElement = getCurrentElement();
 		
-		if(currentElement instanceof TextFlowProvider){
-			TextFlowProvider textFlow = (TextFlowProvider) currentElement;
-			
-			TextFragment textFragment = getResourceFactory().createTextFragment();
+		if(state == State.Flow){
+			TextFragmentEvent textFragment = getEventFactory().createStartTextFragmentEvent();
 
 			textFragment.setContent(reader.getText());
-			textFlow.getFlow().add(textFragment);
-			
-			
-			addStartTextFragmentEvent(textFragment);
+			addEvent(textFragment);
 
-			DataPart dataPart = getResourceFactory().createDataPart();
+			DataPartEvent dataPart = getEventFactory().createStartDataPartEvent();
 			dataPart.setStructuralFeature(FEATURE_XML_CDATA);
-			textFragment.setPart(dataPart.getId());
-			
-			addDataPartEvent(dataPart);
-			
-			addEndTextFragmentEvent();
+			addEvent(dataPart);
+			addEndEvent(); // TextFragment
 			
 		}
-		else if(currentElement instanceof Container){
-			Container container = (Container) currentElement;
-			DataPart dataPart = getResourceFactory().createDataPart();
+		else if(state == State.Container){
+			DataPartEvent dataPart = getEventFactory().createStartDataPartEvent();
 			dataPart.setStructuralFeature(FEATURE_XML_CDATA);
-			container.getParts().add(dataPart.getId());
-			addDataPartEvent(dataPart);
+			addEvent(dataPart);
 		}
 		else{
 			throw new RuntimeException("Programming error");
 		}
 	}
 
-	private void addAttributes(DocumentPart part){
-		addStartPropertiesEvent();
+	private void addAttributes(){
+		addEvent( getEventFactory().createStartPropertiesEvent() );
 		for(int i=0; i<reader.getAttributeCount();i++){
 			QName attName = reader.getAttributeName(i);
 			
-			DocumentPart attribute;
+			IDocumentPartEvent attribute;
 			
 			if(translatableAttributes.contains(attName)){
-				attribute = getResourceFactory().createTextFlow();
+				attribute = getEventFactory().createStartTextFlowEvent();
 				attribute.setName(reader.getAttributeName(i).toString());
 				attribute.setStructuralFeature(FEATURE_XML_ATTRIBUTE);
 				
-				TextFlow textFlow = (TextFlow) attribute;
-				addStartTextFlowEvent(textFlow);
-				addStartTextFlowContentEvent();
+				TextFlowEvent textFlow = (TextFlowEvent) attribute;
+				addEvent(textFlow);
+				addEvent( getEventFactory().createStartTextFlowContentEvent() );
 				
-				TextFragment fragment = getResourceFactory().createTextFragment();
+				TextFragmentEvent fragment = getEventFactory().createStartTextFragmentEvent();
 				fragment.setContent(reader.getAttributeValue(i));
-				addTextFragmentEvent(fragment);
+				addEvent(fragment);
 				
-				addEndTextFlowContentEvent();
-				addEndTextFlowEvent();
+				addEndEvent(); // TextFlowContent
+				addEndEvent(); // TextFlow
 			}
 			else{
-				attribute = getResourceFactory().createDataPart();
+				attribute = getEventFactory().createStartDataPartEvent();
 				attribute.setName(reader.getAttributeName(i).toString());
 				attribute.setStructuralFeature(FEATURE_XML_ATTRIBUTE);
-				addDataPartEvent((DataPart)attribute);
+				addEvent(attribute);
 			}
-			part.getProperties().add(attribute.getId());
 		}
-		addEndPropertiesEvent();
+		addEndEvent(); // Properties
 	}
 
 	private void handleStartElementInTextFlow(){
 		QName name = reader.getName();
 		boolean isInline = inlineElements.contains(name);
 
-		TextFlowProvider current = (TextFlowProvider) getCurrentElement();
-		
 		if(isInline){
-			ContainerFragment containerFragment = getResourceFactory().createContainerFragment();
-			resources.push(containerFragment);
-			
-			current.getFlow().add(containerFragment);
+			ContainerFragmentEvent containerFragment = getEventFactory().createStartContainerFragmentEvent();
 
-			addStartContainerFragmentEvent(containerFragment);
+			addEvent(containerFragment);
 
-			DataPart dataPart = getResourceFactory().createDataPart();
-			containerFragment.setPart(dataPart.getId());
-			addAttributes(dataPart);
-
-			addStartTextFlowContentEvent();
+			DataPartEvent dataPart = getEventFactory().createStartDataPartEvent();
+			addAttributes();
+			addEvent( getEventFactory().createStartTextFlowContentEvent() );
 		}
 		else{
-			ResourceFragment resourceFragment = getResourceFactory().createResourceFragment();
-			//resources.push(resourceFragment);
+			ResourceFragmentEvent resourceFragment = getEventFactory().createStartResourceFragmentEvent();
 			
-			current.getFlow().add(resourceFragment);
+			addEvent(resourceFragment);
 			
-			addStartResourceFragmentEvent(resourceFragment);
-			
-			Container containerPart = getResourceFactory().createContainer();
-			resourceFragment.setPart(containerPart.getId());
-			addAttributes(containerPart);
-			resources.push(containerPart);
+			ContainerEvent containerPart = getEventFactory().createStartContainerEvent();
+			addAttributes();
 		}
 	}
 	
@@ -357,36 +317,30 @@ public class ContentXmlParser extends BaseDocumentParser{
 		boolean isTextFlow = textFlowContainerElements.contains(name);
 		
 		if(isTextFlow){
-			TextFlow flow = getResourceFactory().createTextFlow();
+			TextFlowEvent flow = getEventFactory().createStartTextFlowEvent();
 			flow.setName(name.toString());
 			flow.setStructuralFeature(FEATURE_XML_ELEMENT);
 			flow.setSemanticFeature("paragraph");
 			
-			addStartTextFlowEvent(flow);
-			addAttributes(flow);
-			
-			resources.push(flow);
-			addStartTextFlowContentEvent();
+			addEvent(flow);
+			addAttributes();
+			addEvent( getEventFactory().createStartTextFlowContentEvent() );
 		}
 		else{
 			if(inlineElements.contains(name)){
 				// warning
 			}
-			Container container = getResourceFactory().createContainer();
+			ContainerEvent container = getEventFactory().createStartContainerEvent();
 			container.setName(name.toString());
 			container.setStructuralFeature(FEATURE_XML_ELEMENT);
-			addStartContainerEvent(container);
+			addEvent(container);
 			
-			addAttributes(container);
-			
-			resources.push(container);
+			addAttributes();
 		}
 	}
 	
 	private void handleStartElement(){
-		Resource<?> currentElement = getCurrentElement();
-		
-		if(currentElement instanceof TextFlowProvider){
+		if(state == State.Flow){
 			handleStartElementInTextFlow();
 		}
 		else{
@@ -397,14 +351,13 @@ public class ContentXmlParser extends BaseDocumentParser{
 	}
 	
 	private void handleEndElement(){
-		Resource<?> currentElement = getCurrentElement();
 		
-		if(currentElement instanceof TextFlowProvider){
-			addEndTextFlowContentEvent();
+		if(state == State.Flow){
+			addEvent( getEventFactory().createEndTextFlowContentEvent() );
 		}
 		
 		addEndEvent();
-		resources.pop();
+		state = State.None;
 		hasProcessedEvent = true;
 	}
 	
@@ -440,8 +393,9 @@ public class ContentXmlParser extends BaseDocumentParser{
 			"</text:p>\n";
 					
 		DocumentManager manager = DocumentManager.create("doc-id.xml");
+		EventFactory factory = new DomEventFactory(new ResourceFactoryImpl(manager));
 		ByteArrayInputStream bs = new ByteArrayInputStream(documentString.getBytes());
-		ContentXmlParser parser = new ContentXmlParser(manager,bs);
+		ContentXmlParser parser = new ContentXmlParser(factory,bs);
 		
 		PipelineDriver driver = new PipelineDriver();
 		driver.setInput(parser);

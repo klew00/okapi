@@ -9,18 +9,17 @@ import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.googlecode.okapi.events.ContainerEvent;
+import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.EventFactory;
+import com.googlecode.okapi.events.ReferenceEvent;
 import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
-import com.googlecode.okapi.resource.Container;
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.DocumentId;
-import com.googlecode.okapi.resource.DocumentImpl;
 import com.googlecode.okapi.resource.DocumentManager;
-import com.googlecode.okapi.resource.Reference;
-import com.googlecode.okapi.resource.ResourceFactory;
+import com.googlecode.okapi.resource.DomEventFactory;
+import com.googlecode.okapi.resource.ReferenceType;
 import com.googlecode.okapi.resource.ResourceFactoryImpl;
-import com.googlecode.okapi.resource.Reference.Type;
 
 public class ZipDocumentParser extends BaseDocumentParser {
 
@@ -33,13 +32,13 @@ public class ZipDocumentParser extends BaseDocumentParser {
 	private Stack<Iterator<DomZipEntry>> iterators = new Stack<Iterator<DomZipEntry>>();
 	private Iterator<DomZipEntry> currentIterator = null;
 	
-	public ZipDocumentParser(DocumentManager documentManager, File inputFile) throws IOException {
-		super(documentManager);
+	public ZipDocumentParser(EventFactory factory, File inputFile) throws IOException {
+		super(factory);
 		zipFile = new ZipFile(inputFile, ZipFile.OPEN_READ);
 	}
 	
-	public ZipDocumentParser(DocumentManager documentManager, String inputFile) throws IOException {
-		this(documentManager, new File(inputFile));
+	public ZipDocumentParser(EventFactory factory, String inputFile) throws IOException {
+		this(factory, new File(inputFile));
 	}
 
 	/**
@@ -70,45 +69,46 @@ public class ZipDocumentParser extends BaseDocumentParser {
 	}
 	
 	protected void onStartZip(){
-		documentManager.getDocument().setName(zipFile.getName());
-		addStartDocumentEvent();
+		DocumentEvent docEvent = getEventFactory().createStartDocumentEvent();
+		docEvent.setName(zipFile.getName());
+		addEvent(docEvent);
 	}
 	
 	protected void onEndZip(){
-		addEndDocumentEvent();
+		addEndEvent(); // Document
 		setEndOfDocument();
 	}
 	
 	protected void onStartZipEntryList(){
-		Container c = getResourceFactory().createContainer();
+		ContainerEvent c = getEventFactory().createStartContainerEvent();
 		c.setStructuralFeature("zip-entry-list");
-		addStartContainerEvent(c);
+		addEvent(c);
 	}
 
 	protected void onEndZipEntryList(){
-		addEndContainerEvent(); //zip-entry-list
+		addEndEvent(); //zip-entry-list
 	}
 
 	protected void onVirtualZipDirEntry(String localName){
-		Container c = getResourceFactory().createContainer();
+		ContainerEvent c = getEventFactory().createStartContainerEvent();
 		c.setName(localName);
 		c.setStructuralFeature("zip-virtual-dir");
-		addStartContainerEvent(c);
+		addEvent(c);
 	}
 	
 	protected void onZipDirEntry(String localName, ZipEntry entry){
-		Container c = getResourceFactory().createContainer();
+		ContainerEvent c = getEventFactory().createStartContainerEvent();
 		c.setName(localName);
 		c.setStructuralFeature("zip-dir");
-		addStartContainerEvent(c);
+		addEvent(c);
 	}
 	
 	protected void onZipFileEntry(String localName, ZipEntry entry){
-		Reference ref = getResourceFactory().createReference();
+		ReferenceEvent ref = getEventFactory().createStartReferenceEvent();
 		ref.setName(entry.getName());
-		ref.setType(Type.Internal);
+		ref.setType(ReferenceType.Internal);
 		ref.setStructuralFeature("zip-entry");
-		addReferenceEvent(ref);
+		addEvent(ref);
 	}
 	
 	@Override
@@ -157,7 +157,7 @@ public class ZipDocumentParser extends BaseDocumentParser {
 				onEndZip();
 			}
 			else{ // end dir
-				addEndContainerEvent(); //zip-dir
+				addEndEvent(); //zip-dir container
 				currentIterator = iterators.pop();
 			}
 		}
@@ -193,10 +193,11 @@ public class ZipDocumentParser extends BaseDocumentParser {
 	
 	public static void main(String[] args) {
 		String inputFile = "/home/asgeirf/jdev/netbeans-6.5beta/mobility8/sources/netbeans_databindingme-src.zip";
-		DocumentManager docManager = DocumentManager.create("xyz.xml");
+		DocumentManager docManager = DocumentManager.create("xyz");
+		EventFactory factory = new DomEventFactory(new ResourceFactoryImpl(docManager));
 		ZipDocumentParser input;
 		try{
-			input = new ZipDocumentParser(docManager, inputFile);
+			input = new ZipDocumentParser(factory, inputFile);
 			EventWriter writer = new EventWriter(null, System.out);
 			PipelineDriver driver = new PipelineDriver();
 			driver.addStep(writer);
@@ -208,70 +209,4 @@ public class ZipDocumentParser extends BaseDocumentParser {
 		}
 	}
 
-	
-	void processZip(){
-/*
-		BufferedOutputStream dest = null;
-		BufferedInputStream is = null;
-		ArrayList<DocumentEntry> list = new ArrayList<DocumentEntry>();
-		try {
-			//TODO: generate more unique temp
-			SimpleDateFormat dt = new SimpleDateFormat("_HHmmssS");
-			commonPart = Util.getTempDirectory() + File.separator
-				+ Util.getFilename(path, true)
-				+ dt.format(new Date());
-			ZipEntry entry;
-			ZipFile zipfile = new ZipFile(path);
-			Enumeration<? extends ZipEntry> entries = zipfile.entries();
-			
-			while( entries.hasMoreElements() ) {
-				entry = entries.nextElement();
-				DocumentEntry docEntry = new DocumentEntry();
-				if ( entry.getName().equals("content.xml") ) {
-					docEntry.path = commonPart + "." + entry.getName();
-					docEntry.docType = entry.getName();
-					list.add(docEntry);
-				}
-				else if ( entry.getName().equals("meta.xml") ) {
-					docEntry.path = commonPart + "." + entry.getName();
-					docEntry.docType = entry.getName();
-					list.add(docEntry);
-				}
-				else if ( entry.getName().equals("styles.xml") ) {
-					docEntry.path = commonPart + "." + entry.getName();
-					docEntry.docType = entry.getName();
-					list.add(docEntry);
-				}
-				else continue;
-				
-				Util.createDirectories(docEntry.path);
-				
-				// If it's a file, unzip it
-				is = new BufferedInputStream(zipfile.getInputStream(entry));
-				FileOutputStream fos = new FileOutputStream(docEntry.path);
-				int count;
-				byte data[] = new byte[BUFFER_SIZE];
-				dest = new BufferedOutputStream(fos, BUFFER_SIZE);
-				while ( (count = is.read(data, 0, BUFFER_SIZE)) != -1 ) {
-					dest.write(data, 0, count);
-				}
-				dest.flush();
-			}
-			return list;
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if ( dest != null ) dest.close();
-				if ( is != null ) is.close();
-			}
-			catch ( IOException e ) {
-				throw new RuntimeException(e);
-			}
-		}
-		
-*/	
-	}
 }

@@ -1,9 +1,5 @@
 package com.googlecode.okapi.resource;
 
-import com.googlecode.okapi.resource.textflow.ContainerFragment;
-import com.googlecode.okapi.resource.textflow.ContentId;
-import com.googlecode.okapi.resource.textflow.ResourceFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
 
 public class ResourceFactoryImpl implements ResourceFactory{
 
@@ -39,16 +35,21 @@ public class ResourceFactoryImpl implements ResourceFactory{
 		return new ReferenceImpl( nextPartId(), documentManager );
 	}
 
-	public TextFragment createTextFragment() {
-		return new TextFragment( nextContentId() );
+	public TextFragmentImpl createTextFragment() {
+		return new TextFragmentImpl( nextContentId() );
 	}
 
-	public ContainerFragment createContainerFragment() {
-		return new ContainerFragment( nextContentId() );
+	public ContainerFragmentImpl createContainerFragment() {
+		return new ContainerFragmentImpl( nextContentId() );
 	}
 
-	public ResourceFragment createResourceFragment() {
-		return new ResourceFragment( nextContentId() );
+	public ResourceFragmentImpl createResourceFragment() {
+		return new ResourceFragmentImpl( nextContentId() );
+	}
+
+	public Document createDocument() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

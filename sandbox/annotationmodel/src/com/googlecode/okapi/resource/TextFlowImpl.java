@@ -1,19 +1,23 @@
 package com.googlecode.okapi.resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.googlecode.okapi.resource.textflow.ContentFragment;
+import com.googlecode.okapi.events.EventType;
+import com.googlecode.okapi.events.TextFlowEvent;
 
-final class TextFlowImpl extends DocumentPartImpl implements TextFlow{
+
+final class TextFlowImpl extends DocumentPartImpl implements TextFlow, TextFlowEvent{
 
 	private boolean standalone;
-	private Unit unit;
+	private FlowUnit unit;
 
 	private List<ContentFragment> content;
 	
 	public TextFlowImpl(PartId id, DocumentManager documentManager) {
 		super(id, documentManager);
+		content = new ArrayList<ContentFragment>();
 	}
 	
 	public boolean isStandalone() {
@@ -21,22 +25,46 @@ final class TextFlowImpl extends DocumentPartImpl implements TextFlow{
 	}
 
 	public void setStandalone(boolean standalone) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.standalone = standalone;
 	}
 
-	public Unit getUnit() {
+	public FlowUnit getUnit() {
 		return unit;
 	}
 
-	public void setUnit(Unit unit) {
+	public void setUnit(FlowUnit unit) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.unit = unit;
 	}
 
 	public List<ContentFragment> getFlow() {
-		if(content == null){
-			content = new ArrayList<ContentFragment>();
-		}
 		return content;
+	}
+
+	public final EventType getEventType() {
+		return EventType.StartTextFlow;
+	}
+
+	public final boolean isEmptyEvent() {
+		return false;
+	}
+	
+	@Override
+	public synchronized void setImmutable(boolean immutable) {
+		if(immutable != isImmutable()){
+			if(immutable){
+				content = Collections.unmodifiableList(content);
+			}
+			else{
+				content = new ArrayList<ContentFragment>(content);
+			}
+		}
+		super.setImmutable(immutable);
 	}
 	
 }

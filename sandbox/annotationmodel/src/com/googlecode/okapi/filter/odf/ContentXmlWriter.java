@@ -2,27 +2,22 @@ package com.googlecode.okapi.filter.odf;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.AttributedCharacterIterator.Attribute;
-
-import javax.xml.stream.events.StartElement;
-
-import com.googlecode.okapi.base.annotation.IAnnotation;
-import com.googlecode.okapi.pipeline.BaseEventHandler;
-import com.googlecode.okapi.pipeline.ResourceEvent;
-import com.googlecode.okapi.resource.Container;
-import com.googlecode.okapi.resource.DataPart;
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.DocumentPart;
-import com.googlecode.okapi.resource.Reference;
-import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.textflow.ContainerFragment;
-import com.googlecode.okapi.resource.textflow.ContentFragment;
-import com.googlecode.okapi.resource.textflow.ResourceFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
 
 import nu.xom.Element;
 import nux.xom.io.StreamingSerializer;
 import nux.xom.io.StreamingSerializerFactory;
+
+import com.googlecode.okapi.events.ContainerEvent;
+import com.googlecode.okapi.events.ContainerFragmentEvent;
+import com.googlecode.okapi.events.DataPartEvent;
+import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.IContentFragmentEvent;
+import com.googlecode.okapi.events.IDocumentPartEvent;
+import com.googlecode.okapi.events.ReferenceEvent;
+import com.googlecode.okapi.events.ResourceFragmentEvent;
+import com.googlecode.okapi.events.TextFlowEvent;
+import com.googlecode.okapi.events.TextFragmentEvent;
+import com.googlecode.okapi.pipeline.BaseEventHandler;
 
 public class ContentXmlWriter extends BaseEventHandler{
 	
@@ -39,7 +34,7 @@ public class ContentXmlWriter extends BaseEventHandler{
 	}
 
 	@Override
-	protected void handleStartDocument(Document document) {
+	protected void handleStartDocument(DocumentEvent document) {
 		try{
 			serializer.writeXMLDeclaration();
 		}
@@ -49,7 +44,7 @@ public class ContentXmlWriter extends BaseEventHandler{
 	}
 
 	@Override
-	protected void handleEndDocument(Document document) {
+	protected void handleEndDocument() {
 		try {
 			serializer.writeEndDocument();
 		} catch (IOException e) {
@@ -57,11 +52,9 @@ public class ContentXmlWriter extends BaseEventHandler{
 		}
 	}
 
-	protected void handleAnnotation(IAnnotation<?> annotation) {}
-
 	// called before the specific part...
 	@Override
-	protected void handleStartDocumentPart(DocumentPart part) {
+	protected void handleStartDocumentPart(IDocumentPartEvent part) {
 		if(ContentXmlParser.FEATURE_XML_ELEMENT.equals(part.getStructuralFeature())){
 			currentElement = new Element("");
 		}
@@ -71,22 +64,22 @@ public class ContentXmlWriter extends BaseEventHandler{
 	}
 
 	@Override
-	protected void handleEndDocumentPart(DocumentPart part) {}
+	protected void handleEndDocumentPart() {}
 
 	// Document Parts
 	
 	@Override
-	protected void handleStartReference(Reference reference) {}
+	protected void handleStartReference(ReferenceEvent reference) {}
 	@Override
-	protected void handleEndReference(Reference reference) {}
+	protected void handleEndReference() {}
 
 	@Override
-	protected void handleStartDataPart(DataPart dataPart) {}
+	protected void handleStartDataPart(DataPartEvent dataPart) {}
 	@Override
-	protected void handleEndDataPart(DataPart dataPart) {}
+	protected void handleEndDataPart() {}
 
 	@Override
-	protected void handleStartContainer(Container container) {
+	protected void handleStartContainer(ContainerEvent container) {
 		try{
 			if(ContentXmlParser.FEATURE_XML_ELEMENT.equals(container.getStructuralFeature())){
 				serializer.writeEndTag();
@@ -98,12 +91,12 @@ public class ContentXmlWriter extends BaseEventHandler{
 	}
 
 	@Override
-	protected void handleEndContainer(Container container) {}
+	protected void handleEndContainer() {}
 
 	@Override
-	protected void handleStartTextFlow(TextFlow textFlow) {}
+	protected void handleStartTextFlow(TextFlowEvent textFlow) {}
 	@Override
-	protected void handleEndTextFlow(TextFlow textFlow) {}
+	protected void handleEndTextFlow() {}
 
 	@Override
 	protected void handleStartTextFlowContent() {}
@@ -130,24 +123,24 @@ public class ContentXmlWriter extends BaseEventHandler{
 	// fragments
 	
 	@Override
-	protected void handleStartContentFragment(ContentFragment contentFragment) {}
+	protected void handleStartContentFragment(IContentFragmentEvent contentFragment) {}
 	@Override
-	protected void handleEndContentFragment(ContentFragment contentFragment) {}
+	protected void handleEndContentFragment() {}
 
 	@Override
-	protected void handleStartTextFragment(TextFragment textFragment) {}
+	protected void handleStartTextFragment(TextFragmentEvent textFragment) {}
 	@Override
-	protected void handleEndTextFragment(TextFragment textFragment) {}
+	protected void handleEndTextFragment() {}
 
 	@Override
-	protected void handleStartContainerFragment(ContainerFragment containerFragment) {}
+	protected void handleStartContainerFragment(ContainerFragmentEvent containerFragment) {}
 	@Override
-	protected void handleEndContainerFragment(ContainerFragment containerFragment) {}
+	protected void handleEndContainerFragment() {}
 
 	@Override
-	protected void handlStartResourceFragment(ResourceFragment resourceFragment) {}
+	protected void handlStartResourceFragment(ResourceFragmentEvent resourceFragment) {}
 	@Override
-	protected void handleEndResourceFragment(ResourceFragment resourceFragment) {}
+	protected void handleEndResourceFragment() {}
 
 	
 }

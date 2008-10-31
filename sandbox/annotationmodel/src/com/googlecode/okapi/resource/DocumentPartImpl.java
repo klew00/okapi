@@ -1,13 +1,18 @@
 package com.googlecode.okapi.resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.googlecode.okapi.events.IDocumentPartEvent;
 
 
-abstract class DocumentPartImpl implements DocumentPart{
+
+abstract class DocumentPartImpl implements DocumentPart, IDocumentPartEvent{
 
 	private List<PartId> properties;
+	
+	private volatile boolean immutable = false;
 
 	private PartId id;
 	private String name;
@@ -19,6 +24,7 @@ abstract class DocumentPartImpl implements DocumentPart{
 	public DocumentPartImpl(PartId id, DocumentManager documentManager) {
 		this.id = id;
 		this.documentManager = documentManager;
+		this.properties = new ArrayList<PartId>();
 	}
 	
 	public PartId getId() {
@@ -29,24 +35,36 @@ abstract class DocumentPartImpl implements DocumentPart{
 		return name;
 	}
 	public void setName(String name) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.name = name;
 	}
 	public long getVersion() {
 		return version;
 	}
 	public void setVersion(long version) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.version = version;
 	}
 	public String getStructuralFeature() {
 		return structuralFeature;
 	}
 	public void setStructuralFeature(String structuralFeature) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.structuralFeature = structuralFeature;
 	}
 	public String getSemanticFeature() {
 		return semanticFeature;
 	}
 	public void setSemanticFeature(String semanticFeature) {
+		if(isImmutable()){
+			throw new UnsupportedOperationException();
+		}
 		this.semanticFeature = semanticFeature;
 	}
 
@@ -55,11 +73,27 @@ abstract class DocumentPartImpl implements DocumentPart{
 		return (A) this;
 	}
 	
+	List<PartId> immutableProperties = null;
+	
 	public List<PartId> getProperties() {
-		if(properties == null){
-			properties = new ArrayList<PartId>();
-		}
 		return properties;
+	}
+	
+	public synchronized void setImmutable(boolean immutable) {
+		if(immutable == this.immutable)
+			return;
+		
+		if(this.immutable){
+			properties = new ArrayList<PartId>(properties);
+		}
+		else{
+			properties = Collections.unmodifiableList(properties);
+		}
+		this.immutable = !immutable;
+	}
+	
+	public boolean isImmutable() {
+		return immutable;
 	}
 	
 	

@@ -1,5 +1,7 @@
 package com.googlecode.okapi.pipeline;
 
+import com.googlecode.okapi.events.Event;
+
 
 public abstract class AbstractPipelineStep implements IResourceProcessor{
 	
@@ -15,13 +17,13 @@ public abstract class AbstractPipelineStep implements IResourceProcessor{
 		return input.hasNext();
 	}
 	
-	public final ResourceEvent next() {
-		ResourceEvent event = input.next();
+	public final Event next() {
+		Event event = input.next();
 		handleEvent(event);
 		return event;
 	}
 	
-	public abstract void handleEvent(ResourceEvent event);
+	public abstract void handleEvent(Event event);
 	
 	public final void close() {
 		input.close();

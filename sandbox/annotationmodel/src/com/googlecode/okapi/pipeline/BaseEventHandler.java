@@ -1,27 +1,37 @@
 package com.googlecode.okapi.pipeline;
 
-import com.googlecode.okapi.base.annotation.IAnnotation;
-import com.googlecode.okapi.resource.Container;
-import com.googlecode.okapi.resource.DataPart;
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.DocumentPart;
-import com.googlecode.okapi.resource.Reference;
-import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.textflow.ContainerFragment;
-import com.googlecode.okapi.resource.textflow.ContentFragment;
-import com.googlecode.okapi.resource.textflow.ResourceFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
+import com.googlecode.okapi.events.AnnotationDataEvent;
+import com.googlecode.okapi.events.AnnotationEvent;
+import com.googlecode.okapi.events.ContainerEvent;
+import com.googlecode.okapi.events.ContainerFragmentEvent;
+import com.googlecode.okapi.events.DataPartEvent;
+import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.Event;
+import com.googlecode.okapi.events.IContentFragmentEvent;
+import com.googlecode.okapi.events.IDocumentPartEvent;
+import com.googlecode.okapi.events.ReferenceEvent;
+import com.googlecode.okapi.events.ResourceFragmentEvent;
+import com.googlecode.okapi.events.TextFlowEvent;
+import com.googlecode.okapi.events.TextFragmentEvent;
 
 public abstract class BaseEventHandler extends AbstractPipelineStep{
 	
+	public BaseEventHandler(IDocumentParser input) {
+		super(input);
+	}
+	
+	public BaseEventHandler() {
+	}
+	
+	
 	@Override
-	public final void handleEvent(ResourceEvent event) {
-		switch(event.type){
-		case Annotation:
-			handleAnnotation( (IAnnotation<?>) event.value );
+	public void handleEvent(Event event) {
+		switch(event.getEventType()){
+		case EndAnnotation:
+			handleEndAnnotation();
 			break;
 		case EndDocument:
-			handleEndDocument( (Document) event.value );
+			handleEndDocument();
 			break;
 		case StartProperties:
 			handleStartProperties();
@@ -42,89 +52,95 @@ public abstract class BaseEventHandler extends AbstractPipelineStep{
 			handleEndChildren();
 			break;
 		case EndContainer:
-			handleEndDocumentPart( (DocumentPart) event.value );
-			handleEndContainer( (Container) event.value );
+			handleEndDocumentPart();
+			handleEndContainer();
 			break;
 		case EndDataPart:
-			handleEndDocumentPart( (DocumentPart) event.value );
-			handleEndDataPart( (DataPart) event.value );
+			handleEndDocumentPart();
+			handleEndDataPart();
 			break;
 		case EndReference:
-			handleEndDocumentPart( (DocumentPart) event.value );
-			handleEndReference( (Reference) event.value );
+			handleEndDocumentPart();
+			handleEndReference();
 			break;
 		case EndTextFlow:
-			handleEndDocumentPart( (DocumentPart) event.value );
-			handleEndTextFlow( (TextFlow) event.value );
+			handleEndDocumentPart();
+			handleEndTextFlow();
 			break;
 		case EndContainerFragment:
-			handleEndContentFragment( (ContentFragment) event.value );
-			handleEndContainerFragment( (ContainerFragment) event.value );
+			handleEndContentFragment();
+			handleEndContainerFragment();
 			break;
 		case EndResourceFragment:
-			handleEndContentFragment( (ContentFragment) event.value );
-			handleEndResourceFragment( (ResourceFragment) event.value );
+			handleEndContentFragment();
+			handleEndResourceFragment();
 			break;
 		case EndTextFragment:
-			handleEndContentFragment( (ContentFragment) event.value );
-			handleEndTextFragment( (TextFragment) event.value );
+			handleEndContentFragment();
+			handleEndTextFragment();
 			break;
+		case StartAnnotation:
+			handleStartAnnotation( (AnnotationEvent) event);
 		case StartDocument:
-			handleStartDocument( (Document) event.value );
+			handleStartDocument( (DocumentEvent) event );
 			break;
 		case StartTextFlow:
-			handleStartDocumentPart( (DocumentPart) event.value );
-			handleStartTextFlow( (TextFlow) event.value );
+			handleStartDocumentPart( (IDocumentPartEvent) event );
+			handleStartTextFlow( (TextFlowEvent) event );
 			break;
 		case StartContainer:
-			handleStartDocumentPart( (DocumentPart) event.value );
-			handleStartContainer( (Container) event.value );
+			handleStartDocumentPart( (IDocumentPartEvent) event );
+			handleStartContainer( (ContainerEvent) event );
 			break;
 		case StartDataPart:
-			handleStartDocumentPart( (DocumentPart) event.value );
-			handleStartDataPart( (DataPart) event.value );
+			handleStartDocumentPart( (IDocumentPartEvent) event );
+			handleStartDataPart( (DataPartEvent) event );
 			break;
 		case StartReference:
-			handleStartDocumentPart( (DocumentPart) event.value );
-			handleStartReference( (Reference) event.value );
+			handleStartDocumentPart( (IDocumentPartEvent) event );
+			handleStartReference( (ReferenceEvent) event );
 			break;
 		case StartResourceFragment:
-			handleStartContentFragment( (ContentFragment) event.value );
-			handlStartResourceFragment( (ResourceFragment) event.value );
+			handleStartContentFragment( (IContentFragmentEvent) event );
+			handlStartResourceFragment( (ResourceFragmentEvent) event );
 			break;
 		case StartContainerFragment:
-			handleStartContentFragment( (ContentFragment) event.value );
-			handleStartContainerFragment( (ContainerFragment) event.value );
+			handleStartContentFragment( (IContentFragmentEvent) event );
+			handleStartContainerFragment( (ContainerFragmentEvent) event );
 			break;
 		case StartTextFragment:
-			handleStartContentFragment( (ContentFragment) event.value );
-			handleStartTextFragment( (TextFragment) event.value );
+			handleStartContentFragment( (IContentFragmentEvent) event );
+			handleStartTextFragment( (TextFragmentEvent) event );
 			break;
+		case AnnotationData:
+			handleAnnotationData( (AnnotationDataEvent) event);
 		}
 	}
 
-	protected void handleStartDocument(Document document) {}
-	protected void handleEndDocument(Document document) {}
+	protected void handleStartDocument(DocumentEvent document) {}
+	protected void handleEndDocument() {}
 
-	protected void handleAnnotation(IAnnotation<?> annotation) {}
+	protected void handleStartAnnotation(AnnotationEvent annotation) {}
+	protected void handleAnnotationData(AnnotationDataEvent annotationData) {}
+	protected void handleEndAnnotation() {}
 
 	// called before the specific part...
-	protected void handleStartDocumentPart(DocumentPart part) {}
-	protected void handleEndDocumentPart(DocumentPart part) {}
+	protected void handleStartDocumentPart(IDocumentPartEvent part) {}
+	protected void handleEndDocumentPart() {} // TODO: could pass the EventType here
 
 	// Document Parts
 	
-	protected void handleStartReference(Reference reference) {}
-	protected void handleEndReference(Reference reference) {}
+	protected void handleStartReference(ReferenceEvent reference) {}
+	protected void handleEndReference() {}
 
-	protected void handleStartDataPart(DataPart dataPart) {}
-	protected void handleEndDataPart(DataPart dataPart) {}
+	protected void handleStartDataPart(DataPartEvent dataPart) {}
+	protected void handleEndDataPart() {}
 
-	protected void handleStartContainer(Container container) {}
-	protected void handleEndContainer(Container container) {}
+	protected void handleStartContainer(ContainerEvent container) {}
+	protected void handleEndContainer() {}
 
-	protected void handleStartTextFlow(TextFlow textFlow) {}
-	protected void handleEndTextFlow(TextFlow textFlow) {}
+	protected void handleStartTextFlow(TextFlowEvent textFlow) {}
+	protected void handleEndTextFlow() {}
 
 	protected void handleStartTextFlowContent() {}
 	protected void handleEndTextFlowContent() {}
@@ -137,16 +153,16 @@ public abstract class BaseEventHandler extends AbstractPipelineStep{
 
 	// fragments
 	
-	protected void handleStartContentFragment(ContentFragment contentFragment) {}
-	protected void handleEndContentFragment(ContentFragment contentFragment) {}
+	protected void handleStartContentFragment(IContentFragmentEvent contentFragment) {}
+	protected void handleEndContentFragment() {}
 
-	protected void handleStartTextFragment(TextFragment textFragment) {}
-	protected void handleEndTextFragment(TextFragment textFragment) {}
+	protected void handleStartTextFragment(TextFragmentEvent textFragment) {}
+	protected void handleEndTextFragment() {}
 
-	protected void handleStartContainerFragment(ContainerFragment containerFragment) {}
-	protected void handleEndContainerFragment(ContainerFragment containerFragment) {}
+	protected void handleStartContainerFragment(ContainerFragmentEvent containerFragment) {}
+	protected void handleEndContainerFragment() {}
 
-	protected void handlStartResourceFragment(ResourceFragment resourceFragment) {}
-	protected void handleEndResourceFragment(ResourceFragment resourceFragment) {}
+	protected void handlStartResourceFragment(ResourceFragmentEvent resourceFragment) {}
+	protected void handleEndResourceFragment() {}
 	
 }

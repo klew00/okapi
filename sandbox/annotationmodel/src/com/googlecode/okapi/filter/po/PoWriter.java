@@ -3,15 +3,15 @@ package com.googlecode.okapi.filter.po;
 import com.googlecode.okapi.base.annotation.IAnnotation;
 import com.googlecode.okapi.pipeline.BaseEventHandler;
 import com.googlecode.okapi.resource.Container;
+import com.googlecode.okapi.resource.ContainerFragment;
+import com.googlecode.okapi.resource.ContentFragment;
 import com.googlecode.okapi.resource.DataPart;
 import com.googlecode.okapi.resource.Document;
 import com.googlecode.okapi.resource.DocumentPart;
 import com.googlecode.okapi.resource.Reference;
+import com.googlecode.okapi.resource.ResourceFragmentImpl;
 import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.textflow.ContainerFragment;
-import com.googlecode.okapi.resource.textflow.ContentFragment;
-import com.googlecode.okapi.resource.textflow.ResourceFragment;
-import com.googlecode.okapi.resource.textflow.TextFragment;
+import com.googlecode.okapi.resource.TextFragmentImpl;
 
 public class PoWriter extends BaseEventHandler{
 
@@ -64,13 +64,13 @@ public class PoWriter extends BaseEventHandler{
 	protected void handleStartContentFragment(ContentFragment contentFragment) {}
 	protected void handleEndContentFragment(ContentFragment contentFragment) {}
 
-	protected void handleStartTextFragment(TextFragment textFragment) {}
-	protected void handleEndTextFragment(TextFragment textFragment) {}
+	protected void handleStartTextFragment(TextFragmentImpl textFragment) {}
+	protected void handleEndTextFragment(TextFragmentImpl textFragment) {}
 
 	protected void handleStartContainerFragment(ContainerFragment containerFragment) {}
 	protected void handleEndContainerFragment(ContainerFragment containerFragment) {}
 
-	protected void handlStartResourceFragment(ResourceFragment resourceFragment) {}
-	protected void handleEndResourceFragment(ResourceFragment resourceFragment) {}
+	protected void handlStartResourceFragment(ResourceFragmentImpl resourceFragment) {}
+	protected void handleEndResourceFragment(ResourceFragmentImpl resourceFragment) {}
 	
 }

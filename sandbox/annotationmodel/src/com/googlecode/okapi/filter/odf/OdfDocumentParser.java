@@ -3,11 +3,11 @@ package com.googlecode.okapi.filter.odf;
 import java.io.File;
 import java.io.IOException;
 
+import com.googlecode.okapi.events.Event;
+import com.googlecode.okapi.events.EventFactory;
+import com.googlecode.okapi.events.EventType;
 import com.googlecode.okapi.filter.zip.ZipDocumentParser;
 import com.googlecode.okapi.pipeline.IDocumentParser;
-import com.googlecode.okapi.pipeline.ResourceEvent;
-import com.googlecode.okapi.pipeline.ResourceEvent.ResourceEventType;
-import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.Reference;
 
 public class OdfDocumentParser implements IDocumentParser{
@@ -15,8 +15,8 @@ public class OdfDocumentParser implements IDocumentParser{
 	private ZipDocumentParser zipParser;
 	Reference currentReference = null;
 	
-	public OdfDocumentParser(DocumentManager documentManager, File inputFile) throws IOException{
-		zipParser = new ZipDocumentParser(documentManager, inputFile);
+	public OdfDocumentParser(EventFactory factory, File inputFile) throws IOException{
+		zipParser = new ZipDocumentParser(factory, inputFile);
 	}
 
 	public void close() {
@@ -27,11 +27,11 @@ public class OdfDocumentParser implements IDocumentParser{
 		return zipParser.hasNext();
 	}
 
-	public ResourceEvent next() {
-		ResourceEvent event = zipParser.next();
+	public Event next() {
+		Event event = zipParser.next();
 		
-		currentReference = event.type == ResourceEventType.StartReference ?
-				(Reference) event.value : null;
+		currentReference = event.getEventType() == EventType.StartReference ?
+				(Reference) event : null;
 
 		return event;
 	}
