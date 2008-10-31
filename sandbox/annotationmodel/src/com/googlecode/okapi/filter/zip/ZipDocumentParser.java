@@ -11,6 +11,7 @@ import java.util.zip.ZipFile;
 
 import com.googlecode.okapi.events.ContainerEvent;
 import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.Event;
 import com.googlecode.okapi.events.EventFactory;
 import com.googlecode.okapi.events.ReferenceEvent;
 import com.googlecode.okapi.pipeline.PipelineDriver;
@@ -200,7 +201,7 @@ public class ZipDocumentParser extends BaseDocumentParser {
 		try{
 			input = new ZipDocumentParser(factory, inputFile);
 			EventWriter writer = new EventWriter(null, System.out);
-			PipelineDriver driver = new PipelineDriver();
+			PipelineDriver<Event> driver = new PipelineDriver<Event>();
 			driver.addStep(writer);
 			driver.setInput(input);
 			driver.run();
