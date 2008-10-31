@@ -15,8 +15,8 @@ final class TextFlowImpl extends DocumentPartImpl implements TextFlow, TextFlowE
 
 	private List<ContentFragment> content;
 	
-	public TextFlowImpl(PartId id, DocumentManager documentManager) {
-		super(id, documentManager);
+	public TextFlowImpl(PartId id) {
+		super(id);
 		content = new ArrayList<ContentFragment>();
 	}
 	

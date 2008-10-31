@@ -16,6 +16,7 @@ import com.googlecode.okapi.events.ReferenceEvent;
 import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
+import com.googlecode.okapi.resource.DocumentId;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.DomEventFactory;
 import com.googlecode.okapi.resource.ReferenceType;
@@ -193,8 +194,8 @@ public class ZipDocumentParser extends BaseDocumentParser {
 	
 	public static void main(String[] args) {
 		String inputFile = "/home/asgeirf/jdev/netbeans-6.5beta/mobility8/sources/netbeans_databindingme-src.zip";
-		DocumentManager docManager = DocumentManager.create("xyz");
-		EventFactory factory = new DomEventFactory(new ResourceFactoryImpl(docManager));
+		EventFactory factory = new DomEventFactory(
+				new ResourceFactoryImpl( new DocumentId("xyz")));
 		ZipDocumentParser input;
 		try{
 			input = new ZipDocumentParser(factory, inputFile);

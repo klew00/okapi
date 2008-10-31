@@ -12,8 +12,8 @@ final class ContainerImpl extends DocumentPartImpl implements Container, Contain
 
 	private List<PartId> children;
 	
-	public ContainerImpl(PartId id, DocumentManager documentManager) {
-		super(id, documentManager);
+	public ContainerImpl(PartId id) {
+		super(id);
 		children = new ArrayList<PartId>();
 	}
 

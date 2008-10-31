@@ -24,6 +24,7 @@ import com.googlecode.okapi.events.TextFragmentEvent;
 import com.googlecode.okapi.pipeline.BaseDocumentParser;
 import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
+import com.googlecode.okapi.resource.DocumentId;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.DomEventFactory;
 import com.googlecode.okapi.resource.ResourceFactoryImpl;
@@ -392,8 +393,8 @@ public class ContentXmlParser extends BaseDocumentParser{
 			"  </text:note>\n" +
 			"</text:p>\n";
 					
-		DocumentManager manager = DocumentManager.create("doc-id.xml");
-		EventFactory factory = new DomEventFactory(new ResourceFactoryImpl(manager));
+		EventFactory factory = new DomEventFactory(
+				new ResourceFactoryImpl( new DocumentId("doc-id.xml")));
 		ByteArrayInputStream bs = new ByteArrayInputStream(documentString.getBytes());
 		ContentXmlParser parser = new ContentXmlParser(factory,bs);
 		

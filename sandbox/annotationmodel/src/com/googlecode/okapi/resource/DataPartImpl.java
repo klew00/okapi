@@ -6,8 +6,8 @@ import com.googlecode.okapi.events.EventType;
 
 final class DataPartImpl extends DocumentPartImpl implements DataPart, DataPartEvent{
 
-	public DataPartImpl(PartId id, DocumentManager documentManager) {
-		super(id, documentManager);
+	public DataPartImpl(PartId id) {
+		super(id);
 	}
 	
 	public final EventType getEventType() {

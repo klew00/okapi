@@ -4,11 +4,10 @@ package com.googlecode.okapi.resource;
 public class ResourceFactoryImpl implements ResourceFactory{
 
 	private long nextResourceId = 1l;
-
-	DocumentManager documentManager;
+	private DocumentId docId;
 	
-	public ResourceFactoryImpl(DocumentManager documentManager) {
-		this.documentManager = documentManager;
+	public ResourceFactoryImpl(DocumentId docId) {
+		this.docId = docId;
 	}
 
 	private PartId nextPartId(){
@@ -20,19 +19,19 @@ public class ResourceFactoryImpl implements ResourceFactory{
 	}
 	
 	public TextFlow createTextFlow() {
-		return new TextFlowImpl( nextPartId(), documentManager );
+		return new TextFlowImpl( nextPartId());
 	}
 
 	public Container createContainer() {
-		return new ContainerImpl( nextPartId(), documentManager );
+		return new ContainerImpl( nextPartId());
 	}
 
 	public DataPart createDataPart() {
-		return new DataPartImpl( nextPartId(), documentManager );
+		return new DataPartImpl( nextPartId());
 	}
 
 	public Reference createReference() {
-		return new ReferenceImpl( nextPartId(), documentManager );
+		return new ReferenceImpl( nextPartId());
 	}
 
 	public TextFragmentImpl createTextFragment() {
@@ -48,8 +47,7 @@ public class ResourceFactoryImpl implements ResourceFactory{
 	}
 
 	public Document createDocument() {
-		// TODO Auto-generated method stub
-		return null;
+		return new DocumentImpl(docId);
 	}
 
 	
