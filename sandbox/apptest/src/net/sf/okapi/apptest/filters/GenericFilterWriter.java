@@ -10,10 +10,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.Stack;
 
 import net.sf.okapi.apptest.common.IParameters;
+import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.resource.GenericSkeleton;
+import net.sf.okapi.apptest.resource.GenericSkeletonPart;
 import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.PropertiesUnit;
-import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
@@ -47,7 +49,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	public String getName () {
-		return "GenericFilterWriter";
+		return "GenericSkeletonWriter";
 	}
 
 	public IParameters getParameters () {
@@ -63,24 +65,33 @@ public class GenericFilterWriter implements IFilterWriter {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
 				createWriter();
+				processSkeleton(event.getSkeleton());
 				break;
 			case END_DOCUMENT:
+				processSkeleton(event.getSkeleton());
 				close();
+				break;
+			case START_SUBDOCUMENT:
+				processSkeleton(event.getSkeleton());
+				break;
+			case END_SUBDOCUMENT:
+				processSkeleton(event.getSkeleton());
 				break;
 			case START_GROUP:
 				processStartGroup((Group)event.getResource());
+				processSkeleton(event.getSkeleton());
 				break;
 			case END_GROUP:
+				processSkeleton(event.getSkeleton());
 				processEndGroup((Group)event.getResource());
-				break;
-			case SKELETON_UNIT:
-				writeSkeletonUnit((SkeletonUnit)event.getResource());
 				break;
 			case TEXT_UNIT:
 				writeTextUnit((TextUnit)event.getResource());
+				processSkeleton(event.getSkeleton());
 				break;
 			case PROPERTIES_UNIT:
 				processPropertiesUnit((PropertiesUnit)event.getResource());
+				processSkeleton(event.getSkeleton());
 				break;
 			}
 		}
@@ -116,6 +127,22 @@ public class GenericFilterWriter implements IFilterWriter {
 		this.params = params;
 	}
 
+	private void processSkeleton (ISkeleton skeleton) throws IOException {
+		if ( skeleton == null ) return; // Nothing to process
+		GenericSkeleton skel = (GenericSkeleton)skeleton;
+		for ( GenericSkeletonPart part : skel.getParts() ) {
+			if ( part.isReference() ) {
+				builderData.references.add(part);
+			}
+			if ( groupStack.size() > 0 ) {
+				groupStack.peek().add(part);
+			}
+			else if ( !part.isReference() ) {
+				writer.write(part.toString(builderData));
+			}
+		}
+	}
+	
 	private void processPropertiesUnit (PropertiesUnit resource) {
 		if ( resource.isReference() ) {
 			builderData.references.add(resource);
@@ -150,18 +177,6 @@ public class GenericFilterWriter implements IFilterWriter {
 		writer = new OutputStreamWriter(output, encoding);
 		Util.writeBOMIfNeeded(writer, true, encoding);
 		groupStack = new Stack<Group>();
-	}
-	
-	private void writeSkeletonUnit (SkeletonUnit unit) throws IOException {
-		if ( unit.isReference() ) {
-			builderData.references.add(unit);
-		}
-		if ( groupStack.size() > 0 ) {
-			groupStack.peek().add(unit);
-		}
-		else if ( !unit.isReference() ) {
-			writer.write(unit.toString());
-		}
 	}
 	
 	private void writeTextUnit (TextUnit unit) throws IOException {

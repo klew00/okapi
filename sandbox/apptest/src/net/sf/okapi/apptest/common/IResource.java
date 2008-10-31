@@ -5,5 +5,5 @@ public interface IResource {
 	public String getID ();
 	
 	public void setID (String id);
-
+	
 }

@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import net.sf.okapi.apptest.common.IResource;
-
 /**
  * This class implements the methods to manipulate a unit of extracted text.
  * <p>The TextUnit object includes a source content ({@link #getSourceContent()})
@@ -35,16 +33,16 @@ import net.sf.okapi.apptest.common.IResource;
  */
 public class TextUnit extends BaseResource implements IReferenceable {
 
-	protected String                        name;
-	protected String                        type;
-	protected boolean                       isTranslatable;
-	protected boolean                       preserveWS;
-	protected IResource                     parent;
-	protected LocaleData                    source;
-	protected ArrayList<LocaleData>         targets;
-	protected Hashtable<String, String>     propList;
+	protected String name;
+	protected String type;
+	protected boolean isTranslatable;
+	protected boolean preserveWS;
+	protected LocaleData source;
+	protected ArrayList<LocaleData> targets;
+	protected Hashtable<String, String> propList;
 	protected Hashtable<String, IExtension> extList;
 	protected boolean isReference = false;
+	protected String parentId;
 
 	/**
 	 * Creates a TextUnit object with an empty source content and no target content.
@@ -194,12 +192,12 @@ public class TextUnit extends BaseResource implements IReferenceable {
 		isTranslatable = value;
 	}
 
-	public IResource getParent () {
-		return parent;
+	public String getParentID () {
+		return parentId;
 	}
 
-	public void setParent (IResource value) {
-		parent = value;
+	public void setParentID (String value) {
+		parentId = value;
 	}
 
 	/**

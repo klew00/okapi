@@ -8,7 +8,6 @@ import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.LocaleProperties;
 import net.sf.okapi.apptest.resource.PropertiesUnit;
-import net.sf.okapi.apptest.resource.SkeletonUnit;
 import net.sf.okapi.apptest.resource.TextUnit;
 
 public class DummyFilterWriter implements IFilterWriter {
@@ -33,7 +32,6 @@ public class DummyFilterWriter implements IFilterWriter {
 	public void handleEvent(FilterEvent event) {
 		Group grp;
 		TextUnit tu;
-		SkeletonUnit su;
 		PropertiesUnit pu;
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
@@ -66,16 +64,16 @@ public class DummyFilterWriter implements IFilterWriter {
 			System.out.println("   id="+grp.getID());
 			System.out.println("}");
 			break;
-		case SKELETON_UNIT:
-			su = (SkeletonUnit)event.getResource();
-			System.out.println("skeleton-unit={");
-			System.out.println("   id="+su.getID());
-			if ( su.isReference() ) {
-				System.out.println("   isReference="+su.isReference());
-			}
-			System.out.println("   data="+out(su.toString()));
-			System.out.println("}");
-			break;
+//		case SKELETON_UNIT:
+//			su = (SkeletonUnit)event.getResource();
+//			System.out.println("skeleton-unit={");
+//			System.out.println("   id="+su.getID());
+//			if ( su.isReference() ) {
+//				System.out.println("   isReference="+su.isReference());
+//			}
+//			System.out.println("   data="+out(su.toString()));
+//			System.out.println("}");
+//			break;
 		case TEXT_UNIT:
 			tu = (TextUnit)event.getResource();
 			System.out.println("text-unit={");

@@ -982,7 +982,7 @@ public class TextFragment implements Comparable<Object> {
 							else
 								tmp.replace(start, end, "propVALUE-TODO");
 						}
-						else if ( ref instanceof SkeletonUnit ) {
+						else if ( ref instanceof GenericSkeletonPart ) {
 							if ( propName == null )
 								tmp.replace(start, end, ref.toString());
 							else
@@ -1041,7 +1041,7 @@ public class TextFragment implements Comparable<Object> {
 				else  tc = ((TextUnit)ref).getSourceContent();
 				tmp.append(tc.toString(builderData));
 			}
-			else if ( ref instanceof SkeletonUnit ) {
+			else if ( ref instanceof GenericSkeletonPart ) {
 				tmp.append(ref.toString());
 			}
 			else if ( ref instanceof Group ) {
