@@ -70,10 +70,7 @@ public class DummyParser implements IParser {
 
 	private void makeCase001 () {
 		// <p>Before <img href='img.png' alt='text'/> after.</p>
-/*		Group grp1 = new Group(null, "g1");
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s1", "<p>"))));
-*/
+
 		PropertiesUnit pu = new PropertiesUnit("p1", true);
 		pu.getSourceProperties().setProperty("href", "img.png");
 		list.add(new FilterEvent(FilterEventType.PROPERTIES_UNIT, pu));
@@ -98,8 +95,6 @@ public class DummyParser implements IParser {
 		gs.add(new GenericSkeletonPart("s3", "</p>"));
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, gs));
 
-//		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1,
-//			new GenericSkeleton(new GenericSkeletonPart("s2", "</p>\n"))));
 	}
 	
 	private void makeCase002 () {
@@ -156,49 +151,48 @@ public class DummyParser implements IParser {
 	}
 
 	private void makeCase004 () {
-		Group grp1 = new Group(null, "g1");
+		Group grp1 = new Group(null, "g1", true);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s1", "<p>"))));
-		
-		Group grp2 = new Group(null, "g2", true);
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
 			new GenericSkeleton(new GenericSkeletonPart("s2", "<ul>", true))));
 		
-		Group grp3 = new Group(null, "g3", false);
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
+		Group grp2 = new Group(null, "g2", false);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
 			new GenericSkeleton(new GenericSkeletonPart("s3", "\n  <li>"))));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "Text of item 1")));
 		
-		list.add(new FilterEvent(FilterEventType.END_GROUP, grp3,
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp2,
 			new GenericSkeleton(new GenericSkeletonPart("s4", "</li>"))));
 		
-		Group grp4 = new Group(null, "g4", false);
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp4,
+		Group grp3 = new Group(null, "g3", false);
+		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
 			new GenericSkeleton(new GenericSkeletonPart("s5", "\n  <li>"))));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t2", "Text of item 2")));
 		
-		list.add(new FilterEvent(FilterEventType.END_GROUP, grp4,
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp3,
 			new GenericSkeleton(new GenericSkeletonPart("s6", "</li>"))));
 		
-		list.add(new FilterEvent(FilterEventType.END_GROUP, grp2,
+		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1,
 			new GenericSkeleton(new GenericSkeletonPart("s7", "\n </ul>"))));
 
 		TextUnit tu = new TextUnit();
 		tu.setID("t3");
+		tu.setIsReference(true);
 		TextContainer tc = new TextContainer(tu);
 		tc.append("Text before list: \n ");
-		Code code = tc.append(TagType.PLACEHOLDER, "list", TextContainer.makeRefMarker("g2"));
+		Code code = tc.append(TagType.PLACEHOLDER, "list", TextContainer.makeRefMarker("g1"));
 		code.setHasReference(true);
 		tc.append("\n and text after the list.");
 		tu.setSourceContent(tc);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		GenericSkeleton gs = new GenericSkeleton();
+		gs.add(new GenericSkeletonPart("s1", "<p>"));
+		gs.add(new GenericSkeletonPart("s8", TextFragment.makeRefMarker("t3")));
+		gs.add(new GenericSkeletonPart("s9", "</p>"));
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, gs));
 
-		list.add(new FilterEvent(FilterEventType.END_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s8", "</p>\n"))));
 	}
 	
 	private void resetResources () {
@@ -216,10 +210,10 @@ public class DummyParser implements IParser {
 		subDocRes.setID("sd1");
 		list.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocRes));
 		
-		makeCase001();
+		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		//makeCase004();
+		makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocRes));
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));

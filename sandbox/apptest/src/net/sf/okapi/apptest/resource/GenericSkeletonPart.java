@@ -23,6 +23,11 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 		this.id = id;
 		this.isReference = isReference;
 	}
+	
+	@Override
+	public String toString () {
+		return data.toString();
+	}
 
 	public String toString (BuilderData builderData) {
 		if ( data.toString().startsWith(TextFragment.REFMARKER_START) ) {
