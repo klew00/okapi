@@ -9,19 +9,19 @@ import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.googlecode.okapi.events.ContainerEvent;
-import com.googlecode.okapi.events.DocumentEvent;
-import com.googlecode.okapi.events.Event;
-import com.googlecode.okapi.events.EventFactory;
-import com.googlecode.okapi.events.ReferenceEvent;
+import com.googlecode.okapi.dom.DocumentManager;
+import com.googlecode.okapi.dom.DomEventFactory;
+import com.googlecode.okapi.dom.ReferenceType;
+import com.googlecode.okapi.dom.ResourceFactoryImpl;
 import com.googlecode.okapi.pipeline.PipelineDriver;
-import com.googlecode.okapi.pipeline.event.BaseDocumentParser;
-import com.googlecode.okapi.pipeline.event.EventWriter;
+import com.googlecode.okapi.resource.ContainerEvent;
+import com.googlecode.okapi.resource.DocumentEvent;
 import com.googlecode.okapi.resource.DocumentId;
-import com.googlecode.okapi.resource.DocumentManager;
-import com.googlecode.okapi.resource.DomEventFactory;
-import com.googlecode.okapi.resource.ReferenceType;
-import com.googlecode.okapi.resource.ResourceFactoryImpl;
+import com.googlecode.okapi.resource.Event;
+import com.googlecode.okapi.resource.EventFactory;
+import com.googlecode.okapi.resource.ReferenceEvent;
+import com.googlecode.okapi.resource.pipeline.BaseDocumentParser;
+import com.googlecode.okapi.resource.pipeline.EventWriter;
 
 public class ZipDocumentParser extends BaseDocumentParser {
 

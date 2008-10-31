@@ -7,17 +7,17 @@ import nu.xom.Element;
 import nux.xom.io.StreamingSerializer;
 import nux.xom.io.StreamingSerializerFactory;
 
-import com.googlecode.okapi.events.ContainerEvent;
-import com.googlecode.okapi.events.ContainerFragmentEvent;
-import com.googlecode.okapi.events.DataPartEvent;
-import com.googlecode.okapi.events.DocumentEvent;
-import com.googlecode.okapi.events.IContentFragmentEvent;
-import com.googlecode.okapi.events.IDocumentPartEvent;
-import com.googlecode.okapi.events.ReferenceEvent;
-import com.googlecode.okapi.events.ResourceFragmentEvent;
-import com.googlecode.okapi.events.TextFlowEvent;
-import com.googlecode.okapi.events.TextFragmentEvent;
-import com.googlecode.okapi.pipeline.event.BaseEventHandler;
+import com.googlecode.okapi.resource.ContainerEvent;
+import com.googlecode.okapi.resource.ContainerFragmentEvent;
+import com.googlecode.okapi.resource.DataPartEvent;
+import com.googlecode.okapi.resource.DocumentEvent;
+import com.googlecode.okapi.resource.IContentFragmentEvent;
+import com.googlecode.okapi.resource.IDocumentPartEvent;
+import com.googlecode.okapi.resource.ReferenceEvent;
+import com.googlecode.okapi.resource.ResourceFragmentEvent;
+import com.googlecode.okapi.resource.TextFlowEvent;
+import com.googlecode.okapi.resource.TextFragmentEvent;
+import com.googlecode.okapi.resource.pipeline.BaseEventHandler;
 
 public class ContentXmlWriter extends BaseEventHandler{
 	

@@ -12,23 +12,23 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
 
-import com.googlecode.okapi.events.ContainerEvent;
-import com.googlecode.okapi.events.ContainerFragmentEvent;
-import com.googlecode.okapi.events.DataPartEvent;
-import com.googlecode.okapi.events.DocumentEvent;
-import com.googlecode.okapi.events.Event;
-import com.googlecode.okapi.events.EventFactory;
-import com.googlecode.okapi.events.IDocumentPartEvent;
-import com.googlecode.okapi.events.ResourceFragmentEvent;
-import com.googlecode.okapi.events.TextFlowEvent;
-import com.googlecode.okapi.events.TextFragmentEvent;
+import com.googlecode.okapi.dom.DocumentManager;
+import com.googlecode.okapi.dom.DomEventFactory;
+import com.googlecode.okapi.dom.ResourceFactoryImpl;
 import com.googlecode.okapi.pipeline.PipelineDriver;
-import com.googlecode.okapi.pipeline.event.BaseDocumentParser;
-import com.googlecode.okapi.pipeline.event.EventWriter;
+import com.googlecode.okapi.resource.ContainerEvent;
+import com.googlecode.okapi.resource.ContainerFragmentEvent;
+import com.googlecode.okapi.resource.DataPartEvent;
+import com.googlecode.okapi.resource.DocumentEvent;
 import com.googlecode.okapi.resource.DocumentId;
-import com.googlecode.okapi.resource.DocumentManager;
-import com.googlecode.okapi.resource.DomEventFactory;
-import com.googlecode.okapi.resource.ResourceFactoryImpl;
+import com.googlecode.okapi.resource.Event;
+import com.googlecode.okapi.resource.EventFactory;
+import com.googlecode.okapi.resource.IDocumentPartEvent;
+import com.googlecode.okapi.resource.ResourceFragmentEvent;
+import com.googlecode.okapi.resource.TextFlowEvent;
+import com.googlecode.okapi.resource.TextFragmentEvent;
+import com.googlecode.okapi.resource.pipeline.BaseDocumentParser;
+import com.googlecode.okapi.resource.pipeline.EventWriter;
 
 public class ContentXmlParser extends BaseDocumentParser{
 	

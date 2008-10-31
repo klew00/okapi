@@ -1,7 +1,7 @@
 package com.googlecode.okapi.base.annotation.comments;
 
 import com.googlecode.okapi.base.annotation.AbstractAnnotationManager;
-import com.googlecode.okapi.resource.DocumentPart;
+import com.googlecode.okapi.dom.DocumentPart;
 import com.googlecode.okapi.resource.ResourceId;
 
 public class CommentsAnnotationManager extends AbstractAnnotationManager<CommentsAnnotation>{

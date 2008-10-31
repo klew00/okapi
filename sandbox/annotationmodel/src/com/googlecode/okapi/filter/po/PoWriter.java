@@ -1,17 +1,17 @@
 package com.googlecode.okapi.filter.po;
 
 import com.googlecode.okapi.base.annotation.IAnnotation;
-import com.googlecode.okapi.pipeline.event.BaseEventHandler;
-import com.googlecode.okapi.resource.Container;
-import com.googlecode.okapi.resource.ContainerFragment;
-import com.googlecode.okapi.resource.ContentFragment;
-import com.googlecode.okapi.resource.DataPart;
-import com.googlecode.okapi.resource.Document;
-import com.googlecode.okapi.resource.DocumentPart;
-import com.googlecode.okapi.resource.Reference;
-import com.googlecode.okapi.resource.ResourceFragmentImpl;
-import com.googlecode.okapi.resource.TextFlow;
-import com.googlecode.okapi.resource.TextFragmentImpl;
+import com.googlecode.okapi.dom.Container;
+import com.googlecode.okapi.dom.ContainerFragment;
+import com.googlecode.okapi.dom.ContentFragment;
+import com.googlecode.okapi.dom.DataPart;
+import com.googlecode.okapi.dom.Document;
+import com.googlecode.okapi.dom.DocumentPart;
+import com.googlecode.okapi.dom.Reference;
+import com.googlecode.okapi.dom.ResourceFragmentImpl;
+import com.googlecode.okapi.dom.TextFlow;
+import com.googlecode.okapi.dom.TextFragmentImpl;
+import com.googlecode.okapi.resource.pipeline.BaseEventHandler;
 
 public class PoWriter extends BaseEventHandler{
 

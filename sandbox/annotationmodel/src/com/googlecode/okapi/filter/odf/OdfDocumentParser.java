@@ -3,12 +3,12 @@ package com.googlecode.okapi.filter.odf;
 import java.io.File;
 import java.io.IOException;
 
-import com.googlecode.okapi.events.Event;
-import com.googlecode.okapi.events.EventFactory;
-import com.googlecode.okapi.events.EventType;
+import com.googlecode.okapi.dom.Reference;
 import com.googlecode.okapi.filter.zip.ZipDocumentParser;
 import com.googlecode.okapi.pipeline.IPullParser;
-import com.googlecode.okapi.resource.Reference;
+import com.googlecode.okapi.resource.Event;
+import com.googlecode.okapi.resource.EventFactory;
+import com.googlecode.okapi.resource.EventType;
 
 public class OdfDocumentParser implements IPullParser<Event>{
 	

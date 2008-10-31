@@ -1,7 +1,7 @@
 package com.googlecode.okapi.base.annotation.skeleton;
 
 import com.googlecode.okapi.base.annotation.AbstractAnnotationManager;
-import com.googlecode.okapi.resource.DataPart;
+import com.googlecode.okapi.dom.DataPart;
 import com.googlecode.okapi.resource.ResourceId;
 
 public class SkeletonAnnotationManager extends AbstractAnnotationManager<SkeletonAnnotation>{

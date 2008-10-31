@@ -1,6 +1,6 @@
 package com.googlecode.okapi.base.annotation;
 
-import com.googlecode.okapi.base.apapters.IAdapterFactory;
+import com.googlecode.okapi.dom.apapters.IAdapterFactory;
 import com.googlecode.okapi.resource.ResourceId;
 
 public interface IAnnotationManager<T extends IAnnotation<?>> extends IAdapterFactory{

@@ -2,7 +2,7 @@ package com.googlecode.okapi.base.annotation;
 
 import java.util.Map;
 
-import com.googlecode.okapi.resource.Resource;
+import com.googlecode.okapi.dom.Resource;
 import com.googlecode.okapi.resource.ResourceId;
 
 public abstract class AbstractAnnotationManager<T extends IAnnotation<?>> implements IAnnotationManager<T>{
