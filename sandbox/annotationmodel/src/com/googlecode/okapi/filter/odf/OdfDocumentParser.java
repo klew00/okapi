@@ -7,10 +7,10 @@ import com.googlecode.okapi.events.Event;
 import com.googlecode.okapi.events.EventFactory;
 import com.googlecode.okapi.events.EventType;
 import com.googlecode.okapi.filter.zip.ZipDocumentParser;
-import com.googlecode.okapi.pipeline.IDocumentParser;
+import com.googlecode.okapi.pipeline.IPullParser;
 import com.googlecode.okapi.resource.Reference;
 
-public class OdfDocumentParser implements IDocumentParser{
+public class OdfDocumentParser implements IPullParser<Event>{
 	
 	private ZipDocumentParser zipParser;
 	Reference currentReference = null;
@@ -36,11 +36,11 @@ public class OdfDocumentParser implements IDocumentParser{
 		return event;
 	}
 
-	public IDocumentParser getParser() throws IOException{
+	public IPullParser<Event> getParser() throws IOException{
 		return getParser(currentReference);
 	}
 
-	public IDocumentParser getParser(Reference reference) throws IOException{
+	public IPullParser<Event> getParser(Reference reference) throws IOException{
 		if(reference == null){
 			throw new IllegalStateException("No child-parser available");
 		}

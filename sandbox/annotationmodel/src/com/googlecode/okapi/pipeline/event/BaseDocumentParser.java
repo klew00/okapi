@@ -1,4 +1,4 @@
-package com.googlecode.okapi.pipeline;
+package com.googlecode.okapi.pipeline.event;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -7,8 +7,9 @@ import java.util.Stack;
 import com.googlecode.okapi.events.Event;
 import com.googlecode.okapi.events.EventFactory;
 import com.googlecode.okapi.events.EventType;
+import com.googlecode.okapi.pipeline.IPullParser;
 
-public abstract class BaseDocumentParser implements IDocumentParser{
+public abstract class BaseDocumentParser implements IPullParser<Event>{
 
 	private boolean isFinished = false;
 	private Queue<Event> eventQueue = new LinkedList<Event>();

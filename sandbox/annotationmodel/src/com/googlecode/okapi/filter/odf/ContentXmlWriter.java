@@ -17,7 +17,7 @@ import com.googlecode.okapi.events.ReferenceEvent;
 import com.googlecode.okapi.events.ResourceFragmentEvent;
 import com.googlecode.okapi.events.TextFlowEvent;
 import com.googlecode.okapi.events.TextFragmentEvent;
-import com.googlecode.okapi.pipeline.BaseEventHandler;
+import com.googlecode.okapi.pipeline.event.BaseEventHandler;
 
 public class ContentXmlWriter extends BaseEventHandler{
 	

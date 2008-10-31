@@ -1,13 +1,10 @@
 package com.googlecode.okapi.pipeline;
 
-import com.googlecode.okapi.events.Event;
-
-
-public abstract class AbstractPipelineStep implements IResourceProcessor{
+public abstract class AbstractPipelineStep<T> implements IInputProcessor<T>{
 	
-	private IDocumentParser input;
+	private IPullParser<T> input;
 	
-	public AbstractPipelineStep(IDocumentParser input){
+	public AbstractPipelineStep(IPullParser<T> input){
 		this.input = input;
 	}
 	
@@ -17,19 +14,19 @@ public abstract class AbstractPipelineStep implements IResourceProcessor{
 		return input.hasNext();
 	}
 	
-	public final Event next() {
-		Event event = input.next();
+	public final T next() {
+		T event = input.next();
 		handleEvent(event);
 		return event;
 	}
 	
-	public abstract void handleEvent(Event event);
+	public abstract void handleEvent(T event);
 	
 	public final void close() {
 		input.close();
 	}
 
-	public void setInput(IDocumentParser input){
+	public void setInput(IPullParser<T> input){
 		this.input = input;
 	}
 }

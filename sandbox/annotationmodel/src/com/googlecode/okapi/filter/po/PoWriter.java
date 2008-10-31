@@ -1,7 +1,7 @@
 package com.googlecode.okapi.filter.po;
 
 import com.googlecode.okapi.base.annotation.IAnnotation;
-import com.googlecode.okapi.pipeline.BaseEventHandler;
+import com.googlecode.okapi.pipeline.event.BaseEventHandler;
 import com.googlecode.okapi.resource.Container;
 import com.googlecode.okapi.resource.ContainerFragment;
 import com.googlecode.okapi.resource.ContentFragment;

@@ -1,4 +1,4 @@
-package com.googlecode.okapi.pipeline;
+package com.googlecode.okapi.pipeline.event;
 
 import com.googlecode.okapi.events.AnnotationDataEvent;
 import com.googlecode.okapi.events.AnnotationEvent;
@@ -13,10 +13,12 @@ import com.googlecode.okapi.events.ReferenceEvent;
 import com.googlecode.okapi.events.ResourceFragmentEvent;
 import com.googlecode.okapi.events.TextFlowEvent;
 import com.googlecode.okapi.events.TextFragmentEvent;
+import com.googlecode.okapi.pipeline.AbstractPipelineStep;
+import com.googlecode.okapi.pipeline.IPullParser;
 
-public abstract class BaseEventHandler extends AbstractPipelineStep{
+public abstract class BaseEventHandler extends AbstractPipelineStep<Event>{
 	
-	public BaseEventHandler(IDocumentParser input) {
+	public BaseEventHandler(IPullParser<Event> input) {
 		super(input);
 	}
 	

@@ -1,8 +1,9 @@
-package com.googlecode.okapi.pipeline;
+package com.googlecode.okapi.pipeline.event;
 
 import java.io.PrintStream;
 
 import com.googlecode.okapi.events.Event;
+import com.googlecode.okapi.pipeline.IPullParser;
 
 public class EventWriter extends BaseEventHandler{
 
@@ -10,7 +11,7 @@ public class EventWriter extends BaseEventHandler{
 	private PrintStream out;
 	int stack = 0;
 	
-	public EventWriter(IDocumentParser input, PrintStream writer) {
+	public EventWriter(IPullParser<Event> input, PrintStream writer) {
 		super(input);
 		this.out = writer;
 	}

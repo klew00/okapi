@@ -3,27 +3,26 @@ package com.googlecode.okapi.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+public class PipelineDriver<T> {
 
-public class PipelineDriver {
-
-	private IDocumentParser input;
-	List<IResourceProcessor> steps;
+	private IPullParser<T> input;
+	List<IInputProcessor<T>> steps;
 	
 	public PipelineDriver() {
-		steps = new ArrayList<IResourceProcessor>();
+		steps = new ArrayList<IInputProcessor<T>>();
 	}
 
-	public void setInput(IDocumentParser input) {
+	public void setInput(IPullParser<T> input) {
 		this.input = input;
 	}
 	
-	public void addStep(IResourceProcessor input){
+	public void addStep(IInputProcessor<T> input){
 		steps.add(input);
 	}
 	
 	public void run(){
-		IDocumentParser previous = input;
-		for(IResourceProcessor processor : steps){
+		IPullParser<T> previous = input;
+		for(IInputProcessor<T> processor : steps){
 			processor.setInput(previous);
 			previous = processor;
 		}

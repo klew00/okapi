@@ -16,14 +16,15 @@ import com.googlecode.okapi.events.ContainerEvent;
 import com.googlecode.okapi.events.ContainerFragmentEvent;
 import com.googlecode.okapi.events.DataPartEvent;
 import com.googlecode.okapi.events.DocumentEvent;
+import com.googlecode.okapi.events.Event;
 import com.googlecode.okapi.events.EventFactory;
 import com.googlecode.okapi.events.IDocumentPartEvent;
 import com.googlecode.okapi.events.ResourceFragmentEvent;
 import com.googlecode.okapi.events.TextFlowEvent;
 import com.googlecode.okapi.events.TextFragmentEvent;
-import com.googlecode.okapi.pipeline.BaseDocumentParser;
-import com.googlecode.okapi.pipeline.EventWriter;
 import com.googlecode.okapi.pipeline.PipelineDriver;
+import com.googlecode.okapi.pipeline.event.BaseDocumentParser;
+import com.googlecode.okapi.pipeline.event.EventWriter;
 import com.googlecode.okapi.resource.DocumentId;
 import com.googlecode.okapi.resource.DocumentManager;
 import com.googlecode.okapi.resource.DomEventFactory;
@@ -398,7 +399,7 @@ public class ContentXmlParser extends BaseDocumentParser{
 		ByteArrayInputStream bs = new ByteArrayInputStream(documentString.getBytes());
 		ContentXmlParser parser = new ContentXmlParser(factory,bs);
 		
-		PipelineDriver driver = new PipelineDriver();
+		PipelineDriver<Event> driver = new PipelineDriver<Event>();
 		driver.setInput(parser);
 		driver.addStep(new EventWriter(System.out));
 		
