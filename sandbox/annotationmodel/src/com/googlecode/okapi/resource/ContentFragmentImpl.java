@@ -3,7 +3,7 @@ package com.googlecode.okapi.resource;
 import com.googlecode.okapi.events.IContentFragmentEvent;
 
 
-abstract class ContentFragmentImpl implements ContentFragment, IContentFragmentEvent {
+public abstract class ContentFragmentImpl implements ContentFragment, IContentFragmentEvent {
 
 	private volatile boolean immutable = false;
 	

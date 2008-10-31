@@ -8,7 +8,7 @@ import com.googlecode.okapi.events.ContainerEvent;
 import com.googlecode.okapi.events.EventType;
 
 
-final class ContainerImpl extends DocumentPartImpl implements Container, ContainerEvent{
+public class ContainerImpl extends DocumentPartImpl implements Container, ContainerEvent{
 
 	private List<PartId> children;
 	

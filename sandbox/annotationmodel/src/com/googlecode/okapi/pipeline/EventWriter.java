@@ -22,7 +22,21 @@ public class EventWriter extends BaseEventHandler{
 
 	@Override
 	public void handleEvent(Event event) {
+		if(event.getEventType().isStartEvent()){
+			doIndent();
+			stack++;
+		}
+		else if(event.getEventType().isEndEvent()){
+			stack--;
+			doIndent();
+		}
 		out.println(event.getEventType().name());
 		super.handleEvent(event);
+	}
+	
+	private void doIndent(){
+		for(int i=0;i<stack*INDENT;i++){
+			out.print(' ');
+		}
 	}
 }

@@ -48,11 +48,14 @@ public abstract class BaseDocumentParser implements IDocumentParser{
 	}
 	
 	protected void addEvent(Event event){
+		// TODO validation
 		eventQueue.add(event);
-		eventStack.push(event.getEventType());
+		if(event.getEventType().isStartEvent())
+			eventStack.push(event.getEventType());
 	}
 	
 	protected void addEndEvent(){
+		// TODO validation
 		EventType startType = eventStack.pop();
 		if(!startType.isStartEvent()){
 			throw new RuntimeException("No StartEvent in context");
@@ -65,5 +68,7 @@ public abstract class BaseDocumentParser implements IDocumentParser{
 	public void close() {
 		setEndOfDocument();
 	}
+
+	// TODO: We could add convenience methods such as addEndDocumentEvent()...
 	
 }
