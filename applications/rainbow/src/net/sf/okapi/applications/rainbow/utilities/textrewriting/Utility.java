@@ -29,6 +29,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
@@ -41,6 +43,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private String commonFolder;
 	private Segmenter srcSeg;
 	private Segmenter trgSeg;
+	private SimpleTMConnector tmQ;
 	
 	public Utility () {
 		params = new Parameters();
@@ -71,10 +74,18 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			}
 			trgSeg = doc.applyLanguageRules(targetLanguage, null);
 		}
+		
+		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
+			tmQ = new SimpleTMConnector();
+			tmQ.open(params.tmPath);
+		}
 	}
 	
 	public void doEpilog () {
-		// Not used for this utility
+		if ( tmQ != null ) {
+			tmQ.close();
+			tmQ = null;
+		}
 	}
 	
 	public IParameters getParameters () {
@@ -131,26 +142,39 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		// Skip if already translate (only if required)
 		if ( tu.hasTarget() && !params.applyToExistingTarget ) return;
 		
-		// mark the segments if requested
-		if ( params.segment ) {
+		// Apply the segmentation and/or segment marks if requested
+		if ( params.segment || params.markSegments ) {
 			if ( tu.hasTarget() ) {
-				trgSeg.computeSegments(tu.getTargetContent());
-				tu.getTargetContent().createSegments(trgSeg.getSegmentRanges());
-				mergeSegments(tu.getTargetContent());
+				if ( params.segment ) {
+					trgSeg.computeSegments(tu.getTargetContent());
+					tu.getTargetContent().createSegments(trgSeg.getSegmentRanges());
+				}
 			}
 			else {
-				srcSeg.computeSegments(tu.getSourceContent());
-				tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
-				mergeSegments(tu.getSourceContent());
+				if ( params.segment ) {
+					srcSeg.computeSegments(tu.getSourceContent());
+					tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+				}
 			}
 		}
 		
 		// Else: do the requested modifications
-		// Make sure we have a target where to set data
+		// Make sure we have a target where to apply the modifications
 		if ( !tu.hasTarget() ) {
 			tu.setTargetContent(tu.getSourceContent().clone());
 		}
+		
+		// Translate is done before we merge possible segments
+		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
+			translate(tu);
+		}
 
+		// Merge all segments if needed
+		if ( params.segment || params.markSegments ) {
+			mergeSegments(tu.getTargetContent());
+		}
+
+		// Other text modification are done after merging all segments
 		switch ( params.type ) {
 		case Parameters.TYPE_XNREPLACE:
 			replaceWithXN(tu);
@@ -180,16 +204,15 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 				case TextFragment.MARKER_ISOLATED:
 				case TextFragment.MARKER_SEGMENT:
 					sb.append(result.charAt(i));
-					i++;
-					sb.append(result.charAt(i));
+					sb.append(result.charAt(++i));
 					break;
 				case TMPSTARTSEG: // Keep segment marks if needed
-					if ( params.segment ) sb.append(STARTSEG);
+					if ( params.markSegments ) sb.append(STARTSEG);
 					break;
 				case TMPENDSEG: // Keep segment marks if needed
-					if ( params.segment ) sb.append(ENDSEG);
+					if ( params.markSegments ) sb.append(ENDSEG);
 					break;					
-				default:
+				default: // Do not keep other characters
 					break;
 			}
 		}
@@ -198,12 +221,13 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	}	
 	
 	/**
-	 * Merges back segments into a single content, while adding brackets
-	 * to denote the segments. 
+	 * Merges back segments into a single content, while optionally adding
+	 * brackets to denote the segments. If the unit is not segmented, brackets
+	 * are added if required. 
 	 * @param container The TextContainer object to un-segment.
 	 */
 	private void mergeSegments (TextContainer container) {
-		if ( !container.isSegmented() ) return;
+		// Set variables
 		StringBuilder text = new StringBuilder(container.getCodedText());
 		char start = STARTSEG;
 		char end = ENDSEG;
@@ -213,26 +237,68 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			start = TMPSTARTSEG;
 			end = TMPENDSEG;
 		}
-		// Insert the segment marks
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextContainer.MARKER_OPENING:
-			case TextContainer.MARKER_CLOSING:
-			case TextContainer.MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case TextContainer.MARKER_SEGMENT:
-				text.insert(i, start);
-				i += 3; // The bracket, the marker, the code index
-				text.insert(i, end);
-				// Next i++ will skip over the closing bracket
-				break;
+		
+		if ( !container.isSegmented() ) {
+			if ( params.markSegments ) {
+				container.setCodedText(start+text.toString()+end);
 			}
+			return;
 		}
-		// Replace the original coded text by the one with brackets
-		container.setCodedText(text.toString());
+		
+		// Add the markers if needed
+		if ( params.markSegments ) {
+			// Insert the segment marks if requested
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.charAt(i) ) {
+				case TextContainer.MARKER_OPENING:
+				case TextContainer.MARKER_CLOSING:
+				case TextContainer.MARKER_ISOLATED:
+					i++; // Normal skip
+					break;
+				case TextContainer.MARKER_SEGMENT:
+					text.insert(i, start);
+					i += 3; // The bracket, the marker, the code index
+					text.insert(i, end);
+					// Next i increment will skip over the closing mark
+					break;
+				}
+			}
+			// Replace the original coded text by the one with markers
+			container.setCodedText(text.toString());
+		}
 		// Merge all segments
 		container.mergeAllSegments();
+	}
+
+	private void translate (TextUnit tu) {
+		try {
+			// Target is set if needed
+			QueryResult qr;
+			tmQ.setContext("resname", tu.getName());
+			TextContainer tc = tu.getTargetContent();
+			if ( tc.isSegmented() ) {
+				int seg = 0;
+				for ( TextFragment tf : tc.getSegments() ) {
+					if ( tmQ.query(tf) == 1 ) {
+						qr = tmQ.next();
+						tc.getSegments().set(seg, qr.target);
+					}
+					seg++;
+				}
+			}
+			else {
+				if ( tmQ.query(tc) == 1 ) {
+					qr = tmQ.next();
+					tc = new TextContainer();
+					tc.append(qr.target);
+					tu.setTargetContent(tc);
+				}
+			}
+			
+		}
+		catch ( Throwable e ) {
+			logger.warn("Error while translating: ", e);
+		}
 	}
 	
 	/**
@@ -248,7 +314,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			TextContainer cnt = tu.getTargetContent(); 
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
 		}
 	}
@@ -279,7 +345,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			TextContainer cnt = tu.getTargetContent(); 
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);
 		}
 	}

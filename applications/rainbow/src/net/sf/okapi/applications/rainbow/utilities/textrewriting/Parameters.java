@@ -24,9 +24,10 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	public static final int  TYPE_KEEPORIGINAL   = 0;
-	public static final int  TYPE_XNREPLACE      = 1;
-	public static final int  TYPE_KEEPINLINE     = 2;
+	public static final int  TYPE_KEEPORIGINAL = 0;
+	public static final int  TYPE_XNREPLACE = 1;
+	public static final int  TYPE_KEEPINLINE = 2;
+	public static final int  TYPE_TRANSLATEEXACTMATCHES = 3;
 	
 	protected int       type;
 	protected boolean   addPrefix;
@@ -37,8 +38,10 @@ public class Parameters extends BaseParameters {
 	protected boolean   addName;
 	protected boolean   addID;
 	protected boolean   segment;
+	protected boolean   markSegments;
 	protected String    sourceSrxPath;
 	protected String    targetSrxPath;
+	protected String    tmPath;
 	
 	
 	public Parameters () {
@@ -48,15 +51,17 @@ public class Parameters extends BaseParameters {
 	public void reset() {
 		type = 0;
 		addPrefix = false;
-		prefix = "[[";
+		prefix = "{START_";
 		addSuffix = false;
-		suffix = "]]";
+		suffix = "_END}";
 		applyToExistingTarget = false;
 		addName = false;
 		addID = false;
 		segment = false;
+		markSegments = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
+		tmPath = "";
 	}
 
 	public void fromString (String data) {
@@ -71,8 +76,10 @@ public class Parameters extends BaseParameters {
 		addName = buffer.getBoolean("addName", addName);
 		addID = buffer.getBoolean("addID", addID);
 		segment = buffer.getBoolean("segment", segment);
+		markSegments = buffer.getBoolean("markSegments", markSegments);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
+		tmPath = buffer.getString("tmPath", tmPath);
 	}
 
 	@Override
@@ -87,8 +94,10 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("addName", addName);
 		buffer.setBoolean("addID", addID);
 		buffer.setBoolean("segment", segment);
+		buffer.setBoolean("markSegments", markSegments);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
+		buffer.setString("tmPath", tmPath);
 		return buffer.toString();
 	}
 	

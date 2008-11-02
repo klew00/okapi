@@ -26,6 +26,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.tm.simpletm.Database;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -49,7 +50,10 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel         pnlActions;
 	private Parameters            params;
 	private Text                  edTMXPath;
+	private Button                chkCreateTM;
+	private Text                  edTMPath;
 	private Button                chkUseTradosWorkarounds;
+	private Button                btGetTMPath;
 	private Button                chkCheckSingleSegUnit;
 	private Button                chkUseAutoCorrection;
 	private SegmentationPanel     pnlSegmentation;
@@ -128,6 +132,38 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		chkCreateTM = new Button(cmpTmp, SWT.CHECK);
+		chkCreateTM.setText("Create a translation memory with the following path:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkCreateTM.setLayoutData(gdTmp);
+		chkCreateTM.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edTMPath.setEnabled(chkCreateTM.getSelection());
+				btGetTMPath.setEnabled(chkCreateTM.getSelection());
+			}
+		});
+		
+		edTMPath = new Text(cmpTmp, SWT.BORDER);
+		edTMPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		btGetTMPath = new Button(cmpTmp, SWT.PUSH);
+		btGetTMPath.setText("...");
+		btGetTMPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String path = Dialogs.browseFilenamesForSave(shell, "Simple TM File", null,
+					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
+					"*"+Database.DATAFILE_EXT+"\t*.*");
+				if ( path == null ) return;
+				if ( path.endsWith(Database.DATAFILE_EXT) ) {
+					path = path.substring(0, path.length()-Database.DATAFILE_EXT.length());
+				}
+				edTMPath.setText(path);
+				edTMPath.selectAll();
+				edTMPath.setFocus();
+			}
+		});
+		
 		chkUseTradosWorkarounds = new Button(cmpTmp, SWT.CHECK);
 		chkUseTradosWorkarounds.setText("Generate Trados workarounds");
 		gdTmp = new GridData();
@@ -191,10 +227,14 @@ public class Editor implements IParametersEditor {
 
 	private void setData () {
 		edTMXPath.setText(params.tmxPath);
+		chkCreateTM.setSelection(params.createTM);
+		edTMPath.setText(params.tmPath);
 		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 		chkCheckSingleSegUnit.setSelection(params.checkSingleSegUnit);
 		chkUseAutoCorrection.setSelection(params.useAutoCorrection);
+		edTMPath.setEnabled(chkCreateTM.getSelection());
+		btGetTMPath.setEnabled(chkCreateTM.getSelection());
 	}
 
 	private boolean saveData () {
@@ -205,6 +245,8 @@ public class Editor implements IParametersEditor {
 			return false;
 		}
 		params.tmxPath = edTMXPath.getText();
+		params.createTM = chkCreateTM.getSelection();
+		params.tmPath = edTMPath.getText();
 		params.segment = pnlSegmentation.getSegment();
 		if ( params.segment && pnlSegmentation.getSourceSRX().length() == 0 ) {
 			Dialogs.showError(shell, "You must specify an SRX document for the source.", null);

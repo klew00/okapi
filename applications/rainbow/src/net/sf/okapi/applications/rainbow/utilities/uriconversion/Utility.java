@@ -41,9 +41,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 
 	private Parameters            params;
 	private String                commonFolder;
-	private String                inputPath;
-	private String                outputPath;
-	private String			      inputEncoding;
 	private EventListenerList     listenerList = new EventListenerList();
 	
 	static final int UNESCAPE  = 0;
@@ -115,17 +112,12 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 	}
 	
 	public void addInputData (String path, String encoding, String filterSettings){
-		// Not sure when to use this
-		inputPath = path;
-		inputEncoding = encoding;
 	}
 
 	public void addOutputData (String path, String encoding){
 		// Compute the longest common folder
 		commonFolder = Util.longestCommonDir(commonFolder,
 			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-		outputPath = path;
-		// Encoding stays the same as the input
 	}
 
 	public void setFilterAccess (FilterAccess filterAccess,

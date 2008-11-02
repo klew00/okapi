@@ -196,6 +196,8 @@ public class Editor implements IParametersEditor {
 		rl.pack = false;
 		cmpTmp.setLayout(rl);
 		
+		int standardWidth = 80;
+
 		btMoveUp = new Button(cmpTmp, SWT.PUSH);
 		btMoveUp.setText("Move Up");
 		btMoveUp.setEnabled(false);
@@ -221,6 +223,10 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});	
+		RowData rdTmp = new RowData();
+		rdTmp.width = standardWidth;
+		btMoveUp.setLayoutData(rdTmp);
+		
 		btMoveDown = new Button(cmpTmp, SWT.PUSH);
 		btMoveDown.setText("Move Down");
 		btMoveDown.setEnabled(false);
@@ -263,8 +269,8 @@ public class Editor implements IParametersEditor {
 				showAddItemsDialog();
 			}
 		});		
-		RowData rdTmp = new RowData();
-		rdTmp.width = 80;
+		rdTmp = new RowData();
+		rdTmp.width = standardWidth;
 		btAdd.setLayoutData(rdTmp);
 
 		
@@ -351,7 +357,7 @@ public class Editor implements IParametersEditor {
 		setData();
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-		shell.setSize(shell.getSize().x,shell.getSize().y+50);
+		shell.setSize(600, 400);
 		Dialogs.centerWindow(shell, parent);
 	}
 	

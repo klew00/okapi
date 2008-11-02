@@ -1,6 +1,7 @@
 package net.sf.okapi.applications.test;
 
 import java.awt.Point;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -30,6 +31,12 @@ import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.QueryManager;
+import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.tm.simpletm.Database;
+import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
 public class Main {
 
@@ -133,7 +140,59 @@ public class Main {
 		}
 		System.out.println("---end testContainer---");
 	}*/
-	
+
+	private static void testTranslationQuery () {
+		try {
+			System.out.println("---start testTranslationQuery---");
+			QueryResult qr;
+			QueryManager qm = new QueryManager();
+			qm.setLanguages("en", "fr");
+			qm.addAndInitializeResource(new GoogleMTConnector(), null);
+			
+/*			GoogleMTConnector gQ2 = new GoogleMTConnector();
+			gQ2.setLanguages("en", "de");
+			gQ2.open(null);
+			qm.addResource(gQ2);
+			
+			qm.query("This is a simple AC with and test of translation with the characters: \", <, &, >, and '");
+			
+			while ( qm.hasNext() ) {
+				qr = qm.next();
+				System.out.println("result:");
+				System.out.println(" S=["+qr.source.toString()+"]");
+				System.out.println(" T=["+qr.target.toString()+"]");
+			}
+*/			
+			Database simpleTm = new Database();
+			String tmPath = Util.getTempDirectory() + File.separatorChar + "simpleTm";
+			simpleTm.create(tmPath, true);
+			TextUnit tu = new TextUnit();
+			TextContainer tc = new TextContainer();
+			tc.append("Source text");
+			tu.setSourceContent(tc);
+			tc = new TextContainer();
+			tc.append("Target text");
+			tu.setTargetContent(tc);
+			tu.setName("entry1");
+			simpleTm.addEntry(tu, tu.getName());
+			simpleTm.close();
+
+			qm.setContext("resname", "entry1");
+			qm.addAndInitializeResource(new SimpleTMConnector(), tmPath);
+			qm.query("Source text");
+			while ( qm.hasNext() ) {
+				qr = qm.next();
+				System.out.println(String.format("result: score=%d, from res=%d", qr.score, qr.connectorId));
+				System.out.println(" S=["+qr.source.toString()+"]");
+				System.out.println(" T=["+qr.target.toString()+"]");
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+		}
+		System.out.println("---end testTranslationQuery---");
+	}
+
 	private static void testXMLReader () {
 		try {
 			System.out.println("---start testXMLReader---");
@@ -482,13 +541,14 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testParams();
+		testTranslationQuery();
 		
 		if ( args.length == 0 ) return;
+		testParams();
 		testSegmentation();
-//		testContainer();
+		//testContainer();
 		testConfigString();
-//		testItem();
+		//testItem();
 		testITSEngine();
 		testXMLReader();
 		testFilter();

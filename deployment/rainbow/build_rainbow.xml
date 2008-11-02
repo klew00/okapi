@@ -45,6 +45,9 @@
 		<ant antfile="build_filters.xml.xml" inheritAll="false"/>
 		<ant antfile="build_filters.openoffice.xml" inheritAll="false"/>
 		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
+		<ant antfile="build_lib.translation.xml" inheritAll="false"/>
+		<ant antfile="build_mt.google.xml" inheritAll="false"/>
+		<ant antfile="build_tm.simpletm.xml" inheritAll="false"/>
 		<ant antfile="build_ui.common.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.common.xml" inheritAll="false"/>
 		<ant antfile="build_ui.filters.properties.xml" inheritAll="false"/>

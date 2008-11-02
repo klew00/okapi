@@ -20,5 +20,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openoffice"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.openoffice"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.mt.google"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

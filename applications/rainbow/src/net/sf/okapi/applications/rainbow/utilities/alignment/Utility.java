@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.tm.simpletm.Database;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
@@ -46,6 +47,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private DbStoreBuilder   dbStoreBuilder;
 	private DbStore          dbStore;
 	private TMXWriter        tmxWriter = null;
+	private Database         simpleTm = null;
 	private IInputFilter     trgFilter;
 	private Segmenter        srcSeg;
 	private Segmenter        trgSeg;
@@ -103,6 +105,12 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		// We use the source part only, and it contains the target language of the alignment task
 		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
+		// Prepare the simpletm database
+		if ( params.createTM ) {
+			simpleTm = new Database();
+			simpleTm.create(params.tmPath, true);
+		}
+		
 		if ( aligner == null ) {
 			//TODO: make info part of constructor
 			//aligner = new SegmentsAligner(shell, params.targetSrxPath);
@@ -129,6 +137,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			tmxWriter.writeEndDocument();
 			tmxWriter.close();
 			tmxWriter = null;
+		}
+		if ( simpleTm != null ) {
+			simpleTm.close();
+			simpleTm = null;
 		}
 		if ( dbStore != null ) {
 			dbStore.close();
@@ -246,6 +258,9 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			case 1:
 				aligned++;
 				tmxWriter.writeItem(tu);
+				if ( params.createTM ) {
+					simpleTm.addEntry(tu, tu.getName());
+				}
 				return;
 			case 2:
 				// Do nothing (skip entry)

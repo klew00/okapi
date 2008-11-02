@@ -25,12 +25,14 @@ import net.sf.okapi.common.BaseParameters;
 public class Parameters extends BaseParameters {
 	
 	public String       tmxPath;
+	public String       tmPath;
 	public boolean      segment;
 	public String       sourceSrxPath;
 	public String       targetSrxPath;
 	public boolean      useTradosWorkarounds;
 	public boolean      checkSingleSegUnit;
 	public boolean      useAutoCorrection;
+	public boolean      createTM;
 	
 
 	public Parameters () {
@@ -39,35 +41,41 @@ public class Parameters extends BaseParameters {
 	
 	public void reset () {
 		tmxPath = "";
+		tmPath = "";
 		segment = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
 		useTradosWorkarounds = true;
 		checkSingleSegUnit = true;
 		useAutoCorrection = true;
+		createTM = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		tmxPath = buffer.getString("tmxPath", tmxPath);
+		tmPath = buffer.getString("simpletmPath", tmPath);
 		segment = buffer.getBoolean("segment", segment);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		useTradosWorkarounds = buffer.getBoolean("useTradosWorkarounds", useTradosWorkarounds);
 		checkSingleSegUnit = buffer.getBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		useAutoCorrection = buffer.getBoolean("useAutoCorrection", useAutoCorrection);
+		createTM = buffer.getBoolean("createTM", createTM);
 	}
 
 	public String toString () {
 		buffer.reset();
 		buffer.setString("tmxPath", tmxPath);
+		buffer.setString("simpletmPath", tmPath);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
 		buffer.setBoolean("segment", segment);
 		buffer.setBoolean("useTradosWorkarounds", useTradosWorkarounds);
 		buffer.setBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		buffer.setBoolean("useAutoCorrection", useAutoCorrection);
+		buffer.setBoolean("createTM", createTM);
 		return buffer.toString();
 	}
 }

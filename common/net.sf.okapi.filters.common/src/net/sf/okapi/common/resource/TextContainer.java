@@ -408,7 +408,7 @@ public class TextContainer extends TextFragment {
 				// Insert the segment
 				insert(i-1, segments.get(index));
 				// Adjust the value of i so it is at the end of the new segment
-				i += (add-1);
+				i += (add-2); // -2 = size of code marker
 				break;
 			}
 		}

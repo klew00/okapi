@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="lib.translation" default="all" basedir="."> 
+
+	<property name="proj" value="../../libraries/net.sf.okapi.lib.translation"/> 
+	<property name="src" value="${proj}/src"/> 
+ 	<property name="tmp" value="tmp"/>
+ 
+	<path id="mainClassPath">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${tmp}"/>
+ 	</target>
+
+	<target name="all" depends="init"> 
+		<ant antfile="build_common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.common.xml" inheritAll="false"/>
+ 		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>
