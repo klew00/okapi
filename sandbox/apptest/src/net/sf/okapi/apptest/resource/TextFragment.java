@@ -796,7 +796,10 @@ public class TextFragment implements Comparable<Object> {
 
 	public String toString (BuilderData builderData)
 	{
-		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
+		if (( codes == null ) || ( codes.size() == 0 )) {
+			if ( builderData == null ) return text.toString();
+			else return builderData.encode(text.toString());
+		}
 		if ( !isBalanced ) balanceMarkers();
 		StringBuilder tmp = new StringBuilder();
 		Code code;
@@ -816,7 +819,8 @@ public class TextFragment implements Comparable<Object> {
 				tmp.append(expandCodeContent(code, builderData));
 				break;
 			default:
-				tmp.append(text.charAt(i));
+				if ( builderData == null ) tmp.append(text.charAt(i));
+				else tmp.append(builderData.encode(text.charAt(i)));
 				break;
 			}
 		}
@@ -999,7 +1003,7 @@ public class TextFragment implements Comparable<Object> {
 								tmp.replace(start, end, "-ERR-");
 							else {
 								tmp.replace(start, end,
-									mergeProperty((PropertiesUnit)ref, propName, builderData.outputTarget));
+									getPropertyValue((PropertiesUnit)ref, propName, builderData.outputTarget));
 							}
 								
 						}
@@ -1015,7 +1019,7 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 	
-	private String mergeProperty (PropertiesUnit unit,
+	private String getPropertyValue (PropertiesUnit unit,
 		String name,
 		boolean outputTarget)
 	{

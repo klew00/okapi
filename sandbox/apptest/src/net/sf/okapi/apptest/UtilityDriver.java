@@ -48,6 +48,7 @@ public class UtilityDriver {
 			genWriter.setOptions("en-bz", "UTF-16");
 			genWriter.setOutput("genericOutput.txt");
 			((GenericFilterWriter)genWriter).setOutputTarget(true);
+			((GenericFilterWriter)genWriter).setEncoder(inFilter.getEncoder());
 
 			// Process
 			FilterEvent event;

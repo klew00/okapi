@@ -4,12 +4,15 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.ISkeleton;
+
 public class Group extends ArrayList<IReferenceable>
 	implements IReferenceable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String id;
+	private ISkeleton skeleton;
 	private boolean isReference;
 	private String name;
 	private String parentId;
@@ -36,6 +39,14 @@ public class Group extends ArrayList<IReferenceable>
 		this.isReference = isReference;
 	}
 
+	public ISkeleton getSkeleton () {
+		return skeleton;
+	}
+	
+	public void setSkeleton (ISkeleton skeleton) {
+		this.skeleton = skeleton;
+	}
+	
 	public String getName () {
 		return name;
 	}

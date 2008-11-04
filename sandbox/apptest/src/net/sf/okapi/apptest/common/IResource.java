@@ -6,4 +6,7 @@ public interface IResource {
 	
 	public void setID (String id);
 	
+	public ISkeleton getSkeleton ();
+	
+	public void setSkeleton (ISkeleton skeleton);
 }

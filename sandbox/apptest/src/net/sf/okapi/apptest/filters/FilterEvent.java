@@ -12,7 +12,6 @@ public class FilterEvent {
 	
 	private FilterEventType filterEventType;
 	private IResource resource;
-	private ISkeleton skeleton;
 	
 	public FilterEvent(FilterEventType filterEventType, IResource resource) {
 		this.filterEventType = filterEventType;
@@ -22,7 +21,7 @@ public class FilterEvent {
 	public FilterEvent(FilterEventType filterEventType, IResource resource, ISkeleton skeleton) {
 		this.filterEventType = filterEventType;
 		this.resource = resource;
-		this.skeleton = skeleton;
+		this.resource.setSkeleton(skeleton);
 	}	
 	
 	public FilterEventType getEventType() {
@@ -33,7 +32,4 @@ public class FilterEvent {
 		return resource;
 	}
 	
-	public ISkeleton getSkeleton () {
-		return skeleton;
-	}
 }

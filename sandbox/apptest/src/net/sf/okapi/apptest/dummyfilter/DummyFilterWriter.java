@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
+import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.LocaleProperties;
 import net.sf.okapi.apptest.resource.PropertiesUnit;
@@ -59,9 +60,9 @@ public class DummyFilterWriter implements IFilterWriter {
 			break;
 		case END_GROUP:
 			//level--;
-			grp = (Group)event.getResource();
+			Ending ending = (Ending)event.getResource();
 			System.out.println("end-group={");
-			System.out.println("   id="+grp.getID());
+			System.out.println("   id="+ending.getID());
 			System.out.println("}");
 			break;
 //		case SKELETON_UNIT:

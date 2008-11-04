@@ -12,6 +12,7 @@ import java.util.Stack;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.GenericSkeleton;
 import net.sf.okapi.apptest.resource.GenericSkeletonPart;
 import net.sf.okapi.apptest.resource.Group;
@@ -60,38 +61,42 @@ public class GenericFilterWriter implements IFilterWriter {
 		builderData.outputTarget = value;
 	}
 	
+	public void setEncoder (IEncoder encoder) {
+		builderData.encoder = encoder;
+	}
+	
 	public void handleEvent (FilterEvent event) {
 		try {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
 				createWriter();
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case END_DOCUMENT:
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				close();
 				break;
 			case START_SUBDOCUMENT:
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case END_SUBDOCUMENT:
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case START_GROUP:
 				processStartGroup((Group)event.getResource());
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case END_GROUP:
-				processSkeleton(event.getSkeleton());
-				processEndGroup((Group)event.getResource());
+				processSkeleton(event.getResource().getSkeleton());
+				processEndGroup((Ending)event.getResource());
 				break;
 			case TEXT_UNIT:
 				writeTextUnit((TextUnit)event.getResource());
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case PROPERTIES_UNIT:
 				processPropertiesUnit((PropertiesUnit)event.getResource());
-				processSkeleton(event.getSkeleton());
+				processSkeleton(event.getResource().getSkeleton());
 				break;
 			}
 		}
@@ -163,7 +168,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		}
 	}
 	
-	private void processEndGroup (Group resource) {
+	private void processEndGroup (Ending resource) {
 		if ( groupStack.size() > 0 ) {
 			groupStack.pop();
 		}
