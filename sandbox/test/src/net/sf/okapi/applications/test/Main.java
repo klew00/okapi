@@ -31,7 +31,6 @@ import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
@@ -147,7 +146,7 @@ public class Main {
 			QueryResult qr;
 			QueryManager qm = new QueryManager();
 			qm.setLanguages("en", "fr");
-			qm.addAndInitializeResource(new GoogleMTConnector(), null);
+			qm.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
 			
 /*			GoogleMTConnector gQ2 = new GoogleMTConnector();
 			gQ2.setLanguages("en", "de");
@@ -178,7 +177,7 @@ public class Main {
 			simpleTm.close();
 
 			qm.setContext("resname", "entry1");
-			qm.addAndInitializeResource(new SimpleTMConnector(), tmPath);
+			qm.addAndInitializeResource(new SimpleTMConnector(), "SimpleTM", tmPath);
 			qm.query("Source text");
 			while ( qm.hasNext() ) {
 				qr = qm.next();

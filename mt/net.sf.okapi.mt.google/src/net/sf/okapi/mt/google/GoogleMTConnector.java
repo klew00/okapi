@@ -135,6 +135,14 @@ public class GoogleMTConnector implements IQuery {
 		srcLang = convertLangCode(sourceLang);
 		trgLang = convertLangCode(targetLang);
 	}
+	
+	public String getSourceLanguage () {
+		return srcLang;
+	}
+	
+	public String getTargetLanguage () {
+		return trgLang;
+	}
 
 	private String convertLangCode (String standardCode) {
 		String code = standardCode.toLowerCase();

@@ -1,9 +1,10 @@
 package net.sf.okapi.lib.translation;
 
-class ResourceItem {
+public class ResourceItem {
 	
 	public IQuery query;
 	public boolean enabled;
 	public String connectionString;
+	public String name;
 
 }

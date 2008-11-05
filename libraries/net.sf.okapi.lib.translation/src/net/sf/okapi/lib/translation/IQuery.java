@@ -6,6 +6,10 @@ public interface IQuery {
 
 	public void setLanguages (String sourceLang, String targetLang);
 	
+	public String getSourceLanguage ();
+	
+	public String getTargetLanguage ();
+	
 	public void setContext (String key, String value);
 
 	public void open (String connectionString);

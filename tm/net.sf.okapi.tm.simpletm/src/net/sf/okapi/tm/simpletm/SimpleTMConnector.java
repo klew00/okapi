@@ -13,6 +13,8 @@ public class SimpleTMConnector implements ITMQuery {
 	private List<QueryResult> results;
 	private int current = -1;
 	private String resName;
+	private String srcLang;
+	private String trgLang;
 
 	public SimpleTMConnector () {
 		db = new Database();
@@ -78,7 +80,16 @@ public class SimpleTMConnector implements ITMQuery {
 	}
 
 	public void setLanguages (String sourceLang, String targetLang) {
-		// Not used yet. We assume the TM is in the right language pair for now.
+		srcLang = sourceLang;
+		trgLang = targetLang;
 	}
 
+	public String getSourceLanguage () {
+		return srcLang;
+	}
+	
+	public String getTargetLanguage () {
+		return trgLang;
+	}
+	
 }
