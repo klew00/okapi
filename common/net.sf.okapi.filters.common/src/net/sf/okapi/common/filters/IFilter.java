@@ -1,5 +1,7 @@
 package net.sf.okapi.common.filters;
 
+import java.net.URL;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.IResource;
 
@@ -9,7 +11,7 @@ public interface IFilter {
 
 	public void setOptions(String language, String defaultEncoding);
 
-	public void open(String inputPath);
+	public void open(URL inputPath);
 
 	public void open(CharSequence inputText);
 
