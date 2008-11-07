@@ -35,19 +35,22 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
-import net.sf.okapi.common.filters.BaseParser;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment;
 
-public class HtmlParser extends BaseParser {
+public class HtmlFilter extends BaseFilter {
 	private Source htmlDocument;
 	private GroovyFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
 
-	public HtmlParser() {
+	public HtmlFilter() {
 	}
 
 	public void close() {
@@ -96,10 +99,11 @@ public class HtmlParser extends BaseParser {
 	public IContainable getResource() {
 		return getFinalizedToken();
 	}
-
-	public ParserTokenType parseNext() {
+	
+	public FilterEvent next() {
 		if (isFinishedParsing()) {
-			return ParserTokenType.ENDINPUT;
+			setDone();
+			return new FilterEvent(FilterEventType.FINISHED);
 		}
 
 		// reset state flags and buffers
@@ -149,7 +153,7 @@ public class HtmlParser extends BaseParser {
 		}
 
 		if (isCanceled()) {
-			return getFinalizedTokenType();
+			return new FilterEvent(getFinalizedTokenType(), getResource());
 		}
 
 		if (!nodeIterator.hasNext()) {
@@ -159,7 +163,7 @@ public class HtmlParser extends BaseParser {
 		}
 
 		// return our finalized token
-		return getFinalizedTokenType();
+		return new FilterEvent(getFinalizedTokenType(), getResource());
 	}
 
 	private void handleCdataSection(Tag tag) {
@@ -331,5 +335,34 @@ public class HtmlParser extends BaseParser {
 			tagType = TextFragment.TagType.PLACEHOLDER;
 		}
 		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IFilter#getName()
+	 */
+	public String getName() {
+		return "HTMLFilter";
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
+	 */
+	public IParameters getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String, java.lang.String)
+	 */
+	public void setOptions(String language, String defaultEncoding) {
+		// TODO Auto-generated method stub		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common.IParameters)
+	 */
+	public void setParameters(IParameters params) {
+		// TODO Auto-generated method stub	
 	}
 }

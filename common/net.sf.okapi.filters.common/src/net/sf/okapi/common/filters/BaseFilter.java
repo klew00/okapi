@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.TextUnit;
 /**
  * Abstract helper class for filter writers.
  */
-public abstract class BaseParser implements IParser {
+public abstract class BaseFilter implements IFilter {
 	private int groupId = 0;
 	private int textUnitId = 0;
 	private int skeleltonUnitId = 0;
@@ -41,15 +41,32 @@ public abstract class BaseParser implements IParser {
 	private Group group;
 	private Stack<Group> groupStack;
 	private IContainable finalizedToken;
-	private ParserTokenType finalizedTokenType;
+	private FilterEventType finalizedTokenType;
 	private boolean finishedToken = false;
 	private boolean finishedParsing = false;
 	private boolean cancel = false;
+	private boolean done = false;
 
-	public BaseParser() {
+	public BaseFilter() {
 		groupStack = new Stack<Group>();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IFilter#hasNext()
+	 */
+	public boolean hasNext() {
+		if (done) return false; 
+		return true;
+	} 
+	
+	protected void  setDone() {
+		done = true;
+	}
+	
+	protected void  setDone(boolean done) {
+		this.done = done;
+	}
+	
 	protected TextUnit getTextUnit() {
 		return textUnit;
 	}
@@ -90,7 +107,7 @@ public abstract class BaseParser implements IParser {
 		return finalizedToken;
 	}
 
-	protected ParserTokenType getFinalizedTokenType() {
+	protected FilterEventType getFinalizedTokenType() {
 		return finalizedTokenType;
 	}
 
@@ -120,7 +137,7 @@ public abstract class BaseParser implements IParser {
 	private void finalizeToken(TextUnit textUnit) {
 		finishedToken = true;
 		finalizedToken = textUnit;
-		finalizedTokenType = ParserTokenType.TRANSUNIT;
+		finalizedTokenType = FilterEventType.TEXT_UNIT;
 
 		this.textUnit = null;
 	}
@@ -128,7 +145,7 @@ public abstract class BaseParser implements IParser {
 	private void finalizeToken(SkeletonUnit skeletonUnit) {
 		finishedToken = true;
 		finalizedToken = skeletonUnit;
-		finalizedTokenType = ParserTokenType.SKELETON;
+		finalizedTokenType = FilterEventType.SKELETON_UNIT;
 
 		this.skeletonUnit = null;
 	}
@@ -320,7 +337,7 @@ public abstract class BaseParser implements IParser {
 		// since we are starting the next token we assume Group is finished
 		// and set ENDGROUP as the token type, STARTGROUP should have been
 		// returned earlier.
-		finalizedTokenType = ParserTokenType.ENDGROUP;
+		finalizedTokenType = FilterEventType.END_GROUP;
 		group = null;
 	}
 }

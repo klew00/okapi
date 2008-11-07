@@ -12,6 +12,10 @@ public class FilterEvent {
 		this.resource = resource;
 	}	
 	
+	public FilterEvent(FilterEventType filterEventType) {
+		this.filterEventType = filterEventType;		
+	}	
+	
 	public IResource getData() {
 		return resource;
 	}
