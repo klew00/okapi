@@ -35,7 +35,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.filters.IInputFilter;
 import net.sf.okapi.common.filters.IOutputFilter;
-import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.IOldParser;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
@@ -332,7 +332,7 @@ public class FilterAccess {
 		return result;
 	}
 	
-	public IParser loadParser (String filterID,
+	public IOldParser loadParser (String filterID,
 		String paramPath)
 	{
 		try {
@@ -348,7 +348,7 @@ public class FilterAccess {
 				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID));
 			
 			// Load the class
-			IParser parser = (IParser)Class.forName(m_htFilters.get(filterID).parserClass).newInstance();
+			IOldParser parser = (IOldParser)Class.forName(m_htFilters.get(filterID).parserClass).newInstance();
 			
 			return parser;
 		}

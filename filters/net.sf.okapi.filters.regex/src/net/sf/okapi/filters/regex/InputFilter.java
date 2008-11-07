@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.filters.IParser.ParserTokenType;
+import net.sf.okapi.common.filters.IOldParser.ParserTokenType;
 import net.sf.okapi.common.pipeline.IResourceBuilder;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.SkeletonUnit;

@@ -34,13 +34,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
-import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.IOldParser;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class Parser implements IParser {
+public class Parser implements IOldParser {
 
 	protected Resource                 resource;
 	

@@ -35,12 +35,12 @@ import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.IOldParser;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class Parser implements IParser {
+public class Parser implements IOldParser {
 
 	private static final int RESULT_ERROR        = 0;
 	private static final int RESULT_END          = 1;
