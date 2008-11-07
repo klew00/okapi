@@ -123,9 +123,13 @@ public class GoogleMTConnector implements IQuery {
 		return tmp.replace("&amp;", "&");
 	}
 
-	public void setContext (String key,
+	public void setAttribute (String name,
 		String value)
 	{
+		// Not used with this MT engine
+	}
+	
+	public void removeAttribute (String name) {
 		// Not used with this MT engine
 	}
 	

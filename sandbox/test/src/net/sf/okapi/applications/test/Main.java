@@ -145,8 +145,8 @@ public class Main {
 			System.out.println("---start testTranslationQuery---");
 			QueryResult qr;
 			QueryManager qm = new QueryManager();
-			qm.setLanguages("en", "fr");
-			qm.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
+			//qm.setLanguages("en", "fr");
+			//qm.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
 			
 /*			GoogleMTConnector gQ2 = new GoogleMTConnector();
 			gQ2.setLanguages("en", "de");
@@ -165,18 +165,26 @@ public class Main {
 			Database simpleTm = new Database();
 			String tmPath = Util.getTempDirectory() + File.separatorChar + "simpleTm";
 			simpleTm.create(tmPath, true);
+			
 			TextUnit tu = new TextUnit();
 			TextContainer tc = new TextContainer();
 			tc.append("Source text");
 			tu.setSourceContent(tc);
 			tc = new TextContainer();
-			tc.append("Target text");
+			tc.append("Target text for entry1");
 			tu.setTargetContent(tc);
 			tu.setName("entry1");
 			simpleTm.addEntry(tu, tu.getName());
+			
+			tc = new TextContainer();
+			tc.append("Target text for entry2");
+			tu.setTargetContent(tc);
+			tu.setName("entry2");
+			simpleTm.addEntry(tu, tu.getName());
+			
 			simpleTm.close();
 
-			qm.setContext("resname", "entry1");
+			//qm.setAttribute("resname", "entry1");
 			qm.addAndInitializeResource(new SimpleTMConnector(), "SimpleTM", tmPath);
 			qm.query("Source text");
 			while ( qm.hasNext() ) {
@@ -338,6 +346,7 @@ public class Main {
 			langRule.add(new Rule("[Ee][Tt][Cc]\\.", ".", false));
 			langRule.add(new Rule("\\b\\w{2,}[\\.\\?!]+[\"\'”\\)]?", "", true));
 			langRule.add(new Rule("\\.\\.\\.", "\\s", true));
+			langRule.add(new Rule("\\.", "(\\s*?)ZZ", true));
 			srxDoc.addLanguageRule("default", langRule);
 
 			srxDoc.addLanguageMap(new LanguageMap("[Ff][Rr].*", "french"));
@@ -347,7 +356,7 @@ public class Main {
 			Segmenter seg = srxDoc.applyLanguageRules("fr", null);
 			
 			TextContainer cont = new TextContainer(null);
-			cont.append(" Mr. XYZ. (Test.)   and more test.  ");
+			cont.append(" Mr. XYZ. (Test.)   and more test.  And more. ZZEnd");
 			System.out.println(cont.toString());
 			
 			// All segments
@@ -359,7 +368,7 @@ public class Main {
 				System.out.println("s='"+tf.toString()+"'");
 			}
 
-			System.out.println("---Seg one by one:");
+/*			System.out.println("---Seg one by one:");
 			cont.mergeAllSegments();
 			Point range;
 			while ( (range = seg.getNextSegmentRange(cont)) != null ) {
@@ -382,7 +391,6 @@ public class Main {
 			System.out.println("---Translation steps:");
 			TextUnit tu = new TextUnit("tu1", " Mr. XYZ. Segment 2.   Segment 3.  ");
 			TextContainer srcCont = tu.getSourceContent();
-			
 			TextContainer trgCont = new TextContainer();
 			tu.setTargetContent(trgCont);
 
@@ -407,7 +415,7 @@ public class Main {
 			System.out.println("trg='"+trgCont.toString()+"'");
 			for ( TextFragment tf : trgCont.getSegments() ) {
 				System.out.println("t='"+tf.toString()+"'");
-			}
+			}*/
 			
 		}
 		catch ( Exception e ) {
@@ -543,6 +551,7 @@ public class Main {
 		testTranslationQuery();
 		
 		if ( args.length == 0 ) return;
+		testTranslationQuery();
 		testParams();
 		testSegmentation();
 		//testContainer();

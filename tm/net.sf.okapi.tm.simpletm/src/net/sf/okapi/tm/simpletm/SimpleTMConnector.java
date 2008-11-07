@@ -1,5 +1,6 @@
 package net.sf.okapi.tm.simpletm;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.resource.TextFragment;
@@ -12,12 +13,13 @@ public class SimpleTMConnector implements ITMQuery {
 	private int maxHits = 5;
 	private List<QueryResult> results;
 	private int current = -1;
-	private String resName;
 	private String srcLang;
 	private String trgLang;
+	private LinkedHashMap<String, String> attributes;
 
 	public SimpleTMConnector () {
 		db = new Database();
+		attributes = new LinkedHashMap<String, String>();
 	}
 	
 	public void setMaximumHits (int max) {
@@ -66,20 +68,34 @@ public class SimpleTMConnector implements ITMQuery {
 	
 	public int query (TextFragment text) {
 		current = -1;
-		results = db.query(text, resName, maxHits);
+		results = db.query(text, attributes, maxHits);
 		if ( results == null ) return 0;
 		current = 0;
 		return results.size();
 	}
 	
-	public void setContext (String key,
+	public void setAttribute (String name,
 		String value)
 	{
-		// the only context available with this TM is resname
-		resName = value;
+		assert(value!=null);
+		if ( "resname".equals(name) ) name = Database.NNAME;
+		if ( "restype".equals(name) ) name = Database.NTYPE;
+		if ( attributes.put(name, value) == null ) {
+			// Update the query if this attribute did not exist yet
+			db.setAttributes(attributes);
+		}
+	}
+	
+	public void removeAttribute (String name) {
+		if ( attributes.containsKey(name) ) {
+			attributes.remove(name);
+			db.setAttributes(attributes);
+		}
 	}
 
-	public void setLanguages (String sourceLang, String targetLang) {
+	public void setLanguages (String sourceLang,
+		String targetLang)
+	{
 		srcLang = sourceLang;
 		trgLang = targetLang;
 	}

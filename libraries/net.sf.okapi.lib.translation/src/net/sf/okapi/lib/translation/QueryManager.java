@@ -14,12 +14,12 @@ public class QueryManager implements IQuery {
 	int lastId = 0;
 	String srcLang;
 	String trgLang;
-	String contextKey;
-	String contextValue;
+	LinkedHashMap<String, String> attributes;
 	
 	public QueryManager () {
 		resList = new LinkedHashMap<Integer, ResourceItem>();
 		results = new ArrayList<QueryResult>();
+		attributes = new LinkedHashMap<String, String>();
 	}
 	
 	public int addResource (IQuery connector, String name) {
@@ -33,17 +33,19 @@ public class QueryManager implements IQuery {
 	}
 	
 	public int addAndInitializeResource (IQuery connector,
-		String name,
+		String resourceName,
 		String connectionString)
 	{
 		// Add the resource
-		int id = addResource(connector, name);
+		int id = addResource(connector, resourceName);
 		// open it and set the current options
 		connector.open(connectionString);
 		if (( srcLang != null ) && ( trgLang != null )) {
 			connector.setLanguages(srcLang, trgLang);
 		}
-		connector.setContext(contextKey, contextValue);
+		for ( String name : attributes.keySet() ) {
+			connector.setAttribute(name, attributes.get(name));
+		}
 		// Set the connection string
 		ResourceItem ri = resList.get(id);
 		ri.connectionString = connectionString;
@@ -128,13 +130,19 @@ public class QueryManager implements IQuery {
 		return results.size();
 	}
 
-	public void setContext (String key,
+	public void setAttribute (String name,
 		String value)
 	{
-		contextKey = key;
-		contextValue = value;
+		attributes.put(name, value);
 		for ( ResourceItem ri : resList.values() ) {
-			ri.query.setContext(contextKey, contextValue);
+			ri.query.setAttribute(name, value);
+		}
+	}
+	
+	public void removeAttribute (String name) {
+		attributes.remove(name);
+		for ( ResourceItem ri : resList.values() ) {
+			ri.query.removeAttribute(name);
 		}
 	}
 	

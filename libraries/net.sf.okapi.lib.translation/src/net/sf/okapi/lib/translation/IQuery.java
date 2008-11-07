@@ -10,7 +10,9 @@ public interface IQuery {
 	
 	public String getTargetLanguage ();
 	
-	public void setContext (String key, String value);
+	public void setAttribute (String name, String value);
+	
+	public void removeAttribute (String anme);
 
 	public void open (String connectionString);
 	

@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -47,6 +49,7 @@ public class Database {
 	public static final String DATAFILE_EXT = ".data.db";
 
 	private Connection  conn = null;
+	private PreparedStatement qstm = null;
 
 	public Database () {
 		try {
@@ -60,6 +63,10 @@ public class Database {
 	
 	public void close () {
 		try {
+			if ( qstm != null ) {
+				qstm.close();
+				qstm = null;
+			}
 			if ( conn != null ) {
 				conn.close();
 				conn = null;
@@ -223,24 +230,48 @@ public class Database {
 		}
 	}
 	
-	public List<QueryResult> query (TextFragment query,
-		String name,
-		int maxCount)
-	{
-		PreparedStatement pstm = null;
+	public void setAttributes (LinkedHashMap<String, String> attributes) {
 		try {
 			// prepare the query with or without context condition
-			if ( name == null ) {
-				pstm = conn.prepareStatement(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=?",
-						NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT));
+			if ( attributes == null ) {
+				qstm = conn.prepareStatement(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=?",
+					NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT));
 			}
 			else {
-				pstm = conn.prepareStatement(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=? AND %s=?",
-					NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT, NNAME));
-				pstm.setString(2, name);
+				StringBuilder tmp = new StringBuilder();
+				tmp.append(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=?",
+					NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT));
+				for ( String name : attributes.keySet() ) {
+					tmp.append(" AND "+name+"=?");
+				}
+				qstm = conn.prepareStatement(tmp.toString());
 			}
-			pstm.setString(1, query.getCodedText());
-			ResultSet result = pstm.executeQuery();
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public List<QueryResult> query (TextFragment query,
+		LinkedHashMap<String, String> attributes,
+		int maxCount)
+	{
+		try {
+			// prepare the query with or without context condition
+			if ( qstm == null ) {
+				// Create the statment if needed
+				setAttributes(attributes);
+			}
+			// Fill the parameters
+			if ( attributes != null ) {
+				int i = 2;
+				for ( String name : attributes.keySet() ) {
+					qstm.setString(i, attributes.get(name));
+					i++;
+				}
+			}
+			qstm.setString(1, query.getCodedText());
+			ResultSet result = qstm.executeQuery();
 			if ( !result.first() ) return null;
 			ArrayList<QueryResult> list = new ArrayList<QueryResult>(); 
 			do {
@@ -258,17 +289,6 @@ public class Database {
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if ( pstm != null ) {
-					pstm.close();
-					pstm = null;
-				}
-			}
-			catch ( SQLException e ) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 	
