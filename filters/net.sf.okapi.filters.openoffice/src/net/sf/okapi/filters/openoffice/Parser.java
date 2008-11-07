@@ -35,13 +35,15 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
 
-import net.sf.okapi.common.filters.BaseParser;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
-public class Parser extends BaseParser {
+public class Parser extends BaseFilter {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
@@ -145,62 +147,6 @@ public class Parser extends BaseParser {
 			open(input.openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public ParserTokenType parseNext () {
-		try {
-			if ( isFinishedParsing() ) {
-				return ParserTokenType.ENDINPUT;
-			}
-			initializeLoop();
-
-			while ( !isFinishedToken() && reader.hasNext() && !isCanceled() ) {
-
-				switch ( reader.next() ) {
-				
-				case XMLStreamConstants.CHARACTERS:
-					if ( extract.peek() ) appendToTextUnit(reader.getText());
-					else appendToSkeletonUnit(reader.getText());
-					break;
-					
-				case XMLStreamConstants.START_DOCUMENT:
-					//TODO set resource.setTargetEncoding(SET REAL ENCODING);
-					appendToSkeletonUnit("<?xml version=\"1.0\" "
-						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
-						+ "?>");
-					break;
-				
-				case XMLStreamConstants.END_DOCUMENT:
-					finalizeCurrentToken();
-					setFinishedParsing(true);
-					close();
-					break;
-				
-				case XMLStreamConstants.START_ELEMENT:
-					processStartElement();
-					break;
-				
-				case XMLStreamConstants.END_ELEMENT:
-					processEndElement();
-					break;
-				
-				case XMLStreamConstants.COMMENT:
-					appendToSkeletonUnit("<!--" + reader.getText() + "-->");
-					break;
-
-				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					appendToSkeletonUnit("<?" + reader.getPITarget() + " "
-						+ reader.getPIData() + "?>");
-					break;
-				}
-			
-			} // End of main while		
-
-			return getFinalizedTokenType();
-		}
-		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -352,5 +298,75 @@ public class Parser extends BaseParser {
 				}
 			}
 		}
+	}
+
+	public String getName() {
+		return "ODFFilter";
+	}
+
+	public IParameters getParameters() {
+		return null;
+	}
+
+	public FilterEvent next() {
+		try {
+			initializeLoop();
+			while ( !isFinishedToken() && reader.hasNext() && !isCanceled() ) {
+
+				switch ( reader.next() ) {
+				
+				case XMLStreamConstants.CHARACTERS:
+					if ( extract.peek() ) appendToTextUnit(reader.getText());
+					else appendToSkeletonUnit(reader.getText());
+					break;
+					
+				case XMLStreamConstants.START_DOCUMENT:
+					//TODO set resource.setTargetEncoding(SET REAL ENCODING);
+					appendToSkeletonUnit("<?xml version=\"1.0\" "
+						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
+						+ "?>");
+					break;
+				
+				case XMLStreamConstants.END_DOCUMENT:
+					finalizeCurrentToken();
+					setFinishedParsing(true);
+					close();
+					break;
+				
+				case XMLStreamConstants.START_ELEMENT:
+					processStartElement();
+					break;
+				
+				case XMLStreamConstants.END_ELEMENT:
+					processEndElement();
+					break;
+				
+				case XMLStreamConstants.COMMENT:
+					appendToSkeletonUnit("<!--" + reader.getText() + "-->");
+					break;
+
+				case XMLStreamConstants.PROCESSING_INSTRUCTION:
+					appendToSkeletonUnit("<?" + reader.getPITarget() + " "
+						+ reader.getPIData() + "?>");
+					break;
+				}
+			
+			} // End of main while		
+
+			return new FilterEvent(getFinalizedTokenType(), getResource());
+		}
+		catch ( XMLStreamException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void setOptions (String language, String defaultEncoding) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setParameters (IParameters params) {
+		// TODO Auto-generated method stub
+		
 	}
 }

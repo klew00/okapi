@@ -23,6 +23,7 @@ package net.sf.okapi.filters.openoffice;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -31,7 +32,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IResource;
 
@@ -106,6 +106,10 @@ public class Filter implements IFilter {
 		}
 	}
 
+	public void open (URL inputPath) {
+		//TODO
+	}
+
 	public void open (String inputPath) {
 		this.inputPath = inputPath;
 		nextAction = StateType.OPENZIP;
@@ -119,7 +123,7 @@ public class Filter implements IFilter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		// TODO Auto-generated method stub
+		// Not used for now
 	}
 
 	public void setParameters (IParameters params) {
@@ -170,26 +174,17 @@ public class Filter implements IFilter {
 	}
 	
 	private FilterEvent nextInSubDocument () throws IOException {
-		ParserTokenType tok;
-		do {
-			switch ( (tok = parser.parseNext()) ) {
-			case TRANSUNIT:
-				event = new FilterEvent(FilterEventType.TEXT_UNIT, parser.getResource());
-				return event;
-			case SKELETON:
-				event = new FilterEvent(FilterEventType.SKELETON_UNIT, parser.getResource());
-				return event;
-			case STARTGROUP:
-				event = new FilterEvent(FilterEventType.START_GROUP, parser.getResource());
-				return event;
-			case ENDGROUP:
-				event = new FilterEvent(FilterEventType.END_GROUP, parser.getResource());
-				return event;
+		FilterEvent event;
+		while ( parser.hasNext() ) {
+			event = parser.next();
+			switch ( (FilterEventType)event.getEventType() ) {
+			case START_DOCUMENT:
+			case END_DOCUMENT:
+				continue;
 			default:
-				assert(false); // Catch problem
+				return event;
 			}
 		}
-		while ( tok != ParserTokenType.ENDINPUT );
 
 		// Send the end sub-document even
 		parser.close();
