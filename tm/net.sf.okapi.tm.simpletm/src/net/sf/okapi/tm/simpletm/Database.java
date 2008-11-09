@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -45,6 +44,8 @@ public class Database {
 	public static final String NTRGCODES  = "TrgCodes";
 	public static final int  GRPNAME      = 7;
 	public static final String NGRPNAME   = "GrpName";
+	public static final int  FILENAME     = 8;
+	public static final String NFILENAME  = "FileName";
 	
 	public static final String DATAFILE_EXT = ".data.db";
 
@@ -117,6 +118,7 @@ public class Database {
 				+ NTRGTEXT + " VARCHAR,"
 				+ NTRGCODES + " VARCHAR,"
 				+ NGRPNAME + " VARCHAR,"
+				+ NFILENAME + " VARCHAR,"
 				+ ")");
 		}
 		catch ( SQLException e ) {
@@ -171,44 +173,49 @@ public class Database {
 	}
 	
 	public int addEntry (TextUnit tu,
-		String grpName)
+		String grpName,
+		String fileName)
 	{
 		int count = 0;
 		PreparedStatement pstm = null;
 		try {
 			if ( !tu.hasTarget() ) return 0;
 
-			//TODO: make this pstm class-level
-			pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?);",
-				TBLNAME, NNAME, NTYPE, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, NGRPNAME));
-			
 			// Store the data
 			TextContainer srcCont = tu.getSourceContent();
 			TextContainer trgCont = tu.getTargetContent();
-			pstm.setString(1, tu.getName());
-			pstm.setString(2, tu.getType());
-			pstm.setString(7, tu.getName()); // group name is TU name for now
 
 			// Store the segments if possible
 			if ( srcCont.isSegmented() && trgCont.isSegmented() ) {
+				pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?);",
+					TBLNAME, NTYPE, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, NGRPNAME, NFILENAME));
+				pstm.setString(1, tu.getType());
+				pstm.setString(6, grpName);
+				pstm.setString(7, fileName);
 				TextFragment trgFrag;
 				int seg = 0;
 				for ( TextFragment srcFrag : srcCont.getSegments() ) {
-					pstm.setString(3, srcFrag.getCodedText());
-					pstm.setString(4, Code.codesToString(srcFrag.getCodes()));
+					pstm.setString(2, srcFrag.getCodedText());
+					pstm.setString(3, Code.codesToString(srcFrag.getCodes()));
 					trgFrag = trgCont.getSegments().get(seg);
-					pstm.setString(5, trgFrag.getCodedText());
-					pstm.setString(6, Code.codesToString(trgFrag.getCodes()));
+					pstm.setString(4, trgFrag.getCodedText());
+					pstm.setString(5, Code.codesToString(trgFrag.getCodes()));
 					pstm.execute();
 					count++;
 					seg++;
 				}
 			}
 			else {
+				pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?,?);",
+					TBLNAME, NNAME, NTYPE, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, NGRPNAME, NFILENAME));
+				pstm.setString(1, tu.getName());
+				pstm.setString(2, tu.getType());
 				pstm.setString(3, srcCont.getCodedText());
 				pstm.setString(4, Code.codesToString(srcCont.getCodes()));
 				pstm.setString(5, trgCont.getCodedText());
 				pstm.setString(6, Code.codesToString(trgCont.getCodes()));
+				pstm.setString(7, grpName);
+				pstm.setString(8, fileName);
 				pstm.execute();
 				count++;
 			}
@@ -259,7 +266,7 @@ public class Database {
 		try {
 			// prepare the query with or without context condition
 			if ( qstm == null ) {
-				// Create the statment if needed
+				// Create the statement if needed
 				setAttributes(attributes);
 			}
 			// Fill the parameters
@@ -291,5 +298,54 @@ public class Database {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	public void exportToTMX (String outputPath,
+		String sourceLanguage,
+		String targetLanguage) //TODO: lang should be in db
+	{
+		Statement stm = null;
+		TMXWriter writer = null;
+		try {
+			writer = new TMXWriter();
+			writer.create(outputPath);
+			writer.writeStartDocument(sourceLanguage, targetLanguage);
+			stm = conn.createStatement();
+			ResultSet result = stm.executeQuery(String.format(
+				"SELECT %s,%s,%s,%s,%s,%s FROM " + TBLNAME,
+				NNAME, NGRPNAME, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES));
+			if ( result.first() ) {
+				TextUnit tu;
+				TextContainer tc;
+				do {
+					tu = new TextUnit();
+					tc = new TextContainer();
+					tc.setCodedText(result.getString(3),
+						Code.stringToCodes(result.getString(4)), false);
+					tu.setSourceContent(tc);
+					tc = new TextContainer();
+					tc.setCodedText(result.getString(5),
+						Code.stringToCodes(result.getString(6)), false);
+					tu.setTargetContent(tc);
+					tu.setName(result.getString(1));
+					writer.writeItem(tu);
+				} while ( result.next() );
+			}
+			writer.writeEndDocument();
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if ( writer != null ) writer.close();
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 }

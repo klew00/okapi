@@ -24,6 +24,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -121,6 +122,14 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	{
 	}
 
+	@Override
+    public void startResource (Document resource) {
+    	if ( tmQ != null ) {
+    		tmQ.setAttribute("FileName", Util.getFilename(resource.getName(), true));
+    	}
+    	super.startResource(resource);
+    }
+	
 	@Override
     public void endExtractionItem (TextUnit item) {
 		try {
@@ -274,7 +283,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		try {
 			// Target is set if needed
 			QueryResult qr;
-			tmQ.setAttribute("resname", tu.getName());
+			tmQ.setAttribute("GrpName", tu.getName());
 			TextContainer tc = tu.getTargetContent();
 			if ( tc.isSegmented() ) {
 				int seg = 0;
@@ -358,7 +367,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		String encoding,
 		String filterSettings)
 	{
-		// Not used for this utility
+		// Nothing to do here
 	}
 
 	public void addOutputData (String path,

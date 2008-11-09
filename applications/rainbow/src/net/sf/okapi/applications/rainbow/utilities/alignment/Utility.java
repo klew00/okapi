@@ -42,6 +42,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
 	private Parameters       params;
 	private String           trgPath;
+	private String           fileName;
 	private String           trgEncoding;
 	private String           trgFilterSettings;
 	private DbStoreBuilder   dbStoreBuilder;
@@ -259,7 +260,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 				aligned++;
 				tmxWriter.writeItem(tu);
 				if ( params.createTM ) {
-					simpleTm.addEntry(tu, tu.getName());
+					simpleTm.addEntry(tu, tu.getName(), fileName);
 				}
 				return;
 			case 2:
@@ -285,6 +286,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	{
 		// Target set the second time this is called
 		trgPath = path;
+		// fileName is the value we set as attribute in the TM.
+		fileName = Util.getFilename(path, true);
 		trgEncoding = encoding;
 		trgFilterSettings = filterSettings;
 	}

@@ -1,10 +1,8 @@
 package net.sf.okapi.mt.google;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,8 +10,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
@@ -154,6 +150,14 @@ public class GoogleMTConnector implements IQuery {
 			code = code.substring(0, 2);
 		}
 		return code;
+	}
+
+	public boolean hasOption (int option) {
+		return false;
+	}
+	
+	public void export (String outputPath) {
+		throw new UnsupportedOperationException();
 	}
 
 }

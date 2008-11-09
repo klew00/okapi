@@ -132,6 +132,12 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		chkUseTradosWorkarounds = new Button(cmpTmp, SWT.CHECK);
+		chkUseTradosWorkarounds.setText("Generate Trados workarounds");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseTradosWorkarounds.setLayoutData(gdTmp);
+		
 		chkCreateTM = new Button(cmpTmp, SWT.CHECK);
 		chkCreateTM.setText("Create a translation memory with the following path:");
 		gdTmp = new GridData();
@@ -163,12 +169,6 @@ public class Editor implements IParametersEditor {
 				edTMPath.setFocus();
 			}
 		});
-		
-		chkUseTradosWorkarounds = new Button(cmpTmp, SWT.CHECK);
-		chkUseTradosWorkarounds.setText("Generate Trados workarounds");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkUseTradosWorkarounds.setLayoutData(gdTmp);
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("Segmentation");

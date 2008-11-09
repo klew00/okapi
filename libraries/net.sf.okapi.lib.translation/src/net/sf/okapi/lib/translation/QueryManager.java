@@ -6,7 +6,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.resource.TextFragment;
 
-public class QueryManager implements IQuery {
+public class QueryManager {
 
 	LinkedHashMap<Integer, ResourceItem> resList;
 	ArrayList<QueryResult> results;
@@ -62,8 +62,12 @@ public class QueryManager implements IQuery {
 		resList.remove(resourceId);
 	}
 	
-	public IQuery getResource (int resourceId) {
+	public IQuery getInterface (int resourceId) {
 		return resList.get(resourceId).query;
+	}
+	
+	public ResourceItem getResource (int resourceId) {
+		return resList.get(resourceId);
 	}
 	
 	public String getName (int resourceId) {
@@ -163,5 +167,5 @@ public class QueryManager implements IQuery {
 	public String getTargetLanguage () {
 		return trgLang;
 	}
-	
+
 }

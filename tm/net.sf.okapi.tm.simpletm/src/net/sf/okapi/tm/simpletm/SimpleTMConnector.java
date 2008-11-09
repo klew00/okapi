@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
@@ -107,5 +108,19 @@ public class SimpleTMConnector implements ITMQuery {
 	public String getTargetLanguage () {
 		return trgLang;
 	}
-	
+
+	public boolean hasOption (int option) {
+		switch ( option ) {
+		case HAS_FILEPATH:
+		case SUPPORT_EXPORT:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public void export (String outputPath) {
+		db.exportToTMX(outputPath, srcLang, trgLang);
+	}
+
 }
