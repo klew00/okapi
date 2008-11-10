@@ -187,6 +187,9 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	@Override
     public void startResource (Document resource) {
 		try {
+			// fileName is the value we set as attribute in the TM.
+			fileName = Util.getFilename(resource.getName(), true);
+
 			// Initialize the filter for the target
 			Object[] filters = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 				trgFilterSettings, trgFilter, null);
@@ -286,8 +289,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	{
 		// Target set the second time this is called
 		trgPath = path;
-		// fileName is the value we set as attribute in the TM.
-		fileName = Util.getFilename(path, true);
 		trgEncoding = encoding;
 		trgFilterSettings = filterSettings;
 	}

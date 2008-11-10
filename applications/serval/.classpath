@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.mt.google"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
+	<classpathentry kind="lib" path="lib/h2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

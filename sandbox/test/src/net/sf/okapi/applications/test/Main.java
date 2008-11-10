@@ -171,20 +171,21 @@ public class Main {
 			tc.append("Source text");
 			tu.setSourceContent(tc);
 			tc = new TextContainer();
-			tc.append("Target text for entry1");
+			tc.append("Target text for entry1 file1");
 			tu.setTargetContent(tc);
 			tu.setName("entry1");
-			simpleTm.addEntry(tu, tu.getName());
+			simpleTm.addEntry(tu, tu.getName(), "file1");
 			
 			tc = new TextContainer();
-			tc.append("Target text for entry2");
+			tc.append("Target text for entry1 file2");
 			tu.setTargetContent(tc);
-			tu.setName("entry2");
-			simpleTm.addEntry(tu, tu.getName());
+			tu.setName("entry1");
+			simpleTm.addEntry(tu, tu.getName(), "file2");
 			
 			simpleTm.close();
 
-			//qm.setAttribute("resname", "entry1");
+			qm.setAttribute("FileName", "file1");
+			qm.setAttribute("resname", "entry1");
 			qm.addAndInitializeResource(new SimpleTMConnector(), "SimpleTM", tmPath);
 			qm.query("Source text");
 			while ( qm.hasNext() ) {

@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Stack;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
@@ -16,22 +15,28 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class MIFFilter implements IFilter {
 	
 	static final Hashtable<String, Character> charTable = initCharTable();
 
 	private BufferedReader reader;
-	private StringBuilder buffer;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
-	private Stack<String> tagStack;
+	private StringBuilder sklBuffer;
+	private StringBuilder ilcBuffer;
+	private StringBuilder buffer;
 	private Document docRes;
 	private int parseState = 0;
-	private boolean inPara;
+	private int inPara;
+	private int inString;
 	private IResource currentRes;
 	private int tuId;
 	private int skId;
+	private int level;
+	private TextContainer cont;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -93,11 +98,13 @@ public class MIFFilter implements IFilter {
 			reader = new BufferedReader(
 				new InputStreamReader(input, "UTF-8"));
 			tagBuffer = new StringBuilder();
-			buffer = new StringBuilder();
+			sklBuffer = new StringBuilder();
+			ilcBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
-			tagStack = new Stack<String>();
+			level = 0;
 			parseState = 1; // Need to send start-document
-			inPara = false;
+			inPara = -1;
+			inString = -1;
 			tuId = -1;
 			skId = -1;
 		}
@@ -139,7 +146,9 @@ public class MIFFilter implements IFilter {
 			}
 			
 			// Process other calls
-			buffer.setLength(0);
+			sklBuffer.setLength(0);
+			ilcBuffer.setLength(0);
+			buffer = sklBuffer;// Start buffer is the skeleton buffer
 			int c;
 			while ( (c = reader.read()) != -1 ) {
 				switch ( c ) {
@@ -148,23 +157,51 @@ public class MIFFilter implements IFilter {
 					readComment();
 					break;
 				case '<': // Start of statement
+					level++;
 					buffer.append((char)c);
-					readTag();
-					if ( "Para".equals(tagBuffer) ) {
-						
-						inPara = true;
+					String tag = readTag();
+					if ( "Para".equals(tag) ) {
+						inPara = level;
+						cont = new TextContainer();
 						// Return skeleton before
-						currentRes = new SkeletonUnit(getId(skId), buffer.toString());
+						currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
 						return new FilterEvent(FilterEventType.SKELETON_UNIT, currentRes);
+					}
+					else if ( "String".equals(tag) ) {
+						inString = level;
 					}
 					break;
 				case '>': // End of statement
+					if ( inString == level ) {
+						inString = -1;
+					}
+					else if ( inPara == level ) {
+						inPara = -1;
+						if ( !cont.isEmpty() ) {
+							TextUnit tu = new TextUnit();
+							tu.setID(getTextId());
+							tu.setSourceContent(cont);
+							currentRes = tu;
+							return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
+							//TODO: Skeleton should be attached too
+						}
+					}
 					buffer.append((char)c);
+					level--;
 					// Return skeleton
-					currentRes = new SkeletonUnit(getId(skId), buffer.toString());
+					currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
 					return new FilterEvent(FilterEventType.SKELETON_UNIT, currentRes);
-				case '`': // Start of string
-					//processString();
+				case '`':
+					if (( inPara > -1 ) && ( level == inString )) {
+						cont.append(processString());
+					}
+					else {
+						buffer.append((char)c); // Store '`'
+						copyStringToStorage();
+					}
+					break;
+				default:
+					buffer.append((char)c);
 					break;
 				}
 			}
@@ -202,7 +239,8 @@ public class MIFFilter implements IFilter {
 			case '\t':
 			case '\r':
 			case '\n':
-				buffer.append((char)c);
+				// Let go for now
+				//buffer.append((char)c);
 				break;
 			case -1:
 			default:
@@ -214,6 +252,7 @@ public class MIFFilter implements IFilter {
 		
 		// Now read the name
 		while ( true ) {
+			
 			switch ( c ) {
 			case ' ':
 			case '\t':
@@ -221,7 +260,8 @@ public class MIFFilter implements IFilter {
 			case '\n':
 			case -1:
 				buffer.append(tagBuffer);
-				return tagBuffer.toString(); 
+				buffer.append((char)c);
+				return tagBuffer.toString();
 			default:
 				tagBuffer.append((char)c);
 				break;
@@ -230,24 +270,28 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
+	void copyStringToStorage () throws IOException {
+		int c;
+		boolean inEscape = false;
+		while ( (c = reader.read()) != -1 ) {
+			buffer.append((char)c);
+			if ( inEscape ) {
+				inEscape = false;
+			}
+			else {
+				if ( c == '\'' ) return;
+			}
+		}
+		// Else: Missing end of string error
+		throw new RuntimeException("End of string is missing.");
+	}
+	
 	String processString () throws IOException {
 		strBuffer.setLength(0);
 		int c;
 		boolean inEscape = false;
 		while ( (c = reader.read()) != -1 ) {
 			if ( inEscape ) {
-				switch ( c ) {
-				case '\'':
-					return strBuffer.toString();
-				case '\\':
-					inEscape = true;
-					break;
-				default:
-					strBuffer.append((char)c);
-					break;
-				}
-			}
-			else {
 				switch ( c ) {
 				case '\\':
 				case '>':
@@ -269,19 +313,29 @@ public class MIFFilter implements IFilter {
 				}
 				inEscape = false;
 			}
+			else {
+				switch ( c ) {
+				case '\'': // End of string
+					return strBuffer.toString();
+				case '\\':
+					inEscape = true;
+					break;
+				default:
+					strBuffer.append((char)c);
+					break;
+				}
+			}
 		}
 		// Else: Missing end of string error
 		throw new RuntimeException("End of string is missing.");
 	}
 
-	/**
-	 * Increments and format a given Id value.
-	 * @param idToIncrement The Id variable to process.
-	 * @return The formatted string value of the Id.
-	 */
-	private String getId (int idToIncrement) {
-		//TODO: mmm does this increment the real Id or a copy??? To test.
-		return String.valueOf(++idToIncrement);
+	private String getTextId () {
+		return String.valueOf(++tuId);
+	}
+
+	private String getSkeletonId () {
+		return String.valueOf(++skId);
 	}
 
 }

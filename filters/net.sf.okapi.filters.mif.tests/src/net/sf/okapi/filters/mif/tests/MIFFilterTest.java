@@ -11,7 +11,7 @@ import net.sf.okapi.filters.mif.MIFFilter;
 public class MIFFilterTest {
 	
 	@Before
-	public void setUp() {		
+	public void setUp() {
 	}
 
 	@Test
@@ -26,8 +26,12 @@ public class MIFFilterTest {
 				event = filter.next();
 				switch ( event.getEventType() ) {
 				case SKELETON_UNIT:
-					System.out.println("skl=["+filter.getResource().toString()+"]");
-					System.out.println("-----");
+					System.out.print(filter.getResource().toString());
+					//System.out.println("-----");
+					break;
+				case TEXT_UNIT:
+					System.out.println("["+filter.getResource().toString()+"]");
+					break;
 				}
 			}
 		}

@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 

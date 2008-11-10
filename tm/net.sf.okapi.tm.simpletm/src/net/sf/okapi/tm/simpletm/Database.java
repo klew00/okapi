@@ -311,23 +311,26 @@ public class Database {
 			writer.writeStartDocument(sourceLanguage, targetLanguage);
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery(String.format(
-				"SELECT %s,%s,%s,%s,%s,%s FROM " + TBLNAME,
-				NNAME, NGRPNAME, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES));
+				"SELECT %s,%s,%s,%s,%s,%s,%s FROM " + TBLNAME,
+				NNAME, NGRPNAME, NFILENAME, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES));
 			if ( result.first() ) {
 				TextUnit tu;
 				TextContainer tc;
+				LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>();
 				do {
 					tu = new TextUnit();
 					tc = new TextContainer();
-					tc.setCodedText(result.getString(3),
-						Code.stringToCodes(result.getString(4)), false);
+					tc.setCodedText(result.getString(4),
+						Code.stringToCodes(result.getString(5)), false);
 					tu.setSourceContent(tc);
 					tc = new TextContainer();
-					tc.setCodedText(result.getString(5),
-						Code.stringToCodes(result.getString(6)), false);
+					tc.setCodedText(result.getString(6),
+						Code.stringToCodes(result.getString(7)), false);
 					tu.setTargetContent(tc);
 					tu.setName(result.getString(1));
-					writer.writeItem(tu);
+					attributes.put(NGRPNAME, result.getString(2));
+					attributes.put(NFILENAME, result.getString(3));
+					writer.writeItem(tu, attributes);
 				} while ( result.next() );
 			}
 			writer.writeEndDocument();
