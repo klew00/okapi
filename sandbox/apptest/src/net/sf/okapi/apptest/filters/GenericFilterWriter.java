@@ -12,13 +12,13 @@ import java.util.Stack;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
-import net.sf.okapi.apptest.resource.GenericSkeleton;
-import net.sf.okapi.apptest.resource.GenericSkeletonPart;
 import net.sf.okapi.apptest.resource.Group;
-import net.sf.okapi.apptest.resource.PropertiesUnit;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
+import net.sf.okapi.apptest.skeleton.GenericSkeleton;
+import net.sf.okapi.apptest.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.Util;
 
 public class GenericFilterWriter implements IFilterWriter {
@@ -94,8 +94,8 @@ public class GenericFilterWriter implements IFilterWriter {
 				writeTextUnit((TextUnit)event.getResource());
 				processSkeleton(event.getResource().getSkeleton());
 				break;
-			case PROPERTIES_UNIT:
-				processPropertiesUnit((PropertiesUnit)event.getResource());
+			case DOCUMENT_PART:
+				processDocumentPart((DocumentPart)event.getResource());
 				processSkeleton(event.getResource().getSkeleton());
 				break;
 			}
@@ -148,7 +148,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		}
 	}
 	
-	private void processPropertiesUnit (PropertiesUnit resource) {
+	private void processDocumentPart (DocumentPart resource) {
 		if ( resource.isReference() ) {
 			builderData.references.add(resource);
 		}

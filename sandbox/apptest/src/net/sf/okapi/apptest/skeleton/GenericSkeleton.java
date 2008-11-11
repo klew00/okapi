@@ -1,33 +1,32 @@
-package net.sf.okapi.apptest.resource;
+package net.sf.okapi.apptest.skeleton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.apptest.common.ISkeleton;
+import net.sf.okapi.apptest.resource.TextFragment;
 
 public class GenericSkeleton implements ISkeleton {
 
 	private ArrayList<GenericSkeletonPart> list;
 	private boolean inStartElement = false;
+	private int id;
 	
 	public GenericSkeleton () {
 		list = new ArrayList<GenericSkeletonPart>();
-	}
-
-	public GenericSkeleton (GenericSkeletonPart part) {
-		list = new ArrayList<GenericSkeletonPart>();
-		list.add(part);
-	}
-
-	public void add (GenericSkeletonPart part) {
-		flush();
-		list.add(part);
+		id = 0;
 	}
 
 	public void add (String data) {
-		flush();
-		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(data));
+		closeStartElement();
+		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(makeId(), data));
 		else list.get(list.size()-1).append(data);
+	}
+
+	public void addRef (String refId) {
+		closeStartElement();
+		list.add(new GenericSkeletonPart(makeId(), TextFragment.makeRefMarker(refId)));
+		list.add(new GenericSkeletonPart(makeId(), ""));
 	}
 	
 	public List<GenericSkeletonPart> getParts () {
@@ -42,24 +41,28 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	public void addEndElement(String name) {
-		flush();		
+		closeStartElement();		
 		addWithoutCheck(String.format("</%s>", name));		
 	}
 
 	public void addStartElement(String name) {
-		flush();
+		closeStartElement();
 		addWithoutCheck(String.format("<%s", name));		
 	}
 	
-	public void flush () {
+	public void closeStartElement () {
 		if ( inStartElement ) {
 			addWithoutCheck(">");
 			inStartElement = false;
 		}
 	}
 
+	private String makeId() {
+		return String.valueOf(++id);
+	}
+	
 	private void addWithoutCheck (String data) {
-		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(data));
+		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(makeId(), data));
 		else list.get(list.size()-1).append(data);
 	}
 	

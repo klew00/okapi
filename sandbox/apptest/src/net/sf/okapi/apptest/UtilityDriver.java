@@ -15,6 +15,7 @@ import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
 import net.sf.okapi.apptest.pipelineutil.FilterStep;
 import net.sf.okapi.apptest.pipelineutil.FilterWriterStep;
 import net.sf.okapi.apptest.pipelineutil.UtilityStep;
+import net.sf.okapi.apptest.skeleton.GenericSkeletonProvider;
 import net.sf.okapi.apptest.utilities.IUtility;
 import net.sf.okapi.common.ui.Dialogs;
 
@@ -40,9 +41,10 @@ public class UtilityDriver {
 			util = new PseudoTranslate();
 			outFilter = new DummyFilterWriter();
 			genWriter = new GenericFilterWriter();
+			GenericSkeletonProvider genSkelProv = new GenericSkeletonProvider();
 
 			// Set the options 
-			inFilter.setOptions("en", "UTF-8");
+			inFilter.setOptions("en", "UTF-8", genSkelProv);
 			outFilter.setOptions("en-bz", "UTF-8");
 			outFilter.setOutput("myOutputFile");
 			genWriter.setOptions("en-bz", "UTF-16");
@@ -76,9 +78,10 @@ public class UtilityDriver {
 		try {
 			ILinearPipeline pipeline = new LinearPipeline<FilterEvent>();
 			
+			GenericSkeletonProvider genSkelProv = new GenericSkeletonProvider();
 			FilterStep inputStep = new FilterStep(new DummyFilter());
 			pipeline.addPipleLineStep(inputStep);
-			inputStep.getFilter().setOptions("en", "UTF-8");
+			inputStep.getFilter().setOptions("en", "UTF-8", genSkelProv);
 			inputStep.setInput("myFile");
 			
 			UtilityStep utility = new UtilityStep();

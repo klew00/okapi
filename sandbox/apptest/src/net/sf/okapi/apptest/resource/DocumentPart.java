@@ -4,13 +4,13 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropertiesUnit extends BaseResource implements IReferenceable {
+public class DocumentPart extends BaseResource implements IReferenceable {
 
 	private boolean isReference;
 	private LocaleProperties srcProp;
 	private ArrayList<LocaleProperties> trgPropList;
 
-	public PropertiesUnit (String id,
+	public DocumentPart (String id,
 		boolean isReference)
 	{
 		this.id = id;

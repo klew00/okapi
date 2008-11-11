@@ -1,7 +1,14 @@
-package net.sf.okapi.apptest.resource;
+package net.sf.okapi.apptest.skeleton;
 
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.common.ISkeletonPart;
+import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.resource.DocumentPart;
+import net.sf.okapi.apptest.resource.Group;
+import net.sf.okapi.apptest.resource.IReferenceable;
+import net.sf.okapi.apptest.resource.TextContainer;
+import net.sf.okapi.apptest.resource.TextFragment;
+import net.sf.okapi.apptest.resource.TextUnit;
 
 public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 
@@ -9,10 +16,6 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 	private String id;
 	private StringBuilder data;
 	
-	public GenericSkeletonPart (String data) {
-		this.data = new StringBuilder(data);
-	}
-
 	public GenericSkeletonPart (String id, String data) {
 		this.data = new StringBuilder(data);
 		this.id = id;
@@ -54,7 +57,7 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 						else if ( ref instanceof Group ) {
 							return "!!Not supported!!";
 						}
-						else if ( ref instanceof PropertiesUnit ) {
+						else if ( ref instanceof DocumentPart ) {
 							return "!!Not supported!!";
 						}
 						break;

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.ISkeletonPart;
+
 /**
  * This class implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -986,7 +988,7 @@ public class TextFragment implements Comparable<Object> {
 							else
 								tmp.replace(start, end, "propVALUE-TODO");
 						}
-						else if ( ref instanceof GenericSkeletonPart ) {
+						else if ( ref instanceof ISkeletonPart ) {
 							if ( propName == null )
 								tmp.replace(start, end, ref.toString());
 							else
@@ -998,12 +1000,12 @@ public class TextFragment implements Comparable<Object> {
 							else
 								tmp.replace(start, end, "propValue-TODO");
 						}
-						else if ( ref instanceof PropertiesUnit ) {
+						else if ( ref instanceof DocumentPart ) {
 							if ( propName == null )
 								tmp.replace(start, end, "-ERR-");
 							else {
 								tmp.replace(start, end,
-									getPropertyValue((PropertiesUnit)ref, propName, builderData.outputTarget));
+									getPropertyValue((DocumentPart)ref, propName, builderData.outputTarget));
 							}
 								
 						}
@@ -1019,7 +1021,7 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 	
-	private String getPropertyValue (PropertiesUnit unit,
+	private String getPropertyValue (DocumentPart unit,
 		String name,
 		boolean outputTarget)
 	{
@@ -1045,7 +1047,7 @@ public class TextFragment implements Comparable<Object> {
 				else  tc = ((TextUnit)ref).getSourceContent();
 				tmp.append(tc.toString(builderData));
 			}
-			else if ( ref instanceof GenericSkeletonPart ) {
+			else if ( ref instanceof ISkeletonPart ) {
 				tmp.append(ref.toString());
 			}
 			else if ( ref instanceof Group ) {

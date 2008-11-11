@@ -6,21 +6,20 @@ import java.util.ArrayList;
 
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.IResource;
+import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IEncoder;
 import net.sf.okapi.apptest.filters.IFilter;
 import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.Document;
+import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
-import net.sf.okapi.apptest.resource.GenericSkeleton;
-import net.sf.okapi.apptest.resource.GenericSkeletonPart;
 import net.sf.okapi.apptest.resource.Group;
-import net.sf.okapi.apptest.resource.PropertiesUnit;
 import net.sf.okapi.apptest.resource.TextContainer;
-import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
+import net.sf.okapi.apptest.skeleton.ISkeletonProvider;
 
 public class DummyFilter implements IFilter {
 
@@ -29,6 +28,7 @@ public class DummyFilter implements IFilter {
 	private boolean canceled;
 	private String language;
 	private IEncoder encoder;
+	private ISkeletonProvider skelProv;
 	
 	public DummyFilter () {
 		encoder = new DummyEncoder();
@@ -39,10 +39,11 @@ public class DummyFilter implements IFilter {
 	}
 	
 	public void setOptions (String language,
-		String defaultEncoding)
+		String defaultEncoding,
+		ISkeletonProvider skeletonProvider)
 	{
-		// Not used in this parser
 		System.out.println("DummyParser: setOptions() called");
+		skelProv = skeletonProvider;
 		this.language = language;
 		System.out.println(" -output language = " + language);
 		System.out.println(" -output default encoding = " + defaultEncoding);
@@ -91,9 +92,9 @@ public class DummyFilter implements IFilter {
 	private void makeCase001 () {
 		// <p>Before <img href='img.png' alt='text'/> after.</p>
 
-		PropertiesUnit pu = new PropertiesUnit("p1", true);
-		pu.getSourceProperties().setProperty("href", "img.png");
-		list.add(new FilterEvent(FilterEventType.PROPERTIES_UNIT, pu));
+		DocumentPart dp = new DocumentPart("dp1", true);
+		dp.getSourceProperties().setProperty("href", "img.png");
+		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text", true)));
@@ -104,16 +105,16 @@ public class DummyFilter implements IFilter {
 		TextContainer tc = new TextContainer(tu);
 		tc.append("Before ");
 		Code code = tc.append(TagType.PLACEHOLDER, "image",
-			"<img href='" + TextContainer.makeRefMarker("p1","href") +
+			"<img href='" + TextContainer.makeRefMarker("dp1","href") +
 			"' alt='" + TextContainer.makeRefMarker("t1") + "'/>");
 		code.setHasReference(true);
 		tc.append(" after.");
 		tu.setSourceContent(tc);
-		GenericSkeleton gs = new GenericSkeleton();
-		gs.add(new GenericSkeletonPart("s1", "<p>"));
-		gs.add(new GenericSkeletonPart("s2", TextFragment.makeRefMarker("t2")));
-		gs.add(new GenericSkeletonPart("s3", "</p>"));
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, gs));
+		ISkeleton skel = skelProv.createSkeleton();
+		skel.add("<p>");
+		skel.addRef("t2");
+		skel.add("</p>");
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 
 	}
 	
@@ -121,18 +122,18 @@ public class DummyFilter implements IFilter {
 		// <p>Before <a href='link.htm'/> after.</p>
 		Group grp1 = new Group(null, "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s1", "<p>"))));
+			skelProv.createSkeleton("<p>")));
 
-		PropertiesUnit pu = new PropertiesUnit("p1", true);
-		pu.getSourceProperties().setProperty("href", "link.htm");
-		list.add(new FilterEvent(FilterEventType.PROPERTIES_UNIT, pu));
+		DocumentPart dp = new DocumentPart("dp1", true);
+		dp.getSourceProperties().setProperty("href", "link.htm");
+		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		TextUnit tu = new TextUnit();
 		tu.setID("t1");
 		TextContainer tc = new TextContainer(tu);
 		tc.append("Before ");
 		Code code = tc.append(TagType.PLACEHOLDER, "link",
-			"<a href='" + TextContainer.makeRefMarker("p1","href") + "'/>");
+			"<a href='" + TextContainer.makeRefMarker("dp1","href") + "'/>");
 		code.setHasReference(true);
 		tc.append(" after.");
 		tu.setSourceContent(tc);
@@ -140,7 +141,7 @@ public class DummyFilter implements IFilter {
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			new GenericSkeleton(new GenericSkeletonPart("s2", "</p>\n"))));
+			skelProv.createSkeleton("</p>\n")));
 
 	}
 	
@@ -148,62 +149,62 @@ public class DummyFilter implements IFilter {
 		// <table id=100> <tr><td>text</td></tr><table>
 		Group grp1 = new Group(null, "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s1", "<table id=100>\n "))));
+				skelProv.createSkeleton("<table id=100>\n ")));
 
 		Group grp2 = new Group("g1", "g2");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
-			new GenericSkeleton(new GenericSkeletonPart("s2", "<tr>"))));
+				skelProv.createSkeleton("<tr>")));
 		
 		Group grp3 = new Group("g2", "g3");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
-			new GenericSkeleton(new GenericSkeletonPart("s3", "<td>"))));
+				skelProv.createSkeleton("<td>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g3"),
-			new GenericSkeleton(new GenericSkeletonPart("s4", "</td>"))));
+			skelProv.createSkeleton("</td>")));
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g2"),
-			new GenericSkeleton(new GenericSkeletonPart("s5", "</tr>\n"))));
+			skelProv.createSkeleton("</tr>\n")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			new GenericSkeleton(new GenericSkeletonPart("s6", "</table>\n"))));
+			skelProv.createSkeleton("</table>\n")));
 	}
 
 	private void makeCase004 () {
 		Group grp1 = new Group(null, "g1", true);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton(new GenericSkeletonPart("s2", "<ul>", true))));
+				skelProv.createSkeleton("<ul>", true)));
 		
 		Group grp2 = new Group(null, "g2", false);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
-			new GenericSkeleton(new GenericSkeletonPart("s3", "\n  <li>"))));
+				skelProv.createSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "Text of item 1 with special char < and &.")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g2"),
-			new GenericSkeleton(new GenericSkeletonPart("s4", "</li>"))));
+			skelProv.createSkeleton("</li>")));
 		
 		Group grp3 = new Group(null, "g3", false);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
-			new GenericSkeleton(new GenericSkeletonPart("s5", "\n  <li>"))));
+				skelProv.createSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t2", "Text of item 2")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g3"),
-			new GenericSkeleton(new GenericSkeletonPart("s6", "</li>"))));
+			skelProv.createSkeleton("</li>")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			new GenericSkeleton(new GenericSkeletonPart("s7", "\n </ul>"))));
+			skelProv.createSkeleton("\n </ul>")));
 
 		TextUnit tu = new TextUnit();
 		tu.setID("t3");
@@ -214,11 +215,10 @@ public class DummyFilter implements IFilter {
 		code.setHasReference(true);
 		tc.append("\n and text after the list.");
 		tu.setSourceContent(tc);
-		GenericSkeleton gs = new GenericSkeleton();
-		gs.add(new GenericSkeletonPart("s1", "<p>"));
-		gs.add(new GenericSkeletonPart("s8", TextFragment.makeRefMarker("t3")));
-		gs.add(new GenericSkeletonPart("s9", "</p>"));
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, gs));
+		ISkeleton skel = skelProv.createSkeleton("<p>");
+		skel.addRef("t3");
+		skel.add("</p>");
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 
 	}
 	
@@ -233,11 +233,11 @@ public class DummyFilter implements IFilter {
 		docRes.setEncoding("UTF-8"); // Always
 		docRes.setLanguage(language);
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
-		
+
 		//makeCase001();
-		//makeCase002();
+		makeCase002();
 		//makeCase003();
-		makeCase004();
+		//makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));
