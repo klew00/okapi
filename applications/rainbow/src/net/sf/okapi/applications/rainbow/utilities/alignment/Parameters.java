@@ -24,15 +24,16 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	public String       tmxPath;
-	public String       tmPath;
 	public boolean      segment;
 	public String       sourceSrxPath;
 	public String       targetSrxPath;
-	public boolean      useTradosWorkarounds;
 	public boolean      checkSingleSegUnit;
 	public boolean      useAutoCorrection;
+	public boolean      createTMX;
+	public String       tmxPath;
+	public boolean      useTradosWorkarounds;
 	public boolean      createTM;
+	public String       tmPath;
 	
 
 	public Parameters () {
@@ -40,42 +41,45 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
+		createTMX = true;
 		tmxPath = "";
+		useTradosWorkarounds = true;
+		createTM = false;
 		tmPath = "";
 		segment = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
-		useTradosWorkarounds = true;
 		checkSingleSegUnit = true;
 		useAutoCorrection = true;
-		createTM = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		createTMX = buffer.getBoolean("createTMX", createTMX);
 		tmxPath = buffer.getString("tmxPath", tmxPath);
+		useTradosWorkarounds = buffer.getBoolean("useTradosWorkarounds", useTradosWorkarounds);
+		createTM = buffer.getBoolean("createTM", createTM);
 		tmPath = buffer.getString("simpletmPath", tmPath);
 		segment = buffer.getBoolean("segment", segment);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
-		useTradosWorkarounds = buffer.getBoolean("useTradosWorkarounds", useTradosWorkarounds);
 		checkSingleSegUnit = buffer.getBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		useAutoCorrection = buffer.getBoolean("useAutoCorrection", useAutoCorrection);
-		createTM = buffer.getBoolean("createTM", createTM);
 	}
 
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean("createTMX", createTMX);
 		buffer.setString("tmxPath", tmxPath);
+		buffer.setBoolean("useTradosWorkarounds", useTradosWorkarounds);
+		buffer.setBoolean("createTM", createTM);
+		buffer.setBoolean("segment", segment);
 		buffer.setString("simpletmPath", tmPath);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
-		buffer.setBoolean("segment", segment);
-		buffer.setBoolean("useTradosWorkarounds", useTradosWorkarounds);
 		buffer.setBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		buffer.setBoolean("useAutoCorrection", useAutoCorrection);
-		buffer.setBoolean("createTM", createTM);
 		return buffer.toString();
 	}
 }

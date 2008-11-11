@@ -91,26 +91,28 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			trgSeg = doc.applyLanguageRules(targetLanguage, null);
 		}
 		
-		// Prepare the TMX output
-		if ( tmxWriter != null ) {
-			tmxWriter.close();
-			tmxWriter = null;
+		// Prepare the TMX output if requested
+		if ( params.createTMX ) {
+			if ( tmxWriter != null ) {
+				tmxWriter.close();
+				tmxWriter = null;
+			}
+			tmxWriter = new TMXWriter();
+			tmxWriter.create(params.tmxPath);
+			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
+			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
 		}
-		tmxWriter = new TMXWriter();
-		tmxWriter.create(params.tmxPath);
-		tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
-		tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
-		
-		// Prepare the db store
-		dbStoreBuilder = new DbStoreBuilder();
-		// We use the source part only, and it contains the target language of the alignment task
-		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		// Prepare the simpletm database
 		if ( params.createTM ) {
 			simpleTm = new Database();
 			simpleTm.create(params.tmPath, true);
 		}
+		
+		// Prepare the db store
+		dbStoreBuilder = new DbStoreBuilder();
+		// We use the source part only, and it contains the target language of the alignment task
+		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
 			//TODO: make info part of constructor
@@ -261,7 +263,9 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
-				tmxWriter.writeItem(tu);
+				if ( params.createTMX ) {
+					tmxWriter.writeItem(tu);
+				}
 				if ( params.createTM ) {
 					simpleTm.addEntry(tu, tu.getName(), fileName);
 				}

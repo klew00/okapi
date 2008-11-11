@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel and Okapi Framework contributors         */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -37,7 +37,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -49,10 +48,12 @@ public class Editor implements IParametersEditor {
 	private boolean               result = false;
 	private OKCancelPanel         pnlActions;
 	private Parameters            params;
+	private Button                chkCreateTMX;
 	private Text                  edTMXPath;
+	private Button                btGetTMXPath;
+	private Button                chkUseTradosWorkarounds;
 	private Button                chkCreateTM;
 	private Text                  edTMPath;
-	private Button                chkUseTradosWorkarounds;
 	private Button                btGetTMPath;
 	private Button                chkCheckSingleSegUnit;
 	private Button                chkUseAutoCorrection;
@@ -104,23 +105,64 @@ public class Editor implements IParametersEditor {
 		//--- Main tab
 		
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(2, false));
+		cmpTmp.setLayout(new GridLayout());
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 
-		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Full path of the TMX document to generate:");
-		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		stTmp.setLayoutData(gdTmp);
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Segmentation");
+		grpTmp.setLayout(new GridLayout());
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
 		
-		edTMXPath = new Text(cmpTmp, SWT.BORDER);
+		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
+			"Segment the extracted text using the following SRX rules:");
+		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+	
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Verification and Correction");
+		grpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkCheckSingleSegUnit = UIUtil.createGridButton(grpTmp, SWT.CHECK,
+			"Verify in-line codes for text units with a single segment", -1, 2);
+		chkUseAutoCorrection = UIUtil.createGridButton(grpTmp, SWT.CHECK,
+			"Use auto-correction automatically", -1, 2);
+
+		//--- TM tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Translation Memory");
+		tiTmp.setControl(cmpTmp);
+
+		// TMX output
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("TMX Output");
+		grpTmp.setLayout(new GridLayout(2, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkCreateTMX = new Button(grpTmp, SWT.CHECK);
+		chkCreateTMX.setText("Create a TMX document with the following path:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkCreateTMX.setLayoutData(gdTmp);
+		chkCreateTMX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTMXOptions();
+			}
+		});
+		
+		edTMXPath = new Text(grpTmp, SWT.BORDER);
 		edTMXPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		Button btTmp = new Button(cmpTmp, SWT.PUSH);
-		btTmp.setText("...");
-		btTmp.addSelectionListener(new SelectionAdapter() {
+		btGetTMXPath = new Button(grpTmp, SWT.PUSH);
+		btGetTMXPath.setText("...");
+		btGetTMXPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
@@ -132,28 +174,34 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
-		chkUseTradosWorkarounds = new Button(cmpTmp, SWT.CHECK);
+		chkUseTradosWorkarounds = new Button(grpTmp, SWT.CHECK);
 		chkUseTradosWorkarounds.setText("Generate Trados workarounds");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkUseTradosWorkarounds.setLayoutData(gdTmp);
 		
-		chkCreateTM = new Button(cmpTmp, SWT.CHECK);
-		chkCreateTM.setText("Create a translation memory with the following path:");
+		// Simple TM output
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("SimpleTM Output");
+		grpTmp.setLayout(new GridLayout(2, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkCreateTM = new Button(grpTmp, SWT.CHECK);
+		chkCreateTM.setText("Create a SimpleTM database with the following path:");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkCreateTM.setLayoutData(gdTmp);
 		chkCreateTM.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				edTMPath.setEnabled(chkCreateTM.getSelection());
-				btGetTMPath.setEnabled(chkCreateTM.getSelection());
+				updateTMOptions();
 			}
 		});
 		
-		edTMPath = new Text(cmpTmp, SWT.BORDER);
+		edTMPath = new Text(grpTmp, SWT.BORDER);
 		edTMPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		btGetTMPath = new Button(cmpTmp, SWT.PUSH);
+		btGetTMPath = new Button(grpTmp, SWT.PUSH);
 		btGetTMPath.setText("...");
 		btGetTMPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -169,22 +217,6 @@ public class Editor implements IParametersEditor {
 				edTMPath.setFocus();
 			}
 		});
-		
-		Group grpTmp = new Group(cmpTmp, SWT.NONE);
-		grpTmp.setText("Segmentation");
-		grpTmp.setLayout(new GridLayout());
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		grpTmp.setLayoutData(gdTmp);
-		
-		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Segment the extracted text using the following SRX rules:");
-		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		chkCheckSingleSegUnit = UIUtil.createGridButton(cmpTmp, SWT.CHECK,
-			"Verify in-line codes for text units with a single segment", -1, 2);
-		chkUseAutoCorrection = UIUtil.createGridButton(cmpTmp, SWT.CHECK,
-			"Use auto-correction automatically", -1, 2);
 		
 		//--- Dialog-level buttons
 
@@ -226,41 +258,88 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		edTMXPath.setText(params.tmxPath);
-		chkCreateTM.setSelection(params.createTM);
-		edTMPath.setText(params.tmPath);
-		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 		chkCheckSingleSegUnit.setSelection(params.checkSingleSegUnit);
 		chkUseAutoCorrection.setSelection(params.useAutoCorrection);
+		
+		chkCreateTMX.setSelection(params.createTMX);
+		edTMXPath.setText(params.tmxPath);
+		edTMPath.setText(params.tmPath);
+		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
+		updateTMXOptions();
+
+		chkCreateTM.setSelection(params.createTM);
+		edTMPath.setEnabled(chkCreateTM.getSelection());
+		btGetTMPath.setEnabled(chkCreateTM.getSelection());
+		updateTMOptions();
+	}
+
+	private void updateTMXOptions () {
+		edTMXPath.setEnabled(chkCreateTMX.getSelection());
+		btGetTMXPath.setEnabled(chkCreateTMX.getSelection());
+		chkUseTradosWorkarounds.setEnabled(chkCreateTMX.getSelection());
+	}
+	
+	private void updateTMOptions () {
 		edTMPath.setEnabled(chkCreateTM.getSelection());
 		btGetTMPath.setEnabled(chkCreateTM.getSelection());
 	}
 
 	private boolean saveData () {
 		if ( inInit ) return true;
-		if ( edTMXPath.getText().length() == 0 ) {
-			Dialogs.showError(shell, "You must specify an output file.", null);
-			edTMXPath.setFocus();
+		
+		// Check segmentation info
+		boolean segment = pnlSegmentation.getSegment();
+		if ( segment ) {
+			if ( pnlSegmentation.getSourceSRX().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify an SRX document for the source.", null);
+				return false;
+			}
+			if ( pnlSegmentation.getTargetSRX().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify an SRX document for the target.", null);
+				return false;
+			}
+		}
+		// Check TMX output
+		if ( chkCreateTMX.getSelection() ) {
+			if ( edTMXPath.getText().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify the path of the TMX document.", null);
+				return false;
+			}
+		}
+		// Check TM output
+		if ( chkCreateTM.getSelection() ) {
+			if ( edTMPath.getText().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify the path of the SimpleTM database.", null);
+				return false;
+			}
+		}
+		
+		if ( !chkCreateTMX.getSelection() && !chkCreateTM.getSelection() ) {
+			Dialogs.showError(shell, "You must specify at least one output.", null);
 			return false;
 		}
-		params.tmxPath = edTMXPath.getText();
-		params.createTM = chkCreateTM.getSelection();
-		params.tmPath = edTMPath.getText();
-		params.segment = pnlSegmentation.getSegment();
-		if ( params.segment && pnlSegmentation.getSourceSRX().length() == 0 ) {
-			Dialogs.showError(shell, "You must specify an SRX document for the source.", null);
-			return false;
+		
+		// Set modified values (after we have checked everything)
+		params.segment = segment;
+		if ( segment ) {
+			params.sourceSrxPath = pnlSegmentation.getSourceSRX();
+			params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		}
-		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
-		if ( params.segment && pnlSegmentation.getTargetSRX().length() == 0 ) {
-			Dialogs.showError(shell, "You must specify an SRX document for the target.", null);
-			return false;
-		}
-		params.targetSrxPath = pnlSegmentation.getTargetSRX();
-		params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
 		params.checkSingleSegUnit = chkCheckSingleSegUnit.getSelection();
 		params.useAutoCorrection = chkUseAutoCorrection.getSelection();
+
+		params.createTMX = chkCreateTMX.getSelection();
+		if ( params.createTMX ) {
+			params.tmxPath = edTMXPath.getText();
+			params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
+		}
+
+		params.createTM = chkCreateTM.getSelection();
+		if ( params.createTM ) {
+			params.tmPath = edTMPath.getText();
+		}
+		
 		return true;
 	}
 
