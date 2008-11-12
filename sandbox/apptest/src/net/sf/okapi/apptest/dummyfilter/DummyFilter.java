@@ -235,9 +235,9 @@ public class DummyFilter implements IFilter {
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
 		//makeCase001();
-		makeCase002();
+		//makeCase002();
 		//makeCase003();
-		//makeCase004();
+		makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));

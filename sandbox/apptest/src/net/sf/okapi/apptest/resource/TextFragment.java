@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.apptest.common.ISkeletonPart;
+import net.sf.okapi.apptest.filters.IWriterHelper;
 
 /**
  * This class implements the methods for creating and manipulating a pre-parsed
@@ -796,12 +797,12 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 
-	public String toString (BuilderData builderData)
-	{
+	public String toString (IWriterHelper refProv) {
 		if (( codes == null ) || ( codes.size() == 0 )) {
-			if ( builderData == null ) return text.toString();
-			else return builderData.encode(text.toString());
+			if ( refProv == null ) return text.toString();
+			else return refProv.encode(text.toString());
 		}
+
 		if ( !isBalanced ) balanceMarkers();
 		StringBuilder tmp = new StringBuilder();
 		Code code;
@@ -809,20 +810,20 @@ public class TextFragment implements Comparable<Object> {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, builderData));
+				tmp.append(expandCodeContent(code, refProv));
 				break;
 			case MARKER_CLOSING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, builderData));
+				tmp.append(expandCodeContent(code, refProv));
 				break;
 			case MARKER_ISOLATED:
 			case MARKER_SEGMENT:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, builderData));
+				tmp.append(expandCodeContent(code, refProv));
 				break;
 			default:
-				if ( builderData == null ) tmp.append(text.charAt(i));
-				else tmp.append(builderData.encode(text.charAt(i)));
+				if ( refProv == null ) tmp.append(text.charAt(i));
+				else tmp.append(refProv.encode(text.charAt(i)));
 				break;
 			}
 		}
@@ -954,7 +955,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @return The data for the code, including any sub-flows data.
 	 */
 	private String expandCodeContent (Code code,
-		BuilderData builderData)
+		IWriterHelper refProv)
 	{
 		if ( !code.hasReference ) return code.data;
 		if ( parent == null ) {
@@ -971,50 +972,40 @@ public class TextFragment implements Comparable<Object> {
 		while ( (marker = getRefMarker(tmp)) != null ) {
 			int start = (Integer)marker[1];
 			int end = (Integer)marker[2];
-			if ( builderData.references == null ) {
-				tmp.replace(start, end, "-ERR:NO-REF-LIST-");
+			String propName = (String)marker[3];
+			IReferenceable ref = refProv.getReference((String)marker[0]);
+			if ( ref == null ) {
+				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else {
-				boolean found = false;
-				String propName = (String)marker[3];
-				for ( IReferenceable ref : builderData.references ) {
-					if ( ref.getID().equals((String)marker[0]) ) {
-						TextContainer tc;
-						if ( ref instanceof TextUnit ) {
-							if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
-							else tc = ((TextUnit)ref).getSourceContent();
-							if ( propName == null )
-								tmp.replace(start, end, tc.toString(builderData));
-							else
-								tmp.replace(start, end, "propVALUE-TODO");
-						}
-						else if ( ref instanceof ISkeletonPart ) {
-							if ( propName == null )
-								tmp.replace(start, end, ref.toString());
-							else
-								tmp.replace(start, end, "propValue-TODO");
-						}
-						else if ( ref instanceof Group ) {
-							if ( propName == null )
-								tmp.replace(start, end, mergeGroup((Group)ref, builderData));
-							else
-								tmp.replace(start, end, "propValue-TODO");
-						}
-						else if ( ref instanceof DocumentPart ) {
-							if ( propName == null )
-								tmp.replace(start, end, "-ERR-");
-							else {
-								tmp.replace(start, end,
-									getPropertyValue((DocumentPart)ref, propName, builderData.outputTarget));
-							}
-								
-						}
-						found = true;
-						break;
-					}
+				TextContainer tc;
+				if ( ref instanceof TextUnit ) {
+					if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
+					else tc = ((TextUnit)ref).getSourceContent();
+					if ( propName == null )
+						tmp.replace(start, end, tc.toString(refProv));
+					else
+						tmp.replace(start, end, "propVALUE-TODO");
 				}
-				if ( !found ) {
-					tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
+				else if ( ref instanceof ISkeletonPart ) {
+					if ( propName == null )
+						tmp.replace(start, end, ref.toString());
+					else
+						tmp.replace(start, end, "propValue-TODO");
+				}
+				else if ( ref instanceof Group ) {
+					if ( propName == null )
+						tmp.replace(start, end, mergeGroup((Group)ref, refProv));
+					else
+						tmp.replace(start, end, "propValue-TODO");
+				}
+				else if ( ref instanceof DocumentPart ) {
+					if ( propName == null )
+						tmp.replace(start, end, "-ERR-");
+					else {
+						tmp.replace(start, end,
+							getPropertyValue((DocumentPart)ref, propName, refProv.useTarget()));
+					}
 				}
 			}
 		}
@@ -1036,23 +1027,23 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	private String mergeGroup (Group group,
-		BuilderData builderData)
+		IWriterHelper refProv)
 	{
 		StringBuilder tmp = new StringBuilder();
 		for ( IReferenceable ref : group ) {
 			if ( ref instanceof TextUnit ) {
 				if ( ref.isReference() )continue; // Skip entries that are references
 				TextContainer tc;
-				if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
+				if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
 				else  tc = ((TextUnit)ref).getSourceContent();
-				tmp.append(tc.toString(builderData));
+				tmp.append(tc.toString(refProv));
 			}
 			else if ( ref instanceof ISkeletonPart ) {
 				tmp.append(ref.toString());
 			}
 			else if ( ref instanceof Group ) {
 				// Call recursively
-				tmp.append(mergeGroup((Group)ref, builderData));
+				tmp.append(mergeGroup((Group)ref, refProv));
 			}
 		}
 		return tmp.toString();

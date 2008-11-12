@@ -2,7 +2,7 @@ package net.sf.okapi.apptest.skeleton;
 
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.common.ISkeletonPart;
-import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.IReferenceable;
@@ -32,39 +32,36 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 		return data.toString();
 	}
 
-	public String toString (BuilderData builderData) {
+	public String toString (IWriterHelper refProv) {
 		if ( data.toString().startsWith(TextFragment.REFMARKER_START) ) {
 			Object[] marker = TextFragment.getRefMarker(data);
 			if ( marker != null ) {
 				String propName = (String)marker[3];
-				for ( IReferenceable ref : builderData.references ) {
-					if ( ref.getID().equals((String)marker[0]) ) {
-						TextContainer tc;
-						if ( ref instanceof TextUnit ) {
-							if ( builderData.outputTarget ) tc = ((TextUnit)ref).getTargetContent();
-							else tc = ((TextUnit)ref).getSourceContent();
-							if ( propName == null )
-								return tc.toString(builderData);
-							else
-								return "propVALUE-TODO";
-						}
-						else if ( ref instanceof GenericSkeletonPart ) {
-							if ( propName == null )
-								return ref.toString();
-							else
-								return "propValue-TODO";
-						}
-						else if ( ref instanceof Group ) {
-							return "!!Not supported!!";
-						}
-						else if ( ref instanceof DocumentPart ) {
-							return "!!Not supported!!";
-						}
-						break;
-					}
+				IReferenceable ref = refProv.getReference((String)marker[0]);
+				if ( ref == null ) return "-ERR: Bad marker-";
+				// Else: process the reference
+				TextContainer tc;
+				if ( ref instanceof TextUnit ) {
+					if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
+					else tc = ((TextUnit)ref).getSourceContent();
+					if ( propName == null )
+						return tc.toString(refProv);
+					else
+						return "propVALUE-TODO";
+				}
+				else if ( ref instanceof GenericSkeletonPart ) {
+					if ( propName == null )
+						return ref.toString();
+					else
+						return "propValue-TODO";
+				}
+				else if ( ref instanceof Group ) {
+					return "!!Not supported!!";
+				}
+				else if ( ref instanceof DocumentPart ) {
+					return "!!Not supported!!";
 				}
 			}
-			else return "-ERR: Bad marker-";
 		}
 		return data.toString();
 	}

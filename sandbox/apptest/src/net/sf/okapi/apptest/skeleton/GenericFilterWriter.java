@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
 import java.util.Stack;
 
 import net.sf.okapi.apptest.common.IParameters;
@@ -14,15 +15,16 @@ import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IEncoder;
 import net.sf.okapi.apptest.filters.IFilterWriter;
-import net.sf.okapi.apptest.resource.BuilderData;
+import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.Group;
+import net.sf.okapi.apptest.resource.IReferenceable;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
 
-public class GenericFilterWriter implements IFilterWriter {
+public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 
 	protected OutputStream output;
 	protected String language;
@@ -31,11 +33,13 @@ public class GenericFilterWriter implements IFilterWriter {
 	protected IParameters params;
 	private OutputStreamWriter writer;
 	private Stack<Group> groupStack;
-	private BuilderData builderData;
 	private IEncoder layerEncoder;
+	public LinkedHashMap<String, IReferenceable> references;
+	public boolean outputTarget;
+	public IEncoder encoder;
 	
 	public GenericFilterWriter () {
-		builderData = new BuilderData();
+		references = new LinkedHashMap<String, IReferenceable>();
 	}
 	
 	public void close () {
@@ -60,11 +64,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	public void setOutputTarget (boolean value) {
-		builderData.outputTarget = value;
+		outputTarget = value;
 	}
 	
 	public void setEncoder (IEncoder encoder) {
-		builderData.encoder = encoder;
+		this.encoder = encoder;
 	}
 	
 	public void handleEvent (FilterEvent event) {
@@ -148,20 +152,20 @@ public class GenericFilterWriter implements IFilterWriter {
 		GenericSkeleton skel = (GenericSkeleton)skeleton;
 		for ( GenericSkeletonPart part : skel.getParts() ) {
 			if ( part.isReference() ) {
-				builderData.references.add(part);
+				references.put(part.getID(), part);
 			}
 			if ( groupStack.size() > 0 ) {
 				groupStack.peek().add(part);
 			}
 			else if ( !part.isReference() ) {
-				writer.write(part.toString(builderData));
+				writer.write(part.toString(this));
 			}
 		}
 	}
 	
 	private void processDocumentPart (DocumentPart resource) {
 		if ( resource.isReference() ) {
-			builderData.references.add(resource);
+			references.put(resource.getID(), resource);
 		}
 		else if ( groupStack.size() > 0 ) {
 			groupStack.peek().add(resource);
@@ -170,7 +174,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	
 	private void processStartGroup (Group resource) {
 		if ( resource.isReference() ) {
-			builderData.references.add(resource);
+			references.put(resource.getID(), resource);
 			groupStack.push(resource);
 		}
 		else if ( groupStack.size() > 0 ) {
@@ -197,7 +201,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	
 	private void writeTextUnit (TextUnit unit) throws IOException {
 		if ( unit.isReference() ) {
-			builderData.references.add(unit);
+			references.put(unit.getID(), unit);
 		}
 		if ( groupStack.size() > 0 ) {
 			groupStack.peek().add(unit);
@@ -206,8 +210,27 @@ public class GenericFilterWriter implements IFilterWriter {
 			TextContainer tc;
 			if ( unit.hasTarget() ) tc = unit.getTargetContent();
 			else tc = unit.getSourceContent();
-			writer.write(tc.toString(builderData));
+			writer.write(tc.toString(this));
 		}
+	}
+
+	public IReferenceable getReference (String id) {
+		if ( references == null ) return null;
+		return references.get(id);
+	}
+
+	public boolean useTarget() {
+		return outputTarget;
+	}
+	
+	public String encode (String text) {
+		if ( encoder == null ) return text;
+		return encoder.encode(text);
+	}
+	
+	public String encode (char value) {
+		if ( encoder == null ) return String.valueOf(value);
+		return encoder.encode(value);
 	}
 
 }
