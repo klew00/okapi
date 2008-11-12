@@ -2,9 +2,12 @@ package net.sf.okapi.lib.translation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class QueryManager {
 
@@ -168,4 +171,32 @@ public class QueryManager {
 		return trgLang;
 	}
 
+	/**
+	 * Leverage a text unit (segmented or not) based on the current settings.
+	 * Any options or attributes needed must be set before calling this method.
+	 * @param tu The text unit to modify.
+	 */
+	public void leverage (TextUnit tu) {
+		if ( !tu.isTranslatable() ) return;
+		if ( tu.hasTarget() ) return;
+		
+		TextContainer tc = tu.getSourceContent().clone();
+		tu.setTargetContent(tc);
+		QueryResult qr;
+		if ( tc.isSegmented() ) {
+			List<TextFragment> segList = tc.getSegments();
+			for ( int i=0; i<segList.size(); i++ ) {
+				if ( query(segList.get(i)) != 1 ) continue;
+				qr = next();
+				if ( qr.score != 100 ) continue;
+				segList.set(i, qr.target);
+			}
+		}
+		else {
+			if ( query(tc) != 1 ) return;
+			qr = next();
+			if ( qr.score != 100 ) return;
+			tc.setCodedText(qr.target.getCodedText(), false);
+		}
+	}
 }

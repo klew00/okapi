@@ -1,4 +1,4 @@
-package net.sf.okapi.apptest.filters;
+package net.sf.okapi.apptest.skeleton;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
@@ -11,14 +11,15 @@ import java.util.Stack;
 
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.ISkeleton;
+import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.filters.IEncoder;
+import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.BuilderData;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
-import net.sf.okapi.apptest.skeleton.GenericSkeleton;
-import net.sf.okapi.apptest.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.Util;
 
 public class GenericFilterWriter implements IFilterWriter {
@@ -31,6 +32,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	private OutputStreamWriter writer;
 	private Stack<Group> groupStack;
 	private BuilderData builderData;
+	private IEncoder layerEncoder;
 	
 	public GenericFilterWriter () {
 		builderData = new BuilderData();
@@ -50,7 +52,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	public String getName () {
-		return "GenericSkeletonWriter";
+		return "GenericFilterWriter";
 	}
 
 	public IParameters getParameters () {
@@ -124,7 +126,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	public void setOutput(OutputStream output) {
-		close(); // make sure previous is closed
+		close(); // Make sure previous is closed
 		this.output = output; // then assign the new stream
 	}
 
@@ -132,6 +134,15 @@ public class GenericFilterWriter implements IFilterWriter {
 		this.params = params;
 	}
 
+	public void setLayerOptions (IEncoder encoder,
+		String beforeCode,
+		String afterCode,
+		String beforeInline,
+		String afterInline)
+	{
+		layerEncoder = encoder;
+	}
+	
 	private void processSkeleton (ISkeleton skeleton) throws IOException {
 		if ( skeleton == null ) return; // Nothing to process
 		GenericSkeleton skel = (GenericSkeleton)skeleton;
@@ -198,4 +209,5 @@ public class GenericFilterWriter implements IFilterWriter {
 			writer.write(tc.toString(builderData));
 		}
 	}
+
 }

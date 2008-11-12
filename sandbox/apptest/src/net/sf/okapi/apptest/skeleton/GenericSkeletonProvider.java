@@ -1,6 +1,7 @@
 package net.sf.okapi.apptest.skeleton;
 
 import net.sf.okapi.apptest.common.ISkeleton;
+import net.sf.okapi.apptest.filters.ISkeletonProvider;
 
 public class GenericSkeletonProvider implements ISkeletonProvider {
 	

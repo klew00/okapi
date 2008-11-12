@@ -1,4 +1,4 @@
-package net.sf.okapi.apptest.skeleton;
+package net.sf.okapi.apptest.filters;
 
 import net.sf.okapi.apptest.common.ISkeleton;
 

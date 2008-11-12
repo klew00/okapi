@@ -10,6 +10,7 @@ import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IEncoder;
 import net.sf.okapi.apptest.filters.IFilter;
+import net.sf.okapi.apptest.filters.ISkeletonProvider;
 import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.Document;
@@ -19,7 +20,6 @@ import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
-import net.sf.okapi.apptest.skeleton.ISkeletonProvider;
 
 public class DummyFilter implements IFilter {
 
