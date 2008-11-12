@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -35,19 +35,21 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.translation.QueryManager;
+import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility {
 
-	private String           inputRoot;
-	private String           inputPath;
-	private String           outputRoot;
-	private String           outputPath;
-	private Parameters       params;
-	private IWriter          writer;
-	private int              id;
-	private Segmenter        sourceSeg;
-	private Segmenter        targetSeg;
-	
+	private String inputRoot;
+	private String inputPath;
+	private String outputRoot;
+	private String outputPath;
+	private Parameters params;
+	private IWriter writer;
+	private int id;
+	private Segmenter sourceSeg;
+	private Segmenter targetSeg;
+	private QueryManager qm;
 	
 	public Utility () {
 		params = new Parameters();
@@ -62,6 +64,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 	}
 	
 	public void doEpilog () {
+		if ( qm != null ) {
+			qm.close();
+			qm = null;
+		}
 		if ( writer != null ) {
 			writer.writeEndPackage(params.createZip);
 			writer = null;
@@ -93,6 +99,13 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			targetSeg = doc.applyLanguageRules(targetLanguage, null);
+		}
+
+		if ( params.preTranslate ) {
+			qm = new QueryManager();
+			qm.setLanguages(sourceLanguage, targetLanguage);
+			qm.addAndInitializeResource(new SimpleTMConnector(),
+				params.tmPath, params.tmPath);
 		}
 		
 		String outputDir = params.outputFolder + File.separator + params.pkgName;
@@ -156,6 +169,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 
 	@Override
     public void startResource (Document resource) {
+		if ( qm != null ) {
+			qm.setAttribute("FileName", Util.getFilename(resource.getName(), true));
+		}
+		
 		String relativeInput = inputPath.substring(inputRoot.length()+1);
 		String relativeOutput = outputPath.substring(outputRoot.length()+1);
 		String[] res = FilterAccess.splitFilterSettingsType1("", resource.getFilterSettings());
@@ -202,6 +219,13 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 					+e.getMessage(), item.getID()));
 			}
 		}
+		
+		// Leverage if requested
+		if ( qm != null ) {
+			qm.setAttribute("GroupName", item.getName());
+			qm.leverage(item);
+		}
+		
 		//TODO: Status
 		writer.writeTextUnit(item, 0);
 	}

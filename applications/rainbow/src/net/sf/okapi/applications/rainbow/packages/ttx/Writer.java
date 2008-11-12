@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -170,6 +170,7 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
+	/*
 	private void writeSegment (boolean isSegment,
 		TextFragment srcFragment,
 		TextFragment trgFragment)
@@ -198,7 +199,7 @@ public class Writer extends BaseWriter {
 		if ( isSegment ) {
 			writer.writeEndElement(); //Tu
 		}
-	}
+	}*/
 	
 	public void writeTextUnit (TextUnit item,
 		int status)
@@ -233,7 +234,7 @@ public class Writer extends BaseWriter {
 			writer.writeEndElement(); //Tu
 
 			// Write the item in the TM if needed
-			tmxWriter.writeItem(item);
+			tmxWriter.writeItem(item, null);
 		}
 		else {
 			writeContent(item.getSourceContent());

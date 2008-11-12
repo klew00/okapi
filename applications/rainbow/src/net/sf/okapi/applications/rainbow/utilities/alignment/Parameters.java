@@ -34,7 +34,8 @@ public class Parameters extends BaseParameters {
 	public boolean      useTradosWorkarounds;
 	public boolean      createTM;
 	public String       tmPath;
-	
+	public boolean      createAttributes;
+	public String       attributes;
 
 	public Parameters () {
 		reset();
@@ -51,6 +52,8 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 		checkSingleSegUnit = true;
 		useAutoCorrection = true;
+		createAttributes = true;
+		attributes = "FileName=${filename}";
 	}
 
 	public void fromString (String data) {
@@ -66,6 +69,8 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		checkSingleSegUnit = buffer.getBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		useAutoCorrection = buffer.getBoolean("useAutoCorrection", useAutoCorrection);
+		createAttributes = buffer.getBoolean("createAttributes", createAttributes);
+		attributes = buffer.getString("attributes", attributes);
 	}
 
 	public String toString () {
@@ -80,6 +85,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString("targetSrxPath", targetSrxPath);
 		buffer.setBoolean("checkSingleSegUnit", checkSingleSegUnit);
 		buffer.setBoolean("useAutoCorrection", useAutoCorrection);
+		buffer.setBoolean("createAttributes", createAttributes);
+		buffer.setString("attributes", attributes);
 		return buffer.toString();
 	}
 }

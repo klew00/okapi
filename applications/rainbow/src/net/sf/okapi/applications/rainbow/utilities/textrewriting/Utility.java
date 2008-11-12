@@ -283,7 +283,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		try {
 			// Target is set if needed
 			QueryResult qr;
-			tmQ.setAttribute("GrpName", tu.getName());
+			tmQ.setAttribute("GroupName", tu.getName());
 			TextContainer tc = tu.getTargetContent();
 			if ( tc.isSegmented() ) {
 				int seg = 0;

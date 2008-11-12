@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextContainer;
@@ -65,7 +66,12 @@ public class TMXWriter {
 	}
 	
 	public void writeStartDocument (String sourceLanguage,
-		String targetLanguage)
+		String targetLanguage,
+		String creationTool,
+		String creationToolVersion,
+		String segType,
+		String originalTMFormat,
+		String dataType)
 	{
 		if ( sourceLanguage == null ) throw new NullPointerException();
 		if ( targetLanguage == null ) throw new NullPointerException();
@@ -77,13 +83,18 @@ public class TMXWriter {
 		writer.writeAttributeString("version", "1.4");
 		
 		writer.writeStartElement("header");
-		writer.writeAttributeString("creationtool", "TODO");
-		writer.writeAttributeString("creationtoolversion", "TODO");
-		writer.writeAttributeString("segtype", "paragraph");
-		writer.writeAttributeString("o-tmf", "TODO");
+		writer.writeAttributeString("creationtool",
+			(creationTool==null) ? "unknown" : creationTool);
+		writer.writeAttributeString("creationtoolversion",
+			(creationToolVersion==null) ? "unknown" : creationToolVersion);
+		writer.writeAttributeString("segtype",
+			(segType==null) ? "paragraph" : segType);
+		writer.writeAttributeString("o-tmf",
+			(originalTMFormat==null) ? "unknown" : originalTMFormat);
 		writer.writeAttributeString("adminlang", "en");
 		writer.writeAttributeString("srclang", sourceLang);
-		writer.writeAttributeString("datatype", "TODO");
+		writer.writeAttributeString("datatype",
+			(dataType==null) ? "unknown" : dataType);
 		writer.writeEndElement(); // header
 		
 		writer.writeStartElement("body");
@@ -96,7 +107,8 @@ public class TMXWriter {
 		writer.writeEndDocument();
 	}
 	
-	public void writeItem (TextUnit item)
+	public void writeItem (TextUnit item,
+		Map<String, String> attributes)
 	{
 		if ( item == null ) throw new NullPointerException();
 		itemCount++;
@@ -117,22 +129,33 @@ public class TMXWriter {
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
-					String.format("%s_s%d", tuid, i+1));
+					String.format("%s_s%d", tuid, i+1),
+					attributes);
 			}
 		}
 		else { // Un-segmented entry
-			writeTU(srcTC, item.getTargetContent(), tuid);
+			writeTU(srcTC, item.getTargetContent(), tuid, attributes);
 		}
 	}
 	
 	private void writeTU (TextFragment source,
 		TextFragment target,
-		String tuid)
+		String tuid,
+		Map<String, String> attributes)
 	{
 		writer.writeStartElement("tu");
 		if (( tuid != null ) && ( tuid.length() > 0 ))
 			writer.writeAttributeString("tuid", tuid);
 		writer.writeLineBreak();
+
+		if (( attributes != null ) && ( attributes.size() > 0 )) {
+			for ( String name : attributes.keySet() ) {
+				writer.writeStartElement("prop");
+				writer.writeAttributeString("type", name);
+				writer.writeString(attributes.get(name));
+				writer.writeEndElementLineBreak(); // prop
+			}
+		}
 
 		writer.writeStartElement("tuv");
 		writer.writeAttributeString("xml:lang", sourceLang);

@@ -23,11 +23,13 @@ package net.sf.okapi.applications.rainbow.utilities.alignment;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Hashtable;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
@@ -40,28 +42,29 @@ import net.sf.okapi.tm.simpletm.Database;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
-	private Parameters       params;
-	private String           trgPath;
-	private String           fileName;
-	private String           trgEncoding;
-	private String           trgFilterSettings;
-	private DbStoreBuilder   dbStoreBuilder;
-	private DbStore          dbStore;
-	private TMXWriter        tmxWriter = null;
-	private Database         simpleTm = null;
-	private IInputFilter     trgFilter;
-	private Segmenter        srcSeg;
-	private Segmenter        trgSeg;
-	private int              aligned;
-	private int              alignedTotal;
-	private int              noText;
-	private int              noTextTotal;
-	private int              count;
-	private int              countTotal;
-	private Aligner          aligner;
-	private boolean          stopProcess;
-	private int              targetCount;
-	
+	private Parameters params;
+	private String trgPath;
+	private String fileName;
+	private String trgEncoding;
+	private String trgFilterSettings;
+	private DbStoreBuilder dbStoreBuilder;
+	private DbStore dbStore;
+	private TMXWriter tmxWriter = null;
+	private Database simpleTm = null;
+	private IInputFilter trgFilter;
+	private Segmenter srcSeg;
+	private Segmenter trgSeg;
+	private int aligned;
+	private int alignedTotal;
+	private int noText;
+	private int noTextTotal;
+	private int count;
+	private int countTotal;
+	private Aligner aligner;
+	private boolean stopProcess;
+	private int targetCount;
+	private Hashtable<String, String> originalAttributes;
+	private Hashtable<String, String> assignedAttributes;
 
 	public Utility () {
 		params = new Parameters();
@@ -100,13 +103,23 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			tmxWriter = new TMXWriter();
 			tmxWriter.create(params.tmxPath);
 			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
-			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage);
+			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
+				getID(), null, (params.segment ? "sentence" : "paragraph"),
+				null, null);
 		}
 		
 		// Prepare the simpletm database
 		if ( params.createTM ) {
 			simpleTm = new Database();
 			simpleTm.create(params.tmPath, true);
+		}
+		
+		// Prepare the attributes if needed
+		if ( params.createAttributes ) {
+			ConfigurationString cfgString = new ConfigurationString(
+				params.attributes);
+			originalAttributes = cfgString.toHashtable();
+			assignedAttributes = new Hashtable<String, String>();
 		}
 		
 		// Prepare the db store
@@ -263,9 +276,27 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
-				if ( params.createTMX ) {
-					tmxWriter.writeItem(tu);
+				// Prepare the attributes if needed
+				if ( params.createAttributes ) {
+					String value;
+					for ( String key : originalAttributes.keySet() ) {
+						value = originalAttributes.get(key);
+						if ( "${filename}".equals(value) ) {
+							assignedAttributes.put(key, fileName);
+						}
+						else if ( "${resname}".equals(value) ) {
+							assignedAttributes.put(key, tu.getName());
+						}
+						else {
+							assignedAttributes.put(key, value);
+						}
+					}
 				}
+				// Output to TMX
+				if ( params.createTMX ) {
+					tmxWriter.writeItem(tu, assignedAttributes);
+				}
+				// Output to SimpleTM
 				if ( params.createTM ) {
 					simpleTm.addEntry(tu, tu.getName(), fileName);
 				}

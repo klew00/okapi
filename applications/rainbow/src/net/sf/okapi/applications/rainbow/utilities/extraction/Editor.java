@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel and Okapi Framework contributors         */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -60,6 +60,9 @@ public class Editor implements IParametersEditor {
 	private Button                chkCreateZip;
 	private Button                chkIncludeMergeData;
 	private Text                  edSample;
+	private Button                chkPreTranslate;
+	private Text                  edTmPath;
+	private Button                btGetTmPath;
 	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
 	
@@ -222,11 +225,30 @@ public class Editor implements IParametersEditor {
 			"Pre-segment the extracted text with the following rules:");
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		//--- References tab
-		
+		//--- Pre-translation tab
+
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout(2, false));
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("References");
-		//TODO: Reference tab
+		tiTmp.setText("Pre-Translation");
+		tiTmp.setControl(cmpTmp);
+
+		chkPreTranslate = new Button(cmpTmp, SWT.CHECK);
+		chkPreTranslate.setText("Pre-translate the extracted text using the following TM:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkPreTranslate.setLayoutData(gdTmp);
+		chkPreTranslate.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updatePretranslate();
+			}
+		});
+
+		edTmPath = new Text(cmpTmp, SWT.BORDER);
+		edTmPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		btGetTmPath = new Button(cmpTmp, SWT.PUSH);
+		btGetTmPath.setText("...");
 		
 		//--- Dialog-level buttons
 
@@ -255,6 +277,11 @@ public class Editor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void updatePretranslate () {
+		edTmPath.setEnabled(chkPreTranslate.getSelection());
+		btGetTmPath.setEnabled(chkPreTranslate.getSelection());
+	}
+	
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -279,11 +306,15 @@ public class Editor implements IParametersEditor {
 		edName.setText(params.pkgName);
 		chkCreateZip.setSelection(params.createZip);
 		pnlSegmentation.setData(params.preSegment, params.sourceSRX, params.targetSRX);
+		chkPreTranslate.setSelection(params.preTranslate);
+		edTmPath.setText(params.tmPath);
+		updatePretranslate();
 		updateSample();
 	}
 
 	private boolean saveData () {
 		if ( inInit ) return true;
+		//TODO: verify options (empty path, etc.
 		String[] aItems = ((String)lbTypes.getData()).split("\t", -2);
 		params.pkgType = aItems[lbTypes.getSelectionIndex()];
 		params.createZip = chkCreateZip.getSelection();
@@ -292,6 +323,8 @@ public class Editor implements IParametersEditor {
 		params.preSegment = pnlSegmentation.getSegment();
 		params.sourceSRX = pnlSegmentation.getSourceSRX();
 		params.targetSRX = pnlSegmentation.getTargetSRX();
+		params.preTranslate = chkPreTranslate.getSelection();
+		params.tmPath = edTmPath.getText();
 		result = true;
 		return true;
 	}

@@ -93,7 +93,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 		tmxWriter.create(tmxPath);
 		tmxWriter.writeStartDocument(manifest.getSourceLanguage(),
-			manifest.getTargetLanguage());
+			manifest.getTargetLanguage(), null, null, null, null, null);
 	}
 
 	public void writeEndPackage (boolean createZip) {

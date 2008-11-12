@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -57,6 +58,8 @@ public class Editor implements IParametersEditor {
 	private Button                btGetTMPath;
 	private Button                chkCheckSingleSegUnit;
 	private Button                chkUseAutoCorrection;
+	private Button                chkCreateAttributes;
+	private Text                  edAttributes;
 	private SegmentationPanel     pnlSegmentation;
 	private boolean               inInit = true;
 
@@ -136,7 +139,7 @@ public class Editor implements IParametersEditor {
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Translation Memory");
+		tiTmp.setText("Output");
 		tiTmp.setControl(cmpTmp);
 
 		// TMX output
@@ -218,6 +221,26 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		// Attributes
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Attributes");
+		grpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkCreateAttributes = new Button(grpTmp, SWT.CHECK);
+		chkCreateAttributes.setText("Use the following attributes (one per line in the format name=value):");
+		chkCreateAttributes.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edAttributes.setEnabled(chkCreateAttributes.getSelection());
+			}
+		});
+		
+		edAttributes = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 100;
+		edAttributes.setLayoutData(gdTmp);
+
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -272,6 +295,11 @@ public class Editor implements IParametersEditor {
 		edTMPath.setEnabled(chkCreateTM.getSelection());
 		btGetTMPath.setEnabled(chkCreateTM.getSelection());
 		updateTMOptions();
+
+		chkCreateAttributes.setSelection(params.createAttributes);
+		ConfigurationString tmp = new ConfigurationString(params.attributes);
+		edAttributes.setText(tmp.toString());
+		edAttributes.setEnabled(chkCreateAttributes.getSelection());
 	}
 
 	private void updateTMXOptions () {
@@ -314,7 +342,7 @@ public class Editor implements IParametersEditor {
 				return false;
 			}
 		}
-		
+		// Check that we have at least one output
 		if ( !chkCreateTMX.getSelection() && !chkCreateTM.getSelection() ) {
 			Dialogs.showError(shell, "You must specify at least one output.", null);
 			return false;
@@ -339,7 +367,13 @@ public class Editor implements IParametersEditor {
 		if ( params.createTM ) {
 			params.tmPath = edTMPath.getText();
 		}
-		
+
+		params.createAttributes = chkCreateAttributes.getSelection();
+		if ( params.createAttributes ) {
+			ConfigurationString tmp = new ConfigurationString(edAttributes.getText());
+			params.attributes = tmp.toString();
+		}
+
 		return true;
 	}
 

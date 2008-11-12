@@ -72,6 +72,15 @@ public class Parameters extends BaseParameters {
 	 */
 	protected String    targetSRX;
 
+	/**
+	 * Indicates if the output should be pre-translated.
+	 */
+	protected boolean preTranslate;
+	
+	/**
+	 * Path of the TM fiel to use for pre-translation.
+	 */
+	protected String tmPath;
 
 	public Parameters () {
 		reset();
@@ -88,6 +97,8 @@ public class Parameters extends BaseParameters {
 		preSegment = false;
 		sourceSRX = "";
 		targetSRX = "";
+		preTranslate = false;
+		tmPath = "";
 	}
 
 	public void fromString(String data) {
@@ -102,6 +113,8 @@ public class Parameters extends BaseParameters {
 		preSegment = buffer.getBoolean("preSegment", preSegment);
 		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
 		targetSRX = buffer.getString("targetSRX", targetSRX);
+		preTranslate = buffer.getBoolean("preTranslate", preTranslate);
+		tmPath = buffer.getString("tmPath", tmPath);
 	}
 
 	public String toString() {
@@ -115,6 +128,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("preSegment", preSegment);
 		buffer.setString("sourceSRX", sourceSRX);
 		buffer.setString("targetSRX", targetSRX);
+		buffer.setBoolean("preTranslate", preTranslate);
+		buffer.setString("tmPath", tmPath);
 		return buffer.toString();
 	}
 	

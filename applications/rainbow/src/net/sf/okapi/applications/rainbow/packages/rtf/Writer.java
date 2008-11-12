@@ -109,11 +109,11 @@ public class Writer extends BaseWriter {
 	{
 		// Write the items in the TM if needed
 		if ( item.hasTarget() ) {
-			tmxWriter.writeItem(item);
+			tmxWriter.writeItem(item, null);
 			if ( item.hasChild() ) {
 				for ( TextUnit tu : item.childTextUnitIterator() ) {
 					if ( tu.hasTarget() ) {
-						tmxWriter.writeItem(tu);
+						tmxWriter.writeItem(tu, null);
 					}
 				}
 			}
