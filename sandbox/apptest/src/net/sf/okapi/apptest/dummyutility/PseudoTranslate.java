@@ -29,7 +29,7 @@ public class PseudoTranslate implements IUtility {
 			tu.setTargetContent(tu.getSourceContent().clone());
 		}
 		tu.getTargetContent().setCodedText(
-			tu.getTargetContent().getCodedText().replace("e", "Z"));
+			tu.getTargetContent().getCodedText().replace("e", "\u00CA"));
 	}
 
 	public void doEpilog () {

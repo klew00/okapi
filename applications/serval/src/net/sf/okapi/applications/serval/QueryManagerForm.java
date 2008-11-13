@@ -51,7 +51,7 @@ public class QueryManagerForm {
 		grpTmp.setLayout(new GridLayout(6, false));
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		Label stTmp = new Label(shell, SWT.NONE);
+		new Label(shell, SWT.NONE);
 		
 		table = new Table(grpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.CHECK);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);

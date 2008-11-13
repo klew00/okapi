@@ -39,4 +39,9 @@ public interface IWriterHelper {
 	 */
 	public String encode (char value);
 	
+	public String getLayerBeforeCode ();
+	public String getLayerAfterCode ();
+	public String getLayerBeforeInline ();
+	public String getLayerAfterInline ();
+
 }

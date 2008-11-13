@@ -43,7 +43,7 @@ public class Database {
 	public static final int  TRGCODES     = 6;
 	public static final String NTRGCODES  = "TrgCodes";
 	public static final int  GRPNAME      = 7;
-	public static final String NGRPNAME   = "GrpName";
+	public static final String NGRPNAME   = "GroupName";
 	public static final int  FILENAME     = 8;
 	public static final String NFILENAME  = "FileName";
 	

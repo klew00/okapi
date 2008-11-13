@@ -4,6 +4,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
 import org.eclipse.swt.SWT;
@@ -38,6 +39,7 @@ public class SelectionForm {
 		//TODO: get list and attached data from plugin system
 		lbResources.add("Google MT through Internet");
 		lbResources.add("SimpleTM local translation memory file");
+		lbResources.add("Open-Tran translation server");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -50,11 +52,14 @@ public class SelectionForm {
 				if ( e.widget.getData().equals("o") ) {
 					int n = lbResources.getSelectionIndex();
 					switch ( n ) {
-					case 0: // Google
+					case 0: // Google MT
 						result = new GoogleMTConnector();
 						break;
 					case 1: // SimpleTM
 						result = new SimpleTMConnector();
+						break;
+					case 2: // Open-Tran
+						result = new OpenTranTMConnector();
 						break;
 					}
 				}

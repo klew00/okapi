@@ -33,7 +33,6 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 	protected IParameters params;
 	private OutputStreamWriter writer;
 	private Stack<Group> groupStack;
-	private IEncoder layerEncoder;
 	public LinkedHashMap<String, IReferenceable> references;
 	public boolean outputTarget;
 	public IEncoder encoder;
@@ -129,7 +128,7 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 		this.outputPath = path;
 	}
 
-	public void setOutput(OutputStream output) {
+	public void setOutput (OutputStream output) {
 		close(); // Make sure previous is closed
 		this.output = output; // then assign the new stream
 	}
@@ -138,15 +137,6 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 		this.params = params;
 	}
 
-	public void setLayerOptions (IEncoder encoder,
-		String beforeCode,
-		String afterCode,
-		String beforeInline,
-		String afterInline)
-	{
-		layerEncoder = encoder;
-	}
-	
 	private void processSkeleton (ISkeleton skeleton) throws IOException {
 		if ( skeleton == null ) return; // Nothing to process
 		GenericSkeleton skel = (GenericSkeleton)skeleton;
@@ -208,7 +198,10 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 		}
 		else if ( !unit.isReference() ) {
 			TextContainer tc;
-			if ( unit.hasTarget() ) tc = unit.getTargetContent();
+			if ( useTarget() ) {
+				if ( unit.hasTarget() ) tc = unit.getTargetContent();
+				else tc = unit.getSourceContent();
+			}
 			else tc = unit.getSourceContent();
 			writer.write(tc.toString(this));
 		}
@@ -231,6 +224,22 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 	public String encode (char value) {
 		if ( encoder == null ) return String.valueOf(value);
 		return encoder.encode(value);
+	}
+
+	public String getLayerAfterCode () {
+		return "";
+	}
+
+	public String getLayerAfterInline () {
+		return "";
+	}
+
+	public String getLayerBeforeCode () {
+		return "";
+	}
+
+	public String getLayerBeforeInline () {
+		return "";
 	}
 
 }
