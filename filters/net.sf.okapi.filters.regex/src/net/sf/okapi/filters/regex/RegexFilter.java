@@ -36,11 +36,10 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IOldParser.ParserTokenType;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
@@ -51,17 +50,18 @@ public class RegexFilter implements IFilter {
 	private IResource currentRes;
 	private Parameters params;
 	private String encoding;
-	private Document docRes;
 	private BufferedReader reader;
 	private String inputText;
 	private Stack<Group> groupStack;
 	private int sklID;
 	private int groupID;
 	private int itemID;
-	private LinkedList<IContainable> resultQueue;
+	private Document docRes;
+	private TextUnit tuRes;
+	private LinkedList<FilterEvent> queue;
 	private int startSearch;
 	private int startSkl;
-	private int nextAction;
+	private int parseState = 0;
 	
 	public RegexFilter () {
 		params = new Parameters();
@@ -78,6 +78,7 @@ public class RegexFilter implements IFilter {
 				reader.close();
 				reader = null;
 			}
+			parseState = 0;
 		}
 		catch ( IOException e) {
 			throw new RuntimeException(e);
@@ -97,21 +98,72 @@ public class RegexFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		// TODO Auto-generated method stub
-		return false;
+		return (parseState > 0);
 	}
 
 	public FilterEvent next () {
-		// TODO Auto-generated method stub
-		return null;
+		// Cancel if requested
+		if ( canceled ) {
+			parseState = 0;
+			currentRes = null;
+			return null;
+		}
+		
+		// Process queue if it's not empty yet
+		if ( queue.size() > 0 ) {
+			return nextEvent();
+		}
+
+		// Get the first best match among the rules
+		// trying to match ((start)(.*?)(end))
+		Rule bestRule = null;
+		int bestPosition = inputText.length()+99;
+		MatchResult startResult = null;
+		MatchResult endResult = null;
+		int i = 0;
+		for ( Rule rule : params.rules ) {
+			Matcher m = rule.pattern.matcher(inputText);
+			if ( m.find(startSearch) ) {
+				if ( m.start() < bestPosition ) {
+					bestPosition = m.start();
+					bestRule = rule;
+				}
+			}
+			i++;
+		}
+		
+		if ( bestRule != null ) {
+			// Find the start pattern
+			Pattern p = Pattern.compile(bestRule.start, params.regexOptions);
+			Matcher m = p.matcher(inputText);
+			if ( m.find(bestPosition) ) {
+				startResult = m.toMatchResult();
+			}
+			else throw new RuntimeException("Inconsistant rule finding.");
+			// Find the end pattern
+			p = Pattern.compile(bestRule.end, params.regexOptions);
+			m = p.matcher(inputText);
+			if ( m.find(startResult.end()) ) {
+				endResult = m.toMatchResult();
+			}
+			else throw new RuntimeException("Inconsistant rule finding.");
+			// Process the match we just found
+			return processMatch(bestRule, startResult, endResult);
+		}
+		
+		// Else: Send end of the skeleton if needed
+		if ( startSearch < inputText.length() ) {
+			addSkeletonToQueue(inputText.substring(startSkl, inputText.length()), true);
+		}
+
+		// End finally set the end
+		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
+		return nextEvent();
 	}
 
 	public void open (InputStream input) {
 		try {
-			// Close any previously non-closed file
 			close();
-			canceled = false;
-			
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			reader = new BufferedReader(new InputStreamReader(bis, bis.detectEncoding()));
@@ -130,17 +182,21 @@ public class RegexFilter implements IFilter {
 			// Make sure to close before inputText is set
 			// so it does not get reset to null
 			inputText = tmp.toString();
-			resultQueue = new LinkedList<IContainable>();
+			parseState = 1;
+			canceled = false;
 			groupStack = new Stack<Group>();
 			startSearch = 0;
 			startSkl = 0;
 			itemID = 0;
 			sklID = 0;
 			groupID = 0;
-			nextAction = -1;
 
 			// Prepare the filter rules
 			params.compileRules();
+
+			// Set the start event
+			queue = new LinkedList<FilterEvent>();
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 		}
 		catch ( UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
@@ -177,7 +233,7 @@ public class RegexFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
-	private ParserTokenType processMatch (Rule rule,
+	private FilterEvent processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)
 	{
@@ -189,7 +245,6 @@ public class RegexFilter implements IFilter {
 			skl = new SkeletonUnit();
 			skl.setData(inputText.substring(startSkl, endResult.start()));
 			skl.setID(String.format("%d", ++sklID));
-			currentRes = skl;
 			// Update starts for next read
 			startSearch = endResult.end();
 			startSkl = endResult.start();
@@ -198,7 +253,8 @@ public class RegexFilter implements IFilter {
 				params.locDir.process(skl.toString());
 			}
 			// Then just return one skeleton event
-			return ParserTokenType.SKELETON;
+			currentRes = skl;
+			return new FilterEvent(FilterEventType.SKELETON_UNIT, skl);
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
@@ -206,7 +262,6 @@ public class RegexFilter implements IFilter {
 			skl = new SkeletonUnit();
 			skl.setData(inputText.substring(startSkl, endResult.start()));
 			skl.setID(String.format("%d", ++sklID));
-			currentRes = skl;
 			// Update starts for next read
 			startSearch = endResult.end();
 			startSkl = endResult.start();
@@ -230,7 +285,8 @@ public class RegexFilter implements IFilter {
 			else { // Rule.RULETYPE_CLOSEGROUP
 				groupStack.pop();
 			}
-			return ParserTokenType.SKELETON;
+			currentRes = skl;
+			return new FilterEvent(FilterEventType.SKELETON_UNIT, skl);
 		}
 		
 		// Otherwise: process the content
@@ -294,23 +350,23 @@ public class RegexFilter implements IFilter {
 		String name,
 		String data)
 	{
-		TextUnit item = new TextUnit(String.valueOf(++itemID), data);
-		item.setPreserveWhitespaces(rule.preserveWS);
+		tuRes = new TextUnit(String.valueOf(++itemID), data);
+		tuRes.setPreserveWhitespaces(rule.preserveWS);
 
 		if ( rule.useCodeFinder ) {
-			rule.codeFinder.process(item.getSourceContent());
+			rule.codeFinder.process(tuRes.getSourceContent());
 		}
 
 		if ( name != null ) {
 			if ( rule.nameFormat.length() > 0 ) {
 				String tmp = rule.nameFormat.replace("<parentName>",
 					(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-				item.setName(tmp.replace("<self>", name));
+				tuRes.setName(tmp.replace("<self>", name));
 			}
-			else item.setName(name);
+			else tuRes.setName(name);
 		}
 
-		resultQueue.add(item);
+		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
 	}
 	
 	private void processStrings (Rule rule,
@@ -406,23 +462,23 @@ public class RegexFilter implements IFilter {
 			}
 			
 			// Item to extract
-			TextUnit item = new TextUnit(String.valueOf(++itemID),
+			tuRes = new TextUnit(String.valueOf(++itemID),
 				data.substring(start, end));
-			item.setPreserveWhitespaces(rule.preserveWS);
+			tuRes.setPreserveWhitespaces(rule.preserveWS);
 			
 			if ( rule.useCodeFinder ) {
-				rule.codeFinder.process(item.getSourceContent());
+				rule.codeFinder.process(tuRes.getSourceContent());
 			}
 
 			if ( name != null ) {
 				if ( rule.nameFormat.length() > 0 ) {
 					String tmp = rule.nameFormat.replace("<parentName>",
 						(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-					item.setName(tmp.replace("<self>", name));
+					tuRes.setName(tmp.replace("<self>", name));
 				}
-				else item.setName(name);
+				else tuRes.setName(name);
 			}
-			resultQueue.add(item);
+			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
 			
 			// Skeleton part after
 			if ( end < data.length() ) {
@@ -437,29 +493,27 @@ public class RegexFilter implements IFilter {
 	private void addSkeletonToQueue (String data,
 		boolean forceNewEntry)
 	{
-		SkeletonUnit skl;
-		if ( !forceNewEntry && ( resultQueue.size() > 0 )) {
-			if ( resultQueue.getLast() instanceof SkeletonUnit ) {
+		SkeletonUnit sklRes;
+		if ( !forceNewEntry && ( queue.size() > 0 )) {
+			if ( queue.getLast().getData() instanceof SkeletonUnit ) {
 				// Append to the last queue entry if possible
-				skl = (SkeletonUnit)resultQueue.getLast();
-				skl.appendData(data);
+				sklRes = (SkeletonUnit)queue.getLast().getData();
+				sklRes.appendData(data);
 				return;
 			}
 		}
 		// Else: create a new skeleton entry
-		skl = new SkeletonUnit(String.valueOf(++sklID), data);
-		resultQueue.add(skl);
+		sklRes = new SkeletonUnit(String.valueOf(++sklID), data);
+		queue.add(new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes));
 	}
 
-	private ParserTokenType nextEvent () {
-		if ( resultQueue.size() == 0 ) return ParserTokenType.NONE;
-		if ( resultQueue.peek() instanceof SkeletonUnit ) {
-			currentRes = (SkeletonUnit)resultQueue.poll();
-			return ParserTokenType.SKELETON;
+	private FilterEvent nextEvent () {
+		if ( queue.size() == 0 ) return null;
+		currentRes = queue.peek().getData();
+		if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+			parseState = 0; // No more event after
 		}
-		// Else: it's an item
-		currentRes = (TextUnit)resultQueue.poll();
-		return ParserTokenType.TRANSUNIT;
+		return queue.poll();
 	}
 
 }
