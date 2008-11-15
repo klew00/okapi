@@ -57,7 +57,7 @@ public class PropertiesFilter implements IFilter {
 	private boolean canceled;
 	private String encoding;
 	private IResource currentRes;
-	private TextUnit item;
+	private TextUnit tuRes;
 	private SkeletonUnit sklRes;
 	private Document docRes;
 	private LinkedList<FilterEvent> queue;
@@ -135,7 +135,7 @@ public class PropertiesFilter implements IFilter {
 				break;
 			case RESULT_ITEM:
 				// Store the text unit in the queue for next call.
-				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, item));
+				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
 				currentRes = sklRes;
 				return new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes);
 			default:
@@ -150,13 +150,14 @@ public class PropertiesFilter implements IFilter {
 		// Send the skeleton
 		currentRes = sklRes;
 		return new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes);
-		
 	}
 
 	public void open (InputStream input) {
 		try {
+			close();
 			parseState = 1;
 			canceled = false;
+
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			reader = new BufferedReader(
@@ -362,10 +363,10 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( extract ) {
-					item = new TextUnit(String.valueOf(++itemID),
+					tuRes = new TextUnit(String.valueOf(++itemID),
 						unescape(value));
-					item.setName(key);
-					item.setPreserveWhitespaces(true);
+					tuRes.setName(key);
+					tuRes.setPreserveWhitespaces(true);
 				}
 
 				if ( extract ) {
@@ -377,8 +378,8 @@ public class PropertiesFilter implements IFilter {
 					sklRes.appendData(keyBuffer);
 					// Line-break
 					//item.setSkeletonAfter(lbSkel);
-					item.addChild(new SkeletonUnit(SkeletonUnit.MAINTEXT, ""));
-					item.addChild(lbSkel);
+					tuRes.addChild(new SkeletonUnit(SkeletonUnit.MAINTEXT, ""));
+					tuRes.addChild(lbSkel);
 				}
 				else {
 					sklRes.appendData(keyBuffer);
@@ -389,9 +390,9 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( params.useCodeFinder )
-					params.codeFinder.process(item.getSourceContent());
+					params.codeFinder.process(tuRes.getSourceContent());
 				
-				item.setProperty("start", String.valueOf(lS));
+				tuRes.setProperty("start", String.valueOf(lS));
 				return RESULT_ITEM;
 			}
 		}
