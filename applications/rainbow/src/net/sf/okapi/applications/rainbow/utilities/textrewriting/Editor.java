@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -120,7 +120,7 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		stTmp.setLayoutData(gdTmp);
 
-		lbTypes = new List(cmpTmp, SWT.BORDER);
+		lbTypes = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		lbTypes.add("Keep the original text");
 		lbTypes.add("Replace letters by Xs and digits by Ns");
 		lbTypes.add("Remove text but keep inline codes");

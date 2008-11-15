@@ -37,9 +37,9 @@ public class SelectionForm {
 		lbResources.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		//TODO: get list and attached data from plugin system
-		lbResources.add("Google MT through Internet");
+		lbResources.add("Google MT (Internet)");
 		lbResources.add("SimpleTM local translation memory file");
-		lbResources.add("Open-Tran translation server");
+		lbResources.add("Open-Tran translation search server (Internet)");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons

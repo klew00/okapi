@@ -428,7 +428,7 @@ public class GroupsAndOptionsDialog {
 		
 		while ( true ) {
 			// Edit the name
-			InputDialog dlg = new InputDialog(shell, caption, "Name of the rules:", name, null);
+			InputDialog dlg = new InputDialog(shell, caption, "Name of the rules:", name, null, 0);
 			if ( (name = dlg.showDialog()) == null ) return; // Cancel
 		
 			// Else:

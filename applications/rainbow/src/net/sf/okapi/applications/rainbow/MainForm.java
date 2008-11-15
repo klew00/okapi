@@ -1145,7 +1145,7 @@ public class MainForm implements IParametersProvider {
 	private void changeRoot () {
 		try {
 			InputDialog dlg = new InputDialog(shell, "Source Root",
-				"New root folder:", prj.getInputRoot(currentInput), null);
+				"New root folder:", prj.getInputRoot(currentInput), null, 1);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return;
 			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home"); //$NON-NLS-1$

@@ -228,7 +228,7 @@ public class Editor implements IParametersEditor {
 		cmpButtons.setLayout(layTmp);
 		cmpButtons.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		
-		int buttonWidth = 80;
+		int buttonWidth = 90;
 		
 		btAdd = new Button(cmpButtons, SWT.PUSH);
 		btAdd.setText("Add...");
@@ -478,7 +478,7 @@ public class Editor implements IParametersEditor {
 			Rule rule = rules.get(n);
 			String name = rule.getRuleName();
 			InputDialog dlg = new InputDialog(shell, "Rename Rule",
-				"New name of the rule:", name, null);
+				"New name of the rule:", name, null, 0);
 			if ( (name = dlg.showDialog()) == null ) return;
 			rule.setRuleName(name);
 			lbRules.setItem(n, name);
@@ -496,7 +496,7 @@ public class Editor implements IParametersEditor {
 				// Get the name
 				String name = "newRule";
 				InputDialog dlg = new InputDialog(shell, "New Rule",
-					"Name of the new rule:", name, null);
+					"Name of the new rule:", name, null, 0);
 				if ( (name = dlg.showDialog()) == null ) return;
 				rule = new Rule();
 				rule.setRuleName(name);

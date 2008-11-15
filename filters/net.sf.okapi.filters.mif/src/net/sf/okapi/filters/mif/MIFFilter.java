@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.filters.mif;
 
 import java.io.BufferedReader;
@@ -37,6 +57,7 @@ public class MIFFilter implements IFilter {
 	private int skId;
 	private int level;
 	private TextContainer cont;
+	private boolean canceled;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -61,7 +82,7 @@ public class MIFFilter implements IFilter {
 	}
 
 	public void cancel () {
-		// TODO
+		canceled = true;
 	}
 
 	public void close () {
@@ -107,6 +128,7 @@ public class MIFFilter implements IFilter {
 			inString = -1;
 			tuId = -1;
 			skId = -1;
+			canceled = false;
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -137,7 +159,13 @@ public class MIFFilter implements IFilter {
 
 	public FilterEvent next () {
 		try {
-			// Handle first call
+			// Check for cancellation
+			if ( canceled ) {
+				parseState = 0;
+				return null;
+			}
+			
+			// Process first call
 			if ( parseState == 1 ) {
 				docRes = new Document();
 				parseState = 2; // Inside the document
@@ -222,7 +250,6 @@ public class MIFFilter implements IFilter {
 			switch ( c ) {
 			case '\r':
 			case '\n':
-			case -1:
 				return;
 			}
 		}
@@ -252,16 +279,16 @@ public class MIFFilter implements IFilter {
 		
 		// Now read the name
 		while ( true ) {
-			
 			switch ( c ) {
 			case ' ':
 			case '\t':
 			case '\r':
 			case '\n':
-			case -1:
 				buffer.append(tagBuffer);
 				buffer.append((char)c);
 				return tagBuffer.toString();
+			case -1:
+				throw new RuntimeException("Unexpected end of input.");
 			default:
 				tagBuffer.append((char)c);
 				break;

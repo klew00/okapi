@@ -53,7 +53,7 @@ public class Parameters extends BaseParameters {
 		checkSingleSegUnit = true;
 		useAutoCorrection = true;
 		createAttributes = true;
-		attributes = "FileName=${filename}";
+		attributes = "Txt::FileName=${filename}$0a$Txt::GroupName=${resname}";
 	}
 
 	public void fromString (String data) {

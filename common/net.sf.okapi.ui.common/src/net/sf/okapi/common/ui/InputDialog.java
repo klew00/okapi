@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -26,19 +26,21 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class InputDialog {
 	
-	private Shell            shell;
-	private Text             edField;
-	private String           result = null;
-	private String           help;
-	private OKCancelPanel    pnlActions;
-	private boolean          allowEmptyValue = false;
+	private Shell shell;
+	private Text edField;
+	private String result = null;
+	private String help;
+	private OKCancelPanel pnlActions;
+	private boolean allowEmptyValue = false;
 
 	/**
 	 * Creates a simple input dialog with one text field.
@@ -47,12 +49,15 @@ public class InputDialog {
 	 * @param labelText Label of the text field (must be set).
 	 * @param defaultInputText Default input text (can be null).
 	 * @param helpFile Path to the help file (can be null).
+	 * @param buttonOptions Indicates if a browse button should be set:
+	 * 0=none, 1=directory browser.
 	 */
 	public InputDialog (Shell parent,
 		String captionText,
 		String labelText,
 		String defaultInputText,
-		String helpFile)
+		String helpFile,
+		int buttonOptions)
 	{
 		help = helpFile;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -62,16 +67,33 @@ public class InputDialog {
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout();
+		GridLayout layTmp = new GridLayout((buttonOptions>0) ? 2 : 1, false);
 		cmpTmp.setLayout(layTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText(labelText);
+		GridData gdTmp;
+		if ( buttonOptions > 0 ) {
+			gdTmp = new GridData();
+			gdTmp.horizontalSpan = 2;
+			label.setLayoutData(gdTmp);
+		}
 		
 		edField = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		if ( defaultInputText != null ) edField.setText(defaultInputText);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		//gdTmp.widthHint = 640;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		if ( buttonOptions == 0 ) {
+			gdTmp.horizontalSpan = 2;
+		}
+		else {
+			Button btGet = new Button(cmpTmp, SWT.PUSH);
+			btGet.setText("...");
+			btGet.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					getFolder();
+				};
+			});
+		}
 		edField.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons
@@ -117,6 +139,21 @@ public class InputDialog {
 	
 	public void setAllowEmptyValue (boolean value) {
 		allowEmptyValue = value;
+	}
+
+	private void getFolder () {
+		try {
+			DirectoryDialog dlg = new DirectoryDialog(shell);
+			dlg.setFilterPath(edField.getText());
+			String dir = dlg.open();
+			if (  dir == null ) return;
+			edField.setText(dir);
+			edField.selectAll();
+			edField.setFocus();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
 	}
 	
 	private boolean saveData () {

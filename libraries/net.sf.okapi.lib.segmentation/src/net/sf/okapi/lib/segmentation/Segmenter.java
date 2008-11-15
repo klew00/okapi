@@ -39,7 +39,9 @@ public class Segmenter {
 	private boolean includeIsolatedCodes;
 	private String currentLanguageCode;
 	private boolean oneSegmentIncludesAll;
-	private boolean trimWS;
+	private boolean trimLeadingWS;
+	private boolean trimTrailingWS;
+	private boolean grabTrailingWS; //TODO: implement this
 	private boolean trimCodes;
 	private ArrayList<CompiledRule> rules;
 	private Pattern rangeRule;
@@ -69,7 +71,9 @@ public class Segmenter {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
-		trimWS = true; // Extension IN TEST
+		trimLeadingWS = true; // Extension IN TEST
+		trimTrailingWS = true; // Extension IN TEST
+		grabTrailingWS = true; // Extension IN TEST
 		trimCodes = false; // Extension IN TEST
 	}
 
@@ -198,16 +202,16 @@ public class Segmenter {
 			if ( splits.get(pos) ) {
 				// Trim white-spaces and codes as required at the front
 				trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText,
-					textStart, pos-1, isSCWS, isECWS, isICWS, trimWS);
+					textStart, pos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
 				if ( trimmedTextStart == pos-1 ) {
 					// Only spaces in the segment: Continue with the next position
 					continue;
 				}
-				if ( trimWS || trimCodes ) textStart = trimmedTextStart;
+				if ( trimLeadingWS || trimCodes ) textStart = trimmedTextStart;
 				// Trim white-spaces and codes as required at the back
-				if ( trimWS || trimCodes ) {
+				if ( trimTrailingWS || trimCodes ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
-						pos-1, 0, isSCWS, isECWS, isICWS, trimWS);
+						pos-1, 0, isSCWS, isECWS, isICWS, trimTrailingWS);
 				}
 				else textEnd = pos-1;
 				if ( textEnd > textStart ) { // Only if there is something
@@ -223,13 +227,13 @@ public class Segmenter {
 		if ( textStart < lastPos ) {
 			// Trim white-spaces and codes as required at the front
 			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart,
-				lastPos-1, isSCWS, isECWS, isICWS, trimWS);
-			if ( trimWS || trimCodes  ) textStart = trimmedTextStart;
+				lastPos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
+			if ( trimLeadingWS || trimCodes  ) textStart = trimmedTextStart;
 			if ( trimmedTextStart < lastPos ) {
 				// Trim white-spaces and code as required at the back
-				if ( trimWS || trimCodes ) {
+				if ( trimTrailingWS || trimCodes ) {
 					textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
-						textStart, isSCWS, isECWS, isICWS, trimWS);
+						textStart, isSCWS, isECWS, isICWS, trimTrailingWS);
 				}
 				else textEnd = lastPos-1;
 				//TODO: fix case of last segment is single letter char surrounded by WS 
@@ -315,7 +319,7 @@ public class Segmenter {
 
 		// Trim the white-spaces and required codes at the end of the segment
 		end = TextFragment.getLastNonWhitespacePosition(text, end, start,
-			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimWS);
+			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimTrailingWS);
 		
 		// Adjust for +1 position (it's a range)
 		if ( end == -1 ) return null;

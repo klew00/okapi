@@ -804,7 +804,7 @@ public class SRXEditor {
 		try {
 			InputDialog dlg = new InputDialog(shell, "Range Rule Expression",
 				"Enter the regular expression for the range rule. Use an empty field to not use any range rule.",
-				"", null);
+				"", null, 0);
 			dlg.setInputValue(srxDoc.getRangeRule());
 			dlg.setAllowEmptyValue(true);
 			String result = dlg.showDialog();

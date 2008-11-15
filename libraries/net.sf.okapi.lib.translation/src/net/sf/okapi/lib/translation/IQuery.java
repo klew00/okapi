@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.lib.translation;
 
 import net.sf.okapi.common.resource.TextFragment;
@@ -15,15 +35,17 @@ public interface IQuery {
 
 	public boolean hasOption (int option);
 	
-	public void setLanguages (String sourceLang, String targetLang);
+	public void setLanguages (String sourceLang,
+		String targetLang);
 	
 	public String getSourceLanguage ();
 	
 	public String getTargetLanguage ();
 	
-	public void setAttribute (String name, String value);
+	public void setAttribute (String name,
+		String value);
 	
-	public void removeAttribute (String anme);
+	public void removeAttribute (String name);
 
 	public void open (String connectionString);
 	
@@ -49,7 +71,7 @@ public interface IQuery {
 
 	/**
 	 * Exports all the items of the resource to TMX. This method
-	 * may be un-supported: use {@link #getOptions()} to verify.
+	 * may be un-supported: Use {@link #getOptions()} to verify.
 	 * @param outputPath The full path of the TMX file to create.
 	 */
 	public void export (String outputPath);

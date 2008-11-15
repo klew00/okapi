@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.tm.opentran;
 
 import java.net.MalformedURLException;
@@ -6,25 +26,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.*;
-
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
-public class OpenTranTMConnector implements IQuery {
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+
+public class OpenTranTMConnector implements ITMQuery {
 
 	private XmlRpcClient client;
 	private String srcLang;
 	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
+	private int maxHits = 25;
 	
 	public void close () {
 		if ( client != null ) {
-			client = null; // Free
+			client = null; // Free to garbage collect
 		}
 	}
 
@@ -80,24 +102,31 @@ public class OpenTranTMConnector implements IQuery {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public int query (String plainText) {
 		try {
 			current = -1;
 			results = new ArrayList<QueryResult>();
-
+			// Prepare the parameters
 			Object[] params = new Object[] {
 				new String(plainText),
 				new String(srcLang),
-				new String(trgLang)};
-			Object[] array = (Object[])client.execute("suggest2", params);
+				new String(trgLang),
+				new Integer(maxHits)};
+			
+			// Do the query
+			Object[] array = (Object[])client.execute("suggest3", params);
 			if (( array == null ) || ( array.length == 0 )) return 0;
-
+			
+			// Convert the results
 			QueryResult qr;
+			int count = 0;
+			mainLoop:
 			for ( Object obj1 : array ) {
 				Map<String, Object> map1 = (Map<String, Object>)obj1;
 				String trgText = (String)map1.get("text");
-				int value = (Integer)map1.get("value");
-				int count = (Integer)map1.get("count");
+				//int value = (Integer)map1.get("value");
+				//int count = (Integer)map1.get("count");
 				Object[] projects = (Object[])map1.get("projects");
 				for ( Object obj2 : projects ) {
 					Map<String, Object> map2 = (Map<String, Object>)obj2;
@@ -108,6 +137,9 @@ public class OpenTranTMConnector implements IQuery {
 					qr.source = new TextContainer();
 					qr.source.append(srcText);
 					results.add(qr);
+					// suggest3 maximum parameters limits the number of
+					// level-1 object returned, not the total number
+					if ( ++count == maxHits ) break mainLoop;
 				}
 			}
 
@@ -124,7 +156,7 @@ public class OpenTranTMConnector implements IQuery {
 		return query(tmp);
 	}
 
-	public void removeAttribute (String anme) {
+	public void removeAttribute (String name) {
 	}
 
 	public void setAttribute (String name,
@@ -147,5 +179,21 @@ public class OpenTranTMConnector implements IQuery {
 		return code;
 	}
 
-	
+	public void setMaximumHits (int max) {
+		maxHits = max;
+	}
+
+	public void setThreshold (int threshold) {
+		// Not supported currently
+	}
+
+	public int getMaximunHits () {
+		return maxHits;
+	}
+
+	public int getThreshold () {
+		// Not supported currently
+		return 0;
+	}
+
 }
