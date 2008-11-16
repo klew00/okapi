@@ -12,7 +12,7 @@ public interface IFilter {
 
 	public void setOptions (String language,
 		String defaultEncoding,
-		ISkeletonProvider skeletonProvider);
+		boolean generateSkeleton);
 
 	public void open (InputStream input);
 

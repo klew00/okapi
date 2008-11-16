@@ -24,7 +24,7 @@ import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
 
-public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
+public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 
 	protected OutputStream output;
 	protected String language;
@@ -37,7 +37,7 @@ public class GenericFilterWriter implements IFilterWriter, IWriterHelper {
 	public boolean outputTarget;
 	public IEncoder encoder;
 	
-	public GenericFilterWriter () {
+	public GenericSkeletonWriter () {
 		references = new LinkedHashMap<String, IReferenceable>();
 	}
 	

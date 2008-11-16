@@ -10,7 +10,6 @@ import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IEncoder;
 import net.sf.okapi.apptest.filters.IFilter;
-import net.sf.okapi.apptest.filters.ISkeletonProvider;
 import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.Document;
@@ -20,6 +19,7 @@ import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
+import net.sf.okapi.apptest.skeleton.GenericSkeletonProvider;
 
 public class DummyFilter implements IFilter {
 
@@ -28,7 +28,7 @@ public class DummyFilter implements IFilter {
 	private boolean canceled;
 	private String language;
 	private IEncoder encoder;
-	private ISkeletonProvider skelProv;
+	private GenericSkeletonProvider skelProv;
 	
 	public DummyFilter () {
 		encoder = new DummyEncoder();
@@ -40,10 +40,9 @@ public class DummyFilter implements IFilter {
 	
 	public void setOptions (String language,
 		String defaultEncoding,
-		ISkeletonProvider skeletonProvider)
+		boolean generateSkeleton)
 	{
 		System.out.println("DummyParser: setOptions() called");
-		skelProv = skeletonProvider;
 		this.language = language;
 		System.out.println(" -output language = " + language);
 		System.out.println(" -output default encoding = " + defaultEncoding);
@@ -226,6 +225,7 @@ public class DummyFilter implements IFilter {
 		canceled = false;
 		current = -1;
 		
+		skelProv = new GenericSkeletonProvider();
 		list = new ArrayList<FilterEvent>();
 		
 		Document docRes = new Document();
