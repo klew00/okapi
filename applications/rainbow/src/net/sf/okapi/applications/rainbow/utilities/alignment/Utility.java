@@ -60,6 +60,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private int noTextTotal;
 	private int count;
 	private int countTotal;
+	private int manual;
+	private int manualTotal;
 	private Aligner aligner;
 	private boolean stopProcess;
 	private int targetCount;
@@ -138,12 +140,14 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		alignedTotal = 0;
 		noTextTotal = 0;
 		countTotal = 0;
+		manualTotal = 0;
 	}
 	
 	public void doEpilog () {
 		logger.info(String.format("Total translatable text units = %d", countTotal));
 		logger.info(String.format("Total without text = %d", noTextTotal));
-		logger.info(String.format("Total aligned = %d", alignedTotal));
+		logger.info(String.format("Total aligned = %d (manually modified = %d)",
+			alignedTotal, manualTotal));
     	
 		if ( aligner != null ) {
 			aligner.closeWithoutWarning();
@@ -224,6 +228,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			aligned = 0;
 			noText = 0;
 			count = 0;
+			manual = 0;
 			
 			aligner.setDocumentName(resource.getName());
 		}
@@ -237,9 +242,11 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
     	alignedTotal += aligned;
     	noTextTotal += noText;
     	countTotal += count;
+    	manualTotal += manual;
     	logger.info(String.format("Translatable text units = %d", count));
     	logger.info(String.format("Without text = %d", noText));
-    	logger.info(String.format("Aligned = %d", aligned));
+    	logger.info(String.format("Aligned = %d (manually modified = %d)",
+    		aligned, manual));
     }
 
 	@Override
@@ -276,6 +283,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
+				if ( aligner.wasModifiedManually() ) manual++;
 				// Prepare the attributes if needed
 				if ( params.createAttributes ) {
 					String value;

@@ -106,6 +106,7 @@ public class Aligner {
 	private ArrayList<String> anchorList = new ArrayList<String>();
 	private boolean trimCodes = false;//TODO: take from SRX rules
 	private boolean trimWS = true;//TODO: take from SRX rules
+	private boolean manualCorrection;
 
 	@Override
 	protected void finalize () {
@@ -483,6 +484,10 @@ public class Aligner {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	public boolean wasModifiedManually () {
+		return manualCorrection;
+	}
+	
 	private boolean confirmCancel () {
 		try {
 			if ( !warnOnClosing ) return true;
@@ -608,6 +613,7 @@ public class Aligner {
 			trgList.setFocus();
 			// Re-check for issues
 			hasIssue(true, true);
+			manualCorrection = true;
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
@@ -652,6 +658,7 @@ public class Aligner {
 			// plus the length of the selection to end of original segment minus length of first segment
 			target.createSegment(pos+2+(end-start), pos+(len-(start-2)));
 		}
+		manualCorrection = true;
 	}
 	
 	public void close () {
@@ -699,6 +706,7 @@ public class Aligner {
 		int currentSource,
 		int totalTarget)
 	{
+		manualCorrection = false;
 		// Make sure we do have a target to align
 		if ( !tu.hasTarget() ) return 2;
 		// Set the new values
@@ -827,6 +835,7 @@ public class Aligner {
 					// genericCont is already set with the proper text
 					genericCont.updateFragment(edTrgSeg.getText(),
 						target.getSegments().get(indexActiveSegment), true);
+					manualCorrection = true;
 				}
 				catch ( InvalidContentException e ) {
 					Dialogs.showError(shell, e.getLocalizedMessage(), null);
