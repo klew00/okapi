@@ -7,8 +7,8 @@ import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
-import net.sf.okapi.apptest.resource.Group;
 import net.sf.okapi.apptest.resource.LocaleProperties;
+import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.TextUnit;
 
 public class DummyFilterWriter implements IFilterWriter {
@@ -30,8 +30,8 @@ public class DummyFilterWriter implements IFilterWriter {
 		return null;
 	}
 
-	public void handleEvent(FilterEvent event) {
-		Group grp;
+	public FilterEvent handleEvent (FilterEvent event) {
+		StartGroup grp;
 		TextUnit tu;
 		DocumentPart dp;
 		switch ( event.getEventType() ) {
@@ -49,11 +49,11 @@ public class DummyFilterWriter implements IFilterWriter {
 			System.out.println("end-sub-document");
 			break;
 		case START_GROUP:
-			grp = (Group)event.getResource();
+			grp = (StartGroup)event.getResource();
 			System.out.println("start-group={");
-			System.out.println("   id="+grp.getID());
-			if ( grp.isReference() ) {
-				System.out.println("   isReference="+grp.isReference());
+			System.out.println("   id="+grp.getId());
+			if ( grp.isReferent() ) {
+				System.out.println("   isReference="+grp.isReferent());
 			}
 			System.out.println("}");
 			//level++;
@@ -62,7 +62,7 @@ public class DummyFilterWriter implements IFilterWriter {
 			//level--;
 			Ending ending = (Ending)event.getResource();
 			System.out.println("end-group={");
-			System.out.println("   id="+ending.getID());
+			System.out.println("   id="+ending.getId());
 			System.out.println("}");
 			break;
 //		case SKELETON_UNIT:
@@ -78,9 +78,9 @@ public class DummyFilterWriter implements IFilterWriter {
 		case TEXT_UNIT:
 			tu = (TextUnit)event.getResource();
 			System.out.println("text-unit={");
-			System.out.println("   id="+tu.getID());
-			if ( tu.isReference() ) {
-				System.out.println("   isReference="+tu.isReference());
+			System.out.println("   id="+tu.getId());
+			if ( tu.isReferent() ) {
+				System.out.println("   isReference="+tu.isReferent());
 			}
 			System.out.println("   text="+out(tu.toString()));
 			System.out.println("}");
@@ -88,18 +88,18 @@ public class DummyFilterWriter implements IFilterWriter {
 		case DOCUMENT_PART:
 			dp = (DocumentPart)event.getResource();
 			System.out.println("document-part={");
-			System.out.println("   id="+dp.getID());
-			if ( dp.isReference() ) {
-				System.out.println("   isReference="+dp.isReference());
+			System.out.println("   id="+dp.getId());
+			if ( dp.isReferent() ) {
+				System.out.println("   isReference="+dp.isReferent());
 			}
-			LocaleProperties lp = dp.getSourceProperties();
+			/*TODO: value 
 			for ( String key : lp.getProperties().keySet() ) {
 				System.out.println("   prop: key="+key+" value='"+lp.getProperty(key)+"'");
-			}
-			// TODO: values
+			}*/
 			System.out.println("}");
 			break;
 		}
+		return event;
 	}
 	
 	private String out (String text) {

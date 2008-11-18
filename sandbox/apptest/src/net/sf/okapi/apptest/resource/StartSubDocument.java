@@ -4,81 +4,24 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.apptest.common.ISkeleton;
+public class StartSubDocument extends BaseContainer {
 
-public class Group extends ArrayList<IReferenceable>
-	implements IReferenceable {
-
-	private static final long serialVersionUID = 1L;
-	
-	private String id;
-	private ISkeleton skeleton;
-	private boolean isReference;
-	private String name;
 	private String parentId;
 	private LocaleProperties srcProp;
 	private ArrayList<LocaleProperties> trgPropList;
 	
-	public Group (String parentId) {
-		this.parentId = parentId;
+	public StartSubDocument (String parentId) {
+		setParentId(parentId);
 	}
 
-	public Group (String parentId,
-		String id)
-	{
-		this.parentId = parentId;
-		this.id = id;
-	}
-
-	public Group (String parentId,
-		String id,
-		boolean isReference)
-	{
-		this.parentId = parentId;
-		this.id = id;
-		this.isReference = isReference;
-	}
-
-	public ISkeleton getSkeleton () {
-		return skeleton;
-	}
-	
-	public void setSkeleton (ISkeleton skeleton) {
-		this.skeleton = skeleton;
-	}
-	
-	public String getName () {
-		return name;
-	}
-	
-	public void setName (String name) {
-		this.name = name;
-	}
-	
-	public String getParentID () {
+	public String getParentId () {
 		return parentId;
 	}
 	
-	public void setParentID (String parentId) {
+	public void setParentId (String parentId) {
 		this.parentId = parentId;
 	}
 	
-	public boolean isReference () {
-		return isReference;
-	}
-
-	public void setIsReference (boolean value) {
-		isReference = value;
-	}
-
-	public String getID () {
-		return id;
-	}
-
-	public void setID (String id) {
-		this.id = id;
-	}
-
 	public LocaleProperties getSourceProperties () {
 		if ( srcProp == null ) srcProp = new LocaleProperties();
 		return srcProp;

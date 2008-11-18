@@ -2,61 +2,36 @@ package net.sf.okapi.apptest.resource;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
-public class DocumentPart extends BaseResource implements IReferenceable {
+import net.sf.okapi.apptest.filters.IWriterHelper;
 
-	private boolean isReference;
-	private LocaleProperties srcProp;
-	private ArrayList<LocaleProperties> trgPropList;
+public class DocumentPart extends BaseResource {
+
+	private Hashtable<String, Property> properties;
 
 	public DocumentPart (String id,
-		boolean isReference)
+		boolean isReferent)
 	{
 		this.id = id;
-		this.isReference = isReference;
+		this.isReferent = isReferent;
 	}
 	
-	public boolean isReference() {
-		return isReference;
+	public String toString (IWriterHelper writerHelper) {
+		if ( skeleton != null ) return skeleton.toString(writerHelper);
+		else return "";
 	}
 
-	public void setIsReference(boolean value) {
-		isReference = value;
+	public Property getProperty (String name) {
+		if ( name == null ) throw new InvalidParameterException();
+		if ( properties == null ) return null;
+		return properties.get(name);
 	}
 
-	public LocaleProperties getSourceProperties () {
-		if ( srcProp == null ) srcProp = new LocaleProperties();
-		return srcProp;
+	public void setProperty (Property property) {
+		if ( property == null ) throw new InvalidParameterException();
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		properties.put(property.getName(), property);
 	}
-	
-	public void setSourceProperties (LocaleProperties value) {
-		if ( value == null ) throw new InvalidParameterException();
-		srcProp = value;
-	}
-
-	public boolean hasTargetProperties () {
-		if ( trgPropList == null ) return false;
-		return (trgPropList.get(0) != null);
-	}
-
-	public LocaleProperties getTargetProperties () {
-		if ( trgPropList == null ) trgPropList = new ArrayList<LocaleProperties>();
-		if ( trgPropList.get(0) == null ) trgPropList.add(new LocaleProperties());
-		return trgPropList.get(0);
-	}
-	
-	public void setTarget (LocaleProperties value) {
-		if ( value == null ) throw new InvalidParameterException();
-		if ( trgPropList == null ) trgPropList = new ArrayList<LocaleProperties>();
-		if ( trgPropList.size() == 0 ) trgPropList.add(value);
-		else trgPropList.set(0, value);
-	}
-
-	public List<LocaleProperties> getTargetsProperties () {
-		if ( trgPropList == null ) trgPropList = new ArrayList<LocaleProperties>();
-		if ( trgPropList.get(0) == null ) trgPropList.add(new LocaleProperties());
-		return trgPropList;
-	}
-
 }

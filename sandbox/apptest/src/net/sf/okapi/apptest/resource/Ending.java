@@ -5,18 +5,18 @@ import net.sf.okapi.apptest.common.ISkeleton;
 
 public class Ending implements IResource {
 
-	private String id;
-	private ISkeleton skeleton;
-
+	protected String id;
+	protected ISkeleton skeleton;
+	
 	public Ending (String id) {
 		this.id = id;
 	}
 
-	public String getID() {
+	public String getId () {
 		return id;
 	}
-
-	public void setID(String id) {
+	
+	public void setId (String id) {
 		this.id = id;
 	}
 
@@ -27,4 +27,5 @@ public class Ending implements IResource {
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
 	}
+
 }

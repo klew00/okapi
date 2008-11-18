@@ -14,7 +14,7 @@ public interface IFilterWriter {
 
 	public void setOutput(OutputStream output);
 
-	public void handleEvent(FilterEvent event);
+	public FilterEvent handleEvent(FilterEvent event);
 
 	public void close();
 

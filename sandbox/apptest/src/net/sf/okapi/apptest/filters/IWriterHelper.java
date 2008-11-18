@@ -1,6 +1,6 @@
 package net.sf.okapi.apptest.filters;
 
-import net.sf.okapi.apptest.resource.IReferenceable;
+import net.sf.okapi.apptest.common.IReferenceable;
 
 /**
  * The IWriterHelper interface provides the methods to access the various data
@@ -38,6 +38,8 @@ public interface IWriterHelper {
 	 * @return The resulting encoded text.
 	 */
 	public String encode (char value);
+	
+	public String getLanguage ();
 	
 	public String getLayerBeforeCode ();
 	public String getLayerAfterCode ();

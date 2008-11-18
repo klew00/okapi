@@ -1,18 +1,22 @@
 package net.sf.okapi.apptest.resource;
 
+import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
 
-public class BaseResource implements IResource {
+public abstract class BaseResource implements IResource, IReferenceable {
 
 	protected String id;
 	protected ISkeleton skeleton;
-	
-	public String getID () {
+	protected boolean isReferent;
+	protected String name;
+	protected String parentId;
+
+	public String getId () {
 		return id;
 	}
 	
-	public void setID (String id) {
+	public void setId (String id) {
 		this.id = id;
 	}
 
@@ -23,4 +27,29 @@ public class BaseResource implements IResource {
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
 	}
+
+	public boolean isReferent () {
+		return isReferent;
+	}
+
+	public void setIsReferent (boolean value) {
+		isReferent = value;
+	}
+
+	public String getName () {
+		return name;
+	}
+	
+	public void setName (String name) {
+		this.name = name;
+	}
+	
+	public String getParentId () {
+		return parentId;
+	}
+	
+	public void setParentId (String parentId) {
+		this.parentId = parentId;
+	}
+
 }

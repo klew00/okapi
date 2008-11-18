@@ -4,30 +4,38 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Document extends BaseContainer {
+import net.sf.okapi.apptest.filters.IWriterHelper;
 
-	protected String language;
-	protected String encoding;
-	
+public class StartGroup extends BaseResource {
+
 	private LocaleProperties srcProp;
 	private ArrayList<LocaleProperties> trgPropList;
 	
-	public String getLanguage () {
-		return language;
-	}
-	
-	public void setLanguage (String language) {
-		this.language = language;
+	public StartGroup (String parentId) {
+		this.parentId = parentId;
 	}
 
-	public String getEncoding () {
-		return encoding;
-	}
-	
-	public void setEncoding (String encoding) {
-		this.encoding = encoding;
+	public StartGroup (String parentId,
+		String id)
+	{
+		this.parentId = parentId;
+		this.id = id;
 	}
 
+	public StartGroup (String parentId,
+		String id,
+		boolean isReference)
+	{
+		this.parentId = parentId;
+		this.id = id;
+		this.isReferent = isReference;
+	}
+
+	public String toString (IWriterHelper writerHelper) {
+		if ( skeleton != null ) return skeleton.toString(writerHelper);
+		else return "";
+	}
+	
 	public LocaleProperties getSourceProperties () {
 		if ( srcProp == null ) srcProp = new LocaleProperties();
 		return srcProp;

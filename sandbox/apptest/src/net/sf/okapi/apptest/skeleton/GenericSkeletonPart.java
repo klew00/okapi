@@ -1,18 +1,19 @@
 package net.sf.okapi.apptest.skeleton;
 
+import net.sf.okapi.apptest.common.IReferenceable;
+import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.common.ISkeletonPart;
 import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
-import net.sf.okapi.apptest.resource.Group;
-import net.sf.okapi.apptest.resource.IReferenceable;
+import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 
-public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
+public class GenericSkeletonPart implements ISkeletonPart, IReferenceable, IResource {
 
-	private boolean isReference = false;
+	private boolean isReferent = false;
 	private String id;
 	private StringBuilder data;
 	
@@ -24,7 +25,7 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 	public GenericSkeletonPart (String id, String data, boolean isReference) {
 		this.data = new StringBuilder(data);
 		this.id = id;
-		this.isReference = isReference;
+		this.isReferent = isReference;
 	}
 	
 	@Override
@@ -55,8 +56,11 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 					else
 						return "propValue-TODO";
 				}
-				else if ( ref instanceof Group ) {
-					return "!!Not supported!!";
+				else if ( ref instanceof StartGroup ) {
+					if ( propName == null )
+						return ref.toString(refProv);
+					else
+						return "propValue-TODO";
 				}
 				else if ( ref instanceof DocumentPart ) {
 					return "!!Not supported!!";
@@ -66,19 +70,19 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 		return data.toString();
 	}
 	
-	public boolean isReference() {
-		return isReference;
+	public boolean isReferent () {
+		return isReferent;
 	}
 
-	public void setIsReference (boolean value) {
-		isReference = value;
+	public void setIsReferent (boolean value) {
+		isReferent = value;
 	}
 
-	public String getID () {
+	public String getId () {
 		return id;
 	}
 
-	public void setID (String id) {
+	public void setId (String id) {
 		this.id = id;
 	}
 
@@ -86,12 +90,13 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable {
 		this.data.append(data);
 	}
 
-	public ISkeleton getSkeleton() {
-		assert(false); // There is no skeleton of skeleton
+	public ISkeleton getSkeleton () {
+		// Never used in this class
 		return null;
 	}
 
-	public void setSkeleton(ISkeleton skeleton) {
-		assert(false); // There is no skeleton of skeleton
+	public void setSkeleton (ISkeleton skeleton) {
+		// Never used in this class
 	}
+
 }

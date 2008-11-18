@@ -25,24 +25,22 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import net.sf.okapi.apptest.filters.IWriterHelper;
+
 /**
  * This class implements the methods to manipulate a unit of extracted text.
  * <p>The TextUnit object includes a source content ({@link #getSourceContent()})
  * and one or more target content ({@link #getTargets()}). You can access
  * the first target with {@link #getTarget()}.
  */
-public class TextUnit extends BaseResource implements IReferenceable {
+public class TextUnit extends BaseResource {
 
-	protected String name;
 	protected String type;
 	protected boolean isTranslatable;
 	protected boolean preserveWS;
 	protected LocaleData source;
 	protected ArrayList<LocaleData> targets;
 	protected Hashtable<String, String> propList;
-	protected Hashtable<String, IExtension> extList;
-	protected boolean isReference = false;
-	protected String parentId;
 
 	/**
 	 * Creates a TextUnit object with an empty source content and no target content.
@@ -81,11 +79,11 @@ public class TextUnit extends BaseResource implements IReferenceable {
 	
 	private void create (String id,
 		String sourceText,
-		boolean isReference)
+		boolean isReferent)
 	{
 		isTranslatable = true;
 		this.id = id;
-		this.isReference = isReference;
+		this.isReferent = isReferent;
 		source = new LocaleData(this);
 		source.container = new TextContainer(this);
 		if ( sourceText != null ) source.container.append(sourceText);
@@ -103,12 +101,14 @@ public class TextUnit extends BaseResource implements IReferenceable {
 		return source.container.toString();
 	}
 	
-	public void setIsReference (boolean value) {
-		isReference = value;
-	}
-	
-	public boolean isReference () {
-		return isReference;
+	public String toString (IWriterHelper writerHelper) {
+		TextContainer tc;
+		if ( writerHelper.useTarget() ) {
+			if ( hasTarget() ) tc = getTargetContent();
+			else tc = source.getContent();
+		}
+		else tc = source.getContent();
+		return tc.toString(writerHelper);
 	}
 	
 	public boolean hasReference () {
@@ -122,15 +122,6 @@ public class TextUnit extends BaseResource implements IReferenceable {
 	 */
 	public boolean isEmpty () {
 		return source.container.isEmpty();
-	}
-
-	public String getName () {
-		if ( name == null ) return "";
-		return name;
-	}
-
-	public void setName (String value) {
-		name = value;
 	}
 
 	public String getType () {
@@ -159,23 +150,6 @@ public class TextUnit extends BaseResource implements IReferenceable {
 		return propList;
 	}
 
-	public IExtension getExtension (String name) {
-		if ( extList == null ) return null;
-		return extList.get(name);
-	}
-
-	public void setExtension (String name,
-		IExtension value)
-	{
-		if ( extList == null ) extList = new Hashtable<String, IExtension>();
-		extList.put(name, value);
-	}
-
-	public Hashtable<String, IExtension> getExtensions () {
-		if ( extList == null ) extList = new Hashtable<String, IExtension>();
-		return extList;
-	}
-
 	public boolean preserveWhitespaces () {
 		return preserveWS;
 	}
@@ -190,14 +164,6 @@ public class TextUnit extends BaseResource implements IReferenceable {
 
 	public void setIsTranslatable (boolean value) {
 		isTranslatable = value;
-	}
-
-	public String getParentID () {
-		return parentId;
-	}
-
-	public void setParentID (String value) {
-		parentId = value;
 	}
 
 	/**
@@ -295,5 +261,5 @@ public class TextUnit extends BaseResource implements IReferenceable {
 	public List<LocaleData> getTargets () {
 		return targets;
 	}
-	
+
 }

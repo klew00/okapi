@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.ISkeletonPart;
 import net.sf.okapi.apptest.filters.IWriterHelper;
 
@@ -989,22 +990,22 @@ public class TextFragment implements Comparable<Object> {
 				}
 				else if ( ref instanceof ISkeletonPart ) {
 					if ( propName == null )
-						tmp.replace(start, end, ref.toString());
+						tmp.replace(start, end, ref.toString(refProv));
 					else
 						tmp.replace(start, end, "propValue-TODO");
 				}
-				else if ( ref instanceof Group ) {
+				else if ( ref instanceof StartGroup ) {
 					if ( propName == null )
-						tmp.replace(start, end, mergeGroup((Group)ref, refProv));
+						tmp.replace(start, end, ref.toString(refProv));
 					else
 						tmp.replace(start, end, "propValue-TODO");
 				}
 				else if ( ref instanceof DocumentPart ) {
 					if ( propName == null )
-						tmp.replace(start, end, "-ERR-");
+						tmp.replace(start, end, "-TODO-");
 					else {
 						tmp.replace(start, end,
-							getPropertyValue((DocumentPart)ref, propName, refProv.useTarget()));
+							getPropertyValue((DocumentPart)ref, propName, refProv.getLanguage()));
 					}
 				}
 			}
@@ -1014,39 +1015,20 @@ public class TextFragment implements Comparable<Object> {
 	
 	private String getPropertyValue (DocumentPart unit,
 		String name,
-		boolean outputTarget)
+		String language)
 	{
-		LocaleProperties lp;
-		if ( outputTarget && unit.hasTargetProperties() )
-			lp = unit.getTargetProperties();
-		else
-			lp = unit.getSourceProperties();
-		String value = lp.getProperty(name);
+		Property prop = unit.getProperty(name);
+		String value;
+		if ( language == null ) {
+			value = prop.getValue();
+		}
+		else {
+			prop = (Property)prop.getAnnotation(language);
+			if ( prop == null ) return "-ERR:NO-TARGET-PROP-";
+			value = prop.getValue();
+		}
 		if ( value == null ) return "-ERR:PROP-NOT-FOUND-";
 		else return value;
-	}
-	
-	private String mergeGroup (Group group,
-		IWriterHelper refProv)
-	{
-		StringBuilder tmp = new StringBuilder();
-		for ( IReferenceable ref : group ) {
-			if ( ref instanceof TextUnit ) {
-				if ( ref.isReference() )continue; // Skip entries that are references
-				TextContainer tc;
-				if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
-				else  tc = ((TextUnit)ref).getSourceContent();
-				tmp.append(tc.toString(refProv));
-			}
-			else if ( ref instanceof ISkeletonPart ) {
-				tmp.append(ref.toString());
-			}
-			else if ( ref instanceof Group ) {
-				// Call recursively
-				tmp.append(mergeGroup((Group)ref, refProv));
-			}
-		}
-		return tmp.toString();
 	}
 	
 	/**

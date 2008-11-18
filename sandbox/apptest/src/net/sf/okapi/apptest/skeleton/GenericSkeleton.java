@@ -3,28 +3,36 @@ package net.sf.okapi.apptest.skeleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
+import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.TextFragment;
 
-public class GenericSkeleton implements ISkeleton {
+public class GenericSkeleton implements ISkeleton, IResource {
 
 	private ArrayList<GenericSkeletonPart> list;
-	private boolean inStartElement = false;
 	private int id;
+	private String idText;
 	
 	public GenericSkeleton () {
 		list = new ArrayList<GenericSkeletonPart>();
 		id = 0;
 	}
 
+	public String toString (IWriterHelper writerHelper) {
+		StringBuilder tmp = new StringBuilder();
+		for ( GenericSkeletonPart part : list ) {
+			tmp.append(part.toString(writerHelper));
+		}
+		return tmp.toString();
+	}
+	
 	public void add (String data) {
-		closeStartElement();
 		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(makeId(), data));
 		else list.get(list.size()-1).append(data);
 	}
 
 	public void addRef (String refId) {
-		closeStartElement();
 		list.add(new GenericSkeletonPart(makeId(), TextFragment.makeRefMarker(refId)));
 		list.add(new GenericSkeletonPart(makeId(), ""));
 	}
@@ -33,37 +41,26 @@ public class GenericSkeleton implements ISkeleton {
 		return list;
 	}
 
-	public void addAttribute (String name, String value) {
-		if ( !inStartElement ) {
-			throw new RuntimeException("Call to addAttribute done outside a start element tag.");
-		}
-		addWithoutCheck(String.format(" %s=\"%s\"", name, value));
-	}
-
-	public void addEndElement(String name) {
-		closeStartElement();		
-		addWithoutCheck(String.format("</%s>", name));		
-	}
-
-	public void addStartElement(String name) {
-		closeStartElement();
-		addWithoutCheck(String.format("<%s", name));		
-	}
-	
-	public void closeStartElement () {
-		if ( inStartElement ) {
-			addWithoutCheck(">");
-			inStartElement = false;
-		}
-	}
-
 	private String makeId() {
-		return String.valueOf(++id);
+		idText = String.valueOf(++id);
+		return idText;
 	}
-	
-	private void addWithoutCheck (String data) {
-		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(makeId(), data));
-		else list.get(list.size()-1).append(data);
+
+	public String getId () {
+		return idText;
+	}
+
+	public ISkeleton getSkeleton() {
+		// Not used.
+		return null;
+	}
+
+	public void setId (String id) {
+		// Not used, IDs are auto-incremented
+	}
+
+	public void setSkeleton (ISkeleton skeleton) {
+		// Not used.
 	}
 	
 }
