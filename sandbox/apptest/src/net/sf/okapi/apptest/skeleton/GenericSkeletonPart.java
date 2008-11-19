@@ -7,7 +7,6 @@ import net.sf.okapi.apptest.common.ISkeletonPart;
 import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.StartGroup;
-import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 
@@ -41,12 +40,23 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable, IReso
 				IReferenceable ref = refProv.getReference((String)marker[0]);
 				if ( ref == null ) return "-ERR: Bad marker-";
 				// Else: process the reference
-				TextContainer tc;
+				TextFragment tf;
+				TextUnit tu;
 				if ( ref instanceof TextUnit ) {
-					if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
-					else tc = ((TextUnit)ref).getSourceContent();
+					tu = ((TextUnit)ref);
+					if ( refProv.getLanguage() == null ) {
+						tf = tu.getContent();
+					}
+					else {
+						if ( tu.getAnnotation(refProv.getLanguage()) == null ) {
+							tf = tu.getContent();
+						}
+						else {
+							tf = (TextFragment)tu.getAnnotation(refProv.getLanguage());
+						}
+					}
 					if ( propName == null )
-						return tc.toString(refProv);
+						return tf.toString(refProv);
 					else
 						return "propVALUE-TODO";
 				}

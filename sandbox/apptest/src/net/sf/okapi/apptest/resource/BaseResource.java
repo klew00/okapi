@@ -1,5 +1,8 @@
 package net.sf.okapi.apptest.resource;
 
+import java.security.InvalidParameterException;
+import java.util.Hashtable;
+
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
@@ -11,6 +14,7 @@ public abstract class BaseResource implements IResource, IReferenceable {
 	protected boolean isReferent;
 	protected String name;
 	protected String parentId;
+	protected Hashtable<String, Property> properties;
 
 	public String getId () {
 		return id;
@@ -50,6 +54,18 @@ public abstract class BaseResource implements IResource, IReferenceable {
 	
 	public void setParentId (String parentId) {
 		this.parentId = parentId;
+	}
+
+	public Property getProperty (String name) {
+		if ( name == null ) throw new InvalidParameterException();
+		if ( properties == null ) return null;
+		return properties.get(name);
+	}
+
+	public void setProperty (Property property) {
+		if ( property == null ) throw new InvalidParameterException();
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		properties.put(property.getName(), property);
 	}
 
 }

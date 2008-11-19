@@ -69,6 +69,8 @@ public class TextFragment implements Comparable<Object> {
 	public static final String REFMARKER_END   = "}";
 	public static final String REFMARKER_SEP   = "@%";
 
+	static public final String CODETYPE_SEGMENT  = "$seg$";
+
 	/**
 	 * List of the types of tag usable for in-line codes.
 	 */
@@ -84,7 +86,7 @@ public class TextFragment implements Comparable<Object> {
 	protected boolean             isBalanced;
 	protected String              id;
 	protected int                 lastCodeID;
-	protected TextUnit            parent;
+	protected TextUnit           parent;
 
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -304,6 +306,16 @@ public class TextFragment implements Comparable<Object> {
 	{
 		setCodedText(newCodedText, newCodes, false);
 	}
+	
+	@Override
+	public TextFragment clone () {
+		TextFragment tf = new TextFragment();
+		tf.setCodedText(getCodedText(), getCodes(), false);
+		tf.id = id;
+		tf.lastCodeID = lastCodeID;
+		return tf;
+	}
+	
 
 	/**
 	 * Gets the ID of the fragment.
@@ -964,7 +976,7 @@ public class TextFragment implements Comparable<Object> {
 			//TODO: log a warning
 		}
 		// Check for segment
-		if ( code.type.equals(TextContainer.CODETYPE_SEGMENT) ) {
+		if ( code.type.equals(TextFragment.CODETYPE_SEGMENT) ) {
 			return "[SEG-"+code.data+"]";
 		}
 		// Else: look for place-holders
@@ -979,12 +991,20 @@ public class TextFragment implements Comparable<Object> {
 				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else {
-				TextContainer tc;
+				TextFragment tf;
 				if ( ref instanceof TextUnit ) {
-					if ( refProv.useTarget() ) tc = ((TextUnit)ref).getTargetContent();
-					else tc = ((TextUnit)ref).getSourceContent();
+					TextUnit tu = (TextUnit)ref;
+					if ( refProv.getLanguage() == null ) {
+						tf = tu.getContent();
+					}
+					else if ( tu.getAnnotation(refProv.getLanguage()) == null ) {
+						tf = tu.getContent();
+					}
+					else {
+						tf = ((TextUnit)tu.getAnnotation(refProv.getLanguage())).getContent();
+					}
 					if ( propName == null )
-						tmp.replace(start, end, tc.toString(refProv));
+						tmp.replace(start, end, tf.toString(refProv));
 					else
 						tmp.replace(start, end, "propVALUE-TODO");
 				}

@@ -1,6 +1,7 @@
 package net.sf.okapi.apptest.dummyutility;
 
 import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.utilities.IUtility;
 
@@ -10,8 +11,7 @@ public class PseudoTranslate implements IUtility {
 		return "PseudoTranlate";
 	}
 	
-	public void handleEvent (FilterEvent event)
-	{
+	public void handleEvent (FilterEvent event) {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
 			processTU((TextUnit)event.getResource());
@@ -24,12 +24,19 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		if ( !tu.isTranslatable() ) return;
-		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent().clone());
+		TextUnit trgTu = (TextUnit)tu.getAnnotation("fr");
+		TextFragment tf = null;
+		if ( trgTu != null ) {
+			tf = ((TextUnit)tu.getAnnotation("fr")).getContent();
 		}
-		tu.getTargetContent().setCodedText(
-			tu.getTargetContent().getCodedText().replace("e", "\u00CA"));
+		if ( trgTu == null ) {
+			tf = tu.getContent().clone();
+			trgTu = new TextUnit();
+			trgTu.setContent(tf);
+			tu.setAnnotation("fr", trgTu);
+		}
+		tf.setCodedText(
+			tu.getContent().getCodedText().replace("e", "\u00CA"));
 	}
 
 	public void doEpilog () {

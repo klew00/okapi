@@ -7,7 +7,6 @@ import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
-import net.sf.okapi.apptest.resource.LocaleProperties;
 import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.TextUnit;
 

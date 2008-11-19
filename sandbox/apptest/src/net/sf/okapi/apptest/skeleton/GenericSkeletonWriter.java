@@ -20,7 +20,7 @@ import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.StartGroup;
-import net.sf.okapi.apptest.resource.TextContainer;
+import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
 
@@ -198,13 +198,17 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 			groupStack.peek().add(unit);
 		}
 		else if ( !unit.isReferent() ) {
-			TextContainer tc;
-			if ( useTarget() ) {
-				if ( unit.hasTarget() ) tc = unit.getTargetContent();
-				else tc = unit.getSourceContent();
+			TextFragment tf;
+			if ( language == null ) tf = unit.getContent();
+			else { // TODO: any better way?
+				if ( unit.getAnnotation(language) == null ) {
+					tf = unit.getContent();
+				}
+				else {
+					tf = ((TextUnit)unit.getAnnotation(language)).getContent();
+				}
 			}
-			else tc = unit.getSourceContent();
-			writer.write(tc.toString(this));
+			writer.write(tf.toString(this));
 		}
 	}
 

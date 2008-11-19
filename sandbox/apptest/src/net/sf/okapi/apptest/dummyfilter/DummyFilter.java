@@ -16,7 +16,7 @@ import net.sf.okapi.apptest.resource.StartDocument;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.StartGroup;
-import net.sf.okapi.apptest.resource.TextContainer;
+import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
 import net.sf.okapi.apptest.skeleton.GenericSkeleton;
@@ -102,14 +102,14 @@ public class DummyFilter implements IFilter {
 		TextUnit tu = new TextUnit();
 		tu.setId("t2");
 		tu.setIsReferent(true);
-		TextContainer tc = new TextContainer(tu);
-		tc.append("Before ");
-		Code code = tc.append(TagType.PLACEHOLDER, "image",
-			"<img href='" + TextContainer.makeRefMarker("dp1","href") +
-			"' alt='" + TextContainer.makeRefMarker("t1") + "'/>");
+		TextFragment tf = new TextFragment();
+		tf.append("Before ");
+		Code code = tf.append(TagType.PLACEHOLDER, "image",
+			"<img href='" + TextFragment.makeRefMarker("dp1","href") +
+			"' alt='" + TextFragment.makeRefMarker("t1") + "'/>");
 		code.setHasReference(true);
-		tc.append(" after.");
-		tu.setSourceContent(tc);
+		tf.append(" after.");
+		tu.setContent(tf);
 		GenericSkeleton skel = skelProv.createSkeleton();
 		skel.add("<p>");
 		skel.addRef("t2");
@@ -130,34 +130,33 @@ public class DummyFilter implements IFilter {
 
 		TextUnit tu = new TextUnit();
 		tu.setId("t1");
-		TextContainer tc = new TextContainer(tu);
-		tc.append("Before ");
-		Code code = tc.append(TagType.PLACEHOLDER, "link",
-			"<a href='" + TextContainer.makeRefMarker("dp1","href") + "'/>");
+		TextFragment tf = new TextFragment();
+		tf.append("Before ");
+		Code code = tf.append(TagType.PLACEHOLDER, "link",
+			"<a href='" + TextFragment.makeRefMarker("dp1","href") + "'/>");
 		code.setHasReference(true);
-		tc.append(" after.");
-		tu.setSourceContent(tc);
+		tf.append(" after.");
+		tu.setContent(tf);
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
 			skelProv.createSkeleton("</p>\n")));
-
 	}
 	
 	private void makeCase003 () {
 		// <table id=100> <tr><td>text</td></tr><table>
 		StartGroup grp1 = new StartGroup(null, "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-				skelProv.createSkeleton("<table id=100>\n ")));
+			skelProv.createSkeleton("<table id=100>\n ")));
 
 		StartGroup grp2 = new StartGroup("g1", "g2");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
-				skelProv.createSkeleton("<tr>")));
+			skelProv.createSkeleton("<tr>")));
 		
 		StartGroup grp3 = new StartGroup("g2", "g3");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
-				skelProv.createSkeleton("<td>")));
+			skelProv.createSkeleton("<td>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text")));
@@ -208,12 +207,12 @@ public class DummyFilter implements IFilter {
 
 		TextUnit tu = new TextUnit();
 		tu.setId("t3");
-		TextContainer tc = new TextContainer(tu);
-		tc.append("Text before list: \n ");
-		Code code = tc.append(TagType.PLACEHOLDER, "list", TextContainer.makeRefMarker("g1"));
+		TextFragment tf = new TextFragment();
+		tf.append("Text before list: \n ");
+		Code code = tf.append(TagType.PLACEHOLDER, "list", TextFragment.makeRefMarker("g1"));
 		code.setHasReference(true);
-		tc.append("\n and text after the list.");
-		tu.setSourceContent(tc);
+		tf.append("\n and text after the list.");
+		tu.setContent(tf);
 		GenericSkeleton skel = skelProv.createSkeleton("<p>");
 		skel.addRef("t3");
 		skel.add("</p>");
