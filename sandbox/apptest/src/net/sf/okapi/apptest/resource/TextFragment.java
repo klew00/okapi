@@ -81,12 +81,11 @@ public class TextFragment implements Comparable<Object> {
 		SEGMENTHOLDER
 	};
 	
-	protected StringBuilder       text;
-	protected ArrayList<Code>     codes;
-	protected boolean             isBalanced;
-	protected String              id;
-	protected int                 lastCodeID;
-	protected TextUnit           parent;
+	protected StringBuilder text;
+	protected ArrayList<Code> codes;
+	protected boolean isBalanced;
+	protected int lastCodeID;
+	protected TextUnit parent;
 
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -272,25 +271,38 @@ public class TextFragment implements Comparable<Object> {
 
 
 	/**
-	 * Creates an empty TextFragment.
+	 * Creates an empty TextFragment with a given parent.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 */
-	public TextFragment () {
+	public TextFragment (TextUnit parent) {
+		this.parent = parent;
 		text = new StringBuilder();
 	}
 
 	/**
 	 * Creates a TextFragment with a given text.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param text The text to use.
 	 */
-	public TextFragment (String text) {
+	public TextFragment (TextUnit parent,
+		String text)
+	{
+		this.parent = parent;
 		this.text = new StringBuilder(text);
 	}
 
 	/**
 	 * Creates a TextFragment with the content of a given TextFragment.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param fragment The content to use.
 	 */
-	public TextFragment (TextFragment fragment) {
+	public TextFragment (TextUnit parent,
+		TextFragment fragment)
+	{
+		this.parent = parent;
 		text = new StringBuilder();
 		insert(-1, fragment);
 	}
@@ -298,41 +310,27 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Creates a TextFragment with the content made of a given coded text
 	 * and a list of codes.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param newCodedText The new coded text.
 	 * @param newCodes The list of codes.
 	 */
-	public TextFragment (String newCodedText,
+	public TextFragment (TextUnit parent,
+		String newCodedText,
 		List<Code> newCodes)
 	{
+		this.parent = parent;
 		setCodedText(newCodedText, newCodes, false);
 	}
 	
 	@Override
 	public TextFragment clone () {
-		TextFragment tf = new TextFragment();
+		TextFragment tf = new TextFragment(parent);
 		tf.setCodedText(getCodedText(), getCodes(), false);
-		tf.id = id;
 		tf.lastCodeID = lastCodeID;
 		return tf;
 	}
 	
-
-	/**
-	 * Gets the ID of the fragment.
-	 * @return The ID of the fragment.
-	 */
-	public String getID () {
-		return id;
-	}
-	
-	/**
-	 * sets the ID of the fragment.
-	 * @param value The new value to apply (can be null).
-	 */
-	public void setID (String value) {
-		id = value;
-	}
-
 	public boolean hasReference () {
 		if ( codes == null ) return false;
 		for ( Code code : codes ) {
@@ -655,8 +653,7 @@ public class TextFragment implements Comparable<Object> {
 	public TextFragment subSequence (int start,
 		int end)
 	{
-		TextFragment sub = new TextFragment();
-		sub.parent = this.parent;
+		TextFragment sub = new TextFragment(parent);
 		if ( isEmpty() ) return sub;
 		StringBuilder tmpText = new StringBuilder(getCodedText(start, end));
 		ArrayList<Code> tmpCodes = null;
@@ -1038,13 +1035,14 @@ public class TextFragment implements Comparable<Object> {
 		String language)
 	{
 		Property prop = unit.getProperty(name);
+		if ( prop == null ) return "-ERR:NO-SUCH-PROP-";
 		String value;
 		if ( language == null ) {
 			value = prop.getValue();
 		}
 		else {
 			prop = (Property)prop.getAnnotation(language);
-			if ( prop == null ) return "-ERR:NO-TARGET-PROP-";
+			if ( prop == null ) return unit.getProperty(name).getValue(); // Fall back to source
 			value = prop.getValue();
 		}
 		if ( value == null ) return "-ERR:PROP-NOT-FOUND-";

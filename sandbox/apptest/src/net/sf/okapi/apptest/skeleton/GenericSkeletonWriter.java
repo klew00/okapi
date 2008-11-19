@@ -198,17 +198,7 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 			groupStack.peek().add(unit);
 		}
 		else if ( !unit.isReferent() ) {
-			TextFragment tf;
-			if ( language == null ) tf = unit.getContent();
-			else { // TODO: any better way?
-				if ( unit.getAnnotation(language) == null ) {
-					tf = unit.getContent();
-				}
-				else {
-					tf = ((TextUnit)unit.getAnnotation(language)).getContent();
-				}
-			}
-			writer.write(tf.toString(this));
+			writer.write(unit.toString(this));
 		}
 	}
 

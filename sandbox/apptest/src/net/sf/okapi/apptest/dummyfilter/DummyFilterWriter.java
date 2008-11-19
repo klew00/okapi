@@ -64,16 +64,6 @@ public class DummyFilterWriter implements IFilterWriter {
 			System.out.println("   id="+ending.getId());
 			System.out.println("}");
 			break;
-//		case SKELETON_UNIT:
-//			su = (SkeletonUnit)event.getResource();
-//			System.out.println("skeleton-unit={");
-//			System.out.println("   id="+su.getID());
-//			if ( su.isReference() ) {
-//				System.out.println("   isReference="+su.isReference());
-//			}
-//			System.out.println("   data="+out(su.toString()));
-//			System.out.println("}");
-//			break;
 		case TEXT_UNIT:
 			tu = (TextUnit)event.getResource();
 			System.out.println("text-unit={");

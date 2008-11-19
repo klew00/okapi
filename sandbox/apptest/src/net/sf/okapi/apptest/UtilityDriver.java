@@ -14,6 +14,7 @@ import net.sf.okapi.apptest.pipeline.PipelineReturnValue;
 import net.sf.okapi.apptest.pipelineutil.FilterStep;
 import net.sf.okapi.apptest.pipelineutil.FilterWriterStep;
 import net.sf.okapi.apptest.pipelineutil.UtilityStep;
+import net.sf.okapi.apptest.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.apptest.skeleton.RTFFilterWriter;
 import net.sf.okapi.apptest.utilities.IUtility;
 import net.sf.okapi.common.ui.Dialogs;
@@ -39,16 +40,21 @@ public class UtilityDriver {
 			inFilter = new DummyFilter();
 			util = new PseudoTranslate();
 			outFilter = new DummyFilterWriter();
-			genWriter = new RTFFilterWriter();
+			
+			genWriter = new GenericSkeletonWriter();
+			String ext = ".txt";
+			String srcLang = "en";
+			String trgLang = "en-bz";
 
-			// Set the options 
-			inFilter.setOptions("en", "UTF-8", true);
-			outFilter.setOptions("en-bz", "UTF-8");
+			// Set the options
+			util.setOptions(trgLang);
+			inFilter.setOptions(srcLang, "UTF-8", true);
+			outFilter.setOptions(trgLang, "UTF-8");
 			outFilter.setOutput("myOutputFile");
-			genWriter.setOptions("en-bz", "windows-1252");
-			genWriter.setOutput("genericOutput.txt");
-			((RTFFilterWriter)genWriter).setOutputTarget(true);
-			((RTFFilterWriter)genWriter).setEncoder(inFilter.getEncoder());
+			genWriter.setOptions(trgLang, "windows-1252");
+			genWriter.setOutput("genericOutput"+ext);
+			((GenericSkeletonWriter)genWriter).setOutputTarget(true);
+			((GenericSkeletonWriter)genWriter).setEncoder(inFilter.getEncoder());
 
 			// Process
 			FilterEvent event;

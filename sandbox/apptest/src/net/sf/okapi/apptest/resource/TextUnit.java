@@ -11,7 +11,7 @@ public class TextUnit extends BaseResource {
 	private Hashtable<String, Property> properties;
 	
 	public TextUnit () {
-		source = new TextFragment();
+		source = new TextFragment(this);
 		annotations = new Hashtable<String, Object>();
 		properties = new Hashtable<String, Property>();
 	}
@@ -24,9 +24,9 @@ public class TextUnit extends BaseResource {
 
 	public TextUnit (String id,
 		String sourceText,
-		boolean isReference)
+		boolean isReferent)
 	{
-		create(id, sourceText, isReference);
+		create(id, sourceText, isReferent);
 	}
 
 	private void create (String id,
@@ -35,16 +35,31 @@ public class TextUnit extends BaseResource {
 	{
 		this.id = id;
 		this.isReferent = isReferent;
-		source = new TextFragment();
+		source = new TextFragment(this);
 		annotations = new Hashtable<String, Object>();
 		properties = new Hashtable<String, Property>();
 		if ( sourceText != null ) source.append(sourceText);
-		source.id = id;
 	}
 
+	@Override
+	public String toString () {
+		return source.toString();
+	}
+	
 	public String toString (IWriterHelper writerHelper) {
-		//TODO: handle target choice
-		return source.toString(writerHelper);
+		TextFragment tf;
+		if ( writerHelper.getLanguage() == null ) {
+			tf = source;
+		}
+		else { // TODO: any better way?
+			if ( getAnnotation(writerHelper.getLanguage()) == null ) {
+				tf = source;
+			}
+			else {
+				tf = ((TextUnit)getAnnotation(writerHelper.getLanguage())).getContent();
+			}
+		}
+		return tf.toString(writerHelper);
 	}
 
 	public TextFragment getContent () {

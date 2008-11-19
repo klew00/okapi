@@ -52,7 +52,7 @@ public class GenericSkeletonPart implements ISkeletonPart, IReferenceable, IReso
 							tf = tu.getContent();
 						}
 						else {
-							tf = (TextFragment)tu.getAnnotation(refProv.getLanguage());
+							tf = ((TextUnit)tu.getAnnotation(refProv.getLanguage())).getContent();
 						}
 					}
 					if ( propName == null )

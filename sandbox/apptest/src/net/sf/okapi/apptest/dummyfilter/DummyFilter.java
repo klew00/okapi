@@ -95,15 +95,11 @@ public class DummyFilter implements IFilter {
 		DocumentPart dp = new DocumentPart("dp1", true);
 		dp.setProperty(new Property("href", "img.png", true));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text", true)));
 
-		TextUnit tu = new TextUnit();
-		tu.setId("t2");
-		tu.setIsReferent(true);
-		TextFragment tf = new TextFragment();
-		tf.append("Before ");
+		TextUnit tu = new TextUnit("t2", "before ", true);
+		TextFragment tf = tu.getContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "image",
 			"<img href='" + TextFragment.makeRefMarker("dp1","href") +
 			"' alt='" + TextFragment.makeRefMarker("t1") + "'/>");
@@ -130,7 +126,7 @@ public class DummyFilter implements IFilter {
 
 		TextUnit tu = new TextUnit();
 		tu.setId("t1");
-		TextFragment tf = new TextFragment();
+		TextFragment tf = new TextFragment(tu);
 		tf.append("Before ");
 		Code code = tf.append(TagType.PLACEHOLDER, "link",
 			"<a href='" + TextFragment.makeRefMarker("dp1","href") + "'/>");
@@ -207,7 +203,7 @@ public class DummyFilter implements IFilter {
 
 		TextUnit tu = new TextUnit();
 		tu.setId("t3");
-		TextFragment tf = new TextFragment();
+		TextFragment tf = new TextFragment(tu);
 		tf.append("Text before list: \n ");
 		Code code = tf.append(TagType.PLACEHOLDER, "list", TextFragment.makeRefMarker("g1"));
 		code.setHasReference(true);
@@ -233,10 +229,10 @@ public class DummyFilter implements IFilter {
 		docRes.setLanguage(language);
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
-		makeCase001();
+		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		//makeCase004();
+		makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));

@@ -6,6 +6,8 @@ public interface IUtility {
 
 	public String getName ();
 	
+	public void setOptions (String targetLanguage);
+	
 	public void doProlog ();
 	
 	public void handleEvent (FilterEvent event);

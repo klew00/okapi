@@ -7,6 +7,8 @@ import net.sf.okapi.apptest.utilities.IUtility;
 
 public class PseudoTranslate implements IUtility {
 
+	private String trgLang;
+	
 	public String getName () {
 		return "PseudoTranlate";
 	}
@@ -24,16 +26,16 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		TextUnit trgTu = (TextUnit)tu.getAnnotation("fr");
+		TextUnit trgTu = (TextUnit)tu.getAnnotation(trgLang);
 		TextFragment tf = null;
 		if ( trgTu != null ) {
-			tf = ((TextUnit)tu.getAnnotation("fr")).getContent();
+			tf = ((TextUnit)tu.getAnnotation(trgLang)).getContent();
 		}
 		if ( trgTu == null ) {
 			tf = tu.getContent().clone();
 			trgTu = new TextUnit();
 			trgTu.setContent(tf);
-			tu.setAnnotation("fr", trgTu);
+			tu.setAnnotation(trgLang, trgTu);
 		}
 		tf.setCodedText(
 			tu.getContent().getCodedText().replace("e", "\u00CA"));
@@ -47,6 +49,10 @@ public class PseudoTranslate implements IUtility {
 	public void doProlog () {
 		// Nothing to do in this utility
 		System.out.println("PseudoTranlate: doProlog() called");
+	}
+
+	public void setOptions (String targetLanguage) {
+		trgLang = targetLanguage;
 	}
 
 }
