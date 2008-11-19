@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Jim Hargrave                                           */
+/* Copyright (C) 2008 Jim Hargrave, Dan Higinbotham                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -44,21 +44,19 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.GroovyFilterConfiguration;
-import net.sf.okapi.common.filters.IParser;
-import net.sf.okapi.common.filters.BaseParser;
-import net.sf.okapi.common.filters.IParser.ParserTokenType;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
-import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 //import net.sf.okapi.filters.openxml.tests.OpenXMLParserTest;
 import net.sf.okapi.filters.openxml.ExtractionRuleState;
 import net.sf.okapi.filters.openxml.ExtractionRule.EXTRACTION_RULE_TYPE;
 
-public class OpenXMLParser extends BaseParser {
+public class OpenXMLParser extends BaseFilter {
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
@@ -270,9 +268,10 @@ public class OpenXMLParser extends BaseParser {
 		return getFinalizedToken();
 	}
 	
-	public ParserTokenType parseNext() {
+	public FilterEvent next() {
 		if (isFinishedParsing()) {
-			return ParserTokenType.ENDINPUT;
+			setDone();
+			return new FilterEvent(FilterEventType.FINISHED);
 		}
 	
 		// reset state flags and buffers
@@ -322,7 +321,7 @@ public class OpenXMLParser extends BaseParser {
 		}
 	
 		if (isCanceled()) {
-			return getFinalizedTokenType();
+			return new FilterEvent(getFinalizedTokenType(), getResource());
 		}
 	
 		if (!nodeIterator.hasNext()) {
@@ -332,7 +331,7 @@ public class OpenXMLParser extends BaseParser {
 		}
 	
 		// return our finalized token
-		return getFinalizedTokenType();
+		return new FilterEvent(getFinalizedTokenType(), getResource());
 	}
 	
 	private void handleCdataSection(Tag tag) {
@@ -510,5 +509,22 @@ public class OpenXMLParser extends BaseParser {
 			tagType = TextFragment.TagType.PLACEHOLDER;
 		}
 		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
+	}
+
+	public String getName() {
+		return "HTMLFilter";
+	}
+
+	public IParameters getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setOptions(String language, String defaultEncoding) {
+		// TODO Auto-generated method stub		
+	}
+
+	public void setParameters(IParameters params) {
+		// TODO Auto-generated method stub	
 	}
 }

@@ -26,7 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.TreeMap;
 import java.util.Iterator;
 
-import net.sf.okapi.common.filters.IParser;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
 import net.sf.okapi.common.resource.SkeletonUnit;
@@ -100,6 +102,50 @@ public class OpenXMLParserTest {
 	
 	public void spitOutResources()
 	{
+		FilterEvent event;
+		String sText,sIText;
+		IContainable item=null;
+		while ((event = openXMLParser.next()).getEventType() != FilterEventType.FINISHED)
+		{
+			item = openXMLParser.getResource();
+			if (event.getEventType() == FilterEventType.TEXT_UNIT)
+			{
+				assertTrue(item instanceof TextUnit);
+				//assertEquals(item.toString(), "Text should be included. <b>");
+				sIText = item.toString();
+				sText = gotMilk(sIText); // has some text in it and not just tags
+				if (!sText.equals("")) // DWH 10-13-08
+				{
+					outSkeleton();
+					System.out.println("Text:");
+					assertNotNull(item);
+					System.out.println(sText);
+				}
+			}
+			else if (event.getEventType() == FilterEventType.SKELETON_UNIT)
+			{
+				assertTrue(item instanceof SkeletonUnit);
+//				System.out.println("Skeleton:");
+				assertNotNull(item);
+				sIText = item.toString();
+				sSkeletonSave = sSkeletonSave + sIText;
+			} 
+		    else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP)
+			{
+				assertTrue(item instanceof Group);
+				outSkeleton();
+				System.out.println("Group:");
+				assertNotNull(item);
+				sIText = item.toString();
+				System.out.println(sIText);
+			}
+		}
+		outSkeleton();
+		openXMLParser.resetParse(); // get it ready to do another document
+	}
+/* IParser version
+	public void spitOutResources()
+	{
 		IParser.ParserTokenType tokenType;
 		String sText,sIText;
 		IContainable item=null;
@@ -140,6 +186,7 @@ public class OpenXMLParserTest {
 		outSkeleton();
 		openXMLParser.resetParse(); // get it ready to do another document
 	}
+*/
 	private String gotMilk(String sCheese) // true if there is text and not just tags
 	{
 		boolean bInTag=false;

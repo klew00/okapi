@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.htmlparser.jericho.Attribute;
+import net.sf.okapi.common.filters.IllegalConditionalAttributeMatchTypeException;
 
 /**
  * A conditional attribute is used to test extraction of elements or attributes.
