@@ -16,16 +16,16 @@ public class DummyFilterWriter implements IFilterWriter {
 	private String language;
 	private String defaultEncoding;
 
-	public void close() {
+	public void close () {
 		System.out.println("DummyFilterWriter: close() called");
 		reset();
 	}
 
-	public String getName() {
+	public String getName () {
 		return "DummyFilterWriter";
 	}
 
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return null;
 	}
 
@@ -95,7 +95,7 @@ public class DummyFilterWriter implements IFilterWriter {
 		return "["+text.replace("\n", "\\n")+"]";
 	}
 
-	public void setOptions(String language,
+	public void setOptions (String language,
 		String defaultEncoding)
 	{
 		this.language = language;
@@ -105,13 +105,13 @@ public class DummyFilterWriter implements IFilterWriter {
 		System.out.println(" -output default encoding = " + this.defaultEncoding);
 	}
 
-	public void setOutput(String path) {
+	public void setOutput (String path) {
 		outputPath = path;
 		System.out.println("DummyFilterWriter: setOutput(path) called");
 		System.out.println(" -output path = " + outputPath);
 	}
 
-	public void setOutput(OutputStream output) {
+	public void setOutput (OutputStream output) {
 		System.out.println("DummyFilterWriter: setOutput(OutputStream) called");
 	}
 

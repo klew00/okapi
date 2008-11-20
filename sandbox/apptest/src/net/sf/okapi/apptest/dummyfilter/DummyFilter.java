@@ -20,7 +20,6 @@ import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
 import net.sf.okapi.apptest.skeleton.GenericSkeleton;
-import net.sf.okapi.apptest.skeleton.GenericSkeletonProvider;
 
 public class DummyFilter implements IFilter {
 
@@ -29,7 +28,6 @@ public class DummyFilter implements IFilter {
 	private boolean canceled;
 	private String language;
 	private IEncoder encoder;
-	private GenericSkeletonProvider skelProv;
 	
 	public DummyFilter () {
 		encoder = new DummyEncoder();
@@ -106,7 +104,7 @@ public class DummyFilter implements IFilter {
 		code.setHasReference(true);
 		tf.append(" after.");
 		tu.setContent(tf);
-		GenericSkeleton skel = skelProv.createSkeleton();
+		GenericSkeleton skel = new GenericSkeleton();
 		skel.add("<p>");
 		skel.addRef("t2");
 		skel.add("</p>");
@@ -116,9 +114,9 @@ public class DummyFilter implements IFilter {
 	
 	private void makeCase002 () {
 		// <p>Before <a href='link.htm'/> after.</p>
-		StartGroup grp1 = new StartGroup(null, "g1");
+		StartGroup grp1 = new StartGroup("d1", "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			skelProv.createSkeleton("<p>")));
+			new GenericSkeleton("<p>")));
 
 		DocumentPart dp = new DocumentPart("dp1", true);
 		dp.setProperty(new Property("href", "link.htm", true));
@@ -137,90 +135,88 @@ public class DummyFilter implements IFilter {
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			skelProv.createSkeleton("</p>\n")));
+			new GenericSkeleton("</p>\n")));
 	}
 	
 	private void makeCase003 () {
 		// <table id=100> <tr><td>text</td></tr><table>
-		StartGroup grp1 = new StartGroup(null, "g1");
+		StartGroup grp1 = new StartGroup("d1", "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			skelProv.createSkeleton("<table id=100>\n ")));
+			new GenericSkeleton("<table id=100>\n ")));
 
 		StartGroup grp2 = new StartGroup("g1", "g2");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
-			skelProv.createSkeleton("<tr>")));
+			new GenericSkeleton("<tr>")));
 		
 		StartGroup grp3 = new StartGroup("g2", "g3");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
-			skelProv.createSkeleton("<td>")));
+			new GenericSkeleton("<td>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g3"),
-			skelProv.createSkeleton("</td>")));
+			new GenericSkeleton("</td>")));
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g2"),
-			skelProv.createSkeleton("</tr>\n")));
+			new GenericSkeleton("</tr>\n")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			skelProv.createSkeleton("</table>\n")));
+			new GenericSkeleton("</table>\n")));
 	}
 
 	private void makeCase004 () {
-		StartGroup grp1 = new StartGroup(null, "g1", true);
+		StartGroup grp1 = new StartGroup("d1", "g1", true);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-				skelProv.createSkeleton("<ul>", true)));
+			new GenericSkeleton("<ul>", true)));
 		
-		StartGroup grp2 = new StartGroup(null, "g2", false);
+		StartGroup grp2 = new StartGroup("g1", "g2", false);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,
-				skelProv.createSkeleton("\n  <li>")));
+			new GenericSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "Text of item 1 with special char < and &.")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g2"),
-			skelProv.createSkeleton("</li>")));
+			new GenericSkeleton("</li>")));
 		
-		StartGroup grp3 = new StartGroup(null, "g3", false);
+		StartGroup grp3 = new StartGroup("g1", "g3", false);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp3,
-				skelProv.createSkeleton("\n  <li>")));
+			new GenericSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t2", "Text of item 2")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g3"),
-			skelProv.createSkeleton("</li>")));
+			new GenericSkeleton("</li>")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("g1"),
-			skelProv.createSkeleton("\n </ul>")));
+			new GenericSkeleton("\n </ul>")));
 
 		TextUnit tu = new TextUnit();
 		tu.setId("t3");
 		TextFragment tf = new TextFragment(tu);
 		tf.append("Text before list: \n ");
-		Code code = tf.append(TagType.PLACEHOLDER, "list", TextFragment.makeRefMarker("g1"));
+		Code code = tf.append(TagType.PLACEHOLDER, "list",
+			TextFragment.makeRefMarker("g1"));
 		code.setHasReference(true);
 		tf.append("\n and text after the list.");
 		tu.setContent(tf);
-		GenericSkeleton skel = skelProv.createSkeleton("<p>");
+		GenericSkeleton skel = new GenericSkeleton("<p>");
 		skel.addRef("t3");
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
-
 	}
 	
 	private void resetResources () {
 		canceled = false;
 		current = -1;
-		
-		skelProv = new GenericSkeletonProvider();
 		list = new ArrayList<FilterEvent>();
 		
 		StartDocument docRes = new StartDocument();

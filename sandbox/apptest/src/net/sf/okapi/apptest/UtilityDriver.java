@@ -15,7 +15,6 @@ import net.sf.okapi.apptest.pipelineutil.FilterStep;
 import net.sf.okapi.apptest.pipelineutil.FilterWriterStep;
 import net.sf.okapi.apptest.pipelineutil.UtilityStep;
 import net.sf.okapi.apptest.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.apptest.skeleton.RTFFilterWriter;
 import net.sf.okapi.apptest.utilities.IUtility;
 import net.sf.okapi.common.ui.Dialogs;
 
@@ -53,7 +52,6 @@ public class UtilityDriver {
 			outFilter.setOutput("myOutputFile");
 			genWriter.setOptions(trgLang, "windows-1252");
 			genWriter.setOutput("genericOutput"+ext);
-			((GenericSkeletonWriter)genWriter).setOutputTarget(true);
 			((GenericSkeletonWriter)genWriter).setEncoder(inFilter.getEncoder());
 
 			// Process

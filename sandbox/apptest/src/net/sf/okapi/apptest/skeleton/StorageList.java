@@ -6,6 +6,7 @@ import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.filters.IWriterHelper;
+import net.sf.okapi.apptest.resource.StartGroup;
 
 public class StorageList extends ArrayList<IResource>
 	implements IResource, IReferenceable {
@@ -13,13 +14,18 @@ public class StorageList extends ArrayList<IResource>
 	private static final long serialVersionUID = 1L;
 	
 	private String id;
+	private boolean isReferent;
 
+	public StorageList (StartGroup startGroup) {
+		id = startGroup.getId();
+		isReferent = startGroup.isReferent();
+		
+	}
+	
 	public String toString (IWriterHelper writerHelper) {
 		return mergeList(this, writerHelper);
 	}
 
-	private boolean isReference;
-	
 	public String getId () {
 		return id;
 	}
@@ -29,11 +35,11 @@ public class StorageList extends ArrayList<IResource>
 	}
 
 	public boolean isReferent () {
-		return isReference;
+		return isReferent;
 	}
 
 	public void setIsReferent (boolean value) {
-		isReference = value;
+		isReferent = value;
 	}
 
 	public ISkeleton getSkeleton () {

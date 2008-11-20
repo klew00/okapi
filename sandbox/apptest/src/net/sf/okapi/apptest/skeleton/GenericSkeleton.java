@@ -15,8 +15,24 @@ public class GenericSkeleton implements ISkeleton, IResource {
 	private String idText;
 	
 	public GenericSkeleton () {
+		create(null, false);
+	}
+
+	public GenericSkeleton (String data) {
+		create(data, false);
+	}
+
+	public GenericSkeleton (String data, boolean isReferent) {
+		create(data, isReferent);
+	}
+	
+	private void create (String data, boolean isReferent) {
 		list = new ArrayList<GenericSkeletonPart>();
 		id = 0;
+		if ( data != null ) {
+			add(data);
+			list.get(0).setIsReferent(isReferent);
+		}
 	}
 
 	public String toString (IWriterHelper writerHelper) {

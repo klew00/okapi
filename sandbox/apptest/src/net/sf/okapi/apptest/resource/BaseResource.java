@@ -3,11 +3,12 @@ package net.sf.okapi.apptest.resource;
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
 
+import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
 
-public abstract class BaseResource implements IResource, IReferenceable {
+public abstract class BaseResource implements IResource, INameable, IReferenceable {
 
 	protected String id;
 	protected ISkeleton skeleton;

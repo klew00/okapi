@@ -36,7 +36,6 @@ public class RTFFilterWriter implements IFilterWriter, IWriterHelper {
 	private OutputStreamWriter writer;
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, IResource> references;
-	private boolean outputTarget;
 	private String language;
 	private IEncoder encoder;
 	private CharsetEncoder charEncoder;
@@ -68,10 +67,6 @@ public class RTFFilterWriter implements IFilterWriter, IWriterHelper {
 		return params;
 	}
 
-	public void setOutputTarget (boolean value) {
-		outputTarget = value;
-	}
-	
 	public void setEncoder (IEncoder encoder) {
 		this.encoder = encoder;
 	}
@@ -172,11 +167,11 @@ public class RTFFilterWriter implements IFilterWriter, IWriterHelper {
 	private void processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			references.put(resource.getId(), resource);
-			storageStack.push(new StorageList());
+			storageStack.push(new StorageList(resource));
 		}
 		else if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
-			storageStack.push(new StorageList());
+			storageStack.push(new StorageList(resource));
 		}
 	}
 	
@@ -251,10 +246,6 @@ public class RTFFilterWriter implements IFilterWriter, IWriterHelper {
 		return (IReferenceable)references.get(id);
 	}
 
-	public boolean useTarget() {
-		return outputTarget;
-	}
-	
 	public String encode (String text) {
 		if ( encoder == null ) return text;
 		return encoder.encode(text);

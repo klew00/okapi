@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.ISkeletonPart;
 import net.sf.okapi.apptest.filters.IWriterHelper;
@@ -965,7 +966,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @return The data for the code, including any sub-flows data.
 	 */
 	private String expandCodeContent (Code code,
-		IWriterHelper refProv)
+		IWriterHelper helper)
 	{
 		if ( !code.hasReference ) return code.data;
 		if ( parent == null ) {
@@ -983,46 +984,52 @@ public class TextFragment implements Comparable<Object> {
 			int start = (Integer)marker[1];
 			int end = (Integer)marker[2];
 			String propName = (String)marker[3];
-			IReferenceable ref = refProv.getReference((String)marker[0]);
+			IReferenceable ref = helper.getReference((String)marker[0]);
 			if ( ref == null ) {
+				//TODO: better error handling
 				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else {
-				TextFragment tf;
 				if ( ref instanceof TextUnit ) {
-					TextUnit tu = (TextUnit)ref;
-					if ( refProv.getLanguage() == null ) {
-						tf = tu.getContent();
-					}
-					else if ( tu.getAnnotation(refProv.getLanguage()) == null ) {
-						tf = tu.getContent();
+					if ( propName == null ) {
+						TextUnit tu = (TextUnit)ref;
+						TextFragment tf;
+						if ( helper.getLanguage() == null ) {
+							tf = tu.getContent();
+						}
+						else if ( tu.getAnnotation(helper.getLanguage()) == null ) {
+							tf = tu.getContent();
+						}
+						else {
+							tf = ((TextUnit)tu.getAnnotation(helper.getLanguage())).getContent();
+						}
+						tmp.replace(start, end, tf.toString(helper));
 					}
 					else {
-						tf = ((TextUnit)tu.getAnnotation(refProv.getLanguage())).getContent();
+						tmp.replace(start, end,
+							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
 					}
-					if ( propName == null )
-						tmp.replace(start, end, tf.toString(refProv));
-					else
-						tmp.replace(start, end, "propVALUE-TODO");
 				}
 				else if ( ref instanceof ISkeletonPart ) {
 					if ( propName == null )
-						tmp.replace(start, end, ref.toString(refProv));
+						tmp.replace(start, end, ref.toString(helper));
 					else
-						tmp.replace(start, end, "propValue-TODO");
+						tmp.replace(start, end,
+							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
 				}
 				else if ( ref instanceof StartGroup ) {
 					if ( propName == null )
-						tmp.replace(start, end, ref.toString(refProv));
+						tmp.replace(start, end, ref.toString(helper));
 					else
-						tmp.replace(start, end, "propValue-TODO");
+						tmp.replace(start, end,
+							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
 				}
 				else if ( ref instanceof DocumentPart ) {
 					if ( propName == null )
-						tmp.replace(start, end, "-TODO-");
+						tmp.replace(start, end, "-TODO-"); //TODO
 					else {
 						tmp.replace(start, end,
-							getPropertyValue((DocumentPart)ref, propName, refProv.getLanguage()));
+							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
 					}
 				}
 			}
@@ -1030,7 +1037,7 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 	
-	private String getPropertyValue (DocumentPart unit,
+	private String getPropertyValue (INameable unit,
 		String name,
 		String language)
 	{

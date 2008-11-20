@@ -20,7 +20,6 @@ import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.filters.IWriterHelper;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.StartGroup;
-import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
 
@@ -31,9 +30,8 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 	private String outputPath;
 	private IParameters params;
 	private OutputStreamWriter writer;
-	private Stack<StorageList> groupStack;
+	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, IResource> references;
-	private boolean outputTarget;
 	private IEncoder encoder;
 	private String language;
 	
@@ -62,10 +60,6 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 		return params;
 	}
 
-	public void setOutputTarget (boolean value) {
-		outputTarget = value;
-	}
-	
 	public void setEncoder (IEncoder encoder) {
 		this.encoder = encoder;
 	}
@@ -96,7 +90,7 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 				processEndGroup();
 				break;
 			case TEXT_UNIT:
-				writeTextUnit((TextUnit)event.getResource());
+				processTextUnit((TextUnit)event.getResource());
 				processSkeleton(event.getResource().getSkeleton());
 				break;
 			case DOCUMENT_PART:
@@ -145,8 +139,8 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 			if ( part.isReferent() ) {
 				references.put(part.getId(), part);
 			}
-			if ( groupStack.size() > 0 ) {
-				groupStack.peek().add(part);
+			if ( storageStack.size() > 0 ) {
+				storageStack.peek().add(part);
 			}
 			else if ( !part.isReferent() ) {
 				writer.write(part.toString(this));
@@ -158,25 +152,25 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 		if ( resource.isReferent() ) {
 			references.put(resource.getId(), resource);
 		}
-		else if ( groupStack.size() > 0 ) {
-			groupStack.peek().add(resource);
+		else if ( storageStack.size() > 0 ) {
+			storageStack.peek().add(resource);
 		}
 	}
 	
 	private void processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			references.put(resource.getId(), resource);
-			groupStack.push(new StorageList());
+			storageStack.push(new StorageList(resource));
 		}
-		else if ( groupStack.size() > 0 ) {
-			groupStack.peek().add(resource);
-			groupStack.push(new StorageList());
+		else if ( storageStack.size() > 0 ) {
+			storageStack.peek().add(resource);
+			storageStack.push(new StorageList(resource));
 		}
 	}
 	
 	private void processEndGroup () {
-		if ( groupStack.size() > 0 ) {
-			groupStack.pop();
+		if ( storageStack.size() > 0 ) {
+			storageStack.pop();
 		}
 	}
 	
@@ -187,15 +181,15 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 		}
 		writer = new OutputStreamWriter(output, encoding);
 		Util.writeBOMIfNeeded(writer, true, encoding);
-		groupStack = new Stack<StorageList>();
+		storageStack = new Stack<StorageList>();
 	}
 	
-	private void writeTextUnit (TextUnit unit) throws IOException {
+	private void processTextUnit (TextUnit unit) throws IOException {
 		if ( unit.isReferent() ) {
 			references.put(unit.getId(), unit);
 		}
-		if ( groupStack.size() > 0 ) {
-			groupStack.peek().add(unit);
+		if ( storageStack.size() > 0 ) {
+			storageStack.peek().add(unit);
 		}
 		else if ( !unit.isReferent() ) {
 			writer.write(unit.toString(this));
@@ -207,10 +201,6 @@ public class GenericSkeletonWriter implements IFilterWriter, IWriterHelper {
 		return (IReferenceable)references.get(id);
 	}
 
-	public boolean useTarget() {
-		return outputTarget;
-	}
-	
 	public String encode (String text) {
 		if ( encoder == null ) return text;
 		return encoder.encode(text);

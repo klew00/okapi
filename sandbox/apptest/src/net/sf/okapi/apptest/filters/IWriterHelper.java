@@ -16,12 +16,6 @@ public interface IWriterHelper {
 	public IReferenceable getReference (String id);
 	
 	/**
-	 * Indicates if the current output should use the target data (vs. source).
-	 * @return True if the output is the target.
-	 */
-	public boolean useTarget ();
-	
-	/**
 	 * Encodes/escapes a text to conform to the original format.
 	 * For example a '<' would be escaped to '&lt;' for an encoder that would
 	 * implements an XML/HTML original format.
