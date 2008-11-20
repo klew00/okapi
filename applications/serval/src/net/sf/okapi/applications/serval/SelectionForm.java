@@ -6,6 +6,7 @@ import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
+import net.sf.okapi.tm.simpletm.TradosTMConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,6 +41,7 @@ public class SelectionForm {
 		lbResources.add("Google MT (Internet)");
 		lbResources.add("SimpleTM local translation memory file");
 		lbResources.add("Open-Tran translation search server (Internet)");
+		lbResources.add("Trados TM local translation memory");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -60,6 +62,9 @@ public class SelectionForm {
 						break;
 					case 2: // Open-Tran
 						result = new OpenTranTMConnector();
+						break;
+					case 3: // Trados TM
+						result = new TradosTMConnector();
 						break;
 					}
 				}
