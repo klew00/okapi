@@ -11,7 +11,7 @@ public class TargetsAnnotation implements IAnnotation, Iterable<String> {
 	}
 
 	public void add(String locale, String segment) {
-		targets.putIfAbsent(locale, segment);
+		targets.put(locale, segment);
 	}
 
 	public String get(String locale) {
