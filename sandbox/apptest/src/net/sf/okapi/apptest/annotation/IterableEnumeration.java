@@ -3,6 +3,13 @@ package net.sf.okapi.apptest.annotation;
 import java.util.Enumeration;
 import java.util.Iterator;
 
+/**
+ * 
+ * Wrap an Enumeration and make it compatible with new Iterators. Useful for
+ * dealing with old style API's.
+ * 
+ * @param <T>
+ */
 class IterableEnumeration<T> implements Iterable<T> {
 	private final Enumeration<T> en;
 
