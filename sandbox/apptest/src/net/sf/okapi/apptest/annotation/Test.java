@@ -26,7 +26,9 @@ public class Test {
 		ta = annotations.get(TargetsAnnotation.class);
 		for (String s : ta) {
 			System.out.println(s);
+			System.out.println(ta.get(s));
 		}
+		
 
 		// String sa = annotations.get(String.class); // note the compiler
 		// doesn't like this, must implement IAnnotation
