@@ -4,19 +4,21 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.apptest.common.IAnnotation;
+import net.sf.okapi.apptest.resource.TextUnit;
 
 public class TargetsAnnotation implements IAnnotation, Iterable<String> {
-	private ConcurrentHashMap<String, String> targets;
+
+	private ConcurrentHashMap<String, TextUnit> targets;
 
 	public TargetsAnnotation() {
-		targets = new ConcurrentHashMap<String, String>();
+		targets = new ConcurrentHashMap<String, TextUnit>();
 	}
 
-	public void add(String locale, String segment) {
-		targets.put(locale, segment);
+	public void set (String locale, TextUnit textUnit) {
+		targets.put(locale, textUnit);
 	}
 
-	public String get(String locale) {
+	public TextUnit get (String locale) {
 		return targets.get(locale);
 	}
 
@@ -24,9 +26,6 @@ public class TargetsAnnotation implements IAnnotation, Iterable<String> {
 		return targets.isEmpty();
 	}
 
-	/*
-	 * Iterate over all locales
-	 */
 	public Iterator<String> iterator() {
 		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
 		return iterableLocales.iterator();

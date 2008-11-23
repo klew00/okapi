@@ -61,14 +61,12 @@ public class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
-	public IAnnotation getAnnotation(String name) {
-		return startGroup.getAnnotation(name);
+	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		return startGroup.getAnnotation(type);
 	}
 
-	public void setAnnotation (String name,
-		IAnnotation object)
-	{
-		startGroup.setAnnotation(name, object);
+	public void setAnnotation (IAnnotation annotation) {
+		startGroup.setAnnotation(annotation);
 	}
 
 }

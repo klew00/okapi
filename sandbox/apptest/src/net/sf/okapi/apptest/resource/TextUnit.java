@@ -1,8 +1,6 @@
 package net.sf.okapi.apptest.resource;
 
-import net.sf.okapi.apptest.common.IAnnotation;
-
-public class TextUnit extends BaseReferenceable implements IAnnotation {
+public class TextUnit extends BaseReferenceable {
 
 	private TextFragment source;
 	

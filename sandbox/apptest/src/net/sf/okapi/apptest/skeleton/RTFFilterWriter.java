@@ -1,12 +1,6 @@
 package net.sf.okapi.apptest.skeleton;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.Stack;
 
 import net.sf.okapi.common.Util;
 

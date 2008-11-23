@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.IReferenceable;
@@ -47,6 +48,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	
 	public void close () {
 		try {
+			referents.clear();
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
@@ -347,12 +349,18 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		if ( language == null ) {
 			tf = tu.getContent();
 		}
-		else { // TODO: any better way?
-			if ( tu.getAnnotation(language) == null ) {
+		else {
+			if ( tu.getAnnotation(TargetsAnnotation.class) == null ) {
 				tf = tu.getContent();
 			}
 			else {
-				tf = ((TextUnit)tu.getAnnotation(language)).getContent();
+				TextUnit trgTu = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(language);
+				if ( trgTu == null ) {
+					tf = tu.getContent();
+				}
+				else {
+					tf = trgTu.getContent();
+				}
 			}
 		}
 		return getContent(tf);

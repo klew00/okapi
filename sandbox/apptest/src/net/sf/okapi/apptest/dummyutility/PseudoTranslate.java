@@ -1,12 +1,12 @@
 package net.sf.okapi.apptest.dummyutility;
 
+import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.utilities.IUtility;
-import net.sf.okapi.common.filters.FilterEventType;
 
 public class PseudoTranslate implements IUtility {
 
@@ -35,21 +35,28 @@ public class PseudoTranslate implements IUtility {
 		if ( !prop.isWriteable() ) return; // Can't modify it
 		// Else: localize the href value
 		
-		
-		
+		//TODO: add annotation for properties
 	}
 	
 	private void processTU (TextUnit tu) {
-		TextUnit trgTu = (TextUnit)tu.getAnnotation(trgLang);
+		TargetsAnnotation ta = tu.getAnnotation(TargetsAnnotation.class);
+		TextUnit trgTu = null;
 		TextFragment tf = null;
-		if ( trgTu != null ) {
-			tf = ((TextUnit)tu.getAnnotation(trgLang)).getContent();
+		if ( ta != null ) {
+			trgTu = ta.get(trgLang);
+			if ( trgTu != null ) {
+				tf = trgTu.getContent();
+			}
 		}
 		if ( trgTu == null ) {
 			tf = tu.getContent().clone();
 			trgTu = new TextUnit();
 			trgTu.setContent(tf);
-			tu.setAnnotation(trgLang, trgTu);
+			if ( ta == null ) {
+				ta = new TargetsAnnotation();
+				tu.setAnnotation(ta);
+			}
+			ta.set(trgLang, trgTu);
 		}
 		tf.setCodedText(
 			tu.getContent().getCodedText().replace("e", "\u00CA"));

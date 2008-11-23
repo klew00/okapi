@@ -3,6 +3,7 @@ package net.sf.okapi.apptest.resource;
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
 
+import net.sf.okapi.apptest.annotation.Annotations;
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IResource;
@@ -14,10 +15,10 @@ public class BaseNameable implements IResource, INameable {
 	protected ISkeleton skeleton;
 	protected String name;
 	protected Hashtable<String, Property> properties;
-	protected Hashtable<String, IAnnotation> annotations;
+	protected Annotations annotations;
 	
 	public BaseNameable () {
-		annotations = new Hashtable<String, IAnnotation>();
+		annotations = new Annotations();
 	}
 	
 	public String getId () {
@@ -56,14 +57,13 @@ public class BaseNameable implements IResource, INameable {
 		properties.put(property.getName(), property);
 	}
 
-	public IAnnotation getAnnotation (String name) {
-		return annotations.get(name);
+	@SuppressWarnings("unchecked")
+	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		return (A)annotations.get(type);
 	}
 
-	public void setAnnotation (String name,
-		IAnnotation object)
-	{
-		annotations.put(name, object);
+	public void setAnnotation (IAnnotation annotation) {
+		annotations.set(annotation);
 	}
 
 }

@@ -8,16 +8,16 @@ public class Annotations {
 	
 	private ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations;
 
-	public Annotations() {
+	public Annotations () {
 		annotations = new ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation>();
 	}
 	
-	public void add(IAnnotation annotation) {
+	public void set (IAnnotation annotation) {
 		annotations.put(annotation.getClass(), annotation);
 	}
 		
 	@SuppressWarnings("unchecked")
-	public <A> A get(Class<? extends IAnnotation> annotationType) {
+	public <A> A get (Class<? extends IAnnotation> annotationType) {
 		return (A) annotations.get(annotationType);
 	}
 }

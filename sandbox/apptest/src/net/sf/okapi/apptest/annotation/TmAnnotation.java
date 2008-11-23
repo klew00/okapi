@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.okapi.apptest.common.IAnnotation;
+
 public class TmAnnotation implements IAnnotation, Iterable<TmMatch> {
 	List<TmMatch> tmMatches;
 	

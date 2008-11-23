@@ -1,5 +1,7 @@
 package net.sf.okapi.apptest.annotation;
 
+import net.sf.okapi.apptest.resource.TextUnit;
+
 public class Test {
 
 	public static void main(String[] args) {
@@ -10,13 +12,11 @@ public class Test {
 		ca.add("Test comment 2");
 
 		TargetsAnnotation ta = new TargetsAnnotation();
-		ta.add("es", "Test segment spanish");
-		ta.add("jp", "Test segment japanese");
+		ta.set("es", new TextUnit("t1", "Test text-unit spanish"));
+		ta.set("jp", new TextUnit("t1", "Test text-unit japanese"));
 
-		annotations.add(ca);
-		annotations.add(ta);
-		// annotations.add(new String()); // note the compiler doesn't like
-		// this, must implement IAnnotation
+		annotations.set(ca);
+		annotations.set(ta);
 
 		ca = annotations.get(CommentsAnnotation.class);
 		for (String s : ca) {
@@ -25,17 +25,13 @@ public class Test {
 
 		ta = annotations.get(TargetsAnnotation.class);
 		for (String s : ta) {
-			System.out.println(s);
-			System.out.println(ta.get(s));
+			System.out.print(s + " = ");
+			System.out.println(ta.get(s).toString());
 		}
-		
-
-		// String sa = annotations.get(String.class); // note the compiler
-		// doesn't like this, must implement IAnnotation
 
 		System.out.println(ca.toString());
 		System.out.println(ta.toString());
-		// System.out.println(sa.toString());
+
 	}
 
 }
