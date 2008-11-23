@@ -10,4 +10,8 @@ public interface IResource {
 	
 	public void setSkeleton (ISkeleton skeleton);
 
+	public IAnnotation getAnnotation (String name);
+	
+	public void setAnnotation (String name, IAnnotation object);
+
 }

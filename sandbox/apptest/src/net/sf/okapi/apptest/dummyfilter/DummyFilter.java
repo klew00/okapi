@@ -167,7 +167,7 @@ public class DummyFilter implements IFilter {
 	private void makeCase004 () {
 		StartGroup grp1 = new StartGroup("d1", "g1", true);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton("<ul>", true)));
+			new GenericSkeleton("<ul>")));
 		
 		StartGroup grp2 = new StartGroup("g1", "g2", false);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp2,

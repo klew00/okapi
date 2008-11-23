@@ -2,6 +2,7 @@ package net.sf.okapi.apptest.skeleton;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
@@ -20,11 +21,6 @@ public class StorageList extends ArrayList<IResource>
 		this.startGroup = startGroup;
 	}
 	
-	/*
-	public String toString (IWriterHelper writerHelper) {
-		return mergeList(this, writerHelper);
-	}*/
-
 	public String getId () {
 		return startGroup.getId();
 	}
@@ -38,7 +34,7 @@ public class StorageList extends ArrayList<IResource>
 	}
 
 	public void setIsReferent (boolean value) {
-		// Not implemented: read-omly info
+		// Not implemented: read-only info
 	}
 
 	public ISkeleton getSkeleton () {
@@ -65,27 +61,14 @@ public class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
-	/*
-	private String mergeList (StorageList list,
-		IWriterHelper writerHelper)
+	public IAnnotation getAnnotation(String name) {
+		return startGroup.getAnnotation(name);
+	}
+
+	public void setAnnotation (String name,
+		IAnnotation object)
 	{
-		IReferenceable ref;
-		StringBuilder tmp = new StringBuilder();
-		for ( IResource res : list ) {
-			if ( res instanceof StorageList ) {
-				// Recursive call for lists
-				tmp.append(mergeList((StorageList)res, writerHelper));
-			}
-			else if ( res instanceof IReferenceable ) {
-				ref = (IReferenceable)res;
-				if ( ref.isReferent() ) continue; // Skip referents
-				else tmp.append(ref.toString(writerHelper));
-			}
-			else { // Simple IResource
-				tmp.append(res.toString());
-			}
-		}
-		return tmp.toString();
-	}*/
+		startGroup.setAnnotation(name, object);
+	}
 
 }

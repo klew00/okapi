@@ -1,6 +1,6 @@
 package net.sf.okapi.apptest.resource;
 
-public class StartDocument extends BaseContainer {
+public class StartDocument extends BaseNameable {
 
 	protected String language;
 	protected String encoding;

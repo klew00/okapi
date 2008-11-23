@@ -3,6 +3,8 @@ package net.sf.okapi.apptest.annotation;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.okapi.apptest.common.IAnnotation;
+
 public class TargetsAnnotation implements IAnnotation, Iterable<String> {
 	private ConcurrentHashMap<String, String> targets;
 

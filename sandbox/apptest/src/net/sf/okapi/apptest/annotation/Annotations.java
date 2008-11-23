@@ -2,6 +2,8 @@ package net.sf.okapi.apptest.annotation;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.okapi.apptest.common.IAnnotation;
+
 public class Annotations {
 	
 	private ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations;

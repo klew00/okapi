@@ -3,20 +3,23 @@ package net.sf.okapi.apptest.resource;
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
 
+import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
-import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
 
-public abstract class BaseResource implements IResource, INameable, IReferenceable {
+public class BaseNameable implements IResource, INameable {
 
 	protected String id;
 	protected ISkeleton skeleton;
-	protected boolean isReferent;
 	protected String name;
-	protected String parentId;
 	protected Hashtable<String, Property> properties;
-
+	protected Hashtable<String, IAnnotation> annotations;
+	
+	public BaseNameable () {
+		annotations = new Hashtable<String, IAnnotation>();
+	}
+	
 	public String getId () {
 		return id;
 	}
@@ -33,14 +36,6 @@ public abstract class BaseResource implements IResource, INameable, IReferenceab
 		this.skeleton = skeleton;
 	}
 
-	public boolean isReferent () {
-		return isReferent;
-	}
-
-	public void setIsReferent (boolean value) {
-		isReferent = value;
-	}
-
 	public String getName () {
 		return name;
 	}
@@ -49,14 +44,6 @@ public abstract class BaseResource implements IResource, INameable, IReferenceab
 		this.name = name;
 	}
 	
-	public String getParentId () {
-		return parentId;
-	}
-	
-	public void setParentId (String parentId) {
-		this.parentId = parentId;
-	}
-
 	public Property getProperty (String name) {
 		if ( name == null ) throw new InvalidParameterException();
 		if ( properties == null ) return null;
@@ -67,6 +54,16 @@ public abstract class BaseResource implements IResource, INameable, IReferenceab
 		if ( property == null ) throw new InvalidParameterException();
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		properties.put(property.getName(), property);
+	}
+
+	public IAnnotation getAnnotation (String name) {
+		return annotations.get(name);
+	}
+
+	public void setAnnotation (String name,
+		IAnnotation object)
+	{
+		annotations.put(name, object);
 	}
 
 }

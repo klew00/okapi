@@ -1,22 +1,20 @@
 package net.sf.okapi.apptest.resource;
 
-import java.util.Hashtable;
+import net.sf.okapi.apptest.common.IAnnotation;
 
-public class TextUnit extends BaseResource {
+public class TextUnit extends BaseReferenceable implements IAnnotation {
 
 	private TextFragment source;
-	private Hashtable<String, Object> annotations;
-	private Hashtable<String, Property> properties;
 	
 	public TextUnit () {
+		super();
 		source = new TextFragment(this);
-		annotations = new Hashtable<String, Object>();
-		properties = new Hashtable<String, Property>();
 	}
 
 	public TextUnit (String id,
 		String sourceText)
 	{
+		super();
 		create(id, sourceText, false);
 	}
 
@@ -24,6 +22,7 @@ public class TextUnit extends BaseResource {
 		String sourceText,
 		boolean isReferent)
 	{
+		super();
 		create(id, sourceText, isReferent);
 	}
 
@@ -34,8 +33,6 @@ public class TextUnit extends BaseResource {
 		this.id = id;
 		this.isReferent = isReferent;
 		source = new TextFragment(this);
-		annotations = new Hashtable<String, Object>();
-		properties = new Hashtable<String, Property>();
 		if ( sourceText != null ) source.append(sourceText);
 	}
 
@@ -51,22 +48,6 @@ public class TextUnit extends BaseResource {
 	public void setContent (TextFragment content) {
 		source = content;
 		// We don't change the current annotations
-	}
-
-	public Object getAnnotation (String name) {
-		return annotations.get(name);
-	}
-	
-	public void setAnnotation (String name, Object annotation) {
-		annotations.put(name, annotation);
-	}
-	
-	public void setProperty (String name, Property property) {
-		properties.put(name, property);
-	}
-	
-	public Property getProperty (String name) {
-		return properties.get(name);
 	}
 
 }
