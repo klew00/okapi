@@ -4,9 +4,9 @@ import java.util.Hashtable;
 
 public class Property {
 	
-	private String name;
-	private String value;
-	private boolean isWriteable;
+	private final String name;
+	private final String value;
+	private final boolean isWriteable;
 	private Hashtable<String, Object> annotations;
 
 	public Property (String name, String value, boolean isWriteable) {
@@ -26,10 +26,6 @@ public class Property {
 	
 	public boolean isWriteable () {
 		return isWriteable;
-	}
-	
-	public void setValue (String value) {
-		this.value = value;
 	}
 	
 	public Object getAnnotation (String name) {

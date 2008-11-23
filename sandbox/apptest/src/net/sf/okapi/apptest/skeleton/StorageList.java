@@ -2,55 +2,70 @@ package net.sf.okapi.apptest.skeleton;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.common.ISkeleton;
-import net.sf.okapi.apptest.filters.IWriterHelper;
+import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.StartGroup;
 
 public class StorageList extends ArrayList<IResource>
-	implements IResource, IReferenceable {
+	implements IResource, INameable, IReferenceable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String id;
-	private boolean isReferent;
+	private StartGroup startGroup;
 
 	public StorageList (StartGroup startGroup) {
-		id = startGroup.getId();
-		isReferent = startGroup.isReferent();
-		
+		this.startGroup = startGroup;
 	}
 	
+	/*
 	public String toString (IWriterHelper writerHelper) {
 		return mergeList(this, writerHelper);
-	}
+	}*/
 
 	public String getId () {
-		return id;
+		return startGroup.getId();
 	}
 
 	public void setId (String id) {
-		this.id = id;
+		// Not implemented: read-only info
 	}
 
 	public boolean isReferent () {
-		return isReferent;
+		return startGroup.isReferent();
 	}
 
 	public void setIsReferent (boolean value) {
-		isReferent = value;
+		// Not implemented: read-omly info
 	}
 
 	public ISkeleton getSkeleton () {
-		// Not used
-		return null;
+		return startGroup.getSkeleton();
 	}
 
 	public void setSkeleton (ISkeleton skeleton) {
-		// Not used
+		// Not implemented: read-only info
 	}
 
+	public String getName () {
+		return startGroup.getName();
+	}
+
+	public Property getProperty (String name) {
+		return startGroup.getProperty(name);
+	}
+
+	public void setName (String name) {
+		// Not implemented: read-only info
+	}
+
+	public void setProperty (Property property) {
+		// Not implemented: read-only info
+	}
+
+	/*
 	private String mergeList (StorageList list,
 		IWriterHelper writerHelper)
 	{
@@ -71,6 +86,6 @@ public class StorageList extends ArrayList<IResource>
 			}
 		}
 		return tmp.toString();
-	}
+	}*/
 
 }

@@ -24,11 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.okapi.apptest.common.INameable;
-import net.sf.okapi.apptest.common.IReferenceable;
-import net.sf.okapi.apptest.common.ISkeletonPart;
-import net.sf.okapi.apptest.filters.IWriterHelper;
-
 /**
  * This class implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -808,39 +803,6 @@ public class TextFragment implements Comparable<Object> {
 		return tmp.toString();
 	}
 
-	public String toString (IWriterHelper refProv) {
-		if (( codes == null ) || ( codes.size() == 0 )) {
-			if ( refProv == null ) return text.toString();
-			else return refProv.encode(text.toString());
-		}
-
-		if ( !isBalanced ) balanceMarkers();
-		StringBuilder tmp = new StringBuilder();
-		Code code;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, refProv));
-				break;
-			case MARKER_CLOSING:
-				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, refProv));
-				break;
-			case MARKER_ISOLATED:
-			case MARKER_SEGMENT:
-				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, refProv));
-				break;
-			default:
-				if ( refProv == null ) tmp.append(text.charAt(i));
-				else tmp.append(refProv.encode(text.charAt(i)));
-				break;
-			}
-		}
-		return tmp.toString();
-	}
-	
 	/**
 	 * Gets the parent of the fragment.
 	 * @return the parent of the fragment or null if none is assigned.
@@ -960,103 +922,6 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Creates a complete text representation of the code data including any text
-	 * coming from sub-flows.
-	 * @param code The code to process.
-	 * @return The data for the code, including any sub-flows data.
-	 */
-	private String expandCodeContent (Code code,
-		IWriterHelper helper)
-	{
-		if ( !code.hasReference ) return code.data;
-		if ( parent == null ) {
-			return code.data;
-			//TODO: log a warning
-		}
-		// Check for segment
-		if ( code.type.equals(TextFragment.CODETYPE_SEGMENT) ) {
-			return "[SEG-"+code.data+"]";
-		}
-		// Else: look for place-holders
-		StringBuilder tmp = new StringBuilder(code.data);
-		Object[] marker = null;
-		while ( (marker = getRefMarker(tmp)) != null ) {
-			int start = (Integer)marker[1];
-			int end = (Integer)marker[2];
-			String propName = (String)marker[3];
-			IReferenceable ref = helper.getReference((String)marker[0]);
-			if ( ref == null ) {
-				//TODO: better error handling
-				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
-			}
-			else {
-				if ( ref instanceof TextUnit ) {
-					if ( propName == null ) {
-						TextUnit tu = (TextUnit)ref;
-						TextFragment tf;
-						if ( helper.getLanguage() == null ) {
-							tf = tu.getContent();
-						}
-						else if ( tu.getAnnotation(helper.getLanguage()) == null ) {
-							tf = tu.getContent();
-						}
-						else {
-							tf = ((TextUnit)tu.getAnnotation(helper.getLanguage())).getContent();
-						}
-						tmp.replace(start, end, tf.toString(helper));
-					}
-					else {
-						tmp.replace(start, end,
-							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
-					}
-				}
-				else if ( ref instanceof ISkeletonPart ) {
-					if ( propName == null )
-						tmp.replace(start, end, ref.toString(helper));
-					else
-						tmp.replace(start, end,
-							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
-				}
-				else if ( ref instanceof StartGroup ) {
-					if ( propName == null )
-						tmp.replace(start, end, ref.toString(helper));
-					else
-						tmp.replace(start, end,
-							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
-				}
-				else if ( ref instanceof DocumentPart ) {
-					if ( propName == null )
-						tmp.replace(start, end, "-TODO-"); //TODO
-					else {
-						tmp.replace(start, end,
-							getPropertyValue((INameable)ref, propName, helper.getLanguage()));
-					}
-				}
-			}
-		}
-		return tmp.toString();
-	}
-	
-	private String getPropertyValue (INameable unit,
-		String name,
-		String language)
-	{
-		Property prop = unit.getProperty(name);
-		if ( prop == null ) return "-ERR:NO-SUCH-PROP-";
-		String value;
-		if ( language == null ) {
-			value = prop.getValue();
-		}
-		else {
-			prop = (Property)prop.getAnnotation(language);
-			if ( prop == null ) return unit.getProperty(name).getValue(); // Fall back to source
-			value = prop.getValue();
-		}
-		if ( value == null ) return "-ERR:PROP-NOT-FOUND-";
-		else return value;
-	}
-	
-	/**
 	 * Balances the markers based on the tag type of the codes.
 	 */
 	private void balanceMarkers () {
@@ -1117,24 +982,5 @@ public class TextFragment implements Comparable<Object> {
 		}
 		isBalanced = true;
 	}
-
-	/*
-	private void changeMarkerType (int index,
-		int newMarkerType)
-	{
-		// Update the coded text marker
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-			case MARKER_SEGMENT:
-				if ( toIndex(text.charAt(++i)) == index ) {
-					text.setCharAt(i-1, (char)newMarkerType);
-					return; // Done
-				}
-			}
-		}
-	}*/
 
 }

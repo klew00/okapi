@@ -1,7 +1,5 @@
 package net.sf.okapi.apptest.resource;
 
-import net.sf.okapi.apptest.filters.IWriterHelper;
-
 public class StartGroup extends BaseResource {
 
 	public StartGroup (String parentId) {
@@ -24,9 +22,4 @@ public class StartGroup extends BaseResource {
 		this.isReferent = isReference;
 	}
 
-	public String toString (IWriterHelper writerHelper) {
-		if ( skeleton != null ) return skeleton.toString(writerHelper);
-		else return "";
-	}
-	
 }

@@ -1,7 +1,5 @@
 package net.sf.okapi.apptest.resource;
 
-import net.sf.okapi.apptest.filters.IWriterHelper;
-
 public class DocumentPart extends BaseResource {
 
 	public DocumentPart (String id,
@@ -11,9 +9,4 @@ public class DocumentPart extends BaseResource {
 		this.isReferent = isReferent;
 	}
 	
-	public String toString (IWriterHelper writerHelper) {
-		if ( skeleton != null ) return skeleton.toString(writerHelper);
-		else return "";
-	}
-
 }

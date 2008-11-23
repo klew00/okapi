@@ -93,20 +93,21 @@ public class DummyFilter implements IFilter {
 		DocumentPart dp = new DocumentPart("dp1", true);
 		dp.setProperty(new Property("href", "img.png", true));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text", true)));
 
-		TextUnit tu = new TextUnit("t2", "before ", true);
+		TextUnit tu = new TextUnit("t2", "Before ");
 		TextFragment tf = tu.getContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "image",
-			"<img href='" + TextFragment.makeRefMarker("dp1","href") +
+			"<img href='" + TextFragment.makeRefMarker("dp1", "href") +
 			"' alt='" + TextFragment.makeRefMarker("t1") + "'/>");
 		code.setHasReference(true);
 		tf.append(" after.");
-		tu.setContent(tf);
+		
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add("<p>");
-		skel.addRef("t2");
+		skel.addRef(tu);
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 
@@ -114,32 +115,27 @@ public class DummyFilter implements IFilter {
 	
 	private void makeCase002 () {
 		// <p>Before <a href='link.htm'/> after.</p>
-		StartGroup grp1 = new StartGroup("d1", "g1");
-		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
-			new GenericSkeleton("<p>")));
-
+		
 		DocumentPart dp = new DocumentPart("dp1", true);
 		dp.setProperty(new Property("href", "link.htm", true));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
-		TextUnit tu = new TextUnit();
-		tu.setId("t1");
-		TextFragment tf = new TextFragment(tu);
-		tf.append("Before ");
+		TextUnit tu = new TextUnit("t1", "Before ");
+		TextFragment tf = tu.getContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "link",
-			"<a href='" + TextFragment.makeRefMarker("dp1","href") + "'/>");
+			"<a href='" + TextFragment.makeRefMarker("dp1", "href") + "'/>");
 		code.setHasReference(true);
 		tf.append(" after.");
-		tu.setContent(tf);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 
-		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g1"),
-			new GenericSkeleton("</p>\n")));
+		GenericSkeleton skel = new GenericSkeleton("<p>");
+		skel.addRef(tu);
+		skel.add("</p>");
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
 	
 	private void makeCase003 () {
 		// <table id=100> <tr><td>text</td></tr><table>
+		
 		StartGroup grp1 = new StartGroup("d1", "g1");
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
 			new GenericSkeleton("<table id=100>\n ")));
@@ -209,7 +205,7 @@ public class DummyFilter implements IFilter {
 		tf.append("\n and text after the list.");
 		tu.setContent(tf);
 		GenericSkeleton skel = new GenericSkeleton("<p>");
-		skel.addRef("t3");
+		skel.addRef(tu);
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
@@ -226,9 +222,9 @@ public class DummyFilter implements IFilter {
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
 		//makeCase001();
-		//makeCase002();
+		makeCase002();
 		//makeCase003();
-		makeCase004();
+		//makeCase004();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));

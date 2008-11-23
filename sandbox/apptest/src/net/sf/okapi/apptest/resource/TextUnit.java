@@ -2,8 +2,6 @@ package net.sf.okapi.apptest.resource;
 
 import java.util.Hashtable;
 
-import net.sf.okapi.apptest.filters.IWriterHelper;
-
 public class TextUnit extends BaseResource {
 
 	private TextFragment source;
@@ -46,22 +44,6 @@ public class TextUnit extends BaseResource {
 		return source.toString();
 	}
 	
-	public String toString (IWriterHelper writerHelper) {
-		TextFragment tf;
-		if ( writerHelper.getLanguage() == null ) {
-			tf = source;
-		}
-		else { // TODO: any better way?
-			if ( getAnnotation(writerHelper.getLanguage()) == null ) {
-				tf = source;
-			}
-			else {
-				tf = ((TextUnit)getAnnotation(writerHelper.getLanguage())).getContent();
-			}
-		}
-		return tf.toString(writerHelper);
-	}
-
 	public TextFragment getContent () {
 		return source;
 	}
@@ -88,4 +70,3 @@ public class TextUnit extends BaseResource {
 	}
 
 }
-

@@ -1,9 +1,12 @@
 package net.sf.okapi.apptest.dummyutility;
 
+import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.filters.FilterEvent;
+import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.utilities.IUtility;
+import net.sf.okapi.common.filters.FilterEventType;
 
 public class PseudoTranslate implements IUtility {
 
@@ -17,12 +20,23 @@ public class PseudoTranslate implements IUtility {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
 			processTU((TextUnit)event.getResource());
-			break;
+			// Fall thru
+		case DOCUMENT_PART:
 		case START_DOCUMENT:
-			break;
-		case END_DOCUMENT:
-			break;
+		case START_SUBDOCUMENT:
+		case END_GROUP:
+			processProperties((INameable)event.getResource());
 		}
+	}
+
+	private void processProperties (INameable resource) {
+		Property prop = resource.getProperty("href");
+		if ( prop == null ) return; // Nothing to do
+		if ( !prop.isWriteable() ) return; // Can't modify it
+		// Else: localize the href value
+		
+		
+		
 	}
 	
 	private void processTU (TextUnit tu) {
