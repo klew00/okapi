@@ -1,6 +1,5 @@
 package net.sf.okapi.apptest.dummyutility;
 
-import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.resource.Property;
@@ -44,10 +43,9 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		TextUnit trgTu = tu.getTarget(trgLang, 2);
+		TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_CLONE);
 		TextFragment tf = trgTu.getContent();
-		tf.setCodedText(
-			tu.getContent().getCodedText().replace("e", "\u00CA"));
+		tf.setCodedText(tu.getContent().getCodedText().replace("e", "\u00CA"));
 	}
 
 	public void doEpilog () {

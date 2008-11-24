@@ -108,7 +108,7 @@ public class DummyFilter implements IFilter {
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add("<p>");
-		skel.addRef(tu);
+		skel.addRef(tu, null);
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 
@@ -129,7 +129,7 @@ public class DummyFilter implements IFilter {
 		tf.append(" after.");
 
 		GenericSkeleton skel = new GenericSkeleton("<p>");
-		skel.addRef(tu);
+		skel.addRef(tu, null);
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
@@ -206,7 +206,7 @@ public class DummyFilter implements IFilter {
 		tf.append("\n and text after the list.");
 		tu.setContent(tf);
 		GenericSkeleton skel = new GenericSkeleton("<p>");
-		skel.addRef(tu);
+		skel.addRef(tu, null);
 		skel.add("</p>");
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
@@ -226,30 +226,32 @@ public class DummyFilter implements IFilter {
 
 		TextUnit tu = new TextUnit("t1", "Hello World");
 
+		String trgLang = "FR-CA";
 		TargetsAnnotation ta = new TargetsAnnotation();
-		ta.set("FR-CA", new TextUnit(tu.getId(), "Bonjour tout le monde"));
+		ta.set(trgLang, new TextUnit(tu.getId(), "Bonjour tout le monde"));
 		tu.setAnnotation(ta);
 		
 		GenericSkeleton skel = new GenericSkeleton("<tu tuid=\"1\" datatype=\"Text\">\n");
-		skel.add(" <note>TU level note</note>\n");
+		tu.setProperty(new Property("datatype", "Text", false));
+		skel.append(" <note>TU level note</note>\n");
 		skel.append(" <prop type=\"x-Domain\">TU level prop</prop>\n");
+		tu.setProperty(new Property("x-Domain", "TU level prop", false));
 		skel.append(" <tuv xml:lang=\"EN\" creationid=\"Okapi\">\n");
 		skel.append("  <seg>");
-		skel.addRef(tu);
+		skel.addRef(tu, null);
 		skel.add("<seg>\n </tuv>\n");
-		skel.append(" <tuv xml:lang=\"FR-CA\" creationid=\"");
+		skel.append(" <tuv xml:lang=\"FR-CA\" creationid=\"Okapi\" ");
 		tu.setProperty(new Property("creationid", "Okapi", false));
-		skel.add(TextFragment.makeRefMarker(tu.getId(), "creationid"));
-		skel.add("\" changeid=\"");
+		skel.append("changeid=\"");
 		tu.setProperty(new Property("changeid", "Olifant", true));
-		skel.add(TextFragment.makeRefMarker(tu.getId(), "changeid")); //TODO: Should be target
+		skel.addRef(tu.getId(), "changeid", trgLang);
 		skel.add("\">\n");
-		skel.add("  <prop type=\"Origin\">");
+		skel.append("  <prop type=\"Origin\">");
 		tu.setProperty(new Property("Origin", "MT", true));
-		skel.add(TextFragment.makeRefMarker(tu.getId(), "Origin"));
+		skel.addRef(tu.getId(), "Origin", trgLang);
 		skel.add("</prop>\n");
-		skel.add("  <seg>");
-		skel.addRef(tu, "FR-CA");
+		skel.append("  <seg>");
+		skel.addRef(tu, trgLang);
 		skel.add("</seg>\n");
 		skel.append(" </tuv>\n</tu>");
 		

@@ -297,7 +297,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		// Check for self-reference from the resource that holds the skeleton
 		if ( "$self$".compareTo((String)marker[0]) == 0 ) {
 			if ( part.parent instanceof TextUnit ) {
-				return getContent((TextUnit)part.parent, part.language);
+				return getContent((TextUnit)part.parent, (part.language == null) ? language : part.language);
 			}
 			else {
 				throw new RuntimeException("self-references this skeleton part must be a text-unit.");

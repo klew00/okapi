@@ -10,6 +10,7 @@ import net.sf.okapi.apptest.resource.TextFragment;
 public class GenericSkeleton implements ISkeleton {
 
 	private ArrayList<GenericSkeletonPart> list;
+	private boolean createNew = true;
 	
 	public GenericSkeleton () {
 		list = new ArrayList<GenericSkeletonPart>();
@@ -23,21 +24,23 @@ public class GenericSkeleton implements ISkeleton {
 	public void add (String data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
+		createNew = false;
 	}
 
 	public void append (String data) {
-		if ( list.size() == 0 ) list.add(new GenericSkeletonPart(data));
-		else list.get(list.size()-1).append(data);
+		if (( createNew ) || ( list.size() == 0 )) {
+			add(data);
+		}
+		else {
+			list.get(list.size()-1).append(data);
+		}
 	}
 
-	public void addRef (IResource referent) {
-		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
-		part.parent = referent;
-		list.add(part);
-		// Then start a new part to avoid appending anything to the previous
-		list.add(new GenericSkeletonPart(""));
-	}
-	
+	/**
+	 * Adds a reference to the resource itself to the skeleton.
+	 * @param referent Resource object.
+	 * @param language Language or null if the reference is to the source.
+	 */
 	public void addRef (IResource referent,
 		String language)
 	{
@@ -45,8 +48,26 @@ public class GenericSkeleton implements ISkeleton {
 		part.parent = referent;
 		part.language = language;
 		list.add(part);
-		// Then start a new part to avoid appending anything to the previous
-		list.add(new GenericSkeletonPart(""));
+		// Flag that the next append() should start a new part
+		createNew = true;
+	}
+
+	/**
+	 * Adds a reference to the skeleton.
+	 * @param Id of the referenced resource.
+	 * @param propName Property name or null if the reference is to the text.
+	 * @param language Language or null if the reference is to the source.
+	 */
+	public void addRef (String refId,
+		String propName,
+		String language)
+	{
+		GenericSkeletonPart part = new GenericSkeletonPart(
+			TextFragment.makeRefMarker(refId, propName));
+		part.language = language;
+		list.add(part);
+		// Flag that the next append() should start a new part
+		createNew = true;
 	}
 	
 	public List<GenericSkeletonPart> getParts () {
