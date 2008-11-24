@@ -27,8 +27,8 @@ public class Test {
 		for (String s : ca) {
 			System.out.println(s);
 		}
-
-		ta = annotations.get(TargetsAnnotation.class);
+		
+		TextUnit en = (ta = annotations.get(TargetsAnnotation.class)).get("en");
 		for (String s : ta) {
 			System.out.print(s + " = ");
 			System.out.println(ta.get(s).toString());
