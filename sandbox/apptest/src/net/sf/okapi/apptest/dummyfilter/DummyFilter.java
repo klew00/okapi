@@ -270,8 +270,8 @@ public class DummyFilter implements IFilter {
 		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		//makeCase004();
-		makeCase008();
+		makeCase004();
+		//makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));

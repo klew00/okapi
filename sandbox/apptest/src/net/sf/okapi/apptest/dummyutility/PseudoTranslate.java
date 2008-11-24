@@ -24,7 +24,7 @@ public class PseudoTranslate implements IUtility {
 		case DOCUMENT_PART:
 		case START_DOCUMENT:
 		case START_SUBDOCUMENT:
-		case END_GROUP:
+		case START_GROUP:
 			processProperties((INameable)event.getResource());
 		}
 	}
@@ -44,25 +44,8 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		TargetsAnnotation ta = tu.getAnnotation(TargetsAnnotation.class);
-		TextUnit trgTu = null;
-		TextFragment tf = null;
-		if ( ta != null ) {
-			trgTu = ta.get(trgLang);
-			if ( trgTu != null ) {
-				tf = trgTu.getContent();
-			}
-		}
-		if ( trgTu == null ) {
-			tf = tu.getContent().clone();
-			trgTu = new TextUnit();
-			trgTu.setContent(tf);
-			if ( ta == null ) {
-				ta = new TargetsAnnotation();
-				tu.setAnnotation(ta);
-			}
-			ta.set(trgLang, trgTu);
-		}
+		TextUnit trgTu = tu.getTarget(trgLang, 2);
+		TextFragment tf = trgTu.getContent();
 		tf.setCodedText(
 			tu.getContent().getCodedText().replace("e", "\u00CA"));
 	}
