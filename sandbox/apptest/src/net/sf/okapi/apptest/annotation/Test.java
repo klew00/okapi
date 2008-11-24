@@ -17,6 +17,11 @@ public class Test {
 
 		annotations.set(ca);
 		annotations.set(ta);
+		
+		
+		// Cannot to this:
+		// TextUnit trgTu = annotations.get(TargetsAnnotation.class).get("es");
+		TextUnit trgTu = ((TargetsAnnotation)annotations.get(TargetsAnnotation.class)).get("es");
 
 		ca = annotations.get(CommentsAnnotation.class);
 		for (String s : ca) {

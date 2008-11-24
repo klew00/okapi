@@ -33,9 +33,14 @@ public class PseudoTranslate implements IUtility {
 		Property prop = resource.getProperty("href");
 		if ( prop == null ) return; // Nothing to do
 		if ( !prop.isWriteable() ) return; // Can't modify it
-		// Else: localize the href value
 		
-		//TODO: add annotation for properties
+		// Else: localize the href value
+		Property trgProp = (Property)prop.getAnnotation(trgLang);
+		if ( trgProp == null ) {
+			trgProp = new Property(prop.getName(), "", prop.isWriteable());
+			prop.setAnnotation(trgLang, trgProp);
+		}
+		trgProp.setValue(trgLang+"_"+prop.getValue());
 	}
 	
 	private void processTU (TextUnit tu) {
