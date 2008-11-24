@@ -6,13 +6,10 @@ public class GenericSkeletonPart {
 
 	StringBuilder data;
 	IResource parent;
-	String id;
+	String language;
 	
-	public GenericSkeletonPart (String id,
-		String data)
-	{
+	public GenericSkeletonPart (String data) {
 		this.data = new StringBuilder(data);
-		this.id = id;
 	}
 
 	@Override

@@ -297,7 +297,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		// Check for self-reference from the resource that holds the skeleton
 		if ( "$self$".compareTo((String)marker[0]) == 0 ) {
 			if ( part.parent instanceof TextUnit ) {
-				return getContent((TextUnit)part.parent);
+				return getContent((TextUnit)part.parent, part.language);
 			}
 			else {
 				throw new RuntimeException("self-references this skeleton part must be a text-unit.");
@@ -333,7 +333,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	private String getString (TextUnit tu) {
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
-			return getContent(tu);
+			return getContent(tu, language);
 		}
 		// Else: process the skeleton parts, one of them should
 		// refer to the text-unit content itself
@@ -344,9 +344,9 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		return tmp.toString();
 	}
 
-	private String getContent (TextUnit tu) {
+	private String getContent (TextUnit tu, String langToUse) {
 		TextFragment tf;
-		if ( language == null ) {
+		if ( langToUse == null ) {
 			tf = tu.getContent();
 		}
 		else {
@@ -354,7 +354,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 				tf = tu.getContent();
 			}
 			else {
-				TextUnit trgTu = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(language);
+				TextUnit trgTu = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
 				if ( trgTu == null ) {
 					tf = tu.getContent();
 				}

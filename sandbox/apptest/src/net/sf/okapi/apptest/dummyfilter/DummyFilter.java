@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
+import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.filters.FilterEvent;
@@ -210,6 +211,51 @@ public class DummyFilter implements IFilter {
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
 	
+	private void makeCase008 () {
+		//<tu tuid="1" datatype="Text">
+		// <note>TU level note</note>
+		// <prop type="x-Domain">TU level prop</prop>
+		// <tuv xml:lang="EN" creationid="Okapi">
+		//  <seg>Hello World</seg>
+		// </tuv>
+		// <tuv xml:lang="FR-CA" creationid="Okapi" changeid="Olifant">
+		//  <prop type="Origin">MT</prop>
+		//  <seg>Bonjour tout le monde</seg>
+		// </tuv>
+		//</tu>		
+
+		TextUnit tu = new TextUnit("t1", "Hello World");
+
+		TargetsAnnotation ta = new TargetsAnnotation();
+		ta.set("FR-CA", new TextUnit(tu.getId(), "Bonjour tout le monde"));
+		tu.setAnnotation(ta);
+		
+		GenericSkeleton skel = new GenericSkeleton("<tu tuid=\"1\" datatype=\"Text\">\n");
+		skel.add(" <note>TU level note</note>\n");
+		skel.append(" <prop type=\"x-Domain\">TU level prop</prop>\n");
+		skel.append(" <tuv xml:lang=\"EN\" creationid=\"Okapi\">\n");
+		skel.append("  <seg>");
+		skel.addRef(tu);
+		skel.add("<seg>\n </tuv>\n");
+		skel.append(" <tuv xml:lang=\"FR-CA\" creationid=\"");
+		tu.setProperty(new Property("creationid", "Okapi", false));
+		skel.add(TextFragment.makeRefMarker(tu.getId(), "creationid"));
+		skel.add("\" changeid=\"");
+		tu.setProperty(new Property("changeid", "Olifant", true));
+		skel.add(TextFragment.makeRefMarker(tu.getId(), "changeid")); //TODO: Should be target
+		skel.add("\">\n");
+		skel.add("  <prop type=\"Origin\">");
+		tu.setProperty(new Property("Origin", "MT", true));
+		skel.add(TextFragment.makeRefMarker(tu.getId(), "Origin"));
+		skel.add("</prop>\n");
+		skel.add("  <seg>");
+		skel.addRef(tu, "FR-CA");
+		skel.add("</seg>\n");
+		skel.append(" </tuv>\n</tu>");
+		
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
+	}
+	
 	private void resetResources () {
 		canceled = false;
 		current = -1;
@@ -222,9 +268,10 @@ public class DummyFilter implements IFilter {
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
 		//makeCase001();
-		makeCase002();
+		//makeCase002();
 		//makeCase003();
 		//makeCase004();
+		makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));
