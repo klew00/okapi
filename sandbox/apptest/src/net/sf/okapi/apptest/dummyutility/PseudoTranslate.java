@@ -1,6 +1,7 @@
 package net.sf.okapi.apptest.dummyutility;
 
 import net.sf.okapi.apptest.common.INameable;
+import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.TextFragment;
@@ -34,11 +35,7 @@ public class PseudoTranslate implements IUtility {
 		if ( !prop.isWriteable() ) return; // Can't modify it
 		
 		// Else: localize the href value
-		Property trgProp = (Property)prop.getAnnotation(trgLang);
-		if ( trgProp == null ) {
-			trgProp = new Property(prop.getName(), "", prop.isWriteable());
-			prop.setAnnotation(trgLang, trgProp);
-		}
+		Property trgProp = resource.getTargetProperty(trgLang, prop.getName(), IResource.CREATE_CLONE);
 		trgProp.setValue(trgLang+"_"+prop.getValue());
 	}
 	

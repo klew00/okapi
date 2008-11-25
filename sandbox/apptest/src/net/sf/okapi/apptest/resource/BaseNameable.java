@@ -2,8 +2,11 @@ package net.sf.okapi.apptest.resource;
 
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
+import java.util.Map;
 
 import net.sf.okapi.apptest.annotation.Annotations;
+import net.sf.okapi.apptest.annotation.TargetPropertiesAnnotation;
+import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IResource;
@@ -14,7 +17,7 @@ public class BaseNameable implements IResource, INameable {
 	protected String id;
 	protected ISkeleton skeleton;
 	protected String name;
-	protected Hashtable<String, Property> properties;
+	protected Hashtable<String, Property> properties; // Source properties
 	protected Annotations annotations;
 	
 	public BaseNameable () {
@@ -66,4 +69,69 @@ public class BaseNameable implements IResource, INameable {
 		annotations.set(annotation);
 	}
 
+	public Property getTargetProperty (String language,
+		String name,
+		int creationOptions)
+	{
+		if ( name == null ) throw new InvalidParameterException();
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) {
+			if ( creationOptions > DO_NOTHING ) {
+				tpa = new TargetPropertiesAnnotation();
+				annotations.set(tpa);
+			}
+			else return null;
+		}
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) {
+			if ( creationOptions == DO_NOTHING ) {
+				return null;
+			}
+			else { // Else: create the properties list
+				tpa.set(language, new Hashtable<String, Property>());
+				trgProps = tpa.get(language);
+			}
+		}
+		Property trgProp = trgProps.get(name);
+		if ( trgProp == null ) {
+			if ( creationOptions == DO_NOTHING ) {
+				return null;
+			}
+			else { // Else: create the property
+				Property srcProp = getProperty(name); // Get the source
+				if ( srcProp == null ) { // No corresponding source
+					trgProp = new Property(name, "", true);
+				}
+				else { // Has a corresponding source
+					if ( creationOptions > CREATE_EMPTY ) {
+						trgProp = new Property(name, srcProp.getValue(), srcProp.isWriteable());
+					}
+					else {
+						trgProp = new Property(name, "", srcProp.isWriteable());
+					}
+				}
+				trgProps.put(name, trgProp); // Add the property to the list
+			}
+		}
+		return trgProp;
+	}
+	
+	public void setTargetProperty (String language,
+		Property property)
+	{
+		//TODO
+		if ( property == null ) throw new InvalidParameterException();
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) {
+			tpa = new TargetPropertiesAnnotation();
+			annotations.set(tpa);
+		}
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) {
+			tpa.set(language, new Hashtable<String, Property>());
+			trgProps = tpa.get(language);
+		}
+		trgProps.put(property.getName(), property);
+	}
+	
 }

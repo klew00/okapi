@@ -4,10 +4,6 @@ import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 
 public class TextUnit extends BaseReferenceable {
 
-	public static final int DO_NOTHING = 0;
-	public static final int CREATE_EMPTY = 1;
-	public static final int CREATE_CLONE = 2;
-	
 	private TextFragment source;
 	
 	public TextUnit () {

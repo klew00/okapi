@@ -69,4 +69,15 @@ public class StorageList extends ArrayList<IResource>
 		startGroup.setAnnotation(annotation);
 	}
 
+	public Property getTargetProperty(String language,
+		String name,
+		int creationOptions)
+	{
+		return startGroup.getTargetProperty(language, name, creationOptions);
+	}
+
+	public void setTargetProperty (String language, Property property) {
+		// Not implemented: read-only info
+	}
+
 }

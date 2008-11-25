@@ -304,7 +304,9 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		if ( propName == null ) { // Reference to the content of the referent
 			if ( "$self$".compareTo((String)marker[0]) == 0 ) {
 				if ( part.parent instanceof TextUnit ) {
-					return getContent((TextUnit)part.parent, part.language);
+					//TODO: language here is to be set correctly
+					// Issue when the file is bilingual!!!
+					return getContent((TextUnit)part.parent, (part.language==null) ? language : part.language);
 				}
 				else {
 					throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
