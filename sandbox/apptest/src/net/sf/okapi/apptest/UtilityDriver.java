@@ -43,7 +43,7 @@ public class UtilityDriver {
 			genWriter = new GenericSkeletonWriter();
 			String ext = ".txt";
 			String srcLang = "en";
-			String trgLang = "en-bz";
+			String trgLang = "FR-CA";
 
 			// Set the options
 			util.setOptions(trgLang);

@@ -43,9 +43,12 @@ public class PseudoTranslate implements IUtility {
 	}
 	
 	private void processTU (TextUnit tu) {
-		TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_CLONE);
-		TextFragment tf = trgTu.getContent();
-		tf.setCodedText(tu.getContent().getCodedText().replace("e", "\u00CA"));
+		//if ( !tu.hasTarget(trgLang) ) {
+		// Translate even if we have a target, just to check we use the right TU
+			TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_CLONE);
+			TextFragment tf = trgTu.getContent();
+			tf.setCodedText(trgTu.getContent().getCodedText().replace("e", "\u00CA"));
+		//}
 	}
 
 	public void doEpilog () {

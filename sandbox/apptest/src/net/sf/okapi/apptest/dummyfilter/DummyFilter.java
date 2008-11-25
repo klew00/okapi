@@ -228,7 +228,8 @@ public class DummyFilter implements IFilter {
 
 		String trgLang = "FR-CA";
 		TargetsAnnotation ta = new TargetsAnnotation();
-		ta.set(trgLang, new TextUnit(tu.getId(), "Bonjour tout le monde"));
+		TextUnit trgTu = new TextUnit(tu.getId(), "Bonjour tout le monde");
+		ta.set(trgLang, trgTu);
 		tu.setAnnotation(ta);
 		
 		GenericSkeleton skel = new GenericSkeleton("<tu tuid=\"1\" datatype=\"Text\">\n");
@@ -241,17 +242,17 @@ public class DummyFilter implements IFilter {
 		skel.addRef(tu, null);
 		skel.add("<seg>\n </tuv>\n");
 		skel.append(" <tuv xml:lang=\"FR-CA\" creationid=\"Okapi\" ");
-		tu.setProperty(new Property("creationid", "Okapi", false));
+		trgTu.setProperty(new Property("creationid", "Okapi", false));
 		skel.append("changeid=\"");
-		tu.setProperty(new Property("changeid", "Olifant", true));
-		skel.addRef(tu.getId(), "changeid", trgLang);
+		trgTu.setProperty(new Property("changeid", "Olifant", true));
+		skel.addRef(trgTu, "changeid", trgLang);
 		skel.add("\">\n");
 		skel.append("  <prop type=\"Origin\">");
-		tu.setProperty(new Property("Origin", "MT", true));
-		skel.addRef(tu.getId(), "Origin", trgLang);
+		trgTu.setProperty(new Property("Origin", "MT", true));
+		skel.addRef(trgTu, "Origin", trgLang);
 		skel.add("</prop>\n");
 		skel.append("  <seg>");
-		skel.addRef(tu, trgLang);
+		skel.addRef(trgTu, null); //tu, trgLang); // Or skel.addRef(trgTu, null); 
 		skel.add("</seg>\n");
 		skel.append(" </tuv>\n</tu>");
 		
@@ -272,8 +273,8 @@ public class DummyFilter implements IFilter {
 		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		makeCase004();
-		//makeCase008();
+		//makeCase004();
+		makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("d1")));

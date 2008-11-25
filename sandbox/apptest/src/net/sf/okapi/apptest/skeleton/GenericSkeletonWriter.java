@@ -139,9 +139,12 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	public IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		IReferenceable ref = referents.get(id);
-		// Remove the object found from the list, so the list is clean
-		// We can do this because each referent is referenced to onl once
-		if ( ref != null ) referents.remove(id);
+
+		// Remove the object found from the list
+		//TODO: when can we do this?
+		//if ( ref != null ) {
+		//	referents.remove(id);
+		//}
 		return ref;
 	}
 
@@ -294,19 +297,23 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		if ( marker == null ) {
 			return "-ERR:INVALID-REF-MARKER-";
 		}
-		// Check for self-reference from the resource that holds the skeleton
-		if ( "$self$".compareTo((String)marker[0]) == 0 ) {
-			if ( part.parent instanceof TextUnit ) {
-				return getContent((TextUnit)part.parent, (part.language == null) ? language : part.language);
-			}
-			else {
-				throw new RuntimeException("self-references this skeleton part must be a text-unit.");
+		String propName = (String)marker[3];
+		
+		// We use part.parent rather than a reference because the resource
+		// may not be part of the referents list
+		if ( propName == null ) { // Reference to the content of the referent
+			if ( "$self$".compareTo((String)marker[0]) == 0 ) {
+				if ( part.parent instanceof TextUnit ) {
+					return getContent((TextUnit)part.parent, part.language);
+				}
+				else {
+					throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
+				}
 			}
 		}
-		// Else: Get the referent's string
-		String propName = (String)marker[3];
-		IReferenceable ref = getReference((String)marker[0]);
-		return getString(ref, propName);
+
+		// Or to a property of the referent
+		return getString((IReferenceable)part.parent, propName);
 	}
 
 	private String getString (IReferenceable ref,

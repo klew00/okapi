@@ -54,17 +54,18 @@ public class GenericSkeleton implements ISkeleton {
 
 	/**
 	 * Adds a reference to the skeleton.
-	 * @param Id of the referenced resource.
+	 * @param referent Resource object.
 	 * @param propName Property name or null if the reference is to the text.
 	 * @param language Language or null if the reference is to the source.
 	 */
-	public void addRef (String refId,
+	public void addRef (IResource referent,
 		String propName,
 		String language)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(
-			TextFragment.makeRefMarker(refId, propName));
+			TextFragment.makeRefMarker("$self$", propName));
 		part.language = language;
+		part.parent = referent;
 		list.add(part);
 		// Flag that the next append() should start a new part
 		createNew = true;
