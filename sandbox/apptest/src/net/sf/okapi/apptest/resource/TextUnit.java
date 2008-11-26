@@ -1,5 +1,8 @@
 package net.sf.okapi.apptest.resource;
 
+import java.util.Hashtable;
+import java.util.Iterator;
+
 import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 
 public class TextUnit extends BaseReferenceable {
@@ -120,6 +123,12 @@ public class TextUnit extends BaseReferenceable {
 		}
 		ta.set(language, tu);
 	}
+	
+	public Iterator<String> targetNames () {
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta != null ) return ta.iterator();
+		return null;
+	}
 
 	@Override
 	public boolean hasTargetProperty (String language,
@@ -154,6 +163,14 @@ public class TextUnit extends BaseReferenceable {
 	{
 		// The target property use the target TU, not the source TU's annotations
 		getTarget(language, CREATE_COPY).setProperty(property);
+	}
+
+	@Override
+	public Iterator<String> targetPropertyNames (String language) {
+		// The target property use the target TU, not the source TU's annotations
+		TextUnit tu = getTarget(language, CREATE_COPY);
+		if ( tu.properties == null ) tu.properties = new Hashtable<String, Property>(); 
+		return tu.properties.keySet().iterator();
 	}
 
 }

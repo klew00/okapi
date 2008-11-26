@@ -1,7 +1,10 @@
 package net.sf.okapi.apptest.resource;
 
 import java.security.InvalidParameterException;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.okapi.apptest.annotation.Annotations;
@@ -58,6 +61,11 @@ public class BaseNameable implements IResource, INameable {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		properties.put(property.getName(), property);
 	}
+	
+	public Iterator<String> propertyNames () {
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		return properties.keySet().iterator();
+	}
 
 	@SuppressWarnings("unchecked")
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
@@ -87,7 +95,6 @@ public class BaseNameable implements IResource, INameable {
 		Map<String, Property> trgProps = tpa.get(language);
 		return trgProps.get(name);
 	}
-		
 
 	public Property getTargetProperty (String language,
 		String name,
@@ -152,6 +159,14 @@ public class BaseNameable implements IResource, INameable {
 			trgProps = tpa.get(language);
 		}
 		trgProps.put(property.getName(), property);
+	}
+
+	public Iterator<String> targetPropertyNames (String language) {
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) return null;
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) return null;
+		return trgProps.keySet().iterator();
 	}
 
 }

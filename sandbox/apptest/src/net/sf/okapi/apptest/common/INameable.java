@@ -1,5 +1,7 @@
 package net.sf.okapi.apptest.common;
 
+import java.util.Iterator;
+
 import net.sf.okapi.apptest.resource.Property;
 
 public interface INameable {
@@ -12,6 +14,8 @@ public interface INameable {
 
 	public void setProperty (Property property);
 	
+	public Iterator<String> propertyNames ();
+
 	public boolean hasTargetProperty (String language,
 		String name);
 
@@ -25,4 +29,6 @@ public interface INameable {
 	public void setTargetProperty (String language,
 		Property property);
 	
+	public Iterator<String> targetPropertyNames (String language);
+
 }

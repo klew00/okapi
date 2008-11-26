@@ -1,6 +1,7 @@
 package net.sf.okapi.apptest.skeleton;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
@@ -86,6 +87,14 @@ public class StorageList extends ArrayList<IResource>
 
 	public boolean hasTargetProperty(String language, String name) {
 		return startGroup.hasTargetProperty(language, name);
+	}
+
+	public Iterator<String> propertyNames () {
+		return startGroup.propertyNames();
+	}
+
+	public Iterator<String> targetPropertyNames (String language) {
+		return startGroup.targetPropertyNames(language);
 	}
 
 }
