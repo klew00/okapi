@@ -124,7 +124,7 @@ public class TextUnit extends BaseReferenceable {
 		ta.set(language, tu);
 	}
 	
-	public Iterator<String> targetNames () {
+	public Iterator<String> targetLanguages () {
 		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
 		if ( ta != null ) return ta.iterator();
 		return null;

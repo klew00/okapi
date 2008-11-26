@@ -57,7 +57,7 @@ public class Test {
 		System.out.println("trg prop1="+tu.getTargetProperty("fr", "prop1").toString());
 
 		System.out.println("------");
-		Iterator<String> targetNames = tu.targetNames();
+		Iterator<String> targetNames = tu.targetLanguages();
 		while ( targetNames.hasNext() ) {
 			String lang = targetNames.next();
 			System.out.println("target = " + lang);

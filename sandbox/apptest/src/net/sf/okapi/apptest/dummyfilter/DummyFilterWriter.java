@@ -1,14 +1,20 @@
 package net.sf.okapi.apptest.dummyfilter;
 
 import java.io.OutputStream;
+import java.util.Iterator;
 
+import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IParameters;
+import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.filters.IFilterWriter;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
+import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.TextUnit;
+import net.sf.okapi.apptest.skeleton.GenericSkeleton;
+import net.sf.okapi.apptest.skeleton.GenericSkeletonPart;
 
 public class DummyFilterWriter implements IFilterWriter {
 
@@ -33,62 +39,113 @@ public class DummyFilterWriter implements IFilterWriter {
 		StartGroup grp;
 		TextUnit tu;
 		DocumentPart dp;
+		Ending ending;
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			System.out.println("start-document");
+			System.out.println("START_DOCUMENT -> StartDocument={");
+			printInfo((INameable)event.getResource());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
+			System.out.println("}");
 			break;
 		case END_DOCUMENT:
-			System.out.println("end-document");
+			ending = (Ending)event.getResource();
+			System.out.println("END_DOCUMENT -> Ending={");
+			System.out.println("   id="+ending.getId());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
+			System.out.println("}");
 			close();
 			break;
 		case START_SUBDOCUMENT:
-			System.out.println("start-sub-document");
+			System.out.println("START_SUBDOCUMENT -> StartSubDocument={");
+			printInfo((INameable)event.getResource());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
+			System.out.println("}");
 			break;
 		case END_SUBDOCUMENT:
-			System.out.println("end-sub-document");
+			ending = (Ending)event.getResource();
+			System.out.println("END_SUBDOCUMENT -> Ending={");
+			System.out.println("   id="+ending.getId());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
+			System.out.println("}");
 			break;
 		case START_GROUP:
 			grp = (StartGroup)event.getResource();
-			System.out.println("start-group={");
-			System.out.println("   id="+grp.getId());
-			if ( grp.isReferent() ) {
-				System.out.println("   isReference="+grp.isReferent());
-			}
+			System.out.println("START_GROUP -> StartGroup={");
+			printInfo((INameable)event.getResource());
+			System.out.println("   isReference="+grp.isReferent());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
 			System.out.println("}");
-			//level++;
 			break;
 		case END_GROUP:
-			//level--;
-			Ending ending = (Ending)event.getResource();
-			System.out.println("end-group={");
+			ending = (Ending)event.getResource();
+			System.out.println("END_GROUP -> Ending={");
 			System.out.println("   id="+ending.getId());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
 			System.out.println("}");
 			break;
 		case TEXT_UNIT:
 			tu = (TextUnit)event.getResource();
-			System.out.println("text-unit={");
-			System.out.println("   id="+tu.getId());
-			if ( tu.isReferent() ) {
-				System.out.println("   isReference="+tu.isReferent());
-			}
-			System.out.println("   text="+out(tu.toString()));
+			System.out.println("TEXT_UNIT -> TextUnit={");
+			printInfo((INameable)event.getResource());
+			System.out.println("   isReference="+tu.isReferent());
+			printTextUnit((TextUnit)event.getResource());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
 			System.out.println("}");
 			break;
 		case DOCUMENT_PART:
 			dp = (DocumentPart)event.getResource();
-			System.out.println("document-part={");
-			System.out.println("   id="+dp.getId());
-			if ( dp.isReferent() ) {
-				System.out.println("   isReference="+dp.isReferent());
-			}
-			/*TODO: value 
-			for ( String key : lp.getProperties().keySet() ) {
-				System.out.println("   prop: key="+key+" value='"+lp.getProperty(key)+"'");
-			}*/
+			System.out.println("DOCUMENT_PART -> DocumentPart={");
+			printInfo((INameable)event.getResource());
+			System.out.println("   isReference="+dp.isReferent());
+			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
 			System.out.println("}");
 			break;
 		}
 		return event;
+	}
+
+	private void printTextUnit (TextUnit tu) {
+		System.out.println("   text="+out(tu.toString()));
+		Iterator<String> iterLang = tu.targetLanguages();
+		while ( iterLang.hasNext() ) {
+			String lang = iterLang.next();
+			System.out.println("   target["+lang+"]={");
+				TextUnit trg = tu.getTarget(lang);
+				System.out.println("      text="+out(trg.toString()));
+				System.out.println("      properties={");
+				Iterator<String> iterProp = trg.propertyNames();
+				while ( iterProp.hasNext() ) {
+					String name = iterProp.next();
+					Property prop = trg.getProperty(name);
+					System.out.println("         prop["+name+"]='"+prop.getValue()+"' ("
+						+ (prop.isWriteable() ? "localizable" : "read-only" ) + ")");
+				}
+				System.out.println("      }");
+			System.out.println("   }");
+		}
+	}
+	
+	private void printInfo (INameable res) {
+		System.out.println("   id="+((IResource)res).getId());
+		System.out.println("   properties={");
+		Iterator<String> iter = res.propertyNames();
+		while ( iter.hasNext() ) {
+			String name = iter.next();
+			Property prop = res.getProperty(name);
+			System.out.println("      prop["+name+"]='"+prop.getValue()+"' ("
+				+ (prop.isWriteable() ? "localizable" : "read-only" ) + ")");
+		}
+		System.out.println("   }");
+	}
+	
+	private void printSkeleton(GenericSkeleton skel) {
+		System.out.println("   skeleton={");
+		if ( skel != null ) {
+			for ( GenericSkeletonPart part : skel.getParts() ) {
+				System.out.println("      part='"+part.toString().replace("\n", "\\n")+"'");
+			}
+		}
+		System.out.println("   }");
 	}
 	
 	private String out (String text) {

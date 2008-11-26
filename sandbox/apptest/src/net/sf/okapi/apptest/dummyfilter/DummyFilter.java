@@ -138,6 +138,7 @@ public class DummyFilter implements IFilter {
 		// <table id=100> <tr><td>text</td></tr><table>
 		
 		StartGroup grp1 = new StartGroup("d1", "g1");
+		grp1.setProperty(new Property("id", "100", false));
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
 			new GenericSkeleton("<table id=100>\n ")));
 
