@@ -477,17 +477,16 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		if ( prop == null ) return "-ERR:PROP-NOT-FOUND-";
 		
 		// Get the value based on the output language
-		String value;
-		if ( language == null ) {
+		String value = null;
+		if ( language == null ) { // Use the source
 			value = prop.getValue();
 		}
-		else {
-			prop = (Property)prop.getAnnotation(language);
-			if ( prop == null ) { // Fall back to source
-				return resource.getProperty(name).getValue();
+		else { // Use the given language if possible
+			if ( resource.hasTargetProperty(language, name) ) {
+				value = ((Property)resource.getTargetProperty(language, name)).getValue();
 			}
-			else {
-				value = prop.getValue();
+			else { // Fall back to source
+				value = resource.getProperty(name).getValue();				
 			}
 		}
 		

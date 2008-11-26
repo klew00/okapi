@@ -4,7 +4,7 @@ public interface IResource {
 	
 	public static final int DO_NOTHING = 0;
 	public static final int CREATE_EMPTY = 1;
-	public static final int CREATE_CLONE = 2;
+	public static final int CREATE_COPY = 2;
 	
 	public String getId ();
 	

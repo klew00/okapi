@@ -35,14 +35,14 @@ public class PseudoTranslate implements IUtility {
 		if ( !prop.isWriteable() ) return; // Can't modify it
 		
 		// Else: localize the href value
-		Property trgProp = resource.getTargetProperty(trgLang, prop.getName(), IResource.CREATE_CLONE);
+		Property trgProp = resource.getTargetProperty(trgLang, prop.getName(), IResource.CREATE_COPY);
 		trgProp.setValue(trgLang+"_"+prop.getValue());
 	}
 	
 	private void processTU (TextUnit tu) {
 		//if ( !tu.hasTarget(trgLang) ) {
 		// Translate even if we have a target, just to check we use the right TU
-			TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_CLONE);
+			TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_COPY);
 			TextFragment tf = trgTu.getContent();
 			tf.setCodedText(trgTu.getContent().getCodedText().replace("e", "\u00CA"));
 		//}

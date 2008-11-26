@@ -6,7 +6,6 @@ import java.util.Map;
 
 import net.sf.okapi.apptest.annotation.Annotations;
 import net.sf.okapi.apptest.annotation.TargetPropertiesAnnotation;
-import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IResource;
@@ -68,6 +67,27 @@ public class BaseNameable implements IResource, INameable {
 	public void setAnnotation (IAnnotation annotation) {
 		annotations.set(annotation);
 	}
+
+	public boolean hasTargetProperty (String language,
+		String name)
+	{
+		if ( name == null ) throw new InvalidParameterException();
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) return false;
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) return false;
+		return (trgProps.get(name) != null);
+	}
+	
+	public Property getTargetProperty (String language,
+		String name)
+	{
+		// Assumes it exists
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		Map<String, Property> trgProps = tpa.get(language);
+		return trgProps.get(name);
+	}
+		
 
 	public Property getTargetProperty (String language,
 		String name,
@@ -133,5 +153,5 @@ public class BaseNameable implements IResource, INameable {
 		}
 		trgProps.put(property.getName(), property);
 	}
-	
+
 }

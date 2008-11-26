@@ -1,5 +1,6 @@
 package net.sf.okapi.apptest.annotation;
 
+import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.TextUnit;
 
 public class Test {
@@ -18,17 +19,18 @@ public class Test {
 		annotations.set(ca);
 		annotations.set(ta);
 		
-		
 		// Cannot to this:
 		// TextUnit trgTu = annotations.get(TargetsAnnotation.class).get("es");
 		TextUnit trgTu = ((TargetsAnnotation)annotations.get(TargetsAnnotation.class)).get("es");
+		System.out.println(trgTu.toString());
 
 		ca = annotations.get(CommentsAnnotation.class);
 		for (String s : ca) {
 			System.out.println(s);
 		}
 		
-		TextUnit en = (ta = annotations.get(TargetsAnnotation.class)).get("en");
+		TextUnit en = (ta = annotations.get(TargetsAnnotation.class)).get("es");
+		System.out.println(en.toString());
 		for (String s : ta) {
 			System.out.print(s + " = ");
 			System.out.println(ta.get(s).toString());
@@ -37,6 +39,17 @@ public class Test {
 		System.out.println(ca.toString());
 		System.out.println(ta.toString());
 
+		System.out.println("------");
+
+		TextUnit tu = new TextUnit("t1", "Source text of t1.");
+		tu.setProperty(new Property("prop1", "Source value of prop1", true));
+		tu.setTarget("fr", new TextUnit("t1", "FR text of t1."));
+		tu.setTargetProperty("fr", new Property("prop1", "FR value of prop1", true));
+
+		System.out.println("src text="+tu.toString());
+		System.out.println("src prop1="+tu.getProperty("prop1").toString());
+		System.out.println("trg text="+tu.getTarget("fr").toString());
+		System.out.println("trg prop1="+tu.getTargetProperty("fr", "prop1").toString());
 	}
 
 }

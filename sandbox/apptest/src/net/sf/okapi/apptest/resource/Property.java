@@ -16,6 +16,11 @@ public class Property {
 		annotations = new Hashtable<String, Object>();
 	}
 	
+	@Override
+	public String toString () {
+		return value;
+	}
+	
 	public String getName () {
 		return name;
 	}

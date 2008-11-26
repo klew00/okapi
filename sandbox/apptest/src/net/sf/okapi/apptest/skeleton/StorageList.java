@@ -80,4 +80,12 @@ public class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
+	public Property getTargetProperty (String language, String name) {
+		return startGroup.getTargetProperty(language, name);
+	}
+
+	public boolean hasTargetProperty(String language, String name) {
+		return startGroup.hasTargetProperty(language, name);
+	}
+
 }

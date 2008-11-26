@@ -51,16 +51,6 @@ public class TextUnit extends BaseReferenceable {
 	}
 
 	/**
-	 * Gets the target TextUnit of a given TextUnit, for a given language.
-	 * This method <b>assumes the target exists</b> and does no check at all.
-	 * @return The target TextUnit.
-	 */
-	public TextUnit getTarget (String language) {
-		return ((TargetsAnnotation)annotations.get(
-			TargetsAnnotation.class)).get(language);
-	}
-
-	/**
 	 * Indicates if a TextUnit has a target for a given language.
 	 * @param language The language to check for.
 	 * @return True if a target object exists (even empty), false if a target
@@ -73,6 +63,16 @@ public class TextUnit extends BaseReferenceable {
 	}
 	
 	/**
+	 * Gets the target TextUnit of a given TextUnit, for a given language.
+	 * This method <b>assumes the target exists</b> and does no check at all.
+	 * @return The target TextUnit.
+	 */
+	public TextUnit getTarget (String language) {
+		return ((TargetsAnnotation)annotations.get(
+			TargetsAnnotation.class)).get(language);
+	}
+
+	/**
 	 * Gets the target TextUnit of a given source TextUnit, for a given language.
 	 * If the target does not exists a null is returned, except if the option to create
 	 * the target is set.
@@ -80,8 +80,8 @@ public class TextUnit extends BaseReferenceable {
 	 * @param creationOptions The creation option:
 	 * <ul><li>DO_NOTHING: Returns null if there is no target.</li>
 	 * <li>CREATE_EMPTY: Creates a target if it does not exist, and leave it empty.</li>
-	 * <li>CREATE_CLONE: Creates a target if it does not exist, and copy the text of
-	 * the source into it.</li></ul> 
+	 * <li>CREATE_COPY: Creates a target if it does not exist, and copy the text and
+	 * in-line codes of the source into it.</li></ul> 
 	 * @return The target TextUnit, or null if none if available for the given
 	 * language.
 	 */
@@ -108,6 +108,52 @@ public class TextUnit extends BaseReferenceable {
 			}
 		}
 		return trgTu;
+	}
+
+	public void setTarget (String language,
+		TextUnit tu)
+	{
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) {
+			ta = new TargetsAnnotation();
+			annotations.set(ta);
+		}
+		ta.set(language, tu);
+	}
+
+	@Override
+	public boolean hasTargetProperty (String language,
+		String name)
+	{
+		// The target property use the target TU, not the source TU's annotations
+		if ( !hasTarget(language) ) return false;
+		return (getTarget(language).getProperty(name) != null);
+	}
+
+	@Override
+	public Property getTargetProperty (String language,
+		String name)
+	{
+		// The target property use the target TU, not the source TU's annotations
+		// Assumes the target exists
+		return getTarget(language).getProperty(name);
+	}
+
+	@Override
+	public Property getTargetProperty (String language,
+		String name,
+		int creationOptions)
+	{
+		// The target property use the target TU, not the source TU's annotations
+		return getTarget(language, creationOptions).getProperty(name);
+	}
+
+	@Override
+	public void setTargetProperty (String language,
+		Property property)
+	{
+		// The target property use the target TU, not the source TU's annotations
+		getTarget(language, CREATE_COPY).setProperty(property);
 	}
 
 }

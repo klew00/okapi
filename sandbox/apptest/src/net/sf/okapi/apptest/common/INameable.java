@@ -12,8 +12,17 @@ public interface INameable {
 
 	public void setProperty (Property property);
 	
-	public Property getTargetProperty (String language, String name, int creationOptions);
+	public boolean hasTargetProperty (String language,
+		String name);
+
+	public Property getTargetProperty (String language,
+		String name);
 	
-	public void setTargetProperty (String language, Property property);
+	public Property getTargetProperty (String language,
+		String name,
+		int creationOptions);
+	
+	public void setTargetProperty (String language,
+		Property property);
 	
 }
