@@ -1,6 +1,6 @@
 package net.sf.okapi.apptest.common;
 
-import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.okapi.apptest.resource.Property;
 
@@ -12,23 +12,32 @@ public interface INameable {
 	
 	public Property getProperty (String name);
 
-	public void setProperty (Property property);
+	public Property setProperty (Property property);
 	
-	public Iterator<String> propertyNames ();
+	public Set<String> getPropertyNames ();
 
-	public boolean hasTargetProperty (String language,
-		String name);
+	public Property getSourceProperty (String name);
+
+	public Property setSourceProperty (Property property);
+	
+	public Set<String> getSourcePropertyNames ();
 
 	public Property getTargetProperty (String language,
 		String name);
 	
-	public Property getTargetProperty (String language,
-		String name,
-		int creationOptions);
-	
-	public void setTargetProperty (String language,
+	public Property setTargetProperty (String language,
 		Property property);
 	
-	public Iterator<String> targetPropertyNames (String language);
+	public Set<String> getTargetPropertyNames (String language);
 
+	public Set<String> getTargetLanguages ();
+	
+	public boolean hasTargetProperty (String language,
+			String name);
+
+	public Property createTargetProperty (String language,
+		String name,
+		boolean overwriteExisting,
+		int creationOptions);
+	
 }

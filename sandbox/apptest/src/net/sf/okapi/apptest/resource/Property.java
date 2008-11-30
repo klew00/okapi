@@ -1,26 +1,26 @@
 package net.sf.okapi.apptest.resource;
 
-import java.util.Hashtable;
+import net.sf.okapi.apptest.annotation.Annotations;
+import net.sf.okapi.apptest.common.IAnnotation;
 
 public class Property {
 	
 	private final String name;
-	private final boolean isWriteable;
 	private String value;
-	private Hashtable<String, Object> annotations;
+	private final boolean isReadOnly;
+	protected Annotations annotations;
 
-	public Property (String name, String value, boolean isWriteable) {
+	public Property (String name, String value, boolean isReadOnly) {
 		this.name = name;
 		this.value = value;
-		this.isWriteable = isWriteable;
-		annotations = new Hashtable<String, Object>();
+		this.isReadOnly = isReadOnly;
 	}
 	
 	@Override
 	public String toString () {
 		return value;
 	}
-	
+
 	public String getName () {
 		return name;
 	}
@@ -33,16 +33,19 @@ public class Property {
 		this.value = value;
 	}
 	
-	public boolean isWriteable () {
-		return isWriteable;
+	public boolean isReadOnly () {
+		return isReadOnly;
 	}
 	
-	public Object getAnnotation (String name) {
-		return annotations.get(name);
+	@SuppressWarnings("unchecked")
+	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		if ( annotations == null ) return null;
+		return (A)annotations.get(type);
 	}
-	
-	public void setAnnotation (String name, Object annotation) {
-		annotations.put(name, annotation);
+
+	public void setAnnotation (IAnnotation annotation) {
+		if ( annotations == null ) annotations = new Annotations();
+		annotations.set(annotation);
 	}
-	
+
 }

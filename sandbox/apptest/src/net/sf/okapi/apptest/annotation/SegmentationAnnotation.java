@@ -7,25 +7,19 @@ import java.util.List;
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.TextFragment;
-import net.sf.okapi.apptest.resource.TextUnit;
 
 public class SegmentationAnnotation extends TextFragment implements IAnnotation {
 
 	ArrayList<TextFragment> segments;
 	
 	public SegmentationAnnotation () {
-		super(null);
+		super();
 	}
 	
-	public SegmentationAnnotation (TextUnit parent) {
-		super(parent);
-	}
-
 	@Override
 	public SegmentationAnnotation clone () {
-		SegmentationAnnotation newCont = new SegmentationAnnotation(parent);
+		SegmentationAnnotation newCont = new SegmentationAnnotation();
 		newCont.setCodedText(getCodedText(), getCodes(), false);
-		//newCont.id = id;
 		newCont.lastCodeID = lastCodeID;
 		if ( isSegmented() ) {
 			newCont.segments = new ArrayList<TextFragment>(segments);
@@ -106,12 +100,12 @@ public class SegmentationAnnotation extends TextFragment implements IAnnotation 
 			// Remove it from the main content
 			int width = ranges.get(i).y-ranges.get(i).x;
 			// For chunks < 2 there is no codes so we can just add the needed room for the segment marker
-			if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment(null, "Z"));
-			else if ( width == 0 ) insert(ranges.get(i).x+diff, new TextFragment(null, "ZZ"));
+			if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment("Z"));
+			else if ( width == 0 ) insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
 			else { // Otherwise: we need to remove the chunk of coded text and its codes
 				remove(ranges.get(i).x+diff, ranges.get(i).y+diff);
 				// then re-insert room for the segment marker
-				insert(ranges.get(i).x+diff, new TextFragment(null, "ZZ"));
+				insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
 			}
 			
 			// Set the segment marker and its corresponding code
@@ -262,8 +256,8 @@ public class SegmentationAnnotation extends TextFragment implements IAnnotation 
 		// Remove it from the main content
 		int width = end-start;
 		if ( width > 2 ) remove(start, end-2);
-		else if ( width == 1 ) insert(start, new TextFragment(null, "Z"));
-		else if ( width == 0 ) insert(start, new TextFragment(null, "ZZ"));
+		else if ( width == 1 ) insert(start, new TextFragment("Z"));
+		else if ( width == 0 ) insert(start, new TextFragment("ZZ"));
 		// Else width == 2 : Do nothing
 			
 		// Set the segment marker and its corresponding code

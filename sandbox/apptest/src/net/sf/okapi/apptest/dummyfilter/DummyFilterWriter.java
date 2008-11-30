@@ -1,7 +1,6 @@
 package net.sf.okapi.apptest.dummyfilter;
 
 import java.io.OutputStream;
-import java.util.Iterator;
 
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IParameters;
@@ -12,6 +11,7 @@ import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.StartGroup;
+import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.skeleton.GenericSkeleton;
 import net.sf.okapi.apptest.skeleton.GenericSkeletonPart;
@@ -88,7 +88,7 @@ public class DummyFilterWriter implements IFilterWriter {
 			System.out.println("TEXT_UNIT -> TextUnit={");
 			printInfo((INameable)event.getResource());
 			System.out.println("   isReference="+tu.isReferent());
-			printTextUnit((TextUnit)event.getResource());
+			printTextUnitContent((TextUnit)event.getResource());
 			printSkeleton((GenericSkeleton)event.getResource().getSkeleton());
 			System.out.println("}");
 			break;
@@ -104,36 +104,36 @@ public class DummyFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	private void printTextUnit (TextUnit tu) {
-		System.out.println("   text="+out(tu.toString()));
-		Iterator<String> iterLang = tu.targetLanguages();
-		while ( iterLang.hasNext() ) {
-			String lang = iterLang.next();
+	private void printTextUnitContent (TextUnit tu) {
+		System.out.println("   source={");
+		printInfo(tu.getSource());
+		System.out.println("   }");
+		for ( String lang : tu.getTargetLanguages() ) {
 			System.out.println("   target["+lang+"]={");
-				TextUnit trg = tu.getTarget(lang);
-				System.out.println("      text="+out(trg.toString()));
-				System.out.println("      properties={");
-				Iterator<String> iterProp = trg.propertyNames();
-				while ( iterProp.hasNext() ) {
-					String name = iterProp.next();
-					Property prop = trg.getProperty(name);
-					System.out.println("         prop["+name+"]='"+prop.getValue()+"' ("
-						+ (prop.isWriteable() ? "localizable" : "read-only" ) + ")");
-				}
-				System.out.println("      }");
+				printInfo(tu.getTarget(lang));
 			System.out.println("   }");
 		}
+	}
+	
+	private void printInfo (TextContainer tc) {
+		System.out.println("      text="+out(tc.toString()));
+		System.out.println("      properties={");
+		for ( String name : tc.getPropertyNames() ) {
+			Property prop = tc.getProperty(name);
+			System.out.println("         prop["+name+"]='"+prop.getValue()+"' ("
+				+ (prop.isReadOnly() ? "read-only" : "localizable" ) + ")");
+		}
+		System.out.println("      }");
+		
 	}
 	
 	private void printInfo (INameable res) {
 		System.out.println("   id="+((IResource)res).getId());
 		System.out.println("   properties={");
-		Iterator<String> iter = res.propertyNames();
-		while ( iter.hasNext() ) {
-			String name = iter.next();
+		for ( String name : res.getPropertyNames() ) {
 			Property prop = res.getProperty(name);
 			System.out.println("      prop["+name+"]='"+prop.getValue()+"' ("
-				+ (prop.isWriteable() ? "localizable" : "read-only" ) + ")");
+				+ (prop.isReadOnly() ? "read-only" : "localizable" ) + ")");
 		}
 		System.out.println("   }");
 	}

@@ -2,10 +2,11 @@ package net.sf.okapi.apptest.common;
 
 public interface IResource {
 	
-	public static final int DO_NOTHING = 0;
-	public static final int CREATE_EMPTY = 1;
-	public static final int CREATE_COPY = 2;
-	
+	public static final int CREATE_EMPTY = 0;
+	public static final int COPY_CONTENT = 0x01;
+	public static final int COPY_PROPERTIES = 0x02;
+	public static final int COPY_ALL = (COPY_CONTENT | COPY_PROPERTIES);
+
 	public String getId ();
 	
 	public void setId (String id);

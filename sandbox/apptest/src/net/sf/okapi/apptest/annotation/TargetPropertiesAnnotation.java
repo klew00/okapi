@@ -2,6 +2,7 @@ package net.sf.okapi.apptest.annotation;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.apptest.common.IAnnotation;
@@ -23,12 +24,16 @@ public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String>
 		return targets.get(locale);
 	}
 
-	public boolean isEmpty() {
+	public boolean isEmpty () {
 		return targets.isEmpty();
 	}
 
 	public Iterator<String> iterator () {
 		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
 		return iterableLocales.iterator();
+	}
+
+	public Set<String> getLanguages () {
+		return targets.keySet();
 	}
 }

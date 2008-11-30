@@ -26,6 +26,7 @@ import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.StartDocument;
 import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.StartSubDocument;
+import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.common.Util;
@@ -356,19 +357,19 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	private String getContent (TextUnit tu, String langToUse) {
 		TextFragment tf;
 		if ( langToUse == null ) {
-			tf = tu.getContent();
+			tf = tu.getSourceContent();
 		}
 		else {
 			if ( tu.getAnnotation(TargetsAnnotation.class) == null ) {
-				tf = tu.getContent();
+				tf = tu.getSourceContent();
 			}
 			else {
-				TextUnit trgTu = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
-				if ( trgTu == null ) {
-					tf = tu.getContent();
+				TextContainer tt = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
+				if ( tt == null ) {
+					tf = tu.getSourceContent();
 				}
 				else {
-					tf = trgTu.getContent();
+					tf = tt.getContent();
 				}
 			}
 		}

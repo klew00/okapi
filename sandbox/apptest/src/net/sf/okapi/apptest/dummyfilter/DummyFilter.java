@@ -17,6 +17,7 @@ import net.sf.okapi.apptest.resource.StartDocument;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
 import net.sf.okapi.apptest.resource.StartGroup;
+import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.resource.TextFragment.TagType;
@@ -92,14 +93,14 @@ public class DummyFilter implements IFilter {
 		// <p>Before <img href='img.png' alt='text'/> after.</p>
 
 		DocumentPart dp = new DocumentPart("dp1", true);
-		dp.setProperty(new Property("href", "img.png", true));
+		dp.setProperty(new Property("href", "img.png", false));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
 			new TextUnit("t1", "text", true)));
 
 		TextUnit tu = new TextUnit("t2", "Before ");
-		TextFragment tf = tu.getContent();
+		TextFragment tf = tu.getSourceContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "image",
 			"<img href='" + TextFragment.makeRefMarker("dp1", "href") +
 			"' alt='" + TextFragment.makeRefMarker("t1") + "'/>");
@@ -118,11 +119,11 @@ public class DummyFilter implements IFilter {
 		// <p>Before <a href='link.htm'/> after.</p>
 		
 		DocumentPart dp = new DocumentPart("dp1", true);
-		dp.setProperty(new Property("href", "link.htm", true));
+		dp.setProperty(new Property("href", "link.htm", false));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		TextUnit tu = new TextUnit("t1", "Before ");
-		TextFragment tf = tu.getContent();
+		TextFragment tf = tu.getSourceContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "link",
 			"<a href='" + TextFragment.makeRefMarker("dp1", "href") + "'/>");
 		code.setHasReference(true);
@@ -138,7 +139,7 @@ public class DummyFilter implements IFilter {
 		// <table id=100> <tr><td>text</td></tr><table>
 		
 		StartGroup grp1 = new StartGroup("d1", "g1");
-		grp1.setProperty(new Property("id", "100", false));
+		grp1.setProperty(new Property("id", "100", true));
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
 			new GenericSkeleton("<table id=100>\n ")));
 
@@ -197,15 +198,14 @@ public class DummyFilter implements IFilter {
 			new Ending("g1"),
 			new GenericSkeleton("\n </ul>")));
 
-		TextUnit tu = new TextUnit();
-		tu.setId("t3");
-		TextFragment tf = new TextFragment(tu);
+		TextUnit tu = new TextUnit("t3");
+		TextFragment tf = new TextFragment();
 		tf.append("Text before list: \n ");
 		Code code = tf.append(TagType.PLACEHOLDER, "list",
 			TextFragment.makeRefMarker("g1"));
 		code.setHasReference(true);
 		tf.append("\n and text after the list.");
-		tu.setContent(tf);
+		tu.setSourceContent(tf);
 		GenericSkeleton skel = new GenericSkeleton("<p>");
 		skel.addRef(tu, null);
 		skel.add("</p>");
@@ -229,31 +229,38 @@ public class DummyFilter implements IFilter {
 
 		String trgLang = "FR-CA";
 		TargetsAnnotation ta = new TargetsAnnotation();
-		TextUnit trgTu = new TextUnit(tu.getId(), "Bonjour tout le monde");
-		ta.set(trgLang, trgTu);
+		TextContainer trgCont = new TextContainer("Bonjour tout le monde");
+		ta.set(trgLang, trgCont);
 		tu.setAnnotation(ta);
 		
 		GenericSkeleton skel = new GenericSkeleton("<tu tuid=\"1\" datatype=\"Text\">\n");
-		tu.setProperty(new Property("datatype", "Text", false));
+		tu.setProperty(new Property("datatype", "Text", true));
 		skel.append(" <note>TU level note</note>\n");
 		skel.append(" <prop type=\"x-Domain\">TU level prop</prop>\n");
-		tu.setProperty(new Property("x-Domain", "TU level prop", false));
+		tu.setProperty(new Property("x-Domain", "TU level prop", true));
 		skel.append(" <tuv xml:lang=\"EN\" creationid=\"Okapi\">\n");
+		tu.setSourceProperty(new Property("creationid", "Okapi", true));
 		skel.append("  <seg>");
 		skel.addRef(tu, null);
 		skel.add("<seg>\n </tuv>\n");
 		skel.append(" <tuv xml:lang=\"FR-CA\" creationid=\"Okapi\" ");
-		trgTu.setProperty(new Property("creationid", "Okapi", false));
+		tu.setTargetProperty(trgLang, new Property("creationid", "Okapi", true));
 		skel.append("changeid=\"");
-		trgTu.setProperty(new Property("changeid", "Olifant", true));
-		skel.addRef(trgTu, "changeid", trgLang);
+		trgCont.setProperty(new Property("changeid", "Olifant", false));
+		
+		TextContainer tc = tu.getTarget("FR-CA");
+		for ( String n : tc.getPropertyNames() ) {
+			String s = n;
+		}
+		
+		skel.addRef(tu, "changeid", trgLang);
 		skel.add("\">\n");
 		skel.append("  <prop type=\"Origin\">");
-		trgTu.setProperty(new Property("Origin", "MT", true));
-		skel.addRef(trgTu, "Origin", trgLang);
+		trgCont.setProperty(new Property("Origin", "MT", false));
+		skel.addRef(tu, "Origin", trgLang);
 		skel.add("</prop>\n");
 		skel.append("  <seg>");
-		skel.addRef(trgTu, null); //tu, trgLang); // Or skel.addRef(trgTu, null); 
+		skel.addRef(tu, trgLang); 
 		skel.add("</seg>\n");
 		skel.append(" </tuv>\n</tu>");
 		

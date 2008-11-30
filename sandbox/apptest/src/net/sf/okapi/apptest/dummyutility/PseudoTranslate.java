@@ -4,7 +4,7 @@ import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.filters.FilterEvent;
 import net.sf.okapi.apptest.resource.Property;
-import net.sf.okapi.apptest.resource.TextFragment;
+import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextUnit;
 import net.sf.okapi.apptest.utilities.IUtility;
 
@@ -32,19 +32,21 @@ public class PseudoTranslate implements IUtility {
 	private void processProperties (INameable resource) {
 		Property prop = resource.getProperty("href");
 		if ( prop == null ) return; // Nothing to do
-		if ( !prop.isWriteable() ) return; // Can't modify it
+		if ( prop.isReadOnly() ) return; // Can't modify it
 		
-		// Else: localize the href value
-		Property trgProp = resource.getTargetProperty(trgLang, prop.getName(), IResource.CREATE_COPY);
-		trgProp.setValue(trgLang+"_"+prop.getValue());
+		// Else: create a localized href value if there is no target property yet
+		if ( !resource.hasTargetProperty(trgLang, "href") ) {
+			Property trgProp = resource.createTargetProperty(
+				trgLang, prop.getName(), false, IResource.COPY_ALL);
+			trgProp.setValue(trgLang+"_"+prop.getValue());
+		}
 	}
 	
 	private void processTU (TextUnit tu) {
 		//if ( !tu.hasTarget(trgLang) ) {
-		// Translate even if we have a target, just to check we use the right TU
-			TextUnit trgTu = tu.getTarget(trgLang, TextUnit.CREATE_COPY);
-			TextFragment tf = trgTu.getContent();
-			tf.setCodedText(trgTu.getContent().getCodedText().replace("e", "\u00CA"));
+			TextContainer tt = tu.createTarget(trgLang, false, TextUnit.COPY_ALL);
+			tt.getContent().setCodedText(
+				tt.getContent().getCodedText().replace("e", "\u00CA"));
 		//}
 	}
 

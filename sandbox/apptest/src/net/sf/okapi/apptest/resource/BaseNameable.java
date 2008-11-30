@@ -1,11 +1,9 @@
 package net.sf.okapi.apptest.resource;
 
 import java.security.InvalidParameterException;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.okapi.apptest.annotation.Annotations;
 import net.sf.okapi.apptest.annotation.TargetPropertiesAnnotation;
@@ -19,12 +17,9 @@ public class BaseNameable implements IResource, INameable {
 	protected String id;
 	protected ISkeleton skeleton;
 	protected String name;
-	protected Hashtable<String, Property> properties; // Source properties
+	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
-	
-	public BaseNameable () {
-		annotations = new Annotations();
-	}
+	protected Hashtable<String, Property> sourceProperties;
 	
 	public String getId () {
 		return id;
@@ -50,104 +45,64 @@ public class BaseNameable implements IResource, INameable {
 		this.name = name;
 	}
 	
-	public Property getProperty (String name) {
-		if ( name == null ) throw new InvalidParameterException();
-		if ( properties == null ) return null;
-		return properties.get(name);
-	}
-
-	public void setProperty (Property property) {
-		if ( property == null ) throw new InvalidParameterException();
-		if ( properties == null ) properties = new Hashtable<String, Property>();
-		properties.put(property.getName(), property);
-	}
-	
-	public Iterator<String> propertyNames () {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
-		return properties.keySet().iterator();
-	}
-
 	@SuppressWarnings("unchecked")
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		if ( annotations == null ) return null;
 		return (A)annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
+		if ( annotation == null ) annotations = new Annotations();
 		annotations.set(annotation);
 	}
 
-	public boolean hasTargetProperty (String language,
-		String name)
-	{
-		if ( name == null ) throw new InvalidParameterException();
-		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
-		if ( tpa == null ) return false;
-		Map<String, Property> trgProps = tpa.get(language);
-		if ( trgProps == null ) return false;
-		return (trgProps.get(name) != null);
+	public Property getProperty (String name) {
+		if ( properties == null ) return null;
+		return properties.get(name);
+	}
+
+	public Property setProperty (Property property) {
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		properties.put(property.getName(), property);
+		return property;
 	}
 	
-	public Property getTargetProperty (String language,
-		String name)
-	{
-		// Assumes it exists
-		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
-		Map<String, Property> trgProps = tpa.get(language);
-		return trgProps.get(name);
+	public Set<String> getPropertyNames () {
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		return properties.keySet();
+	}
+
+	public Property getSourceProperty (String name) {
+		if ( sourceProperties == null ) return null;
+		return sourceProperties.get(name);
+	}
+
+	public Property setSourceProperty (Property property) {
+		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
+		sourceProperties.put(property.getName(), property);
+		return property;
+	}
+	
+	public Set<String> getSourcePropertyNames () {
+		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
+		return sourceProperties.keySet();
 	}
 
 	public Property getTargetProperty (String language,
-		String name,
-		int creationOptions)
+		String name)
 	{
-		if ( name == null ) throw new InvalidParameterException();
+		if ( annotations == null ) return null;
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
-		if ( tpa == null ) {
-			if ( creationOptions > DO_NOTHING ) {
-				tpa = new TargetPropertiesAnnotation();
-				annotations.set(tpa);
-			}
-			else return null;
-		}
+		if ( tpa == null ) return null;
 		Map<String, Property> trgProps = tpa.get(language);
-		if ( trgProps == null ) {
-			if ( creationOptions == DO_NOTHING ) {
-				return null;
-			}
-			else { // Else: create the properties list
-				tpa.set(language, new Hashtable<String, Property>());
-				trgProps = tpa.get(language);
-			}
-		}
-		Property trgProp = trgProps.get(name);
-		if ( trgProp == null ) {
-			if ( creationOptions == DO_NOTHING ) {
-				return null;
-			}
-			else { // Else: create the property
-				Property srcProp = getProperty(name); // Get the source
-				if ( srcProp == null ) { // No corresponding source
-					trgProp = new Property(name, "", true);
-				}
-				else { // Has a corresponding source
-					if ( creationOptions > CREATE_EMPTY ) {
-						trgProp = new Property(name, srcProp.getValue(), srcProp.isWriteable());
-					}
-					else {
-						trgProp = new Property(name, "", srcProp.isWriteable());
-					}
-				}
-				trgProps.put(name, trgProp); // Add the property to the list
-			}
-		}
-		return trgProp;
+		if ( trgProps == null ) return null;
+		return trgProps.get(name);
 	}
-	
-	public void setTargetProperty (String language,
+
+	public Property setTargetProperty (String language,
 		Property property)
 	{
-		//TODO
-		if ( property == null ) throw new InvalidParameterException();
+		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) {
 			tpa = new TargetPropertiesAnnotation();
@@ -159,14 +114,78 @@ public class BaseNameable implements IResource, INameable {
 			trgProps = tpa.get(language);
 		}
 		trgProps.put(property.getName(), property);
+		return property;
 	}
 
-	public Iterator<String> targetPropertyNames (String language) {
+	public Set<String> getTargetPropertyNames (String language) {
+		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
-		if ( tpa == null ) return null;
+		if ( tpa == null ) {
+			tpa = new TargetPropertiesAnnotation();
+			annotations.set(tpa);
+		}
 		Map<String, Property> trgProps = tpa.get(language);
-		if ( trgProps == null ) return null;
-		return trgProps.keySet().iterator();
+		if ( trgProps == null ) {
+			tpa.set(language, new Hashtable<String, Property>());
+			trgProps = tpa.get(language);
+		}
+		return trgProps.keySet();
 	}
 
+	public boolean hasTargetProperty (String language,
+		String name)
+	{
+		if ( annotations == null ) return false;
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) return false;
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) return false;
+		return (trgProps.get(name) != null);
+	}
+		
+	public Set<String> getTargetLanguages () {
+		if ( annotations == null ) annotations = new Annotations();
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) {
+			tpa = new TargetPropertiesAnnotation();
+			annotations.set(tpa);
+		}
+		return tpa.getLanguages();
+	}
+
+	public Property createTargetProperty (String language,
+		String name,
+		boolean overwriteExisting,
+		int creationOptions)
+	{
+		if ( name == null ) throw new InvalidParameterException();
+		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+		if ( tpa == null ) {
+			tpa = new TargetPropertiesAnnotation();
+			annotations.set(tpa);
+		}
+		Map<String, Property> trgProps = tpa.get(language);
+		if ( trgProps == null ) {
+			tpa.set(language, new Hashtable<String, Property>());
+			trgProps = tpa.get(language);
+		}
+		Property trgProp = trgProps.get(name);
+		if (( trgProp == null ) || overwriteExisting ) {
+			if ( creationOptions > CREATE_EMPTY ) {
+				trgProp = new Property(name, "", false);
+			}
+			else { // Copy the source
+				Property srcProp = getProperty(name); // Get the source
+				if ( srcProp == null ) { // No corresponding source
+					trgProp = new Property(name, "", false);
+				}
+				else { // Has a corresponding source
+					trgProp = new Property(name, srcProp.getValue(), srcProp.isReadOnly());
+				}
+			}
+			trgProps.put(name, trgProp); // Add the property to the list
+		}
+		return trgProp;
+	}
+	
 }

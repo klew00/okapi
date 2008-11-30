@@ -1,7 +1,7 @@
 package net.sf.okapi.apptest.skeleton;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.okapi.apptest.common.IAnnotation;
 import net.sf.okapi.apptest.common.INameable;
@@ -30,19 +30,19 @@ public class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
-	public boolean isReferent () {
-		return startGroup.isReferent();
-	}
-
-	public void setIsReferent (boolean value) {
-		// Not implemented: read-only info
-	}
-
 	public ISkeleton getSkeleton () {
 		return startGroup.getSkeleton();
 	}
 
 	public void setSkeleton (ISkeleton skeleton) {
+		// Not implemented: read-only info
+	}
+
+	public boolean isReferent () {
+		return startGroup.isReferent();
+	}
+
+	public void setIsReferent (boolean value) {
 		// Not implemented: read-only info
 	}
 
@@ -58,8 +58,9 @@ public class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
-	public void setProperty (Property property) {
+	public Property setProperty (Property property) {
 		// Not implemented: read-only info
+		return null;
 	}
 
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
@@ -70,15 +71,17 @@ public class StorageList extends ArrayList<IResource>
 		startGroup.setAnnotation(annotation);
 	}
 
-	public Property getTargetProperty(String language,
+	public Property createTargetProperty(String language,
 		String name,
+		boolean overwrite,
 		int creationOptions)
 	{
-		return startGroup.getTargetProperty(language, name, creationOptions);
+		return startGroup.createTargetProperty(language, name, overwrite, creationOptions);
 	}
 
-	public void setTargetProperty (String language, Property property) {
+	public Property setTargetProperty (String language, Property property) {
 		// Not implemented: read-only info
+		return null;
 	}
 
 	public Property getTargetProperty (String language, String name) {
@@ -89,12 +92,29 @@ public class StorageList extends ArrayList<IResource>
 		return startGroup.hasTargetProperty(language, name);
 	}
 
-	public Iterator<String> propertyNames () {
-		return startGroup.propertyNames();
+	public Set<String> getPropertyNames () {
+		return startGroup.getPropertyNames();
 	}
 
-	public Iterator<String> targetPropertyNames (String language) {
-		return startGroup.targetPropertyNames(language);
+	public Set<String> getTargetPropertyNames (String language) {
+		return startGroup.getTargetPropertyNames(language);
+	}
+
+	public Property getSourceProperty (String name) {
+		return startGroup.getSourceProperty(name);
+	}
+
+	public Set<String> getSourcePropertyNames () {
+		return startGroup.getSourcePropertyNames();
+	}
+
+	public Set<String> getTargetLanguages () {
+		return startGroup.getTargetLanguages();
+	}
+
+	public Property setSourceProperty (Property property) {
+		// Not implemented: read-only info
+		return null;
 	}
 
 }

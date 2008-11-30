@@ -81,7 +81,7 @@ public class TextFragment implements Comparable<Object> {
 	protected ArrayList<Code> codes;
 	protected boolean isBalanced;
 	protected int lastCodeID;
-	protected TextUnit parent;
+	//protected TextUnit parent;
 
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -271,8 +271,8 @@ public class TextFragment implements Comparable<Object> {
 	 * @param parent The parent of this TextFragment. You can use a null parent,
 	 * but then you won't be able to use in-line codes with references.
 	 */
-	public TextFragment (TextUnit parent) {
-		this.parent = parent;
+	public TextFragment () {
+		//this.parent = parent;
 		text = new StringBuilder();
 	}
 
@@ -282,10 +282,9 @@ public class TextFragment implements Comparable<Object> {
 	 * but then you won't be able to use in-line codes with references.
 	 * @param text The text to use.
 	 */
-	public TextFragment (TextUnit parent,
-		String text)
+	public TextFragment (String text)
 	{
-		this.parent = parent;
+		//this.parent = parent;
 		this.text = new StringBuilder(text);
 	}
 
@@ -295,10 +294,9 @@ public class TextFragment implements Comparable<Object> {
 	 * but then you won't be able to use in-line codes with references.
 	 * @param fragment The content to use.
 	 */
-	public TextFragment (TextUnit parent,
-		TextFragment fragment)
+	public TextFragment (TextFragment fragment)
 	{
-		this.parent = parent;
+		//this.parent = parent;
 		text = new StringBuilder();
 		insert(-1, fragment);
 	}
@@ -311,17 +309,16 @@ public class TextFragment implements Comparable<Object> {
 	 * @param newCodedText The new coded text.
 	 * @param newCodes The list of codes.
 	 */
-	public TextFragment (TextUnit parent,
-		String newCodedText,
+	public TextFragment (String newCodedText,
 		List<Code> newCodes)
 	{
-		this.parent = parent;
+		//this.parent = parent;
 		setCodedText(newCodedText, newCodes, false);
 	}
 	
 	@Override
 	public TextFragment clone () {
-		TextFragment tf = new TextFragment(parent);
+		TextFragment tf = new TextFragment();
 		tf.setCodedText(getCodedText(), getCodes(), false);
 		tf.lastCodeID = lastCodeID;
 		return tf;
@@ -649,7 +646,7 @@ public class TextFragment implements Comparable<Object> {
 	public TextFragment subSequence (int start,
 		int end)
 	{
-		TextFragment sub = new TextFragment(parent);
+		TextFragment sub = new TextFragment();
 		if ( isEmpty() ) return sub;
 		StringBuilder tmpText = new StringBuilder(getCodedText(start, end));
 		ArrayList<Code> tmpCodes = null;
@@ -807,17 +804,17 @@ public class TextFragment implements Comparable<Object> {
 	 * Gets the parent of the fragment.
 	 * @return the parent of the fragment or null if none is assigned.
 	 */
-	public TextUnit getParent() {
-		return parent;
-	}
+//	public TextUnit getParent() {
+//		return parent;
+//	}
 
 	/**
 	 * Sets the parent of the fragment.
 	 * @param value The new parent to assign (can be null).
 	 */
-	public void setParent (TextUnit value) {
-		parent = value;
-	}
+//	public void setParent (TextUnit value) {
+//		parent = value;
+//	}
 	
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;
