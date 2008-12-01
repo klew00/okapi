@@ -41,7 +41,8 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	protected Stack<StorageList> storageStack;
 	protected LinkedHashMap<String, IReferenceable> referents;
 	protected IEncoder encoder;
-	protected String language;
+	protected String outputLang;
+	protected boolean multilingual;
 	
 	public GenericSkeletonWriter () {
 		referents = new LinkedHashMap<String, IReferenceable>();
@@ -119,7 +120,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		this.language = language;
+		this.outputLang = language;
 		this.encoding = defaultEncoding;
 	}
 
@@ -176,11 +177,11 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	}
 
 	public String getLanguage() {
-		return language;
+		return outputLang;
 	}
 
 	public void setLanguage (String language) {
-		this.language = language;
+		this.outputLang = language;
 	}
 
 	protected void createWriter () {
@@ -202,6 +203,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	}
 	
 	private void processStartDocument (StartDocument resource) throws IOException {
+		multilingual = resource.isMultilingual();
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
 		}
@@ -262,7 +264,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 			storageStack.peek().add(resource);
 		}
 		else {
-			writer.write(getString(resource));
+			writer.write(getString(resource, outputLang));
 		}
 	}
 
@@ -300,50 +302,51 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		}
 		String propName = (String)marker[3];
 		
-		// We use part.parent rather than a reference because the resource
-		// may not be part of the referents list
+		// We use part.parent always for these parts
 		if ( propName == null ) { // Reference to the content of the referent
-			if ( "$self$".compareTo((String)marker[0]) == 0 ) {
-				if ( part.parent instanceof TextUnit ) {
-					//TODO: language here is to be set correctly
-					// Issue when the file is bilingual!!!
-					return getContent((TextUnit)part.parent, (part.language==null) ? language : part.language);
+			if ( part.parent instanceof TextUnit ) {
+				if ( multilingual ) {
+					return getContent((TextUnit)part.parent, part.language);
 				}
 				else {
-					throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
+					return getContent((TextUnit)part.parent, (part.language==null) ? outputLang : part.language);
 				}
+			}
+			else {
+				throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
 			}
 		}
 
 		// Or to a property of the referent
-		return getString((IReferenceable)part.parent, propName);
+		return getString((IReferenceable)part.parent, propName, part.language);
 	}
 
 	private String getString (IReferenceable ref,
-		String propName)
+		String propName,
+		String langToUse)
 	{
 		if ( ref == null ) {
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
-			return getPropertyValue((INameable)ref, propName);
+			return getPropertyValue((INameable)ref, propName, langToUse);
 		}
 		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref);
+			return getString((TextUnit)ref, langToUse);
 		}
 		if ( ref instanceof DocumentPart ) {
 			return getString((GenericSkeleton)((IResource)ref).getSkeleton());
 		}
 		if ( ref instanceof StorageList ) {
-			return getString((StorageList)ref);
+			return getString((StorageList)ref, langToUse);
 		}
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
-	private String getString (TextUnit tu) {
+	private String getString (TextUnit tu, String langToUse) {
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
-			return getContent(tu, language);
+			return getContent(tu, langToUse);
 		}
 		// Else: process the skeleton parts, one of them should
 		// refer to the text-unit content itself
@@ -373,10 +376,10 @@ public class GenericSkeletonWriter implements IFilterWriter {
 				}
 			}
 		}
-		return getContent(tf);
+		return getContent(tf, langToUse);
 	}
 
-	public String getContent (TextFragment tf) {
+	public String getContent (TextFragment tf, String langToUse) {
 		if ( !tf.hasCode() ) { // The easy output
 			return encode(tf.toString());
 		}
@@ -389,16 +392,16 @@ public class GenericSkeletonWriter implements IFilterWriter {
 			switch ( text.charAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
+				tmp.append(expandCodeContent(code, langToUse));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
+				tmp.append(expandCodeContent(code, langToUse));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
+				tmp.append(expandCodeContent(code, langToUse));
 				break;
 			default:
 				tmp.append(encode(text.charAt(i)));
@@ -408,7 +411,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		return tmp.toString();
 	}
 	
-	private String expandCodeContent (Code code) {
+	private String expandCodeContent (Code code, String langToUse) {
 		if ( !code.hasReference() ) return code.getData();
 		// Check for segment
 		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
@@ -427,16 +430,16 @@ public class GenericSkeletonWriter implements IFilterWriter {
 			}
 			else if ( propName != null ) {
 				tmp.replace(start, end,
-					getPropertyValue((INameable)ref, propName));
+					getPropertyValue((INameable)ref, propName, langToUse));
 			}
 			else if ( ref instanceof TextUnit ) {
-				tmp.replace(start, end, getString((TextUnit)ref));
+				tmp.replace(start, end, getString((TextUnit)ref, langToUse));
 			}
 			else if ( ref instanceof GenericSkeletonPart ) {
 				tmp.replace(start, end, getString((GenericSkeletonPart)ref));
 			}
 			else if ( ref instanceof StorageList ) { // == StartGroup
-				tmp.replace(start, end, getString((StorageList)ref));
+				tmp.replace(start, end, getString((StorageList)ref, langToUse));
 			}
 			else if ( ref instanceof DocumentPart ) {
 				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton()));
@@ -448,17 +451,17 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		return tmp.toString();
 	}
 	
-	private String getString (StorageList list) {
+	private String getString (StorageList list, String langToUse) {
 		StringBuilder tmp = new StringBuilder();
 		// Treat the skeleton of this list
 		tmp.append(getString((GenericSkeleton)list.getSkeleton()));		
 		// Then treat the list itself
 		for ( IResource res : list ) {
 			if ( res instanceof TextUnit ) {
-				tmp.append(getString((TextUnit)res));
+				tmp.append(getString((TextUnit)res, langToUse));
 			}
 			else if ( res instanceof StorageList ) {
-				tmp.append(getString((StorageList)res));
+				tmp.append(getString((StorageList)res, langToUse));
 			}
 			else if ( res instanceof DocumentPart ) {
 				tmp.append(getString((GenericSkeleton)res.getSkeleton()));
@@ -471,27 +474,29 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	}
 	
 	private String getPropertyValue (INameable resource,
-		String name)
+		String name,
+		String langToUse)
 	{
-		// Get the property
-		Property prop = resource.getProperty(name);
-		if ( prop == null ) return "-ERR:PROP-NOT-FOUND-";
-		
 		// Get the value based on the output language
-		String value = null;
-		if ( language == null ) { // Use the source
-			value = prop.getValue();
+		Property prop;
+		if ( outputLang == null ) { // Use the source
+			prop = resource.getSourceProperty(name);
+		}
+		else if ( langToUse.length() == 0 ) { // Use the resource-level properties
+			prop = resource.getProperty(name);
 		}
 		else { // Use the given language if possible
-			if ( resource.hasTargetProperty(language, name) ) {
-				value = ((Property)resource.getTargetProperty(language, name)).getValue();
+			if ( resource.hasTargetProperty(outputLang, name) ) {
+				prop = resource.getTargetProperty(outputLang, name);
 			}
 			else { // Fall back to source
-				value = resource.getProperty(name).getValue();				
+				prop = resource.getSourceProperty(name);				
 			}
 		}
-		
-		// Process the value
+		// Check the property we got
+		if ( prop == null ) return "-ERR:PROP-NOT-FOUND-";
+		// Else process the value
+		String value = prop.getValue();
 		if ( value == null ) return "-ERR:PROP-VALUE-NOT-FOUND-";
 		else return value;
 	}

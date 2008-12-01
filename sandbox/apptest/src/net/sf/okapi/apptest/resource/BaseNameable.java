@@ -158,7 +158,7 @@ public class BaseNameable implements IResource, INameable {
 		boolean overwriteExisting,
 		int creationOptions)
 	{
-		if ( name == null ) throw new InvalidParameterException();
+		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) {
 			tpa = new TargetPropertiesAnnotation();

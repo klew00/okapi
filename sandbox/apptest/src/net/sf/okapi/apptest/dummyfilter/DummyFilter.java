@@ -225,6 +225,9 @@ public class DummyFilter implements IFilter {
 		// </tuv>
 		//</tu>		
 
+		// Update the document info: TMX is multilingual input
+		((StartDocument)list.get(list.size()-1).getResource()).setIsMultilingual(true);
+		
 		TextUnit tu = new TextUnit("t1", "Hello World");
 
 		String trgLang = "FR-CA";
