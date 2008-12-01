@@ -141,12 +141,10 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	public IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		IReferenceable ref = referents.get(id);
-
 		// Remove the object found from the list
-		//TODO: when can we do this?
-		//if ( ref != null ) {
-		//	referents.remove(id);
-		//}
+		if ( ref != null ) {
+			referents.remove(id);
+		}
 		return ref;
 	}
 

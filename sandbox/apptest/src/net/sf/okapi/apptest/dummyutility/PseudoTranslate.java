@@ -31,14 +31,20 @@ public class PseudoTranslate implements IUtility {
 
 	private void processProperties (INameable resource) {
 		Property prop = resource.getProperty("href");
-		if ( prop == null ) return; // Nothing to do
-		if ( prop.isReadOnly() ) return; // Can't modify it
+		if ( prop != null ) {
+			if ( prop.isReadOnly() ) return; // Can't modify it
+			// Else: create a localized href value if there is no target property yet
+			if ( !resource.hasTargetProperty(trgLang, "href") ) {
+				Property trgProp = resource.createTargetProperty(
+					trgLang, prop.getName(), false, IResource.COPY_ALL);
+				trgProp.setValue(trgLang+"_"+prop.getValue());
+			}
+			return;
+		}
 		
-		// Else: create a localized href value if there is no target property yet
-		if ( !resource.hasTargetProperty(trgLang, "href") ) {
-			Property trgProp = resource.createTargetProperty(
-				trgLang, prop.getName(), false, IResource.COPY_ALL);
-			trgProp.setValue(trgLang+"_"+prop.getValue());
+		prop = resource.getTargetProperty(trgLang, "changeid");
+		if ( prop != null ) {
+			prop.setValue("TestUtility");
 		}
 	}
 	

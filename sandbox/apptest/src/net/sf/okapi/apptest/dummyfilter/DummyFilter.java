@@ -238,7 +238,11 @@ public class DummyFilter implements IFilter {
 		
 		GenericSkeleton skel = new GenericSkeleton("<tu tuid=\"1\" datatype=\"Text\">\n");
 		tu.setProperty(new Property("datatype", "Text", true));
-		skel.append(" <note>TU level note</note>\n");
+		tu.setProperty(new Property("tuid", "1", true));
+		skel.append(" <note>");
+		skel.addRef(tu, "note", "");
+		skel.append("</note>\n");
+		tu.setProperty(new Property("note", "TU level note", false));
 		skel.append(" <prop type=\"x-Domain\">TU level prop</prop>\n");
 		tu.setProperty(new Property("x-Domain", "TU level prop", true));
 		skel.append(" <tuv xml:lang=\"EN\" creationid=\"Okapi\">\n");
