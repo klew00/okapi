@@ -1,6 +1,5 @@
 package net.sf.okapi.apptest.resource;
 
-import java.security.InvalidParameterException;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -180,7 +179,7 @@ public class BaseNameable implements IResource, INameable {
 					trgProp = new Property(name, "", false);
 				}
 				else { // Has a corresponding source
-					trgProp = new Property(name, srcProp.getValue(), srcProp.isReadOnly());
+					trgProp = srcProp.clone();
 				}
 			}
 			trgProps.put(name, trgProp); // Add the property to the list

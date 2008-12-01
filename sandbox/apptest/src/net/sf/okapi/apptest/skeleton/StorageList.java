@@ -11,7 +11,7 @@ import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.resource.Property;
 import net.sf.okapi.apptest.resource.StartGroup;
 
-public class StorageList extends ArrayList<IResource>
+class StorageList extends ArrayList<IResource>
 	implements IResource, INameable, IReferenceable {
 
 	private static final long serialVersionUID = 1L;

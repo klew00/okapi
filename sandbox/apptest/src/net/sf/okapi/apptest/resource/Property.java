@@ -20,6 +20,12 @@ public class Property {
 	public String toString () {
 		return value;
 	}
+	
+	public Property clone () {
+		Property prop = new Property(name, value, isReadOnly);
+		//TODO: copy annotations?? prop.annotations = annotations.clone();
+		return prop;
+	}
 
 	public String getName () {
 		return name;

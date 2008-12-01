@@ -155,15 +155,15 @@ public class DummyFilter implements IFilter {
 			new TextUnit("t1", "text")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g3"),
+			new Ending("e3"),
 			new GenericSkeleton("</td>")));
 
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g2"),
+			new Ending("e2"),
 			new GenericSkeleton("</tr>\n")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g1"),
+			new Ending("e1"),
 			new GenericSkeleton("</table>\n")));
 	}
 
@@ -180,7 +180,7 @@ public class DummyFilter implements IFilter {
 			new TextUnit("t1", "Text of item 1 with special char < and &.")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g2"),
+			new Ending("e2"),
 			new GenericSkeleton("</li>")));
 		
 		StartGroup grp3 = new StartGroup("g1", "g3", false);
@@ -191,11 +191,11 @@ public class DummyFilter implements IFilter {
 			new TextUnit("t2", "Text of item 2")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g3"),
+			new Ending("e3"),
 			new GenericSkeleton("</li>")));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
-			new Ending("g1"),
+			new Ending("e1"),
 			new GenericSkeleton("\n </ul>")));
 
 		TextUnit tu = new TextUnit("t3");
@@ -240,9 +240,9 @@ public class DummyFilter implements IFilter {
 		tu.setProperty(new Property("datatype", "Text", true));
 		tu.setProperty(new Property("tuid", "1", true));
 		skel.append(" <note>");
-		skel.addRef(tu, "note", "");
+		skel.addRef(tu, "note-1", "");
 		skel.append("</note>\n");
-		tu.setProperty(new Property("note", "TU level note", false));
+		tu.setProperty(new Property("note-1", "TU level note", false));
 		skel.append(" <prop type=\"x-Domain\">TU level prop</prop>\n");
 		tu.setProperty(new Property("x-Domain", "TU level prop", true));
 		skel.append(" <tuv xml:lang=\"EN\" creationid=\"Okapi\">\n");
@@ -292,7 +292,7 @@ public class DummyFilter implements IFilter {
 		makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
-			new Ending("d1")));
+			new Ending("de1")));
 	}
 
 	public void cancel () {

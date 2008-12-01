@@ -10,7 +10,12 @@ public class Ending implements IResource {
 	protected String id;
 	protected ISkeleton skeleton;
 	protected Annotations annotations;
-	
+
+	/**
+	 * Creates a new Ending object.
+	 * @param id The ID of this resource (It should NOT be the same ID as the one set of 
+	 * the corresponding starting resource: each resource has a ID are unique).
+	 */
 	public Ending (String id) {
 		annotations = new Annotations();
 		this.id = id;

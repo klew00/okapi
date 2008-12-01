@@ -2,6 +2,10 @@ package net.sf.okapi.apptest.resource;
 
 public class StartGroup extends BaseReferenceable {
 
+	/**
+	 * Creates a new StartGroup object.
+	 * @param parentId The ID of the parent resource for this resource.
+	 */
 	public StartGroup (String parentId) {
 		super();
 		this.parentId = parentId;
