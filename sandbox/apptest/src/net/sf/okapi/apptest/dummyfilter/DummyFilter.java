@@ -5,10 +5,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.apptest.annotation.TargetsAnnotation;
+import net.sf.okapi.apptest.common.IEncoder;
 import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.IResource;
 import net.sf.okapi.apptest.filters.FilterEvent;
-import net.sf.okapi.apptest.filters.IEncoder;
 import net.sf.okapi.apptest.filters.IFilter;
 import net.sf.okapi.apptest.filters.FilterEvent.FilterEventType;
 import net.sf.okapi.apptest.resource.Code;
@@ -97,9 +97,9 @@ public class DummyFilter implements IFilter {
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t1", "text", true)));
+			new TextUnit("t1", "text", true, encoder)));
 
-		TextUnit tu = new TextUnit("t2", "Before ");
+		TextUnit tu = new TextUnit("t2", "Before ", false, encoder);
 		TextFragment tf = tu.getSourceContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "image",
 			"<img href='" + TextFragment.makeRefMarker("dp1", "href") +
@@ -122,7 +122,7 @@ public class DummyFilter implements IFilter {
 		dp.setProperty(new Property("href", "link.htm", false));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
-		TextUnit tu = new TextUnit("t1", "Before ");
+		TextUnit tu = new TextUnit("t1", "Before ", false, encoder);
 		TextFragment tf = tu.getSourceContent();
 		Code code = tf.append(TagType.PLACEHOLDER, "link",
 			"<a href='" + TextFragment.makeRefMarker("dp1", "href") + "'/>");
@@ -152,7 +152,7 @@ public class DummyFilter implements IFilter {
 			new GenericSkeleton("<td>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t1", "text")));
+			new TextUnit("t1", "text", false, encoder)));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("e3"),
@@ -177,7 +177,7 @@ public class DummyFilter implements IFilter {
 			new GenericSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t1", "Text of item 1 with special char < and &.")));
+			new TextUnit("t1", "Text of item 1 with special char < and &.", false, encoder)));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("e2"),
@@ -188,7 +188,7 @@ public class DummyFilter implements IFilter {
 			new GenericSkeleton("\n  <li>")));
 		
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
-			new TextUnit("t2", "Text of item 2")));
+			new TextUnit("t2", "Text of item 2", false, encoder)));
 		
 		list.add(new FilterEvent(FilterEventType.END_GROUP,
 			new Ending("e3"),
@@ -199,6 +199,7 @@ public class DummyFilter implements IFilter {
 			new GenericSkeleton("\n </ul>")));
 
 		TextUnit tu = new TextUnit("t3");
+		tu.setEncoder(encoder);
 		TextFragment tf = new TextFragment();
 		tf.append("Text before list: \n ");
 		Code code = tf.append(TagType.PLACEHOLDER, "list",
@@ -217,7 +218,7 @@ public class DummyFilter implements IFilter {
 		// <note>TU level note</note>
 		// <prop type="x-Domain">TU level prop</prop>
 		// <tuv xml:lang="EN" creationid="Okapi">
-		//  <seg>Hello World</seg>
+		//  <seg>Hello &lt; World</seg>
 		// </tuv>
 		// <tuv xml:lang="FR-CA" creationid="Okapi" changeid="Olifant">
 		//  <prop type="Origin">MT</prop>
@@ -228,7 +229,7 @@ public class DummyFilter implements IFilter {
 		// Update the document info: TMX is multilingual input
 		((StartDocument)list.get(list.size()-1).getResource()).setIsMultilingual(true);
 		
-		TextUnit tu = new TextUnit("t1", "Hello World");
+		TextUnit tu = new TextUnit("t1", "Hello < World", false, encoder);
 
 		String trgLang = "FR-CA";
 		TargetsAnnotation ta = new TargetsAnnotation();
@@ -255,11 +256,6 @@ public class DummyFilter implements IFilter {
 		skel.append("changeid=\"");
 		trgCont.setProperty(new Property("changeid", "Olifant", false));
 		
-		TextContainer tc = tu.getTarget("FR-CA");
-		for ( String n : tc.getPropertyNames() ) {
-			String s = n;
-		}
-		
 		skel.addRef(tu, "changeid", trgLang);
 		skel.add("\">\n");
 		skel.append("  <prop type=\"Origin\">");
@@ -279,6 +275,8 @@ public class DummyFilter implements IFilter {
 		current = -1;
 		list = new ArrayList<FilterEvent>();
 		
+		list.add(new FilterEvent(FilterEventType.START, null));
+
 		StartDocument docRes = new StartDocument();
 		docRes.setId("d1");
 		docRes.setEncoding("UTF-8"); // Always
@@ -292,7 +290,9 @@ public class DummyFilter implements IFilter {
 		makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
-			new Ending("de1")));
+			new Ending("ed1")));
+		
+		list.add(new FilterEvent(FilterEventType.FINISHED, null));
 	}
 
 	public void cancel () {
@@ -305,10 +305,6 @@ public class DummyFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 		// No parameters used for this filter.
-	}
-
-	public IEncoder getEncoder() {
-		return encoder;
 	}
 
 }

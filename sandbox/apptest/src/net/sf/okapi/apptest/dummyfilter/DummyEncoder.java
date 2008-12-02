@@ -1,15 +1,15 @@
 package net.sf.okapi.apptest.dummyfilter;
 
-import net.sf.okapi.apptest.filters.IEncoder;
+import net.sf.okapi.apptest.common.IEncoder;
 import net.sf.okapi.common.Util;
 
 public class DummyEncoder implements IEncoder {
 
-	public String encode (String text) {
+	public String encode (String text, int context) {
 		return Util.escapeToXML(text, 1, false);
 	}
 	
-	public String encode (char value) {
+	public String encode (char value, int context) {
 		switch ( value ) {
 		case '<':
 			return "&lt";

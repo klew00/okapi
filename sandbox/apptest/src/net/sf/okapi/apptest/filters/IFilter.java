@@ -34,5 +34,4 @@ public interface IFilter {
 
 	public void setParameters (IParameters params);
 
-	public IEncoder getEncoder ();
 }

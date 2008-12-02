@@ -6,6 +6,7 @@ import java.util.Set;
 import net.sf.okapi.apptest.annotation.Annotations;
 import net.sf.okapi.apptest.annotation.TargetsAnnotation;
 import net.sf.okapi.apptest.common.IAnnotation;
+import net.sf.okapi.apptest.common.IEncoder;
 import net.sf.okapi.apptest.common.INameable;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
@@ -20,13 +21,14 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	protected Hashtable<String, Property> properties;
 	private Annotations annotations;
 	private TextContainer source;
+	private IEncoder encoder;
 
 	/**
 	 * Creates a new TextUnit object.
 	 * @param id The ID of this resource.
 	 */
 	public TextUnit (String id) {
-		create(id, null, false);
+		create(id, null, false, null);
 	}
 
 	/**
@@ -37,11 +39,11 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	public TextUnit (String id,
 		String sourceText)
 	{
-		create(id, sourceText, false);
+		create(id, sourceText, false, null);
 	}
 
 	/**
-	 * Creates a new IextUnit object.
+	 * Creates a new TextUnit object.
 	 * @param id The ID of this resource.
 	 * @param sourceText The initial text of the source.
 	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
@@ -51,16 +53,35 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		String sourceText,
 		boolean isReferent)
 	{
-		create(id, sourceText, isReferent);
+		create(id, sourceText, isReferent, null);
+	}
+
+	/**
+	 * Creates a new TextUnit object.
+	 * @param id The ID of this resource.
+	 * @param sourceText The initial text of the source.
+	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * by another resource) or not.
+	 * @param encoder The encoder to use for escaping characters and string for this
+	 * TextUnit.
+	 */
+	public TextUnit (String id,
+		String sourceText,
+		boolean isReferent,
+		IEncoder encoder)
+	{
+		create(id, sourceText, isReferent, encoder);
 	}
 
 	private void create (String id,
 		String sourceText,
-		boolean isReferent)
+		boolean isReferent,
+		IEncoder encoder)
 	{
 		annotations = new Annotations();
 		this.id = id;
 		this.isReferent = isReferent;
+		this.encoder = encoder;
 		source = new TextContainer();
 		if ( sourceText != null ) {
 			source.text.append(sourceText);
@@ -343,5 +364,13 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		tc.text = content;
 		return tc.text;
 	}
+
+	public IEncoder getEncoder () {
+		return encoder;
+	}
+	
+	public void setEncoder (IEncoder encoder) {
+		this.encoder = encoder;
+	}	
 
 }

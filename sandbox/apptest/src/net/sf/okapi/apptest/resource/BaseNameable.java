@@ -186,5 +186,5 @@ public class BaseNameable implements IResource, INameable {
 		}
 		return trgProp;
 	}
-	
+
 }

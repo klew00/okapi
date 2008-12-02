@@ -1,24 +1,15 @@
 package net.sf.okapi.apptest.skeleton;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
 import net.sf.okapi.apptest.annotation.TargetsAnnotation;
+import net.sf.okapi.apptest.common.IEncoder;
 import net.sf.okapi.apptest.common.INameable;
-import net.sf.okapi.apptest.common.IParameters;
 import net.sf.okapi.apptest.common.IReferenceable;
 import net.sf.okapi.apptest.common.IResource;
-import net.sf.okapi.apptest.filters.FilterEvent;
-import net.sf.okapi.apptest.filters.IEncoder;
-import net.sf.okapi.apptest.filters.IFilterWriter;
+import net.sf.okapi.apptest.common.ISkeleton;
 import net.sf.okapi.apptest.resource.Code;
 import net.sf.okapi.apptest.resource.DocumentPart;
 import net.sf.okapi.apptest.resource.Ending;
@@ -29,116 +20,37 @@ import net.sf.okapi.apptest.resource.StartSubDocument;
 import net.sf.okapi.apptest.resource.TextContainer;
 import net.sf.okapi.apptest.resource.TextFragment;
 import net.sf.okapi.apptest.resource.TextUnit;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.apptest.writers.ILayerProvider;
 
-public class GenericSkeletonWriter implements IFilterWriter {
+public class GenericSkeletonWriter implements ISkeletonWriter {
 
-	protected OutputStream output;
-	protected String encoding;
-	protected String outputPath;
-	protected IParameters params;
-	protected OutputStreamWriter writer;
-	protected Stack<StorageList> storageStack;
-	protected LinkedHashMap<String, IReferenceable> referents;
-	protected IEncoder encoder;
-	protected String outputLang;
-	protected boolean multilingual;
+	//private String encoding;
+	private Stack<StorageList> storageStack;
+	private LinkedHashMap<String, IReferenceable> referents;
+	private String outputLang;
+	private boolean isMultilingual;
+	private ILayerProvider layer;
 	
-	public GenericSkeletonWriter () {
-		referents = new LinkedHashMap<String, IReferenceable>();
+	public GenericSkeletonWriter (ILayerProvider layer) {
+		this.layer = layer;
 	}
 	
-	public void close () {
-		try {
-			referents.clear();
-			if ( writer != null ) {
-				writer.close();
-				writer = null;
-				//TODO: do we need to close the underlying stream???
-			}
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public String getName () {
-		return "GenericFilterWriter";
-	}
-
-	public IParameters getParameters () {
-		return params;
-	}
-
-	public void setEncoder (IEncoder encoder) {
-		this.encoder = encoder;
+	public void setLayerProvider (ILayerProvider layer) {
+		this.layer = layer;
 	}
 	
-	public FilterEvent handleEvent (FilterEvent event) {
-		try {
-			switch ( event.getEventType() ) {
-			case START_DOCUMENT:
-				createWriter();
-				processStartDocument((StartDocument)event.getResource());
-				break;
-			case END_DOCUMENT:
-				processEnding((Ending)event.getResource());
-				close();
-				break;
-			case START_SUBDOCUMENT:
-				processStartSubDocument((StartSubDocument)event.getResource());
-				break;
-			case END_SUBDOCUMENT:
-				processEnding((Ending)event.getResource());
-				break;
-			case START_GROUP:
-				processStartGroup((StartGroup)event.getResource());
-				break;
-			case END_GROUP:
-				processEndGroup((Ending)event.getResource());
-				break;
-			case TEXT_UNIT:
-				processTextUnit((TextUnit)event.getResource());
-				break;
-			case DOCUMENT_PART:
-				processDocumentPart((DocumentPart)event.getResource());
-				break;
-			}
-		}
-		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-		return event;
+	public ILayerProvider getLayerProvider () {
+		return layer;
 	}
-
+	
 	public void setOptions (String language,
-		String defaultEncoding)
+		String encoding)
 	{
 		this.outputLang = language;
-		this.encoding = defaultEncoding;
+		//this.encoding = encoding;
 	}
 
-	public void setOutput (String path) {
-		close();
-		this.outputPath = path;
-	}
-
-	public void setOutput (OutputStream output) {
-		close(); // Make sure previous is closed
-		this.output = output; // then assign the new stream
-	}
-
-	public void setParameters (IParameters params) {
-		this.params = params;
-	}
-
-	public IReferenceable getReference (String id) {
+	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		IReferenceable ref = referents.get(id);
 		// Remove the object found from the list
@@ -148,140 +60,98 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		return ref;
 	}
 
-	public String encode (String text) {
-		if ( encoder == null ) return text;
-		return encoder.encode(text);
+	public void processStart () {
+		referents = new LinkedHashMap<String, IReferenceable>();
+		storageStack = new Stack<StorageList>();
 	}
 	
-	public String encode (char value) {
-		if ( encoder == null ) return String.valueOf(value);
-		return encoder.encode(value);
-	}
-
-	public String getLayerAfterCode () {
-		return "";
-	}
-
-	public String getLayerAfterInline () {
-		return "";
-	}
-
-	public String getLayerBeforeCode () {
-		return "";
-	}
-
-	public String getLayerBeforeInline () {
-		return "";
-	}
-
-	public String getLanguage() {
-		return outputLang;
-	}
-
-	public void setLanguage (String language) {
-		this.outputLang = language;
-	}
-
-	protected void createWriter () {
-		try {
-			// Create the output writer from the provided stream
-			if ( output == null ) {
-				output = new BufferedOutputStream(new FileOutputStream(outputPath));
-			}
-			writer = new OutputStreamWriter(output, encoding);
-			Util.writeBOMIfNeeded(writer, true, encoding);
-			storageStack = new Stack<StorageList>();
-		}
-		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
-		}
+	public void processFinished () {
+		referents.clear();
+		referents = null;
+		storageStack.clear();
+		storageStack = null;
 	}
 	
-	private void processStartDocument (StartDocument resource) throws IOException {
-		multilingual = resource.isMultilingual();
+	public String processStartDocument (StartDocument resource) {
+		isMultilingual = resource.isMultilingual();
+		// EndDocument cannot be stored, no need to check for that.
+		return getString((GenericSkeleton)resource.getSkeleton());
+	}
+
+	public String processEndDocument (Ending resource) {
+		// EndDocument cannot be stored, no need to check for that.
+		return getString((GenericSkeleton)resource.getSkeleton());
+	}
+
+	public String processStartSubDocument (StartSubDocument resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
+			return "";
 		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
+		return getString((GenericSkeleton)resource.getSkeleton());
 	}
-	
-	private void processStartSubDocument (StartSubDocument resource) throws IOException {
+
+	public String processEndSubDocument (Ending resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
+			return "";
 		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
+		return getString((GenericSkeleton)resource.getSkeleton());
 	}
 	
-	private void processEnding (Ending resource) throws IOException {
-		if ( storageStack.size() > 0 ) {
-			storageStack.peek().add(resource);
-		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
-	}
-	
-	private void processStartGroup (StartGroup resource) throws IOException {
+	public String processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			StorageList sl = new StorageList(resource);
 			referents.put(sl.getId(), sl);
 			storageStack.push(sl);
+			return "";
 		}
-		else if ( storageStack.size() > 0 ) {
+		if ( storageStack.size() > 0 ) {
 			StorageList sl = new StorageList(resource);
 			storageStack.peek().add(sl);
 			storageStack.push(sl);
+			return "";
 		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
+		return getString((GenericSkeleton)resource.getSkeleton());
 	}
 	
-	private void processEndGroup (Ending resource) throws IOException {
+	public String processEndGroup (Ending resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
 			storageStack.pop();
+			return "";
 		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
+		return getString((GenericSkeleton)resource.getSkeleton());
 	}
 	
-	private void processTextUnit (TextUnit resource) throws IOException {
+	public String processTextUnit (TextUnit resource) {
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), resource);
+			return "";
 		}
-		else if ( storageStack.size() > 0 ) {
+		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
+			return "";
 		}
-		else {
-			writer.write(getString(resource, outputLang));
-		}
+		return getString(resource, outputLang);
 	}
 
-	private void processDocumentPart (DocumentPart resource) throws IOException {
+	public String processDocumentPart (DocumentPart resource) {
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), resource);
+			return "";
 		}
-		else if ( storageStack.size() > 0 ) {
+		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
+			return "";
 		}
-		else {
-			writer.write(getString((GenericSkeleton)resource.getSkeleton()));
-		}
+		return getString((GenericSkeleton)resource.getSkeleton());
 	}
 	
-	private String getString (GenericSkeleton skeleton) {
+	private String getString (ISkeleton skeleton) {
 		if ( skeleton == null ) return "";
 		StringBuilder tmp = new StringBuilder();
-		for ( GenericSkeletonPart part : skeleton.getParts() ) {
+		for ( GenericSkeletonPart part : ((GenericSkeleton)skeleton).getParts() ) {
 			tmp.append(getString(part));
 		}
 		return tmp.toString();
@@ -290,7 +160,12 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	private String getString (GenericSkeletonPart part) {
 		// If it is not a reference marker, just use the data
 		if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
-			return part.data.toString();
+			if ( layer == null ) {
+				return part.data.toString();
+			}
+			else {
+				return layer.encode(part.data.toString(), 1);
+			}
 		}
 		// Get the reference info
 		Object[] marker = TextFragment.getRefMarker(part.data);
@@ -303,7 +178,7 @@ public class GenericSkeletonWriter implements IFilterWriter {
 		// We use part.parent always for these parts
 		if ( propName == null ) { // Reference to the content of the referent
 			if ( part.parent instanceof TextUnit ) {
-				if ( multilingual ) {
+				if ( isMultilingual ) {
 					return getContent((TextUnit)part.parent, part.language);
 				}
 				else {
@@ -374,12 +249,24 @@ public class GenericSkeletonWriter implements IFilterWriter {
 				}
 			}
 		}
-		return getContent(tf, langToUse);
+		if ( layer == null ) {
+			return getContent(tf, langToUse, tu.getEncoder());
+		}
+		else {
+			return layer.endCode()
+				+ getContent(tf, langToUse, tu.getEncoder())
+				+ layer.startCode();
+		}
 	}
 
-	public String getContent (TextFragment tf, String langToUse) {
+	private String getContent (TextFragment tf, String langToUse, IEncoder encoder) {
 		if ( !tf.hasCode() ) { // The easy output
-			return encode(tf.toString());
+			if ( encoder == null ) {
+				return tf.toString();
+			}
+			else {
+				return encoder.encode(tf.toString(), 0);				
+			}
 		}
 
 		List<Code> codes = tf.getCodes();
@@ -402,7 +289,12 @@ public class GenericSkeletonWriter implements IFilterWriter {
 				tmp.append(expandCodeContent(code, langToUse));
 				break;
 			default:
-				tmp.append(encode(text.charAt(i)));
+				if ( encoder == null ) {
+					tmp.append(text.charAt(i));
+				}
+				else {
+					tmp.append(encoder.encode(text.charAt(i), 0));
+				}
 				break;
 			}
 		}
@@ -477,15 +369,15 @@ public class GenericSkeletonWriter implements IFilterWriter {
 	{
 		// Get the value based on the output language
 		Property prop;
-		if ( outputLang == null ) { // Use the source
+		if ( langToUse == null ) { // Use the source
 			prop = resource.getSourceProperty(name);
 		}
 		else if ( langToUse.length() == 0 ) { // Use the resource-level properties
 			prop = resource.getProperty(name);
 		}
 		else { // Use the given language if possible
-			if ( resource.hasTargetProperty(outputLang, name) ) {
-				prop = resource.getTargetProperty(outputLang, name);
+			if ( resource.hasTargetProperty(langToUse, name) ) {
+				prop = resource.getTargetProperty(langToUse, name);
 			}
 			else { // Fall back to source
 				prop = resource.getSourceProperty(name);				
