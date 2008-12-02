@@ -37,30 +37,25 @@ public class UtilityDriver {
 	public void simpleExecute () {
 		IFilter inFilter = null;
 		IUtility util = null;
-		IFilterWriter outFilter = null;
-		IFilterWriter genWriter = null;
+		IFilterWriter outWriter = null;
+		IFilterWriter rtfWriter = null;
 		try {
-			inFilter = new DummyFilter();
-			util = new PseudoTranslate();
-			outFilter = new DummyFilterWriter();
-			
-			ILayerProvider layer = new RTFLayerProvider();
-			ISkeletonWriter skelWriter = new GenericSkeletonWriter(layer);
-			genWriter = new RTFFilterWriter(layer, skelWriter);
-			
-			String ext = ".rtf";
 			String srcLang = "en";
 			String trgLang = "FR-CA";
 
-			// Set the options
+			util = new PseudoTranslate();
 			util.setOptions(trgLang);
+
+			inFilter = new DummyFilter();
 			inFilter.setOptions(srcLang, "UTF-8", true);
 			
-			outFilter.setOptions(trgLang, "UTF-8");
-			outFilter.setOutput("myOutputFile");
+			outWriter = new DummyFilterWriter();
+			outWriter.setOptions(trgLang, "UTF-8");
+			outWriter.setOutput("myOutputFile");
 			
-			genWriter.setOptions(trgLang, "windows-1252");
-			genWriter.setOutput("genericOutput"+ext);
+			rtfWriter = new RTFFilterWriter(new GenericSkeletonWriter());
+			rtfWriter.setOptions(trgLang, "windows-1252");
+			rtfWriter.setOutput("genericOutput.rtf");
 
 			// Process
 			FilterEvent event;
@@ -68,8 +63,8 @@ public class UtilityDriver {
 			while ( inFilter.hasNext() ) {
 				event = inFilter.next();
 				util.handleEvent(event);
-				outFilter.handleEvent(event);
-				genWriter.handleEvent(event);
+				outWriter.handleEvent(event);
+				rtfWriter.handleEvent(event);
 			}
 		}
 		catch ( Throwable e ) {
@@ -78,9 +73,9 @@ public class UtilityDriver {
 		}
 		finally {
 			if ( util != null ) util.doEpilog();
-			if ( outFilter != null ) outFilter.close();
+			if ( outWriter != null ) outWriter.close();
 			if ( inFilter != null ) inFilter.close();
-			if ( genWriter != null ) genWriter.close();
+			if ( rtfWriter != null ) rtfWriter.close();
 		}
 	}
 	

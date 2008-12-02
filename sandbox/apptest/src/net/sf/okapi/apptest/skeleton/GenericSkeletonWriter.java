@@ -31,23 +31,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private boolean isMultilingual;
 	private ILayerProvider layer;
 	
-	public GenericSkeletonWriter (ILayerProvider layer) {
-		this.layer = layer;
-	}
-	
-	public void setLayerProvider (ILayerProvider layer) {
-		this.layer = layer;
-	}
-	
-	public ILayerProvider getLayerProvider () {
-		return layer;
-	}
-	
-	public void setOptions (String language,
-		String encoding)
+	public void setOptionsFromWriter (String language,
+		String encoding,
+		ILayerProvider layer)
 	{
 		this.outputLang = language;
 		//this.encoding = encoding;
+		this.layer = layer;
 	}
 
 	private IReferenceable getReference (String id) {
@@ -240,12 +230,12 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				tf = tu.getSourceContent();
 			}
 			else {
-				TextContainer tt = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
-				if ( tt == null ) {
+				TextContainer tc = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
+				if ( tc == null ) {
 					tf = tu.getSourceContent();
 				}
 				else {
-					tf = tt.getContent();
+					tf = tc.getContent();
 				}
 			}
 		}

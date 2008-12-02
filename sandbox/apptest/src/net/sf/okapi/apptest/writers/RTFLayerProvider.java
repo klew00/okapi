@@ -3,7 +3,6 @@ package net.sf.okapi.apptest.writers;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
-import net.sf.okapi.apptest.common.IEncoder;
 import net.sf.okapi.common.Util;
 
 public class RTFLayerProvider implements ILayerProvider {

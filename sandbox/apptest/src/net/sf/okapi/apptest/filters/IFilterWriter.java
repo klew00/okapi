@@ -3,7 +3,6 @@ package net.sf.okapi.apptest.filters;
 import java.io.OutputStream;
 
 import net.sf.okapi.apptest.common.IParameters;
-import net.sf.okapi.apptest.writers.ILayerProvider;
 
 public interface IFilterWriter {
 

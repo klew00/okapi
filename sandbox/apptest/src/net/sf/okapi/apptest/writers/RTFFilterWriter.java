@@ -27,12 +27,11 @@ public class RTFFilterWriter implements IFilterWriter {
 	private OutputStream output;
 	private String outputPath;
 	private OutputStreamWriter writer;
+	private String language;
 	private String encoding;
 	
-	public RTFFilterWriter (ILayerProvider layer,
-		ISkeletonWriter skelWriter)
-	{
-		this.layer = layer;
+	public RTFFilterWriter (ISkeletonWriter skelWriter) {
+		layer = new RTFLayerProvider();
 		this.skelWriter = skelWriter;
 	}
 	
@@ -106,6 +105,8 @@ public class RTFFilterWriter implements IFilterWriter {
 	}
 
 	private void processStart () {
+		// Make sure we set the info for the skeleton writer
+		skelWriter.setOptionsFromWriter(language, encoding, layer);
 		// Create the output
 		createWriter();
 		skelWriter.processStart();

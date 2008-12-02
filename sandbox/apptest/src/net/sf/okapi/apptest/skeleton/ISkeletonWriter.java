@@ -6,11 +6,13 @@ import net.sf.okapi.apptest.resource.StartDocument;
 import net.sf.okapi.apptest.resource.StartGroup;
 import net.sf.okapi.apptest.resource.StartSubDocument;
 import net.sf.okapi.apptest.resource.TextUnit;
+import net.sf.okapi.apptest.writers.ILayerProvider;
 
 public interface ISkeletonWriter {
 
-	public void setOptions (String language,
-		String encoding);
+	public void setOptionsFromWriter (String language,
+		String encoding,
+		ILayerProvider layer);
 
 	public void processStart ();
 	

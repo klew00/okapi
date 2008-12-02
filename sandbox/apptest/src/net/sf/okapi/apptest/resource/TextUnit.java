@@ -32,7 +32,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	}
 
 	/**
-	 * Creates a new IextUnit object.
+	 * Creates a new TextUnit object.
 	 * @param id The ID of this resource.
 	 * @param sourceText The initial text of the source.
 	 */
@@ -323,9 +323,11 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 				tc.setContent(tf);
 			}
 			if ( (creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES ) {
-				tc.properties = new Hashtable<String, Property>();
-				for ( Property prop : source.properties.values() ) {
-					tc.properties.put(prop.getName(), prop.clone()); 
+				if ( source.properties != null ) {
+					tc.properties = new Hashtable<String, Property>();
+					for ( Property prop : source.properties.values() ) {
+						tc.properties.put(prop.getName(), prop.clone()); 
+					}
 				}
 			}
 			ta.set(language, tc);
