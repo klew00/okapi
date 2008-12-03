@@ -281,13 +281,14 @@ public class DummyFilter implements IFilter {
 		docRes.setId("d1");
 		docRes.setEncoding("UTF-8"); // Always
 		docRes.setLanguage(language);
+		docRes.setName("myDocument");
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
 		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		makeCase004();
-		//makeCase008();
+		//makeCase004();
+		makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,
 			new Ending("ed1")));
