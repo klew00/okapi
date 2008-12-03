@@ -103,11 +103,9 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	private void processStart () {
-		// Make sure we set the info for the skeleton writer
-		skelWriter.setOptionsFromWriter(language, encoding, null);
 		// Create the output
 		createWriter();
-		skelWriter.processStart();
+		skelWriter.processStart(language, encoding, null);
 	}
 
 	private void processFinished () {

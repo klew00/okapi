@@ -24,22 +24,12 @@ import net.sf.okapi.apptest.writers.ILayerProvider;
 
 public class GenericSkeletonWriter implements ISkeletonWriter {
 
-	//private String encoding;
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, IReferenceable> referents;
 	private String outputLang;
 	private boolean isMultilingual;
 	private ILayerProvider layer;
 	
-	public void setOptionsFromWriter (String language,
-		String encoding,
-		ILayerProvider layer)
-	{
-		this.outputLang = language;
-		//this.encoding = encoding;
-		this.layer = layer;
-	}
-
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		IReferenceable ref = referents.get(id);
@@ -50,7 +40,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return ref;
 	}
 
-	public void processStart () {
+	public void processStart (String language,
+		String encoding,
+		ILayerProvider layer)
+	{
+		this.outputLang = language;
+		//Not used: encoding;
+		this.layer = layer;
+		
 		referents = new LinkedHashMap<String, IReferenceable>();
 		storageStack = new Stack<StorageList>();
 	}
@@ -207,7 +204,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
-	private String getString (TextUnit tu, String langToUse, int context) {
+	private String getString (TextUnit tu,
+		String langToUse,
+		int context)
+	{
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
 			return getContent(tu, langToUse, context);
@@ -222,7 +222,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 
 	// context: 0=text, 1=skeleton, 2=inline
-	private String getContent (TextUnit tu, String langToUse, int context) {
+	private String getContent (TextUnit tu,
+		String langToUse,
+		int context) 
+	{
 		TextFragment tf;
 		if ( langToUse == null ) {
 			tf = tu.getSourceContent();
@@ -256,14 +259,30 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 	}
 
-	private String getContent (TextFragment tf, String langToUse, IEncoder encoder, int context) {
-		context = 0;
+	private String getContent (TextFragment tf,
+		String langToUse,
+		IEncoder encoder,
+		int context)
+	{
+		context = 0; //TODO: Handle the case of non-trans inline at a high level
 		if ( !tf.hasCode() ) { // The easy output
 			if ( encoder == null ) {
-				return tf.toString();
+				if ( layer == null ) {
+					return tf.toString();
+				}
+				else {
+					return layer.encode(tf.toString(), context);
+				}
 			}
 			else {
-				return encoder.encode(tf.toString(), context);				
+				if ( layer == null ) {
+					return encoder.encode(tf.toString(), context);
+				}
+				else {
+					return layer.encode(
+						encoder.encode(tf.toString(), context),
+						context);
+				}
 			}
 		}
 
@@ -288,10 +307,22 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				break;
 			default:
 				if ( encoder == null ) {
-					tmp.append(text.charAt(i));
+					if ( layer == null ) {
+						tmp.append(text.charAt(i));
+					}
+					else {
+						tmp.append(layer.encode(text.charAt(i), context));
+					}
 				}
 				else {
-					tmp.append(encoder.encode(text.charAt(i), context));
+					if ( layer == null ) {
+						tmp.append(encoder.encode(text.charAt(i), context));
+					}
+					else {
+						tmp.append(layer.encode(
+							encoder.encode(text.charAt(i), context),
+							context));
+					}
 				}
 				break;
 			}
@@ -299,18 +330,29 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String expandCodeContent (Code code, String langToUse, int context) {
+	private String expandCodeContent (Code code,
+		String langToUse,
+		int context)
+	{
 		String codeTmp = code.getData();
 		if ( layer != null ) {
-			codeTmp = layer.startInline() + code.getData() + layer.endInline();
+			codeTmp = layer.startInline() 
+				+ layer.encode(code.getData(), context)
+				+ layer.endInline();
 		}
 		if ( !code.hasReference() ) {
 			return codeTmp;
 		}
 		// Check for segment
 		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
-			if ( layer == null ) return "[SEG-"+code.getData()+"]";
-			else return layer.startCode() + "[SEG-"+code.getData()+"]" + layer.endInline();
+			if ( layer == null ) {
+				return "[SEG-"+code.getData()+"]";
+			}
+			else {
+				return layer.startCode()
+					+ layer.encode("[SEG-"+code.getData()+"]", context)
+					+ layer.endInline();
+			}
 		}
 		// Else: look for place-holders
 		StringBuilder tmp = new StringBuilder(codeTmp);

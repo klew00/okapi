@@ -10,11 +10,9 @@ import net.sf.okapi.apptest.writers.ILayerProvider;
 
 public interface ISkeletonWriter {
 
-	public void setOptionsFromWriter (String language,
+	public void processStart (String language,
 		String encoding,
 		ILayerProvider layer);
-
-	public void processStart ();
 	
 	public void processFinished ();
 	

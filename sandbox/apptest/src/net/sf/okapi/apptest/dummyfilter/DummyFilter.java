@@ -229,7 +229,7 @@ public class DummyFilter implements IFilter {
 		// Update the document info: TMX is multilingual input
 		((StartDocument)list.get(list.size()-1).getResource()).setIsMultilingual(true);
 		
-		TextUnit tu = new TextUnit("t1", "Hello < World", false, encoder);
+		TextUnit tu = new TextUnit("t1", "Hello < and { World", false, encoder);
 
 		String trgLang = "FR-CA";
 		TargetsAnnotation ta = new TargetsAnnotation();

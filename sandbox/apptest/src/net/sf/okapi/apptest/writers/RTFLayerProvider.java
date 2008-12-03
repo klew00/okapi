@@ -9,10 +9,8 @@ public class RTFLayerProvider implements ILayerProvider {
 
 	private CharsetEncoder outputEncoder;
 
-	public void setOptions (String language,
-		String defaultEncoding)
-	{
-		outputEncoder = Charset.forName(defaultEncoding).newEncoder();
+	public RTFLayerProvider (String encoding) {
+		outputEncoder = Charset.forName(encoding).newEncoder();
 	}
 	
 	public String endCode () {
