@@ -93,7 +93,7 @@ public class DummyFilter implements IFilter {
 		// <p>Before <img href='img.png' alt='text'/> after.</p>
 
 		DocumentPart dp = new DocumentPart("dp1", true);
-		dp.setProperty(new Property("href", "img.png", false));
+		dp.setSourceProperty(new Property("href", "img.png", false));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		list.add(new FilterEvent(FilterEventType.TEXT_UNIT,
@@ -119,7 +119,7 @@ public class DummyFilter implements IFilter {
 		// <p>Before <a href='link.htm'/> after.</p>
 		
 		DocumentPart dp = new DocumentPart("dp1", true);
-		dp.setProperty(new Property("href", "link.htm", false));
+		dp.setSourceProperty(new Property("href", "link.htm", false));
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		TextUnit tu = new TextUnit("t1", "Before ", false, encoder);
@@ -139,7 +139,7 @@ public class DummyFilter implements IFilter {
 		// <table id=100> <tr><td>text</td></tr><table>
 		
 		StartGroup grp1 = new StartGroup("d1", "g1");
-		grp1.setProperty(new Property("id", "100", true));
+		grp1.setSourceProperty(new Property("id", "100", true));
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
 			new GenericSkeleton("<table id=100>\n ")));
 
@@ -283,10 +283,10 @@ public class DummyFilter implements IFilter {
 		docRes.setLanguage(language);
 		list.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
 
-		makeCase001();
+		//makeCase001();
 		//makeCase002();
 		//makeCase003();
-		//makeCase004();
+		makeCase004();
 		//makeCase008();
 	
 		list.add(new FilterEvent(FilterEventType.END_DOCUMENT,

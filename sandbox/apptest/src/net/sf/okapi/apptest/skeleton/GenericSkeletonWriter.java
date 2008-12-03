@@ -65,12 +65,12 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	public String processStartDocument (StartDocument resource) {
 		isMultilingual = resource.isMultilingual();
 		// EndDocument cannot be stored, no need to check for that.
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
 	public String processEndDocument (Ending resource) {
 		// EndDocument cannot be stored, no need to check for that.
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
 	public String processStartSubDocument (StartSubDocument resource) {
@@ -78,7 +78,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
 	public String processEndSubDocument (Ending resource) {
@@ -86,7 +86,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
 	public String processStartGroup (StartGroup resource) {
@@ -102,7 +102,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.push(sl);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
 	public String processEndGroup (Ending resource) {
@@ -111,7 +111,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.pop();
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
 	public String processTextUnit (TextUnit resource) {
@@ -123,7 +123,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString(resource, outputLang);
+		return getString(resource, outputLang, 1);
 	}
 
 	public String processDocumentPart (DocumentPart resource) {
@@ -135,26 +135,26 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString((GenericSkeleton)resource.getSkeleton());
+		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
-	private String getString (ISkeleton skeleton) {
+	private String getString (ISkeleton skeleton, int context) {
 		if ( skeleton == null ) return "";
 		StringBuilder tmp = new StringBuilder();
 		for ( GenericSkeletonPart part : ((GenericSkeleton)skeleton).getParts() ) {
-			tmp.append(getString(part));
+			tmp.append(getString(part, context));
 		}
 		return tmp.toString();
 	}
 	
-	private String getString (GenericSkeletonPart part) {
+	private String getString (GenericSkeletonPart part, int context) {
 		// If it is not a reference marker, just use the data
 		if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
 			if ( layer == null ) {
 				return part.data.toString();
 			}
 			else {
-				return layer.encode(part.data.toString(), 1);
+				return layer.encode(part.data.toString(), context);
 			}
 		}
 		// Get the reference info
@@ -169,10 +169,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( propName == null ) { // Reference to the content of the referent
 			if ( part.parent instanceof TextUnit ) {
 				if ( isMultilingual ) {
-					return getContent((TextUnit)part.parent, part.language);
+					return getContent((TextUnit)part.parent, part.language, context);
 				}
 				else {
-					return getContent((TextUnit)part.parent, (part.language==null) ? outputLang : part.language);
+					return getContent((TextUnit)part.parent, (part.language==null) ? outputLang : part.language, context);
 				}
 			}
 			else {
@@ -181,12 +181,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 
 		// Or to a property of the referent
-		return getString((IReferenceable)part.parent, propName, part.language);
+		return getString((IReferenceable)part.parent, propName, part.language, context);
 	}
 
 	private String getString (IReferenceable ref,
 		String propName,
-		String langToUse)
+		String langToUse,
+		int context)
 	{
 		if ( ref == null ) {
 			return "-ERR:NULL-REF-";
@@ -195,32 +196,33 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return getPropertyValue((INameable)ref, propName, langToUse);
 		}
 		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, langToUse);
+			return getString((TextUnit)ref, langToUse, context);
 		}
 		if ( ref instanceof DocumentPart ) {
-			return getString((GenericSkeleton)((IResource)ref).getSkeleton());
+			return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
 		}
 		if ( ref instanceof StorageList ) {
-			return getString((StorageList)ref, langToUse);
+			return getString((StorageList)ref, langToUse, context);
 		}
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
-	private String getString (TextUnit tu, String langToUse) {
+	private String getString (TextUnit tu, String langToUse, int context) {
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
-			return getContent(tu, langToUse);
+			return getContent(tu, langToUse, context);
 		}
 		// Else: process the skeleton parts, one of them should
 		// refer to the text-unit content itself
 		StringBuilder tmp = new StringBuilder();
 		for ( GenericSkeletonPart part : skel.getParts() ) {
-			tmp.append(getString(part));
+			tmp.append(getString(part, context));
 		}
 		return tmp.toString();
 	}
 
-	private String getContent (TextUnit tu, String langToUse) {
+	// context: 0=text, 1=skeleton, 2=inline
+	private String getContent (TextUnit tu, String langToUse, int context) {
 		TextFragment tf;
 		if ( langToUse == null ) {
 			tf = tu.getSourceContent();
@@ -240,22 +242,28 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 		}
 		if ( layer == null ) {
-			return getContent(tf, langToUse, tu.getEncoder());
+			return getContent(tf, langToUse, tu.getEncoder(), context);
 		}
 		else {
-			return layer.endCode()
-				+ getContent(tf, langToUse, tu.getEncoder())
-				+ layer.startCode();
+			if ( context == 1 ) {
+				return layer.endCode()
+					+ getContent(tf, langToUse, tu.getEncoder(), context)
+					+ layer.startCode();
+			}
+			return layer.endInline()
+				+ getContent(tf, langToUse, tu.getEncoder(), context)
+				+ layer.startInline();
 		}
 	}
 
-	private String getContent (TextFragment tf, String langToUse, IEncoder encoder) {
+	private String getContent (TextFragment tf, String langToUse, IEncoder encoder, int context) {
+		context = 0;
 		if ( !tf.hasCode() ) { // The easy output
 			if ( encoder == null ) {
 				return tf.toString();
 			}
 			else {
-				return encoder.encode(tf.toString(), 0);				
+				return encoder.encode(tf.toString(), context);				
 			}
 		}
 
@@ -267,23 +275,23 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			switch ( text.charAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse));
+				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse));
+				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse));
+				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			default:
 				if ( encoder == null ) {
 					tmp.append(text.charAt(i));
 				}
 				else {
-					tmp.append(encoder.encode(text.charAt(i), 0));
+					tmp.append(encoder.encode(text.charAt(i), context));
 				}
 				break;
 			}
@@ -291,14 +299,21 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String expandCodeContent (Code code, String langToUse) {
-		if ( !code.hasReference() ) return code.getData();
+	private String expandCodeContent (Code code, String langToUse, int context) {
+		String codeTmp = code.getData();
+		if ( layer != null ) {
+			codeTmp = layer.startInline() + code.getData() + layer.endInline();
+		}
+		if ( !code.hasReference() ) {
+			return codeTmp;
+		}
 		// Check for segment
 		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
-			return "[SEG-"+code.getData()+"]";
+			if ( layer == null ) return "[SEG-"+code.getData()+"]";
+			else return layer.startCode() + "[SEG-"+code.getData()+"]" + layer.endInline();
 		}
 		// Else: look for place-holders
-		StringBuilder tmp = new StringBuilder(code.getData());
+		StringBuilder tmp = new StringBuilder(codeTmp);
 		Object[] marker = null;
 		while ( (marker = TextFragment.getRefMarker(tmp)) != null ) {
 			int start = (Integer)marker[1];
@@ -313,16 +328,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					getPropertyValue((INameable)ref, propName, langToUse));
 			}
 			else if ( ref instanceof TextUnit ) {
-				tmp.replace(start, end, getString((TextUnit)ref, langToUse));
+				tmp.replace(start, end, getString((TextUnit)ref, langToUse, context));
 			}
 			else if ( ref instanceof GenericSkeletonPart ) {
-				tmp.replace(start, end, getString((GenericSkeletonPart)ref));
+				tmp.replace(start, end, getString((GenericSkeletonPart)ref, context));
 			}
 			else if ( ref instanceof StorageList ) { // == StartGroup
-				tmp.replace(start, end, getString((StorageList)ref, langToUse));
+				tmp.replace(start, end, getString((StorageList)ref, langToUse, context));
 			}
 			else if ( ref instanceof DocumentPart ) {
-				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton()));
+				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), context));
 			}
 			else {
 				tmp.replace(start, end, "-ERR:INVALID-TYPE-");
@@ -331,23 +346,23 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getString (StorageList list, String langToUse) {
+	private String getString (StorageList list, String langToUse, int context) {
 		StringBuilder tmp = new StringBuilder();
 		// Treat the skeleton of this list
-		tmp.append(getString((GenericSkeleton)list.getSkeleton()));		
+		tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));		
 		// Then treat the list itself
 		for ( IResource res : list ) {
 			if ( res instanceof TextUnit ) {
-				tmp.append(getString((TextUnit)res, langToUse));
+				tmp.append(getString((TextUnit)res, langToUse, context));
 			}
 			else if ( res instanceof StorageList ) {
-				tmp.append(getString((StorageList)res, langToUse));
+				tmp.append(getString((StorageList)res, langToUse, context));
 			}
 			else if ( res instanceof DocumentPart ) {
-				tmp.append(getString((GenericSkeleton)res.getSkeleton()));
+				tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
 			}
 			else if ( res instanceof Ending ) {
-				tmp.append(getString((GenericSkeleton)res.getSkeleton()));
+				tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
 			}
 		}
 		return tmp.toString();

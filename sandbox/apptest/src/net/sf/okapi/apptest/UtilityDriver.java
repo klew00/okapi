@@ -17,6 +17,7 @@ import net.sf.okapi.apptest.pipelineutil.UtilityStep;
 import net.sf.okapi.apptest.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.apptest.skeleton.ISkeletonWriter;
 import net.sf.okapi.apptest.utilities.IUtility;
+import net.sf.okapi.apptest.writers.GenericFilterWriter;
 import net.sf.okapi.apptest.writers.ILayerProvider;
 import net.sf.okapi.apptest.writers.RTFFilterWriter;
 import net.sf.okapi.apptest.writers.RTFLayerProvider;
@@ -39,6 +40,7 @@ public class UtilityDriver {
 		IUtility util = null;
 		IFilterWriter outWriter = null;
 		IFilterWriter rtfWriter = null;
+		IFilterWriter genWriter = null;
 		try {
 			String srcLang = "en";
 			String trgLang = "FR-CA";
@@ -57,6 +59,10 @@ public class UtilityDriver {
 			rtfWriter.setOptions(trgLang, "windows-1252");
 			rtfWriter.setOutput("genericOutput.rtf");
 
+			genWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+			genWriter.setOptions(trgLang, "windows-1252");
+			genWriter.setOutput("genericOutput.txt");
+
 			// Process
 			FilterEvent event;
 			inFilter.open("myFile");
@@ -65,6 +71,7 @@ public class UtilityDriver {
 				util.handleEvent(event);
 				outWriter.handleEvent(event);
 				rtfWriter.handleEvent(event);
+				genWriter.handleEvent(event);
 			}
 		}
 		catch ( Throwable e ) {
@@ -76,6 +83,7 @@ public class UtilityDriver {
 			if ( outWriter != null ) outWriter.close();
 			if ( inFilter != null ) inFilter.close();
 			if ( rtfWriter != null ) rtfWriter.close();
+			if ( genWriter != null ) genWriter.close();
 		}
 	}
 	
