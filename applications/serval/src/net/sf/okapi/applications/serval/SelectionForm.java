@@ -6,7 +6,7 @@ import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
-import net.sf.okapi.tm.simpletm.TradosTMConnector;
+import net.sf.okapi.tm.trados.TradosTMConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
