@@ -31,7 +31,7 @@ public class TradosTMConnector implements ITMQuery {
 		tradosInstance.invoke("quit", new Variant[] {});
 	}
 
-	@Override
+
 	public void export(String outputPath) {
 		// TODO Auto-generated method stub
 		
@@ -89,13 +89,11 @@ public class TradosTMConnector implements ITMQuery {
 		return results.size();
 	}
 
-	@Override
 	public void removeAttribute(String anme) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void setAttribute(String name, String value) {
 		// TODO Auto-generated method stub
 		
