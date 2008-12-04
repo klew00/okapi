@@ -61,8 +61,8 @@ public class TextFragment implements Comparable<Object> {
 	public static final int MARKER_SEGMENT  = 0xE104;
 	public static final int CHARBASE        = 0xE110;
 
-	public static final String REFMARKER_START = "{#$";
-	public static final String REFMARKER_END   = "}";
+	public static final String REFMARKER_START = "[#$";
+	public static final String REFMARKER_END   = "]";
 	public static final String REFMARKER_SEP   = "@%";
 
 	static public final String CODETYPE_SEGMENT  = "$seg$";
