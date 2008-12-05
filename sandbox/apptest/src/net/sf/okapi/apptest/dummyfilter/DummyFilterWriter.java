@@ -136,6 +136,24 @@ public class DummyFilterWriter implements IFilterWriter {
 				+ (prop.isReadOnly() ? "read-only" : "localizable" ) + ")");
 		}
 		System.out.println("   }");
+		System.out.println("   source-properties={");
+		for ( String name : res.getSourcePropertyNames() ) {
+			Property prop = res.getSourceProperty(name);
+			System.out.println("      prop["+name+"]='"+prop.getValue()+"' ("
+				+ (prop.isReadOnly() ? "read-only" : "localizable" ) + ")");
+		}
+		System.out.println("   }");
+		System.out.println("   target-properties={");
+		for ( String lang : res.getTargetLanguages() ) {
+			System.out.println("      lang="+lang+"={");
+			for ( String name : res.getTargetPropertyNames(lang) ) {
+				Property prop = res.getTargetProperty(lang, name);
+				System.out.println("         prop["+name+"]='"+prop.getValue()+"' ("
+					+ (prop.isReadOnly() ? "read-only" : "localizable" ) + ")");
+			}
+			System.out.println("      }");
+		}
+		System.out.println("   }");
 	}
 	
 	private void printSkeleton(GenericSkeleton skel) {
