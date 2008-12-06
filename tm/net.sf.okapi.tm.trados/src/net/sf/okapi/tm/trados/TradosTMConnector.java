@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Variant;
+
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -42,11 +45,19 @@ public class TradosTMConnector implements ITMQuery {
 		return query(tf);
 	}
 
-	public int query(TextFragment text) {
+	public int query(TextFragment tf) {
 		
-		String s = text.getCodedText();
+		String searchString;
+
+		//--process plain text or parsed TextFragment if ther are codes--
+		if ( !tf.hasCode() ) {
+			searchString = Util.escapeToRTF(tf.toString(), true, 0, null);
+		}else{
+			RtfHelper rth = new RtfHelper();
+			searchString = rth.parseTextFragmentToRtf(tf);			
+		}
+		
 		current = -1;
-		
 		try {
 	    	//ActiveXComponent xl = ActiveXComponent.connectToActiveInstance("TW4Win.Application");
 	    	//if(xl==null){
@@ -57,7 +68,7 @@ public class TradosTMConnector implements ITMQuery {
 			ActiveXComponent tu = tmInstance.getPropertyAsComponent("TranslationUnit");
 
 			//--execute the search--
-			tmInstance.invoke("Search",new Variant(s));
+			tmInstance.invoke("Search",new Variant(searchString));
 			
 			current = -1;
 			
@@ -73,8 +84,16 @@ public class TradosTMConnector implements ITMQuery {
 					counter++;
 					QueryResult qr = new QueryResult();
 					qr.score = tu.invoke("Score").getInt();
-					qr.source = new TextFragment(tu.invoke("Source").getString());
-					qr.target = new TextFragment(tu.invoke("Target").getString());
+					
+					RtfHelper rth = new RtfHelper();
+					rth.processRtfFragment(tu.invoke("Source").getString());
+					qr.source = rth.rtfToTextFragment();
+					rth.clear();
+					
+					rth.processRtfFragment(tu.invoke("Target").getString());
+					qr.target = rth.rtfToTextFragment();
+					rth.clear();
+					
 					results.add(qr);
 					
 				} while (tu.invoke("Next").getBoolean() && (counter < maxHits));
