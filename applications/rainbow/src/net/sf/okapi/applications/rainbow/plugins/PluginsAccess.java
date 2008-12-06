@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.plugins;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -66,7 +67,7 @@ public class PluginsAccess {
 			File file = new File(tmp);
 			if ( !file.exists() ) continue;
 			// Add the package
-			addPackage(file.getAbsolutePath());
+			addPackage(URLDecoder.decode(file.getAbsolutePath(),"utf-8"));
 		}
 	}
 	
