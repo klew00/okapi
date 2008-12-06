@@ -6,7 +6,6 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Variant;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
