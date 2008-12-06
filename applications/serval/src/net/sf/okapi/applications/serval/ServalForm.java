@@ -1,7 +1,11 @@
 package net.sf.okapi.applications.serval;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.QueryManager;
@@ -167,7 +171,7 @@ public class ServalForm {
 	
 	private void query () {
 		try {
-			queryMgt.query(edQuery.getText());
+			queryMgt.query(parseToTextFragment(edQuery.getText()));
 			modResults.updateTable(queryMgt);
 			updateCurrentHit();
 		}
@@ -272,5 +276,58 @@ public class ServalForm {
 		return sL1.equalsIgnoreCase(sL2);
 	}
 
+	/**
+	 * Converts the search string into a TextFragment.
+	 * With minor modifications this code is based on the SRXEditor -> processInlineCodes() method.
+	 * @param  text  	Textstring to convert to TextFragment
+	 * @return      TextFragment created from the search string text field
+	 */	
+	public TextFragment parseToTextFragment (String text) {
+		
+		//--parses any thing within <...> into opening codes
+		//--parses any thing within </...> into closing codes
+		//--parses any thing within <.../> into placeholder codes
+		Pattern patternOpening = Pattern.compile("\\<(\\w+)[ ]*[^\\>/]*\\>");
+		Pattern patternClosing = Pattern.compile("\\</(\\w+)[ ]*[^\\>]*\\>");
+		Pattern patternPlaceholder = Pattern.compile("\\<(\\w+)[ ]*[^\\>]*/\\>");
+		
+		TextFragment tf = new TextFragment();
+		
+		tf.setCodedText(text);
+
+		int n;
+		int start = 0;
+		int diff = 0;
+		
+		Matcher m = patternOpening.matcher(text);
+		
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.OPENING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = tf.getCodedText();
+		start = diff = 0;
+		m = patternClosing.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.CLOSING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = tf.getCodedText();
+		start = diff = 0;
+		m = patternPlaceholder.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.PLACEHOLDER, null);
+			start = (n+m.group().length());
+		}
+		return tf;
+	}
 }
 
