@@ -42,19 +42,16 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class Editor implements IParametersEditor {
 
-	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Table                 table;
-	
-	private Button 				  chkUpdateAll;
-	private Button                chkUnescape;
-	private Button                chkEscape;
-	private Button                btnFirstOption;
-	private Button                btnSecondOption;
-	
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Table  table;
+	private Button chkUpdateAll;
+	private Button chkUnescape;
+	private Button chkEscape;
+	private Button btnFirstOption;
+	private Button btnSecondOption;
 	
 	public boolean edit (IParameters params,
 		Object object)

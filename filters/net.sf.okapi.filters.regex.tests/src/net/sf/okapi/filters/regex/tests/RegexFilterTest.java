@@ -49,7 +49,7 @@ public class RegexFilterTest {
 			URL paramsUrl = RegexFilterTest.class.getResource("/okf_regex@StringInfo.fprm");
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
-			filter.setOptions("en", "UTF-8");
+			filter.setOptions("en", "UTF-8", true);
 			InputStream input = RegexFilterTest.class.getResourceAsStream("/Test01_stringinfo_en.info");
 			filter.open(input);
 			process(filter);
@@ -58,7 +58,7 @@ public class RegexFilterTest {
 			paramsUrl = RegexFilterTest.class.getResource("/okf_regex@SRT.fprm");
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
-			filter.setOptions("en", "UTF-8");
+			filter.setOptions("en", "UTF-8", true);
 			input = RegexFilterTest.class.getResourceAsStream("/Test01_srt_en.srt");
 			filter.open(input);
 			process(filter);

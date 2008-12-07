@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -29,20 +29,19 @@ public class Parameters extends BaseParameters {
 	public static final int  TYPE_KEEPINLINE = 2;
 	public static final int  TYPE_TRANSLATEEXACTMATCHES = 3;
 	
-	protected int       type;
-	protected boolean   addPrefix;
-	protected String    prefix;
-	protected boolean   addSuffix;
-	protected String    suffix;
-	protected boolean   applyToExistingTarget;
-	protected boolean   addName;
-	protected boolean   addID;
-	protected boolean   segment;
-	protected boolean   markSegments;
-	protected String    sourceSrxPath;
-	protected String    targetSrxPath;
-	protected String    tmPath;
-	
+	protected int type;
+	protected boolean addPrefix;
+	protected String prefix;
+	protected boolean addSuffix;
+	protected String suffix;
+	protected boolean applyToExistingTarget;
+	protected boolean addName;
+	protected boolean addID;
+	protected boolean segment;
+	protected boolean markSegments;
+	protected String sourceSrxPath;
+	protected String targetSrxPath;
+	protected String tmPath;
 	
 	public Parameters () {
 		reset();

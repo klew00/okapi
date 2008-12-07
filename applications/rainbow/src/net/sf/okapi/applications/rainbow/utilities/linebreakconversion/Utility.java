@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -43,13 +43,12 @@ import net.sf.okapi.common.Util;
 
 public class Utility implements ISimpleUtility {
 
-	private Parameters                 params;
-	private String                     commonFolder;
-	private String                     inputPath;
-	private String                     outputPath;
-	private String                     encoding;
-	private EventListenerList          listenerList = new EventListenerList();
-	
+	private Parameters params;
+	private String commonFolder;
+	private String inputPath;
+	private String outputPath;
+	private String encoding;
+	private EventListenerList listenerList = new EventListenerList();
 
 	public Utility () {
 		params = new Parameters();

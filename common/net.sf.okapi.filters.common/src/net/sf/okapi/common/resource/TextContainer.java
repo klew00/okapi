@@ -20,7 +20,9 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.okapi.common.annotation.Annotations;
@@ -28,9 +30,10 @@ import net.sf.okapi.common.annotation.IAnnotation;
 
 public class TextContainer extends TextFragment {
 
-//	protected TextFragment text;
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
+	protected TextFragment masterSegment;
+	protected ArrayList<TextFragment> segments;
 	
 	public TextContainer () {
 		super();
@@ -47,6 +50,23 @@ public class TextContainer extends TextFragment {
 		return text.toString();
 	}
 	
+	@Override
+	public TextContainer clone () {
+		TextContainer tc = new TextContainer();
+		// Clone the content
+		tc.setContent(super.clone());
+		// Clone the properties
+		if ( properties != null ) {
+			tc.properties = new Hashtable<String, Property>();
+			for ( Property prop : properties.values() ) {
+				tc.properties.put(prop.getName(), prop.clone()); 
+			}
+		}
+		//TODO: Clone the annotations ???
+		//TODO: Clone the segments
+		return tc;
+	}
+
 	public TextFragment getContent () {
 		return this;
 	}
@@ -55,6 +75,11 @@ public class TextContainer extends TextFragment {
 		text = new StringBuilder();
 		insert(-1, content);
 		// We don't change the current annotations
+		// But we reset the segments
+		if ( masterSegment != null ) {
+			masterSegment = null;
+			segments.clear();
+		}
 	}
 
 	public boolean hasProperty (String name) {
@@ -86,4 +111,20 @@ public class TextContainer extends TextFragment {
 		annotations.set(annotation);
 	}
 
+	/**
+	 * Indicates if this TextContainer is segmented.
+	 * @return True if the this TextContainer is segmented.
+	 */
+	public boolean isSegmented () {
+		return (masterSegment != null);
+	}
+	
+	/**
+	 * Gets the list of all current segments, or null if this object is not segmented.
+	 * @return The list of all current segments, or null. 
+	 */
+	public List<TextFragment> getSegments () {
+		return segments;
+	}
+	
 }

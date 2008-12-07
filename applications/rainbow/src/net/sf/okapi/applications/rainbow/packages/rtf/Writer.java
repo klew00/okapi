@@ -33,9 +33,6 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.IContainable;
-import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -44,9 +41,8 @@ public class Writer extends BaseWriter {
 	
 	private static final String   EXTENSION = ".rtf";
 
-	private PrintWriter      writer;     
-	private CharsetEncoder   outputEncoder;
-
+	private PrintWriter writer;     
+	private CharsetEncoder outputEncoder;
 
 	public String getPackageType () {
 		return "rtf";

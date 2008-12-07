@@ -33,6 +33,7 @@ public class BaseNameable implements IResource, INameable {
 	protected String id;
 	protected ISkeleton skeleton;
 	protected String name;
+	protected boolean isTranslatable;
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
 	protected Hashtable<String, Property> sourceProperties;
@@ -203,5 +204,13 @@ public class BaseNameable implements IResource, INameable {
 		}
 		return trgProp;
 	}
-
+	
+	public boolean isTranslatable () {
+		return isTranslatable;
+	}
+	
+	public void setIsTranslatable (boolean value) {
+		isTranslatable = value;
+	}
+	
 }

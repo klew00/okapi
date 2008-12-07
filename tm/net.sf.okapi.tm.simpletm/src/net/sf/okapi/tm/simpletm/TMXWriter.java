@@ -30,13 +30,12 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class TMXWriter {
 	
-	private XMLWriter   writer;
-	private TMXContent  tmxCont;
-	private String      sourceLang;
-	private String      targetLang;
-	private int         itemCount;
-	private boolean     withTradosWorkarounds;
-
+	private XMLWriter writer;
+	private TMXContent tmxCont;
+	private String sourceLang;
+	private String trgLang;
+	private int itemCount;
+	private boolean withTradosWorkarounds;
 
 	public void close () {
 		if ( writer != null ) {
@@ -71,7 +70,7 @@ public class TMXWriter {
 		if ( sourceLanguage == null ) throw new NullPointerException();
 		if ( targetLanguage == null ) throw new NullPointerException();
 		this.sourceLang = sourceLanguage;
-		this.targetLang = targetLanguage;
+		this.trgLang = targetLanguage;
 		
 		writer.writeStartDocument();
 		writer.writeStartElement("tmx");
@@ -115,7 +114,7 @@ public class TMXWriter {
 			//writeTU(srcTC, item.getTargetContent(), tuid);
 			// Write the segments
 			List<TextFragment> srcList = item.getSourceContent().getSegments();
-			List<TextFragment> trgList = item.getTargetContent().getSegments();
+			List<TextFragment> trgList = item.getTargetContent(trgLang).getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
@@ -156,7 +155,7 @@ public class TMXWriter {
 		
 		if ( target != null ) {
 			writer.writeStartElement("tuv");
-			writer.writeAttributeString("xml:lang", targetLang);
+			writer.writeAttributeString("xml:lang", trgLang);
 			writer.writeStartElement("seg");
 			writer.writeRawXML(tmxCont.setContent(target).toString());
 			writer.writeEndElement(); // seg

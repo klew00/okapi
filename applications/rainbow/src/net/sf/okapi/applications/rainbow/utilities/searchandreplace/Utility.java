@@ -45,19 +45,19 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrivenUtility { 
 	
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-
-	private Parameters            params;
-	private String                commonFolder;
-	private String                inputPath;
-	private String                outputPath;
-	private String			      inputEncoding;
-	private EventListenerList     listenerList = new EventListenerList();	
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private Parameters params;
+	private String commonFolder;
+	private String inputPath;
+	private String outputPath;
+	private String inputEncoding;
+	private EventListenerList listenerList = new EventListenerList();	
 	
 	public Utility () {
 		params = new Parameters();
@@ -238,11 +238,6 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 	public void endExtractionItem (TextUnit item) {
 		try {
 			processTU(item);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					processTU(tu);
-				}
-			}
 		}
 		finally {
 			super.endExtractionItem(item);
@@ -250,22 +245,16 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 	}
 	
 	private void processTU (TextUnit tu) {
-		
 		String tmp = null;
-		
-		// Skip non-translatable
-		if ( !tu.isTranslatable() ) 
-			return;
-
-		// Else: do the requested modifications
-		// Make sure we have a target where to set data
-		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent().clone());
-		}
-
 		try {
-			String result = tu.getTargetContent().getCodedText();
+			// Skip non-translatable
+			if ( !tu.isTranslatable() ) return;
 
+			// Else: do the requested modifications
+			// Make sure we have a target where to set data
+			tu.createTarget(trgLang, false, IResource.COPY_ALL);
+
+			String result = tu.getTargetContent(trgLang).getCodedText();
 	        for ( String[] s : params.rules ) {
 	        	if ( s[0].equals("true") ) {
 		        	int flags = 0;
@@ -283,7 +272,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 	        	}
 	        }			
 			
-			TextContainer cnt = tu.getTarget(); 
+			TextContainer cnt = tu.getTarget(trgLang); 
 			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {

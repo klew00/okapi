@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -27,12 +27,11 @@ public class Parameters extends BaseParameters {
 	/**
 	 * Path of the XSLT template to apply.
 	 */
-	public String       xsltPath;
+	public String xsltPath;
 	/**
 	 * List of parameters to pass to the template.
 	 */
-	public String       paramList;
-	
+	public String paramList;
 
 	public Parameters () {
 		reset();

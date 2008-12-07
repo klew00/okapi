@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -33,6 +33,11 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class XLIFFReader {
 
@@ -52,21 +57,16 @@ public class XLIFFReader {
 	public static final int       RESULT_ENDTRANSUNIT      = 6;
 	public static final int       RESULT_SKELETON          = 7;
 
-	protected Resource            resource;
-	protected Group               fileRes;
-	protected Stack<Group>        groupResStack;
-	protected TextUnit            item;
+	protected Resource resource;
+	protected StartGroup fileRes;
+	protected Stack<StartGroup> groupResStack;
+	protected TextUnit item;
 
-	private SkeletonUnit          sklBefore;
-	private SkeletonUnit          sklAfter;
-	private SkeletonUnit          currentSkl;
-	private int                   itemID;
-	private int                   sklID;
-	private boolean               sourceDone;
-	private boolean               targetDone;
-	private XMLStreamReader       reader; 
-	private TextContainer         content;
-	private int                   nextAction;
+	private boolean sourceDone;
+	private boolean targetDone;
+	private XMLStreamReader reader; 
+	private TextContainer content;
+	private int nextAction;
 //	private Pattern               pattern;
 	
 //	private String                elemTransUnit;
@@ -76,8 +76,7 @@ public class XLIFFReader {
 
 	public XLIFFReader () {
 		resource = new Resource();
-		sklBefore = new SkeletonUnit();
-		groupResStack = new Stack<Group>();
+		groupResStack = new Stack<StartGroup>();
 	}
 	
 	public void close () {
@@ -100,8 +99,6 @@ public class XLIFFReader {
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			reader = fact.createXMLStreamReader(input);
 			nextAction = -1;
-			sklID = 0;
-			itemID = 0;
 			sklAfter = new SkeletonUnit();
 /*			if ( resource.params.useStateValues ) {
 				pattern = Pattern.compile(resource.params.stateValues);
@@ -120,14 +117,6 @@ public class XLIFFReader {
 		return item;
 	}
 
-	/**
-	 * Gets the last skeleton part read.
-	 * @return
-	 */
-	public SkeletonUnit getSkeleton () {
-		return currentSkl;
-	}
-	
 	/**
 	 * Reads the next part of the input.
 	 * @return One of the RESULT_* values.
@@ -157,7 +146,6 @@ public class XLIFFReader {
 			}
 			sourceDone = targetDone = false;
 			sklBefore.setData(sklAfter.toString());
-			sklBefore.setID(String.format("s%d", ++sklID));
 			currentSkl = sklBefore;
 			resource.needTargetElement = true;
 
@@ -236,11 +224,11 @@ public class XLIFFReader {
 	}*/
 	
 	private void resetItem () {
-		item = new TextUnit();
+		item = new TextUnit(null);
 	}
 	
 	private int processFile () {
-		fileRes = new Group();
+		fileRes = new StartSubDocument(null);
 		storeStartElement();
 		String tmp = reader.getAttributeValue("", "original");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'original'.");
@@ -304,7 +292,7 @@ public class XLIFFReader {
 
 			tmp = reader.getAttributeValue("", "id");
 			if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
-			item.setID(tmp);
+			item.setId(tmp);
 			
 			tmp = reader.getAttributeValue("", "resname");
 			if ( tmp != null ) item.setName(tmp);
@@ -655,7 +643,7 @@ public class XLIFFReader {
 			processContent("source", true, tmpCont, null);
 			return;
 		}
-		content = item.getSourceContent();
+		content = item.getSource();
 		content.clear();
 		processContent("source", true, content, resource.srcCodes);
 		sklAfter.setData("");

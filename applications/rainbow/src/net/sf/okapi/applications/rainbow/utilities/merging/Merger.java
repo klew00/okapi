@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -35,21 +35,20 @@ import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.filters.IOutputFilter;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.pipeline.ThrougputPipeBase;
-import net.sf.okapi.common.resource.LocaleData;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Merger extends ThrougputPipeBase {
 
-	private Manifest         manifest;
-	private IReader          reader;
-	private FilterAccess     fa;
-	private IInputFilter     inpFilter;
-	private IOutputFilter    outFilter;
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-	private boolean          skipNoTranslate;
+	private Manifest manifest;
+	private IReader reader;
+	private FilterAccess fa;
+	private IFilter inpFilter;
+	private IFilterWriter outFilter;
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private boolean skipNoTranslate;
 
 	public Merger () {
 		fa = new FilterAccess();
@@ -99,8 +98,8 @@ public class Merger extends ThrougputPipeBase {
 				+ File.separator + String.format("%d.fprm", docID);
 			// Load the relevant filter
 			Object[] filters = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter, outFilter);
-			inpFilter = (IInputFilter)filters[0];
-			outFilter = (IOutputFilter)filters[1];
+			inpFilter = (IFilter)filters[0];
+			outFilter = (IFilterWriter)filters[1];
 			
 			reader.openDocument(fileToMerge);
 			
@@ -145,12 +144,6 @@ public class Merger extends ThrougputPipeBase {
 	@Override
     public void endExtractionItem (TextUnit item) {
 		processItem(item);
-		if ( item.hasChild() ) {
-			for ( TextUnit tu : item.childTextUnitIterator() ) {
-				processItem(tu);
-			}
-		}
-
 		// Call output filter
 		super.endExtractionItem(item);
 	}
@@ -163,7 +156,7 @@ public class Merger extends ThrougputPipeBase {
 		if ( !reader.readItem() ) {
 			// Problem: 
 			logger.warn("There is no more package item to merge (for id=\"{}\")",
-				item.getID());
+				item.getId());
 			// Keep the source
 			return;
 		}
@@ -172,10 +165,10 @@ public class Merger extends ThrougputPipeBase {
 		if ( item.isTranslatable() ) {
 			TextUnit srcPkgItem = reader.getItem();
 			
-			if ( !item.getID().equals(srcPkgItem.getID()) ) {
+			if ( !item.getId().equals(srcPkgItem.getID()) ) {
 				// Problem: different IDs
 				logger.warn("ID mismatch: original item id=\"{}\" package item id=\"{}\"",
-					item.getID(), srcPkgItem.getID());
+					item.getId(), srcPkgItem.getId());
 				// Keep the source
 				return;
 			}

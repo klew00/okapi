@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -40,13 +40,13 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Text                  edOutputPath;
-	private boolean               inInit = true;
-	private Button                chkAutoOpen;
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Text edOutputPath;
+	private boolean inInit = true;
+	private Button chkAutoOpen;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.

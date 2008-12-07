@@ -66,6 +66,7 @@ public class PropertiesFilter implements IFilter {
 	private int lineSince;
 	private long position;
 	private int itemID;
+	private int grpID;
 	private Pattern keyConditionPattern;
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String lineBreak;
@@ -144,8 +145,10 @@ public class PropertiesFilter implements IFilter {
 		} while ( n > RESULT_END );
 		
 		// Store the ending for next call
-		Ending ending = new Ending();
-		ending.setSkeleton(sklRes);
+		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
+		// Set the ending call
+		Ending ending = new Ending(String.format("%d", ++grpID));
+		ending.setSkeleton(skel);
 		parseState = 2;
 		currentRes = ending;
 		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
@@ -165,6 +168,7 @@ public class PropertiesFilter implements IFilter {
 			// Initializes the variables
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
 			itemID = 0;
+			grpID = 0;
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;

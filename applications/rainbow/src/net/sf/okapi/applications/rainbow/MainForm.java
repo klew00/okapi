@@ -47,7 +47,7 @@ import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
@@ -1444,7 +1444,7 @@ public class MainForm implements IParametersProvider {
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		Object[] filters = fa.loadFilter(aRes[1], null, null, null);
-		return ((IInputFilter)filters[0]).getParameters();
+		return ((IFilter)filters[0]).getParameters();
 	}
 
 	public IParameters load (String location)
@@ -1453,7 +1453,7 @@ public class MainForm implements IParametersProvider {
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		Object[] filters = fa.loadFilter(aRes[1], aRes[3], null, null);
-		return ((IInputFilter)filters[0]).getParameters();
+		return ((IFilter)filters[0]).getParameters();
 	}
 
 	public void save (String location,

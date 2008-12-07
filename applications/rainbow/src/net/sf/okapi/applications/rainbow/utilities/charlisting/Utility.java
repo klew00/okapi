@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -35,9 +35,8 @@ import net.sf.okapi.common.ui.UIUtil;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
-	private Parameters                      params;
-	private Hashtable<Character, Integer>   charList;
-
+	private Parameters params;
+	private Hashtable<Character, Integer> charList;
 	
 	public Utility () {
 		params = new Parameters();
@@ -125,11 +124,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
     public void endExtractionItem(TextUnit item) {
 		try {
 			processTU(item);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					processTU(tu);
-				}
-			}
 		}
 		finally {
 			super.endExtractionItem(item);

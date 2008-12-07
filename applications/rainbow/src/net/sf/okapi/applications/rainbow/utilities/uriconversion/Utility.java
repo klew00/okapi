@@ -37,14 +37,13 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class Utility extends BaseUtility implements IFilterDrivenUtility { 
 	
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-
-	private Parameters            params;
-	private String                commonFolder;
-	private EventListenerList     listenerList = new EventListenerList();
-	
 	static final int UNESCAPE  = 0;
 	static final int ESCAPE    = 1;
+	
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private Parameters params;
+	private String commonFolder;
+	private EventListenerList listenerList = new EventListenerList();
 	
 	public Utility () {
 		params = new Parameters();
@@ -150,11 +149,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 	public void endExtractionItem (TextUnit item) {
 		try {
 			processTU(item);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					processTU(tu);
-				}
-			}
 		}
 		finally {
 			super.endExtractionItem(item);

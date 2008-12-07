@@ -33,8 +33,9 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	private String id;
 	private boolean isReferent;
 	private String name;
+	private boolean isTranslatable;
 	private ISkeleton skeleton;
-	protected Hashtable<String, Property> properties;
+	private Hashtable<String, Property> properties;
 	private Annotations annotations;
 	private TextContainer source;
 	private IEncoder encoder;
@@ -108,7 +109,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	public String toString () {
 		return source.toString();
 	}
-
+	
 	public String getId () {
 		return id;
 	}
@@ -238,6 +239,14 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 			}
 		}
 		return prop;
+	}
+
+	public boolean isTranslatable () {
+		return isTranslatable;
+	}
+	
+	public void setIsTranslatable (boolean value) {
+		isTranslatable = value;
 	}
 
 	public boolean isReferent () {
@@ -391,4 +400,11 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		this.encoder = encoder;
 	}	
 
+	/**
+	 * Indicates if the source text of this TextUnit is empty.
+	 * @return True if the source text of this TextUnit is empty, false otherwise.
+	 */
+	public boolean isEmpty () {
+		return (( source.text == null ) || ( source.text.length() == 0 ));
+	}
 }

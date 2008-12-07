@@ -200,9 +200,9 @@ public class QueryManager {
 	 */
 	public void leverage (TextUnit tu) {
 		if ( !tu.isTranslatable() ) return;
-		if ( tu.hasTarget() ) return;
+		if ( tu.hasTarget(trgLang) ) return;
 		
-		TextContainer tc = tu.setTarget(tu.getSource().clone());
+		TextContainer tc = tu.setTarget(trgLang, tu.getSource().clone());
 		QueryResult qr;
 		if ( tc.isSegmented() ) {
 			List<TextFragment> segList = tc.getSegments();

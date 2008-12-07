@@ -114,5 +114,9 @@ public interface INameable {
 		String name,
 		boolean overwriteExisting,
 		int creationOptions);
+
+	public boolean isTranslatable ();
+	
+	public void setIsTranslatable (boolean value);
 	
 }

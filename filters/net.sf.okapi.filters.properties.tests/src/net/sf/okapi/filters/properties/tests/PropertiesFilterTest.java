@@ -41,12 +41,11 @@ public class PropertiesFilterTest {
 		PropertiesFilter filter = null;		
 		try {
 			filter = new PropertiesFilter();
-			filter.setOptions("en", "UTF-8");
+			filter.setOptions("en", "UTF-8", true);
 			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");
 			filter.open(input);
 			process(filter);
 			filter.close();
-			
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
@@ -67,10 +66,10 @@ public class PropertiesFilterTest {
 				System.out.println("--- Start Document ---");
 				break;
 			case TEXT_UNIT:
-				System.out.print("["+filter.getResource().toString()+"]");
+				System.out.println("["+filter.getResource().toString()+"]");
 				break;
 			case END_DOCUMENT:
-				System.out.println("\n--- End Document ---");
+				System.out.println("--- End Document ---");
 				break;
 			}
 		}

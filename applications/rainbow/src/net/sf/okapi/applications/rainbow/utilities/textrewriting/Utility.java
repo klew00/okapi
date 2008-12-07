@@ -24,7 +24,6 @@ import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -134,11 +133,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
     public void endExtractionItem (TextUnit item) {
 		try {
 			processTU(item);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					processTU(tu);
-				}
-			}
 		}
 		finally {
 			super.endExtractionItem(item);

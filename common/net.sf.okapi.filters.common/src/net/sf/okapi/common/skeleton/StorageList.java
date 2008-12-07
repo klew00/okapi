@@ -137,4 +137,12 @@ class StorageList extends ArrayList<IResource>
 		return null;
 	}
 
+	public boolean isTranslatable () {
+		return startGroup.isTranslatable();
+	}
+
+	public void setIsTranslatable (boolean value) {
+		// Not implemented: read-only info
+	}
+
 }

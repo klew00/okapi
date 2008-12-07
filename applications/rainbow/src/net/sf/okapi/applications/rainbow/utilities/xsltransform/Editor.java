@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -53,13 +53,12 @@ import org.w3c.dom.NodeList;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Text                  edXsltPath;
-	private Text                  edParameters;
-	
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Text edXsltPath;
+	private Text edParameters;
 
 	public boolean edit (IParameters params,
 		Object object)
