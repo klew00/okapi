@@ -40,10 +40,12 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class PropertiesFilter implements IFilter {
 
@@ -51,26 +53,24 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
-	private SkeletonUnit lbSkel;
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
 	private String encoding;
 	private IResource currentRes;
 	private TextUnit tuRes;
-	private SkeletonUnit sklRes;
-	private Document docRes;
+	private StartDocument docRes;
 	private LinkedList<FilterEvent> queue;
 	private String textLine;
 	private int lineNumber;
 	private int lineSince;
 	private long position;
 	private int itemID;
-	private int sklID;
 	private Pattern keyConditionPattern;
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String lineBreak;
 	private int parseState = 0;
+	private GenericSkeleton skel;
 	
 	public PropertiesFilter () {
 		params = new Parameters();
@@ -120,7 +120,7 @@ public class PropertiesFilter implements IFilter {
 		// Process queue if it's not empty yet
 		if ( queue.size() > 0 ) {
 			if ( parseState == 2 ) parseState = 0; // End
-			currentRes = queue.peek().getData();
+			currentRes = queue.peek().getResource();
 			return queue.poll();
 		}
 		
@@ -134,10 +134,9 @@ public class PropertiesFilter implements IFilter {
 				resetBuffer = false;
 				break;
 			case RESULT_ITEM:
-				// Store the text unit in the queue for next call.
-				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
-				currentRes = sklRes;
-				return new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes);
+				// It's a text-unit, the skeleton is already set
+				currentRes = tuRes;
+				return new FilterEvent(FilterEventType.TEXT_UNIT, tuRes);
 			default:
 				resetBuffer = true;
 				break;
@@ -145,11 +144,11 @@ public class PropertiesFilter implements IFilter {
 		} while ( n > RESULT_END );
 		
 		// Store the ending for next call
-		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
+		Ending ending = new Ending();
+		ending.setSkeleton(sklRes);
 		parseState = 2;
-		// Send the skeleton
-		currentRes = sklRes;
-		return new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes);
+		currentRes = ending;
+		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
 	}
 
 	public void open (InputStream input) {
@@ -165,9 +164,7 @@ public class PropertiesFilter implements IFilter {
 			
 			// Initializes the variables
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
-			lbSkel = new SkeletonUnit("after", lineBreak); 
 			itemID = 0;
-			sklID = 0;
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;
@@ -197,7 +194,7 @@ public class PropertiesFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			docRes = new Document();
+			docRes = new StartDocument();
 			docRes.setName(inputUrl.getPath());
 			open(inputUrl.openStream());
 		}
@@ -212,8 +209,10 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	public void setOptions (String language,
-		String defaultEncoding)
+		String defaultEncoding,
+		boolean generateSkeleton)
 	{
+		//TODO: Implement boolean generateSkeleton
 		encoding = defaultEncoding;
 	}
 
@@ -224,8 +223,7 @@ public class PropertiesFilter implements IFilter {
 	private int readItem (boolean resetBuffer) {
 		try {
 			if ( resetBuffer ) {
-				sklRes = new SkeletonUnit();
-				sklRes.setID(String.format("s%d", ++sklID));
+				skel = new GenericSkeleton();
 			}
 			
 			StringBuilder keyBuffer = new StringBuilder();
@@ -251,8 +249,8 @@ public class PropertiesFilter implements IFilter {
 				else {
 					// Empty lines
 					if ( tmp.length() == 0 ) {
-						sklRes.appendData(textLine);
-						sklRes.appendData(lineBreak);
+						skel.append(textLine);
+						skel.append(lineBreak);
 						continue;
 					}
 
@@ -265,8 +263,8 @@ public class PropertiesFilter implements IFilter {
 
 					if ( isComment ) {
 						params.locDir.process(tmp);
-						sklRes.appendData(textLine);
-						sklRes.appendData(lineBreak);
+						skel.append(textLine);
+						skel.append(lineBreak);
 						continue;
 					}
 
@@ -366,7 +364,7 @@ public class PropertiesFilter implements IFilter {
 					tuRes = new TextUnit(String.valueOf(++itemID),
 						unescape(value));
 					tuRes.setName(key);
-					tuRes.setPreserveWhitespaces(true);
+					//TODO: whitespace tuRes.setPreserveWhitespaces(true);
 				}
 
 				if ( extract ) {
@@ -375,24 +373,24 @@ public class PropertiesFilter implements IFilter {
 						// Single-line case
 						keyBuffer.append(textLine.substring(0, startText));
 					}
-					sklRes.appendData(keyBuffer);
+					skel.append(keyBuffer.toString());
+					skel.addRef(tuRes, null);
 					// Line-break
-					//item.setSkeletonAfter(lbSkel);
-					tuRes.addChild(new SkeletonUnit(SkeletonUnit.MAINTEXT, ""));
-					tuRes.addChild(lbSkel);
+					skel.append(lineBreak);
 				}
 				else {
-					sklRes.appendData(keyBuffer);
-					sklRes.appendData(textBuffer);
-					sklRes.appendData(textLine);
-					sklRes.appendData(lineBreak);
+					skel.append(keyBuffer.toString());
+					skel.append(textBuffer.toString());
+					skel.append(textLine);
+					skel.append(lineBreak);
 					return RESULT_DATA;
 				}
 
 				if ( params.useCodeFinder )
 					params.codeFinder.process(tuRes.getSourceContent());
 				
-				tuRes.setProperty("start", String.valueOf(lS));
+				tuRes.setSkeleton(skel);
+				tuRes.setSourceProperty(new Property("start", String.valueOf(lS), true));
 				return RESULT_ITEM;
 			}
 		}

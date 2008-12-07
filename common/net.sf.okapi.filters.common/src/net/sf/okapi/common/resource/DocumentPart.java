@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,54 +20,30 @@
 
 package net.sf.okapi.common.resource;
 
-public class Group extends ResourceContainer implements ITranslatable {
+import net.sf.okapi.common.filters.ISkeleton;
 
-	private static final long serialVersionUID = 1L;
-	
-	private String                          id;
-	private String							data;
-	private ITranslatable                   parent;
-	private boolean                         isTranslatable;
+public class DocumentPart extends BaseReferenceable {
 
-
-	public Group () {
-		isTranslatable = true;
+	/**
+	 * Creates a new DocumentPart object.
+	 * @param id The ID of the resource.
+	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * by another resource) or not.
+	 */
+	public DocumentPart (String id,
+		boolean isReferent)
+	{
+		this.id = id;
+		this.isReferent = isReferent;
 	}
 	
-	public String getID () {
-		return id;
-	}
-
-	public void setID (String value) {
-		id = value;
-	}
-	
-	public void setData(String data) {
-		this.data = data;
-	}
-
-	public String getData() {
-		return data;
+	public DocumentPart (String id,
+		boolean isReferent,
+		ISkeleton skeleton)
+	{
+		this.id = id;
+		this.isReferent = isReferent;
+		setSkeleton(skeleton);
 	}
 	
-	public ITranslatable getParent () {
-		return parent;
-	}
-
-	public void setParent (ITranslatable value) {
-		parent = value;
-	}
-
-	public boolean isTranslatable () {
-		return isTranslatable;
-	}
-
-	public void setIsTranslatable (boolean value) {
-		isTranslatable = value;
-	}
-
-	public boolean hasChild () {
-		return !isEmpty();
-	}
-
 }

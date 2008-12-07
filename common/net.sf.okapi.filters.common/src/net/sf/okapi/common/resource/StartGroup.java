@@ -18,61 +18,35 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.properties.tests;
+package net.sf.okapi.common.resource;
 
-import java.io.InputStream;
+public class StartGroup extends BaseReferenceable {
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.filters.properties.PropertiesFilter;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-public class PropertiesFilterTest {
-	
-	@Before
-	public void setUp() {
+	/**
+	 * Creates a new StartGroup object.
+	 * @param parentId The ID of the parent resource for this resource.
+	 */
+	public StartGroup (String parentId) {
+		super();
+		this.parentId = parentId;
 	}
 
-	@Test
-	public void runTest () {
-		PropertiesFilter filter = null;		
-		try {
-			filter = new PropertiesFilter();
-			filter.setOptions("en", "UTF-8");
-			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");
-			filter.open(input);
-			process(filter);
-			filter.close();
-			
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail("Exception occured");
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public StartGroup (String parentId,
+		String id)
+	{
+		super();
+		this.parentId = parentId;
+		this.id = id;
 	}
-	
-	private void process (IFilter filter) {
-		System.out.println("==================================================");
-		FilterEvent event;
-		while ( filter.hasNext() ) {
-			event = filter.next();
-			switch ( event.getEventType() ) {
-			case START_DOCUMENT:
-				System.out.println("--- Start Document ---");
-				break;
-			case TEXT_UNIT:
-				System.out.print("["+filter.getResource().toString()+"]");
-				break;
-			case END_DOCUMENT:
-				System.out.println("\n--- End Document ---");
-				break;
-			}
-		}
+
+	public StartGroup (String parentId,
+		String id,
+		boolean isReference)
+	{
+		super();
+		this.parentId = parentId;
+		this.id = id;
+		this.isReferent = isReference;
 	}
+
 }

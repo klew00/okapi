@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.tm.trados;
 
 import java.util.ArrayList;
@@ -18,25 +38,21 @@ public class TradosTMConnector implements ITMQuery {
 	private int current = -1;
 	private String srcLang;
 	private String trgLang;
-	
-	ActiveXComponent tradosInstance, tmInstance;
+	private ActiveXComponent tradosInstance, tmInstance;
 
-	public void open(String connectionString) {
-
+	public void open (String connectionString) {
 		tradosInstance = new ActiveXComponent("TW4Win.Application");
 		tmInstance = tradosInstance.getPropertyAsComponent("TranslationMemory");
 		tmInstance.invoke("Open",new Variant(connectionString),new Variant("BATCH_ANALYZER"));
-
 	}
 		
-	public void close() {
+	public void close () {
 		tradosInstance.invoke("quit", new Variant[] {});
 	}
 
 
-	public void export(String outputPath) {
+	public void export (String outputPath) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public int query(String plainText) {
@@ -44,14 +60,14 @@ public class TradosTMConnector implements ITMQuery {
 		return query(tf);
 	}
 
-	public int query(TextFragment tf) {
-		
+	public int query (TextFragment tf) {
 		String searchString;
 
 		//--process plain text or parsed TextFragment if ther are codes--
 		if ( !tf.hasCode() ) {
 			searchString = Util.escapeToRTF(tf.toString(), true, 0, null);
-		}else{
+		}
+		else {
 			RtfHelper rth = new RtfHelper();
 			searchString = rth.parseTextFragmentToRtf(tf);			
 		}
@@ -68,16 +84,14 @@ public class TradosTMConnector implements ITMQuery {
 
 			//--execute the search--
 			tmInstance.invoke("Search",new Variant(searchString));
-			
 			current = -1;
-			
 			int hits = tmInstance.invoke("HitCount").getInt();
 			int counter = 0;
 			
-			if (hits ==0){
+			if ( hits ==0 ) {
 				return 0;
-			}else{
-				
+			}
+			else {
 				results = new ArrayList<QueryResult>();
 				do {
 					counter++;
@@ -97,27 +111,23 @@ public class TradosTMConnector implements ITMQuery {
 					
 				} while (tu.invoke("Next").getBoolean() && (counter < maxHits));
 			}
-			
 			current = 0;
-	
-        } catch (Exception e) {
+        }
+		catch (Exception e) {
     		System.out.println("Error occured");
         } 			
-		
 		return results.size();
 	}
 
 	public void removeAttribute(String anme) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void setAttribute(String name, String value) {
 		// TODO Auto-generated method stub
-		
 	}
 
-	public boolean hasOption(int option) {
+	public boolean hasOption (int option) {
 		switch ( option ) {
 		case HAS_FILEPATH:
 			return true;
@@ -126,7 +136,7 @@ public class TradosTMConnector implements ITMQuery {
 		}
 	}
 	
-	public QueryResult next() {
+	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
 			current++;
@@ -136,7 +146,7 @@ public class TradosTMConnector implements ITMQuery {
 		return null;
 	}
 	
-	public boolean hasNext() {
+	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
 			current = -1;
@@ -152,24 +162,26 @@ public class TradosTMConnector implements ITMQuery {
 		return trgLang;
 	}	
 
-	public void setLanguages(String sourceLang, String targetLang) {
+	public void setLanguages (String sourceLang, String targetLang) {
 		srcLang = sourceLang;
 		trgLang = targetLang;
 	}
 
-	public void setMaximumHits(int max) {
+	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;
 	}
 	
-	public int getMaximunHits() {
+	public int getMaximunHits () {
 		return maxHits;
 	}
 
-	public void setThreshold(int threshold) {
+	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
-	public int getThreshold() {
-		return threshold;	}
+	public int getThreshold () {
+		return threshold;
 	}
+	
+}

@@ -33,12 +33,6 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.LocaleData;
-import net.sf.okapi.common.resource.SkeletonUnit;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class XLIFFReader {
 

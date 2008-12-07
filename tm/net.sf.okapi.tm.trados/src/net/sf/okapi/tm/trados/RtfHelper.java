@@ -1,3 +1,23 @@
+/*===========================================================================*/
+/* Copyright (C) 2008 By the Okapi Framework contributors                    */
+/*---------------------------------------------------------------------------*/
+/* This library is free software; you can redistribute it and/or modify it   */
+/* under the terms of the GNU Lesser General Public License as published by  */
+/* the Free Software Foundation; either version 2.1 of the License, or (at   */
+/* your option) any later version.                                           */
+/*                                                                           */
+/* This library is distributed in the hope that it will be useful, but       */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
+/* General Public License for more details.                                  */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this library; if not, write to the Free Software Foundation,   */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/*                                                                           */
+/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
+/*===========================================================================*/
+
 package net.sf.okapi.tm.trados;
 
 import java.util.ArrayList;
@@ -25,8 +45,8 @@ public class RtfHelper {
 	}
 	
 	/**
-	 * Takes a resulting rtf string and parses it into a temporary state--
-	 * @param  sParam  	Rtf string to process
+	 * Takes a resulting RTF string and parses it into a temporary state--
+	 * @param sParam RTF string to process
 	 */	
 	public void processRtfFragment(String sParam){
 		
@@ -79,8 +99,8 @@ public class RtfHelper {
 
 	/**
 	 * Checks the string to see if there are any rtf start groups to process--
-	 * @param  sParam  	Takes the entire string and locates the opening of a group.
-	 * @return      search result.
+	 * @param sParam Takes the entire string and locates the opening of a group.
+	 * @return search result.
 	 */		
 	public boolean containsStartGroup(String sParam){
 
@@ -99,7 +119,6 @@ public class RtfHelper {
 		else
 			return false;
 	}	
-	
 	
 	/**
 	 * Uses a stack to process the first group that doesn't contain any nested group--
@@ -152,8 +171,8 @@ public class RtfHelper {
 	
 	/**
 	 * Uses regular expression to filter out the control words. 
-	 * @param  sParam  parameter string to use for search and replace
-	 * @return      resulting string
+	 * @param sParam Parameter string to use for search and replace
+	 * @return Resulting string
 	 */
 	String removeControlWords(String sParam){
 		String result = sParam.replaceAll("\\\\[a-zA-Z_0-9]+[^\\\\]", "");
@@ -162,8 +181,8 @@ public class RtfHelper {
 	
 	/**
 	 * Checks the string for \\cs6 to see if the group is an inline code. 
-	 * @param  sParam  parameter string to use for check
-	 * @return      resulting string
+	 * @param sParam Parameter string to use for check
+	 * @return Resulting string
 	 */
 	boolean isInlineGroup(String sParam){
 		return sParam.contains("\\cs6");
@@ -174,8 +193,7 @@ public class RtfHelper {
 	 * @param  tf  	TextFragment to be parsed
 	 * @return      resulting unescaped string
 	 */	
-	public String unescapeRTF (String rtfStr)
-	{
+	public String unescapeRTF (String rtfStr) {
 		//--TODO: Need add additional replacement characters--
 		String temp = rtfStr.replace("\\{","{");
 		temp = temp.replace("\\}","}");
@@ -219,6 +237,5 @@ public class RtfHelper {
 		}
 		return sb.toString();
 	}
-	
-	
+
 }

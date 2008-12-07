@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.pipeline;
 
-
 public enum PipelineReturnValue {
 	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED
 }

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,36 +20,34 @@
 
 package net.sf.okapi.common.resource;
 
-public interface ITranslatable extends IContainable {
+
+public class BaseReferenceable extends BaseNameable implements IReferenceable {
+
+	protected boolean isReferent;
+	protected String parentId;
+	
+	public boolean isReferent () {
+		return isReferent;
+	}
+
+	public void setIsReferent (boolean value) {
+		isReferent = value;
+	}
 
 	/**
-	 * Indicates if the content of the resource is translatable.
-	 * @return True if the content is translatable, false otherwise.
+	 * Gets the ID of the parent resource of this resource.
+	 * @return The ID of this resource's parent, or null if there is none.
 	 */
-	public boolean isTranslatable ();
+	public String getParentId () {
+		return parentId;
+	}
 	
 	/**
-	 * Sets the flag indicating if the content of the resource is translatable.
-	 * @param value The new value to set.
+	 * Sets the ID of the parent resource of this resource.
+	 * @param id The ID to set.
 	 */
-	public void setIsTranslatable (boolean value);
-	
-	/**
-	 * Gets the current parent of the object.
-	 * @return The parent of the resource or null if it has no parent.
-	 */
-	public ITranslatable getParent ();
-	
-	/**
-	 * Sets the parent for the resource.
-	 * @param value The new parent of the resource.
-	 */
-	public void setParent (ITranslatable value);
+	public void setParentId (String id) {
+		parentId = id;
+	}
 
-	/**
-	 * Indicates if the resource has at least one child.
-	 * @return True if the resource has one child or more, false if it has none.
-	 */
-	public boolean hasChild ();
-	
 }

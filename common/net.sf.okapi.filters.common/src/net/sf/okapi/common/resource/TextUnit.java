@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,468 +20,375 @@
 
 package net.sf.okapi.common.resource;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Set;
 
-/**
- * This class implements the methods to manipulate a unit of extracted text.
- * 
- * <p>The TextUnit object includes a source content ({@link #getSourceContent()})
- * and one or more target content ({@link #getTargets()}). You can access
- * the first target with {@link #getTarget()}.
- * 
- * <p>A TextUnit may have children TextUnit objects. You can add child TextUnit
- * child (or {@link Group}) with the {@link #addChild(ITranslatable)} method.
- * You can retrieve these children with the {@link #getChild(String)} method or the 
- * iteratable returned by {@link #childTextUnitIterator()}.
- */
-public class TextUnit implements ITranslatable, IAnnotatable {
+import net.sf.okapi.common.annotation.Annotations;
+import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.filters.IEncoder;
+import net.sf.okapi.common.filters.ISkeleton;
 
-	protected String                        id;
-	protected String                        name;
-	protected String                        type;
-	protected boolean                       isTranslatable;
-	protected boolean                       preserveWS;
-	protected SkeletonUnit                  sklBefore;
-	protected SkeletonUnit                  sklAfter;
-	protected ArrayList<IContainable>       children;
-	protected ITranslatable                 parent;
-	protected LocaleData                    source;
-	protected ArrayList<LocaleData>         targets;
-	protected Hashtable<String, String>     propList;
-	protected Hashtable<String, IExtension> extList;
-	private ArrayList<TextUnit>             allUnits;
+public class TextUnit implements IResource, INameable, IReferenceable {
+
+	private String id;
+	private boolean isReferent;
+	private String name;
+	private ISkeleton skeleton;
+	protected Hashtable<String, Property> properties;
+	private Annotations annotations;
+	private TextContainer source;
+	private IEncoder encoder;
 
 	/**
-	 * Creates a TextUnit object with an empty source content and no target content.
+	 * Creates a new TextUnit object.
+	 * @param id The ID of this resource.
 	 */
-	public TextUnit () {
-		isTranslatable = true;
-		source = new LocaleData(this);
-		targets = new ArrayList<LocaleData>();
-		targets.add(null);
+	public TextUnit (String id) {
+		create(id, null, false, null);
 	}
 
 	/**
-	 * Creates a TextUnit object with given ID and source text.
-	 * @param id the ID to use.
-	 * @param sourceText The source text to use.
+	 * Creates a new TextUnit object.
+	 * @param id The ID of this resource.
+	 * @param sourceText The initial text of the source.
 	 */
 	public TextUnit (String id,
 		String sourceText)
 	{
-		isTranslatable = true;
-		this.id = id;
-		source = new LocaleData(this);
-		source.container = new TextContainer(this);
-		if ( sourceText != null ) source.container.append(sourceText);
-		source.container.id = id;
-		targets = new ArrayList<LocaleData>();
-		targets.add(null);
+		create(id, sourceText, false, null);
 	}
 
-	/** 
-	 * Get the text representation of the source of this text unit.
-	 * @return The text representation of the source of this text unit.
+	/**
+	 * Creates a new TextUnit object.
+	 * @param id The ID of this resource.
+	 * @param sourceText The initial text of the source.
+	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * by another resource) or not.
 	 */
+	public TextUnit (String id,
+		String sourceText,
+		boolean isReferent)
+	{
+		create(id, sourceText, isReferent, null);
+	}
+
+	/**
+	 * Creates a new TextUnit object.
+	 * @param id The ID of this resource.
+	 * @param sourceText The initial text of the source.
+	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * by another resource) or not.
+	 * @param encoder The encoder to use for escaping characters and string for this
+	 * TextUnit.
+	 */
+	public TextUnit (String id,
+		String sourceText,
+		boolean isReferent,
+		IEncoder encoder)
+	{
+		create(id, sourceText, isReferent, encoder);
+	}
+
+	private void create (String id,
+		String sourceText,
+		boolean isReferent,
+		IEncoder encoder)
+	{
+		annotations = new Annotations();
+		this.id = id;
+		this.isReferent = isReferent;
+		this.encoder = encoder;
+		source = new TextContainer();
+		if ( sourceText != null ) {
+			source.text.append(sourceText);
+		}
+	}
+
 	@Override
 	public String toString () {
-		return source.container.toString();
+		return source.toString();
 	}
-	
-	public String getID () {
-		if ( id == null ) return "";
+
+	public String getId () {
 		return id;
 	}
 
-	public void setID (String value) {
-		id = value;
+	public void setId (String id) {
+		this.id = id;
 	}
 
-	/**
-	 * Indicates if the source content of this resource is empty.
-	 * @return True if the source content is empty, false otherwise.
-	 */
-	public boolean isEmpty () {
-		return source.container.isEmpty();
+	public ISkeleton getSkeleton () {
+		return skeleton;
+	}
+
+	public void setSkeleton (ISkeleton skeleton) {
+		this.skeleton = skeleton;
 	}
 
 	public String getName () {
-		if ( name == null ) return "";
 		return name;
 	}
 
-	public void setName (String value) {
-		name = value;
+	public void setName (String name) {
+		this.name = name;
 	}
 
-	public String getType () {
-		if ( type == null ) return "";
-		return type;
+	@SuppressWarnings("unchecked")
+	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+		return (A)annotations.get(type);
 	}
 
-	public void setType (String value) {
-		type = value;
+	public void setAnnotation (IAnnotation annotation) {
+		annotations.set(annotation);
 	}
 
-	public String getProperty (String name) {
-		if ( propList == null ) return null;
-		return propList.get(name);
+	public Property getProperty (String name) {
+		if ( properties == null ) return null;
+		return properties.get(name);
 	}
 
-	public void setProperty (String name,
-		String value)
+	public Property setProperty (Property property) {
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		properties.put(property.getName(), property);
+		return property;
+	}
+	
+	public Set<String> getPropertyNames () {
+		if ( properties == null ) properties = new Hashtable<String, Property>();
+		return properties.keySet();
+	}
+
+	public Property getSourceProperty (String name) {
+		if ( source.properties == null ) return null;
+		return source.properties.get(name);
+	}
+
+	public Property setSourceProperty (Property property) {
+		return source.setProperty(property);
+	}
+	
+	public Set<String> getSourcePropertyNames () {
+		return source.getPropertyNames();
+	}
+	
+	public Property getTargetProperty (String language,
+		String name)
 	{
-		if ( propList == null ) propList = new Hashtable<String, String>();
-		propList.put(name, value);
+		TextContainer tc = getTarget(language);
+		if ( tc == null ) return null;
+		return tc.getProperty(name);
 	}
 
-	public Hashtable<String, String> getProperties () {
-		if ( propList == null ) propList = new Hashtable<String, String>();
-		return propList;
-	}
-
-	public IExtension getExtension (String name) {
-		if ( extList == null ) return null;
-		return extList.get(name);
-	}
-
-	public void setExtension (String name,
-		IExtension value)
+	public Property setTargetProperty (String language,
+		Property property)
 	{
-		if ( extList == null ) extList = new Hashtable<String, IExtension>();
-		extList.put(name, value);
+		return createTarget(language, false, IResource.CREATE_EMPTY).setProperty(property);
 	}
 
-	public Hashtable<String, IExtension> getExtensions () {
-		if ( extList == null ) extList = new Hashtable<String, IExtension>();
-		return extList;
+	public Set<String> getTargetPropertyNames (String language) {
+		TextContainer tc = createTarget(language, false, IResource.CREATE_EMPTY);
+		if ( tc.properties == null ) {
+			tc.properties = new Hashtable<String, Property>(); 
+		}
+		return tc.properties.keySet();
 	}
 
-	public boolean preserveWhitespaces() {
-		return preserveWS;
+	public boolean hasTargetProperty (String language,
+		String name)
+	{
+		TextContainer tc = getTarget(language);
+		if ( tc == null ) return false;
+		return (tc.getProperty(name) != null);
 	}
 
-	public void setPreserveWhitespaces (boolean value) {
-		preserveWS = value;
+	public Set<String> getTargetLanguages () {
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) {
+			ta = new TargetsAnnotation();
+			annotations.set(ta);
+		}
+		return ta.getLanguages();
 	}
 
-	public boolean isTranslatable () {
-		return isTranslatable;
+	public Property createTargetProperty (String language,
+		String name,
+		boolean overwriteExisting,
+		int creationOptions)
+	{
+		// Get the target or create an empty one
+		TextContainer tc = createTarget(language, false, CREATE_EMPTY);
+		// Get the property if it exists
+		Property prop = tc.getProperty(name);
+		// If it does not exists or if we overwrite: create a new one
+		if (( prop == null ) || overwriteExisting ) {
+			// Get the source property
+			prop = source.getProperty(name);
+			if ( prop == null ) {
+				// If there is no source, create an empty property
+				return tc.setProperty(new Property(name, "", false));
+			}
+			else { // If there is a source property
+				// Create a copy, empty or not depending on the options
+				if ( creationOptions == CREATE_EMPTY ) {
+					return tc.setProperty(new Property(name, "", prop.isReadOnly()));
+				}
+				else {
+					return tc.setProperty(prop.clone());
+				}
+			}
+		}
+		return prop;
 	}
 
-	public void setIsTranslatable (boolean value) {
-		isTranslatable = value;
+	public boolean isReferent () {
+		return isReferent;
 	}
 
-	public ITranslatable getParent () {
-		return parent;
-	}
-
-	public void setParent (ITranslatable value) {
-		parent = value;
+	public void setIsReferent (boolean value) {
+		isReferent = value;
 	}
 
 	/**
-	 * Gets the skeleton unit just before the resource. For example a "<p>"
-	 * in a HTML paragraph. 
-	 * @return The skeleton unit before the resource or null.
+	 * Gets the source object for this TextUnit.
+	 * @return The source object for this TextUnit.
 	 */
-//	public SkeletonUnit getSkeletonBefore () {
-//		return sklBefore;
-//	}
+	public TextContainer getSource () {
+		return source;
+	}
 	
 	/**
-	 * Sets the skeleton unit just before the resource. For example a "<p>"
-	 * in a HTML paragraph. 
-	 * @param value The skeleton unit to set.
+	 * Sets the source object for this TextUnit. Any existing source object is overwritten.
+	 * @param textContainer The source object to set.
+	 * @return The source object that has been set.
 	 */
-//	public void setSkeletonBefore (SkeletonUnit value) {
-//		sklBefore = value;
-//	}
-
-	/**
-	 * Gets the skeleton unit just after the resource. For example a "</p>"
-	 * in a HTML paragraph. 
-	 * @return The skeleton unit after the resource or null.
-	 */
-//	public SkeletonUnit getSkeletonAfter () {
-//		return sklAfter;
-//	}
+	public TextContainer setSource (TextContainer textContainer) {
+		source = textContainer;
+		return source;
+	}
 	
 	/**
-	 * Sets the skeleton unit just after the resource. For example a "</p>"
-	 * in a HTML paragraph. 
-	 * @param value The skeleton unit to set.
+	 * Gets the target object for this TextUnit for a given language.
+	 * @param language The language to query.
+	 * @return The target object for this TextUnit for the given language, or null if
+	 * it does not exist.
 	 */
-//	public void setSkeletonAfter (SkeletonUnit value) {
-//		sklAfter = value;
-//	}
+	public TextContainer getTarget (String language) {
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) return null;
+		return ta.get(language);
+	}
 
 	/**
-	 * Gets the source object of the resource.
-	 * @return The source object of the resource, never null.
+	 * Sets the target object for this TextUnit for a given language.
+	 * Any existing target object for the given language is overwritten.
+	 * To set a target object based on the source, use the 
+	 * {@link #createTarget(String, boolean, int)} method.
+	 * @param language The target language. 
+	 * @param text The target object to set.
+	 * @return The target object that has been set.
 	 */
-	public LocaleData getSource () {
+	public TextContainer setTarget (String language,
+		TextContainer text)
+	{
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) {
+			ta = new TargetsAnnotation();
+			annotations.set(ta);
+		}
+		ta.set(language, text);
+		return text;
+	}
+	
+	/**
+	 * Indicates if there is a target object for a given language for this TextUnit. 
+	 * @param language The language to query.
+	 * @return True if a target object exists for the given language, false otherwise.
+	 */
+	public boolean hasTarget (String language) {
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) return false;
+		return (ta.get(language) != null);
+	}
+	
+	/**
+	 * Creates or get the target for this TextUnit.
+	 * @param language The target language.
+	 * @param overwriteExisting True to overwrite any existing target for the given language.
+	 * False to not create a new target object if one already exists for the given language. 
+	 * @param creationOptions Creation options:
+	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
+	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
+	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
+	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
+	 * @return The target object that was created, or retrieved. 
+	 */
+	public TextContainer createTarget (String language,
+		boolean overwriteExisting,
+		int creationOptions)
+	{
+		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+		if ( ta == null ) {
+			ta = new TargetsAnnotation();
+			annotations.set(ta);
+		}
+		TextContainer tc = ta.get(language);
+		if (( tc == null ) || overwriteExisting ) {
+			tc = new TextContainer();
+			if ( (creationOptions & COPY_CONTENT) == COPY_CONTENT ) {
+				TextFragment tf = getSourceContent().clone();
+				tc.setContent(tf);
+			}
+			if ( (creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES ) {
+				if ( source.properties != null ) {
+					tc.properties = new Hashtable<String, Property>();
+					for ( Property prop : source.properties.values() ) {
+						tc.properties.put(prop.getName(), prop.clone()); 
+					}
+				}
+			}
+			ta.set(language, tc);
+		}
+		return tc;
+	}
+
+	/**
+	 * Gets the content of the source for this TextUnit.
+	 * @return The content of the source for this TextUnit.
+	 */
+	public TextFragment getSourceContent () {
+		return source;
+	}
+	
+	public TextFragment setSourceContent (TextFragment content) {
+		source.setContent(content);
 		return source;
 	}
 
 	/**
-	 * Sets the source object of the resource.
-	 * @param value The new source object. Must not be null.
+	 * Gets the content of the target for a given language for this TextUnit.
+	 * @param language The language to query.
+	 * @return The content of the target for the given language for this TextUnit.
 	 */
-	public void setSource (LocaleData value) {
-		if ( value == null ) throw new InvalidParameterException();
-		source = value;
-		if ( source.container == null ) throw new InvalidParameterException();
-		source.container.parent = this;
+	public TextFragment getTargetContent (String language) {
+		TextContainer tc = getTarget(language);
+		if ( tc == null ) return null;
+		return tc.getContent();
 	}
 	
-	/**
-	 * Gets the source content of the resource.
-	 * @return The source content of the resource.
-	 */
-	public TextContainer getSourceContent () {
-		return source.container;
-	}
-	
-	/**
-	 * Sets the source content of the resource.
-	 * @param value The source content. Must not be null.
-	 */
-	public void setSourceContent (TextContainer value) {
-		if ( value == null ) throw new InvalidParameterException();
-		value.parent = this;
-		source.container = value;
-	}
-	
-	/**
-	 * Indicates if the text unit has a (first) target (even if it is empty)
-	 * @return True if the unit has a (first) target, false otherwise.
-	 */
-	public boolean hasTarget () {
-		if (( targets.get(0) == null )
-			|| ( !(targets.get(0).container != null) )) return false;
-		return true; // Can be empty
-	}
-
-	/**
-	 * Gets the (first) target object of the resource. You can use
-	 * {@link #hasTarget()} to know if there is a target available.
-	 * @return The (first) target object, or null.
-	 */
-	public LocaleData getTarget () {
-		return targets.get(0); 
-	}
-	
-	/**
-	 * Sets the (first) target object of the resource.
-	 * @param value The object to assign (can be null).
-	 */
-	public void setTarget (LocaleData value) {
-		if ( value == null ) throw new InvalidParameterException();
-		targets.set(0, value);
-	}
-	
-	/**
-	 * Gets the (first) target content of the resource. You can use
-	 * {@link #hasTarget()} to know if there is a target available.
-	 * @return The (first) target content, or null.
-	 */
-	public TextContainer getTargetContent () {
-		if ( targets.get(0) == null ) return null;
-		return targets.get(0).container;
-	}
-
-	/**
-	 * Sets the (first) target content of the resource. If there is no target
-	 * object yet, it is created automatically.
-	 * @param value The new content (can be null).
-	 */
-	public void setTargetContent (TextContainer value) {
-		if ( targets.get(0) == null ) {
-			targets.set(0, new LocaleData(this));
-		}
-		targets.get(0).container = value;
-	}
-
-	/**
-	 * Gets the list of the target objects of the resource.
-	 * @return The list of the targets.
-	 */
-	//For now the only way to access all targets
-	public List<LocaleData> getTargets () {
-		return targets;
-	}
-	
-	/**
-	 * Adds a child resource to the resource.
-	 * @param child The child resource to add.
-	 */
-	public void addChild (IContainable child) {
-		if ( children == null ) {
-			children = new ArrayList<IContainable>();
-		}
-		child.setParent(this);
-		children.add(child);
-	}
-
-	public boolean hasChild () {
-		if ( children == null ) return false;
-		else return !children.isEmpty();
-	}
-
-	/**
-	 * Gets the list of all the children of the resource.
-	 * @return The list of all the children of the resource.
-	 */
-	public List<IContainable> getChildren () {
-		if ( children == null ) {
-			children = new ArrayList<IContainable>();
-		}
-		return children;
-	}
-
-	/**
-	 * Stores recursively all TextUnit items in the children for the given object.
-	 * Only TextUnit objects are stored, Group and SkeletonUnit objects are not.
-	 * @param parent The parent object.
-	 */
-	private void storeTextUnits (ITranslatable parent) {
-		// Check if it's a TextUnit
-		if ( parent instanceof TextUnit ) {
-			allUnits.add((TextUnit)parent);
-			if ( parent.hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
-					storeTextUnits((ITranslatable)item);
-				}
-			}
-			return;
-		}
-		// Else: it is a Group
-		if ( parent.hasChild() ) {
-			for ( IContainable item : (Group)parent ) {
-				if ( item instanceof ITranslatable ) { 
-					storeTextUnits((ITranslatable)item);
-				}
-			}
-		}
-	}
-
-	private void storeUnits (ArrayList<IContainable> list,
-		IContainable unit)
+	public TextFragment setTargetContent (String language,
+		TextFragment content)
 	{
-		// Check if it's a TextUnit
-		if ( unit instanceof TextUnit ) {
-			list.add(unit);
-			if ( ((TextUnit)unit).hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).getChildren() ) {
-					storeUnits(list, item);
-				}
-			}
-			return;
-		}
-		else if ( unit instanceof SkeletonUnit ) {
-			list.add(unit);
-			return;
-		}
-		// Else: it is a Group
-		if ( parent.hasChild() ) {
-			for ( IContainable item : (Group)unit ) {
-				if ( item instanceof ITranslatable ) { 
-					storeUnits(list, item);
-				}
-			}
-		}
-	}
-	
-	
-	/**
-	 * Gets the child object with a given ID.
-	 * @param id The ID value of the child to return.
-	 * @return The child object for the given ID, or null if it has not
-	 * been found.
-	 */
-	public ITranslatable getChild (String id) {
-		if ( id == null ) return null;
-		if ( !hasChild() ) return null;
-		//TODO: Fix this so it cannot match the initial parent...
-		return findChild(this, id);
-	}
-	
-	/**
-	 * Creates an iteratable list of all children TextUnit objects for this
-	 * TextUnit.
-	 * @return An iteratable list of all the children TextUnit objects.
-	 */
-	public Iterable<TextUnit> childTextUnitIterator () {
-		// Rebuild the list each time
-		allUnits = new ArrayList<TextUnit>();
-		if ( hasChild() ) {
-			// Children only
-			for ( int i=0; i<children.size(); i++ ) {
-				// Skip over skeleton units
-				if ( getChildren().get(i) instanceof SkeletonUnit ) continue;
-				storeTextUnits((ITranslatable)getChildren().get(i));
-			}
-		}
-		return Collections.unmodifiableList(allUnits);
+		TextContainer tc = createTarget(language, false, CREATE_EMPTY);
+		tc.setContent(content);
+		return tc;
 	}
 
-	/**
-	 * Creates an iteratable flattened list of all children TextUnit and SkeletonUnit
-	 * objects for this TextUnit.
-	 * @return An iteratable flattened list of all children TextUnit and SkeletonUnit
-	 * objects.
-	 */
-	public Iterable<IContainable> childUnitIterator () {
-		ArrayList<IContainable> unitList = new ArrayList<IContainable>();
-		if ( hasChild() ) {
-			// Children only
-			for ( int i=0; i<children.size(); i++ ) {
-				storeUnits(unitList, getChildren().get(i));
-			}
-		}
-		return Collections.unmodifiableList(unitList);
+	public IEncoder getEncoder () {
+		return encoder;
 	}
 	
-	
-	/**
-	 * Finds the child of this text unit that corresponds to the given ID.
-	 * Only children that implement ITranslatable are searched.
-	 * @param parent The parent of the child to search for.
-	 * @param id The ID to search for.
-	 * @return The found child, or null if it not been found.
-	 */
-	private ITranslatable findChild (ITranslatable parent,
-		String id)
-	{
-		if ( parent instanceof TextUnit ) {
-			if ( parent.hasChild() ) {
-				for ( IContainable item : ((TextUnit)parent).children ) {
-					if ( id.equals(item.getID()) ) {
-						return (ITranslatable)item;
-					}
-					ITranslatable res = findChild((ITranslatable)item, id);
-					if ( res != null ) return res;
-				}
-			}
-			else if ( id.equals(parent.getID()) ) {
-				return parent;
-			}
-		}
-		else if ( parent instanceof Group ) {
-			for ( IContainable item : (Group)parent ) {
-				if ( item instanceof ITranslatable ) { 
-					ITranslatable res = findChild((ITranslatable)item, id);
-					if ( res != null ) return res;
-				}
-			}
-		}
-		return null;
-	}
-	
+	public void setEncoder (IEncoder encoder) {
+		this.encoder = encoder;
+	}	
+
 }

@@ -352,10 +352,10 @@ public class HtmlFilter extends BaseFilter {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String, java.lang.String)
-	 */
-	public void setOptions(String language, String defaultEncoding) {
+	public void setOptions (String language,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		// TODO Auto-generated method stub		
 	}
 

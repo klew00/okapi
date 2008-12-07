@@ -202,8 +202,8 @@ public class Database {
 			if ( !tu.hasTarget() ) return 0;
 
 			// Store the data
-			TextContainer srcCont = tu.getSourceContent();
-			TextContainer trgCont = tu.getTargetContent();
+			TextContainer srcCont = tu.getSource();
+			TextContainer trgCont = tu.getTarget();
 
 			// Store the segments if possible
 			if ( srcCont.isSegmented() && trgCont.isSegmented() ) {
@@ -338,7 +338,7 @@ public class Database {
 				TextContainer tc;
 				LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>();
 				do {
-					tu = new TextUnit();
+					tu = new TextUnit("0");
 					tc = new TextContainer();
 					tc.setCodedText(result.getString(4),
 						Code.stringToCodes(result.getString(5)), false);
@@ -346,7 +346,7 @@ public class Database {
 					tc = new TextContainer();
 					tc.setCodedText(result.getString(6),
 						Code.stringToCodes(result.getString(7)), false);
-					tu.setTargetContent(tc);
+					tu.setTarget(tc);
 					tu.setName(result.getString(1));
 					attributes.put(NGRPNAME, result.getString(2));
 					attributes.put(NFILENAME, result.getString(3));

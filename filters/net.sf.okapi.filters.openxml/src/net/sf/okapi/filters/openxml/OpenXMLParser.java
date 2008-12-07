@@ -520,7 +520,10 @@ public class OpenXMLParser extends BaseFilter {
 		return null;
 	}
 
-	public void setOptions(String language, String defaultEncoding) {
+	public void setOptions(String language,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		// TODO Auto-generated method stub		
 	}
 

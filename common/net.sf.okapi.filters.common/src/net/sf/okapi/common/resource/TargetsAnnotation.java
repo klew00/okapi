@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,30 +18,41 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.resource;
 
-import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import net.sf.okapi.common.pipeline.IResourceBuilder;
+import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.annotation.IterableEnumeration;
 
-public interface IOutputFilter extends IResourceBuilder {
+public class TargetsAnnotation implements IAnnotation, Iterable<String> {
 
-	/**
-	 * Initializes the output.
-	 * @param output Stream where to do the output.
-	 * @param outputPath Full path of the output.
-	 * @param encoding Encoding for the output.
-	 * @param targeLanguage Language code of the target.
-	 */
-	//TODO: Need to work out better init: either path or stream?
-	void initialize (OutputStream output,
-		String outputPath,
-		String encoding,
-		String targetLanguage);
+	private ConcurrentHashMap<String, TextContainer> targets;
 
-	/**
-	 * Closes the current output and free any associated resources.
-	 */
-	void close ();
+	public TargetsAnnotation() {
+		targets = new ConcurrentHashMap<String, TextContainer>();
+	}
 
+	public void set (String language, TextContainer tt) {
+		targets.put(language, tt);
+	}
+
+	public TextContainer get (String language) {
+		return targets.get(language);
+	}
+
+	public boolean isEmpty() {
+		return targets.isEmpty();
+	}
+
+	public Iterator<String> iterator () {
+		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
+		return iterableLocales.iterator();
+	}
+
+	public Set<String> getLanguages () {
+		return targets.keySet();
+	}
 }

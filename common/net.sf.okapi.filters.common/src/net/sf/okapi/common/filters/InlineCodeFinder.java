@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
@@ -133,7 +133,7 @@ public class InlineCodeFinder {
 	 * into in-line codes.
 	 * @param fragment The fragment where to apply the rules.
 	 */
-	public void process (TextContainer fragment) {
+	public void process (TextFragment fragment) {
 		if ( pattern.pattern().length() == 0 ) return;
 		String tmp = fragment.getCodedText();
 		Matcher m = pattern.matcher(tmp);

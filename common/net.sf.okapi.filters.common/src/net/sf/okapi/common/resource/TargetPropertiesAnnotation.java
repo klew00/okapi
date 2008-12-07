@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,22 +20,40 @@
 
 package net.sf.okapi.common.resource;
 
-public class LocaleData extends LocaleProperties {
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-	TextContainer       container;
-	
-	public LocaleData (TextUnit parent) {
-		container = new TextContainer(parent);
+import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.annotation.IterableEnumeration;
+
+public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String> {
+
+	private ConcurrentHashMap<String, Hashtable<String, Property>> targets;
+
+	public TargetPropertiesAnnotation () {
+		targets = new ConcurrentHashMap<String, Hashtable<String, Property>>();
 	}
 
-	@Override
-	public String toString () {
-		return container.toString();
+	public void set (String locale, Hashtable<String, Property> properties) {
+		targets.put(locale, properties);
 	}
-	
-	public TextContainer getContent () {
-		return container;
+
+	public Hashtable<String, Property> get (String locale) {
+		return targets.get(locale);
 	}
-	
+
+	public boolean isEmpty () {
+		return targets.isEmpty();
+	}
+
+	public Iterator<String> iterator () {
+		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
+		return iterableLocales.iterator();
+	}
+
+	public Set<String> getLanguages () {
+		return targets.keySet();
+	}
 }
-

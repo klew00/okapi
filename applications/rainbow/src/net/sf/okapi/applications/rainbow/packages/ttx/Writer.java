@@ -216,7 +216,7 @@ public class Writer extends BaseWriter {
 		String name = item.getName();
 		writer.writeRawXML(String.format(
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
-			item.getID(), (name.length()>0 ? " rn='"+name+"'" : "") ));
+			item.getId(), (name.length()>0 ? " rn='"+name+"'" : "") ));
 		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
 		if ( item.hasTarget() ) {
 			//TODO: Info about the match

@@ -83,11 +83,8 @@ public class RegexFilterTest {
 			case START_DOCUMENT:
 				System.out.println("--- Start Document ---");
 				break;
-			case SKELETON_UNIT:
-				System.out.print(filter.getResource().toString());
-				break;
 			case TEXT_UNIT:
-				System.out.print("["+filter.getResource().toString()+"]");
+				System.out.println("["+filter.getResource().toString()+"]");
 				break;
 			case END_DOCUMENT:
 				System.out.println("\n--- End Document ---");

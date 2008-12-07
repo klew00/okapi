@@ -32,10 +32,10 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class MIFFilter implements IFilter {
@@ -48,7 +48,7 @@ public class MIFFilter implements IFilter {
 	private StringBuilder sklBuffer;
 	private StringBuilder ilcBuffer;
 	private StringBuilder buffer;
-	private Document docRes;
+	private StartDocument startDoc;
 	private int parseState = 0;
 	private int inPara;
 	private int inString;
@@ -167,10 +167,10 @@ public class MIFFilter implements IFilter {
 			
 			// Process first call
 			if ( parseState == 1 ) {
-				docRes = new Document();
+				startDoc = new StartDocument();
 				parseState = 2; // Inside the document
-				currentRes = docRes;
-				return new FilterEvent(FilterEventType.START_DOCUMENT, docRes);
+				currentRes = startDoc;
+				return new FilterEvent(FilterEventType.START_DOCUMENT, startDoc);
 			}
 			
 			// Process other calls
@@ -193,7 +193,7 @@ public class MIFFilter implements IFilter {
 						cont = new TextContainer();
 						// Return skeleton before
 						currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
-						return new FilterEvent(FilterEventType.SKELETON_UNIT, currentRes);
+						return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
 					}
 					else if ( "String".equals(tag) ) {
 						inString = level;
@@ -206,9 +206,8 @@ public class MIFFilter implements IFilter {
 					else if ( inPara == level ) {
 						inPara = -1;
 						if ( !cont.isEmpty() ) {
-							TextUnit tu = new TextUnit();
-							tu.setID(getTextId());
-							tu.setSourceContent(cont);
+							TextUnit tu = new TextUnit(getTextId());
+							tu.setSource(cont);
 							currentRes = tu;
 							return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
 							//TODO: Skeleton should be attached too
@@ -239,7 +238,7 @@ public class MIFFilter implements IFilter {
 		}
 		
 		parseState = 0; // No more
-		currentRes = docRes;
+		currentRes = startDoc;
 		return new FilterEvent(FilterEventType.END_DOCUMENT, null);
 	}
 
@@ -365,4 +364,17 @@ public class MIFFilter implements IFilter {
 		return String.valueOf(++skId);
 	}
 
+	private String guessEncoding (InputStream input) {
+		try {
+			// Open the file for byte reading
+		
+			// Read the start of the file to an array of bytes
+		
+			// Try to match the file signature with the pre-defined signatures
+		}
+		finally {
+			
+		}
+		return null; // No encoding detected
+	}
 }

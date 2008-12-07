@@ -22,7 +22,6 @@ import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.filters.IOutputFilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -166,19 +165,19 @@ public class Main {
 			String tmPath = Util.getTempDirectory() + File.separatorChar + "simpleTm";
 			simpleTm.create(tmPath, true);
 			
-			TextUnit tu = new TextUnit();
-			TextContainer tc = new TextContainer();
-			tc.append("Source text");
-			tu.setSourceContent(tc);
-			tc = new TextContainer();
-			tc.append("Target text for entry1 file1");
-			tu.setTargetContent(tc);
+			TextUnit tu = new TextUnit("t1");
+			TextFragment tf = new TextFragment();
+			tf.append("Source text");
+			tu.setSourceContent(tf);
+			tf = new TextFragment();
+			tf.append("Target text for entry1 file1");
+			tu.setTargetContent("fr", tf);
 			tu.setName("entry1");
 			simpleTm.addEntry(tu, tu.getName(), "file1");
 			
-			tc = new TextContainer();
-			tc.append("Target text for entry1 file2");
-			tu.setTargetContent(tc);
+			tf = new TextFragment();
+			tf.append("Target text for entry1 file2");
+			tu.setTargetContent("fr", tf);
 			tu.setName("entry1");
 			simpleTm.addEntry(tu, tu.getName(), "file2");
 			

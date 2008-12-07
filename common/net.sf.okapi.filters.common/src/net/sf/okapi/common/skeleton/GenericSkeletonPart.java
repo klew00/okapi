@@ -18,23 +18,27 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.openoffice;
+package net.sf.okapi.common.skeleton;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.resource.IResource;
 
-public class Resource extends Document {
+public class GenericSkeletonPart {
 
-	private static final long serialVersionUID = 1L;
-
-	protected Parameters     params;
+	StringBuilder data;
+	IResource parent;
+	String language;
 	
-	public Resource () {
-		params = new Parameters();
+	public GenericSkeletonPart (String data) {
+		this.data = new StringBuilder(data);
 	}
 
 	@Override
-	public IParameters getParameters () {
-		return params;
+	public String toString () {
+		return data.toString();
 	}
+
+	public void append (String data) {
+		this.data.append(data);
+	}
+
 }

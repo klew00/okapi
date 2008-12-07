@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -23,7 +23,6 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * This class implements the methods for creating and manipulating a pre-parsed
@@ -62,8 +61,11 @@ public class TextFragment implements Comparable<Object> {
 	public static final int MARKER_SEGMENT  = 0xE104;
 	public static final int CHARBASE        = 0xE110;
 
-	public static final String SFMARKER_START    = "{@#$";
-	public static final String SFMARKER_END      = "}";
+	public static final String REFMARKER_START = "[#$";
+	public static final String REFMARKER_END   = "]";
+	public static final String REFMARKER_SEP   = "@%";
+
+	static public final String CODETYPE_SEGMENT  = "$seg$";
 
 	/**
 	 * List of the types of tag usable for in-line codes.
@@ -75,13 +77,11 @@ public class TextFragment implements Comparable<Object> {
 		SEGMENTHOLDER
 	};
 	
-	protected StringBuilder       text;
-	protected ArrayList<Code>     codes;
-	protected boolean             isBalanced;
-	protected String              id;
-	protected int                 lastCodeID;
-	protected TextUnit            parent;
-	
+	protected StringBuilder text;
+	protected ArrayList<Code> codes;
+	protected boolean isBalanced;
+	protected int lastCodeID;
+	//protected TextUnit parent;
 
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -103,6 +103,37 @@ public class TextFragment implements Comparable<Object> {
 		return ((int)index)-CHARBASE;
 	}
 	
+	public static String makeRefMarker (String id) {
+		return REFMARKER_START+id+REFMARKER_END;
+	}
+	
+	public static String makeRefMarker (String id,
+		String propertyName)
+	{
+		return REFMARKER_START+id+REFMARKER_SEP+propertyName+REFMARKER_END;
+	}
+	
+	public static Object[] getRefMarker (StringBuilder text) {
+		int start = text.indexOf(REFMARKER_START);
+		if ( start == -1 ) return null; // No marker
+		int end = text.indexOf(REFMARKER_END, start);
+		if ( end == -1 ) return null; // No ending found, we assume it's not a marker
+		String id = text.substring(start+REFMARKER_START.length(), end);
+		Object[] result = new Object[4];
+		result[1] = start;
+		result[2] = end+REFMARKER_END.length();
+		// Check for property name
+		int sep = id.indexOf(REFMARKER_SEP);
+		if ( sep > -1 ) {
+			String propName = id.substring(sep+REFMARKER_SEP.length());
+			id = id.substring(0, sep);
+			result[3] = propName;
+		}
+		// Else: result[3] is null: it's not a property marker
+		result[0] = id;
+		return result;
+	}
+
 	/**
 	 * Helper method to find, from the back, the first non-whitespace character
 	 * of a coded text, starting at a given position and no farther than another
@@ -115,7 +146,6 @@ public class TextFragment implements Comparable<Object> {
 	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
 	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
 	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
-	 * @param whitespaceIsWS Indicates if whitespace characters count as whitespace.
 	 * @return The first non-whitespace character position from the back, given the parameters.
 	 */
 	public static int getLastNonWhitespacePosition (String codedText,
@@ -123,8 +153,7 @@ public class TextFragment implements Comparable<Object> {
 		int untilIndex,
 		boolean openingMarkerIsWS,
 		boolean closingMarkerIsWS,
-		boolean isolatedMarkerIsWS,
-		boolean whitespaceIsWS)
+		boolean isolatedMarkerIsWS)
 	{
 		// Empty text
 		if (( codedText == null ) || ( codedText.length() == 0 )) return -1;
@@ -156,7 +185,7 @@ public class TextFragment implements Comparable<Object> {
 				}
 				break;
 			default:
-				if ( whitespaceIsWS && Character.isWhitespace(codedText.charAt(textEnd)) ) break;
+				if ( Character.isWhitespace(codedText.charAt(textEnd)) ) break;
 				done = true; // Else: Probably done
 				// But check if it's the index of a marker
 				if ( textEnd > 1 ) {
@@ -191,7 +220,6 @@ public class TextFragment implements Comparable<Object> {
 	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
 	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
 	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
-	 * @param whitespaceIsWS Indicates if whitespace characters count as whitespace.
 	 * @return The first non-whitespace character position, given the parameters.
 	 */
 	public static int getFirstNonWhitespacePosition (String codedText,
@@ -199,8 +227,7 @@ public class TextFragment implements Comparable<Object> {
 		int untilIndex,
 		boolean openingMarkerIsWS,
 		boolean closingMarkerIsWS,
-		boolean isolatedMarkerIsWS,
-		boolean whitespaceIsWS)
+		boolean isolatedMarkerIsWS)
 	{
 		// Empty text
 		if (( codedText == null ) || ( codedText.length() == 0 )) return -1;
@@ -226,8 +253,7 @@ public class TextFragment implements Comparable<Object> {
 				else done = true;
 				break;
 			default:
-				if ( whitespaceIsWS
-					&& Character.isWhitespace(codedText.charAt(textStart)) ) break;
+				if ( Character.isWhitespace(codedText.charAt(textStart)) ) break;
 				done = true;
 				break;
 			}
@@ -241,25 +267,34 @@ public class TextFragment implements Comparable<Object> {
 
 
 	/**
-	 * Creates an empty TextFragment.
+	 * Creates an empty TextFragment with a given parent.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 */
 	public TextFragment () {
+		//this.parent = parent;
 		text = new StringBuilder();
 	}
 
 	/**
 	 * Creates a TextFragment with a given text.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param text The text to use.
 	 */
 	public TextFragment (String text) {
+		//this.parent = parent;
 		this.text = new StringBuilder(text);
 	}
 
 	/**
 	 * Creates a TextFragment with the content of a given TextFragment.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param fragment The content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
+		//this.parent = parent;
 		text = new StringBuilder();
 		insert(-1, fragment);
 	}
@@ -267,29 +302,32 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Creates a TextFragment with the content made of a given coded text
 	 * and a list of codes.
+	 * @param parent The parent of this TextFragment. You can use a null parent,
+	 * but then you won't be able to use in-line codes with references.
 	 * @param newCodedText The new coded text.
 	 * @param newCodes The list of codes.
 	 */
 	public TextFragment (String newCodedText,
 		List<Code> newCodes)
 	{
+		//this.parent = parent;
 		setCodedText(newCodedText, newCodes, false);
 	}
-
-	/**
-	 * Gets the ID of the fragment.
-	 * @return The ID of the fragment.
-	 */
-	public String getID () {
-		return id;
+	
+	@Override
+	public TextFragment clone () {
+		TextFragment tf = new TextFragment();
+		tf.setCodedText(getCodedText(), getCodes(), false);
+		tf.lastCodeID = lastCodeID;
+		return tf;
 	}
 	
-	/**
-	 * sets the ID of the fragment.
-	 * @param value The new value to apply (can be null).
-	 */
-	public void setID (String value) {
-		id = value;
+	public boolean hasReference () {
+		if ( codes == null ) return false;
+		for ( Code code : codes ) {
+			if ( code.hasReference ) return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -358,16 +396,16 @@ public class TextFragment implements Comparable<Object> {
 	 * Inserts a TextFragment object to this fragment.
 	 * @param offset Position in the coded text where to insert the new fragment.
 	 * You can use -1 to append at the end of the current content.
-	 * @param container The TextFragment to insert.
+	 * @param fragment The TextFragment to insert.
 	 * @throws InvalidPositionException When offset points inside a marker.
 	 */
 	public void insert (int offset,
-		TextFragment container)
+		TextFragment fragment)
 	{
-		if ( container == null ) return;
+		if ( fragment == null ) return;
 		checkPositionForMarker(offset);
-		StringBuilder tmp = new StringBuilder(container.getCodedText());
-		List<Code> newCodes = container.getCodes();
+		StringBuilder tmp = new StringBuilder(fragment.getCodedText());
+		List<Code> newCodes = fragment.getCodes();
 		if (( codes == null ) && ( newCodes.size() > 0 )) {
 			codes = new ArrayList<Code>();
 		}
@@ -391,7 +429,6 @@ public class TextFragment implements Comparable<Object> {
 		// If there was new codes we will need to re-balance
 		if ( newCodes.size() > 0 ) isBalanced = false;
 	}
-	
 
 	/**
 	 * Clears the fragment of all content. The parent is not modified.
@@ -607,7 +644,6 @@ public class TextFragment implements Comparable<Object> {
 		int end)
 	{
 		TextFragment sub = new TextFragment();
-		sub.parent = this.parent;
 		if ( isEmpty() ) return sub;
 		StringBuilder tmpText = new StringBuilder(getCodedText(start, end));
 		ArrayList<Code> tmpCodes = null;
@@ -742,19 +778,16 @@ public class TextFragment implements Comparable<Object> {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[%d:%s]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			case MARKER_CLOSING:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[/%d:%s]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			case MARKER_ISOLATED:
 			case MARKER_SEGMENT:
 				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code));
-				//tmp.append(String.format("[%d:%s/]", code.id, expandCodeContent(code))); // Debug
+				tmp.append(code.data);
 				break;
 			default:
 				tmp.append(text.charAt(i));
@@ -768,17 +801,17 @@ public class TextFragment implements Comparable<Object> {
 	 * Gets the parent of the fragment.
 	 * @return the parent of the fragment or null if none is assigned.
 	 */
-	public TextUnit getParent() {
-		return parent;
-	}
+//	public TextUnit getParent() {
+//		return parent;
+//	}
 
 	/**
 	 * Sets the parent of the fragment.
 	 * @param value The new parent to assign (can be null).
 	 */
-	public void setParent (TextUnit value) {
-		parent = value;
-	}
+//	public void setParent (TextUnit value) {
+//		parent = value;
+//	}
 	
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;
@@ -883,42 +916,6 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Creates a complete text representation of the code data including any text
-	 * coming from sub-flows.
-	 * @param code The code to process.
-	 * @return The data for the code, including any sub-flows data.
-	 */
-	private String expandCodeContent (Code code) {
-		if ( !code.hasSubflow ) return code.data;
-		if ( parent == null ) {
-			return code.data;
-			//TODO: log a warning
-		}
-		// Check for segment
-		if ( code.type.equals(TextContainer.CODETYPE_SEGMENT) ) {
-			return "[SEG-"+code.data+"]";
-		}
-		// Else: look for place-holders
-		StringBuilder tmp = new StringBuilder(code.data);
-		int start;
-		int pos = 0;
-		while ( (start = tmp.indexOf(SFMARKER_START, pos)) > -1 ) {
-			int end = tmp.indexOf(SFMARKER_END, start);
-			if ( end != -1 ) {
-				String id = tmp.substring(start+SFMARKER_START.length(), end);
-				ITranslatable res = parent.getChild(id);
-				if ( res == null ) {
-					tmp.replace(start, end+1, "-Subflow not found-");
-				}
-				else tmp.replace(start, end+1, res.toString());
-				pos = end;
-			}
-			else pos = start;
-		}
-		return tmp.toString();
-	}
-	
-	/**
 	 * Balances the markers based on the tag type of the codes.
 	 */
 	private void balanceMarkers () {
@@ -979,24 +976,5 @@ public class TextFragment implements Comparable<Object> {
 		}
 		isBalanced = true;
 	}
-
-	/*
-	private void changeMarkerType (int index,
-		int newMarkerType)
-	{
-		// Update the coded text marker
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-			case MARKER_SEGMENT:
-				if ( toIndex(text.charAt(++i)) == index ) {
-					text.setCharAt(i-1, (char)newMarkerType);
-					return; // Done
-				}
-			}
-		}
-	}*/
 
 }

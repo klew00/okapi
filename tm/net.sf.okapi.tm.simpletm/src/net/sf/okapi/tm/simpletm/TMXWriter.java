@@ -108,7 +108,7 @@ public class TMXWriter {
 			tuid = String.format("autoID%d", itemCount);
 		}
 		
-		TextContainer srcTC = item.getSourceContent();
+		TextContainer srcTC = item.getSource();
 		//TextContainer trgTC = item.getTargetContent();
 		if ( srcTC.isSegmented() ) {
 			//TODO: Optionally, write the paragraph-level entry

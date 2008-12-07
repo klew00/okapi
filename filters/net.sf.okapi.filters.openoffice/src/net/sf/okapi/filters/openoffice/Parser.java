@@ -39,8 +39,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Parser extends BaseFilter {
@@ -54,12 +53,9 @@ public class Parser extends BaseFilter {
 	
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
-	private Stack<Group> groupResources;
 
 	public Parser () {
-		resource = new Resource();
 		extract = new Stack<Boolean>();
-		groupResources = new Stack<Group>();
 		
 		toExtract = new Hashtable<String, ElementRule>();
 		toExtract.put("text:p", new ElementRule("text:p", null));
@@ -110,7 +106,7 @@ public class Parser extends BaseFilter {
 		}
 	}
 
-	public IContainable getResource () {
+	public IResource getResource () {
 		return getFinalizedToken();
 	}
 
@@ -128,7 +124,6 @@ public class Parser extends BaseFilter {
 			reset();
 			setFinishedParsing(false); //TODO: Should this be in reset()???
 			
-			groupResources.clear();
 			extract.clear();
 			extract.push(false);
 		}

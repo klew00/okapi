@@ -283,7 +283,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 	        	}
 	        }			
 			
-			TextContainer cnt = tu.getTargetContent(); 
+			TextContainer cnt = tu.getTarget(); 
 			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {

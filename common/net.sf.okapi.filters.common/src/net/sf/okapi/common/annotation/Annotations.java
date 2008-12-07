@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,25 +18,24 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.properties;
+package net.sf.okapi.common.annotation;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Resource extends net.sf.okapi.common.resource.Document {
-
-	private static final long serialVersionUID = 1L;
-
-	protected SkeletonUnit   sklRes;
-	protected Parameters     params;
+public class Annotations {
 	
-	public Resource () {
-		sklRes = new SkeletonUnit();
-		params = new Parameters();
-	}
+	private ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations;
 
-	@Override
-	public IParameters getParameters () {
-		return params;
+	public Annotations () {
+		annotations = new ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation>();
+	}
+	
+	public void set (IAnnotation annotation) {
+		annotations.put(annotation.getClass(), annotation);
+	}
+		
+	@SuppressWarnings("unchecked")
+	public <A> A get (Class<? extends IAnnotation> annotationType) {
+		return (A) annotations.get(annotationType);
 	}
 }

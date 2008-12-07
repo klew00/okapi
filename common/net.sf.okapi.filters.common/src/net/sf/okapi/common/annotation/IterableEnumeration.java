@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,37 +18,43 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.resource;
+package net.sf.okapi.common.annotation;
 
-public interface IContainable extends IResource {
+import java.util.Enumeration;
+import java.util.Iterator;
 
-	/**
-	 * Gets the extraction ID of the resource.
-	 * @return The ID of the resource.
-	 */
-	public String getID ();
-	
-	/**
-	 * Sets the extraction ID of the resource.
-	 * @param value The new ID to set.
-	 */
-	public void setID (String value);
-	
-	/**
-	 * Indicates if the resource has any content.
-	 * @return True if there is non-empty content, false otherwise.
-	 */
-	public boolean isEmpty ();
+/**
+ * 
+ * Wrap an Enumeration and make it compatible with new Iterators. Useful for
+ * dealing with old style API's.
+ * 
+ * @param <T>
+ */
+public class IterableEnumeration<T> implements Iterable<T> {
+	private final Enumeration<T> en;
 
-	/**
-	 * Gets the current parent of the object.
-	 * @return The parent of the resource or null if it has no parent.
-	 */
-	public ITranslatable getParent ();
-	
-	/**
-	 * Sets the parent for the resource.
-	 * @param value The new parent of the resource.
-	 */
-	public void setParent (ITranslatable value);
+	public IterableEnumeration(Enumeration<T> en) {
+		this.en = en;
+	}
+
+	// return an adaptor for the Enumeration
+	public Iterator<T> iterator() {
+		return new Iterator<T>() {
+			public boolean hasNext() {
+				return en.hasMoreElements();
+			}
+
+			public T next() {
+				return en.nextElement();
+			}
+
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+	}
+
+	public static <T> Iterable<T> make(Enumeration<T> en) {
+		return new IterableEnumeration<T>(en);
+	}
 }

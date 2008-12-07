@@ -38,11 +38,13 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.Group;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.IResource;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class RegexFilter implements IFilter {
 
@@ -52,11 +54,11 @@ public class RegexFilter implements IFilter {
 	private String encoding;
 	private BufferedReader reader;
 	private String inputText;
-	private Stack<Group> groupStack;
-	private int sklID;
+	private Stack<StartGroup> groupStack;
+	private int dpID;
 	private int groupID;
 	private int itemID;
-	private Document docRes;
+	private StartDocument docRes;
 	private TextUnit tuRes;
 	private LinkedList<FilterEvent> queue;
 	private int startSearch;
@@ -184,11 +186,11 @@ public class RegexFilter implements IFilter {
 			inputText = tmp.toString();
 			parseState = 1;
 			canceled = false;
-			groupStack = new Stack<Group>();
+			groupStack = new Stack<StartGroup>();
 			startSearch = 0;
 			startSkl = 0;
 			itemID = 0;
-			sklID = 0;
+			dpID = 0;
 			groupID = 0;
 
 			// Prepare the filter rules
@@ -209,7 +211,7 @@ public class RegexFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			docRes = new Document();
+			docRes = new StartDocument();
 			docRes.setName(inputUrl.getPath());
 			open(inputUrl.openStream());
 		}
@@ -224,8 +226,10 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void setOptions (String language,
-		String defaultEncoding)
+		String defaultEncoding,
+		boolean generateSkeleton)
 	{
+		//TODO: Implement generateSkeleton
 		encoding = defaultEncoding;
 	}
 
@@ -237,56 +241,56 @@ public class RegexFilter implements IFilter {
 		MatchResult startResult,
 		MatchResult endResult)
 	{
-		SkeletonUnit skl;
+		GenericSkeleton skel;
 		switch ( rule.ruleType ) {
 		case Rule.RULETYPE_NOTRANS:
 		case Rule.RULETYPE_COMMENT:
 			// Skeleton data include the content
-			skl = new SkeletonUnit();
-			skl.setData(inputText.substring(startSkl, endResult.start()));
-			skl.setID(String.format("%d", ++sklID));
+			skel = new GenericSkeleton(inputText.substring(startSkl, endResult.start()));
 			// Update starts for next read
 			startSearch = endResult.end();
 			startSkl = endResult.start();
 			// If comment: process the comment for directives
 			if ( rule.ruleType == Rule.RULETYPE_COMMENT ) {
-				params.locDir.process(skl.toString());
+				params.locDir.process(skel.toString());
 			}
 			// Then just return one skeleton event
-			currentRes = skl;
-			return new FilterEvent(FilterEventType.SKELETON_UNIT, skl);
+			return new FilterEvent(FilterEventType.DOCUMENT_PART,
+				new DocumentPart(String.format("%d", ++dpID), false, skel));
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
 			// Skeleton data include the content
-			skl = new SkeletonUnit();
-			skl.setData(inputText.substring(startSkl, endResult.start()));
-			skl.setID(String.format("%d", ++sklID));
+			skel = new GenericSkeleton(inputText.substring(startSkl, endResult.start()));
 			// Update starts for next read
 			startSearch = endResult.end();
 			startSkl = endResult.start();
 			//TODO: return group event, and deal with skeleton
 			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
-				Group groupRes = new Group();
-				groupRes.setID(String.valueOf(++groupID));
+				StartGroup startGroup = new StartGroup(null);
+				startGroup.setId(String.valueOf(++groupID));
+				startGroup.setSkeleton(skel);
 				if ( rule.nameStart.length() > 0 ) {
 					String name = getMatch(startResult.group(), rule.nameStart, rule.nameEnd);
-					if ( name != null ) {
+					if ( name != null ) { // Process the name format if needed
 						if ( rule.nameFormat.length() > 0 ) {
 							String tmp = rule.nameFormat.replace("<parentName>",
 								(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-							groupRes.setName(tmp.replace("<self>", name));
+							startGroup.setName(tmp.replace("<self>", name));
 						}
-						else groupRes.setName(name);
+						else startGroup.setName(name);
 					}
 				}
-				groupStack.push(groupRes);
+				groupStack.push(startGroup);
+				return new FilterEvent(FilterEventType.START_GROUP, startGroup);
 			}
-			else { // Rule.RULETYPE_CLOSEGROUP
+			else { // Close group
 				groupStack.pop();
+				Ending ending = new Ending(String.valueOf(++groupID));
+				ending.setSkeleton(skel);
+				return new FilterEvent(FilterEventType.END_GROUP, ending);
+				
 			}
-			currentRes = skl;
-			return new FilterEvent(FilterEventType.SKELETON_UNIT, skl);
 		}
 		
 		// Otherwise: process the content
@@ -351,7 +355,7 @@ public class RegexFilter implements IFilter {
 		String data)
 	{
 		tuRes = new TextUnit(String.valueOf(++itemID), data);
-		tuRes.setPreserveWhitespaces(rule.preserveWS);
+		//TODO: whitespace tuRes.setPreserveWhitespaces(rule.preserveWS);
 
 		if ( rule.useCodeFinder ) {
 			rule.codeFinder.process(tuRes.getSourceContent());
@@ -464,7 +468,7 @@ public class RegexFilter implements IFilter {
 			// Item to extract
 			tuRes = new TextUnit(String.valueOf(++itemID),
 				data.substring(start, end));
-			tuRes.setPreserveWhitespaces(rule.preserveWS);
+			//TODO: whitespace tuRes.setPreserveWhitespaces(rule.preserveWS);
 			
 			if ( rule.useCodeFinder ) {
 				rule.codeFinder.process(tuRes.getSourceContent());
@@ -493,23 +497,24 @@ public class RegexFilter implements IFilter {
 	private void addSkeletonToQueue (String data,
 		boolean forceNewEntry)
 	{
-		SkeletonUnit sklRes;
+		GenericSkeleton skel;
 		if ( !forceNewEntry && ( queue.size() > 0 )) {
-			if ( queue.getLast().getData() instanceof SkeletonUnit ) {
+			if ( queue.getLast().getResource() instanceof DocumentPart ) {
 				// Append to the last queue entry if possible
-				sklRes = (SkeletonUnit)queue.getLast().getData();
-				sklRes.appendData(data);
+				skel = (GenericSkeleton)queue.getLast().getResource().getSkeleton();
+				skel.append(data);
 				return;
 			}
 		}
 		// Else: create a new skeleton entry
-		sklRes = new SkeletonUnit(String.valueOf(++sklID), data);
-		queue.add(new FilterEvent(FilterEventType.SKELETON_UNIT, sklRes));
+		skel = new GenericSkeleton(data);
+		queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART,
+			new DocumentPart(String.valueOf(++dpID), false, skel)));
 	}
 
 	private FilterEvent nextEvent () {
 		if ( queue.size() == 0 ) return null;
-		currentRes = queue.peek().getData();
+		currentRes = queue.peek().getResource();
 		if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
 			parseState = 0; // No more event after
 		}

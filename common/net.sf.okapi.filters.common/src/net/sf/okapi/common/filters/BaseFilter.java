@@ -25,6 +25,7 @@ import java.util.Stack;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.ITranslatable;
 import net.sf.okapi.common.resource.SkeletonUnit;
 import net.sf.okapi.common.resource.TextUnit;
@@ -37,10 +38,9 @@ public abstract class BaseFilter implements IFilter {
 	private int textUnitId = 0;
 	private int skeleltonUnitId = 0;
 	private TextUnit textUnit;
-	private SkeletonUnit skeletonUnit;
 	private Group group;
 	private Stack<Group> groupStack;
-	private IContainable finalizedToken;
+	private IResource finalizedToken;
 	private FilterEventType finalizedTokenType;
 	private boolean finishedToken = false;
 	private boolean finishedParsing = false;
@@ -103,7 +103,7 @@ public abstract class BaseFilter implements IFilter {
 		return skeleltonUnitId;
 	}
 
-	protected IContainable getFinalizedToken() {
+	protected IResource getFinalizedToken() {
 		return finalizedToken;
 	}
 
@@ -273,8 +273,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	private void createTextUnit(Code code) {
-		textUnit = new TextUnit();
-		textUnit.setID(String.format("s%d", ++textUnitId));
+		textUnit = new TextUnit(String.format("s%d", ++textUnitId));
 		textUnit.getSource().getContent().append(code.getTagType(), code.getType(), code.getData());
 	}
 
@@ -283,19 +282,19 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	private void createTextUnit(TextUnit child) {
-		textUnit = new TextUnit();
-		textUnit.setID(String.format("s%d", ++textUnitId));
-		child.setParent(textUnit);
+		textUnit = new TextUnit(String.format("s%d", ++textUnitId));
+		//child.setParent(textUnit);
 		textUnit.addChild(child);
 	}
 
 	protected boolean isGroupState() {
-		if (groupStack.isEmpty())
+		if ( groupStack.isEmpty() ) {
 			return false;
+		}
 		return true;
 	}
 
-	private void pushGroup(Group group) {
+	private void pushGroup (Group group) {
 		groupStack.push(group);
 	}
 
@@ -303,7 +302,7 @@ public abstract class BaseFilter implements IFilter {
 		return groupStack.pop();
 	}
 
-	private Group createGroup(String name, String data, ITranslatable parent) {
+	private Group createGroup (String name, String data, ITranslatable parent) {
 		Group group = new Group();
 		group.setID(String.format("s%d", ++groupId));
 		group.setData(data);

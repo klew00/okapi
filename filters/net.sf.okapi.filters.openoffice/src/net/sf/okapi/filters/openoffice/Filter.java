@@ -32,8 +32,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.StartSubDocument;
 
 public class Filter implements IFilter {
 
@@ -48,7 +48,7 @@ public class Filter implements IFilter {
 	private String inputPath;
 	private Enumeration<? extends ZipEntry> entries;
 	private FilterEvent event;
-	private Group subDocResource;
+	private StartSubDocument startSubDoc;
 
 	public Filter () {
 		parser = new Parser();
@@ -76,7 +76,7 @@ public class Filter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		return parser.resource.getParameters();
+		return parser.getParameters();
 	}
 
 	public IResource getResource () {
@@ -106,7 +106,11 @@ public class Filter implements IFilter {
 		}
 	}
 
-	public void open (URL inputPath) {
+	public void open (InputStream input) {
+		//TODO
+	}
+	
+	public void open (URL inputUrl) {
 		//TODO
 	}
 
@@ -121,13 +125,14 @@ public class Filter implements IFilter {
 	}
 
 	public void setOptions (String language,
-		String defaultEncoding)
+		String defaultEncoding,
+		boolean generateSkeleton)
 	{
 		// Not used for now
 	}
 
 	public void setParameters (IParameters params) {
-		parser.resource.params = (Parameters)params;
+		parser.setParameters((Parameters)params);
 	}
 
 	private FilterEvent openZipFile () throws IOException {
@@ -165,10 +170,10 @@ public class Filter implements IFilter {
 		input = new BufferedInputStream(zipFile.getInputStream(zipEntry));
 		parser.open(input);
 		// Send the start sub-document event
-		subDocResource = new Group();
-		subDocResource.setName(zipEntry.getName());
-		subDocResource.setType(zipEntry.getName());
-		event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, subDocResource);
+		startSubDoc = new StartSubDocument(null);
+		startSubDoc.setName(zipEntry.getName());
+		startSubDoc.setType(zipEntry.getName());
+		event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDoc);
 		nextAction = StateType.NEXTINSUBDOC;
 		return event;
 	}
@@ -189,7 +194,7 @@ public class Filter implements IFilter {
 		// Send the end sub-document even
 		parser.close();
 		// input.close(); Not needed as the reader is set to do it automatically
-		event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, subDocResource);
+		event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, startSubDoc);
 		nextAction = StateType.NEXTINZIP;
 		return event;
 	}

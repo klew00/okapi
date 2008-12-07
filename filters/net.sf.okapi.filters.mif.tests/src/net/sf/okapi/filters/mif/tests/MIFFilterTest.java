@@ -45,10 +45,6 @@ public class MIFFilterTest {
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				switch ( event.getEventType() ) {
-				case SKELETON_UNIT:
-					System.out.print(filter.getResource().toString());
-					//System.out.println("-----");
-					break;
 				case TEXT_UNIT:
 					System.out.println("["+filter.getResource().toString()+"]");
 					break;

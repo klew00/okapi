@@ -202,8 +202,7 @@ public class QueryManager {
 		if ( !tu.isTranslatable() ) return;
 		if ( tu.hasTarget() ) return;
 		
-		TextContainer tc = tu.getSourceContent().clone();
-		tu.setTargetContent(tc);
+		TextContainer tc = tu.setTarget(tu.getSource().clone());
 		QueryResult qr;
 		if ( tc.isSegmented() ) {
 			List<TextFragment> segList = tc.getSegments();

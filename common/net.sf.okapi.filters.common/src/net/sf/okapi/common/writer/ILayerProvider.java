@@ -18,61 +18,18 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.properties.tests;
+package net.sf.okapi.common.writer;
 
-import java.io.InputStream;
+import net.sf.okapi.common.filters.IEncoder;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.filters.properties.PropertiesFilter;
+public interface ILayerProvider extends IEncoder {
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-public class PropertiesFilterTest {
+	public String startCode ();
 	
-	@Before
-	public void setUp() {
-	}
-
-	@Test
-	public void runTest () {
-		PropertiesFilter filter = null;		
-		try {
-			filter = new PropertiesFilter();
-			filter.setOptions("en", "UTF-8");
-			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");
-			filter.open(input);
-			process(filter);
-			filter.close();
-			
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail("Exception occured");
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
-	}
+	public String endCode ();
 	
-	private void process (IFilter filter) {
-		System.out.println("==================================================");
-		FilterEvent event;
-		while ( filter.hasNext() ) {
-			event = filter.next();
-			switch ( event.getEventType() ) {
-			case START_DOCUMENT:
-				System.out.println("--- Start Document ---");
-				break;
-			case TEXT_UNIT:
-				System.out.print("["+filter.getResource().toString()+"]");
-				break;
-			case END_DOCUMENT:
-				System.out.println("\n--- End Document ---");
-				break;
-			}
-		}
-	}
+	public String startInline ();
+	
+	public String endInline ();
+	
 }

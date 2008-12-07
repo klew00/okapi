@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -31,7 +31,7 @@ public class Code {
 	protected int       id;
 	protected String    type;
 	protected String    data;
-	protected boolean   hasSubflow;
+	protected boolean   hasReference;
 
 
 	/**
@@ -44,7 +44,7 @@ public class Code {
 		for ( Code code : list ) {
 			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data,
-				(code.hasSubflow ? "1" : "0")));
+				(code.hasReference ? "1" : "0")));
 		}
 		return tmp.toString();
 	}
@@ -58,7 +58,7 @@ public class Code {
 				String[] tmpFields = tmp.split("\u009C");
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
-				code.hasSubflow = (tmpFields[4].charAt(0)=='1');
+				code.hasReference = (tmpFields[4].charAt(0)=='1');
 				list.add(code);
 			}
 		}
@@ -172,16 +172,16 @@ public class Code {
 	 * sub-flows.
 	 * @return True if the code has one sub-flow.
 	 */
-	public boolean hasSubflow () {
-		return hasSubflow;
+	public boolean hasReference () {
+		return hasReference;
 	}
 	
 	/**
 	 * Sets the sub-flow indicator. 
 	 * @param value The new value to apply.
 	 */
-	public void setHasSubflow (boolean value) {
-		hasSubflow = value;
+	public void setHasReference (boolean value) {
+		hasReference = value;
 	}
 
 }

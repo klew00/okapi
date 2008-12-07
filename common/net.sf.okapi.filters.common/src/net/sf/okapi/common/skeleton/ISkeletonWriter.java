@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Asgeir Frimannsson, Jim Hargrave, Yves Savourel        */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,47 +18,38 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.resource;
+package net.sf.okapi.common.skeleton;
 
-import java.util.Hashtable;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.writer.ILayerProvider;
 
-public class LocaleProperties {
+public interface ISkeletonWriter {
 
-	private Hashtable<String, String>  props;
+	public void processStart (String language,
+		String encoding,
+		ILayerProvider layer);
 	
+	public void processFinished ();
 	
-	public String getProperty (String name) {
-		if ( props == null ) return null;
-		return props.get(name);
-	}
+	public String processStartDocument (StartDocument resource);
 	
-	public void setProperty (String name,
-		String value)
-	{
-		if ( props == null ) props = new Hashtable<String, String>();
-		props.put(name, value);
-	}
+	public String processEndDocument (Ending resource);
 	
-	public Hashtable<String, String> getProperties () {
-		if ( props == null ) props = new Hashtable<String, String>();
-		return props;
-	}
-
+	public String processStartSubDocument (StartSubDocument resource);
+	
+	public String processEndSubDocument (Ending resource);
+	
+	public String processStartGroup (StartGroup resource);
+	
+	public String processEndGroup (Ending resource);
+	
+	public String processTextUnit (TextUnit resource);
+	
+	public String processDocumentPart (DocumentPart resource);
+	
 }
-
-/*
-Group
-	LocalizableProperties source;
-	List<LocalizableProperties> targets
-
-LocalizableData extends LocalizableProperties
-
-TextUnit
-	LocalizableData source
-	List<LocalizableData> targets;
-
-	source.getproperties();
-targets.get(0).getProperties
-
-	*/
-

@@ -268,7 +268,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		count++;
 		// Segment the source if needed
 		if ( params.segment ) {
-			srcSeg.computeSegments(tu.getSourceContent());
+			srcSeg.computeSegments(tu.getSource());
 			tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
 			if ( !tu.getSourceContent().isSegmented() ) {
 				noText++;

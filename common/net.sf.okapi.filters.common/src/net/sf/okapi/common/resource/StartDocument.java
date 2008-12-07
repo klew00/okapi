@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -18,26 +18,36 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.regex;
+package net.sf.okapi.common.resource;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.IContainable;
+public class StartDocument extends BaseNameable {
 
-public class Resource extends net.sf.okapi.common.resource.Document {
-
-	private static final long serialVersionUID = 1L;
+	protected String language;
+	protected String encoding;
+	protected boolean isMultilingual;
 	
-	protected IContainable        currentRes;
-	protected Parameters          params;
-	
-
-	public Resource () {
-		params = new Parameters();
+	public String getLanguage () {
+		return language;
 	}
 	
-	@Override
-	public IParameters getParameters () {
-		return params;
+	public void setLanguage (String language) {
+		this.language = language;
+	}
+
+	public String getEncoding () {
+		return encoding;
+	}
+	
+	public void setEncoding (String encoding) {
+		this.encoding = encoding;
+	}
+	
+	public boolean isMultilingual () {
+		return isMultilingual;
+	}
+	
+	public void setIsMultilingual (boolean value) {
+		isMultilingual = value;
 	}
 
 }

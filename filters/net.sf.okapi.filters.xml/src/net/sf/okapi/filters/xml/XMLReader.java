@@ -31,7 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -50,16 +49,15 @@ public class XMLReader {
 	
 	public static final String    ILMARKER  = "@MRK:";
 
-	protected Resource       resource;
+	protected Resource resource;
 	
-	private boolean          sendEndEvent;
-	private TextUnit         item;
-	private TextContainer    content;
-	private int              itemID;
-	private boolean          hasText;
-	private Node             node;
-	private ITSEngine        itsEng;
-	
+	private boolean sendEndEvent;
+	private TextUnit item;
+	private TextContainer content;
+	private int itemID;
+	private boolean hasText;
+	private Node node;
+	private ITSEngine itsEng;
 	
 	public XMLReader () {
 		resource = new Resource();
