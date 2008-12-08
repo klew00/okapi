@@ -80,7 +80,7 @@ public class GoogleMTConnector implements IQuery {
 			if ( text.hasCode() ) {
 				StringBuilder tmp = new StringBuilder();
 				for ( int i=0; i<qtext.length(); i++ ) {
-					switch ( qtext.codePointAt(i) ) {
+					switch ( qtext.charAt(i) ) {
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
@@ -88,7 +88,7 @@ public class GoogleMTConnector implements IQuery {
 						i++; // Skip second part of the code
 						break;
 					default:
-						tmp.append(qtext.codePointAt(i));
+						tmp.append(qtext.charAt(i));
 					}
 				}
 				qtext = tmp.toString();
