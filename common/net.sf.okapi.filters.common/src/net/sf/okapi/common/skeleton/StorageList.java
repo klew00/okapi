@@ -145,4 +145,12 @@ class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
+	public String getType () {
+		return startGroup.getType();
+	}
+
+	public void setType (String value) {
+		// Not implemented: read-only info
+	}
+
 }

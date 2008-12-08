@@ -33,6 +33,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	private String id;
 	private boolean isReferent;
 	private String name;
+	private String type;
 	private boolean isTranslatable;
 	private ISkeleton skeleton;
 	private Hashtable<String, Property> properties;
@@ -134,6 +135,14 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		this.name = name;
 	}
 
+	public String getType () {
+		return type;
+	}
+	
+	public void setType (String value) {
+		type = value;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
 		return (A)annotations.get(type);

@@ -18,6 +18,18 @@ public interface INameable {
 	public void setName (String name);
 
 	/**
+	 * Gets the type information associated with this resource.
+	 * @return The type information associated with this resource.
+	 */
+	public String getType ();
+	
+	/**
+	 * Sets the type information associated with this resource.
+	 * @param value The new type information.
+	 */
+	public void setType (String value);
+	
+	/**
 	 * Gets the resource-level property for a given name.
 	 * @param name Name of the property to retrieve.
 	 * @return The property or null if it does not exist.

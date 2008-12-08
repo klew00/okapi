@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -21,15 +21,12 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.SkeletonUnit;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.filters.IFilterWriter;
 
 /**
  * Provides a common way create a translation package. 
  */
-public interface IWriter {
+public interface IWriter extends IFilterWriter {
 
 	public String getPackageType ();
 	
@@ -63,21 +60,4 @@ public interface IWriter {
 		String filterSettings,
 		IParameters filterParams);
 	
-	public void writeStartDocument (Document resource);
-	
-	public void writeEndDocument (Document resource);
-	
-	public void writeStartGroup (Group resource);
-	
-	public void writeEndGroup (Group resource);
-
-	public void writeSkeletonUnit (SkeletonUnit resource);
-	
-	/**
-	 * Writes a text unit in the current document. 
-	 * @param tu The text unit to write.
-	 * @param p_nStatus The current target status (same values as Borneo DB TSTATUS_*)
-	 */
-	public void writeTextUnit (TextUnit tu,
-		int p_nStatus);
 }

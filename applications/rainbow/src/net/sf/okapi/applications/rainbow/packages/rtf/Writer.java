@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages.rtf;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -32,6 +33,7 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -91,13 +93,6 @@ public class Writer extends BaseWriter {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public void writeEndDocument (Document resource) {
-		writer.write(Util.RTF_ENDCODE+"}\n");
-		writer.close();
-		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
 	public void writeTextUnit (TextUnit item,
@@ -323,11 +318,6 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
-	@Override
-	public void writeSkeletonUnit (SkeletonUnit resource) {
-		writer.write(Util.escapeToRTF(resource.toString(), true, 1, outputEncoder));
-	}
-	
 	public void writeStartDocument (Document resource) {
 		//TODO: change codepage
 		writer.write("{\\rtf1\\ansi\\ansicpg" + "1252" + "\\uc1\\deff1 \n"+
@@ -357,4 +347,52 @@ public class Writer extends BaseWriter {
 			"\\paperw11907\\paperh16840\\viewkind4\\viewscale100\\pard\\plain\\s0\\sb80\\slmult1\\widctlpar\\fs20\\f1 \n"+
 			Util.RTF_STARTCODE);
 	}
+
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public String getName () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public IParameters getParameters () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setOptions (String language, String defaultEncoding) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (OutputStream output) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setParameters (IParameters params) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processEndDocument (Ending resource) { 
+		writer.write(Util.RTF_ENDCODE+"}\n");
+		writer.close();
+		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+	}
+
 }

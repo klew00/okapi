@@ -42,12 +42,11 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
-public class Parser extends BaseFilter {
+class Parser extends BaseFilter {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 
-	protected Resource resource;
 	protected Hashtable<String, ElementRule> toExtract;
 	protected ArrayList<String> toProtect;
 	

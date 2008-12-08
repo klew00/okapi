@@ -55,7 +55,6 @@ public class XLIFFReader {
 	public static final int       RESULT_ENDGROUP          = 4;
 	public static final int       RESULT_STARTTRANSUNIT    = 5;
 	public static final int       RESULT_ENDTRANSUNIT      = 6;
-	public static final int       RESULT_SKELETON          = 7;
 
 	protected Resource resource;
 	protected StartGroup fileRes;

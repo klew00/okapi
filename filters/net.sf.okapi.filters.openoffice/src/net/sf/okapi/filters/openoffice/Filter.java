@@ -33,6 +33,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 
 public class Filter implements IFilter {
@@ -107,11 +108,12 @@ public class Filter implements IFilter {
 	}
 
 	public void open (InputStream input) {
-		//TODO
+		throw new UnsupportedOperationException(
+			"The open(InputStream) method is not supported for this filter.");
 	}
 	
 	public void open (URL inputUrl) {
-		//TODO
+		//TODO support open(URL)
 	}
 
 	public void open (String inputPath) {

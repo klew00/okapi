@@ -328,7 +328,7 @@ public class FilterAccess {
 		return result;
 	}
 	
-	public IOldParser loadParser (String filterID,
+/*	public IOldParser loadParser (String filterID,
 		String paramPath)
 	{
 		try {
@@ -358,7 +358,7 @@ public class FilterAccess {
 			throw new RuntimeException(e);
 		}
 	}
-	
+*/	
 	public Object[] loadFilterFromFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings,
 		IFilter previousInputFilter,

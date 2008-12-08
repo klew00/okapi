@@ -33,6 +33,7 @@ public class BaseNameable implements IResource, INameable {
 	protected String id;
 	protected ISkeleton skeleton;
 	protected String name;
+	protected String type;
 	protected boolean isTranslatable;
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
@@ -58,8 +59,16 @@ public class BaseNameable implements IResource, INameable {
 		return name;
 	}
 	
-	public void setName (String name) {
-		this.name = name;
+	public void setName (String value) {
+		name = value;
+	}
+	
+	public String getType () {
+		return type;
+	}
+	
+	public void setType (String value) {
+		type = value;
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -18,22 +18,75 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.packages;
+package net.sf.okapi.filters.xliff;
 
-import net.sf.okapi.common.resource.TextUnit;
+import java.io.InputStream;
+import java.net.URL;
 
-/**
- * Provides a common way to read a translation package generated with an implementation 
- * of IWriter. 
- */
-public interface IReader {
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.IResource;
 
-	public void openDocument (String p_sPath);
-	
-	public void closeDocument ();
+public class XLIFFFilter implements IFilter {
 
-	public boolean readItem ();
-	
-	public TextUnit getItem ();
-	
+	public void cancel () {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void close () {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public String getName () {
+		return "XLIFFFilter";
+	}
+
+	public IParameters getParameters () {
+		return null;
+	}
+
+	public IResource getResource () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean hasNext () {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public FilterEvent next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void open(InputStream input) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void open(CharSequence inputText) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void open(URL inputURL) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOptions(String language, String defaultEncoding,
+			boolean generateSkeleton) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setParameters(IParameters params) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

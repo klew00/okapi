@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -26,22 +26,20 @@ import java.io.IOException;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.SkeletonUnit;
 
 public abstract class BaseWriter implements IWriter {
 	
-	protected Manifest  manifest;
-	protected int       docID;
-	protected String    inputRoot;
-	protected String    relativeWorkPath;
-	protected String    relativeSourcePath;
-	protected String    relativeTargetPath;
-	protected String    sourceEncoding;
-	protected String    targetEncoding;
-	protected String    filterID;
+	protected Manifest manifest;
+	protected int docID;
+	protected String inputRoot;
+	protected String relativeWorkPath;
+	protected String relativeSourcePath;
+	protected String relativeTargetPath;
+	protected String sourceEncoding;
+	protected String targetEncoding;
+	protected String filterID;
 	protected TMXWriter tmxWriter;
-	protected String    tmxPath;
+	protected String tmxPath;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
@@ -157,16 +155,5 @@ public abstract class BaseWriter implements IWriter {
 			filterParams.save(paramsCopy);
 		}
 	}
-	
-	public void writeStartGroup (Group resource) {
-		// Do nothing
-	}
-	
-	public void writeEndGroup (Group resource) {
-		// Do nothing
-	}
-	
-	public void writeSkeletonUnit (SkeletonUnit resource) {
-		// Do nothing)
-	}
+
 }
