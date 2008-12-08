@@ -26,6 +26,15 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	public FilterEvent handleEvent(FilterEvent event) {
 		switch (event.getEventType()) {
+
+		case START:
+			handleStart(event);
+			break;
+
+		case FINISHED:
+			handleFinished(event);
+			break;
+
 		case START_DOCUMENT:
 			handleStartDocument(event);
 			break;
@@ -54,23 +63,29 @@ public abstract class BasePipelineStep implements IPipelineStep {
 			handleTextUnit(event);
 			break;
 
-		case TEXT_GROUP:
-			handleTextGroup(event);
-			break;
-
-		case SKELETON_UNIT:
-			handleSkeletonUnit(event);
+		case DOCUMENT_PART:
+			handleDocumentPart(event);
 			break;
 
 		default:
-			break;				
+			break;
 		}
-		
+
 		return event;
 	}
 
 	// By default we eat all events - override these methods if need to process
 	// the event
+	
+	protected void handleDocumentPart(FilterEvent event) {
+	}
+	
+	protected void handleFinished(FilterEvent event) {
+	}
+
+	protected void handleStart(FilterEvent event) {
+	}
+
 	protected void handleStartDocument(FilterEvent event) {
 	}
 
@@ -90,11 +105,5 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	protected void handleTextUnit(FilterEvent event) {
-	}
-
-	protected void handleTextGroup(FilterEvent event) {
-	}
-
-	protected void handleSkeletonUnit(FilterEvent event) {
 	}
 }
