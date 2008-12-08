@@ -12,7 +12,6 @@ public class FilterEventTest {
 	@Test
 	public void testGenericEventTypes() {	
 		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT, null);
-		assertEquals(event.getEventType(), FilterEventType.END_DOCUMENT);
-		assertNull(event.getData());
+		assertEquals(event.getEventType(), FilterEventType.END_DOCUMENT);		
 	}
 }
