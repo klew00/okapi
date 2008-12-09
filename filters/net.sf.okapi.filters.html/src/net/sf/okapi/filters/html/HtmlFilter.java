@@ -39,9 +39,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.filters.GroovyFilterConfiguration;
+import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.IContainable;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class HtmlFilter extends BaseFilter {
@@ -96,7 +96,7 @@ public class HtmlFilter extends BaseFilter {
 		nodeIterator = htmlDocument.getNodeIterator();
 	}
 
-	public IContainable getResource() {
+	public IResource getResource() {
 		return getFinalizedToken();
 	}
 	
