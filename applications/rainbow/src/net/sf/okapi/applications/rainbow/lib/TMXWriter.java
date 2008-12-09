@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
+/* Copyright (C) 2008 Yves Savourel                                          */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextContainer;
@@ -30,13 +31,13 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class TMXWriter {
 	
-	private XMLWriter   writer;
-	private TMXContent  tmxCont;
-	private String      sourceLang;
-	private String      trgLang;
-	private int         itemCount;
-	private boolean     withTradosWorkarounds;
-
+	private XMLWriter writer;
+	private TMXContent tmxCont;
+	private String sourceLang;
+	private String targetLang;
+	private int itemCount;
+	private boolean withTradosWorkarounds;
+	private Pattern exclusionPattern = null;
 
 	public void close () {
 		if ( writer != null ) {
@@ -65,6 +66,15 @@ public class TMXWriter {
 		}
 	}
 	
+	public void setExclusionOption (String pattern) {
+		if (( pattern == null ) || ( pattern.length() == 0 )) {
+			exclusionPattern = null;
+		}
+		else {
+			exclusionPattern = Pattern.compile(pattern);
+		}
+	}
+	
 	public void writeStartDocument (String sourceLanguage,
 		String targetLanguage,
 		String creationTool,
@@ -76,7 +86,7 @@ public class TMXWriter {
 		if ( sourceLanguage == null ) throw new NullPointerException();
 		if ( targetLanguage == null ) throw new NullPointerException();
 		this.sourceLang = sourceLanguage;
-		this.trgLang = targetLanguage;
+		this.targetLang = targetLanguage;
 		
 		writer.writeStartDocument();
 		writer.writeStartElement("tmx");
@@ -125,7 +135,7 @@ public class TMXWriter {
 			//writeTU(srcTC, item.getTargetContent(), tuid);
 			// Write the segments
 			List<TextFragment> srcList = item.getSourceContent().getSegments();
-			List<TextFragment> trgList = item.getTargetContent(trgLang).getSegments();
+			List<TextFragment> trgList = item.getTargetContent().getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
@@ -134,7 +144,7 @@ public class TMXWriter {
 			}
 		}
 		else { // Un-segmented entry
-			writeTU(srcTC, item.getTargetContent(trgLang), tuid, attributes);
+			writeTU(srcTC, item.getTargetContent(), tuid, attributes);
 		}
 	}
 	
@@ -143,6 +153,14 @@ public class TMXWriter {
 		String tuid,
 		Map<String, String> attributes)
 	{
+		// Check if this source entry should be excluded from the output
+		if ( exclusionPattern != null ) {
+			if ( exclusionPattern.matcher(source.getCodedText()).matches() ) {
+				// The source coded text matches: do not include this entry in the output
+				return;
+			}
+		}
+		
 		writer.writeStartElement("tu");
 		if (( tuid != null ) && ( tuid.length() > 0 ))
 			writer.writeAttributeString("tuid", tuid);
@@ -166,7 +184,7 @@ public class TMXWriter {
 		
 		if ( target != null ) {
 			writer.writeStartElement("tuv");
-			writer.writeAttributeString("xml:lang", trgLang);
+			writer.writeAttributeString("xml:lang", targetLang);
 			writer.writeStartElement("seg");
 			writer.writeRawXML(tmxCont.setContent(target).toString());
 			writer.writeEndElement(); // seg

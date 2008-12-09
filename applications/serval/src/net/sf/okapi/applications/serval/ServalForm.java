@@ -11,7 +11,6 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
-import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -53,8 +52,8 @@ public class ServalForm {
 			// Default
 			queryMgt.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
 			// For test
-			SimpleTMConnector smptm = new SimpleTMConnector();
-			queryMgt.addAndInitializeResource(smptm, "SimpleTM test", "C:\\Projects\\CaridianBCT\\AlignerTests\\RealProject\\PL-PL\\outputdb_PL");
+			//SimpleTMConnector smptm = new SimpleTMConnector();
+			//queryMgt.addAndInitializeResource(smptm, "SimpleTM test", "C:\\Projects\\CaridianBCT\\AlignerTests\\RealProject\\PL-PL\\outputdb_PL");
 			
 			createContent();
 		}

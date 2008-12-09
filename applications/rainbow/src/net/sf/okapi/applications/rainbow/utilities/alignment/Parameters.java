@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -36,6 +36,8 @@ public class Parameters extends BaseParameters {
 	public String       tmPath;
 	public boolean      createAttributes;
 	public String       attributes;
+	public boolean      useExclusion;
+	public String       exclusion;
 
 	public Parameters () {
 		reset();
@@ -54,6 +56,8 @@ public class Parameters extends BaseParameters {
 		useAutoCorrection = true;
 		createAttributes = true;
 		attributes = "Txt::FileName=${filename}$0a$Txt::GroupName=${resname}";
+		useExclusion = false;
+		exclusion = "";
 	}
 
 	public void fromString (String data) {
@@ -71,6 +75,8 @@ public class Parameters extends BaseParameters {
 		useAutoCorrection = buffer.getBoolean("useAutoCorrection", useAutoCorrection);
 		createAttributes = buffer.getBoolean("createAttributes", createAttributes);
 		attributes = buffer.getString("attributes", attributes);
+		useExclusion = buffer.getBoolean("useExclusion", useExclusion);
+		exclusion = buffer.getString("exclusion", exclusion);
 	}
 
 	public String toString () {
@@ -87,6 +93,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useAutoCorrection", useAutoCorrection);
 		buffer.setBoolean("createAttributes", createAttributes);
 		buffer.setString("attributes", attributes);
+		buffer.setBoolean("useExclusion", useExclusion);
+		buffer.setString("exclusion", exclusion);
 		return buffer.toString();
 	}
 }

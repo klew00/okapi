@@ -53,6 +53,8 @@ public class Editor implements IParametersEditor {
 	private Text                  edTMXPath;
 	private Button                btGetTMXPath;
 	private Button                chkUseTradosWorkarounds;
+	private Button                chkUseExclusion;
+	private Text                  edExclusion;
 	private Button                chkCreateTM;
 	private Text                  edTMPath;
 	private Button                btGetTMPath;
@@ -183,6 +185,22 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		chkUseTradosWorkarounds.setLayoutData(gdTmp);
 		
+		chkUseExclusion = new Button(grpTmp, SWT.CHECK);
+		chkUseExclusion.setText("Exclude segments where the source text matches this regular expression:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseExclusion.setLayoutData(gdTmp);
+		chkUseExclusion.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edExclusion.setEnabled(chkUseExclusion.getSelection());
+			}
+		});
+		
+		edExclusion = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edExclusion.setLayoutData(gdTmp);
+		
 		// Simple TM output
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("SimpleTM Output");
@@ -289,6 +307,8 @@ public class Editor implements IParametersEditor {
 		edTMXPath.setText(params.tmxPath);
 		edTMPath.setText(params.tmPath);
 		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
+		chkUseExclusion.setSelection(params.useExclusion);
+		edExclusion.setText(params.exclusion);
 		updateTMXOptions();
 
 		chkCreateTM.setSelection(params.createTM);
@@ -306,6 +326,7 @@ public class Editor implements IParametersEditor {
 		edTMXPath.setEnabled(chkCreateTMX.getSelection());
 		btGetTMXPath.setEnabled(chkCreateTMX.getSelection());
 		chkUseTradosWorkarounds.setEnabled(chkCreateTMX.getSelection());
+		edExclusion.setEnabled(chkUseExclusion.getSelection());
 	}
 	
 	private void updateTMOptions () {
@@ -361,6 +382,10 @@ public class Editor implements IParametersEditor {
 		if ( params.createTMX ) {
 			params.tmxPath = edTMXPath.getText();
 			params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
+			params.useExclusion = chkUseExclusion.getSelection();
+			if ( params.useExclusion ) {
+				params.exclusion = edExclusion.getText();
+			}
 		}
 
 		params.createTM = chkCreateTM.getSelection();

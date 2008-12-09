@@ -98,7 +98,7 @@ public class Utility implements ISimpleUtility {
 			
 			ConfigurationString cfgString = new ConfigurationString(
 				params.paramList);
-			paramList = cfgString.toHashtable();
+			paramList = cfgString.toMap();
 			
 			// Create the source for the XSLT
 			xsltInput = new javax.xml.transform.stream.StreamSource(

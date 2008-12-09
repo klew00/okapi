@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -20,7 +20,8 @@
 
 package net.sf.okapi.common;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ConfigurationString {
 
@@ -180,8 +181,8 @@ public class ConfigurationString {
 		return data.toString().substring(pos1, pos2);
 	}
 
-	public Hashtable<String, String> toHashtable () {
-		Hashtable<String, String> table = new Hashtable<String, String>();
+	public Map<String, String> toMap () {
+		LinkedHashMap<String, String> table = new LinkedHashMap<String, String>();
 		String tmp = toString();
 		String[] pairs = tmp.split("\n");
 		for ( String pair : pairs ) {

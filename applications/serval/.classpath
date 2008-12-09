@@ -7,7 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.mt.google"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry kind="lib" path="lib/h2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.opentran"/>

@@ -23,7 +23,8 @@ package net.sf.okapi.applications.rainbow.utilities.alignment;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
@@ -32,8 +33,7 @@ import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.resource.Document;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -51,7 +51,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private DbStore dbStore;
 	private TMXWriter tmxWriter = null;
 	private Database simpleTm = null;
-	private IInputFilter trgFilter;
+	private IFilter trgFilter;
 	private Segmenter srcSeg;
 	private Segmenter trgSeg;
 	private int aligned;
@@ -65,8 +65,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private Aligner aligner;
 	private boolean stopProcess;
 	private int targetCount;
-	private Hashtable<String, String> originalAttributes;
-	private Hashtable<String, String> assignedAttributes;
+	private Map<String, String> originalAttributes;
+	private Map<String, String> assignedAttributes;
 
 	public Utility () {
 		params = new Parameters();
@@ -120,8 +120,16 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		if ( params.createAttributes ) {
 			ConfigurationString cfgString = new ConfigurationString(
 				params.attributes);
-			originalAttributes = cfgString.toHashtable();
-			assignedAttributes = new Hashtable<String, String>();
+			originalAttributes = cfgString.toMap();
+			assignedAttributes = new LinkedHashMap<String, String>();
+		}
+		
+		// Prepare exclusion pattern if needed
+		if ( params.useExclusion ) {
+			tmxWriter.setExclusionOption(params.exclusion);
+		}
+		else {
+			tmxWriter.setExclusionOption(null);
 		}
 		
 		// Prepare the db store
@@ -252,11 +260,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	@Override
     public void endExtractionItem (TextUnit item) {
 		processTU(item);
-		if ( item.hasChild() ) {
-			for ( TextUnit tu : item.childTextUnitIterator() ) {
-				processTU(tu);
-			}
-		}
     }
 	
 	private void processTU (TextUnit tu) {
@@ -268,8 +271,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		count++;
 		// Segment the source if needed
 		if ( params.segment ) {
-			srcSeg.computeSegments(tu.getSource());
-			tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+			srcSeg.computeSegments(tu.getSourceContent());
+			tu.getSource().createSegments(srcSeg.getSegmentRanges());
 			if ( !tu.getSourceContent().isSegmented() ) {
 				noText++;
 				return;
@@ -279,7 +282,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		TextContainer trgTC = dbStore.findEntry(tu.getName(), true);
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
-			tu.setTargetContent(trgTC);
+			tu.setTarget(trgTC);
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
