@@ -3,9 +3,9 @@ package net.sf.okapi.applications.test;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +21,14 @@ import org.w3c.its.ITraversal;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IInputFilter;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -32,7 +36,6 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.tm.simpletm.Database;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
@@ -163,7 +166,7 @@ public class Main {
 */			
 			Database simpleTm = new Database();
 			String tmPath = Util.getTempDirectory() + File.separatorChar + "simpleTm";
-			simpleTm.create(tmPath, true);
+			simpleTm.create(tmPath, true, "fr");
 			
 			TextUnit tu = new TextUnit("t1");
 			TextFragment tf = new TextFragment();
@@ -315,17 +318,20 @@ public class Main {
 		try {
 			System.out.println("---start testFilter---");
 		
-			String inputFile = "test.properties";
-			IInputFilter inputFlt = new net.sf.okapi.filters.properties.InputFilter();
-			FileInputStream input = new FileInputStream(inputFile);
-			inputFlt.initialize(input, inputFile, inputFile, null, "utf-16", null, null);
+			IFilter inputFlt = new net.sf.okapi.filters.properties.PropertiesFilter();
+			inputFlt.setOptions("en", "utf-8", true);
+			File f = new File("testdata/Test01.properties");
+			inputFlt.open(f.toURL());
 			
-			IOutputFilter outputFlt = new net.sf.okapi.filters.properties.OutputFilter();
-			FileOutputStream output = new FileOutputStream("test.out.properties");
-			outputFlt.initialize(output, "test.out.properties", "us-ascii", null);
-			
-			inputFlt.setOutput(outputFlt);
-			inputFlt.process();
+			IFilterWriter outputFlt = new GenericFilterWriter(new GenericSkeletonWriter());
+			outputFlt.setOptions("fr", "us-ascii");
+			outputFlt.setOutput("testdata/Test01.out.properties");
+
+			FilterEvent event;
+			while ( inputFlt.hasNext() ) {
+				event = inputFlt.next();
+				outputFlt.handleEvent(event);
+			}
 		}
 		catch ( Exception e ) {
 			System.out.println(e.getLocalizedMessage());
@@ -424,10 +430,10 @@ public class Main {
 		System.out.println("---end testSegmentation---");
 	}
 	
-	// fake translation
-	static private void translate (TextFragment fragment) {
-		fragment.append("_trans");
-	}
+	// Fake translation
+//	static private void translate (TextFragment fragment) {
+//		fragment.append("_trans");
+//	}
 
 /*	static private String printSplits (Segmenter segmenter,
 		String input)
@@ -548,7 +554,8 @@ public class Main {
 	public static void main (String[] args)
 		throws Exception
 	{
-		testTranslationQuery();
+		testFilter();
+		//testTranslationQuery();
 		
 		if ( args.length == 0 ) return;
 		testTranslationQuery();
@@ -559,7 +566,6 @@ public class Main {
 		//testItem();
 		testITSEngine();
 		testXMLReader();
-		testFilter();
 	}		
 		
 }

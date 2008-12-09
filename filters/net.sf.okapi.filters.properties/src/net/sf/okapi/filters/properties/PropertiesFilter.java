@@ -53,13 +53,13 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
+	private Encoder encoder;
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
 	private String encoding;
 	private IResource currentRes;
 	private TextUnit tuRes;
-	private StartDocument docRes;
 	private LinkedList<FilterEvent> queue;
 	private String textLine;
 	private int lineNumber;
@@ -165,6 +165,8 @@ public class PropertiesFilter implements IFilter {
 			reader = new BufferedReader(
 				new InputStreamReader(bis, bis.detectEncoding()));
 			
+			encoder = new Encoder(encoding, false);
+			
 			// Initializes the variables
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
 			itemID = 0;
@@ -185,7 +187,9 @@ public class PropertiesFilter implements IFilter {
 			}
 			// Set the start event
 			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
+			queue.add(new FilterEvent(FilterEventType.START));
+			StartDocument startDoc = new StartDocument();
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -198,8 +202,6 @@ public class PropertiesFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			docRes = new StartDocument();
-			docRes.setName(inputUrl.getPath());
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -368,7 +370,8 @@ public class PropertiesFilter implements IFilter {
 					tuRes = new TextUnit(String.valueOf(++itemID),
 						unescape(value));
 					tuRes.setName(key);
-					//TODO: whitespace tuRes.setPreserveWhitespaces(true);
+					tuRes.setEncoder(encoder); //TODO: wrong charset-encoding, need better handling of encoders
+					tuRes.setPreserveWhitespaces(true);
 				}
 
 				if ( extract ) {

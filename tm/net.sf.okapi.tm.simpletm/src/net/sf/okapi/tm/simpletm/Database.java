@@ -71,6 +71,7 @@ public class Database {
 
 	private Connection  conn = null;
 	private PreparedStatement qstm = null;
+	private String trgLang;
 
 	public Database () {
 		try {
@@ -113,7 +114,8 @@ public class Database {
 	}
 	
 	public void create (String path,
-		boolean deleteExistingDB)
+		boolean deleteExistingDB,
+		String targetLanguage)
 	{
 		Statement stm = null;
 		try {
@@ -140,6 +142,7 @@ public class Database {
 				+ NGRPNAME + " VARCHAR,"
 				+ NFILENAME + " VARCHAR,"
 				+ ")");
+			trgLang = targetLanguage;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -199,11 +202,11 @@ public class Database {
 		int count = 0;
 		PreparedStatement pstm = null;
 		try {
-			if ( !tu.hasTarget() ) return 0;
+			if ( !tu.hasTarget(trgLang) ) return 0;
 
 			// Store the data
 			TextContainer srcCont = tu.getSource();
-			TextContainer trgCont = tu.getTarget();
+			TextContainer trgCont = tu.getTarget(trgLang);
 
 			// Store the segments if possible
 			if ( srcCont.isSegmented() && trgCont.isSegmented() ) {
@@ -346,7 +349,7 @@ public class Database {
 					tc = new TextContainer();
 					tc.setCodedText(result.getString(6),
 						Code.stringToCodes(result.getString(7)), false);
-					tu.setTarget(tc);
+					tu.setTarget(trgLang, tc);
 					tu.setName(result.getString(1));
 					attributes.put(NGRPNAME, result.getString(2));
 					attributes.put(NFILENAME, result.getString(3));

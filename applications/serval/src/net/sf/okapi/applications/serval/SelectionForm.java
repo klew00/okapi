@@ -5,6 +5,7 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
+import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 import net.sf.okapi.tm.trados.TradosTMConnector;
 
 import org.eclipse.swt.SWT;
@@ -56,9 +57,9 @@ public class SelectionForm {
 					case 0: // Google MT
 						result = new GoogleMTConnector();
 						break;
-//					case 1: // SimpleTM
-//						result = new SimpleTMConnector();
-//						break;
+					case 1: // SimpleTM
+						result = new SimpleTMConnector();
+						break;
 					case 2: // Open-Tran
 						result = new OpenTranTMConnector();
 						break;
