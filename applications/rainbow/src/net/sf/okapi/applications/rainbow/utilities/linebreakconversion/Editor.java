@@ -41,14 +41,13 @@ import org.eclipse.swt.widgets.TabItem;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Button                rdDos;
-	private Button                rdUnix;
-	private Button                rdMac;
-
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Button rdDos;
+	private Button rdUnix;
+	private Button rdMac;
 
 	public boolean edit (IParameters params,
 		Object object)

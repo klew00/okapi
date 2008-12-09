@@ -33,7 +33,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -45,13 +44,12 @@ public class Writer extends BaseWriter {
 	private static final String   DTD_SETTINGS_FILE = "okapiTTX.ini";
 	private static final String   EXTENSION = ".xml.ttx";
 	
-	private XMLWriter        writer;
+	private XMLWriter writer;
 	private SimpleDateFormat dateFmt;
-
 
 	public Writer() {
 		super();
-		// CreationDate format: "20071026T162120Z"
+		// CreationDate format: "20030426T162120Z"
 		dateFmt = new SimpleDateFormat("yyyyMMdd'T'HHmmZ");
 		dateFmt.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}

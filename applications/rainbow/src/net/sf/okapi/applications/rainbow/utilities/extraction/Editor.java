@@ -49,22 +49,22 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private List                  lbTypes;
-	private Text                  edDescription;
-	private Text                  edName;
-	private Text                  edOutputFolder;
-	private Button                chkCreateZip;
-	private Button                chkIncludeMergeData;
-	private Text                  edSample;
-	private Button                chkPreTranslate;
-	private Text                  edTmPath;
-	private Button                btGetTmPath;
-	private SegmentationPanel     pnlSegmentation;
-	private boolean               inInit = true;
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private List lbTypes;
+	private Text edDescription;
+	private Text edName;
+	private Text edOutputFolder;
+	private Button chkCreateZip;
+	private Button chkIncludeMergeData;
+	private Text edSample;
+	private Button chkPreTranslate;
+	private Text edTmPath;
+	private Button btGetTmPath;
+	private SegmentationPanel pnlSegmentation;
+	private boolean inInit = true;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.

@@ -130,5 +130,9 @@ public interface INameable {
 	public boolean isTranslatable ();
 	
 	public void setIsTranslatable (boolean value);
+
+	public boolean preserveWhitespaces ();
+	
+	public void setPreserveWhitespaces (boolean value);
 	
 }

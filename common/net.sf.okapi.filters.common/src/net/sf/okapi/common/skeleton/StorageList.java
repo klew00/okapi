@@ -153,4 +153,12 @@ class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
+	public boolean preserveWhitespaces () {
+		return startGroup.preserveWhitespaces();
+	}
+
+	public void setPreserveWhitespaces (boolean value) {
+		// Not implemented: read-only info
+	}
+
 }

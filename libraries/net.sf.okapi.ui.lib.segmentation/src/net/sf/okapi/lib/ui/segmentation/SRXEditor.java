@@ -22,7 +22,6 @@ package net.sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,32 +69,32 @@ import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
 
-	private Shell            shell;
-	private Text             edSampleText;
-	private Text             edResults;
-	private Table            tblRules;
-	private RulesTableModel  rulesTableMod;
-	private Combo            cbGroup;
-	private SRXDocument      srxDoc;
-	private Segmenter        segmenter;
-	private String           srxPath;
-	private TextContainer    sampleText;
-	private Button           btSRXDocs;
-	private Menu             popupSRXDocs;
-	private Button           btAddRule;
-	private Button           btEditRule;
-	private Button           btRemoveRule;
-	private Button           btMoveUpRule;
-	private Button           btMoveDownRule;
-	private ClosePanel       pnlActions;
-	private Button           rdApplySampleForMappedRules;
-	private Button           rdApplySampleForCurrentSet;
-	private Text             edSampleLanguage;
-	private GenericContent   sampleOutput;
-	private Pattern          patternOpening;
-	private Pattern          patternClosing;
-	private Pattern          patternPlaceholder;
-	private Font             sampleFont;
+	private Shell shell;
+	private Text edSampleText;
+	private Text edResults;
+	private Table tblRules;
+	private RulesTableModel rulesTableMod;
+	private Combo cbGroup;
+	private SRXDocument srxDoc;
+	private Segmenter segmenter;
+	private String srxPath;
+	private TextContainer sampleText;
+	private Button btSRXDocs;
+	private Menu popupSRXDocs;
+	private Button btAddRule;
+	private Button btEditRule;
+	private Button btRemoveRule;
+	private Button btMoveUpRule;
+	private Button btMoveDownRule;
+	private ClosePanel pnlActions;
+	private Button rdApplySampleForMappedRules;
+	private Button rdApplySampleForCurrentSet;
+	private Text edSampleLanguage;
+	private GenericContent sampleOutput;
+	private Pattern patternOpening;
+	private Pattern patternClosing;
+	private Pattern patternPlaceholder;
+	private Font sampleFont;
 
 	@Override
 	protected void finalize () {
@@ -531,8 +530,7 @@ public class SRXEditor {
 				processInlineCodes();
 				// Segment
 				segmenter.computeSegments(sampleText);
-				List<java.awt.Point> ranges = segmenter.getSegmentRanges();
-				sampleText.createSegments(ranges);
+				sampleText.createSegments(segmenter.getSegmentRanges());
 				// Create the output in generic format
 				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true));
 			}

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -33,8 +33,8 @@ public class TMXWriter {
 	
 	private XMLWriter writer;
 	private TMXContent tmxCont;
-	private String sourceLang;
-	private String targetLang;
+	private String srcLang;
+	private String trgLang;
 	private int itemCount;
 	private boolean withTradosWorkarounds;
 	private Pattern exclusionPattern = null;
@@ -85,8 +85,8 @@ public class TMXWriter {
 	{
 		if ( sourceLanguage == null ) throw new NullPointerException();
 		if ( targetLanguage == null ) throw new NullPointerException();
-		this.sourceLang = sourceLanguage;
-		this.targetLang = targetLanguage;
+		this.srcLang = sourceLanguage;
+		this.trgLang = targetLanguage;
 		
 		writer.writeStartDocument();
 		writer.writeStartElement("tmx");
@@ -102,7 +102,7 @@ public class TMXWriter {
 		writer.writeAttributeString("o-tmf",
 			(originalTMFormat==null) ? "unknown" : originalTMFormat);
 		writer.writeAttributeString("adminlang", "en");
-		writer.writeAttributeString("srclang", sourceLang);
+		writer.writeAttributeString("srclang", srcLang);
 		writer.writeAttributeString("datatype",
 			(dataType==null) ? "unknown" : dataType);
 		writer.writeEndElement(); // header
@@ -131,11 +131,9 @@ public class TMXWriter {
 		TextContainer srcTC = item.getSource();
 		//TextContainer trgTC = item.getTargetContent();
 		if ( srcTC.isSegmented() ) {
-			//TODO: Optionally, write the paragraph-level entry
-			//writeTU(srcTC, item.getTargetContent(), tuid);
 			// Write the segments
-			List<TextFragment> srcList = item.getSourceContent().getSegments();
-			List<TextFragment> trgList = item.getTargetContent().getSegments();
+			List<TextFragment> srcList = item.getSource().getSegments();
+			List<TextFragment> trgList = item.getTarget(trgLang).getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
@@ -144,7 +142,7 @@ public class TMXWriter {
 			}
 		}
 		else { // Un-segmented entry
-			writeTU(srcTC, item.getTargetContent(), tuid, attributes);
+			writeTU(srcTC, item.getTarget(trgLang), tuid, attributes);
 		}
 	}
 	
@@ -176,7 +174,7 @@ public class TMXWriter {
 		}
 
 		writer.writeStartElement("tuv");
-		writer.writeAttributeString("xml:lang", sourceLang);
+		writer.writeAttributeString("xml:lang", srcLang);
 		writer.writeStartElement("seg");
 		writer.writeRawXML(tmxCont.setContent(source).toString());
 		writer.writeEndElement(); // seg
@@ -184,7 +182,7 @@ public class TMXWriter {
 		
 		if ( target != null ) {
 			writer.writeStartElement("tuv");
-			writer.writeAttributeString("xml:lang", targetLang);
+			writer.writeAttributeString("xml:lang", trgLang);
 			writer.writeStartElement("seg");
 			writer.writeRawXML(tmxCont.setContent(target).toString());
 			writer.writeEndElement(); // seg

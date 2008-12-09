@@ -113,8 +113,8 @@ public class TMXWriter {
 			//TODO: Optionally, write the paragraph-level entry
 			//writeTU(srcTC, item.getTargetContent(), tuid);
 			// Write the segments
-			List<TextFragment> srcList = item.getSourceContent().getSegments();
-			List<TextFragment> trgList = item.getTargetContent(trgLang).getSegments();
+			List<TextFragment> srcList = item.getSource().getSegments();
+			List<TextFragment> trgList = item.getTarget(trgLang).getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
@@ -123,7 +123,7 @@ public class TMXWriter {
 			}
 		}
 		else { // Un-segmented entry
-			writeTU(srcTC, item.getTargetContent(), tuid, attributes);
+			writeTU(srcTC, item.getTarget(trgLang), tuid, attributes);
 		}
 	}
 	

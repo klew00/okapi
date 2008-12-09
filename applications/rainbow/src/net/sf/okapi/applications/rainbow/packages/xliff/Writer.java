@@ -26,8 +26,6 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.resource.Document;
-import net.sf.okapi.common.resource.Group;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -38,11 +36,10 @@ public class Writer extends BaseWriter {
 	
 	private static final String   EXTENSION = ".xlf";
 
-	private XMLWriter        writer = null;
-	private XLIFFContent     xliffCont;
-	private boolean          excludeNoTranslate = false;
-	private boolean          useSourceForTranslated = false;
-
+	private XMLWriter writer = null;
+	private XLIFFContent xliffCont;
+	private boolean excludeNoTranslate = false;
+	private boolean useSourceForTranslated = false;
 
 	public Writer () {
 		super();
@@ -141,11 +138,6 @@ public class Writer extends BaseWriter {
 		int status)
 	{
 		processItem(item);
-		if ( item.hasChild() ) {
-			for ( TextUnit tu : item.childTextUnitIterator() ) {
-				processItem(tu);
-			}
-		}
 	}
 	
 	private void processItem (TextUnit item) {
@@ -173,7 +165,7 @@ public class Writer extends BaseWriter {
 		writer.writeLineBreak();
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		if ( item.getSourceContent().isSegmented() ) {
+		if ( item.getSource().isSegmented() ) {
 			//TextUnit tmpTU = new TextUnit();
 			//tmpTU.setSourceContent(item.getSourceContent());
 			//tmpTU.getSourceContent().mergeAllSegments();
@@ -230,7 +222,7 @@ public class Writer extends BaseWriter {
 		// Note
 		if ( item.getProperties().containsKey("note") ) {
 			writer.writeStartElement("note");
-			writer.writeString(item.getProperty("note"));
+			writer.writeString(item.getProperty("note").getValue());
 			writer.writeEndElementLineBreak(); // note
 		}
 

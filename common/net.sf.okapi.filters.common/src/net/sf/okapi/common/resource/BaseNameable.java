@@ -35,6 +35,7 @@ public class BaseNameable implements IResource, INameable {
 	protected String name;
 	protected String type;
 	protected boolean isTranslatable;
+	protected boolean preserveWS;
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
 	protected Hashtable<String, Property> sourceProperties;
@@ -220,6 +221,14 @@ public class BaseNameable implements IResource, INameable {
 	
 	public void setIsTranslatable (boolean value) {
 		isTranslatable = value;
+	}
+
+	public boolean preserveWhitespaces () {
+		return preserveWS;
+	}
+	
+	public void setPreserveWhitespaces (boolean value) {
+		preserveWS = value;
 	}
 	
 }

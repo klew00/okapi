@@ -35,6 +35,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	private String name;
 	private String type;
 	private boolean isTranslatable;
+	private boolean preserveWS;
 	private ISkeleton skeleton;
 	private Hashtable<String, Property> properties;
 	private Annotations annotations;
@@ -416,4 +417,13 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	public boolean isEmpty () {
 		return (( source.text == null ) || ( source.text.length() == 0 ));
 	}
+
+	public boolean preserveWhitespaces () {
+		return preserveWS;
+	}
+	
+	public void setPreserveWhitespaces (boolean value) {
+		preserveWS = value;
+	}
+	
 }

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -34,21 +34,19 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
-
 public class Utility implements ISimpleUtility {
 
-	private String           commonFolder;
-	private String           inputRoot;
-	private String           outputRoot;
-	private String           manifestPath;
-	private Manifest         manifest;
-	private Merger           merger;
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
-	private EventListenerList     listenerList = new EventListenerList();
+	private String commonFolder;
+	private String inputRoot;
+	private String outputRoot;
+	private String manifestPath;
+	private Manifest manifest;
+	private Merger merger;
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private EventListenerList listenerList = new EventListenerList();
 	
 	public Utility () {
 	}
-	
 	
 	public void resetLists () {
 		// Not used for this utility

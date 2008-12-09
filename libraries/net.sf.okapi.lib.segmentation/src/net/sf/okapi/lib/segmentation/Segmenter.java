@@ -41,7 +41,7 @@ public class Segmenter {
 	private boolean oneSegmentIncludesAll;
 	private boolean trimLeadingWS;
 	private boolean trimTrailingWS;
-	private boolean grabTrailingWS; //TODO: implement this
+//	private boolean grabTrailingWS; //TODO: implement this
 	private boolean trimCodes;
 	private ArrayList<CompiledRule> rules;
 	private Pattern rangeRule;
@@ -73,7 +73,7 @@ public class Segmenter {
 		oneSegmentIncludesAll = false; // Extension
 		trimLeadingWS = true; // Extension IN TEST
 		trimTrailingWS = true; // Extension IN TEST
-		grabTrailingWS = true; // Extension IN TEST
+//		grabTrailingWS = true; // Extension IN TEST
 		trimCodes = false; // Extension IN TEST
 	}
 

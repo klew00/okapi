@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -57,19 +57,20 @@ class TTXReader {
 	private static final int      TARGET              = 0x02;
 	private static final int      BOTH                = 0x03;
 
-	protected TextUnit       item;
+	protected TextUnit item;
 	
-	private String           sourceLang;
-	private TextContainer    srcCont;
-	private TextContainer    trgCont;
-	private int              textType;
-	private NodeList         nodeList = null;
-	private Node             node;
-	private boolean          backTrack;
-	private Stack<Boolean>   m_stkFirstChildDone;
-	private Pattern          idPattern;
-	private int              inline;
-	private boolean          inText;
+	private String srcLang;
+	private String trgLang;
+	private TextContainer srcCont;
+	private TextContainer trgCont;
+	private int textType;
+	private NodeList nodeList = null;
+	private Node node;
+	private boolean backTrack;
+	private Stack<Boolean> m_stkFirstChildDone;
+	private Pattern idPattern;
+	private int inline;
+	private boolean inText;
 
 	//TODO: Implement case for multiple file in single doc
 	public TTXReader () {
@@ -185,11 +186,13 @@ class TTXReader {
 	}
 	
 	private void resetItem () {
-		item = new TextUnit();
+		item = new TextUnit(null);
 	}
 	
 	private void processUserSettings () {
-		sourceLang = ((Element)node).getAttribute("SourceLanguage");
+		srcLang = ((Element)node).getAttribute("SourceLanguage");
+		//TODO: check if targetlanguage exists, and handle case of null/empty
+		trgLang = ((Element)node).getAttribute("TargetLanguage");
 	}
 
 	private boolean processOuterUT () {
@@ -198,12 +201,12 @@ class TTXReader {
 		if ( text.indexOf("<u ") == 0 ) {
 			inText = true;
 			textType = SOURCE;
-			srcCont = new TextContainer(item);
-			trgCont = new TextContainer(item);
+			srcCont = new TextContainer();
+			trgCont = new TextContainer();
 			Matcher m = idPattern.matcher(text);
 			if ( m.find() ) {
 				item.setIsTranslatable(false);
-				item.setID(m.group(1));
+				item.setId(m.group(1));
 			}
 			else throw new RuntimeException("ID value not found for <u> element: "+text);
 		}
@@ -211,7 +214,7 @@ class TTXReader {
 			inText = false;
 			item.setSourceContent(srcCont);
 			if ( !trgCont.isEmpty() ) {
-				item.setTargetContent(trgCont);
+				item.setTarget(trgLang, trgCont);
 			}
 			// If <ut> contains a </u> tag, that's the end of the item
 			result = true;
@@ -229,7 +232,7 @@ class TTXReader {
 	
 	private void processTUV () {
 		String lang = ((Element)node).getAttribute("Lang");
-		if ( lang.equals(sourceLang) ) textType = SOURCE;
+		if ( lang.equals(srcLang) ) textType = SOURCE;
 		else textType = TARGET;
 		inline = 0;
 		processContent("Tuv");
