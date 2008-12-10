@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -31,7 +31,7 @@ public interface IUtility {
 	/**
 	 * Sets the filter access information to use with the utility.
 	 * This allows utilities to re-use loaded filter access objects to instantiate
-	 * filters or readers.
+	 * filters.
 	 * @param filterAccess The filter access object to use.
 	 * @param paramsFolder The parameters folder to use.
 	 */
@@ -50,7 +50,7 @@ public interface IUtility {
 	 * Gets the unique string that identifies the utility.
 	 * @return
 	 */
-	String getID ();
+	String getName ();
 
 	/**
 	 * Resets the input and output lists. This is to call when a utility 
@@ -60,20 +60,14 @@ public interface IUtility {
 	void resetLists ();
 	
 	/**
-	 * Executes any prolog steps needed by this utility.
+	 * Sets the runtime options for this utility.
 	 * This method should be called once, before processing each input.
 	 * @param sourceLanguage Language code for the source.
 	 * @param targetLanguage Language code for the target.
 	 */
-	void doProlog (String sourceLanguage,
+	void setOptions (String sourceLanguage,
 		String targetLanguage);
 
-	/**
-	 * Executes any concluding steps needed by this utility.
-	 * This method should be called once, after processing all inputs.
-	 */
-	void doEpilog ();
-	
 	/**
 	 * Indicates if the utility has parameters.
 	 * @return True if the utility has parameters, false otherwise.

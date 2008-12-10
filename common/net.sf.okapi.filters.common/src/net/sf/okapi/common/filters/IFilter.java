@@ -30,9 +30,14 @@ public interface IFilter {
 
 	public String getName ();
 
-	public void setOptions (String language,
-		String defaultEncoding,
-		boolean generateSkeleton);
+	public void setOptions (String sourceLanguage,
+			String defaultEncoding,
+			boolean generateSkeleton);
+
+	public void setOptions (String sourceLanguage,
+			String targetLanguage,
+			String defaultEncoding,
+			boolean generateSkeleton);
 
 	public void open (InputStream input);
 

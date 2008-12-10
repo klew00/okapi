@@ -76,7 +76,7 @@ public class Utility implements ISimpleUtility {
 		// Not used in this utility
 	}
 	
-	public String getID () {
+	public String getName () {
 		return "oku_encodingconversion";
 	}
 	
@@ -199,10 +199,7 @@ public class Utility implements ISimpleUtility {
 		}
 	}
 
-	public void doEpilog () {
-	}
-
-	public void doProlog (String sourceLanguage,
+	public void setOptions (String sourceLanguage,
 		String targetLanguage)
 	{
 		buffer = CharBuffer.allocate(13); //TODO: change to real length

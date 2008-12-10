@@ -23,6 +23,7 @@ package net.sf.okapi.common.encoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IEncoder;
 
 /**
@@ -33,15 +34,18 @@ public class PropertiesEncoder implements IEncoder {
 	private CharsetEncoder outputEncoder;
 	private boolean escapeAll = false;
 
-	/**
-	 * Creates a default encoder object for properties.
-	 * Nullary constructor is required so the object can be instantiated. 
-	 */
 	public PropertiesEncoder () {
 		escapeAll = false;
-		outputEncoder = Charset.forName("UTF-8").newEncoder();
+		outputEncoder = Charset.forName("us-ascii").newEncoder();
 	}
 	
+	public void setOptions (IParameters params,
+		String encoding)
+	{
+		outputEncoder = Charset.forName(encoding).newEncoder();
+		//TODO: get escapeAll from params
+	}
+
 	public String encode (String text, int context) {
 		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {

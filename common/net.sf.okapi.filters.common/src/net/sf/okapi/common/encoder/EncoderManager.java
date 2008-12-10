@@ -22,6 +22,7 @@ package net.sf.okapi.common.encoder;
 
 import java.util.Hashtable;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IEncoder;
 
 public class EncoderManager implements IEncoder {
@@ -32,9 +33,15 @@ public class EncoderManager implements IEncoder {
 
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
+		// Default mapping
+		mimeMap.put("text/xml", "net.sf.okapi.common.encoder.XMLEncoder");
 		mimeMap.put("text/x-properties", "net.sf.okapi.common.encoder.PropertiesEncoder");
 	}
 
+	public void clearMap () {
+		mimeMap.clear();
+	}
+	
 	public void addMapping (String mimeType,
 		String className)
 	{
@@ -84,6 +91,14 @@ public class EncoderManager implements IEncoder {
 
 	public IEncoder getEncoder () {
 		return encoder;
+	}
+
+	public void setOptions (IParameters params,
+		String encoding)
+	{
+		if ( encoder != null ) {
+			encoder.setOptions(params, encoding);
+		}
 	}
 
 }

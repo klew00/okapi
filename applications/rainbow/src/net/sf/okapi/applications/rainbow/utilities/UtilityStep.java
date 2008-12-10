@@ -5,9 +5,9 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class UtilityStep extends BasePipelineStep {
 
-	private IFilterDrivenUtility2 utility;
+	private IFilterDrivenUtility utility;
 
-	public UtilityStep (IFilterDrivenUtility2 utility) {
+	public UtilityStep (IFilterDrivenUtility utility) {
 		this.utility = utility;
 	}
 

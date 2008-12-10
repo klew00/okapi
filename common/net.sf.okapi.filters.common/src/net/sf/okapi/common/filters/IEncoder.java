@@ -20,10 +20,38 @@
 
 package net.sf.okapi.common.filters;
 
+import net.sf.okapi.common.IParameters;
+
+/**
+ * Interface for the objects used to encode/escape text to a specific format.
+ * Each class implementing this interface must have a nullary constructor, so the object 
+ * can be instantiated using the Class.fromName() methods by the EncoderManager.
+ */
 public interface IEncoder {
 
-	String encode (String text, int context);
+	/**
+	 * Sets the options for this encoder.
+	 * @param params The parameters object with all the configuration information 
+	 * specific to this encoder.
+	 * @param encoding The name of the charset encoding to use.
+	 */
+	public void setOptions (IParameters params, String encoding);
 	
-	String encode (char value, int context);
+	/**
+	 * Encodes a given text with this encoder.
+	 * @param text The text to encode.
+	 * @param context The context of the text: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded text.
+	 */
+	public String encode (String text, int context);
+	
+	/**
+	 * Encodes a given character with this encoding.
+	 * @param value The character to encode.
+	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded character 9as a string since it can be now made up of
+	 * more than one character).
+	 */
+	public String encode (char value, int context);
 	
 }

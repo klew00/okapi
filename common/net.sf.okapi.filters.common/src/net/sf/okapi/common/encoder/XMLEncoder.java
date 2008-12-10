@@ -20,10 +20,16 @@
 
 package net.sf.okapi.common.encoder;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IEncoder;
 
 public class XMLEncoder implements IEncoder {
+
+	public void setOptions (IParameters params,
+		String encoding)
+	{
+	}
 
 	public String encode (String text, int context) {
 		return Util.escapeToXML(text, 1, false);

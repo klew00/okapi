@@ -214,12 +214,20 @@ public class PropertiesFilter implements IFilter {
 		open(new ByteArrayInputStream(inputText.toString().getBytes())); 
 	}
 
-	public void setOptions (String language,
+	public void setOptions (String sourceLanguage,
+		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
 		//TODO: Implement boolean generateSkeleton
 		encoding = defaultEncoding;
+	}
+
+	public void setOptions (String sourceLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
 	}
 
 	public void setParameters (IParameters params) {

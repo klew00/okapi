@@ -58,7 +58,7 @@ public class XLIFFFilter implements IFilter {
 		return false;
 	}
 
-	public FilterEvent next() {
+	public FilterEvent next () {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -78,13 +78,22 @@ public class XLIFFFilter implements IFilter {
 		
 	}
 
-	public void setOptions(String language, String defaultEncoding,
-			boolean generateSkeleton) {
+	public void setOptions(String sourceLanguage,
+		String targetLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		// TODO Auto-generated method stub
-		
 	}
 
-	public void setParameters(IParameters params) {
+	public void setOptions(String sourceLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
+	}
+
+	public void setParameters (IParameters params) {
 		// TODO Auto-generated method stub
 		
 	}

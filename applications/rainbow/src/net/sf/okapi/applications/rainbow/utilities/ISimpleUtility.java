@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -23,7 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities;
 public interface ISimpleUtility extends IUtility {
 
 	/**
-	 * Executes the utility for the last input set.
+	 * Executes the utility for the current input.
 	 */
 	void processInput ();
 	

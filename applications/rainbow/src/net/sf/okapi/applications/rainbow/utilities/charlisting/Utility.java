@@ -46,17 +46,17 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		// Not used for this utility
 	}
 	
-	public String getID () {
+	public String getName () {
 		return "oku_charlisting";
 	}
 	
-	public void doProlog (String sourceLanguage,
+	public void setOptions (String sourceLanguage,
 		String targetLanguage)
 	{
 		charList = new Hashtable<Character, Integer>();
 	}
 	
-	public void doEpilog () {
+	public void postprocess () {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
