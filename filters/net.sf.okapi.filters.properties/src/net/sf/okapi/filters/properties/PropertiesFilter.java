@@ -53,7 +53,6 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
-	private Encoder encoder;
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
@@ -164,8 +163,6 @@ public class PropertiesFilter implements IFilter {
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			reader = new BufferedReader(
 				new InputStreamReader(bis, bis.detectEncoding()));
-			
-			encoder = new Encoder(encoding, false);
 			
 			// Initializes the variables
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
