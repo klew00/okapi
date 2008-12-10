@@ -18,40 +18,30 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.skeleton;
+package net.sf.okapi.common.encoder;
 
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.writer.ILayerProvider;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IEncoder;
 
-public interface ISkeletonWriter {
+public class XMLEncoder implements IEncoder {
 
-	public void processStart (String language,
-		String encoding,
-		ILayerProvider layer,
-		EncoderManager encoderManager);
-	
-	public void processFinished ();
-	
-	public String processStartDocument (StartDocument resource);
-	
-	public String processEndDocument (Ending resource);
-	
-	public String processStartSubDocument (StartSubDocument resource);
-	
-	public String processEndSubDocument (Ending resource);
-	
-	public String processStartGroup (StartGroup resource);
-	
-	public String processEndGroup (Ending resource);
-	
-	public String processTextUnit (TextUnit resource);
-	
-	public String processDocumentPart (DocumentPart resource);
-	
+	public String encode (String text, int context) {
+		return Util.escapeToXML(text, 1, false);
+	}
+
+	public String encode (char value, int context) {
+		switch ( value ) {
+		case '<':
+			return "&lt";
+		case '\"':
+			return "&quot;";
+		case '\'':
+			return "&apos;";
+		case '&':
+			return "&amp;";
+		default:
+			return String.valueOf(value);
+		}
+	}
+
 }

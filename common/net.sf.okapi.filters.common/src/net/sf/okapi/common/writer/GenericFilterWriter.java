@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -48,9 +49,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	private OutputStreamWriter writer;
 	private String language;
 	private String encoding;
+	private EncoderManager encoderManager;
 	
 	public GenericFilterWriter (ISkeletonWriter skelWriter) {
 		this.skelWriter = skelWriter;
+		encoderManager = new EncoderManager();
 	}
 	
 	public void close () {
@@ -125,7 +128,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	private void processStart () {
 		// Create the output
 		createWriter();
-		skelWriter.processStart(language, encoding, null);
+		skelWriter.processStart(language, encoding, null, encoderManager);
 	}
 
 	private void processFinished () {
@@ -204,5 +207,5 @@ public class GenericFilterWriter implements IFilterWriter {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -334,7 +333,7 @@ public class Main {
 			}
 		}
 		catch ( Exception e ) {
-			System.out.println(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 		System.out.println("---end testFilter---");
 	}

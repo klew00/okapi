@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.Code;
@@ -49,6 +50,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private String outputLang;
 	private boolean isMultilingual;
 	private ILayerProvider layer;
+	private EncoderManager encoderManager;
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
@@ -62,8 +64,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	public void processStart (String language,
 		String encoding,
-		ILayerProvider layer)
+		ILayerProvider layer,
+		EncoderManager encoderManager)
 	{
+		this.encoderManager = encoderManager;
 		this.outputLang = language;
 		//Not used: encoding;
 		this.layer = layer;
@@ -246,6 +250,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		String langToUse,
 		int context) 
 	{
+		// Update the encoder from the TU's mimetype
+		encoderManager.updateEncoder(tu.getMimeType());
+		// Get the right text container
 		TextFragment tf;
 		if ( langToUse == null ) {
 			tf = tu.getSourceContent();
@@ -264,17 +271,18 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 			}
 		}
+		// Apply the layer
 		if ( layer == null ) {
-			return getContent(tf, langToUse, tu.getEncoder(), context);
+			return getContent(tf, langToUse, encoderManager, context);
 		}
 		else {
 			if ( context == 1 ) {
 				return layer.endCode()
-					+ getContent(tf, langToUse, tu.getEncoder(), context)
+					+ getContent(tf, langToUse, encoderManager, context)
 					+ layer.startCode();
 			}
 			return layer.endInline()
-				+ getContent(tf, langToUse, tu.getEncoder(), context)
+				+ getContent(tf, langToUse, encoderManager, context)
 				+ layer.startInline();
 		}
 	}

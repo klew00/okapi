@@ -25,7 +25,6 @@ import java.util.Set;
 
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.ISkeleton;
 
 public class TextUnit implements IResource, INameable, IReferenceable {
@@ -40,7 +39,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	private Hashtable<String, Property> properties;
 	private Annotations annotations;
 	private TextContainer source;
-	private IEncoder encoder;
+	private String mimeType;
 
 	/**
 	 * Creates a new TextUnit object.
@@ -87,20 +86,20 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	public TextUnit (String id,
 		String sourceText,
 		boolean isReferent,
-		IEncoder encoder)
+		String mimeType)
 	{
-		create(id, sourceText, isReferent, encoder);
+		create(id, sourceText, isReferent, mimeType);
 	}
 
 	private void create (String id,
 		String sourceText,
 		boolean isReferent,
-		IEncoder encoder)
+		String mimeType)
 	{
 		annotations = new Annotations();
 		this.id = id;
 		this.isReferent = isReferent;
-		this.encoder = encoder;
+		this.mimeType = mimeType;
 		source = new TextContainer();
 		if ( sourceText != null ) {
 			source.text.append(sourceText);
@@ -402,12 +401,12 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		return tc;
 	}
 
-	public IEncoder getEncoder () {
-		return encoder;
+	public String getMimeType () {
+		return mimeType;
 	}
 	
-	public void setEncoder (IEncoder encoder) {
-		this.encoder = encoder;
+	public void setMimeType (String mimeType) {
+		this.mimeType = mimeType;
 	}	
 
 	/**

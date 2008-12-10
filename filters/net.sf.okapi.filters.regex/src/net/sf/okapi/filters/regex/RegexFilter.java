@@ -355,7 +355,8 @@ public class RegexFilter implements IFilter {
 		String data)
 	{
 		tuRes = new TextUnit(String.valueOf(++itemID), data);
-		//TODO: whitespace tuRes.setPreserveWhitespaces(rule.preserveWS);
+		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+		tuRes.setPreserveWhitespaces(rule.preserveWS);
 
 		if ( rule.useCodeFinder ) {
 			rule.codeFinder.process(tuRes.getSourceContent());

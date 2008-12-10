@@ -370,7 +370,7 @@ public class PropertiesFilter implements IFilter {
 					tuRes = new TextUnit(String.valueOf(++itemID),
 						unescape(value));
 					tuRes.setName(key);
-					tuRes.setEncoder(encoder); //TODO: wrong charset-encoding, need better handling of encoders
+					tuRes.setMimeType("text/x-properties");
 					tuRes.setPreserveWhitespaces(true);
 				}
 
