@@ -168,6 +168,13 @@ public class DummyFilter implements IFilter {
 	}
 
 	private void makeCase004 () {
+//		<p>Text before list:
+//			 <ul>
+//			  <li>Text of item 1</li>
+//			  <li>Text of item 2</li>
+//			 </u>
+//			 and text after the list.</p>
+			 
 		StartGroup grp1 = new StartGroup("d1", "g1", true);
 		list.add(new FilterEvent(FilterEventType.START_GROUP, grp1,
 			new GenericSkeleton("<ul>")));
