@@ -141,7 +141,7 @@ public class Utility implements ISimpleUtility {
 		// Not used in this utility.
 	}
 
-	public int getInputCount () {
+	public int requestInputCount () {
 		return 1;
 	}
 	

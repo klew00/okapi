@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.charlisting;
 
@@ -25,15 +25,15 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.UIUtil;
 
-public class Utility extends BaseUtility implements IFilterDrivenUtility  {
+public class Utility extends BaseFilterDrivenUtility  {
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
@@ -42,17 +42,11 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		params = new Parameters();
 	}
 	
-	public void resetLists () {
-		// Not used for this utility
-	}
-	
 	public String getName () {
 		return "oku_charlisting";
 	}
 	
-	public void setOptions (String sourceLanguage,
-		String targetLanguage)
-	{
+	public void preprocess () {
 		charList = new Hashtable<Character, Integer>();
 	}
 	
@@ -91,14 +85,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return params;
 	}
 
-	public String getInputRoot () {
-		return null;
-	}
-	
-	public String getOutputRoot () {
-		return null;
-	}
-
 	public boolean hasParameters () {
 		return true;
 	}
@@ -107,29 +93,31 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return false;
 	}
 
-	public boolean needsOutputFilter () {
-		return true;
-	}
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
 	}
 
-	public void setRoots (String inputRoot,
-		String outputRoot)
-	{
+	public boolean isFilterDriven () {
+		return true;
 	}
 
-	@Override
-    public void endExtractionItem(TextUnit item) {
-		try {
-			processTU(item);
+	public int requestInputCount () {
+		return 1;
+	}
+
+	public String getFolderAfterProcess () {
+		return Util.getDirectoryName(params.outputPath);
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case TEXT_UNIT:
+			processTU((TextUnit)event.getResource());
+			break;
 		}
-		finally {
-			super.endExtractionItem(item);
-		}
-    }
-	
+		return event;
+	}
+
 	private void processTU (TextUnit tu) {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
@@ -153,31 +141,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 				break;
 			}
 		}
-	}
-	
-	public boolean isFilterDriven () {
-		return true;
-	}
-
-	public void addInputData (String path,
-		String encoding,
-		String filterSettings)
-	{
-		// Not used for this utility
-	}
-
-	public void addOutputData (String path,
-		String encoding)
-	{
-		// Not used for this utility
-	}
-
-	public int getInputCount () {
-		return 1;
-	}
-
-	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.outputPath);
 	}
 
 }

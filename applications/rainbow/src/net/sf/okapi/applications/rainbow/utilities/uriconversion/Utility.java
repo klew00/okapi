@@ -22,62 +22,43 @@ package net.sf.okapi.applications.rainbow.utilities.uriconversion;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import javax.swing.event.EventListenerList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.applications.rainbow.utilities.CancelListener;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class Utility extends BaseUtility implements IFilterDrivenUtility { 
+public class Utility extends BaseFilterDrivenUtility { 
 	
 	static final int UNESCAPE  = 0;
 	static final int ESCAPE    = 1;
 	
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private Parameters params;
 	private String commonFolder;
-	private EventListenerList listenerList = new EventListenerList();
 	
 	public Utility () {
 		params = new Parameters();
 	}
 	
-	public void resetLists () {
-		// Not used in this utility
-		// Not sure when to use this
-	}
-	
-	public String getID () {
+	public String getName () {
 		return "oku_uriconversion";
 	}
 	
-	public void doProlog (String sourceLanguage, String targetLanguage){
+	public void preprocess () {
 		commonFolder = null; // Reset
 	}
 	
-	public void doEpilog () {
-		// Not sure when to use this
+	public void postprocess () {
+		// Nothing to do
 	}
 
 	public IParameters getParameters () {
 		return params;
 	}
 	
-	public String getInputRoot () {
-		return null;
-	}
-
-	public String getOutputRoot () {
-		return null;
-	}
-
 	public boolean hasParameters () {
 		return true;
 	}
@@ -86,16 +67,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 		return false;
 	}
 	
-	public boolean needsOutputFilter() {
-		return true;
-	}	
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
-	}
-	
-	public void setRoots (String inputRoot, String outputRoot){
-		// Not used in this utility.
 	}
 	
 	public boolean isFilterDriven () {
@@ -106,55 +79,19 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 		return commonFolder;
 	}
 	
-	public int getInputCount() {
+	public int requestInputCount () {
 		return 1;
 	}
 	
-	public void addInputData (String path, String encoding, String filterSettings){
-	}
-
-	public void addOutputData (String path, String encoding){
+	public void addOutputData (String path,
+		String encoding)
+	{
+		super.addOutputData(path, encoding);
 		// Compute the longest common folder
 		commonFolder = Util.longestCommonDir(commonFolder,
 			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
 	}
 
-	public void setFilterAccess (FilterAccess filterAccess,
-		String paramsFolder)
-	{
-		// Not used
-	}
-
-	public void setContextUI (Object contextUI) {
-		// Not used
-	}
-	
-	public void addCancelListener (CancelListener listener) {
-		listenerList.add(CancelListener.class, listener);
-	}
-
-	public void removeCancelListener (CancelListener listener) {
-		listenerList.remove(CancelListener.class, listener);
-	}
-
-	/*private void fireCancelEvent (CancelEvent event) {
-		Object[] listeners = listenerList.getListenerList();
-		for ( int i=0; i<listeners.length; i+=2 ) {
-			if ( listeners[i] == CancelListener.class ) {
-				((CancelListener)listeners[i+1]).cancelOccurred(event);
-			}
-		}
-	}*/
-
-	public void endExtractionItem (TextUnit item) {
-		try {
-			processTU(item);
-		}
-		finally {
-			super.endExtractionItem(item);
-		}		
-	}
-	
 	private void processTU (TextUnit tu) {
 		
 		String forceEscape = " * -,.";
@@ -170,12 +107,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data
-		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent().clone());
-		}
+		tu.createTarget(trgLang, false, IResource.COPY_ALL);
 
 		try {
-			String result = tu.getTargetContent().getCodedText();
+			String result = tu.getTarget(trgLang).getCodedText();
 			
 			if ( params.conversionType == UNESCAPE ){
 				//--do unescape
@@ -184,19 +119,19 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 				for ( int i=0; i<result.length(); i++ ) {
 				
 					switch ( result.charAt(i) ) {
+
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
 					case TextFragment.MARKER_SEGMENT:
-						
 						sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 						sb.append(result.charAt(i));
 						i++;
 						sb.append(result.charAt(i));
 						sbTemp = new StringBuilder();
 						break;
-					case '+':
 
+					case '+':
 						sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 						sb.append(result.charAt(i));
 						sbTemp = new StringBuilder();
@@ -249,13 +184,21 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 				}	
 			}
 			
-			TextContainer cnt = tu.getTargetContent();
+			TextContainer cnt = tu.getTarget(trgLang);
 			cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Exception e ) {
 			System.out.println("Error");
 			logger.warn("Error when updating content: '"+tmp+"'", e);
 		}
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case TEXT_UNIT:
+			processTU((TextUnit)event.getResource());
+		}
+		return event;
 	}	
 	
 }

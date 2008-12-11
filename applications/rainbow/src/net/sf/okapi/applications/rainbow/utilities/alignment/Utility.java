@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -27,12 +27,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
+import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -40,13 +42,10 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.tm.simpletm.Database;
 
-public class Utility extends BaseUtility implements IFilterDrivenUtility  {
+public class Utility extends BaseFilterDrivenUtility {
 
 	private Parameters params;
-	private String trgPath;
 	private String fileName;
-	private String trgEncoding;
-	private String trgFilterSettings;
 	private DbStoreBuilder dbStoreBuilder;
 	private DbStore dbStore;
 	private TMXWriter tmxWriter = null;
@@ -72,28 +71,22 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		params = new Parameters();
 	}
 	
-	public void resetLists () {
-		// Not used for this utility
-	}
-	
-	public String getID () {
+	public String getName () {
 		return "oku_alignment";
 	}
 	
-	public void doProlog (String sourceLanguage,
-		String targetLanguage)
-	{
+	public void preprocess () {
 		// Load the segmentation rules
 		if ( params.segment ) {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(params.sourceSrxPath);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
-			srcSeg = doc.applyLanguageRules(sourceLanguage, null);
+			srcSeg = doc.applyLanguageRules(srcLang, null);
 			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
 				doc.loadRules(params.targetSrxPath);
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
-			trgSeg = doc.applyLanguageRules(targetLanguage, null);
+			trgSeg = doc.applyLanguageRules(trgLang, null);
 		}
 		
 		// Prepare the TMX output if requested
@@ -105,15 +98,15 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			tmxWriter = new TMXWriter();
 			tmxWriter.create(params.tmxPath);
 			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
-			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
-				getID(), null, (params.segment ? "sentence" : "paragraph"),
+			tmxWriter.writeStartDocument(srcLang, trgLang,
+				getName(), null, (params.segment ? "sentence" : "paragraph"),
 				null, null);
 		}
 		
 		// Prepare the simpletm database
 		if ( params.createTM ) {
 			simpleTm = new Database();
-			simpleTm.create(params.tmPath, true);
+			simpleTm.create(params.tmPath, true, trgLang);
 		}
 		
 		// Prepare the attributes if needed
@@ -151,7 +144,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		manualTotal = 0;
 	}
 	
-	public void doEpilog () {
+	public void postprocess () {
 		logger.info(String.format("Total translatable text units = %d", countTotal));
 		logger.info(String.format("Total without text = %d", noTextTotal));
 		logger.info(String.format("Total aligned = %d (manually modified = %d)",
@@ -182,14 +175,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return params;
 	}
 
-	public String getInputRoot () {
-		return null;
-	}
-	
-	public String getOutputRoot () {
-		return null;
-	}
-
 	public boolean hasParameters () {
 		return true;
 	}
@@ -198,17 +183,8 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return false;
 	}
 
-	public boolean needsOutputFilter () {
-		return false;
-	}
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
-	}
-
-	public void setRoots (String inputRoot,
-		String outputRoot)
-	{
 	}
 
 	@Override
@@ -219,13 +195,14 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
 			// Initialize the filter for the target
 			Object[] filters = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-				trgFilterSettings, trgFilter, null);
-			trgFilter = (IInputFilter)filters[0];
+				getInputFilterSettings(1), trgFilter, null);
+			trgFilter = (IFilter)filters[0];
 			trgFilter.setOutput(dbStoreBuilder);
-			InputStream input = new FileInputStream(trgPath);
-			trgFilter.initialize(input, trgPath, trgPath, trgFilterSettings, trgEncoding,
-				// Note we use the target language as the source, because we are
-				// processing the 'target' from the utility viewpoint
+			InputStream input = new FileInputStream(getInputPath(1));
+			// Note we use the target language as the source, because we are
+			// processing the 'target' from the utility viewpoint
+			trgFilter.initialize(input, getInputPath(1), getInputPath(1),
+				getInputFilterSettings(1), getInputEncoding(1),
 				resource.getTargetLanguage(), resource.getTargetLanguage());
 			
 			// Fill the database with the target file
@@ -282,7 +259,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		TextContainer trgTC = dbStore.findEntry(tu.getName(), true);
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
-			tu.setTarget(trgTC);
+			tu.setTarget(trgLang, trgTC);
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
@@ -329,23 +306,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return true;
 	}
 
-	public void addInputData (String path,
-		String encoding,
-		String filterSettings)
-	{
-		// Target set the second time this is called
-		trgPath = path;
-		trgEncoding = encoding;
-		trgFilterSettings = filterSettings;
-	}
-
-	public void addOutputData (String path,
-		String encoding)
-	{
-		// Not used for this utility
-	}
-
-	public int getInputCount () {
+	public int requestInputCount () {
 		// Source and possibly target
 		return 2;
 	}
@@ -354,5 +315,9 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return Util.getDirectoryName(params.tmxPath);
 	}
 
+	public FilterEvent handleEvent (FilterEvent event) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities;
 
@@ -35,7 +35,7 @@ public interface IUtility {
 	 * @param filterAccess The filter access object to use.
 	 * @param paramsFolder The parameters folder to use.
 	 */
-	void setFilterAccess (FilterAccess filterAccess,
+	public void setFilterAccess (FilterAccess filterAccess,
 		String paramsFolder);
 	
 	/**
@@ -44,20 +44,20 @@ public interface IUtility {
 	 * attached to the main UI shell from where the utilities are called.
 	 * @param contextUI The shell object to use.
 	 */
-	void setContextUI (Object contextUI);
+	public void setContextUI (Object contextUI);
 	
 	/**
 	 * Gets the unique string that identifies the utility.
 	 * @return
 	 */
-	String getName ();
+	public String getName ();
 
 	/**
 	 * Resets the input and output lists. This is to call when a utility 
 	 * uses more than one input list, before {@link #addInputData(String, String, String)}
 	 * and {@link #addOutputData(String, String)}. 
 	 */
-	void resetLists ();
+	public void resetLists ();
 	
 	/**
 	 * Sets the runtime options for this utility.
@@ -65,50 +65,38 @@ public interface IUtility {
 	 * @param sourceLanguage Language code for the source.
 	 * @param targetLanguage Language code for the target.
 	 */
-	void setOptions (String sourceLanguage,
+	public void setOptions (String sourceLanguage,
 		String targetLanguage);
 
 	/**
 	 * Indicates if the utility has parameters.
 	 * @return True if the utility has parameters, false otherwise.
 	 */
-	boolean hasParameters ();
+	public boolean hasParameters ();
 	
 	/**
 	 * Gets the parameters object for the utility.
 	 */
-	IParameters getParameters ();
+	public IParameters getParameters ();
 	
 	/**
 	 * Sets the parameters object for the utility.
 	 * @param paramsObject The new parameters object.
 	 */
-	void setParameters (IParameters paramsObject);
+	public void setParameters (IParameters paramsObject);
 	
 	/**
 	 * Indicates if the utility need the root to be defined.
 	 * @return True if the root is needed, false otherwise.
 	 */
-	boolean needsRoots ();
-	
-	/**
-	 * Gets the current input root for the utility.
-	 * @return The current input root for the utility.
-	 */
-	String getInputRoot ();
-	
-	/**
-	 * Gets the output root for the utility.
-	 * @return The current output root for the utility.
-	 */
-	String getOutputRoot ();
+	public boolean needsRoots ();
 	
 	/**
 	 * Sets the input and output roots for the utility.
 	 * @param inputRoot The input root for the utility.
 	 * @param outputRoot The output root for the utility. 
 	 */
-	void setRoots (String inputRoot,
+	public void setRoots (String inputRoot,
 		String outputRoot);
 
 	/**
@@ -116,13 +104,13 @@ public interface IUtility {
 	 * is processed using the {@link #processInput()} method.
 	 * @return True if the utility is filter-driven, false otherwise.
 	 */
-	boolean isFilterDriven ();
+	public boolean isFilterDriven ();
 	
 	/**
 	 * Gets the number of input documents needed for this utility.
 	 * @return The number of input documents needed.
 	 */
-	int getInputCount ();
+	public int requestInputCount ();
 
 	/**
 	 * Adds a set of document information for the the input.
@@ -130,7 +118,7 @@ public interface IUtility {
 	 * @param encoding The default encoding.
 	 * @param filterSettings The filter settings to use.
 	 */
-	void addInputData (String path,
+	public void addInputData (String path,
 		String encoding,
 		String filterSettings);
 	
@@ -139,7 +127,7 @@ public interface IUtility {
 	 * @param path The full path of the output.
 	 * @param encoding The encoding.
 	 */
-	void addOutputData (String path,
+	public void addOutputData (String path,
 		String encoding);
 
 	/**
@@ -149,18 +137,16 @@ public interface IUtility {
 	 * the output documents have been created.
 	 * @return The output folder for the utility, or null.
 	 */
-	String getFolderAfterProcess ();
+	public String getFolderAfterProcess ();
 	
-	/**
-	 * Adds a CancelListener to the object listener list.
-	 * @param listener The listener to add.
-	 */
-	void addCancelListener (CancelListener listener);
+	public void preprocess ();
+	
+	public void postprocess ();
+	
+	public void cancel ();
 
-	/**
-	 * Removes a CancelListener from the object listener list.
-	 * @param listener The listener to add.
-	 */
-	void removeCancelListener (CancelListener listener);
+	public void pause ();
+
+	public void resume ();
 
 }

@@ -68,7 +68,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 		// Not sure when to use this
 	}
 	
-	public String getID () {
+	public String getName () {
 		return "oku_searchandreplace";
 	}
 	
@@ -142,14 +142,12 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 		}
 	}
 
-	public void doProlog (String sourceLanguage, String targetLanguage){
+	public void setOptions (String sourceLanguage,
+		String targetLanguage)
+	{
 		commonFolder = null; // Reset
 	}
 	
-	public void doEpilog () {
-		// Not sure when to use this
-	}
-
 	public IParameters getParameters () {
 		return params;
 	}
@@ -190,7 +188,7 @@ public class Utility extends BaseUtility implements ISimpleUtility, IFilterDrive
 		return commonFolder;
 	}
 	
-	public int getInputCount() {
+	public int requestInputCount() {
 		return 1;
 	}
 	

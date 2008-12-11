@@ -261,7 +261,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility {
 		// Not used: outputEncoding = encoding;
 	}
 
-	public int getInputCount () {
+	public int requestInputCount () {
 		return 1;
 	}
 

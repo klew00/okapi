@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.bomconversion;
 
@@ -25,42 +25,26 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.event.EventListenerList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
-import net.sf.okapi.applications.rainbow.utilities.CancelListener;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
-public class Utility implements ISimpleUtility {
-
-	private final Logger     logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+public class Utility extends BaseUtility implements ISimpleUtility {
 
 	private final byte[]     BOM_UTF8       = {(byte)0xEF,(byte)0xBB,(byte)0xBF};
 	private final byte[]     BOM_UTF16BE    = {(byte)0xFE,(byte)0xFF};
 	private final byte[]     BOM_UTF16LE    = {(byte)0xFF,(byte)0xFE};
 
-	private Parameters       params;
-	private String           commonFolder;
-	private String           inputPath;
-	private String           outputPath;
-	private byte[]           buffer;
-	private EventListenerList     listenerList = new EventListenerList();
-	
+	private Parameters params;
+	private String commonFolder;
+	private byte[] buffer;
 
 	public Utility () {
 		params = new Parameters();
 	}
 	
-	public void resetLists () {
-		// Not used in this utility
-	}
-	
-	public String getID () {
+	public String getName () {
 		return "oku_bomconversion";
 	}
 	
@@ -153,10 +137,10 @@ public class Utility implements ISimpleUtility {
 		FileOutputStream output = null;
 		try {
 			// Open the input
-			input = new FileInputStream(inputPath);
+			input = new FileInputStream(getInputPath(0));
 			// Open the output
-			Util.createDirectories(outputPath);
-			output = new FileOutputStream(outputPath);
+			Util.createDirectories(getOutputPath(0));
+			output = new FileOutputStream(getOutputPath(0));
 			
 			// Reset the start of the buffer
 			for ( int i=0; i<5; i++ ) buffer[i] = 0;
@@ -237,24 +221,19 @@ public class Utility implements ISimpleUtility {
 		}
 	}
 
-	public void doEpilog () {
+	public void setOptions (String sourceLanguage,
+		String targetLanguage)
+	{
+	}
+
+	public void postprocess () {
 		// Release the buffer
 		buffer = null;
 	}
 
-	public void doProlog (String sourceLanguage,
-		String targetLanguage)
-	{
+	public void preprocess () {
 		commonFolder = null; // Reset
 		buffer = new byte[1024*2];
-	}
-
-	public String getInputRoot () {
-		return null;
-	}
-
-	public String getOutputRoot () {
-		return null;
 	}
 
 	public IParameters getParameters () {
@@ -273,66 +252,25 @@ public class Utility implements ISimpleUtility {
 		return false;
 	}
 
-	public void addInputData (String path,
-		String encoding,
-		String filterSettings)
-	{
-		inputPath = path;
-	}
-
 	public void addOutputData (String path,
 		String encoding)
 	{
+		super.addOutputData(path, encoding);
 		// Compute the longest common folder
 		commonFolder = Util.longestCommonDir(commonFolder,
 			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-		outputPath = path;
-		// Encoding stays the same as the input
 	}
 
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
 	}
 
-	public void setRoots (String inputRoot,
-		String outputRoot)
-	{
-		// Not used in this utility.
-	}
-
 	public String getFolderAfterProcess () {
 		return commonFolder;
 	}
 
-	public int getInputCount() {
+	public int requestInputCount() {
 		return 1;
 	}
-
-	public void setFilterAccess (FilterAccess filterAccess,
-		String paramsFolder)
-	{
-		// Not used
-	}
-
-	public void setContextUI (Object contextUI) {
-		// Not used
-	}
-	
-	public void addCancelListener (CancelListener listener) {
-		listenerList.add(CancelListener.class, listener);
-	}
-
-	public void removeCancelListener (CancelListener listener) {
-		listenerList.remove(CancelListener.class, listener);
-	}
-
-	/*private void fireCancelEvent (CancelEvent event) {
-		Object[] listeners = listenerList.getListenerList();
-		for ( int i=0; i<listeners.length; i+=2 ) {
-			if ( listeners[i] == CancelListener.class ) {
-				((CancelListener)listeners[i+1]).cancelOccurred(event);
-			}
-		}
-	}*/
 
 }

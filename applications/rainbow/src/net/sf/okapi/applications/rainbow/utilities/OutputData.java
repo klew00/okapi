@@ -20,11 +20,16 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-public interface ISimpleUtility extends IUtility {
+class OutputData {
+	
+	String path;
+	String encoding;
 
-	/**
-	 * Executes the utility for the current input.
-	 */
-	void processInput ();
+	OutputData (String path,
+		String encoding)
+	{
+		this.path = path;
+		this.encoding = encoding;
+	}
 	
 }

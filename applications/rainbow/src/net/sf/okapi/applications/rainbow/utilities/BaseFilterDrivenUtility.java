@@ -20,11 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-public interface ISimpleUtility extends IUtility {
+public abstract class BaseFilterDrivenUtility extends BaseUtility
+	implements IFilterDrivenUtility {
 
-	/**
-	 * Executes the utility for the current input.
-	 */
-	void processInput ();
-	
 }

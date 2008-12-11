@@ -22,7 +22,7 @@ package net.sf.okapi.applications.rainbow.utilities.xsltransform;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 import javax.xml.transform.Result;
@@ -46,7 +46,7 @@ public class Utility implements ISimpleUtility {
 	private ArrayList<String> inputPaths;
 	private ArrayList<String> outputEncodings;
 	private ArrayList<String> outputPaths;
-	private Hashtable<String, String> paramList;
+	private Map<String, String> paramList;
 	private Transformer trans;
 	private Parameters params;
 	private String commonFolder;
@@ -62,7 +62,7 @@ public class Utility implements ISimpleUtility {
 		outputPaths = new ArrayList<String>();
 	}
 	
-	public String getID () {
+	public String getName () {
 		return "oku_xsltransform"; //$NON-NLS-1$
 	}
 	
@@ -83,11 +83,7 @@ public class Utility implements ISimpleUtility {
 		}
 	}
 
-	public void doEpilog () {
-		// Not used in this utility.
-	}
-
-	public void doProlog (String sourceLanguage,
+	public void setOptions (String sourceLanguage,
 		String targetLanguage)
 	{
 		try {
@@ -191,7 +187,7 @@ public class Utility implements ISimpleUtility {
 		}
 	}
 
-	public int getInputCount () {
+	public int requestInputCount () {
 		return 3; // between 1 and 3, depending on the template
 	}
 

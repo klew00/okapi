@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.encodingconversion;
 
@@ -42,28 +42,27 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Button                chkUnescapeNCR;
-	private Button                chkUnescapeCER;     
-	private Button                chkUnescapeJava;
-	private Button                rdEscapeToNCRHexaU;
-	private Button                rdEscapeToNCRHexaL;
-	private Button                rdEscapeToNCRDeci;
-	private Button                rdEscapeToCER;
-	private Button                rdEscapeToJavaU;
-	private Button                rdEscapeToJavaL;
-	private Button                rdEscapeToUserFormat;
-	private Text                  edUserFormat;
-	private Button                rdEscapeUnsupported;
-	private Button                rdEscapeAll;
-	private String                formattedOutput;
-	private Button                chkUseBytes;
-	private Button                chkBOMonUTF8;
-	private Button                chkReportUnsupported;
-
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Button chkUnescapeNCR;
+	private Button chkUnescapeCER;     
+	private Button chkUnescapeJava;
+	private Button rdEscapeToNCRHexaU;
+	private Button rdEscapeToNCRHexaL;
+	private Button rdEscapeToNCRDeci;
+	private Button rdEscapeToCER;
+	private Button rdEscapeToJavaU;
+	private Button rdEscapeToJavaL;
+	private Button rdEscapeToUserFormat;
+	private Text edUserFormat;
+	private Button rdEscapeUnsupported;
+	private Button rdEscapeAll;
+	private String formattedOutput;
+	private Button chkUseBytes;
+	private Button chkBOMonUTF8;
+	private Button chkReportUnsupported;
 
 	public boolean edit (IParameters params,
 		Object object)

@@ -1,40 +1,45 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Stack;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IFilterWriter;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
-public class DbStoreBuilder implements IResourceBuilder {
+class DbStoreBuilder implements IFilterWriter {
 	
-	private Stack<Integer>   groupStack;
-	private int              lastGroupKey;
-	private DbStore          dbs;
-	private Segmenter        srcSeg;
-	private Segmenter        trgSeg;
-
+	private Stack<Integer> groupStack;
+	private int lastGroupKey;
+	private DbStore dbs;
+	private Segmenter srcSeg;
+	private Segmenter trgSeg;
 
 	public DbStoreBuilder () {
 		dbs = new DbStore();
@@ -51,11 +56,63 @@ public class DbStoreBuilder implements IResourceBuilder {
 		this.trgSeg = trgSeg;
 	}
 	
-	public void endContainer (Group resource) {
+	public void close () {
+		// Nothing to do
+	}
+
+	public String getName () {
+		// No name
+		return null;
+	}
+
+	public IParameters getParameters () {
+		return null;
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument();
+			break;
+		case START_GROUP:
+			processStartGroup();
+			break;
+		case END_GROUP:
+			processEndGroup();
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		}
+		return event;
+	}
+
+	public void setOptions (String language,
+		String defaultEncoding)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (OutputStream output) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setParameters (IParameters params) {
+		// Nothing to do
+	}
+
+	private void processEndGroup () {
 		groupStack.pop();
 	}
 
-	public void endExtractionItem (TextUnit tu) {
+	private void processTextUnit (TextUnit tu) {
 		// Segment if requested
 		if ( srcSeg != null ) {
 			srcSeg.computeSegments(tu.getSourceContent());
@@ -71,22 +128,11 @@ public class DbStoreBuilder implements IResourceBuilder {
 		dbs.addSourceTextUnit(tu, groupStack.peek());
 	}
 
-	public void endResource (Document resource) {
-	}
-
-	public void skeletonContainer (SkeletonUnit resource) {
-		// Store nothing of the skeleton
-	}
-
-	public void startContainer (Group resource) {
+	private void processStartGroup () {
 		groupStack.push(++lastGroupKey);
 	}
 
-	public void startExtractionItem (TextUnit item) {
-		// Nothing to do, wait for end
-	}
-
-	public void startResource (Document resource) {
+	private void processStartDocument () {
 		groupStack = new Stack<Integer>();
 		lastGroupKey = 0;
 		groupStack.push(0);
@@ -94,4 +140,5 @@ public class DbStoreBuilder implements IResourceBuilder {
 		String path = Util.getTempDirectory() + File.separatorChar + "tmpDB";
 		dbs.create(path, "tmpDB", true);
 	}
+
 }

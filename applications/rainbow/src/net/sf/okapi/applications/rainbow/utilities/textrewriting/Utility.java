@@ -372,7 +372,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
 	}
 
-	public int getInputCount () {
+	public int requestInputCount () {
 		return 1;
 	}
 
