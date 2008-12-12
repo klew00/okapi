@@ -66,7 +66,6 @@ public class Utility extends BaseFilterDrivenUtility implements ISimpleUtility {
 			BOMAwareInputStream bis = new BOMAwareInputStream(
 				new FileInputStream(getInputPath(0)), getInputEncoding(0));
 			String encoding = bis.detectEncoding();	        
-			logger.info("Input encoding: " + encoding);	
 	        FileChannel fc = fis.getChannel();
 	    
 	        // Create a read-only CharBuffer on the file
@@ -95,7 +94,6 @@ public class Utility extends BaseFilterDrivenUtility implements ISimpleUtility {
 			oWriter = new OutputStreamWriter(new BufferedOutputStream(
 				new FileOutputStream(getOutputPath(0))), encoding);
 			writer = new BufferedWriter(oWriter);
-			logger.info("Output encoding: " + encoding);
 			Util.writeBOMIfNeeded(writer, true, encoding);
 			writer.write(result);
 			

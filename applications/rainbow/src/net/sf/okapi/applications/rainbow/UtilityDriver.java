@@ -151,7 +151,6 @@ public class UtilityDriver implements CancelListener {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}
 			utility.setOptions(prj.getSourceLanguage(), prj.getTargetLanguage());
-			utility.resetLists();
 			
 			// All is initialized, now run the pre-process 
 			utility.preprocess();
@@ -171,6 +170,7 @@ public class UtilityDriver implements CancelListener {
 				log.message("-- Input: "+item.relativePath);
 
 				// Initialize the main input
+				utility.resetLists();
 				String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
 				utility.addInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
 				// Initialize the main output
