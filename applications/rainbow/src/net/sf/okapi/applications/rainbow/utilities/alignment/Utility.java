@@ -20,22 +20,20 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -131,11 +129,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
-			//TODO: make info part of constructor
-			//aligner = new SegmentsAligner(shell, params.targetSrxPath);
 			aligner = new Aligner(shell);
 			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit,
-				params.useAutoCorrection);
+				params.useAutoCorrection, trgLang);
 		}
 		
 		alignedTotal = 0;
@@ -187,43 +183,80 @@ public class Utility extends BaseFilterDrivenUtility {
 		params = (Parameters)paramsObject;
 	}
 
-	@Override
-    public void startResource (Document resource) {
-		try {
-			// fileName is the value we set as attribute in the TM.
-			fileName = Util.getFilename(resource.getName(), true);
+	public boolean isFilterDriven () {
+		return true;
+	}
 
-			// Initialize the filter for the target
-			Object[] filters = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-				getInputFilterSettings(1), trgFilter, null);
-			trgFilter = (IFilter)filters[0];
-			trgFilter.setOutput(dbStoreBuilder);
-			InputStream input = new FileInputStream(getInputPath(1));
-			// Note we use the target language as the source, because we are
-			// processing the 'target' from the utility viewpoint
-			trgFilter.initialize(input, getInputPath(1), getInputPath(1),
-				getInputFilterSettings(1), getInputEncoding(1),
-				resource.getTargetLanguage(), resource.getTargetLanguage());
-			
-			// Fill the database with the target file
-			trgFilter.process();
-			trgFilter.close();
-			dbStore = dbStoreBuilder.getDbStore();
-			targetCount = dbStore.getTextUnitCount();
-			aligned = 0;
-			noText = 0;
-			count = 0;
-			manual = 0;
-			
-			aligner.setDocumentName(resource.getName());
+	public int requestInputCount () {
+		// Source and possibly target
+		return 2;
+	}
+
+	@Override
+	public String getFolderAfterProcess () {
+		return Util.getDirectoryName(params.tmxPath);
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument();
+			break;
 		}
-		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
-		}
+		return event;
+	}
+
+    private void processStartDocument (StartDocument resource) {
+		// fileName is the value we set as attribute in the TM.
+		fileName = Util.getFilename(resource.getName(), true);
+		
+		readTargetToDb();
+		
+		dbStore = dbStoreBuilder.getDbStore();
+		targetCount = dbStore.getTextUnitCount();
+		aligned = 0;
+		noText = 0;
+		count = 0;
+		manual = 0;
+		
+		aligner.setDocumentName(resource.getName());
     }
 	
-	@Override
-    public void endResource (Document resource) {
+    private void readTargetToDb () {
+    	try {
+			// Initialize the filter for the target
+			trgFilter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
+				getInputFilterSettings(1), trgFilter);
+			
+			// Note we use the target language as the source, because we are
+			// processing the 'target' from the utility viewpoint
+			trgFilter.setOptions(srcLang, trgLang, getInputEncoding(1), false);
+
+			// Open the file
+			File f = new File(getInputPath(1));
+			trgFilter.open(f.toURL());
+			
+			// Fill the database with the target file
+			while ( trgFilter.hasNext() ) {
+				dbStoreBuilder.handleEvent(trgFilter.next());
+			}
+    	}
+    	catch ( MalformedURLException e ) {
+    		throw new RuntimeException(e);
+    	}
+    	finally {
+    		if ( trgFilter != null ) trgFilter.close();
+    	}
+		
+    }
+    
+    private void processEndDocument () {
     	alignedTotal += aligned;
     	noTextTotal += noText;
     	countTotal += count;
@@ -234,12 +267,7 @@ public class Utility extends BaseFilterDrivenUtility {
     		aligned, manual));
     }
 
-	@Override
-    public void endExtractionItem (TextUnit item) {
-		processTU(item);
-    }
-	
-	private void processTU (TextUnit tu) {
+	private void processTextUnit (TextUnit tu) {
 		//TODO: Find a way to stop the filter
 		if ( stopProcess ) return;
 		
@@ -248,9 +276,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		count++;
 		// Segment the source if needed
 		if ( params.segment ) {
-			srcSeg.computeSegments(tu.getSourceContent());
+			srcSeg.computeSegments(tu.getSource());
 			tu.getSource().createSegments(srcSeg.getSegmentRanges());
-			if ( !tu.getSourceContent().isSegmented() ) {
+			if ( !tu.getSource().isSegmented() ) {
 				noText++;
 				return;
 			}
@@ -302,23 +330,4 @@ public class Utility extends BaseFilterDrivenUtility {
 		logger.info("Not aligned: "+tu.getName());
 	}
 	
-	public boolean isFilterDriven () {
-		return true;
-	}
-
-	public int requestInputCount () {
-		// Source and possibly target
-		return 2;
-	}
-
-	@Override
-	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.tmxPath);
-	}
-
-	public FilterEvent handleEvent (FilterEvent event) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

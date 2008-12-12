@@ -177,7 +177,85 @@ public class TextContainer extends TextFragment {
 		// Return the number of segments
 		return segments.size();
 	}
+	
+	/**
+	 * Creates a new segment from a section of the container text.
+	 * Any existing segmentation remains in place, but the section 
+	 * must not contain existing segment markers.
+	 * @param start The position of the first character or marker of the section
+	 * (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * (in the coded text representation). You can use -1 to indicate the end of the
+	 * text.
+	 * @return The segment just created, or null if no segment was created (for
+	 * example when the width provided was 0).
+	 */
+	public TextFragment createSegment (int start,
+		int end)
+	{
+		// Compute end for -1
+		if ( end == -1 ) end = masterSegment.text.length();
+		// Check if the segment is empty
+		if ( start == end ) return null;
 
+		// Create lists if needed
+		if ( segments == null ) {
+			segments = new ArrayList<TextFragment>();
+		}
+		if ( masterSegment.codes == null ) {
+			masterSegment.codes = new ArrayList<Code>();
+		}
+
+		// Get the segment index value for the first segment to create
+		// (where it goes in the list of existing segments)
+		int segIndex = 0;
+		for ( int i=0; i<masterSegment.text.length(); i++ ) {
+			switch ( masterSegment.text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip
+				break;
+			case MARKER_SEGMENT:
+				// Are we after the start of the segment to insert?
+				if ( i >= start ) i = masterSegment.text.length(); // Then stop here
+				else segIndex++; // Else wait for next marker or end of text
+				break;
+			}
+		}
+
+		// Add the new segment in the list
+		boolean inserted = true;
+		if ( segIndex > segments.size()-1 ) {
+			segments.add(masterSegment.subSequence(start, end));
+			segIndex = segments.size()-1;
+			inserted = false; // new segment was added
+		}
+		else {
+			segments.add(segIndex, masterSegment.subSequence(start, end));
+		}
+		
+		// Remove it from the main content
+		int width = end-start;
+		if ( width > 2 ) masterSegment.remove(start, end-2);
+		else if ( width == 1 ) masterSegment.insert(start, new TextFragment("Z"));
+		else if ( width == 0 ) masterSegment.insert(start, new TextFragment("ZZ"));
+		// Else width == 2 : Do nothing
+			
+		// Set the segment marker and its corresponding code
+		masterSegment.text.setCharAt(start, (char)MARKER_SEGMENT);
+		// Add the segment marker
+		masterSegment.codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
+			String.valueOf(segIndex)));
+		// Index of the marker is independent of its location
+		masterSegment.text.setCharAt(start+1, toChar(codes.size()-1));
+
+		// If required: update the indices of the segment markers after the new one
+		if ( inserted ) renumberSegmentMarkers(start+2, segIndex+1);
+		// Return the created segment
+		return segments.get(segIndex);
+	}
+	
 	/**
 	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
@@ -267,11 +345,68 @@ public class TextContainer extends TextFragment {
 				i++; // Skip
 				break;
 			case MARKER_SEGMENT:
-				code = masterSegment.getCode(text.charAt(++i));
+				code = masterSegment.getCode(masterSegment.text.charAt(++i));
 				code.data = String.valueOf(indexValue++);
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Joins a given segment with the closest to it on the right side.
+	 * @param segmentIndex Index of the first segment to join.
+	 */
+	public void joinSegmentWithNext (int segmentIndex) {
+		Code code;
+		int pos1 = -1;
+		int pos2 = -1;
+		int seg2Index = -1;
+		for ( int i=0; i<masterSegment.text.length(); i++ ) {
+			switch ( masterSegment.text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip
+				break;
+			case MARKER_SEGMENT:
+				code = getCode(masterSegment.text.charAt(++i));
+				if ( pos1 == -1 ) { // Search for left segment
+					if ( segmentIndex == Integer.parseInt(code.data) ) {
+						pos1 = i-1;
+					}
+				}
+				else { // Search for right segment
+					seg2Index = Integer.parseInt(code.data);
+					pos2 = i-1;
+					i = masterSegment.text.length(); // Stop the loop
+					break;
+				}
+			}
+		}
+		
+		if ( seg2Index == -1 ) return;
+		
+		// Assumes pos1 and pos2 are > -1 now
+		// Get the inter-segment part and add it to first segment
+		segments.get(segmentIndex).append(masterSegment.subSequence(pos1+2, pos2));
+		// Remove inter-segment part and marker for second segment
+		masterSegment.remove(pos1+2, pos2+2);
+		// Update the indices of the remaining segments
+		renumberSegmentMarkers(pos1+2, segmentIndex+1);
+		// Add second segment to first one
+		segments.get(segmentIndex).append(segments.get(seg2Index));
+		// Remove second segment
+		segments.remove(seg2Index);
+	}
+
+	/**
+	 * Sets the list of segments for this object. No change is made to the
+	 * master content itself, so it must already match the given list at the end, or it
+	 * must be build separately.
+	 * @param segments The new list of segments.
+	 */
+	public void setSegments (ArrayList<TextFragment> segments) {
+		this.segments = segments;
 	}
 
 }

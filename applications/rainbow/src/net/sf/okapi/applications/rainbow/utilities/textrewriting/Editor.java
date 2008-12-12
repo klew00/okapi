@@ -129,6 +129,12 @@ public class Editor implements IParametersEditor {
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
 		lbTypes.setLayoutData(gdTmp);
+		lbTypes.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
+				btGetTMPath.setEnabled(edTMPath.isEnabled());
+			}
+		});
 		
 		chkAddPrefix = new Button(cmpTmp, SWT.CHECK);
 		chkAddPrefix.setText("Add the following prefix:");
@@ -272,6 +278,8 @@ public class Editor implements IParametersEditor {
 
 		edPrefix.setEnabled(chkAddPrefix.getSelection());
 		edSuffix.setEnabled(chkAddSuffix.getSelection());
+		edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
+		btGetTMPath.setEnabled(edTMPath.isEnabled());
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 

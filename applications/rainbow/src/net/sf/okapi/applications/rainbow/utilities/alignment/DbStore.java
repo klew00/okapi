@@ -80,7 +80,6 @@ public class DbStore {
 
 	private Connection  conn = null;
 
-
 	public DbStore () {
 		try {
 			// Initialize the driver

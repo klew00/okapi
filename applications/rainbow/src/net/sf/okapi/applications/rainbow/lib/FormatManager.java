@@ -40,12 +40,16 @@ public class FormatManager {
 		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
 		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
 		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
+		else if ( sExt.equals(".asp") ) aRes[1] = "okf_html";
+		else if ( sExt.equals(".php") ) aRes[1] = "okf_html";
 		else if ( sExt.equals(".htm") ) aRes[1] = "okf_html";
 		else if ( sExt.equals(".odt") ) aRes[1] = "okf_openoffice";
 		else if ( sExt.equals(".ods") ) aRes[1] = "okf_openoffice";
 		else if ( sExt.equals(".odp") ) aRes[1] = "okf_openoffice";
 		else if ( sExt.equals(".odg") ) aRes[1] = "okf_openoffice";
 		else if ( sExt.equals(".ott") ) aRes[1] = "okf_openoffice";
+		else if ( sExt.equals(".tmx") ) aRes[1] = "okf_tmx";
+		else if ( sExt.equals(".mif") ) aRes[1] = "okf_mif";
 		return aRes;
 	}
 }

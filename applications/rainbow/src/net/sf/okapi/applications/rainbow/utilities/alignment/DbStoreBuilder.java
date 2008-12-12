@@ -28,8 +28,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilterWriter;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
@@ -40,6 +38,7 @@ class DbStoreBuilder implements IFilterWriter {
 	private DbStore dbs;
 	private Segmenter srcSeg;
 	private Segmenter trgSeg;
+	private String language;
 
 	public DbStoreBuilder () {
 		dbs = new DbStore();
@@ -90,18 +89,15 @@ class DbStoreBuilder implements IFilterWriter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		// TODO Auto-generated method stub
-		
+		this.language = language;
 	}
 
 	public void setOutput (String path) {
-		// TODO Auto-generated method stub
-		
+		// Not used
 	}
 
 	public void setOutput (OutputStream output) {
-		// TODO Auto-generated method stub
-		
+		// Not used
 	}
 
 	public void setParameters (IParameters params) {
@@ -115,13 +111,13 @@ class DbStoreBuilder implements IFilterWriter {
 	private void processTextUnit (TextUnit tu) {
 		// Segment if requested
 		if ( srcSeg != null ) {
-			srcSeg.computeSegments(tu.getSourceContent());
-			tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+			srcSeg.computeSegments(tu.getSource());
+			tu.getSource().createSegments(srcSeg.getSegmentRanges());
 		}
 		if ( trgSeg != null ) {
-			if ( tu.hasTarget() ) {
-				trgSeg.computeSegments(tu.getTargetContent());
-				tu.getTargetContent().createSegments(trgSeg.getSegmentRanges());
+			if ( tu.hasTarget(language) ) {
+				trgSeg.computeSegments(tu.getTarget(language));
+				tu.getTarget(language).createSegments(trgSeg.getSegmentRanges());
 			}
 		}
 		// Add the tu to the db store

@@ -4,40 +4,37 @@
  <filter id="okf_regex"
   parserClass="net.sf.okapi.filters.regex.Parser"
   inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
-  outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.regex.Editor"
  >Regular Expressions</filter>
   
  <filter id="okf_properties"
   inputFilterClass="net.sf.okapi.filters.properties.PropertiesFilter"
-  outputFilterClass="net.sf.okapi.filters.properties.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.properties.Editor"
  >Properties</filter>
   
  <filter id="okf_xliff"
   inputFilterClass="net.sf.okapi.filters.xliff.XLIFFFilter"
-  outputFilterClass="net.sf.okapi.filters.xliff.OutputFilter"
  >XLIFF</filter>
   
  <filter id="okf_xml"
-  inputFilterClass="net.sf.okapi.filters.xml.InputFilter"
-  outputFilterClass="net.sf.okapi.filters.xml.OutputFilter"
+  inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
  >XML</filter>
   
  <filter id="okf_html"
-  inputFilterClass="net.sf.okapi.filters.html.HTMLFilter"
-  outputFilterClass="net.sf.okapi.filters.html.OutputFilter"
+  inputFilterClass="net.sf.okapi.filters.html.HtmlFilter"
  >HTML</filter>
   
  <filter id="okf_tmx"
   inputFilterClass="net.sf.okapi.filters.tmx.InputFilter"
-  outputFilterClass="net.sf.okapi.filters.tmx.OutputFilter"
  >TMX</filter>
   
  <filter id="okf_openoffice"
   inputFilterClass="net.sf.okapi.filters.openoffice.InputFilter"
-  outputFilterClass="net.sf.okapi.filters.openoffice.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
+ >Open Document</filter>
+  
+ <filter id="okf_mif"
+  inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
  >Open Document</filter>
   
 </okapiFilters>

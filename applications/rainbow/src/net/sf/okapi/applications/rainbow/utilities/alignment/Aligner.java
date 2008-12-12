@@ -107,6 +107,7 @@ public class Aligner {
 	private boolean trimCodes = false;//TODO: take from SRX rules
 	private boolean trimWS = true;//TODO: take from SRX rules
 	private boolean manualCorrection;
+	private String targetLanguage;
 
 	@Override
 	protected void finalize () {
@@ -511,8 +512,10 @@ public class Aligner {
 	 */
 	public void setInfo (String targetSrxPath,
 		boolean checkSingleSegUnit,
-		boolean useAutoCorrection)
+		boolean useAutoCorrection,
+		String targetLanguage)
 	{
+		this.targetLanguage = targetLanguage;
 		this.targetSrxPath = targetSrxPath;
 		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
 		chkUseAutoCorrection.setSelection(useAutoCorrection);
@@ -637,7 +640,7 @@ public class Aligner {
 		if ( pos == -1 ) return; // Segment index not found
 		
 		if ( trimCodes || trimWS ) {
-			
+			//TODO
 		}
 		
 		// Create the new segment(s)
@@ -670,9 +673,7 @@ public class Aligner {
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
-	private int showDialog ()
-	{
-		TextUnit tu = source.getParent();
+	private int showDialog (TextUnit tu) {
 		edName.setText("");
 		if ( tu != null ) {
 			if ( tu.getName().length() > 0 ) {
@@ -708,10 +709,10 @@ public class Aligner {
 	{
 		manualCorrection = false;
 		// Make sure we do have a target to align
-		if ( !tu.hasTarget(trgLang) ) return 2;
+		if ( !tu.hasTarget(targetLanguage) ) return 2;
 		// Set the new values
 		source = tu.getSource();
-		target = tu.getTarget(trgLang);
+		target = tu.getTarget(targetLanguage);
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
@@ -724,8 +725,8 @@ public class Aligner {
 			// Try to auto-correct
 			if ( chkUseAutoCorrection.getSelection() ) autoCorrect();
 			// Correct manually
-			edCounter.setText(String.format("This source: #%d / Total targets: %d", currentSource, totalTarget));
-			return showDialog();
+			edCounter.setText(String.format("Source: #%d / Targets: %d", currentSource, totalTarget));
+			return showDialog(tu);
 		}
 		// Else: assumes correct alignment
 		return 1;
@@ -1172,4 +1173,5 @@ public class Aligner {
 		btAccept.setEnabled(canAcceptUnit);
 		return (issueType>0);
 	}
+
 }

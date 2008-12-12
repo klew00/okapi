@@ -23,5 +23,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.mt.google"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.html"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common.groovy"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

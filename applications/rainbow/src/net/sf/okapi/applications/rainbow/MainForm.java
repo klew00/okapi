@@ -1443,8 +1443,8 @@ public class MainForm implements IParametersProvider {
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
-		Object[] filters = fa.loadFilter(aRes[1], null, null, null);
-		return ((IFilter)filters[0]).getParameters();
+		IFilter filter = fa.loadFilter(aRes[1], null, null);
+		return filter.getParameters();
 	}
 
 	public IParameters load (String location)
@@ -1452,8 +1452,8 @@ public class MainForm implements IParametersProvider {
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
-		Object[] filters = fa.loadFilter(aRes[1], aRes[3], null, null);
-		return ((IFilter)filters[0]).getParameters();
+		IFilter filter = fa.loadFilter(aRes[1], aRes[3], null);
+		return filter.getParameters();
 	}
 
 	public void save (String location,
