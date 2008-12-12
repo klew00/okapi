@@ -199,19 +199,13 @@ public class FilterAccess {
 	 * @param previousInputFilter An optional previous instance of the input filter
 	 * it will be re-used if the one requested is the same. Use null to force
 	 * reloading the filter or if there is no previous instance available.
-	 * @param previousOutputFilter An optional previous instance of the input filter
-	 * it will be re-used if the one requested is the same. Use null to force
-	 * reloading the filter or if there is no previous instance available.
-	 * @return An array of two object: 0=input filter, 1=output filter.
-	 *
-	public Object[] loadFilter (String filterID,
+	 * @return The filter requested.
+	 */
+	public IFilter loadFilter (String filterID,
 		String paramPath,
-		IFilter previousInputFilter,
-		IFilterWriter previousOutputFilter)
+		IFilter previousInputFilter)
 	{
-		Object result[] = new Object[2];
-		result[0] = previousInputFilter;
-		result[1] = previousOutputFilter;
+		IFilter newFilter = previousInputFilter;
 		try {
 			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
 			// we remove the NNN. part. That part is reserved for multi-file storage info
@@ -231,20 +225,11 @@ public class FilterAccess {
 				bLoad = !s.equals(m_htFilters.get(filterID).inputFilterClass);
 			}
 			if ( bLoad ) {
-				result[0] = (IFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
-			}
-
-			bLoad = true;
-			if ( previousOutputFilter != null ) {
-				String s = previousOutputFilter.getClass().getName();
-				bLoad = !s.equals(m_htFilters.get(filterID).outputFilterClass);
-			}
-			if ( bLoad ) {
-				result[1] = (IFilterWriter)Class.forName(m_htFilters.get(filterID).outputFilterClass).newInstance();
+				newFilter = (IFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
 			}
 
 			// Load the parameters
-			IParameters params = ((IFilter)result[0]).getParameters();
+			IParameters params = newFilter.getParameters();
 			if ( params != null ) { // Not all filters have parameters
 				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
 					params.load(paramPath, false);
@@ -263,69 +248,7 @@ public class FilterAccess {
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
 		}
-		return result;
-	}*/
-
-	public Object[] loadFilter (String filterID,
-		String paramPath,
-		IFilter previousInputFilter,
-		IFilterWriter previousOutputFilter)
-	{
-		Object result[] = new Object[2];
-		result[0] = previousInputFilter;
-		result[1] = previousOutputFilter;
-		try {
-			// If the filter ID starts with NNN. (e.g. 123.okf_xml...)
-			// we remove the NNN. part. That part is reserved for multi-file storage info
-			if ( Character.isDigit(filterID.charAt(0)) ) {
-				int n = filterID.indexOf('.');
-				if ( n != -1 ) filterID = filterID.substring(n+1);
-			}
-
-			// Map the ID to the class, and instantiate the filter
-			if ( !m_htFilters.containsKey(filterID) )
-				throw new RuntimeException(String.format(Res.getString("UNDEF_FILTERID"), filterID)); 
-
-			// Load if not already done
-			boolean bLoad = true;
-			if ( previousInputFilter != null ) {
-				String s = previousInputFilter.getClass().getName();
-				bLoad = !s.equals(m_htFilters.get(filterID).inputFilterClass);
-			}
-			if ( bLoad ) {
-				result[0] = (IFilter)Class.forName(m_htFilters.get(filterID).inputFilterClass).newInstance();
-			}
-
-			bLoad = true;
-			if ( previousOutputFilter != null ) {
-				String s = previousOutputFilter.getClass().getName();
-				bLoad = !s.equals(m_htFilters.get(filterID).outputFilterClass);
-			}
-			if ( bLoad ) {
-				result[1] = (IFilterWriter)Class.forName(m_htFilters.get(filterID).outputFilterClass).newInstance();
-			}
-
-			// Load the parameters
-			IParameters params = ((IFilter)result[0]).getParameters();
-			if ( params != null ) { // Not all filters have parameters
-				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
-					params.load(paramPath, false);
-				}
-				else {
-					params.reset();
-				}
-			}
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException(e);
-		}
-		return result;
+		return newFilter;
 	}
 	
 /*	public IOldParser loadParser (String filterID,
@@ -359,13 +282,12 @@ public class FilterAccess {
 		}
 	}
 */	
-	public Object[] loadFilterFromFilterSettingsType1 (String projectParamsFolder,
+	public IFilter loadFilterFromFilterSettingsType1 (String projectParamsFolder,
 		String filterSettings,
-		IFilter previousInputFilter,
-		IFilterWriter previousOutputFilter)
+		IFilter previousInputFilter)
 	{
 		String[] aRes = splitFilterSettingsType1(projectParamsFolder, filterSettings);
-		return loadFilter(aRes[1], aRes[3], previousInputFilter, previousOutputFilter);
+		return loadFilter(aRes[1], aRes[3], previousInputFilter);
 	}
 		
 	public IParametersEditor loadEditor (String filterID) {

@@ -58,7 +58,7 @@ public class RegexFilter implements IFilter {
 	private int dpID;
 	private int groupID;
 	private int itemID;
-	private StartDocument docRes;
+	private StartDocument startDoc;
 	private TextUnit tuRes;
 	private LinkedList<FilterEvent> queue;
 	private int startSearch;
@@ -159,7 +159,11 @@ public class RegexFilter implements IFilter {
 		}
 
 		// End finally set the end
-		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, docRes));
+		// Set the ending call
+		Ending ending = new Ending(String.format("%d", ++groupID));
+		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+		// Store the last event
+		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
 		return nextEvent();
 	}
 
@@ -198,7 +202,8 @@ public class RegexFilter implements IFilter {
 
 			// Set the start event
 			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, docRes));
+			queue.add(new FilterEvent(FilterEventType.START));
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
@@ -211,8 +216,8 @@ public class RegexFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			docRes = new StartDocument();
-			docRes.setName(inputUrl.getPath());
+			startDoc = new StartDocument();
+			startDoc.setName(inputUrl.getPath());
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -525,7 +530,7 @@ public class RegexFilter implements IFilter {
 	private FilterEvent nextEvent () {
 		if ( queue.size() == 0 ) return null;
 		currentRes = queue.peek().getResource();
-		if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
 			parseState = 0; // No more event after
 		}
 		return queue.poll();

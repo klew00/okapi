@@ -173,8 +173,8 @@ public class GenericFilterWriter implements IFilterWriter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		//NOT USED: outputLang = language;
-		encoding = defaultEncoding;
+		this.language = language;
+		this.encoding = defaultEncoding;
 	}
 
 	public void setOutput (String path) {

@@ -33,7 +33,7 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	private boolean isReferent;
 	private String name;
 	private String type;
-	private boolean isTranslatable;
+	private boolean isTranslatable = true;
 	private boolean preserveWS;
 	private ISkeleton skeleton;
 	private Hashtable<String, Property> properties;

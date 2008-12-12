@@ -24,4 +24,6 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 
 public interface IFilterDrivenUtility extends IUtility, IPipelineStep {
 
+	public void processFilterInput ();
+
 }

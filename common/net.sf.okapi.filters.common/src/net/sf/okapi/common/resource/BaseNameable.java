@@ -34,7 +34,7 @@ public class BaseNameable implements IResource, INameable {
 	protected ISkeleton skeleton;
 	protected String name;
 	protected String type;
-	protected boolean isTranslatable;
+	protected boolean isTranslatable = true;
 	protected boolean preserveWS;
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;

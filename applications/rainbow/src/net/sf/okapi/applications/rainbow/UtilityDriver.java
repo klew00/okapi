@@ -36,7 +36,6 @@ import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.ui.Dialogs;
@@ -200,36 +199,15 @@ public class UtilityDriver implements CancelListener {
 				
 				// Executes the utility
 				if ( utility.isFilterDriven() ) {
-					// Set the proper type of utility
-					IFilterDrivenUtility filterUtility = (IFilterDrivenUtility)utility;
-
-					// Load the filter and the filterWriter if needed
-					Object[] filters = fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
-						item.filterSettings, filter, filterWriter);
-					
-					// Set the filter
-					filter = (IFilter)filters[0];
-					filter.setOptions(prj.getSourceLanguage(), prj.buildSourceEncoding(item), true);
-					
-					// Set the filter writer
-					filterWriter = (IFilterWriter)filters[1];
-					filterWriter.setOptions(prj.getTargetLanguage(), prj.buildTargetEncoding(item));
-					
-					// Process
-					FilterEvent event;
-					filter.open(inputPath);
-					while ( filter.hasNext() ) {
-						event = filter.next();
-						filterUtility.handleEvent(event);
-						filterWriter.handleEvent(event);
-					}
-					filter.close();
+					((IFilterDrivenUtility)utility).processFilterInput();
 				}
 				else {
 					((ISimpleUtility)utility).processInput();
 				}
 			}			
 			
+			// All is done, now run the post-process 
+			utility.postprocess();
 		}
 		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
