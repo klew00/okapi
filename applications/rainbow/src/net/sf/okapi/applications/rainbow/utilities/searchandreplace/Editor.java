@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Fredrik Liden                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.searchandreplace;
 
@@ -50,28 +50,27 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 
-	private Shell                 dialog;	
-	private OKCancelPanel         pnlActionsDialog;	
-	private Shell                 shell;
-	private boolean               result = false;
-	private OKCancelPanel         pnlActions;
-	private Parameters            params;
-	private Table                 table;
-	private Text                  searchText;
-	private Text                  replacementText;
-	private Button                btMoveUp;
-	private Button                btMoveDown;
-	private Button 				  chkPlainText;
-	private Button 				  chkRegEx;
-	private Button 				  chkDotAll;
-	private Button 				  chkIgnoreCase;
-	private Button 				  chkMultiLine;
-	private int 				  updateType;
-	
-	
 	public static final int ADD_ITEM    = 1;
 	public static final int EDIT_ITEM   = 2;
 
+	private Shell dialog;	
+	private OKCancelPanel pnlActionsDialog;	
+	private Shell shell;
+	private boolean result = false;
+	private OKCancelPanel pnlActions;
+	private Parameters params;
+	private Table table;
+	private Text searchText;
+	private Text replacementText;
+	private Button btMoveUp;
+	private Button btMoveDown;
+	private Button chkPlainText;
+	private Button chkRegEx;
+	private Button chkDotAll;
+	private Button chkIgnoreCase;
+	private Button chkMultiLine;
+	private int updateType;
+	
 	public boolean edit (IParameters params,
 		Object object)
 	{
@@ -98,7 +97,6 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	
 	public void updateUpDownBtnState(){
 
 		int index = table.getSelectionIndex();
@@ -124,9 +122,7 @@ public class Editor implements IParametersEditor {
         }
 	}
 	
-	
-	private void create (Shell parent)
-	{
+	private void create (Shell parent) {
 		shell.setText("Search And Replace");
 		if ( parent != null ) shell.setImage(parent.getImage());
 
@@ -361,7 +357,6 @@ public class Editor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -371,7 +366,6 @@ public class Editor implements IParametersEditor {
 		return result;
 	}
 
-	
 	private boolean showAddItemsDialog () {
 		dialog = new Shell (shell);
 		dialog.setText ("Search And Replace Item");
@@ -545,4 +539,5 @@ public class Editor implements IParametersEditor {
 		};
 		return true;
 	}
+
 }

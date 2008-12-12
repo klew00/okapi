@@ -45,6 +45,12 @@ public interface IUtility {
 	 * @param contextUI The shell object to use.
 	 */
 	public void setContextUI (Object contextUI);
+
+	/**
+	 * Adds a cancel listener to this utility.
+	 * @param listener The listener to add.
+	 */
+	public void addCancelListener (CancelListener listener);
 	
 	/**
 	 * Gets the unique string that identifies the utility.

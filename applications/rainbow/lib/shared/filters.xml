@@ -3,19 +3,19 @@
  
  <filter id="okf_regex"
   parserClass="net.sf.okapi.filters.regex.Parser"
-  inputFilterClass="net.sf.okapi.filters.regex.InputFilter"
+  inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
   outputFilterClass="net.sf.okapi.filters.regex.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.regex.Editor"
  >Regular Expressions</filter>
   
  <filter id="okf_properties"
-  inputFilterClass="net.sf.okapi.filters.properties.InputFilter"
+  inputFilterClass="net.sf.okapi.filters.properties.PropertiesFilter"
   outputFilterClass="net.sf.okapi.filters.properties.OutputFilter"
   editorClass="net.sf.okapi.filters.ui.properties.Editor"
  >Properties</filter>
   
  <filter id="okf_xliff"
-  inputFilterClass="net.sf.okapi.filters.xliff.InputFilter"
+  inputFilterClass="net.sf.okapi.filters.xliff.XLIFFFilter"
   outputFilterClass="net.sf.okapi.filters.xliff.OutputFilter"
  >XLIFF</filter>
   
@@ -25,7 +25,7 @@
  >XML</filter>
   
  <filter id="okf_html"
-  inputFilterClass="net.sf.okapi.filters.html.InputFilter"
+  inputFilterClass="net.sf.okapi.filters.html.HTMLFilter"
   outputFilterClass="net.sf.okapi.filters.html.OutputFilter"
  >HTML</filter>
   

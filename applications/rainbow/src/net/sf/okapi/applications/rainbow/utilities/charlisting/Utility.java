@@ -105,6 +105,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 		return 1;
 	}
 
+	@Override
 	public String getFolderAfterProcess () {
 		return Util.getDirectoryName(params.outputPath);
 	}
@@ -112,13 +113,13 @@ public class Utility extends BaseFilterDrivenUtility  {
 	public FilterEvent handleEvent (FilterEvent event) {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
-			processTU((TextUnit)event.getResource());
+			processTextUnit((TextUnit)event.getResource());
 			break;
 		}
 		return event;
 	}
 
-	private void processTU (TextUnit tu) {
+	private void processTextUnit (TextUnit tu) {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		// Get the coded text and detect the used characters

@@ -45,7 +45,6 @@ import net.sf.okapi.common.Util;
 public class Utility extends BaseUtility implements ISimpleUtility {
 
 	private Parameters params;
-	private String commonFolder;
 	private String outFormat;
 	private CharsetEncoder outputEncoder;
 	private boolean useCER;
@@ -132,21 +131,8 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		return false;
 	}
 
-	public void addOutputData (String path,
-		String encoding)
-	{
-		super.addOutputData(path, encoding);
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-	}
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
-	}
-
-	public String getFolderAfterProcess () {
-		return commonFolder;
 	}
 
 	public int requestInputCount () {

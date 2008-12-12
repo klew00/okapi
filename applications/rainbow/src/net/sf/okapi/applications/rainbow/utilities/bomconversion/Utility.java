@@ -37,7 +37,6 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	private final byte[]     BOM_UTF16LE    = {(byte)0xFF,(byte)0xFE};
 
 	private Parameters params;
-	private String commonFolder;
 	private byte[] buffer;
 
 	public Utility () {
@@ -48,90 +47,39 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		return "oku_bomconversion";
 	}
 	
-	/**
-	 * Checks for BOM presence
-	 * @param buffer The buffer to check.
-	 * @param length The number of usable bytes in the buffer.
-	 * @return 0 if there is no BOM, or the number of bytes used by
-	 * the BOM if it is present.
-	 */
-	private int hasBOM (byte[] buffer,
-		int length)
-	{
-		if ( length > 1 ) {
-			// Check for UTF-16
-			if (( buffer[0] == (byte)0xFE )
-				&& ( buffer[1] == (byte)0xFF )) {
-				// UTF-16BE
-				logger.info("UTF-16BE detected");
-				return 2;
-			}
-			else if (( buffer[0] == (byte)0xFF )
-				&& ( buffer[1] == (byte)0xFE )) {
-				// UTF-16LE
-				logger.info("UTF-16LE detected");
-				return 2;
-			}
-			// Check for UTF-8
-			if ( length > 2 ) {
-				if (( buffer[0] == (byte)0xEF )
-					&& ( buffer[1] == (byte)0xBB )
-					&& ( buffer[2] == (byte)0xBF )) {
-					// UTF-8
-					logger.info("UTF-8 detected");
-					return 3;
-				}
-				// Check for UTF-32
-				if ( length > 3) {
-					if (( buffer[0] == (byte)0xFF )
-						&& ( buffer[1] == (byte)0xFE )
-						&& ( buffer[2] == (byte)0x00 )
-						&& ( buffer[3] == (byte)0x00 )) {
-						// UTF-32LE
-						logger.info("UTF-32LE detected");
-						return 4;
-					}
-					else if (( buffer[0] == (byte)0x00 )
-						&& ( buffer[1] == (byte)0x00 )
-						&& ( buffer[2] == (byte)0xFE )
-						&& ( buffer[3] == (byte)0xFF )) {
-						// UTF-32BE
-						logger.info("UTF-32BE detected");
-						return 4;
-					}
-				}
-			}
-		}
-		return 0;
+	public void postprocess () {
+		// Release the buffer
+		buffer = null;
 	}
 
-	/**
-	 * Tries to guess the type of endian from the byte patterns.
-	 * @param buffer The buffer to check.
-	 * @param length The number of usable bytes in the buffer.
-	 * @return 0=no detection, 1=UTF-16BE, 2=UTF-16LE
-	 */
-	private int guessByteOrder (byte[] buffer,
-		int length)
-	{
-		if ( length < 4 ) return 0;
-		if (( buffer[0] != (byte)0x00 )
-			&& ( buffer[1] == (byte)0x00 )
-			&& ( buffer[2] != (byte)0x00 )
-			&& ( buffer[3] == (byte)0x00 )) {
-			// Probably UTF-16BE 
-			return 1;
-		}
-		if (( buffer[0] == (byte)0x00 )
-			&& ( buffer[1] != (byte)0x00 )
-			&& ( buffer[2] == (byte)0x00 )
-			&& ( buffer[3] != (byte)0x00 )) {
-			// Probably UTF-16LE
-			return 2;
-		}
-		return 0;
+	public void preprocess () {
+		buffer = new byte[1024*2];
 	}
-	
+
+	public IParameters getParameters () {
+		return params;
+	}
+
+	public boolean hasParameters () {
+		return true;
+	}
+
+	public boolean isFilterDriven () {
+		return false;
+	}
+
+	public boolean needsRoots () {
+		return false;
+	}
+
+	public void setParameters (IParameters paramsObject) {
+		params = (Parameters)paramsObject;
+	}
+
+	public int requestInputCount() {
+		return 1;
+	}
+
 	public void processInput () {
 		FileInputStream input = null;
 		FileOutputStream output = null;
@@ -221,56 +169,88 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		}
 	}
 
-	public void setOptions (String sourceLanguage,
-		String targetLanguage)
+	/**
+	 * Checks for BOM presence
+	 * @param buffer The buffer to check.
+	 * @param length The number of usable bytes in the buffer.
+	 * @return 0 if there is no BOM, or the number of bytes used by
+	 * the BOM if it is present.
+	 */
+	private int hasBOM (byte[] buffer,
+		int length)
 	{
+		if ( length > 1 ) {
+			// Check for UTF-16
+			if (( buffer[0] == (byte)0xFE )
+				&& ( buffer[1] == (byte)0xFF )) {
+				// UTF-16BE
+				logger.info("UTF-16BE detected");
+				return 2;
+			}
+			else if (( buffer[0] == (byte)0xFF )
+				&& ( buffer[1] == (byte)0xFE )) {
+				// UTF-16LE
+				logger.info("UTF-16LE detected");
+				return 2;
+			}
+			// Check for UTF-8
+			if ( length > 2 ) {
+				if (( buffer[0] == (byte)0xEF )
+					&& ( buffer[1] == (byte)0xBB )
+					&& ( buffer[2] == (byte)0xBF )) {
+					// UTF-8
+					logger.info("UTF-8 detected");
+					return 3;
+				}
+				// Check for UTF-32
+				if ( length > 3) {
+					if (( buffer[0] == (byte)0xFF )
+						&& ( buffer[1] == (byte)0xFE )
+						&& ( buffer[2] == (byte)0x00 )
+						&& ( buffer[3] == (byte)0x00 )) {
+						// UTF-32LE
+						logger.info("UTF-32LE detected");
+						return 4;
+					}
+					else if (( buffer[0] == (byte)0x00 )
+						&& ( buffer[1] == (byte)0x00 )
+						&& ( buffer[2] == (byte)0xFE )
+						&& ( buffer[3] == (byte)0xFF )) {
+						// UTF-32BE
+						logger.info("UTF-32BE detected");
+						return 4;
+					}
+				}
+			}
+		}
+		return 0;
 	}
 
-	public void postprocess () {
-		// Release the buffer
-		buffer = null;
-	}
-
-	public void preprocess () {
-		commonFolder = null; // Reset
-		buffer = new byte[1024*2];
-	}
-
-	public IParameters getParameters () {
-		return params;
-	}
-
-	public boolean hasParameters () {
-		return true;
-	}
-
-	public boolean isFilterDriven () {
-		return false;
-	}
-
-	public boolean needsRoots () {
-		return false;
-	}
-
-	public void addOutputData (String path,
-		String encoding)
+	/**
+	 * Tries to guess the type of endian from the byte patterns.
+	 * @param buffer The buffer to check.
+	 * @param length The number of usable bytes in the buffer.
+	 * @return 0=no detection, 1=UTF-16BE, 2=UTF-16LE
+	 */
+	private int guessByteOrder (byte[] buffer,
+		int length)
 	{
-		super.addOutputData(path, encoding);
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
+		if ( length < 4 ) return 0;
+		if (( buffer[0] != (byte)0x00 )
+			&& ( buffer[1] == (byte)0x00 )
+			&& ( buffer[2] != (byte)0x00 )
+			&& ( buffer[3] == (byte)0x00 )) {
+			// Probably UTF-16BE 
+			return 1;
+		}
+		if (( buffer[0] == (byte)0x00 )
+			&& ( buffer[1] != (byte)0x00 )
+			&& ( buffer[2] == (byte)0x00 )
+			&& ( buffer[3] != (byte)0x00 )) {
+			// Probably UTF-16LE
+			return 2;
+		}
+		return 0;
 	}
-
-	public void setParameters (IParameters paramsObject) {
-		params = (Parameters)paramsObject;
-	}
-
-	public String getFolderAfterProcess () {
-		return commonFolder;
-	}
-
-	public int requestInputCount() {
-		return 1;
-	}
-
+	
 }

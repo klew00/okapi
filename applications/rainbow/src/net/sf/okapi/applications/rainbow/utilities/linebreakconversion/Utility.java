@@ -32,8 +32,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
 
-import javax.swing.event.EventListenerList;
-
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.BOMAwareInputStream;
@@ -43,7 +41,6 @@ import net.sf.okapi.common.Util;
 public class Utility extends BaseUtility implements ISimpleUtility {
 
 	private Parameters params;
-	private String commonFolder;
 
 	public Utility () {
 		params = new Parameters();
@@ -53,12 +50,12 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		return "oku_linebreakconversion";
 	}
 	
-	public void postprocess () {
+	public void preprocess () {
 		// Nothing to do
 	}
 
-	public void preprocess () {
-		commonFolder = null; // Reset
+	public void postprocess () {
+		// Nothing to do
 	}
 
 	public IParameters getParameters () {
@@ -77,21 +74,8 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		return false;
 	}
 
-	public void addOutputData (String path,
-		String encoding)
-	{
-		super.addOutputData(path, encoding);
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-	}
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
-	}
-
-	public String getFolderAfterProcess () {
-		return commonFolder;
 	}
 
 	public int requestInputCount() {

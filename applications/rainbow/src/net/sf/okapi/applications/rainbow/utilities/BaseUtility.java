@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.common.Util;
 
 public abstract class BaseUtility implements IUtility {
 
@@ -43,6 +44,7 @@ public abstract class BaseUtility implements IUtility {
 	protected String outputRoot;
 	protected String srcLang;
 	protected String trgLang;
+	protected String commonFolder;
 
 	public BaseUtility () {
 		inputs = new ArrayList<InputData>();
@@ -95,6 +97,9 @@ public abstract class BaseUtility implements IUtility {
 		String encoding)
 	{
 		outputs.add(new OutputData(path, encoding));
+		// Compute the longest common folder
+		commonFolder = Util.longestCommonDir(commonFolder,
+			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
 	}
 
 	public String getInputRoot () {
@@ -108,6 +113,7 @@ public abstract class BaseUtility implements IUtility {
 	public void resetLists () {
 		inputs.clear();
 		outputs.clear();
+		commonFolder = null;
 	}
 
 	public void setRoots (String inputRoot,
@@ -115,6 +121,10 @@ public abstract class BaseUtility implements IUtility {
 	{
 		this.inputRoot = inputRoot;
 		this.outputRoot = outputRoot;
+	}
+
+	public String getFolderAfterProcess () {
+		return commonFolder;
 	}
 
 	public String getInputPath (int index) {

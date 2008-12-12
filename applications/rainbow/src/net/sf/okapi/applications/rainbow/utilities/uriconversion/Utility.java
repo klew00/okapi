@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Fredrik Liden                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.uriconversion;
 
@@ -24,7 +24,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextContainer;
@@ -37,7 +36,6 @@ public class Utility extends BaseFilterDrivenUtility {
 	static final int ESCAPE    = 1;
 	
 	private Parameters params;
-	private String commonFolder;
 	
 	public Utility () {
 		params = new Parameters();
@@ -48,7 +46,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
 	public void preprocess () {
-		commonFolder = null; // Reset
+		// Nothing do to
 	}
 	
 	public void postprocess () {
@@ -75,23 +73,18 @@ public class Utility extends BaseFilterDrivenUtility {
 		return true;
 	}
 
-	public String getFolderAfterProcess () {
-		return commonFolder;
-	}
-	
 	public int requestInputCount () {
 		return 1;
 	}
 	
-	public void addOutputData (String path,
-		String encoding)
-	{
-		super.addOutputData(path, encoding);
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-	}
-
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case TEXT_UNIT:
+			processTU((TextUnit)event.getResource());
+		}
+		return event;
+	}	
+	
 	private void processTU (TextUnit tu) {
 		
 		String forceEscape = " * -,.";
@@ -193,12 +186,4 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
-		switch ( event.getEventType() ) {
-		case TEXT_UNIT:
-			processTU((TextUnit)event.getResource());
-		}
-		return event;
-	}	
-	
 }

@@ -1,29 +1,31 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -32,7 +34,7 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
-public class Utility extends BaseUtility implements IFilterDrivenUtility  {
+public class Utility extends BaseFilterDrivenUtility {
 
 	private static final char TMPSTARTSEG = '\u0002';
 	private static final char TMPENDSEG = '\u0003';
@@ -40,7 +42,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private static final char ENDSEG = ']';
 	
 	private Parameters params;
-	private String commonFolder;
 	private Segmenter srcSeg;
 	private Segmenter trgSeg;
 	private SimpleTMConnector tmQ;
@@ -49,30 +50,22 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		params = new Parameters();
 	}
 	
-	public void resetLists () {
-		// Not used for this utility
-	}
-	
-	public String getID () {
+	public String getName () {
 		return "oku_textrewriting";
 	}
 	
-	public void doProlog (String sourceLanguage,
-		String targetLanguage)
-	{
-		commonFolder = null;
-
+	public void preprocess () {
 		// Load the segmentation rules
 		if ( params.segment ) {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(params.sourceSrxPath);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
-			srcSeg = doc.applyLanguageRules(sourceLanguage, null);
+			srcSeg = doc.applyLanguageRules(srcLang, null);
 			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
 				doc.loadRules(params.targetSrxPath);
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
-			trgSeg = doc.applyLanguageRules(targetLanguage, null);
+			trgSeg = doc.applyLanguageRules(trgLang, null);
 		}
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
@@ -81,7 +74,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		}
 	}
 	
-	public void doEpilog () {
+	public void postprocess () {
 		if ( tmQ != null ) {
 			tmQ.close();
 			tmQ = null;
@@ -92,14 +85,6 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return params;
 	}
 
-	public String getInputRoot () {
-		return null;
-	}
-	
-	public String getOutputRoot () {
-		return null;
-	}
-
 	public boolean hasParameters () {
 		return true;
 	}
@@ -108,65 +93,62 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		return false;
 	}
 
-	public boolean needsOutputFilter () {
-		return true;
-	}
-
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
 	}
 
-	public void setRoots (String inputRoot,
-		String outputRoot)
-	{
+	public boolean isFilterDriven () {
+		return true;
 	}
 
-	@Override
-    public void startResource (Document resource) {
+	public int requestInputCount () {
+		return 1;
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		}
+		return event;
+	}
+	
+    private void processStartDocument (StartDocument resource) {
     	if ( tmQ != null ) {
     		tmQ.setAttribute("FileName", Util.getFilename(resource.getName(), true));
     	}
-    	super.startResource(resource);
     }
 	
-	@Override
-    public void endExtractionItem (TextUnit item) {
-		try {
-			processTU(item);
-		}
-		finally {
-			super.endExtractionItem(item);
-		}
-    }
-	
-	private void processTU (TextUnit tu) {
+	private void processTextUnit (TextUnit tu) {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		// Skip if already translate (only if required)
-		if ( tu.hasTarget() && !params.applyToExistingTarget ) return;
+		if ( !params.applyToExistingTarget && tu.hasTarget(trgLang) ) return;
 		
 		// Apply the segmentation and/or segment marks if requested
 		if ( params.segment || params.markSegments ) {
-			if ( tu.hasTarget() ) {
+			if ( tu.hasTarget(trgLang) ) {
 				if ( params.segment ) {
-					trgSeg.computeSegments(tu.getTargetContent());
-					tu.getTargetContent().createSegments(trgSeg.getSegmentRanges());
+					trgSeg.computeSegments(tu.getTarget(trgLang));
+					tu.getTarget(trgLang).createSegments(trgSeg.getSegmentRanges());
 				}
 			}
 			else {
 				if ( params.segment ) {
-					srcSeg.computeSegments(tu.getSourceContent());
-					tu.getSourceContent().createSegments(srcSeg.getSegmentRanges());
+					srcSeg.computeSegments(tu.getSource());
+					tu.getSource().createSegments(srcSeg.getSegmentRanges());
 				}
 			}
 		}
 		
 		// Else: do the requested modifications
-		// Make sure we have a target where to apply the modifications
-		if ( !tu.hasTarget() ) {
-			tu.setTargetContent(tu.getSourceContent().clone());
-		}
-		
+		// Make sure we have target content
+		tu.createTarget(trgLang, false, IResource.COPY_ALL);
+
 		// Translate is done before we merge possible segments
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
 			translate(tu);
@@ -174,7 +156,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 
 		// Merge all segments if needed
 		if ( params.segment || params.markSegments ) {
-			mergeSegments(tu.getTargetContent());
+			mergeSegments(tu.getTarget(trgLang));
 		}
 
 		// Other text modification are done after merging all segments
@@ -197,7 +179,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (TextUnit tu) {
-		String result = tu.getTargetContent().getCodedText();
+		String result = tu.getTarget(trgLang).getCodedText();
 		StringBuilder sb = new StringBuilder();
 		
 		for ( int i=0; i<result.length(); i++ ) {
@@ -219,7 +201,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 					break;
 			}
 		}
-		TextContainer cnt = tu.getTargetContent();
+		TextContainer cnt = tu.getTarget(trgLang);
 		cnt.setCodedText(sb.toString());
 	}	
 	
@@ -278,7 +260,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 			// Target is set if needed
 			QueryResult qr;
 			tmQ.setAttribute("GroupName", tu.getName());
-			TextContainer tc = tu.getTargetContent();
+			TextContainer tc = tu.getTarget(trgLang);
 			if ( tc.isSegmented() ) {
 				int seg = 0;
 				for ( TextFragment tf : tc.getSegments() ) {
@@ -294,7 +276,7 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 					qr = tmQ.next();
 					tc = new TextContainer();
 					tc.append(qr.target);
-					tu.setTargetContent(tc);
+					tu.setTarget(trgLang, tc);
 				}
 			}
 			
@@ -311,10 +293,10 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
 		try {
-			tmp = tu.getTargetContent().getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
+			tmp = tu.getTarget(trgLang).getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
-			TextContainer cnt = tu.getTargetContent(); 
+			TextContainer cnt = tu.getTarget(trgLang); 
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
@@ -331,53 +313,26 @@ public class Utility extends BaseUtility implements IFilterDrivenUtility  {
 		String tmp = null;
 		try {
 			// Use the target as the text to change.
-			tmp = tu.getTargetContent().getCodedText();
+			tmp = tu.getTarget(trgLang).getCodedText();
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
 			if ( params.addName ) {
 				if ( tu.getName().length() > 0 ) tmp += "_"+tu.getName();
-				else tmp += "_"+tu.getID();
+				else tmp += "_"+tu.getId();
 			}
 			if ( params.addID ) {
-				tmp += "_"+tu.getID();
+				tmp += "_"+tu.getId();
 			}
 			if ( params.addSuffix ) {
 				tmp += params.suffix;
 			}
-			TextContainer cnt = tu.getTargetContent(); 
+			TextContainer cnt = tu.getTarget(trgLang); 
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);
 		}
-	}
-	
-	public boolean isFilterDriven () {
-		return true;
-	}
-
-	public void addInputData (String path,
-		String encoding,
-		String filterSettings)
-	{
-		// Nothing to do here
-	}
-
-	public void addOutputData (String path,
-		String encoding)
-	{
-		// Compute the longest common folder
-		commonFolder = Util.longestCommonDir(commonFolder,
-			Util.getDirectoryName(path), !Util.isOSCaseSensitive());
-	}
-
-	public int requestInputCount () {
-		return 1;
-	}
-
-	public String getFolderAfterProcess () {
-		return commonFolder;
 	}
 
 }

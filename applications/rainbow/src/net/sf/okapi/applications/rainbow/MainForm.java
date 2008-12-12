@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -92,71 +92,71 @@ import org.eclipse.swt.widgets.Text;
 
 public class MainForm implements IParametersProvider {
 	
-	private int                        currentInput;
-	private ArrayList<Table>           inputTables;
+	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+
+	private int currentInput;
+	private ArrayList<Table> inputTables;
 	private ArrayList<InputTableModel> inputTableMods;
 
-	private Shell                 shell;
-	private ILog                  log;
-	private LogHandler            logHandler;
-	private UserConfiguration     config;
-	private String                rootFolder;
-	private String                sharedFolder;
-	private Project               prj;
-	private StatusBar             statusBar;
-	private TabFolder             tabFolder;
-	private Text                  edInputRoot;
-	private Button                btGetRoot;
-	private Button                chkUseOutputRoot;
-	private Text                  edOutputRoot;
-	private Text                  edSourceLang;
-	private List                  lbSourceLang;
-	private boolean               inSourceLangSelection;
-	private Text                  edSourceEnc;
-	private List                  lbSourceEnc;
-	private boolean               inSourceEncSelection;
-	private Text                  edTargetLang;
-	private List                  lbTargetLang;
-	private boolean               inTargetLangSelection;
-	private Text                  edTargetEnc;
-	private List                  lbTargetEnc;
-	private boolean               inTargetEncSelection;
-	private Button                chkUseCustomParametersFolder;
-	private Text                  edParamsFolder;
-	private TabItem               tiInputList1;
-	private TabItem               tiInputList2;
-	private TabItem               tiInputList3;
-	private TabItem               tiOptions;
-	private PathBuilderPanel      pnlPathBuilder;
-	private int                   waitCount;
-	private boolean               startLogWasRequested;
-	private LanguageManager       lm;
-	private ResourceManager       rm;
-	private FormatManager         fm;
-	private FilterAccess          fa;
-	private EncodingManager       em;
-	private PluginsAccess         plugins;
-	private UtilityDriver         ud;
-	private MenuItem              miInput;
-	private MenuItem              miUtilities;
-	private MenuItem              miHelp;
-	private MenuItem              miSave;
-	private MenuItem              miTools;
-	private MenuItem              miEditInputProperties;
-	private MenuItem              cmiEditInputProperties;
-	private MenuItem              miOpenInputDocument;
-	private MenuItem              cmiOpenInputDocument;
-	private MenuItem              miRemoveInputDocuments;
-	private MenuItem              cmiRemoveInputDocuments;
-	private MenuItem              miMoveDocumentsUp;
-	private MenuItem              cmiMoveDocumentsUp;
-	private MenuItem              miMoveDocumentsDown;
-	private MenuItem              cmiMoveDocumentsDown;
-	private MenuItem              miOpenFolder;
-	private MenuItem              cmiOpenFolder;
-	private MenuItem              miOpenOutputFolder;
-
-	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+	private Shell shell;
+	private ILog log;
+	private LogHandler logHandler;
+	private UserConfiguration config;
+	private String rootFolder;
+	private String sharedFolder;
+	private Project prj;
+	private StatusBar statusBar;
+	private TabFolder tabFolder;
+	private Text edInputRoot;
+	private Button btGetRoot;
+	private Button chkUseOutputRoot;
+	private Text edOutputRoot;
+	private Text edSourceLang;
+	private List lbSourceLang;
+	private boolean inSourceLangSelection;
+	private Text edSourceEnc;
+	private List lbSourceEnc;
+	private boolean inSourceEncSelection;
+	private Text edTargetLang;
+	private List lbTargetLang;
+	private boolean inTargetLangSelection;
+	private Text edTargetEnc;
+	private List lbTargetEnc;
+	private boolean inTargetEncSelection;
+	private Button chkUseCustomParametersFolder;
+	private Text edParamsFolder;
+	private TabItem tiInputList1;
+	private TabItem tiInputList2;
+	private TabItem tiInputList3;
+	private TabItem tiOptions;
+	private PathBuilderPanel pnlPathBuilder;
+	private int waitCount;
+	private boolean startLogWasRequested;
+	private LanguageManager lm;
+	private ResourceManager rm;
+	private FormatManager fm;
+	private FilterAccess fa;
+	private EncodingManager em;
+	private PluginsAccess plugins;
+	private UtilityDriver ud;
+	private MenuItem miInput;
+	private MenuItem miUtilities;
+	private MenuItem miHelp;
+	private MenuItem miSave;
+	private MenuItem miTools;
+	private MenuItem miEditInputProperties;
+	private MenuItem cmiEditInputProperties;
+	private MenuItem miOpenInputDocument;
+	private MenuItem cmiOpenInputDocument;
+	private MenuItem miRemoveInputDocuments;
+	private MenuItem cmiRemoveInputDocuments;
+	private MenuItem miMoveDocumentsUp;
+	private MenuItem cmiMoveDocumentsUp;
+	private MenuItem miMoveDocumentsDown;
+	private MenuItem cmiMoveDocumentsDown;
+	private MenuItem miOpenFolder;
+	private MenuItem cmiOpenFolder;
+	private MenuItem miOpenOutputFolder;
 
 	protected static void showHelp (Shell shell,
 		String helpFile)

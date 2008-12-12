@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -31,9 +31,9 @@ import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.CancelListener;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility2;
-import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility2;
-import net.sf.okapi.applications.rainbow.utilities.IUtility2;
+import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
+import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
+import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
@@ -53,7 +53,7 @@ public class UtilityDriver implements CancelListener {
 	private FilterAccess fa;
 	private IFilter filter;
 	private IFilterWriter filterWriter;
-	private IUtility2 utility;
+	private IUtility utility;
 	private IParametersEditor editor;
 	private PluginItem pluginItem;
 	private PluginsAccess plugins;
@@ -73,7 +73,7 @@ public class UtilityDriver implements CancelListener {
 	 * Gets the current utility.
 	 * @return The last utility loaded, or null.
 	 */
-	public IUtility2 getUtility () {
+	public IUtility getUtility () {
 		return utility;
 	}
 
@@ -85,7 +85,9 @@ public class UtilityDriver implements CancelListener {
 			if ( !plugins.containsID(utilityName) )
 				throw new RuntimeException("Utility not found: "+utilityName);
 			pluginItem = plugins.getItem(utilityName);
-			utility = (IUtility2)Class.forName(pluginItem.pluginClass).newInstance();
+			utility = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
+			// Feedback event handling
+			utility.addCancelListener(this);
 			
 			if ( pluginItem.editorClass.length() > 0 ) {
 				editor = (IParametersEditor)Class.forName(pluginItem.editorClass).newInstance();
@@ -118,7 +120,8 @@ public class UtilityDriver implements CancelListener {
 				if ( editor != null ) {
 					if ( !editor.edit(utility.getParameters(), shell) ) return false;
 					// Save the parameters in memory
-					prj.setUtilityParameters(utility.getName(), utility.getParameters().toString());
+					prj.setUtilityParameters(utility.getName(),
+						utility.getParameters().toString());
 				}
 			}
 			else {
@@ -141,17 +144,24 @@ public class UtilityDriver implements CancelListener {
 			log.beginTask(pluginItem.name);
 			stopProcess = false;
 
-			// Set its parameters as required
-			if ( !checkParameters(shell) ) return; // User cancel or error
 			// Set the run-time parameters
-			//TODO (root), etc.
+			utility.setFilterAccess(fa, prj.getParametersFolder());
+			utility.setContextUI(shell);
+			if ( utility.needsRoots() ) {
+				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
+			}
+			utility.setOptions(prj.getSourceLanguage(), prj.getTargetLanguage());
+			utility.resetLists();
 			
-			// Warning for empty list
+			// All is initialized, now run the pre-process 
+			utility.preprocess();
+			
+			// Last check to warning for empty list
 			if ( prj.getList(0).size() == 0 ) {
 				log.warning("There is no input document.");
 			}
 
-			// For each input file
+			// Process each input file
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
@@ -170,7 +180,7 @@ public class UtilityDriver implements CancelListener {
 				// Add input/output data from other input lists if requested
 				for ( int j=1; j<prj.inputLists.size(); j++ ) {
 					// Does the utility requests this list?
-					if ( j >= utility.getRequestedInputCount() ) break; // No need to loop more
+					if ( j >= utility.requestInputCount() ) break; // No need to loop more
 					// Do we have a corresponding input?
 					if ( prj.inputLists.get(j).size() > f ) {
 						// Data is available
@@ -188,13 +198,10 @@ public class UtilityDriver implements CancelListener {
 					else throw new RuntimeException("No more input files available.");
 				}
 				
-				// Feedback event handling
-				utility.addCancelListener(this);
-
 				// Executes the utility
 				if ( utility.isFilterDriven() ) {
 					// Set the proper type of utility
-					IFilterDrivenUtility2 filterUtility = (IFilterDrivenUtility2)utility;
+					IFilterDrivenUtility filterUtility = (IFilterDrivenUtility)utility;
 
 					// Load the filter and the filterWriter if needed
 					Object[] filters = fa.loadFilterFromFilterSettingsType1(prj.getParametersFolder(),
@@ -219,33 +226,28 @@ public class UtilityDriver implements CancelListener {
 					filter.close();
 				}
 				else {
-					((ISimpleUtility2)utility).processInput();
+					((ISimpleUtility)utility).processInput();
 				}
 			}			
 			
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
 			if ( filterWriter != null ) filterWriter.close();
-			if ( utility != null ) utility.finish();
+			if ( utility != null ) utility.postprocess();
 			logger.error("Error with utility.", e);
 		}
 		finally {
 			if ( stopProcess ) {
 				logger.warn("Process interrupted by user.");
 			}
-//			if ( utility != null ) {
-//				outputFolder = util.getFolderAfterProcess();
-//			}
+			if ( utility != null ) {
+				outputFolder = utility.getFolderAfterProcess();
+			}
 			log.endTask(null);
 		}
 	}
 	
-/*	private void executeFilterDrivenUtility (Input item) {
-		
-		
-	}
-*/	
 	String getFolderAfterProcess () {
 		return outputFolder;
 	}
