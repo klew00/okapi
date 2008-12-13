@@ -18,13 +18,11 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.applications.rainbow.lib;
+package net.sf.okapi.common.ui;
 
-class FilterAccessItem {
+class CommandItem {
 
-	public String name;
-	public String description;
-	public String inputFilterClass;
-	public String editorClass;
+	String label;
+	int accelerator;
 	
 }

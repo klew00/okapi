@@ -140,11 +140,10 @@ public class TextContainer extends TextFragment {
 	 * @return The number of segments.
 	 */
 	public int createSegments (List<Point> ranges) {
-		// Un-segment all if needed
 		//TODO: Find a way to offer re-segmentation on top of existing one
-		mergeAllSegments();
 		if( ranges == null ) return 0;
-
+		// Create the master segment
+		masterSegment = new TextFragment(getContent().clone());
 		// Extract the segments using the ranges
 		segments = new ArrayList<TextFragment>();
 		if (( masterSegment.codes == null ) && (ranges.size() > 0 )) {
@@ -264,6 +263,7 @@ public class TextContainer extends TextFragment {
 	 * and will be lost.
 	 */
 	public void mergeAllSegments () {
+		//TODO: Decide how to do the merge: re-use original or remerged?
 		if ( !isSegmented() ) return;
 		Code code;
 		for ( int i=0; i<masterSegment.text.length(); i++ ) {

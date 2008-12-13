@@ -287,8 +287,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @param text The text to use.
 	 */
 	public TextFragment (String text) {
-		//this.parent = parent;
-		this.text = new StringBuilder(text);
+		this.text = new StringBuilder((text==null) ? "" : text);
 	}
 
 	/**

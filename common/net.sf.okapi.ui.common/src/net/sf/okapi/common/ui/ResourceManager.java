@@ -1,24 +1,24 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-package net.sf.okapi.applications.rainbow.lib;
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
+
+package net.sf.okapi.common.ui;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -38,15 +38,14 @@ import org.w3c.dom.NodeList;
 public class ResourceManager {
 
 	@SuppressWarnings("unchecked")
-	private Class                      m_Cls;
-	private Display                    m_Disp;
-	private Hashtable<String, Image>   m_htImages;
-	private Hashtable<String, Color>   m_htColors1;
-	private Hashtable<Integer, Color>  m_htColors2;
-	private String                     m_sExt = ".png";
-	private String                     m_sSubdir = "images";
-	
-	private Hashtable<String, CommandItem>  commands;
+	private Class cls;
+	private Display display;
+	private Hashtable<String, Image> images;
+	private Hashtable<String, Color> colors1;
+	private Hashtable<Integer, Color> colors2;
+	private String ext = ".png";
+	private String subdir = "images";
+	private Hashtable<String, CommandItem> commands;
 
 	/**
 	 * Creates a ResourceManager object.
@@ -58,11 +57,11 @@ public class ResourceManager {
 	public ResourceManager (Class p_Class,
 		Display p_Display)
 	{
-		m_Disp = p_Display;
-		m_Cls = p_Class;
-		m_htImages = new Hashtable<String, Image>();
-		m_htColors1 = new Hashtable<String, Color>();
-		m_htColors2 = new Hashtable<Integer, Color>();
+		display = p_Display;
+		cls = p_Class;
+		images = new Hashtable<String, Image>();
+		colors1 = new Hashtable<String, Color>();
+		colors2 = new Hashtable<Integer, Color>();
 		commands = new Hashtable<String, CommandItem>();
 	}
 	
@@ -70,23 +69,23 @@ public class ResourceManager {
 	 * Disposes of all the resources.
 	 */
 	public void dispose () {
-		Enumeration<Image> E1 = m_htImages.elements();
+		Enumeration<Image> E1 = images.elements();
 		while ( E1.hasMoreElements() ) {
 			E1.nextElement().dispose();
 		}
-		m_htImages.clear();
+		images.clear();
 		
-		Enumeration<Color> E2 = m_htColors1.elements();
+		Enumeration<Color> E2 = colors1.elements();
 		while ( E2.hasMoreElements() ) {
 			E2.nextElement().dispose();
 		}
-		m_htColors1.clear();
+		colors1.clear();
 		
-		E2 = m_htColors2.elements();
+		E2 = colors2.elements();
 		while ( E2.hasMoreElements() ) {
 			E2.nextElement().dispose();
 		}
-		m_htColors2.clear();
+		colors2.clear();
 
 		if ( commands != null )
 			commands.clear();
@@ -97,7 +96,7 @@ public class ResourceManager {
 	 * @param p_sValue the extension, with its leading period.
 	 */
 	public void setDefaultExtension (String p_sValue) {
-		m_sExt = p_sValue;
+		ext = p_sValue;
 	}
 	
 	/**
@@ -106,7 +105,7 @@ public class ResourceManager {
 	 * separators. Make sure to use '/' for internal separators.
 	 */
 	public void setSubDirectory (String p_sValue) {
-		m_sSubdir = p_sValue;
+		subdir = p_sValue;
 	}
 
 	/**
@@ -125,12 +124,12 @@ public class ResourceManager {
 	public void addImage (String p_sName) {
 		String sKey = p_sName;
 		if ( p_sName.lastIndexOf('.') == -1 ) {
-			p_sName += m_sExt;
+			p_sName += ext;
 		}
-		if (( p_sName.indexOf(File.separatorChar) == -1 ) && ( m_sSubdir.length() != 0 )) {
-			p_sName = m_sSubdir + "/" + p_sName; // Use '/' not File.separatorChar!
+		if (( p_sName.indexOf(File.separatorChar) == -1 ) && ( subdir.length() != 0 )) {
+			p_sName = subdir + "/" + p_sName; // Use '/' not File.separatorChar!
 		}
-		m_htImages.put(sKey, new Image(m_Disp, m_Cls.getResourceAsStream(p_sName)));
+		images.put(sKey, new Image(display, cls.getResourceAsStream(p_sName)));
 	}
 	
 	public void addColor (String p_sName,
@@ -138,7 +137,7 @@ public class ResourceManager {
 		int p_nGreen,
 		int p_nBlue)
 	{
-		m_htColors1.put(p_sName, new Color(m_Disp, p_nRed, p_nGreen, p_nBlue));	
+		colors1.put(p_sName, new Color(display, p_nRed, p_nGreen, p_nBlue));	
 	}
 		
 	public void addColor (int p_nID,
@@ -146,7 +145,7 @@ public class ResourceManager {
 		int p_nGreen,
 		int p_nBlue)
 	{
-		m_htColors2.put(p_nID, new Color(m_Disp, p_nRed, p_nGreen, p_nBlue));	
+		colors2.put(p_nID, new Color(display, p_nRed, p_nGreen, p_nBlue));	
 	}
 	
 	/**
@@ -156,15 +155,15 @@ public class ResourceManager {
 	 * @return The image.
 	 */
 	public Image getImage (String p_sName) {
-		return m_htImages.get(p_sName);
+		return images.get(p_sName);
 	}
 	
 	public Color getColor (String p_sName) {
-		return m_htColors1.get(p_sName);
+		return colors1.get(p_sName);
 	}
 
 	public Color getColor (int p_nID) {
-		return m_htColors2.get(p_nID);
+		return colors2.get(p_nID);
 	}
 
 	public void setCommand (MenuItem menuItem,
@@ -185,7 +184,7 @@ public class ResourceManager {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document Doc = Fact.newDocumentBuilder().parse(m_Cls.getResourceAsStream(path));
+			Document Doc = Fact.newDocumentBuilder().parse(cls.getResourceAsStream(path));
 			NodeList NL = Doc.getElementsByTagName("command");
 			commands.clear();
 			CommandItem item;

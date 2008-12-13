@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 By the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.lib.ui.segmentation;
 
@@ -32,6 +32,7 @@ import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.filters.GenericContent;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -70,6 +71,7 @@ import org.eclipse.swt.widgets.Text;
 public class SRXEditor {
 
 	private Shell shell;
+	private boolean asDialog;
 	private Text edSampleText;
 	private Text edResults;
 	private Table tblRules;
@@ -86,7 +88,6 @@ public class SRXEditor {
 	private Button btRemoveRule;
 	private Button btMoveUpRule;
 	private Button btMoveDownRule;
-	private ClosePanel pnlActions;
 	private Button rdApplySampleForMappedRules;
 	private Button rdApplySampleForCurrentSet;
 	private Text edSampleLanguage;
@@ -95,13 +96,17 @@ public class SRXEditor {
 	private Pattern patternClosing;
 	private Pattern patternPlaceholder;
 	private Font sampleFont;
+	private ResourceManager rm;
 
 	@Override
 	protected void finalize () {
 		dispose();
 	}
 
-	public SRXEditor (Shell parent) {
+	public SRXEditor (Shell parent,
+		boolean asDialog)
+	{
+		this.asDialog = asDialog;
 		srxDoc = new SRXDocument();
 		segmenter = new Segmenter();
 		srxPath = null;
@@ -113,9 +118,15 @@ public class SRXEditor {
 		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
-		shell.setImage(parent.getImage());
+
+		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
+		rm.loadCommands("commands.xml"); //$NON-NLS-1$
+		
+		//shell.setImage(parent.getImage());
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
+		
+		createMenus();
 		
 		SashForm sashForm = new SashForm(shell, SWT.VERTICAL);
 		sashForm.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -128,7 +139,7 @@ public class SRXEditor {
 		cmpTmp.setLayout(layTmp);
 		
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Language rules currently displayed:");
+		label.setText(Res.getString("edit.currentLangRules"));
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
@@ -226,7 +237,7 @@ public class SRXEditor {
 
 		int ruleButtonsWidth = 95;
 		btAddRule = new Button(cmpGroup, SWT.PUSH);
-		btAddRule.setText("&Add...");
+		btAddRule.setText(Res.getString("edit.btAddRule"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btAddRule.setLayoutData(gdTmp);
@@ -238,7 +249,7 @@ public class SRXEditor {
 		
 		btEditRule = new Button(cmpGroup, SWT.PUSH);
 		btEditRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btEditRule.setText("&Edit...");
+		btEditRule.setText(Res.getString("edit.btEditRule"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btEditRule.setLayoutData(gdTmp);
@@ -250,7 +261,7 @@ public class SRXEditor {
 		
 		btRemoveRule = new Button(cmpGroup, SWT.PUSH);
 		btRemoveRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btRemoveRule.setText("&Remove");
+		btRemoveRule.setText(Res.getString("edit.btRemoveRule"));
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btRemoveRule.setLayoutData(gdTmp);
@@ -389,24 +400,26 @@ public class SRXEditor {
 
 		
 		//--- Dialog-level buttons
-		
-		SelectionAdapter CloseActions = new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if ( e.widget.getData().equals("h") ) {
-					//TODO: UIUtil.start(help);
-					return;
-				}
-				if ( e.widget.getData().equals("c") ) {
-					shell.close();
-				}
+		if ( asDialog ) {
+			SelectionAdapter closeActions = new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					if ( e.widget.getData().equals("h") ) {
+						//TODO: UIUtil.start(help);
+						return;
+					}
+					if ( e.widget.getData().equals("c") ) {
+						shell.close();
+					}
+				};
 			};
-		};
-		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btClose);
-		
+			ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, closeActions, true);
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			gdTmp.horizontalSpan = 2;
+			pnlActions.setLayoutData(gdTmp);
+			shell.setDefaultButton(pnlActions.btClose);
+		}
+
+		// Size
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Point startSize = shell.getMinimumSize();
@@ -419,10 +432,69 @@ public class SRXEditor {
 		updateAll();
 	}
 	
+	private void createMenus () {
+		// Menus
+	    Menu menuBar = new Menu(shell, SWT.BAR);
+		shell.setMenuBar(menuBar);
+
+		// File menu
+		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
+		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				newSRXDocument();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				loadSRXDocument(null);
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.save"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveSRXDocument(srxPath);
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.saveas"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveSRXDocument(null);
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.exit"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				shell.close();
+            }
+		});
+	}
+	
 	public void dispose () {
 		if ( sampleFont != null ) {
 			sampleFont.dispose();
 			sampleFont = null;
+		}
+		if ( rm != null ) {
+			rm.dispose();
 		}
 	}
 
@@ -643,13 +715,12 @@ public class SRXEditor {
 	}
 	
 	private void updateCaption () {
-		if ( srxPath == null ) {
-			shell.setText("Segmentation Rules Editor");
+		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");
+		if ( srxPath != null ) {
+			text += " - ";
+			text += Util.getFilename(srxPath, true);	
 		}
-		else {
-			shell.setText("Segmentation Rules Editor - "
-				+ Util.getFilename(srxPath, true));
-		}
+		shell.setText(text);
 	}
 	
 	private void updateAll () {
@@ -801,8 +872,7 @@ public class SRXEditor {
 	private void editRangeRule () {
 		try {
 			InputDialog dlg = new InputDialog(shell, "Range Rule Expression",
-				"Enter the regular expression for the range rule. Use an empty field to not use any range rule.",
-				"", null, 0);
+				Res.getString("edit.rangeRuleDesc"), "", null, 0);
 			dlg.setInputValue(srxDoc.getRangeRule());
 			dlg.setAllowEmptyValue(true);
 			String result = dlg.showDialog();

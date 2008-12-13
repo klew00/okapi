@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
@@ -36,10 +36,10 @@ import org.xml.sax.SAXException;
 
 public class LanguageManager {
 	
-	private Vector<LanguageItem>  m_aLangs;
+	private Vector<LanguageItem> langs;
 
 	public LanguageManager () {
-		m_aLangs = new Vector<LanguageItem>();
+		langs = new Vector<LanguageItem>();
 	}
 	
 	public void loadList (String p_sPath) {
@@ -49,7 +49,7 @@ public class LanguageManager {
 			Document Doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
 			
 			NodeList NL = Doc.getElementsByTagName("language");
-			m_aLangs.clear();
+			langs.clear();
 			LanguageItem LI;
 			
 			for ( int i=0; i<NL.getLength(); i++ ) {
@@ -78,7 +78,7 @@ public class LanguageManager {
 					else N = N.getNextSibling();
 				}
 				if ( LI.name == null ) throw new RuntimeException("The element 'name' is missing.");
-				m_aLangs.add(LI);
+				langs.add(LI);
 			}
         }
 		catch ( SAXException e ) {
@@ -93,37 +93,37 @@ public class LanguageManager {
 	}
 	
 	public int getCount () {
-		return m_aLangs.size();
+		return langs.size();
 	}
 	
 	public LanguageItem getItem (int p_nIndex) {
-		return m_aLangs.get(p_nIndex);
+		return langs.get(p_nIndex);
 	}
 
 	public LanguageItem GetItem (String p_sCode) {
-		for ( int i=0; i<m_aLangs.size(); i++ ) {
-			if ( p_sCode.equalsIgnoreCase(m_aLangs.get(i).code) )
-				return m_aLangs.get(i);
+		for ( int i=0; i<langs.size(); i++ ) {
+			if ( p_sCode.equalsIgnoreCase(langs.get(i).code) )
+				return langs.get(i);
 		}
 		return null;
 	}
 
 	public int GetLCID (int p_nIndex) {
-		return m_aLangs.get(p_nIndex).lcid;
+		return langs.get(p_nIndex).lcid;
 	}
 
 	public String GetNameFromCode (String p_sCode) {
-		for ( int i=0; i<m_aLangs.size(); i++ ) {
-			if ( p_sCode.equalsIgnoreCase(m_aLangs.get(i).code) )
-				return m_aLangs.get(i).name;
+		for ( int i=0; i<langs.size(); i++ ) {
+			if ( p_sCode.equalsIgnoreCase(langs.get(i).code) )
+				return langs.get(i).name;
 		}
 		return p_sCode; // Return code if not found
 	}
 	
 	public int getIndexFromCode (String p_sCode) {
 		if ( p_sCode == null ) return -1;
-		for ( int i=0; i<m_aLangs.size(); i++ ) {
-			if ( p_sCode.equalsIgnoreCase(m_aLangs.get(i).code) )
+		for ( int i=0; i<langs.size(); i++ ) {
+			if ( p_sCode.equalsIgnoreCase(langs.get(i).code) )
 				return i;
 		}
 		return  -1; // Return -1 if not found

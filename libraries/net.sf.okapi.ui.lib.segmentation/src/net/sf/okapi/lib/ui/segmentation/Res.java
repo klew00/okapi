@@ -18,13 +18,25 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.applications.rainbow.lib;
+package net.sf.okapi.lib.ui.segmentation;
 
-class FilterAccessItem {
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-	public String name;
-	public String description;
-	public String inputFilterClass;
-	public String editorClass;
-	
+class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.lib.ui.segmentation.Res";
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+		.getBundle(BUNDLE_NAME);
+
+	private Res () {
+	}
+
+	public static String getString (String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }

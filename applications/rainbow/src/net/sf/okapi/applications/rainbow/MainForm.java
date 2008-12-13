@@ -40,7 +40,6 @@ import net.sf.okapi.applications.rainbow.lib.LanguageItem;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
-import net.sf.okapi.applications.rainbow.lib.ResourceManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -51,6 +50,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
@@ -314,7 +314,7 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		 rm.setCommand(menuItem, "view.inputList3"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "view.inputList3"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				tabFolder.setSelection(2);
@@ -1512,7 +1512,7 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		SRXEditor dlg = null;
 		try {
-			dlg = new SRXEditor(shell);
+			dlg = new SRXEditor(shell, true);
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {

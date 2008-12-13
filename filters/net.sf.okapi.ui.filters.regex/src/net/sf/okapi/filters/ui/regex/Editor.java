@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.filters.ui.regex;
 
@@ -54,33 +54,31 @@ import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
-	private Shell            shell;
-	private boolean          result = false;
-	private Text             edExpression;
-	private Button           chkExtractOuterStrings;
-	private Text             edStartString;
-	private Text             edEndString;
-	private List             lbRules;
-	private Button           btAdd;
-	private Button           btEdit;
-	private Button           btRename;
-	private Button           btRemove;
-	private Button           btMoveUp;
-	private Button           btMoveDown;
-	private LDPanel          pnlLD;
-	private OKCancelPanel    pnlActions;
-	private Parameters       params;
-	private ArrayList<Rule>  rules;
-	private int              ruleIndex = -1;
-	private Combo            cbRuleType;
-	private Button           chkPreserveWS;
-	private Button           chkUnwrap;
-	private Button           chkUseCodeFinder;
-	private Button           btEditFinderRules;
-	private Button           chkIgnoreCase;
-	private Button           chkDotAll;
-	private Button           chkMultiline;
-
+	private Shell shell;
+	private boolean result = false;
+	private Text edExpression;
+	private Button chkExtractOuterStrings;
+	private Text edStartString;
+	private Text edEndString;
+	private List lbRules;
+	private Button btAdd;
+	private Button btEdit;
+	private Button btRename;
+	private Button btRemove;
+	private Button btMoveUp;
+	private Button btMoveDown;
+	private LDPanel pnlLD;
+	private Parameters params;
+	private ArrayList<Rule> rules;
+	private int ruleIndex = -1;
+	private Combo cbRuleType;
+	private Button chkPreserveWS;
+	private Button chkUnwrap;
+	private Button chkUseCodeFinder;
+	private Button btEditFinderRules;
+	private Button chkIgnoreCase;
+	private Button chkDotAll;
+	private Button chkMultiline;
 	
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -369,7 +367,7 @@ public class Editor implements IParametersEditor {
 		
 		//--- Dialog-level buttons
 
-		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+		SelectionAdapter okCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) {
 					//TODO: Call help
@@ -379,7 +377,7 @@ public class Editor implements IParametersEditor {
 				shell.close();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);

@@ -10,7 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry kind="lib" path="lib/h2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.opentran"/>
-	<classpathentry kind="lib" path="/rainbow/lib/win32-x86/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.trados"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
 	<classpathentry kind="output" path="bin"/>

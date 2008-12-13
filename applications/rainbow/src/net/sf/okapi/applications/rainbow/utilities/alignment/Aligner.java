@@ -813,7 +813,7 @@ public class Aligner {
 	
 	private void editRules () {
 		try {
-			SRXEditor editor = new SRXEditor(shell);
+			SRXEditor editor = new SRXEditor(shell, true);
 			editor.showDialog(targetSrxPath);
 		}
 		catch ( Throwable e) {

@@ -21,9 +21,11 @@
 package net.sf.okapi.applications.rainbow;
 
 class Input {
-	String              relativePath;
-	String              format;
-	String              sourceEncoding;
-	String              targetEncoding;
-	String              filterSettings;
+
+	String relativePath;
+	String format;
+	String sourceEncoding;
+	String targetEncoding;
+	String filterSettings;
+
 }
