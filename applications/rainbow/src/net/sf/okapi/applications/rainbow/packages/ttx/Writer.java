@@ -32,6 +32,7 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -114,7 +115,78 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument (Document resource) {
+	public void close () {
+		if ( writer != null ) {
+			writer.close();
+			writer = null;
+		}
+	}
+
+	public String getName() {
+		return getClass().getName();
+	}
+
+	public IParameters getParameters () {
+		return null;
+	}
+
+	public void setParameters (IParameters params) {
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument();
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument();
+			break;
+		}
+		return event;
+	}
+
+	public void processStartDocument () {
+		writer.writeStartDocument();
+
+		writer.writeStartElement("TRADOStag");
+		writer.writeAttributeString("Version", "2.0");
+	
+		writer.writeStartElement("FrontMatter");
+
+		writer.writeStartElement("ToolSettings");
+		writer.writeAttributeString("CreationDate", dateFmt.format(new java.util.Date())); 
+		writer.writeAttributeString("CreationTool", getClass().getName());
+		writer.writeAttributeString("CreationToolVersion", "1"); // TODO: toolversion
+		writer.writeEndElement(); // ToolSettings
+		
+		writer.writeStartElement("UserSettings");
+		writer.writeAttributeString("DataType", "XML");
+		writer.writeAttributeString("O-Encoding", "UTF-8");
+		writer.writeAttributeString("SettingsName", "okapiTTX");
+		writer.writeAttributeString("SettingsPath", DTD_SETTINGS_FILE);
+		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
+		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
+		writer.writeAttributeString("TargetDefaultFont", "");
+		writer.writeAttributeString("SourceDocumentPath", relativeSourcePath);
+		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
+		writer.writeAttributeString("PlugInInfo", "");
+		writer.writeEndElement(); // UserSettings
+		
+		writer.writeEndElement(); // FrontMatter
+		
+		writer.writeStartElement("Body");
+		writer.writeStartElement("Raw");
+		
+		writer.writeRawXML("<ut Class=\"procinstr\" DisplayText=\"Instruction\">&lt;?xml version=&quot;1.0&quot;?&gt;</ut>");
+		writer.writeLineBreak();
+		writer.writeRawXML("<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;okapiTTX&gt;</ut>");
+		writer.writeLineBreak();
+	}
+
+	private void processEndDocument () {
 		try {
 			writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;/okapiTTX&gt;</ut>");
 			writer.writeEndElement(); // Raw
@@ -125,8 +197,40 @@ public class Writer extends BaseWriter {
 					relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 		}
 		finally {
-			writer.close();
+			close();
 		}
+	}
+
+	private void processTextUnit (TextUnit item) {
+		String name = item.getName();
+		writer.writeRawXML(String.format(
+			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
+			item.getId(), (name.length()>0 ? " rn='"+name+"'" : "") ));
+		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
+		if ( item.hasTarget(trgLang) ) {
+			//TODO: Info about the match
+			writer.writeStartElement("Tu");
+			//TODO: writer.writeAttributeString("Origin", "manual");
+			//TODO: writer.writeAttributeString("MatchPercent", "100");
+			writer.writeStartElement("Tuv");
+			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
+			writeContent(item.getSourceContent());
+			writer.writeEndElement(); //Tuv
+			writer.writeStartElement("Tuv");
+			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
+			writeContent(item.getTargetContent(trgLang));
+			writer.writeEndElement(); //Tuv
+			writer.writeEndElement(); //Tu
+
+			// Write the item in the TM if needed
+			tmxWriter.writeItem(item, null);
+		}
+		else {
+			writeContent(item.getSourceContent());
+		}
+		
+		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"u\">&lt;/u&gt;</ut>");
+		writer.writeLineBreak();
 	}
 
 	private void writeContent (TextFragment srcContent) {
@@ -199,49 +303,6 @@ public class Writer extends BaseWriter {
 		}
 	}*/
 	
-	public void writeTextUnit (TextUnit item,
-		int status)
-	{
-		processItem(item);
-		if ( item.hasChild() ) {
-			for ( TextUnit tu : item.childTextUnitIterator() ) {
-				processItem(tu);
-			}
-		}
-	}
-	
-	private void processItem (TextUnit item) {
-		String name = item.getName();
-		writer.writeRawXML(String.format(
-			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
-			item.getId(), (name.length()>0 ? " rn='"+name+"'" : "") ));
-		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
-		if ( item.hasTarget() ) {
-			//TODO: Info about the match
-			writer.writeStartElement("Tu");
-			//TODO: writer.writeAttributeString("Origin", "manual");
-			//TODO: writer.writeAttributeString("MatchPercent", "100");
-			writer.writeStartElement("Tuv");
-			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
-			writeContent(item.getSourceContent());
-			writer.writeEndElement(); //Tuv
-			writer.writeStartElement("Tuv");
-			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
-			writeContent(item.getTargetContent());
-			writer.writeEndElement(); //Tuv
-			writer.writeEndElement(); //Tu
-
-			// Write the item in the TM if needed
-			tmxWriter.writeItem(item, null);
-		}
-		else {
-			writeContent(item.getSourceContent());
-		}
-		
-		writer.writeRawXML("<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"u\">&lt;/u&gt;</ut>");
-		writer.writeLineBreak();
-	}
-
 	private String getSettingsRelativePath () {
 		String dir = Util.getDirectoryName(relativeSourcePath);
 		int n = dir.length();
@@ -253,44 +314,6 @@ public class Writer extends BaseWriter {
 			relation.append("..\\");
 		}
 		return relation.toString() + DTD_SETTINGS_FILE;
-	}
-
-	public void writeStartDocument (Document resource) {
-		writer.writeStartDocument();
-
-		writer.writeStartElement("TRADOStag");
-		writer.writeAttributeString("Version", "2.0");
-	
-		writer.writeStartElement("FrontMatter");
-
-		writer.writeStartElement("ToolSettings");
-		writer.writeAttributeString("CreationDate", dateFmt.format(new java.util.Date())); 
-		writer.writeAttributeString("CreationTool", getClass().getName());
-		writer.writeAttributeString("CreationToolVersion", "1"); // TODO: toolversion
-		writer.writeEndElement(); // ToolSettings
-		
-		writer.writeStartElement("UserSettings");
-		writer.writeAttributeString("DataType", "XML");
-		writer.writeAttributeString("O-Encoding", "UTF-8");
-		writer.writeAttributeString("SettingsName", "okapiTTX");
-		writer.writeAttributeString("SettingsPath", DTD_SETTINGS_FILE);
-		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
-		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
-		writer.writeAttributeString("TargetDefaultFont", "");
-		writer.writeAttributeString("SourceDocumentPath", relativeSourcePath);
-		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
-		writer.writeAttributeString("PlugInInfo", "");
-		writer.writeEndElement(); // UserSettings
-		
-		writer.writeEndElement(); // FrontMatter
-		
-		writer.writeStartElement("Body");
-		writer.writeStartElement("Raw");
-		
-		writer.writeRawXML("<ut Class=\"procinstr\" DisplayText=\"Instruction\">&lt;?xml version=&quot;1.0&quot;?&gt;</ut>");
-		writer.writeLineBreak();
-		writer.writeRawXML("<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"okapiTTX\">&lt;okapiTTX&gt;</ut>");
-		writer.writeLineBreak();
 	}
 
 }
