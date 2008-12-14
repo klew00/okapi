@@ -72,6 +72,7 @@ public class PropertiesFilter implements IFilter {
 	private int parseState = 0;
 	private GenericSkeleton skel;
 	private StartDocument startDoc;
+	private String srcLang;
 	
 	public PropertiesFilter () {
 		params = new Parameters();
@@ -201,6 +202,7 @@ public class PropertiesFilter implements IFilter {
 			// TODO: docRes should be always set with all opens... need better way
 			startDoc = new StartDocument();
 			startDoc.setName(inputUrl.getPath());
+			startDoc.setLanguage(srcLang);
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -220,6 +222,7 @@ public class PropertiesFilter implements IFilter {
 	{
 		//TODO: Implement boolean generateSkeleton
 		encoding = defaultEncoding;
+		srcLang = sourceLanguage;
 	}
 
 	public void setOptions (String sourceLanguage,

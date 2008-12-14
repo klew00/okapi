@@ -22,8 +22,10 @@ package net.sf.okapi.applications.rainbow.packages;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
+import net.sf.okapi.applications.rainbow.packages.rtf.LayerProvider;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
@@ -41,6 +43,9 @@ public abstract class BaseWriter implements IWriter {
 	protected TMXWriter tmxWriter;
 	protected String tmxPath;
 	protected String trgLang;
+	protected String encoding;
+	protected String outputPath;
+	
 	
 	public BaseWriter () {
 		manifest = new Manifest();
@@ -163,6 +168,21 @@ public abstract class BaseWriter implements IWriter {
 			+ relativeWorkPath;
 		setOptions(trgLang, targetEncoding);
 		setOutput(outputPath);
+	}
+
+	public void setOptions (String language,
+		String defaultEncoding)
+	{
+		trgLang = language;
+		encoding = defaultEncoding;
+	}
+	
+	public void setOutput (String path) {
+		outputPath = path;
+	}
+
+	public void setOutput (OutputStream output) {
+		throw new UnsupportedOperationException();
 	}
 
 }

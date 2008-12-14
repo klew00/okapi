@@ -26,6 +26,11 @@ import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -40,6 +45,8 @@ public class Writer extends BaseWriter {
 	private XLIFFContent xliffCont;
 	private boolean excludeNoTranslate = false;
 	private boolean useSourceForTranslated = false;
+	private boolean inFile;
+	private String srcLang;
 
 	public Writer () {
 		super();
@@ -116,44 +123,133 @@ public class Writer extends BaseWriter {
 			+ relativeWorkPath);
 	}
 
-	public void writeEndDocument (Document resource) {
-		writer.writeEndElementLineBreak(); // body
-		writer.writeEndElementLineBreak(); // file
+	public void close () {
+		if ( writer != null ) {
+			writer.close();
+			writer = null;
+		}
+	}
+
+	public String getName() {
+		return getClass().getName();
+	}
+
+	public IParameters getParameters () {
+		return null;
+	}
+
+	public void setParameters (IParameters params) {
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument();
+			close();
+			break;
+		case START_SUBDOCUMENT:
+			processStartSubDocument((StartSubDocument)event.getResource());
+			break;
+		case END_SUBDOCUMENT:
+			processEndSubDocument((Ending)event.getResource());
+			break;
+		case START_GROUP:
+			processStartGroup((StartGroup)event.getResource());
+			break;
+		case END_GROUP:
+			processEndGroup((Ending)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		}
+		return event;
+	}
+
+	private void processStartDocument (StartDocument resource) {
+		srcLang = resource.getLanguage();
+		writer.writeStartDocument();
+		writer.writeStartElement("xliff");
+		writer.writeAttributeString("version", "1.2");
+		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+	}
+
+	private void processEndDocument () {
+		if ( inFile ) writeEndFile();
 		writer.writeEndElementLineBreak(); // xliff
 		writer.writeEndDocument();
-		writer.close();
+		close();
+
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
 			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
 	}
 
-	public void writeStartGroup (Group resource) {
-		writer.writeStartElement("group");
+	private void processStartSubDocument (StartSubDocument resource) {
+		writeStartFile(resource.getName());		
 	}
 	
-	public void writeEndGroup (Group resource) {
+	private void writeStartFile (String original) {
+		writer.writeStartElement("file");
+		writer.writeAttributeString("original", (original!=null) ? original : "unknown");
+		writer.writeAttributeString("source-language", srcLang);
+		writer.writeAttributeString("target-language", trgLang);
+		writer.writeAttributeString("datatype", "TODO");
+		writer.writeLineBreak();
+		inFile = true;
+
+//		writer.writeStartElement("header");
+//		writer.writeEndElement(); // header
+		
+		writer.writeStartElement("body");
+		writer.writeLineBreak();
+	}
+	
+	private void processEndSubDocument (Ending resource) {
+		writeEndFile();
+	}
+	
+	private void writeEndFile () {
+		writer.writeEndElementLineBreak(); // body
+		writer.writeEndElementLineBreak(); // file
+		inFile = false;
+	}
+	
+	private void processStartGroup (StartGroup resource) {
+		if ( !inFile ) writeStartFile(relativeSourcePath);
+		writer.writeStartElement("group");
+		writer.writeAttributeString("id", resource.getId());
+		if ( resource.getName() != null ) {
+			writer.writeAttributeString("resname", resource.getName());
+		}
+		writer.writeLineBreak();
+	}
+	
+	private void processEndGroup (Ending resource) {
 		writer.writeEndElementLineBreak(); // group
 	}
 	
-	public void writeTextUnit (TextUnit item,
-		int status)
-	{
-		processItem(item);
-	}
-	
-	private void processItem (TextUnit item) {
-		if ( excludeNoTranslate ) {
-			if ( !item.isTranslatable() ) return;
+	private void processTextUnit (TextUnit tu) {
+		if ( excludeNoTranslate && !tu.isTranslatable() ) {
+			return;
 		}
-		
+		if ( !inFile ) writeStartFile(relativeSourcePath);
+
 		writer.writeStartElement("trans-unit");
-		writer.writeAttributeString("id", String.valueOf(item.getID()));
-		if ( item.getName().length() != 0 )
-			writer.writeAttributeString("resname", item.getName());
-		if ( item.getType().length() != 0 )
-			writer.writeAttributeString("restype", item.getType());
-		if ( !item.isTranslatable() )
+		writer.writeAttributeString("id", String.valueOf(tu.getId()));
+		String tmp = tu.getName();
+		if (( tmp != null ) && ( tmp.length() != 0 )) {
+			writer.writeAttributeString("resname", tmp);
+		}
+		tmp = tu.getType();
+		if (( tmp != null ) && ( tmp.length() != 0 )) {
+			writer.writeAttributeString("restype", tmp);
+		}
+		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
-		if ( item.preserveWhitespaces() )
+		if ( tu.preserveWhitespaces() )
 			writer.writeAttributeString("xml:space", "preserve");
 //TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
 //			m_XW.writeAttributeString("approved", "yes");
@@ -165,24 +261,24 @@ public class Writer extends BaseWriter {
 		writer.writeLineBreak();
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		if ( item.getSource().isSegmented() ) {
+		if ( tu.getSource().isSegmented() ) {
 			//TextUnit tmpTU = new TextUnit();
 			//tmpTU.setSourceContent(item.getSourceContent());
 			//tmpTU.getSourceContent().mergeAllSegments();
 			//writer.writeRawXML(xliffCont.setContent(tmpTU.getSourceContent()).toString());
-			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
 			writer.writeEndElementLineBreak(); // source
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(item.getSourceContent(), 1, true));
+			writer.writeRawXML(xliffCont.toSegmentedString(tu.getSource(), 1, true));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 		else {
-			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
 			writer.writeEndElementLineBreak(); // source
 		}
 
 		// Target (if needed)
-		if ( item.hasTarget() ) {
+		if ( tu.hasTarget(trgLang) ) {
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
 //TODO: segmented target			
@@ -201,50 +297,33 @@ public class Writer extends BaseWriter {
 					break;
 			}
 */
-			if ( item.hasTarget() && !useSourceForTranslated ) {
-				writer.writeRawXML(xliffCont.setContent(item.getTargetContent()).toString());
+			if ( tu.hasTarget(trgLang) && !useSourceForTranslated ) {
+				writer.writeRawXML(xliffCont.setContent(tu.getTarget(trgLang)).toString());
 			}
 			else {
-				writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+				writer.writeRawXML(xliffCont.setContent(tu.getSource()).toString());
 			}
 
 			writer.writeEndElementLineBreak(); // target
 			// Write the item in the TM if needed
-			tmxWriter.writeItem(item, null);
+			tmxWriter.writeItem(tu, null);
 		}
 		else { // Use the source 
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-			writer.writeRawXML(xliffCont.setContent(item.getSourceContent()).toString());
+			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
 			writer.writeEndElementLineBreak(); // target
 		}
 
 		// Note
-		if ( item.getProperties().containsKey("note") ) {
-			writer.writeStartElement("note");
-			writer.writeString(item.getProperty("note").getValue());
-			writer.writeEndElementLineBreak(); // note
-		}
+//		if ( tu.getSourceProperties().containsKey("note") ) {
+//			writer.writeStartElement("note");
+//			writer.writeString(tu.getProperty("note").getValue());
+//			writer.writeEndElementLineBreak(); // note
+//		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
-	public void writeStartDocument (Document resource) {
-		writer.writeStartDocument();
-
-		writer.writeStartElement("xliff");
-		writer.writeAttributeString("version", "1.2");
-		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
-		
-		writer.writeStartElement("file");
-		writer.writeAttributeString("source-language", manifest.getSourceLanguage());
-		writer.writeAttributeString("target-language", manifest.getTargetLanguage());
-		writer.writeAttributeString("original", relativeSourcePath);
-		writer.writeAttributeString("datatype", "TODO");
-		
-		writer.writeStartElement("header");
-		writer.writeEndElement(); // header
-		
-		writer.writeStartElement("body");
-	}
+	
 }

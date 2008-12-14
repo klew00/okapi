@@ -64,6 +64,7 @@ public class RegexFilter implements IFilter {
 	private int startSearch;
 	private int startSkl;
 	private int parseState = 0;
+	private String srcLang;
 	
 	public RegexFilter () {
 		params = new Parameters();
@@ -218,6 +219,7 @@ public class RegexFilter implements IFilter {
 			// TODO: docRes should be always set with all opens... need better way
 			startDoc = new StartDocument();
 			startDoc.setName(inputUrl.getPath());
+			startDoc.setLanguage(srcLang);
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -237,6 +239,7 @@ public class RegexFilter implements IFilter {
 	{
 		//TODO: Implement generateSkeleton
 		encoding = defaultEncoding;
+		srcLang = sourceLanguage;
 	}
 
 	public void setOptions (String sourceLanguage,

@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.packages.rtf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
@@ -48,9 +47,6 @@ public class Writer extends BaseWriter {
 	private ISkeletonWriter skelWriter;
 	private ILayerProvider layer;
 	private PrintWriter writer;
-	private String language;
-	private String encoding;
-	private String outputPath;
 	private EncoderManager encoderManager;
 	
 	public Writer (ISkeletonWriter skelWriter) {
@@ -113,21 +109,13 @@ public class Writer extends BaseWriter {
 		return null;
 	}
 
+	@Override
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		this.language = language;
-		encoding = defaultEncoding;
+		super.setOptions(language, defaultEncoding);
 		layer = new LayerProvider();
 		layer.setOptions(null, encoding);
-	}
-
-	public void setOutput (String path) {
-		outputPath = path;
-	}
-
-	public void setOutput (OutputStream output) {
-		throw new UnsupportedOperationException();
 	}
 
 	public void setParameters (IParameters params) {
@@ -186,7 +174,7 @@ public class Writer extends BaseWriter {
 			close();
 			Util.createDirectories(outputPath);
 			writer = new PrintWriter(outputPath, encoding);
-			skelWriter.processStart(language, encoding, layer, encoderManager);
+			skelWriter.processStart(trgLang, encoding, layer, encoderManager);
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
@@ -261,7 +249,7 @@ public class Writer extends BaseWriter {
 
 	private void processTextUnit (TextUnit resource) {
 		// Write the items in the TM if needed
-		if (( tmxWriter != null ) && resource.hasTarget(language) ) {
+		if (( tmxWriter != null ) && resource.hasTarget(trgLang) ) {
 			tmxWriter.writeItem(resource, null);
 		}
 		// Write skeleton and its content
