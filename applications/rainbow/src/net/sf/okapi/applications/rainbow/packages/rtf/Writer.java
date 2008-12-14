@@ -21,33 +21,44 @@
 package net.sf.okapi.applications.rainbow.packages.rtf;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.ILayerProvider;
 
 public class Writer extends BaseWriter {
 	
 	private static final String   EXTENSION = ".rtf";
 
-	private PrintWriter writer;     
-	private CharsetEncoder outputEncoder;
-
+	private ISkeletonWriter skelWriter;
+	private ILayerProvider layer;
+	private PrintWriter writer;
+	private String language;
+	private String encoding;
+	private String outputPath;
+	private EncoderManager encoderManager;
+	
+	public Writer (ISkeletonWriter skelWriter) {
+		super();
+		this.skelWriter = skelWriter;
+		encoderManager = new EncoderManager();
+	}
+	
 	public String getPackageType () {
 		return "rtf";
 	}
@@ -67,7 +78,7 @@ public class Writer extends BaseWriter {
 	}
 
 	@Override
-	public void createDocument (int docID,
+	public void createOutput (int docID,
 		String relativeSourcePath,
 		String relativeTargetPath,
 		String sourceEncoding,
@@ -77,234 +88,119 @@ public class Writer extends BaseWriter {
 	{
 		relativeWorkPath = relativeSourcePath;
 		relativeWorkPath += EXTENSION;
-		outputEncoder = Charset.forName(targetEncoding).newEncoder();
 
-		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
+		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filtersettings, filterParams);
 
+		String path = manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+			+ relativeWorkPath;
+		Util.createDirectories(path);
+	}
+
+	public void close () {
+		if ( writer != null ) {
+			writer.close();
+			writer = null;
+		}
+	}
+
+	public String getName () {
+		return getClass().getName();
+	}
+
+	public IParameters getParameters () {
+		return null;
+	}
+
+	public void setOptions (String language,
+		String defaultEncoding)
+	{
+		this.language = language;
+		encoding = defaultEncoding;
+		layer = new LayerProvider();
+		layer.setOptions(null, encoding);
+	}
+
+	public void setOutput (String path) {
+		outputPath = path;
+	}
+
+	public void setOutput (OutputStream output) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setParameters (IParameters params) {
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
 		try {
-			if ( writer != null ) {
-				writer.close();
+			switch ( event.getEventType() ) {
+			case START:
+				processStart();
+				break;
+			case FINISHED:
+				processFinished();
+				break;
+			case START_DOCUMENT:
+				processStartDocument((StartDocument)event.getResource());
+				break;
+			case END_DOCUMENT:
+				processEndDocument((Ending)event.getResource());
+				close();
+				break;
+			case START_SUBDOCUMENT:
+				processStartSubDocument((StartSubDocument)event.getResource());
+				break;
+			case END_SUBDOCUMENT:
+				processEndSubDocument((Ending)event.getResource());
+				break;
+			case START_GROUP:
+				processStartGroup((StartGroup)event.getResource());
+				break;
+			case END_GROUP:
+				processEndGroup((Ending)event.getResource());
+				break;
+			case TEXT_UNIT:
+				processTextUnit((TextUnit)event.getResource());
+				break;
+			case DOCUMENT_PART:
+				processDocumentPart((DocumentPart)event.getResource());
+				break;
 			}
-			String path = manifest.getRoot() + File.separator
-				+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
-				+ relativeWorkPath;
-			Util.createDirectories(path);
-			writer = new PrintWriter(path, targetEncoding);
+		}
+		catch ( FileNotFoundException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new RuntimeException(e);
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	public void close() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public String getName () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FilterEvent handleEvent (FilterEvent event) {
-		switch ( event.getEventType() ) {
-		case START_DOCUMENT:
-			processStartDocument((StartDocument)event.getResource());
-			break;
-		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
-			break;
-		case END_DOCUMENT:
-			processEndDocument((Ending)event.getResource());
-			break;
-		}
 		return event;
 	}
 
-	public void setOptions (String language, String defaultEncoding) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setOutput (String path) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setOutput (OutputStream output) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void processTextUnit (TextUnit item) {
-		// Write the items in the TM if needed
-		if ( item.hasTarget(trgLang) ) {
-			tmxWriter.writeItem(item, null);
-		}
-
-		// Output the text unit
-		StringBuilder tmp = new StringBuilder();
-		tmp.append(Util.RTF_ENDCODE);
-		if ( item.hasTarget(trgLang) ) {
-			//TODO
-		}
-		else {
-			processContent(item.getSourceContent(), tmp, item.getSource().isSegmented());
-		}
-		
-		tmp.append(Util.RTF_STARTCODE);
-		writer.write(tmp.toString());
-	}
-
-	private String processContent (TextFragment content,
-		StringBuilder buffer,
-		boolean isSegmented)
-	{
+	private void processStart () {
 		try {
-			String text = content.getCodedText();
-			CharBuffer tmpBuf = CharBuffer.allocate(1);
-			ByteBuffer encBuf;
-			Code code;
-			// Cast to a TextContainer if needed
-			TextContainer tc = null;
-			if ( isSegmented ) {
-				tc = (TextContainer)content;
-			}
-			
-			for ( int i=0; i<text.length(); i++ ) {
-				switch ( text.charAt(i) ) {
-				case TextFragment.MARKER_OPENING:
-				case TextFragment.MARKER_CLOSING:
-					buffer.append(Util.RTF_STARTINLINE);
-					code = content.getCode(text.charAt(++i));
-					//TODO: handle sub-flows!!!
-					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
-					buffer.append(Util.RTF_ENDINLINE);
-					break;
-				case TextFragment.MARKER_ISOLATED:
-				case TextFragment.MARKER_SEGMENT:
-					//TODO: handle sub-flows!!!
-					code = content.getCode(text.charAt(++i));
-					if ( isSegmented ) {
-						if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-							int index = Integer.valueOf(code.getData());
-							buffer.append(Util.RTF_STARTMARKER);
-							processContent(tc.getSegments().get(index), buffer, false);
-							//TODO: case when a target is available (what kind of match?)
-							buffer.append(Util.RTF_MIDMARKER1+"0"+Util.RTF_MIDMARKER2);
-							//debug: buffer.append("{\\highlight7 ");
-//TODO: do we need to set the target as hidden							
-							processContent(tc.getSegments().get(index), buffer, false);
-							//debug: buffer.append("}");
-							buffer.append(Util.RTF_ENDMARKER);
-							break;
-						}
-						// Else: fall back to normal isolated in-line 
-					}
-					buffer.append(Util.RTF_STARTINLINE);
-					buffer.append(Util.escapeToRTF(code.getData(), true, 2, outputEncoder));
-					buffer.append(Util.RTF_ENDINLINE);
-					break;
-				case '{':
-				case '}':
-				case '\\':
-					buffer.append("\\"+text.charAt(i));
-					break;
-				case '\r': // to skip
-					break;
-				case '\n':
-					buffer.append("\r\n\\par ");
-					break;
-				case '\u00a0': // Non-breaking space
-					buffer.append("\\~"); // No extra space (it's a control word)
-					break;
-				case '\t':
-					buffer.append("\\tab ");
-					break;
-				case '\u2022':
-					buffer.append("\\bullet ");
-					break;
-				case '\u2018':
-					buffer.append("\\lquote ");
-					break;
-				case '\u2019':
-					buffer.append("\\rquote ");
-					break;
-				case '\u201c':
-					buffer.append("\\ldblquote ");
-					break;
-				case '\u201d':
-					buffer.append("\\rdblquote ");
-					break;
-				case '\u2013':
-					buffer.append("\\endash ");
-					break;
-				case '\u2014':
-					buffer.append("\\emdash ");
-					break;
-				case '\u200d':
-					buffer.append("\\zwj ");
-					break;
-				case '\u200c':
-					buffer.append("\\zwnj ");
-					break;
-				case '\u200e':
-					buffer.append("\\ltrmark ");
-					break;
-				case '\u200f':
-					buffer.append("\\rtlmark ");
-					break;
-				default:
-					if ( text.charAt(i) > 127 ) {
-						if ( outputEncoder.canEncode(text.charAt(i)) ) {
-							tmpBuf.put(0, text.charAt(i));
-							tmpBuf.position(0);
-							encBuf = outputEncoder.encode(tmpBuf);
-							if ( encBuf.limit() > 1 ) {
-								buffer.append(String.format("{\\uc%d",
-									encBuf.limit()));
-								buffer.append(String.format("\\u%d",
-									(int)text.charAt(i)));
-								for ( int j=0; j<encBuf.limit(); j++ ) {
-									buffer.append(String.format("\\'%x",
-										(encBuf.get(j)<0 ? (0xFF^~encBuf.get(j)) : encBuf.get(j)) ));
-								}
-								buffer.append("}");
-							}
-							else {
-								buffer.append(String.format("\\u%d",
-									(int)text.charAt(i)));
-								buffer.append(String.format("\\'%x",
-									(encBuf.get(0)<0 ? (0xFF^~encBuf.get(0)) : encBuf.get(0))));
-							}
-						}
-						else { // Cannot encode in the RTF encoding, so use just Unicode
-							buffer.append(String.format("\\u%d ?",
-								(int)text.charAt(i)));
-						}
-					}
-					else buffer.append(text.charAt(i));
-					break;
-				}
-			}
-			return buffer.toString();
+			close();
+			Util.createDirectories(outputPath);
+			writer = new PrintWriter(outputPath, encoding);
+			skelWriter.processStart(language, encoding, layer, encoderManager);
 		}
-		catch ( CharacterCodingException e ) {
+		catch ( FileNotFoundException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	private void processFinished () {
+		skelWriter.processFinished();
+		close();
+	}
+
 	private void processStartDocument (StartDocument resource) {
 		//TODO: change codepage
 		writer.write("{\\rtf1\\ansi\\ansicpg" + "1252" + "\\uc1\\deff1 \n"+
@@ -333,13 +229,47 @@ public class Writer extends BaseWriter {
 			"}\n"+
 			"\\paperw11907\\paperh16840\\viewkind4\\viewscale100\\pard\\plain\\s0\\sb80\\slmult1\\widctlpar\\fs20\\f1 \n"+
 			Util.RTF_STARTCODE);
+
+		// Write the skeleton
+		writer.write(skelWriter.processStartDocument(resource));
 	}
 
 	private void processEndDocument (Ending resource) { 
 		writer.write(Util.RTF_ENDCODE+"}\n");
 		writer.close();
-		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+		if ( manifest != null ) {
+			manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
+				relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+		}
+	}
+
+	private void processStartSubDocument (StartSubDocument resource) throws IOException {
+		writer.write(skelWriter.processStartSubDocument(resource));
+	}
+
+	private void processEndSubDocument (Ending resource) throws IOException {
+		writer.write(skelWriter.processEndSubDocument(resource));
+	}
+
+	private void processStartGroup (StartGroup resource) throws IOException {
+		writer.write(skelWriter.processStartGroup(resource));
+	}
+
+	private void processEndGroup (Ending resource) throws IOException {
+		writer.write(skelWriter.processEndGroup(resource));
+	}
+
+	private void processTextUnit (TextUnit resource) {
+		// Write the items in the TM if needed
+		if (( tmxWriter != null ) && resource.hasTarget(language) ) {
+			tmxWriter.writeItem(resource, null);
+		}
+		// Write skeleton and its content
+		writer.write(skelWriter.processTextUnit(resource));
+	}
+
+	private void processDocumentPart (DocumentPart resource) throws IOException {
+		writer.write(skelWriter.processDocumentPart(resource));
 	}
 
 }

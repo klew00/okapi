@@ -25,16 +25,12 @@ import java.io.File;
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.lib.translation.QueryManager;
@@ -51,6 +47,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 	public Utility () {
 		params = new Parameters();
+		needsSelfOutput = false;
 	}
 	
 	public String getName () {
@@ -65,7 +62,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		else if ( params.pkgType.equals("ttx") )
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else if ( params.pkgType.equals("rtf") )
-			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
+			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer(
+				new GenericSkeletonWriter());
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 	
@@ -105,19 +103,19 @@ public class Utility extends BaseFilterDrivenUtility {
 		Util.deleteDirectory(outputDir, false);
 		
 		id = 0;
-		writer.setParameters(srcLang, trgLang,
+		writer.setInformation(srcLang, trgLang,
 			"TODO:projectID", outputDir, params.makePackageID(), inputRoot);
 		writer.writeStartPackage();
 	}
 
 	public void postprocess () {
-		if ( qm != null ) {
-			qm.close();
-			qm = null;
-		}
 		if ( writer != null ) {
 			writer.writeEndPackage(params.createZip);
 			writer = null;
+		}
+		if ( qm != null ) {
+			qm.close();
+			qm = null;
 		}
 	}
 
@@ -152,28 +150,30 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	public FilterEvent handleEvent (FilterEvent event) {
 		switch ( event.getEventType() ) {
-		
+		case START:
+			processStart();
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
 		}
+		// All events then go to the actual writer
+		writer.handleEvent(event);
 		return event;
 	}
 	
-    private void processStartDocument (StartDocument resource) {
+    private void processStart () {
 		if ( qm != null ) {
-			qm.setAttribute("FileName", Util.getFilename(resource.getName(), true));
+			qm.setAttribute("FileName", Util.getFilename(getInputPath(0), true));
 		}
 		
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		String relativeOutput = getOutputPath(0).substring(outputRoot.length()+1);
 		String[] res = FilterAccess.splitFilterSettingsType1("", getInputFilterSettings(0));
-		writer.createDocument(++id, relativeInput, relativeOutput,
+		writer.createOutput(++id, relativeInput, relativeOutput,
 			getInputEncoding(0), getOutputEncoding(0),
-			res[1], resource.getParameters());
-		writer.writeStartDocument(resource);
+			res[1], null);
     }
-	
-    private void processEndDocument (Ending resource) {
-		writer.writeEndDocument(resource);
-	}
 	
     private void processTextUnit (TextUnit item ) {
 		//TODO: int status = IFilterItem.TSTATUS_TOTRANS;
@@ -184,7 +184,8 @@ public class Utility extends BaseFilterDrivenUtility {
 			//TODO: Find a solution to not output item with
 			// existing target
 		}
-		
+	
+		// Segment if requested
 		if (( params.preSegment ) && !"no".equals(item.getProperty("canSegment")) ) {
 			try {
 				TextContainer cont;
@@ -210,7 +211,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		//TODO: Status
-		writer.writeTextUnit(item, 0);
 	}
     
 }

@@ -40,6 +40,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 	
 	public Utility () {
 		params = new Parameters();
+		needsSelfOutput = false;
 	}
 	
 	public String getName () {

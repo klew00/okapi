@@ -41,7 +41,7 @@ public interface IWriter extends IFilterWriter {
 	 * @param packageID The package identifier.
 	 * @param sourceRoot The root folder of the original inputs.
 	 */
-	public void setParameters (String sourceLanguage,
+	public void setInformation (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
 		String outputDir,
@@ -52,12 +52,12 @@ public interface IWriter extends IFilterWriter {
 	
 	public void writeEndPackage (boolean createZip);
 	
-	public void createDocument (int docID,
+	public void createOutput (int docID,
 		String relativeSourcePath,
 		String relativeTargetPath,
 		String sourceEncoding,
 		String targetEncoding,
 		String filterSettings,
 		IParameters filterParams);
-	
+
 }

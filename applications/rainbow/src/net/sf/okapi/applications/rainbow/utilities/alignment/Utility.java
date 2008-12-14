@@ -67,6 +67,7 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	public Utility () {
 		params = new Parameters();
+		needsSelfOutput = false;
 	}
 	
 	public String getName () {
@@ -178,7 +179,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	public boolean needsRoots () {
 		return false;
 	}
-
+	
 	public void setParameters (IParameters paramsObject) {
 		params = (Parameters)paramsObject;
 	}

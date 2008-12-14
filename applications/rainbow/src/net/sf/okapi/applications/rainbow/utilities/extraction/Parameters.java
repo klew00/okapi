@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
@@ -29,48 +29,48 @@ public class Parameters extends BaseParameters {
 	/**
 	 * Type of package.
 	 */
-	protected String    pkgType;
+	protected String pkgType;
 	
 	/**
 	 * True to zip the package. 
 	 */
-	protected boolean   createZip;
+	protected boolean createZip;
 	
 	/**
 	 * True to generate also the data needed to merge back the
 	 * extracted data.
 	 */
-	protected boolean   includeMergeData;
+	protected boolean includeMergeData;
 	
 	/**
 	 * Base-name of the package. 
 	 */
-	protected String    pkgName;
+	protected String pkgName;
 	
 	/**
 	 * Folder where to output the package.
 	 */
-	protected String    outputFolder;
+	protected String outputFolder;
 	
 	/**
 	 * When possible, include target items in package.
 	 */
-	protected boolean   includeTargets;
+	protected boolean includeTargets;
 
 	/**
 	 * Pre-segment the output when possible.
 	 */
-	protected boolean   preSegment;
+	protected boolean preSegment;
 	
 	/**
 	 * Path of the SRX file to use for source segmentation.
 	 */
-	protected String    sourceSRX;
+	protected String sourceSRX;
 	
 	/**
 	 * Path of the SRX file to use for target segmentation.
 	 */
-	protected String    targetSRX;
+	protected String targetSRX;
 
 	/**
 	 * Indicates if the output should be pre-translated.

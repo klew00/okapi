@@ -78,7 +78,7 @@ public class Writer extends BaseWriter {
 	}
 
 	@Override
-	public void createDocument (int docID,
+	public void createOutput (int docID,
 		String relativeSourcePath,
 		String relativeTargetPath,
 		String sourceEncoding,
@@ -106,7 +106,7 @@ public class Writer extends BaseWriter {
 		}
 		
 		relativeWorkPath += EXTENSION;
-		super.createDocument(docID, relativeSourcePath, relativeTargetPath,
+		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filtersettings, filterParams);
 		if ( writer == null ) writer = new XMLWriter();
 		else writer.close(); // Else: make sure the previous output is closed

@@ -32,8 +32,9 @@ import net.sf.okapi.common.writer.GenericFilterWriter;
 public abstract class BaseFilterDrivenUtility extends BaseUtility
 	implements IFilterDrivenUtility {
 	
-	IFilter filter = null;
-	IFilterWriter filterWriter = null;
+	protected IFilter filter = null;
+	protected IFilterWriter filterWriter = null;
+	protected boolean needsSelfOutput = true;
 
 	public void processFilterInput () {
 		try {
@@ -42,11 +43,13 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 				getInputFilterSettings(0), filter);
 			filter.setOptions(srcLang, getInputEncoding(0), true);
 		
-			// Create the filter writer
-			//TODO: Get the skeleton from the filter, somehow
-			filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
-			filterWriter.setOptions(trgLang, getOutputEncoding(0));
-			filterWriter.setOutput(getOutputPath(0));
+			// Create the filter writer if required
+			if ( needsSelfOutput ) {
+				//TODO: Get the skeleton from the filter, somehow
+				filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+				filterWriter.setOptions(trgLang, getOutputEncoding(0));
+				filterWriter.setOutput(getOutputPath(0));
+			}
 
 			// Setup the filter
 			File f = new File(getInputPath(0)); 
@@ -57,7 +60,9 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				handleEvent(event);
-				filterWriter.handleEvent(event);
+				if ( needsSelfOutput ) { // Only if needed
+					filterWriter.handleEvent(event);
+				}
 			}
 		}
 		catch ( MalformedURLException e ) {

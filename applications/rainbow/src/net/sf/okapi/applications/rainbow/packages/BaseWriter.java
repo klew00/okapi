@@ -28,7 +28,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
 public abstract class BaseWriter implements IWriter {
-	
+
 	protected Manifest manifest;
 	protected int docID;
 	protected String inputRoot;
@@ -48,7 +48,7 @@ public abstract class BaseWriter implements IWriter {
 		tmxWriter = new TMXWriter();
 	}
 	
-	public void setParameters (String sourceLanguage,
+	public void setInformation (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
 		String outputFolder,
@@ -119,7 +119,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 	}
 	
-	public void createDocument (int docID,
+	public void createOutput (int docID,
 		String relativeSourcePath,
 		String relativeTargetPath,
 		String sourceEncoding,
@@ -156,6 +156,13 @@ public abstract class BaseWriter implements IWriter {
 		if ( filterParams != null ) {
 			filterParams.save(paramsCopy);
 		}
+		
+		// Set the options for the actual writer
+		String outputPath = manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+			+ relativeWorkPath;
+		setOptions(trgLang, targetEncoding);
+		setOutput(outputPath);
 	}
 
 }
