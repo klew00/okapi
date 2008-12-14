@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.rtf;
 
@@ -35,6 +35,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -95,87 +97,72 @@ public class Writer extends BaseWriter {
 		}
 	}
 
-	public void writeTextUnit (TextUnit item,
-		int status)
-	{
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public String getName () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public IParameters getParameters () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FilterEvent handleEvent (FilterEvent event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument((Ending)event.getResource());
+			break;
+		}
+		return event;
+	}
+
+	public void setOptions (String language, String defaultEncoding) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (String path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOutput (OutputStream output) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setParameters (IParameters params) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void processTextUnit (TextUnit item) {
 		// Write the items in the TM if needed
-		if ( item.hasTarget() ) {
+		if ( item.hasTarget(trgLang) ) {
 			tmxWriter.writeItem(item, null);
-			if ( item.hasChild() ) {
-				for ( TextUnit tu : item.childTextUnitIterator() ) {
-					if ( tu.hasTarget() ) {
-						tmxWriter.writeItem(tu, null);
-					}
-				}
-			}
 		}
 
 		// Output the text unit
-		
-/*		if ( item.getSkeletonBefore() != null ) {
-			writer.write(Util.escapeToRTF(item.getSkeletonBefore().toString(),
-				true, 1, outputEncoder));
-		}
 		StringBuilder tmp = new StringBuilder();
 		tmp.append(Util.RTF_ENDCODE);
-		if ( item.hasTarget() ) {
-			//TODO: handle pre-populated target
-		}
-		else { // No target
-			processContent(item.getSourceContent(), tmp,
-				item.getSourceContent().isSegmented());
-		}
-		tmp.append(Util.RTF_STARTCODE);
-		writer.write(tmp.toString());
-		
-		if ( item.getSkeletonAfter() != null ) {
-			writer.write(Util.escapeToRTF(item.getSkeletonAfter().toString(),
-				true, 1, outputEncoder));
-		}
-*/
-
-		StringBuilder tmp = new StringBuilder();
-		tmp.append(Util.RTF_ENDCODE);
-		TextUnit tu;
-		if ( item.hasChild() ) {
-			for ( IContainable part : item.childUnitIterator() ) {
-				if ( part instanceof TextUnit ) {
-					tu = (TextUnit)part;
-					if ( tu.hasTarget() ) {
-						//TODO
-					}
-					else {
-						processContent(tu.getSourceContent(), tmp,
-							tu.getSourceContent().isSegmented());
-					}
-				}
-				else if ( part instanceof SkeletonUnit ) {
-					if ( SkeletonUnit.MAINTEXT.equals(part.getID()) ) {
-						if ( item.hasTarget() ) {
-							//TODO
-						}
-						else {
-							processContent(item.getSourceContent(), tmp,
-								item.getSourceContent().isSegmented());
-						}
-					}
-					else {
-						writer.write(Util.escapeToRTF(part.toString(),
-							true, 1, outputEncoder));
-					}
-				}
-			}
+		if ( item.hasTarget(trgLang) ) {
+			//TODO
 		}
 		else {
-			if ( item.hasTarget() ) {
-				//TODO
-			}
-			else {
-				processContent(item.getSourceContent(), tmp,
-					item.getSourceContent().isSegmented());
-			}
-			
+			processContent(item.getSourceContent(), tmp, item.getSource().isSegmented());
 		}
+		
 		tmp.append(Util.RTF_STARTCODE);
 		writer.write(tmp.toString());
 	}
@@ -318,7 +305,7 @@ public class Writer extends BaseWriter {
 		}
 	}
 	
-	public void writeStartDocument (Document resource) {
+	private void processStartDocument (StartDocument resource) {
 		//TODO: change codepage
 		writer.write("{\\rtf1\\ansi\\ansicpg" + "1252" + "\\uc1\\deff1 \n"+
 			"{\\fonttbl \n"+
@@ -346,46 +333,6 @@ public class Writer extends BaseWriter {
 			"}\n"+
 			"\\paperw11907\\paperh16840\\viewkind4\\viewscale100\\pard\\plain\\s0\\sb80\\slmult1\\widctlpar\\fs20\\f1 \n"+
 			Util.RTF_STARTCODE);
-	}
-
-	public void close() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public String getName () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public FilterEvent handleEvent (FilterEvent event) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setOptions (String language, String defaultEncoding) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setOutput (String path) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setOutput (OutputStream output) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void processEndDocument (Ending resource) { 

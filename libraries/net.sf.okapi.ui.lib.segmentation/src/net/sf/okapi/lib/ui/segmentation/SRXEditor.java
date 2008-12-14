@@ -372,7 +372,6 @@ public class SRXEditor {
 			}
 		});
 
-
 		edResults = new Text(cmpSample, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		edResults.setLayoutData(gdTmp);
@@ -611,6 +610,7 @@ public class SRXEditor {
 			}
 		}
 		catch ( Throwable e ) {
+			e.printStackTrace();
 			edResults.setText("Error: "+ e.getMessage());
 		}
 	}
@@ -619,7 +619,6 @@ public class SRXEditor {
 	 * Converts the sample edit field content to sampleText.
 	 */
 	private void processInlineCodes () {
-		sampleText.clear();
 		String text = edSampleText.getText().replace("\r", "");
 		sampleText.clear();
 		sampleText.setCodedText(text);

@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.filters.regex;
 
@@ -34,22 +34,22 @@ public class Rule {
 	public static final int       RULETYPE_OPENGROUP  = 4;
 	public static final int       RULETYPE_CLOSEGROUP = 5;
 	
-	protected String              ruleName;
-	protected String              start;
-	protected String              end;
-	protected String              nameStart;
-	protected String              nameEnd;
-	protected String              nameFormat;
-	protected int                 ruleType;
-	protected boolean             preserveWS;
-	protected boolean             unwrap;
-	protected boolean             useCodeFinder;
-	protected InlineCodeFinder    codeFinder;
-	protected String              propertyName;
-	protected String              propertyValue;
-	protected String              sample;
+	protected String ruleName;
+	protected String start;
+	protected String end;
+	protected String nameStart;
+	protected String nameEnd;
+	protected String nameFormat;
+	protected int ruleType;
+	protected boolean preserveWS;
+	protected boolean unwrap;
+	protected boolean useCodeFinder;
+	protected InlineCodeFinder codeFinder;
+	protected String propertyName;
+	protected String propertyValue;
+	protected String sample;
 	// Runtime-only variable (don't serialize)
-	protected Pattern             pattern;
+	protected Pattern pattern;
 
 	public Rule () {
 		start = "";

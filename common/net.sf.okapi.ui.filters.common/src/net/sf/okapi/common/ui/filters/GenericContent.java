@@ -86,7 +86,7 @@ public class GenericContent {
 		if ( !container.isSegmented() ) {
 			return setContent(container).toString();
 		}
-		
+		//TODO: the getCodedText get the codes from the wrong textFragment.
 		Code code;
 		String text = container.getCodedText();
 		StringBuilder tmp = new StringBuilder();
