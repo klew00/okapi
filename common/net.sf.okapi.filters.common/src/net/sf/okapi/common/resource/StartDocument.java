@@ -20,11 +20,14 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.IParameters;
+
 public class StartDocument extends BaseNameable {
 
 	protected String language;
 	protected String encoding;
 	protected boolean isMultilingual;
+	protected IParameters params;
 	
 	public String getLanguage () {
 		return language;
@@ -48,6 +51,14 @@ public class StartDocument extends BaseNameable {
 	
 	public void setIsMultilingual (boolean value) {
 		isMultilingual = value;
+	}
+
+	public IParameters getFilterParameters () {
+		return params;
+	}
+	
+	public void setFilterParameters (IParameters params) {
+		this.params = params;
 	}
 
 }

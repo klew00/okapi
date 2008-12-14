@@ -21,10 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +31,16 @@ import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
+import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
-public class Merger extends ThrougputPipeBase {
+public class Merger {
 
 	private Manifest manifest;
 	private IReader reader;
@@ -48,6 +49,7 @@ public class Merger extends ThrougputPipeBase {
 	private IFilterWriter outFilter;
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private boolean skipNoTranslate;
+	private String trgLang;
 
 	public Merger () {
 		fa = new FilterAccess();
@@ -74,6 +76,7 @@ public class Merger extends ThrougputPipeBase {
 		// Set the manifest and the options
 		this.manifest = manifest;
 		skipNoTranslate = "omegat".equals(manifest.getPackageType());
+		trgLang = manifest.getTargetLanguage();
 	}
 	
 	public void merge (int docID) {
@@ -96,29 +99,32 @@ public class Merger extends ThrougputPipeBase {
 			String paramsFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
 				+ File.separator + String.format("%d.fprm", docID);
 			// Load the relevant filter
-			Object[] filters = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter, outFilter);
-			inpFilter = (IFilter)filters[0];
-			outFilter = (IFilterWriter)filters[1];
+			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
 			
 			reader.openDocument(fileToMerge);
 			
 			// Initializes the input
-			InputStream input = new FileInputStream(originalFile);
-			inpFilter.initialize(input, originalFile, originalFile, "TODO:filterSettings???", item.getInputEncoding(),
-				manifest.getSourceLanguage(), manifest.getTargetLanguage());
+			inpFilter.setOptions(manifest.getSourceLanguage(), trgLang,
+				item.getInputEncoding(), true);
+			File f = new File(originalFile);
+			inpFilter.open(f.toURL());
 			
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);
 			Util.createDirectories(outputFile);
-			OutputStream output = new FileOutputStream(outputFile);
-			outFilter.initialize(output, outputFile, item.getOutputEncoding(), manifest.getTargetLanguage());
-
-			// Set the pipeline: inputFilter -> merger -> outputFilter 
-			inpFilter.setOutput(this);
-			this.setOutput(outFilter);
+			outFilter = new GenericFilterWriter(new GenericSkeletonWriter());
+			outFilter.setOptions(trgLang, item.getOutputEncoding());
+			outFilter.setOutput(outputFile);
 			
 			// Do it
-			inpFilter.process();
+			FilterEvent event;
+			while ( inpFilter.hasNext() ) {
+				event = inpFilter.next();
+				if ( event.getEventType() == FilterEventType.TEXT_UNIT ) {
+					processTextUnit((TextUnit)event.getResource());
+				}
+				outFilter.handleEvent(event);
+			}
 		}
 		catch ( Exception e ) {
 			// Log and move on to the next file
@@ -140,60 +146,51 @@ public class Merger extends ThrougputPipeBase {
 		}
 	}
 
-	@Override
-    public void endExtractionItem (TextUnit item) {
-		processItem(item);
-		// Call output filter
-		super.endExtractionItem(item);
-	}
-
-	private void processItem (TextUnit item) {
+	private void processTextUnit (TextUnit tu) {
 		// Skip the non-translatable if they are not included in the package
-		if ( skipNoTranslate && !item.isTranslatable() ) return;
+		if ( skipNoTranslate && !tu.isTranslatable() ) return;
 			
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
 			logger.warn("There is no more package item to merge (for id=\"{}\")",
-				item.getId());
+				tu.getId());
 			// Keep the source
 			return;
 		}
 
 		// Update the item if needed
-		if ( item.isTranslatable() ) {
+		if ( tu.isTranslatable() ) {
 			TextUnit srcPkgItem = reader.getItem();
 			
-			if ( !item.getId().equals(srcPkgItem.getID()) ) {
+			if ( !tu.getId().equals(srcPkgItem.getId()) ) {
 				// Problem: different IDs
 				logger.warn("ID mismatch: original item id=\"{}\" package item id=\"{}\"",
-					item.getId(), srcPkgItem.getId());
+					tu.getId(), srcPkgItem.getId());
 				// Keep the source
 				return;
 			}
 
-			if ( srcPkgItem.hasTarget() ) {
-				if ( !item.hasTarget() ) {
-					// Create the target entry for the output if it does not exist yet
-					item.setTarget(new LocaleData(item));
-				}
+			if ( srcPkgItem.hasTarget(trgLang) ) {
+				// Create the target entry for the output if it does not exist yet
+				tu.createTarget(trgLang, false, IResource.COPY_ALL);
 				// Set the codedText part of the content only. Do not modify the codes.
 				//TODO: in-line could be clones: the code should come from the translation not the original then.
 				try {
-					item.getTargetContent().setCodedText(
-						srcPkgItem.getTargetContent().getCodedText(),
-						item.getSourceContent().getCodes(), false);
+					tu.getTarget(trgLang).setCodedText(
+						srcPkgItem.getTargetContent(trgLang).getCodedText(),
+						tu.getSourceContent().getCodes(), false);
 				}
 				catch ( RuntimeException e ) {
-					logger.error("Error with item id=\"{}\".", item.getID());
+					logger.error("Error with item id=\"{}\".", tu.getId());
 					// Use the source instead, continue the merge
-					item.setTarget(item.getSource());
+					tu.setTarget(trgLang, tu.getSource());
 				}
 			}
 			else { // No translation in package
-				if ( !item.isEmpty() ) {
-					logger.warn("Item id=\"{}\": No translation provided.", item.getID());
-					item.setTarget(item.getSource());
+				if ( !tu.isEmpty() ) {
+					logger.warn("Item id=\"{}\": No translation provided.", tu.getId());
+					tu.setTarget(trgLang, tu.getSource());
 				}
 			}
 		}

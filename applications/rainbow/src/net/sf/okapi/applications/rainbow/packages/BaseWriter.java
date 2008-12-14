@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
-import net.sf.okapi.applications.rainbow.packages.rtf.LayerProvider;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 
@@ -157,7 +156,7 @@ public abstract class BaseWriter implements IWriter {
 		Util.copyFile(inputPath, destination, false);
 			
 		String paramsCopy = manifest.getRoot() + File.separator + subFolder
-			+ File.separator + "fprm";
+			+ File.separator + docPrefix + "fprm";
 		if ( filterParams != null ) {
 			filterParams.save(paramsCopy);
 		}

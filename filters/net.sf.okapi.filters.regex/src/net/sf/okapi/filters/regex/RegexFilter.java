@@ -220,6 +220,7 @@ public class RegexFilter implements IFilter {
 			startDoc = new StartDocument();
 			startDoc.setName(inputUrl.getPath());
 			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(params);
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {

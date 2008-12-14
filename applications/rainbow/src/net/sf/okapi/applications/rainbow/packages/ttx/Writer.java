@@ -166,7 +166,14 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("DataType", "XML");
 		writer.writeAttributeString("O-Encoding", "UTF-8");
 		writer.writeAttributeString("SettingsName", "okapiTTX");
-		writer.writeAttributeString("SettingsPath", DTD_SETTINGS_FILE);
+		// Build relative path backward to access the INI file
+		String dir = ".."+File.separator;
+		for ( int i=0; i<relativeSourcePath.length(); i++ ) {
+			if ( relativeSourcePath.charAt(i) == File.separatorChar ) {
+				dir += (".."+File.separator);
+			}
+		}
+		writer.writeAttributeString("SettingsPath", dir+DTD_SETTINGS_FILE);
 		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
 		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
 		writer.writeAttributeString("TargetDefaultFont", "");

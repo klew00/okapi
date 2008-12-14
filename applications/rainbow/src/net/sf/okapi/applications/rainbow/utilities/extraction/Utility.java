@@ -28,6 +28,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -150,8 +151,8 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	public FilterEvent handleEvent (FilterEvent event) {
 		switch ( event.getEventType() ) {
-		case START:
-			processStart();
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
 			break;
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
@@ -162,7 +163,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return event;
 	}
 	
-    private void processStart () {
+    private void processStartDocument (StartDocument resource) {
 		if ( qm != null ) {
 			qm.setAttribute("FileName", Util.getFilename(getInputPath(0), true));
 		}
@@ -172,7 +173,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		String[] res = FilterAccess.splitFilterSettingsType1("", getInputFilterSettings(0));
 		writer.createOutput(++id, relativeInput, relativeOutput,
 			getInputEncoding(0), getOutputEncoding(0),
-			res[1], null);
+			res[1], resource.getFilterParameters());
     }
 	
     private void processTextUnit (TextUnit item ) {
