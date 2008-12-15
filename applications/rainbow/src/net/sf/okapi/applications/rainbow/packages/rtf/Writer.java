@@ -124,9 +124,6 @@ public class Writer extends BaseWriter {
 	public FilterEvent handleEvent (FilterEvent event) {
 		try {
 			switch ( event.getEventType() ) {
-			case START:
-				processStart();
-				break;
 			case FINISHED:
 				processFinished();
 				break;
@@ -169,12 +166,17 @@ public class Writer extends BaseWriter {
 		return event;
 	}
 
-	private void processStart () {
+	private void processFinished () {
+		skelWriter.processFinished();
+		close();
+	}
+
+	private void processStartDocument (StartDocument resource) {
 		try {
 			close();
+			skelWriter.processStart(trgLang, encoding, layer, encoderManager);
 			Util.createDirectories(outputPath);
 			writer = new PrintWriter(outputPath, encoding);
-			skelWriter.processStart(trgLang, encoding, layer, encoderManager);
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
@@ -182,14 +184,7 @@ public class Writer extends BaseWriter {
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
 		}
-	}
 
-	private void processFinished () {
-		skelWriter.processFinished();
-		close();
-	}
-
-	private void processStartDocument (StartDocument resource) {
 		//TODO: change codepage
 		writer.write("{\\rtf1\\ansi\\ansicpg" + "1252" + "\\uc1\\deff1 \n"+
 			"{\\fonttbl \n"+

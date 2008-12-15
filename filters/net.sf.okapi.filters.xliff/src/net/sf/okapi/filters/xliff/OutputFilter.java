@@ -87,11 +87,11 @@ public class OutputFilter implements IOutputFilter {
 			try {
 				TextContainer content;
 				if ( item.hasTarget() ) {
-					content = item.getTargetContent();
+					content = item.getTarget();
 					content.setCodedText(content.getCodedText(), res.trgCodes, false);
 				}
 				else {
-					content = item.getSourceContent();
+					content = item.getSource();
 					content.setCodedText(content.getCodedText(), res.srcCodes, false);
 				}
 				String tmp = xliffCont.setContent(content).toString(0, false, true);
@@ -99,7 +99,7 @@ public class OutputFilter implements IOutputFilter {
 			}
 			catch ( InvalidContentException e ) {
 				logger.error(String.format("Inline code problem in item id=\"%s\" (resname=\"%s\"):",
-					item.getID(), item.getName()), e);
+					item.getId(), item.getName()), e);
 				logger.info("Content: ["+item.toString()+"]");
 			}
 				

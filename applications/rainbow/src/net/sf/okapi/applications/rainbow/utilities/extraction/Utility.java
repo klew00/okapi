@@ -167,7 +167,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( qm != null ) {
 			qm.setAttribute("FileName", Util.getFilename(getInputPath(0), true));
 		}
-		
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		String relativeOutput = getOutputPath(0).substring(outputRoot.length()+1);
 		String[] res = FilterAccess.splitFilterSettingsType1("", getInputFilterSettings(0));

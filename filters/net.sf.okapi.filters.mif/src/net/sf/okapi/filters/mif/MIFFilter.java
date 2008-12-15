@@ -61,23 +61,23 @@ public class MIFFilter implements IFilter {
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
-		table.put("HardSpace",    '\u00a0');
-		table.put("DiscHyphen",   '\u00ad');
-		table.put("NoHyphen",     '\u200d');
-		table.put("Tab",          '\t');
-		table.put("Cent",         '\u00a2');
-		table.put("Pound",        '\u00a3');
-		table.put("Yen",          '\u00a5');
-		table.put("EnDash",       '\u2013');
-		table.put("Dagger",       '\u2020');
-		table.put("EmDash",       '\u2014');
+		table.put("HardSpace", '\u00a0');
+		table.put("DiscHyphen", '\u00ad');
+		table.put("NoHyphen", '\u200d');
+		table.put("Tab", '\t');
+		table.put("Cent", '\u00a2');
+		table.put("Pound", '\u00a3');
+		table.put("Yen", '\u00a5');
+		table.put("EnDash", '\u2013');
+		table.put("Dagger", '\u2020');
+		table.put("EmDash", '\u2014');
 		table.put("DoubleDagger", '\u2021');
-		table.put("Bullet",       '\u2022');
-		table.put("NumberSpace",  '\u2007');
-		table.put("ThinSpace",    '\u2009');
-		table.put("EnSpace",      '\u2002');
-		table.put("EmSpace",      '\u2003');
-		table.put("HardReturn",   '\r');
+		table.put("Bullet", '\u2022');
+		table.put("NumberSpace", '\u2007');
+		table.put("ThinSpace", '\u2009');
+		table.put("EnSpace", '\u2002');
+		table.put("EmSpace", '\u2003');
+		table.put("HardReturn", '\r');
 		return table;
 	}
 
