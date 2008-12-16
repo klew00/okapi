@@ -137,6 +137,8 @@ public class RTFFilter implements IFilter {
 	private int noReset;
 	private byte byteData;
 	private char uChar;
+	int internalStyle;
+	int doNotTranslateStyle;
 	private CharsetDecoder currentCSDec;
 	private int currentDBCSCodepage;
 	private String currentCSName;
@@ -397,6 +399,8 @@ public class RTFFilter implements IFilter {
 		fonts = new Hashtable<Integer, RTFFont>();
 		inFontTable = 0;
 		noReset = 0;
+		internalStyle = 6;
+		doNotTranslateStyle = 8;
 
 		RTFContext ctx = new RTFContext();
 		ctx.uniCount = 1;
@@ -417,15 +421,13 @@ public class RTFFilter implements IFilter {
 		int nState = 0;
 		String sTmp = "";
 		String sCode = "";
-		int nType = 0;
 		int nGrp = 0;
 		int nStyle = 0;
 		int nCode = 0;
-		int internalStyle = 6;
-		int doNotTranslateStyle = 8;
 
 		TextFragment srcFrag = tu.setSourceContent(new TextFragment());
 		TextFragment trgFrag = new TextFragment();
+		TextFragment currentFrag = null;
 		
 		while ( true ) {
 			switch ( getNextToken() ) {
@@ -452,7 +454,7 @@ public class RTFFilter implements IFilter {
 				case 2: // Wait for > in {0>
 					if ( chCurrent == '>' ) {
 						nState = 3;
-						nType = 1;
+						currentFrag = srcFrag;
 					}
 					else if ( chCurrent == '{' ) nState = 1; // Is {0{
 					else nState = 0; // Is {0x
@@ -511,7 +513,7 @@ public class RTFFilter implements IFilter {
 
 				case 6: // After <}n*{ in <}n*{>
 					if ( chCurrent == '>' ) {
-						nType = 2; // Starting target text
+						currentFrag = trgFrag; // Starting target text
 						nState = 7;
 					}
 					else {
@@ -590,13 +592,16 @@ public class RTFFilter implements IFilter {
 							doNotTranslateStyle = nCode;
 						}
 					}
-					else nStyle = 0;
+					else {
+						nStyle = 0;
+					}
 					break;
 				}
 				if ( nGrp > 0 ) {
 					if ( nGrp == ctxStack.size()+1 ) {
-						if ( nType == 1 ) srcFrag.append(TagType.PLACEHOLDER, null, sCode);
-						else trgFrag.append(TagType.PLACEHOLDER, null, sCode);
+						if ( currentFrag != null ) {
+							addInlineCode(currentFrag, sCode);
+						}
 						nGrp = 0;
 					}
 					break;
@@ -632,6 +637,54 @@ public class RTFFilter implements IFilter {
 				break;
 			} // End of switch ( getNextToken() )
 		} // End of while
+	}
+	
+	/**
+	 * Tries to guess if an in-line code is an opening/closing XML/HTML tag.
+	 * @param data The text of the in-line code.
+	 * @return The guessed TagType for the given in-line code.
+	 */
+	private void addInlineCode (TextFragment frag,
+		String data)
+	{
+		// By default we assume it's a place-holder
+		String type = null;
+		TagType tagType = TagType.PLACEHOLDER;
+		int last = data.length()-1;
+		int extra = 0;
+		
+		// Long enough to be an XML/HTML tag?
+		if ( last > 1 ) { 
+			// Starts with the proper character?
+			if ( data.charAt(0) == '<' ) {
+				// Ends with the proper character?
+				if ( data.charAt(last) == '>' ) {
+					// Has no more than one tag?
+					if ( data.indexOf('<', 1) == -1 ) {
+						// Is like "</...>", but not "</>", so that's a closing tag
+						if (( data.charAt(1) == '/' ) && ( last > 2 )) {
+							tagType = TagType.CLOSING;
+							extra = 1;
+						}
+						else if ( data.charAt(last-1) != '/' ) {
+							// Is like "<...>, that's an opening tag
+							tagType = TagType.OPENING;
+						}
+						// Else it's likely a empty tag, or it can also be something
+						// non XML/HTML, so it's a place-holder
+					}
+				}
+			}
+		}
+
+		// Set the type of opening and closing tags
+		if ( tagType != TagType.PLACEHOLDER ) {
+			int n = data.indexOf(' ');
+			if ( n > -1 ) type = data.substring(1+extra, n);
+			else type = data.substring(1+extra, last);
+		}
+		// Add the guessed in-line code
+		frag.append(tagType, type, data);
 	}
 	
 	// Return: 0=ok, 1=err, 2=stop
