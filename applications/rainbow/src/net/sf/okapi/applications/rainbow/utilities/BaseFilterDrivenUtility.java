@@ -41,7 +41,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// Load the filter if needed
 			filter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 				getInputFilterSettings(0), filter);
-			filter.setOptions(srcLang, getInputEncoding(0), true);
+			filter.setOptions(srcLang, trgLang, getInputEncoding(0), true);
 		
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {

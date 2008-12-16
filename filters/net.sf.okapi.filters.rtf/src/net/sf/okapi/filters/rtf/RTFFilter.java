@@ -32,6 +32,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Stack;
 
 import org.slf4j.Logger;
@@ -39,8 +40,11 @@ import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -137,6 +141,11 @@ public class RTFFilter implements IFilter {
 	private int currentDBCSCodepage;
 	private String currentCSName;
 	private ByteBuffer byteBuffer;
+	
+	private LinkedList<FilterEvent> queue;
+	private int parseState;
+	private StartDocument startDoc;
+	private int id;
 	
 	public RTFFilter () {
 		winCharsets = new Hashtable<Integer, String>();
@@ -282,13 +291,41 @@ public class RTFFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		// TODO Auto-generated method stub
-		return false;
+		return (parseState != 2);
 	}
 
 	public FilterEvent next () {
-		// TODO Auto-generated method stub
+		if ( parseState == 0 ) {
+			queue.add(new FilterEvent(FilterEventType.START));
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			parseState = 1;
+		}
+		else if ( queue.size() == 0 ) {
+			parseNext();
+		}
+		if ( queue.size() > 0 ) {
+			FilterEvent event = queue.poll();
+			currentRes = event.getResource();
+			if ( event.getEventType() == FilterEventType.FINISHED ) {
+				parseState = 2;
+			}
+			return event;
+		}
 		return null;
+	}
+
+	public void parseNext () {
+		TextUnit textUnit = new TextUnit(String.valueOf(++id));
+		if ( !getSegment(textUnit) ) {
+			// Send the end-document event
+			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
+				new Ending(String.valueOf(++id))));
+			// Store the finished event
+			queue.add(new FilterEvent(FilterEventType.FINISHED));
+		}
+		else {
+			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, textUnit));
+		}
 	}
 
 	public void open (InputStream input) {
@@ -296,6 +333,13 @@ public class RTFFilter implements IFilter {
 			reader = new BufferedReader(
 				new InputStreamReader(input, passedEncoding));
 			reset(passedEncoding);
+			startDoc = new StartDocument();
+			startDoc.setId(String.valueOf(++id));
+			startDoc.setIsMultilingual(true);
+			startDoc.setFilterParameters(getParameters());
+			startDoc.setLanguage(srcLang);
+			startDoc.setEncoding(passedEncoding);
+			startDoc.setName("TODO");
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -335,7 +379,6 @@ public class RTFFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 	}
-
 	
 	private void reset (String defaultEncoding) {
 		chCurrent = (char)0;
@@ -364,9 +407,13 @@ public class RTFFilter implements IFilter {
 		ctxStack = new Stack<RTFContext>();
 		ctxStack.push(ctx);
 		loadEncoding(ctx.encoding);
+		
+		parseState = 0;
+		id = 0;
+		queue = new LinkedList<FilterEvent>();
 	}
 
-	public int getSegment (TextUnit tu) {
+	public boolean getSegment (TextUnit tu) {
 		int nState = 0;
 		String sTmp = "";
 		String sCode = "";
@@ -383,7 +430,7 @@ public class RTFFilter implements IFilter {
 		while ( true ) {
 			switch ( getNextToken() ) {
 			case TOKEN_ENDINPUT:
-				return 2;
+				return false;
 
 			case TOKEN_CHAR:
 				if ( !ctxStack.peek().inText ) {
@@ -468,7 +515,7 @@ public class RTFFilter implements IFilter {
 						nState = 7;
 					}
 					else {
-						return 1;
+						throw new RuntimeException("Expecting: '>' while parsing Trados markup.");
 					}
 					break;
 
@@ -506,7 +553,7 @@ public class RTFFilter implements IFilter {
 						if ( !trgFrag.isEmpty() ) {
 							tu.setTargetContent(trgLang, trgFrag);
 						}
-						return 0;
+						return true;
 					}
 					else if ( chCurrent == '<' ) {
 						// <0< sequence
@@ -536,10 +583,10 @@ public class RTFFilter implements IFilter {
 				if ( nStyle > 0 ) {
 					if ( nStyle < ctxStack.size()+1 ) {
 						// Is it the tw4winInternal style?
-						if ( sTmp == "tw4winInternal;" ) {
+						if ( "tw4winInternal;".compareTo(sTmp) == 0 ) {
 							internalStyle = nCode;
 						}
-						else if ( sTmp == "DO_NOT_TRANSLATE;" ) {
+						else if ( "DO_NOT_TRANSLATE;".compareTo(sTmp) == 0 ) {
 							doNotTranslateStyle = nCode;
 						}
 					}
@@ -548,7 +595,6 @@ public class RTFFilter implements IFilter {
 				}
 				if ( nGrp > 0 ) {
 					if ( nGrp == ctxStack.size()+1 ) {
-						
 						if ( nType == 1 ) srcFrag.append(TagType.PLACEHOLDER, null, sCode);
 						else trgFrag.append(TagType.PLACEHOLDER, null, sCode);
 						nGrp = 0;

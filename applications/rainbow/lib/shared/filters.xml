@@ -25,8 +25,12 @@
  >HTML</filter>
   
  <filter id="okf_tmx"
-  inputFilterClass="net.sf.okapi.filters.tmx.InputFilter"
+  inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
  >TMX</filter>
+  
+ <filter id="okf_rtf"
+  inputFilterClass="net.sf.okapi.filters.rtf.RTFFilter"
+ >Trados RTF</filter>
   
  <filter id="okf_openoffice"
   inputFilterClass="net.sf.okapi.filters.openoffice.InputFilter"

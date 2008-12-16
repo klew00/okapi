@@ -50,6 +50,7 @@ public class FormatManager {
 		else if ( sExt.equals(".ott") ) aRes[1] = "okf_openoffice";
 		else if ( sExt.equals(".tmx") ) aRes[1] = "okf_tmx";
 		else if ( sExt.equals(".mif") ) aRes[1] = "okf_mif";
+		else if ( sExt.equals(".rtf") ) aRes[1] = "okf_rtf";
 		return aRes;
 	}
 }
