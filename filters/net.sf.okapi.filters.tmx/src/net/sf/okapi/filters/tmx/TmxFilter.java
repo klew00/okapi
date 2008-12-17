@@ -317,17 +317,14 @@ public class TmxFilter implements IFilter {
 	public void setOptions(String language, String defaultEncoding,
 			boolean generateSkeleton) {
 
-		this.sourceLanguage = language;
-		this.targetLanguage = "FR-FR";
-		encoding = defaultEncoding;
+		setOptions(language, null, defaultEncoding, generateSkeleton);
 	}
 
 	public void setOptions(String sourceLanguage, String targetLanguage,
 			String defaultEncoding, boolean generateSkeleton) {
 
-		//this.sourceLanguage = sourceLanguage;
 		this.sourceLanguage = sourceLanguage;
-		this.targetLanguage = "FR-FR";
+		this.targetLanguage = targetLanguage;
 		encoding = defaultEncoding;
 	}
 	
@@ -469,69 +466,60 @@ public class TmxFilter implements IFilter {
 	 */		
 	private FilterEvent processTranslationUnit(){
 		
-		boolean processSource = false;
+		int tuvType=0;	//--tracks tuv type: 1 for source, 2 for target, otherwise 0 language independent--
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnit tu = new TextUnit(String.format("t%d", ++tuId),null,false,"text/xml");
 		TargetsAnnotation ta = new TargetsAnnotation();
 		TextContainer trgCont = new TextContainer();
 		
-		ta.set(sourceLanguage, trgCont);
+		ta.set(targetLanguage, trgCont);
 		tu.setAnnotation(ta);
 		
-		//--process the opening tu element--
-		appendStartElement(skel, tu, false);
-		
+		//--process the opening tu element which is 0 unspecified at this point--
+		appendStartElement(skel, tu, tuvType);
 
-		boolean endNoteProcessed = false;
+		String localName;
+		boolean completed = false;
 		try {
-			while(reader.hasNext() && !endNoteProcessed){
+			while(reader.hasNext() && !completed){
 				
 				int eventType = reader.next();
-				
 				switch ( eventType ) {
-
-				//--process the document note content--
 				case XMLStreamConstants.CHARACTERS:
-					
+					//--whitespace and linebreaks--
 					skel.append(reader.getText());
-					//System.out.print(reader.getText());
 					break;
-
-				//--process the content elements--				
 				case XMLStreamConstants.START_ELEMENT:
 
-					if(reader.getLocalName().equals("note") || reader.getLocalName().equals("prop")){
-						if(processSource){
-							appendContentElement(skel, tu, true, null, null);
-						}else{
-							appendContentElement(skel, tu, false, null, null);	
-						}
+					localName = reader.getLocalName().toLowerCase(); 
+					if(localName.equals("note") || localName.equals("prop")){
+						processNoteProp(skel, tu, tuvType);	
 					}else if(reader.getLocalName().equals("tuv")){
-						appendStartElement(skel, tu, true);
-						processSource = isSourceTuv();
+						tuvType = tuvType();
+						appendStartElement(skel, tu, tuvType);
 					}else if(reader.getLocalName().equals("seg")){
-						if(processSource){
-							//TODO: change to seg specific--
-							appendContentElement(skel, tu, true, tu.getSource(), tu);
-						}else{
-							//TODO: change to seg specific--
-							appendContentElement(skel, tu, false, trgCont, tu);
+						if(tuvType==1){
+							processSeg(skel, tuvType, tu.getSource(), tu);
+						}if(tuvType==2){
+							processSeg(skel, tuvType, trgCont, tu);
+						}if(tuvType==0){
+							processSeg(skel, tuvType, null, null);
 						}
-					}					
+					}
 					break;
 					
 				//--process the end document note--				
 				case XMLStreamConstants.END_ELEMENT:
 
-					if(reader.getLocalName().equals("tu")){
+					//--lowercase for comparison--
+					localName = reader.getLocalName().toLowerCase(); 
+					if(localName.equals("tu")){
 						appendEndElement(skel);
-						endNoteProcessed = true;
+						completed = true;
 					}else if(reader.getLocalName().equals("tuv")){
 						appendEndElement(skel);
-						if(processSource){
-							processSource=false;
-						}
+						tuvType=0; 	//--reset tuvType to unspecified--
 					}			
 					break;
 				}
@@ -548,18 +536,17 @@ public class TmxFilter implements IFilter {
 	
 	
 	/**
-	 * Process an element, appending the skeleton to skel and adding the properties to nameable 
+	 * Process an opening element, building the skeleton and adding the properties to nameable 
 	 */			
-	public void appendStartElement(GenericSkeleton skel, INameable nameable, boolean isSource){
+	public void appendStartElement(GenericSkeleton skel, INameable nameable, int tuvType){
 		
-		skel.append("<");
-		System.out.print("<");
-		
-		skel.append(reader.getLocalName());
-		System.out.print(reader.getLocalName());
+		skel.append("<"+reader.getLocalName());
+		System.out.print("<"+reader.getLocalName());
 		
 		for(int i=0; i< reader.getAttributeCount(); i++){
-			String attributeName;
+			
+			String attributeName;	//--handle prefixes--
+			
 			if(reader.getAttributePrefix(i).length()>0){
 				attributeName=reader.getAttributePrefix(i)+":"+reader.getAttributeLocalName(i);
 			}else{
@@ -567,11 +554,14 @@ public class TmxFilter implements IFilter {
 			}
 			
 			skel.append(" "+attributeName+"=\""+reader.getAttributeValue(i)+"\"");
-			System.out.println(" "+attributeName+"=\""+reader.getAttributeValue(i)+"\"");
-			
-			if(isSource){
-				nameable.setSourceProperty(new Property(attributeName,reader.getAttributeValue(i), true));	
-			}else{
+			System.out.print(" "+attributeName+"=\""+reader.getAttributeValue(i)+"\"");
+
+			//--set the properties depending on the tuvType--
+			if(tuvType == 1){
+				nameable.setSourceProperty(new Property(attributeName, reader.getAttributeValue(i), true));	
+			}else if(tuvType == 2){
+				nameable.setTargetProperty(targetLanguage, new Property(attributeName,reader.getAttributeValue(i), true));
+			}else if(tuvType == 0){
 				nameable.setProperty(new Property(attributeName,reader.getAttributeValue(i), true));
 			}
 		}
@@ -581,77 +571,114 @@ public class TmxFilter implements IFilter {
 	}
 	
 	/**
-	 * Process an end element, appending the skeleton to skel 
+	 * Process a closing element, building the skeleton 
 	 */			
 	public void appendEndElement(GenericSkeleton skel){
-
 		skel.append("</"+reader.getLocalName()+">");
 		System.out.println("</"+reader.getLocalName()+">");
-		
 	}	
 	
 	/**
 	 * Process a content element, appending the skeleton to skel and adding the properties to nameable 
 	 */			
-	private void appendContentElement(GenericSkeleton skel, INameable nameable, boolean isSource, TextContainer tc, TextUnit tu){
+	private void processNoteProp(GenericSkeleton skel, INameable nameable, int tuvType){
+		
+		String startElement = reader.getLocalName();
+		appendStartElement(skel, nameable, tuvType);
+		boolean completed = false;				
+		try {
+			while(reader.hasNext() && !completed){
+				int eventType = reader.next();
+				switch ( eventType ) {
+				case XMLStreamConstants.CHARACTERS:
+
+					skel.append(reader.getText());
+					System.out.print(reader.getText());
+					
+					//--set the properties depending on the tuvType--
+					if(tuvType == 1){
+						nameable.setSourceProperty(new Property(startElement, reader.getText(), true));	
+					}else if(tuvType == 2){
+						nameable.setTargetProperty(targetLanguage, new Property(startElement, reader.getText(), true));
+					}else if(tuvType == 0){
+						nameable.setProperty(new Property(startElement, reader.getText(), true));
+					}
+					break;
+				
+				case XMLStreamConstants.END_ELEMENT:
+
+					if(reader.getLocalName().equals(startElement)){
+						appendEndElement(skel);
+						completed = true;
+					}
+					break;
+				}
+			}
+		} catch (XMLStreamException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Process a segment <seg>*</seg>, appending the skeleton to skel and adding the properties to nameable and reference to tu 
+	 */			
+	private void processSeg(GenericSkeleton skel, int tuvType, TextContainer tc, TextUnit tu){
 		
 		String startElement = reader.getLocalName();
 			
-		//--append opening element--
-		appendStartElement(skel, nameable, isSource);
+		skel.append("<"+reader.getLocalName()+">");
+		System.out.print("<"+reader.getLocalName()+">");
+		//TODO: <seg> shouldn't have any attributes but possibly add any attributes to the skeleton-- 
 		
-		boolean elementProcessed = false;
+		boolean completed = false;				//--controls the loop--
 		try {
-			while(reader.hasNext() && !elementProcessed){
+			while(reader.hasNext() && !completed){
 				
 				int eventType = reader.next();
-				
 				switch ( eventType ) {
-
-				//--process the document note content--
 				case XMLStreamConstants.CHARACTERS:
-					
-					if(tc!=null){
+					if(tuvType == 1 || tuvType == 2){
+						//--if source or target add it to TextContainer (and make a ref later)--
 						tc.append(reader.getText());
-						System.out.println(reader.getText());
-					}else{
+						System.out.print(reader.getText());
+					}else if (tuvType == 0){
+						//--if unspecified add it to the general skeleton--
 						skel.append(reader.getText());
 						System.out.print(reader.getText());
-						nameable.setProperty(new Property(startElement,reader.getText(), true));
+						//TODO: Need to add placeholders to the skeleton as well
 					}
 					break;
 				
-				//--handles the inline elements--
-				//TODO: handle remaining tags
-				case XMLStreamConstants.START_ELEMENT:					
-					if(tc!=null){
-						if(reader.getLocalName().equals("ph")){
+				case XMLStreamConstants.START_ELEMENT:		
+					
+					if(tuvType == 1 || tuvType == 2){
+						String localName = reader.getLocalName().toLowerCase();
+						
+						if(localName.equals("ph") || localName.equals("it") || localName.equals("hi")){
 							processInlineElement(tc, TagType.PLACEHOLDER);	
-						}else if(reader.getLocalName().equals("it")){
-							processInlineElement(tc, TagType.PLACEHOLDER);	
-						}else if(reader.getLocalName().equals("hi")){
-							processInlineElement(tc, TagType.PLACEHOLDER);
-						}else if(reader.getLocalName().equals("bpt")){
+						}else if(localName.equals("bpt")){
 							processInlineElement(tc, TagType.OPENING);	
-						}else if(reader.getLocalName().equals("ept")){
+						}else if(localName.equals("ept")){
 							processInlineElement(tc, TagType.CLOSING);	
 						}
+						break;
+					}else if (tuvType == 0){
+						//TODO: handle remaining inline tags
 					}
-					break;
 					
-				//--process the end document note--				
 				case XMLStreamConstants.END_ELEMENT:
+
+					//--matches the opening element--
 					if(reader.getLocalName().equals(startElement)){
-						
-						if(tc!=null && tu!=null){
-							if(isSource){
-								skel.addRef(tu, null);
-							}else{
-								skel.addRef(tu, targetLanguage);
-							}
+						if(tuvType == 1){
+							//--add ref to source
+							skel.addRef(tu, null);
+						}else if(tuvType == 2){
+							//--add ref to target
+							skel.addRef(tu, targetLanguage);
 						}
 						appendEndElement(skel);
-						elementProcessed = true;
+						completed = true;
 					}
 					break;
 				}
@@ -661,8 +688,6 @@ public class TmxFilter implements IFilter {
 		}
 	}
 
-	
-	
 	
 	/**
 	 * Process an Inline Element, create a code and add to the passed TextContainer. 
@@ -710,7 +735,7 @@ public class TmxFilter implements IFilter {
 					if(reader.getLocalName().equals(startElement)){
 
 						sb.append("</"+reader.getLocalName()+">");
-						System.out.println("</"+reader.getLocalName()+">");
+						System.out.print("</"+reader.getLocalName()+">");
 						elementProcessed = true;
 					}
 					break;
@@ -724,7 +749,7 @@ public class TmxFilter implements IFilter {
 	
 	
 	/**
-	 * Checks the elementName to see if it's a group element
+	 * Checks the elementName to see if it's a group element in the general doc section as listed in the docStartGroups array
 	 * @param elementName Name of the element.
 	 * @return returns true if elementName refers to a group.
 	 */	
@@ -766,16 +791,20 @@ public class TmxFilter implements IFilter {
 	
 	
 	/**
-	 * Checks the tuv attribute to see if it's a source tuv
-	 * @return returns true if tuv is source
+	 * Checks the tuv lang attribute to see if it's a source tuv
+	 * @return 	returns 0 for tuv that is neither source or target
+	 * 			returns 1 for source tuv
+	 * 			returns 2 for target tuv
 	 */		
-	private boolean isSourceTuv(){
+	private int tuvType(){
 		
 		//TODO: change this to check for the actual name of the attribute (not the index)
 		if (reader.getAttributeValue(0).toLowerCase().equals(sourceLanguage.toLowerCase())){
-			return true;
+			return 1;
+		}else if (reader.getAttributeValue(0).toLowerCase().equals(targetLanguage.toLowerCase())){
+			return 2;
 		}
-		return false;
+		return 0;
 	}
 	
 }

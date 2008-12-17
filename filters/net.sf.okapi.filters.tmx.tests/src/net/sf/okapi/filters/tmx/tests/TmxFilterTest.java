@@ -21,7 +21,7 @@ public class TmxFilterTest {
 		TmxFilter filter = null;		
 		try {
 			filter = new TmxFilter();
-			filter.setOptions("en-us","FR-FR", "UTF-8",true);
+			filter.setOptions("en-us","fr-ca", "UTF-8",true);
 			InputStream input = TmxFilterTest.class.getResourceAsStream("/ImportTest2A.tmx");
 			filter.open(input);
 			process(filter);
