@@ -548,12 +548,10 @@ public class ITSEngine implements IProcessor, ITraversal
 		return trace.peek().translate;
 	}
 	
-	public boolean translate (String attrName) {
-		if ( node == null ) return false;
-		if ( !(node instanceof Element) ) return false;
-		Node attr = ((Element)node).getAttributeNode(attrName);
+	public boolean translate (Attr attribute) {
+		if ( attribute == null ) return false;
 		String tmp;
-		if ( (tmp = (String)attr.getUserData(FLAGNAME)) == null ) return false;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TRANSLATE) == 'y');
 	}
@@ -562,12 +560,10 @@ public class ITSEngine implements IProcessor, ITraversal
 		return trace.peek().dir;
 	}
 
-	public int getDirectionality (String attrName) {
-		if ( node == null ) return DIR_LTR;
-		if ( !(node instanceof Element) ) return DIR_LTR;
-		Node attr = ((Element)node).getAttributeNode(attrName);
+	public int getDirectionality (Attr attribute) {
+		if ( attribute == null ) return DIR_LTR;
 		String tmp;
-		if ( (tmp = (String)attr.getUserData(FLAGNAME)) == null ) return DIR_LTR;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return DIR_LTR;
 		return Integer.valueOf(tmp.charAt(FP_DIRECTIONALITY));
 	}
 	

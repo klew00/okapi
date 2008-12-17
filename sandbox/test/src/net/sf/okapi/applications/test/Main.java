@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -269,9 +270,9 @@ public class Main {
 							itsEng.getDirectionality()));
 						NamedNodeMap list = node.getAttributes();
 						for ( int i=0; i<list.getLength(); i++ ) {
-							Node attr = list.item(i);
+							Attr attr = (Attr)list.item(i);
 							System.out.println("      - " + attr.getNodeName() + ", trans="
-								+ (itsEng.translate(attr.getNodeName()) ? "yes" : "no"));
+								+ (itsEng.translate(attr) ? "yes" : "no"));
 						}
 					}
 					break;

@@ -32,6 +32,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -202,13 +203,13 @@ public class XMLReader {
 	private void processAttributes () {
 		if ( !node.hasAttributes() ) return; // Fast way out
 		NamedNodeMap list = node.getAttributes();
-		Node attr;
+		Attr attr;
 		for ( int i=0; i<list.getLength(); i++ ) {
-			attr = list.item(i);
-			if ( itsEng.translate(attr.getNodeName()) ) {
+			attr = (Attr)list.item(i);
+			if ( itsEng.translate(attr) ) {
 				TextUnit attrItem = new TextUnit();
 				attrItem.getSourceContent().append(attr.getNodeValue());
-				attrItem.setID(String.valueOf(++itemID));
+				attrItem.setId(String.valueOf(++itemID));
 				attrItem.setType("x-attr-"+attr.getNodeName());
 				if ( itsEng.getWithinText() == ITraversal.WITHINTEXT_YES ) {
 					// For sub-items in in-line codes: Replace the value by a

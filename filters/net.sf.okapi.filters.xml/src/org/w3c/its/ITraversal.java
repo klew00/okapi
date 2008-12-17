@@ -1,5 +1,6 @@
 package org.w3c.its;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Node;
 
 public interface ITraversal {
@@ -40,12 +41,13 @@ public interface ITraversal {
 	boolean translate ();
 	
 	/**
-	 * Indicates if a given attribute of the current node of the traversal is
+	 * Indicates if a given attribute of the current element of the traversal is
 	 * translatable.
-	 * @param attrName The name of the attribute to query.
+	 * @param attribute The attribute to query. The attribute must be in the current
+	 * node of the traversal.
 	 * @return True if the attribute is translatable, false otherwise.
 	 */
-	boolean translate (String attrName);
+	boolean translate (Attr attribute);
 	
 	/**
 	 * Gets the directionality for the text of the current node of the
@@ -57,10 +59,11 @@ public interface ITraversal {
 	/**
 	 * Gets the directionality for the text of a given attribute of the current 
 	 * node of the traversal.
-	 * @param attrName The name of the attribute to query.
+	 * @param attribute The attribute to query. The attribute must be in the current
+	 * node of the traversal.
 	 * @return One of the DIR_* values.
 	 */
-	int getDirectionality (String attrName);
+	int getDirectionality (Attr attribute);
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.
