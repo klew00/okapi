@@ -57,6 +57,20 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	/**
+	 * Adds a reference to the resource itself to the skeleton. Defaults to source.
+	 * @param referent Resource object.
+	 */
+	public void addRef (IResource referent)
+	{
+		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
+		part.parent = referent;
+		part.language = null;
+		list.add(part);
+		// Flag that the next append() should start a new part
+		createNew = true;
+	}
+	
+	/**
 	 * Adds a reference to the resource itself to the skeleton.
 	 * @param referent Resource object.
 	 * @param language Language or null if the reference is to the source.
