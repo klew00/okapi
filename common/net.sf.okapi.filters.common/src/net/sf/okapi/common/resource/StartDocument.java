@@ -28,6 +28,11 @@ public class StartDocument extends BaseNameable {
 	protected String encoding;
 	protected boolean isMultilingual;
 	protected IParameters params;
+
+	public StartDocument (String id) {
+		super();
+		this.id = id;
+	}
 	
 	public String getLanguage () {
 		return language;

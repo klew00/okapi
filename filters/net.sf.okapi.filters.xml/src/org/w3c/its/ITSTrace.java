@@ -1,10 +1,11 @@
 package org.w3c.its;
 
 class ITSTrace {
-	boolean             isChildDone;
-	boolean             translate;
-	int                 dir;
-	int                 withinText;
+	
+	boolean isChildDone;
+	boolean translate;
+	int dir;
+	int withinText;
 
 	ITSTrace () {
 	}
@@ -17,4 +18,5 @@ class ITSTrace {
 		withinText = initialTrace.withinText;
 		this.isChildDone = isChildDone;
 	}
+
 }

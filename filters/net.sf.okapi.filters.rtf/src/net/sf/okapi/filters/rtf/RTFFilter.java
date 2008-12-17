@@ -335,7 +335,7 @@ public class RTFFilter implements IFilter {
 			reader = new BufferedReader(
 				new InputStreamReader(input, passedEncoding));
 			reset(passedEncoding);
-			startDoc = new StartDocument();
+			startDoc = new StartDocument(String.valueOf(++id));
 			startDoc.setId(String.valueOf(++id));
 			startDoc.setIsMultilingual(true);
 			startDoc.setFilterParameters(getParameters());
@@ -693,7 +693,7 @@ public class RTFFilter implements IFilter {
 		int p_nErrorCWCode)
 	{
 		text.setLength(0);
-		boolean bParOrLine = false;
+		//boolean bParOrLine = false;
 
 		while ( true ) {
 			switch ( getNextToken() ) {
@@ -716,13 +716,13 @@ public class RTFFilter implements IFilter {
 			case TOKEN_CTRLWORD:
 				if ( p_nCWCode == -1 ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
-						bParOrLine = true;
+						//bParOrLine = true;
 						return 0;
 					}
 				}
 				else if ( code == p_nCWCode ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
-						bParOrLine = true;
+						//bParOrLine = true;
 					}
 					return 0;
 				}

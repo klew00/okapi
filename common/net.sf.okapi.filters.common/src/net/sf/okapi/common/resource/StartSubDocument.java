@@ -26,7 +26,15 @@ public class StartSubDocument extends BaseNameable {
 	
 	public StartSubDocument (String parentId) {
 		super();
-		setParentId(parentId);
+		this.parentId = parentId;
+	}
+
+	public StartSubDocument (String parentId,
+		String id)
+	{
+		super();
+		this.parentId = parentId;
+		this.id = id;
 	}
 
 	public String getParentId () {

@@ -64,8 +64,7 @@ public class PropertiesFilter implements IFilter {
 	private int lineNumber;
 	private int lineSince;
 	private long position;
-	private int itemID;
-	private int grpID;
+	private int id;
 	private Pattern keyConditionPattern;
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String lineBreak;
@@ -148,7 +147,7 @@ public class PropertiesFilter implements IFilter {
 		// Store the ending for next call
 		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
 		// Set the ending call
-		Ending ending = new Ending(String.format("%d", ++grpID));
+		Ending ending = new Ending(String.valueOf(++id));
 		ending.setSkeleton(skel);
 		parseState = 2;
 		currentRes = ending;
@@ -168,8 +167,7 @@ public class PropertiesFilter implements IFilter {
 			
 			// Initializes the variables
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
-			itemID = 0;
-			grpID = 0;
+			id = 0;
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;
@@ -200,7 +198,7 @@ public class PropertiesFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			startDoc = new StartDocument();
+			startDoc = new StartDocument(String.valueOf(++id));
 			startDoc.setName(inputUrl.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(params);
@@ -378,7 +376,7 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( extract ) {
-					tuRes = new TextUnit(String.valueOf(++itemID),
+					tuRes = new TextUnit(String.valueOf(++id),
 						unescape(value));
 					tuRes.setName(key);
 					tuRes.setMimeType("text/x-properties");

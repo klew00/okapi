@@ -15,7 +15,8 @@ public interface ITraversal {
 	
 	
 	/**
-	 * Starts the traversal of the document.
+	 * Starts the traversal of the document. This method must be called
+	 * once before you call {@link #nextNode()}.
 	 */
 	void startTraversal ();
 	
@@ -62,7 +63,7 @@ public interface ITraversal {
 	int getDirectionality (String attrName);
 	
 	/**
-	 * Gets the withinText-related information for the current element.
+	 * Gets the element-withinText-related information for the current element.
 	 * @return One of the WINTINTEXT_* values.
 	 */
 	int getWithinText ();

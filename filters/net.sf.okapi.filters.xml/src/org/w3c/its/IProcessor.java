@@ -45,9 +45,10 @@ public interface IProcessor {
 	void applyRules (int dataCategories);
 	
 	/**
-	 * Removes all the special attributes added when applying the ITS rules.
+	 * Removes all the special flags added when applying the ITS rules.
 	 * Once you have called this method you should call applyRules() again to be able
-	 * to use any ITSState again.
+	 * to use ITS-aware methods again.
 	 */
 	void disapplyRules ();
+
 }

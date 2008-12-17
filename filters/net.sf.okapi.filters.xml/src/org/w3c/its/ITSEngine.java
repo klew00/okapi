@@ -15,8 +15,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.okapi.common.Util;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,18 +35,17 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
 
-	private DocumentBuilderFactory     fact; 
-	private Document                   doc;
-	private URI                        docURI;
-	private NSContextManager           nsContext;
-	private XPathFactory               xpFact;
-	private XPath                      xpath;
-	private ArrayList<ITSRule>         rules;
-	private Node                       node;
-	private boolean                    startTraversal;
-	private Stack<ITSTrace>            trace;
-	private boolean                    backTracking;
-
+	private DocumentBuilderFactory fact; 
+	private Document doc;
+	private URI docURI;
+	private NSContextManager nsContext;
+	private XPathFactory xpFact;
+	private XPath xpath;
+	private ArrayList<ITSRule> rules;
+	private Node node;
+	private boolean startTraversal;
+	private Stack<ITSTrace> trace;
+	private boolean backTracking;
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -98,24 +95,24 @@ public class ITSEngine implements IProcessor, ITraversal
 		try {
 			// Compile the namespaces
 			XPathExpression expr = xpath.compile("//*[@selector]//namespace::*");
-			NodeList NL = (NodeList)expr.evaluate(rulesDoc, XPathConstants.NODESET);
-			for ( int i=0; i<NL.getLength(); i++ ) {
-				String prefix = NL.item(i).getLocalName();
+			NodeList nl = (NodeList)expr.evaluate(rulesDoc, XPathConstants.NODESET);
+			for ( int i=0; i<nl.getLength(); i++ ) {
+				String prefix = nl.item(i).getLocalName();
 				if ( "xml".equals(prefix) ) continue; // Set by default
-				String uri = NL.item(i).getNodeValue();
+				String uri = nl.item(i).getNodeValue();
 				nsContext.addNamespace(prefix, uri);
 			}
 			
 			// Compile the rules
 			// First: get the its:rules element(s)
 			expr = xpath.compile("//"+ITS_NS_PREFIX+":rules");
-			NL = (NodeList)expr.evaluate(rulesDoc, XPathConstants.NODESET);
-			if ( NL.getLength() == 0 ) return; // Nothing to do
+			nl = (NodeList)expr.evaluate(rulesDoc, XPathConstants.NODESET);
+			if ( nl.getLength() == 0 ) return; // Nothing to do
 			
 			// Process each its:rules element
 			Element rulesElem;
-			for ( int i=0; i<NL.getLength(); i++ ) {
-				rulesElem = (Element)NL.item(i);
+			for ( int i=0; i<nl.getLength(); i++ ) {
+				rulesElem = (Element)nl.item(i);
 				//TODO: Check version
 
 				//TODO: load linked rules
@@ -132,7 +129,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					// xlink:href allows the use of xml:base so we need to calculate it
 					// The initial base is the folder of the current document
 					File tmpFile = new File(docURI);
-					String baseFolder = Util.getDirectoryName(tmpFile.getPath());
+					String baseFolder = getDirectoryName(tmpFile.getPath());
 					// Then we look for the last xml:base specified
 					Node node = rulesElem;
 					while ( node != null ) {
@@ -164,12 +161,12 @@ public class ITSEngine implements IProcessor, ITraversal
 
 				// Process each rule inside its:rules
 				expr = xpath.compile("//"+ITS_NS_PREFIX+":*");
-				NodeList NL2 = (NodeList)expr.evaluate(rulesElem, XPathConstants.NODESET);
-				if ( NL2.getLength() == 0 ) break; // Nothing to do, move to next its:rules
+				NodeList nl2 = (NodeList)expr.evaluate(rulesElem, XPathConstants.NODESET);
+				if ( nl2.getLength() == 0 ) break; // Nothing to do, move to next its:rules
 				
 				Element ruleElem;
-				for ( int j=0; j<NL2.getLength(); j++ ) {
-					ruleElem = (Element)NL2.item(j);
+				for ( int j=0; j<nl2.getLength(); j++ ) {
+					ruleElem = (Element)nl2.item(j);
 					if ( "translateRule".equals(ruleElem.getLocalName()) ) {
 						compileTranslateRule(ruleElem, isInternal);
 					}
@@ -577,4 +574,11 @@ public class ITSEngine implements IProcessor, ITraversal
 	public int getWithinText () {
 		return trace.peek().withinText;
 	}
+
+	private String getDirectoryName (String path) {
+		int n = path.lastIndexOf(File.separator);
+		if ( n > 0 ) return path.substring(0, n);
+		else return "";
+	}
+
 }

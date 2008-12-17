@@ -14,7 +14,7 @@ import javax.xml.namespace.NamespaceContext;
  */
 public class NSContextManager implements NamespaceContext {
 
-	private Hashtable<String, String>  table;
+	private Hashtable<String, String> table;
 	
 	public NSContextManager () {
 		table = new Hashtable<String, String>();

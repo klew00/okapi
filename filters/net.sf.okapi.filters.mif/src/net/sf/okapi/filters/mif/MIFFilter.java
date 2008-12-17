@@ -27,16 +27,19 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.LinkedList;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class MIFFilter implements IFilter {
 	
@@ -45,19 +48,15 @@ public class MIFFilter implements IFilter {
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
-	private StringBuilder sklBuffer;
-	private StringBuilder ilcBuffer;
-	private StringBuilder buffer;
-	private StartDocument startDoc;
-	private int parseState = 0;
 	private int inPara;
 	private int inString;
 	private IResource currentRes;
-	private int tuId;
-	private int skId;
+	private int id;
 	private int level;
 	private TextContainer cont;
 	private boolean canceled;
+	private LinkedList<FilterEvent> queue;
+	private String srcLang;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -110,25 +109,49 @@ public class MIFFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		return (( parseState == 1 ) || ( parseState == 2 ));
+		return (( queue != null ) && ( queue.size() > 0 ));
 	}
 	
+	public void setOptions (String sourceLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
+	}
+
+	public void setOptions (String sourceLanguage,
+		String targetLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		srcLang = sourceLanguage;
+	}
+
 	public void open (InputStream input) {
 		try {
 			close(); //TODO: encoding for non-EN
+			
+			String encoding = guessEncoding(input);
+			
 			reader = new BufferedReader(
-				new InputStreamReader(input, "UTF-8"));
+				new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
-			sklBuffer = new StringBuilder();
-			ilcBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
 			level = 0;
-			parseState = 1; // Need to send start-document
 			inPara = -1;
 			inString = -1;
-			tuId = -1;
-			skId = -1;
+			id = 0;
 			canceled = false;
+			queue = new LinkedList<FilterEvent>();
+			
+			queue.add(new FilterEvent(FilterEventType.START));
+			
+			StartDocument startDoc = new StartDocument(String.valueOf(++id));
+			startDoc.setEncoding(encoding);
+			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(getParameters());
+			
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -149,11 +172,6 @@ public class MIFFilter implements IFilter {
 		throw new UnsupportedOperationException();
 	}
 
-	public void setOptions (String language,
-		String defaultEncoding)
-	{
-	}
-
 	public void setParameters (IParameters params) {
 	}
 
@@ -161,27 +179,21 @@ public class MIFFilter implements IFilter {
 		try {
 			// Check for cancellation
 			if ( canceled ) {
-				parseState = 0;
+				queue.clear();
 				return null;
 			}
-			
-			// Process first call
-			if ( parseState == 1 ) {
-				startDoc = new StartDocument();
-				parseState = 2; // Inside the document
-				currentRes = startDoc;
-				return new FilterEvent(FilterEventType.START_DOCUMENT, startDoc);
+			// Check the queue first
+			if ( queue.size() > 0 ) {
+				return pollQueue();
 			}
 			
 			// Process other calls
-			sklBuffer.setLength(0);
-			ilcBuffer.setLength(0);
-			buffer = sklBuffer;// Start buffer is the skeleton buffer
+			GenericSkeleton skel = new GenericSkeleton();
 			int c;
 			while ( (c = reader.read()) != -1 ) {
 				switch ( c ) {
 				case '#':
-					buffer.append((char)c);
+					skel.append((char)c);
 					readComment();
 					break;
 				case '<': // Start of statement
@@ -191,9 +203,6 @@ public class MIFFilter implements IFilter {
 					if ( "Para".equals(tag) ) {
 						inPara = level;
 						cont = new TextContainer();
-						// Return skeleton before
-						currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
-						return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
 					}
 					else if ( "String".equals(tag) ) {
 						inString = level;
@@ -206,8 +215,12 @@ public class MIFFilter implements IFilter {
 					else if ( inPara == level ) {
 						inPara = -1;
 						if ( !cont.isEmpty() ) {
-							TextUnit tu = new TextUnit(getTextId());
+							TextUnit tu = new TextUnit(String.valueOf(++id));
 							tu.setSource(cont);
+							if ( sklBuffer.length() > 0 ) {
+								tu.setSkeleton(skel);
+							}
+							
 							currentRes = tu;
 							return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
 							//TODO: Skeleton should be attached too
@@ -236,12 +249,26 @@ public class MIFFilter implements IFilter {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-		
-		parseState = 0; // No more
-		currentRes = startDoc;
-		return new FilterEvent(FilterEventType.END_DOCUMENT, null);
+
+		// Else: we are done
+		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
+			new Ending(String.valueOf(++id))));
+		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		return pollQueue();
 	}
 
+	private FilterEvent pollQueue () {
+		if ( queue.size() == 0 ) { // Just in case
+			currentRes = null;
+			return null;
+		}
+		else {
+			FilterEvent event = queue.poll();
+			currentRes = event.getResource();
+			return event;
+		}
+	}
+	
 	private void readComment () throws IOException {
 		int c;
 		while ( (c = reader.read()) != -1 ) {
@@ -356,14 +383,6 @@ public class MIFFilter implements IFilter {
 		throw new RuntimeException("End of string is missing.");
 	}
 
-	private String getTextId () {
-		return String.valueOf(++tuId);
-	}
-
-	private String getSkeletonId () {
-		return String.valueOf(++skId);
-	}
-
 	private String guessEncoding (InputStream input) {
 		try {
 			// Open the file for byte reading
@@ -377,4 +396,5 @@ public class MIFFilter implements IFilter {
 		}
 		return null; // No encoding detected
 	}
+
 }

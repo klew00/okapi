@@ -55,9 +55,7 @@ public class RegexFilter implements IFilter {
 	private BufferedReader reader;
 	private String inputText;
 	private Stack<StartGroup> groupStack;
-	private int dpID;
-	private int groupID;
-	private int itemID;
+	private int id;
 	private StartDocument startDoc;
 	private TextUnit tuRes;
 	private LinkedList<FilterEvent> queue;
@@ -161,7 +159,7 @@ public class RegexFilter implements IFilter {
 
 		// End finally set the end
 		// Set the ending call
-		Ending ending = new Ending(String.format("%d", ++groupID));
+		Ending ending = new Ending(String.format("%d", ++id));
 		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
 		// Store the last event
 		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
@@ -194,9 +192,7 @@ public class RegexFilter implements IFilter {
 			groupStack = new Stack<StartGroup>();
 			startSearch = 0;
 			startSkl = 0;
-			itemID = 0;
-			dpID = 0;
-			groupID = 0;
+			id = 0;
 
 			// Prepare the filter rules
 			params.compileRules();
@@ -217,7 +213,7 @@ public class RegexFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			startDoc = new StartDocument();
+			startDoc = new StartDocument(String.valueOf(++id));
 			startDoc.setName(inputUrl.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(params);
@@ -273,7 +269,7 @@ public class RegexFilter implements IFilter {
 			}
 			// Then just return one skeleton event
 			return new FilterEvent(FilterEventType.DOCUMENT_PART,
-				new DocumentPart(String.format("%d", ++dpID), false, skel));
+				new DocumentPart(String.format("%d", ++id), false, skel));
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
@@ -285,7 +281,7 @@ public class RegexFilter implements IFilter {
 			//TODO: return group event, and deal with skeleton
 			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
 				StartGroup startGroup = new StartGroup(null);
-				startGroup.setId(String.valueOf(++groupID));
+				startGroup.setId(String.valueOf(++id));
 				startGroup.setSkeleton(skel);
 				if ( rule.nameStart.length() > 0 ) {
 					String name = getMatch(startResult.group(), rule.nameStart, rule.nameEnd);
@@ -303,7 +299,7 @@ public class RegexFilter implements IFilter {
 			}
 			else { // Close group
 				groupStack.pop();
-				Ending ending = new Ending(String.valueOf(++groupID));
+				Ending ending = new Ending(String.valueOf(++id));
 				ending.setSkeleton(skel);
 				return new FilterEvent(FilterEventType.END_GROUP, ending);
 				
@@ -371,7 +367,7 @@ public class RegexFilter implements IFilter {
 		String name,
 		String data)
 	{
-		tuRes = new TextUnit(String.valueOf(++itemID), data);
+		tuRes = new TextUnit(String.valueOf(++id), data);
 		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
 		tuRes.setPreserveWhitespaces(rule.preserveWS);
 
@@ -484,7 +480,7 @@ public class RegexFilter implements IFilter {
 			}
 			
 			// Item to extract
-			tuRes = new TextUnit(String.valueOf(++itemID),
+			tuRes = new TextUnit(String.valueOf(++id),
 				data.substring(start, end));
 			tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
 			tuRes.setPreserveWhitespaces(rule.preserveWS);
@@ -528,7 +524,7 @@ public class RegexFilter implements IFilter {
 		// Else: create a new skeleton entry
 		skel = new GenericSkeleton(data);
 		queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART,
-			new DocumentPart(String.valueOf(++dpID), false, skel)));
+			new DocumentPart(String.valueOf(++id), false, skel)));
 	}
 
 	private FilterEvent nextEvent () {

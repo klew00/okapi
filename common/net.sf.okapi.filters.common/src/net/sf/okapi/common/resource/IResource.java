@@ -32,9 +32,9 @@ public interface IResource {
 
 	/**
 	 * Gets the ID of the resource. This ID is unique per extracted document, and may be 
-	 * different from one extraction to the next.
+	 * different from one extraction of the same document to the next.
 	 * It has no correspondence in the source document ("IDs" coming from the source document
-	 * are "Names" and not available for all resources).
+	 * are "names" and not available for all resources).
 	 * @return The id of this resource.
 	 */
 	public String getId ();
