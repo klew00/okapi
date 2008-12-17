@@ -318,6 +318,17 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 	}
 	
 	/**
+	 * Removes a given target object from this TextUnit.  
+	 * @param language the target language to remove.
+	 */
+	public void removeTarget (String language) {
+		if ( hasTarget(language) ) {
+			TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
+			ta.remove(language);
+		}
+	}
+	
+	/**
 	 * Indicates if there is a target object for a given language for this TextUnit. 
 	 * @param language The language to query.
 	 * @return True if a target object exists for the given language, false otherwise.

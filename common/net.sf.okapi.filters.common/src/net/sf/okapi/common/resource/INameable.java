@@ -91,8 +91,8 @@ public interface INameable {
 
 	/**
 	 * Gets the target property for a given name and target language.
-	 * @param language The language of the property to retrieve.
-	 * @param name The name of the property to retrieve.
+	 * @param language The language of the property to retrieve. The language code is case-sensitive.
+	 * @param name The name of the property to retrieve. This name is case-sensitive.
 	 * @return The property or null if it does not exist.
 	 */
 	public Property getTargetProperty (String language,
@@ -100,8 +100,9 @@ public interface INameable {
 	
 	/**
 	 * Sets a target property. If a property already exists it is overwritten.
-	 * @param language The target language for which this property should be set.
-	 * @param property The new property to set.
+	 * @param language The target language for which this property should be set. The language code
+	 * is case-sensitive.
+	 * @param property The new property to set. This name is case-sensitive.
 	 * @return The property that has been set.
 	 */
 	public Property setTargetProperty (String language,
@@ -109,7 +110,7 @@ public interface INameable {
 	
 	/**
 	 * Gets the names of all the properties for a given target language in this resource.
-	 * @param language The target language to query.
+	 * @param language The target language to query. The language code is case-sensitive.
 	 * @return All the names of the target properties for the given language in this resource.
 	 */
 	public Set<String> getTargetPropertyNames (String language);
@@ -122,7 +123,7 @@ public interface INameable {
 	
 	/**
 	 * Indicates if a property exists for a given name and target language.
-	 * @param language The target language to query.
+	 * @param language The target language to query. The language code is case-sensitive.
 	 * @param name The name of the property to query.
 	 * @return True if a property exists, false otherwise.
 	 */
@@ -131,7 +132,7 @@ public interface INameable {
 
 	/**
 	 * Creates or get a target property based on the corresponding source.
-	 * @param language The target language to use.
+	 * @param language The target language to use. The language code is case-sensitive.
 	 * @param name The name of the property to create (or retrieve)
 	 * @param overwriteExisting True to overwrite any existing property.
 	 * False to not create a new property if one exists already. 

@@ -42,6 +42,10 @@ public class TargetsAnnotation implements IAnnotation, Iterable<String> {
 	public TextContainer get (String language) {
 		return targets.get(language);
 	}
+	
+	public void remove (String language) {
+		targets.remove(language);
+	}
 
 	public boolean isEmpty() {
 		return targets.isEmpty();
