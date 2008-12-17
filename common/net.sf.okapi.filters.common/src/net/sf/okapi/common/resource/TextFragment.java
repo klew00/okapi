@@ -360,6 +360,13 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
+	 * Helper method to add existing code.
+	 */
+	public Code append (Code code) {
+		return append (code.tagType, code.type,	code.data);
+	}
+	
+	/**
 	 * Appends a new code to the text.
 	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
 	 * @param type The type of the code (e.g. "bold").
