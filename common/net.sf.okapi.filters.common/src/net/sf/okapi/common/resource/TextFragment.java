@@ -801,21 +801,12 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Gets the parent of the fragment.
-	 * @return the parent of the fragment or null if none is assigned.
+	 * Compares and object with this TextFragment. If the object is also a TextFragment,
+	 * the methods returns the comparison between the coded text string of both TextFragments.
+	 * If the object is not a TextFragment, the method returns the comparison between the two
+	 * toString() results of the two objects.
+	 * @return A value 0 if the objects are the same.
 	 */
-//	public TextUnit getParent() {
-//		return parent;
-//	}
-
-	/**
-	 * Sets the parent of the fragment.
-	 * @param value The new parent to assign (can be null).
-	 */
-//	public void setParent (TextUnit value) {
-//		parent = value;
-//	}
-	
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;
 		if ( object instanceof TextFragment ) {

@@ -144,7 +144,7 @@ public class OutputFilter implements IOutputFilter {
 					if ( siFlag.startsWith(XMLReader.ILMARKER) ) {
 						// This is an item extracted from an in-line code
 						// We have to wait the parent to be merged to set it
-						subItems.put(tu.getID(), tu.getTargetContent());
+						subItems.put(tu.getId(), tu.getTargetContent());
 					}
 					else { // Not in in-line code, set it now
 						Element elem = (Element)res.srcNode;
@@ -152,7 +152,7 @@ public class OutputFilter implements IOutputFilter {
 						if ( attr != null ) attr.setNodeValue(tu.getTargetContent().toString());
 						else {
 							logger.warn(String.format("Cannot found mergeable attribute '%s' in item id='%s'",
-								siFlag, tu.getID()));
+								siFlag, tu.getId()));
 						}
 					}
 				}
@@ -172,7 +172,7 @@ public class OutputFilter implements IOutputFilter {
 							}
 							else {
 								logger.warn(String.format("Cannot found marker for sub-item id='%s' in item id='%s'",
-									id, tu.getID()));
+									id, tu.getId()));
 							}
 						}
 						subItems.clear();
@@ -183,11 +183,11 @@ public class OutputFilter implements IOutputFilter {
 					}
 					catch ( IOException e ) {
 						logger.error(String.format("Problem in new content of item id='%s'.",
-							tu.getID()), e);
+							tu.getId()), e);
 					}
 					catch ( SAXException e ) {
 						logger.error(String.format("Problem in new content of item id='%s'.",
-							tu.getID()), e);
+							tu.getId()), e);
 					}
 				}
 			}

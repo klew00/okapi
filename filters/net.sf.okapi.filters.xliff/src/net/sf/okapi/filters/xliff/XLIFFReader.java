@@ -296,7 +296,7 @@ public class XLIFFReader {
 			tmp = reader.getAttributeValue("", "resname");
 			if ( tmp != null ) item.setName(tmp);
 			else if ( resource.params.fallbackToID ) {
-				item.setName(item.getID());
+				item.setName(item.getId());
 			}
 
 			tmp = reader.getAttributeValue("", "restype");

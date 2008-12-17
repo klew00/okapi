@@ -236,7 +236,7 @@ public class XMLReader {
 		if ( node == null ) throw new NullPointerException();
 		item.setType("x-"+node.getLocalName());
 		item.setSourceContent(content);
-		item.setID(String.valueOf(++itemID));
+		item.setId(String.valueOf(++itemID));
 		item.setName(((Element)node).getAttribute("xml:id"));
 		sendEndEvent = true;
 		resource.srcNode = node;

@@ -27,12 +27,11 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
 
-	protected TagType   tagType;
-	protected int       id;
-	protected String    type;
-	protected String    data;
-	protected boolean   hasReference;
-
+	protected TagType tagType;
+	protected int id;
+	protected String type;
+	protected String data;
+	protected boolean hasReference;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -151,7 +150,7 @@ public class Code {
 	 * Gets the ID of the code.
 	 * @return The ID of the code.
 	 */
-	public int getID () {
+	public int getId () {
 		return id;
 	}
 
@@ -161,7 +160,7 @@ public class Code {
 	 * values may result in codes with duplicate IDs.
 	 * @param value The new ID value to be applied.
 	 */
-	public void setID (int value) {
+	public void setId (int value) {
 		id = value;
 	}
 

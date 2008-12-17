@@ -327,6 +327,11 @@ public class TextContainer extends TextFragment {
 					segments.remove(segmentIndex);
 					// Renumber the remaining segment
 					renumberSegmentMarkers(pos, segmentIndex);
+					// Check if it was the last segment to merge
+					if ( segments.size() == 0 ) {
+						// This make the container not segmented anymore
+						segments = null;
+					}
 					return pos;
 				}
 			}
@@ -408,8 +413,7 @@ public class TextContainer extends TextFragment {
 
 	/**
 	 * Sets the list of segments for this object. No change is made to the
-	 * master content itself, so it must already match the given list at the end, or it
-	 * must be build separately.
+	 * place-holder itself, so it must already match the given list.
 	 * @param segments The new list of segments.
 	 */
 	public void setSegments (ArrayList<TextFragment> segments) {

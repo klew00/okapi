@@ -75,7 +75,7 @@ public class XLIFFContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}
@@ -87,7 +87,7 @@ public class XLIFFContent {
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}
@@ -100,7 +100,7 @@ public class XLIFFContent {
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				if ( codeOnlyMode ) {
 					tmp.append(codes.get(index).toString());
 				}
@@ -177,7 +177,7 @@ public class XLIFFContent {
 					tmp.append("</mrk>");
 				}
 				else {
-					id = codes.get(index).getID();
+					id = codes.get(index).getId();
 					tmp.append(String.format("<ph id=\"%d\">", id));
 					tmp.append(Util.escapeToXML(codes.get(index).toString(),
 						quoteMode, escapeGT));
@@ -186,7 +186,7 @@ public class XLIFFContent {
 				break;
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				tmp.append(String.format("<bpt id=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(),
 					quoteMode, escapeGT));
@@ -194,7 +194,7 @@ public class XLIFFContent {
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				tmp.append(String.format("<ept id=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(),
 					quoteMode, escapeGT));

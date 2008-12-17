@@ -304,7 +304,7 @@ public abstract class BaseFilterOld implements IFilter {
 
 	private Group createGroup (String name, String data, ITranslatable parent) {
 		Group group = new Group();
-		group.setID(String.format("s%d", ++groupId));
+		group.setId(String.format("s%d", ++groupId));
 		group.setData(data);
 		group.setParent(parent);
 		return group;

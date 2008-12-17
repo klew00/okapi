@@ -95,17 +95,17 @@ public class GenericContent {
 			case TextFragment.MARKER_OPENING:
 				code = container.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("<%d>", code.getID()));
+				else tmp.append(String.format("<%d>", code.getId()));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				code = container.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("</%d>", code.getID()));
+				else tmp.append(String.format("</%d>", code.getId()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 				code = container.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("<%d/>", code.getID()));
+				else tmp.append(String.format("<%d/>", code.getId()));
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				code = container.getCode(text.charAt(++i));
@@ -145,18 +145,18 @@ public class GenericContent {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
-				else tmp.append(String.format("<%d>", codes.get(index).getID()));
+				else tmp.append(String.format("<%d>", codes.get(index).getId()));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
-				else tmp.append(String.format("</%d>", codes.get(index).getID()));
+				else tmp.append(String.format("</%d>", codes.get(index).getId()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
-				else tmp.append(String.format("<%d/>", codes.get(index).getID()));
+				else tmp.append(String.format("<%d/>", codes.get(index).getId()));
 				break;
 			default:
 				tmp.append(codedText.charAt(i));
@@ -181,18 +181,18 @@ public class GenericContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				genericPos += String.format("<%d>", codes.get(index).getID()).length();
+				genericPos += String.format("<%d>", codes.get(index).getId()).length();
 				codedPos += 2;
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				genericPos += String.format("</%d>", codes.get(index).getID()).length();
+				genericPos += String.format("</%d>", codes.get(index).getId()).length();
 				codedPos += 2;
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				genericPos += String.format("<%d/>", codes.get(index).getID()).length();
+				genericPos += String.format("<%d/>", codes.get(index).getId()).length();
 				codedPos += 2;
 				break;
 			default:

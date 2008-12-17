@@ -78,14 +78,14 @@ public class TMXContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				tmp.append(String.format("<bpt i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</bpt>");
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getID();
+				id = codes.get(index).getId();
 				tmp.append(String.format("<ept i=\"%d\">", id));
 				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
 				tmp.append("</ept>");
@@ -94,7 +94,7 @@ public class TMXContent {
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				id = code.getID();
+				id = code.getId();
 				// Use <ph> or <it> depending on underlying tagType
 				switch ( code.getTagType() ) {
 				case PLACEHOLDER:
