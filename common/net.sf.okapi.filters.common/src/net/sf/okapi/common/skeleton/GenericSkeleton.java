@@ -40,6 +40,11 @@ public class GenericSkeleton implements ISkeleton {
 		list = new ArrayList<GenericSkeletonPart>();
 		if ( data != null ) add(data);
 	}
+	
+	public GenericSkeleton (GenericSkeleton skel) {
+		list = new ArrayList<GenericSkeletonPart>();		
+		if ( skel != null ) add(skel.toString());
+	}
 
 	public void add (String data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
@@ -107,6 +112,15 @@ public class GenericSkeleton implements ISkeleton {
 	
 	public List<GenericSkeletonPart> getParts () {
 		return list;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		for (GenericSkeletonPart part : list) {
+			b.append(part.toString());
+		}
+		return b.toString();		
 	}
 
 }
