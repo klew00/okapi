@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.ui.filters.GenericContent;
+import net.sf.okapi.common.writer.GenericInlines;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -94,7 +94,7 @@ public class Aligner {
 	private boolean splitMode = false;
 	private boolean editMode = false;
 	private int indexActiveSegment;
-	private GenericContent genericCont;
+	private GenericInlines genericCont;
 	private String targetSrxPath;
 	private Color colorGreen;
 	private Color colorAmber;
@@ -150,7 +150,7 @@ public class Aligner {
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
 		
-		genericCont = new GenericContent();
+		genericCont = new GenericInlines();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
@@ -783,12 +783,16 @@ public class Aligner {
 		toggleFields(true);
 	}
 	
+	private java.awt.Point conv (Point point) {
+		return new java.awt.Point(point.x, point.y);
+	}
+	
 	private void endSplitMode (boolean accept) {
 		try {
 			// Compute the new segmentation
 			if ( accept ) {
 				// genericCont is already set with the proper text
-				Point sel = genericCont.getCodedTextPosition(edTrgSeg.getSelection());
+				java.awt.Point sel = genericCont.getCodedTextPosition(conv(edTrgSeg.getSelection()));
 				splitSegment(indexActiveSegment, sel.x, sel.y);
 			}
 			// Re-check for issues

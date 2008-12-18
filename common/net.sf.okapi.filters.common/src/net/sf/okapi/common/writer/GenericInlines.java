@@ -1,30 +1,29 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-package net.sf.okapi.common.ui.filters;
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
 
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
+
+package net.sf.okapi.common.writer;
+
+import java.awt.Point;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.swt.graphics.Point;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
@@ -35,24 +34,23 @@ import net.sf.okapi.common.resource.TextFragment;
 /**
  * Handles the conversion between a coded text object and a generic markup string.
  */
-public class GenericContent {
+public class GenericInlines {
 
-	private String      codedText;
-	private List<Code>  codes;
-	private Pattern     patternOpening = Pattern.compile("\\<(\\d*?)\\>");
-	private Pattern     patternClosing = Pattern.compile("\\</(\\d*?)\\>");
-	private Pattern     patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
-	
+	private String codedText;
+	private List<Code> codes;
+	private Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
+	private Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
+	private Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
 
-	public GenericContent () {
+	public GenericInlines () {
 		codedText = "";
 	}
 	
-	public GenericContent (TextFragment content) {
+	public GenericInlines (TextFragment content) {
 		setContent(content);
 	}
 	
-	public GenericContent setContent (TextFragment content) {
+	public GenericInlines setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;

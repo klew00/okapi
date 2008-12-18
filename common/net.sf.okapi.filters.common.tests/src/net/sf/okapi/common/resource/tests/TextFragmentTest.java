@@ -20,13 +20,24 @@
 
 package net.sf.okapi.common.resource.tests;
 
+import java.util.List;
+
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.writer.GenericInlines;
 import junit.framework.*;
 
 public class TextFragmentTest extends TestCase {
 
+	private GenericInlines fmt;
+	
+	@Override
+	public void setUp () throws Exception {
+		super.setUp();
+		fmt = new GenericInlines();
+	}
+	
 	public void testConstructors () {
 		TextFragment tf1 = new TextFragment();
 		assertTrue(tf1.isEmpty());
@@ -59,6 +70,7 @@ public class TextFragmentTest extends TestCase {
 		assertTrue(tf1.hasCode());
 		Code code = tf1.getCode(0);
 		assertEquals(code.getData(), "<br/>");
+		assertEquals(tf1.toString(), "<br/>"); 
 	}
 	
 	public void testInsert () {
@@ -81,6 +93,116 @@ public class TextFragmentTest extends TestCase {
 		tf1.insert(1, tf2);
 		Code code = tf1.getCode(0);
 		assertEquals(code.getData(), "<br/>");
+		assertEquals(fmt.setContent(tf1).toString(true), "a<br/>bc");
+		tf2 = new TextFragment();
+		tf2.append(TagType.OPENING, "b", "<b>");
+		tf1.insert(4, tf2);
+		tf2 = new TextFragment();
+		tf2.append(TagType.CLOSING, "b", "</b>");
+		tf1.insert(7, tf2);
+		tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf1.insert(-1, tf2);
+		assertEquals(tf1.toString(), "a<br/>b<b>c</b><x/>");
 	}
 
+	public void testRemove () {
+		TextFragment tf1 = makeFragment();
+		assertEquals(fmt.setContent(tf1).toString(true), "<b>A<br/>B</b>C");
+		tf1.remove(2, 3); // xxAxxBxxC -> xxxxBxxC
+		tf1.remove(4, 5); // xxxxBxxC -> xxxxxxC
+		tf1.remove(6, 7); // xxxxxxC -> xxxxxx
+		assertFalse(tf1.hasText(true));
+		assertEquals(tf1.getCodedText().length(), 3*2);
+		assertEquals(tf1.toString(), "<b><br/></b>");
+
+		tf1 = makeFragment();
+		tf1.remove(0, 2); // xxAxxBxxC -> AxxBxxC
+		tf1.remove(1, 3); // AxxBxxC -> ABxxC
+		tf1.remove(2, 4); // ABxxC -> ABC
+		assertFalse(tf1.hasCode());
+		assertEquals(tf1.getCodedText().length(), 3);
+		assertEquals(tf1.toString(), "ABC");
+	}
+	
+	public void testInlines () {
+		TextFragment tf1 = makeFragment();
+		assertTrue(tf1.hasCode());
+		assertEquals(tf1.toString(), "<b>A<br/>B</b>C");
+		assertEquals(tf1.getCode(0).getData(), "<b>");
+		assertEquals(tf1.getCode(1).getData(), "<br/>");
+		assertEquals(tf1.getCode(2).getData(), "</b>");
+		assertEquals(fmt.setContent(tf1).toString(false), "<1>A<2/>B</1>C");
+		tf1.remove(0, 2);
+		//TODO: assertEquals(display.setContent(tf1).toString(false), "A<2/>B<1/>C");
+		assertEquals(tf1.toString(), "A<br/>B</b>C");
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.OPENING, "b", "<b>");
+		tf1.insert(0, tf2);
+		//TODO: assertEquals(display.setContent(tf1).toString(false), "<1/>A<2/>B</1>C");
+	}
+	
+	public void testCodedText () {
+		TextFragment tf1 = makeFragment();
+		assertEquals(tf1.getCodedText().length(), (2*3)+3); // 2 per code + 3 chars
+		assertEquals(tf1.getCodedText(3, 5).length(), 2); // code length for <br/>
+		
+		String codedText = tf1.getCodedText();
+		List<Code> codes = tf1.getCodes();
+		TextFragment tf2 = new TextFragment();
+		tf2.setCodedText(codedText, codes);
+		assertEquals(tf1.toString(), tf2.toString());
+		assertEquals(fmt.setContent(tf1).toString(false), fmt.setContent(tf2).toString(false));
+		assertNotSame(tf1, tf2);
+
+		codes = null;
+		codes = tf1.getCodes(0, 5); // xxAxxBxxC
+		assertNotNull(codes);
+		assertEquals(codes.size(), 2);
+		assertEquals(codes.get(0).getData(), "<b>");
+		assertEquals(codes.get(1).getData(), "<br/>");
+	}
+
+	public void testHasText () {
+		TextFragment tf1 = new TextFragment();
+		assertFalse(tf1.hasText(true));
+		assertFalse(tf1.hasText(false));
+		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		assertFalse(tf1.hasText(true));
+		assertFalse(tf1.hasText(false));
+		tf1.append('\t');
+		assertTrue(tf1.hasText(true));
+		assertFalse(tf1.hasText(false));
+		tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tf1.append('c');
+		assertTrue(tf1.hasText(true));
+		assertTrue(tf1.hasText(false));
+	}
+	
+	public void testHasCode () {
+		TextFragment tf1 = new TextFragment();
+		assertFalse(tf1.hasCode());
+		tf1.append('\t');
+		assertFalse(tf1.hasCode());
+		tf1.append('c');
+		assertFalse(tf1.hasCode());
+		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		assertTrue(tf1.hasCode());
+	}
+	
+	/**
+	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("A");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tf.append("B");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("C");
+		return tf;
+	}
 }

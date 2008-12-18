@@ -33,7 +33,7 @@ import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
-import net.sf.okapi.common.ui.filters.GenericContent;
+import net.sf.okapi.common.writer.GenericInlines;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -91,7 +91,7 @@ public class SRXEditor {
 	private Button rdApplySampleForMappedRules;
 	private Button rdApplySampleForCurrentSet;
 	private Text edSampleLanguage;
-	private GenericContent sampleOutput;
+	private GenericInlines sampleOutput;
 	private Pattern patternOpening;
 	private Pattern patternClosing;
 	private Pattern patternPlaceholder;
@@ -111,7 +111,7 @@ public class SRXEditor {
 		segmenter = new Segmenter();
 		srxPath = null;
 		sampleText = new TextContainer(null);
-		sampleOutput = new GenericContent();
+		sampleOutput = new GenericInlines();
 		
 		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>");
 		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");

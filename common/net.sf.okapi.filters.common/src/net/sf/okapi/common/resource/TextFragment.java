@@ -933,6 +933,8 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_ISOLATED:
 			case MARKER_SEGMENT:
 				int index = toIndex(text.charAt(i+1));
+				//TODO: fix this: index is not codes sequence, so the loop to find the sibling close may not work
+				// because it start after the code (e.g. if the code was inserted after)
 				Code code = codes.get(index);
 				switch ( code.tagType ) {
 				case SEGMENTHOLDER:
