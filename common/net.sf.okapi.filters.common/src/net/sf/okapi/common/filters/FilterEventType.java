@@ -30,5 +30,6 @@ public enum FilterEventType {
 	END_GROUP,
 	TEXT_UNIT,
 	DOCUMENT_PART,
-	FINISHED
+	FINISHED,
+	CANCELED
 }
