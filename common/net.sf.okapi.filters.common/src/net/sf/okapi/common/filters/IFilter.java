@@ -49,9 +49,7 @@ public interface IFilter {
 
 	public boolean hasNext ();
 
-	public FilterEvent next ();
-
-	public IResource getResource ();
+	public FilterEvent next ();	
 
 	public void cancel ();
 

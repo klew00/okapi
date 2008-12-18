@@ -27,7 +27,6 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
@@ -66,22 +65,7 @@ public abstract class BaseFilter implements IFilter {
 		groupStack = new Stack<StartGroup>();
 		textUnitStack = new Stack<TextUnit>();
 		codeStack = new Stack<Code>();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#getResource()
-	 */
-	public IResource getResource() {
-		if (!referencableFilterEvents.isEmpty()) {
-			return referencableFilterEvents.peek().getResource();
-		}
-		if (!filterEvents.isEmpty()) {
-			return filterEvents.peek().getResource();
-		}
-		return null;
-	}
+	}	
 
 	/*
 	 * (non-Javadoc)
@@ -137,6 +121,13 @@ public abstract class BaseFilter implements IFilter {
 			return null;
 		}
 		return codeStack.peek();
+	}
+	
+	protected boolean isFinishedTextUnit() {
+		if (textUnitStack.isEmpty()) {
+			return true;
+		}
+		return false;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
