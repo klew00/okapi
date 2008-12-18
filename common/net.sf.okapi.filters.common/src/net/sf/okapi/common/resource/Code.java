@@ -91,6 +91,15 @@ public class Code {
 		this.data = "";
 	}
 	
+	/**
+	 * Append to the current code data
+	 * @param data
+	 */
+	public void append(String data) {
+		// TODO: Make this.data a StringBuilder for speed?
+		this.data += data;
+	}
+	
 	@Override
 	public String toString () {
 		return data;

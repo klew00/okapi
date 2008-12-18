@@ -51,6 +51,12 @@ public class GenericSkeleton implements ISkeleton {
 		list.add(part);
 		createNew = false;
 	}
+	
+	public void add (GenericSkeleton skel) {
+		GenericSkeletonPart part = new GenericSkeletonPart(skel.toString());
+		list.add(part);
+		createNew = false;
+	}
 
 	public void append (String data) {
 		if (( createNew ) || ( list.size() == 0 )) {
