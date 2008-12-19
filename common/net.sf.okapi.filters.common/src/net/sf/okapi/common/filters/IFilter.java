@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.IResource;
 
 public interface IFilter {	
 

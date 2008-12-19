@@ -41,7 +41,6 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -53,11 +52,12 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
 	private String encoding;
-	private IResource currentRes;
 	private TextUnit tuRes;
 	private LinkedList<FilterEvent> queue;
 	private String textLine;
@@ -66,7 +66,6 @@ public class PropertiesFilter implements IFilter {
 	private long position;
 	private int id;
 	private Pattern keyConditionPattern;
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	private String lineBreak;
 	private int parseState = 0;
 	private GenericSkeleton skel;
@@ -102,10 +101,6 @@ public class PropertiesFilter implements IFilter {
 		return params;
 	}
 
-	public IResource getResource () {
-		return currentRes;
-	}
-
 	public boolean hasNext () {
 		return (parseState > 0);
 	}
@@ -114,14 +109,13 @@ public class PropertiesFilter implements IFilter {
 		// Cancel if requested
 		if ( canceled ) {
 			parseState = 0;
-			currentRes = null;
-			return null;
+			queue.clear();
+			queue.add(new FilterEvent(FilterEventType.CANCELED));
 		}
 		
 		// Process queue if it's not empty yet
 		if ( queue.size() > 0 ) {
 			if ( parseState == 2 ) parseState = 0; // End
-			currentRes = queue.peek().getResource();
 			return queue.poll();
 		}
 		
@@ -136,7 +130,6 @@ public class PropertiesFilter implements IFilter {
 				break;
 			case RESULT_ITEM:
 				// It's a text-unit, the skeleton is already set
-				currentRes = tuRes;
 				return new FilterEvent(FilterEventType.TEXT_UNIT, tuRes);
 			default:
 				resetBuffer = true;
@@ -150,7 +143,6 @@ public class PropertiesFilter implements IFilter {
 		Ending ending = new Ending(String.valueOf(++id));
 		ending.setSkeleton(skel);
 		parseState = 2;
-		currentRes = ending;
 		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
 	}
 

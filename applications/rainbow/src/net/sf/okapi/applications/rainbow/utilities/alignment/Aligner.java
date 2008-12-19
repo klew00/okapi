@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.TextContainer;
@@ -783,8 +784,13 @@ public class Aligner {
 		toggleFields(true);
 	}
 	
-	private java.awt.Point conv (Point point) {
-		return new java.awt.Point(point.x, point.y);
+	/**
+	 * Converts a SWT Point to a Range.
+	 * @param point The object to convert.
+	 * @return The range created from the point.
+	 */
+	private Range conv (Point point) {
+		return new Range(point.x, point.y);
 	}
 	
 	private void endSplitMode (boolean accept) {
@@ -792,8 +798,8 @@ public class Aligner {
 			// Compute the new segmentation
 			if ( accept ) {
 				// genericCont is already set with the proper text
-				java.awt.Point sel = genericCont.getCodedTextPosition(conv(edTrgSeg.getSelection()));
-				splitSegment(indexActiveSegment, sel.x, sel.y);
+				Range sel = genericCont.getCodedTextPosition(conv(edTrgSeg.getSelection()));
+				splitSegment(indexActiveSegment, sel.start, sel.end);
 			}
 			// Re-check for issues
 			hasIssue(true, true);

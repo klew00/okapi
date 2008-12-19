@@ -32,6 +32,10 @@ public class GenericSkeletonPart {
 		this.data = new StringBuilder(data);
 	}
 
+	public GenericSkeletonPart (char data) {
+		this.data = new StringBuilder(data);
+	}
+
 	@Override
 	public String toString () {
 		return data.toString();

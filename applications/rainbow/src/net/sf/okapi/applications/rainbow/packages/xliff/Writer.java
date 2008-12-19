@@ -31,6 +31,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFContent;
 
@@ -188,15 +189,19 @@ public class Writer extends BaseWriter {
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {
-		writeStartFile(resource.getName());		
+		writeStartFile(resource.getName(), resource.getType());		
 	}
 	
-	private void writeStartFile (String original) {
+	private void writeStartFile (String original,
+		String contentType)
+	{
 		writer.writeStartElement("file");
-		writer.writeAttributeString("original", (original!=null) ? original : "unknown");
+		writer.writeAttributeString("original",
+			(original!=null) ? original : "unknown");
 		writer.writeAttributeString("source-language", srcLang);
 		writer.writeAttributeString("target-language", trgLang);
-		writer.writeAttributeString("datatype", "TODO");
+		writer.writeAttributeString("datatype",
+			(contentType!=null) ? "x-"+contentType : "x-undefined");
 		writer.writeLineBreak();
 		inFile = true;
 
@@ -218,7 +223,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	private void processStartGroup (StartGroup resource) {
-		if ( !inFile ) writeStartFile(relativeSourcePath);
+		if ( !inFile ) writeStartFile(relativeSourcePath, null);
 		writer.writeStartElement("group");
 		writer.writeAttributeString("id", resource.getId());
 		if ( resource.getName() != null ) {
@@ -235,7 +240,7 @@ public class Writer extends BaseWriter {
 		if ( excludeNoTranslate && !tu.isTranslatable() ) {
 			return;
 		}
-		if ( !inFile ) writeStartFile(relativeSourcePath);
+		if ( !inFile ) writeStartFile(relativeSourcePath, null);
 
 		writer.writeStartElement("trans-unit");
 		writer.writeAttributeString("id", String.valueOf(tu.getId()));
@@ -251,70 +256,43 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("translate", "no");
 		if ( tu.preserveWhitespaces() )
 			writer.writeAttributeString("xml:space", "preserve");
-//TODO		if (( p_Target != null ) && ( status == IExtractionItem.TSTATUS_OK ))
-//			m_XW.writeAttributeString("approved", "yes");
-//		if ( p_Source.hasCoord() )
-//			m_XW.writeAttributeString("coord", p_Source.getCoord());
-//		if ( p_Source.hasFont() )
-//			m_XW.writeAttributeString("font", p_Source.getFont());
-
 		writer.writeLineBreak();
+
+		// Get the source container
+		TextContainer tc = tu.getSource();
+
+		//--- Write the source
+		
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
-		if ( tu.getSource().isSegmented() ) {
-			//TextUnit tmpTU = new TextUnit();
-			//tmpTU.setSourceContent(item.getSourceContent());
-			//tmpTU.getSourceContent().mergeAllSegments();
-			//writer.writeRawXML(xliffCont.setContent(tmpTU.getSourceContent()).toString());
-			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
-			writer.writeEndElementLineBreak(); // source
+		// Write full source content (always without segments markers
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, false));
+		writer.writeEndElementLineBreak(); // source
+		// Write segmented source (with markers) if needed
+		if ( tc.isSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tu.getSource(), 1, true));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, true));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
-		else {
-			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
-			writer.writeEndElementLineBreak(); // source
-		}
 
-		// Target (if needed)
+		//--- Write the target
+		
+		writer.writeStartElement("target");
+		writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
+		// At this point tc contains the source
+		// Do we have an available target to use instead?
 		if ( tu.hasTarget(trgLang) ) {
-			writer.writeStartElement("target");
-			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-//TODO: segmented target			
-/*			switch ( p_nStatus ) {
-				case IExtractionItem.TSTATUS_OK:
-					m_XW.writeAttributeString("state", "final");
-					break;
-				case IExtractionItem.TSTATUS_TOEDIT:
-					m_XW.writeAttributeString("state", "translated");
-					break;
-				case IExtractionItem.TSTATUS_TOREVIEW:
-					m_XW.writeAttributeString("state", "needs-review-translation");
-					break;
-				case IExtractionItem.TSTATUS_TOTRANS:
-					m_XW.writeAttributeString("state", "needs-translation");
-					break;
-			}
-*/
-			if ( tu.hasTarget(trgLang) && !useSourceForTranslated ) {
-				writer.writeRawXML(xliffCont.setContent(tu.getTarget(trgLang)).toString());
-			}
-			else {
-				writer.writeRawXML(xliffCont.setContent(tu.getSource()).toString());
-			}
-
-			writer.writeEndElementLineBreak(); // target
-			// Write the item in the TM if needed
+			// We do, by the way: write the item in the TM if needed
 			tmxWriter.writeItem(tu, null);
+			// Do we want to use that translation content?
+			if ( !useSourceForTranslated ) {
+				tc = tu.getTarget(trgLang);
+			}
 		}
-		else { // Use the source 
-			writer.writeStartElement("target");
-			writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
-			writer.writeRawXML(xliffCont.setContent(tu.getSourceContent()).toString());
-			writer.writeEndElementLineBreak(); // target
-		}
-
+		// Now tc hold the content to write. Write it with or without marks
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, tc.isSegmented()));
+		writer.writeEndElementLineBreak(); // target
+		
 		// Note
 //		if ( tu.getSourceProperties().containsKey("note") ) {
 //			writer.writeStartElement("note");
@@ -325,5 +303,4 @@ public class Writer extends BaseWriter {
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
-	
 }

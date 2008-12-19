@@ -152,7 +152,8 @@ public class XLIFFContent {
 	
 	public String toSegmentedString (TextContainer container,
 		int quoteMode,
-		boolean escapeGT)
+		boolean escapeGT,
+		boolean withMarkers)
 	{
 		codedText = container.getCodedText();
 		codes = container.getCodes();
@@ -167,14 +168,14 @@ public class XLIFFContent {
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-					tmp.append("<mrk mtype=\"seg\">"); //TODO: mid attribute
+					if ( withMarkers ) tmp.append("<mrk mtype=\"seg\">"); //TODO: mid attribute
 					if ( innerContent == null ) {
 						innerContent = new XLIFFContent();
 					}
 					index = Integer.valueOf(code.getData());
 					innerContent.setContent(container.getSegments().get(index));
 					tmp.append(innerContent.toString(quoteMode, escapeGT, false));
-					tmp.append("</mrk>");
+					if ( withMarkers ) tmp.append("</mrk>");
 				}
 				else {
 					id = codes.get(index).getId();
@@ -239,4 +240,5 @@ public class XLIFFContent {
 		}
 		return tmp.toString();
 	}
+
 }

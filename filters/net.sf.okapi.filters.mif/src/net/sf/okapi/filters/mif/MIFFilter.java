@@ -48,6 +48,7 @@ public class MIFFilter implements IFilter {
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
+	private StringBuilder sklBuffer;
 	private int inPara;
 	private int inString;
 	private IResource currentRes;
@@ -137,6 +138,7 @@ public class MIFFilter implements IFilter {
 				new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
+			sklBuffer = new StringBuilder();
 			level = 0;
 			inPara = -1;
 			inString = -1;
@@ -198,7 +200,7 @@ public class MIFFilter implements IFilter {
 					break;
 				case '<': // Start of statement
 					level++;
-					buffer.append((char)c);
+					skel.append((char)c);
 					String tag = readTag();
 					if ( "Para".equals(tag) ) {
 						inPara = level;
@@ -217,7 +219,7 @@ public class MIFFilter implements IFilter {
 						if ( !cont.isEmpty() ) {
 							TextUnit tu = new TextUnit(String.valueOf(++id));
 							tu.setSource(cont);
-							if ( sklBuffer.length() > 0 ) {
+							if ( !skel.isEmpty() ) {
 								tu.setSkeleton(skel);
 							}
 							
@@ -226,7 +228,7 @@ public class MIFFilter implements IFilter {
 							//TODO: Skeleton should be attached too
 						}
 					}
-					buffer.append((char)c);
+					skel.append((char)c);
 					level--;
 					// Return skeleton
 					currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
@@ -236,7 +238,7 @@ public class MIFFilter implements IFilter {
 						cont.append(processString());
 					}
 					else {
-						buffer.append((char)c); // Store '`'
+						skel.append((char)c); // Store '`'
 						copyStringToStorage();
 					}
 					break;

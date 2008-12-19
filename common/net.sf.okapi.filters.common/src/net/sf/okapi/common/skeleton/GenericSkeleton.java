@@ -46,7 +46,17 @@ public class GenericSkeleton implements ISkeleton {
 		if ( skel != null ) add(skel.toString());
 	}
 
+	public boolean isEmpty () {
+		return (list.size()==0);
+	}
+
 	public void add (String data) {
+		GenericSkeletonPart part = new GenericSkeletonPart(data);
+		list.add(part);
+		createNew = false;
+	}
+	
+	public void add (char data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
 		createNew = false;

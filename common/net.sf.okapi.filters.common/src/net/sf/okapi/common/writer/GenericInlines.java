@@ -20,11 +20,11 @@
 
 package net.sf.okapi.common.writer;
 
-import java.awt.Point;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.InvalidPositionException;
@@ -170,8 +170,8 @@ public class GenericInlines {
 	 * @param position Generic text position to convert to coded text position.
 	 * @return Calculated coded text position.
 	 */
-	public Point getCodedTextPosition (Point position) {
-		Point result = new Point(0, 0);
+	public Range getCodedTextPosition (Range position) {
+		Range result = new Range(0, 0);
 		int genericPos = 0;
 		int codedPos = 0;
 		int index;
@@ -198,21 +198,21 @@ public class GenericInlines {
 				codedPos++;
 				break;
 			}
-			if ( genericPos == position.x ) {
-				result.x = codedPos;
-				if ( position.x == position.y ) {
-					result.y = result.x;
+			if ( genericPos == position.start ) {
+				result.start = codedPos;
+				if ( position.start == position.end ) {
+					result.end = result.start;
 					return result;
 				}
 			}
-			if ( genericPos == position.y ) {
-				result.y = codedPos;
+			if ( genericPos == position.end ) {
+				result.end = codedPos;
 				return result;
 			}
 		}
 		// Else: out-of-bounds or within an in-line code
 		throw new InvalidPositionException (
-			String.format("Position %d or %d is invalid.", position.x, position.y));
+			String.format("Position %d or %d is invalid.", position.start, position.end));
 	}
 	
 	/**

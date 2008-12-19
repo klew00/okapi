@@ -84,7 +84,7 @@ public class RegexFilterTest {
 				System.out.println("--- Start Document ---");
 				break;
 			case TEXT_UNIT:
-				System.out.println("["+filter.getResource().toString()+"]");
+				System.out.println("["+event.getResource().toString()+"]");
 				break;
 			case END_DOCUMENT:
 				System.out.println("\n--- End Document ---");
