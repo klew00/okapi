@@ -34,6 +34,7 @@ public class BaseNameable implements IResource, INameable {
 	protected ISkeleton skeleton;
 	protected String name;
 	protected String type;
+	protected String mimeType;
 	protected boolean isTranslatable = true;
 	protected boolean preserveWS;
 	protected Hashtable<String, Property> properties;
@@ -70,6 +71,14 @@ public class BaseNameable implements IResource, INameable {
 	
 	public void setType (String value) {
 		type = value;
+	}
+	
+	public String getMimeType () {
+		return mimeType;
+	}
+	
+	public void setMimeType (String value) {
+		mimeType = value;
 	}
 	
 	@SuppressWarnings("unchecked")

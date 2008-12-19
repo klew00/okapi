@@ -48,6 +48,7 @@ public class Writer extends BaseWriter {
 	private boolean useSourceForTranslated = false;
 	private boolean inFile;
 	private String srcLang;
+	private String docMimeType;
 
 	public Writer () {
 		super();
@@ -176,6 +177,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		docMimeType = resource.getMimeType();
 	}
 
 	private void processEndDocument () {
@@ -189,7 +191,7 @@ public class Writer extends BaseWriter {
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {
-		writeStartFile(resource.getName(), resource.getType());		
+		writeStartFile(resource.getName(), resource.getMimeType());		
 	}
 	
 	private void writeStartFile (String original,
@@ -201,7 +203,7 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("source-language", srcLang);
 		writer.writeAttributeString("target-language", trgLang);
 		writer.writeAttributeString("datatype",
-			(contentType!=null) ? "x-"+contentType : "x-undefined");
+			(contentType!=null) ? contentType : "x-undefined");
 		writer.writeLineBreak();
 		inFile = true;
 
@@ -223,7 +225,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	private void processStartGroup (StartGroup resource) {
-		if ( !inFile ) writeStartFile(relativeSourcePath, null);
+		if ( !inFile ) writeStartFile(relativeSourcePath, docMimeType);
 		writer.writeStartElement("group");
 		writer.writeAttributeString("id", resource.getId());
 		if ( resource.getName() != null ) {
@@ -240,7 +242,7 @@ public class Writer extends BaseWriter {
 		if ( excludeNoTranslate && !tu.isTranslatable() ) {
 			return;
 		}
-		if ( !inFile ) writeStartFile(relativeSourcePath, null);
+		if ( !inFile ) writeStartFile(relativeSourcePath, docMimeType);
 
 		writer.writeStartElement("trans-unit");
 		writer.writeAttributeString("id", String.valueOf(tu.getId()));

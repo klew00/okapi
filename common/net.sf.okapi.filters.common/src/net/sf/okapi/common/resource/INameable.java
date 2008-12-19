@@ -38,16 +38,28 @@ public interface INameable {
 	public void setName (String name);
 
 	/**
-	 * Gets the type information associated with this resource.
+	 * Gets the type information associated with this resource. For example "button".
 	 * @return The type information associated with this resource.
 	 */
 	public String getType ();
 	
 	/**
-	 * Sets the type information associated with this resource.
+	 * Sets the type information associated with this resource. For example "button".
 	 * @param value The new type information.
 	 */
 	public void setType (String value);
+	
+	/**
+	 * Gets the type of content of this resource. For example "text/xml".
+	 * @return The type of content of this resource.
+	 */
+	public String getMimeType ();
+	
+	/**
+	 * Sets the type of content of this resource. For example "text/xml".
+	 * @param value The new type of content of this resource.
+	 */
+	public void setMimeType (String value);
 	
 	/**
 	 * Gets the resource-level property for a given name.

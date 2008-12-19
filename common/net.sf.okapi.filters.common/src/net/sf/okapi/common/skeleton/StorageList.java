@@ -161,4 +161,12 @@ class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
+	public String getMimeType() {
+		return startGroup.getMimeType();
+	}
+
+	public void setMimeType(String value) {
+		// Not implemented: read-only info		
+	}
+
 }

@@ -194,6 +194,8 @@ public class PropertiesFilter implements IFilter {
 			startDoc.setName(inputUrl.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(params);
+			startDoc.setType("text/x-properties");
+			startDoc.setMimeType("text/x-properties");
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {

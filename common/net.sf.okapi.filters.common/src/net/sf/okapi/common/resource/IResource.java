@@ -31,8 +31,8 @@ public interface IResource {
 	public static final int COPY_ALL = (COPY_CONTENT | COPY_PROPERTIES);
 
 	/**
-	 * Gets the ID of the resource. This ID is unique per extracted document, and may be 
-	 * different from one extraction of the same document to the next.
+	 * Gets the ID of the resource. This ID is unique per extracted document and by type of resource.
+	 * It and may be different from one extraction of the same document to the next.
 	 * It has no correspondence in the source document ("IDs" coming from the source document
 	 * are "names" and not available for all resources).
 	 * @return The id of this resource.
@@ -42,6 +42,7 @@ public interface IResource {
 	/**
 	 * Sets the ID of this resource.
 	 * @param id The new ID value.
+	 * @see #getId()
 	 */
 	public void setId (String id);
 	

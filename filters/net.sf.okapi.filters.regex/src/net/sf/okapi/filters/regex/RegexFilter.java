@@ -213,6 +213,8 @@ public class RegexFilter implements IFilter {
 			startDoc.setName(inputUrl.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(params);
+			startDoc.setType(params.mimeType);
+			startDoc.setMimeType(params.mimeType);
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {

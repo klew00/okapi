@@ -79,6 +79,7 @@ public class Editor implements IParametersEditor {
 	private Button chkIgnoreCase;
 	private Button chkDotAll;
 	private Button chkMultiline;
+	private Text edMimeType;
 	
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -328,6 +329,7 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
+		// Localization directives
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
@@ -336,6 +338,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(gdTmp);
 		pnlLD = new LDPanel(grpTmp, SWT.NONE);
 
+		// Strings
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
@@ -361,6 +364,20 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edEndString.setLayoutData(gdTmp);
 
+		// Content type
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		grpTmp.setLayout(layTmp);
+		grpTmp.setText("Content type");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Mime type for the document:");
+		edMimeType = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edMimeType.setLayoutData(gdTmp);
+		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
@@ -577,6 +594,8 @@ public class Editor implements IParametersEditor {
 		chkExtractOuterStrings.setSelection(params.extractOuterStrings);
 		edStartString.setText(params.startString);
 		edEndString.setText(params.endString);
+		edMimeType.setText(params.mimeType);
+		
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
@@ -597,6 +616,7 @@ public class Editor implements IParametersEditor {
 		params.extractOuterStrings = chkExtractOuterStrings.getSelection();
 		params.startString = edStartString.getText();
 		params.endString = edEndString.getText();
+		params.mimeType = edMimeType.getText();
 		
 		ArrayList<Rule> paramRules = params.getRules();
 		paramRules.clear();

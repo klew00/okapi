@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters {
 	public int regexOptions;
 	public String expression;
 	public LocalizationDirectives locDir;
+	public String mimeType;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -50,6 +51,7 @@ public class Parameters extends BaseParameters {
 		extractOuterStrings = false;
 		useBSlashEscape = true;
 		locDir.reset();
+		mimeType = "text/plain";
 	}
 
 	public void fromString (String data) {
@@ -63,6 +65,7 @@ public class Parameters extends BaseParameters {
 		extractOuterStrings = buffer.getBoolean("extractOuterStrings", extractOuterStrings);
 		useBSlashEscape = buffer.getBoolean("useBSlashEscape", useBSlashEscape);
 		regexOptions = buffer.getInteger("regexOptions", regexOptions);
+		mimeType = buffer.getString("mimeType", mimeType);
 		Rule rule;
 		int count = buffer.getInteger("ruleCount", 0);
 		for ( int i=0; i<count; i++ ) {
@@ -82,6 +85,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("extractOuterStrings", extractOuterStrings);
 		buffer.setBoolean("useBSlashEscape", useBSlashEscape);
 		buffer.setInteger("regexOptions", regexOptions);
+		buffer.setString("mimeType", mimeType);
 		buffer.setInteger("ruleCount", rules.size());
 		for ( int i=0; i<rules.size(); i++ ) {
 			buffer.setGroup(String.format("rule%d", i), rules.get(i).toString());
