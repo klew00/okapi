@@ -108,6 +108,11 @@ public class BaseNameable implements IResource, INameable {
 		return properties.keySet();
 	}
 
+	public boolean hasProperty (String name) {
+		if ( properties == null ) return false;
+		return properties.containsKey(name);
+	}
+
 	public Property getSourceProperty (String name) {
 		if ( sourceProperties == null ) return null;
 		return sourceProperties.get(name);
@@ -122,6 +127,11 @@ public class BaseNameable implements IResource, INameable {
 	public Set<String> getSourcePropertyNames () {
 		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
 		return sourceProperties.keySet();
+	}
+
+	public boolean hasSourceProperty (String name) {
+		if ( sourceProperties == null ) return false;
+		return sourceProperties.containsKey(name);
 	}
 
 	public Property getTargetProperty (String language,

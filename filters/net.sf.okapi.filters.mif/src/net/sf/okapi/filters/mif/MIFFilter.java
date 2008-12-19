@@ -51,7 +51,6 @@ public class MIFFilter implements IFilter {
 	private StringBuilder sklBuffer;
 	private int inPara;
 	private int inString;
-	private IResource currentRes;
 	private int id;
 	private int level;
 	private TextContainer cont;
@@ -103,10 +102,6 @@ public class MIFFilter implements IFilter {
 
 	public IParameters getParameters () {
 		return null;
-	}
-
-	public IResource getResource () {
-		return currentRes;
 	}
 
 	public boolean hasNext () {
@@ -222,9 +217,7 @@ public class MIFFilter implements IFilter {
 							if ( !skel.isEmpty() ) {
 								tu.setSkeleton(skel);
 							}
-							
-							currentRes = tu;
-							return new FilterEvent(FilterEventType.TEXT_UNIT, currentRes);
+							return new FilterEvent(FilterEventType.TEXT_UNIT, tu);
 							//TODO: Skeleton should be attached too
 						}
 					}
@@ -261,13 +254,10 @@ public class MIFFilter implements IFilter {
 
 	private FilterEvent pollQueue () {
 		if ( queue.size() == 0 ) { // Just in case
-			currentRes = null;
 			return null;
 		}
 		else {
-			FilterEvent event = queue.poll();
-			currentRes = event.getResource();
-			return event;
+			return queue.poll();
 		}
 	}
 	

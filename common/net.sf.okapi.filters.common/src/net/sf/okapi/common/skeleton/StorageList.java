@@ -169,4 +169,12 @@ class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info		
 	}
 
+	public boolean hasProperty (String name) {
+		return startGroup.hasProperty(name);
+	}
+
+	public boolean hasSourceProperty(String name) {
+		return startGroup.hasSourceProperty(name);
+	}
+
 }

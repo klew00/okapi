@@ -82,6 +82,13 @@ public interface INameable {
 	public Set<String> getPropertyNames ();
 
 	/**
+	 * Indicates if a resource-level property exists for a given name.
+	 * @param name The name of the resource-level property to query.
+	 * @return True if a resource-level property exists, false otherwise.
+	 */
+	public boolean hasProperty (String name);
+
+	/**
 	 * Gets the source property for a given name.
 	 * @param name The name of the source property to retrieve.
 	 * @return The property or null if it does not exist.
@@ -100,6 +107,13 @@ public interface INameable {
 	 * @return All the names of the source properties for this resource.
 	 */
 	public Set<String> getSourcePropertyNames ();
+
+	/**
+	 * Indicates if a source property exists for a given name.
+	 * @param name The name of the source property to query.
+	 * @return True if a source property exists, false otherwise.
+	 */
+	public boolean hasSourceProperty (String name);
 
 	/**
 	 * Gets the target property for a given name and target language.
@@ -140,7 +154,7 @@ public interface INameable {
 	 * @return True if a property exists, false otherwise.
 	 */
 	public boolean hasTargetProperty (String language,
-			String name);
+		String name);
 
 	/**
 	 * Creates or get a target property based on the corresponding source.

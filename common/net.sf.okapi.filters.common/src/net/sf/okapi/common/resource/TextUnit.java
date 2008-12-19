@@ -168,6 +168,11 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		return properties.keySet();
 	}
 
+	public boolean hasProperty (String name) {
+		if ( properties == null ) return false;
+		return properties.containsKey(name);
+	}
+
 	public Property getSourceProperty (String name) {
 		if ( source.properties == null ) return null;
 		return source.properties.get(name);
@@ -181,6 +186,11 @@ public class TextUnit implements IResource, INameable, IReferenceable {
 		return source.getPropertyNames();
 	}
 	
+	public boolean hasSourceProperty (String name) {
+		if ( source.properties == null ) return false;
+		return source.properties.containsKey(name);
+	}
+
 	public Property getTargetProperty (String language,
 		String name)
 	{

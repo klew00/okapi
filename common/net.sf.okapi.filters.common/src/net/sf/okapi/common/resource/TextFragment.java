@@ -81,7 +81,6 @@ public class TextFragment implements Comparable<Object> {
 	protected ArrayList<Code> codes;
 	protected boolean isBalanced;
 	protected int lastCodeID;
-	//protected TextUnit parent;
 
 	/**
 	 * Helper method to convert a marker index to its character value in the

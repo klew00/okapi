@@ -24,24 +24,24 @@ import java.io.FileInputStream;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.xliff.XLIFFReader;
+import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 /**
  * Implements IReader for generic XLIFF translation packages.
  */
 public class Reader implements IReader {
 	
-	XLIFFReader reader;
+	XLIFFFilter reader;
 	
 	public Reader () {
-		reader = new XLIFFReader();
+		reader = new XLIFFFilter();
 	}
 
 	public void closeDocument () {
 	}
 
 	public TextUnit getItem () {
-		return reader.getItem();
+		return null; //reader.getItem();
 	}
 
 	public void openDocument (String path) {
@@ -54,13 +54,13 @@ public class Reader implements IReader {
 	}
 
 	public boolean readItem () {
-		int n;
+		/*int n;
 		do {
 			switch ( (n = reader.readItem()) ) {
 			case XLIFFReader.RESULT_ENDTRANSUNIT:
 				return true;
 			}
-		} while ( n > XLIFFReader.RESULT_ENDINPUT );
+		} while ( n > XLIFFReader.RESULT_ENDINPUT );*/
 		return false;
 	}
 
