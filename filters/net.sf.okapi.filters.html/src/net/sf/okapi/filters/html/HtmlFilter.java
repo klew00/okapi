@@ -37,12 +37,14 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.BaseFilterOld;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class HtmlFilter extends BaseFilter {
 	private Source htmlDocument;
@@ -51,6 +53,7 @@ public class HtmlFilter extends BaseFilter {
 	private ExtractionRuleState ruleState;
 
 	public HtmlFilter() {
+		super();
 	}
 
 	public void close() {
@@ -96,21 +99,15 @@ public class HtmlFilter extends BaseFilter {
 		nodeIterator = htmlDocument.getNodeIterator();
 	}
 
-	public IResource getResource() {
-		return getFinalizedToken();
-	}
-	
 	public FilterEvent next() {
-		if (isFinishedParsing()) {
-			setDone();
-			return new FilterEvent(FilterEventType.FINISHED);
-		}
-
 		// reset state flags and buffers
 		ruleState.reset();
-		initializeLoop();
 
-		while (!isFinishedToken() && nodeIterator.hasNext() && !isCanceled()) {
+		while (hasQueuedEvents()) {
+			return super.next();
+		}
+
+		while (!hasQueuedEvents() && nodeIterator.hasNext() && !isCanceled()) {
 			Segment segment = nodeIterator.next();
 
 			if (segment instanceof Tag) {
@@ -152,36 +149,20 @@ public class HtmlFilter extends BaseFilter {
 			}
 		}
 
-		if (isCanceled()) {
-			return new FilterEvent(getFinalizedTokenType(), getResource());
-		}
-
-		if (!nodeIterator.hasNext()) {
-			// take care of the token from the previous run
-			finalizeCurrentToken();
-			setFinishedParsing(true);
-		}
-
-		// return our finalized token
-		return new FilterEvent(getFinalizedTokenType(), getResource());
+		// return one of the waiting events
+		return super.next();
 	}
 
 	private void handleCdataSection(Tag tag) {
-		// if in excluded state everything is skeleton including text
-		if (ruleState.isExludedState()) {
-			appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
-			return;
-		}
-
-		// TODO: special handling for CDATA sections (may call sub-filters
-		// or unescape content etc.)
-		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
+		addToSkeleton(tag.toString());
+		// TODO: special handling for CDATA sections (may call sub-filters or
+		// unescape content etc.)
 	}
 
 	private void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
+			addToSkeleton(text.toString());
 			return;
 		}
 
@@ -190,23 +171,23 @@ public class HtmlFilter extends BaseFilter {
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !ruleState.isInline()) {
-			appendToSkeletonUnit(text.toString(), text.getBegin(), text.length());
+			addToSkeleton(text.toString());
 			return;
 		}
 
 		// its not pure whitespace so we are now processing inline text
 		ruleState.setInline(true);
-		appendToTextUnit(text.toString());
+		startTextUnit(text.toString());
 	}
 
 	private void handleSkeleton(Tag tag) {
-		appendToSkeletonUnit(tag.toString(), tag.getBegin(), tag.length());
+		addToSkeleton(tag.toString());
 	}
 
 	private void handleStartTag(StartTag startTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			addToSkeleton(startTag.toString());
 			// process these tag types to update parser state
 			switch (configuration.getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
@@ -229,7 +210,7 @@ public class HtmlFilter extends BaseFilter {
 			break;
 
 		case ATTRIBUTES_ONLY:
-			if (configuration.hasActionableAttributes(startTag.getName())) {				
+			if (configuration.hasActionableAttributes(startTag.getName())) {
 			}
 			break;
 		case GROUP_ELEMENT:
@@ -322,6 +303,7 @@ public class HtmlFilter extends BaseFilter {
 			}
 		}
 	}
+
 	private void addToCurrentTextUnit(Tag tag) {
 		TextFragment.TagType tagType;
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
@@ -337,14 +319,18 @@ public class HtmlFilter extends BaseFilter {
 		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#getName()
 	 */
 	public String getName() {
 		return "HTMLFilter";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
 	public IParameters getParameters() {
@@ -352,17 +338,30 @@ public class HtmlFilter extends BaseFilter {
 		return null;
 	}
 
-	public void setOptions (String language,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		// TODO Auto-generated method stub		
+	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
+		// TODO Auto-generated method stub
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common.IParameters)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
+	 * .IParameters)
 	 */
 	public void setParameters(IParameters params) {
-		// TODO Auto-generated method stub	
+		// TODO Auto-generated method stub
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
+	 * java.lang.String, java.lang.String, boolean)
+	 */
+	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
+			boolean generateSkeleton) {
+		// TODO Auto-generated method stub
+
 	}
 }
