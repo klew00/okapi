@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -354,13 +355,13 @@ public class Segmenter {
 	 * calling {@link #computeSegments(String)}, or
 	 * {@link #computeSegments(TextContainer)}.
 	 * @return The list of all segments ranges. each range is stored in
-	 * a {@link Point} object where x is the start and y the end of the range.
+	 * a {@link Range} object where start is the start and end the end of the range.
 	 */
-	public List<Point> getSegmentRanges () {
-		ArrayList<Point> list = new ArrayList<Point>();
+	public List<Range> getSegmentRanges () {
+		ArrayList<Range> list = new ArrayList<Range>();
 		if ( starts == null ) return null;
 		for ( int i=0; i<starts.size(); i++ ) {
-			list.add(new Point(starts.get(i), ends.get(i)));
+			list.add(new Range(starts.get(i), ends.get(i)));
 		}
 		return list;
 	}

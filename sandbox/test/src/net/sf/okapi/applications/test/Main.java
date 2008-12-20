@@ -1,6 +1,5 @@
 package net.sf.okapi.applications.test;
 
-import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -20,6 +19,7 @@ import org.w3c.its.ITraversal;
 
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
@@ -367,7 +367,7 @@ public class Main {
 			
 			// All segments
 			seg.computeSegments(cont);
-			List<Point> list = seg.getSegmentRanges();
+			List<Range> list = seg.getSegmentRanges();
 			cont.createSegments(list);
 			System.out.println("---all segs:");
 			for ( TextFragment tf : cont.getSegments() ) {

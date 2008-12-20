@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -51,6 +52,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class XLIFFFilter implements IFilter {
 
+	private boolean hasNext;
 	private XMLStreamReader reader;
 	private StartDocument startDoc;
 	private int tuId;
@@ -95,7 +97,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		return (queue.size() > 0);
+		return hasNext;
 	}
 
 	public FilterEvent next () {
@@ -104,16 +106,23 @@ public class XLIFFFilter implements IFilter {
 			if ( canceled ) {
 				queue.clear();
 				queue.add(new FilterEvent(FilterEventType.CANCELED));
+				hasNext = false;
 			}
 			
 			// Parse next if nothing in the queue
 			if ( queue.size() == 0 ) {
 				if ( !read() ) {
-					return null; // Was done
+					Ending ending = new Ending(String.valueOf(++otherId));
+					ending.setSkeleton(skel);
+					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+					queue.add(new FilterEvent(FilterEventType.FINISHED));
 				}
 			}
 			
 			// Return the head of the queue
+			if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+				hasNext = false;
+			}
 			return queue.poll();
 		}
 		catch ( XMLStreamException e ) {
@@ -134,6 +143,7 @@ public class XLIFFFilter implements IFilter {
 			tuId = 0;
 			otherId = 0;
 			// Set the start event
+			hasNext = true;
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
@@ -194,7 +204,7 @@ public class XLIFFFilter implements IFilter {
 			case XMLStreamConstants.START_ELEMENT:
 				String name = reader.getLocalName();
 				if ( "trans-unit".equals(name) ) {
-					return processStartTransUnit();
+					return processTransUnit();
 				}
 				else if ( "file".equals(name) ) {
 					return processStartFile();
@@ -205,7 +215,7 @@ public class XLIFFFilter implements IFilter {
 			case XMLStreamConstants.END_ELEMENT:
 				storeEndElement();
 				if ( "file".equals(reader.getLocalName()) ) {
-					return processStartFile();
+					return processEndFile();
 				}
 				break;
 				
@@ -228,11 +238,16 @@ public class XLIFFFilter implements IFilter {
 				break;
 				
 			case XMLStreamConstants.ENTITY_REFERENCE:
-				//TODO: handle entity references
+			case XMLStreamConstants.ENTITY_DECLARATION:
+			case XMLStreamConstants.NAMESPACE:
+			case XMLStreamConstants.NOTATION_DECLARATION:
+			case XMLStreamConstants.ATTRIBUTE:
+			case XMLStreamConstants.START_DOCUMENT:
+			case XMLStreamConstants.END_DOCUMENT:
+				//TODO:
 				break;
 			}
 		}
-		
 		return false;
 	}
 
@@ -260,6 +275,12 @@ public class XLIFFFilter implements IFilter {
 		
 		startDoc.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDoc));
+		return true;
+	}
+
+	private boolean processEndFile () {
+		Ending ending = new Ending(String.valueOf(+otherId));
+		queue.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, ending));
 		return true;
 	}
 	
@@ -301,7 +322,7 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 
-	private boolean processStartTransUnit () {
+	private boolean processTransUnit () {
 		try {
 			sourceDone = false;
 			targetDone = false;
@@ -343,7 +364,7 @@ public class XLIFFFilter implements IFilter {
 						checkTarget();
 						storeEndElement();
 					}
-					if ( "seg-source".equals(name) ) {
+					else if ( "seg-source".equals(name) ) {
 						storeStartElement();
 						processSource(true);
 						storeEndElement();
@@ -366,6 +387,7 @@ public class XLIFFFilter implements IFilter {
 					if ( "trans-unit".equals(name) ) {
 						storeEndElement();
 						tu.setSkeleton(skel);
+						queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 						return true;
 					}
 					else storeEndElement();
@@ -385,8 +407,7 @@ public class XLIFFFilter implements IFilter {
 							}
 						}
 					}
-					skel.append(Util.escapeToXML(reader.getText(),
-						0, params.escapeGT));
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
 					break;
 					
 				case XMLStreamConstants.COMMENT:

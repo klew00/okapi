@@ -23,7 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.Set;
 
 
-public interface INameable {
+public interface INameable extends IResource {
 
 	/**
 	 * Gets the name of this resource. The resource name is the equivalent of the XLIFF resname attribute.

@@ -20,12 +20,12 @@
 
 package net.sf.okapi.common.resource;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
@@ -147,7 +147,7 @@ public class TextContainer extends TextFragment {
 	 * to the right-most.
 	 * @return The number of segments.
 	 */
-	public int createSegments (List<Point> ranges) {
+	public int createSegments (List<Range> ranges) {
 		//TODO: Find a way to offer re-segmentation on top of existing one
 		if( ranges == null ) return 0;
 		// Extract the segments using the ranges
@@ -159,23 +159,23 @@ public class TextContainer extends TextFragment {
 		int diff = 0;
 		for ( int i=0; i<ranges.size(); i++ ) {
 			// Add the new segment in the list
-			segments.add(subSequence(ranges.get(i).x+diff, ranges.get(i).y+diff));
+			segments.add(subSequence(ranges.get(i).start+diff, ranges.get(i).end+diff));
 			// Remove it from the main content
-			int width = ranges.get(i).y-ranges.get(i).x;
+			int width = ranges.get(i).end-ranges.get(i).start;
 			// For chunks < 2 there is no codes so we can just add the needed room for the segment marker
-			if ( width == 1 ) insert(ranges.get(i).x+diff, new TextFragment("Z"));
-			else if ( width == 0 ) insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
+			if ( width == 1 ) insert(ranges.get(i).start+diff, new TextFragment("Z"));
+			else if ( width == 0 ) insert(ranges.get(i).start+diff, new TextFragment("ZZ"));
 			else { // Otherwise: we need to remove the chunk of coded text and its codes
-				remove(ranges.get(i).x+diff, ranges.get(i).y+diff);
+				remove(ranges.get(i).start+diff, ranges.get(i).end+diff);
 				// then re-insert room for the segment marker
-				insert(ranges.get(i).x+diff, new TextFragment("ZZ"));
+				insert(ranges.get(i).start+diff, new TextFragment("ZZ"));
 			}
 			
 			// Set the segment marker and its corresponding code
 			if ( codes == null ) codes = new ArrayList<Code>();
 			codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, String.valueOf(i)));
-			text.setCharAt(ranges.get(i).x+diff, (char)MARKER_SEGMENT);
-			text.setCharAt(ranges.get(i).x+diff+1,
+			text.setCharAt(ranges.get(i).start+diff, (char)MARKER_SEGMENT);
+			text.setCharAt(ranges.get(i).start+diff+1,
 				toChar(codes.size()-1));
 			// Compute the adjustment to take in account
 			diff = (text.length()-oriLength);

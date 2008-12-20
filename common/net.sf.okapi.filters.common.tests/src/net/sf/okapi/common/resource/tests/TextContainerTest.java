@@ -20,11 +20,11 @@
 
 package net.sf.okapi.common.resource.tests;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -94,10 +94,10 @@ public class TextContainerTest extends TestCase {
 		assertEquals(tc1.toString(), originalText);
 		
 		// Test segmenting from an array
-		List<Point> ranges = new ArrayList<Point>();
-		ranges.add(new Point(0, 6));
-		ranges.add(new Point(6, 12));
-		ranges.add(new Point(13, 19));
+		List<Range> ranges = new ArrayList<Range>();
+		ranges.add(new Range(0, 6));
+		ranges.add(new Range(6, 12));
+		ranges.add(new Range(13, 19));
 		tc1.createSegments(ranges);
 		assertTrue(tc1.isSegmented());
 		assertEquals(tc1.toString().length(), 2+2+1+2);
