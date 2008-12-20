@@ -21,17 +21,13 @@ package net.sf.okapi.filters.html.tests;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import net.sf.okapi.common.filters.GroovyFilterConfiguration;
-
-/**
- * @author HargraveJE
- *
- */
 public class HtmlConfigurationTest {
 	
 	@Before

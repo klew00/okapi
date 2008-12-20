@@ -19,17 +19,13 @@
 
 package net.sf.okapi.filters.html.tests;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Group;
-import net.sf.okapi.common.resource.IContainable;
-import net.sf.okapi.common.resource.SkeletonUnit;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -50,53 +46,30 @@ public class HtmlParserTest {
 
 	@Test
 	public void excludeInclude() {
-		htmlParser = new HtmlFilter();
-		//htmlParser.setHtmlFilterConfiguration(new ExcludeIncludeConfiguration());
+		htmlParser = new HtmlFilter();		
 		FilterEvent event;
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/test.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
 		htmlParser.open(htmlStream);
-		while ((event = htmlParser.next()).getEventType() != FilterEventType.FINISHED) {
-			IContainable item = htmlParser.getResource();
+		while ((event = htmlParser.next()).getEventType() != FilterEventType.FINISHED) {			
 			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
-				assertTrue(item instanceof TextUnit);
-				//assertEquals(item.toString(), "Text should be included. <b>");
+				assertTrue(event.getResource() instanceof TextUnit);				
 				System.out.println("=======================Text:");
-			} else if (event.getEventType() == FilterEventType.SKELETON_UNIT) {
-				assertTrue(item instanceof SkeletonUnit);
-				System.out.println("=======================Skeleton:");
+			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
+				assertTrue(event.getResource() instanceof DocumentPart);
+				System.out.println("=======================Document Part:");
 			} else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP) {
-				assertTrue(item instanceof Group);
-				System.out.println("Group:");
+				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+				System.out.println("=======================Group:");
+			}			
+			System.out.println(event.getEventType().toString());
+			if (event.getResource() != null) {
+				if (event.getResource().getSkeleton() != null) {
+					System.out.println(event.getResource().getSkeleton().toString());
+				} else {
+					System.out.println(event.getResource().toString());
+				}
 			}
-			assertNotNull(item);
-			System.out.println(item.toString());
 		}
 		htmlParser.close();
 	}
-
-	/*
-	@Test
-	public void parse() {
-		htmlParser = new HtmlParser();
-		IParser.ParserTokenType tokenType;
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("test.html");
-		htmlParser.open(htmlStream);
-		while ((tokenType = htmlParser.parseNext()) != IParser.ParserTokenType.ENDINPUT) {
-			IContainable item = htmlParser.getResource();
-			if (tokenType == IParser.ParserTokenType.TRANSUNIT) {
-				assertTrue(item instanceof TextUnit);
-				System.out.println("Text:");
-			} else if (tokenType == IParser.ParserTokenType.SKELETON) {
-				assertTrue(item instanceof SkeletonUnit);
-				System.out.println("Skeleton:");
-			} else if (tokenType == IParser.ParserTokenType.STARTGROUP || tokenType == IParser.ParserTokenType.ENDGROUP) {
-				assertTrue(item instanceof Group);
-				System.out.println("Group:");
-			}
-			assertNotNull(item);
-			System.out.println(item.toString());
-		}
-		htmlParser.close();
-	}
-*/
 }

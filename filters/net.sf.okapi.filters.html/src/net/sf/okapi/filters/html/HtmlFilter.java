@@ -37,12 +37,9 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
-import net.sf.okapi.common.filters.BaseFilterOld;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -88,7 +85,9 @@ public class HtmlFilter extends BaseFilter {
 		this.configuration = configuration;
 	}
 
-	private void initialize() {
+	public void initialize() {
+		super.initialize();
+
 		if (configuration == null) {
 			configuration = new GroovyFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");
 		}
@@ -107,7 +106,7 @@ public class HtmlFilter extends BaseFilter {
 			return super.next();
 		}
 
-		while (!hasQueuedEvents() && nodeIterator.hasNext() && !isCanceled()) {
+		while (nodeIterator.hasNext() && !isCanceled()) {
 			Segment segment = nodeIterator.next();
 
 			if (segment instanceof Tag) {
@@ -144,9 +143,25 @@ public class HtmlFilter extends BaseFilter {
 						handleSkeleton(tag);
 					}
 				}
+
+				// We just hit a tag that could close the current TextUnit, but
+				// only if it was not opened with a tag (i.e., TextUnit's of
+				// mixed content) and we are processing inline tags
+				if (hasUnfinishedTextUnits() && !currentTextUnitsHasSkeleton() && !ruleState.isInline()) {
+					endTextUnit();
+				}
+
 			} else {
 				handleText(segment);
 			}
+			
+			if (hasQueuedEvents()) {
+				break;
+			}
+		}
+
+		if (!nodeIterator.hasNext()) {
+			finalize(); // we are done
 		}
 
 		// return one of the waiting events
@@ -177,7 +192,12 @@ public class HtmlFilter extends BaseFilter {
 
 		// its not pure whitespace so we are now processing inline text
 		ruleState.setInline(true);
-		startTextUnit(text.toString());
+
+		if (hasUnfinishedTextUnits()) {
+			addToTextUnit(text.toString());
+		} else {
+			startTextUnit(text.toString());
+		}
 	}
 
 	private void handleSkeleton(Tag tag) {
@@ -206,7 +226,10 @@ public class HtmlFilter extends BaseFilter {
 		switch (configuration.getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
-			addToCurrentTextUnit(startTag);
+			if (!hasUnfinishedTextUnits()) {
+				startTextUnit();
+			}
+			addCodeToCurrentTextUnit(startTag);
 			break;
 
 		case ATTRIBUTES_ONLY:
@@ -214,35 +237,34 @@ public class HtmlFilter extends BaseFilter {
 			}
 			break;
 		case GROUP_ELEMENT:
-			startGroup(startTag.getName(), startTag.toString());
+			startGroup(new GenericSkeleton(startTag.toString()));
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			addToSkeleton(startTag.toString());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.pushIncludedRule(startTag.getName());
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			addToSkeleton(startTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
-			// TODO: I'm wondering if we really need before and after skeleton.
-			// If we do need it I need to know which tags to apply it to.
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			ruleState.setInline(true);
+			startTextUnit(new GenericSkeleton(startTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.pushPreserverWhitespaceRule(startTag.getName());
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			addToSkeleton(startTag.toString());
 			break;
 		default:
 			ruleState.setInline(false);
-			appendToSkeletonUnit(startTag.toString(), startTag.getBegin(), startTag.length());
+			addToSkeleton(startTag.toString());
 		}
 	}
 
 	private void handleEndTag(EndTag endTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			addToSkeleton(endTag.toString());
 			// process these tag types to update parser state
 			switch (configuration.getMainRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
@@ -262,31 +284,33 @@ public class HtmlFilter extends BaseFilter {
 		switch (configuration.getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			ruleState.setInline(true);
-			addToCurrentTextUnit(endTag);
+			if (!hasUnfinishedTextUnits()) {
+				startTextUnit();
+			}
+			addCodeToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
-			endGroup(endTag.toString());
+			endGroup(new GenericSkeleton(endTag.toString()));
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			addToSkeleton(endTag.toString());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			addToSkeleton(endTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
-			// TODO: if we really need before and after skeleton I need to know
-			// which tags to apply it to.
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			ruleState.setInline(false);
+			endTextUnit(new GenericSkeleton(endTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.popPreserverWhitespaceRule();
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			addToSkeleton(endTag.toString());
 			break;
 		default:
 			ruleState.setInline(false);
-			appendToSkeletonUnit(endTag.toString(), endTag.getBegin(), endTag.length());
+			addToSkeleton(endTag.toString());
 			break;
 		}
 	}
@@ -304,7 +328,7 @@ public class HtmlFilter extends BaseFilter {
 		}
 	}
 
-	private void addToCurrentTextUnit(Tag tag) {
+	private void addCodeToCurrentTextUnit(Tag tag) {
 		TextFragment.TagType tagType;
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 			if (((StartTag) tag).isSyntacticalEmptyElementTag())
@@ -316,7 +340,8 @@ public class HtmlFilter extends BaseFilter {
 		} else {
 			tagType = TextFragment.TagType.PLACEHOLDER;
 		}
-		appendToTextUnit(new Code(tagType, tag.getName(), tag.toString()));
+		startCode(new Code(tagType, tag.getName(), tag.toString()));
+		endCode();
 	}
 
 	/*

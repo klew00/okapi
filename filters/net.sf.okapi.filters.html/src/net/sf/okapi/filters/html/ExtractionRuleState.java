@@ -41,6 +41,8 @@ public class ExtractionRuleState {
 
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
+	private Stack<RuleType> groupRuleStack;
+	private Stack<RuleType> textUnitRuleStack;
 	private boolean isInline = false;
 
 	/**
@@ -49,10 +51,29 @@ public class ExtractionRuleState {
 	public ExtractionRuleState() {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
 		excludedIncludedRuleStack = new Stack<RuleType>();		
+		groupRuleStack = new Stack<RuleType>();
+		textUnitRuleStack = new Stack<RuleType>();
 	}
 	
-	public void reset() {		
-		isInline = false;
+	public void reset() {				
+	}
+	
+	public boolean isGroupState() {
+		if (groupRuleStack.isEmpty())
+			return false;
+		if (groupRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.GROUP_ELEMENT)
+			return true;
+
+		return false;
+	}
+
+	public boolean isTextUnitState() {
+		if (textUnitRuleStack.isEmpty())
+			return false;
+		if (textUnitRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT)
+			return true;
+
+		return false;
 	}
 
 	public boolean isExludedState() {
@@ -88,11 +109,27 @@ public class ExtractionRuleState {
 	public void pushIncludedRule(String ruleName) {
 		excludedIncludedRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT));
 	}
+	
+	public void pushGroupRule(String ruleName) {
+		groupRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.GROUP_ELEMENT));
+	}
 
+	public void pushTextUnitRule(String ruleName) {
+		textUnitRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT));
+	}
+	
 	public void popExcludedIncludedRule() {
 		excludedIncludedRuleStack.pop();
 	}
+	
+	public void popGroupRule() {
+		groupRuleStack.pop();
+	}
 
+	public void popTextUnitRule() {
+		textUnitRuleStack.pop();
+	}
+	
 	protected boolean isInline() {
 		return isInline;
 	}

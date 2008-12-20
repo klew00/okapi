@@ -31,8 +31,29 @@ NOT_EQUALS = 2
 MATCH = 3 // regex match. Must match the entire attribute value
 
 // test group rules
-group {
+table {
 	ruleTypes = [GROUP]	
+}
+
+tr {
+	ruleTypes = [GROUP]	
+}
+
+td {
+	ruleTypes = [GROUP]	
+}
+
+ul {
+	ruleTypes = [GROUP]	
+}
+
+li {
+	ruleTypes = [GROUP]	
+}
+
+// test TextUnit rules
+p {
+	ruleTypes = [TEXTUNIT]	
 }
 
 // attributes that occur on many elements
@@ -175,7 +196,7 @@ legend {
 }
 
 li {
-	ruleTypes = [ATTRIBUTES_ONLY]
+	ruleTypes = [GROUP]
 	translatableAttributes = ['value']
 }
 
@@ -262,7 +283,7 @@ symbol {
 } 
 
 table {
-	ruleTypes = [ATTRIBUTES_ONLY]
+	ruleTypes = [GROUP]
 	translatableAttributes = ['summary']
 } 
 
@@ -276,7 +297,7 @@ tt {
 } 
 
 td {
-	ruleTypes = [ATTRIBUTES_ONLY]
+	ruleTypes = [GROUP]
 	translatableAttributes = ['abbr']
 } 
 
