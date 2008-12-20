@@ -28,7 +28,7 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.filters.ISkeleton;
 
-public class BaseNameable implements IResource, INameable {
+public class BaseNameable implements INameable {
 
 	protected String id;
 	protected ISkeleton skeleton;

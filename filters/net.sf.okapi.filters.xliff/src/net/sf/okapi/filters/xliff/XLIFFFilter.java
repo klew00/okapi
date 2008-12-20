@@ -34,6 +34,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -41,6 +43,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -52,6 +55,8 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class XLIFFFilter implements IFilter {
 
+	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	
 	private boolean hasNext;
 	private XMLStreamReader reader;
 	private StartDocument startDoc;
@@ -67,6 +72,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean sourceDone;
 	private boolean targetDone;
 	private TextContainer content;
+	private String encoding;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -136,10 +142,13 @@ public class XLIFFFilter implements IFilter {
 			canceled = false;
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
-			//fact.setProperty(XMLInputFactory.IS_COALESCING, false);
+			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			reader = fact.createXMLStreamReader(input);
 
+			//TODO: Need to auto-detect the encoding and update 'encoding' variable
+			// use reader.getCharacterEncodingScheme() ??? but start doc not reported
+			
 			tuId = 0;
 			otherId = 0;
 			// Set the start event
@@ -147,6 +156,15 @@ public class XLIFFFilter implements IFilter {
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			// The XML declaration is not reported by the parser, so we need to
+			// create it as a document part when starting
+			skel = new GenericSkeleton();
+			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+			dp.setProperty(new Property("encoding", encoding, false));
+			skel.append("<?xml version=\"1.0\" encoding=\"");
+			skel.addRef(dp, "encoding", "");
+			skel.append("\"?>");
+			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
@@ -182,6 +200,7 @@ public class XLIFFFilter implements IFilter {
 	{
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
+		encoding = defaultEncoding;
 	}
 
 	public void setOptions(String sourceLanguage,
@@ -242,9 +261,10 @@ public class XLIFFFilter implements IFilter {
 			case XMLStreamConstants.NAMESPACE:
 			case XMLStreamConstants.NOTATION_DECLARATION:
 			case XMLStreamConstants.ATTRIBUTE:
+				break;
 			case XMLStreamConstants.START_DOCUMENT:
+				break;
 			case XMLStreamConstants.END_DOCUMENT:
-				//TODO:
 				break;
 			}
 		}
@@ -252,6 +272,15 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	private boolean processStartFile () {
+		// Make a document part with skeleton between the previous event and now.
+		// Spaces can go with the file element to reduce the number of events.
+		// This allows to have only the file skeleton parts with the sub-document event
+		if ( !skel.isEmpty(true) ) {
+			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+			skel = new GenericSkeleton(); // And create a new skeleton for the next event
+			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		}
+		
 		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		storeStartElement();
 		String tmp = reader.getAttributeValue("", "original");
@@ -262,24 +291,25 @@ public class XLIFFFilter implements IFilter {
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'source-language'.");
 		if ( tmp.compareTo(srcLang) != 0 ) { // Warn about source language
-			//TODO
+			logger.warn(String.format("The source language declared in <file> is '%s'.", tmp));
 		}
 		
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
-			if ( tmp.compareTo(srcLang) != 0 ) { // Warn about target language
-				//TODO
+			if ( tmp.compareTo(trgLang) != 0 ) { // Warn about target language
+				logger.warn(String.format("The target language declared in <file> is '%s'.", tmp));
 			}
 		}
 		
-		startDoc.setSkeleton(skel);
+		startSubDoc.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDoc));
 		return true;
 	}
 
 	private boolean processEndFile () {
 		Ending ending = new Ending(String.valueOf(+otherId));
+		ending.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, ending));
 		return true;
 	}
@@ -324,6 +354,16 @@ public class XLIFFFilter implements IFilter {
 
 	private boolean processTransUnit () {
 		try {
+			// Make a document part with skeleton between the previous event and now.
+			// Spaces can go with trans-unit to reduce the number of events.
+			// This allows to have only the trans-unit skeleton parts with the TextUnit event
+			if ( !skel.isEmpty(true) ) {
+				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+				skel = new GenericSkeleton(); // And create a new skeleton for the next event
+				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			}
+			
+			// Process trans-unit
 			sourceDone = false;
 			targetDone = false;
 			tu = new TextUnit(String.valueOf(++tuId));
@@ -387,6 +427,7 @@ public class XLIFFFilter implements IFilter {
 					if ( "trans-unit".equals(name) ) {
 						storeEndElement();
 						tu.setSkeleton(skel);
+						tu.setMimeType("text/xml");
 						queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 						return true;
 					}
@@ -441,7 +482,7 @@ public class XLIFFFilter implements IFilter {
 */		}
 		else {
 			skel.addRef(tu);
-			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", true, null);
+			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", false, null);
 			if ( isSegSource ) {
 				//TODO
 			}
@@ -459,6 +500,7 @@ public class XLIFFFilter implements IFilter {
 			//processContent("target", true, tmpCont, null);
 		}
 		else {
+			skel.addRef(tu, trgLang);
 			TextContainer tc = processContent("target", false, null);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;

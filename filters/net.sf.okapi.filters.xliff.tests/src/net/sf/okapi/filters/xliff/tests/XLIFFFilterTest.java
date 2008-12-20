@@ -24,7 +24,10 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
+import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 import org.junit.Assert;
@@ -63,29 +66,46 @@ public class XLIFFFilterTest {
 				break;
 			case FINISHED:
 				System.out.println("---Finished");
+				printSkeleton(event.getResource());
 				break;
 			case START_DOCUMENT:
 				System.out.println("---Start Document");
+				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
 				System.out.println("---End Document");
+				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
 				System.out.println("---Start Sub Document");
+				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
 				System.out.println("---End Sub Document");
+				printSkeleton(event.getResource());
 				break;
 			case START_GROUP:
 				System.out.println("---Start Group");
+				printSkeleton(event.getResource());
 				break;
 			case END_GROUP:
 				System.out.println("---End Group");
+				printSkeleton(event.getResource());
 				break;
 			case TEXT_UNIT:
 				System.out.println("---Text Unit");
+				TextUnit tu = (TextUnit)event.getResource();
+				printResource(tu);
+				System.out.println("S=["+tu.toString()+"]");
+				for ( String lang : tu.getTargetLanguages() ) {
+					System.out.println("T=["+tu.getTarget(lang).toString()+"]");
+				}
+				printSkeleton(tu);
+				break;
+			case DOCUMENT_PART:
+				System.out.println("---Document Part");
 				printResource((INameable)event.getResource());
-				System.out.println("["+event.getResource().toString()+"]");
+				printSkeleton(event.getResource());
 				break;
 			}
 		}
@@ -96,5 +116,14 @@ public class XLIFFFilterTest {
 		System.out.println("  name="+res.getName());
 		System.out.println("  type="+res.getType());
 		System.out.println("  mimeType="+res.getMimeType());
+	}
+
+	private void printSkeleton (IResource res) {
+		ISkeleton skel = res.getSkeleton();
+		if ( skel != null ) {
+			System.out.println("---");
+			System.out.println(skel.toString());
+			System.out.println("---");
+		}
 	}
 }

@@ -27,7 +27,7 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.filters.ISkeleton;
 
-public class TextUnit implements IResource, INameable, IReferenceable {
+public class TextUnit implements INameable, IReferenceable {
 
 	private String id;
 	private boolean isReferent;

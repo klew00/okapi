@@ -49,6 +49,22 @@ public class GenericSkeleton implements ISkeleton {
 	public boolean isEmpty () {
 		return (list.size()==0);
 	}
+	
+	public boolean isEmpty (boolean ignoreWhitespaces) {
+		if ( ignoreWhitespaces ) {
+			for ( GenericSkeletonPart part : list ) {
+				for ( int i=0; i<part.data.length(); i++ ) {
+					if ( !Character.isWhitespace(part.data.charAt(i)) ) {
+						return false;
+					}
+				}
+			}
+			return true; // no parts, or only with white-spaces
+		}
+		else { // Just like isEmpty()
+			return (list.size()==0);
+		}
+	}
 
 	public void add (String data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
