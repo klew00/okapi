@@ -41,6 +41,16 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
+/**
+ * This class implements the filter writer interface for filters that use the
+ * GenericSkeleton skeleton.
+ * <p>Recognized properties:</p>
+ * <ul>
+ * <li><code>encoding</code> - The value of the <code>encoding</code> resource-level property in the 
+ * <code>{@link IResource.START_DOCUMENT}</code> event is replaced by the value of the encoding provided with
+ * the {@link #setOptions(String, String)} method.</li>
+ * </ul>
+ */
 public class GenericFilterWriter implements IFilterWriter {
 
 	private ISkeletonWriter skelWriter;
@@ -137,6 +147,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 	
 	private void processStartDocument(StartDocument resource) throws IOException {
+		if ( resource != null ) {
+			if ( resource.hasProperty("encoding") ) {
+				resource.getProperty("encoding").setValue(encoding);
+			}
+		}
 		// Write the skeleton
 		writer.write(skelWriter.processStartDocument(resource));
 	}

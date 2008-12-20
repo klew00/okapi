@@ -20,9 +20,11 @@
 
 package net.sf.okapi.applications.rainbow.packages.xliff;
 
-import java.io.FileInputStream;
+import java.io.File;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
@@ -32,21 +34,29 @@ import net.sf.okapi.filters.xliff.XLIFFFilter;
 public class Reader implements IReader {
 	
 	XLIFFFilter reader;
+	FilterEvent event;
 	
-	public Reader () {
-		reader = new XLIFFFilter();
-	}
-
 	public void closeDocument () {
+		if ( reader != null ) {
+			reader.close();
+			reader = null;
+		}
 	}
 
 	public TextUnit getItem () {
-		return null; //reader.getItem();
+		return (TextUnit)event.getResource();
 	}
 
-	public void openDocument (String path) {
+	public void openDocument (String path,
+		String sourceLanguage,
+		String targetLanguage) {
 		try {
-			reader.open(new FileInputStream(path));
+			closeDocument();
+			reader = new XLIFFFilter();
+			// Encoding is not really used so we can hard-code
+			reader.setOptions(sourceLanguage, targetLanguage, "UTF-8", false);
+			File f = new File(path);
+			reader.open(f.toURL());
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);
@@ -54,13 +64,12 @@ public class Reader implements IReader {
 	}
 
 	public boolean readItem () {
-		/*int n;
-		do {
-			switch ( (n = reader.readItem()) ) {
-			case XLIFFReader.RESULT_ENDTRANSUNIT:
+		while ( reader.hasNext() ) {
+			event = reader.next();
+			if ( event.getEventType() == FilterEventType.TEXT_UNIT ) {
 				return true;
 			}
-		} while ( n > XLIFFReader.RESULT_ENDINPUT );*/
+		}
 		return false;
 	}
 

@@ -138,6 +138,8 @@ public class XLIFFFilter implements IFilter {
 
 	public void open (InputStream input) {
 		try {
+			if ( srcLang == null ) throw new RuntimeException("Source language not set.");
+			if ( trgLang == null ) throw new RuntimeException("Target language not set.");
 			close();
 			canceled = false;
 
@@ -155,16 +157,15 @@ public class XLIFFFilter implements IFilter {
 			hasNext = true;
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 			// The XML declaration is not reported by the parser, so we need to
 			// create it as a document part when starting
 			skel = new GenericSkeleton();
-			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
-			dp.setProperty(new Property("encoding", encoding, false));
+			startDoc.setProperty(new Property("encoding", encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addRef(dp, "encoding", "");
+			skel.addRef(startDoc, "encoding", "");
 			skel.append("\"?>");
-			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			startDoc.setSkeleton(skel);
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);

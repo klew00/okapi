@@ -42,7 +42,10 @@ public class Reader implements IReader {
 		return reader.item;
 	}
 
-	public void openDocument (String path) {
+	public void openDocument (String path,
+		String sourceLanguage,
+		String targetLanguage)
+	{
 		reader.open(path);
 	}
 

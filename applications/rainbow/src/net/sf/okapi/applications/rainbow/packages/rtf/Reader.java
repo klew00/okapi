@@ -32,7 +32,9 @@ public class Reader implements IReader {
 		return null;
 	}
 
-	public void openDocument (String path) {
+	public void openDocument (String path,
+		String sourceLanguage,
+		String targetLanguage) {
 	}
 
 	public boolean readItem () {

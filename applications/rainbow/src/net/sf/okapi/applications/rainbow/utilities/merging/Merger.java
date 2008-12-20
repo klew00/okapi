@@ -101,7 +101,7 @@ public class Merger {
 			// Load the relevant filter
 			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
 			
-			reader.openDocument(fileToMerge);
+			reader.openDocument(fileToMerge, manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
 			// Initializes the input
 			inpFilter.setOptions(manifest.getSourceLanguage(), trgLang,

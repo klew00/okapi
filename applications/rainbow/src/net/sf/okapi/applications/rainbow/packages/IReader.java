@@ -28,7 +28,9 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public interface IReader {
 
-	public void openDocument (String p_sPath);
+	public void openDocument (String p_sPath,
+		String sourceLanguage,
+		String targetLanguage);
 	
 	public void closeDocument ();
 

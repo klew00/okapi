@@ -127,7 +127,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * Adds a reference to the skeleton.
 	 * @param referent Resource object.
 	 * @param propName Property name or null if the reference is to the text.
-	 * @param language Language or null if the reference is to the source.
+	 * @param language Language code; use null for the source; empty string for resource-level property.
 	 */
 	public void addRef (IResource referent,
 		String propName,

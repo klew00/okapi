@@ -202,10 +202,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 
 		// Or to a property of the referent
-		return getString((IReferenceable)part.parent, propName, part.language, context);
+		return getString((INameable)part.parent, propName, part.language, context);
 	}
 
-	private String getString (IReferenceable ref,
+	private String getString (INameable ref,
 		String propName,
 		String langToUse,
 		int context)
