@@ -64,12 +64,13 @@ public class PropertiesFilter implements IFilter {
 	private int lineNumber;
 	private int lineSince;
 	private long position;
-	private int id;
+	private int tuId;
+	private int otherId;
 	private Pattern keyConditionPattern;
 	private String lineBreak;
 	private int parseState = 0;
 	private GenericSkeleton skel;
-	private StartDocument startDoc;
+	private String docName;
 	private String srcLang;
 	
 	public PropertiesFilter () {
@@ -140,7 +141,7 @@ public class PropertiesFilter implements IFilter {
 		// Store the ending for next call
 		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
 		// Set the ending call
-		Ending ending = new Ending(String.valueOf(++id));
+		Ending ending = new Ending(String.valueOf(++otherId));
 		ending.setSkeleton(skel);
 		parseState = 2;
 		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
@@ -158,8 +159,9 @@ public class PropertiesFilter implements IFilter {
 				new InputStreamReader(bis, bis.detectEncoding()));
 			
 			// Initializes the variables
+			tuId = 0;
+			otherId = 0;
 			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
-			id = 0;
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;
@@ -177,6 +179,14 @@ public class PropertiesFilter implements IFilter {
 			// Set the start event
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
+
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDoc.setName(docName);
+			startDoc.setEncoding(encoding);
+			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(params);
+			startDoc.setType("text/x-properties");
+			startDoc.setMimeType("text/x-properties");
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
@@ -190,12 +200,7 @@ public class PropertiesFilter implements IFilter {
 	public void open (URL inputUrl) {
 		try { //TODO: Make sure this is actually working (encoding?, etc.)
 			// TODO: docRes should be always set with all opens... need better way
-			startDoc = new StartDocument(String.valueOf(++id));
-			startDoc.setName(inputUrl.getPath());
-			startDoc.setLanguage(srcLang);
-			startDoc.setFilterParameters(params);
-			startDoc.setType("text/x-properties");
-			startDoc.setMimeType("text/x-properties");
+			docName = inputUrl.getPath();
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -370,7 +375,7 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( extract ) {
-					tuRes = new TextUnit(String.valueOf(++id),
+					tuRes = new TextUnit(String.valueOf(++tuId),
 						unescape(value));
 					tuRes.setName(key);
 					tuRes.setMimeType("text/x-properties");

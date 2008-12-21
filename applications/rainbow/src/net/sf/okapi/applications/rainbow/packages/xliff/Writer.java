@@ -296,11 +296,11 @@ public class Writer extends BaseWriter {
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note
-//		if ( tu.getSourceProperties().containsKey("note") ) {
-//			writer.writeStartElement("note");
-//			writer.writeString(tu.getProperty("note").getValue());
-//			writer.writeEndElementLineBreak(); // note
-//		}
+		if ( tu.hasProperty("note") ) {
+			writer.writeStartElement("note");
+			writer.writeString(tu.getProperty("note").getValue());
+			writer.writeEndElementLineBreak(); // note
+		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
 	}

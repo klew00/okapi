@@ -190,10 +190,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( propName == null ) { // Reference to the content of the referent
 			if ( part.parent instanceof TextUnit ) {
 				if ( isMultilingual ) {
-					return getContent((TextUnit)part.parent, part.language, context);
+					return getContent((TextUnit)part.parent,
+						part.language,
+						// If lang==null: it's source, so not text in multilingual
+						(part.language==null) ? 0 : context);
 				}
 				else {
-					return getContent((TextUnit)part.parent, (part.language==null) ? outputLang : part.language, context);
+					return getContent((TextUnit)part.parent,
+						// If lang==null: it's source, so use output lang for monlingual
+						(part.language==null) ? outputLang : part.language,
+						context);
 				}
 			}
 			else {
@@ -276,14 +282,18 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return getContent(tf, langToUse, encoderManager, context);
 		}
 		else {
-			if ( context == 1 ) {
+			switch ( context ) {
+			case 1:
 				return layer.endCode()
 					+ getContent(tf, langToUse, encoderManager, context)
 					+ layer.startCode();
+			case 2:
+				return layer.endInline()
+					+ getContent(tf, langToUse, encoderManager, context)
+					+ layer.startInline();
+			default:
+				return getContent(tf, langToUse, encoderManager, context);
 			}
-			return layer.endInline()
-				+ getContent(tf, langToUse, encoderManager, context)
-				+ layer.startInline();
 		}
 	}
 

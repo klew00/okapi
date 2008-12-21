@@ -114,6 +114,7 @@ public class RTFFilter implements IFilter {
 	
 	private IResource currentRes;
 	private BufferedReader reader;
+	private boolean canceled;
 	private String srcLang;
 	private String trgLang;
 	private String passedEncoding;
@@ -143,11 +144,11 @@ public class RTFFilter implements IFilter {
 	private int currentDBCSCodepage;
 	private String currentCSName;
 	private ByteBuffer byteBuffer;
-	
 	private LinkedList<FilterEvent> queue;
-	private int parseState;
-	private StartDocument startDoc;
-	private int id;
+	private boolean hasNext;
+	private String docName;
+	private int tuId;
+	private int otherId;
 	
 	public RTFFilter () {
 		winCharsets = new Hashtable<Integer, String>();
@@ -265,7 +266,7 @@ public class RTFFilter implements IFilter {
 	}
 	
 	public void cancel () {
-		//TODO
+		canceled = true;
 	}
 
 	public void close () {
@@ -274,6 +275,7 @@ public class RTFFilter implements IFilter {
 				reader.close();
 				reader = null;
 			}
+			hasNext = false;
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -293,35 +295,35 @@ public class RTFFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		return (parseState != 2);
+		return hasNext;
 	}
 
 	public FilterEvent next () {
-		if ( parseState == 0 ) {
-			queue.add(new FilterEvent(FilterEventType.START));
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
-			parseState = 1;
+		// Check for cancellation first
+		if ( canceled ) {
+			queue.clear();
+			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			hasNext = false;
 		}
-		else if ( queue.size() == 0 ) {
+		
+		// Parse next if nothing in the queue
+		if ( queue.size() == 0 ) {
 			parseNext();
 		}
-		if ( queue.size() > 0 ) {
-			FilterEvent event = queue.poll();
-			currentRes = event.getResource();
-			if ( event.getEventType() == FilterEventType.FINISHED ) {
-				parseState = 2;
-			}
-			return event;
+		
+		// Return the head of the queue
+		if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+			hasNext = false;
 		}
-		return null;
+		return queue.poll();
 	}
 
 	public void parseNext () {
-		TextUnit textUnit = new TextUnit(String.valueOf(++id));
+		TextUnit textUnit = new TextUnit(String.valueOf(++tuId));
 		if ( !getSegment(textUnit) ) {
 			// Send the end-document event
 			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
-				new Ending(String.valueOf(++id))));
+				new Ending(String.valueOf(++otherId))));
 			// Store the finished event
 			queue.add(new FilterEvent(FilterEventType.FINISHED));
 		}
@@ -332,16 +334,20 @@ public class RTFFilter implements IFilter {
 
 	public void open (InputStream input) {
 		try {
+			reset(passedEncoding);
 			reader = new BufferedReader(
 				new InputStreamReader(input, passedEncoding));
-			reset(passedEncoding);
-			startDoc = new StartDocument(String.valueOf(++id));
-			startDoc.setId(String.valueOf(++id));
-			startDoc.setIsMultilingual(true);
-			startDoc.setFilterParameters(getParameters());
-			startDoc.setLanguage(srcLang);
+	
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDoc.setName(docName);
 			startDoc.setEncoding(passedEncoding);
-			startDoc.setName("TODO");
+			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(getParameters());
+			startDoc.setType("text/rtf");
+			startDoc.setMimeType("text/rtf");
+			startDoc.setIsMultilingual(true);
+			queue.add(new FilterEvent(FilterEventType.START));
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -353,9 +359,10 @@ public class RTFFilter implements IFilter {
 		throw new UnsupportedOperationException();
 	}
 
-	public void open (URL inputURL) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			open(inputURL.openStream());
+	public void open (URL inputUrl) {
+		try {
+			docName = inputUrl.getPath();
+			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -383,6 +390,9 @@ public class RTFFilter implements IFilter {
 	}
 	
 	private void reset (String defaultEncoding) {
+		close();
+		canceled = false;
+		
 		chCurrent = (char)0;
 		reParse = false;
 		chReParseChar = (char)0;
@@ -411,9 +421,10 @@ public class RTFFilter implements IFilter {
 		ctxStack = new Stack<RTFContext>();
 		ctxStack.push(ctx);
 		loadEncoding(ctx.encoding);
-		
-		parseState = 0;
-		id = 0;
+
+		hasNext = true;
+		tuId = 0;
+		otherId = 0;
 		queue = new LinkedList<FilterEvent>();
 	}
 

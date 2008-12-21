@@ -47,6 +47,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -59,9 +60,10 @@ public class XLIFFFilter implements IFilter {
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
-	private StartDocument startDoc;
+	private String docName;
 	private int tuId;
 	private int otherId;
+	private int groupId;
 	private String srcLang;
 	private String trgLang;
 	private LinkedList<FilterEvent> queue;
@@ -73,6 +75,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean targetDone;
 	private TextContainer content;
 	private String encoding;
+	private Stack<Integer> parentIds;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -88,6 +91,7 @@ public class XLIFFFilter implements IFilter {
 				reader.close();
 				reader = null;
 			}
+			hasNext = false;
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
@@ -151,12 +155,26 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Need to auto-detect the encoding and update 'encoding' variable
 			// use reader.getCharacterEncodingScheme() ??? but start doc not reported
 			
+			parentIds = new Stack<Integer>();
+			parentIds.push(0);
+			groupId = 0;
 			tuId = 0;
 			otherId = 0;
 			// Set the start event
 			hasNext = true;
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
+			
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDoc.setName(docName);
+			startDoc.setEncoding(encoding);
+			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(getParameters());
+			startDoc.setType("text/x-xliff");
+			startDoc.setMimeType("text/x-xliff");
+			startDoc.setIsMultilingual(true);
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+
 			// The XML declaration is not reported by the parser, so we need to
 			// create it as a document part when starting
 			skel = new GenericSkeleton();
@@ -165,7 +183,6 @@ public class XLIFFFilter implements IFilter {
 			skel.addRef(startDoc, "encoding", "");
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
@@ -178,15 +195,8 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public void open (URL inputUrl) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			// TODO: docRes should be always set with all opens... need better way
-			startDoc = new StartDocument(String.valueOf(++otherId));
-			startDoc.setName(inputUrl.getPath());
-			startDoc.setLanguage(srcLang);
-			startDoc.setIsMultilingual(true);
-			startDoc.setFilterParameters(params);
-			startDoc.setType("text/x-xliff");
-			startDoc.setMimeType("text/x-xliff");
+		try {
+			docName = inputUrl.getPath();
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
@@ -229,6 +239,9 @@ public class XLIFFFilter implements IFilter {
 				else if ( "file".equals(name) ) {
 					return processStartFile();
 				}
+				else if ( "group".equals(name) ) {
+					if ( processStartGroup() ) return true;
+				}
 				else storeStartElement();
 				break;
 				
@@ -236,6 +249,9 @@ public class XLIFFFilter implements IFilter {
 				storeEndElement();
 				if ( "file".equals(reader.getLocalName()) ) {
 					return processEndFile();
+				}
+				else if ( "group".equals(reader.getLocalName()) ) {
+					return processEndGroup();
 				}
 				break;
 				
@@ -383,8 +399,8 @@ public class XLIFFFilter implements IFilter {
 				tu.setName(tu.getId());
 			}
 
-			tmp = reader.getAttributeValue("", "restype");
-			if ( tmp != null ) tu.setType(tmp);
+			// Set restype (can be null)
+			tu.setType(reader.getAttributeValue("", "restype"));
 			
 			// Get the content
 			int eventType;
@@ -402,7 +418,6 @@ public class XLIFFFilter implements IFilter {
 					else if ( "target".equals(name) ) {
 						storeStartElement();
 						processTarget();
-						checkTarget();
 						storeEndElement();
 					}
 					else if ( "seg-source".equals(name) ) {
@@ -411,20 +426,20 @@ public class XLIFFFilter implements IFilter {
 						storeEndElement();
 					}
 					else if ( "note".equals(name) ) {
-						checkTarget();
+						addTargetIfNeeded();
 						storeStartElement();
 						processNote();
 						storeEndElement();
 					}
 					else {
-						checkTarget();
+						addTargetIfNeeded();
 						storeStartElement();
 					}
 					break;
 				
 				case XMLStreamConstants.END_ELEMENT:
 					name = reader.getLocalName();
-					checkTarget();
+					addTargetIfNeeded();
 					if ( "trans-unit".equals(name) ) {
 						storeEndElement();
 						tu.setSkeleton(skel);
@@ -432,7 +447,8 @@ public class XLIFFFilter implements IFilter {
 						queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 						return true;
 					}
-					else storeEndElement();
+					// Else: just store the end
+					storeEndElement();
 					break;
 				
 				case XMLStreamConstants.SPACE:
@@ -444,7 +460,7 @@ public class XLIFFFilter implements IFilter {
 						tmp = reader.getText();
 						for ( int i=0; i<tmp.length(); i++ ) {
 							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
-								checkTarget();
+								addTargetIfNeeded();
 								break;
 							}
 						}
@@ -453,12 +469,12 @@ public class XLIFFFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.COMMENT:
-					checkTarget();
+					addTargetIfNeeded();
 					skel.append("<!--"+ reader.getText() + "-->");
 					break;
 				
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					checkTarget();
+					addTargetIfNeeded();
 					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
 					break;
 				}
@@ -473,15 +489,17 @@ public class XLIFFFilter implements IFilter {
 	private void processSource (boolean isSegSource) {
 		if ( sourceDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-/*			TextContainer tmpCont = new TextContainer(null);
-			String propName = "alt-trans";
-			Property prop = new Property(propName, "", true);
-			skel.addRef(tu, propName, currentLang);
-			TextContainer tmpCont = new TextContainer(null);
-			processContent("source", true, tmpCont, null);
-			tu.setSourceProperty(prop);
-*/		}
+			processContent(isSegSource ? "seg-source" : "source", true, null);
+			//TODO: put this in an annotation
+		}
 		else {
+			// Get the coord attribute if available
+			String tmp = reader.getAttributeValue("", "coord");
+			if ( tmp != null ) {
+				//TODO: Need a way to store and make modifiable property
+				tu.setSourceProperty(new Property("coord", tmp, true));
+			}
+
 			skel.addRef(tu);
 			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", false, null);
 			if ( isSegSource ) {
@@ -497,35 +515,54 @@ public class XLIFFFilter implements IFilter {
 	private void processTarget () {
 		if ( targetDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-			//TextContainer tmpCont = new TextContainer(null);
-			//processContent("target", true, tmpCont, null);
+			TextContainer tc = processContent("target", true, null);
+			//TODO: put this in an annotation
 		}
 		else {
+			// Get the state attribute if available
+			String tmp = reader.getAttributeValue("", "state");
+			if ( tmp != null ) {
+				//TODO: Need a way to store and make modifiable property
+				tu.setTargetProperty(trgLang, new Property("state", tmp, true));
+			}
+		
+			// Get the coord attribute if available
+			tmp = reader.getAttributeValue("", "coord");
+			if ( tmp != null ) {
+				//TODO: Need a way to store and make modifiable property
+				tu.setTargetProperty(trgLang, new Property("coord", tmp, true));
+			}
+
 			skel.addRef(tu, trgLang);
 			TextContainer tc = processContent("target", false, null);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
 				tu.setTarget(trgLang, tc);
 			}
+			targetDone = true;
 		}
 	}
 	
-	
-	private void checkTarget () {
-		if ( !sourceDone ) return;
-		if ( targetDone ) return;
+	private void addTargetIfNeeded () {
+		if ( targetDone ) return; // Nothing to add
+		//Else: this trans-unit has no target, we add it here in the skeleton
+		// so we can merge target data in it when writing out the skeleton
+		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
+		skel.addRef(tu, trgLang);
+		skel.append("</target>");
+		skel.append("\n"); // TODO: use the line-break type of the original file
 		targetDone = true;
 	}
 	
 	/**
-	 * Processes a segment content. Set the 'content' and set 'inCode' gobal variables 
+	 * Processes a segment content. Set the 'inCode' gobal variables 
 	 * before calling this method with <source> or <target>.
 	 * @param tagName The name of the element content that is being processed.
 	 * @param store True if the data must be stored in the skeleton.
 	 * This is used to merge later on.
-	 * @param content The object where to put the code.
 	 * @param inlineCodes Array where to save the in-line codes. Do not save if this parameter
 	 * is set to null.
+	 * @return A new TextContainer object with the parsed content.
 	 */
 	private TextContainer processContent (String tagName,
 		boolean store,
@@ -562,6 +599,7 @@ public class XLIFFFilter implements IFilter {
 					else if ( name.equals("g") || name.equals("mrk") ) {
 						if ( store ) storeEndElement();
 						content.append(TagType.CLOSING, name, name); 
+						idStack.pop();
 						if ( inlineCodes != null ) {
 							String tmp = reader.getPrefix();
 							if (( tmp != null ) && ( tmp.length()>0 )) {
@@ -752,8 +790,7 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					skel.append(Util.escapeToXML(reader.getText(),
-						0, params.escapeGT));
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
 					tmp.append(reader.getText());
 					break;
 				case XMLStreamConstants.END_ELEMENT:
@@ -772,5 +809,49 @@ public class XLIFFFilter implements IFilter {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private boolean processStartGroup () {
+		// Check if it's a 'merge-trans' group (v1.2)
+		String tmp = reader.getAttributeValue("", "merge-trans");
+		if ( tmp != null ) {
+			// If it's a 'merge-trans' group we do not treat it as a normal group.
+			// The group element was not generated by the extractor.
+			if ( tmp.compareTo("yes") == 0 ) {
+				parentIds.push(-1);
+				return false;
+			}
+		}
+		
+		// Else: it's a structural group
+		StartGroup group = new StartGroup(parentIds.peek().toString(),
+			String.valueOf(++groupId));
+		parentIds.push(groupId);
+		queue.add(new FilterEvent(FilterEventType.START_GROUP, group));
+
+		// Get resname (can be null)
+		tmp = reader.getAttributeValue("", "resname");
+		if ( tmp != null ) group.setName(tmp);
+		else if ( params.fallbackToID ) {
+			group.setName(reader.getAttributeValue("", "id"));
+		}
+
+		// Get restype (can be null)
+		group.setType(reader.getAttributeValue("", "restype"));
+		return true;
+	}
 	
+	private boolean processEndGroup () {
+		// Pop and checks the value for this group
+		int id = parentIds.pop();
+		if ( id == -1 ) {
+			// This closes a 'merge-trans' non-structural group
+			return false;
+		}
+
+		// Else: it's a structural group
+		Ending ending = new Ending(String.valueOf(id));
+		queue.add(new FilterEvent(FilterEventType.END_GROUP, ending));
+		return true;
+	}
+
 }

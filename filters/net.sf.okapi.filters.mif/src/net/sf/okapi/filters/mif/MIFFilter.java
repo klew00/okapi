@@ -45,6 +45,7 @@ public class MIFFilter implements IFilter {
 	
 	static final Hashtable<String, Character> charTable = initCharTable();
 
+	private String docName;
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
@@ -125,10 +126,9 @@ public class MIFFilter implements IFilter {
 
 	public void open (InputStream input) {
 		try {
-			close(); //TODO: encoding for non-EN
-			
+			close();
+			// Detect encoding
 			String encoding = guessEncoding(input);
-			
 			reader = new BufferedReader(
 				new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
@@ -139,15 +139,16 @@ public class MIFFilter implements IFilter {
 			inString = -1;
 			id = 0;
 			canceled = false;
+			
 			queue = new LinkedList<FilterEvent>();
-			
 			queue.add(new FilterEvent(FilterEventType.START));
-			
 			StartDocument startDoc = new StartDocument(String.valueOf(++id));
+			startDoc.setName(docName);
 			startDoc.setEncoding(encoding);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			
+			startDoc.setType("text/x-mif");
+			startDoc.setMimeType("text/x-mif");
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
@@ -155,9 +156,10 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	public void open (URL inputPath) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			open(inputPath.openStream());
+	public void open (URL inputUrl) {
+		try {
+			docName = inputUrl.getPath();
+			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

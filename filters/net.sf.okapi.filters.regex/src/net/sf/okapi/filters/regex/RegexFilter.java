@@ -55,7 +55,7 @@ public class RegexFilter implements IFilter {
 	private Stack<StartGroup> groupStack;
 	private int tuId;
 	private int otherId;
-	private StartDocument startDoc;
+	private String docName;
 	private TextUnit tuRes;
 	private LinkedList<FilterEvent> queue;
 	private int startSearch;
@@ -196,6 +196,13 @@ public class RegexFilter implements IFilter {
 			// Set the start event
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDoc.setName(docName);
+			startDoc.setEncoding(encoding);
+			startDoc.setLanguage(srcLang);
+			startDoc.setFilterParameters(getParameters());
+			startDoc.setType(params.mimeType);
+			startDoc.setMimeType(params.mimeType);
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e) {
@@ -207,14 +214,8 @@ public class RegexFilter implements IFilter {
 	}
 	
 	public void open (URL inputUrl) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			// TODO: docRes should be always set with all opens... need better way
-			startDoc = new StartDocument(String.valueOf(++otherId));
-			startDoc.setName(inputUrl.getPath());
-			startDoc.setLanguage(srcLang);
-			startDoc.setFilterParameters(params);
-			startDoc.setType(params.mimeType);
-			startDoc.setMimeType(params.mimeType);
+		try {
+			docName = inputUrl.getPath();
 			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {

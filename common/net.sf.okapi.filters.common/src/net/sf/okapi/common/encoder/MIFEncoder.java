@@ -20,31 +20,13 @@
 
 package net.sf.okapi.common.encoder;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IEncoder;
 
 /**
- * Encoder for properties-type files. For example Java properties file.
+ * Encoder for Adobe FrameMaker MIF files.
  */
-public class PropertiesEncoder implements IEncoder {
-	
-	private CharsetEncoder outputEncoder;
-	private boolean escapeAll = false;
-
-	public PropertiesEncoder () {
-		escapeAll = false;
-		outputEncoder = Charset.forName("us-ascii").newEncoder();
-	}
-	
-	public void setOptions (IParameters params,
-		String encoding)
-	{
-		outputEncoder = Charset.forName(encoding).newEncoder();
-		//TODO: get escapeAll from params
-	}
+public class MIFEncoder implements IEncoder {
 
 	public String encode (String text,
 		int context)
@@ -52,23 +34,25 @@ public class PropertiesEncoder implements IEncoder {
 		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( text.codePointAt(i) > 127 ) {
-				if ( escapeAll ) {
-					escaped.append(String.format("\\u%04x", text.codePointAt(i))); 
-				}
-				else {
-					if ( outputEncoder.canEncode(text.charAt(i)) )
-						escaped.append(text.charAt(i));
-					else
-						escaped.append(String.format("\\u%04x", text.codePointAt(i)));
-				}
+				escaped.append(String.format("\\u%04X", text.codePointAt(i))); 
+				//TODO: Do we need legacy \xHH using MIF encoding?
 			}
 			else {
 				switch ( text.charAt(i) ) {
-				case '\n':
-					escaped.append("\\n");
-					break;
 				case '\t':
 					escaped.append("\\t");
+					break;
+				case '>':
+					escaped.append("\\>");
+					break;
+				case '\'':
+					escaped.append("\\q");
+					break;
+				case '`':
+					escaped.append("\\Q");
+					break;
+				case '\\':
+					escaped.append("\\\\");
 					break;
 				default:
 					escaped.append(text.charAt(i));
@@ -82,27 +66,32 @@ public class PropertiesEncoder implements IEncoder {
 	public String encode (char value,
 		int context)
 	{
-		if ( value > 127 ) {
-			if ( escapeAll ) {
-				return String.format("\\u%04x", value); 
+		switch ( value ) {
+		case '\t':
+			return "\\t";
+		case '>':
+			return "\\>";
+		case '\'':
+			return "\\q";
+		case '`':
+			return "\\Q";
+		case '\\':
+			return "\\\\";
+		default:
+			if ( value > 127 ) {
+				return String.format("\\u%04X", value);
+				//TODO: Do we need legacy \xHH using MIF encoding?
 			}
 			else {
-				if ( outputEncoder.canEncode(value) )
-					return String.valueOf(value);
-				else
-					return String.format("\\u%04x", value);
-			}
-		}
-		else {
-			switch ( value ) {
-			case '\n':
-				return "\\n";
-			case '\t':
-				return "\\t";
-			default:
 				return String.valueOf(value);
 			}
 		}
+	}
+
+	public void setOptions (IParameters params,
+		String encoding)
+	{
+		// Nothing to do
 	}
 
 }

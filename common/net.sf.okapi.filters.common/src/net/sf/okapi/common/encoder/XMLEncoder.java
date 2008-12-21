@@ -29,6 +29,7 @@ public class XMLEncoder implements IEncoder {
 	public void setOptions (IParameters params,
 		String encoding)
 	{
+		// Nothing to do
 	}
 
 	public String encode (String text, int context) {
