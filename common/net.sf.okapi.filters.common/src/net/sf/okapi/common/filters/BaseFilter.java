@@ -38,9 +38,18 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public abstract class BaseFilter implements IFilter {
+	private static final String START_GROUP = "sg";
+	private static final String END_GROUP = "eg";
+	private static final String TEXT_UNIT = "tu";
+	private static final String DOCUMENT_PART = "dp";
+	private static final String START_DOCUMENT = "sd";
+	private static final String END_DOCUMENT = "ed";
+	private static final String START_SUBDOCUMENT = "ssd";
+	private static final String END_SUBDOCUMENT = "esd";
+
 	private int startGroupId = 0;
 	private int endGroupId = 0;
-	private int textUnitId = 0;	
+	private int textUnitId = 0;
 	private int subDocumentId = 0;
 	private int documentId = 0;
 	private int documentPartId = 0;
@@ -50,16 +59,16 @@ public abstract class BaseFilter implements IFilter {
 	private List<FilterEvent> filterEvents;
 	private List<FilterEvent> referencableFilterEvents;
 	private boolean canceled;
-	
-	private final class TextUnitWithSkeleton {		
+
+	private final class TextUnitWithSkeleton {
 		private TextUnit tu;
 		private GenericSkeleton skel;
-		
+
 		public TextUnitWithSkeleton(TextUnit tu, GenericSkeleton skel) {
 			this.tu = tu;
 			this.skel = skel;
 		}
-		
+
 		public TextUnit getTu() {
 			return tu;
 		}
@@ -75,7 +84,7 @@ public abstract class BaseFilter implements IFilter {
 		public void setSkel(GenericSkeleton skel) {
 			this.skel = skel;
 		}
-		
+
 		public boolean hasSkeleton() {
 			if (skel == null) {
 				return false;
@@ -140,10 +149,14 @@ public abstract class BaseFilter implements IFilter {
 		} else if (hasUnfinishedTextUnits()) {
 			endTextUnit();
 		}
-		
+
 		endSubDocument();
 		endDocument();
 		finish();
+	}
+
+	private String createId(String name, int number) {
+		return String.format("%s%d", name, number);
 	}
 
 	private void addPropertiesToResource(INameable resource, List<Property> properties) {
@@ -188,7 +201,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 		return true;
 	}
-	
+
 	protected boolean currentTextUnitsHasSkeleton() {
 		if (textUnitStack.isEmpty()) {
 			return false;
@@ -198,7 +211,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 		return true;
 	}
-	
+
 	protected boolean hasUnfinishedGroups() {
 		if (groupStack.isEmpty()) {
 			return false;
@@ -229,7 +242,7 @@ public abstract class BaseFilter implements IFilter {
 		textUnitId = 0;
 		documentPartId = 0;
 		subDocumentId = 0;
-		
+
 		canceled = false;
 
 		referencableFilterEvents = new LinkedList<FilterEvent>();
@@ -259,25 +272,25 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void startDocument() {
-		StartDocument startDocument = new StartDocument(String.format("d%d", ++documentId));
-		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);		
+		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
+		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 	}
 
 	protected void endDocument() {
-		Ending endDocument = new Ending(String.format("d%d", ++documentId));
+		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
 		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
-	protected void startSubDocument() {		
-		StartSubDocument startSubDocument = new StartSubDocument(String.format("sd%d", ++subDocumentId));
+	protected void startSubDocument() {
+		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
 		FilterEvent event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
 	}
 
 	protected void endSubDocument() {
-		Ending endDocument = new Ending(String.format("sd%d", ++subDocumentId));
+		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
 		FilterEvent event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
@@ -308,12 +321,12 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void startTextUnit(String text, ISkeleton startMarker, List<Property> properties) {
 		GenericSkeleton skel = null;
-		
+
 		if (hasUnfinishedSkeleton()) {
 			endSkeleton();
 		}
 
-		TextUnit tu = new TextUnit(String.format("tu%d", ++textUnitId), text);		
+		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
 
 		addPropertiesToResource(tu, properties);
 
@@ -321,7 +334,7 @@ public abstract class BaseFilter implements IFilter {
 			skel = new GenericSkeleton((GenericSkeleton) startMarker);
 			skel.addRef(tu);
 		}
-		
+
 		textUnitStack.push(new TextUnitWithSkeleton(tu, skel));
 	}
 
@@ -335,15 +348,15 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		if (endMarker != null) {
-			tuWithSkel.getSkel().add((GenericSkeleton)endMarker);
+			tuWithSkel.getSkel().add((GenericSkeleton) endMarker);
 		}
 
 		addPropertiesToResource(tuWithSkel.getTu(), properties);
 
-		filterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuWithSkel.getTu(), tuWithSkel.getSkel()));		
+		filterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuWithSkel.getTu(), tuWithSkel.getSkel()));
 	}
 
-	protected void addToTextUnit(String text) {		
+	protected void addToTextUnit(String text) {
 		TextUnitWithSkeleton tuWithSkel = getCurrentTextUnit();
 		if (tuWithSkel == null) {
 			throw new BaseFilterException("TextUnit not found");
@@ -368,13 +381,13 @@ public abstract class BaseFilter implements IFilter {
 			endSkeleton();
 		}
 
-		String parentId = String.format("sub%d", subDocumentId);
+		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
 		if (hasUnfinishedGroups()) {
 			StartGroup parent = groupStack.lastElement();
 			parentId = parent.getId();
 		}
 
-		StartGroup g = new StartGroup(parentId, String.format("sg%d", ++startGroupId));
+		StartGroup g = new StartGroup(parentId, createId(START_GROUP, ++startGroupId));
 
 		addPropertiesToResource(g, properties);
 
@@ -402,8 +415,8 @@ public abstract class BaseFilter implements IFilter {
 
 		addPropertiesToResource(g, properties);
 
-		filterEvents.add(new FilterEvent(FilterEventType.END_GROUP, new Ending(String.format("eg%d", ++endGroupId)),
-				skel));
+		filterEvents
+				.add(new FilterEvent(FilterEventType.END_GROUP, new Ending(createId(END_GROUP, ++endGroupId)), skel));
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -415,7 +428,7 @@ public abstract class BaseFilter implements IFilter {
 			endSkeleton();
 		}
 
-		DocumentPart dp = new DocumentPart(String.format("dp%d", ++documentPartId), false);
+		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		dp.setTargetProperty(language, property);
 		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 	}
@@ -431,7 +444,7 @@ public abstract class BaseFilter implements IFilter {
 			endSkeleton();
 		}
 
-		DocumentPart dp = new DocumentPart(String.format("dp%d", ++documentPartId), false);
+		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		dp.setProperty(property);
 		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 	}
@@ -446,7 +459,7 @@ public abstract class BaseFilter implements IFilter {
 	// Code Methods
 	// ////////////////////////////////////////////////////////////////////////
 
-	protected void startCode(Code code) {		
+	protected void startCode(Code code) {
 		if (!hasUnfinishedTextUnits()) {
 			throw new BaseFilterException("TextUnit not found. Cannot add a Code to a non-exisitant TextUnit.");
 		}
@@ -475,18 +488,18 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void addToCode(Property property) {
 		Code code;
-		
+
 		code = getCurrentCode();
-		
+
 		if (code == null) {
 			throw new BaseFilterException("Code not found. Cannot add a Property to a non-exisitant code.");
 		}
-		
+
 		String refMarker = TextFragment.makeRefMarker(getCurrentTextUnit().getTu().getId());
 		code.append(refMarker);
 		code.setHasReference(true);
 
-		DocumentPart dp = new DocumentPart(String.format("dp%d", ++documentPartId), true);
+		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
 		dp.setProperty(property);
 		referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 	}
@@ -503,7 +516,7 @@ public abstract class BaseFilter implements IFilter {
 		if (skel != null) {
 			currentSkeleton.append(skel);
 		}
-		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, new DocumentPart(String.format("dp%d",
+		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, new DocumentPart(createId(DOCUMENT_PART,
 				++documentPartId), false), currentSkeleton));
 		currentSkeleton = null;
 	}
@@ -512,7 +525,7 @@ public abstract class BaseFilter implements IFilter {
 		endSkeleton(null);
 	}
 
-	protected void addToSkeleton(String skel) {			
+	protected void addToSkeleton(String skel) {
 		if (currentSkeleton == null) {
 			startSkeleton(skel);
 			return;

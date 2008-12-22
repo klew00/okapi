@@ -63,10 +63,9 @@ public class HtmlParserTest {
 			}			
 			System.out.println(event.getEventType().toString());
 			if (event.getResource() != null) {
+				System.out.println(event.getResource().toString());
 				if (event.getResource().getSkeleton() != null) {
 					System.out.println(event.getResource().getSkeleton().toString());
-				} else {
-					System.out.println(event.getResource().toString());
 				}
 			}
 		}
