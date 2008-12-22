@@ -24,6 +24,9 @@ import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -39,6 +42,7 @@ public abstract class BaseFilter implements IFilter {
 	private int endGroupId = 0;
 	private int textUnitId = 0;	
 	private int subDocumentId = 0;
+	private int documentId = 0;
 	private int documentPartId = 0;
 	private Stack<StartGroup> groupStack;
 	private Stack<TextUnitWithSkeleton> textUnitStack;
@@ -255,23 +259,26 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void startDocument() {
-		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT);
+		StartDocument startDocument = new StartDocument(String.format("d%d", ++documentId));
+		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);		
 		filterEvents.add(event);
 	}
 
 	protected void endDocument() {
-		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT);
+		Ending endDocument = new Ending(String.format("d%d", ++documentId));
+		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
-	protected void startSubDocument() {
-		subDocumentId++;
-		FilterEvent event = new FilterEvent(FilterEventType.START_SUBDOCUMENT);
+	protected void startSubDocument() {		
+		StartSubDocument startSubDocument = new StartSubDocument(String.format("sd%d", ++subDocumentId));
+		FilterEvent event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
 	}
 
 	protected void endSubDocument() {
-		FilterEvent event = new FilterEvent(FilterEventType.END_SUBDOCUMENT);
+		Ending endDocument = new Ending(String.format("sd%d", ++subDocumentId));
+		FilterEvent event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
