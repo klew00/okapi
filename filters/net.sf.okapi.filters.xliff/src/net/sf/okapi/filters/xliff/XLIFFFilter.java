@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -489,7 +488,7 @@ public class XLIFFFilter implements IFilter {
 	private void processSource (boolean isSegSource) {
 		if ( sourceDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-			processContent(isSegSource ? "seg-source" : "source", true, null);
+			processContent(isSegSource ? "seg-source" : "source", true);
 			//TODO: put this in an annotation
 		}
 		else {
@@ -501,7 +500,7 @@ public class XLIFFFilter implements IFilter {
 			}
 
 			skel.addRef(tu);
-			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", false, null);
+			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( isSegSource ) {
 				//TODO
 			}
@@ -515,7 +514,7 @@ public class XLIFFFilter implements IFilter {
 	private void processTarget () {
 		if ( targetDone ) {
 			// Case where this entry is not the main one, but from an alt-trans
-			TextContainer tc = processContent("target", true, null);
+			processContent("target", true);
 			//TODO: put this in an annotation
 		}
 		else {
@@ -534,7 +533,7 @@ public class XLIFFFilter implements IFilter {
 			}
 
 			skel.addRef(tu, trgLang);
-			TextContainer tc = processContent("target", false, null);
+			TextContainer tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
 				tu.setTarget(trgLang, tc);
@@ -565,8 +564,7 @@ public class XLIFFFilter implements IFilter {
 	 * @return A new TextContainer object with the parsed content.
 	 */
 	private TextContainer processContent (String tagName,
-		boolean store,
-		ArrayList<Code> inlineCodes)
+		boolean store)
 	{
 		try {
 			content = new TextContainer();
@@ -575,9 +573,7 @@ public class XLIFFFilter implements IFilter {
 			idStack.push(id);
 			int eventType;
 			String name;
-			if ( inlineCodes != null ) {
-				inlineCodes.clear();
-			}
+			Code code;
 			
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -586,9 +582,9 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					content.append(reader.getText());
-					if ( store )
-						skel.append(Util.escapeToXML(reader.getText(),
-							0, params.escapeGT));
+					if ( store ) {
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					}
 					break;
 		
 				case XMLStreamConstants.END_ELEMENT:
@@ -598,16 +594,13 @@ public class XLIFFFilter implements IFilter {
 					}
 					else if ( name.equals("g") || name.equals("mrk") ) {
 						if ( store ) storeEndElement();
-						content.append(TagType.CLOSING, name, name); 
+						code = content.append(TagType.CLOSING, name, name); 
 						idStack.pop();
-						if ( inlineCodes != null ) {
-							String tmp = reader.getPrefix();
-							if (( tmp != null ) && ( tmp.length()>0 )) {
-								tmp = tmp+":";
-							}
-							inlineCodes.add(
-								new Code(TagType.CLOSING, name, "</"+tmp+name+">"));
+						String tmp = reader.getPrefix();
+						if (( tmp != null ) && ( tmp.length()>0 )) {
+							tmp = tmp+":";
 						}
+						code.setOuterData("</"+tmp+name+">");
 					}
 					break;
 					
@@ -616,106 +609,8 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					if ( name.equals("g") || name.equals("mrk") ) {
 						idStack.push(++id);
-						content.append(TagType.OPENING, name, name);
-						if ( inlineCodes != null ) {
-							String prefix = reader.getPrefix();
-							StringBuilder tmpg = new StringBuilder();
-							if (( prefix == null ) || ( prefix.length()==0 )) {
-								tmpg.append("<"+reader.getLocalName());
-							}
-							else {
-								tmpg.append("<"+prefix+":"+reader.getLocalName());
-							}
-							int count = reader.getNamespaceCount();
-							for ( int i=0; i<count; i++ ) {
-								prefix = reader.getNamespacePrefix(i);
-								tmpg.append(String.format(" xmlns:%s=\"%s\"",
-									((prefix.length()>0) ? ":"+prefix : ""),
-									reader.getNamespaceURI(i)));
-							}
-							count = reader.getAttributeCount();
-							for ( int i=0; i<count; i++ ) {
-								if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-								prefix = reader.getAttributePrefix(i); 
-								tmpg.append(String.format(" %s%s=\"%s\"",
-									(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-									reader.getAttributeLocalName(i),
-									reader.getAttributeValue(i)));
-							}
-							tmpg.append(">");
-							inlineCodes.add(
-								new Code(TagType.OPENING, name, tmpg.toString()));
-						}
-					}
-					else if ( name.equals("x") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
-					}
-					else if ( name.equals("bpt") ) {
-						idStack.push(++id);
-						appendCode(TagType.OPENING, id, name, store, content, inlineCodes);
-					}
-					else if ( name.equals("ept") ) {
-						appendCode(TagType.CLOSING, idStack.pop(), name, store, content, inlineCodes);
-					}
-					else if ( name.equals("ph") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
-					}
-					else if ( name.equals("it") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content, inlineCodes);
-					}
-					break;
-				}
-			}
-			return content;
-		}
-		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
-	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
-	 * @param type The type of in-line code.
-	 * @param id The id of the code to add.
-	 * @param tagName The tag name of the in-line element to process.
-	 * @param store True if we need to store the data in the skeleton.
-	 * @param content The object where to put the code.
-	 * @param inlineCodes Array where to save the original in-line code.
-	 * Do not save if this parameter is null.
-	 */
-	private void appendCode (TagType tagType,
-		int id,
-		String tagName,
-		boolean store,
-		TextContainer content,
-		ArrayList<Code> inlineCodes)
-	{
-		try {
-			StringBuilder tmp = new StringBuilder();
-			StringBuilder outerCode = null;
-			if ( inlineCodes != null ) {
-				outerCode = new StringBuilder();
-				outerCode.append("<"+tagName);
-				int count = reader.getAttributeCount();
-				String prefix;
-				for ( int i=0; i<count; i++ ) {
-					if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-					prefix = reader.getAttributePrefix(i); 
-					outerCode.append(String.format(" %s%s=\"%s\"",
-						(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-						reader.getAttributeLocalName(i),
-						reader.getAttributeValue(i)));
-				}
-				outerCode.append(">");
-			}
-			
-			int eventType;
-			while ( reader.hasNext() ) {
-				eventType = reader.next();
-				switch ( eventType ) {
-				case XMLStreamConstants.START_ELEMENT:
-					if ( store ) storeStartElement();
-					if ( inlineCodes != null ) {
+						code = content.append(TagType.OPENING, name, name);
+						// Get the outer code
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
 						if (( prefix == null ) || ( prefix.length()==0 )) {
@@ -741,32 +636,118 @@ public class XLIFFFilter implements IFilter {
 								reader.getAttributeValue(i)));
 						}
 						tmpg.append(">");
-						outerCode.append(tmpg.toString());
+						code.setOuterData(tmpg.toString());
 					}
+					else if ( name.equals("x") ) {
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+					}
+					else if ( name.equals("bpt") ) {
+						idStack.push(++id);
+						appendCode(TagType.OPENING, id, name, store, content);
+					}
+					else if ( name.equals("ept") ) {
+						appendCode(TagType.CLOSING, idStack.pop(), name, store, content);
+					}
+					else if ( name.equals("ph") ) {
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+					}
+					else if ( name.equals("it") ) {
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+					}
+					break;
+				}
+			}
+			return content;
+		}
+		catch ( XMLStreamException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
+	 * @param type The type of in-line code.
+	 * @param id The id of the code to add.
+	 * @param tagName The tag name of the in-line element to process.
+	 * @param store True if we need to store the data in the skeleton.
+	 * @param content The object where to put the code.
+	 * @param inlineCodes Array where to save the original in-line code.
+	 * Do not save if this parameter is null.
+	 */
+	private void appendCode (TagType tagType,
+		int id,
+		String tagName,
+		boolean store,
+		TextContainer content)
+	{
+		try {
+			StringBuilder innerCode = new StringBuilder();
+			StringBuilder outerCode = null;
+			outerCode = new StringBuilder();
+			outerCode.append("<"+tagName);
+			int count = reader.getAttributeCount();
+			String prefix;
+			for ( int i=0; i<count; i++ ) {
+				if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+				prefix = reader.getAttributePrefix(i); 
+				outerCode.append(String.format(" %s%s=\"%s\"",
+					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+					reader.getAttributeLocalName(i),
+					reader.getAttributeValue(i)));
+			}
+			outerCode.append(">");
+			
+			int eventType;
+			while ( reader.hasNext() ) {
+				eventType = reader.next();
+				switch ( eventType ) {
+				case XMLStreamConstants.START_ELEMENT:
+					if ( store ) storeStartElement();
+					prefix = reader.getPrefix();
+					StringBuilder tmpg = new StringBuilder();
+					if (( prefix == null ) || ( prefix.length()==0 )) {
+						tmpg.append("<"+reader.getLocalName());
+					}
+					else {
+						tmpg.append("<"+prefix+":"+reader.getLocalName());
+					}
+					count = reader.getNamespaceCount();
+					for ( int i=0; i<count; i++ ) {
+						prefix = reader.getNamespacePrefix(i);
+						tmpg.append(String.format(" xmlns:%s=\"%s\"",
+							((prefix.length()>0) ? ":"+prefix : ""),
+							reader.getNamespaceURI(i)));
+					}
+					count = reader.getAttributeCount();
+					for ( int i=0; i<count; i++ ) {
+						if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+						prefix = reader.getAttributePrefix(i); 
+						tmpg.append(String.format(" %s%s=\"%s\"",
+							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+							reader.getAttributeLocalName(i),
+							reader.getAttributeValue(i)));
+					}
+					tmpg.append(">");
+					outerCode.append(tmpg.toString());
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
-						if ( inlineCodes != null ) {
-							outerCode.append("</"+tagName+">");
-							inlineCodes.add(
-								new Code(tagType, tagName, outerCode.toString()));
-						}
-						content.append(tagType, tagName, tagName); //TODO: was: tmp.toString());
+						Code code = content.append(tagType, tagName, innerCode.toString());
+						outerCode.append("</"+tagName+">");
+						code.setOuterData(outerCode.toString());
 						return;	
 					}
 					break;
+
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					tmp.append(reader.getText());
-					if ( inlineCodes != null )
-						outerCode.append(Util.escapeToXML(reader.getText(),
-							0, params.escapeGT));
+					innerCode.append(reader.getText());
+					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
 					if ( store )
-						skel.append(Util.escapeToXML(reader.getText(),
-							0, params.escapeGT));
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
 					break;
 				}
 			}

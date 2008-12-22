@@ -31,16 +31,20 @@ public class Main {
 		try {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
-			
-			String projectFile = null;
-			if ( args.length > 0 ) {
-				//TODO: other arguments
-				projectFile = args[0];
-			}
 
-			MainForm mf = new MainForm(shlMain, projectFile);
-			shlMain.open();
-			mf.run();
+			if ( args.length > 1 ) {
+				CommandLine cmd = new CommandLine();
+				cmd.execute(shlMain, args);
+			}
+			else {
+				String projectFile = null;
+				if ( args.length == 1 ) {
+					projectFile = args[0];
+				}
+				MainForm mf = new MainForm(shlMain, projectFile);
+				shlMain.open();
+				mf.run();
+			}
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

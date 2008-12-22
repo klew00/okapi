@@ -327,7 +327,7 @@ public class TextFragment implements Comparable<Object> {
 	public boolean hasReference () {
 		if ( codes == null ) return false;
 		for ( Code code : codes ) {
-			if ( code.hasReference ) return true;
+			if ( code.dataType == Code.REFERENCE ) return true;
 		}
 		return false;
 	}

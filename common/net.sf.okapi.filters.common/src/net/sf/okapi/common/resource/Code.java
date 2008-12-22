@@ -27,11 +27,16 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
 
+	protected static final int SIMPLE       = 0;
+	protected static final int REFERENCE    = 1;
+	protected static final int OUTER        = 2;
+	
 	protected TagType tagType;
 	protected int id;
 	protected String type;
 	protected String data;
-	protected boolean hasReference;
+	protected int dataType;
+	protected String outer;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -43,7 +48,7 @@ public class Code {
 		for ( Code code : list ) {
 			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data,
-				(code.hasReference ? "1" : "0")));
+				code.dataType));
 		}
 		return tmp.toString();
 	}
@@ -57,7 +62,7 @@ public class Code {
 				String[] tmpFields = tmp.split("\u009C");
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
-				code.hasReference = (tmpFields[4].charAt(0)=='1');
+				code.dataType = Integer.valueOf(tmpFields[4]);
 				list.add(code);
 			}
 		}
@@ -76,6 +81,7 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = data;
+		this.dataType = SIMPLE;
 	}
 
 	/**
@@ -89,6 +95,7 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = "";
+		this.dataType = SIMPLE;
 	}
 	
 	/**
@@ -194,7 +201,7 @@ public class Code {
 	 * @return True if the code has one sub-flow.
 	 */
 	public boolean hasReference () {
-		return hasReference;
+		return (dataType == REFERENCE);
 	}
 	
 	/**
@@ -202,7 +209,18 @@ public class Code {
 	 * @param value The new value to apply.
 	 */
 	public void setHasReference (boolean value) {
-		hasReference = value;
+		if ( value ) dataType = REFERENCE;
+		else dataType = SIMPLE;
 	}
 
+	public void setOuterData (String value) {
+		outer = value;
+		dataType = OUTER;
+	}
+	
+	public String getOuterData () {
+		if ( dataType == OUTER ) return outer;
+		else return data; // Returns data (not outer) by default
+	}
+	
 }

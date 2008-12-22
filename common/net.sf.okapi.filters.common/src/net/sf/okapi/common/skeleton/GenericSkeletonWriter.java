@@ -372,10 +372,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		String langToUse,
 		int context)
 	{
-		String codeTmp = code.getData();
+		String codeTmp = code.getOuterData();
 		if ( layer != null ) {
 			codeTmp = layer.startInline() 
-				+ layer.encode(code.getData(), context)
+				+ layer.encode(codeTmp, context)
 				+ layer.endInline();
 		}
 		if ( !code.hasReference() ) {
