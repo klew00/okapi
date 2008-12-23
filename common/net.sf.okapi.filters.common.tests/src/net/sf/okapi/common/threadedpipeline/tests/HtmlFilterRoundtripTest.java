@@ -47,7 +47,7 @@ public class HtmlFilterRoundtripTest {
 		IPipeline pipeline = new ThreadedPipeline();
 		
 		HtmlFilter htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleSimpleTest.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
 		htmlFilter.open(htmlStream);
 		

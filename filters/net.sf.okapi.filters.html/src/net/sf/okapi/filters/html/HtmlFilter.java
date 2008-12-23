@@ -112,6 +112,13 @@ public class HtmlFilter extends BaseFilter {
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
+				// We just hit a tag that could close the current TextUnit, but
+				// only if it was not opened with a tag (i.e., complex
+				// TextUnits)
+				if (isCurrentTextUnit() && !isCurrentComplexTextUnit()) {
+					endTextUnit();
+				}
+
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 					handleStartTag((StartTag) tag);
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -143,18 +150,10 @@ public class HtmlFilter extends BaseFilter {
 						handleSkeleton(tag);
 					}
 				}
-
-				// We just hit a tag that could close the current TextUnit, but
-				// only if it was not opened with a tag (i.e., TextUnit's of
-				// mixed content) and we are processing inline tags
-				if (hasUnfinishedTextUnits() && !currentTextUnitsHasSkeleton() && !ruleState.isInline()) {
-					endTextUnit();
-				}
-
 			} else {
 				handleText(segment);
 			}
-			
+
 			if (hasQueuedEvents()) {
 				break;
 			}
@@ -185,18 +184,15 @@ public class HtmlFilter extends BaseFilter {
 		// The Jericho html parser always pulls out the largest stretch of text
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
-		if (text.isWhiteSpace() && !ruleState.isInline()) {
+		if (text.isWhiteSpace() && !isInsideTextRun()) {
 			addToSkeleton(text.toString());
 			return;
 		}
 
-		// its not pure whitespace so we are now processing inline text
-		ruleState.setInline(true);
-
-		if (hasUnfinishedTextUnits()) {
-			addToTextUnit(text.toString());
-		} else {
+		if (canStartNewTextUnit()) {
 			startTextUnit(text.toString());
+		} else {
+			addToTextUnit(text.toString());
 		}
 	}
 
@@ -225,8 +221,7 @@ public class HtmlFilter extends BaseFilter {
 
 		switch (configuration.getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
-			ruleState.setInline(true);
-			if (!hasUnfinishedTextUnits()) {
+			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
 			addCodeToCurrentTextUnit(startTag);
@@ -248,7 +243,6 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(startTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
-			ruleState.setInline(true);
 			startTextUnit(new GenericSkeleton(startTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
@@ -256,7 +250,6 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(startTag.toString());
 			break;
 		default:
-			ruleState.setInline(false);
 			addToSkeleton(startTag.toString());
 		}
 	}
@@ -283,8 +276,7 @@ public class HtmlFilter extends BaseFilter {
 
 		switch (configuration.getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
-			ruleState.setInline(true);
-			if (!hasUnfinishedTextUnits()) {
+			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
 			addCodeToCurrentTextUnit(endTag);
@@ -301,7 +293,6 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(endTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
-			ruleState.setInline(false);
 			endTextUnit(new GenericSkeleton(endTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
@@ -309,7 +300,6 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(endTag.toString());
 			break;
 		default:
-			ruleState.setInline(false);
 			addToSkeleton(endTag.toString());
 			break;
 		}

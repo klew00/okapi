@@ -42,8 +42,7 @@ public class ExtractionRuleState {
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
 	private Stack<RuleType> groupRuleStack;
-	private Stack<RuleType> textUnitRuleStack;
-	private boolean isInline = false;
+	private Stack<RuleType> textUnitRuleStack;	
 
 	/**
 	 * 
@@ -128,13 +127,5 @@ public class ExtractionRuleState {
 
 	public void popTextUnitRule() {
 		textUnitRuleStack.pop();
-	}
-	
-	protected boolean isInline() {
-		return isInline;
-	}
-
-	protected void setInline(boolean isInline) {
-		this.isInline = isInline;
-	}
+	}		
 }
