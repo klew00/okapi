@@ -20,8 +20,12 @@
 
 package net.sf.okapi.filters.html;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +42,7 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.groovy.GroovyConfigurationReader;
 import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -45,15 +50,54 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class HtmlFilter extends BaseFilter {
 	private Source htmlDocument;
-	private GroovyFilterConfiguration configuration;
 	private Iterator<Segment> nodeIterator;
 	private ExtractionRuleState ruleState;
+	private Parameters parameters;
 
 	public HtmlFilter() {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
+	 */
+	public IParameters getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
+		setOptions(language, null, defaultEncoding, generateSkeleton);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
+	 * .IParameters)
+	 */
+	public void setParameters(IParameters params) {
+		this.parameters = (Parameters) params;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
+	 * java.lang.String, java.lang.String, boolean)
+	 */
+	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
+			boolean generateSkeleton) {
+		// TODO: Implement generateSkeleton
+		setEncoding(defaultEncoding);
+		setSrcLang(sourceLanguage);
+	}
+
 	public void close() {
+
 	}
 
 	public void open(CharSequence input) {
@@ -63,7 +107,13 @@ public class HtmlFilter extends BaseFilter {
 
 	public void open(InputStream input) {
 		try {
-			htmlDocument = new Source(input);
+			if (getEncoding() != null) {
+				BufferedReader r = new BufferedReader(new InputStreamReader(input, getEncoding()));
+				htmlDocument = new Source(r);
+			} else {
+				// try to guess encoding
+				htmlDocument = new Source(input);
+			}
 		} catch (IOException e) {
 			// TODO Wrap unchecked exception
 			throw new RuntimeException(e);
@@ -73,23 +123,28 @@ public class HtmlFilter extends BaseFilter {
 
 	public void open(URL input) {
 		try {
-			htmlDocument = new Source(input);
+			if (getEncoding() != null) {
+				BufferedReader r = new BufferedReader(new InputStreamReader(input.openStream(), getEncoding()));
+				htmlDocument = new Source(r);
+			} else {
+				// try to guess encoding
+				htmlDocument = new Source(input);
+			}
 		} catch (IOException e) {
 			// TODO: Wrap unchecked exception
 			throw new RuntimeException(e);
 		}
 		initialize();
 	}
-
-	public void setHtmlFilterConfiguration(GroovyFilterConfiguration configuration) {
-		this.configuration = configuration;
-	}
-
+	
 	public void initialize() {
 		super.initialize();
 
-		if (configuration == null) {
-			configuration = new GroovyFilterConfiguration("/net/sf/okapi/filters/html/defaultConfiguration.groovy");
+		setMimeType("text/html");
+
+		if (parameters.getGroovyConfig() == null) {
+			URL url = GroovyConfigurationReader.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.groovy");			
+			parameters.setGroovyConfig(new GroovyFilterConfiguration(url));
 		}
 
 		// Segment iterator
@@ -205,7 +260,7 @@ public class HtmlFilter extends BaseFilter {
 		if (ruleState.isExludedState()) {
 			addToSkeleton(startTag.toString());
 			// process these tag types to update parser state
-			switch (configuration.getMainRuleType(startTag.getName())) {
+			switch (parameters.getGroovyConfig().getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.pushExcludedRule(startTag.getName());
 				break;
@@ -219,7 +274,7 @@ public class HtmlFilter extends BaseFilter {
 			return;
 		}
 
-		switch (configuration.getMainRuleType(startTag.getName())) {
+		switch (parameters.getGroovyConfig().getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
@@ -228,7 +283,7 @@ public class HtmlFilter extends BaseFilter {
 			break;
 
 		case ATTRIBUTES_ONLY:
-			if (configuration.hasActionableAttributes(startTag.getName())) {
+			if (parameters.getGroovyConfig().hasActionableAttributes(startTag.getName())) {
 			}
 			break;
 		case GROUP_ELEMENT:
@@ -259,7 +314,7 @@ public class HtmlFilter extends BaseFilter {
 		if (ruleState.isExludedState()) {
 			addToSkeleton(endTag.toString());
 			// process these tag types to update parser state
-			switch (configuration.getMainRuleType(endTag.getName())) {
+			switch (parameters.getGroovyConfig().getMainRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.popExcludedIncludedRule();
 				break;
@@ -274,7 +329,7 @@ public class HtmlFilter extends BaseFilter {
 			return;
 		}
 
-		switch (configuration.getMainRuleType(endTag.getName())) {
+		switch (parameters.getGroovyConfig().getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
@@ -310,9 +365,9 @@ public class HtmlFilter extends BaseFilter {
 		Map<String, String> attrs = new HashMap<String, String>();
 		attrs = startTag.getAttributes().populateMap(attrs, true);
 		for (Attribute attribute : startTag.getAttributes()) {
-			if (configuration.isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			if (parameters.getGroovyConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 
-			} else if (configuration.isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			} else if (parameters.getGroovyConfig().isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 
 			}
 		}
@@ -341,42 +396,5 @@ public class HtmlFilter extends BaseFilter {
 	 */
 	public String getName() {
 		return "HTMLFilter";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
-	 */
-	public IParameters getParameters() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
-		// TODO Auto-generated method stub
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
-	 * .IParameters)
-	 */
-	public void setParameters(IParameters params) {
-		// TODO Auto-generated method stub
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
-	 * java.lang.String, java.lang.String, boolean)
-	 */
-	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
-			boolean generateSkeleton) {
-		// TODO Auto-generated method stub
-
 	}
 }

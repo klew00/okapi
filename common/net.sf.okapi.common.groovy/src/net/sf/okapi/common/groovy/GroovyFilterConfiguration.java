@@ -27,6 +27,11 @@ public class GroovyFilterConfiguration {
 	public GroovyFilterConfiguration(String configurationScript) {
 		configReader = new GroovyConfigurationReader(configurationScript);
 	}
+	
+	@Override
+	public String toString() {
+		return configReader.toString();
+	}
 
 	@SuppressWarnings("unchecked")
 	public RULE_TYPE getMainRuleType(String ruleName) {

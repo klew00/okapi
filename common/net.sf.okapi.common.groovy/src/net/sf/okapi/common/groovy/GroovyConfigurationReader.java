@@ -28,6 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import org.codehaus.groovy.runtime.StringBufferWriter;
+
 public class GroovyConfigurationReader  {	
 	private boolean preserveWhitespace;
 	private ConfigSlurper configSlurper;
@@ -59,6 +61,13 @@ public class GroovyConfigurationReader  {
 	public GroovyConfigurationReader(String configurationScript) {
 		configSlurper = new ConfigSlurper();		
 		config = configSlurper.parse(configurationScript);		
+	}
+	
+	@Override
+	public String toString() {	
+		StringBufferWriter b = new StringBufferWriter(new StringBuffer());
+		config.writeTo(b);
+		return b.toString();
 	}
 	
 	@SuppressWarnings("unchecked")

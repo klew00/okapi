@@ -1,46 +1,43 @@
 package net.sf.okapi.filters.html;
 
-import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 
-public class Parameters implements IParameters {
+public class Parameters extends BaseParameters {
+	private GroovyFilterConfiguration groovyConfig;
+	
+	public Parameters () {		
+		reset();
+	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.IParameters#fromString(java.lang.String)
 	 */
 	public void fromString(String data) {
-		// TODO Auto-generated method stub
-
+		groovyConfig = new GroovyFilterConfiguration(data);
 	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.IParameters#getPath()
-	 */
-	public String getPath() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.IParameters#load(java.lang.String, boolean)
-	 */
-	public void load(String filePath, boolean ignoreErrors) {
-		// TODO Auto-generated method stub
-
+	
+	@Override
+	public String toString() {
+		return groovyConfig.toString();
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.IParameters#reset()
 	 */
 	public void reset() {
-		// TODO Auto-generated method stub
-
+		groovyConfig = null;
+	}
+	
+	public GroovyFilterConfiguration getGroovyConfig() {
+		return groovyConfig;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.IParameters#save(java.lang.String)
+	/**
+	 * @param groovyFilterConfiguration
 	 */
-	public void save(String filePath) {
-		// TODO Auto-generated method stub
-
+	public void setGroovyConfig(GroovyFilterConfiguration groovyConfig) {		
+		this.groovyConfig = groovyConfig;
 	}
 }
