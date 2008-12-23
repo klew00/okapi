@@ -48,18 +48,15 @@ public class HtmlParserTest {
 	public void excludeInclude() {
 		htmlParser = new HtmlFilter();		
 		FilterEvent event;
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleSimpleTest.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/ExcludeIncludeTest.html");
 		htmlParser.open(htmlStream);
 		while ((event = htmlParser.next()).getEventType() != FilterEventType.FINISHED) {			
 			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
-				assertTrue(event.getResource() instanceof TextUnit);				
-				System.out.println("=======================Text:");
+				assertTrue(event.getResource() instanceof TextUnit);								
 			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
-				assertTrue(event.getResource() instanceof DocumentPart);
-				System.out.println("=======================Document Part:");
+				assertTrue(event.getResource() instanceof DocumentPart);				
 			} else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP) {
-				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
-				System.out.println("=======================Group:");
+				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);				
 			}			
 			System.out.println(event.getEventType().toString());
 			if (event.getResource() != null) {
