@@ -20,13 +20,19 @@
 
 package net.sf.okapi.applications.rainbow;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class Main {
 
-	public static void main (String args[])
-	{
+	public static void main (String args[]) {
+		
 		Display dispMain = null;
 		try {
 			dispMain = new Display();

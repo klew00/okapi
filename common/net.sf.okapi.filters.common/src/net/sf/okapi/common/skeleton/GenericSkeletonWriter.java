@@ -69,9 +69,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	{
 		this.encoderManager = encoderManager;
 		this.outputLang = language;
-		//Not used: encoding;
 		this.layer = layer;
-		
 		referents = new LinkedHashMap<String, IReferenceable>();
 		storageStack = new Stack<StorageList>();
 	}
@@ -234,6 +232,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
+	/**
+	 * Gets the skeleton and the original content of a given text unit.
+	 * @param tu The text unit to process.
+	 * @param langToUse Language to output. Use null for the source, or the language
+	 * code for the target languages.
+	 * @param content Context flag: 0=no-change, 1=skeleton, 2=in-line.
+	 * @return The string representation of the text unit. 
+	 */
 	private String getString (TextUnit tu,
 		String langToUse,
 		int context)
@@ -251,7 +257,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 
-	// context: 0=text, 1=skeleton, 2=inline
+	/**
+	 * Gets the original content of a given text unit.
+	 * @param tu The text unit to process.
+	 * @param langToUse Language to output. Use null for the source, or the language
+	 * code for the target languages.
+	 * @param content Context flag: 0=no-change, 1=skeleton, 2=in-line.
+	 * @return The string representation of the text unit content.
+	 */
 	private String getContent (TextUnit tu,
 		String langToUse,
 		int context) 
@@ -303,7 +316,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		context = 0; //TODO: Handle the case of non-trans inline at a high level
-		if ( !tf.hasCode() ) { // The easy output
+		
+		// Output simple text
+		if ( !tf.hasCode() ) {
 			if ( encoder == null ) {
 				if ( layer == null ) {
 					return tf.toString();
@@ -324,6 +339,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 		}
 
+		// Output text with in-line codes
 		List<Code> codes = tf.getCodes();
 		StringBuilder tmp = new StringBuilder();
 		String text = tf.getCodedText();
@@ -416,17 +432,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			else if ( ref instanceof StorageList ) { // == StartGroup
 				tmp.replace(start, end, getString((StorageList)ref, langToUse, context));
 			}
-			else if ( ref instanceof DocumentPart ) {
+			else { // DocumentPart, StartDocument, StartSubDocument 
 				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), context));
-			}
-			else {
-				tmp.replace(start, end, "-ERR:INVALID-TYPE-");
 			}
 		}
 		return tmp.toString();
 	}
 	
-	private String getString (StorageList list, String langToUse, int context) {
+	private String getString (StorageList list,
+		String langToUse,
+		int context)
+	{
 		StringBuilder tmp = new StringBuilder();
 		// Treat the skeleton of this list
 		tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));		
@@ -460,11 +476,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		else if ( langToUse.length() == 0 ) { // Use the resource-level properties
 			prop = resource.getProperty(name);
 		}
-		else { // Use the given language if possible
+		else { // Use the given target language if possible
 			if ( resource.hasTargetProperty(langToUse, name) ) {
 				prop = resource.getTargetProperty(langToUse, name);
 			}
-			else { // Fall back to source
+			else { // Fall back to source if there is no target
 				prop = resource.getSourceProperty(name);				
 			}
 		}
@@ -472,7 +488,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( prop == null ) return "-ERR:PROP-NOT-FOUND-";
 		// Else process the value
 		String value = prop.getValue();
-		if ( value == null ) return "-ERR:PROP-VALUE-NOT-FOUND-";
+		if ( value == null ) return "-ERR:PROP-VALUE-NULL-";
 		else return value;
 	}
 	

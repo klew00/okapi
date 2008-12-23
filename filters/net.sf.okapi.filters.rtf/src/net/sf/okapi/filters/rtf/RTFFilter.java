@@ -764,7 +764,6 @@ public class RTFFilter implements IFilter {
 	private int getNextToken () {
 		int nRes;
 		boolean waitingSecondByte = false;
-		byteBuffer.clear(); //TODO: need to clear here?
 
 		while ( true ) {
 			// Get the next character
@@ -816,7 +815,8 @@ public class RTFFilter implements IFilter {
 						// We were waiting for the second byte
 						waitingSecondByte = false;
 						// Convert the DBCS char into Unicode
-						byteBuffer.put(byteData);
+						//TODO: verify that byte-order works
+						byteBuffer.put(1, byteData);
 						CharBuffer charBuf;
 						try {
 							charBuf = currentCSDec.decode(byteBuffer);
@@ -833,11 +833,12 @@ public class RTFFilter implements IFilter {
 								waitingSecondByte = true;
 								// It's a lead byte. Store it and get the next byte
 								byteBuffer.clear();
-								byteBuffer.put((byte)byteData);
+								byteBuffer.put(0, byteData);
 								break;
 							}
 							else { // SBCS
-								byteBuffer.put((byte)byteData);
+								byteBuffer.clear();
+								byteBuffer.put(0, byteData);
 								CharBuffer charBuf;
 								try {
 									charBuf = currentCSDec.decode(byteBuffer);
@@ -863,8 +864,8 @@ public class RTFFilter implements IFilter {
 					if ( waitingSecondByte ) {
 						// We were waiting for the second byte
 						waitingSecondByte = false;
-						// Convert the DBCS char into unicode
-						byteBuffer.put(byteData);
+						// Convert the DBCS char into Unicode
+						byteBuffer.put(1, byteData);
 						CharBuffer charBuf;
 						try {
 							charBuf = currentCSDec.decode(byteBuffer);
@@ -901,23 +902,24 @@ public class RTFFilter implements IFilter {
 	
 	private boolean isLeadByte (byte byteValue) {
 		switch ( currentDBCSCodepage ) {
-			case 932: // Shift-JIS
-				if (( byteValue >= 0x81 ) && ( byteValue <= 0x9F )) return true;
-				if (( byteValue >= 0xE0 ) && ( byteValue <= 0xEE )) return true;
-				if (( byteValue >= 0xFA ) && ( byteValue <= 0xFC )) return true;
-				break;
-			case 936: // Chinese Simplified
-				if (( byteValue >= 0xA1 ) && ( byteValue <= 0xA9 )) return true;
-				if (( byteValue >= 0xB0 ) && ( byteValue <= 0xF7 )) return true;
-				break;
-			case 949: // Korean
-				if (( byteValue >= 0x81 ) && ( byteValue <= 0xC8 )) return true;
-				if (( byteValue >= 0xCA ) && ( byteValue <= 0xFD )) return true;
-				break;
-			case 950: // Chinese Traditional
-				if (( byteValue >= 0xA1 ) && ( byteValue <= 0xC6 )) return true;
-				if (( byteValue >= 0xC9 ) && ( byteValue <= 0xF9 )) return true;
-				break;
+		// Make sure to cast to (byte) to get the signed value!
+		case 932: // Shift-JIS
+			if (( byteValue >= (byte)0x81 ) && ( byteValue <= (byte)0x9F )) return true;
+			if (( byteValue >= (byte)0xE0 ) && ( byteValue <= (byte)0xEE )) return true;
+			if (( byteValue >= (byte)0xFA ) && ( byteValue <= (byte)0xFC )) return true;
+			break;
+		case 936: // Chinese Simplified
+			if (( byteValue >= (byte)0xA1 ) && ( byteValue <= (byte)0xA9 )) return true;
+			if (( byteValue >= (byte)0xB0 ) && ( byteValue <= (byte)0xF7 )) return true;
+			break;
+		case 949: // Korean
+			if (( byteValue >= (byte)0x81 ) && ( byteValue <= (byte)0xC8 )) return true;
+			if (( byteValue >= (byte)0xCA ) && ( byteValue <= (byte)0xFD )) return true;
+			break;
+		case 950: // Chinese Traditional
+			if (( byteValue >= (byte)0xA1 ) && ( byteValue <= (byte)0xC6 )) return true;
+			if (( byteValue >= (byte)0xC9 ) && ( byteValue <= (byte)0xF9 )) return true;
+			break;
 		}
 		// All other encoding: No lead bytes
 		return false;
@@ -933,8 +935,7 @@ public class RTFFilter implements IFilter {
 				if ( inHexa ) {
 					sBuf += chCurrent;
 					if ( (++count) == 2 ) {
-						// Java does not support unsigned conversion so we have to do it ourselves 
-						byteData = (byte)(Integer.parseInt(sBuf, 16) & 0x000000ff); 
+						byteData = (byte)(Integer.parseInt(sBuf, 16)); 
 						return(-1); // Byte to process
 					}
 					continue;

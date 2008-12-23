@@ -27,32 +27,35 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
 
-	protected static final int SIMPLE       = 0;
-	protected static final int REFERENCE    = 1;
-	protected static final int OUTER        = 2;
-	
 	protected TagType tagType;
 	protected int id;
 	protected String type;
 	protected String data;
-	protected int dataType;
 	protected String outer;
+	protected boolean hasReference;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
 	 * @param list List of the codes to flatten into a string.
 	 * @return The string with all the codes.
+	 * @see #stringToCodes(String)
 	 */
 	public static String codesToString (List<Code> list) {
 		StringBuilder tmp = new StringBuilder();
 		for ( Code code : list ) {
 			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data,
-				code.dataType));
+				(code.hasReference ? "1" : "0")));
 		}
 		return tmp.toString();
 	}
 	
+	/**
+	 * helper method to convert a storage string into a list of codes.
+	 * @param data the storage string to convert.
+	 * @return A list of the codes in the storage string.
+	 * @see #codesToString(List)
+	 */
 	public static List<Code> stringToCodes (String data) {
 		ArrayList<Code> list = new ArrayList<Code>();
 		if ( data != null ) {
@@ -62,7 +65,7 @@ public class Code {
 				String[] tmpFields = tmp.split("\u009C");
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
-				code.dataType = Integer.valueOf(tmpFields[4]);
+				code.hasReference = ("1".compareTo(tmpFields[4]) == 0);
 				list.add(code);
 			}
 		}
@@ -81,7 +84,6 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = data;
-		this.dataType = SIMPLE;
 	}
 
 	/**
@@ -95,7 +97,6 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = "";
-		this.dataType = SIMPLE;
 	}
 	
 	/**
@@ -120,6 +121,8 @@ public class Code {
 	public Code clone () {
 		Code clone = new Code(tagType, type, data);
 		clone.id = id;
+		clone.outer = outer;
+		clone.hasReference = hasReference;
 		return clone;
 	}
 	
@@ -201,7 +204,7 @@ public class Code {
 	 * @return True if the code has one sub-flow.
 	 */
 	public boolean hasReference () {
-		return (dataType == REFERENCE);
+		return hasReference;
 	}
 	
 	/**
@@ -209,18 +212,28 @@ public class Code {
 	 * @param value The new value to apply.
 	 */
 	public void setHasReference (boolean value) {
-		if ( value ) dataType = REFERENCE;
-		else dataType = SIMPLE;
+		hasReference = value;
 	}
 
+	/**
+	 * Sets the complete data for this in-line code (inner data and outer).
+	 * Outer data is used for format that implements in-line codes like TMX or XLIFF.
+	 * For example "<ph id='1'>code</ph>" is the outer data, and "code" in the
+	 * inner data.
+	 * @param value The data to set.
+	 */
 	public void setOuterData (String value) {
 		outer = value;
-		dataType = OUTER;
 	}
 	
+	/**
+	 * Gets the outer data for this in-line code. If there is no outer data,
+	 * the inner data is returned (same as {@link #getData()}).
+	 * @return the outer data or, if there is none, the inner data.
+	 */
 	public String getOuterData () {
-		if ( dataType == OUTER ) return outer;
-		else return data; // Returns data (not outer) by default
+		if ( outer != null ) return outer;
+		else return data; // Returns data if no outer-data is set
 	}
 	
 }

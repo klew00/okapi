@@ -155,6 +155,18 @@
   </info>
  </plugin>
 
+  <plugin type="utility"
+   id="oku_rtfconversion"
+   version="1.0"
+   pluginClass="net.sf.okapi.applications.rainbow.utilities.rtfconversion.Utility"
+   updateUri="http://okapi.sf.net/">
+   <info>
+    <name>RTF Conversion</name>
+    <description>Convers the input RTF to different formats.</description>
+    <provider>Okapi Framework</provider>
+   </info>
+  </plugin>
+
 <!-- <plugin type="utility"
   id="oku_twbbatchanalysis"
   version="1.0"

@@ -93,6 +93,15 @@ public class GenericSkeleton implements ISkeleton {
 		}
 	}
 
+	public void append (char data) {
+		if (( createNew ) || ( list.size() == 0 )) {
+			add(data);
+		}
+		else {
+			list.get(list.size()-1).data.append(data);
+		}
+	}
+
 	/**
 	 * Adds a reference to the resource itself to the skeleton. Defaults to source.
 	 * @param referent Resource object.
