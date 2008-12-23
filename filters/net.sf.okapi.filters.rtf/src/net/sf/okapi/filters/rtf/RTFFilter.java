@@ -43,7 +43,6 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -112,7 +111,6 @@ public class RTFFilter implements IFilter {
 
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	
-	private IResource currentRes;
 	private BufferedReader reader;
 	private boolean canceled;
 	private String srcLang;
@@ -288,10 +286,6 @@ public class RTFFilter implements IFilter {
 
 	public IParameters getParameters () {
 		return null;
-	}
-
-	public IResource getResource () {
-		return currentRes;
 	}
 
 	public boolean hasNext () {

@@ -25,26 +25,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.nio.charset.Charset;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
 	
 	private RTFFilter filter;
+	private Parameters params;
+	private String lineBreak;
 
+	public Utility () {
+		params = new Parameters();
+	}
+	
 	public void processInput () {
 		OutputStreamWriter writer = null;
 		try {
@@ -63,6 +63,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			StringBuilder buf = new StringBuilder();
 			while ( filter.getTextUntil(buf, -1, 0) == 0 ) {
 				writer.write(buf.toString());
+				writer.write(lineBreak);
 			}
 		}
 		catch ( MalformedURLException e ) {
@@ -97,7 +98,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public boolean hasParameters () {
@@ -117,6 +118,17 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 
 	public void preprocess () {
 		filter = new RTFFilter();
+		switch ( params.lineBreakType ) {
+		case 0:
+			lineBreak = Util.LINEBREAK_DOS;
+			break;
+		case 1:
+			lineBreak = Util.LINEBREAK_MAC;
+			break;
+		default:
+			lineBreak = Util.LINEBREAK_UNIX;
+			break;
+		}
 	}
 
 	public int requestInputCount () {
@@ -124,6 +136,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
+		params = (Parameters)paramsObject;
 	}
 
 }

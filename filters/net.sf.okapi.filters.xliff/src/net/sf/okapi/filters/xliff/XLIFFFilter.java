@@ -297,8 +297,8 @@ public class XLIFFFilter implements IFilter {
 			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 		}
 		
-		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		storeStartElement();
+		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		String tmp = reader.getAttributeValue("", "original");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'original'.");
 		else startSubDoc.setName(tmp);
@@ -792,6 +792,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	private boolean processStartGroup () {
+		storeStartElement();
 		// Check if it's a 'merge-trans' group (v1.2)
 		String tmp = reader.getAttributeValue("", "merge-trans");
 		if ( tmp != null ) {
@@ -806,6 +807,7 @@ public class XLIFFFilter implements IFilter {
 		// Else: it's a structural group
 		StartGroup group = new StartGroup(parentIds.peek().toString(),
 			String.valueOf(++groupId));
+		group.setSkeleton(skel);
 		parentIds.push(groupId);
 		queue.add(new FilterEvent(FilterEventType.START_GROUP, group));
 
@@ -831,6 +833,7 @@ public class XLIFFFilter implements IFilter {
 
 		// Else: it's a structural group
 		Ending ending = new Ending(String.valueOf(id));
+		ending.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.END_GROUP, ending));
 		return true;
 	}

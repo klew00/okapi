@@ -20,7 +20,7 @@
 		</header>
 		<body>
 
-		<group resname="!Specials">
+		<group resname="!Specials-test=&lt;&quot;&apos;&amp;>">
 			<trans-unit id="S_XStr_LangCode">
 				<source>en</source>
 				<target>fr</target>
