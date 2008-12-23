@@ -46,6 +46,10 @@ public abstract class BaseFilter implements IFilter {
 	private static final String END_DOCUMENT = "ed";
 	private static final String START_SUBDOCUMENT = "ssd";
 	private static final String END_SUBDOCUMENT = "esd";
+	
+	private String encoding;
+	private String srcLang;
+	private String mimeType;
 
 	private int startGroupId = 0;
 	private int endGroupId = 0;
@@ -106,6 +110,56 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(event);
 	}
 
+	private String createId(String name, int number) {
+		return String.format("%s%d", name, number);
+	}
+
+	private void addPropertiesToResource(INameable resource, List<Property> properties) {
+		if (properties != null) {
+			for (Property property : properties) {
+				resource.setProperty(property);
+			}
+		}
+	}
+
+	private FilterEvent peekUnfinishedEvent() {
+		if (tempFilterEventStack.isEmpty()) {
+			return null;
+		}
+		return tempFilterEventStack.peek();
+	}
+
+	private FilterEvent popUnfinishedEvent() {
+		if (tempFilterEventStack.isEmpty()) {
+			return null;
+		}
+		return tempFilterEventStack.pop();
+	}
+
+	protected String getEncoding() {
+		return encoding;
+	}
+
+	protected void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	protected String getSrcLang() {
+		return srcLang;
+	}
+
+	protected void setSrcLang(String srcLang) {
+		this.srcLang = srcLang;
+	}
+
+	protected String getMimeType() {
+		return mimeType;
+	}
+
+	protected void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
 	protected void initialize() {
 		start();
 		startDocument();
@@ -134,32 +188,6 @@ public abstract class BaseFilter implements IFilter {
 		endSubDocument();
 		endDocument();
 		finish();
-	}
-
-	private String createId(String name, int number) {
-		return String.format("%s%d", name, number);
-	}
-
-	private void addPropertiesToResource(INameable resource, List<Property> properties) {
-		if (properties != null) {
-			for (Property property : properties) {
-				resource.setProperty(property);
-			}
-		}
-	}
-
-	private FilterEvent peekUnfinishedEvent() {
-		if (tempFilterEventStack.isEmpty()) {
-			return null;
-		}
-		return tempFilterEventStack.peek();
-	}
-
-	private FilterEvent popUnfinishedEvent() {
-		if (tempFilterEventStack.isEmpty()) {
-			return null;
-		}
-		return tempFilterEventStack.pop();
 	}
 
 	protected boolean isCurrentTextUnit() {
@@ -276,6 +304,9 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void startDocument() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
+		startDocument.setEncoding(getEncoding());
+		startDocument.setLanguage(getSrcLang());
+		startDocument.setMimeType(getMimeType());		
 		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 	}
