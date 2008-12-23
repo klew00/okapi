@@ -56,6 +56,16 @@ p {
 	ruleTypes = [TEXTUNIT]	
 }
 
+// exclude / include test
+exclude {
+	ruleTypes = [EXCLUDE]	
+}
+
+include {
+	ruleTypes = [INCLUDE]	
+}
+
+
 // attributes that occur on many elements
 title  {
 	ruleTypes = [ATTRIBUTE]
