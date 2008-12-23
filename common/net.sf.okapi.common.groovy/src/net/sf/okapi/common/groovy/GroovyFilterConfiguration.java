@@ -1,6 +1,7 @@
 package net.sf.okapi.common.groovy;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,16 @@ public class GroovyFilterConfiguration {
 
 	private GroovyConfigurationReader configReader;
 
-	public GroovyFilterConfiguration(String configurationPathAsResource) {
+	public GroovyFilterConfiguration(URL configurationPathAsResource) {
 		configReader = new GroovyConfigurationReader(configurationPathAsResource);
 	}
 
 	public GroovyFilterConfiguration(File configurationFile) {
 		configReader = new GroovyConfigurationReader(configurationFile);
+	}
+	
+	public GroovyFilterConfiguration(String configurationScript) {
+		configReader = new GroovyConfigurationReader(configurationScript);
 	}
 
 	@SuppressWarnings("unchecked")

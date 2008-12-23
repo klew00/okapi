@@ -41,10 +41,9 @@ public class GroovyConfigurationReader  {
 		this.preserveWhitespace = preserveWhitespace;
 	}
 
-	public GroovyConfigurationReader(String configurationPathAsResource) {
-		configSlurper = new ConfigSlurper();
-		URL url = GroovyConfigurationReader.class.getResource(configurationPathAsResource);
-		config = configSlurper.parse(url);		
+	public GroovyConfigurationReader(URL configurationPathAsResource) {
+		configSlurper = new ConfigSlurper();		
+		config = configSlurper.parse(configurationPathAsResource);		
 	}
 	
 	public GroovyConfigurationReader(File configurationFile) {
@@ -55,6 +54,11 @@ public class GroovyConfigurationReader  {
 			// TODO Create custom exception
 			throw new RuntimeException(e);
 		}		
+	}
+	
+	public GroovyConfigurationReader(String configurationScript) {
+		configSlurper = new ConfigSlurper();		
+		config = configSlurper.parse(configurationScript);		
 	}
 	
 	@SuppressWarnings("unchecked")
