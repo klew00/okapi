@@ -24,8 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -398,6 +396,6 @@ public class HtmlFilter extends BaseFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#getName()
 	 */
 	public String getName() {
-		return "HTMLFilter";
+		return "HTMLFilter"; //$NON-NLS-1$
 	}
 }
