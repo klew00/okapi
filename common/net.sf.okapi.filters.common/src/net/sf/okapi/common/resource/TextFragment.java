@@ -362,7 +362,28 @@ public class TextFragment implements Comparable<Object> {
 	 * Helper method to add existing code.
 	 */
 	public Code append (Code code) {
-		return append (code.tagType, code.type,	code.data);
+		if ( codes == null ) codes = new ArrayList<Code>();
+		// Append the code marker
+		switch ( code.tagType ) {
+		case OPENING:
+			append(""+((char)MARKER_OPENING)+toChar(codes.size()));
+			break;
+		case CLOSING:
+			append(""+((char)MARKER_CLOSING)+toChar(codes.size()));
+			break;
+		case PLACEHOLDER:
+			append(""+((char)MARKER_ISOLATED)+toChar(codes.size()));
+			break;
+		case SEGMENTHOLDER:
+			append(""+((char)MARKER_SEGMENT)+toChar(codes.size()));
+			break;
+		}
+		// Create the code
+		codes.add(code); //Code newCode = code.clone();
+		if ( code.tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
+		if (( code.tagType != TagType.PLACEHOLDER )
+			&& ( code.tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
+		return code;
 	}
 	
 	/**
