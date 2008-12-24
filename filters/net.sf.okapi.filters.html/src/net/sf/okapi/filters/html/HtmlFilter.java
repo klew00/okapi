@@ -137,13 +137,15 @@ public class HtmlFilter extends BaseFilter {
 		initialize();
 	}
 	
+	@Override
 	public void initialize() {
 		super.initialize();
 
-		setMimeType("text/html");
+		setMimeType("text/html"); //$NON-NLS-1$
 
-		if (parameters.getGroovyConfig() == null) {
-			URL url = GroovyConfigurationReader.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.groovy");			
+		if (parameters == null) {
+			parameters = new Parameters();
+			URL url = GroovyConfigurationReader.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.groovy");			 //$NON-NLS-1$
 			parameters.setGroovyConfig(new GroovyFilterConfiguration(url));
 		}
 
@@ -153,6 +155,7 @@ public class HtmlFilter extends BaseFilter {
 		nodeIterator = htmlDocument.getNodeIterator();
 	}
 
+	@Override
 	public FilterEvent next() {
 		// reset state flags and buffers
 		ruleState.reset();
