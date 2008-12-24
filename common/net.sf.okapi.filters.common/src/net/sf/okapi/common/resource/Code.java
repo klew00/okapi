@@ -27,12 +27,16 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Code {
 
+	protected static final int HASREF       = 0x01;
+	protected static final int CLONEABLE    = 0x02;
+	protected static final int DELETEABLE   = 0x04;
+	
 	protected TagType tagType;
 	protected int id;
 	protected String type;
 	protected String data;
 	protected String outer;
-	protected boolean hasReference;
+	protected int flag;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -45,7 +49,7 @@ public class Code {
 		for ( Code code : list ) {
 			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data,
-				(code.hasReference ? "1" : "0")));
+				code.flag)); //(code.flag ? "1" : "0")));
 		}
 		return tmp.toString();
 	}
@@ -65,7 +69,8 @@ public class Code {
 				String[] tmpFields = tmp.split("\u009C");
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
-				code.hasReference = ("1".compareTo(tmpFields[4]) == 0);
+				//code.hasReference = ("1".compareTo(tmpFields[4]) == 0);
+				code.flag = Integer.valueOf(tmpFields[4]);
 				list.add(code);
 			}
 		}
@@ -84,6 +89,7 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = data;
+		this.flag = CLONEABLE | DELETEABLE;
 	}
 
 	/**
@@ -97,6 +103,7 @@ public class Code {
 		if ( type == null ) type = "null";
 		this.type = type;
 		this.data = "";
+		this.flag = CLONEABLE | DELETEABLE;
 	}
 	
 	/**
@@ -114,7 +121,8 @@ public class Code {
 	}
 
 	/**
-	 * Clone the code.
+	 * Clone the code. Note that this method does not check if this code can be
+	 * duplicated or not. Use {@link #isCloneable()} to check.
 	 * @return A copy of the object.
 	 */
 	@Override
@@ -122,7 +130,7 @@ public class Code {
 		Code clone = new Code(tagType, type, data);
 		clone.id = id;
 		clone.outer = outer;
-		clone.hasReference = hasReference;
+		clone.flag = flag;
 		return clone;
 	}
 	
@@ -204,7 +212,7 @@ public class Code {
 	 * @return True if the code has one sub-flow.
 	 */
 	public boolean hasReference () {
-		return hasReference;
+		return ((flag & HASREF) == HASREF);
 	}
 	
 	/**
@@ -212,7 +220,8 @@ public class Code {
 	 * @param value The new value to apply.
 	 */
 	public void setHasReference (boolean value) {
-		hasReference = value;
+		if ( value ) flag |= HASREF;
+		else flag &= ~HASREF;
 	}
 
 	/**
@@ -235,5 +244,42 @@ public class Code {
 		if ( outer != null ) return outer;
 		else return data; // Returns data if no outer-data is set
 	}
+
+	/**
+	 * Indicates if this in-line code can be duplicated in its text fragment.
+	 * For example a HTML bold element could be duplicated, while a %s would not.
+	 * @return True if this in-line code can be duplicated.
+	 */
+	public boolean isCloneable () {
+		return ((flag & CLONEABLE) == CLONEABLE);
+	}
+
+	/**
+	 * Sets the flag of this in-line code to indicate if it can be duplicated or not.
+	 * @param value True to allow duplication, false to forbid it.
+	 */
+	public void setIsCloneable (boolean value) {
+		if ( value ) flag |= CLONEABLE;
+		else flag &= ~CLONEABLE;
+	}
+	
+	/**
+	 * Indicates if this in-line code can be removed from its text fragment.
+	 * For example a HTML bold element could be removed, while a %s would not.
+	 * @return True if this in-line code can be removed.
+	 */
+	public boolean isDeleteable () {
+		return ((flag & DELETEABLE) == DELETEABLE);
+	}
+	
+	/**
+	 * Sets the flag of this in-line code to indicate if it can be removed or not.
+	 * @param value True to allow deletion, false to forbid it.
+	 */
+	public void setIsDeleteable (boolean value) {
+		if ( value ) flag |= DELETEABLE;
+		else flag &= ~DELETEABLE;
+	}
+	
 	
 }

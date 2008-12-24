@@ -318,7 +318,8 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmp = params.prefix + tmp;
 			}
 			if ( params.addName ) {
-				if ( tu.getName().length() > 0 ) tmp += "_"+tu.getName();
+				String name = tu.getName();
+				if (( name != null ) && ( name.length() > 0 )) tmp += "_"+name;
 				else tmp += "_"+tu.getId();
 			}
 			if ( params.addID ) {
@@ -331,7 +332,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error when add prefix or suffix: '"+tmp+"'", e);
+			logger.warn("Error when adding text to '"+tmp+"'", e);
 		}
 	}
 

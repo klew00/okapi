@@ -35,11 +35,10 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class InlineCodeFinder {
 
-	private ArrayList<String>     rules;
-	private String                sample;
-	private boolean               useAllRulesWhenTesting;
-	private Pattern               pattern;
-
+	private ArrayList<String> rules;
+	private String sample;
+	private boolean useAllRulesWhenTesting;
+	private Pattern pattern;
 	
 	public InlineCodeFinder () {
 		reset();

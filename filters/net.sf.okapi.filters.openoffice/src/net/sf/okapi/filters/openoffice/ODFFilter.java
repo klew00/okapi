@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Stack;
 
 import javax.xml.stream.XMLInputFactory;
@@ -36,25 +37,46 @@ import javax.xml.stream.XMLStreamReader;
 import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-class Parser extends BaseFilter {
+/**
+ * This class implements IFilter for XML documents in Open-Document format (ODF).
+ * The expected input is the XML document itself. It can be used on ODF documents
+ * that are not in Open-Office.org files (i.e. directly on the content.xml of the .odt).
+ * For processing ODT, ODS, ODP or ODG zipped documents, use the OpenDocumentFilter class,
+ * which calls this filter as needed.
+ */
+public class ODFFilter implements IFilter {
 
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 
-	protected Hashtable<String, ElementRule> toExtract;
-	protected ArrayList<String> toProtect;
-	
+	private Hashtable<String, ElementRule> toExtract;
+	private ArrayList<String> toProtect;
+	private LinkedList<FilterEvent> queue;
+	private String docName;
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
+	private int otherId;
+	private int tuId;
+	private String language;
+	private Parameters params;
+	private GenericSkeleton skel;
+	private TextFragment tf;
+	private boolean canceled;
+	private boolean hasNext;
 
-	public Parser () {
-		extract = new Stack<Boolean>();
+	public ODFFilter () {
+		params = new Parameters();
 		
 		toExtract = new Hashtable<String, ElementRule>();
 		toExtract.put("text:p", new ElementRule("text:p", null));
@@ -99,19 +121,25 @@ class Parser extends BaseFilter {
 				reader.close();
 				reader = null;
 			}
+			hasNext = false;
 		}
 		catch ( XMLStreamException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public IResource getResource () {
-		return getFinalizedToken();
+	public void cancel () {
+		canceled = true;
+	}
+
+	public boolean hasNext () {
+		return hasNext;
 	}
 
 	public void open (InputStream input) {
 		try {
 			close();
+			canceled = false;
 			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
@@ -120,11 +148,19 @@ class Parser extends BaseFilter {
 			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 			reader = fact.createXMLStreamReader(input);
 			
-			reset();
-			setFinishedParsing(false); //TODO: Should this be in reset()???
-			
-			extract.clear();
+			extract = new Stack<Boolean>();
 			extract.push(false);
+			otherId = 0;
+			tuId = 0;
+
+			queue = new LinkedList<FilterEvent>();
+			queue.add(new FilterEvent(FilterEventType.START));
+			hasNext = true;
+			
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDoc.setLanguage(language);
+			startDoc.setName(docName);
+			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
@@ -136,13 +172,111 @@ class Parser extends BaseFilter {
 		open(new ByteArrayInputStream(input.toString().getBytes())); 
 	}
 
-	public void open (URL input) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			open(input.openStream());
+	public void open (URL inputUrl) {
+		try {
+			docName = inputUrl.getPath();
+			open(inputUrl.openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public String getName () {
+		return "ODFFilter";
+	}
+
+	public IParameters getParameters () {
+		return params;
+	}
+
+	public FilterEvent next() {
+		if ( canceled ) {
+			queue.clear();
+			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			hasNext = false;
+		}
+		
+		if ( queue.isEmpty() ) {
+			if ( !read() ) {
+				Ending ending = new Ending(String.valueOf(++otherId));
+				ending.setSkeleton(skel);
+				queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+				queue.add(new FilterEvent(FilterEventType.FINISHED));
+			}
+		}
+		
+		// Return the head of the queue
+		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+			hasNext = false;
+		}
+		return queue.poll();
+	}
+	
+	public void setParameters (IParameters params) {
+		params = (Parameters)params;
+	}
+
+	public void setOptions (String sourceLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		setOptions(sourceLanguage, defaultEncoding, generateSkeleton);
+	}
+
+	public void setOptions (String sourceLanguage,
+		String targetLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
+		language = sourceLanguage;
+	}
+
+	private boolean read () {
+		skel = new GenericSkeleton();
+		try {
+			while ( reader.hasNext() ) {
+				switch ( reader.next() ) {
+				case XMLStreamConstants.CHARACTERS:
+				case XMLStreamConstants.CDATA:
+				case XMLStreamConstants.SPACE:
+					if ( extract.peek() ) tf.append(reader.getText());
+					else skel.append(reader.getText()); //TODO: need to escape
+					break;
+					
+				case XMLStreamConstants.START_DOCUMENT:
+					//TODO set resource.setTargetEncoding(SET REAL ENCODING);
+					skel.append("<?xml version=\"1.0\" "
+						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
+						+ "?>");
+					break;
+				
+				case XMLStreamConstants.END_DOCUMENT:
+					return true;
+				
+				case XMLStreamConstants.START_ELEMENT:
+					processStartElement();
+					break;
+				
+				case XMLStreamConstants.END_ELEMENT:
+					if ( processEndElement() ) return true; // Send an event
+					break;
+				
+				case XMLStreamConstants.COMMENT:
+					skel.append("<!--" + reader.getText() + "-->");
+					break;
+
+				case XMLStreamConstants.PROCESSING_INSTRUCTION:
+					skel.append("<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
+					break;
+				}
+			} // End of main while		
+
+		}
+		catch ( XMLStreamException e ) {
+			throw new RuntimeException(e);
+		}
+		return true;
 	}
 
 	private String buildStartTag (String name) {
@@ -191,7 +325,7 @@ class Parser extends BaseFilter {
 	private void processStartElement () throws XMLStreamException {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
-			appendToSkeletonUnit(buildStartTag(name));
+			skel.append(buildStartTag(name));
 			//TODO: need a way to set the TextUnit's name/id/restype/etc.
 			extract.push(true);
 		}
@@ -200,28 +334,28 @@ class Parser extends BaseFilter {
 			if ( tmp != null ) {
 				int count = Integer.valueOf(tmp);
 				for ( int i=0; i<count; i++ ) {
-					appendToTextUnit(" ");
+					tf.append(" ");
 				}
 			}
-			else appendToTextUnit(" "); // Default=1
+			else skel.append(" "); // Default=1
 			reader.nextTag(); // Eat the end-element event
 		}
 		else if ( extract.peek() && name.equals("text:tab") ) {
-			appendToTextUnit("\t");
+			tf.append("\t");
 			reader.nextTag(); // Eat the end-element event
 		}
 		else if ( extract.peek() && name.equals("text:line-break") ) {
-			appendToTextUnit(new Code(TagType.PLACEHOLDER, "lb", "<text:line-break/>"));
+			tf.append(new Code(TagType.PLACEHOLDER, "lb", "<text:line-break/>"));
 			reader.nextTag(); // Eat the end-element event
 		}
 		else {
 			if ( extract.peek() ) {
 				if ( name.equals("text:a") ) processStartALink(name);
 				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
-				else appendToTextUnit(new Code(TagType.OPENING, name, buildStartTag(name)));
+				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
 			}
 			else {
-				appendToSkeletonUnit(buildStartTag(name));
+				skel.append(buildStartTag(name));
 			}
 		}
 	}
@@ -232,7 +366,7 @@ class Parser extends BaseFilter {
 		if ( href != null ) {
 			//TODO: set the property, but where???
 		}
-		appendToTextUnit(new Code(TagType.OPENING, name, data));
+		tf.append(new Code(TagType.OPENING, name, data));
 	}
 	
 	private void processReadOnlyInlineElement (String name) throws XMLStreamException {
@@ -249,7 +383,7 @@ class Parser extends BaseFilter {
 				String tmpName = makePrintName();
 				tmp.append(buildEndTag(tmpName));
 				if ( tmpName.equals(name) ) {
-					appendToTextUnit(new Code(TagType.PLACEHOLDER, name, tmp.toString()));
+					tf.append(new Code(TagType.PLACEHOLDER, name, tmp.toString()));
 					return;
 				}
 				break;
@@ -268,99 +402,37 @@ class Parser extends BaseFilter {
 		}		
 	}
 	
-	private void processEndElement () {
+	// Return true when it's ready to send an event
+	private boolean processEndElement () {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
-			finalizeCurrentToken();
 			extract.pop();
-			// Add line break because ODT files don't have any
-			// Note: we may keep adding extra line if processing a filter output!
-			appendToSkeletonUnit(buildEndTag(name)+"\n");
+			// Add line break because ODF files don't have any
+			// Note: we may keep adding extra lines if one exists already!
+			//TODO: find a way to add \n only if needed
+			skel.append(buildEndTag(name)+"\n");
+			TextUnit tu = new TextUnit(String.valueOf(++tuId));
+			tu.setSourceContent(tf);
+			tu.setSkeleton(skel);
+			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+			return true;
 		}
 		else {
 			if ( extract.peek() ) {
-				appendToTextUnit(new Code(TagType.CLOSING, name, buildEndTag(name)));
+				tf.append(new Code(TagType.CLOSING, name, buildEndTag(name)));
 			}
 			else {
-				appendToSkeletonUnit(buildEndTag(name));
+				skel.append(buildEndTag(name));
 				if ( name.equals("style:style")
 					|| ( name.equals("text:list-style"))
 					|| ( name.equals("draw:frame"))
 					|| ( name.equals("text:list"))
 					|| ( name.equals("text:list-item")) ) {
-					appendToSkeletonUnit("\n");
+					skel.append("\n");
 				}
 			}
 		}
+		return false;
 	}
 
-	public String getName() {
-		return "ODFFilter";
-	}
-
-	public IParameters getParameters() {
-		return null;
-	}
-
-	public FilterEvent next() {
-		try {
-			initializeLoop();
-			while ( !isFinishedToken() && reader.hasNext() && !isCanceled() ) {
-
-				switch ( reader.next() ) {
-				
-				case XMLStreamConstants.CHARACTERS:
-					if ( extract.peek() ) appendToTextUnit(reader.getText());
-					else appendToSkeletonUnit(reader.getText());
-					break;
-					
-				case XMLStreamConstants.START_DOCUMENT:
-					//TODO set resource.setTargetEncoding(SET REAL ENCODING);
-					appendToSkeletonUnit("<?xml version=\"1.0\" "
-						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
-						+ "?>");
-					break;
-				
-				case XMLStreamConstants.END_DOCUMENT:
-					finalizeCurrentToken();
-					setFinishedParsing(true);
-					close();
-					break;
-				
-				case XMLStreamConstants.START_ELEMENT:
-					processStartElement();
-					break;
-				
-				case XMLStreamConstants.END_ELEMENT:
-					processEndElement();
-					break;
-				
-				case XMLStreamConstants.COMMENT:
-					appendToSkeletonUnit("<!--" + reader.getText() + "-->");
-					break;
-
-				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					appendToSkeletonUnit("<?" + reader.getPITarget() + " "
-						+ reader.getPIData() + "?>");
-					break;
-				}
-			
-			} // End of main while		
-
-			return new FilterEvent(getFinalizedTokenType(), getResource());
-		}
-		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void setOptions (String language, String defaultEncoding) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
-		
-	}
 }

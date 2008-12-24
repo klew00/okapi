@@ -210,6 +210,7 @@ public class Writer extends BaseWriter {
 
 	private void processTextUnit (TextUnit item) {
 		String name = item.getName();
+		if ( name == null ) name = "";
 		writer.writeRawXML(String.format(
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
 			item.getId(), (name.length()>0 ? " rn='"+name+"'" : "") ));

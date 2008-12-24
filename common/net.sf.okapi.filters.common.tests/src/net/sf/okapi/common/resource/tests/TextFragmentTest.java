@@ -170,6 +170,57 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(code4.getOuterData(), "outer");
 		assertEquals(code4.getId(), 1); // ID automatically adjusted to 1
 		assertEquals(code4.getTagType(), TagType.PLACEHOLDER);
+		
+		code1 = new Code(TagType.PLACEHOLDER, "t", "d");
+		assertFalse(code1.hasReference());
+		assertTrue(code1.isCloneable());
+		assertTrue(code1.isDeleteable());
+		code2 = code1.clone();
+		assertFalse(code2.hasReference());
+		assertTrue(code2.isCloneable());
+		assertTrue(code2.isDeleteable());
+		
+		code1.setHasReference(true);
+		code1.setIsCloneable(true);
+		code1.setIsDeleteable(true);
+		assertTrue(code1.hasReference());
+		assertTrue(code1.isCloneable());
+		assertTrue(code1.isDeleteable());
+		
+		code1.setHasReference(false);
+		assertFalse(code1.hasReference());
+		assertTrue(code1.isCloneable());
+		assertTrue(code1.isDeleteable());
+		
+		code1.setIsCloneable(false);
+		assertFalse(code1.hasReference());
+		assertFalse(code1.isCloneable());
+		assertTrue(code1.isDeleteable());
+
+		code1.setIsDeleteable(false);
+		assertFalse(code1.hasReference());
+		assertFalse(code1.isCloneable());
+		assertFalse(code1.isDeleteable());
+
+		code1.setHasReference(true);
+		code1.setIsDeleteable(true);
+		assertTrue(code1.hasReference());
+		assertFalse(code1.isCloneable());
+		assertTrue(code1.isDeleteable());
+		
+		tf1 = new TextFragment();
+		tf1.append(code1);
+		String codesStorage1 = Code.codesToString(tf1.getCodes());
+		String textStorage1 = tf1.getCodedText();
+		assertNotNull(codesStorage1);
+		assertNotNull(textStorage1);
+		tf2 = new TextFragment();
+		tf2.setCodedText(textStorage1, Code.stringToCodes(codesStorage1));
+		assertEquals(tf1.toString(), tf2.toString());
+		String codesStorage2 = Code.codesToString(tf2.getCodes());
+		String textStorage2 = tf2.getCodedText();
+		assertEquals(codesStorage1, codesStorage2);
+		assertEquals(textStorage1, textStorage2);
 	}
 	
 	public void testCodedText () {

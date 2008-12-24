@@ -119,7 +119,7 @@ public class XLIFFFilter implements IFilter {
 			}
 			
 			// Parse next if nothing in the queue
-			if ( queue.size() == 0 ) {
+			if ( queue.isEmpty() ) {
 				if ( !read() ) {
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
@@ -129,7 +129,7 @@ public class XLIFFFilter implements IFilter {
 			}
 			
 			// Return the head of the queue
-			if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+			if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
 				hasNext = false;
 			}
 			return queue.poll();
