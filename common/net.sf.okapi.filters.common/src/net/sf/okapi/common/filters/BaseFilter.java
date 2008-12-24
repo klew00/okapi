@@ -38,14 +38,14 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public abstract class BaseFilter implements IFilter {
-	private static final String START_GROUP = "sg";
-	private static final String END_GROUP = "eg";
-	private static final String TEXT_UNIT = "tu";
-	private static final String DOCUMENT_PART = "dp";
-	private static final String START_DOCUMENT = "sd";
-	private static final String END_DOCUMENT = "ed";
-	private static final String START_SUBDOCUMENT = "ssd";
-	private static final String END_SUBDOCUMENT = "esd";
+	private static final String START_GROUP = "sg"; //$NON-NLS-1$
+	private static final String END_GROUP = "eg"; //$NON-NLS-1$
+	private static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
+	private static final String DOCUMENT_PART = "dp"; //$NON-NLS-1$
+	private static final String START_DOCUMENT = "sd"; //$NON-NLS-1$
+	private static final String END_DOCUMENT = "ed"; //$NON-NLS-1$
+	private static final String START_SUBDOCUMENT = "ssd"; //$NON-NLS-1$
+	private static final String END_SUBDOCUMENT = "esd"; //$NON-NLS-1$
 	
 	private String encoding;
 	private String srcLang;
@@ -78,10 +78,10 @@ public abstract class BaseFilter implements IFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#hasNext()
 	 */
 	public boolean hasNext() {
-		if (!referencableFilterEvents.isEmpty() && !filterEvents.isEmpty()) {
-			return true;
+		if (referencableFilterEvents.isEmpty() && filterEvents.isEmpty()) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/*
@@ -111,7 +111,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	private String createId(String name, int number) {
-		return String.format("%s%d", name, number);
+		return String.format("%s%d", name, number); //$NON-NLS-1$
 	}
 
 	private void addPropertiesToResource(INameable resource, List<Property> properties) {
@@ -163,9 +163,9 @@ public abstract class BaseFilter implements IFilter {
 	protected void initialize() {
 		start();
 		startDocument();
-		startSubDocument();
 	}
 
+	@Override
 	protected void finalize() {
 		if (hasUnfinishedSkeleton()) {
 			endSkeleton();
@@ -174,10 +174,10 @@ public abstract class BaseFilter implements IFilter {
 			while (!tempFilterEventStack.isEmpty()) {
 				FilterEvent fe = tempFilterEventStack.pop();
 				if (fe.getEventType() == FilterEventType.START_GROUP) {
-					endGroup(new GenericSkeleton(""));
+					endGroup(new GenericSkeleton("")); //$NON-NLS-1$
 				} else if (fe.getEventType() == FilterEventType.TEXT_UNIT) {
 					if (fe.getResource().getSkeleton() != null) {
-						endTextUnit(new GenericSkeleton(""));
+						endTextUnit(new GenericSkeleton("")); //$NON-NLS-1$
 					} else {
 						endTextUnit();
 					}
@@ -185,7 +185,6 @@ public abstract class BaseFilter implements IFilter {
 			}
 		}
 
-		endSubDocument();
 		endDocument();
 		finish();
 	}
@@ -428,7 +427,8 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent fe = new FilterEvent(FilterEventType.START_GROUP, g, skel);		
 		
 		if (isCurrentComplexTextUnit()) {
-			// add this group as a code of the complex TextUnit	
+			// add this group as a cde of the complex TextUnit	
+			g.setIsReferent(true);
 			Code c = new Code(TagType.PLACEHOLDER, startMarker.toString(), TextFragment.makeRefMarker(gid));
 			c.setHasReference(true);
 			startCode(c);
