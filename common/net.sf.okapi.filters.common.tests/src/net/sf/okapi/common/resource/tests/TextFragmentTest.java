@@ -140,6 +140,36 @@ public class TextFragmentTest extends TestCase {
 		tf2.append(TagType.OPENING, "b", "<b>");
 		tf1.insert(0, tf2);
 		//TODO: assertEquals(display.setContent(tf1).toString(false), "<1/>A<2/>B</1>C");
+		
+		Code code1 = new Code(TagType.PLACEHOLDER, "type", "data");
+		code1.setHasReference(true);
+		code1.setId(100);
+		code1.setOuterData("outer");
+		assertEquals(code1.getType(), "type");
+		assertEquals(code1.getData(), "data");
+		assertEquals(code1.getOuterData(), "outer");
+		assertEquals(code1.getId(), 100);
+		assertEquals(code1.getTagType(), TagType.PLACEHOLDER);
+
+		tf1 = new TextFragment();
+		Code code2 = tf1.append(code1);
+		Code code3 = tf1.getCode(0);
+		assertSame(code1, code2);
+		assertSame(code2, code3);
+		code1 = null;
+		assertEquals(code2.getType(), "type");
+		assertEquals(code2.getData(), "data");
+		assertEquals(code2.getOuterData(), "outer");
+		assertEquals(code2.getId(), 1); // ID automatically adjusted to 1
+		assertEquals(code2.getTagType(), TagType.PLACEHOLDER);
+		
+		Code code4 = code2.clone();
+		assertNotSame(code4, code2);
+		assertEquals(code4.getType(), "type");
+		assertEquals(code4.getData(), "data");
+		assertEquals(code4.getOuterData(), "outer");
+		assertEquals(code4.getId(), 1); // ID automatically adjusted to 1
+		assertEquals(code4.getTagType(), TagType.PLACEHOLDER);
 	}
 	
 	public void testCodedText () {

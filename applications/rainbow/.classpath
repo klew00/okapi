@@ -26,5 +26,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-JDK14-1.5.0"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.rtf"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JERICHO-HTML-3.0-Beta1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

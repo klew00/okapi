@@ -86,7 +86,7 @@ public class RegexFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "okf_properties";
+		return "okf_regex";
 	}
 
 	public IParameters getParameters () {
