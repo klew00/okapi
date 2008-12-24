@@ -525,7 +525,9 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("Code not found. Cannot add a Property to a non-exisitant code.");
 		}
 
-		String refMarker = TextFragment.makeRefMarker(peekMostRecentTextUnit().getResource().getId());
+		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
+		tu.setIsReferent(true);
+		String refMarker = TextFragment.makeRefMarker(tu.getId());
 		currentCode.append(refMarker);
 		currentCode.setHasReference(true);
 
