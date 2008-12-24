@@ -122,14 +122,14 @@ public abstract class BaseFilter implements IFilter {
 		}
 	}
 
-	private FilterEvent peekUnfinishedEvent() {
+	private FilterEvent peekTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
 		return tempFilterEventStack.peek();
 	}
 
-	private FilterEvent popUnfinishedEvent() {
+	private FilterEvent popTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
@@ -191,7 +191,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected boolean isCurrentTextUnit() {
-		FilterEvent e = peekUnfinishedEvent();
+		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT) {
 			return true;
 		}
@@ -199,7 +199,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected boolean isCurrentComplexTextUnit() {
-		FilterEvent e = peekUnfinishedEvent();
+		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT && e.getResource().getSkeleton() != null) {
 			return true;
 		}
@@ -207,7 +207,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected boolean isCurrentGroup() {
-		FilterEvent e = peekUnfinishedEvent();
+		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.START_GROUP) {
 			return true;
 		}
@@ -379,7 +379,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("Found non-TextUnit event. Cannot end TextUnit");
 		}
 
-		tempTextUnit = popUnfinishedEvent();
+		tempTextUnit = popTempEvent();
 
 		if (endMarker != null) {
 			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
@@ -396,7 +396,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot add text");
 		}
 
-		FilterEvent tempTextUnit = peekUnfinishedEvent();
+		FilterEvent tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
 	}
@@ -448,7 +448,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("Start group not found. Cannot end group");
 		}
 
-		popUnfinishedEvent();
+		popTempEvent();
 
 		Ending eg = new Ending(createId(END_GROUP, ++endGroupId));
 
