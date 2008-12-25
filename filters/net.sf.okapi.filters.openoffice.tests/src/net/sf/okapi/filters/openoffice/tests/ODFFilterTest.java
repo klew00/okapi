@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.filters.xliff.tests;
+package net.sf.okapi.filters.openoffice.tests;
 
 import java.net.URL;
 
@@ -28,20 +28,20 @@ import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.xliff.XLIFFFilter;
+import net.sf.okapi.filters.openoffice.ODFFilter;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class XLIFFFilterTest {
+public class ODFFilterTest {
 
 	@Test
 	public void runTest () {
-		XLIFFFilter filter = null;		
+		ODFFilter filter = null;		
 		try {
-			filter = new XLIFFFilter();
-			filter.setOptions("en", "es", "UTF-8", true);
-			URL url = XLIFFFilterTest.class.getResource("/SF-12-Test01.xlf");
+			filter = new ODFFilter();
+			filter.setOptions("en", "UTF-8", true);
+			URL url = ODFFilterTest.class.getResource("/content_TestDocument01.odt.xml");
 			filter.open(url);
 			process(filter);
 			filter.close();
@@ -125,4 +125,5 @@ public class XLIFFFilterTest {
 			System.out.println("---");
 		}
 	}
+
 }

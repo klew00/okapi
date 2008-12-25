@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -160,6 +161,8 @@ public class ODFFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setLanguage(language);
 			startDoc.setName(docName);
+			startDoc.setMimeType("text/x-odf"); //TODO Use proper mime type value
+			startDoc.setType(startDoc.getMimeType());
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e ) {
@@ -190,7 +193,7 @@ public class ODFFilter implements IFilter {
 		return params;
 	}
 
-	public FilterEvent next() {
+	public FilterEvent next () {
 		if ( canceled ) {
 			queue.clear();
 			queue.add(new FilterEvent(FilterEventType.CANCELED));
@@ -198,18 +201,14 @@ public class ODFFilter implements IFilter {
 		}
 		
 		if ( queue.isEmpty() ) {
-			if ( !read() ) {
-				Ending ending = new Ending(String.valueOf(++otherId));
-				ending.setSkeleton(skel);
-				queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-				queue.add(new FilterEvent(FilterEventType.FINISHED));
-			}
+			read();
 		}
-		
-		// Return the head of the queue
+
+		// Update hasNext flag on last event
 		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
 			hasNext = false;
 		}
+		// Return the head of the queue
 		return queue.poll();
 	}
 	
@@ -221,7 +220,7 @@ public class ODFFilter implements IFilter {
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
-		setOptions(sourceLanguage, defaultEncoding, generateSkeleton);
+		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -234,6 +233,7 @@ public class ODFFilter implements IFilter {
 
 	private boolean read () {
 		skel = new GenericSkeleton();
+		tf = new TextFragment();
 		try {
 			while ( reader.hasNext() ) {
 				switch ( reader.next() ) {
@@ -325,8 +325,17 @@ public class ODFFilter implements IFilter {
 	private void processStartElement () throws XMLStreamException {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
+			// Send document-part if there is non-whitespace skeleton
+			if ( !skel.isEmpty(true) ) {
+				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+				dp.setSkeleton(skel);
+				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+				skel = new GenericSkeleton(); // Start new skeleton 
+			}
+			// Start the new text-unit
 			skel.append(buildStartTag(name));
 			//TODO: need a way to set the TextUnit's name/id/restype/etc.
+			//TODO: getProperties()
 			extract.push(true);
 		}
 		else if ( extract.peek() && name.equals("text:s") ) {
@@ -407,13 +416,17 @@ public class ODFFilter implements IFilter {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
 			extract.pop();
+			TextUnit tu = new TextUnit(String.valueOf(++tuId));
+			skel.addRef(tu);
+			tu.setSourceContent(tf);
+			tu.setSkeleton(skel);
+			tu.setMimeType("text/x-odf");
 			// Add line break because ODF files don't have any
+			// They are needed for example in RTF output
+			//TODO: Maybe have this as an options set through the parameters but not user-driven?
 			// Note: we may keep adding extra lines if one exists already!
 			//TODO: find a way to add \n only if needed
 			skel.append(buildEndTag(name)+"\n");
-			TextUnit tu = new TextUnit(String.valueOf(++tuId));
-			tu.setSourceContent(tf);
-			tu.setSkeleton(skel);
 			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			return true;
 		}
@@ -431,6 +444,13 @@ public class ODFFilter implements IFilter {
 					skel.append("\n");
 				}
 			}
+		}
+		if ( name.equals("office:document-content") ) {
+			Ending ending = new Ending(String.valueOf(++otherId));
+			ending.setSkeleton(skel);
+			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+			queue.add(new FilterEvent(FilterEventType.FINISHED));
+			return true;
 		}
 		return false;
 	}
