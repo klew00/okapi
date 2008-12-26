@@ -33,6 +33,7 @@ import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.writer.GenericInlines;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -81,8 +82,6 @@ public class SRXEditor {
 	private Segmenter segmenter;
 	private String srxPath;
 	private TextContainer sampleText;
-	private Button btSRXDocs;
-	private Menu popupSRXDocs;
 	private Button btAddRule;
 	private Button btEditRule;
 	private Button btRemoveRule;
@@ -146,7 +145,7 @@ public class SRXEditor {
 		
 		cbGroup = new Combo(cmpTmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 5;
 		cbGroup.setLayoutData(gdTmp);
 		cbGroup.setVisibleItemCount(15);
 		cbGroup.addSelectionListener(new SelectionAdapter() {
@@ -155,7 +154,7 @@ public class SRXEditor {
 			};
 		});
 		
-		int topButtonsWidth = 140;
+		int topButtonsWidth = 180; //140;
 		Button btTmp = new Button(cmpTmp, SWT.PUSH);
 		btTmp.setText("Groups and Options...");
 		gdTmp = new GridData();
@@ -165,23 +164,6 @@ public class SRXEditor {
 			public void widgetSelected(SelectionEvent e) {
 				editGroupsAndOptions();
 			}
-		});
-		
-		btSRXDocs = new Button(cmpTmp, SWT.PUSH);
-		btSRXDocs.setText("SRX Document...");
-		gdTmp = new GridData();
-		gdTmp.widthHint = topButtonsWidth;
-		btSRXDocs.setLayoutData(gdTmp);
-		setFileMenu(shell, btSRXDocs);
-		btSRXDocs.addSelectionListener( new SelectionAdapter () {
-			public void widgetSelected(SelectionEvent evt) {
-				if (( popupSRXDocs != null ) && ( !popupSRXDocs.isVisible() )) {
-					Rectangle bounds = btSRXDocs.getBounds(); 
-					Point menuLoc = btSRXDocs.getParent().toDisplay(
-						bounds.x, bounds.y + bounds.height);
-					popupSRXDocs.setLocation(menuLoc.x, menuLoc.y);
-					popupSRXDocs.setVisible(true);
-			}}
 		});
 		
 		tblRules = new Table(cmpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.CHECK);
@@ -403,7 +385,7 @@ public class SRXEditor {
 			SelectionAdapter closeActions = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					if ( e.widget.getData().equals("h") ) {
-						//TODO: UIUtil.start(help);
+						UIUtil.start(SRXEditor.class.getResource("SRXEditor.html"));
 						return;
 					}
 					if ( e.widget.getData().equals("c") ) {
@@ -510,47 +492,6 @@ public class SRXEditor {
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
-	}
-
-	private void setFileMenu (Shell shell,
-		Button fileButton)
-	{
-		popupSRXDocs = new Menu(shell, SWT.POP_UP);
-		fileButton.setMenu(popupSRXDocs);
-
-		MenuItem menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
-		menuItem.setText("New Document");
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				newSRXDocument();
-            }
-		});
-
-		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
-		menuItem.setText("Open Document...");
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				loadSRXDocument(null);
-            }
-		});
-
-		new MenuItem(popupSRXDocs, SWT.SEPARATOR);
-
-		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
-		menuItem.setText("Save Current Document");
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				saveSRXDocument(srxPath);
-            }
-		});
-
-		menuItem = new MenuItem(popupSRXDocs, SWT.PUSH);
-		menuItem.setText("Save Current Document As...");
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				saveSRXDocument(null);
-            }
-		});
 	}
 
 	/**

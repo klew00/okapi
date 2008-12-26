@@ -37,12 +37,18 @@ import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 
+/**
+ * This class implements the IFilter interface for Open-Office.org documents
+ * (ODT, ODP, ODS, and ODG files). It expects the zipped files as input, and calls the
+ * ODFFilter as needed to process the content documents.
+ */
 public class OpenOfficeFilter implements IFilter {
 
 	private enum StateType {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
 	}
-	
+
+	private String docName;
 	private InputStream input;
 	private ODFFilter odf;
 	private ZipFile zipFile;
@@ -112,6 +118,8 @@ public class OpenOfficeFilter implements IFilter {
 	
 	public void open (URL inputUrl) {
 		//TODO
+		docName = inputUrl.getPath();
+		
 	}
 
 	public void open (CharSequence inputText) {

@@ -43,6 +43,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -63,6 +64,7 @@ public class ODFFilter implements IFilter {
 
 	private Hashtable<String, ElementRule> toExtract;
 	private ArrayList<String> toProtect;
+	private ArrayList<String> subFlow;
 	private LinkedList<FilterEvent> queue;
 	private String docName;
 	private XMLStreamReader reader;
@@ -73,6 +75,8 @@ public class ODFFilter implements IFilter {
 	private Parameters params;
 	private GenericSkeleton skel;
 	private TextFragment tf;
+	private TextUnit tu;
+	private Stack<INameable> stack;
 	private boolean canceled;
 	private boolean hasNext;
 
@@ -88,6 +92,9 @@ public class ODFFilter implements IFilter {
 		toExtract.put("meta:keyword", new ElementRule("meta:keyword", null));
 		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
 		toExtract.put("text:index-title-template", new ElementRule("text:index-title-template", null));
+
+		subFlow = new ArrayList<String>();
+		subFlow.add("text:note");
 		
 		toProtect = new ArrayList<String>();
 		toProtect.add("text:initial-creator");
@@ -151,6 +158,7 @@ public class ODFFilter implements IFilter {
 			
 			extract = new Stack<Boolean>();
 			extract.push(false);
+			stack = new Stack<INameable>();
 			otherId = 0;
 			tuId = 0;
 
@@ -279,6 +287,12 @@ public class ODFFilter implements IFilter {
 		return true;
 	}
 
+	private void gatherInfo (String name) {
+		tu.setType("x-"+name);
+		//lang?? 
+		//id???
+	}
+	
 	private String buildStartTag (String name) {
 		StringBuilder tmp = new StringBuilder();
 		// Tag name
@@ -335,7 +349,8 @@ public class ODFFilter implements IFilter {
 			// Start the new text-unit
 			skel.append(buildStartTag(name));
 			//TODO: need a way to set the TextUnit's name/id/restype/etc.
-			//TODO: getProperties()
+			tu = new TextUnit(null); // ID set only if needed
+			gatherInfo(name);
 			extract.push(true);
 		}
 		else if ( extract.peek() && name.equals("text:s") ) {
@@ -416,8 +431,8 @@ public class ODFFilter implements IFilter {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
 			extract.pop();
-			TextUnit tu = new TextUnit(String.valueOf(++tuId));
 			skel.addRef(tu);
+			tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);
 			tu.setMimeType("text/x-odf");

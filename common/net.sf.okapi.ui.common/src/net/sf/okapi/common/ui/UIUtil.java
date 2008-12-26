@@ -1,26 +1,27 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.common.ui;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -30,17 +31,26 @@ import org.eclipse.swt.widgets.Composite;
 
 public class UIUtil {
 
-	public static final int    PFTYPE_WIN        = 0;
-	public static final int    PFTYPE_MAC        = 1;
-	public static final int    PFTYPE_UNIX       = 2;
+	public static final int PFTYPE_WIN      = 0;
+	public static final int PFTYPE_MAC      = 1;
+	public static final int PFTYPE_UNIX     = 2;
 
 	/**
 	 * Starts a program or a command.
 	 * @param command Command or program to launch. This can also be a 
-	 * URL (to open a browser), etc.
+	 * URL string (to open a browser), etc.
 	 */
 	static public void start (String command) {
 		Program.launch(command); 
+	}
+	
+	/**
+	 * starts a program or a command.
+	 * @param url URL of the resource to open with its associated program. 
+	 */
+	static public void start ( URL url) {
+		if ( url == null ) return;
+		Program.launch(url.getPath());
 	}
 	
 	/**

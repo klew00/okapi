@@ -33,8 +33,11 @@
  >Trados RTF</filter>
   
  <filter id="okf_openoffice"
-  inputFilterClass="net.sf.okapi.filters.openoffice.InputFilter"
-  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
+  inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
+ >OpenOffice.org Document</filter>
+  
+ <filter id="okf_odf"
+  inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
  >Open Document</filter>
   
  <filter id="okf_mif"

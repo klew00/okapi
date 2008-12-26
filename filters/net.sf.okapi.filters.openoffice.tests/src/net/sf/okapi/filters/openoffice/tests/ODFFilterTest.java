@@ -28,6 +28,8 @@ import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.openoffice.ODFFilter;
 
 import org.junit.Assert;
@@ -45,6 +47,10 @@ public class ODFFilterTest {
 			filter.open(url);
 			process(filter);
 			filter.close();
+			
+			filter.open(url);
+			rewrite(filter);
+			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
@@ -53,6 +59,22 @@ public class ODFFilterTest {
 		finally {
 			if ( filter != null ) filter.close();
 		}
+	}
+	
+	private void rewrite (IFilter filter) {
+		GenericFilterWriter writer = null;
+		try {
+			writer = new GenericFilterWriter(new GenericSkeletonWriter());
+			writer.setOptions("FR", "UTF-8");
+			writer.setOutput("content_TestDocument01.odt_out.xml");
+			while ( filter.hasNext() ) {
+				writer.handleEvent(filter.next());
+			}
+		}
+		finally {
+			if ( writer != null ) writer.close();
+		}
+		
 	}
 	
 	private void process (IFilter filter) {
