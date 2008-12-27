@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework Contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.lib.segmentation;
 
@@ -36,6 +36,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -73,6 +74,19 @@ public class SRXDocument {
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
 	private String rangeRule;
 
+	/**
+	 * Gets the text content of the first child of an element node.
+	 * This is to use instead of node.getTextContent() which does not work with some
+	 * Macintosh Java VMs.
+	 * @param node The container element.
+	 * @return The text of the first child node.
+	 */
+	private static String getTextContent (Node node) {
+		Node n = node.getFirstChild();
+		if ( n == null ) return "";
+		return n.getNodeValue();
+	}
+	
 	public SRXDocument () {
 		resetAll();
 	}
@@ -103,7 +117,7 @@ public class SRXDocument {
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
 
-		sampleText = "Mr. Holmes is from the <A>U.K.</A> <B>Is Dr. Watson from there too?</B> Yes: both are.<C/>";
+		sampleText = "Mr. Holmes is from the <I>U.K.</I> <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
 		
 		//TEST
@@ -561,7 +575,7 @@ public class SRXDocument {
 			// Extension: sample
 			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "sample", elem1);
 			if ( elem2 != null ) {
-				setSampleText(elem2.getTextContent());
+				setSampleText(getTextContent(elem2));
 				tmp = elem2.getAttribute("language");
 				if ( tmp.length() > 0 ) setSampleLanguage(tmp);
 				tmp = elem2.getAttribute("useMappedRules");
@@ -571,7 +585,7 @@ public class SRXDocument {
 			// Extension: rangeRule
 			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "rangeRule", elem1);
 			if ( elem2 != null ) {
-				setRangeRule(elem2.getTextContent());
+				setRangeRule(getTextContent(elem2));
 			}
 			
 			// Get the body element
@@ -595,9 +609,9 @@ public class SRXDocument {
 					tmp = elem4.getAttributeNS(NSURI_OKPSRX, "active");
 					if ( tmp.length() > 0 ) newRule.isActive = "yes".equals(tmp);
 					Element elem5 = getFirstElementByTagNameNS(ns, "beforebreak", elem4);
-					if ( elem5 != null ) newRule.before = elem5.getTextContent();
+					if ( elem5 != null ) newRule.before = getTextContent(elem5);
 					elem5 = getFirstElementByTagNameNS(ns, "afterbreak", elem4);
-					if ( elem5 != null ) newRule.after = elem5.getTextContent();
+					if ( elem5 != null ) newRule.after = getTextContent(elem5);
 					tmpList.add(newRule);
 				}
 				langRules.put(ruleName, tmpList);

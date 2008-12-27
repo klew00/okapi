@@ -84,7 +84,7 @@ class StorageList extends ArrayList<IResource>
 	}
 
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
-		return startGroup.getAnnotation(type);
+		return null; //TODO: Fix this (doesn't compile on command-line) startGroup.getAnnotation(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {

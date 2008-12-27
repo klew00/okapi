@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 
 import org.eclipse.swt.SWT;
@@ -43,11 +44,14 @@ public class LanguageMapDialog {
 	private Text edRuleName;
 	private LanguageMap result = null;
 	private OKCancelPanel pnlActions;
+	private String helpPath;
 
 	public LanguageMapDialog (Shell parent,
 		String caption,
-		LanguageMap langMap)
+		LanguageMap langMap,
+		String helpPath)
 	{
+		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( caption != null ) shell.setText(caption);
 		shell.setImage(parent.getImage());
@@ -80,7 +84,7 @@ public class LanguageMapDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: UIUtil.start(help);
+					callHelp();
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
@@ -124,4 +128,9 @@ public class LanguageMapDialog {
 			return false;
 		}
 	}
+
+	public void callHelp () {
+		if ( helpPath != null ) UIUtil.start(helpPath);
+	}
+
 }

@@ -222,7 +222,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Pre-segment the extracted text with the following rules:");
+			"Pre-segment the extracted text with the following rules:", null);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Pre-translation tab

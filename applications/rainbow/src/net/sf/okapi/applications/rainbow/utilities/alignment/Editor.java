@@ -122,7 +122,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(gdTmp);
 		
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Segment the extracted text using the following SRX rules:");
+			"Segment the extracted text using the following SRX rules:", null);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	
 		grpTmp = new Group(cmpTmp, SWT.NONE);

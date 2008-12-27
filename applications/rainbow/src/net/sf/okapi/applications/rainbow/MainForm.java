@@ -1512,7 +1512,7 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		SRXEditor dlg = null;
 		try {
-			dlg = new SRXEditor(shell, true);
+			dlg = new SRXEditor(shell, true, null);
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {

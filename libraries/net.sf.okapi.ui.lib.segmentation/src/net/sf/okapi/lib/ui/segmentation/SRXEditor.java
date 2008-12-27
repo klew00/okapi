@@ -35,6 +35,7 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -96,6 +97,7 @@ public class SRXEditor {
 	private Pattern patternPlaceholder;
 	private Font sampleFont;
 	private ResourceManager rm;
+	private String helpPath;
 
 	@Override
 	protected void finalize () {
@@ -103,9 +105,11 @@ public class SRXEditor {
 	}
 
 	public SRXEditor (Shell parent,
-		boolean asDialog)
+		boolean asDialog,
+		String helpPath)
 	{
 		this.asDialog = asDialog;
+		this.helpPath = helpPath;
 		srxDoc = new SRXDocument();
 		segmenter = new Segmenter();
 		srxPath = null;
@@ -116,7 +120,12 @@ public class SRXEditor {
 		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
 		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
 		
-		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
+		if ( asDialog ) {
+			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
+		}
+		else {
+			shell = parent;
+		}
 
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
 		rm.loadCommands("commands.xml"); //$NON-NLS-1$
@@ -385,7 +394,7 @@ public class SRXEditor {
 			SelectionAdapter closeActions = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					if ( e.widget.getData().equals("h") ) {
-						UIUtil.start(SRXEditor.class.getResource("SRXEditor.html"));
+						callHelp();
 						return;
 					}
 					if ( e.widget.getData().equals("c") ) {
@@ -407,7 +416,9 @@ public class SRXEditor {
 		if ( startSize.x < 700 ) startSize.x = 700; 
 		if ( startSize.y < 600 ) startSize.y = 600; 
 		shell.setSize(startSize);
-		Dialogs.centerWindow(shell, parent);
+		if ( asDialog ) {
+			Dialogs.centerWindow(shell, parent);
+		}
 		
 		updateCaption();
 		updateAll();
@@ -418,7 +429,8 @@ public class SRXEditor {
 	    Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
 
-		// File menu
+		//=== File menu
+		
 		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -467,6 +479,63 @@ public class SRXEditor {
 				shell.close();
             }
 		});
+
+		//=== Tools menu
+
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("tools")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.example"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				generateExampleRules();
+            }
+		});
+		
+		//=== Help menu
+
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("help")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				callHelp();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Ratel: SRX Editor)");
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.users"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://groups.yahoo.com/group/okapitools/"); //$NON-NLS-1$
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.srx20"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://www.lisa.org/fileadmin/standards/srx20.html"); //$NON-NLS-1$
+            }
+		});
+
 	}
 	
 	public void dispose () {
@@ -629,7 +698,7 @@ public class SRXEditor {
 	private void editGroupsAndOptions () {
 		try {
 			getSurfaceData();
-			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc);
+			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc, helpPath);
 			dlg.showDialog();
 		}
 		catch ( Exception e ) {
@@ -669,12 +738,13 @@ public class SRXEditor {
 		updateLanguageRuleList();
 	}
 	
-	private void newSRXDocument () {
-		if ( !checkIfRulesNeedSaving() ) return;
+	private boolean newSRXDocument () {
+		if ( !checkIfRulesNeedSaving() ) return false;
 		srxDoc = new SRXDocument();
 		srxPath = null;
 		updateCaption();
 		updateAll();
+		return true;
 	}
 	
 	private void loadSRXDocument (String path) {
@@ -749,7 +819,7 @@ public class SRXEditor {
 			caption = "Edit Rule";
 		}
 		
-		RuleDialog dlg = new RuleDialog(shell, caption, rule);
+		RuleDialog dlg = new RuleDialog(shell, caption, rule, helpPath);
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
@@ -847,4 +917,38 @@ public class SRXEditor {
 		}
 		return true;
 	}
+
+	private void generateExampleRules () {
+		// Create new document (allows for escape)
+		if ( !newSRXDocument() ) return;
+
+		// Use cascading rules
+		srxDoc.setCascade(true);
+		
+		// Default rules
+		ArrayList<Rule> rules = new ArrayList<Rule>();
+		rules.add(new Rule("\\b[Dd][Rr]\\.", "", false));
+		rules.add(new Rule("\\.", "\\s", true));
+		rules.add(new Rule("\\;", "\\s", true));
+		rules.add(new Rule("\\:", "\\s", true));
+		rules.add(new Rule("\\?", "\\s", true));
+		rules.add(new Rule("[:\\uFF1A]", "\\p{Lo}", true));
+		rules.add(new Rule("\\u3002", "", true));
+		srxDoc.addLanguageRule("Default", rules);
+
+		// Exceptions for English
+		rules = new ArrayList<Rule>();
+		rules.add(new Rule("\\b[Mm][Rr]\\.", "", false));
+		srxDoc.addLanguageRule("English", rules);
+
+		// Language maps
+		srxDoc.addLanguageMap(new LanguageMap("[Ee][Nn].*", "English"));
+		srxDoc.addLanguageMap(new LanguageMap(".*", "Default"));
+		updateAll();
+	}
+	
+	public void callHelp () {
+		if ( helpPath != null ) UIUtil.start(helpPath);
+	}
+
 }

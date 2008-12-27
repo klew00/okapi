@@ -48,9 +48,13 @@ public class UIUtil {
 	 * starts a program or a command.
 	 * @param url URL of the resource to open with its associated program. 
 	 */
-	static public void start ( URL url) {
+	static public void start (URL url) {
 		if ( url == null ) return;
-		Program.launch(url.getPath());
+		String param = url.getPath();
+		if ( "file".equals(url.getProtocol()) && param.startsWith("/") ) {
+			param = param.substring(1);
+		}
+		Program.launch(param);
 	}
 	
 	/**

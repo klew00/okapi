@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.Rule;
 
 import org.eclipse.swt.SWT;
@@ -45,11 +46,14 @@ public class RuleDialog {
 	private Button rdBreak;
 	private Button rdNoBreak;
 	private Rule result = null;
+	private String helpPath;
 
 	public RuleDialog (Shell parent,
 		String caption,
-		Rule rule)
+		Rule rule,
+		String helpPath)
 	{
+		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( caption != null ) shell.setText(caption);
 		shell.setImage(parent.getImage());
@@ -101,7 +105,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: UIUtil.start(help);
+					callHelp();
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
@@ -146,4 +150,9 @@ public class RuleDialog {
 			return false;
 		}
 	}
+
+	public void callHelp () {
+		if ( helpPath != null ) UIUtil.start(helpPath);
+	}
+
 }

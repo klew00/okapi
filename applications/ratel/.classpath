@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/win32-x86/swt.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.segmentation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.lib.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

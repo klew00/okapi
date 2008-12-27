@@ -225,7 +225,7 @@ public class Editor implements IParametersEditor {
 		});
 
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Apply the following segmentation rules:");
+			"Apply the following segmentation rules:", null);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Dialog-level buttons

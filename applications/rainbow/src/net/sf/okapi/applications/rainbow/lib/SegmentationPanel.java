@@ -47,12 +47,15 @@ public class SegmentationPanel extends Composite {
 	private Text edTargetSRX;
 	private Button btGetTargetSRX;
 	private Button btEditTargetSRX;
+	private String helpPath;
 
 	public SegmentationPanel(Composite p_Parent,
 		int p_nFlags,
-		String segmentCaption)
+		String segmentCaption,
+		String helpPath)
 	{
 		super(p_Parent, SWT.NONE);
+		this.helpPath = helpPath;
 		createContent(segmentCaption);
 	}
 	
@@ -134,7 +137,7 @@ public class SegmentationPanel extends Composite {
 	
 	private void editSRXFile (Text edTextField) {
 		try {
-			SRXEditor editor = new SRXEditor(getShell(), true);
+			SRXEditor editor = new SRXEditor(getShell(), true, helpPath);
 			String path = edTextField.getText();
 			if ( path.length() == 0 ) path = null;
 			editor.showDialog(path);

@@ -18,19 +18,12 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.lib.segmentation;
+package net.sf.okapi.lib.ui.segmentation;
 
-import java.util.regex.Pattern;
+public class FileProcessor {
 
-class CompiledRule {
-	
-	protected Pattern pattern;
-	protected boolean isBreak;
-	
-	CompiledRule (String pattern,
-		boolean isBreak)
-	{
-		this.pattern = Pattern.compile(pattern);
-		this.isBreak = isBreak;
+	public void process () {
+		
 	}
+
 }

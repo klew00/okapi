@@ -29,7 +29,6 @@
  <command name="input.moveDocumentsUp" alt="1" key="Up">Move &amp;Up&#x9;Alt+Up</command>
  <command name="input.moveDocumentsDown" alt="1" key="Down">Move &amp;Down&#x9;Alt+Down</command>
  
- 
  <!-- Utilities menu -->
  <command name="utilities">&amp;Utilities</command>
  <command name="utilities.openOutputFolder" ctrl="1" key="L">&amp;Open Last Output Folder&#x9;Ctrl+L</command>
