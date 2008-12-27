@@ -20,10 +20,120 @@
 
 package net.sf.okapi.lib.ui.segmentation;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.lib.segmentation.Segmenter;
+
 public class FileProcessor {
 
-	public void process () {
+	private Pattern patternOpening;
+	private Pattern patternClosing;
+	private Pattern patternPlaceholder;
+	private GenericInlines sampleOutput;
+	
+	public FileProcessor () {
+		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>");
+		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
+		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
+		sampleOutput = new GenericInlines();
+	}
+	
+	/**
+	 * Puts a simple text string into a TextContainer object. If the string contains
+	 * XML-like tags they are converted as in-line codes. 
+	 * @param text The string to put into the TextContainer object.
+	 * @param textCont The TextContainer object where to put the string
+	 * (it must be NOT null).
+	 */
+	public void populateTextContainer (String text,
+		TextContainer textCont)
+	{
+		assert(textCont!=null);
+		textCont.clear();
+		textCont.setCodedText(text);
+		int n;
+		int start = 0;
+		int diff = 0;
 		
+		Matcher m = patternOpening.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.OPENING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = textCont.getCodedText();
+		start = diff = 0;
+		m = patternClosing.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.CLOSING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = textCont.getCodedText();
+		start = diff = 0;
+		m = patternPlaceholder.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.PLACEHOLDER, null);
+			start = (n+m.group().length());
+		}
+	}
+	
+	public void process (String inputPath,
+		String outputPath,
+		Segmenter segmenter)
+		throws IOException
+	{
+		BufferedReader reader = null;
+		BufferedWriter writer = null;
+		try {
+			reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(inputPath), "UTF-8"));
+
+			Util.createDirectories(outputPath);
+			writer = new BufferedWriter(new OutputStreamWriter(
+				new BufferedOutputStream(new FileOutputStream(outputPath)), "UTF-8"));
+			
+			String line;
+			TextContainer textCont = new TextContainer();
+			while ( (line = reader.readLine()) != null ) {
+				if ( line.length() > 0 ) {
+					// Convert the line/paragraph
+					populateTextContainer(line, textCont);
+					// Segment
+					segmenter.computeSegments(textCont);
+					textCont.createSegments(segmenter.getSegmentRanges());
+					writer.write(sampleOutput.printSegmentedContent(textCont, true));
+				}
+				writer.write(Util.LINEBREAK_UNIX);
+			}
+		}
+		finally {
+			if ( writer != null ) {
+				writer.close();
+			}
+			if ( reader != null ) {
+				reader.close();
+			}
+		}
 	}
 
 }

@@ -24,7 +24,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -65,19 +64,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 					filterWriter.handleEvent(event);
 				}
 			}
-
-/*Temporary test code to try out filters with hasNext() issue:
- * 			event = filter.next();
-			do {
-				handleEvent(event);
-				if ( needsSelfOutput ) { // Only if needed
-					filterWriter.handleEvent(event);
-				}
-				if ( event.getEventType() == FilterEventType.CANCELED ) break;
-				if ( event.getEventType() == FilterEventType.FINISHED ) break;
-				event = filter.next();
-			} while ( true );
-*/			
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException(e);

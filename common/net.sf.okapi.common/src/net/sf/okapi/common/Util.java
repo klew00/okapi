@@ -379,6 +379,19 @@ public class Util {
         if ( n > -1 ) return path.substring(0, n);
         else return path;
 	}
+	
+	/**
+	 * Gets the extension of a given path or filename.
+	 * @param path The original path or filename.
+	 * @return The last extension of the filename, or an empty string if the filename
+	 * ends with a period, or null if there is no period in the filename.
+	 */
+	static public String getExtension (String path) {
+		// Get the extension
+		int n = path.lastIndexOf('.');
+		if ( n == -1 ) return null; // None
+        return path.substring(n);
+	}
 
 	/**
 	 * Makes a URI string from a path. If the path itself can be recognized as a string

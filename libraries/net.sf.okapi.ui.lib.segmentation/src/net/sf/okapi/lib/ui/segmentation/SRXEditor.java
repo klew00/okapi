@@ -22,12 +22,9 @@ package net.sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
@@ -92,12 +89,12 @@ public class SRXEditor {
 	private Button rdApplySampleForCurrentSet;
 	private Text edSampleLanguage;
 	private GenericInlines sampleOutput;
-	private Pattern patternOpening;
-	private Pattern patternClosing;
-	private Pattern patternPlaceholder;
 	private Font sampleFont;
 	private ResourceManager rm;
 	private String helpPath;
+	private FileProcessor fileProc;
+	private String testInputPath;
+	private String testOutputPath;
 
 	@Override
 	protected void finalize () {
@@ -115,10 +112,7 @@ public class SRXEditor {
 		srxPath = null;
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericInlines();
-		
-		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>");
-		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
-		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
+		fileProc = new FileProcessor();
 		
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
@@ -495,6 +489,14 @@ public class SRXEditor {
             }
 		});
 		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.segfile"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				segmentTextFile();
+            }
+		});
+		
 		//=== Help menu
 
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
@@ -608,7 +610,7 @@ public class SRXEditor {
 			
 			if ( segmenter.getLanguage() != null ) {
 				// Converts the <x>/</x>/etc. into real inline codes
-				processInlineCodes();
+				fileProc.populateTextContainer(edSampleText.getText().replace("\r", ""), sampleText);
 				// Segment
 				segmenter.computeSegments(sampleText);
 				sampleText.createSegments(segmenter.getSegmentRanges());
@@ -625,46 +627,6 @@ public class SRXEditor {
 		}
 	}
 
-	/**
-	 * Converts the sample edit field content to sampleText.
-	 */
-	private void processInlineCodes () {
-		String text = edSampleText.getText().replace("\r", "");
-		sampleText.clear();
-		sampleText.setCodedText(text);
-		int n;
-		int start = 0;
-		int diff = 0;
-		
-		Matcher m = patternOpening.matcher(text);
-		while ( m.find(start) ) {
-			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
-				TagType.OPENING, m.group(1));
-			start = (n+m.group().length());
-		}
-		
-		text = sampleText.getCodedText();
-		start = diff = 0;
-		m = patternClosing.matcher(text);
-		while ( m.find(start) ) {
-			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
-				TagType.CLOSING, m.group(1));
-			start = (n+m.group().length());
-		}
-		
-		text = sampleText.getCodedText();
-		start = diff = 0;
-		m = patternPlaceholder.matcher(text);
-		while ( m.find(start) ) {
-			n = m.start();
-			diff += sampleText.changeToCode(n+diff, (n+diff)+m.group().length(),
-				TagType.PLACEHOLDER, null);
-			start = (n+m.group().length());
-		}
-	}
-	
 	private void updateLanguageRuleList () {
 		cbGroup.removeAll();
 		LinkedHashMap<String, ArrayList<Rule>> langRules = srxDoc.getAllLanguageRules();
@@ -951,4 +913,24 @@ public class SRXEditor {
 		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
+	private void segmentTextFile () {
+		try {
+			// Get the input file
+			FileProcessingDialog dlg = new FileProcessingDialog(shell, helpPath);
+			String[] result = dlg.showDialog(testInputPath, testOutputPath);
+			if ( result == null ) return; // Canceled
+			testInputPath = result[0];
+			testOutputPath = result[1];
+
+			// Process
+			fileProc.process(testInputPath, testOutputPath, segmenter);
+			
+			// Show the result
+			UIUtil.start(testOutputPath);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
 }
