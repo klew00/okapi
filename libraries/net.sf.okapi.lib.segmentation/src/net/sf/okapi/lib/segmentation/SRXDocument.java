@@ -403,7 +403,7 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Adds a language rule to the segmenter. If another language rule
+	 * Adds a language rule to this SRX document. If another language rule
 	 * with the same name exists already it will be replaced by the
 	 * new one, without warning.
 	 * @param name Name of the language rule to add.
@@ -417,7 +417,7 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Adds a language map to the segmenter. The new map is added
+	 * Adds a language map to this SRX document. The new map is added
 	 * at the end of the one already there.
 	 * @param langMap The language map object to add.
 	 */

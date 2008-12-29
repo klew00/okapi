@@ -107,6 +107,14 @@ public class Segmenter {
 		return cascade;
 	}
 	
+	public boolean trimLeadingWhitespaces () {
+		return trimLeadingWS;
+	}
+	
+	public boolean trimTrailingWhitespaces () {
+		return trimTrailingWS;
+	}
+	
 	/**
 	 * Indicates if start codes should be included (See SRX implementation notes).
 	 * @return True if they should be included, false otherwise.
@@ -137,7 +145,7 @@ public class Segmenter {
 	 * @return The number of segment found.
 	 */
 	public int computeSegments (String text) {
-		TextContainer tmp = new TextContainer(null);
+		TextContainer tmp = new TextContainer(text);
 		return computeSegments(tmp);
 	}
 	
@@ -360,6 +368,7 @@ public class Segmenter {
 	 * {@link #computeSegments(TextContainer)}.
 	 * @return The list of all segments ranges. each range is stored in
 	 * a {@link Range} object where start is the start and end the end of the range.
+	 * Return null if no ranges have been defined yet.
 	 */
 	public List<Range> getSegmentRanges () {
 		ArrayList<Range> list = new ArrayList<Range>();
