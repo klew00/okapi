@@ -28,11 +28,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.writer.GenericInlines;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -99,6 +101,7 @@ public class FileProcessor {
 	
 	public void process (String inputPath,
 		String outputPath,
+		boolean htmlOutput,
 		Segmenter segmenter)
 		throws IOException
 	{
@@ -111,6 +114,11 @@ public class FileProcessor {
 			Util.createDirectories(outputPath);
 			writer = new BufferedWriter(new OutputStreamWriter(
 				new BufferedOutputStream(new FileOutputStream(outputPath)), "UTF-8"));
+
+			if ( htmlOutput ) {
+				writer.write("<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>");
+				writer.write("<title>Segmentation Test Output</title></head><body><table width=\"100%\" border=\"1\">");
+			}
 			
 			String line;
 			TextContainer textCont = new TextContainer();
@@ -121,9 +129,23 @@ public class FileProcessor {
 					// Segment
 					segmenter.computeSegments(textCont);
 					textCont.createSegments(segmenter.getSegmentRanges());
-					writer.write(sampleOutput.printSegmentedContent(textCont, true));
+					if ( htmlOutput ) {
+						List<TextFragment> list = textCont.getSegments();
+						for ( TextFragment frag : list ) {
+							writer.write("<tr><td>");
+							writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false));
+							writer.write("</td></tr>");
+						}
+					}
+					else {
+						writer.write(sampleOutput.printSegmentedContent(textCont, true));
+					}
 				}
 				writer.write(Util.LINEBREAK_UNIX);
+			}
+
+			if ( htmlOutput ) {
+				writer.write("</table></body></html>");
 			}
 		}
 		finally {

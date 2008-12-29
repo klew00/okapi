@@ -95,6 +95,7 @@ public class SRXEditor {
 	private FileProcessor fileProc;
 	private String testInputPath;
 	private String testOutputPath;
+	private boolean htmlOutput;
 
 	@Override
 	protected void finalize () {
@@ -615,7 +616,7 @@ public class SRXEditor {
 				segmenter.computeSegments(sampleText);
 				sampleText.createSegments(segmenter.getSegmentRanges());
 				// Create the output in generic format
-				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true));
+				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true, true));
 			}
 			else {
 				edResults.setText("");
@@ -890,12 +891,10 @@ public class SRXEditor {
 		// Default rules
 		ArrayList<Rule> rules = new ArrayList<Rule>();
 		rules.add(new Rule("\\b[Dd][Rr]\\.", "", false));
-		rules.add(new Rule("\\.", "\\s", true));
-		rules.add(new Rule("\\;", "\\s", true));
-		rules.add(new Rule("\\:", "\\s", true));
-		rules.add(new Rule("\\?", "\\s", true));
+		rules.add(new Rule("\\b\\p{Lu}\\.\\p{Lu}\\.", "\\s\\P{Lu}", false));
+		rules.add(new Rule("[\\.:\\?]+", "\\s", true));
 		rules.add(new Rule("[:\\uFF1A]", "\\p{Lo}", true));
-		rules.add(new Rule("\\u3002", "", true));
+		rules.add(new Rule("[\u3002\uFF61\uFF0E\uFF01\uFF1F]+", "", true));
 		srxDoc.addLanguageRule("Default", rules);
 
 		// Exceptions for English
@@ -917,14 +916,15 @@ public class SRXEditor {
 		try {
 			// Get the input file
 			FileProcessingDialog dlg = new FileProcessingDialog(shell, helpPath);
-			String[] result = dlg.showDialog(testInputPath, testOutputPath);
+			String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
 			if ( result == null ) return; // Canceled
 			testInputPath = result[0];
 			testOutputPath = result[1];
+			htmlOutput = (result[2]!=null);
 
 			// Process
-			fileProc.process(testInputPath, testOutputPath, segmenter);
-			
+			fileProc.process(testInputPath, testOutputPath, htmlOutput, segmenter);
+
 			// Show the result
 			UIUtil.start(testOutputPath);
 		}

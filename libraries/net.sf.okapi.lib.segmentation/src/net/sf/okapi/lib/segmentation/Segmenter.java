@@ -75,7 +75,7 @@ public class Segmenter {
 		trimLeadingWS = false; // Extension IN TEST (was true for StringInfo)
 		trimTrailingWS = false; // Extension IN TEST (was true for StringInfo)
 //		grabTrailingWS = true; // Extension IN TEST
-		trimCodes = true; // Extension IN TEST (was false for StringInfo)
+		trimCodes = false; // Extension IN TEST (was false for StringInfo)
 	}
 
 	public void setOptions (boolean segmentSubFlows,

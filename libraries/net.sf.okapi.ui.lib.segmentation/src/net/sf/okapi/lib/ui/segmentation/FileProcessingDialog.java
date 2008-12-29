@@ -41,6 +41,7 @@ public class FileProcessingDialog {
 	private Shell shell;
 	private Text edInput;
 	private Text edOutput;
+	private Button chkHtmlOutput;
 	private String[] result = null;
 	private String helpPath;
 
@@ -104,6 +105,12 @@ public class FileProcessingDialog {
 			}
 		});
 
+		chkHtmlOutput = new Button(cmpTmp, SWT.CHECK);
+		chkHtmlOutput.setText("Create HTML output");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkHtmlOutput.setLayoutData(gdTmp);
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
@@ -132,11 +139,13 @@ public class FileProcessingDialog {
 	}
 	
 	public String[] showDialog (String inputPath,
-		String outputPath)
+		String outputPath,
+		boolean htmlOutput)
 	{
 		shell.open();
 		if ( inputPath != null ) edInput.setText(inputPath);
 		if ( outputPath != null ) edOutput.setText(outputPath);
+		chkHtmlOutput.setSelection(htmlOutput);
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
@@ -157,9 +166,10 @@ public class FileProcessingDialog {
 				edOutput.setFocus();
 				return false;
 			}
-			result = new String[2];
+			result = new String[3];
 			result[0] = edInput.getText();
 			result[1] = edOutput.getText();
+			result[2] = (chkHtmlOutput.getSelection() ? "html" : null);
 			return true;
 		}
 		catch ( Exception e) {

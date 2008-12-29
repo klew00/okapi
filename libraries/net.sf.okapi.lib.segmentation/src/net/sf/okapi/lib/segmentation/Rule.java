@@ -30,7 +30,7 @@ public class Rule {
 	public Rule () {
 		before = "";
 		after = "";
-		isBreak = false;
+		isBreak = true;
 		isActive = true;
 	}
 	
