@@ -72,23 +72,27 @@ public class Segmenter {
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
 		oneSegmentIncludesAll = false; // Extension
-		trimLeadingWS = true; // Extension IN TEST
-		trimTrailingWS = true; // Extension IN TEST
+		trimLeadingWS = false; // Extension IN TEST (was true for StringInfo)
+		trimTrailingWS = false; // Extension IN TEST (was true for StringInfo)
 //		grabTrailingWS = true; // Extension IN TEST
-		trimCodes = false; // Extension IN TEST
+		trimCodes = true; // Extension IN TEST (was false for StringInfo)
 	}
 
 	public void setOptions (boolean segmentSubFlows,
 		boolean includeStartCodes,
 		boolean includeEndCodes,
 		boolean includeIsolatedCodes,
-		boolean oneSegmentIncludesAll)
+		boolean oneSegmentIncludesAll,
+		boolean trimLeadingWS,
+		boolean trimTrailingWS)
 	{
 		this.segmentSubFlows = segmentSubFlows;
 		this.includeStartCodes = includeStartCodes;
 		this.includeEndCodes = includeEndCodes;
 		this.includeIsolatedCodes = includeIsolatedCodes;
 		this.oneSegmentIncludesAll = oneSegmentIncludesAll;
+		this.trimLeadingWS = trimLeadingWS;
+		this.trimTrailingWS = trimTrailingWS;
 	}
 	
 	public boolean oneSegmentIncludesAll () {
@@ -154,8 +158,8 @@ public class Segmenter {
 		}
 		
 		// Set the flag for trimming or not the in-line codes
-		boolean isECWS = (trimCodes ? !includeStartCodes : false); 
-		boolean isSCWS = (trimCodes ? !includeEndCodes : false); 
+		boolean isSCWS = (trimCodes ? !includeStartCodes : false); 
+		boolean isECWS = (trimCodes ? !includeEndCodes : false); 
 		boolean isICWS = (trimCodes ? !includeIsolatedCodes : false); 
 
 		// Build the list of split positions

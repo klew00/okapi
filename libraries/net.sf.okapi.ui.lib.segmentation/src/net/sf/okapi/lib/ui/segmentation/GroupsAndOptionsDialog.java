@@ -65,6 +65,8 @@ public class GroupsAndOptionsDialog {
 	private Button chkIncludeClosingCodes;
 	private Button chkIncludeIsolatedCodes;
 	private Button chkOneSegmentIncludesAll;
+	private Button chkTrimLeadingWS;
+	private Button chkTrimTrailingWS;
 	private ClosePanel pnlActions;
 	private String helpPath;
 
@@ -100,11 +102,17 @@ public class GroupsAndOptionsDialog {
 		chkIncludeClosingCodes = new Button(grpTmp, SWT.CHECK);
 		chkIncludeClosingCodes.setText("Include closing in-line codes");
 
-		chkOneSegmentIncludesAll = new Button(grpTmp, SWT.CHECK);
-		chkOneSegmentIncludesAll.setText("Include all text for single segment (extension)");
+		chkTrimLeadingWS = new Button(grpTmp, SWT.CHECK);
+		chkTrimLeadingWS.setText("Trim leading white-spaces (extension)");
 		
 		chkIncludeIsolatedCodes = new Button(grpTmp, SWT.CHECK);
 		chkIncludeIsolatedCodes.setText("Include isolated in-line codes");
+		
+		chkTrimTrailingWS = new Button(grpTmp, SWT.CHECK);
+		chkTrimTrailingWS.setText("Trim trailing white-spaces (extension)");
+		
+		chkOneSegmentIncludesAll = new Button(grpTmp, SWT.CHECK);
+		chkOneSegmentIncludesAll.setText("Include all text for single segment (extension)");
 		
 		//=== Language Rules
 		
@@ -294,6 +302,8 @@ public class GroupsAndOptionsDialog {
 		chkIncludeClosingCodes.setSelection(srxDoc.includeEndCodes());
 		chkIncludeIsolatedCodes.setSelection(srxDoc.includeIsolatedCodes());
 		chkOneSegmentIncludesAll.setSelection(srxDoc.oneSegmentIncludesAll());
+		chkTrimLeadingWS.setSelection(srxDoc.trimLeadingWhitespaces());
+		chkTrimTrailingWS.setSelection(srxDoc.trimTrailingWhitespaces());
 	}
 	
 	private void getOptions () {
@@ -303,6 +313,8 @@ public class GroupsAndOptionsDialog {
 		srxDoc.setIncludeEndCodes(chkIncludeClosingCodes.getSelection());
 		srxDoc.setIncludeIsolatedCodes(chkIncludeIsolatedCodes.getSelection());
 		srxDoc.setOneSegmentIncludesAll(chkOneSegmentIncludesAll.getSelection());
+		srxDoc.setTrimLeadingWhitespaces(chkTrimLeadingWS.getSelection());
+		srxDoc.setTrimTrailingWhitespaces(chkTrimTrailingWS.getSelection());
 	}
 	
 	private void updateRulesButtons () {

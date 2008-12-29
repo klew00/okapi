@@ -64,6 +64,8 @@ public class SRXDocument {
 	private boolean includeEndCodes;
 	private boolean includeIsolatedCodes;
 	private boolean oneSegmentIncludesAll;
+	private boolean trimLeadingWS;
+	private boolean trimTrailingWS;
 	private String version = "2.0";
 	private String warning;
 	private String sampleText;
@@ -115,7 +117,10 @@ public class SRXDocument {
 		includeStartCodes = false; // SRX default
 		includeEndCodes = true; // SRX default
 		includeIsolatedCodes = false; // SRX default
+		
 		oneSegmentIncludesAll = false; // Extension
+		trimLeadingWS = false; // Extension
+		trimTrailingWS = false; // Extension
 
 		sampleText = "Mr. Holmes is from the <I>U.K.</I> <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
@@ -170,10 +175,51 @@ public class SRXDocument {
 	 * Sets the indicator that tells if when there is a single segment in a 
 	 * text it should include the whole text (no spaces or codes trim left/right)
 	 * text.
+	 * @param value The new value to set.
 	 */
 	public void setOneSegmentIncludesAll (boolean value) {
 		if ( value != oneSegmentIncludesAll ) {
 			oneSegmentIncludesAll = value;
+			modified = true;
+		}
+	}
+
+	/**
+	 * Indicates if leading white-spaces should be left outside the segments.
+	 * @return True if the leading white-spaces should be trimmed.
+	 */
+	public boolean trimLeadingWhitespaces () {
+		return trimLeadingWS;
+	}
+	
+	/**
+	 * Sets the indicator that tells if leading white-spaces should be left outside 
+	 * the segments.
+	 * @param value The new value to set.
+	 */
+	public void setTrimLeadingWhitespaces (boolean value) {
+		if ( value != trimLeadingWS ) {
+			trimLeadingWS = value;
+			modified = true;
+		}
+	}
+	
+	/**
+	 * Indicates if trailing white-spaces should be left outside the segments.
+	 * @return True if the trailing white-spaces should be trimmed.
+	 */
+	public boolean trimTrailingWhitespaces () {
+		return trimTrailingWS;
+	}
+	
+	/**
+	 * Sets the indicator that tells if trailing white-spaces should be left outside 
+	 * the segments.
+	 * @param value The new value to set.
+	 */
+	public void setTrimTrailingWhitespaces (boolean value) {
+		if ( value != trimTrailingWS ) {
+			trimTrailingWS = value;
 			modified = true;
 		}
 	}
@@ -411,7 +457,8 @@ public class SRXDocument {
 		
 		segmenter.setCascade(cascade);
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
-			includeEndCodes, includeIsolatedCodes, 	oneSegmentIncludesAll);
+			includeEndCodes, includeIsolatedCodes, 	oneSegmentIncludesAll,
+			trimLeadingWS, trimTrailingWS);
 		
 		for ( LanguageMap langMap : langMaps ) {
 			if ( Pattern.matches(langMap.pattern, languageCode) ) {
@@ -447,7 +494,8 @@ public class SRXDocument {
 		}
 
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
-			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll);
+			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll,
+			trimLeadingWS, trimTrailingWS);
 		compileRules(segmenter, ruleName);
 		segmenter.setLanguage("__"+ruleName);
 		return segmenter;
@@ -570,6 +618,12 @@ public class SRXDocument {
 			if ( elem2 != null ) {
 				tmp = elem2.getAttribute("oneSegmentIncludesAll");
 				if ( tmp.length() > 0 ) oneSegmentIncludesAll = "yes".equals(tmp);
+				
+				tmp = elem2.getAttribute("trimLeadingWhitespaces");
+				if ( tmp.length() > 0 ) trimLeadingWS = "yes".equals(tmp);
+				
+				tmp = elem2.getAttribute("trimTrailingWhitespaces");
+				if ( tmp.length() > 0 ) trimTrailingWS = "yes".equals(tmp);
 			}
 
 			// Extension: sample
@@ -706,6 +760,10 @@ public class SRXDocument {
 			writer.writeStartElement(NSPREFIX_OKPSRX+":options");
 			writer.writeAttributeString("oneSegmentIncludesAll",
 				(oneSegmentIncludesAll ? "yes" : "no"));
+			writer.writeAttributeString("trimLeadingWhitespaces",
+				(trimLeadingWS ? "yes" : "no"));
+			writer.writeAttributeString("trimTrailingWhitespaces",
+				(trimTrailingWS ? "yes" : "no"));
 			writer.writeEndElementLineBreak(); // okpsrx:options
 
 			writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
