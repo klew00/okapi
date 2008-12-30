@@ -71,7 +71,7 @@ public class SRXDocument {
 	private String sampleText;
 	private String sampleLanguage;
 	private boolean modified;
-	private boolean sampleOnMappedRules; 
+	private boolean testOnSelectedGroup; 
 	private ArrayList<LanguageMap> langMaps;
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
 	private String rangeRule;
@@ -362,23 +362,23 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Indicates of (when sampling the rules) the sample should be
-	 * computed from all the active rules.
-	 * @return True to compute from all matching rules, false to use 
-	 * a single given language rule set.
+	 * Indicates that, when sampling the rules, the sample should be
+	 * computed using only a selected group of rules.
+	 * @return True to test using only a selected group of rules.
+	 * False to test using all the rules matching a given language.
 	 */
-	public boolean sampleOnMappedRules () {
-		return sampleOnMappedRules;
+	public boolean testOnSelectedGroup () {
+		return testOnSelectedGroup;
 	}
 	
 	/**
 	 * Sets the indicator on how to apply rules for samples.
-	 * @param value True to compute from all the matching rules,
-	 * false to use a single language rule set.
+	 * @param value True to test using only a selected group of rules.
+	 * False to test using all the rules matching a given language.
 	 */
-	public void setSampleOnMappedRules (boolean value) {
-		if ( value != sampleOnMappedRules ) {
-			sampleOnMappedRules = value;
+	public void setTestOnSelectedGroup (boolean value) {
+		if ( value != testOnSelectedGroup ) {
+			testOnSelectedGroup = value;
 			modified = true;
 		}
 	}
@@ -633,7 +633,7 @@ public class SRXDocument {
 				tmp = elem2.getAttribute("language");
 				if ( tmp.length() > 0 ) setSampleLanguage(tmp);
 				tmp = elem2.getAttribute("useMappedRules");
-				if ( tmp.length() > 0 ) setSampleOnMappedRules("yes".equals(tmp));
+				if ( tmp.length() > 0 ) setTestOnSelectedGroup("no".equals(tmp));
 			}
 			
 			// Extension: rangeRule
@@ -768,7 +768,7 @@ public class SRXDocument {
 
 			writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
 			writer.writeAttributeString("language", getSampleLanguage());
-			writer.writeAttributeString("useMappedRules", (sampleOnMappedRules() ? "yes" : "no"));
+			writer.writeAttributeString("useMappedRules", (testOnSelectedGroup() ? "no" : "yes"));
 			writer.writeString(getSampleText());
 			writer.writeEndElementLineBreak(); // okpsrx:sample
 			

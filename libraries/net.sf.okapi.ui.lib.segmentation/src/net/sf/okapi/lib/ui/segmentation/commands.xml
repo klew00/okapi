@@ -11,7 +11,6 @@
 
  <!-- Tools menu -->
  <command name="tools">&amp;Tools</command>
- <command name="tools.example">&amp;Generate Example Rules</command>
  <command name="tools.segfile">&amp;Segment Test File...</command>
  
  <!-- Help menu -->

@@ -20,6 +20,9 @@
 
 package net.sf.okapi.lib.ui.segmentation;
 
+import java.io.File;
+
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -79,6 +82,7 @@ public class FileProcessingDialog {
 				edInput.setText(paths[0]);
 				edInput.selectAll();
 				edInput.setFocus();
+				updateOutputPath();
 			}
 		});
 
@@ -110,6 +114,11 @@ public class FileProcessingDialog {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkHtmlOutput.setLayoutData(gdTmp);
+		chkHtmlOutput.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateOutputPath();
+			}
+		});
 		
 		//--- Dialog-level buttons
 
@@ -146,6 +155,8 @@ public class FileProcessingDialog {
 		if ( inputPath != null ) edInput.setText(inputPath);
 		if ( outputPath != null ) edOutput.setText(outputPath);
 		chkHtmlOutput.setSelection(htmlOutput);
+		updateOutputPath();
+		
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
@@ -182,4 +193,25 @@ public class FileProcessingDialog {
 		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
+	private String makeHtmlOutputPath (String inputPath) {
+		if ( inputPath.length() == 0 ) return "";
+		return inputPath + ".html";
+	}
+	
+	private String makeNonHtmlOutputPath (String inputPath) {
+		if ( inputPath.length() == 0 ) return "";
+		String ext = Util.getExtension(inputPath);
+		String filename = Util.getFilename(inputPath, false);
+		return Util.getDirectoryName(inputPath) + File.separator +
+			filename + ".segmented" + ext;
+	}
+	
+	private void updateOutputPath () {
+		if ( chkHtmlOutput.getSelection() ) {
+			edOutput.setText(makeHtmlOutputPath(edInput.getText()));
+		}
+		else {
+			edOutput.setText(makeNonHtmlOutputPath(edInput.getText()));
+		}
+	}
 }

@@ -21,7 +21,6 @@
 package net.sf.okapi.lib.segmentation.tests;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;

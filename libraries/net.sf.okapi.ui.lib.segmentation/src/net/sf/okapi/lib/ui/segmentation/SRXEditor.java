@@ -32,7 +32,6 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.writer.GenericInlines;
-import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -85,8 +84,8 @@ public class SRXEditor {
 	private Button btRemoveRule;
 	private Button btMoveUpRule;
 	private Button btMoveDownRule;
-	private Button rdApplySampleForMappedRules;
-	private Button rdApplySampleForCurrentSet;
+	private Button rdTestOnLanguage;
+	private Button rdTestOnSelectedGroup;
 	private Text edSampleLanguage;
 	private GenericInlines sampleOutput;
 	private Font sampleFont;
@@ -331,20 +330,20 @@ public class SRXEditor {
 		sampleFont = new Font(font.getDevice(), fontData[0]);
 		edSampleText.setFont(sampleFont);
 		
-		rdApplySampleForCurrentSet = new Button(cmpSample, SWT.RADIO);
-		rdApplySampleForCurrentSet.setText("Test on the current set of rules only");
-		rdApplySampleForCurrentSet.addSelectionListener(new SelectionAdapter() {
+		rdTestOnSelectedGroup = new Button(cmpSample, SWT.RADIO);
+		rdTestOnSelectedGroup.setText("Test on the current set of rules only");
+		rdTestOnSelectedGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+				edSampleLanguage.setEnabled(rdTestOnLanguage.getSelection());
 				updateRules(tblRules.getSelectionIndex(), true);
 			};
 		});
 
-		rdApplySampleForMappedRules = new Button(cmpSample, SWT.RADIO);
-		rdApplySampleForMappedRules.setText("Test on the rules for this language code:");
-		rdApplySampleForMappedRules.addSelectionListener(new SelectionAdapter() {
+		rdTestOnLanguage = new Button(cmpSample, SWT.RADIO);
+		rdTestOnLanguage.setText("Test on the rules for this language code:");
+		rdTestOnLanguage.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+				edSampleLanguage.setEnabled(rdTestOnLanguage.getSelection());
 				updateRules(tblRules.getSelectionIndex(), true);
 			};
 		});
@@ -483,14 +482,6 @@ public class SRXEditor {
 		topItem.setMenu(dropMenu);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "tools.example"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				generateExampleRules();
-            }
-		});
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "tools.segfile"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -595,7 +586,7 @@ public class SRXEditor {
 				// Both methods applies new rules only if the 
 				// parameter passed is different from the current identifier
 				// or if forceReset is true.
-				if ( rdApplySampleForCurrentSet.getSelection() ) {
+				if ( rdTestOnSelectedGroup.getSelection() ) {
 					segmenter = srxDoc.applySingleLanguageRule(cbGroup.getText(),
 						(forceReset ? null : segmenter));
 				}
@@ -675,15 +666,15 @@ public class SRXEditor {
 	private void setSurfaceData () {
 		edSampleText.setText(srxDoc.getSampleText());
 		edSampleLanguage.setText(srxDoc.getSampleLanguage());
-		rdApplySampleForMappedRules.setSelection(srxDoc.sampleOnMappedRules());
-		rdApplySampleForCurrentSet.setSelection(!srxDoc.sampleOnMappedRules());
-		edSampleLanguage.setEnabled(rdApplySampleForMappedRules.getSelection());
+		rdTestOnSelectedGroup.setSelection(srxDoc.testOnSelectedGroup());
+		rdTestOnLanguage.setSelection(!srxDoc.testOnSelectedGroup());
+		edSampleLanguage.setEnabled(rdTestOnLanguage.getSelection());
 	}
 
 	private void getSurfaceData () {
 		srxDoc.setSampleText(edSampleText.getText());
 		srxDoc.setSampleLanguage(edSampleLanguage.getText());
-		srxDoc.setSampleOnMappedRules(rdApplySampleForMappedRules.getSelection());
+		srxDoc.setTestOnSelectedGroup(rdTestOnSelectedGroup.getSelection());
 	}
 	
 	private void updateCaption () {
@@ -881,33 +872,6 @@ public class SRXEditor {
 		return true;
 	}
 
-	private void generateExampleRules () {
-		// Create new document (allows for escape)
-		if ( !newSRXDocument() ) return;
-
-		// Use cascading rules
-		srxDoc.setCascade(true);
-		
-		// Default rules
-		ArrayList<Rule> rules = new ArrayList<Rule>();
-		rules.add(new Rule("\\b[Dd][Rr]\\.", "", false));
-		rules.add(new Rule("\\b\\p{Lu}\\.\\p{Lu}\\.", "\\s\\P{Lu}", false));
-		rules.add(new Rule("[\\.:\\?]+", "\\s", true));
-		rules.add(new Rule("[:\\uFF1A]", "\\p{Lo}", true));
-		rules.add(new Rule("[\u3002\uFF61\uFF0E\uFF01\uFF1F]+", "", true));
-		srxDoc.addLanguageRule("Default", rules);
-
-		// Exceptions for English
-		rules = new ArrayList<Rule>();
-		rules.add(new Rule("\\b[Mm][Rr]\\.", "", false));
-		srxDoc.addLanguageRule("English", rules);
-
-		// Language maps
-		srxDoc.addLanguageMap(new LanguageMap("[Ee][Nn].*", "English"));
-		srxDoc.addLanguageMap(new LanguageMap(".*", "Default"));
-		updateAll();
-	}
-	
 	public void callHelp () {
 		if ( helpPath != null ) UIUtil.start(helpPath);
 	}

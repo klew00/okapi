@@ -117,35 +117,37 @@ public class FileProcessor {
 
 			if ( htmlOutput ) {
 				writer.write("<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>");
-				writer.write("<title>Segmentation Test Output</title></head><body><table width=\"100%\" border=\"1\">");
+				writer.write("<title>Segmentation Test Output</title><style>p {white-space: pre; font-family: monospace; border: 1px solid; padding: 4; margin-top: 0; margin-bottom: -1;}</style></head><body>");
 			}
 			
-			String line;
+			// Read the whole file into one string
+			//TODO: Optimize this with a better 'readToEnd()'
+			StringBuilder tmp = new StringBuilder();
+			String buffer;
+			while ( (buffer = reader.readLine()) != null ) {
+				if ( tmp.length() > 0 ) tmp.append("\n");
+				tmp.append(buffer);
+			}
+			
 			TextContainer textCont = new TextContainer();
-			while ( (line = reader.readLine()) != null ) {
-				if ( line.length() > 0 ) {
-					// Convert the line/paragraph
-					populateTextContainer(line, textCont);
-					// Segment
-					segmenter.computeSegments(textCont);
-					textCont.createSegments(segmenter.getSegmentRanges());
-					if ( htmlOutput ) {
-						List<TextFragment> list = textCont.getSegments();
-						for ( TextFragment frag : list ) {
-							writer.write("<tr><td>");
-							writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false));
-							writer.write("</td></tr>");
-						}
-					}
-					else {
-						writer.write(sampleOutput.printSegmentedContent(textCont, true));
-					}
+			populateTextContainer(tmp.toString(), textCont);
+			// Segment
+			segmenter.computeSegments(textCont);
+			textCont.createSegments(segmenter.getSegmentRanges());
+			if ( htmlOutput ) {
+				List<TextFragment> list = textCont.getSegments();
+				for ( TextFragment frag : list ) {
+					writer.write("<p>");
+					writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false));
+					writer.write("</p>");
 				}
-				writer.write(Util.LINEBREAK_UNIX);
+			}
+			else {
+				writer.write(sampleOutput.printSegmentedContent(textCont, true, true));
 			}
 
 			if ( htmlOutput ) {
-				writer.write("</table></body></html>");
+				writer.write("</body></html>");
 			}
 		}
 		finally {
