@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Segmenter {
 	
@@ -202,7 +201,6 @@ public class Segmenter {
 				splits.put(m.end(), true);
 			}
 		}
-
 		
 		// Adjust the split positions for in-line codes inclusion/exclusion options
 		// And create the list of final splits at the same time
@@ -212,20 +210,36 @@ public class Segmenter {
 			boolean done;
 			for ( int pos : splits.keySet() ) {
 				if ( !splits.get(pos) ) continue; // Skip non-break positions
-				done = false;
+				// Walk back through all sequential codes before the break
 				finalPos = pos;
+				done = false;
 				while (( finalPos > 1 ) && !done ) {
 					switch ( codedText.charAt(finalPos-2) ) {
 					case (char)TextFragment.MARKER_OPENING:
-						if ( !includeStartCodes ) finalPos-=2;
+					case (char)TextFragment.MARKER_CLOSING:
+					case (char)TextFragment.MARKER_ISOLATED:
+						finalPos-=2;
+						break;
+					default:
+						done = true;
+						break;
+					}
+				}
+				// Now finalPos points to the first code in the sequence before the break.
+				// Check, from that point to the break, if the break needs to change position
+				done = false;
+				while (( finalPos < pos ) && !done ) {
+					switch ( codedText.charAt(finalPos) ) {
+					case (char)TextFragment.MARKER_OPENING:
+						if ( includeStartCodes ) finalPos+=2;
 						else done = true;
 						break;
 					case (char)TextFragment.MARKER_CLOSING:
-						if ( !includeEndCodes ) finalPos-=2;
+						if ( includeEndCodes ) finalPos+=2;
 						else done = true;
 						break;
 					case (char)TextFragment.MARKER_ISOLATED:
-						if ( !includeIsolatedCodes ) finalPos-=2;
+						if ( includeIsolatedCodes ) finalPos+=2;
 						else done = true;
 						break;
 					default:
@@ -233,6 +247,7 @@ public class Segmenter {
 						break;
 					}
 				}
+				// Store the updated position
 				finalSplits.add(finalPos);
 			}
 		}

@@ -118,7 +118,6 @@ public class SRXEditor {
 		this.asDialog = asDialog;
 		this.helpPath = helpPath;
 		srxDoc = new SRXDocument();
-		segmenter = new Segmenter();
 		srxPath = null;
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericInlines();
@@ -609,8 +608,11 @@ public class SRXEditor {
 						(forceReset ? null : segmenter));
 				}
 			}
+			else { // No selection
+				segmenter = null;
+			}
 			
-			if ( segmenter.getLanguage() != null ) {
+			if (( segmenter != null ) && ( segmenter.getLanguage() != null )) {
 				// Converts the <x>/</x>/etc. into real inline codes
 				fileProc.populateTextContainer(edSampleText.getText().replace("\r", ""), sampleText);
 				// Segment

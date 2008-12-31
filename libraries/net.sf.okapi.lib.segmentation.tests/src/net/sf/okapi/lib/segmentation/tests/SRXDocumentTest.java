@@ -25,7 +25,6 @@ import java.util.List;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
