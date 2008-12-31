@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.htmlparser.jericho.Attribute;
-import net.sf.okapi.common.groovy.IllegalConditionalAttributeMatchTypeException;
+import net.sf.okapi.common.yaml.IllegalConditionalAttributeException;
+
 
 /**
  * A conditional attribute is used to test extraction of elements or attributes.
@@ -93,11 +94,11 @@ public class ConditionalAttributeRule {
 				Matcher m = matchPattern.matcher(currentAttributeValue);
 				result = m.matches();
 			} catch (PatternSyntaxException e) {
-				throw new IllegalConditionalAttributeMatchTypeException(e);
+				throw new IllegalConditionalAttributeException(e);
 			}
 			return result;
 		default:
-			throw new IllegalConditionalAttributeMatchTypeException(
+			throw new IllegalConditionalAttributeException(
 					"Unkown match type: " + matchType.toString());
 		}
 	}

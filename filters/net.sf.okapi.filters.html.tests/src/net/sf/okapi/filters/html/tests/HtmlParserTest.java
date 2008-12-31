@@ -48,7 +48,7 @@ public class HtmlParserTest {
 	public void excludeInclude() {
 		htmlParser = new HtmlFilter();		
 		FilterEvent event;
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/SimpleTest.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
 		htmlParser.open(htmlStream);
 		while ((event = htmlParser.next()).getEventType() != FilterEventType.FINISHED) {			
 			if (event.getEventType() == FilterEventType.TEXT_UNIT) {

@@ -40,11 +40,10 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.groovy.GroovyConfigurationReader;
-import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
 
 public class HtmlFilter extends BaseFilter {
 	private Source htmlDocument;
@@ -143,8 +142,8 @@ public class HtmlFilter extends BaseFilter {
 
 		if (parameters == null) {
 			parameters = new Parameters();
-			URL url = GroovyConfigurationReader.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.groovy");			 //$NON-NLS-1$
-			parameters.setGroovyConfig(new GroovyFilterConfiguration(url));
+			URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");			 //$NON-NLS-1$
+			parameters.setTaggedConfig(new TaggedFilterConfiguration(url));
 		}
 
 		// Segment iterator
@@ -261,7 +260,7 @@ public class HtmlFilter extends BaseFilter {
 		if (ruleState.isExludedState()) {
 			addToSkeleton(startTag.toString());
 			// process these tag types to update parser state
-			switch (parameters.getGroovyConfig().getMainRuleType(startTag.getName())) {
+			switch (parameters.getTaggedConfig().getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.pushExcludedRule(startTag.getName());
 				break;
@@ -275,7 +274,7 @@ public class HtmlFilter extends BaseFilter {
 			return;
 		}
 
-		switch (parameters.getGroovyConfig().getMainRuleType(startTag.getName())) {
+		switch (parameters.getTaggedConfig().getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
@@ -284,7 +283,7 @@ public class HtmlFilter extends BaseFilter {
 			break;
 
 		case ATTRIBUTES_ONLY:
-			if (parameters.getGroovyConfig().hasActionableAttributes(startTag.getName())) {
+			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
 			}
 			break;
 		case GROUP_ELEMENT:
@@ -315,7 +314,7 @@ public class HtmlFilter extends BaseFilter {
 		if (ruleState.isExludedState()) {
 			addToSkeleton(endTag.toString());
 			// process these tag types to update parser state
-			switch (parameters.getGroovyConfig().getMainRuleType(endTag.getName())) {
+			switch (parameters.getTaggedConfig().getMainRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
 				ruleState.popExcludedIncludedRule();
 				break;
@@ -330,7 +329,7 @@ public class HtmlFilter extends BaseFilter {
 			return;
 		}
 
-		switch (parameters.getGroovyConfig().getMainRuleType(endTag.getName())) {
+		switch (parameters.getTaggedConfig().getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
@@ -361,14 +360,14 @@ public class HtmlFilter extends BaseFilter {
 		}
 	}
 
-	private void addAttribute(StartTag startTag) {
+	private void addAttributes(StartTag startTag) {
 		// convert Jericho attributes to HashMap
 		Map<String, String> attrs = new HashMap<String, String>();
 		attrs = startTag.getAttributes().populateMap(attrs, true);
 		for (Attribute attribute : startTag.getAttributes()) {
-			if (parameters.getGroovyConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 
-			} else if (parameters.getGroovyConfig().isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			} else if (parameters.getTaggedConfig().isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 
 			}
 		}

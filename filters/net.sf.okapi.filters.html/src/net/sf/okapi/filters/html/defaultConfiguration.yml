@@ -61,12 +61,12 @@ include:
 # attributes that occur on many elements
 title:
   ruleTypes: [ATTRIBUTE]
-# onlyTheseElements: []
+  onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script, title]
 
 # inline tags
 a:
-  ruleTypes: INLINE
+  ruleTypes: [INLINE]
   translatableAttributes: [title, accesskey]
 
 abbr:
@@ -173,12 +173,10 @@ li:
 map:
   ruleTypes: [INLINE]
 
-#meta:
-#  ruleTypes: [ATTRIBUTES_ONLY]
-#    translatableAttributes:
-#      content: [[http-equiv, EQUALS, keywords], name]
-#    localizableAttributes: 
-#      content: [http-equiv, EQUALS, [content-language, content-type]]
+meta:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [content, [[http-equiv, EQUALS, keywords], name: null]]
+  localizableAttributes: [content, [http-equiv, EQUALS, [content-language, content-type]]]
 
 nobr:
   ruleTypes: [INLINE]

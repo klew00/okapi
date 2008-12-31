@@ -132,7 +132,12 @@ public class ThreadedPipeline implements IPipeline {
 			return PipelineReturnValue.CANCELLED;
 		}
 
-		if (state == PipelineReturnValue.PAUSED) {
+		if (state == PipelineReturnValue.PAUSED) {			
+			try {				
+				// TODO: will this interfere with SWT GUI thread?
+				Thread.sleep(100);
+			} catch (InterruptedException e) {				
+			}
 			return PipelineReturnValue.PAUSED;
 		}
 

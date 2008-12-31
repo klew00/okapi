@@ -1,10 +1,11 @@
 package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.groovy.GroovyFilterConfiguration;
+import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
+import net.sf.okapi.common.yaml.YamlConfigurationReader;
 
 public class Parameters extends BaseParameters {
-	private GroovyFilterConfiguration groovyConfig;
+	private TaggedFilterConfiguration taggedConfig;
 	
 	public Parameters () {		
 		reset();
@@ -14,12 +15,12 @@ public class Parameters extends BaseParameters {
 	 * @see net.sf.okapi.common.IParameters#fromString(java.lang.String)
 	 */
 	public void fromString(String data) {
-		groovyConfig = new GroovyFilterConfiguration(data);
+		taggedConfig = new TaggedFilterConfiguration(data);
 	}
 	
 	@Override
 	public String toString() {
-		return groovyConfig.toString();
+		return taggedConfig.toString();
 		
 	}
 
@@ -27,17 +28,17 @@ public class Parameters extends BaseParameters {
 	 * @see net.sf.okapi.common.IParameters#reset()
 	 */
 	public void reset() {
-		groovyConfig = null;
+		taggedConfig = null;
 	}
 	
-	public GroovyFilterConfiguration getGroovyConfig() {
-		return groovyConfig;
+	public TaggedFilterConfiguration getTaggedConfig() {
+		return taggedConfig;
 	}
 
 	/**
 	 * @param groovyFilterConfiguration
 	 */
-	public void setGroovyConfig(GroovyFilterConfiguration groovyConfig) {		
-		this.groovyConfig = groovyConfig;
+	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {		
+		this.taggedConfig = taggedConfig;
 	}
 }

@@ -21,10 +21,15 @@
 package net.sf.okapi.common.threadedpipeline.tests;
 
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.tests.Consumer;
+import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
+import net.sf.okapi.common.pipeline.tests.Producer;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
 import net.sf.okapi.common.writer.GenericFilterWriter;
@@ -41,32 +46,51 @@ public class HtmlFilterRoundtripTest {
 	public void setUp() {
 
 	}
-	
+
 	@Test
 	public void runPipeline() {
-		IPipeline pipeline = new ThreadedPipeline();
+		final IPipeline pipeline = new ThreadedPipeline();
 		
-		HtmlFilter htmlFilter = new HtmlFilter();
+		final HtmlFilter htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
 		htmlFilter.open(htmlStream);
 		
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
+		final GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
 		genericFilterWriter.setOptions("es", "windows-1252");
-		genericFilterWriter.setOutput("genericOutput.txt");
-
+		genericFilterWriter.setOutput("genericOutput.txt");				
 		
-		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
+		Runnable runnable = new Runnable() {
+			public void run() {
+				pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
+				pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
+				pipeline.execute();
+			}
+		};
 
-		System.out.println("START PIPELINE");
-		pipeline.execute();		
+		ExecutorService e = Executors.newSingleThreadExecutor();
+		e.execute(runnable);
+
+		boolean stop = false;
+		while (!stop) {
+			switch (pipeline.getState()) {
+			case CANCELLED:
+			case SUCCEDED:
+			case FAILED:
+			case INTERRUPTED:			
+				stop = true;
+				e.shutdownNow();
+				break;
+			default:
+				// still running
+				break;
+			}
+		}
 	}
 
 	@After
 	public void cleanUp() {
-		System.out.println("CLEANUP PIPELINE");
 	}
 
 }

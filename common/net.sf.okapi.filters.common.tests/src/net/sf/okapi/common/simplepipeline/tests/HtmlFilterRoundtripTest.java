@@ -59,14 +59,12 @@ public class HtmlFilterRoundtripTest {
 		
 		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-
-		System.out.println("START PIPELINE");
+		
 		pipeline.execute();		
 	}
 
 	@After
 	public void cleanUp() {
-		System.out.println("CLEANUP PIPELINE");
 	}
 
 }
