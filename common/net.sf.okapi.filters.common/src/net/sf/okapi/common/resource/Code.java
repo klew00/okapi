@@ -98,12 +98,7 @@ public class Code {
 	 * @param type The type of code (e.g. the name of the tag).
 	 */
 	public Code (TagType tagType, String type) {
-		id = -1;
-		this.tagType = tagType;
-		if ( type == null ) type = "null";
-		this.type = type;
-		this.data = "";
-		this.flag = CLONEABLE | DELETEABLE;
+		this(tagType, type, "");
 	}
 	
 	/**
