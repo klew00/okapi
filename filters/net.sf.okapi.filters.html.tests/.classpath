@@ -6,6 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.html"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common.groovy"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common.yaml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
