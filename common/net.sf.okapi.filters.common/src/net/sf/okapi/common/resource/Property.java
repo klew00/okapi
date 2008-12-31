@@ -36,6 +36,12 @@ public class Property {
 		this.isReadOnly = isReadOnly;
 	}
 	
+	public Property (String name, String value) {
+		this.name = name;
+		this.value = value;
+		this.isReadOnly = true;
+	}
+	
 	@Override
 	public String toString () {
 		return value;
