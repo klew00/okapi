@@ -102,6 +102,14 @@ public class Code {
 	}
 	
 	/**
+	 * Creates a new code with null type empty data.	 
+	 * @param type The type of code (e.g. the name of the tag).
+	 */
+	public Code (String type) {
+		this(null, type, "");
+	}
+	
+	/**
 	 * Append to the current code data
 	 * @param data
 	 */
