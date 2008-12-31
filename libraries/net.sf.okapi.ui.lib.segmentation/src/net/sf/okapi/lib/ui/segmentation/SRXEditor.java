@@ -290,15 +290,15 @@ public class SRXEditor {
 			}
 		});
 
-		Button btRangeRule = new Button(cmpGroup, SWT.PUSH);
-		btRangeRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btRangeRule.setText("Range Rule...");
+		Button btMaskRule = new Button(cmpGroup, SWT.PUSH);
+		btMaskRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btMaskRule.setText("Mask Rule...");
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
-		btRangeRule.setLayoutData(gdTmp);
-		btRangeRule.addSelectionListener(new SelectionAdapter() {
+		btMaskRule.setLayoutData(gdTmp);
+		btMaskRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				editRangeRule();
+				editMaskRule();
 			}
 		});
 
@@ -843,16 +843,16 @@ public class SRXEditor {
 	/**
 	 * Edits the range rule of the document.
 	 */
-	private void editRangeRule () {
+	private void editMaskRule () {
 		try {
-			InputDialog dlg = new InputDialog(shell, "Range Rule Expression",
-				Res.getString("edit.rangeRuleDesc"), "", null, 0);
-			dlg.setInputValue(srxDoc.getRangeRule());
+			InputDialog dlg = new InputDialog(shell, "Mask Rule Expression",
+				Res.getString("edit.maskRuleDesc"), "", null, 0);
+			dlg.setInputValue(srxDoc.getMaskRule());
 			dlg.setAllowEmptyValue(true);
 			String result = dlg.showDialog();
 			if ( result == null ) return; // Canceled
 			// Else: Set the new expression
-			srxDoc.setRangeRule(result);
+			srxDoc.setMaskRule(result);
 			updateResults(true);
 		}
 		catch ( Throwable e ) {

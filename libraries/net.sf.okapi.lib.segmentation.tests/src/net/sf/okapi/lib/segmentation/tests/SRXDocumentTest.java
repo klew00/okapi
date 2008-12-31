@@ -21,7 +21,12 @@
 package net.sf.okapi.lib.segmentation.tests;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import net.sf.okapi.common.Range;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -114,6 +119,28 @@ public class SRXDocumentTest extends TestCase {
 		assertEquals(seg.getSegmentRanges().size(), 2);
 		seg.computeSegments("MR. Holmes. The detective.");
 		assertEquals(seg.getSegmentRanges().size(), 3);
+		
+		TextContainer tc = new TextContainer();
+		tc.append("One.");
+		tc.append(TagType.OPENING, "b", "<b>");
+		tc.append(" Two.");
+		tc.append(TagType.CLOSING, "b", "</b>");
+		seg.setOptions(true, true, true, false, false, false, false);
+		seg.computeSegments(tc);
+		// "One.XX Two.YY" --> "[One.XX][ Two.YY]"
+		List<Range> ranges = seg.getSegmentRanges();
+		assertNotNull(ranges);
+		assertEquals(ranges.size(), 2);
+		assertEquals(ranges.get(0).end, 6);
+		assertEquals(ranges.get(1).start, 6);
+		seg.setOptions(true, false, true, false, false, false, false);
+		seg.computeSegments(tc);
+		// "One.XX Two.YY" --> "[One.][XX Two.YY]"
+		ranges = seg.getSegmentRanges();
+		assertNotNull(ranges);
+		assertEquals(ranges.size(), 2);
+		assertEquals(ranges.get(0).end, 4);
+		assertEquals(ranges.get(1).start, 4);
 	}
 
 }

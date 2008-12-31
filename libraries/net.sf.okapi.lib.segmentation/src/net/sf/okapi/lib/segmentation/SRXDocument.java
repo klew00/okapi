@@ -74,7 +74,7 @@ public class SRXDocument {
 	private boolean testOnSelectedGroup; 
 	private ArrayList<LanguageMap> langMaps;
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
-	private String rangeRule;
+	private String maskRule;
 
 	/**
 	 * Gets the text content of the first child of an element node.
@@ -109,7 +109,7 @@ public class SRXDocument {
 	public void resetAll () {
 		langMaps = new ArrayList<LanguageMap>();
 		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
-		rangeRule = null;
+		maskRule = null;
 		modified = false;
 
 		segmentSubFlows = true; // SRX default
@@ -285,27 +285,27 @@ public class SRXDocument {
 	}
 
 	/**
-	 * Gets the current pattern of the range rule.
-	 * @return The current pattern of the range rule.
+	 * Gets the current pattern of the mask rule.
+	 * @return The current pattern of the mask rule.
 	 */
-	public String getRangeRule () {
-		return rangeRule;
+	public String getMaskRule () {
+		return maskRule;
 	}
 	
 	/**
-	 * Sets the pattern for the range rule.
-	 * @param pattern The pattern to use for the range rule.
+	 * Sets the pattern for the mask rule.
+	 * @param pattern The pattern to use for the mask rule.
 	 */
-	public void setRangeRule (String pattern) {
+	public void setMaskRule (String pattern) {
 		if ( pattern != null ) {
-			if ( !pattern.equals(rangeRule) ) {
+			if ( !pattern.equals(maskRule) ) {
 				modified = true;
 			}
 		}
-		else if ( rangeRule != null ) {
+		else if ( maskRule != null ) {
 			modified = true;
 		}
-		rangeRule = pattern;
+		maskRule = pattern;
 	}
 	
 	/**
@@ -531,7 +531,7 @@ public class SRXDocument {
 		}
 		
 		// Range rules
-		segmenter.setRangeRule(rangeRule);
+		segmenter.setMaskRule(maskRule);
 	}
 	
 	/**
@@ -639,7 +639,7 @@ public class SRXDocument {
 			// Extension: rangeRule
 			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "rangeRule", elem1);
 			if ( elem2 != null ) {
-				setRangeRule(getTextContent(elem2));
+				setMaskRule(getTextContent(elem2));
 			}
 			
 			// Get the body element
@@ -773,7 +773,7 @@ public class SRXDocument {
 			writer.writeEndElementLineBreak(); // okpsrx:sample
 			
 			writer.writeStartElement(NSPREFIX_OKPSRX+":rangeRule");
-			writer.writeString(getRangeRule());
+			writer.writeString(getMaskRule());
 			writer.writeEndElementLineBreak(); // okpsrx:rangeRule
 
 			writer.writeEndElementLineBreak(); // header

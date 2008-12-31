@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Segmenter {
 	
@@ -42,11 +43,11 @@ public class Segmenter {
 	private boolean oneSegmentIncludesAll;
 	private boolean trimLeadingWS;
 	private boolean trimTrailingWS;
-//	private boolean grabTrailingWS; //TODO: implement this
 	private boolean trimCodes;
 	private ArrayList<CompiledRule> rules;
-	private Pattern rangeRule;
+	private Pattern maskRule;
 	private TreeMap<Integer, Boolean> splits;
+	private List<Integer> finalSplits;
 	private ArrayList<Integer> starts;
 	private ArrayList<Integer> ends;
 
@@ -64,7 +65,7 @@ public class Segmenter {
 	public void reset () {
 		currentLanguageCode = null;
 		rules = new ArrayList<CompiledRule>();
-		rangeRule = null;
+		maskRule = null;
 		splits = null;
 		segmentSubFlows = true; // SRX default
 		cascade = false; // There is no SRX default for this
@@ -74,8 +75,7 @@ public class Segmenter {
 		oneSegmentIncludesAll = false; // Extension
 		trimLeadingWS = false; // Extension IN TEST (was true for StringInfo)
 		trimTrailingWS = false; // Extension IN TEST (was true for StringInfo)
-//		grabTrailingWS = true; // Extension IN TEST
-		trimCodes = false; // Extension IN TEST (was false for StringInfo)
+		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT USED for now
 	}
 
 	public void setOptions (boolean segmentSubFlows,
@@ -186,9 +186,9 @@ public class Segmenter {
 			}
 		}
 		
-		// Set the additional split positions for rage-rules
-		if ( rangeRule != null ) {
-			m = rangeRule.matcher(codedText);
+		// Set the additional split positions for mask-rules
+		if ( maskRule != null ) {
+			m = maskRule.matcher(codedText);
 			while ( m.find() ) {
 				// Remove any existing marker inside the range
 				for ( int n=m.start(); n<m.end(); n++ ) {
@@ -202,6 +202,38 @@ public class Segmenter {
 				splits.put(m.end(), true);
 			}
 		}
+
+		
+		// Adjust the split positions for in-line codes inclusion/exclusion options
+		// And create the list of final splits at the same time
+		finalSplits = new ArrayList<Integer>();
+		if ( container.hasCode() ) { // Do this only if we have in-line codes
+			int finalPos;
+			for ( int pos : splits.keySet() ) {
+				if ( !splits.get(pos) ) continue; // Skip non-break positions
+				finalPos = pos;
+				if ( pos > 1 ) {
+					switch ( codedText.charAt(pos-2) ) {
+					case (char)TextFragment.MARKER_OPENING:
+						if ( !includeStartCodes ) finalPos = pos-2;
+						break;
+					case (char)TextFragment.MARKER_CLOSING:
+						if ( !includeEndCodes ) finalPos = pos-2;
+						break;
+					case (char)TextFragment.MARKER_ISOLATED:
+						if ( !includeIsolatedCodes ) finalPos = pos-2;
+						break;
+					}
+				}
+				finalSplits.add(finalPos);
+			}
+		}
+		else { // Just copy the real splits
+			for ( int pos : splits.keySet() ) {
+				if ( splits.get(pos) ) finalSplits.add(pos);
+			}
+		}
+		
 		
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
@@ -211,29 +243,27 @@ public class Segmenter {
 		int textEnd;
 		int textStart = 0;
 		int trimmedTextStart;
-		for ( int pos : splits.keySet() ) {
-			if ( splits.get(pos) ) {
-				// Trim white-spaces and codes as required at the front
-				trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText,
-					textStart, pos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
-				if ( trimmedTextStart == pos-1 ) {
-					// Only spaces in the segment: Continue with the next position
-					continue;
-				}
-				if ( trimLeadingWS || trimCodes ) textStart = trimmedTextStart;
-				// Trim white-spaces and codes as required at the back
-				if ( trimTrailingWS || trimCodes ) {
-					textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
-						pos-1, 0, isSCWS, isECWS, isICWS, trimTrailingWS);
-				}
-				else textEnd = pos-1;
-				if ( textEnd > textStart ) { // Only if there is something
-					if ( textEnd < pos ) textEnd++; // Adjust for +1 position
-					starts.add(textStart);
-					ends.add(textEnd);
-				}
-				textStart = pos;
+		for ( int pos : finalSplits ) {
+			// Trim white-spaces and codes as required at the front
+			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText,
+				textStart, pos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
+			if ( trimmedTextStart == pos-1 ) {
+				// Only spaces in the segment: Continue with the next position
+				continue;
 			}
+			if ( trimLeadingWS || trimCodes ) textStart = trimmedTextStart;
+			// Trim white-spaces and codes as required at the back
+			if ( trimTrailingWS || trimCodes ) {
+				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
+					pos-1, 0, isSCWS, isECWS, isICWS, trimTrailingWS);
+			}
+			else textEnd = pos-1;
+			if ( textEnd > textStart ) { // Only if there is something
+				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
+				starts.add(textStart);
+				ends.add(textEnd);
+			}
+			textStart = pos;
 		}
 		// Last one
 		int lastPos = codedText.length();
@@ -347,19 +377,18 @@ public class Segmenter {
 	 * Gets the list of all the split positions in the text
 	 * that was last segmented. You must call {@link #computeSegment(IContainer)}
 	 * or {@link #computeSegments(String)} before calling this method.
+	 * A split position is the first character position of a new segment.
+	 * <p><b>IMPORTANT: The position returned here are the position WITHOUT taking in account the options
+	 * for trimming or not leading and trailing white-spaces.</b>
 	 * @return An array of integers where each value is a split position
-	 * in the coded text that was segmented. The split position between two segments
-	 * is the first character position of the second segment.
+	 * in the coded text that was segmented.
 	 */
 	public List<Integer> getSplitPositions () {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		if ( splits == null ) return list;
-		for ( int pos : splits.keySet() ) {
-			if ( splits.get(pos) ) {
-				list.add(pos);
-			}
+		
+		if ( finalSplits == null ) {
+			finalSplits = new ArrayList<Integer>();
 		}
-		return list;
+		return finalSplits;
 	}
 
 	/**
@@ -400,11 +429,11 @@ public class Segmenter {
 		rules.add(compiledRule);
 	}
 	
-	protected void setRangeRule (String pattern) {
+	protected void setMaskRule (String pattern) {
 		if (( pattern != null ) && ( pattern.length() > 0 ))
-			rangeRule = Pattern.compile(pattern);
+			maskRule = Pattern.compile(pattern);
 		else
-			rangeRule = null;
+			maskRule = null;
 	}
 
 }
