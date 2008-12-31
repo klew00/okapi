@@ -53,7 +53,7 @@ public class FileProcessingDialog {
 	{
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Segment Test File");
+		shell.setText("Test Segmentation on a File");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		

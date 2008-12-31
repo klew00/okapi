@@ -209,19 +209,27 @@ public class Segmenter {
 		finalSplits = new ArrayList<Integer>();
 		if ( container.hasCode() ) { // Do this only if we have in-line codes
 			int finalPos;
+			boolean done;
 			for ( int pos : splits.keySet() ) {
 				if ( !splits.get(pos) ) continue; // Skip non-break positions
+				done = false;
 				finalPos = pos;
-				if ( pos > 1 ) {
-					switch ( codedText.charAt(pos-2) ) {
+				while (( finalPos > 1 ) && !done ) {
+					switch ( codedText.charAt(finalPos-2) ) {
 					case (char)TextFragment.MARKER_OPENING:
-						if ( !includeStartCodes ) finalPos = pos-2;
+						if ( !includeStartCodes ) finalPos-=2;
+						else done = true;
 						break;
 					case (char)TextFragment.MARKER_CLOSING:
-						if ( !includeEndCodes ) finalPos = pos-2;
+						if ( !includeEndCodes ) finalPos-=2;
+						else done = true;
 						break;
 					case (char)TextFragment.MARKER_ISOLATED:
-						if ( !includeIsolatedCodes ) finalPos = pos-2;
+						if ( !includeIsolatedCodes ) finalPos-=2;
+						else done = true;
+						break;
+					default:
+						done = true;
 						break;
 					}
 				}
