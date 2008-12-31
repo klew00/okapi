@@ -37,9 +37,7 @@ public class Property {
 	}
 	
 	public Property (String name, String value) {
-		this.name = name;
-		this.value = value;
-		this.isReadOnly = true;
+		this(name, value, true);
 	}
 	
 	@Override
