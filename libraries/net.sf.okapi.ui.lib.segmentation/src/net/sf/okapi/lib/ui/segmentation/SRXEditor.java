@@ -31,6 +31,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.writer.GenericInlines;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -68,6 +69,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
 
+	private static final String APPNAME = "Ratel";
+	
 	private Shell shell;
 	private boolean asDialog;
 	private Text edSampleText;
@@ -95,6 +98,7 @@ public class SRXEditor {
 	private String testInputPath;
 	private String testOutputPath;
 	private boolean htmlOutput;
+	private UserConfiguration config;
 
 	@Override
 	protected void finalize () {
@@ -105,6 +109,12 @@ public class SRXEditor {
 		boolean asDialog,
 		String helpPath)
 	{
+		config = new UserConfiguration();
+		config.load(APPNAME);
+		testInputPath = config.getProperty("testInputPath");
+		testOutputPath = config.getProperty("testOutputPath");
+		htmlOutput = config.getBoolean("htmlOutput");
+
 		this.asDialog = asDialog;
 		this.helpPath = helpPath;
 		srxDoc = new SRXDocument();
@@ -116,6 +126,7 @@ public class SRXEditor {
 		
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
+			shell.setImage(parent.getImage());
 		}
 		else {
 			shell = parent;
@@ -124,7 +135,6 @@ public class SRXEditor {
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
 		rm.loadCommands("commands.xml"); //$NON-NLS-1$
 		
-		//shell.setImage(parent.getImage());
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 		
@@ -856,6 +866,11 @@ public class SRXEditor {
 	 * @return False if the user cancel, true if a decision is made. 
 	 */
 	private boolean checkIfRulesNeedSaving () {
+		config.setProperty("testInputPath", testInputPath);
+		config.setProperty("testOutputPath", testOutputPath);
+		config.setProperty("htmlOutput", htmlOutput);
+		config.save(APPNAME, "Beta");
+		
 		getSurfaceData();
 		if ( srxDoc.isModified() ) {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);

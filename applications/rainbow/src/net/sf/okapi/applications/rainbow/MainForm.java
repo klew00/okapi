@@ -52,6 +52,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -184,7 +185,8 @@ public class MainForm implements IParametersProvider {
 			loadResources();
 
 			config = new UserConfiguration();
-			config.load();
+			config.setProperty("loadLastFile", "true"); // Defaults
+			config.load(APPNAME);
 			
 			createContent();
 			createProject(false);
@@ -1179,7 +1181,7 @@ public class MainForm implements IParametersProvider {
 		if ( prj != null ) {
 			config.setProperty("lastFile", prj.path); //$NON-NLS-1$
 		}
-		config.save();
+		config.save(APPNAME, Res.getString("VERSION"));
 	}
 
 	private boolean canContinue () {

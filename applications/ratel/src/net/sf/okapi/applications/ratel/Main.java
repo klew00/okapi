@@ -26,6 +26,7 @@ import java.net.URLDecoder;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -34,6 +35,7 @@ public class Main {
 	public static void main (String args[])
 	{
 		Display dispMain = null;
+		Image img = null;
 		try {
 			// Compute the path of the help file
 			File file = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile());
@@ -47,6 +49,8 @@ public class Main {
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
+			img = new Image(dispMain, Main.class.getResourceAsStream("images/ratel.png"));
+			shlMain.setImage(img);
 			SRXEditor editor = new SRXEditor(shlMain, false, helpPath);
 			editor.showDialog(null);
 		}
@@ -54,6 +58,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		finally {
+			if ( img != null ) img.dispose();
 			if ( dispMain != null ) dispMain.dispose();
 		}
     }

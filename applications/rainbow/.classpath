@@ -21,11 +21,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.mt.google"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.html"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common.groovy"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-API-1.5.0"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-JDK14-1.5.0"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.rtf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JERICHO-HTML-3.0-Beta1"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common.yaml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
