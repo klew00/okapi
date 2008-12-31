@@ -23,11 +23,12 @@ package net.sf.okapi.common.yaml;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Map;
 
-import org.jvyaml.YAML;
-
+import org.ho.yaml.Yaml;
 
 public class YamlConfigurationReader  {	
 	private boolean preserveWhitespace;	
@@ -45,9 +46,10 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(URL configurationPathAsResource) {		
 		try {
-			config = (Map)YAML.load(new FileReader(new File(configurationPathAsResource.getPath())));
+			config = (Map)Yaml.load(new InputStreamReader(configurationPathAsResource.openStream()));
 		} catch (FileNotFoundException e) {
-			// TODO Create custom exception
+			throw new RuntimeException(e);
+		} catch (IOException e) {			
 			throw new RuntimeException(e);
 		}		
 	}
@@ -55,7 +57,7 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(File configurationFile) {				
 		try {
-			config = (Map)YAML.load(new FileReader(configurationFile));
+			config = (Map)Yaml.load(new FileReader(configurationFile));
 		} catch (FileNotFoundException e) {
 			// TODO Create custom exception
 			throw new RuntimeException(e);
@@ -64,12 +66,12 @@ public class YamlConfigurationReader  {
 	
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(String configurationScript) {
-		config = (Map)YAML.load(configurationScript);			
+		config = (Map)Yaml.load(configurationScript);			
 	}
 	
 	@Override
 	public String toString() {	
-		return YAML.dump(config);
+		return Yaml.dump(config);
 	}
 	
 	@SuppressWarnings("unchecked")

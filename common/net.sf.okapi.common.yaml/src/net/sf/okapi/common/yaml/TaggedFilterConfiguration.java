@@ -58,25 +58,25 @@ public class TaggedFilterConfiguration {
 		List ruleTypes = (List) rule.get("ruleTypes");
 		String ruleType = (String) ruleTypes.get(0);
 
-		if (ruleType == INLINE) {
+		if (ruleType.equals(INLINE)) {
 			return RULE_TYPE.INLINE_ELEMENT;
-		} else if (ruleType == GROUP) {
+		} else if (ruleType.equals(GROUP)) {
 			return RULE_TYPE.GROUP_ELEMENT;
-		} else if (ruleType == EXCLUDE) {
+		} else if (ruleType.equals(EXCLUDE)) {
 			return RULE_TYPE.EXCLUDED_ELEMENT;
-		} else if (ruleType == INCLUDE) {
+		} else if (ruleType.equals(INCLUDE)) {
 			return RULE_TYPE.INCLUDED_ELEMENT;
-		} else if (ruleType == TEXTUNIT) {
+		} else if (ruleType.equals(TEXTUNIT)) {
 			return RULE_TYPE.TEXT_UNIT_ELEMENT;
-		} else if (ruleType == PRESERVE_WHITESPACE) {
+		} else if (ruleType.equals(PRESERVE_WHITESPACE)) {
 			return RULE_TYPE.PRESERVE_WHITESPACE;
-		} else if (ruleType == SCRIPT) {
+		} else if (ruleType.equals(SCRIPT)) {
 			return RULE_TYPE.SCRIPT_ELEMENT;
-		} else if (ruleType == SERVER) {
+		} else if (ruleType.equals(SERVER)) {
 			return RULE_TYPE.SERVER_ELEMENT;
-		} else if (ruleType == ATTRIBUTE) {
+		} else if (ruleType.equals(ATTRIBUTE)) {
 			return RULE_TYPE.ATTRIBUTE;
-		} else if (ruleType == ATTRIBUTES_ONLY) {
+		} else if (ruleType.equals(ATTRIBUTES_ONLY)) {
 			return RULE_TYPE.ATTRIBUTES_ONLY;
 		} else {
 			return RULE_TYPE.UNKOWN;
@@ -181,11 +181,11 @@ public class TaggedFilterConfiguration {
 	}
 
 	private boolean applyCondition(String attributeValue, String compareType, String conditionValue) {
-		if (compareType == EQUALS) {
+		if (compareType.equals(EQUALS)) {
 			return attributeValue.equalsIgnoreCase(conditionValue);
-		} else if (compareType == NOT_EQUALS) {
+		} else if (compareType.equals(NOT_EQUALS)) {
 			return !(attributeValue.equalsIgnoreCase(conditionValue));
-		} else if (compareType == MATCH) {
+		} else if (compareType.equals(MATCH)) {
 			boolean result = false;
 			Pattern matchPattern = Pattern.compile(conditionValue);
 			try {
