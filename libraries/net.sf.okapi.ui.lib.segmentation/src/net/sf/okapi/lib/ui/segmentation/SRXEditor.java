@@ -69,7 +69,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
 
-	private static final String APPNAME = "Ratel";
+	private static final String APPNAME = "Ratel"; //$NON-NLS-1$
 	
 	private Shell shell;
 	private boolean asDialog;
@@ -111,9 +111,9 @@ public class SRXEditor {
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
-		testInputPath = config.getProperty("testInputPath");
-		testOutputPath = config.getProperty("testOutputPath");
-		htmlOutput = config.getBoolean("htmlOutput");
+		testInputPath = config.getProperty("testInputPath"); //$NON-NLS-1$
+		testOutputPath = config.getProperty("testOutputPath"); //$NON-NLS-1$
+		htmlOutput = config.getBoolean("htmlOutput"); //$NON-NLS-1$
 
 		this.asDialog = asDialog;
 		this.helpPath = helpPath;
@@ -150,7 +150,7 @@ public class SRXEditor {
 		cmpTmp.setLayout(layTmp);
 		
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("edit.currentLangRules"));
+		label.setText(Res.getString("edit.currentLangRules")); //$NON-NLS-1$
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
@@ -166,9 +166,9 @@ public class SRXEditor {
 			};
 		});
 		
-		int topButtonsWidth = 180; //140;
+		int topButtonsWidth = 180;
 		Button btTmp = new Button(cmpTmp, SWT.PUSH);
-		btTmp.setText("Groups and Options...");
+		btTmp.setText(Res.getString("edit.groupAndOptions")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = topButtonsWidth;
 		btTmp.setLayoutData(gdTmp);
@@ -231,7 +231,7 @@ public class SRXEditor {
 
 		int ruleButtonsWidth = 95;
 		btAddRule = new Button(cmpGroup, SWT.PUSH);
-		btAddRule.setText(Res.getString("edit.btAddRule"));
+		btAddRule.setText(Res.getString("edit.btAddRule")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btAddRule.setLayoutData(gdTmp);
@@ -243,7 +243,7 @@ public class SRXEditor {
 		
 		btEditRule = new Button(cmpGroup, SWT.PUSH);
 		btEditRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btEditRule.setText(Res.getString("edit.btEditRule"));
+		btEditRule.setText(Res.getString("edit.btEditRule")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btEditRule.setLayoutData(gdTmp);
@@ -255,7 +255,7 @@ public class SRXEditor {
 		
 		btRemoveRule = new Button(cmpGroup, SWT.PUSH);
 		btRemoveRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btRemoveRule.setText(Res.getString("edit.btRemoveRule"));
+		btRemoveRule.setText(Res.getString("edit.btRemoveRule")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btRemoveRule.setLayoutData(gdTmp);
@@ -267,7 +267,7 @@ public class SRXEditor {
 
 		btMoveUpRule = new Button(cmpGroup, SWT.PUSH);
 		btMoveUpRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btMoveUpRule.setText("Move &Up");
+		btMoveUpRule.setText(Res.getString("edit.moveUp")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btMoveUpRule.setLayoutData(gdTmp);
@@ -279,7 +279,7 @@ public class SRXEditor {
 
 		btMoveDownRule = new Button(cmpGroup, SWT.PUSH);
 		btMoveDownRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btMoveDownRule.setText("Move &Down");
+		btMoveDownRule.setText(Res.getString("edit.moveDown")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btMoveDownRule.setLayoutData(gdTmp);
@@ -291,7 +291,7 @@ public class SRXEditor {
 
 		Button btMaskRule = new Button(cmpGroup, SWT.PUSH);
 		btMaskRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btMaskRule.setText("Mask Rule...");
+		btMaskRule.setText(Res.getString("edit.maskRule")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btMaskRule.setLayoutData(gdTmp);
@@ -303,7 +303,7 @@ public class SRXEditor {
 
 		Button btCharInfo = new Button(cmpGroup, SWT.PUSH);
 		btCharInfo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btCharInfo.setText("Char Info...");
+		btCharInfo.setText(Res.getString("edit.charInfo")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = ruleButtonsWidth;
 		btCharInfo.setLayoutData(gdTmp);
@@ -321,7 +321,7 @@ public class SRXEditor {
 		cmpSample.setLayout(new GridLayout(3, false));
 		
 		label = new Label(cmpSample, SWT.None);
-		label.setText("Sample text (use <x>...</x> and <x/> to represent in-line codes):");
+		label.setText(Res.getString("edit.sampleNote")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 3;
 		label.setLayoutData(gdTmp);
@@ -340,7 +340,7 @@ public class SRXEditor {
 		edSampleText.setFont(sampleFont);
 		
 		rdTestOnSelectedGroup = new Button(cmpSample, SWT.RADIO);
-		rdTestOnSelectedGroup.setText("Test on the current set of rules only");
+		rdTestOnSelectedGroup.setText(Res.getString("edit.testOnlyGroup")); //$NON-NLS-1$
 		rdTestOnSelectedGroup.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edSampleLanguage.setEnabled(rdTestOnLanguage.getSelection());
@@ -349,7 +349,7 @@ public class SRXEditor {
 		});
 
 		rdTestOnLanguage = new Button(cmpSample, SWT.RADIO);
-		rdTestOnLanguage.setText("Test on the rules for this language code:");
+		rdTestOnLanguage.setText(Res.getString("edit.testLanguage")); //$NON-NLS-1$
 		rdTestOnLanguage.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edSampleLanguage.setEnabled(rdTestOnLanguage.getSelection());
@@ -396,11 +396,11 @@ public class SRXEditor {
 		if ( asDialog ) {
 			SelectionAdapter closeActions = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					if ( e.widget.getData().equals("h") ) {
+					if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 						callHelp();
 						return;
 					}
-					if ( e.widget.getData().equals("c") ) {
+					if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
 						shell.close();
 					}
 				};
@@ -517,7 +517,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Ratel: SRX Editor)");
+				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Ratel: SRX Editor)"); //$NON-NLS-1$
             }
 		});
 		
@@ -553,7 +553,8 @@ public class SRXEditor {
 
 	private void showCharInfo () {
 		try {
-			CharacterInfoDialog charInfoDlg = new CharacterInfoDialog(shell, "Character Information", null);
+			CharacterInfoDialog charInfoDlg = new CharacterInfoDialog(shell,
+				Res.getString("edit.charInfoCaption"), null); //$NON-NLS-1$
 			int codePoint = 225;
 			String tmp = edSampleText.getSelectionText();
 			if ( tmp.length() > 0 ) {
@@ -602,7 +603,7 @@ public class SRXEditor {
 				else { // Applies all the matching rules
 					// Make sure we have a language code
 					if ( edSampleLanguage.getText().length() == 0 ) {
-						edSampleLanguage.setText("en");
+						edSampleLanguage.setText("en"); //$NON-NLS-1$
 					}
 					segmenter = srxDoc.applyLanguageRules(edSampleLanguage.getText(),
 						(forceReset ? null : segmenter));
@@ -614,7 +615,8 @@ public class SRXEditor {
 			
 			if (( segmenter != null ) && ( segmenter.getLanguage() != null )) {
 				// Converts the <x>/</x>/etc. into real inline codes
-				fileProc.populateTextContainer(edSampleText.getText().replace("\r", ""), sampleText);
+				fileProc.populateTextContainer(
+					edSampleText.getText().replace("\r", ""), sampleText);  //$NON-NLS-1$  //$NON-NLS-2$
 				// Segment
 				segmenter.computeSegments(sampleText);
 				sampleText.createSegments(segmenter.getSegmentRanges());
@@ -622,12 +624,11 @@ public class SRXEditor {
 				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true, true));
 			}
 			else {
-				edResults.setText("");
+				edResults.setText(""); //$NON-NLS-1$
 			}
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
-			edResults.setText("Error: "+ e.getMessage());
+			edResults.setText(Res.getString("edit.error")+ e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
@@ -690,9 +691,9 @@ public class SRXEditor {
 	}
 	
 	private void updateCaption () {
-		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");
+		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");  //$NON-NLS-1$  //$NON-NLS-2$
 		if ( srxPath != null ) {
-			text += " - ";
+			text += " - "; //$NON-NLS-1$
 			text += Util.getFilename(srxPath, true);	
 		}
 		shell.setText(text);
@@ -717,9 +718,10 @@ public class SRXEditor {
 		try {
 			getSurfaceData(); // To get back the original data in case of escape: 
 			if ( path == null ) {
-				String[] paths = Dialogs.browseFilenames(shell, "Open SRX Document",
-					false, null, "SRX Documents (*.srx)\tAll Files (*.*)",
-					"*.srx\t*.*");
+				String[] paths = Dialogs.browseFilenames(shell,
+					Res.getString("edit.loadDocCaption"), //$NON-NLS-1$
+					false, null, Res.getString("edit.loadDocFileTypes"), //$NON-NLS-1$
+					Res.getString("edit.loadDocFilters")); //$NON-NLS-1$
 				if ( paths == null ) return; // Cancel
 				else path = paths[0];
 			}
@@ -744,16 +746,16 @@ public class SRXEditor {
 	
 	private boolean saveSRXDocument (String path) {
 		try {
-			if ( !srxDoc.getVersion().equals("2.0") ) {
+			if ( !srxDoc.getVersion().equals("2.0") ) { //$NON-NLS-1$
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 				dlg.setText(shell.getText());
-				dlg.setMessage("The file will be saved as SRX 2.0.\n"
-					+"Do you want to proceed?");
+				dlg.setMessage(Res.getString("edit.saveDocVersionWarning")); //$NON-NLS-1$
 				if ( dlg.open() != SWT.YES ) return false;
 			}
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save SRX Document", null,
-					"SRX Documents (*.srx)", "*.srx");
+				path = Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, //$NON-NLS-1$
+					Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
+					Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
 				if ( path == null ) return false;
 			}
 			getSurfaceData();
@@ -775,17 +777,15 @@ public class SRXEditor {
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
 		int n = -1;
 		if ( createNewRule ) {
-			caption = "New Rule";
-			rule = new Rule("", "", true);
+			rule = new Rule("", "", true);  //$NON-NLS-1$  //$NON-NLS-2$
 		}
 		else {
 			n = tblRules.getSelectionIndex();
 			if ( n == -1 ) return;
 			rule = srxDoc.getLanguageRules(ruleName).get(n);
-			caption = "Edit Rule";
 		}
 		
-		RuleDialog dlg = new RuleDialog(shell, caption, rule, helpPath);
+		RuleDialog dlg = new RuleDialog(shell, rule, helpPath);
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
@@ -847,8 +847,8 @@ public class SRXEditor {
 	 */
 	private void editMaskRule () {
 		try {
-			InputDialog dlg = new InputDialog(shell, "Mask Rule Expression",
-				Res.getString("edit.maskRuleDesc"), "", null, 0);
+			InputDialog dlg = new InputDialog(shell, Res.getString("edit.maskRuleCaption"), //$NON-NLS-1$
+				Res.getString("edit.maskRuleDesc"), "", null, 0);  //$NON-NLS-1$  //$NON-NLS-2$
 			dlg.setInputValue(srxDoc.getMaskRule());
 			dlg.setAllowEmptyValue(true);
 			String result = dlg.showDialog();
@@ -868,17 +868,16 @@ public class SRXEditor {
 	 * @return False if the user cancel, true if a decision is made. 
 	 */
 	private boolean checkIfRulesNeedSaving () {
-		config.setProperty("testInputPath", testInputPath);
-		config.setProperty("testOutputPath", testOutputPath);
-		config.setProperty("htmlOutput", htmlOutput);
+		config.setProperty("testInputPath", testInputPath); //$NON-NLS-1$
+		config.setProperty("testOutputPath", testOutputPath); //$NON-NLS-1$
+		config.setProperty("htmlOutput", htmlOutput); //$NON-NLS-1$
 		config.save(APPNAME, "Beta");
 		
 		getSurfaceData();
 		if ( srxDoc.isModified() ) {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
-			dlg.setMessage("The segmentation rules have been modified but not saved.\n"
-				+"Do you want to save them?");
+			dlg.setMessage(Res.getString("edit.confirmSave")); //$NON-NLS-1$
 			switch ( dlg.open() ) {
 			case SWT.CANCEL:
 				return false;

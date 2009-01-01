@@ -49,13 +49,12 @@ public class RuleDialog {
 	private String helpPath;
 
 	public RuleDialog (Shell parent,
-		String caption,
 		Rule rule,
 		String helpPath)
 	{
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		if ( caption != null ) shell.setText(caption);
+		shell.setText("Edit Rule");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		

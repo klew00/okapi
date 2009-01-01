@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.common.ui;
 
@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ClosePanel extends Composite {
 
-	public Button       btClose;
-	public Button       btHelp;
+	public Button btClose;
+	public Button btHelp;
 
 	/**
 	 * Creates a new panel for Help/OK/Cancel buttons.
@@ -65,8 +65,8 @@ public class ClosePanel extends Composite {
 		int nWidth = 80;
 
 		btHelp = new Button(this, SWT.PUSH);
-		btHelp.setText(Res.getString("ClosePanel.btHelp"));
-		btHelp.setData("h");
+		btHelp.setText(Res.getString("ClosePanel.btHelp")); //$NON-NLS-1$
+		btHelp.setData("h"); //$NON-NLS-1$
 		btHelp.addSelectionListener(action);
 		GridData gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
@@ -85,8 +85,8 @@ public class ClosePanel extends Composite {
 		// Create the buttons in a platform-specific order
 		btClose = new Button(cmpTmp, SWT.PUSH);
 
-		btClose.setText(Res.getString("ClosePanel.btClose"));
-		btClose.setData("c");
+		btClose.setText(Res.getString("ClosePanel.btClose")); //$NON-NLS-1$
+		btClose.setData("c"); //$NON-NLS-1$
 		btClose.addSelectionListener(action);
 		RowData rdTmp = new RowData();
 		rdTmp.width = nWidth;

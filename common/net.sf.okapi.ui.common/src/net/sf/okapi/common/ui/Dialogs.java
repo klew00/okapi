@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.common.ui;
 
@@ -55,11 +55,11 @@ public class Dialogs {
 		FileDialog dlg = new FileDialog(parent, SWT.OPEN | (allowMultiple ? SWT.MULTI : 0));
 		dlg.setFilterPath(root); // Can be null
 		if ( filterNames != null ) {
-			String[] aNames = filterNames.split("\t", -2);
+			String[] aNames = filterNames.split("\t", -2); //$NON-NLS-1$
 			dlg.setFilterNames(aNames);
 		}
 		if ( filterExtensions != null ) {
-			String[] aExts = filterExtensions.split("\t", -2);
+			String[] aExts = filterExtensions.split("\t", -2); //$NON-NLS-1$
 			dlg.setFilterExtensions(aExts);
 		}
 		dlg.setText(title);
@@ -92,8 +92,8 @@ public class Dialogs {
 		{
 			String[] aExts = null;
 			String[] aNames = null;
-			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2);
-			if ( filterNames != null ) aNames = filterNames.split("\t", -2);
+			if ( filterExtensions != null ) aExts = filterExtensions.split("\t", -2); //$NON-NLS-1$
+			if ( filterNames != null ) aNames = filterNames.split("\t", -2); //$NON-NLS-1$
 			String path = null;
 			// Call the SaveAs dialog until we are done
 			while ( true ) {
@@ -111,7 +111,7 @@ public class Dialogs {
 					MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING
 						| SWT.YES | SWT.NO | SWT.CANCEL);
 					mb.setText(title);
-					mb.setMessage(path + "\nThis file already exists.\nDo you want to replace it?");
+					mb.setMessage(path + Res.getString("dialogs.browseForSave")); //$NON-NLS-1$
 					int result = mb.open();
 					if ( result == SWT.YES ) return path;
 					if ( result == SWT.CANCEL ) return null;
@@ -151,8 +151,8 @@ public class Dialogs {
 		String details)
 	{
 		MessageBox dlg = new MessageBox(shell, SWT.ICON_ERROR);
-		dlg.setMessage((message==null) ? "The error message is null." : message);
-		dlg.setText("Error");
+		dlg.setMessage((message==null) ? "The error message is null." : message); //$NON-NLS-1$
+		dlg.setText(Res.getString("dialogs.errorCaption")); //$NON-NLS-1$
 		dlg.open();
 	}
 		
