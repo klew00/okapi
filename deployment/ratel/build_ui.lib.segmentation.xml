@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<project name="ui.lib.segmentation" default="all" basedir="."> 
+
+	<property name="platform" value="win32-x86"/>
+	<property name="proj" value="../../libraries/net.sf.okapi.ui.lib.segmentation"/> 
+	<property name="src" value="${proj}/src"/> 
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="dist-bin" value="${dist}/lib"/>
+ 
+	<path id="mainClassPath">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${proj}/lib/${platform}/swt.jar"/>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${tmp}"/>
+		<mkdir dir="${dist-bin}"/>
+ 	</target>
+
+	<target name="all" depends="init"> 
+		<ant antfile="build_common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.common.xml" inheritAll="false"/>
+		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
+		<ant antfile="build_ui.common.xml" inheritAll="false"/>
+ 		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src}" excludes="**/*.java"/>
+		</copy>
+		<copy todir="${dist-bin}">
+			<fileset dir="${proj}/lib"/>
+		</copy>
+	</target>
+
+</project>

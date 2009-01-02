@@ -1,0 +1,101 @@
+<?xml version="1.0"?> 
+<project name="ratel" default="all" basedir="."> 
+
+	<property name="platform" value="win32-x86"/>
+	<property name="proj" value="../../applications/ratel"/> 
+	<property name="src" value="${proj}/src"/> 
+	<property name="build" value="build"/>
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="dist-bin" value="${dist}/lib"/>
+ 
+	<condition property="is_win32-x86">
+		<equals arg1="${platform}" arg2="win32-x86"/>
+	</condition>
+	<condition property="is_carbon-macosx">
+		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	</condition>
+	<condition property="is_gtk2-linux-x86">
+		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+	</condition>
+
+	<path id="mainClassPath">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${dist-bin}/${platform}/swt.jar"/>
+	</path>
+	
+	<target name="init">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+			<fileset dir="${dist}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<mkdir dir="${dist-bin}"/>
+ 	</target>
+
+	<target name="compile" depends="init"> 
+		<ant antfile="build_common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.common.xml" inheritAll="false"/>
+		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
+		<ant antfile="build_ui.common.xml" inheritAll="false"/>
+		<ant antfile="build_ui.lib.segmentation.xml" inheritAll="false"/>
+ 		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy todir="${dist-bin}">
+			<fileset dir="${dist-bin}/${platform}"/>
+		</copy>
+		<copy todir="${dist}">
+			<fileset dir="data/${platform}"/>
+			<fileset dir="data" includes="**/*.srx"/>
+			<fileset dir="data" includes="**/*.txt"/>
+		</copy>
+		<copy todir="${dist}/help">
+			<fileset dir="data/help"/>
+		</copy>
+
+		<delete includeEmptyDirs="true">
+			<fileset dir="${dist-bin}/win32-x86"/>
+			<fileset dir="${dist-bin}/gtk2-linux-x86"/>
+			<fileset dir="${dist-bin}/carbon-macosx"/>
+		</delete>
+		
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Main-Class" value="net.sf.okapi.applications.ratel.Main"/>
+			<attribute name="Class-Path" value="swt.jar"/>
+  		</manifest>
+
+		<jar jarfile="${dist-bin}/ratel.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+			excludes="MANIFEST.MF"
+  		/>
+
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		
+	</target>
+
+	<target name="winExe" if="is_win32-x86">
+		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
+		<taskdef name="launch4j"
+			classname="net.sf.launch4j.ant.Launch4jTask"
+			classpath="${launch4j.dir}/launch4j.jar
+				:${launch4j.dir}/lib/xstream.jar" />
+	<launch4j configFile="./l4j_win_config.xml" />
+	</target>
+	
+	<target name="zipAll" unless="is_gtk2-linux-x86">
+		<zip destfile="${dist}/srxeditor-ratel_${platform}.zip" basedir="${dist}"/>
+	</target>
+
+	<target name="gzipAll" if="is_gtk2-linux-x86">
+		<tar destfile="${dist}/srxeditor-ratel_${platform}.tar" basedir="${dist}"/>
+		<gzip destfile="${dist}/srxeditor-ratel_${platform}.tar.gz" src="${dist}/srxeditor-ratel_${platform}.tar"/>
+		<delete file="${dist}/srxeditor-ratel_${platform}.tar"/>
+	</target>
+	
+	<target name="all" depends="compile, winExe, zipAll, gzipAll"/>
+
+</project>

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,12 +44,12 @@ public class Main {
 	    	if ( helpPath.endsWith(".jar") ) helpPath = Util.getDirectoryName(helpPath); //$NON-NLS-1$
 	    	// Remove the application folder in all cases
 	    	helpPath = Util.getDirectoryName(helpPath);
-	    	helpPath += File.separator + "help" + File.separator + "SRXEditor.html";  //$NON-NLS-2$
+	    	helpPath += File.separator + "help" + File.separator + "srxeditor.html"; //$NON-NLS-1$ //$NON-NLS-2$
 			
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
-			img = new Image(dispMain, Main.class.getResourceAsStream("images/ratel.png"));
+			img = new Image(dispMain, Main.class.getResourceAsStream("images/ratel.png")); //$NON-NLS-1$
 			shlMain.setImage(img);
 			SRXEditor editor = new SRXEditor(shlMain, false, helpPath);
 			editor.showDialog(null);

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<srx xmlns="http://www.lisa.org/srx20" xmlns:okpsrx="http://okapi.sf.net/srx-extensions" version="2.0">
+<header segmentsubflows="yes" cascade="yes">
+<formathandle type="start" include="no"></formathandle>
+<formathandle type="end" include="yes"></formathandle>
+<formathandle type="isolated" include="no"></formathandle>
+<okpsrx:options oneSegmentIncludesAll="no" trimLeadingWhitespaces="no" trimTrailingWhitespaces="no"></okpsrx:options>
+<okpsrx:sample language="en" useMappedRules="yes">The U.K. is in Europe, the U.S. in America. John is from the U.S. But Tom is from the U.K.
+Mr. Holmes is from the &lt;I>U.K.&lt;/I> &lt;B>Is Dr. Watson from there too?&lt;/B> Yes: both are.&lt;BR/>
+Sentence one.&lt;b> Sentence&lt;/b> two.
+Sentence &lt;b>one.&lt;/b> Sentence two.
+Sentence one.&lt;br/> Sentence two.
+Sentence &lt;b>one.&lt;/b>&lt;br/>&lt;u> Sentence&lt;/u> two.</okpsrx:sample>
+<okpsrx:rangeRule></okpsrx:rangeRule>
+</header>
+<body>
+<languagerules>
+<languagerule languagerulename="Default">
+<rule break="no">
+<beforebreak>\b[Dd][Rr]\.</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b\p{Lu}\.\p{Lu}\.</beforebreak>
+<afterbreak>\s\P{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[\.:\?]+</beforebreak>
+<afterbreak>\s</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[:\uFF1A]</beforebreak>
+<afterbreak>\p{Lo}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[。｡．！？]+</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+</languagerule>
+<languagerule languagerulename="English">
+<rule break="no">
+<beforebreak>\b[Mm][Rr]\.</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b[Mm][Ss]+\.</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b[Mm][Rr][Ss]\.</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+</languagerule>
+</languagerules>
+<maprules>
+<languagemap languagepattern="[Ee][Nn].*" languagerulename="English"></languagemap>
+<languagemap languagepattern=".*" languagerulename="Default"></languagemap>
+</maprules>
+</body>
+</srx>

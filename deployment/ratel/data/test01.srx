@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<srx xmlns="http://www.lisa.org/srx20" xmlns:okpsrx="http://okapi.sf.net/srx-extensions" version="2.0">
+<header segmentsubflows="yes" cascade="no">
+<formathandle type="start" include="no"></formathandle>
+<formathandle type="end" include="yes"></formathandle>
+<formathandle type="isolated" include="yes"></formathandle>
+<okpsrx:options oneSegmentIncludesAll="no" trimLeadingWhitespaces="no" trimTrailingWhitespaces="no"></okpsrx:options>
+<okpsrx:sample language="en" useMappedRules="yes">Sentence 1.&lt;b> Sentence&lt;/b> 2. Sentence &lt;b>3.&lt;/b> Sentence 4.&lt;br/> Sentence &lt;b>5.&lt;/b>&lt;br/>&lt;u> Sentence&lt;/u> 6. Sentence &lt;b>7.&lt;/b>&lt;i>&lt;br/> Sentence 8.&lt;/i>.</okpsrx:sample>
+<okpsrx:rangeRule></okpsrx:rangeRule>
+</header>
+<body>
+<languagerules>
+<languagerule languagerulename="default">
+<rule break="yes">
+<beforebreak>\.</beforebreak>
+<afterbreak>\s</afterbreak>
+</rule>
+</languagerule>
+</languagerules>
+<maprules>
+<languagemap languagepattern=".*" languagerulename="default"></languagemap>
+</maprules>
+</body>
+</srx>

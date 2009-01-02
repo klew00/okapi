@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -78,12 +78,12 @@ public class GroupsAndOptionsDialog {
 		this.srxDoc = srxDoc;
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Groups And Options");
+		shell.setText(Res.getString("options.caption")); //$NON-NLS-1$
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout(2, true));
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Options");
+		grpTmp.setText(Res.getString("options.grpOptions")); //$NON-NLS-1$
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		grpTmp.setLayoutData(gdTmp);
@@ -91,33 +91,33 @@ public class GroupsAndOptionsDialog {
 		grpTmp.setLayout(layTmp);
 
 		chkSegmentSubFlows = new Button(grpTmp, SWT.CHECK);
-		chkSegmentSubFlows.setText("Segment sub-flow items");
+		chkSegmentSubFlows.setText(Res.getString("options.segmentSubFlow")); //$NON-NLS-1$
 		
 		chkIncludeOpeningCodes = new Button(grpTmp, SWT.CHECK);
-		chkIncludeOpeningCodes.setText("Include opening in-line codes");
+		chkIncludeOpeningCodes.setText(Res.getString("options.includeStartCodes")); //$NON-NLS-1$
 		
 		chkCascade = new Button(grpTmp, SWT.CHECK);
-		chkCascade.setText("Cascade language maps matching");
+		chkCascade.setText(Res.getString("options.cascade")); //$NON-NLS-1$
 		
 		chkIncludeClosingCodes = new Button(grpTmp, SWT.CHECK);
-		chkIncludeClosingCodes.setText("Include closing in-line codes");
+		chkIncludeClosingCodes.setText(Res.getString("options.includeEndCodes")); //$NON-NLS-1$
 
 		chkTrimLeadingWS = new Button(grpTmp, SWT.CHECK);
-		chkTrimLeadingWS.setText("Trim leading white-spaces (extension)");
+		chkTrimLeadingWS.setText(Res.getString("options.trimLeadingWS")); //$NON-NLS-1$
 		
 		chkIncludeIsolatedCodes = new Button(grpTmp, SWT.CHECK);
-		chkIncludeIsolatedCodes.setText("Include isolated in-line codes");
+		chkIncludeIsolatedCodes.setText(Res.getString("options.includeIsolatedCodes")); //$NON-NLS-1$
 		
 		chkTrimTrailingWS = new Button(grpTmp, SWT.CHECK);
-		chkTrimTrailingWS.setText("Trim trailing white-spaces (extension)");
+		chkTrimTrailingWS.setText(Res.getString("options.trimtrailingWS")); //$NON-NLS-1$
 		
 		chkOneSegmentIncludesAll = new Button(grpTmp, SWT.CHECK);
-		chkOneSegmentIncludesAll.setText("Include all text for single segment (extension)");
+		chkOneSegmentIncludesAll.setText(Res.getString("options.includeAllInOne")); //$NON-NLS-1$
 		
 		//=== Language Rules
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Language Rules");
+		grpTmp.setText(Res.getString("options.grpLangRules")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		grpTmp.setLayoutData(gdTmp);
 		layTmp = new GridLayout(2, false);
@@ -137,7 +137,7 @@ public class GroupsAndOptionsDialog {
 		
 		int buttonWidth = 80;
 		btAddRules = new Button(grpTmp, SWT.PUSH);
-		btAddRules.setText("Add...");
+		btAddRules.setText(Res.getString("options.addRules")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btAddRules.setLayoutData(gdTmp);
@@ -148,7 +148,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btRenameRules = new Button(grpTmp, SWT.PUSH);
-		btRenameRules.setText("Rename...");
+		btRenameRules.setText(Res.getString("options.renameRules")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btRenameRules.setLayoutData(gdTmp);
@@ -159,7 +159,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btRemoveRules = new Button(grpTmp, SWT.PUSH);
-		btRemoveRules.setText("Remove...");
+		btRemoveRules.setText(Res.getString("options.removeRules")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btRemoveRules.setLayoutData(gdTmp);
@@ -172,7 +172,7 @@ public class GroupsAndOptionsDialog {
 		//=== Language Maps
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Language Maps");
+		grpTmp.setText(Res.getString("options.grpLangMaps")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		grpTmp.setLayoutData(gdTmp);
 		layTmp = new GridLayout(2, false);
@@ -190,7 +190,7 @@ public class GroupsAndOptionsDialog {
 		});
 
 		btAddMap = new Button(grpTmp, SWT.PUSH);
-		btAddMap.setText("Add...");
+		btAddMap.setText(Res.getString("options.addMap")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btAddMap.setLayoutData(gdTmp);
@@ -201,7 +201,7 @@ public class GroupsAndOptionsDialog {
 		});
 
 		btEditMap = new Button(grpTmp, SWT.PUSH);
-		btEditMap.setText("Edit...");
+		btEditMap.setText(Res.getString("options.editMap")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btEditMap.setLayoutData(gdTmp);
@@ -212,7 +212,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btRemoveMap = new Button(grpTmp, SWT.PUSH);
-		btRemoveMap.setText("Remove");
+		btRemoveMap.setText(Res.getString("options.removeMap")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btRemoveMap.setLayoutData(gdTmp);
@@ -223,7 +223,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btMoveUpMap = new Button(grpTmp, SWT.PUSH);
-		btMoveUpMap.setText("Move Up");
+		btMoveUpMap.setText(Res.getString("options.moveUpMap")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btMoveUpMap.setLayoutData(gdTmp);
@@ -234,7 +234,7 @@ public class GroupsAndOptionsDialog {
 		});
 		
 		btMoveDownMap = new Button(grpTmp, SWT.PUSH);
-		btMoveDownMap.setText("Move Down");
+		btMoveDownMap.setText(Res.getString("options.moveDownMap")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = buttonWidth;
 		btMoveDownMap.setLayoutData(gdTmp);
@@ -260,11 +260,11 @@ public class GroupsAndOptionsDialog {
 		
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					callHelp();
 					return;
 				}
-				if ( e.widget.getData().equals("c") ) {
+				if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
 					shell.close();
 				}
 			};
@@ -355,7 +355,7 @@ public class GroupsAndOptionsDialog {
 		lbLangMaps.removeAll();
 		ArrayList<LanguageMap> list = srxDoc.getAllLanguagesMaps();
 		for ( LanguageMap langMap : list ) {
-			lbLangMaps.add(langMap.getPattern() + " --> " + langMap.getRuleName());
+			lbLangMaps.add(langMap.getPattern() + " --> " + langMap.getRuleName()); //$NON-NLS-1$
 		}
 		if (( selection < 0 ) || ( selection >= lbLangMaps.getItemCount() )) {
 			selection = 0;
@@ -368,20 +368,17 @@ public class GroupsAndOptionsDialog {
 	
 	private void editMap (boolean createNewMap) {
 		LanguageMap langMap;
-		String caption;
 		int n = -1;
 		if ( createNewMap ) {
-			caption = "New Language Map";
-			langMap = new LanguageMap("", "");
+			langMap = new LanguageMap("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			n = lbLangMaps.getSelectionIndex();
 			if ( n == -1 ) return;
 			langMap = srxDoc.getAllLanguagesMaps().get(n);
-			caption = "Edit Language Map";
 		}
 		
-		LanguageMapDialog dlg = new LanguageMapDialog(shell, caption, langMap, helpPath);
+		LanguageMapDialog dlg = new LanguageMapDialog(shell, langMap, helpPath);
 		if ( (langMap = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewMap ) {
@@ -430,27 +427,28 @@ public class GroupsAndOptionsDialog {
 		String oldName = null;
 		String caption;
 		if ( createNewRules ) {
-			name = String.format("group%d",
+			name = String.format(Res.getString("options.defaultGroupName"), //$NON-NLS-1$
 				srxDoc.getAllLanguageRules().size()+1);
-			caption = "New Rules";
+			caption = Res.getString("options.newGroupCaption"); //$NON-NLS-1$
 		}
 		else {
 			int n = lbLangRules.getSelectionIndex();
 			if ( n == -1 ) return;
 			oldName = name = lbLangRules.getItem(n);
-			caption = "Rename Rules";
+			caption = Res.getString("options.renameGroupCaption"); //$NON-NLS-1$
 		}
 		
 		while ( true ) {
 			// Edit the name
-			InputDialog dlg = new InputDialog(shell, caption, "Name of the rules:", name, null, 0);
+			InputDialog dlg = new InputDialog(shell, caption,
+				Res.getString("options.groupNameLabel"), name, null, 0); //$NON-NLS-1$
 			if ( (name = dlg.showDialog()) == null ) return; // Cancel
 		
 			// Else:
 			if ( createNewRules ) {
 				if ( srxDoc.getAllLanguageRules().containsKey(name) ) {
 					Dialogs.showError(shell,
-						String.format("The name \"%s\" exists already.\nPlease choose another one.", name),
+						String.format(Res.getString("options.sameNameError"), name), //$NON-NLS-1$
 						null);
 				}
 				else {
@@ -475,8 +473,7 @@ public class GroupsAndOptionsDialog {
 		// Ask confirmation
 		MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 		dlg.setText(shell.getText());
-		dlg.setMessage(String.format("This command will delete all thes rules grouped under '%s'.\n"
-			+ "Do you want to proceed with the deletion?", ruleName));
+		dlg.setMessage(String.format(Res.getString("options.confirmRemoveRules"), ruleName)); //$NON-NLS-1$
 		switch ( dlg.open() ) {
 		case SWT.CANCEL:
 		case SWT.NO:
@@ -495,7 +492,7 @@ public class GroupsAndOptionsDialog {
 			LinkedHashMap<String, ArrayList<Rule>> list = srxDoc.getAllLanguageRules();
 			for ( LanguageMap langRule : srxDoc.getAllLanguagesMaps() ) {
 				if ( !list.containsKey(langRule.getRuleName()) ) {
-					if ( nonexistingRules > 0 ) notMapped.append(", ");
+					if ( nonexistingRules > 0 ) notMapped.append(", "); //$NON-NLS-1$
 					notMapped.append(langRule.getRuleName());
 					nonexistingRules++;
 				}
@@ -505,9 +502,8 @@ public class GroupsAndOptionsDialog {
 			// Else: Error.
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setText(shell.getText());
-			dlg.setMessage(String.format("Number of language maps associated with non-existing rules: %d\n"
-				+ "(%s)\n"
-				+ "Do you want to proceed closing the dialog?", nonexistingRules, notMapped.toString()));
+			dlg.setMessage(String.format(Res.getString("options.badNamesError"), //$NON-NLS-1$
+				nonexistingRules, notMapped.toString()));
 			switch ( dlg.open() ) {
 			case SWT.CANCEL:
 			case SWT.NO:

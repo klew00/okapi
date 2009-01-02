@@ -1,0 +1,17 @@
+﻿Text in <B>bold.</B> Text in <I>italics</I>. Normal text.<BR/>
+Abbreviations such as Mr. Smith, Ms. Smith, Mrs Smith, etc. can cause issues.
+He said: "Better now than never!" and also "It's too late."
+
+Mr. Holmes is from the <I>U.K.</I> <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>
+
+1. First line
+2. Second line
+First segment	Segment after tab.
+B.	Line for case B
+C. Line for case C
+Go visit the U.S. in Sept. because it's less crowded.
+
+Sentence one.<b> Sentence</b> two.
+Sentence <b>one.</b> Sentence two.
+Sentence one.<br/> Sentence two.
+Sentence <b>one.</b><i></i><br/><u> Sentence</u> two.

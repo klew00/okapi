@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,13 +47,12 @@ public class LanguageMapDialog {
 	private String helpPath;
 
 	public LanguageMapDialog (Shell parent,
-		String caption,
 		LanguageMap langMap,
 		String helpPath)
 	{
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		if ( caption != null ) shell.setText(caption);
+		shell.setText("Edit Language Map");
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		
