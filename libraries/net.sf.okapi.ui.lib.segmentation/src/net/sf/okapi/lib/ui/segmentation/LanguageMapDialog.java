@@ -52,8 +52,8 @@ public class LanguageMapDialog {
 	{
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Edit Language Map");
-		shell.setImage(parent.getImage());
+		shell.setText(Res.getString("langMap.caption")); //$NON-NLS-1$
+		shell.setImages(parent.getImages());
 		shell.setLayout(new GridLayout());
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
@@ -62,7 +62,7 @@ public class LanguageMapDialog {
 		cmpTmp.setLayout(layTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Regular expression describing the language map:");
+		label.setText(Res.getString("langMap.regexLabel")); //$NON-NLS-1$
 		
 		edPattern = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -70,7 +70,7 @@ public class LanguageMapDialog {
 		edPattern.setText(langMap.getPattern());
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Name of the language rule associated with the regular expression:");
+		label.setText(Res.getString("langMap.groupName")); //$NON-NLS-1$
 		
 		edRuleName = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -82,11 +82,11 @@ public class LanguageMapDialog {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					callHelp();
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();

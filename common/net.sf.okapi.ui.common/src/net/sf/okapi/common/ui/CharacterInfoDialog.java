@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Yves Savourel                                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.common.ui;
 
@@ -64,7 +64,8 @@ public class CharacterInfoDialog {
 		help = helpFile;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( captionText != null ) shell.setText(captionText);
-		shell.setImage(parent.getImage());
+		if ( parent.getImages() != null ) shell.setImages(parent.getImages());
+		else shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
@@ -86,7 +87,7 @@ public class CharacterInfoDialog {
 		stRendering.setFont(sampleFont);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Code point:");
+		label.setText(Res.getString("charInfoDlg.codePoint")); //$NON-NLS-1$
 		edCodePoint = new Text(cmpTmp, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 60;
@@ -98,7 +99,7 @@ public class CharacterInfoDialog {
 		});
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Character:");
+		label.setText(Res.getString("charInfoDlg.char")); //$NON-NLS-1$
 		edCharacter = new Text(cmpTmp, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 30;
@@ -110,7 +111,7 @@ public class CharacterInfoDialog {
 		});
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Character type:");
+		label.setText(Res.getString("charInfoDlg.charType")); //$NON-NLS-1$
 		edType = new Text(cmpTmp, SWT.BORDER);
 		edType.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -118,7 +119,7 @@ public class CharacterInfoDialog {
 		edType.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Numeric value:");
+		label.setText(Res.getString("charInfoDlg.numValue")); //$NON-NLS-1$
 		edNumValue = new Text(cmpTmp, SWT.BORDER);
 		edNumValue.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -126,7 +127,7 @@ public class CharacterInfoDialog {
 		edNumValue.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Java isWhitespace():");
+		label.setText(Res.getString("charInfoDlg.isWhitespace")); //$NON-NLS-1$
 		edIsJavaSpace = new Text(cmpTmp, SWT.BORDER);
 		edIsJavaSpace.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -134,7 +135,7 @@ public class CharacterInfoDialog {
 		edIsJavaSpace.setLayoutData(gdTmp);
 
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Is Unicode whitespace:");
+		label.setText(Res.getString("charInfoDlg.isUniWhitespace")); //$NON-NLS-1$
 		edIsUnicodeSpace = new Text(cmpTmp, SWT.BORDER);
 		edIsUnicodeSpace.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -145,7 +146,7 @@ public class CharacterInfoDialog {
 
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					UIUtil.start(help);
 					return;
 				}
@@ -181,7 +182,7 @@ public class CharacterInfoDialog {
 			edCodePoint.setSelection(4, 4);
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Invalid value: "+e.getMessage(), null);
+			Dialogs.showError(shell, Res.getString("charInfoDlg.invalidValue")+e.getMessage(), null); //$NON-NLS-1$
 		}
 	}
 	
@@ -193,113 +194,113 @@ public class CharacterInfoDialog {
 			setCodePoint(tmp.codePointAt(0));
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Invalid value: "+e.getMessage(), null);
+			Dialogs.showError(shell, Res.getString("charInfoDlg.invalidValue")+e.getMessage(), null); //$NON-NLS-1$
 		}
 	}
 	
 	private void setCodePoint (int value) {
 		settingCodePoint = true;
 		codePoint = value;
-		stRendering.setText(String.format("%c", codePoint));
+		stRendering.setText(String.format("%c", codePoint)); //$NON-NLS-1$
 		edCharacter.setText(stRendering.getText());
-		edCodePoint.setText(String.format("%04X", codePoint));
+		edCodePoint.setText(String.format("%04X", codePoint)); //$NON-NLS-1$
 		
 		int type = Character.getType(codePoint);
 		switch ( type ) {
 		case Character.COMBINING_SPACING_MARK:
-			edType.setText("Mc : COMBINING_SPACING_MARK");
+			edType.setText("Mc : COMBINING_SPACING_MARK"); //$NON-NLS-1$
 			break;
 		case Character.CONNECTOR_PUNCTUATION:
-			edType.setText("Pc : CONNECTOR_PUNCTUATION");
+			edType.setText("Pc : CONNECTOR_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.CONTROL:
-			edType.setText("Cc : CONTROL");
+			edType.setText("Cc : CONTROL"); //$NON-NLS-1$
 			break;
 		case Character.CURRENCY_SYMBOL:
-			edType.setText("Sc : CURRENCY_SYMBOL");
+			edType.setText("Sc : CURRENCY_SYMBOL"); //$NON-NLS-1$
 			break;
 		case Character.DASH_PUNCTUATION:
-			edType.setText("Pd : DASH_PUNCTUATION");
+			edType.setText("Pd : DASH_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.DECIMAL_DIGIT_NUMBER:
-			edType.setText("Nd : DECIMAL_DIGIT_NUMBER");
+			edType.setText("Nd : DECIMAL_DIGIT_NUMBER"); //$NON-NLS-1$
 			break;
 		case Character.ENCLOSING_MARK:
-			edType.setText("Me : ENCLOSING_MARK");
+			edType.setText("Me : ENCLOSING_MARK"); //$NON-NLS-1$
 			break;
 		case Character.END_PUNCTUATION:
-			edType.setText("Pe : END_PUNCTUATION");
+			edType.setText("Pe : END_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.FINAL_QUOTE_PUNCTUATION:
-			edType.setText("Pf : FINAL_QUOTE_PUNCTUATION");
+			edType.setText("Pf : FINAL_QUOTE_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.FORMAT:
-			edType.setText("Cf : FORMAT");
+			edType.setText("Cf : FORMAT"); //$NON-NLS-1$
 			break;
 		case Character.INITIAL_QUOTE_PUNCTUATION:
-			edType.setText("Pi : INITIAL_QUOTE_PUNCTUATION");
+			edType.setText("Pi : INITIAL_QUOTE_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.LETTER_NUMBER:
-			edType.setText("Nl : LETTER_NUMBER");
+			edType.setText("Nl : LETTER_NUMBER"); //$NON-NLS-1$
 			break;
 		case Character.UPPERCASE_LETTER:
-			edType.setText("Lu : UPPERCASE_LETTER");
+			edType.setText("Lu : UPPERCASE_LETTER"); //$NON-NLS-1$
 			break;
  		case Character.LINE_SEPARATOR:
- 			edType.setText("Zl : LINE_SEPARATOR");
+ 			edType.setText("Zl : LINE_SEPARATOR"); //$NON-NLS-1$
  			break;
  		case Character.LOWERCASE_LETTER:
-	 		edType.setText("Ll : LOWERCASE_LETTER");
+	 		edType.setText("Ll : LOWERCASE_LETTER"); //$NON-NLS-1$
 			break;
 		case Character.MATH_SYMBOL:
-			edType.setText("Sm : MATH_SYMBOL");
+			edType.setText("Sm : MATH_SYMBOL"); //$NON-NLS-1$
 			break;
 		case Character.MODIFIER_LETTER:
-			edType.setText("Lm : MODIFIER_LETTER");
+			edType.setText("Lm : MODIFIER_LETTER"); //$NON-NLS-1$
 			break;
 		case Character.MODIFIER_SYMBOL:
-			edType.setText("Sk : MODIFIER_SYMBOL");
+			edType.setText("Sk : MODIFIER_SYMBOL"); //$NON-NLS-1$
 			break;
 		case Character.NON_SPACING_MARK:
-			edType.setText("Mn : NON_SPACING_MARK");
+			edType.setText("Mn : NON_SPACING_MARK"); //$NON-NLS-1$
 			break;
 		case Character.OTHER_LETTER:
-			edType.setText("Lo : OTHER_LETTER");
+			edType.setText("Lo : OTHER_LETTER"); //$NON-NLS-1$
 			break;
 		case Character.OTHER_NUMBER:
-			edType.setText("No : OTHER_NUMBER");
+			edType.setText("No : OTHER_NUMBER"); //$NON-NLS-1$
 			break;
 		case Character.OTHER_PUNCTUATION:
-			edType.setText("Po : OTHER_PUNCTUATION");
+			edType.setText("Po : OTHER_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.OTHER_SYMBOL:
-			edType.setText("So : OTHER_SYMBOL");
+			edType.setText("So : OTHER_SYMBOL"); //$NON-NLS-1$
 			break;
 		case Character.PARAGRAPH_SEPARATOR:
-			edType.setText("Zp : PARAGRAPH_SEPARATOR");
+			edType.setText("Zp : PARAGRAPH_SEPARATOR"); //$NON-NLS-1$
 			break;
 		case Character.PRIVATE_USE:
-			edType.setText("Co : PRIVATE_USE");
+			edType.setText("Co : PRIVATE_USE"); //$NON-NLS-1$
 			break;
 		case Character.SPACE_SEPARATOR:
-			edType.setText("Zs : SPACE_SEPARATOR");
+			edType.setText("Zs : SPACE_SEPARATOR"); //$NON-NLS-1$
 			break;
 		case Character.START_PUNCTUATION:
-			edType.setText("Ps : START_PUNCTUATION");
+			edType.setText("Ps : START_PUNCTUATION"); //$NON-NLS-1$
 			break;
 		case Character.SURROGATE:
-			edType.setText("Cs : SURROGATE");
+			edType.setText("Cs : SURROGATE"); //$NON-NLS-1$
 			break;
 		case Character.TITLECASE_LETTER:
-			edType.setText("Lt : TITLECASE_LETTER");
+			edType.setText("Lt : TITLECASE_LETTER"); //$NON-NLS-1$
 			break;
 		case Character.UNASSIGNED:
-			edType.setText("Cn : UNASSIGNED");
+			edType.setText("Cn : UNASSIGNED"); //$NON-NLS-1$
 			break;
 		}
 		
-		edIsJavaSpace.setText(Character.isWhitespace(codePoint)? "YES" : "NO");
-		edIsUnicodeSpace.setText(Character.isSpaceChar(codePoint)? "YES" : "NO");
+		edIsJavaSpace.setText(Character.isWhitespace(codePoint)? Res.getString("charInfoDlg.yes") : Res.getString("charInfoDlg.no")); //$NON-NLS-1$ //$NON-NLS-2$
+		edIsUnicodeSpace.setText(Character.isSpaceChar(codePoint)? Res.getString("charInfoDlg.yes") : Res.getString("charInfoDlg.no")); //$NON-NLS-1$ //$NON-NLS-2$
 		edNumValue.setText(String.valueOf(Character.getNumericValue(codePoint)));
 		
 		settingCodePoint = false;

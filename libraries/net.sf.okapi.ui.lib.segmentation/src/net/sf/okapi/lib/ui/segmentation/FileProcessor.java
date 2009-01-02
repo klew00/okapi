@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,9 +47,9 @@ public class FileProcessor {
 	private GenericInlines sampleOutput;
 	
 	public FileProcessor () {
-		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>");
-		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>");
-		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>");
+		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>"); //$NON-NLS-1$
+		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>"); //$NON-NLS-1$
+		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>"); //$NON-NLS-1$
 		sampleOutput = new GenericInlines();
 	}
 	
@@ -109,15 +109,15 @@ public class FileProcessor {
 		BufferedWriter writer = null;
 		try {
 			reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(inputPath), "UTF-8"));
+				new InputStreamReader(new FileInputStream(inputPath), "UTF-8")); //$NON-NLS-1$
 
 			Util.createDirectories(outputPath);
 			writer = new BufferedWriter(new OutputStreamWriter(
-				new BufferedOutputStream(new FileOutputStream(outputPath)), "UTF-8"));
+				new BufferedOutputStream(new FileOutputStream(outputPath)), "UTF-8")); //$NON-NLS-1$
 
 			if ( htmlOutput ) {
-				writer.write("<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>");
-				writer.write("<title>Segmentation Test Output</title><style>p {white-space: pre; font-family: monospace; border: 1px solid; padding: 4; margin-top: 0; margin-bottom: -1;}</style></head><body>");
+				writer.write("<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"); //$NON-NLS-1$
+				writer.write("<style>p {white-space: pre; font-family: monospace; border: 1px solid; padding: 4; margin-top: 0; margin-bottom: -1;}</style></head><body>"); //$NON-NLS-1$
 			}
 			
 			// Read the whole file into one string
@@ -125,7 +125,7 @@ public class FileProcessor {
 			StringBuilder tmp = new StringBuilder();
 			String buffer;
 			while ( (buffer = reader.readLine()) != null ) {
-				if ( tmp.length() > 0 ) tmp.append("\n");
+				if ( tmp.length() > 0 ) tmp.append("\n"); //$NON-NLS-1$
 				tmp.append(buffer);
 			}
 			
@@ -137,9 +137,9 @@ public class FileProcessor {
 			if ( htmlOutput ) {
 				List<TextFragment> list = textCont.getSegments();
 				for ( TextFragment frag : list ) {
-					writer.write("<p>");
+					writer.write("<p>"); //$NON-NLS-1$
 					writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false));
-					writer.write("</p>");
+					writer.write("</p>"); //$NON-NLS-1$
 				}
 			}
 			else {
@@ -147,7 +147,7 @@ public class FileProcessor {
 			}
 
 			if ( htmlOutput ) {
-				writer.write("</body></html>");
+				writer.write("</body></html>"); //$NON-NLS-1$
 			}
 		}
 		finally {

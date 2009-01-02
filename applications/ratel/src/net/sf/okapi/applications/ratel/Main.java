@@ -35,7 +35,8 @@ public class Main {
 	public static void main (String args[])
 	{
 		Display dispMain = null;
-		Image img = null;
+		Image img16 = null;
+		Image img32 = null;
 		try {
 			// Compute the path of the help file
 			File file = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile());
@@ -49,8 +50,9 @@ public class Main {
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
-			img = new Image(dispMain, Main.class.getResourceAsStream("images/ratel.png")); //$NON-NLS-1$
-			shlMain.setImage(img);
+			img16 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel16.png")); //$NON-NLS-1$
+			img32 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel32.png")); //$NON-NLS-1$
+			shlMain.setImages(new Image[]{img16, img32});
 			SRXEditor editor = new SRXEditor(shlMain, false, helpPath);
 			editor.showDialog(null);
 		}
@@ -58,7 +60,8 @@ public class Main {
 			e.printStackTrace();
 		}
 		finally {
-			if ( img != null ) img.dispose();
+			if ( img16 != null ) img16.dispose();
+			if ( img32 != null ) img32.dispose();
 			if ( dispMain != null ) dispMain.dispose();
 		}
     }

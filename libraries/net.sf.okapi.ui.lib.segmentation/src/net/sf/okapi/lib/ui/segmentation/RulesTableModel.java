@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,11 +37,11 @@ class RulesTableModel {
 	void linkTable (Table newTable) {
 		table = newTable;
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Type");
+		col.setText(Res.getString("ruleTable.type")); //$NON-NLS-1$
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("Before Break");
+		col.setText(Res.getString("ruleTable.beforeBreak")); //$NON-NLS-1$
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("After Break");
+		col.setText(Res.getString("ruleTable.afterBreak")); //$NON-NLS-1$
 	}
 	
 	void setLanguageRules (ArrayList<Rule> list) {
@@ -54,7 +54,7 @@ class RulesTableModel {
 		for ( Rule rule : list ) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setChecked(rule.isActive());
-			item.setText(0, rule.isBreak() ? "Break" : "No-Break");
+			item.setText(0, rule.isBreak() ? Res.getString("ruleTable.break") : Res.getString("ruleTable.noBreak")); //$NON-NLS-1$ //$NON-NLS-2$
 			item.setText(1, rule.getBefore());
 			item.setText(2, rule.getAfter());
 		}

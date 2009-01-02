@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -53,8 +53,8 @@ public class FileProcessingDialog {
 	{
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Test Segmentation on a File");
-		shell.setImage(parent.getImage());
+		shell.setText(Res.getString("testFileDlg.caption")); //$NON-NLS-1$
+		shell.setImages(parent.getImages());
 		shell.setLayout(new GridLayout());
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
@@ -63,7 +63,7 @@ public class FileProcessingDialog {
 		cmpTmp.setLayoutData(gdTmp);
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Full path of the input test file to segment:");
+		label.setText(Res.getString("testFileDlg.inputPath")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
@@ -73,11 +73,11 @@ public class FileProcessingDialog {
 		edInput.setLayoutData(gdTmp);
 		
 		Button btGetInput = new Button(cmpTmp, SWT.PUSH);
-		btGetInput.setText("...");
+		btGetInput.setText("..."); //$NON-NLS-1$
 		btGetInput.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell, "Input Test File", false,
-					edInput.getText(), "Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+				String[] paths = Dialogs.browseFilenames(shell, Res.getString("testFileDlg.getInputCaption"), false, //$NON-NLS-1$
+					edInput.getText(), Res.getString("testFileDlg.getInputFileTypes"), Res.getString("testFileDlg.getInputFilter")); //$NON-NLS-1$ //$NON-NLS-2$
 				if ( paths == null ) return;
 				edInput.setText(paths[0]);
 				edInput.selectAll();
@@ -87,7 +87,7 @@ public class FileProcessingDialog {
 		});
 
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Full path of the output file:");
+		label.setText(Res.getString("testFileDlg.outputPath")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
@@ -97,11 +97,11 @@ public class FileProcessingDialog {
 		edOutput.setLayoutData(gdTmp);
 
 		Button btGetOutput = new Button(cmpTmp, SWT.PUSH);
-		btGetOutput.setText("...");
+		btGetOutput.setText("..."); //$NON-NLS-1$
 		btGetOutput.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String path = Dialogs.browseFilenamesForSave(shell, "Output Test File",
-					edInput.getText(), "Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+				String path = Dialogs.browseFilenamesForSave(shell, Res.getString("testFileDlg.getOutputCaption"), //$NON-NLS-1$
+					edInput.getText(), Res.getString("testFileDlg.getOutputFileTypes"), Res.getString("testFileDlg.getOutputFilter")); //$NON-NLS-1$ //$NON-NLS-2$
 				if ( path == null ) return;
 				edOutput.setText(path);
 				edOutput.selectAll();
@@ -110,7 +110,7 @@ public class FileProcessingDialog {
 		});
 
 		chkHtmlOutput = new Button(cmpTmp, SWT.CHECK);
-		chkHtmlOutput.setText("Create HTML output");
+		chkHtmlOutput.setText(Res.getString("testFileDlg.createHTML")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkHtmlOutput.setLayoutData(gdTmp);
@@ -125,11 +125,11 @@ public class FileProcessingDialog {
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					callHelp();
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();
@@ -180,7 +180,7 @@ public class FileProcessingDialog {
 			result = new String[3];
 			result[0] = edInput.getText();
 			result[1] = edOutput.getText();
-			result[2] = (chkHtmlOutput.getSelection() ? "html" : null);
+			result[2] = (chkHtmlOutput.getSelection() ? "html" : null); //$NON-NLS-1$
 			return true;
 		}
 		catch ( Exception e) {
@@ -194,16 +194,16 @@ public class FileProcessingDialog {
 	}
 
 	private String makeHtmlOutputPath (String inputPath) {
-		if ( inputPath.length() == 0 ) return "";
-		return inputPath + ".html";
+		if ( inputPath.length() == 0 ) return ""; //$NON-NLS-1$
+		return inputPath + ".html"; //$NON-NLS-1$
 	}
 	
 	private String makeNonHtmlOutputPath (String inputPath) {
-		if ( inputPath.length() == 0 ) return "";
+		if ( inputPath.length() == 0 ) return ""; //$NON-NLS-1$
 		String ext = Util.getExtension(inputPath);
 		String filename = Util.getFilename(inputPath, false);
 		return Util.getDirectoryName(inputPath) + File.separator +
-			filename + ".segmented" + ext;
+			filename + Res.getString("testFileDlg.outputExtension") + ext; //$NON-NLS-1$
 	}
 	
 	private void updateOutputPath () {
