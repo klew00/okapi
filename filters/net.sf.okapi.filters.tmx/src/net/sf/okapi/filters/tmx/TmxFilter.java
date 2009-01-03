@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
+
 package net.sf.okapi.filters.tmx;
 
 import java.io.IOException;
@@ -470,11 +490,7 @@ public class TmxFilter implements IFilter {
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnit tu = new TextUnit(String.format("t%d", ++tuId),null,false,"text/xml");
-		TargetsAnnotation ta = new TargetsAnnotation();
-		TextContainer trgCont = new TextContainer();
-		
-		ta.set(targetLanguage, trgCont);
-		tu.setAnnotation(ta);
+		TextContainer trgCont = tu.setTarget(targetLanguage, new TextContainer());
 		
 		//--process the opening tu element which is 0 unspecified at this point--
 		appendStartElement(skel, tu, tuvType);

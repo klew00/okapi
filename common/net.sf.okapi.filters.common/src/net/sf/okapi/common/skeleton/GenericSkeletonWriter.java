@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,8 +37,6 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TargetsAnnotation;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.writer.ILayerProvider;
@@ -277,17 +275,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			tf = tu.getSourceContent();
 		}
 		else {
-			if ( tu.getAnnotation(TargetsAnnotation.class) == null ) {
+			if ( (tf = tu.getTargetContent(langToUse)) == null ) {
 				tf = tu.getSourceContent();
-			}
-			else {
-				TextContainer tc = ((TargetsAnnotation)tu.getAnnotation(TargetsAnnotation.class)).get(langToUse);
-				if ( tc == null ) {
-					tf = tu.getSourceContent();
-				}
-				else {
-					tf = tc.getContent();
-				}
 			}
 		}
 		// Apply the layer

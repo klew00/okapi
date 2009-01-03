@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
@@ -40,6 +41,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private Annotations annotations;
 	private TextContainer source;
 	private String mimeType;
+	private ConcurrentHashMap<String, TextContainer> targets;
 
 	/**
 	 * Creates a new TextUnit object.
@@ -96,7 +98,7 @@ public class TextUnit implements INameable, IReferenceable {
 		boolean isReferent,
 		String mimeType)
 	{
-		annotations = new Annotations();
+		targets = new ConcurrentHashMap<String, TextContainer>();
 		this.id = id;
 		this.isReferent = isReferent;
 		this.mimeType = mimeType;
@@ -145,10 +147,14 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	@SuppressWarnings("unchecked")
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
-		return (A)annotations.get(type);
+		if ( annotations == null ) return null;
+		else return (A)annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
+		if ( annotations == null ) {
+			annotations = new Annotations();
+		}
 		annotations.set(annotation);
 	}
 
@@ -222,12 +228,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	public Set<String> getTargetLanguages () {
-		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-		if ( ta == null ) {
-			ta = new TargetsAnnotation();
-			annotations.set(ta);
-		}
-		return ta.getLanguages();
+		return targets.keySet();
 	}
 
 	public Property createTargetProperty (String language,
@@ -301,9 +302,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * it does not exist.
 	 */
 	public TextContainer getTarget (String language) {
-		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-		if ( ta == null ) return null;
-		return ta.get(language);
+		return targets.get(language);
 	}
 
 	/**
@@ -318,12 +317,7 @@ public class TextUnit implements INameable, IReferenceable {
 	public TextContainer setTarget (String language,
 		TextContainer text)
 	{
-		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-		if ( ta == null ) {
-			ta = new TargetsAnnotation();
-			annotations.set(ta);
-		}
-		ta.set(language, text);
+		targets.put(language, text);
 		return text;
 	}
 	
@@ -333,8 +327,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 */
 	public void removeTarget (String language) {
 		if ( hasTarget(language) ) {
-			TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-			ta.remove(language);
+			targets.remove(language);
 		}
 	}
 	
@@ -344,9 +337,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @return True if a target object exists for the given language, false otherwise.
 	 */
 	public boolean hasTarget (String language) {
-		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-		if ( ta == null ) return false;
-		return (ta.get(language) != null);
+		return (targets.get(language) != null);
 	}
 	
 	/**
@@ -365,12 +356,7 @@ public class TextUnit implements INameable, IReferenceable {
 		boolean overwriteExisting,
 		int creationOptions)
 	{
-		TargetsAnnotation ta = annotations.get(TargetsAnnotation.class);
-		if ( ta == null ) {
-			ta = new TargetsAnnotation();
-			annotations.set(ta);
-		}
-		TextContainer tc = ta.get(language);
+		TextContainer tc = targets.get(language);
 		if (( tc == null ) || overwriteExisting ) {
 			tc = new TextContainer();
 			if ( (creationOptions & COPY_CONTENT) == COPY_CONTENT ) {
@@ -385,7 +371,7 @@ public class TextUnit implements INameable, IReferenceable {
 					}
 				}
 			}
-			ta.set(language, tc);
+			targets.put(language, tc);
 		}
 		return tc;
 	}
