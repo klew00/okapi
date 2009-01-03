@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,16 +16,20 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.openoffice;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.IParameters;
@@ -33,14 +37,13 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 
 /**
  * This class implements the IFilter interface for Open-Office.org documents
- * (ODT, ODP, ODS, and ODG files). It expects the zipped files as input, and calls the
- * ODFFilter as needed to process the content documents.
+ * (ODT, ODP, ODS, and ODG files). It expects the ZIP files as input, and calls the
+ * ODFFilter as needed to process the embedded documents.
  */
 public class OpenOfficeFilter implements IFilter {
 
@@ -48,17 +51,14 @@ public class OpenOfficeFilter implements IFilter {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
 	}
 
-	private String docName;
-	private InputStream input;
 	private ODFFilter odf;
 	private ZipFile zipFile;
 	private StateType nextAction = StateType.DONE;
-	private String inputPath;
+	private URL inputUrl;
 	private Enumeration<? extends ZipEntry> entries;
-	private FilterEvent event;
-	private StartSubDocument startSubDoc;
 	private int subDocId;
-
+	private LinkedList<FilterEvent> queue;
+	
 	public OpenOfficeFilter () {
 		odf = new ODFFilter();
 	}
@@ -89,11 +89,16 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		return (nextAction != StateType.DONE);
+		return ((( queue != null ) && ( !queue.isEmpty() )) || ( nextAction != StateType.DONE ));
 	}
 
 	public FilterEvent next () {
 		try {
+			// Return queue content first
+			if ( !queue.isEmpty() ) {
+				return queue.poll();
+			}
+			// Else: get the next event
 			switch ( nextAction ) {
 			case OPENZIP:
 				return openZipFile();
@@ -117,9 +122,10 @@ public class OpenOfficeFilter implements IFilter {
 	}
 	
 	public void open (URL inputUrl) {
-		//TODO
-		docName = inputUrl.getPath();
-		
+		this.inputUrl = inputUrl;
+		queue = new LinkedList<FilterEvent>();
+		queue.add(new FilterEvent(FilterEventType.START));
+		nextAction = StateType.OPENZIP;
 	}
 
 	public void open (CharSequence inputText) {
@@ -148,12 +154,24 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	private FilterEvent openZipFile () throws IOException {
-		zipFile = new ZipFile(inputPath);
-		entries = zipFile.entries();
-		
-		event = new FilterEvent(FilterEventType.START_DOCUMENT);
-		nextAction = StateType.NEXTINZIP;
-		return event;
+		try {
+			zipFile = new ZipFile(new File(inputUrl.toURI()));
+			entries = zipFile.entries();
+			subDocId = 0;
+			nextAction = StateType.NEXTINZIP;
+			StartDocument startDoc = new StartDocument("sd");
+			startDoc.setName(inputUrl.getPath());
+			return new FilterEvent(FilterEventType.START_DOCUMENT, startDoc);
+		}
+		catch ( ZipException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( URISyntaxException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private FilterEvent nextInZipFile () throws IOException {
@@ -170,32 +188,25 @@ public class OpenOfficeFilter implements IFilter {
 			else continue;
 		}
 
-		// No more sub-documents: end of the document
+		// No more sub-documents: end of the ZIP document
 		close();
-		event = new FilterEvent(FilterEventType.END_DOCUMENT, odf.resource);
+		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		Ending ending = new Ending("ed");
 		nextAction = StateType.DONE;
-		return event;
+		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
 	}
 
 	private FilterEvent openSubDocument (ZipEntry zipEntry) throws IOException {
 		// Start of the sub-document
 		// Get the input stream
-		input = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-		odf.open(input);
-		subDocId = 0;
-		// Send the start sub-document event
-		startSubDoc = new StartSubDocument(null);
-		startSubDoc.setName(zipEntry.getName());
-		startSubDoc.setType(zipEntry.getName());
-		event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDoc);
+		odf.open(new BufferedInputStream(zipFile.getInputStream(zipEntry)));
 		nextAction = StateType.NEXTINSUBDOC;
-		return event;
+		return nextInSubDocument();
 	}
 	
 	private FilterEvent nextInSubDocument () throws IOException {
-		FilterEvent event;
 		while ( odf.hasNext() ) {
-			event = odf.next();
+			FilterEvent event = odf.next();
 			switch ( (FilterEventType)event.getEventType() ) {
 			case START:
 			case FINISHED:
@@ -224,10 +235,10 @@ public class OpenOfficeFilter implements IFilter {
 			}
 		}
 
-		// Send the end sub-document even
+		// Send the end sub-document event
 		odf.close();
 		nextAction = StateType.NEXTINZIP;
-		return null;
+		return nextInZipFile();
 	}
 
 }

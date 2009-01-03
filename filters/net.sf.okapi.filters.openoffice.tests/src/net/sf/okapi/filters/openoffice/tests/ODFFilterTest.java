@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.openoffice.tests;
 
@@ -30,7 +30,7 @@ import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
-import net.sf.okapi.filters.openoffice.ODFFilter;
+import net.sf.okapi.filters.openoffice.ODFFilter2;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,9 +39,9 @@ public class ODFFilterTest {
 
 	@Test
 	public void runTest () {
-		ODFFilter filter = null;		
+		ODFFilter2 filter = null;		
 		try {
-			filter = new ODFFilter();
+			filter = new ODFFilter2();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = ODFFilterTest.class.getResource("/content_TestDocument01.odt.xml");
 			filter.open(url);

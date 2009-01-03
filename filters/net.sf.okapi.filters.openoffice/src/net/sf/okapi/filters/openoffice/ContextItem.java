@@ -20,26 +20,22 @@
 
 package net.sf.okapi.filters.openoffice;
 
-import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class Parameters extends BaseParameters {
+public class ContextItem {
+
+	public ContextItem (boolean inText,
+		TextUnit tu,
+		GenericSkeleton skel)
+	{
+		this.inText = inText;
+		this.tu = tu;
+		this.skel = skel;
+	}
 	
-	public boolean extractComments;
-	
-	public void reset () {
-		extractComments = false;
-	}
+	public boolean inText;
+	public TextUnit tu;
+	public GenericSkeleton skel;
 
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		extractComments = buffer.getBoolean("extractComments", extractComments);
-	}
-
-	@Override
-	public String toString () {
-		buffer.reset();
-		buffer.setBoolean("extractComments", extractComments);
-		return buffer.toString();
-	}
 }
