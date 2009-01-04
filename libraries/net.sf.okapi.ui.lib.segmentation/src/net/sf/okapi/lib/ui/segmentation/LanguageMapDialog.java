@@ -53,7 +53,7 @@ public class LanguageMapDialog {
 		this.helpPath = helpPath;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("langMap.caption")); //$NON-NLS-1$
-		shell.setImages(parent.getImages());
+		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);

@@ -91,7 +91,7 @@ public class Util {
 	/**
 	 * Gets the directory name of a full path.
 	 * @param path Full path from where to extract the directory name. The path
-	 * can be a URL path (e.g. /C:/test/file.ext).
+	 * can be a URL path (e.g. "/C:/test/file.ext").
 	 * @return The directory name (without the final separator), or an empty
 	 * string if p_sPath is a filename.
 	 */

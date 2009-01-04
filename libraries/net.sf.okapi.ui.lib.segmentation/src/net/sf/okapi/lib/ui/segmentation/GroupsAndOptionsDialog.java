@@ -79,7 +79,7 @@ public class GroupsAndOptionsDialog {
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("options.caption")); //$NON-NLS-1$
-		shell.setImages(parent.getImages());
+		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(2, true));
 		
 		Group grpTmp = new Group(shell, SWT.NONE);

@@ -2,6 +2,7 @@ package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ResourceItem;
 
@@ -38,7 +39,7 @@ public class ConnectorOptionsForm {
 	public ConnectorOptionsForm (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Translation Resource Options");
-		shell.setImage(parent.getImage());
+		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(2, false));
 		
 		Label stTmp = new Label(shell, SWT.NONE);

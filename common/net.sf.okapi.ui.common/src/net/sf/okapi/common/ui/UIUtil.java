@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 
 public class UIUtil {
 
@@ -113,4 +115,19 @@ public class UIUtil {
 		return newButton;
 	}
 	
+	/**
+	 * Sets the icon of a dialog to the image(s) inherited from the parent
+	 * shell. If the parent has several images available, they are passed to the
+	 * dialog, otherwise the current result of parent.getImage() is used. 
+	 * @param dialog The dialog where to set the icon.
+	 * @param parent The parent to inherit from.
+	 */
+	public static void inheritIcon (Shell dialog,
+		Shell parent)
+	{
+		Image[] list = parent.getImages();
+		if (( list == null ) || ( list.length < 2 )) dialog.setImage(parent.getImage()); 
+		else dialog.setImages(list);
+	}
+
 }

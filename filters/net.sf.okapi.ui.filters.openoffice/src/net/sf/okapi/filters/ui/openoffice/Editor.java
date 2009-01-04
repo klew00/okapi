@@ -24,6 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.filters.openoffice.Parameters;
 
 import org.eclipse.swt.SWT;
@@ -77,9 +78,9 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent) {
+	private void create (Shell parent) {
 		shell.setText("OpenOffice Filter Parameters");
-		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
+		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;
@@ -131,7 +132,7 @@ public class Editor implements IParametersEditor {
 		if ( startSize.x < 300 ) startSize.x = 300; 
 		if ( startSize.y < 200 ) startSize.y = 200; 
 		shell.setSize(startSize);
-		Dialogs.centerWindow(shell, p_Parent);
+		Dialogs.centerWindow(shell, parent);
 		setData();
 	}
 	

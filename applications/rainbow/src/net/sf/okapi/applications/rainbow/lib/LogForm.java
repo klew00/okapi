@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -55,7 +55,7 @@ public class LogForm implements ILog {
 	public LogForm (Shell p_Parent) {
 		shell = new Shell(p_Parent, SWT.BORDER | SWT.RESIZE | SWT.TITLE
 			| SWT.MODELESS | SWT.CLOSE | SWT.MAX | SWT.MIN);
-		shell.setImage(p_Parent.getImage());
+		UIUtil.inheritIcon(shell, p_Parent);
 		createContent();
 	}
 	

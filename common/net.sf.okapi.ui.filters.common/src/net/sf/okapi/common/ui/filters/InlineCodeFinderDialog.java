@@ -49,7 +49,7 @@ public class InlineCodeFinderDialog {
 		help = helpFile;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( captionText != null ) shell.setText(captionText);
-		shell.setImage(parent.getImage());
+		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);

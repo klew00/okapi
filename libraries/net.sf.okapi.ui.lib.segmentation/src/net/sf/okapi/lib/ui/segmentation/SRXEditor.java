@@ -125,7 +125,7 @@ public class SRXEditor {
 		
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
-			shell.setImage(parent.getImage());
+			UIUtil.inheritIcon(shell, parent);
 		}
 		else {
 			shell = parent;

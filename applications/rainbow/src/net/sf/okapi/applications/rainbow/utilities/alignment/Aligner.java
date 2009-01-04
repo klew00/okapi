@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -156,7 +156,7 @@ public class Aligner {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		shell.setText("Alignment Verification");
-		shell.setImage(parent.getImage());
+		UIUtil.inheritIcon(shell, parent);
 		GridLayout layout = new GridLayout();
 		layout.verticalSpacing = 0;
 		shell.setLayout(layout);
