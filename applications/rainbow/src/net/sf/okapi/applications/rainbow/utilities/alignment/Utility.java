@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
-import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -215,6 +214,7 @@ public class Utility extends BaseFilterDrivenUtility {
 
     private void processStartDocument (StartDocument resource) {
 		// fileName is the value we set as attribute in the TM.
+    	// Get it from the document name
 		fileName = Util.getFilename(resource.getName(), true);
 		
 		readTargetToDb();
@@ -323,7 +323,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				break;
 			case 0:
 				stopProcess = true;
-				fireCancelEvent(new CancelEvent(this));
+				cancel();
 				break;
 			}
 		}

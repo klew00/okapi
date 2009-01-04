@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+============================================================================*/
 
 package net.sf.okapi.common;
 
@@ -90,12 +90,16 @@ public class Util {
 
 	/**
 	 * Gets the directory name of a full path.
-	 * @param path Full path from where to extract the directory name.
+	 * @param path Full path from where to extract the directory name. The path
+	 * can be a URL path (e.g. /C:/test/file.ext).
 	 * @return The directory name (without the final separator), or an empty
 	 * string if p_sPath is a filename.
 	 */
 	static public String getDirectoryName (String path) {
 		int n = path.lastIndexOf(File.separator);
+		if ( n == -1 ) { // Try generic URL separator
+			n = path.lastIndexOf('/');
+		}
 		if ( n > 0 ) return path.substring(0, n);
 		else return "";
 	}
@@ -104,9 +108,13 @@ public class Util {
 	 * Creates the directory tree for the give full path (dir+filename)
 	 * @param path Directory and filename. If you want to pass only a directory
 	 * name make sure it has a trailing separator (e.g. "c:\project\tmp\").
+	 * The path can bea URL path (e.g. "/C:/test/file.ext").
 	 */
 	static public void createDirectories (String path) {
 		int n = path.lastIndexOf(File.separatorChar);
+		if ( n == -1 ) { // Try generic URL separator
+			n = path.lastIndexOf('/');
+		}
 		if ( n == -1 ) return; // Nothing to do
 		// Else, use the directory part and create the tree	
 		String dir = path.substring(0, n);
@@ -362,7 +370,8 @@ public class Util {
 	
 	/**
 	 * Gets the filename of a path.
-	 * @param path The path from where to get the filename.
+	 * @param path The path from where to get the filename. The path can be
+	 * a URL path (e.g. "/C:/test/file.ext").
 	 * @param keepExtension True to keep the existing extension, false to remove it.
 	 * @return The filename with or without extension.
 	 */
@@ -370,11 +379,13 @@ public class Util {
 		boolean keepExtension) {
 		// Get the filename
 		int n = path.lastIndexOf(File.separator);
+		if ( n == -1 ) { // Try generic URL separator
+			n = path.lastIndexOf('/');
+		}
 		if ( n > -1 ) path = path.substring(n+1);
-
+		// Stop here if we keep the extension
 		if ( keepExtension ) return path;
-		
-		// Remove the extension if there is one
+		// Else: remove the extension if there is one
 	    n = path.lastIndexOf('.');
         if ( n > -1 ) return path.substring(0, n);
         else return path;
@@ -482,7 +493,8 @@ public class Util {
 	static public boolean isOSCaseSensitive () {
 		// May not work on all platforms,
 		// But should on basic Windows, Mac and Linux
-		return File.separator.equals("\\"); // Windows line-types
+		// (Use Windows file separator-type to guess the OS)
+		return File.separator.equals("\\");
 	}
 	
 	/**
