@@ -46,7 +46,7 @@ public abstract class BaseFilter implements IFilter {
 	private static final String END_DOCUMENT = "ed"; //$NON-NLS-1$
 	private static final String START_SUBDOCUMENT = "ssd"; //$NON-NLS-1$
 	private static final String END_SUBDOCUMENT = "esd"; //$NON-NLS-1$
-	
+
 	private String encoding;
 	private String srcLang;
 	private String mimeType;
@@ -68,6 +68,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private GenericSkeleton currentSkeleton;
 	private Code currentCode;
+	private DocumentPart currentDocumentPartForStandaloneProperties;
 
 	public BaseFilter() {
 		reset();
@@ -89,19 +90,18 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	public FilterEvent next() {
 		FilterEvent event;
-		
-		if (!referencableFilterEvents.isEmpty()) {
-			event = referencableFilterEvents.remove(0);			
-			if (event.getEventType() == FilterEventType.FINISHED) done = true;
-			return event;
-		}
-		
-		if (!filterEvents.isEmpty()) {
-			event = filterEvents.remove(0);
-			if (event.getEventType() == FilterEventType.FINISHED) done = true;
-			return event;
-		}
 
+		if (hasNext()) {
+			if (!referencableFilterEvents.isEmpty()) {				
+				return referencableFilterEvents.remove(0);
+			} else if (!filterEvents.isEmpty()) {
+				event = filterEvents.remove(0);
+				if (event.getEventType() == FilterEventType.FINISHED)
+					done = true;
+				return event;
+			}
+		} 
+		
 		return null;
 	}
 
@@ -127,9 +127,9 @@ public abstract class BaseFilter implements IFilter {
 			}
 		}
 	}
-	
+
 	private void addPropertyToResource(INameable resource, Property property) {
-		if (property != null) {			
+		if (property != null) {
 			resource.setProperty(property);
 		}
 	}
@@ -294,6 +294,7 @@ public abstract class BaseFilter implements IFilter {
 
 		currentCode = null;
 		currentSkeleton = null;
+		currentDocumentPartForStandaloneProperties = null;
 	}
 
 	protected boolean isCanceled() {
@@ -311,14 +312,14 @@ public abstract class BaseFilter implements IFilter {
 
 	private void finish() {
 		FilterEvent event = new FilterEvent(FilterEventType.FINISHED);
-		filterEvents.add(event);		
+		filterEvents.add(event);
 	}
 
 	protected void startDocument() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
 		startDocument.setEncoding(getEncoding());
 		startDocument.setLanguage(getSrcLang());
-		startDocument.setMimeType(getMimeType());		
+		startDocument.setMimeType(getMimeType());
 		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 	}
@@ -378,7 +379,7 @@ public abstract class BaseFilter implements IFilter {
 
 		if (startMarker != null) {
 			skel = new GenericSkeleton((GenericSkeleton) startMarker);
-			skel.addRef(tu);			
+			skel.addRef(tu);
 		}
 
 		tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
@@ -412,14 +413,14 @@ public abstract class BaseFilter implements IFilter {
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
 	}
-	
+
 	protected void addToTextUnit(Property property) {
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("Found non-TextUnit event. Cannot add property");
 		}
-		
+
 		FilterEvent tempTextUnit = peekTempEvent();
-		
+
 		addPropertyToResource((TextUnit) tempTextUnit.getResource(), property);
 	}
 
@@ -447,10 +448,10 @@ public abstract class BaseFilter implements IFilter {
 		addPropertiesToResource(g, properties);
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 
-		FilterEvent fe = new FilterEvent(FilterEventType.START_GROUP, g, skel);		
-		
+		FilterEvent fe = new FilterEvent(FilterEventType.START_GROUP, g, skel);
+
 		if (isCurrentComplexTextUnit()) {
-			// add this group as a cde of the complex TextUnit	
+			// add this group as a cde of the complex TextUnit
 			g.setIsReferent(true);
 			Code c = new Code(TagType.PLACEHOLDER, startMarker.toString(), TextFragment.makeRefMarker(gid));
 			c.setHasReference(true);
@@ -460,7 +461,7 @@ public abstract class BaseFilter implements IFilter {
 		} else {
 			filterEvents.add(fe);
 		}
-		
+
 		tempFilterEventStack.push(fe);
 	}
 
@@ -482,7 +483,7 @@ public abstract class BaseFilter implements IFilter {
 	// Standalone Property Methods (not attached to any other resource)
 	// ////////////////////////////////////////////////////////////////////////
 
-	protected void addProperty(Property property, String language) {
+	protected void startProperty(Property property, String language) {
 		if (hasUnfinishedSkeleton()) {
 			endSkeleton();
 		}
@@ -492,26 +493,31 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 	}
 
-	protected void addProperties(List<Property> properties, String language) {
+	protected void startProperties(List<Property> properties, String language) {
 		for (Property property : properties) {
-			addProperty(property, language);
+			startProperty(property, language);
 		}
 	}
 
-	protected void addProperty(Property property) {
+	protected void startProperty(Property property) {
 		if (hasUnfinishedSkeleton()) {
 			endSkeleton();
 		}
 
 		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		dp.setProperty(property);
-		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+
 	}
 
-	protected void addProperties(List<Property> properties) {
+	protected void startProperties(List<Property> properties) {
 		for (Property property : properties) {
-			addProperty(property);
+			startProperty(property);
 		}
+	}
+
+	protected void endProperty() {
+		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, currentDocumentPartForStandaloneProperties));
+		currentDocumentPartForStandaloneProperties = null;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -529,7 +535,7 @@ public abstract class BaseFilter implements IFilter {
 		if (currentCode == null) {
 			throw new BaseFilterException("Code not found. Cannot end a non-exisitant code.");
 		}
-		
+
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
 		tu.getSource().append(currentCode);
 		currentCode = null;
