@@ -63,7 +63,8 @@ public abstract class BaseFilter implements IFilter {
 	private List<FilterEvent> filterEvents;
 	private List<FilterEvent> referencableFilterEvents;
 
-	private boolean canceled;
+	private boolean canceled = false;
+	private boolean done = false;
 
 	private GenericSkeleton currentSkeleton;
 	private Code currentCode;
@@ -78,10 +79,7 @@ public abstract class BaseFilter implements IFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#hasNext()
 	 */
 	public boolean hasNext() {
-		if (referencableFilterEvents.isEmpty() && filterEvents.isEmpty()) {
-			return false;
-		}
-		return true;
+		return !done;
 	}
 
 	/*
@@ -90,11 +88,18 @@ public abstract class BaseFilter implements IFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#next()
 	 */
 	public FilterEvent next() {
+		FilterEvent event;
+		
 		if (!referencableFilterEvents.isEmpty()) {
-			return referencableFilterEvents.remove(0);
+			event = referencableFilterEvents.remove(0);			
+			if (event.getEventType() == FilterEventType.FINISHED) done = true;
+			return event;
 		}
+		
 		if (!filterEvents.isEmpty()) {
-			return filterEvents.remove(0);
+			event = filterEvents.remove(0);
+			if (event.getEventType() == FilterEventType.FINISHED) done = true;
+			return event;
 		}
 
 		return null;
@@ -108,6 +113,7 @@ public abstract class BaseFilter implements IFilter {
 
 		FilterEvent event = new FilterEvent(FilterEventType.CANCELED);
 		filterEvents.add(event);
+		finish();
 	}
 
 	private String createId(String name, int number) {
@@ -117,8 +123,14 @@ public abstract class BaseFilter implements IFilter {
 	private void addPropertiesToResource(INameable resource, List<Property> properties) {
 		if (properties != null) {
 			for (Property property : properties) {
-				resource.setProperty(property);
+				addPropertyToResource(resource, property);
 			}
+		}
+	}
+	
+	private void addPropertyToResource(INameable resource, Property property) {
+		if (property != null) {			
+			resource.setProperty(property);
 		}
 	}
 
@@ -273,6 +285,7 @@ public abstract class BaseFilter implements IFilter {
 		subDocumentId = 0;
 
 		canceled = false;
+		done = false;
 
 		referencableFilterEvents = new LinkedList<FilterEvent>();
 		filterEvents = new LinkedList<FilterEvent>();
@@ -291,14 +304,14 @@ public abstract class BaseFilter implements IFilter {
 	// Start and Finish Methods
 	// ////////////////////////////////////////////////////////////////////////
 
-	protected void start() {
+	private void start() {
 		FilterEvent event = new FilterEvent(FilterEventType.START);
 		filterEvents.add(event);
 	}
 
-	protected void finish() {
+	private void finish() {
 		FilterEvent event = new FilterEvent(FilterEventType.FINISHED);
-		filterEvents.add(event);
+		filterEvents.add(event);		
 	}
 
 	protected void startDocument() {
@@ -398,6 +411,16 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
+	}
+	
+	protected void addToTextUnit(Property property) {
+		if (!isCurrentTextUnit()) {
+			throw new BaseFilterException("Found non-TextUnit event. Cannot add property");
+		}
+		
+		FilterEvent tempTextUnit = peekTempEvent();
+		
+		addPropertyToResource((TextUnit) tempTextUnit.getResource(), property);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
