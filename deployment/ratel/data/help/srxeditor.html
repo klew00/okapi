@@ -9,15 +9,15 @@
 
 <body>
 
-<h1>Segmentation Rules Editor (Beta)</h1>
-<p>The Segmentation Rules Editor allows you to create, test and maintain sets of 
-SRX 2.0 documents.</p>
+<h1>Ratel - Segmentation Rules Editor (Beta)</h1>
+<p>Ratel is a Java application that allows you to create, test and maintain 
+segmentation rules stored in SRX 2.0 documents.</p>
 <ul>
 	<li><a href="#overview">Overview</a></li>
 	<li><a href="#mainWindow">Main Window</a></li>
 	<li><a href="#groupsAndOptions">Groups and Options Dialog</a></li>
-	<li><a href="#dlgLanguageMap">New/Edit Language Map Dialog</a></li>
-	<li><a href="#dlgRule">New/Edit Rule Dialog</a></li>
+	<li><a href="#dlgLanguageMap">Edit Language Map Dialog</a></li>
+	<li><a href="#dlgRule">Edit Rule Dialog</a></li>
 	<li><a href="#dlgTestFile">Test Segmentation on a File Dialog</a></li>
 	<li><a href="#fileMenu">File Menu</a></li>
 	<li><a href="#toolsMenu">Tools Menu</a></li>
@@ -28,8 +28,12 @@ SRX 2.0 documents.</p>
 rules. You can find the specifications of SRX 2.0 here:
 <a href="http://www.lisa.org/fileadmin/standards/srx20.html">
 http://www.lisa.org/fileadmin/standards/srx20.html</a>.</p>
-<p>The editor can load SRX version 1.0 documents, but they will be saved as 
-version 2.0 documents. Be aware that versions 1.0 and 2.0 of SRX may be 
+<p>Segmentation rules are used to indicate to translation and other 
+linguistic-oriented tools how to split a text into small meaningful sequence of 
+words (for example in sentences).</p>
+<p>This editor can load SRX version 1.0 documents, but they will be saved as 
+version 2.0 documents. You will be warned both when opeing and saving SRX 1.0 
+documents. Be aware that versions 1.0 and 2.0 of SRX may be 
 incompatible depending on how the version 1.0 document was interpreted by the 
 tool that created the file.</p>
 <h2><a name="mainWindow"></a>Main Window</h2>
@@ -107,7 +111,7 @@ selected.</p>
 selected upward in the list.</p>
 <p><cite>Move Down</cite> -- Click this button to move the language map 
 currently selected downward in the list.</p>
-<h2><a name="dlgLanguageMap"></a>New/Edit Language Map Dialog</h2>
+<h2><a name="dlgLanguageMap"></a>Edit Language Map Dialog</h2>
 <p>This dialog box allows you to edit the data of a language map.</p>
 <p><cite>Regular expression describing the language map</cite> -- Enter the 
 regular expression matching the language or languages for the language rule 
@@ -115,7 +119,7 @@ regular expression matching the language or languages for the language rule
 <p><cite>Name of the language rule associated with the regular expression</cite> 
 -- Enter the name of the language rule (group of rules) for this language map. 
 The name is case-sensitive.</p>
-<h2><a name="dlgRule"></a>New/Edit Rule Dialog</h2>
+<h2><a name="dlgRule"></a>Edit Rule Dialog</h2>
 <p>This dialog box allows you to edit the data of a rule.</p>
 <p><cite>Expression before the position</cite> -- Enter the regular expression 
 for the text just before the break point of this rule.</p>

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource.tests;
 
@@ -64,6 +64,15 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(tf2.toString(), "stringc");
 		assertNotSame(tf1, tf2);
 		assertFalse(tf1.hasCode());
+		
+		tf1 = new TextFragment("string");
+		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		String s1 = tf1.getCodedText();
+		s1 = s1.toUpperCase();
+		assertEquals(tf1.toString(), "string<br/>");
+		tf1.setCodedText(s1);
+		assertEquals(tf1.toString(), "STRING<br/>");
+		
 		// Test with in-line codes
 		tf1 = new TextFragment();
 		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");

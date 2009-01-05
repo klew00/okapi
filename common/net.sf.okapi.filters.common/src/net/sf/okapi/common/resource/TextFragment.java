@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource;
 
@@ -102,16 +102,37 @@ public class TextFragment implements Comparable<Object> {
 		return ((int)index)-CHARBASE;
 	}
 	
+	/**
+	 * Helper method to build a reference marker string from a given ID.
+	 * @param id The ID to use.
+	 * @return The reference marker constructed from the ID.
+	 */
 	public static String makeRefMarker (String id) {
 		return REFMARKER_START+id+REFMARKER_END;
 	}
 	
+	/**
+	 * Helper method to build a reference marker string from a given ID and a property name.
+	 * @param id The ID to use.
+	 * @param propertyName The name of the property to use.
+	 * @return The reference marker constructed from the ID and the property name.
+	 */
 	public static String makeRefMarker (String id,
 		String propertyName)
 	{
 		return REFMARKER_START+id+REFMARKER_SEP+propertyName+REFMARKER_END;
 	}
-	
+
+	/**
+	 * Helper method to retrieve a reference marker from a string.  
+	 * @param text The text to search for a reference marker. 
+	 * @return Null if no reference marker has been found. An array of four objects if 
+	 * a reference marker has been found:
+	 * <ul><li>Object 0: The ID of the reference.
+	 * <li>Object 1: The start position of the reference marker in the string.
+	 * <li>Object 2: The end position of the reference marker in the string.
+	 * <li>Object 3: The name of the property if there is one, null otherwise. 
+	 */
 	public static Object[] getRefMarker (StringBuilder text) {
 		int start = text.indexOf(REFMARKER_START);
 		if ( start == -1 ) return null; // No marker
@@ -270,9 +291,7 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Creates an empty TextFragment with a given parent.
-	 * @param parent The parent of this TextFragment. You can use a null parent,
-	 * but then you won't be able to use in-line codes with references.
+	 * Creates an empty TextFragment.
 	 */
 	public TextFragment () {
 		//this.parent = parent;
@@ -281,8 +300,6 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Creates a TextFragment with a given text.
-	 * @param parent The parent of this TextFragment. You can use a null parent,
-	 * but then you won't be able to use in-line codes with references.
 	 * @param text The text to use.
 	 */
 	public TextFragment (String text) {
@@ -291,8 +308,6 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Creates a TextFragment with the content of a given TextFragment.
-	 * @param parent The parent of this TextFragment. You can use a null parent,
-	 * but then you won't be able to use in-line codes with references.
 	 * @param fragment The content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
@@ -304,8 +319,6 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Creates a TextFragment with the content made of a given coded text
 	 * and a list of codes.
-	 * @param parent The parent of this TextFragment. You can use a null parent,
-	 * but then you won't be able to use in-line codes with references.
 	 * @param newCodedText The new coded text.
 	 * @param newCodes The list of codes.
 	 */
@@ -316,6 +329,10 @@ public class TextFragment implements Comparable<Object> {
 		setCodedText(newCodedText, newCodes, false);
 	}
 	
+	/**
+	 * Clones this TextFragment.
+	 * @return A new TextFragment that is a copy of this one.
+	 */
 	@Override
 	public TextFragment clone () {
 		TextFragment tf = new TextFragment();
@@ -324,6 +341,11 @@ public class TextFragment implements Comparable<Object> {
 		return tf;
 	}
 	
+	/**
+	 * Indicates if this TextFragment contains any in-line code with a reference.
+	 * @return True if there is one or more in-line codes with a reference,
+	 * false if there is no reference.
+	 */
 	public boolean hasReference () {
 		if ( codes == null ) return false;
 		for ( Code code : codes ) {
@@ -359,7 +381,8 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Helper method to add existing code.
+	 * Appends an existing code to this fragment.
+	 * @param code The existing code to append.
 	 */
 	public Code append (Code code) {
 		if ( codes == null ) codes = new ArrayList<Code>();
@@ -593,7 +616,8 @@ public class TextFragment implements Comparable<Object> {
 	 * count as characters).
 	 * @param whiteSpacesAreText Indicates if white-spaces should be considered 
 	 * characters or not for the purpose of checking if this fragment is empty.
-	 * @return True if the fragment contains at least one character.
+	 * @return True if the fragment contains at least one character (that character could
+	 * be a white-space if whiteSpacesAreText is set to true).
 	 */
 	public boolean hasText (boolean whiteSpacesAreText) {
 		for ( int i=0; i<text.length(); i++ ) {
@@ -851,7 +875,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Changes a section of the coded text into a single code. Any code already
-	 * existing that is within the range will be included in the new code.
+	 * existing that is within the range will become part of the new code.
 	 * @param start The position of the first character or marker of the section
 	 * (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section

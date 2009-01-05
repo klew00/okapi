@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.writer;
 
@@ -47,7 +47,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * <p>Recognized properties:</p>
  * <ul>
  * <li><code>encoding</code> - The value of the <code>encoding</code> resource-level property in the 
- * <code>{@link IResource.START_DOCUMENT}</code> event is replaced by the value of the encoding provided with
+ * <code>START_DOCUMENT</code> event is replaced by the value of the encoding provided with
  * the {@link #setOptions(String, String)} method.</li>
  * </ul>
  */

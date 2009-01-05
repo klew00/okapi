@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource;
 
@@ -82,8 +82,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @param sourceText The initial text of the source.
 	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
 	 * by another resource) or not.
-	 * @param encoder The encoder to use for escaping characters and string for this
-	 * TextUnit.
+	 * @param mimeType The MIME type identifier for the content of this TextUnit.
 	 */
 	public TextUnit (String id,
 		String sourceText,

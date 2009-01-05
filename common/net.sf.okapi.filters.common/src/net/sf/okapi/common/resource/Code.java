@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource;
 
@@ -25,6 +25,10 @@ import java.util.List;
 
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
+/**
+ * This class represent an abstracted in-line code 
+ * (e.g. a <code>&lt;b></code> in an HTML paragraph) used in a TextFragment object.
+ */
 public class Code {
 
 	protected static final int HASREF       = 0x01;
@@ -230,7 +234,7 @@ public class Code {
 	/**
 	 * Sets the complete data for this in-line code (inner data and outer).
 	 * Outer data is used for format that implements in-line codes like TMX or XLIFF.
-	 * For example "<ph id='1'>code</ph>" is the outer data, and "code" in the
+	 * For example "&lt;ph id='1'>code&lt;/ph>" is the outer data, and "code" in the
 	 * inner data.
 	 * @param value The data to set.
 	 */
@@ -249,8 +253,8 @@ public class Code {
 	}
 
 	/**
-	 * Indicates if this in-line code can be duplicated in its text fragment.
-	 * For example a HTML bold element could be duplicated, while a %s would not.
+	 * Indicates if this in-line code can be duplicated in the text.
+	 * For example a HTML bold element could be duplicated, while a <code>%s</code> should not.
 	 * @return True if this in-line code can be duplicated.
 	 */
 	public boolean isCloneable () {
@@ -267,8 +271,8 @@ public class Code {
 	}
 	
 	/**
-	 * Indicates if this in-line code can be removed from its text fragment.
-	 * For example a HTML bold element could be removed, while a %s would not.
+	 * Indicates if this in-line code can be removed from the text.
+	 * For example a HTML bold element could be removed, while a <code>%s</code> should not.
 	 * @return True if this in-line code can be removed.
 	 */
 	public boolean isDeleteable () {
