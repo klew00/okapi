@@ -26,8 +26,8 @@ import java.util.List;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
- * This class represent an abstracted in-line code 
- * (e.g. a <code>&lt;b></code> in an HTML paragraph) used in a TextFragment object.
+ * Represents an abstracted in-line code used in a TextFragment object.
+ * For example, a <code>&lt;b></code> tag in an HTML paragraph.
  */
 public class Code {
 
@@ -82,7 +82,7 @@ public class Code {
 	}
 	
 	/**
-	 * Creates a new code.
+	 * Creates a new code. By default codes can be both deleted and cloned.
 	 * @param tagType The tag type.
 	 * @param type The type of code (e.g. the name of the tag).
 	 * @param data the content of the code.
@@ -106,7 +106,7 @@ public class Code {
 	}
 	
 	/**
-	 * Creates a new code with null type empty data.	 
+	 * Creates a new code with a null type, and empty data. You must set the type later on.	 
 	 * @param type The type of code (e.g. the name of the tag).
 	 */
 	public Code (String type) {

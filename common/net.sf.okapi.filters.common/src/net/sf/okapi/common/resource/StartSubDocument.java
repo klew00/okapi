@@ -21,7 +21,7 @@
 package net.sf.okapi.common.resource;
 
 /**
- * This class represents the resource associated with the filter event START_SUBDOCUMENT.
+ * Represents the resource associated with the filter event START_SUBDOCUMENT.
  */
 public class StartSubDocument extends BaseNameable {
 

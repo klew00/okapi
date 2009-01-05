@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,15 +16,23 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common;
 
+/**
+ * Represents a range: a start and end position.
+ */
 public class Range {
 
 	public int start;
 	public int end;
-	
+
+	/**
+	 * Creates a new range with given starting and ending values.
+	 * @param start The start value of the new range.
+	 * @param end The end value of the new range.
+	 */
 	public Range (int start, int end) {
 		this.start = start;
 		this.end = end;

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This class implements the methods for creating and manipulating a pre-parsed
+ * Implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
  * 
  * <p>The model uses two objects to store the data:

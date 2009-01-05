@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,15 +16,15 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.IParameters;
 
 /**
- * Interface for the objects used to encode/escape text to a specific format.
- * Each class implementing this interface must have a nullary constructor, so the object 
+ * Provides common methods to encode/escape text to a specific format.
+ * <p>Important: Each class implementing this interface must have a nullary constructor, so the object 
  * can be instantiated using the Class.fromName() methods by the EncoderManager.
  */
 public interface IEncoder {

@@ -28,6 +28,10 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.filters.ISkeleton;
 
+/**
+ * Basic unit of extraction from a filter. The TextUnit object holds the extracted source text, all its
+ * properties and annotations, and any target corresponding data.
+ */
 public class TextUnit implements INameable, IReferenceable {
 
 	private String id;
@@ -44,7 +48,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private ConcurrentHashMap<String, TextContainer> targets;
 
 	/**
-	 * Creates a new TextUnit object.
+	 * Creates a new TextUnit object with its ID.
 	 * @param id The ID of this resource.
 	 */
 	public TextUnit (String id) {
@@ -52,7 +56,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Creates a new TextUnit object.
+	 * Creates a new TextUnit object with its ID and a text.
 	 * @param id The ID of this resource.
 	 * @param sourceText The initial text of the source.
 	 */
@@ -63,7 +67,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Creates a new TextUnit object.
+	 * Creates a new TextUnit object with its ID, a text, and a flag indicating if it is a referent or not.
 	 * @param id The ID of this resource.
 	 * @param sourceText The initial text of the source.
 	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
@@ -77,7 +81,8 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Creates a new TextUnit object.
+	 * Creates a new TextUnit object with its ID, a text, a flag indicating if it is a referent or not, and
+	 * a given MIME type.
 	 * @param id The ID of this resource.
 	 * @param sourceText The initial text of the source.
 	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
@@ -107,6 +112,10 @@ public class TextUnit implements INameable, IReferenceable {
 		}
 	}
 
+	/**
+	 * Gets the string representation of the source text of this TextUnit.
+	 * @return The source text of this TextUnit.
+	 */
 	@Override
 	public String toString () {
 		return source.toString();

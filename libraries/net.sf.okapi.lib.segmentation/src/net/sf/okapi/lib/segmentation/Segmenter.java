@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.lib.segmentation;
 
@@ -77,6 +77,19 @@ public class Segmenter {
 		trimCodes = false; // Extension IN TEST (was false for StringInfo) NOT USED for now
 	}
 
+	/**
+	 * Sets the options for this segmenter.
+	 * @param segmentSubFlows True to segment sub-flows, false to no segment them.
+	 * @param includeStartCodes True to include start codes just before a break in the 'left' segment,
+	 * false to put them in the next segment. 
+	 * @param includeEndCodes  True to include end codes just before a break in the 'left' segment,
+	 * false to put them in the next segment.
+	 * @param includeIsolatedCodes True to include isolated codes just before a break in the 'left' segment,
+	 * false to put them in the next segment.
+	 * @param oneSegmentIncludesAll True to include everything in segments that are alone.
+	 * @param trimLeadingWS True to trim leading white-spaces from the segments, false to keep them.
+	 * @param trimTrailingWS True to trim trailing white-spaces from the segments, false to keep them.
+	 */
 	public void setOptions (boolean segmentSubFlows,
 		boolean includeStartCodes,
 		boolean includeEndCodes,
@@ -398,7 +411,7 @@ public class Segmenter {
 
 	/**
 	 * Gets the list of all the split positions in the text
-	 * that was last segmented. You must call {@link #computeSegment(IContainer)}
+	 * that was last segmented. You must call {@link #computeSegment(TextContainer)}
 	 * or {@link #computeSegments(String)} before calling this method.
 	 * A split position is the first character position of a new segment.
 	 * <p><b>IMPORTANT: The position returned here are the position WITHOUT taking in account the options
@@ -440,6 +453,10 @@ public class Segmenter {
 		return currentLanguageCode;
 	}
 	
+	/**
+	 * Sets the language used to apply the rules.
+	 * @param languageCode Code of the language to use to apply the rules.
+	 */
 	protected void setLanguage (String languageCode) {
 		currentLanguageCode = languageCode;
 	}

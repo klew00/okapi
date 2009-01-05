@@ -30,7 +30,7 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * This class is an extension of the TextFragment class that provides methods for
+ * Extension of the TextFragment class that provides methods for
  * handling properties, annotations and segmentation of the text.
  */
 public class TextContainer extends TextFragment {
