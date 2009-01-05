@@ -21,7 +21,7 @@
 # extract the value of 'content' if the value of 'http-equiv' equals 'keywords'
 #
 # Multiple attribute values may be included in a list:
-# 'content':['http-equiv', EQUALS, ['content-language', 'content-type']
+# 'content':['http-equiv', EQUALS, ['content-language', 'content-type']]
 #
 # This rule would be read: 
 # extract the value of 'content' if the value of 'http-equiv' equals 'content-language' or 'content-type' 
@@ -64,6 +64,36 @@ title:
   onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script, title]
 
+# only attributes are localizable or translatable 
+meta:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: {content: [http-equiv, EQUALS, keywords], name: ~}
+  localizableAttributes: {content: [http-equiv, EQUALS, [content-language, content-type]]}
+  
+area:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [accesskey, area]
+  
+isindex:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [prompt]
+  
+legend:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [accesskey]
+
+option:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [label, value]
+  
+optgroup:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [label]
+  
+th:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [abbr]
+
 # inline tags
 a:
   ruleTypes: [INLINE]
@@ -84,10 +114,6 @@ applet:
 
 acronym:
   ruleTypes: [INLINE]
-
-area:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey, area]
 
 b:
   ruleTypes: [INLINE]
@@ -148,10 +174,6 @@ input:
 ins:
   ruleTypes: [INLINE]
 
-isindex:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [prompt]
-
 acronym:
   ruleTypes: [INLINE]
  
@@ -162,10 +184,6 @@ label:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
-legend:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey]
-
 li:
   ruleTypes: [GROUP]
   translatableAttributes: [value]
@@ -173,25 +191,12 @@ li:
 map:
   ruleTypes: [INLINE]
 
-meta:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [content, [[http-equiv, EQUALS, keywords], name: null]]
-  localizableAttributes: [content, [http-equiv, EQUALS, [content-language, content-type]]]
-
 nobr:
   ruleTypes: [INLINE]
  
 object:
   ruleTypes: [INLINE]
   translatableAttributes: [standby]
- 
-option:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [label, value]
-
-optgroup:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [label]
 
 param:
   ruleTypes: [INLINE]
@@ -246,10 +251,6 @@ tt:
  
 td:
   ruleTypes: [GROUP]
-  translatableAttributes: [abbr]
- 
-th:
-  ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [abbr]
  
 u:
