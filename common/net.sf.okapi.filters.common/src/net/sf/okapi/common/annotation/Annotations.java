@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,26 +16,42 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.annotation;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Provides annotation mechanism to the resources.
+ */
 public class Annotations {
 	
 	private ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations;
 
+	/**
+	 * Creates a new Annotations object.
+	 */
 	public Annotations () {
 		annotations = new ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation>();
 	}
 	
+	/**
+	 * Sets an annotation.
+	 * @param annotation The annotation object to set.
+	 */
 	public void set (IAnnotation annotation) {
 		annotations.put(annotation.getClass(), annotation);
 	}
-		
+	
+	/**
+	 * Gets the annotation for a given type.
+	 * @param annotationType Type of the annotation to retrieve.
+	 * @return The found annotation, or null if no annotation of the given type was found. 
+	 */
 	@SuppressWarnings("unchecked")
 	public <A> A get (Class<? extends IAnnotation> annotationType) {
 		return (A) annotations.get(annotationType);
 	}
+
 }

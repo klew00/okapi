@@ -38,22 +38,33 @@ public class TextContainer extends TextFragment {
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
 	protected ArrayList<TextFragment> segments;
-	
+
+	/**
+	 * Creates a new empty TextContainer object.
+	 */
 	public TextContainer () {
 		super();
 		annotations = new Annotations();
 	}
 
+	/**
+	 * Creates a new TextContainer object with some initial text.
+	 * @param text
+	 */
 	public TextContainer (String text) {
 		super(text);
 		annotations = new Annotations();
 	}
 	
-	@Override
-	public String toString () {
-		return text.toString();
-	}
+//	@Override
+//	public String toString () {
+//		return text.toString();
+//	}
 	
+	/**
+	 * Clones this TextContainer.
+	 * @return A new TextContainer object that is a copy of this one. 
+	 */
 	@Override
 	public TextContainer clone () {
 		TextContainer tc = new TextContainer();
@@ -71,10 +82,19 @@ public class TextContainer extends TextFragment {
 		return tc;
 	}
 
+	/**
+	 * Gets the TextFragment for this TextContainer. Because TextContainer is an extension of
+	 * TextFragment this methods returns this object itself, but typed as a TextFragment.
+	 * @return This object itself, but typed as a TextFragment.
+	 */
 	public TextFragment getContent () {
 		return this;
 	}
 	
+	/**
+	 * Sets the content of this TextContainer.
+	 * @param content The new content to set. 
+	 */
 	public void setContent (TextFragment content) {
 		text = new StringBuilder();
 		insert(-1, content);
@@ -86,6 +106,9 @@ public class TextContainer extends TextFragment {
 		}
 	}
 
+	/**
+	 * Clears this TextContainer, removes an existing segments.
+	 */
 	@Override
 	public void clear () {
 		super.clear();

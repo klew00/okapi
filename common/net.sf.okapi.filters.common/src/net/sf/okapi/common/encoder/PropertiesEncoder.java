@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.encoder;
 
@@ -27,13 +27,17 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IEncoder;
 
 /**
- * Encoder for properties-type files. For example Java properties file.
+ * Implements IEncoder for properties-type format.
  */
 public class PropertiesEncoder implements IEncoder {
 	
 	private CharsetEncoder outputEncoder;
 	private boolean escapeAll = false;
 
+	/**
+	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding, and
+	 * escaping all extended characters.
+	 */
 	public PropertiesEncoder () {
 		escapeAll = false;
 		outputEncoder = Charset.forName("us-ascii").newEncoder();

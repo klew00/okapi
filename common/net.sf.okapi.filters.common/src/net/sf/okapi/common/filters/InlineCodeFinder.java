@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.filters;
 
@@ -40,16 +40,26 @@ public class InlineCodeFinder {
 	private boolean useAllRulesWhenTesting;
 	private Pattern pattern;
 	
+	/**
+	 * Creates a new InlineCodeFinder object.
+	 */
 	public InlineCodeFinder () {
 		reset();
 	}
 
+	/**
+	 * Resets this finder.
+	 */
 	public void reset () {
 		rules = new ArrayList<String>();
 		sample = "";
 		useAllRulesWhenTesting = false;
 	}
 	
+	/**
+	 * Clones this finder.
+	 * @return A new InlineCodeFinder object that is a copy of this one.
+	 */
 	@Override
 	public InlineCodeFinder clone () {
 		InlineCodeFinder tmp = new InlineCodeFinder();
@@ -122,7 +132,7 @@ public class InlineCodeFinder {
 			tmp.append("("+rule+")");
 		}
 		if ( tmp.length() == 2 )
-			pattern = Pattern.compile(""); // () = empty
+			pattern = Pattern.compile("");
 		else
 			pattern = Pattern.compile(tmp.toString(), Pattern.MULTILINE);
 	}
@@ -148,6 +158,11 @@ public class InlineCodeFinder {
 		}
 	}
 
+	/**
+	 * Gets a string of all the options for this finder.
+	 * @return The string storing all the options for this finder.
+	 * @see #fromString(String)
+	 */
 	@Override
 	public String toString () {
 		ParametersString tmp = new ParametersString();
@@ -161,7 +176,13 @@ public class InlineCodeFinder {
 		tmp.setBoolean("useAllRulesWhenTesting", useAllRulesWhenTesting);
 		return tmp.toString();
 	}
-	
+
+	/**
+	 * Sets the options of this finder with the values stored in a given string.
+	 * The provided string can be created by {@link #toString()}.
+	 * @param data String storing all the options for this finder.
+	 * @see #toString() 
+	 */
 	public void fromString (String data) {
 		reset();
 		ParametersString tmp = new ParametersString(data);
@@ -173,4 +194,5 @@ public class InlineCodeFinder {
 		sample = tmp.getString("sample", sample);
 		useAllRulesWhenTesting = tmp.getBoolean("useAllRulesWhenTesting", useAllRulesWhenTesting);
 	}
+
 }

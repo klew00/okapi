@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.skeleton;
 
@@ -41,6 +41,9 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.writer.ILayerProvider;
 
+/**
+ * Implements ISkeletonWriter for the GenericSkeleton skeleton. 
+ */
 public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private Stack<StorageList> storageStack;

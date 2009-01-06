@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.encoder;
 
@@ -25,12 +25,19 @@ import java.util.Hashtable;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IEncoder;
 
+/**
+ * Provides caching and lookup mechanism for the text encoders used when writing out text
+ * processed by a filter.
+ */
 public class EncoderManager implements IEncoder {
 
 	private String mimeType = "";
 	private IEncoder encoder;
 	private Hashtable<String, String> mimeMap;
 
+	/**
+	 * Creates a new encoder manager, with default pre-defined encoder loaded.
+	 */
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
 		// Default mapping
@@ -40,20 +47,38 @@ public class EncoderManager implements IEncoder {
 		mimeMap.put("text/x-mif", "net.sf.okapi.common.encoder.MIFEncoder");
 	}
 
+	/**
+	 * Clears all encoders from the manager.
+	 */
 	public void clearMap () {
 		mimeMap.clear();
 	}
 	
+	/**
+	 * Adds a mapping to the manager. If a mapping for this MIME type exists already
+	 * in the manager, it will be overridden by this new one.
+	 * @param mimeType The MIME type identifier for this mapping.
+	 * @param className The class name of the encoder to use.
+	 */
 	public void addMapping (String mimeType,
 		String className)
 	{
 		mimeMap.put(mimeType, className);
 	}
 	
+	/**
+	 * Removes a given mapping from the manager.
+	 * @param mimeType The MIME type identifier of the mapping to remove.
+	 */
 	public void removeMapping (String mimeType) {
 		mimeMap.remove(mimeType);
 	}
 	
+	/**
+	 * Updates the current cached encoder for this manager.
+	 * @param newMimeType The MIME type identifier for the encoder to use now. If there is no mapping for the
+	 * given MIME type, the cache is cleared and no encoder is active.
+	 */
 	public void updateEncoder (String newMimeType) {
 		try {
 			if ( newMimeType == null ) return;
@@ -81,20 +106,46 @@ public class EncoderManager implements IEncoder {
 		}
 	}
 
+	/**
+	 * Encodes a given text with the encoder currently cached. If no encoder is currently
+	 * cached, the text is returned untouched.
+	 * @param text The text to encode.
+	 * @param context The context of the text: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded text.
+	 */
 	public String encode (String text, int context) {
 		if ( encoder != null ) return encoder.encode(text, context);
 		else return text;
 	}
 
+	/**
+	 * Encodes a given character with the encoder currently cached. If no encoder is currently
+	 * cached, the character is returned as its string value.
+	 * @param value The character to encode.
+	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded character 9as a string since it can be now made up of
+	 * more than one character).
+	 */
 	public String encode (char value, int context) {
 		if ( encoder != null ) return encoder.encode(value, context);
 		else return String.valueOf(value);
 	}
 
+	/**
+	 * Gets the encoder currently cached by this manager.
+	 * @return The encoder currently cached by this manager, or null if there is none.
+	 */
 	public IEncoder getEncoder () {
 		return encoder;
 	}
 
+	/**
+	 * Sets the options for the encoder currently cached. If no encoder is currently
+	 * cached, the method does nothing.
+	 * @param params The parameters object with all the configuration information 
+	 * specific to this encoder.
+	 * @param encoding The name of the charset encoding to use.
+	 */
 	public void setOptions (IParameters params,
 		String encoding)
 	{

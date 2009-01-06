@@ -29,34 +29,62 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.annotation.IterableEnumeration;
 
 /**
- * Represents the target properties associated to a set of source properties in a resource.
+ * Represents the target properties associated to a set of source properties
+ * in a resource.
  */
 public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String> {
 
 	private ConcurrentHashMap<String, Hashtable<String, Property>> targets;
 
+	/**
+	 * Creates a new TargetPropertiesAnnotation object.
+	 */
 	public TargetPropertiesAnnotation () {
 		targets = new ConcurrentHashMap<String, Hashtable<String, Property>>();
 	}
 
-	public void set (String locale, Hashtable<String, Property> properties) {
-		targets.put(locale, properties);
+	/**
+	 * Sets properties for a given target language.
+	 * @param language Code of the target language for this property.
+	 * @param properties The properties to set.
+	 */
+	public void set (String language,
+		Hashtable<String, Property> properties)
+	{
+		targets.put(language, properties);
 	}
 
-	public Hashtable<String, Property> get (String locale) {
-		return targets.get(locale);
+	/**
+	 * Gets the properties for a given target language.
+	 * @param language Code of the target language of the properties to retrieve. 
+	 * @return The properties, or null if none has been found.
+	 */
+	public Hashtable<String, Property> get (String language) {
+		return targets.get(language);
 	}
 
+	/**
+	 * Indicates if this annotation has any properties.
+	 * @return True if this annotation counts at least one property.
+	 */
 	public boolean isEmpty () {
 		return targets.isEmpty();
 	}
 
+	/**
+	 * Gets a new iterator for this annotation.
+	 */
 	public Iterator<String> iterator () {
 		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
 		return iterableLocales.iterator();
 	}
 
+	/**
+	 * Gets a set of the target languages available in this annotation.
+	 * @return A set of the target language codes in this annotation.
+	 */
 	public Set<String> getLanguages () {
 		return targets.keySet();
 	}
+
 }

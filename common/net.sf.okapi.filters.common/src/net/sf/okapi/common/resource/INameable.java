@@ -22,7 +22,9 @@ package net.sf.okapi.common.resource;
 
 import java.util.Set;
 
-
+/**
+ * Provides the methods common to all resources that can be named and have properties. 
+ */
 public interface INameable extends IResource {
 
 	/**

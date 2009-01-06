@@ -58,7 +58,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// Process the document
 			FilterEvent event;
 			while ( filter.hasNext() ) {
-			//while ((event = filter.next()).getEventType() != FilterEventType.FINISHED) {
 				event = filter.next();
 				handleEvent(event);
 				if ( needsSelfOutput ) { // Only if needed

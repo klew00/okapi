@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,12 +16,15 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.filters;
 
 import java.util.Stack;
 
+/**
+ * Processes localization directives.
+ */
 public class LocalizationDirectives {
 
 	private boolean useLD;
@@ -44,29 +47,58 @@ public class LocalizationDirectives {
 			this.extract = extract;
 		}
 	}
-	
+
+	/**
+	 * Creates a new LocalizationDirectives object.
+	 */
 	public LocalizationDirectives () {
 		reset();
 	}
 	
+	/**
+	 * Resets this localization directives processor.
+	 */
 	public void reset () {
 		context = new Stack<Context>();
 		setOptions(true, true);
 	}
 	
+	/**
+	 * Indicates if localization directives are to be used or not.
+	 * @return True if localization directives should be processed,
+	 * false if they should not.
+	 */
 	public boolean useLD () {
 		return useLD;
 	}
 	
+	/**
+	 * Indicates if text outside the scope of localization directives should be
+	 * extracted or not.
+	 * @return True if text text outside the scope of localization directives is to
+	 * be extracted, false if it should not. 
+	 */
 	public boolean localizeOutside () {
 		if ( !useLD ) return true; // Always localize all when LD not used
 		return localizeOutside;
 	}
 	
+	/**
+	 * Indicates if the current context is inside the scope of a localization directive.
+	 * @return True if the current context is inside the scope of a localization directive,
+	 * false if it is outside.
+	 */
 	public boolean isWithinScope () {
 		return (context.size() > 0);
 	}
 	
+	/**
+	 * Indicates if the current context is localizable or not.
+	 * @param popSingle Indicates if non-group directives should be popped
+	 * out of the context when calling this method.
+	 * @return True if the current context is localizable, or if localization directives
+	 * are not to be used.
+	 */
 	public boolean isLocalizable (boolean popSingle) {
 		// If LD not used always localize
 		if ( !useLD ) return true;
@@ -84,6 +116,12 @@ public class LocalizationDirectives {
 		return res;
 	}
 	
+	/**
+	 * Sets the options for this localization directives processor.
+	 * @param useLD Indicates if localization directives are to be used or not.
+	 * @param localizeOutside Indicates if text outside the scope of localization 
+	 * directives should be extracted or not.
+	 */
 	public void setOptions (boolean useLD,
 		boolean localizeOutside)
 	{
