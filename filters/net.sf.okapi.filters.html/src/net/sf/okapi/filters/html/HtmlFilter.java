@@ -41,6 +41,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
@@ -133,7 +134,7 @@ public class HtmlFilter extends BaseFilter {
 		}
 		initialize();
 	}
-	
+
 	@Override
 	public void initialize() {
 		super.initialize();
@@ -142,7 +143,7 @@ public class HtmlFilter extends BaseFilter {
 
 		if (parameters == null) {
 			parameters = new Parameters();
-			URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");			 //$NON-NLS-1$
+			URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml"); //$NON-NLS-1$
 			parameters.setTaggedConfig(new TaggedFilterConfiguration(url));
 		}
 
@@ -168,8 +169,8 @@ public class HtmlFilter extends BaseFilter {
 				final Tag tag = (Tag) segment;
 
 				// We just hit a tag that could close the current TextUnit, but
-				// only if it was not opened with a tag (i.e., complex
-				// TextUnits)
+				// only if it was not opened with a TextUnit tag (i.e., complex
+				// TextUnits such as <p> etc.)
 				if (isCurrentTextUnit() && !isCurrentComplexTextUnit()) {
 					endTextUnit();
 				}
@@ -283,10 +284,29 @@ public class HtmlFilter extends BaseFilter {
 			break;
 
 		case ATTRIBUTES_ONLY:
+			// we assume we have already ended any (non-complex) TextUnit in
+			// the main while loop above
 			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
+				// convert Jericho attributes to HashMap
+				Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
+				for (Attribute attribute : startTag.parseAttributes()) {
+					if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(),
+							attrs)) {
+
+					} else if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
+							attribute.getName(), attrs)) {
+
+					} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
+							attribute.getName(), attrs)) {
+						
+					}
+				}
+			} else {
+				addToSkeleton(startTag.toString());
 			}
 			break;
 		case GROUP_ELEMENT:
+			ruleState.pushGroupRule(startTag.getName());
 			startGroup(new GenericSkeleton(startTag.toString()));
 			break;
 		case EXCLUDED_ELEMENT:
@@ -298,6 +318,7 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(startTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
+			ruleState.pushTextUnitRule(startTag.getName());
 			startTextUnit(new GenericSkeleton(startTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
@@ -334,9 +355,9 @@ public class HtmlFilter extends BaseFilter {
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
-			addCodeToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
+			ruleState.popGroupRule();
 			endGroup(new GenericSkeleton(endTag.toString()));
 			break;
 		case EXCLUDED_ELEMENT:
@@ -348,6 +369,7 @@ public class HtmlFilter extends BaseFilter {
 			addToSkeleton(endTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
+			ruleState.popTextUnitRule();
 			endTextUnit(new GenericSkeleton(endTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
@@ -360,32 +382,46 @@ public class HtmlFilter extends BaseFilter {
 		}
 	}
 
-	private void addAttributes(StartTag startTag) {
-		// convert Jericho attributes to HashMap
-		Map<String, String> attrs = new HashMap<String, String>();
-		attrs = startTag.getAttributes().populateMap(attrs, true);
-		for (Attribute attribute : startTag.getAttributes()) {
-			if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
-
-			} else if (parameters.getTaggedConfig().isLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
-
-			}
-		}
-	}
-
 	private void addCodeToCurrentTextUnit(Tag tag) {
-		TextFragment.TagType tagType;
+		String literalTag = tag.toString();
+		Code code = new Code(tag.getName());
+		startCode(code);
+
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-			if (((StartTag) tag).isSyntacticalEmptyElementTag())
-				tagType = TextFragment.TagType.PLACEHOLDER;
+			StartTag startTag = ((StartTag) tag);
+
+			// is this a empty tag?
+			if (startTag.isSyntacticalEmptyElementTag())
+				code.setTagType(TextFragment.TagType.PLACEHOLDER);
 			else
-				tagType = TextFragment.TagType.OPENING;
+				code.setTagType(TextFragment.TagType.OPENING);
+
+			// check for attributes
+			if (startTag.getStartTagType().hasAttributes()) {
+				// convert Jericho attributes to HashMap
+				Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
+				for (Attribute attribute : startTag.parseAttributes()) {
+					if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(),
+							attrs)) {
+
+					} else if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
+							attribute.getName(), attrs)) {
+
+						addToCode(new Property(attribute.getName(), attribute.getValue()));
+					} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
+							attribute.getName(), attrs)) {
+						addToCode(new Property(attribute.getName(), attribute.getValue(), false));
+					}
+				}
+			}
 		} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-			tagType = TextFragment.TagType.CLOSING;
+			code.setTagType(TextFragment.TagType.CLOSING);
+			code.setData(literalTag);
 		} else {
-			tagType = TextFragment.TagType.PLACEHOLDER;
+			code.setTagType(TextFragment.TagType.PLACEHOLDER);
+			code.setData(literalTag);
 		}
-		startCode(new Code(tagType, tag.getName(), tag.toString()));
+
 		endCode();
 	}
 

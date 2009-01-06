@@ -45,6 +45,7 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getMainRuleType("area"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		assertEquals(rules.getMainRuleType("script"), TaggedFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);
 		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		assertEquals(rules.getMainRuleType("meta"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put("http-equiv", "keywords");		
@@ -53,10 +54,10 @@ public class HtmlConfigurationTest {
 		
 		attributes.clear();
 		attributes.put("http-equiv", "content-language");
-		assertTrue(rules.isLocalizableAttribute("meta", "content", attributes));
+		assertTrue(rules.isWritableLocalizableAttribute("meta", "content", attributes));
 
 		attributes.clear();
 		attributes.put("http-equiv", "content-type");
-		assertTrue(rules.isLocalizableAttribute("meta", "content", attributes));
+		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
 	}
 }

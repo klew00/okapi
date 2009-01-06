@@ -67,8 +67,9 @@ title:
 # only attributes are localizable or translatable 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: {content: [http-equiv, EQUALS, keywords], name: ~}
-  localizableAttributes: {content: [http-equiv, EQUALS, [content-language, content-type]]}
+  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, NOT_EQUALS, [generator, author, progid, date]]]}
+  writableLocalizableAttributes: {content: [http-equiv, EQUALS, content-language], charset: ~}
+  readOnlyLocalizableAttributes: {content: [http-equiv, EQUALS, content-type]}
   
 area:
   ruleTypes: [ATTRIBUTES_ONLY]

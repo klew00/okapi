@@ -99,7 +99,27 @@ public class TaggedFilterConfiguration {
 	@SuppressWarnings("unchecked")
 	public boolean hasLocalizableAttributes(String ruleName) {
 		Map<String, Object> rule = configReader.getRule(ruleName);
-		if (rule != null && rule.containsKey("localizableAttributes")) {
+		if (rule != null
+				&& (rule.containsKey("writableLocalizableAttributes") || rule
+						.containsKey("readOnlyLocalizableAttributes"))) {
+			return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean hasReadOnlyLocalizableAttributes(String ruleName) {
+		Map<String, Object> rule = configReader.getRule(ruleName);
+		if (rule != null && rule.containsKey("readOnlyLocalizableAttributes")) {
+			return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean hasWritableLocalizableAttributes(String ruleName) {
+		Map<String, Object> rule = configReader.getRule(ruleName);
+		if (rule != null && rule.containsKey("writableLocalizableAttributes")) {
 			return true;
 		}
 		return false;
@@ -107,12 +127,14 @@ public class TaggedFilterConfiguration {
 
 	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
 		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
-
 	}
 
-	public boolean isLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("localizableAttributes", elementName, attribute, attributes);
+	public boolean isReadOnlyLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("readOnlyLocalizableAttributes", elementName, attribute, attributes);
+	}
 
+	public boolean isWritableLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("writableLocalizableAttributes", elementName, attribute, attributes);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -124,6 +146,7 @@ public class TaggedFilterConfiguration {
 		}
 
 		Object ta = elementRule.get(type);
+
 		if (ta instanceof List) {
 			List actionableAttributes = (List) elementRule.get(type);
 			for (Iterator<String> i = actionableAttributes.iterator(); i.hasNext();) {
@@ -142,6 +165,17 @@ public class TaggedFilterConfiguration {
 					return true;
 				} else {
 					// apply conditions
+					if (condition.get(0) instanceof List) {
+						// We have multiple conditions - individual results are OR'ed together
+						// so only one condition need be true for the rule to apply
+						for (int i = 0; i <= condition.size() - 1; i++) {
+							List c = (List)condition.get(i);
+							if (applyConditions(c, attribute, attributes)) {
+								return true;
+							}
+						}
+						return false;
+					}
 					return applyConditions(condition, attribute, attributes);
 				}
 
@@ -153,8 +187,14 @@ public class TaggedFilterConfiguration {
 
 	@SuppressWarnings("unchecked")
 	private boolean applyConditions(List<?> condition, String attribute, Map<String, String> attributes) {
-		// attribute that must have conditional value
-		String conditionalAttribute = (String) condition.get(0);
+		String conditionalAttribute = null;
+		conditionalAttribute = (String) condition.get(0);
+
+		// we didn't find the conditional test attribute - we assume no
+		// extraction
+		if (attributes.get(conditionalAttribute) == null) {
+			return false;
+		}
 
 		// '=', '!=' or regex
 		String compareType = (String) condition.get(1);
@@ -197,6 +237,6 @@ public class TaggedFilterConfiguration {
 			return result;
 		} else {
 			throw new IllegalConditionalAttributeException("Unkown match type");
-		}				
+		}
 	}
 }
