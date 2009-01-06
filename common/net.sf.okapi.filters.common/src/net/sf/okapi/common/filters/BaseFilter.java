@@ -71,7 +71,7 @@ public abstract class BaseFilter implements IFilter {
 	private DocumentPart currentDocumentPartForStandaloneProperties;
 
 	public BaseFilter() {
-		reset();
+		// reset is called in initialize method - no need to call it twice
 	}
 
 	/*
@@ -101,7 +101,7 @@ public abstract class BaseFilter implements IFilter {
 				return event;
 			}
 		} 
-		
+				
 		return null;
 	}
 
@@ -173,6 +173,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void initialize() {
+		reset();
 		start();
 		startDocument();
 	}
@@ -283,7 +284,7 @@ public abstract class BaseFilter implements IFilter {
 		textUnitId = 0;
 		documentPartId = 0;
 		subDocumentId = 0;
-
+		
 		canceled = false;
 		done = false;
 
