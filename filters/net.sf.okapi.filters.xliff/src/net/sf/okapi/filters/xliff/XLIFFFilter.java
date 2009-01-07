@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.xliff;
 
@@ -55,6 +55,8 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class XLIFFFilter implements IFilter {
 
+	public static final String    XML_NS_URI   = "http://www.w3.org/XML/1998/namespace";
+	
 	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	
 	private boolean hasNext;
@@ -75,6 +77,7 @@ public class XLIFFFilter implements IFilter {
 	private TextContainer content;
 	private String encoding;
 	private Stack<Integer> parentIds;
+	private AltTransAnnotation altTrans;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -227,6 +230,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean read () throws XMLStreamException {
 		skel = new GenericSkeleton();
 		int eventType;
+		
 		while ( reader.hasNext() ) {
 			eventType = reader.next();
 			switch ( eventType ) {
@@ -240,6 +244,9 @@ public class XLIFFFilter implements IFilter {
 				}
 				else if ( "group".equals(name) ) {
 					if ( processStartGroup() ) return true;
+				}
+				else if ( "alt-trans".equals(name) ) {
+					processStartAltTrans();
 				}
 				else storeStartElement();
 				break;
@@ -382,6 +389,7 @@ public class XLIFFFilter implements IFilter {
 			// Process trans-unit
 			sourceDone = false;
 			targetDone = false;
+			altTrans = null;
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
 
@@ -429,6 +437,11 @@ public class XLIFFFilter implements IFilter {
 						storeStartElement();
 						processNote();
 						storeEndElement();
+					}
+					else if ( "alt-trans".equals(name) ) {
+						addTargetIfNeeded();
+						storeStartElement();
+						processStartAltTrans();
 					}
 					else {
 						addTargetIfNeeded();
@@ -486,10 +499,14 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void processSource (boolean isSegSource) {
-		if ( sourceDone ) {
-			// Case where this entry is not the main one, but from an alt-trans
-			processContent(isSegSource ? "seg-source" : "source", true);
-			//TODO: put this in an annotation
+		TextContainer tc;
+		if ( sourceDone ) { // Case of an alt-trans entry
+			// Get the language
+			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			// Get the text content
+			tc = processContent(isSegSource ? "seg-source" : "source", true);
+			// Put the source in the alt-trans annotation
+			altTrans.addNew(lang, tc);
 		}
 		else {
 			// Get the coord attribute if available
@@ -500,7 +517,7 @@ public class XLIFFFilter implements IFilter {
 			}
 
 			skel.addRef(tu);
-			TextContainer tc = processContent(isSegSource ? "seg-source" : "source", false);
+			tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( isSegSource ) {
 				//TODO
 			}
@@ -512,10 +529,14 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void processTarget () {
-		if ( targetDone ) {
-			// Case where this entry is not the main one, but from an alt-trans
-			processContent("target", true);
-			//TODO: put this in an annotation
+		TextContainer tc;
+		if ( targetDone ) { // Case of an alt-trans entry
+			// Get the language
+			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			// Get the text content
+			tc = processContent("target", true);
+			// Put the target in the alt-trans annotation
+			altTrans.setTarget(lang, tc);
 		}
 		else {
 			// Get the state attribute if available
@@ -533,12 +554,20 @@ public class XLIFFFilter implements IFilter {
 			}
 
 			skel.addRef(tu, trgLang);
-			TextContainer tc = processContent("target", false);
+			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
 				tu.setTarget(trgLang, tc);
 			}
 			targetDone = true;
+		}
+	}
+	
+	private void processStartAltTrans () {
+		// Creates an annotation for the alt-trans if there is none yet.
+		if ( altTrans ==  null ) {
+			altTrans = new AltTransAnnotation();
+			tu.setAnnotation(altTrans);
 		}
 	}
 	
