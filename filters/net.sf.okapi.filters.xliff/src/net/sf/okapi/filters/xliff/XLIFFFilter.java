@@ -245,9 +245,6 @@ public class XLIFFFilter implements IFilter {
 				else if ( "group".equals(name) ) {
 					if ( processStartGroup() ) return true;
 				}
-				else if ( "alt-trans".equals(name) ) {
-					processStartAltTrans();
-				}
 				else storeStartElement();
 				break;
 				
@@ -503,6 +500,7 @@ public class XLIFFFilter implements IFilter {
 		if ( sourceDone ) { // Case of an alt-trans entry
 			// Get the language
 			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			if ( lang == null ) lang = srcLang; // Use default
 			// Get the text content
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
@@ -533,6 +531,7 @@ public class XLIFFFilter implements IFilter {
 		if ( targetDone ) { // Case of an alt-trans entry
 			// Get the language
 			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			if ( lang == null ) lang = trgLang; // Use default
 			// Get the text content
 			tc = processContent("target", true);
 			// Put the target in the alt-trans annotation
@@ -565,7 +564,7 @@ public class XLIFFFilter implements IFilter {
 	
 	private void processStartAltTrans () {
 		// Creates an annotation for the alt-trans if there is none yet.
-		if ( altTrans ==  null ) {
+		if ( altTrans == null ) {
 			altTrans = new AltTransAnnotation();
 			tu.setAnnotation(altTrans);
 		}

@@ -28,6 +28,7 @@ import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.xliff.AltTransAnnotation;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 import org.junit.Assert;
@@ -41,7 +42,7 @@ public class XLIFFFilterTest {
 		try {
 			filter = new XLIFFFilter();
 			filter.setOptions("en", "es", "UTF-8", true);
-			URL url = XLIFFFilterTest.class.getResource("/SF-12-Test01.xlf");
+			URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
 			filter.open(url);
 			process(filter);
 			filter.close();
@@ -99,6 +100,7 @@ public class XLIFFFilterTest {
 				for ( String lang : tu.getTargetLanguages() ) {
 					System.out.println("T=["+tu.getTarget(lang).toString()+"]");
 				}
+				printAltTrans(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
@@ -125,4 +127,29 @@ public class XLIFFFilterTest {
 			System.out.println("---");
 		}
 	}
+
+	private void printAltTrans (TextUnit res) {
+		System.out.println("---AltTransAnnotation---");
+		AltTransAnnotation ata = res.getAnnotation(AltTransAnnotation.class);
+		if ( ata == null ) {
+			System.out.println("No annotation");
+		}
+		else {
+			ata.startIteration();
+			while ( ata.moveToNext() ) {
+				TextUnit tu = ata.getEntry();
+				if ( ata.hasSource() ) {
+					System.out.println("S("+ata.getSourceLanguage()+")=["+tu.toString()+"]");
+				}
+				else {
+					System.out.println("No source defined.");
+					
+				}
+				System.out.println("T("+ata.getTargetLanguage()+")=["
+					+tu.getTarget(ata.getTargetLanguage()).toString()+"]");
+			}
+		}
+		System.out.println("---end of AltTransAnnotation---");
+	}
+
 }

@@ -73,6 +73,24 @@
 					<target xml:lang="de">2. Request-Code:</target>
 				</alt-trans>
 			</trans-unit>
+			<trans-unit id="TestAltTrans" restype="x-misc">
+				<source>File</source>
+				<target>Fichier</target>
+				<alt-trans>
+					<target xml:lang="de">Datei</target>
+				</alt-trans>
+				<alt-trans>
+					<target xml:lang="de">Ordner</target>
+				</alt-trans>
+				<alt-trans>
+					<source xml:lang="en">Open File</source>
+					<target xml:lang="fr">Ouvrir le fichier</target>
+				</alt-trans>
+				<alt-trans>
+					<source>Open File2</source>
+					<target xml:lang="fr">Ouvrir le fichier2</target>
+				</alt-trans>
+			</trans-unit>
 			<trans-unit id="S_LinActivationDlg__p_Tech_Support_will_then_supply_xxx" restype="x-misc">
 				<source>&lt;p>3. Operating System Type: &amp;lt Linux&amp;gt &lt;p>&lt;p>Tech Support will then supply a 20 digit Response Code that you will need to type into the empty boxes below. If you have access to e-mail, but don't wish to use Internet Activation, you may send the Request Code to GDF Technical Support at support@gdf.com. Tech Support will reply with the Response Code, which needs to be entered into the edit boxes.&lt;p></source>
 				<target>&lt;p>3. Type de système d'exploitation : &amp;lt Linux&amp;gt &lt;p>&lt;p>L'assistance technique fournit alors un code de réponse à 20 chiffres que vous devez saisir dans les cadres vides qui se trouvent ci-dessous. Si vous avez accès au courrier électronique, mais ne voulez pas utiliser l'activation Internet, vous pouvez envoyer le code de requête à l'adresse de l'assistance technique GDF : support@gdf.com. L'assistance technique répondra avec le code de réponse à saisir dans les boîtes d'édition.&lt;p></target>
