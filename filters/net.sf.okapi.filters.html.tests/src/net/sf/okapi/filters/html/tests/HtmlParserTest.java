@@ -66,6 +66,28 @@ public class HtmlParserTest {
 				}
 			}
 		}
+		
+		// Test second pass with the same filter object
+		htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
+		htmlParser.open(htmlStream);		
+		while (htmlParser.hasNext()) {
+			FilterEvent event = htmlParser.next();
+			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
+				assertTrue(event.getResource() instanceof TextUnit);								
+			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
+				assertTrue(event.getResource() instanceof DocumentPart);				
+			} else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP) {
+				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);				
+			}			
+			System.out.println(event.getEventType().toString());
+			if (event.getResource() != null) {
+				System.out.println(event.getResource().toString());
+				if (event.getResource().getSkeleton() != null) {
+					System.out.println(event.getResource().getSkeleton().toString());
+				}
+			}
+		}
+		
 		htmlParser.close();
 	}
 }
