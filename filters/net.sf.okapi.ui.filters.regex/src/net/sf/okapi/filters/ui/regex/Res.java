@@ -18,16 +18,25 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.translation;
+package net.sf.okapi.filters.ui.regex;
 
-/**
- * Set of fields common to all translation resources.
- */
-public class ResourceItem {
-	
-	public IQuery query;
-	public boolean enabled;
-	public String connectionString;
-	public String name;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
+public class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.filters.ui.regex.Res"; //$NON-NLS-1$
+
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME);
+
+	private Res() {
+	}
+
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }

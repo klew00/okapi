@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -51,7 +51,7 @@ class InputPropertiesForm {
 		IParametersProvider paramsProv)
 	{
 		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText(Res.getString("INPROP_CAPTION"));
+		shell.setText(Res.getString("INPROP_CAPTION")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, p_Parent);
 		shell.setLayout(new GridLayout());
 		
@@ -72,20 +72,20 @@ class InputPropertiesForm {
 		label.setLayoutData(gdTmp);
 		
 		label = new Label(comp, SWT.NONE);
-		label.setText(Res.getString("INPROP_ENCNOTE"));
+		label.setText(Res.getString("INPROP_ENCNOTE")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.verticalIndent = verticalIndent;
 		label.setLayoutData(gdTmp);
 
 		label = new Label(comp, SWT.NONE);
-		label.setText(Res.getString("INPROP_SRCENCODING"));
+		label.setText(Res.getString("INPROP_SRCENCODING")); //$NON-NLS-1$
 		
 		edSrcEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edSrcEncoding.setLayoutData(gdTmp);
 		
 		label = new Label(comp, SWT.NONE);
-		label.setText(Res.getString("INPROP_TRGENCODING"));
+		label.setText(Res.getString("INPROP_TRGENCODING")); //$NON-NLS-1$
 		edTrgEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
 		edTrgEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -93,11 +93,11 @@ class InputPropertiesForm {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				results = null;
-				if ( e.widget.getData().equals("h") ) {
-					MainForm.showHelp(shell, "inputDocProp.html");
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
+					MainForm.showHelp(shell, "inputDocProp.html"); //$NON-NLS-1$
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();

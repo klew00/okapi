@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -59,17 +59,17 @@ class StatusBar extends Composite {
 	}
 
 	void setInfo (String p_sText) {
-		infoLabel.setText((p_sText == null) ? "" : p_sText);
+		infoLabel.setText((p_sText == null) ? "" : p_sText); //$NON-NLS-1$
 	}
 	
 	void clearInfo () {
-		infoLabel.setText("");
+		infoLabel.setText(""); //$NON-NLS-1$
 	}
 	
 	void setCounter (int current,
 		int total)
 	{
-		if ( current < 0 ) counterLabel.setText("");
-		else counterLabel.setText(String.format("%d / %d", current+1, total));
+		if ( current < 0 ) counterLabel.setText(""); //$NON-NLS-1$
+		else counterLabel.setText(String.format("%d / %d", current+1, total)); //$NON-NLS-1$
 	}
 }

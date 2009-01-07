@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.ui.regex;
 
@@ -70,13 +70,13 @@ public class RuleDialog {
 		shell.setLayout(new GridLayout());
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Boundaries of the content");
+		grpTmp.setText(Res.getString("RuleDialog.boundaries")); //$NON-NLS-1$
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
 
 		Label label = new Label(grpTmp, SWT.NONE);
-		label.setText("Start:");
+		label.setText(Res.getString("RuleDialog.start")); //$NON-NLS-1$
 		
 		edStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -88,7 +88,7 @@ public class RuleDialog {
 		});
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("End:");
+		label.setText(Res.getString("RuleDialog.end")); //$NON-NLS-1$
 		
 		edEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -118,27 +118,27 @@ public class RuleDialog {
 		edResult.setEditable(false);
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Resource name (inside the start expression)");
+		grpTmp.setText(Res.getString("RuleDialog.resourceName")); //$NON-NLS-1$
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
 
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Before the name:");
+		label.setText(Res.getString("RuleDialog.beforeName")); //$NON-NLS-1$
 		
 		edNameStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edNameStart.setLayoutData(gdTmp);
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("After the name:");
+		label.setText(Res.getString("RuleDialog.afterName")); //$NON-NLS-1$
 		
 		edNameEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edNameEnd.setLayoutData(gdTmp);
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Format:");
+		label.setText(Res.getString("RuleDialog.format")); //$NON-NLS-1$
 		
 		edNameFormat = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -149,11 +149,11 @@ public class RuleDialog {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					//TODO: UIUtil.start(help);
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();
@@ -180,7 +180,7 @@ public class RuleDialog {
 
 	private void updateResults () {
 		try {
-			fullPattern = Pattern.compile("("+edStart.getText()+")(.*?)("+edEnd.getText()+")",
+			fullPattern = Pattern.compile("("+edStart.getText()+")(.*?)("+edEnd.getText()+")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				regexOptions);
 			Matcher m1 = fullPattern.matcher(getSampleText());
 			if ( m1.find() ) {
@@ -190,25 +190,25 @@ public class RuleDialog {
 					endPattern = Pattern.compile(edEnd.getText(), regexOptions);
 					Matcher m3 = endPattern.matcher(m1.group());
 					if ( m3.find(m2.end()) ) {
-						edResult.setText("start=[" + m2.group() + "]\ncontent=["
+						edResult.setText(Res.getString("RuleDialog.resultStart") + m2.group() + Res.getString("RuleDialog.resultContent") //$NON-NLS-1$ //$NON-NLS-2$
 							+ m1.group().substring(m2.end(), m3.start())
-							+ "]\nend=[" + m3.group() + "]");
+							+ Res.getString("RuleDialog.resultEnd") + m3.group() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
-			else edResult.setText("<No match>");
+			else edResult.setText(Res.getString("RuleDialog.noMatch")); //$NON-NLS-1$
 		}
 		catch ( Throwable e ) {
-			edResult.setText("Error: "+e.getMessage());
+			edResult.setText(Res.getString("RuleDialog.error")+e.getMessage()); //$NON-NLS-1$
 		}
 	}
 
 	private String getSampleText() {
 		// Change different line breaks type into \n cases
 		String tmp = edSample.getText();
-		tmp = tmp.replaceAll("\r\r\n", "\n");
-		tmp = tmp.replace("\r\n", "\n");
-		return tmp.replace("\r", "\n"); 
+		tmp = tmp.replaceAll("\r\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		tmp = tmp.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		return tmp.replace("\r", "\n");  //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private boolean saveData () {

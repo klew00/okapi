@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.ui.regex;
 
@@ -120,7 +120,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void create (Shell p_Parent) {
-		shell.setText("Regex Filter Parameters");
+		shell.setText(Res.getString("Editor.caption")); //$NON-NLS-1$
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -162,7 +162,7 @@ public class Editor implements IParametersEditor {
 		Group propGroup = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		propGroup.setLayout(layTmp);
-		propGroup.setText("Rule properties");
+		propGroup.setText(Res.getString("Editor.ruleProperties")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 3;
 		propGroup.setLayoutData(gdTmp);
@@ -175,29 +175,29 @@ public class Editor implements IParametersEditor {
 		edExpression.setLayoutData(gdTmp);
 		
 		Label label = new Label(propGroup, SWT.NONE);
-		label.setText("Action:");
+		label.setText(Res.getString("Editor.action")); //$NON-NLS-1$
 		
 		cbRuleType = new Combo(propGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cbRuleType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		cbRuleType.add("Extract the strings inside the content");
-		cbRuleType.add("Extract the content itself");
-		cbRuleType.add("Treat the content as a comment");
-		cbRuleType.add("Do not extract the content");
+		cbRuleType.add(Res.getString("Editor.extractStringsInside")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.extractContent")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.treatAsComment")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.doNotExtract")); //$NON-NLS-1$
 		
 		chkPreserveWS = new Button(propGroup, SWT.CHECK);
-		chkPreserveWS.setText("Preserve white spaces");
+		chkPreserveWS.setText(Res.getString("Editor.preserveWS")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkPreserveWS.setLayoutData(gdTmp);
 		
 		chkUnwrap = new Button(propGroup, SWT.CHECK);
-		chkUnwrap.setText("Unwrap text");
+		chkUnwrap.setText(Res.getString("Editor.unwrap")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkUnwrap.setLayoutData(gdTmp);
 		
 		chkUseCodeFinder = new Button(propGroup, SWT.CHECK);
-		chkUseCodeFinder.setText("Has in-line codes");
+		chkUseCodeFinder.setText(Res.getString("Editor.hasInlines")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkUseCodeFinder.setLayoutData(gdTmp);
@@ -208,7 +208,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btEditFinderRules = new Button(propGroup, SWT.PUSH);
-		btEditFinderRules.setText("  Edit In-line Codes Patterns...  ");
+		btEditFinderRules.setText(Res.getString("Editor.editInlines")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		gdTmp.horizontalSpan = 2;
@@ -230,7 +230,7 @@ public class Editor implements IParametersEditor {
 		int buttonWidth = 90;
 		
 		btAdd = new Button(cmpButtons, SWT.PUSH);
-		btAdd.setText("Add...");
+		btAdd.setText(Res.getString("Editor.add")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btAdd.setLayoutData(gdTmp);
@@ -241,7 +241,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btEdit = new Button(cmpButtons, SWT.PUSH);
-		btEdit.setText("Edit...");
+		btEdit.setText(Res.getString("Editor.edit")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btEdit.setLayoutData(gdTmp);
@@ -252,7 +252,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btRename = new Button(cmpButtons, SWT.PUSH);
-		btRename.setText("Rename...");
+		btRename.setText(Res.getString("Editor.rename")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btRename.setLayoutData(gdTmp);
@@ -263,7 +263,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btMoveUp = new Button(cmpButtons, SWT.PUSH);
-		btMoveUp.setText("Move Up");
+		btMoveUp.setText(Res.getString("Editor.moveUp")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		btMoveUp.setLayoutData(gdTmp);
@@ -274,7 +274,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btRemove = new Button(cmpButtons, SWT.PUSH);
-		btRemove.setText("Remove");
+		btRemove.setText(Res.getString("Editor.remove")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = buttonWidth;
 		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
@@ -286,7 +286,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		btMoveDown = new Button(cmpButtons, SWT.PUSH);
-		btMoveDown.setText("Move Down");
+		btMoveDown.setText(Res.getString("Editor.moveDown")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
 		gdTmp.widthHint = buttonWidth;
@@ -302,24 +302,24 @@ public class Editor implements IParametersEditor {
 		Group optionsGroup = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		optionsGroup.setLayout(layTmp);
-		optionsGroup.setText("Regular expression options");
+		optionsGroup.setText(Res.getString("Editor.regexOptions")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		gdTmp.verticalSpan = 1;
 		optionsGroup.setLayoutData(gdTmp);
 		
 		chkDotAll = new Button(optionsGroup, SWT.CHECK);
-		chkDotAll.setText("Dot also matches line-feed");
+		chkDotAll.setText(Res.getString("Editor.dotMatchesLF")); //$NON-NLS-1$
 
 		chkMultiline = new Button(optionsGroup, SWT.CHECK);
-		chkMultiline.setText("Multi-line");
+		chkMultiline.setText(Res.getString("Editor.multiline")); //$NON-NLS-1$
 		
 		chkIgnoreCase = new Button(optionsGroup, SWT.CHECK);
-		chkIgnoreCase.setText("Ignore case differences");
+		chkIgnoreCase.setText(Res.getString("Editor.ignoreCases")); //$NON-NLS-1$
 		
 		//--- end Options
 		
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Rules");
+		tiTmp.setText(Res.getString("Editor.rules")); //$NON-NLS-1$
 		tiTmp.setControl(cmpTmp);
 		
 		
@@ -333,7 +333,7 @@ public class Editor implements IParametersEditor {
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Localization directives");
+		grpTmp.setText(Res.getString("Editor.locDir")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		pnlLD = new LDPanel(grpTmp, SWT.NONE);
@@ -342,24 +342,24 @@ public class Editor implements IParametersEditor {
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Strings");
+		grpTmp.setText(Res.getString("Editor.strings")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		
 		chkExtractOuterStrings = new Button(grpTmp, SWT.CHECK);
-		chkExtractOuterStrings.setText("Extract strings outside the rules");
+		chkExtractOuterStrings.setText(Res.getString("Editor.extractStringsOutside")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkExtractOuterStrings.setLayoutData(gdTmp);
 
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Beginning of string:");
+		label.setText(Res.getString("Editor.startOfString")); //$NON-NLS-1$
 		edStartString = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edStartString.setLayoutData(gdTmp);
 
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("End of string:");
+		label.setText(Res.getString("Editor.endOfString")); //$NON-NLS-1$
 		edEndString = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edEndString.setLayoutData(gdTmp);
@@ -368,29 +368,29 @@ public class Editor implements IParametersEditor {
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText("Content type");
+		grpTmp.setText(Res.getString("Editor.contentType")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Mime type for the document:");
+		label.setText(Res.getString("Editor.mimeType")); //$NON-NLS-1$
 		edMimeType = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edMimeType.setLayoutData(gdTmp);
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
+		tiTmp.setText(Res.getString("Editor.options")); //$NON-NLS-1$
 		tiTmp.setControl(cmpTmp);
 		
 		//--- Dialog-level buttons
 
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					//TODO: Call help
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) saveData(); //$NON-NLS-1$
 				shell.close();
 			};
 		};
@@ -427,7 +427,7 @@ public class Editor implements IParametersEditor {
 
 		ruleIndex = newRuleIndex;
 		if ( ruleIndex < 0 ) {
-			edExpression.setText("");
+			edExpression.setText(""); //$NON-NLS-1$
 			cbRuleType.select(0);
 			chkPreserveWS.setSelection(false);
 			chkUnwrap.setSelection(false);
@@ -436,7 +436,7 @@ public class Editor implements IParametersEditor {
 			return;
 		}
 		Rule rule = rules.get(ruleIndex);
-		edExpression.setText("(("+rule.getStart()+")(.*?)("+rule.getEnd()+"))");
+		edExpression.setText("(("+rule.getStart()+")(.*?)("+rule.getEnd()+"))"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		cbRuleType.select(rule.getRuleType());
 		chkPreserveWS.setSelection(rule.preserveWS());
 		chkUnwrap.setSelection(rule.unwrap());
@@ -452,7 +452,7 @@ public class Editor implements IParametersEditor {
 		try {
 			Rule rule = rules.get(ruleIndex);
 			InlineCodeFinderDialog dlg = 
-				new InlineCodeFinderDialog(shell, "In-Line Codes Patterns", null);
+				new InlineCodeFinderDialog(shell, Res.getString("Editor.inlinesPatterns"), null); //$NON-NLS-1$
 			dlg.setData(rule.getCodeFinderRules());
 			String tmp = dlg.showDialog();
 			if ( tmp == null ) return;
@@ -492,8 +492,8 @@ public class Editor implements IParametersEditor {
 			if ( n == -1 ) return;
 			Rule rule = rules.get(n);
 			String name = rule.getRuleName();
-			InputDialog dlg = new InputDialog(shell, "Rename Rule",
-				"New name of the rule:", name, null, 0);
+			InputDialog dlg = new InputDialog(shell, Res.getString("Editor.renameRule"), //$NON-NLS-1$
+				Res.getString("Editor.newRuleName"), name, null, 0); //$NON-NLS-1$
 			if ( (name = dlg.showDialog()) == null ) return;
 			rule.setRuleName(name);
 			lbRules.setItem(n, name);
@@ -509,19 +509,19 @@ public class Editor implements IParametersEditor {
 			String caption;
 			if ( newRule ) {
 				// Get the name
-				String name = "newRule";
-				InputDialog dlg = new InputDialog(shell, "New Rule",
-					"Name of the new rule:", name, null, 0);
+				String name = Res.getString("Editor.defaultRuleName"); //$NON-NLS-1$
+				InputDialog dlg = new InputDialog(shell, Res.getString("Editor.newRuleCaption"), //$NON-NLS-1$
+					Res.getString("Editor.newRuleLabel"), name, null, 0); //$NON-NLS-1$
 				if ( (name = dlg.showDialog()) == null ) return;
 				rule = new Rule();
 				rule.setRuleName(name);
-				caption = "Add New Rule";
+				caption = Res.getString("Editor.addNewRuleCaption"); //$NON-NLS-1$
 			}
 			else {
 				int n = lbRules.getSelectionIndex();
 				if ( n == -1 ) return;
 				rule = rules.get(n);
-				caption = "Edit Rule";
+				caption = Res.getString("Editor.editRuleCaption"); //$NON-NLS-1$
 			}
 			
 			RuleDialog dlg = new RuleDialog(shell, caption, rule, getRegexOptions());
