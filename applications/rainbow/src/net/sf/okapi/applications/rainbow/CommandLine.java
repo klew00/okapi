@@ -46,6 +46,7 @@ public class CommandLine {
 	private BatchLog log;
 	private LogHandler logHandler;
 	private String utilityId;
+	private boolean promptForOptions = true;
 	
 	public void execute (Shell shell,
 		String[] args)
@@ -64,9 +65,6 @@ public class CommandLine {
 		catch ( Throwable e ) {
 			e.printStackTrace();
 		}
-		finally {
-			System.out.println("-- end of session --");
-		}
 	}
 	
 	/**
@@ -84,15 +82,19 @@ public class CommandLine {
 		prj.setInputRoot(0, rootFolder);
 		prj.setInputRoot(1, rootFolder);
 		prj.setInputRoot(2, rootFolder);
+		boolean setOutSearch = false;
 		
 		for ( int i=0; i<args.length; i++ ) {
-			arg = args[i].toLowerCase();
+			arg = args[i];
 			if ( "-p".equals(arg) ) { // Load a project
 				prj.load(nextArg(args, ++i));
 			}
 			else if ( "-x".equals(arg) ) { // Execute utility
 				utilityId = nextArg(args, ++i);
 				continueAfter = true;
+			}
+			else if ( "-np".equals(arg) ) { // No prompt for options
+				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
 				MainForm.showHelp(shell, "index.html");
@@ -121,15 +123,38 @@ public class CommandLine {
 					inp.filterSettings = nextArg(args, ++i);
 				}
 			}
-			//TODO: -fs for filter settings
-			else if ( !arg.startsWith("-") ) { // Add input to list 0
-				File f = new File(args[i]); // Use original arg (for case-sensitive paths)
+			else if ( "-o".equals(arg) ) { // Output file
+				File f = new File(nextArg(args, ++i));
+				prj.setOutputRoot(Util.getDirectoryName(f.getAbsolutePath()));
+				prj.setUseOutputRoot(true);
+				prj.pathBuilder.setUseExtension(false);
+				prj.pathBuilder.setUseReplace(true);
+				prj.pathBuilder.setReplace(Util.getFilename(f.getAbsolutePath(), true));
+				setOutSearch = true;
+				//System.out.println("Output: " + f.getAbsolutePath());
+			}
+			else if ( !arg.startsWith("-") ) { // Input file
+				File f = new File(arg);
 				String[] res = fm.guessFormat(f.getAbsolutePath());
+				prj.inputLists.get(0).clear();
+				prj.setInputRoot(0, Util.getDirectoryName(f.getAbsolutePath()));
 				prj.addDocument(0, f.getAbsolutePath(), res[0], null, res[1]);
+				//System.out.println(" Input: " + f.getAbsolutePath());
 			}
 			else {
 				log.error("Invalid command line argument: "+args[i]);
 				continueAfter = false;
+			}
+			
+			// Sets the search part of the output builder if an output path was specified.
+			if ( setOutSearch ) {
+				Input inp = prj.getLastItem(0);
+				if ( inp == null ) { 
+					throw new RuntimeException("No input file specified.");
+				}
+				else {
+					prj.pathBuilder.setSearch(inp.relativePath);
+				}
 			}
 		}
 		return continueAfter;
@@ -144,7 +169,7 @@ public class CommandLine {
 	
 	private void printBanner () {
 		System.out.println("---------------------------");
-		System.out.println("Rainbow - Command line mode");
+		System.out.println("Rainbow - Command Line Mode");
 		System.out.println("---------------------------");
 	}
 	
@@ -179,9 +204,10 @@ public class CommandLine {
 		// Get the data for the utility and instantiate it
 		ud.setData(prj, utilityID);
 		// Run it
-		//if ( !ud.checkParameters(shell) ) return;
+		if ( promptForOptions ) {
+			if ( !ud.checkParameters(shell) ) return;
+		}
 		ud.execute(shell);
 	}
 
-	
 }
