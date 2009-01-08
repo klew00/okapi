@@ -32,11 +32,8 @@ public class Main {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
 
-			if ( args.length > 1 ) {
-				CommandLine cmd = new CommandLine();
-				cmd.execute(shlMain, args);
-			}
-			else {
+			if (( args.length < 1 ) || !args[0].startsWith("-") ) {
+				// Normal mode
 				String projectFile = null;
 				if ( args.length == 1 ) {
 					projectFile = args[0];
@@ -44,6 +41,10 @@ public class Main {
 				MainForm mf = new MainForm(shlMain, projectFile);
 				shlMain.open();
 				mf.run();
+			}
+			else { // Command line mode
+				CommandLine cmd = new CommandLine();
+				cmd.execute(shlMain, args);
 			}
 		}
 		catch ( Throwable e ) {

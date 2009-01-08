@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
@@ -24,6 +44,7 @@ public class CommandLine {
 	private PluginsAccess plugins;
 	private BatchLog log;
 	private LogHandler logHandler;
+	private String utilityId;
 	
 	public void execute (Shell shell,
 		String[] args)
@@ -31,19 +52,12 @@ public class CommandLine {
 		try {
 			this.shell = shell;
 			printBanner();
-			if ( args == null ) return;
-			if ( args.length < 1 ) return;
-		
 			initialize();
-			
-			// First parameter is the project file
-			prj = new Project(lm);
-			prj.load(args[0]);
-			
-			
-			// Then execute the commands
-			for ( int i=1; i<args.length; i++ ) {
-				launchUtility(args[i]);
+			if ( !parseArguments(args) ) {
+				return;
+			}
+			if ( utilityId != null ) {
+				launchUtility(utilityId);
 			}
 		}
 		catch ( Throwable e ) {
@@ -52,6 +66,57 @@ public class CommandLine {
 		finally {
 			System.out.println("--- end Rainbow session ---");
 		}
+	}
+	
+	/**
+	 * Parse the command line.
+	 * @return True to execute something, false if error or exit immediately.
+	 * @throws Exception 
+	 */
+	private boolean parseArguments (String[] args) throws Exception {
+		String arg;
+		boolean continueAfter = false;
+		prj = new Project(lm);
+		for ( int i=0; i<args.length; i++ ) {
+			arg = args[i].toLowerCase();
+			if ( "-p".equals(arg) ) { // Load a project
+				prj.load(nextArg(args, ++i));
+			}
+			else if ( "-x".equals(arg) ) { // Execute utility
+				utilityId = nextArg(args, ++i);
+				continueAfter = true;
+			}
+			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) {
+				MainForm.showHelp(shell, "index.html");
+			}
+			else if ( "-se".equals(arg) ) { // Source encoding
+				prj.setSourceEncoding(nextArg(args, ++i));
+			}
+			else if ( "-te".equals(arg) ) { // Target encoding
+				prj.setTargetEncoding(nextArg(args, ++i));
+			}
+			else if ( "-sl".equals(arg) ) { // Source language
+				prj.setSourceLanguage(nextArg(args, ++i));
+			}
+			else if ( "-tl".equals(arg) ) { // Target language
+				prj.setTargetLanguage(nextArg(args, ++i));
+			}
+			else if ( !arg.startsWith("-") ) {
+				//prj.addDocument(prj., newPath, null, null, null);
+			}
+			else {
+				log.error("Invalid command line argument: "+args[i]);
+				continueAfter = false;
+			}
+		}
+		return continueAfter;
+	}
+	
+	private String nextArg (String[] args, int index) {
+		if ( index >= args.length ) {
+			throw new RuntimeException("Missing parameter in the command line.");
+		}
+		return args[index];
 	}
 	
 	private void printBanner () {
