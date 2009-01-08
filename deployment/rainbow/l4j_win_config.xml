@@ -1,8 +1,8 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>lib\ratel.jar</jar>
-  <outfile>C:\OkapiJava\trunk\deployment\ratel\dist_win32-x86\ratel.exe</outfile>
+  <jar>lib\rainbow.jar</jar>
+  <outfile>C:\OkapiJava\trunk\deployment\rainbow\dist_win32-x86\rainbow.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -12,9 +12,9 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>C:\OkapiJava\trunk\deployment\ratel\data\win32-x86_nocopy\ratel.ico</icon>
+  <icon>C:\OkapiJava\trunk\deployment\rainbow\data\win32-x86_nocopy\rainbow.ico</icon>
   <classPath>
-    <mainClass>net.sf.okapi.applications.ratel.Main</mainClass>
+    <mainClass>net.sf.okapi.applications.rainbow.Main</mainClass>
     <cp>swt.jar</cp>
   </classPath>
   <jre>

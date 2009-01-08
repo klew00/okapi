@@ -83,6 +83,7 @@ public class CommandLine {
 		prj.setInputRoot(1, rootFolder);
 		prj.setInputRoot(2, rootFolder);
 		boolean setOutSearch = false;
+		int inpList = -1;
 		
 		for ( int i=0; i<args.length; i++ ) {
 			arg = args[i];
@@ -131,15 +132,16 @@ public class CommandLine {
 				prj.pathBuilder.setUseReplace(true);
 				prj.pathBuilder.setReplace(Util.getFilename(f.getAbsolutePath(), true));
 				setOutSearch = true;
-				//System.out.println("Output: " + f.getAbsolutePath());
 			}
 			else if ( !arg.startsWith("-") ) { // Input file
+				if ( ++inpList > 2 ) {
+					throw new RuntimeException("Too many input files.");
+				}
 				File f = new File(arg);
 				String[] res = fm.guessFormat(f.getAbsolutePath());
-				prj.inputLists.get(0).clear();
-				prj.setInputRoot(0, Util.getDirectoryName(f.getAbsolutePath()));
-				prj.addDocument(0, f.getAbsolutePath(), res[0], null, res[1]);
-				//System.out.println(" Input: " + f.getAbsolutePath());
+				prj.inputLists.get(inpList).clear();
+				prj.setInputRoot(inpList, Util.getDirectoryName(f.getAbsolutePath()));
+				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1]);
 			}
 			else {
 				log.error("Invalid command line argument: "+args[i]);

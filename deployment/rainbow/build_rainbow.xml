@@ -42,7 +42,8 @@
 		<ant antfile="build_filters.properties.xml" inheritAll="false"/>
 		<ant antfile="build_filters.regex.xml" inheritAll="false"/>
 		<ant antfile="build_filters.xliff.xml" inheritAll="false"/>
-		<ant antfile="build_filters.xml.xml" inheritAll="false"/>
+		<ant antfile="build_filters.rtf.xml" inheritAll="false"/>
+		<!--<ant antfile="build_filters.xml.xml" inheritAll="false"/> -->
 		<ant antfile="build_filters.openoffice.xml" inheritAll="false"/>
 		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
 		<ant antfile="build_lib.translation.xml" inheritAll="false"/>
@@ -90,6 +91,15 @@
 		
 	</target>
 
+	<target name="winExe" if="is_win32-x86">
+		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
+		<taskdef name="launch4j"
+			classname="net.sf.launch4j.ant.Launch4jTask"
+			classpath="${launch4j.dir}/launch4j.jar
+				:${launch4j.dir}/lib/xstream.jar" />
+		<launch4j configFile="./l4j_win_config.xml" />
+	</target>
+	
 	<target name="zipAll" unless="is_gtk2-linux-x86">
 		<zip destfile="${dist}/rainbow_${platform}.zip" basedir="${dist}"/>
 	</target>
@@ -100,6 +110,6 @@
 		<delete file="${dist}/rainbow_${platform}.tar"/>
 	</target>
 	
-	<target name="all" depends="compile, zipAll, gzipAll"/>
+	<target name="all" depends="compile, winExe, zipAll, gzipAll"/>
 
 </project>
