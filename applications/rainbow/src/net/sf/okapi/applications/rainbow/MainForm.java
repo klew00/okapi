@@ -1378,8 +1378,8 @@ public class MainForm implements IParametersProvider {
 				n += doAddDocuments(F.list(), path);
 			}
 			else {
-				String[] aRes = fm.guessFormat(path);
-				switch ( prj.addDocument(currentInput, path, aRes[0], null, aRes[1]) ) {
+				String[] res = fm.guessFormat(path);
+				switch ( prj.addDocument(currentInput, path, res[0], null, res[1]) ) {
 				case 0: // OK
 					n++;
 					break;

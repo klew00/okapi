@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -137,6 +137,16 @@ public class Project {
 			if ( inp.relativePath.equalsIgnoreCase(relativePath) ) return inp;
 		}
 		return null;
+	}
+	
+	/**
+	 * Gets the last input item from the list.
+	 * @param listIndex Index of the input list where perform the operation.
+	 * @return An input object or null.
+	 */
+	public Input getLastItem (int listIndex) {
+		if ( inputLists.get(listIndex).size() == 0 ) return null;
+		return inputLists.get(listIndex).get(inputLists.get(listIndex).size()-1);
 	}
 	
 	public void save (String newPath)

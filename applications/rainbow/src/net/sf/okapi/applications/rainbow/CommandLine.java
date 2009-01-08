@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -64,7 +65,7 @@ public class CommandLine {
 			e.printStackTrace();
 		}
 		finally {
-			System.out.println("--- end Rainbow session ---");
+			System.out.println("-- end of session --");
 		}
 	}
 	
@@ -76,7 +77,14 @@ public class CommandLine {
 	private boolean parseArguments (String[] args) throws Exception {
 		String arg;
 		boolean continueAfter = false;
+		
+		// Creates default project
+		FormatManager fm = new FormatManager();
 		prj = new Project(lm);
+		prj.setInputRoot(0, rootFolder);
+		prj.setInputRoot(1, rootFolder);
+		prj.setInputRoot(2, rootFolder);
+		
 		for ( int i=0; i<args.length; i++ ) {
 			arg = args[i].toLowerCase();
 			if ( "-p".equals(arg) ) { // Load a project
@@ -86,7 +94,7 @@ public class CommandLine {
 				utilityId = nextArg(args, ++i);
 				continueAfter = true;
 			}
-			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) {
+			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
 				MainForm.showHelp(shell, "index.html");
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding
@@ -101,8 +109,23 @@ public class CommandLine {
 			else if ( "-tl".equals(arg) ) { // Target language
 				prj.setTargetLanguage(nextArg(args, ++i));
 			}
-			else if ( !arg.startsWith("-") ) {
-				//prj.addDocument(prj., newPath, null, null, null);
+			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0
+				prj.setInputRoot(0, nextArg(args, ++i));
+			}
+			else if ( "-fs".equals(arg) ) {
+				Input inp = prj.getLastItem(0);
+				if ( inp == null ) { 
+					throw new RuntimeException("-fs parameter defined before input path.");
+				}
+				else {
+					inp.filterSettings = nextArg(args, ++i);
+				}
+			}
+			//TODO: -fs for filter settings
+			else if ( !arg.startsWith("-") ) { // Add input to list 0
+				File f = new File(args[i]); // Use original arg (for case-sensitive paths)
+				String[] res = fm.guessFormat(f.getAbsolutePath());
+				prj.addDocument(0, f.getAbsolutePath(), res[0], null, res[1]);
 			}
 			else {
 				log.error("Invalid command line argument: "+args[i]);

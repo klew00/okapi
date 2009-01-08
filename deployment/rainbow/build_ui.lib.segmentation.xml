@@ -23,7 +23,6 @@
 		<ant antfile="build_filters.common.xml" inheritAll="false"/>
 		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
 		<ant antfile="build_ui.common.xml" inheritAll="false"/>
-		<ant antfile="build_ui.filters.common.xml" inheritAll="false"/>
  		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
 		<copy todir="${tmp}">
 			<fileset dir="${src}" excludes="**/*.java"/>
