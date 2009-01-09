@@ -202,17 +202,17 @@ public class ODFFilter implements IFilter {
 	}
 
 	public FilterEvent next () {
+		// Treat cancel
 		if ( canceled ) {
 			queue.clear();
 			queue.add(new FilterEvent(FilterEventType.CANCELED));
 			hasNext = false;
 		}
-		
+		// Fill the queue if it's empty
 		if ( queue.isEmpty() ) {
 			read();
 		}
-
-		// Update hasNext flag on last event
+		// Update hasNext flag on the FINISHED event
 		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
 			hasNext = false;
 		}

@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-API-1.5.0"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-JDK14-1.5.0"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.tests"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

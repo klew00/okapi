@@ -4,6 +4,7 @@
  <!-- File menu -->
  <command name="file">&amp;File</command>
  <command name="file.new" ctrl="1" key="N">&amp;New&#x9;Ctrl+N</command>
+ <command name="file.newWithSample">New &amp;With Simple Default Rules</command>
  <command name="file.open" ctrl="1" key="O">&amp;Open...&#x9;Ctrl+O</command>
  <command name="file.save" ctrl="1" key="S">&amp;Save&#x9;Ctrl+S</command>
  <command name="file.saveas">Save &amp;As...</command>

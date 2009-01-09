@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,16 +16,15 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.rtf.tests;
 
 import java.io.InputStream;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,6 +38,7 @@ public class RTFFilterTest {
 
 	@Test
 	public void runTest () {
+		FilterTestDriver testDriver = new FilterTestDriver();
 		RTFFilter filter = null;		
 		try {
 			filter = new RTFFilter();
@@ -55,7 +55,7 @@ public class RTFFilterTest {
 
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
 			filter.open(input);
-			process3(filter);
+			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
 		catch ( Throwable e ) {
@@ -82,25 +82,6 @@ public class RTFFilterTest {
 			System.out.println("S="+tu.toString());
 			if ( tu.hasTarget("fr") ) {
 				System.out.println("T="+tu.getTargetContent("fr").toString());
-			}
-		}
-	}
-
-	private void process3 (IFilter filter) {
-		System.out.println("===== 3 ===========================================");
-		FilterEvent event;
-		while ( filter.hasNext() ) {
-			event = filter.next();
-			switch ( event.getEventType() ) {
-			case START_DOCUMENT:
-				System.out.println("--- Start Document ---");
-				break;
-			case TEXT_UNIT:
-				System.out.println("["+event.getResource().toString()+"]");
-				break;
-			case END_DOCUMENT:
-				System.out.println("\n--- End Document ---");
-				break;
 			}
 		}
 	}

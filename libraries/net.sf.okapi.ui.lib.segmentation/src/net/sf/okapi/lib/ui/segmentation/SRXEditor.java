@@ -33,6 +33,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -444,7 +445,15 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				newSRXDocument();
+				newSRXDocument(false);
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.newWithSample"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				newSRXDocument(true);
             }
 		});
 		
@@ -692,12 +701,11 @@ public class SRXEditor {
 	}
 	
 	private void updateCaption () {
+		String filename;
+		if ( srxPath != null ) filename = Util.getFilename(srxPath, true);
+		else filename = "Untitled"; 
 		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");  //$NON-NLS-1$  //$NON-NLS-2$
-		if ( srxPath != null ) {
-			text += " - "; //$NON-NLS-1$
-			text += Util.getFilename(srxPath, true);	
-		}
-		shell.setText(text);
+		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 	
 	private void updateAll () {
@@ -706,11 +714,20 @@ public class SRXEditor {
 		updateLanguageRuleList();
 	}
 	
-	private boolean newSRXDocument () {
+	private boolean newSRXDocument (boolean withSimpleDefault) {
 		if ( !checkIfRulesNeedSaving() ) return false;
 		srxDoc = new SRXDocument();
 		srxPath = null;
 		updateCaption();
+		
+		if ( withSimpleDefault ) {
+			ArrayList<Rule> list = new ArrayList<Rule>();
+			list.add(new Rule("([A-Z]\\.){2,}", "\\s", false)); //$NON-NLS-1$ //$NON-NLS-2$
+			list.add(new Rule("\\.", "\\s", true)); //$NON-NLS-1$ //$NON-NLS-2$
+			srxDoc.addLanguageRule(Res.getString("SRXEditor.defaultSetName"), list); //$NON-NLS-1$
+			srxDoc.addLanguageMap(new LanguageMap(".*", Res.getString("SRXEditor.defaultSetName"))); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
 		updateAll();
 		return true;
 	}
@@ -871,7 +888,7 @@ public class SRXEditor {
 		config.setProperty("testInputPath", testInputPath); //$NON-NLS-1$
 		config.setProperty("testOutputPath", testOutputPath); //$NON-NLS-1$
 		config.setProperty("htmlOutput", htmlOutput); //$NON-NLS-1$
-		config.save(APPNAME, "Beta");
+		config.save(APPNAME, "Beta"); //$NON-NLS-1$
 		
 		getSurfaceData();
 		if ( srxDoc.isModified() ) {
@@ -912,5 +929,5 @@ public class SRXEditor {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
-	
+
 }

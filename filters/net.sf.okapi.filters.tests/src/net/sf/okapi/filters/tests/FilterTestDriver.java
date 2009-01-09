@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,79 +18,105 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xliff.tests;
-
-import java.net.URL;
+package net.sf.okapi.filters.tests;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.xliff.AltTransAnnotation;
-import net.sf.okapi.filters.xliff.XLIFFFilter;
 
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * Driver to test filter output.
+ */
+public class FilterTestDriver {
 
-public class XLIFFFilterTest {
+	private boolean showSkeleton = true;
+	private boolean showOnlyTextUnits = false;
+	private boolean ok;
 
-	@Test
-	public void runTest () {
-		FilterTestDriver testDriver = new FilterTestDriver();
-		XLIFFFilter filter = null;		
-		try {
-			filter = new XLIFFFilter();
-			filter.setOptions("en", "es", "UTF-8", true);
-			URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-			filter.open(url);
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	/**
+	 * Indicates to this driver to display the skeleton data.
+	 * @param value True to display the skeleton, false to not display the skeleton.
+	 */
+	public void setShowSkeleton (boolean value) {
+		showSkeleton = value;
+		
 	}
 	
-	private void process (IFilter filter) {
+	/**
+	 * Indicates to this driver that only the TEXT_UNIT event should be displayed.
+	 * @param value True to show only the text units, false to show all events. 
+	 */
+	public void setShowOnlyTextUnits (boolean value) {
+		showOnlyTextUnits = value;
+		
+	}
+
+	/**
+	 * Process the input document. You must have called the setOptions() and open() methods 
+	 * of the filter before calling this method.
+	 * @param filter Filter to process.
+	 * @return False if an error occurred, true if all was OK.
+	 */
+	public boolean process (IFilter filter) {
+		ok = true;
+		int start = 0;
+		int finished = 0;
+		int startDoc = 0;
+		int endDoc = 0;
+		int startGroup = 0;
+		int endGroup = 0;
+		
 		System.out.println("================================================");
 		FilterEvent event;
 		while ( filter.hasNext() ) {
 			event = filter.next();
 			switch ( event.getEventType() ) {
 			case START:
+				start++;
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Start");
 				break;
 			case FINISHED:
+				finished++;
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Finished");
 				break;
 			case START_DOCUMENT:
+				startDoc++;
+				checkStartDocument((StartDocument)event.getResource());
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Start Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
+				endDoc++;
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---End Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Start Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---End Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_GROUP:
+				startGroup++;
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Start Group");
 				printSkeleton(event.getResource());
 				break;
 			case END_GROUP:
+				endGroup++;
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---End Group");
 				printSkeleton(event.getResource());
 				break;
@@ -102,19 +128,46 @@ public class XLIFFFilterTest {
 				for ( String lang : tu.getTargetLanguages() ) {
 					System.out.println("T=["+tu.getTarget(lang).toString()+"]");
 				}
-				printAltTrans(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
+				if ( showOnlyTextUnits ) break;
 				System.out.println("---Document Part");
 				printResource((INameable)event.getResource());
 				printSkeleton(event.getResource());
 				break;
 			}
 		}
+		
+		if ( start != 1 ) {
+			System.out.println(String.format("START = %d", start));
+			ok = false;
+		}
+		if ( startDoc != 1 ) {
+			System.out.println(String.format("START_DOCUMENT = %d", startDoc));
+			ok = false;
+		}
+		if ( endDoc != 1 ) {
+			System.out.println(String.format("END_DOCUMENT = %d", endDoc));
+			ok = false;
+		}
+		if ( finished != 1 ) {
+			System.out.println(String.format("FINISHED = %d", finished));
+			ok = false;
+		}
+		if ( startGroup != endGroup ) {
+			System.out.println(String.format("START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
+			ok = false;
+		}
+		
+		return ok;
 	}
 	
 	private void printResource (INameable res) {
+		if ( res == null ) {
+			System.err.println("NULL resource.");
+			ok = false;
+		}
 		System.out.println("  id="+res.getId());
 		System.out.println("  name="+res.getName());
 		System.out.println("  type="+res.getType());
@@ -122,6 +175,7 @@ public class XLIFFFilterTest {
 	}
 
 	private void printSkeleton (IResource res) {
+		if ( !showSkeleton ) return;
 		ISkeleton skel = res.getSkeleton();
 		if ( skel != null ) {
 			System.out.println("---");
@@ -129,29 +183,31 @@ public class XLIFFFilterTest {
 			System.out.println("---");
 		}
 	}
+	
+	private void checkStartDocument (StartDocument startDoc) {
+		String tmp = startDoc.getEncoding();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			System.err.println("No encoding specified in StartDocument.");
+			ok = false;
+		}
+		else System.err.println("StartDocument encoding = "+tmp);
+		
+		tmp = startDoc.getLanguage();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			System.err.println("No language specified in StartDocument.");
+			ok = false;
+		}
+		else System.err.println("StartDocument language = "+tmp);
+		
+		tmp = startDoc.getName();
+		if (( tmp == null ) || ( tmp.length() == 0 )) {
+			System.err.println("No name specified in StartDocument.");
+			ok = false;
+		}
+		else System.err.println("StartDocument name = "+tmp);
 
-	private void printAltTrans (TextUnit res) {
-		System.out.println("---AltTransAnnotation---");
-		AltTransAnnotation ata = res.getAnnotation(AltTransAnnotation.class);
-		if ( ata == null ) {
-			System.out.println("No annotation");
-		}
-		else {
-			ata.startIteration();
-			while ( ata.moveToNext() ) {
-				TextUnit tu = ata.getEntry();
-				if ( ata.hasSource() ) {
-					System.out.println("S("+ata.getSourceLanguage()+")=["+tu.toString()+"]");
-				}
-				else {
-					System.out.println("No source defined.");
-					
-				}
-				System.out.println("T("+ata.getTargetLanguage()+")=["
-					+tu.getTarget(ata.getTargetLanguage()).toString()+"]");
-			}
-		}
-		System.out.println("---end of AltTransAnnotation---");
+		System.err.println("StartDocument MIME type = "+startDoc.getMimeType());
+		System.err.println("StartDocument MIME type = "+startDoc.getType());
 	}
-
+	
 }

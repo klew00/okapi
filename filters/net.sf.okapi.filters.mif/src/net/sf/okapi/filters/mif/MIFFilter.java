@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.mif;
 
@@ -33,11 +33,10 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -49,15 +48,16 @@ public class MIFFilter implements IFilter {
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
-	private StringBuilder sklBuffer;
 	private int inPara;
 	private int inString;
-	private int id;
+	private int tuId;
+	private int otherId;
 	private int level;
 	private TextContainer cont;
 	private boolean canceled;
 	private LinkedList<FilterEvent> queue;
 	private String srcLang;
+	private GenericSkeleton skel;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -133,16 +133,16 @@ public class MIFFilter implements IFilter {
 				new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
-			sklBuffer = new StringBuilder();
 			level = 0;
 			inPara = -1;
 			inString = -1;
-			id = 0;
+			tuId = 0;
+			otherId = 0;
 			canceled = false;
 			
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
-			StartDocument startDoc = new StartDocument(String.valueOf(++id));
+			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding);
 			startDoc.setLanguage(srcLang);
@@ -175,19 +175,23 @@ public class MIFFilter implements IFilter {
 	}
 
 	public FilterEvent next () {
+		// Treat cancel
+		if ( canceled ) {
+			queue.clear();
+			queue.add(new FilterEvent(FilterEventType.CANCELED));
+		}
+		// Fill the queue if it's empty
+		if ( queue.isEmpty() ) {
+			read();
+		}
+		// Return the head of the queue
+		return queue.poll();
+	}
+
+	private void read () {
 		try {
-			// Check for cancellation
-			if ( canceled ) {
-				queue.clear();
-				return null;
-			}
-			// Check the queue first
-			if ( queue.size() > 0 ) {
-				return pollQueue();
-			}
-			
 			// Process other calls
-			GenericSkeleton skel = new GenericSkeleton();
+			skel = new GenericSkeleton();
 			int c;
 			while ( (c = reader.read()) != -1 ) {
 				switch ( c ) {
@@ -214,20 +218,20 @@ public class MIFFilter implements IFilter {
 					else if ( inPara == level ) {
 						inPara = -1;
 						if ( !cont.isEmpty() ) {
-							TextUnit tu = new TextUnit(String.valueOf(++id));
+							TextUnit tu = new TextUnit(String.valueOf(++tuId));
 							tu.setSource(cont);
 							if ( !skel.isEmpty() ) {
 								tu.setSkeleton(skel);
 							}
-							return new FilterEvent(FilterEventType.TEXT_UNIT, tu);
-							//TODO: Skeleton should be attached too
+							queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+							return;
 						}
 					}
 					skel.append((char)c);
 					level--;
 					// Return skeleton
-					currentRes = new SkeletonUnit(getSkeletonId(), sklBuffer.toString());
-					return new FilterEvent(FilterEventType.SKELETON_UNIT, currentRes);
+					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
+					queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 				case '`':
 					if (( inPara > -1 ) && ( level == inString )) {
 						cont.append(processString());
@@ -238,7 +242,7 @@ public class MIFFilter implements IFilter {
 					}
 					break;
 				default:
-					buffer.append((char)c);
+					skel.append((char)c);
 					break;
 				}
 			}
@@ -249,24 +253,14 @@ public class MIFFilter implements IFilter {
 
 		// Else: we are done
 		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
-			new Ending(String.valueOf(++id))));
+			new Ending(String.valueOf(++otherId))));
 		queue.add(new FilterEvent(FilterEventType.FINISHED));
-		return pollQueue();
 	}
 
-	private FilterEvent pollQueue () {
-		if ( queue.size() == 0 ) { // Just in case
-			return null;
-		}
-		else {
-			return queue.poll();
-		}
-	}
-	
 	private void readComment () throws IOException {
 		int c;
 		while ( (c = reader.read()) != -1 ) {
-			buffer.append((char)c);
+			skel.append((char)c);
 			switch ( c ) {
 			case '\r':
 			case '\n':
@@ -304,8 +298,8 @@ public class MIFFilter implements IFilter {
 			case '\t':
 			case '\r':
 			case '\n':
-				buffer.append(tagBuffer);
-				buffer.append((char)c);
+				skel.append(tagBuffer.toString());
+				skel.append((char)c);
 				return tagBuffer.toString();
 			case -1:
 				throw new RuntimeException("Unexpected end of input.");
@@ -321,7 +315,7 @@ public class MIFFilter implements IFilter {
 		int c;
 		boolean inEscape = false;
 		while ( (c = reader.read()) != -1 ) {
-			buffer.append((char)c);
+			skel.append((char)c);
 			if ( inEscape ) {
 				inEscape = false;
 			}
@@ -355,7 +349,7 @@ public class MIFFilter implements IFilter {
 					break;
 				case 'u':
 				case 'x':
-					//TODO
+					//TODO: parse escaped U and X styled chars
 					break;
 				}
 				inEscape = false;
@@ -388,7 +382,7 @@ public class MIFFilter implements IFilter {
 		finally {
 			
 		}
-		return null; // No encoding detected
+		return "UTF-8"; // No encoding detected: use UTF-8
 	}
 
 }
