@@ -35,6 +35,7 @@ public class FilterTestDriver {
 
 	private boolean showSkeleton = true;
 	private boolean showOnlyTextUnits = false;
+	private int warnings;
 	private boolean ok;
 
 	/**
@@ -43,7 +44,6 @@ public class FilterTestDriver {
 	 */
 	public void setShowSkeleton (boolean value) {
 		showSkeleton = value;
-		
 	}
 	
 	/**
@@ -63,12 +63,15 @@ public class FilterTestDriver {
 	 */
 	public boolean process (IFilter filter) {
 		ok = true;
+		warnings = 0;
 		int start = 0;
 		int finished = 0;
 		int startDoc = 0;
 		int endDoc = 0;
 		int startGroup = 0;
 		int endGroup = 0;
+		int startSubDoc = 0;
+		int endSubDoc = 0;
 		
 		System.out.println("================================================");
 		FilterEvent event;
@@ -87,9 +90,9 @@ public class FilterTestDriver {
 				break;
 			case START_DOCUMENT:
 				startDoc++;
+				System.out.println("---Start Document");
 				checkStartDocument((StartDocument)event.getResource());
 				if ( showOnlyTextUnits ) break;
-				System.out.println("---Start Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
@@ -99,11 +102,13 @@ public class FilterTestDriver {
 				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
+				startSubDoc++;
 				if ( showOnlyTextUnits ) break;
 				System.out.println("---Start Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
+				endSubDoc++;
 				if ( showOnlyTextUnits ) break;
 				System.out.println("---End Sub Document");
 				printSkeleton(event.getResource());
@@ -123,11 +128,11 @@ public class FilterTestDriver {
 			case TEXT_UNIT:
 				System.out.println("---Text Unit");
 				TextUnit tu = (TextUnit)event.getResource();
-				printResource(tu);
 				System.out.println("S=["+tu.toString()+"]");
 				for ( String lang : tu.getTargetLanguages() ) {
-					System.out.println("T=["+tu.getTarget(lang).toString()+"]");
+					System.out.println("T("+lang+")=["+tu.getTarget(lang).toString()+"]");
 				}
+				printResource(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
@@ -140,38 +145,42 @@ public class FilterTestDriver {
 		}
 		
 		if ( start != 1 ) {
-			System.out.println(String.format("START = %d", start));
+			System.out.println(String.format("*****ERROR: START = %d", start));
 			ok = false;
 		}
 		if ( startDoc != 1 ) {
-			System.out.println(String.format("START_DOCUMENT = %d", startDoc));
+			System.out.println(String.format("*****ERROR: START_DOCUMENT = %d", startDoc));
 			ok = false;
 		}
 		if ( endDoc != 1 ) {
-			System.out.println(String.format("END_DOCUMENT = %d", endDoc));
+			System.out.println(String.format("*****ERROR: END_DOCUMENT = %d", endDoc));
 			ok = false;
 		}
 		if ( finished != 1 ) {
-			System.out.println(String.format("FINISHED = %d", finished));
+			System.out.println(String.format("*****ERROR: FINISHED = %d", finished));
+			ok = false;
+		}
+		if ( startSubDoc != endSubDoc ) {
+			System.out.println(String.format("*****ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc, endSubDoc));
 			ok = false;
 		}
 		if ( startGroup != endGroup ) {
-			System.out.println(String.format("START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
+			System.out.println(String.format("*****ERROR: START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
 			ok = false;
 		}
-		
+		System.out.println(String.format("Number of warnings = %d", warnings));
 		return ok;
 	}
 	
 	private void printResource (INameable res) {
 		if ( res == null ) {
-			System.err.println("NULL resource.");
+			System.out.println("NULL resource.");
 			ok = false;
 		}
-		System.out.println("  id="+res.getId());
-		System.out.println("  name="+res.getName());
-		System.out.println("  type="+res.getType());
-		System.out.println("  mimeType="+res.getMimeType());
+		System.out.print("  id='"+res.getId()+"'");
+		System.out.print(" name='"+res.getName()+"'");
+		System.out.print(" type='"+res.getType()+"'");
+		System.out.println(" mimeType='"+res.getMimeType()+"'");
 	}
 
 	private void printSkeleton (IResource res) {
@@ -187,27 +196,27 @@ public class FilterTestDriver {
 	private void checkStartDocument (StartDocument startDoc) {
 		String tmp = startDoc.getEncoding();
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
-			System.err.println("No encoding specified in StartDocument.");
-			ok = false;
+			System.out.println("*****WARNING: No encoding specified in StartDocument.");
+			warnings++;
 		}
-		else System.err.println("StartDocument encoding = "+tmp);
+		else System.out.println("StartDocument encoding = "+tmp);
 		
 		tmp = startDoc.getLanguage();
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
-			System.err.println("No language specified in StartDocument.");
-			ok = false;
+			System.out.println("*****WARNING: No language specified in StartDocument.");
+			warnings++;
 		}
-		else System.err.println("StartDocument language = "+tmp);
+		else System.out.println("StartDocument language = "+tmp);
 		
 		tmp = startDoc.getName();
 		if (( tmp == null ) || ( tmp.length() == 0 )) {
-			System.err.println("No name specified in StartDocument.");
-			ok = false;
+			System.out.println("*****WARNING: No name specified in StartDocument.");
+			warnings++;
 		}
-		else System.err.println("StartDocument name = "+tmp);
+		else System.out.println("StartDocument name = "+tmp);
 
-		System.err.println("StartDocument MIME type = "+startDoc.getMimeType());
-		System.err.println("StartDocument MIME type = "+startDoc.getType());
+		System.out.println("StartDocument MIME type = "+startDoc.getMimeType());
+		System.out.println("StartDocument Type = "+startDoc.getType());
 	}
 	
 }

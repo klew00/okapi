@@ -239,7 +239,7 @@ public class ODFFilter implements IFilter {
 		language = sourceLanguage;
 	}
 
-	private boolean read () {
+	private void read () {
 		skel = new GenericSkeleton();
 		tf = new TextFragment();
 		try {
@@ -260,14 +260,18 @@ public class ODFFilter implements IFilter {
 					break;
 				
 				case XMLStreamConstants.END_DOCUMENT:
-					return true;
+					Ending ending = new Ending(String.valueOf(++otherId));
+					ending.setSkeleton(skel);
+					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+					queue.add(new FilterEvent(FilterEventType.FINISHED));
+					return;
 				
 				case XMLStreamConstants.START_ELEMENT:
 					processStartElement();
 					break;
 				
 				case XMLStreamConstants.END_ELEMENT:
-					if ( processEndElement() ) return true; // Send an event
+					if ( processEndElement() ) return; // Send an event
 					break;
 				
 				case XMLStreamConstants.COMMENT:
@@ -284,7 +288,6 @@ public class ODFFilter implements IFilter {
 		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
 		}
-		return true;
 	}
 
 	private void gatherInfo (String name) {
@@ -459,13 +462,6 @@ public class ODFFilter implements IFilter {
 					skel.append("\n");
 				}
 			}
-		}
-		if ( name.equals("office:document-content") ) {
-			Ending ending = new Ending(String.valueOf(++otherId));
-			ending.setSkeleton(skel);
-			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-			queue.add(new FilterEvent(FilterEventType.FINISHED));
-			return true;
 		}
 		return false;
 	}

@@ -40,6 +40,8 @@ public class PropertiesFilterTest {
 		PropertiesFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
+			testDriver.setShowSkeleton(false);
+			testDriver.setShowOnlyTextUnits(true);
 			filter = new PropertiesFilter();
 			filter.setOptions("en", "UTF-8", true);
 			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");

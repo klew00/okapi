@@ -255,8 +255,10 @@ public class ODFFilter2 implements IFilter {
 					break;
 				
 				case XMLStreamConstants.END_DOCUMENT:
-					// Never called because of bug in STAX reader?
-					// Work around by detecting last element
+					Ending ending = new Ending(String.valueOf(++otherId));
+					ending.setSkeleton(skel);
+					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+					queue.add(new FilterEvent(FilterEventType.FINISHED));
 					return true;
 				
 				case XMLStreamConstants.START_ELEMENT:
@@ -510,13 +512,6 @@ public class ODFFilter2 implements IFilter {
 			}
 		}
 		
-		if ( name.equals("office:document-content") ) {
-			Ending ending = new Ending(String.valueOf(++otherId));
-			ending.setSkeleton(skel);
-			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-			queue.add(new FilterEvent(FilterEventType.FINISHED));
-			return true;
-		}
 		return false;
 	}
 	

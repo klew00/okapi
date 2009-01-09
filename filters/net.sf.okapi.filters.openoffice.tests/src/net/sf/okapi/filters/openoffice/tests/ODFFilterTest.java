@@ -38,6 +38,8 @@ public class ODFFilterTest {
 		ODFFilter2 filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
+			testDriver.setShowSkeleton(false);
+			testDriver.setShowOnlyTextUnits(false);
 			filter = new ODFFilter2();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = ODFFilterTest.class.getResource("/content_TestDocument01.odt.xml");
