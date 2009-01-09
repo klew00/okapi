@@ -32,6 +32,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -147,17 +148,10 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 	
 	private void processStartDocument(StartDocument resource) throws IOException {
-		if ( resource != null ) {
-			if ( resource.hasProperty("encoding") ) {
-				resource.getProperty("encoding").setValue(encoding);
-			}
-		}
-		// Write the skeleton
 		writer.write(skelWriter.processStartDocument(resource));
 	}
 
 	private void processEndDocument(Ending resource) throws IOException {
-		// Write the skeleton
 		writer.write(skelWriter.processEndDocument(resource));
 	}
 

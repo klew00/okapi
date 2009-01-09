@@ -44,4 +44,9 @@ public class LayerProvider implements ILayerProvider {
 		outputEncoder = Charset.forName(encoding).newEncoder();
 	}
 
+	// Not used for a layer provider
+	public String toNative(String propertyName, String value) {
+		return value; // No modification
+	}
+
 }

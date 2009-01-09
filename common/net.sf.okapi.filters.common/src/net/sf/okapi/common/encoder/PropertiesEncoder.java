@@ -109,4 +109,14 @@ public class PropertiesEncoder implements IEncoder {
 		}
 	}
 
+	public String toNative (String propertyName,
+		String value)
+	{
+		// PROP_ENCODING: Not applicable
+		// PROP_LANGUGE: Not applicable
+		
+		// No changes for the other values
+		return value;
+	}
+
 }

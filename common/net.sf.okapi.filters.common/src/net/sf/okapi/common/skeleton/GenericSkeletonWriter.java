@@ -49,6 +49,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, IReferenceable> referents;
 	private String outputLang;
+	private String outputEncoding;
 	private boolean isMultilingual;
 	private ILayerProvider layer;
 	private EncoderManager encoderManager;
@@ -70,6 +71,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	{
 		this.encoderManager = encoderManager;
 		this.outputLang = language;
+		this.outputEncoding = encoding;
 		this.layer = layer;
 		referents = new LinkedHashMap<String, IReferenceable>();
 		storageStack = new Stack<StorageList>();
@@ -84,12 +86,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	public String processStartDocument (StartDocument resource) {
 		isMultilingual = resource.isMultilingual();
-		// EndDocument cannot be stored, no need to check for that.
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
 	public String processEndDocument (Ending resource) {
-		// EndDocument cannot be stored, no need to check for that.
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
@@ -481,7 +481,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Else process the value
 		String value = prop.getValue();
 		if ( value == null ) return "-ERR:PROP-VALUE-NULL-";
-		else return value;
+		
+		// Else: We got the property value
+		// Check if it needs to be auto-modified
+		if ( IEncoder.PROP_LANGUAGE.equals(name) ) {
+			value = outputLang;
+		}
+		else if ( IEncoder.PROP_ENCODING.equals(name) ) {
+			value = outputEncoding;
+		}
+		// Return the native value
+		return encoderManager.toNative(name, value);
 	}
 	
 }

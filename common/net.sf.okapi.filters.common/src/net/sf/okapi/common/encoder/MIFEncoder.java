@@ -94,4 +94,18 @@ public class MIFEncoder implements IEncoder {
 		// Nothing to do
 	}
 
+	public String toNative (String propertyName,
+		String value)
+	{
+		if ( PROP_ENCODING.equals(propertyName) ) {
+			if ( "shift-jis".equals(value) ) return "\u65E5\u672C\u8A9E";
+			//TODO: CJK etc...
+		}
+
+		// PROP_LANGUGE: Not applicable
+
+		// No changes for the other values
+		return value;
+	}
+
 }

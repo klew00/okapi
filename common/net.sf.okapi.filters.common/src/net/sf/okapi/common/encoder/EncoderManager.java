@@ -154,4 +154,14 @@ public class EncoderManager implements IEncoder {
 		}
 	}
 
+	public String toNative (String propertyName,
+		String value)
+	{
+		if ( encoder != null ) {
+			return encoder.toNative(propertyName, value);
+		}
+		// No change if there is no encoder active
+		return value;
+	}
+
 }

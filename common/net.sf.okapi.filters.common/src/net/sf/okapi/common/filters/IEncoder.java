@@ -29,6 +29,9 @@ import net.sf.okapi.common.IParameters;
  */
 public interface IEncoder {
 
+	public static final String PROP_ENCODING = "encoding";
+	public static final String PROP_LANGUAGE = "language";
+	
 	/**
 	 * Sets the options for this encoder.
 	 * @param params The parameters object with all the configuration information 
@@ -54,4 +57,14 @@ public interface IEncoder {
 	 */
 	public String encode (char value, int context);
 	
+	/**
+	 * Converts any property values from its standard representation to
+	 * the native representation for this encoder.
+	 * @param propertyName Name of the property.
+	 * @param value Standard value to convert.
+	 * @return Native representation of the given value.
+	 */
+	public String toNative (String propertyName,
+		String value);
+
 }
