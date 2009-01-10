@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
@@ -31,16 +32,28 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class Code {
 
+	/**
+	 * Indicates that this code has one reference or more in its data part.
+	 */
 	protected static final int HASREF       = 0x01;
+	
+	/**
+	 * Indicates that this code can be duplicated in the text.
+	 */
 	protected static final int CLONEABLE    = 0x02;
+	
+	/**
+	 * Indicates that this code can be removed from the text.
+	 */
 	protected static final int DELETEABLE   = 0x04;
 	
 	protected TagType tagType;
 	protected int id;
 	protected String type;
 	protected String data;
-	protected String outer;
+	protected String outerData;
 	protected int flag;
+	protected IAnnotation annotation;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -84,16 +97,23 @@ public class Code {
 	/**
 	 * Creates a new code. By default codes can be both deleted and cloned.
 	 * @param tagType The tag type.
-	 * @param type The type of code (e.g. the name of the tag).
+	 * @param type The type of code (e.g. the name of the tag). The type must be
+	 * exactly the same between the opening and closing codes.
 	 * @param data the content of the code.
 	 */
-	public Code (TagType tagType, String type, String data) {
+	public Code (TagType tagType,
+		String type,
+		String data)
+	{
 		id = -1;
 		this.tagType = tagType;
-		if ( type == null ) type = "null";
-		this.type = type;
-		this.data = data;
 		this.flag = CLONEABLE | DELETEABLE;
+		// Never let the type to be null
+		if ( type == null ) this.type = "null";
+		else this.type = type;
+		// Use "" for null data
+		if ( data == null ) this.data = "";
+		this.data = data;
 	}
 
 	/**
@@ -101,7 +121,9 @@ public class Code {
 	 * @param tagType The tag type.
 	 * @param type The type of code (e.g. the name of the tag).
 	 */
-	public Code (TagType tagType, String type) {
+	public Code (TagType tagType,
+		String type)
+	{
 		this(tagType, type, "");
 	}
 	
@@ -117,16 +139,38 @@ public class Code {
 	 * Append to the current code data
 	 * @param data
 	 */
-	public void append(String data) {
-		// TODO: Make this.data a StringBuilder for speed?
+	public void append (String data) {
+		// TODO: Make this.data a StringBuilder for speed? But this method is probably not used often
 		this.data += data;
 	}
 	
+	/**
+	 * Gets the string representation of this code: its data.
+	 * @return The raw data of this code.
+	 */
 	@Override
 	public String toString () {
 		return data;
 	}
 
+	/**
+	 * Indicates if this code has an annotation code. Annotation are used to apply
+	 * information to the text. They are added information.
+	 * For example, annotation codes can be used to denote protected text.
+	 * @return True when this code has an annotation.
+	 */
+	public boolean hasAnnotation () {
+		return (annotation!=null);
+	}
+
+	/**
+	 * Indicates if this code has data.
+	 * @return True if this code has data. 
+	 */
+	public boolean hasData () {
+		return (data.length()>0);
+	}
+	
 	/**
 	 * Clone the code. Note that this method does not check if this code can be
 	 * duplicated or not. Use {@link #isCloneable()} to check.
@@ -136,8 +180,9 @@ public class Code {
 	public Code clone () {
 		Code clone = new Code(tagType, type, data);
 		clone.id = id;
-		clone.outer = outer;
+		clone.outerData = outerData;
 		clone.flag = flag;
+		clone.annotation = annotation;
 		return clone;
 	}
 	
@@ -239,7 +284,7 @@ public class Code {
 	 * @param value The data to set.
 	 */
 	public void setOuterData (String value) {
-		outer = value;
+		outerData = value;
 	}
 	
 	/**
@@ -248,7 +293,7 @@ public class Code {
 	 * @return the outer data or, if there is none, the inner data.
 	 */
 	public String getOuterData () {
-		if ( outer != null ) return outer;
+		if ( outerData != null ) return outerData;
 		else return data; // Returns data if no outer-data is set
 	}
 

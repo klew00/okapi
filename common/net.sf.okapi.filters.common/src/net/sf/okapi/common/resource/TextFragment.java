@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.okapi.common.annotation.IAnnotation;
+
 /**
  * Implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -406,6 +408,22 @@ public class TextFragment implements Comparable<Object> {
 		if ( code.tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
 		if (( code.tagType != TagType.PLACEHOLDER )
 			&& ( code.tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
+		return code;
+	}
+
+	/**
+	 * Appends an annotation-type code to this text.
+	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
+	 * @param type The type of the annotation (e.g. "protected").
+	 * @return The new code that was added to this text.
+	 */
+	//TODO: provide hook to the IAnnotation as well, and maybe start/end vs append
+	public Code appendAnnotation (TagType tagType,
+		String type,
+		IAnnotation annotation)
+	{
+		Code code = append(tagType, type, "");
+		code.annotation = annotation; 
 		return code;
 	}
 	
@@ -882,7 +900,7 @@ public class TextFragment implements Comparable<Object> {
 	 * (in the coded text representation).
 	 * @param tagType Tag type of the new code.
 	 * @param type Type of the new code.
-	 * @return The different between the coded text length before and after 
+	 * @return The difference between the coded text length before and after 
 	 * the operation. This value can be used to adjust further start and end positions
 	 * that have been calculated on the coded text before the changes are applied.
 	 * @throws InvalidPositionException When start or end points inside a marker.
@@ -926,6 +944,52 @@ public class TextFragment implements Comparable<Object> {
 		// Add the new code
 		codes.add(code);
 		isBalanced = false;
+		return text.length()-before;
+	}
+
+	/**
+	 * Annotates a section of this text.
+	 * @param start The position of the first character or marker of the section 
+	 * to annotate (in the coded text representation).
+	 * @param end The position just after the last character or marker of the section
+	 * to annotate (in the coded text representation).
+	 * @param type Type of the annotation codes.
+	 * @return The difference between the coded text length before and after 
+	 * the operation. This value can be used to adjust further start and end positions
+	 * that have been calculated on the coded text before the changes are applied.
+	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @return
+	 */
+	public int annotate (int start,
+		int end,
+		String type,
+		IAnnotation annotation)
+	{
+		// Store the length of the coded text before the operation
+		int before = text.length();
+		// Make sure we have a codes array
+		if ( codes == null ) codes = new ArrayList<Code>();
+
+		// Create the new start code
+		Code startCode = new Code(TagType.OPENING, type);
+		startCode.annotation = annotation;
+		String startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
+		startCode.id = ++lastCodeID;
+		// Insert the start marker
+		text.insert(start, startBuf);
+		codes.add(startCode);
+
+		// Create the new end code
+		Code endCode = new Code(TagType.CLOSING, type);
+		endCode.annotation = annotation;
+		String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
+		endCode.id = startCode.id;
+		// Insert the end code
+		text.insert(end+startBuf.length(), endBuf);
+		codes.add(endCode);
+		
+		// No need to change isBalance since we did balance those codes
+		// return the difference
 		return text.length()-before;
 	}
 

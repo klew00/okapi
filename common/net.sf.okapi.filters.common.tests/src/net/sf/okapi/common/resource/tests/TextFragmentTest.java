@@ -280,6 +280,26 @@ public class TextFragmentTest extends TestCase {
 		tf1.append(TagType.PLACEHOLDER, "br", "<br/>");
 		assertTrue(tf1.hasCode());
 	}
+
+	public void testTextCodesChanges () {
+		TextFragment tf1 = new TextFragment("<b>New file:</b> %s");
+		// Change the codes
+		int diff = tf1.changeToCode(0, 3, TagType.OPENING, "b");
+		diff += tf1.changeToCode(12+diff, 16+diff, TagType.CLOSING, "b");
+		List<Code> list = tf1.getCodes();
+		assertEquals(list.get(0).getData(), "<b>");
+		assertEquals(list.get(1).getData(), "</b>");
+		assertEquals(tf1.toString(), "<b>New file:</b> %s");
+		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
+		// Add annotation
+		tf1.annotate(17+diff, 19+diff, "protected", null);
+		assertEquals(tf1.toString(), "<b>New file:</b> %s");
+		list = tf1.getCodes();
+		assertTrue(list.get(2).hasAnnotation());
+		assertEquals(list.get(2).getType(), "protected");
+		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
+		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> <2>%s</2>");
+	}
 	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
@@ -295,4 +315,5 @@ public class TextFragmentTest extends TestCase {
 		tf.append("C");
 		return tf;
 	}
+
 }
