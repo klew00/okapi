@@ -37,13 +37,16 @@ public class MIFFilterTest {
 
 	@Test
 	public void runTest () {
+		FilterTestDriver testDriver;
 		MIFFilter filter = null;		
 		try {
+			testDriver = new FilterTestDriver();
+			testDriver.setShowSkeleton(false);
+			testDriver.setShowOnlyTextUnits(false);
 			filter = new MIFFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = MIFFilterTest.class.getResource("/Test01.mif");
 			filter.open(url);
-			FilterTestDriver testDriver = new FilterTestDriver();
 			if ( !testDriver.process(filter) ) Assert.fail();
 		}
 		catch ( Throwable e ) {

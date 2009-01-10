@@ -42,11 +42,12 @@ public class ODFFilterTest {
 			testDriver.setShowOnlyTextUnits(false);
 			filter = new ODFFilter2();
 			filter.setOptions("en", "UTF-8", true);
-			URL url = ODFFilterTest.class.getResource("/content_TestDocument01.odt.xml");
+			URL url = ODFFilterTest.class.getResource("/TestDocument01.odt_content.xml");
 			filter.open(url);
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
-			
+
+			// Test a simple re-write
 			filter.open(url);
 			rewrite(filter);
 			filter.close();
@@ -65,7 +66,7 @@ public class ODFFilterTest {
 		try {
 			writer = new GenericFilterWriter(new GenericSkeletonWriter());
 			writer.setOptions("FR", "UTF-8");
-			writer.setOutput("content_TestDocument01.odt_out.xml");
+			writer.setOutput("TestDocument01.odt_content.out.xml");
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}

@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class MIFFilter implements IFilter {
@@ -58,6 +59,7 @@ public class MIFFilter implements IFilter {
 	private LinkedList<FilterEvent> queue;
 	private String srcLang;
 	private GenericSkeleton skel;
+	private boolean hasNext;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -91,6 +93,7 @@ public class MIFFilter implements IFilter {
 				reader.close();
 				reader = null;
 			}
+			hasNext = false;
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -106,7 +109,7 @@ public class MIFFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
-		return (( queue != null ) && ( queue.size() > 0 ));
+		return hasNext;
 	}
 	
 	public void setOptions (String sourceLanguage,
@@ -139,6 +142,7 @@ public class MIFFilter implements IFilter {
 			tuId = 0;
 			otherId = 0;
 			canceled = false;
+			hasNext = true;
 			
 			queue = new LinkedList<FilterEvent>();
 			queue.add(new FilterEvent(FilterEventType.START));
@@ -179,10 +183,15 @@ public class MIFFilter implements IFilter {
 		if ( canceled ) {
 			queue.clear();
 			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			hasNext = false;
 		}
 		// Fill the queue if it's empty
 		if ( queue.isEmpty() ) {
 			read();
+		}
+		// Update hasNext flag on the FINISHED event
+		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+			hasNext = false;
 		}
 		// Return the head of the queue
 		return queue.poll();
@@ -201,7 +210,7 @@ public class MIFFilter implements IFilter {
 					break;
 				case '<': // Start of statement
 					level++;
-					skel.append((char)c);
+					//skel.append((char)c);
 					String tag = readTag();
 					if ( "Para".equals(tag) ) {
 						inPara = level;
@@ -210,6 +219,7 @@ public class MIFFilter implements IFilter {
 					else if ( "String".equals(tag) ) {
 						inString = level;
 					}
+					//TODO: inline
 					break;
 				case '>': // End of statement
 					if ( inString == level ) {
@@ -220,9 +230,9 @@ public class MIFFilter implements IFilter {
 						if ( !cont.isEmpty() ) {
 							TextUnit tu = new TextUnit(String.valueOf(++tuId));
 							tu.setSource(cont);
-							if ( !skel.isEmpty() ) {
-								tu.setSkeleton(skel);
-							}
+							tu.setMimeType("text/x-mif");
+							skel.addRef(tu);
+							tu.setSkeleton(skel);
 							queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 							return;
 						}
@@ -232,6 +242,7 @@ public class MIFFilter implements IFilter {
 					// Return skeleton
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
 					queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+					return;
 				case '`':
 					if (( inPara > -1 ) && ( level == inString )) {
 						cont.append(processString());
@@ -246,6 +257,10 @@ public class MIFFilter implements IFilter {
 					break;
 				}
 			}
+			
+			Ending ending = new Ending(String.valueOf(++otherId)); 
+			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+			queue.add(new FilterEvent(FilterEventType.FINISHED));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -269,6 +284,11 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
+	/**
+	 * Reads a tag name.
+	 * @return The name of the tag.
+	 * @throws IOException
+	 */
 	private String readTag () throws IOException {
 		tagBuffer.setLength(0);
 		int c;

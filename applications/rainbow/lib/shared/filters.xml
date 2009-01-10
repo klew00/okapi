@@ -42,6 +42,6 @@
   
  <filter id="okf_mif"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
- >Open Document</filter>
+ >FrameMaker MIF</filter>
   
 </okapiFilters>

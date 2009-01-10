@@ -33,7 +33,8 @@ public class GenericSkeletonPart {
 	}
 
 	public GenericSkeletonPart (char data) {
-		this.data = new StringBuilder(data);
+		this.data = new StringBuilder();
+		this.data.append(data);
 	}
 
 	@Override
