@@ -389,7 +389,8 @@ public class Code {
 	/**
 	 * Sets the annotation for this code.
 	 * @param type Type of the annotation to set.
-	 * @param annotation the annotation to set.
+	 * @param annotation the annotation to set. This parameter can be null for example
+	 * when the annotation is used like a boolean flag.
 	 */
 	public void setAnnotation (String type,
 		InlineAnnotation annotation)
