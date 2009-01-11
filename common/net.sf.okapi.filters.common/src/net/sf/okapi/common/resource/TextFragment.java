@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.okapi.common.annotation.IAnnotation;
-
 /**
  * Implements the methods for creating and manipulating a pre-parsed
  * flat representation of a content with in-line codes.
@@ -420,10 +418,10 @@ public class TextFragment implements Comparable<Object> {
 	//TODO: provide hook to the IAnnotation as well, and maybe start/end vs append
 	public Code appendAnnotation (TagType tagType,
 		String type,
-		IAnnotation annotation)
+		InlineAnnotation annotation)
 	{
 		Code code = append(tagType, type, "");
-		code.annotation = annotation; 
+		code.setAnnotation(type, annotation);
 		return code;
 	}
 	
@@ -953,26 +951,37 @@ public class TextFragment implements Comparable<Object> {
 	 * to annotate (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section
 	 * to annotate (in the coded text representation).
-	 * @param type Type of the annotation codes.
+	 * @param type Type of annotation to set.
+	 * @param annotation Annotation to set (can be null).
 	 * @return The difference between the coded text length before and after 
 	 * the operation. This value can be used to adjust further start and end positions
 	 * that have been calculated on the coded text before the changes are applied.
 	 * @throws InvalidPositionException When start or end points inside a marker.
-	 * @return
 	 */
 	public int annotate (int start,
 		int end,
 		String type,
-		IAnnotation annotation)
+		InlineAnnotation annotation)
 	{
+		// cases:
+		// a<1>|bc|</1>d = a<1n>bc</1>d
+		// a|<1>bc|</1>d = a<1n>bc</1>d
+		// a<1>|bc</1>|d = a<1n>bc</1>d
+		// a|<1>bc</1>|d = a<1n>bc</1>d
+		// a<1>|b|c</1>d = a<1><2n>b</2>c</1>d
+		// a<1>b|c|</1>d = a<1>b<2n>c</2></1>d
+		// a<1>|bc</1>d| = a<1n>bc</1><2n>d</2>
+		// a<1>b|c</1>d| = a<1>b<2n>c</2></1><3n>d</3>
+		// |a<1>bc</1>d| = <2n>a<1>bc</1>d</2>
+
 		// Store the length of the coded text before the operation
 		int before = text.length();
 		// Make sure we have a codes array
 		if ( codes == null ) codes = new ArrayList<Code>();
 
 		// Create the new start code
-		Code startCode = new Code(TagType.OPENING, type);
-		startCode.annotation = annotation;
+		Code startCode = new Code(TagType.OPENING, "$");
+		startCode.setAnnotation(type, annotation);
 		String startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
 		startCode.id = ++lastCodeID;
 		// Insert the start marker
@@ -980,8 +989,8 @@ public class TextFragment implements Comparable<Object> {
 		codes.add(startCode);
 
 		// Create the new end code
-		Code endCode = new Code(TagType.CLOSING, type);
-		endCode.annotation = annotation;
+		Code endCode = new Code(TagType.CLOSING, "$");
+		endCode.setAnnotation(type, annotation);
 		String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
 		endCode.id = startCode.id;
 		// Insert the end code

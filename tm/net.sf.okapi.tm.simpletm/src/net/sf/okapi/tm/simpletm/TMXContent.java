@@ -64,7 +64,7 @@ public class TMXContent {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt.
-	 * @return
+	 * @return The TMX string.
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT)

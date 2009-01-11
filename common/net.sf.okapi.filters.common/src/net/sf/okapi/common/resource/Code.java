@@ -21,9 +21,9 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
@@ -32,6 +32,11 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class Code {
 
+	/** Initial capacity for creating annotations maps.
+	 * Keeping it small to save space.
+	 */
+	private static final int ANNOTATIONS_INITCAP = 2;
+	
 	/**
 	 * Indicates that this code has one reference or more in its data part.
 	 */
@@ -53,7 +58,7 @@ public class Code {
 	protected String data;
 	protected String outerData;
 	protected int flag;
-	protected IAnnotation annotation;
+	protected HashMap<String, InlineAnnotation> annotations;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -64,9 +69,27 @@ public class Code {
 	public static String codesToString (List<Code> list) {
 		StringBuilder tmp = new StringBuilder();
 		for ( Code code : list ) {
-			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009D",
+			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data,
-				code.flag)); //(code.flag ? "1" : "0")));
+				code.flag, annotationsToString(code.annotations)));
+		}
+		return tmp.toString();
+	}
+	
+	/**
+	 * Gets a string storage representation of the annotations of a Code.
+	 * @param map The list of annotations.
+	 * @return The storage string.
+	 */
+	private static String annotationsToString (HashMap<String, InlineAnnotation> map) {
+		if (( map == null ) || map.isEmpty() ) return "";
+		StringBuilder tmp = new StringBuilder();
+		InlineAnnotation annotation;
+		for ( String key : map.keySet() ) {
+			tmp.append(key+"\u009E");
+			annotation = map.get(key);
+			tmp.append((annotation==null) ? "" : annotation.toString());
+			tmp.append('\u009F');
 		}
 		return tmp.toString();
 	}
@@ -86,12 +109,34 @@ public class Code {
 				String[] tmpFields = tmp.split("\u009C");
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
-				//code.hasReference = ("1".compareTo(tmpFields[4]) == 0);
 				code.flag = Integer.valueOf(tmpFields[4]);
+				if ( tmpFields.length > 5 ) {
+					code.annotations = stringToAnnotations(tmpFields[5]);
+				}
+				else code.annotations = null;
 				list.add(code);
 			}
 		}
 		return list;
+	}
+	
+	private static HashMap<String, InlineAnnotation> stringToAnnotations (String data) {
+		if (( data == null ) || ( data.length() == 0 )) return null;
+		// Create the map with low initial capacity
+		HashMap<String, InlineAnnotation> map = new HashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
+		InlineAnnotation annotation;
+		String[] tmpEntries = data.split("\u009F");
+		for ( String tmp : tmpEntries ) {
+			if ( tmp.length() == 0 ) continue;
+			String[] tmpPair = tmp.split("\u009E");
+			if ( tmpPair.length > 1 ) {
+				annotation = new InlineAnnotation();
+				annotation.fromString(tmpPair[1]);
+			}
+			else annotation = null;
+			map.put(tmpPair[0], annotation);
+		}
+		return map;
 	}
 	
 	/**
@@ -154,15 +199,22 @@ public class Code {
 	}
 
 	/**
-	 * Indicates if this code has an annotation code. Annotation are used to apply
-	 * information to the text. They are added information.
-	 * For example, annotation codes can be used to denote protected text.
-	 * @return True when this code has an annotation.
+	 * Indicates if this code has any type of annotation.
+	 * @return True when this code has any type of annotation.
 	 */
 	public boolean hasAnnotation () {
-		return (annotation!=null);
+		return (annotations!=null);
 	}
 
+	/**
+	 * Indicates if this code has a given type of annotation.
+	 * @return The type of annotation for this code or and empty string.
+	 */
+	public boolean hasAnnotation (String type) {
+		if ( annotations == null ) return false;
+		return annotations.containsKey(type);
+	}
+	
 	/**
 	 * Indicates if this code has data.
 	 * @return True if this code has data. 
@@ -182,7 +234,8 @@ public class Code {
 		clone.id = id;
 		clone.outerData = outerData;
 		clone.flag = flag;
-		clone.annotation = annotation;
+		//TODO: Do we need to do a deep copy for the annotations?
+		clone.annotations = annotations;
 		return clone;
 	}
 	
@@ -332,6 +385,31 @@ public class Code {
 		if ( value ) flag |= DELETEABLE;
 		else flag &= ~DELETEABLE;
 	}
+
+	/**
+	 * Sets the annotation for this code.
+	 * @param type Type of the annotation to set.
+	 * @param annotation the annotation to set.
+	 */
+	public void setAnnotation (String type,
+		InlineAnnotation annotation)
+	{
+		// Use a small initial capacity to save space
+		if ( annotations == null ) {
+			annotations = new HashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
+		}
+		annotations.put(type, annotation);
+	}
 	
-	
+	/**
+	 * Gets the annotation of a given type.
+	 * @param type The type of annotation to retrieve.
+	 * @return The annotation of the given type, or null if there is no such
+	 * annotation for this code.
+	 */
+	public InlineAnnotation getAnnotation (String type) {
+		if ( annotations == null ) return null;
+		return annotations.get(type);
+	}
+
 }

@@ -411,7 +411,7 @@ public class Segmenter {
 
 	/**
 	 * Gets the list of all the split positions in the text
-	 * that was last segmented. You must call {@link #computeSegment(TextContainer)}
+	 * that was last segmented. You must call {@link #computeSegments(TextContainer)}
 	 * or {@link #computeSegments(String)} before calling this method.
 	 * A split position is the first character position of a new segment.
 	 * <p><b>IMPORTANT: The position returned here are the position WITHOUT taking in account the options

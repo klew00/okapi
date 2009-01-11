@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource.tests;
 import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.writer.GenericInlines;
@@ -283,22 +284,63 @@ public class TextFragmentTest extends TestCase {
 
 	public void testTextCodesChanges () {
 		TextFragment tf1 = new TextFragment("<b>New file:</b> %s");
+
 		// Change the codes
 		int diff = tf1.changeToCode(0, 3, TagType.OPENING, "b");
 		diff += tf1.changeToCode(12+diff, 16+diff, TagType.CLOSING, "b");
-		List<Code> list = tf1.getCodes();
-		assertEquals(list.get(0).getData(), "<b>");
-		assertEquals(list.get(1).getData(), "</b>");
+		List<Code> list1 = tf1.getCodes();
+		assertEquals(list1.get(0).getData(), "<b>");
+		assertEquals(list1.get(1).getData(), "</b>");
 		assertEquals(tf1.toString(), "<b>New file:</b> %s");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
-		// Add annotation
+
+		// Add an annotation: "%s" (use diff because %s is after both added codes) 
 		tf1.annotate(17+diff, 19+diff, "protected", null);
 		assertEquals(tf1.toString(), "<b>New file:</b> %s");
-		list = tf1.getCodes();
-		assertTrue(list.get(2).hasAnnotation());
-		assertEquals(list.get(2).getType(), "protected");
+		list1 = tf1.getCodes();
+		assertTrue(list1.get(2).hasAnnotation());
+		assertTrue(list1.get(2).hasAnnotation("protected"));
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> <2>%s</2>");
+		
+		// Test if we can rebuild the annotation from the storage string
+		String codesStorage1 = Code.codesToString(tf1.getCodes());
+		String textStorage1 = tf1.getCodedText();
+		assertNotNull(codesStorage1);
+		assertNotNull(textStorage1);
+		TextFragment tf2 = new TextFragment();
+		tf2.setCodedText(textStorage1, Code.stringToCodes(codesStorage1));
+		assertEquals(tf1.toString(), tf2.toString());
+		List<Code> list2 = tf2.getCodes();
+		assertTrue(list1.get(2).hasAnnotation());
+		assertTrue(list1.get(2).hasAnnotation("protected"));
+		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
+		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> <2>%s</2>");
+
+		// Add an annotation for "New" (don't use diff, correct manually: xxNew file:</b>
+		tf1.annotate(2, 5, "term", new InlineAnnotation("Nouveau"));
+		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
+		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
+		// Test if we can rebuild the annotation from the storage string
+		tf2 = new TextFragment();
+		tf2.setCodedText(tf1.getCodedText(),
+			Code.stringToCodes(Code.codesToString(tf1.getCodes())));
+		assertEquals(tf1.toString(), tf2.toString());
+		list2 = tf2.getCodes();
+		assertTrue(list2.get(2).hasAnnotation());
+		assertTrue(list2.get(2).hasAnnotation("protected"));
+		assertTrue(list2.get(4).hasAnnotation("term"));
+		InlineAnnotation annotation = list2.get(4).getAnnotation("term");
+		assertEquals(annotation.getData(), "Nouveau");
+		
+		// Test annotation change
+		annotation.setData("Neue");
+		// Get the codes of tf1
+		list1 = tf1.getCodes();
+		// Check if the same annotation is now change like in tf2:
+		// It should not as tf2 is a clone.
+		assertEquals(list1.get(4).getAnnotation("term").getData(), "Nouveau");
+		assertEquals(list2.get(4).getAnnotation("term").getData(), "Neue");
 	}
 	
 	/**
