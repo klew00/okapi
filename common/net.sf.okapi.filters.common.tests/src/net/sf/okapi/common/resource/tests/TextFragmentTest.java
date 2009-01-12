@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource.tests;
 
 import java.util.List;
 
+import net.sf.okapi.common.resource.AnnotatedSpan;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextFragment;
@@ -341,6 +342,44 @@ public class TextFragmentTest extends TestCase {
 		// It should not as tf2 is a clone.
 		assertEquals(list1.get(4).getAnnotation("term").getData(), "Nouveau");
 		assertEquals(list2.get(4).getAnnotation("term").getData(), "Neue");
+		
+		// Test re-use of codes for adding annotations
+		// Add annotations for "yyNewyy file:" xxyyNewyy file:xx
+		tf1.annotate(2, 15, "mt", new InlineAnnotation("MT1"));
+		tf1.annotate(2, 15, "term", new InlineAnnotation("TERM2"));
+		// The added annotations should have used <1></1>
+		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
+		list1 = tf1.getCodes();
+		assertEquals(list1.get(0).getAnnotation("mt").getData(), "MT1");
+		assertEquals(list1.get(0).getAnnotation("term").getData(), "TERM2");
+		
+		// Test spans
+		List<AnnotatedSpan> spans = tf1.getAnnotatedSpans("term");
+		assertEquals(spans.size(), 2);
+		assertEquals(fmt.setContent(spans.get(0).span).toString(true), "New file:");		
+		assertEquals(fmt.setContent(spans.get(0).span).toString(false), "<3>New</3> file:");		
+		assertEquals(fmt.setContent(spans.get(1).span).toString(true), "New");		
+		assertEquals(fmt.setContent(spans.get(1).span).toString(false), "New");		
+		
+		// Test clearing the annotations
+		assertTrue(tf1.hasAnnotation());
+		// Clear annotations on <b>
+		list1.get(0).removeAnnotations();
+		assertTrue(tf1.hasAnnotation()); // Has still other annotations
+		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
+		assertFalse(list1.get(0).hasAnnotation());
+		// Clear annotation on <3>
+		int n = list1.size();
+		list1.get(4).removeAnnotations();
+		// Should be same number of codes: clearing the code does not remove it
+		assertEquals(list1.size(), n);
+		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
+		// Clear on the whole text
+		tf1.removeAnnotations();
+		assertFalse(tf1.hasAnnotation());
+		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
+		// Codes with annotations only should be removed by ClearAnnotations()
+		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
 	}
 	
 	/**

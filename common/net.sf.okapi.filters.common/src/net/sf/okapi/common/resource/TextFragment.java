@@ -946,6 +946,33 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
+	 * Finds the position in this coded text of the closing code for a give
+	 * opening code.
+	 * @param id ID of the opening code.
+	 * @param indexOfOpening Index of the opening code.
+	 * @return The position in this text of the closing code for the given
+	 * opening code, or -1 if it could not be found. 
+	 */
+	private int findClosingCodePosition(int id, int indexOfOpening) {
+		for ( int i=indexOfOpening+1; i<codes.size(); i++ ) {
+			if ( codes.get(i).id == id ) {
+				if ( codes.get(i).type.equals(codes.get(indexOfOpening).type) ) {
+					char ci = toChar(i); // Convert found index to char
+					for ( int j=0; j<text.length(); j++ ) {
+						if ( text.charAt(j) == MARKER_CLOSING ) {
+							if ( text.charAt(j+1) == ci ) {
+								return j;
+							}
+						}
+					}
+					return -1; // Found the code in the list but not in the text
+				}
+			}
+		}
+		return -1; // Cannot find the code
+	}
+
+	/**
 	 * Annotates a section of this text.
 	 * @param start The position of the first character or marker of the section 
 	 * to annotate (in the coded text representation).
@@ -963,6 +990,10 @@ public class TextFragment implements Comparable<Object> {
 		String type,
 		InlineAnnotation annotation)
 	{
+		checkPositionForMarker(start);
+		checkPositionForMarker(end);
+		balanceMarkers();
+		//TODO: Handle all the cases (overlapping, interrupted range, etc.
 		// cases:
 		// a<1>|bc|</1>d = a<1n>bc</1>d
 		// a|<1>bc|</1>d = a<1n>bc</1>d
@@ -976,32 +1007,131 @@ public class TextFragment implements Comparable<Object> {
 
 		// Store the length of the coded text before the operation
 		int before = text.length();
-		// Make sure we have a codes array
-		if ( codes == null ) codes = new ArrayList<Code>();
+		Code startCode = null;
+		Code endCode = null;
+		
+		// Make sure we have a codes array or check if we can re-use codes
+		if ( codes == null ) {
+			codes = new ArrayList<Code>();
+		}
+		else { // If we have other codes, maybe we can use them...
+			if (( start > 1 ) && (( text.charAt(start-2) == MARKER_OPENING ))) {
+				// start is just before an opening code
+				int sci = toIndex(text.charAt(start-1));
+				int ccp = findClosingCodePosition(codes.get(sci).id, sci);
+				if ( ccp != -1 ) {
+					if ( ccp == end ) {
+						startCode = codes.get(sci);
+						endCode = codes.get(toIndex(text.charAt(ccp+1)));
+					}
+				}
+			}
+		}
 
-		// Create the new start code
-		Code startCode = new Code(TagType.OPENING, "$");
+		String startBuf = ""; // Empty by default
+		if ( startCode == null ) {
+			// Create the new start code
+			startCode = new Code(TagType.OPENING, "$");
+			startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
+			startCode.id = ++lastCodeID;
+			// Insert the start marker
+			text.insert(start, startBuf);
+			codes.add(startCode);
+		}
 		startCode.setAnnotation(type, annotation);
-		String startBuf = ""+((char)MARKER_OPENING)+toChar(codes.size());
-		startCode.id = ++lastCodeID;
-		// Insert the start marker
-		text.insert(start, startBuf);
-		codes.add(startCode);
 
-		// Create the new end code
-		Code endCode = new Code(TagType.CLOSING, "$");
+		if ( endCode == null ) {
+			// Create the new end code
+			endCode = new Code(TagType.CLOSING, "$");
+			String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
+			endCode.id = startCode.id;
+			// Insert the end code, startBuf length is 0 or 2
+			text.insert(end+startBuf.length(), endBuf);
+			codes.add(endCode);
+		}
+		//TODO: How to avoid the actual annotation on the closing code??
+		//TODO: could it be linked somehow to the starting code??
 		endCode.setAnnotation(type, annotation);
-		String endBuf = ""+((char)MARKER_CLOSING)+toChar(codes.size());
-		endCode.id = startCode.id;
-		// Insert the end code
-		text.insert(end+startBuf.length(), endBuf);
-		codes.add(endCode);
 		
 		// No need to change isBalance since we did balance those codes
 		// return the difference
 		return text.length()-before;
 	}
 
+	/**
+	 * Removes all annotations in this text. This also removes any code that
+	 * is or was there only for holding an annotation.
+	 */
+	public void removeAnnotations () {
+		if ( codes == null ) return;
+		for ( Code code : codes ) {
+			if ( code.annotations != null ) {
+				code.annotations.clear();
+				code.annotations = null;
+			}
+			// Remove any code that has no annotations and no data
+			if ( !code.hasAnnotation() && !code.hasData() ) {
+				//TODO: remove the code
+			}
+		}
+	}
+	
+	/**
+	 * Removes all annotations of a given type in this text. This also removes any
+	 * code that is there only for holding an annotation of the given type, or
+	 * any code that has no annotation and no data either. 
+	 * @param type The type of annotation to remove.
+	 */
+	public void removeAnnotations (String type) {
+		if ( codes == null ) return;
+		for ( Code code : codes ) {
+			code.removeAnnotation(type);
+			// Remove any code that has no annotations and no data
+			if ( !code.hasAnnotation() && !code.hasData() ) {
+				//TODO: remove the code
+			}
+		}
+	}
+	
+	/**
+	 * Indicates if this text has an code with one annotation or more.
+	 * @return True if there is at least one annotation. 
+	 */
+	public boolean hasAnnotation () {
+		if ( !hasCode() ) return false;
+		for ( Code code : codes ) {
+			if ( code.hasAnnotation() ) return true;
+		}
+		return false;
+	}
+	
+	private int getCodePosition (int index) {
+		int n = text.indexOf(String.valueOf(toChar(index)), 0);
+		if ( n == -1 ) return -1; // Not found
+		return n-1; // Position is the one of char before (open/close/placeholder) 
+	}
+
+	/**
+	 * Gets the list of all spans of text annotated with a given type of annotation.
+	 * @param type The type of annotation to look for.
+	 * @return A list of annotated spans for the given type.
+	 */
+	public List<AnnotatedSpan> getAnnotatedSpans (String type) {
+		// Always return a list, never null.
+		ArrayList<AnnotatedSpan> list = new ArrayList<AnnotatedSpan>();
+		if ( codes == null ) return list;
+		for ( int i=0; i<codes.size(); i++ ) {
+			if (( codes.get(i).tagType == TagType.OPENING ) && ( codes.get(i).hasAnnotation(type) )) {
+				int start = getCodePosition(i)+2; // Span starts just after the marker
+				int end = findClosingCodePosition(codes.get(i).id, i);
+				if (( start == -1 ) || ( end == -1 )) continue; // Something is wrong
+				list.add(new AnnotatedSpan(type, codes.get(i).getAnnotation(type),
+					subSequence(start, end)));
+			}
+		}
+		return list;
+	}
+	
 	/**
 	 * Renumbers the IDs of the codes in the fragment.
 	 */

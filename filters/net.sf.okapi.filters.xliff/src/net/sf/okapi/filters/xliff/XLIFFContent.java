@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.xliff;
 
@@ -70,44 +70,56 @@ public class XLIFFContent {
 	{
 		StringBuilder tmp = new StringBuilder();
 		int index;
-		int id;
+		Code code;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
+				code = codes.get(index);
 				if ( codeOnlyMode ) {
-					tmp.append(codes.get(index).toString());
+					tmp.append(code.toString());
 				}
 				else {
-					tmp.append(String.format("<bpt id=\"%d\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-					tmp.append("</bpt>");
+					if ( code.hasData() ) {
+						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append("</bpt>");
+					}
+					if ( code.hasAnnotation("protected") ) {
+						tmp.append("<mrk mtype=\"protected\">");
+					}
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
+				code = codes.get(index);
 				if ( codeOnlyMode ) {
-					tmp.append(codes.get(index).toString());
+					tmp.append(code.toString());
 				}
 				else {
-					tmp.append(String.format("<ept id=\"%d\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-					tmp.append("</ept>");
+					if ( code.hasData() ) {
+						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append("</ept>");
+					}
+					if ( code.hasAnnotation("protected") ) {
+						tmp.append("</mrk>");
+					}
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
+				code = codes.get(index);
 				if ( codeOnlyMode ) {
-					tmp.append(codes.get(index).toString());
+					tmp.append(code.toString());
 				}
 				else {
-					tmp.append(String.format("<ph id=\"%d\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-					tmp.append("</ph>");
+					if ( code.hasData() ) {
+						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append("</ph>");
+					}
 				}
 				break;
 			case '>':
@@ -159,7 +171,6 @@ public class XLIFFContent {
 		codes = container.getCodes();
 		StringBuilder tmp = new StringBuilder();
 		int index;
-		int id;
 		Code code;
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
@@ -178,28 +189,37 @@ public class XLIFFContent {
 					if ( withMarkers ) tmp.append("</mrk>");
 				}
 				else {
-					id = codes.get(index).getId();
-					tmp.append(String.format("<ph id=\"%d\">", id));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(),
+					tmp.append(String.format("<ph id=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(code.toString(),
 						quoteMode, escapeGT));
 					tmp.append("</ph>");
 				}
 				break;
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<bpt id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(),
-					quoteMode, escapeGT));
-				tmp.append("</bpt>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(code.toString(),
+						quoteMode, escapeGT));
+					tmp.append("</bpt>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("<mrk mtype=\"protected\">");
+				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<ept id=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(),
-					quoteMode, escapeGT));
-				tmp.append("</ept>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(code.toString(),
+						quoteMode, escapeGT));
+					tmp.append("</ept>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("</mrk>");
+				}
 				break;
 			case '>':
 				if ( escapeGT ) tmp.append("&gt;");

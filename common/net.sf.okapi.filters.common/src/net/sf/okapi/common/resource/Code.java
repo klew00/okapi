@@ -21,7 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -58,7 +58,7 @@ public class Code {
 	protected String data;
 	protected String outerData;
 	protected int flag;
-	protected HashMap<String, InlineAnnotation> annotations;
+	protected LinkedHashMap<String, InlineAnnotation> annotations;
 
 	/**
 	 * Helper method to convert a list of codes into a string.
@@ -81,7 +81,7 @@ public class Code {
 	 * @param map The list of annotations.
 	 * @return The storage string.
 	 */
-	private static String annotationsToString (HashMap<String, InlineAnnotation> map) {
+	private static String annotationsToString (LinkedHashMap<String, InlineAnnotation> map) {
 		if (( map == null ) || map.isEmpty() ) return "";
 		StringBuilder tmp = new StringBuilder();
 		InlineAnnotation annotation;
@@ -120,10 +120,10 @@ public class Code {
 		return list;
 	}
 	
-	private static HashMap<String, InlineAnnotation> stringToAnnotations (String data) {
+	private static LinkedHashMap<String, InlineAnnotation> stringToAnnotations (String data) {
 		if (( data == null ) || ( data.length() == 0 )) return null;
 		// Create the map with low initial capacity
-		HashMap<String, InlineAnnotation> map = new HashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
+		LinkedHashMap<String, InlineAnnotation> map = new LinkedHashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
 		InlineAnnotation annotation;
 		String[] tmpEntries = data.split("\u009F");
 		for ( String tmp : tmpEntries ) {
@@ -203,7 +203,7 @@ public class Code {
 	 * @return True when this code has any type of annotation.
 	 */
 	public boolean hasAnnotation () {
-		return (annotations!=null);
+		return (( annotations != null ) && ( annotations.size() > 0 ));
 	}
 
 	/**
@@ -397,7 +397,7 @@ public class Code {
 	{
 		// Use a small initial capacity to save space
 		if ( annotations == null ) {
-			annotations = new HashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
+			annotations = new LinkedHashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
 		}
 		annotations.put(type, annotation);
 	}
@@ -411,6 +411,28 @@ public class Code {
 	public InlineAnnotation getAnnotation (String type) {
 		if ( annotations == null ) return null;
 		return annotations.get(type);
+	}
+
+	/**
+	 * Removes all annotations from this code.
+	 */
+	public void removeAnnotations () {
+		if ( annotations != null ) {
+			annotations.clear();
+			annotations = null;
+		}
+		//TODO: update closing code if needed (when they'll be linked)
+	}
+
+	/**
+	 * Removes the annotation of a given type in this code.
+	 * @param type The type of annotation to remove.
+	 */
+	public void removeAnnotation (String type) {
+		if ( annotations != null ) {
+			annotations.remove(type);
+		}
+		//TODO: update closing code if needed (when they'll be linked)
 	}
 
 }
