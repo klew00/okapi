@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.resource.AnnotatedSpan;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InlineAnnotation;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.writer.GenericInlines;
@@ -315,20 +316,17 @@ public class TextFragmentTest extends TestCase {
 		List<Code> list2 = tf2.getCodes();
 		assertTrue(list1.get(2).hasAnnotation());
 		assertTrue(list1.get(2).hasAnnotation("protected"));
-		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
-		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> <2>%s</2>");
-		InlineAnnotation annot1 = list1.get(2).getAnnotation("protected");
-		InlineAnnotation annot2 = list1.get(3).getAnnotation("protected");
-		assertSame(annot1, annot2);
+		assertEquals(fmt.setContent(tf2).toString(true), "<b>New file:</b> %s");
+		assertEquals(fmt.setContent(tf2).toString(false), "<1>New file:</1> <2>%s</2>");
 
-		// Add an annotation for "New" (don't use diff, correct manually: xxNew file:</b>
+		// Add an annotation for "New" (don't use diff, correct manually: xxNew file:</b>)
 		tf1.annotate(2, 5, "term", new InlineAnnotation("Nouveau"));
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
 
 		// Test start/end annotation and cloning
-		annot1 = list1.get(4).getAnnotation("term");
-		annot2 = list1.get(5).getAnnotation("term");
+		InlineAnnotation annot1 = list1.get(4).getAnnotation("term"); // Opening
+		InlineAnnotation annot2 = list1.get(5).getAnnotation("term"); // Closing
 		assertSame(annot1, annot2);
 		annot1.setData("new data"); // Check that changing in one, affects both
 		assertEquals(annot2.toString(), "new data");
@@ -341,7 +339,6 @@ public class TextFragmentTest extends TestCase {
 		annot1 = c1.getAnnotation("term");
 		annot2 = c2.getAnnotation("term");
 		assertNotSame(annot1, annot2);
-
 		
 		// Test if we can rebuild the annotation from the storage string
 		tf2 = new TextFragment();
@@ -362,6 +359,10 @@ public class TextFragmentTest extends TestCase {
 		// It should not as tf2 is a clone.
 		assertEquals(list1.get(4).getAnnotation("term").getData(), "Nouveau");
 		assertEquals(list2.get(4).getAnnotation("term").getData(), "Neue");
+		// Checks same annotation object after reading from string storage
+		annot1 = list2.get(4).getAnnotation("term"); // Opening
+		annot2 = list2.get(5).getAnnotation("term"); // Closing
+		assertSame(annot1, annot2);
 		
 		// Test re-use of codes for adding annotations
 		// Add annotations for "yyNewyy file:" xxyyNewyy file:xx
@@ -404,6 +405,49 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
 		// Codes with annotations only should be removed by removeAnnotations()
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
+		
+		// Check annotate behavior
+		tf1 = new TextContainer("w1 ");
+		tf1.append(TagType.OPENING, "b", "<b>");
+		tf1.append("w2 w3");
+		tf1.append(TagType.CLOSING, "b", "</b>");
+		tf1.append(" w4 ");
+		tf1.append(TagType.OPENING, "i", "<i>");
+		tf1.append("w5 w6");
+		tf1.append(TagType.CLOSING, "i", "</i>");
+		tf1.append(" w7");
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1>w2 w3</1> w4 <2>w5 w6</2> w7");
+		// Annotate "<1>[w2 w3]</1>"
+		tf1.annotate(5, 10, "a1", null);
+		// Should be the same as annotation uses <1> and </1>
+		assertTrue(tf1.hasAnnotation("a1"));
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1>w2 w3</1> w4 <2>w5 w6</2> w7");
+		// Annotate "[<1>w2 w3</1>]"
+		tf1.annotate(3, 12, "a2", null);
+		// Should be the same as annotation uses <1> and </1>
+		assertTrue(tf1.hasAnnotation("a2"));
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1>w2 w3</1> w4 <2>w5 w6</2> w7");
+		// Annotate "<1>[w2] w3</1>]"
+		tf1.annotate(5, 7, "a3", null);
+		assertTrue(tf1.hasAnnotation("a3"));
+		String s = fmt.setContent(tf1).toString(false);
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1><3>w2</3> w3</1> w4 <2>w5 w6</2> w7");
+		// Annotate "<1>w2 [w3]</1>]" (w1 xxyyw2yy w3xx)
+		tf1.annotate(12, 14, "a4", null);
+		assertTrue(tf1.hasAnnotation("a4"));
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1><3>w2</3> <4>w3</4></1> w4 <2>w5 w6</2> w7");
+
+		// Clear all annotations
+		tf1.removeAnnotations();
+		assertFalse(tf1.hasAnnotation());
+		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1>w2 w3</1> w4 <2>w5 w6</2> w7");
+		
+		// Annotate "[w1 <1>w2] w3</1>"
+		tf1.annotate(0, 7, "a5", null);
+		spans = tf1.getAnnotatedSpans("a5");
+		assertEquals(spans.size(), 2);
+		assertEquals(fmt.setContent(tf1).toString(false), "<3>w1 </3><1><4>w2</4> w3</1> w4 <2>w5 w6</2> w7");
+
 	}
 	
 	/**

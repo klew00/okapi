@@ -347,7 +347,7 @@ public class TextFragment implements Comparable<Object> {
 	 * false if there is no reference.
 	 */
 	public boolean hasReference () {
-		if ( codes == null ) return false;
+		if ( !hasCode() ) return false;
 		for ( Code code : codes ) {
 			if ( code.hasReference() ) return true;
 		}
@@ -1063,17 +1063,16 @@ public class TextFragment implements Comparable<Object> {
 	 * is or was there only for holding an annotation.
 	 */
 	public void removeAnnotations () {
-		if ( codes == null ) return;
+		if ( !hasCode() ) return;
+		boolean clean = false;
 		for ( Code code : codes ) {
 			if ( code.annotations != null ) {
 				code.annotations.clear();
 				code.annotations = null;
-			}
-			// Remove any code that has no annotations and no data
-			if ( !code.hasAnnotation() && !code.hasData() ) {
-				//TODO: remove the code
+				clean = true;
 			}
 		}
+		if ( clean ) cleanUnusedCodes();
 	}
 	
 	/**
@@ -1083,19 +1082,18 @@ public class TextFragment implements Comparable<Object> {
 	 * @param type The type of annotation to remove.
 	 */
 	public void removeAnnotations (String type) {
-		if ( codes == null ) return;
+		if ( !hasCode() ) return;
+		boolean clean = false;
 		for ( Code code : codes ) {
 			code.removeAnnotation(type);
-			// Remove any code that has no annotations and no data
-			if ( !code.hasAnnotation() && !code.hasData() ) {
-				//TODO: remove the code
-			}
+			clean = true;
 		}
+		if ( clean ) cleanUnusedCodes();
 	}
 	
 	/**
-	 * Indicates if this text has an code with one annotation or more.
-	 * @return True if there is at least one annotation. 
+	 * Indicates if this text has at least one annotation.
+	 * @return True if there is at least one annotation, false otherwise.
 	 */
 	public boolean hasAnnotation () {
 		if ( !hasCode() ) return false;
@@ -1103,6 +1101,63 @@ public class TextFragment implements Comparable<Object> {
 			if ( code.hasAnnotation() ) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Indicates if this text has at least one annotation of a given type.
+	 * @param type The type of annotation to look for.
+	 * @return True if there is at least one annotation of the given type, false otherwise.
+	 */
+	public boolean hasAnnotation (String type) {
+		if ( !hasCode() ) return false;
+		for ( Code code : codes ) {
+			if ( code.hasAnnotation(type) ) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Removes all codes that have no data and no annotation.
+	 */
+	private void cleanUnusedCodes () {
+		// We cannot use hasCode() because it may be wrong at this point.
+		Code code;
+		int before = text.length();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
+				code = codes.get(toIndex(text.charAt(++i)));
+				if (( !code.hasData() ) && ( !code.hasAnnotation() )) {
+					text = text.delete(i-1, i+1);
+					i--; // Correct  for loop
+				}
+				break;
+			}
+		}
+		// No change, we're don.
+		if ( text.length() == before ) return;
+		// Else: We need to re-build the list of codes and adjust the indices
+		// Make a list of all remaining codes
+		ArrayList<Code> remaining = new ArrayList<Code>();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
+				// Copy the remaining codes into the new list
+				remaining.add(codes.get(toIndex(text.charAt(++i))));
+				// And update the index in the coded text
+				text.setCharAt(i, toChar(remaining.size()-1));
+				break;
+			}
+		}
+		codes.clear();
+		codes = remaining; // The new list is the remaining codes
+		isBalanced = false;
 	}
 	
 	private int getCodePosition (int index) {

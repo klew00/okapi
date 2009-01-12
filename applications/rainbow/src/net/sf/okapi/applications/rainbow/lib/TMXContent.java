@@ -78,17 +78,27 @@ public class TMXContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<bpt i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</bpt>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</bpt>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("<hi type=\"protected\">");
+				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<ept i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
-				tmp.append("</ept>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<ept i=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+					tmp.append("</ept>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("</hi>");
+				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
