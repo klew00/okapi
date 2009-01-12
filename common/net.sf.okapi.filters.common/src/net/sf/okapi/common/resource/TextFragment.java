@@ -413,10 +413,10 @@ public class TextFragment implements Comparable<Object> {
 	 * Appends an annotation-type code to this text.
 	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
 	 * @param type The type of the annotation (e.g. "protected").
+	 * @param annotation The annotation to add (can be null).
 	 * @return The new code that was added to this text.
 	 */
-	//TODO: provide hook to the IAnnotation as well, and maybe start/end vs append
-	public Code appendAnnotation (TagType tagType,
+	public Code append (TagType tagType,
 		String type,
 		InlineAnnotation annotation)
 	{
@@ -1126,7 +1126,7 @@ public class TextFragment implements Comparable<Object> {
 				int end = findClosingCodePosition(codes.get(i).id, i);
 				if (( start == -1 ) || ( end == -1 )) continue; // Something is wrong
 				list.add(new AnnotatedSpan(type, codes.get(i).getAnnotation(type),
-					subSequence(start, end)));
+					subSequence(start, end), start, end));
 			}
 		}
 		return list;

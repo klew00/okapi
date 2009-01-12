@@ -121,6 +121,7 @@ public class Code {
 	}
 	
 	private static LinkedHashMap<String, InlineAnnotation> stringToAnnotations (String data) {
+		//TODO: ISSUE here: the annotations of the closing code should point to the same as the opeing code!				
 		if (( data == null ) || ( data.length() == 0 )) return null;
 		// Create the map with low initial capacity
 		LinkedHashMap<String, InlineAnnotation> map = new LinkedHashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);
@@ -230,13 +231,21 @@ public class Code {
 	 */
 	@Override
 	public Code clone () {
-		Code clone = new Code(tagType, type, data);
-		clone.id = id;
-		clone.outerData = outerData;
-		clone.flag = flag;
-		//TODO: Do we need to do a deep copy for the annotations?
-		clone.annotations = annotations;
-		return clone;
+		Code newCode = new Code(tagType, type, data);
+		newCode.id = id;
+		newCode.outerData = outerData;
+		newCode.flag = flag;
+		// Clone the annotations
+		if ( annotations != null ) {
+			InlineAnnotation annot;
+			newCode.annotations = new LinkedHashMap<String, InlineAnnotation>();
+			for ( String type : annotations.keySet() ) {
+				annot = annotations.get(type);
+				if ( annot == null ) newCode.annotations.put(type, null);
+				else newCode.annotations.put(type, annot.clone());
+			}
+		}
+		return newCode;
 	}
 	
 	/**

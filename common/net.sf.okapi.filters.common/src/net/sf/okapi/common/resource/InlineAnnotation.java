@@ -48,6 +48,16 @@ public class InlineAnnotation implements IAnnotation {
 	}
 	
 	/**
+	 * Clones this annotation.
+	 * @return A new InlineAnnotation object that is a copy of this one.
+	 */
+	@Override
+	public InlineAnnotation clone () {
+		InlineAnnotation newObj = new InlineAnnotation(this.data);
+		return newObj;
+	}
+	
+	/**
 	 * Gets a storage string representation of the whole annotation that can
 	 * be used for serialization.
 	 * @return The storage string representation of this annotation.

@@ -317,11 +317,32 @@ public class TextFragmentTest extends TestCase {
 		assertTrue(list1.get(2).hasAnnotation("protected"));
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> <2>%s</2>");
+		InlineAnnotation annot1 = list1.get(2).getAnnotation("protected");
+		InlineAnnotation annot2 = list1.get(3).getAnnotation("protected");
+		assertSame(annot1, annot2);
 
 		// Add an annotation for "New" (don't use diff, correct manually: xxNew file:</b>
 		tf1.annotate(2, 5, "term", new InlineAnnotation("Nouveau"));
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1><3>New</3> file:</1> <2>%s</2>");
+
+		// Test start/end annotation and cloning
+		annot1 = list1.get(4).getAnnotation("term");
+		annot2 = list1.get(5).getAnnotation("term");
+		assertSame(annot1, annot2);
+		annot1.setData("new data"); // Check that changing in one, affects both
+		assertEquals(annot2.toString(), "new data");
+		annot2.setData("Nouveau"); // Check changing back
+		assertEquals(annot1.toString(), "Nouveau");
+		assertEquals(list1.get(4).getAnnotation("term").toString(), annot2.toString());
+		// Check cloning
+		Code c1 = list1.get(4);
+		Code c2 = c1.clone();
+		annot1 = c1.getAnnotation("term");
+		annot2 = c2.getAnnotation("term");
+		assertNotSame(annot1, annot2);
+
+		
 		// Test if we can rebuild the annotation from the storage string
 		tf2 = new TextFragment();
 		tf2.setCodedText(tf1.getCodedText(),
@@ -333,7 +354,6 @@ public class TextFragmentTest extends TestCase {
 		assertTrue(list2.get(4).hasAnnotation("term"));
 		InlineAnnotation annotation = list2.get(4).getAnnotation("term");
 		assertEquals(annotation.getData(), "Nouveau");
-		
 		// Test annotation change
 		annotation.setData("Neue");
 		// Get the codes of tf1
@@ -352,14 +372,18 @@ public class TextFragmentTest extends TestCase {
 		list1 = tf1.getCodes();
 		assertEquals(list1.get(0).getAnnotation("mt").getData(), "MT1");
 		assertEquals(list1.get(0).getAnnotation("term").getData(), "TERM2");
-		
+
 		// Test spans
 		List<AnnotatedSpan> spans = tf1.getAnnotatedSpans("term");
 		assertEquals(spans.size(), 2);
 		assertEquals(fmt.setContent(spans.get(0).span).toString(true), "New file:");		
 		assertEquals(fmt.setContent(spans.get(0).span).toString(false), "<3>New</3> file:");		
 		assertEquals(fmt.setContent(spans.get(1).span).toString(true), "New");		
-		assertEquals(fmt.setContent(spans.get(1).span).toString(false), "New");		
+		assertEquals(fmt.setContent(spans.get(1).span).toString(false), "New");
+		assertEquals(spans.get(0).range.start, 2);
+		assertEquals(spans.get(0).range.end, 15);
+		assertEquals(spans.get(1).range.start, 4);
+		assertEquals(spans.get(1).range.end, 7);
 		
 		// Test clearing the annotations
 		assertTrue(tf1.hasAnnotation());
@@ -378,7 +402,7 @@ public class TextFragmentTest extends TestCase {
 		tf1.removeAnnotations();
 		assertFalse(tf1.hasAnnotation());
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>New file:</b> %s");
-		// Codes with annotations only should be removed by ClearAnnotations()
+		// Codes with annotations only should be removed by removeAnnotations()
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
 	}
 	
