@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import sun.net.www.http.PosterOutputStream;
+
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -579,6 +581,7 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void startDocumentPart(String part) {
 		currentSkeleton = new GenericSkeleton(part);
+		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 	}
 
 	protected void startDocumentPart(String part, String name,
@@ -607,7 +610,7 @@ public abstract class BaseFilter implements IFilter {
 
 		// add the part up to the first prop or text
 		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
-		currentSkeleton.add(part.substring(0, pt.getMainStartPos() - 1));
+		currentSkeleton.add(part.substring(0, pt.getMainStartPos()));
 
 		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
 			propOrTextId++;
@@ -621,9 +624,7 @@ public abstract class BaseFilter implements IFilter {
 
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				// begin a new TextUnit - also creates ID
-				startTextUnit(propOrText.getValue());
-				// return the newly created TextUnit
-				TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
+				TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
 				// compose TextUnit skeleton with reference i.e.,
 				// content="#ref1"
 				String TextUnitSkel = part.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos())
@@ -632,8 +633,8 @@ public abstract class BaseFilter implements IFilter {
 				// set the skeleton on the TextUnit
 				tu.setSkeleton(new GenericSkeleton(TextUnitSkel));
 				tu.setIsReferent(true);
-				currentSkeleton.addRef(tu, language);
-				endTextUnit(); // sends TextUnit event
+				currentSkeleton.addRef(tu, language);				
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
 				Property p = new Property(propOrText.getName(), propOrText.getValue(), false);

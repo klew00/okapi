@@ -18,6 +18,7 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int mainStartPos, int mainEndPos) {
 		this.type = type;
 		this.name = name;
+		this.value = value;
 		this.mainStartPos = mainStartPos;
 		this.mainEndPos = mainEndPos;
 	}
