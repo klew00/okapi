@@ -67,21 +67,38 @@ public class TextContainer extends TextFragment {
 	 */
 	@Override
 	public TextContainer clone () {
-		TextContainer tc = new TextContainer();
-		// Clone the content
-		tc.setContent(super.clone());
-		// Clone the properties
-		if ( properties != null ) {
-			tc.properties = new Hashtable<String, Property>();
-			for ( Property prop : properties.values() ) {
-				tc.properties.put(prop.getName(), prop.clone()); 
-			}
-		}
-		//TODO: Clone the annotations ???
-		//TODO: Clone the segments
-		return tc;
+		return clone(true);
 	}
 
+	/**
+	 * Clones this container, with or without its properties. 
+	 * @param cloneProperties Indicates if the properties should be cloned.
+	 * @return A new TextContainer object that is a copy of this one.
+	 */
+	public TextContainer clone (boolean cloneProperties) {
+		TextContainer newCont = new TextContainer();
+		// Clone the content
+		newCont.setContent(super.clone());
+		// Clone the properties
+		if ( cloneProperties && ( properties != null )) {
+			newCont.properties = new Hashtable<String, Property>();
+			for ( Property prop : properties.values() ) {
+				newCont.properties.put(prop.getName(), prop.clone()); 
+			}
+		}
+		// Clone the segments
+		if ( segments != null ) {
+			newCont.segments = new ArrayList<TextFragment>();
+			for ( TextFragment frag : segments ) {
+				newCont.segments.add(frag.clone());
+			}
+		}
+		
+		// Clone the annotations
+		//TODO: Clone the annotations
+		return newCont;
+	}
+	
 	/**
 	 * Gets the TextFragment for this TextContainer. Because TextContainer is an extension of
 	 * TextFragment this methods returns this object itself, but typed as a TextFragment.
@@ -96,8 +113,12 @@ public class TextContainer extends TextFragment {
 	 * @param content The new content to set. 
 	 */
 	public void setContent (TextFragment content) {
+		//TODO: Fix this, this is not right, maybe just call clone()?
 		text = new StringBuilder();
 		insert(-1, content);
+		this.lastCodeID = content.lastCodeID;
+		//TODO: what about the properties???
+		
 		// We don't change the current annotations
 		// But we reset the segments
 		if ( segments != null ) {

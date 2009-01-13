@@ -34,6 +34,8 @@ import net.sf.okapi.common.filters.ISkeleton;
  */
 public class TextUnit implements INameable, IReferenceable {
 
+	private static final int TARGETS_INITCAP = 2;
+	
 	private String id;
 	private boolean isReferent;
 	private String name;
@@ -102,7 +104,7 @@ public class TextUnit implements INameable, IReferenceable {
 		boolean isReferent,
 		String mimeType)
 	{
-		targets = new ConcurrentHashMap<String, TextContainer>();
+		targets = new ConcurrentHashMap<String, TextContainer>(TARGETS_INITCAP);
 		this.id = id;
 		this.isReferent = isReferent;
 		this.mimeType = mimeType;
@@ -364,24 +366,13 @@ public class TextUnit implements INameable, IReferenceable {
 		boolean overwriteExisting,
 		int creationOptions)
 	{
-		TextContainer tc = targets.get(language);
-		if (( tc == null ) || overwriteExisting ) {
-			tc = new TextContainer();
-			if ( (creationOptions & COPY_CONTENT) == COPY_CONTENT ) {
-				TextFragment tf = getSourceContent().clone();
-				tc.setContent(tf);
-			}
-			if ( (creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES ) {
-				if ( source.properties != null ) {
-					tc.properties = new Hashtable<String, Property>();
-					for ( Property prop : source.properties.values() ) {
-						tc.properties.put(prop.getName(), prop.clone()); 
-					}
-				}
-			}
-			targets.put(language, tc);
+		TextContainer trgCont = targets.get(language);
+		if (( trgCont == null ) || overwriteExisting ) {
+			trgCont = getSource().clone(
+				(creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
+			targets.put(language, trgCont);
 		}
-		return tc;
+		return trgCont;
 	}
 
 	/**

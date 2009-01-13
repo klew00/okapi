@@ -335,10 +335,10 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	@Override
 	public TextFragment clone () {
-		TextFragment tf = new TextFragment();
-		tf.setCodedText(getCodedText(), getCodes(), false);
-		tf.lastCodeID = lastCodeID;
-		return tf;
+		TextFragment newFrag = new TextFragment();
+		newFrag.setCodedText(getCodedText(), getCodes(), false);
+		newFrag.lastCodeID = lastCodeID;
+		return newFrag;
 	}
 	
 	/**
