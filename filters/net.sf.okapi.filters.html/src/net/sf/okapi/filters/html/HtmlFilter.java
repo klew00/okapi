@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import net.htmlparser.jericho.Attribute;
@@ -38,8 +40,13 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.markupfilter.ExtractionRuleState;
+import net.sf.okapi.common.markupfilter.Parameters;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
@@ -224,7 +231,7 @@ public class HtmlFilter extends BaseFilter {
 	}
 
 	private void handleCdataSection(Tag tag) {
-		addToSkeleton(tag.toString());
+		addToDocumentPart(tag.toString());
 		// TODO: special handling for CDATA sections (may call sub-filters or
 		// unescape content etc.)
 	}
@@ -232,7 +239,7 @@ public class HtmlFilter extends BaseFilter {
 	private void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			addToSkeleton(text.toString());
+			addToDocumentPart(text.toString());
 			return;
 		}
 
@@ -241,7 +248,7 @@ public class HtmlFilter extends BaseFilter {
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
-			addToSkeleton(text.toString());
+			addToDocumentPart(text.toString());
 			return;
 		}
 
@@ -253,13 +260,13 @@ public class HtmlFilter extends BaseFilter {
 	}
 
 	private void handleSkeleton(Tag tag) {
-		addToSkeleton(tag.toString());
+		addToDocumentPart(tag.toString());
 	}
 
 	private void handleStartTag(StartTag startTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			addToSkeleton(startTag.toString());
+			addToDocumentPart(startTag.toString());
 			// process these tag types to update parser state
 			switch (parameters.getTaggedConfig().getMainRuleType(startTag.getName())) {
 			case EXCLUDED_ELEMENT:
@@ -286,23 +293,15 @@ public class HtmlFilter extends BaseFilter {
 		case ATTRIBUTES_ONLY:
 			// we assume we have already ended any (non-complex) TextUnit in
 			// the main while loop above
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+
 			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
-				// convert Jericho attributes to HashMap
-				Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
-				for (Attribute attribute : startTag.parseAttributes()) {
-					if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(),
-							attrs)) {
-
-					} else if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
-							attribute.getName(), attrs)) {
-
-					} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
-							attribute.getName(), attrs)) {
-						
-					}
-				}
+				propertyTextUnitPlaceholders = createPropertyTextUnitPlacehlders(startTag);
+				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
 			} else {
-				addToSkeleton(startTag.toString());
+				// This shouldn't happen if rules are consistent
+				addToDocumentPart(startTag.toString());
 			}
 			break;
 		case GROUP_ELEMENT:
@@ -311,11 +310,11 @@ public class HtmlFilter extends BaseFilter {
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.pushExcludedRule(startTag.getName());
-			addToSkeleton(startTag.toString());
+			addToDocumentPart(startTag.toString());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.pushIncludedRule(startTag.getName());
-			addToSkeleton(startTag.toString());
+			addToDocumentPart(startTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
 			ruleState.pushTextUnitRule(startTag.getName());
@@ -323,17 +322,17 @@ public class HtmlFilter extends BaseFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.pushPreserverWhitespaceRule(startTag.getName());
-			addToSkeleton(startTag.toString());
+			addToDocumentPart(startTag.toString());
 			break;
 		default:
-			addToSkeleton(startTag.toString());
+			addToDocumentPart(startTag.toString());
 		}
 	}
 
 	private void handleEndTag(EndTag endTag) {
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
-			addToSkeleton(endTag.toString());
+			addToDocumentPart(endTag.toString());
 			// process these tag types to update parser state
 			switch (parameters.getTaggedConfig().getMainRuleType(endTag.getName())) {
 			case EXCLUDED_ELEMENT:
@@ -362,11 +361,11 @@ public class HtmlFilter extends BaseFilter {
 			break;
 		case EXCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
-			addToSkeleton(endTag.toString());
+			addToDocumentPart(endTag.toString());
 			break;
 		case INCLUDED_ELEMENT:
 			ruleState.popExcludedIncludedRule();
-			addToSkeleton(endTag.toString());
+			addToDocumentPart(endTag.toString());
 			break;
 		case TEXT_UNIT_ELEMENT:
 			ruleState.popTextUnitRule();
@@ -374,15 +373,16 @@ public class HtmlFilter extends BaseFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			ruleState.popPreserverWhitespaceRule();
-			addToSkeleton(endTag.toString());
+			addToDocumentPart(endTag.toString());
 			break;
 		default:
-			addToSkeleton(endTag.toString());
+			addToDocumentPart(endTag.toString());
 			break;
 		}
 	}
 
 	private void addCodeToCurrentTextUnit(Tag tag) {
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
 		Code code = new Code(tag.getName());
 		startCode(code);
@@ -390,30 +390,18 @@ public class HtmlFilter extends BaseFilter {
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
 
-			// is this a empty tag?
+			// is this an empty tag?
 			if (startTag.isSyntacticalEmptyElementTag())
 				code.setTagType(TextFragment.TagType.PLACEHOLDER);
 			else
 				code.setTagType(TextFragment.TagType.OPENING);
 
 			// check for attributes
-			if (startTag.getStartTagType().hasAttributes()) {
-				// convert Jericho attributes to HashMap
-				Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
-				for (Attribute attribute : startTag.parseAttributes()) {
-					if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(),
-							attrs)) {
-
-					} else if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
-							attribute.getName(), attrs)) {
-
-						addToCode(new Property(attribute.getName(), attribute.getValue()));
-					} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
-							attribute.getName(), attrs)) {
-						addToCode(new Property(attribute.getName(), attribute.getValue(), false));
-					}
-				}
+			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
+				propertyTextUnitPlaceholders = createPropertyTextUnitPlacehlders(startTag);
+				addToCode(propertyTextUnitPlaceholders);
 			}
+
 		} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 			code.setTagType(TextFragment.TagType.CLOSING);
 			code.setData(literalTag);
@@ -423,6 +411,48 @@ public class HtmlFilter extends BaseFilter {
 		}
 
 		endCode();
+	}
+
+	private List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlacehlders(StartTag startTag) {
+		// list to hold the properties or TextUnits
+		List<PropertyTextUnitPlaceholder> propertyOrTextUnitPlaceholders = new LinkedList<PropertyTextUnitPlaceholder>();
+
+		// convert Jericho attributes to HashMap
+		Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
+		for (Attribute attribute : startTag.parseAttributes()) {
+			if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderType.TRANSLATABLE,
+						attribute.getName(), attribute.getValue(), startTag, attribute));
+			} else {
+
+				if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
+						attribute.getName(), attrs)) {
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag, attribute));
+				} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
+						attribute.getName(), attrs)) {
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag, attribute));
+				}
+			}
+		}
+
+		return propertyOrTextUnitPlaceholders;
+	}
+
+	private PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
+			String value, Tag tag, Attribute attribute) {
+		// offset of attribute
+		int mainStartPos = attribute.getBegin() - tag.getBegin();
+		int mainEndPos = attribute.getEnd() - tag.getBegin();
+
+		// normalize values for encoder
+		if (name.equals(HtmlEncoder.NATIVE_ENCODING)) {
+			name = HtmlEncoder.NORMALIZED_ENCODING;
+		} else if (name.equals(HtmlEncoder.NATIVE_LANGUAGE)) {
+			name = HtmlEncoder.NORMALIZED_LANGUAGE;
+		}
+		return new PropertyTextUnitPlaceholder(type, name, value, mainStartPos, mainEndPos);
 	}
 
 	/*

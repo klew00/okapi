@@ -64,7 +64,9 @@ title:
   onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script, title]
 
-# only attributes are localizable or translatable 
+# only attributes are localizable or translatable - no PCDATA
+# ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
+# with embedded skeketon 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, NOT_EQUALS, [generator, author, progid, date]]]}
