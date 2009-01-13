@@ -38,19 +38,18 @@ import org.eclipse.swt.widgets.Text;
 
 public class CharacterInfoDialog {
 	
-	private Shell            shell;
-	private String           help;
-	private ClosePanel       pnlActions;
-	private int              codePoint;
-	private CLabel           stRendering;
-	private Text             edCharacter;
-	private Text             edCodePoint;
-	private Text             edType;
-	private Text             edNumValue;
-	private Text             edIsJavaSpace;
-	private Text             edIsUnicodeSpace;
-	private boolean          settingCodePoint = false;
-	private Font             sampleFont;
+	private Shell shell;
+	private String help;
+	private int codePoint;
+	private CLabel stRendering;
+	private Text edCharacter;
+	private Text edCodePoint;
+	private Text edType;
+	private Text edNumValue;
+	private Text edIsJavaSpace;
+	private Text edIsUnicodeSpace;
+	private boolean settingCodePoint = false;
+	private Font sampleFont;
 
 	@Override
 	protected void finalize () {
@@ -152,7 +151,7 @@ public class CharacterInfoDialog {
 				shell.close();
 			};
 		};
-		pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, (helpFile != null));
+		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, (helpFile != null));
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btClose);
 

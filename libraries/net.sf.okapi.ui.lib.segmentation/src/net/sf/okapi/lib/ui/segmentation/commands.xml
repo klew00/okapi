@@ -19,6 +19,7 @@
  <command name="help.topics" key="F1">&amp;Help Topics&#x9;F1</command>
  <command name="help.feedback">&amp;Send Feedback</command>
  <command name="help.users">Users &amp;Group</command>
- <command name="help.srx20">SRX 2.0 Specification</command>
+ <command name="help.srx20">SRX 2.0 Sp&amp;ecification</command>
+ <command name="help.about">&amp;About Ratel...</command>
  
  </commands>

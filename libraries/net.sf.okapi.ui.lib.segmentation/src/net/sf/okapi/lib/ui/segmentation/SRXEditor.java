@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
@@ -548,6 +549,21 @@ public class SRXEditor {
 				UIUtil.start("http://www.lisa.org/fileadmin/standards/srx20.html"); //$NON-NLS-1$
             }
 		});
+		
+		if ( !asDialog ) {
+			menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
+			menuItem = new MenuItem(dropMenu, SWT.PUSH);
+			rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
+			menuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					AboutDialog dlg = new AboutDialog(shell,
+						Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
+						Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
+						Res.getString("SRXEditor.aboutVersion")); //$NON-NLS-1$
+					dlg.showDialog();
+	            }
+			});
+		}
 
 	}
 	
@@ -703,7 +719,7 @@ public class SRXEditor {
 	private void updateCaption () {
 		String filename;
 		if ( srxPath != null ) filename = Util.getFilename(srxPath, true);
-		else filename = "Untitled"; 
+		else filename = Res.getString("SRXEditor.untitled");  //$NON-NLS-1$
 		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");  //$NON-NLS-1$  //$NON-NLS-2$
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}

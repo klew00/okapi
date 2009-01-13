@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.rtf;
 
@@ -113,12 +113,14 @@ public class Writer extends BaseWriter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
+		//TODO: Fix encoding so we use a windows-able one (especially for utf-16)
 		super.setOptions(language, defaultEncoding);
 		layer = new LayerProvider();
 		layer.setOptions(null, encoding);
 	}
 
 	public void setParameters (IParameters params) {
+		// Nothing to do
 	}
 
 	public FilterEvent handleEvent (FilterEvent event) {

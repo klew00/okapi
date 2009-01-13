@@ -47,6 +47,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
@@ -510,12 +511,11 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
-				dlg.setText("About Rainbow");
-				dlg.setMessage("Rainbow - Okapi Localization Toolbox\n"
-					+"Version "
-					+Res.getString("VERSION")); //$NON-NLS-1$
-				dlg.open();
+				AboutDialog dlg = new AboutDialog(shell,
+					"About Rainbow",
+					"Rainbow - Okapi Localization Toolbox",
+					"Version "+Res.getString("VERSION")); //$NON-NLS-1$);
+				dlg.showDialog();
 			}
 		});
 
