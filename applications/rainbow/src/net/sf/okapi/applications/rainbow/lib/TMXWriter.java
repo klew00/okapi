@@ -129,11 +129,14 @@ public class TMXWriter {
 		}
 		
 		TextContainer srcTC = item.getSource();
-		//TextContainer trgTC = item.getTargetContent();
-		if ( srcTC.isSegmented() ) {
+		TextContainer trgTC = item.getTarget(trgLang);
+		if ( !srcTC.isSegmented() ) { // Source is not segmented
+			writeTU(srcTC, item.getTarget(trgLang), tuid, attributes);
+		}
+		else if ( trgTC.isSegmented() ) { // Source AND traget are segmented
 			// Write the segments
-			List<TextFragment> srcList = item.getSource().getSegments();
-			List<TextFragment> trgList = item.getTarget(trgLang).getSegments();
+			List<TextFragment> srcList = srcTC.getSegments();
+			List<TextFragment> trgList = trgTC.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
@@ -141,9 +144,7 @@ public class TMXWriter {
 					attributes);
 			}
 		}
-		else { // Un-segmented entry
-			writeTU(srcTC, item.getTarget(trgLang), tuid, attributes);
-		}
+		// Else no TMX output needed for source segmented but not target
 	}
 	
 	private void writeTU (TextFragment source,

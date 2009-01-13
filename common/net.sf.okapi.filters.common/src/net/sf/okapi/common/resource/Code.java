@@ -121,7 +121,7 @@ public class Code {
 	}
 	
 	private static LinkedHashMap<String, InlineAnnotation> stringToAnnotations (String data) {
-		//TODO: ISSUE here: the annotations of the closing code should point to the same as the opeing code!				
+		//TODO: ISSUE here: the annotations of the closing code should point to the same as the opening code!				
 		if (( data == null ) || ( data.length() == 0 )) return null;
 		// Create the map with low initial capacity
 		LinkedHashMap<String, InlineAnnotation> map = new LinkedHashMap<String, InlineAnnotation>(ANNOTATIONS_INITCAP);

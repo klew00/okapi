@@ -26,7 +26,19 @@ public class LayerProvider implements ILayerProvider {
 	public String startInline () {
 		return "{\\cs6\\f1\\cf6\\lang1024 ";
 	}
-
+	
+	public String startSegment () {
+		return "{\\cs15\\v\\cf12\\sub\\f2 \\{0>}{\\v\\f1 ";
+	}
+	
+	public String endSegment () {
+		return "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
+	}
+	
+	public String midSegment (int leverage) {
+		return String.format("%s%d%s", "}{\\cs15\\v\\cf12\\sub\\f2 <\\}", leverage, "\\{>}");
+	}
+	
 	// context: 0=in text, 1=in skeleton, 2=in inline
 	public String encode (String text, int context) {
 		//TODO: change to better faster support

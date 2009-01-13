@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.writer.ILayerProvider;
@@ -273,33 +274,113 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Update the encoder from the TU's mimetype
 		encoderManager.updateEncoder(tu.getMimeType());
 		// Get the right text container
-		TextFragment tf;
+		TextContainer tc;
 		if ( langToUse == null ) {
-			tf = tu.getSourceContent();
+			tc = tu.getSource();
 		}
 		else {
-			if ( (tf = tu.getTargetContent(langToUse)) == null ) {
-				tf = tu.getSourceContent();
+			if ( (tc = tu.getTarget(langToUse)) == null ) {
+				tc = tu.getSource();
 			}
 		}
-		// Apply the layer
-		if ( layer == null ) {
-			return getContent(tf, langToUse, encoderManager, context);
+		// Check for segmentation
+		if ( tc.isSegmented() ) {
+			return getSegmentedText(tc, langToUse, encoderManager, context);
 		}
 		else {
-			switch ( context ) {
-			case 1:
-				return layer.endCode()
-					+ getContent(tf, langToUse, encoderManager, context)
-					+ layer.startCode();
-			case 2:
-				return layer.endInline()
-					+ getContent(tf, langToUse, encoderManager, context)
-					+ layer.startInline();
+			// Apply the layer if there is one
+			if ( layer == null ) {
+				return getContent(tc, langToUse, encoderManager, context);
+			}
+			else {
+				switch ( context ) {
+				case 1:
+					return layer.endCode()
+						+ getContent(tc, langToUse, encoderManager, context)
+						+ layer.startCode();
+				case 2:
+					return layer.endInline()
+						+ getContent(tc, langToUse, encoderManager, context)
+						+ layer.startInline();
+				default:
+					return getContent(tc, langToUse, encoderManager, context);
+				}
+			}
+		}
+	}
+	
+	private String getSegmentedText (TextContainer tc,
+		String langToUse,
+		IEncoder encoder,
+		int context)
+	{
+		StringBuilder tmp = new StringBuilder();
+		List<TextFragment> segs = tc.getSegments();
+		String text = tc.getCodedText();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				//TODO: Handle codes outside the segments!!!
+				break;
+			case TextFragment.MARKER_SEGMENT:
+				code = tc.getCode(text.charAt(++i));
+				int n = Integer.valueOf(code.getData());
+				if ( layer == null ) {
+					tmp.append(getContent(segs.get(n), langToUse, encoderManager, context));
+				}
+				else {
+					switch ( context ) {
+					case 1:
+						tmp.append(layer.endCode()
+							+ layer.startSegment()
+							+ getContent(segs.get(n), langToUse, encoderManager, context)
+							+ layer.midSegment(0)
+							+ layer.endSegment()
+							+ layer.startCode());
+						break;
+					case 2:
+						tmp.append(layer.endInline()
+							+ layer.startSegment()
+							+ getContent(segs.get(n), langToUse, encoderManager, context)
+							+ layer.midSegment(0)
+							+ layer.endSegment()
+							+ layer.startInline());
+						break;
+					default:
+						tmp.append(layer.startSegment()
+							+ getContent(segs.get(n), langToUse, encoderManager, context)
+							+ layer.midSegment(0)
+							+ layer.endSegment());
+						break;
+					}
+				}
+				break;	
 			default:
-				return getContent(tf, langToUse, encoderManager, context);
+				if ( encoder == null ) {
+					if ( layer == null ) {
+						tmp.append(text.charAt(i));
+					}
+					else {
+						tmp.append(layer.encode(text.charAt(i), context));
+					}
+				}
+				else {
+					if ( layer == null ) {
+						tmp.append(encoder.encode(text.charAt(i), context));
+					}
+					else {
+						tmp.append(layer.encode(
+							encoder.encode(text.charAt(i), context),
+							context));
+					}
+				}
+				break;
 			}
 		}
+		return tmp.toString();
 	}
 
 	private String getContent (TextFragment tf,

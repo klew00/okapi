@@ -52,4 +52,23 @@ public interface ILayerProvider extends IEncoder {
 	 */
 	public String endInline ();
 	
+	/**
+	 * Gets the string denoting the start of a bilingual segment.
+	 * @return The string denoting the start of a bilingual segment.
+	 */
+	public String startSegment ();
+	
+	/**
+	 * Gets the string denoting the end of a bilingual segment.
+	 * @return The string denoting the end of a bilingual segment.
+	 */
+	public String endSegment ();
+	
+	/**
+	 * Gets the string for the separator at the middle of a bilingual segment.
+	 * @param leverage Indicator of leverage to optionally place in the separator.
+	 * @return The string for the separator at the middle of a bilingual segment.
+	 */
+	public String midSegment (int leverage);
+	
 }
