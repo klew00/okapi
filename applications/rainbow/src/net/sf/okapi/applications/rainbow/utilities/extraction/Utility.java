@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
@@ -176,10 +176,6 @@ public class Utility extends BaseFilterDrivenUtility {
     }
 	
     private void processTextUnit (TextUnit item ) {
-		//TODO: int status = IFilterItem.TSTATUS_TOTRANS;
-		//if ( !sourceItem.isTranslatable() ) status = IFilterItem.TSTATUS_NOTRANS;
-		//else if ( sourceItem.hasTarget() ) status = IFilterItem.TSTATUS_TOEDIT;
-
 		if ( params.includeTargets ) {
 			//TODO: Find a solution to not output item with
 			// existing target
@@ -209,8 +205,6 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.setAttribute("GroupName", item.getName());
 			qm.leverage(item);
 		}
-		
-		//TODO: Status
 	}
     
 }

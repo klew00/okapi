@@ -295,7 +295,7 @@ public class QueryManager {
 	}
 
 	/**
-	 * Leverage a text unit (segmented or not) based on the current settings.
+	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu The text unit to modify.
 	 */
@@ -310,14 +310,14 @@ public class QueryManager {
 			for ( int i=0; i<segList.size(); i++ ) {
 				if ( query(segList.get(i)) != 1 ) continue;
 				qr = next();
-				if ( qr.score != 100 ) continue;
+				if ( qr.score < 100 ) continue;
 				segList.set(i, qr.target);
 			}
 		}
 		else {
 			if ( query(tc) != 1 ) return;
 			qr = next();
-			if ( qr.score != 100 ) return;
+			if ( qr.score < 100 ) return;
 			tc.setCodedText(qr.target.getCodedText(), false);
 		}
 	}

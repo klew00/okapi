@@ -377,6 +377,16 @@ public class MainForm implements IParametersProvider {
 		});
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "input.editRoot"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				changeRoot();
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		miOpenInputDocument = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miOpenInputDocument, "input.openDocument"); //$NON-NLS-1$
@@ -1146,7 +1156,8 @@ public class MainForm implements IParametersProvider {
 	
 	private void changeRoot () {
 		try {
-			InputDialog dlg = new InputDialog(shell, "Source Root",
+			InputDialog dlg = new InputDialog(shell,
+				String.format("Root for Input List %d", currentInput+1),
 				"New root folder:", prj.getInputRoot(currentInput), null, 1);
 			String newRoot = dlg.showDialog();
 			if ( newRoot == null ) return;
@@ -1220,20 +1231,19 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			prj.save(path);
 			updateTitle();
+			edParamsFolder.setText(prj.getParametersFolder(true));
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
-	
+
 	private void updateTitle () {
 		shell.setText(((prj.path == null)
 			? Res.getString("UNTITLED") //$NON-NLS-1$
 			: Util.getFilename(prj.path, true))
 			+ " - " //$NON-NLS-1$ 
-			+ APPNAME
-			+ " " //$NON-NLS-1$
-			+ Res.getString("VERSION")); //$NON-NLS-1$
+			+ APPNAME);
 	}
 
 	// Use -1 for all lists

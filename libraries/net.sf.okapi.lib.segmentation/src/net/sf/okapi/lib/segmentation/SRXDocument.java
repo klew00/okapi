@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.lib.segmentation;
 
@@ -124,10 +124,6 @@ public class SRXDocument {
 
 		sampleText = "Mr. Holmes is from the <I>U.K.</I> <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
-		
-		//TEST
-		//rangeRule = "(([\\uE101\\uE102\\uE103].)+)(([\\d\\p{Lu}]\\.)|\\u00B7|-)([\\uE101\\uE102\\uE103].)";
-		//ENDTEST
 	}
 	
 	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
@@ -466,9 +462,7 @@ public class SRXDocument {
 				if ( !segmenter.cascade() ) break; // Stop at the first matching map
 			}
 		}
-		
-		
-		
+
 		segmenter.setLanguage(languageCode);
 		return segmenter;
 	}

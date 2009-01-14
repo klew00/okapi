@@ -271,52 +271,62 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		String langToUse,
 		int context) 
 	{
-		// Update the encoder from the TU's mimetype
+		// Update the encoder from the TU's MIME type
 		encoderManager.updateEncoder(tu.getMimeType());
 		// Get the right text container
-		TextContainer tc;
-		if ( langToUse == null ) {
-			tc = tu.getSource();
-		}
-		else {
-			if ( (tc = tu.getTarget(langToUse)) == null ) {
-				tc = tu.getSource();
+		TextContainer srcCont = tu.getSource();
+		TextContainer trgCont = null;
+		if ( langToUse != null ) {
+			if ( (trgCont = tu.getTarget(langToUse)) == null ) {
+				if ( !srcCont.isSegmented() ) {
+					// Fall back to source, except when the source is segmented
+					trgCont = tu.getSource();
+				}
 			}
 		}
+		// Now trgCont is null only if we have segments and no target is available
+		// Otherwise trgCont is either the available target or the source (fall-back case)
+
+//TODO: Case of unsegmented with target!!!		
+		
 		// Check for segmentation
-		if ( tc.isSegmented() ) {
-			return getSegmentedText(tc, langToUse, encoderManager, context);
+		if ( srcCont.isSegmented() ) {
+			// Special case of segmented entry: source + target
+			return getSegmentedText(tu.getSource(), trgCont, langToUse, encoderManager, context);
 		}
-		else {
+		else { // Normal case: use the calculated target
 			// Apply the layer if there is one
 			if ( layer == null ) {
-				return getContent(tc, langToUse, encoderManager, context);
+				return getContent(trgCont, langToUse, encoderManager, context);
 			}
 			else {
 				switch ( context ) {
 				case 1:
 					return layer.endCode()
-						+ getContent(tc, langToUse, encoderManager, context)
+						+ getContent(trgCont, langToUse, encoderManager, context)
 						+ layer.startCode();
 				case 2:
 					return layer.endInline()
-						+ getContent(tc, langToUse, encoderManager, context)
+						+ getContent(trgCont, langToUse, encoderManager, context)
 						+ layer.startInline();
 				default:
-					return getContent(tc, langToUse, encoderManager, context);
+					return getContent(trgCont, langToUse, encoderManager, context);
 				}
 			}
 		}
 	}
 	
-	private String getSegmentedText (TextContainer tc,
+	private String getSegmentedText (TextContainer srcCont,
+		TextContainer trgCont,
 		String langToUse,
 		IEncoder encoder,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
-		List<TextFragment> segs = tc.getSegments();
-		String text = tc.getCodedText();
+		List<TextFragment> srcSegs = srcCont.getSegments();
+		List<TextFragment> trgSegs = null;
+		if ( trgCont != null ) trgSegs = trgCont.getSegments();
+		String text = srcCont.getCodedText();
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
@@ -326,38 +336,55 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				//TODO: Handle codes outside the segments!!!
 				break;
 			case TextFragment.MARKER_SEGMENT:
-				code = tc.getCode(text.charAt(++i));
+				code = srcCont.getCode(text.charAt(++i));
 				int n = Integer.valueOf(code.getData());
+				// Check segment source/target
+				TextFragment trgFrag = null;
+				int lev = 0;
+				if (( trgSegs != null ) && ( n < trgSegs.size() )) {
+					trgFrag = trgSegs.get(n);
+					lev = 100;
+				}
+				//TODO: Else, source/target segments do not match
+				// Write it
 				if ( layer == null ) {
-					tmp.append(getContent(segs.get(n), langToUse, encoderManager, context));
+					if ( trgFrag == null ) {
+						tmp.append(getContent(srcSegs.get(n), null, encoderManager, context));
+					}
+					else { // No target available: use the source
+						tmp.append(getContent(trgFrag, langToUse, encoderManager, context));
+					}
 				}
 				else {
 					switch ( context ) {
 					case 1:
 						tmp.append(layer.endCode()
 							+ layer.startSegment()
-							+ getContent(segs.get(n), langToUse, encoderManager, context)
-							+ layer.midSegment(0)
+							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ layer.midSegment(lev)
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
 					case 2:
 						tmp.append(layer.endInline()
 							+ layer.startSegment()
-							+ getContent(segs.get(n), langToUse, encoderManager, context)
-							+ layer.midSegment(0)
+							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ layer.midSegment(lev)
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
 					default:
 						tmp.append(layer.startSegment()
-							+ getContent(segs.get(n), langToUse, encoderManager, context)
-							+ layer.midSegment(0)
+							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ layer.midSegment(lev)
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
 							+ layer.endSegment());
 						break;
 					}
 				}
-				break;	
+				break;
 			default:
 				if ( encoder == null ) {
 					if ( layer == null ) {

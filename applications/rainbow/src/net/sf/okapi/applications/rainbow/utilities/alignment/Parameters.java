@@ -55,7 +55,7 @@ public class Parameters extends BaseParameters {
 		checkSingleSegUnit = true;
 		useAutoCorrection = true;
 		createAttributes = true;
-		attributes = "Txt::FileName=${filename}$0a$Txt::GroupName=${resname}";
+		attributes = "Txt::FileName=${filename}\nTxt::GroupName=${resname}";
 		useExclusion = false;
 		exclusion = "";
 	}

@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
@@ -28,6 +28,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.tm.simpletm.Database;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -250,6 +251,18 @@ public class Editor implements IParametersEditor {
 		
 		btGetTmPath = new Button(cmpTmp, SWT.PUSH);
 		btGetTmPath.setText("...");
+		btGetTmPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String[] paths = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
+					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
+					"*"+Database.DATAFILE_EXT+"\t*.*");
+				if ( paths == null ) return;
+				edTmPath.setText(paths[0]);
+				edTmPath.selectAll();
+				edTmPath.setFocus();
+			}
+		});
+		
 		
 		//--- Dialog-level buttons
 

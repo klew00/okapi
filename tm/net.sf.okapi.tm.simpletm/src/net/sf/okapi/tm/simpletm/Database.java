@@ -120,14 +120,18 @@ public class Database {
 		Statement stm = null;
 		try {
 			close();
-			if ( (new File(path+DATAFILE_EXT)).exists() ) {
-				if ( !deleteExistingDB ) return;
-				deleteFiles(path+".*");
+			String pathNoExt = path;
+			if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
+				pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
 			}
-			else Util.createDirectories(path);
+			if ( (new File(pathNoExt+DATAFILE_EXT)).exists() ) {
+				if ( !deleteExistingDB ) return;
+				deleteFiles(pathNoExt+".*");
+			}
+			else Util.createDirectories(pathNoExt);
 			
 			// Open the connection, this creates the DB if none exists
-			conn = DriverManager.getConnection("jdbc:h2:"+path, "sa", "");
+			conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
 	
 			// Create the source table
 			stm = conn.createStatement();
@@ -163,8 +167,12 @@ public class Database {
 	public void open (String path) {
 		try {
 			close();
-			if ( !(new File(path+DATAFILE_EXT)).exists() ) return;
-			conn = DriverManager.getConnection("jdbc:h2:"+path, "sa", "");
+			String pathNoExt = path;
+			if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
+				pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
+			}
+			if ( !(new File(pathNoExt+DATAFILE_EXT)).exists() ) return;
+			conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);

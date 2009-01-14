@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -230,9 +230,6 @@ public class Editor implements IParametersEditor {
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
 				if ( path == null ) return;
-				if ( path.endsWith(Database.DATAFILE_EXT) ) {
-					path = path.substring(0, path.length()-Database.DATAFILE_EXT.length());
-				}
 				edTMPath.setText(path);
 				edTMPath.selectAll();
 				edTMPath.setFocus();

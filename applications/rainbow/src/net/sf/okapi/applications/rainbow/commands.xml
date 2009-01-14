@@ -23,6 +23,7 @@
  <command name="input.addDocuments" ctrl="1" key="Insert">&amp;Add Documents...&#x9;Ctrl+Insert</command>
  <!-- Delete is a shortcut, but defined from the tables not from the menu -->
  <command name="input.removeDocuments">&amp;Remove Documents...&#x9;Delete</command>
+ <command name="input.editRoot" key="F2">&amp;Edit &amp;Root...&#x9;F2</command>
  <command name="input.openDocument">&amp;Open Document</command>
  <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
  <command name="input.openFolder">&amp;Open Containing Folder</command>
