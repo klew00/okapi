@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -40,8 +41,10 @@ public class AboutDialog {
 	private Shell shell;
 
 	/**
-	 * Creates a new AboutDialog object.
-	 * @param parent The parent shell.
+	 * Creates a new AboutDialog object. The icon displayed in this dialog box
+	 * is provided by the parent shell. It should be either a unique image 
+	 * (Shell.getImage()), or the second image of a list of (Shell.getImages()[1]).
+	 * @param parent The parent shell (also carry the icon to display).
 	 * @param caption Caption text.
 	 * @param description Text for the application description line.
 	 * @param version Text for the application version line.
@@ -63,17 +66,33 @@ public class AboutDialog {
 			
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout(1, false);
+		GridLayout layTmp = new GridLayout(2, false);
 		cmpTmp.setLayout(layTmp);
-		
+
+		// Application icon
+		Label appIcon = new Label(cmpTmp, SWT.NONE);
+		GridData gdTmp = new GridData();
+		gdTmp.verticalSpan = 2;
+		appIcon.setLayoutData(gdTmp);
+		Image[] list = parent.getImages();
+		// Gets the single icon
+		if (( list == null ) || ( list.length < 2 )) {
+			appIcon.setImage(parent.getImage());
+		}
+		else { // Or the second one if there are more than one.
+			appIcon.setImage(list[1]);
+		}
+
 		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText(description);
-		GridData gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL);
+		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL
+			| GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
 		label.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText(version);
-		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL);
+		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL
+			| GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
 		label.setLayoutData(gdTmp);
 
 		// Info

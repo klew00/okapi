@@ -46,13 +46,13 @@ public class RuleDialog {
 	private Button rdBreak;
 	private Button rdNoBreak;
 	private Rule result = null;
-	private String helpPath;
+	private String helpRoot;
 
 	public RuleDialog (Shell parent,
 		Rule rule,
-		String helpPath)
+		String helpRootParam)
 	{
-		this.helpPath = helpPath;
+		this.helpRoot = helpRootParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("ruleDlg.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -104,7 +104,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					callHelp();
+					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -148,10 +148,6 @@ public class RuleDialog {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			return false;
 		}
-	}
-
-	public void callHelp () {
-		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
 }

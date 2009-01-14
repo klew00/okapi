@@ -46,12 +46,12 @@ public class FileProcessingDialog {
 	private Text edOutput;
 	private Button chkHtmlOutput;
 	private String[] result = null;
-	private String helpPath;
+	private String helpRoot;
 
 	public FileProcessingDialog (Shell parent,
-		String helpPath)
+		String helpRootParam)
 	{
-		this.helpPath = helpPath;
+		this.helpRoot = helpRootParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("testFileDlg.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -126,7 +126,7 @@ public class FileProcessingDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					callHelp();
+					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -187,10 +187,6 @@ public class FileProcessingDialog {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			return false;
 		}
-	}
-
-	public void callHelp () {
-		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
 	private String makeHtmlOutputPath (String inputPath) {

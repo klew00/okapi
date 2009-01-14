@@ -44,13 +44,13 @@ public class LanguageMapDialog {
 	private Text edRuleName;
 	private LanguageMap result = null;
 	private OKCancelPanel pnlActions;
-	private String helpPath;
+	private String helpRoot;
 
 	public LanguageMapDialog (Shell parent,
 		LanguageMap langMap,
-		String helpPath)
+		String helpRootParam)
 	{
-		this.helpPath = helpPath;
+		this.helpRoot = helpRootParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("langMap.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -83,7 +83,7 @@ public class LanguageMapDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					callHelp();
+					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -126,10 +126,6 @@ public class LanguageMapDialog {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 			return false;
 		}
-	}
-
-	public void callHelp () {
-		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
 }

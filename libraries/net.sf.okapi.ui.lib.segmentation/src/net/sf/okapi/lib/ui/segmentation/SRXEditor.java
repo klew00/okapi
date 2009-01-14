@@ -95,7 +95,7 @@ public class SRXEditor {
 	private GenericInlines sampleOutput;
 	private Font sampleFont;
 	private ResourceManager rm;
-	private String helpPath;
+	private String helpRoot;
 	private FileProcessor fileProc;
 	private String testInputPath;
 	private String testOutputPath;
@@ -109,7 +109,7 @@ public class SRXEditor {
 
 	public SRXEditor (Shell parent,
 		boolean asDialog,
-		String helpPath)
+		String helpRootParam)
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
@@ -118,7 +118,7 @@ public class SRXEditor {
 		htmlOutput = config.getBoolean("htmlOutput"); //$NON-NLS-1$
 
 		this.asDialog = asDialog;
-		this.helpPath = helpPath;
+		this.helpRoot = helpRootParam;
 		srxDoc = new SRXDocument();
 		srxPath = null;
 		sampleText = new TextContainer(null);
@@ -400,7 +400,7 @@ public class SRXEditor {
 			SelectionAdapter closeActions = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-						callHelp();
+						UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
 						return;
 					}
 					if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
@@ -520,7 +520,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				callHelp();
+				UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
             }
 		});
 		
@@ -691,7 +691,7 @@ public class SRXEditor {
 	private void editGroupsAndOptions () {
 		try {
 			getSurfaceData();
-			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc, helpPath);
+			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc, helpRoot);
 			dlg.showDialog();
 		}
 		catch ( Exception e ) {
@@ -818,7 +818,7 @@ public class SRXEditor {
 			rule = srxDoc.getLanguageRules(ruleName).get(n);
 		}
 		
-		RuleDialog dlg = new RuleDialog(shell, rule, helpPath);
+		RuleDialog dlg = new RuleDialog(shell, rule, helpRoot);
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
@@ -921,14 +921,10 @@ public class SRXEditor {
 		return true;
 	}
 
-	public void callHelp () {
-		if ( helpPath != null ) UIUtil.start(helpPath);
-	}
-
 	private void segmentTextFile () {
 		try {
 			// Get the input file
-			FileProcessingDialog dlg = new FileProcessingDialog(shell, helpPath);
+			FileProcessingDialog dlg = new FileProcessingDialog(shell, helpRoot);
 			String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
 			if ( result == null ) return; // Canceled
 			testInputPath = result[0];

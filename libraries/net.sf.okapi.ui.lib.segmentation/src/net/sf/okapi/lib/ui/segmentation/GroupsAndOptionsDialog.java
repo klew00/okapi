@@ -68,13 +68,13 @@ public class GroupsAndOptionsDialog {
 	private Button chkTrimLeadingWS;
 	private Button chkTrimTrailingWS;
 	private ClosePanel pnlActions;
-	private String helpPath;
+	private String helpRoot;
 
 	public GroupsAndOptionsDialog (Shell parent,
 		SRXDocument srxDoc,
-		String helpPath)
+		String helpRootParam)
 	{
-		this.helpPath = helpPath;
+		this.helpRoot = helpRootParam;
 		this.srxDoc = srxDoc;
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -261,7 +261,7 @@ public class GroupsAndOptionsDialog {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					callHelp();
+					UIUtil.callHelp(helpRoot, this, "srxeditor");
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
@@ -378,7 +378,7 @@ public class GroupsAndOptionsDialog {
 			langMap = srxDoc.getAllLanguagesMaps().get(n);
 		}
 		
-		LanguageMapDialog dlg = new LanguageMapDialog(shell, langMap, helpPath);
+		LanguageMapDialog dlg = new LanguageMapDialog(shell, langMap, helpRoot);
 		if ( (langMap = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewMap ) {
@@ -517,10 +517,6 @@ public class GroupsAndOptionsDialog {
 			return false;
 		}
 		return true;
-	}
-
-	public void callHelp () {
-		if ( helpPath != null ) UIUtil.start(helpPath);
 	}
 
 }

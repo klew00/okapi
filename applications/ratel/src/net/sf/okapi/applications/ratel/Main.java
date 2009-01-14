@@ -40,12 +40,12 @@ public class Main {
 		try {
 			// Compute the path of the help file
 			File file = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile());
-	    	String helpPath = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
+	    	String helpRoot = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
 	    	// Remove the JAR file if running an installed version
-	    	if ( helpPath.endsWith(".jar") ) helpPath = Util.getDirectoryName(helpPath); //$NON-NLS-1$
+	    	if ( helpRoot.endsWith(".jar") ) helpRoot = Util.getDirectoryName(helpRoot); //$NON-NLS-1$
 	    	// Remove the application folder in all cases
-	    	helpPath = Util.getDirectoryName(helpPath);
-	    	helpPath += File.separator + "help" + File.separator + "srxeditor.html"; //$NON-NLS-1$ //$NON-NLS-2$
+	    	helpRoot = Util.getDirectoryName(helpRoot);
+	    	helpRoot += File.separator + "help" + File.separator; //$NON-NLS-1$
 			
 			// Start the application
 			dispMain = new Display();
@@ -53,7 +53,7 @@ public class Main {
 			img16 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel16.png")); //$NON-NLS-1$
 			img32 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel32.png")); //$NON-NLS-1$
 			shlMain.setImages(new Image[]{img16, img32});
-			SRXEditor editor = new SRXEditor(shlMain, false, helpPath);
+			SRXEditor editor = new SRXEditor(shlMain, false, helpRoot);
 			editor.showDialog(null);
 		}
 		catch ( Throwable e ) {
