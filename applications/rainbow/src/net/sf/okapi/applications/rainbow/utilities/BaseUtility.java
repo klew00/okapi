@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 
 public abstract class BaseUtility implements IUtility {
@@ -38,6 +39,7 @@ public abstract class BaseUtility implements IUtility {
 	protected FilterAccess fa;
 	protected String paramsFolder;
 	protected Shell shell;
+	protected IHelp help;
 	protected ArrayList<InputData> inputs;
 	protected ArrayList<OutputData> outputs;
 	protected String inputRoot;
@@ -59,8 +61,10 @@ public abstract class BaseUtility implements IUtility {
 		listenerList.remove(CancelListener.class, listener);
 	}
 
-	public void setContextUI (Object contextUI) {
+	public void setContextUI (Object contextUI,
+		IHelp helpParam) {
 		shell = (Shell)contextUI;
+		help = helpParam;
 	}
 
 	public void setOptions (String sourceLanguage,

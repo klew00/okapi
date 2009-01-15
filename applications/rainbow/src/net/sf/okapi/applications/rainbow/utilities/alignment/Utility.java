@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -129,7 +129,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
-			aligner = new Aligner(shell);
+			aligner = new Aligner(shell, help);
 			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit,
 				params.useAutoCorrection, trgLang);
 		}

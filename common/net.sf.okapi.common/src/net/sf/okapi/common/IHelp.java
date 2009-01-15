@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.ui;
+package net.sf.okapi.common;
 
 /**
  * Common way of calling the help topics, regardless of the underlying system
@@ -28,6 +28,8 @@ public interface IHelp {
 
 	/**
 	 * Shows the help for a given topic.
+	 * @param object The object for which the help is to be displayed. The package
+	 * name of this parameter is used to compute the location of the help file. 
 	 * @param filenameWithoutExtension The name of the topic file without an extension.
 	 * The extension is assumed to be .html and is added automatically.
 	 */

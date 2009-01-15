@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.linebreakconversion;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
@@ -51,7 +52,8 @@ public class Editor implements IParametersEditor {
 	private Button rdMac;
 
 	public boolean edit (IParameters params,
-		Object object)
+		Object object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {

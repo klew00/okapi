@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
@@ -109,6 +110,7 @@ public class Aligner {
 	private boolean trimWS = true;//TODO: take from SRX rules
 	private boolean manualCorrection;
 	private String targetLanguage;
+	private IHelp help;
 
 	@Override
 	protected void finalize () {
@@ -143,7 +145,10 @@ public class Aligner {
 		close();
 	}
 
-	public Aligner (Shell parent) {
+	public Aligner (Shell parent,
+		IHelp helpParam)
+	{
+		help = helpParam;
 		warnOnClosing = true;
 		anchors = Pattern.compile("((\\d+[\\.,])*\\d+)");
 		
@@ -461,7 +466,7 @@ public class Aligner {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: UIUtil.start(help);
+					if ( help != null ) help.showTopic(this, "aligner");
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) {
@@ -823,7 +828,7 @@ public class Aligner {
 	
 	private void editRules () {
 		try {
-			SRXEditor editor = new SRXEditor(shell, true, null);
+			SRXEditor editor = new SRXEditor(shell, true, help);
 			editor.showDialog(targetSrxPath);
 		}
 		catch ( Throwable e) {

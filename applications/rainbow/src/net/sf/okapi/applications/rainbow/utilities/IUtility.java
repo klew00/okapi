@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -43,8 +44,10 @@ public interface IUtility {
 	 * This allows utilities to create UI elements during the process that are
 	 * attached to the main UI shell from where the utilities are called.
 	 * @param contextUI The shell object to use.
+	 * @param help The IHelp object to display help.
 	 */
-	public void setContextUI (Object contextUI);
+	public void setContextUI (Object contextUI,
+		IHelp helpParam);
 
 	/**
 	 * Adds a cancel listener to this utility.

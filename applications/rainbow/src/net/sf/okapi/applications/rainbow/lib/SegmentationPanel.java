@@ -20,8 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;

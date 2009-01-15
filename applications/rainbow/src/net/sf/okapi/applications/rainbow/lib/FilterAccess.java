@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
@@ -293,6 +294,7 @@ public class FilterAccess {
 	public boolean editParameters (String filterID,
 		IParameters paramObject,
 		Object uiContext,
+		IHelp helpParam,
 		String paramsPath)
 	{
 		IParametersEditor paramsEditor = loadEditor(filterID);
@@ -302,7 +304,7 @@ public class FilterAccess {
 				UIUtil.execute(defaultEditor, paramsPath);
 			}
 		}
-		else result = paramsEditor.edit(paramObject, uiContext);
+		else result = paramsEditor.edit(paramObject, uiContext, helpParam);
 		return result;
 	}
 	

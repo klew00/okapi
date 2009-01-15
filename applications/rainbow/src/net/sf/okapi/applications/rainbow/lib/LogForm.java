@@ -16,11 +16,11 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import net.sf.okapi.common.ui.IHelp;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
 
 /**
  * General-purpose default log as a window.
@@ -51,7 +50,8 @@ public class LogForm implements ILog {
 	private ProgressBar pbPrimary;
 	private ProgressBar pbSecondary;
 	private boolean inProgress = false;
-	IHelp help;
+	private IHelp help;
+	private String helpPath;
 	
 	public LogForm (Shell p_Parent) {
 		shell = new Shell(p_Parent, SWT.BORDER | SWT.RESIZE | SWT.TITLE
@@ -79,7 +79,7 @@ public class LogForm implements ILog {
 		button.setLayoutData(gdTmp);
 		button.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				UIUtil.start("TODO");
+				if (( help != null ) && ( helpPath != null )) help.showTopic(null, helpPath);
 			}
 		});
 		
@@ -250,8 +250,10 @@ public class LogForm implements ILog {
 		data = newData;
 	}
 
-	public void setHelp (String newHelpFile) {
-		//TODO: helpFile = newHelpFile;
+	public void setHelp (IHelp helpParam,
+		String helpPath) {
+		help = helpParam;
+		this.helpPath = helpPath;
 	}
 
 	public boolean setLog (int p_nType,

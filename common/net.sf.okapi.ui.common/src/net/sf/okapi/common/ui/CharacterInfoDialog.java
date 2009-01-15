@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.ui;
 
+import net.sf.okapi.common.IHelp;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;

@@ -22,6 +22,8 @@ package net.sf.okapi.common.ui;
 
 import java.io.File;
 
+import net.sf.okapi.common.IHelp;
+
 public class BaseHelp implements IHelp {
 
 	private static final String PKGROOT = "net.sf.okapi.";

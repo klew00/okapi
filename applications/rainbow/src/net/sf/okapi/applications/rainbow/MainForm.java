@@ -989,7 +989,7 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				ud = new UtilityDriver(log, fa, plugins);
+				ud = new UtilityDriver(log, fa, plugins, help);
 			}
 			// Get the data for the utility and instantiate it
 			ud.setData(prj, utilityID);

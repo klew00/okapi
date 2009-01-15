@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow.utilities.searchandreplace;
 
 import java.util.regex.Pattern;
+
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -74,7 +76,8 @@ public class Editor implements IParametersEditor {
 	private int updateType;
 	
 	public boolean edit (IParameters params,
-		Object object)
+		Object object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {

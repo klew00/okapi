@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,12 +16,13 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.Iterator;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.ui.Dialogs;
@@ -51,12 +52,15 @@ public class FilterSettingsPanel extends Composite {
 	private Button btDelete;
 	private IParametersProvider paramsProv;
 	private String[] paramsList;
+	private IHelp help;
 	
 	public FilterSettingsPanel(Composite p_Parent,
+		IHelp helpParam,
 		int p_nFlags,
 		IParametersProvider paramProv)
 	{
 		super(p_Parent, SWT.NONE);
+		help = helpParam;
 		this.paramsProv = paramProv;
 		createContent();
 	}
@@ -236,7 +240,7 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the UI side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), aRes[3]) ) {
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);
@@ -277,7 +281,7 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the client side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), aRes[3]) ) {
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);

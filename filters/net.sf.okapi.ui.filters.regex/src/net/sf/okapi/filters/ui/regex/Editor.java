@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ui.regex;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -87,7 +88,8 @@ public class Editor implements IParametersEditor {
 	 * @param p_Object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters p_Options,
-		Object p_Object)
+		Object p_Object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		shell = null;

@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import net.sf.okapi.common.ConfigurationString;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.NSContextManager;
@@ -62,7 +63,8 @@ public class Editor implements IParametersEditor {
 	private Text edParameters;
 
 	public boolean edit (IParameters params,
-		Object object)
+		Object object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {

@@ -22,8 +22,8 @@ package net.sf.okapi.lib.ui.segmentation;
 
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;

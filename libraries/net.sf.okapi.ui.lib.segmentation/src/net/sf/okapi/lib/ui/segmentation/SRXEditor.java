@@ -23,13 +23,13 @@ package net.sf.okapi.lib.ui.segmentation;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;

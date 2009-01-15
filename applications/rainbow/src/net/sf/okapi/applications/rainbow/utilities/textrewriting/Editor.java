@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -70,7 +71,8 @@ public class Editor implements IParametersEditor {
 	 * @param object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters params,
-		Object object)
+		Object object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {

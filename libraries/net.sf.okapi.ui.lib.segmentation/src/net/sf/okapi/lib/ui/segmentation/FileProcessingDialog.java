@@ -22,9 +22,9 @@ package net.sf.okapi.lib.ui.segmentation;
 
 import java.io.File;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 

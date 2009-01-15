@@ -22,9 +22,9 @@ package net.sf.okapi.applications.rainbow;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterSettingsPanel;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -63,7 +63,7 @@ class InputPropertiesForm {
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		comp.setLayout(new GridLayout(2, false));
 
-		pnlFilterSettings = new FilterSettingsPanel(comp, SWT.NONE, paramsProv);
+		pnlFilterSettings = new FilterSettingsPanel(comp, help, SWT.NONE, paramsProv);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlFilterSettings.setLayoutData(gdTmp);

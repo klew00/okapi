@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow;
 
@@ -34,6 +34,7 @@ import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
@@ -58,14 +59,17 @@ public class UtilityDriver implements CancelListener {
 	private PluginsAccess plugins;
 	private String outputFolder;
 	private boolean stopProcess;
+	private IHelp help;
 	
 	public UtilityDriver (ILog log,
 		FilterAccess newFA,
-		PluginsAccess newPlugins)
+		PluginsAccess newPlugins,
+		IHelp helpParam)
 	{
 		this.log = log;
 		fa = newFA;
 		plugins = newPlugins;
+		help = helpParam;
 	}
 	
 	/**
@@ -117,7 +121,7 @@ public class UtilityDriver implements CancelListener {
 				}
 				// Invoke the editor if there is one
 				if ( editor != null ) {
-					if ( !editor.edit(utility.getParameters(), shell) ) return false;
+					if ( !editor.edit(utility.getParameters(), shell, help) ) return false;
 					// Save the parameters in memory
 					prj.setUtilityParameters(utility.getName(),
 						utility.getParameters().toString());
@@ -145,7 +149,7 @@ public class UtilityDriver implements CancelListener {
 
 			// Set the run-time parameters
 			utility.setFilterAccess(fa, prj.getParametersFolder());
-			utility.setContextUI(shell);
+			utility.setContextUI(shell, help);
 			if ( utility.needsRoots() ) {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}

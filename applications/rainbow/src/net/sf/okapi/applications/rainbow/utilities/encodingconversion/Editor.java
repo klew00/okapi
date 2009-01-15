@@ -16,10 +16,11 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.encodingconversion;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -66,7 +67,8 @@ public class Editor implements IParametersEditor {
 	private Button chkReportUnsupported;
 
 	public boolean edit (IParameters params,
-		Object object)
+		Object object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {

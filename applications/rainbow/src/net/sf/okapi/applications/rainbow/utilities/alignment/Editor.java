@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.common.ConfigurationString;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
@@ -64,6 +65,7 @@ public class Editor implements IParametersEditor {
 	private Text edAttributes;
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
+	private IHelp help;
 
 	/**
 	 * Invokes the editor for the parameters of this utility.
@@ -71,11 +73,13 @@ public class Editor implements IParametersEditor {
 	 * @param p_Object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters p_Options,
-		Object p_Object)
+		Object p_Object,
+		IHelp helpParam)
 	{
 		boolean bRes = false;
 		try {
 			shell = null;
+			help = helpParam;
 			params = (Parameters)p_Options;
 			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);
@@ -122,7 +126,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(gdTmp);
 		
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Segment the extracted text using the following SRX rules:", null);
+			"Segment the extracted text using the following SRX rules:", help);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	
 		grpTmp = new Group(cmpTmp, SWT.NONE);

@@ -100,7 +100,6 @@ public class CommandLine {
 				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
-				help = new BaseHelp(rootFolder+File.separator+"help");
 				help.showTopic(this, "index");
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding
@@ -187,6 +186,7 @@ public class CommandLine {
     	// Remove the application folder in all cases
     	rootFolder = Util.getDirectoryName(rootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
+		help = new BaseHelp(rootFolder+File.separator+"help");
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);
@@ -204,7 +204,7 @@ public class CommandLine {
 		if ( utilityID == null ) return;
 		// Save any pending data
 		if ( ud == null ) {
-			ud = new UtilityDriver(log, fa, plugins);
+			ud = new UtilityDriver(log, fa, plugins, help);
 		}
 		// Get the data for the utility and instantiate it
 		ud.setData(prj, utilityID);
