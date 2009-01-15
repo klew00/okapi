@@ -47,6 +47,7 @@ public class Editor implements IParametersEditor {
 	private boolean result = false;
 	private Button chkExtractComments;
 	private Parameters params;
+	private IHelp help;
 
 	/**
 	 * Invokes the editor for the openoffice filter parameters.
@@ -57,6 +58,7 @@ public class Editor implements IParametersEditor {
 		Object p_Object,
 		IHelp helpParam)
 	{
+		help = helpParam;
 		boolean bRes = false;
 		shell = null;
 		params = (Parameters)p_Options;
@@ -112,7 +114,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

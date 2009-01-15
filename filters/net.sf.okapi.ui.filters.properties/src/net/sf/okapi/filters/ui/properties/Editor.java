@@ -59,6 +59,7 @@ public class Editor implements IParametersEditor {
 	private Button chkEscapeExtendedChars;
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
+	private IHelp help;
 
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -69,6 +70,7 @@ public class Editor implements IParametersEditor {
 		Object p_Object,
 		IHelp helpParam)
 	{
+		help = helpParam;
 		boolean bRes = false;
 		shell = null;
 		params = (Parameters)p_Options;
@@ -211,7 +213,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

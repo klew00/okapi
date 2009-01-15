@@ -68,6 +68,7 @@ public class Editor implements IParametersEditor {
 	private Button btGetTmPath;
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
+	private IHelp help;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -81,6 +82,7 @@ public class Editor implements IParametersEditor {
 		boolean bRes = false;
 		try {
 			shell = null;
+			help = helpParam;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
@@ -272,7 +274,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();

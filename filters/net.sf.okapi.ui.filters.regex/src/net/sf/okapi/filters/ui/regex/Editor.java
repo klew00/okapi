@@ -81,6 +81,7 @@ public class Editor implements IParametersEditor {
 	private Button chkDotAll;
 	private Button chkMultiline;
 	private Text edMimeType;
+	private IHelp help;
 	
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -93,6 +94,7 @@ public class Editor implements IParametersEditor {
 	{
 		boolean bRes = false;
 		shell = null;
+		help = helpParam;
 		
 		params = (Parameters)p_Options;
 		// Make a work copy (in case of escape)
@@ -389,7 +391,7 @@ public class Editor implements IParametersEditor {
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData(); //$NON-NLS-1$
@@ -508,7 +510,6 @@ public class Editor implements IParametersEditor {
 	private void editRule (boolean newRule) {
 		try {
 			Rule rule;
-			String caption;
 			if ( newRule ) {
 				// Get the name
 				String name = Res.getString("Editor.defaultRuleName"); //$NON-NLS-1$
@@ -517,16 +518,14 @@ public class Editor implements IParametersEditor {
 				if ( (name = dlg.showDialog()) == null ) return;
 				rule = new Rule();
 				rule.setRuleName(name);
-				caption = Res.getString("Editor.addNewRuleCaption"); //$NON-NLS-1$
 			}
 			else {
 				int n = lbRules.getSelectionIndex();
 				if ( n == -1 ) return;
 				rule = rules.get(n);
-				caption = Res.getString("Editor.editRuleCaption"); //$NON-NLS-1$
 			}
 			
-			RuleDialog dlg = new RuleDialog(shell, caption, rule, getRegexOptions());
+			RuleDialog dlg = new RuleDialog(shell, help, rule, getRegexOptions());
 			if ( !dlg.showDialog() ) return;
 			rule = dlg.getRule();
 			

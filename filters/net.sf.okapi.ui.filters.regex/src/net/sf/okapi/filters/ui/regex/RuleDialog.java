@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ui.regex;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.filters.regex.Rule;
@@ -55,17 +56,18 @@ public class RuleDialog {
 	private Pattern endPattern;
 	private Rule rule = null;
 	private int regexOptions;
-
+	private IHelp help;
 
 	public RuleDialog (Shell parent,
-		String caption,
+		IHelp helpParam,
 		Rule rule,
 		int regexOptions)
 	{
 		this.rule = rule;
+		help = helpParam;
 		this.regexOptions = regexOptions;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		if ( caption != null ) shell.setText(caption);
+		shell.setText(Res.getString("RuleDialog.caption")); //$NON-NLS-1$
 		shell.setImage(parent.getImage());
 		shell.setLayout(new GridLayout());
 		
@@ -150,7 +152,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					//TODO: UIUtil.start(help);
+					help.showTopic(this, "editrule"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

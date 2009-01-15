@@ -74,6 +74,9 @@
 		<copy todir="${dist}/help/applications/rainbow">
 			<fileset dir="../../help/applications/rainbow" />
 		</copy>
+		<copy todir="${dist}/help/filters">
+			<fileset dir="../../help/filters" />
+		</copy>
 
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dist-bin}/win32-x86"/>

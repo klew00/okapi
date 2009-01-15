@@ -74,6 +74,7 @@ public class Editor implements IParametersEditor {
 	private Button chkIgnoreCase;
 	private Button chkMultiLine;
 	private int updateType;
+	private IHelp help;
 	
 	public boolean edit (IParameters params,
 		Object object,
@@ -82,6 +83,7 @@ public class Editor implements IParametersEditor {
 		boolean bRes = false;
 		try {
 			shell = null;
+			help = helpParam;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
@@ -340,7 +342,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ){
@@ -407,7 +409,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					//TODO: Call help
+					if ( help != null ) help.showTopic(this, "editItem");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

@@ -1,0 +1,71 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ID-Based Alignment</title>
+<link rel="stylesheet" type="text/css" href="../../../../help.css">
+</head>
+<body>
+<h1>ID-Based Alignment</h1>
+<h2>Overview</h2>
+<p>This utility allows you to align the source and target content of documents 
+based on the identifiers of the text units. In addition, each text unit can be 
+segmented and this utility provides a basic default alignment of the segments, 
+along with a visual editor to fix any issue within those segments.</p>
+<p>Warning:<br>
+This utility should be used only with documents formats that provide identifiers 
+(e.g. Properties files). Text units without identifier will not be aligned.</p>
+<p>Note:<br>
+The result of the alignment is generated in a single TMX document even when the 
+input is made of several input documents.</p>
+<h2>Common Parameters</h2>
+<ul>
+	<li>The list of the source documents to align.</li>
+	<li>The list of the corresponding target documents.</li>
+	<li>The source language and default input encoding.</li>
+	<li>The target language and default input encoding.</li>
+</ul>
+<h2>Configuration</h2>
+<h3>Options Tab</h3>
+<p>-- <cite>Full path of the TMX document to generate </cite>(Configuration key 
+= <code>tmxPath</code>)</p>
+<p>Enter the full path of the TMX document where to put the results of the 
+alignment. If the document already exists it will be overwritten.</p>
+<p>-- Create a translation memory with the following path (Configuration key =
+<code>createTM</code>)</p>
+<p>Set this option to create a translation memory from the results of the 
+alignment. Enter the full path of the translation memory to create. If the 
+translation memory already exists it will be overwritten.</p>
+<p>-- <cite>Generate Trados workarounds</cite> (Configuration key = <code>useTradosWorkarounds</code>)</p>
+<p>Set this option to generate Trados-specific output in the TMX document. This non-standard notation is needed 
+to prevent loosing some characters such a the backslash or the curly braces when 
+importing the TMX document in some versions of Trados Workbench.</p>
+<p>TMX documents generated with this option are not standard TMX files and will 
+likely not be imported correctly in tools correctly supporting TMX.</p>
+<p>-- <cite>Segment the extracted text using the following SRX rules</cite> 
+(Configuration key = <code>segment</code>)</p>
+<p>Set this option to segment the content of each extracted text unit. If this 
+option is set, the alignment is done first at the level of the text units (using 
+their identifiers), then within each text unit, at the level of the segments. If 
+this option is not set the alignment is done at the level of the text unit only.</p>
+<p>-- <cite>SRX file for the source</cite> (Configuration key = <code>sourceSrxPath</code>)</p>
+<p>Enter the path or URL of the SRX 
+document where to take the SRX rules for the source language.</p>
+<p>-- <cite>SRX file for the target</cite> (Configuration key = <code>targetSrxPath</code>)</p>
+<p>Enter the path or URL of the SRX 
+document where to take the SRX rules for the target language. Note that when the same document for both languages (most of the cases), the 
+document is read only once, saving processing time.</p>
+<p>-- <cite>Verify in-line codes for text units with single segment</cite> 
+(Configuration key = <code>checkSingleSegUnit</code>)</p>
+<p>Set this option to check the in-line codes of the text units that have only a 
+single segment. If this option is set the utility checks for possible issues and 
+may prompt the user to validate the alignment. If this option is not set the 
+utility assumes aligned text units with a single segment do not need manual 
+validation.</p>
+<p>-- <cite>Use auto-correction automatically</cite> (Configuration key = <code>
+useAutoCorrection</code>)</p>
+<p>Set this option to automatically try to correct text units that have a 
+different number of source and target segments. The user is always prompted to 
+confirm the modifications made by auto-correction.</p>
+<p>&nbsp;</p>
+</body>
+</html>
