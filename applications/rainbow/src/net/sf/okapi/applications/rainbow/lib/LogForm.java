@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
@@ -42,7 +43,6 @@ import org.eclipse.swt.widgets.Text;
 public class LogForm implements ILog {
 
 	private Shell shell;
-	private String helpFile;
 	private Text edLog;
 	private Button btStop;
 	private int errorCount;
@@ -51,6 +51,7 @@ public class LogForm implements ILog {
 	private ProgressBar pbPrimary;
 	private ProgressBar pbSecondary;
 	private boolean inProgress = false;
+	IHelp help;
 	
 	public LogForm (Shell p_Parent) {
 		shell = new Shell(p_Parent, SWT.BORDER | SWT.RESIZE | SWT.TITLE
@@ -78,7 +79,7 @@ public class LogForm implements ILog {
 		button.setLayoutData(gdTmp);
 		button.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				UIUtil.start(helpFile);
+				UIUtil.start("TODO");
 			}
 		});
 		
@@ -250,7 +251,7 @@ public class LogForm implements ILog {
 	}
 
 	public void setHelp (String newHelpFile) {
-		helpFile = newHelpFile;
+		//TODO: helpFile = newHelpFile;
 	}
 
 	public boolean setLog (int p_nType,

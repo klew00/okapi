@@ -27,6 +27,10 @@
 		<copy todir="${dist-bin}">
 			<fileset dir="${proj}/lib"/>
 		</copy>
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/common/ui">
+			<fileset dir="../../help/common/ui" />
+		</copy>
 	</target>
 
 </project>

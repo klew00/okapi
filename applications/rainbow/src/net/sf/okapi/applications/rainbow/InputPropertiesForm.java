@@ -24,6 +24,7 @@ import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterSettingsPanel;
 import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -40,16 +41,19 @@ import org.eclipse.swt.widgets.Text;
 
 class InputPropertiesForm {
 	
-	private Shell                 shell;
-	private Text                  edSrcEncoding;
-	private Text                  edTrgEncoding;
-	private String[]              results;
-	private OKCancelPanel         pnlActions;
-	private FilterSettingsPanel   pnlFilterSettings;
+	private Shell shell;
+	private Text edSrcEncoding;
+	private Text edTrgEncoding;
+	private String[] results;
+	private OKCancelPanel pnlActions;
+	private FilterSettingsPanel pnlFilterSettings;
+	private IHelp help;
 
 	InputPropertiesForm (Shell p_Parent,
+		IHelp helpParam,
 		IParametersProvider paramsProv)
 	{
+		help = helpParam;
 		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("INPROP_CAPTION")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, p_Parent);
@@ -94,7 +98,7 @@ class InputPropertiesForm {
 			public void widgetSelected(SelectionEvent e) {
 				results = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					MainForm.showHelp(shell, "inputDocProp.html"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "inputDocProp"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

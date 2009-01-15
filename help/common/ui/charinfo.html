@@ -1,0 +1,43 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="../../help.css">
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Segmentation Rules Editor</title>
+</head>
+
+<body>
+
+<h1>Character Information</h1>
+<p>This dialog box allows you to get various information about any Unicode 
+character.</p>
+<p><cite>Code point</cite> -- Enter the hexadecimal value of the Unicode 
+character to lookup.</p>
+<p><cite>Character</cite> -- Enter or paste the Unicode character to lookup.</p>
+<p><cite>Character type</cite> -- Displays the general Unicode category of the 
+character selected. For example '<code>&amp;</code>' has for type &quot;Po : 
+OTHER_PUNCTUATION&quot;.</p>
+<p><cite>Numeric value</cite> -- Displays the numeric value represented by the 
+selected character. For example, the character U+216C (the Roman numeral fifty) 
+will show the numeric value 50. if the selected character does not correspond to 
+a given value, a value -1 is displayed.</p>
+<p><cite>Java isWhitespace()</cite> -- Indicates whether the selected character 
+is a Java whitespace or not. A Java whitespace character is it satisfies one of 
+the following criteria:</p>
+<ul>
+	<li>It is a Unicode space character (SPACE_SEPARATOR, LINE_SEPARATOR, or 
+	PARAGRAPH_SEPARATOR) but is not also a non-breaking space (U+00A0, U+2007, 
+	U+202F).</li>
+	<li>It is U+0009, or U+000A, or U+000B, or U+000C, or U+000D, or U+001C, or 
+	U+001D, or U+001E, or U+001F.</li>
+</ul>
+<p><cite>Is Unicode whitespace</cite> -- Indicates whether the selected 
+character is a Unicode whitespace. A Unicode character is a character that is in 
+one of the following categories: SPACE_SEPARATOR, LINE_SEPARATOR, 
+PARAGRAPH_SEPARATOR.</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

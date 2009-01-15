@@ -30,6 +30,10 @@
 		<copy todir="${dist-bin}">
 			<fileset dir="${proj}/lib"/>
 		</copy>
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/lib/ui/segmentation">
+			<fileset dir="../../help/lib/ui/segmentation" />
+		</copy>
 	</target>
 
 </project>

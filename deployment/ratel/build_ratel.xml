@@ -52,9 +52,6 @@
 			<fileset dir="data" includes="**/*.srx"/>
 			<fileset dir="data" includes="**/*.txt"/>
 		</copy>
-		<copy todir="${dist}/help">
-			<fileset dir="data/help"/>
-		</copy>
 
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dist-bin}/win32-x86"/>

@@ -581,7 +581,7 @@ public class SRXEditor {
 	private void showCharInfo () {
 		try {
 			CharacterInfoDialog charInfoDlg = new CharacterInfoDialog(shell,
-				Res.getString("edit.charInfoCaption"), null); //$NON-NLS-1$
+				Res.getString("edit.charInfoCaption"), help); //$NON-NLS-1$
 			int codePoint = 225;
 			String tmp = edSampleText.getSelectionText();
 			if ( tmp.length() > 0 ) {

@@ -22,7 +22,6 @@ package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.AboutDialog;
+import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
@@ -99,13 +99,13 @@ public class MainForm implements IParametersProvider {
 	private int currentInput;
 	private ArrayList<Table> inputTables;
 	private ArrayList<InputTableModel> inputTableMods;
-
 	private Shell shell;
 	private ILog log;
 	private LogHandler logHandler;
 	private UserConfiguration config;
 	private String rootFolder;
 	private String sharedFolder;
+	private BaseHelp help;
 	private Project prj;
 	private StatusBar statusBar;
 	private TabFolder tabFolder;
@@ -160,22 +160,6 @@ public class MainForm implements IParametersProvider {
 	private MenuItem cmiOpenFolder;
 	private MenuItem miOpenOutputFolder;
 
-	protected static void showHelp (Shell shell,
-		String helpFile)
-	{
-		try {
-			URL url = MainForm.class.getResource("help/"+helpFile); //$NON-NLS-1$
-			if ( url == null ) {
-				throw new RuntimeException("Help file not found: "+helpFile);
-			}
-			else UIUtil.start(url.toString());
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}
-
-	
 	public MainForm (Shell shell,
 		String projectFile)
 	{
@@ -475,7 +459,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				showHelp(shell, "index.html");
+				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
 			}
 		});
 
@@ -483,7 +467,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				showHelp(shell, "howto.html");
+				if ( help != null ) help.showTopic(this, "howto"); //$NON-NLS-1$
 			}
 		});
 		
@@ -1085,6 +1069,7 @@ public class MainForm implements IParametersProvider {
     	// Remove the application folder in all cases
     	rootFolder = Util.getDirectoryName(rootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
+		help = new BaseHelp(rootFolder+File.separator+"help"); //$NON-NLS-1$
 	}
 	
 	private void startWaiting (String text,
@@ -1415,7 +1400,7 @@ public class MainForm implements IParametersProvider {
 				table.getItem(n).getText(0));
 
 			// Call the dialog
-			InputPropertiesForm dlg = new InputPropertiesForm(shell, this);
+			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this);
 			dlg.setData(inp.filterSettings, inp.sourceEncoding,
 				inp.targetEncoding, fa);
 			String[] aRes = dlg.showDialog();
@@ -1524,7 +1509,7 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		SRXEditor dlg = null;
 		try {
-			dlg = new SRXEditor(shell, true, null);
+			dlg = new SRXEditor(shell, true, help);
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {
@@ -1537,7 +1522,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void showCharInfo () {
 		try {
-			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, "Character Information", null);
+			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, "Character Information", help);
 			dlg.showDialog(0x9F99);
 		}
 		catch ( Exception e ) {

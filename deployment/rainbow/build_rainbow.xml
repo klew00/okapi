@@ -70,6 +70,11 @@
 			<fileset dir="data/${platform}"/>
 		</copy>
 
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/applications/rainbow">
+			<fileset dir="../../help/applications/rainbow" />
+		</copy>
+
 		<delete includeEmptyDirs="true">
 			<fileset dir="${dist-bin}/win32-x86"/>
 			<fileset dir="${dist-bin}/gtk2-linux-x86"/>

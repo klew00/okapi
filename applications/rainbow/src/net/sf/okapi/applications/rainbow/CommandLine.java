@@ -32,6 +32,7 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
 
@@ -47,6 +48,7 @@ public class CommandLine {
 	private LogHandler logHandler;
 	private String utilityId;
 	private boolean promptForOptions = true;
+	private BaseHelp help;
 	
 	public void execute (Shell shell,
 		String[] args)
@@ -98,7 +100,8 @@ public class CommandLine {
 				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
-				MainForm.showHelp(shell, "index.html");
+				help = new BaseHelp(rootFolder+File.separator+"help");
+				help.showTopic(this, "index");
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding
 				prj.setSourceEncoding(nextArg(args, ++i));

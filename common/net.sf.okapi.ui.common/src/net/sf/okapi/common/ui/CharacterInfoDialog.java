@@ -39,7 +39,6 @@ import org.eclipse.swt.widgets.Text;
 public class CharacterInfoDialog {
 	
 	private Shell shell;
-	private String help;
 	private int codePoint;
 	private CLabel stRendering;
 	private Text edCharacter;
@@ -50,6 +49,7 @@ public class CharacterInfoDialog {
 	private Text edIsUnicodeSpace;
 	private boolean settingCodePoint = false;
 	private Font sampleFont;
+	private IHelp help;
 
 	@Override
 	protected void finalize () {
@@ -58,9 +58,9 @@ public class CharacterInfoDialog {
 
 	public CharacterInfoDialog (Shell parent,
 		String captionText,
-		String helpFile)
+		IHelp helpParam)
 	{
-		help = helpFile;
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( captionText != null ) shell.setText(captionText);
 		UIUtil.inheritIcon(shell, parent);
@@ -145,13 +145,13 @@ public class CharacterInfoDialog {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					UIUtil.start(help);
+					if ( help != null ) help.showTopic(this, "charinfo");
 					return;
 				}
 				shell.close();
 			};
 		};
-		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, (helpFile != null));
+		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, (help!=null));
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btClose);
 
