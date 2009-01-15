@@ -23,6 +23,7 @@ package net.sf.okapi.lib.ui.segmentation;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;
@@ -44,13 +45,13 @@ public class LanguageMapDialog {
 	private Text edRuleName;
 	private LanguageMap result = null;
 	private OKCancelPanel pnlActions;
-	private String helpRoot;
+	private IHelp help;
 
 	public LanguageMapDialog (Shell parent,
 		LanguageMap langMap,
-		String helpRootParam)
+		IHelp helpParam)
 	{
-		this.helpRoot = helpRootParam;
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("langMap.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -83,7 +84,7 @@ public class LanguageMapDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "editlangmap"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

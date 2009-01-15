@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -47,15 +48,15 @@ public class SegmentationPanel extends Composite {
 	private Text edTargetSRX;
 	private Button btGetTargetSRX;
 	private Button btEditTargetSRX;
-	private String helpPath;
+	private IHelp help;
 
-	public SegmentationPanel(Composite p_Parent,
+	public SegmentationPanel (Composite p_Parent,
 		int p_nFlags,
 		String segmentCaption,
-		String helpPath)
+		IHelp helpParam)
 	{
 		super(p_Parent, SWT.NONE);
-		this.helpPath = helpPath;
+		help = helpParam;
 		createContent(segmentCaption);
 	}
 	
@@ -137,7 +138,7 @@ public class SegmentationPanel extends Composite {
 	
 	private void editSRXFile (Text edTextField) {
 		try {
-			SRXEditor editor = new SRXEditor(getShell(), true, helpPath);
+			SRXEditor editor = new SRXEditor(getShell(), true, help);
 			String path = edTextField.getText();
 			if ( path.length() == 0 ) path = null;
 			editor.showDialog(path);

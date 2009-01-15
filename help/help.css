@@ -1,0 +1,16 @@
+body	{ font-family: sans-serif; font-size: 0.9em; }
+
+h1	{ font-weight: bold; font-size: 2em; background-color: #336699; color: #FFFFFF;
+		padding: 0.5em; }
+
+h2	{ font-weight: bold; font-size: 1.3em; background-color: #DDEEFF;
+		padding: 0.1em 0.1em 0.1em 0.3em; }
+
+cite	{ font-weight: bold; color: #000080; font-style:normal; }
+
+kbd	{ font-weight: bold; color: maroon; font-family: sans-serif; }
+
+code	{ font-family: monospace; font-size: 1em; }
+
+pre	{ font-family: monospace; font-size: 1em; background-color: #FFF999; border-style: solid; 
+		border-width: 1px; border-color: silver; padding: 10; }

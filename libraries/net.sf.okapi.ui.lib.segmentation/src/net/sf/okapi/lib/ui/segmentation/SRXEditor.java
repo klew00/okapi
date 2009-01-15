@@ -29,6 +29,7 @@ import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
@@ -95,12 +96,12 @@ public class SRXEditor {
 	private GenericInlines sampleOutput;
 	private Font sampleFont;
 	private ResourceManager rm;
-	private String helpRoot;
 	private FileProcessor fileProc;
 	private String testInputPath;
 	private String testOutputPath;
 	private boolean htmlOutput;
 	private UserConfiguration config;
+	private IHelp help;
 
 	@Override
 	protected void finalize () {
@@ -109,7 +110,7 @@ public class SRXEditor {
 
 	public SRXEditor (Shell parent,
 		boolean asDialog,
-		String helpRootParam)
+		IHelp helpParam)
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
@@ -118,7 +119,7 @@ public class SRXEditor {
 		htmlOutput = config.getBoolean("htmlOutput"); //$NON-NLS-1$
 
 		this.asDialog = asDialog;
-		this.helpRoot = helpRootParam;
+		help = helpParam;
 		srxDoc = new SRXDocument();
 		srxPath = null;
 		sampleText = new TextContainer(null);
@@ -400,7 +401,7 @@ public class SRXEditor {
 			SelectionAdapter closeActions = new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-						UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
+						if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
 						return;
 					}
 					if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
@@ -520,7 +521,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
+				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
             }
 		});
 		
@@ -691,7 +692,7 @@ public class SRXEditor {
 	private void editGroupsAndOptions () {
 		try {
 			getSurfaceData();
-			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc, helpRoot);
+			GroupsAndOptionsDialog dlg = new GroupsAndOptionsDialog(shell, srxDoc, help);
 			dlg.showDialog();
 		}
 		catch ( Exception e ) {
@@ -818,7 +819,7 @@ public class SRXEditor {
 			rule = srxDoc.getLanguageRules(ruleName).get(n);
 		}
 		
-		RuleDialog dlg = new RuleDialog(shell, rule, helpRoot);
+		RuleDialog dlg = new RuleDialog(shell, rule, help);
 		if ( (rule = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewRule ) {
@@ -924,7 +925,7 @@ public class SRXEditor {
 	private void segmentTextFile () {
 		try {
 			// Get the input file
-			FileProcessingDialog dlg = new FileProcessingDialog(shell, helpRoot);
+			FileProcessingDialog dlg = new FileProcessingDialog(shell, help);
 			String[] result = dlg.showDialog(testInputPath, testOutputPath, htmlOutput);
 			if ( result == null ) return; // Canceled
 			testInputPath = result[0];

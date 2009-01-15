@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.ui;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -78,29 +77,6 @@ public class UIUtil {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	/**
-	 * Opens an HTML help file.
-	 * The path is built as: root + package-"net.sf.okapi" as directory + filename.
-	 * @param root Root directory of the help path (must ends with a separator)
-	 * @param object An object of the package where the file is located.
-	 * @param filenameWithoutExt The name of the file (without the .html extension).
-	 */
-	public static void callHelp (String root,
-		Object object,
-		String filenameWithoutExt)
-	{
-		// Compute the path of the help file
-		// Get the package name
-		String path = object.getClass().getPackage().getName();
-		// Remove the Okapi root
-		path = path.replace("net.sf.okapi.", "");
-		// Replace the dots by the directories separators
-		path = path.replace(".", File.separator);
-		// Add the root at the head and the file name at the tail
-		path = root + path + File.separator + filenameWithoutExt + ".html";;
-		UIUtil.start(path);
 	}
 	
 	/**

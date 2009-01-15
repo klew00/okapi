@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.LanguageMap;
@@ -68,13 +69,13 @@ public class GroupsAndOptionsDialog {
 	private Button chkTrimLeadingWS;
 	private Button chkTrimTrailingWS;
 	private ClosePanel pnlActions;
-	private String helpRoot;
+	private IHelp help;
 
 	public GroupsAndOptionsDialog (Shell parent,
 		SRXDocument srxDoc,
-		String helpRootParam)
+		IHelp helpParam)
 	{
-		this.helpRoot = helpRootParam;
+		help = helpParam;
 		this.srxDoc = srxDoc;
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -261,7 +262,7 @@ public class GroupsAndOptionsDialog {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					UIUtil.callHelp(helpRoot, this, "srxeditor");
+					if ( help != null ) help.showTopic(this, "groupandoptions"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
@@ -378,7 +379,7 @@ public class GroupsAndOptionsDialog {
 			langMap = srxDoc.getAllLanguagesMaps().get(n);
 		}
 		
-		LanguageMapDialog dlg = new LanguageMapDialog(shell, langMap, helpRoot);
+		LanguageMapDialog dlg = new LanguageMapDialog(shell, langMap, help);
 		if ( (langMap = dlg.showDialog()) == null ) return; // Cancel
 		
 		if ( createNewMap ) {

@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URLDecoder;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.graphics.Image;
@@ -45,7 +46,7 @@ public class Main {
 	    	if ( helpRoot.endsWith(".jar") ) helpRoot = Util.getDirectoryName(helpRoot); //$NON-NLS-1$
 	    	// Remove the application folder in all cases
 	    	helpRoot = Util.getDirectoryName(helpRoot);
-	    	helpRoot += File.separator + "help" + File.separator; //$NON-NLS-1$
+	    	BaseHelp help = new BaseHelp(helpRoot + File.separator + "help"); //$NON-NLS-1$
 			
 			// Start the application
 			dispMain = new Display();
@@ -53,7 +54,7 @@ public class Main {
 			img16 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel16.png")); //$NON-NLS-1$
 			img32 = new Image(dispMain, Main.class.getResourceAsStream("images/ratel32.png")); //$NON-NLS-1$
 			shlMain.setImages(new Image[]{img16, img32});
-			SRXEditor editor = new SRXEditor(shlMain, false, helpRoot);
+			SRXEditor editor = new SRXEditor(shlMain, false, help);
 			editor.showDialog(null);
 		}
 		catch ( Throwable e ) {

@@ -1,0 +1,36 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="../../../help.css">
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Segmentation Rules Editor</title>
+</head>
+
+<body>
+
+<h2><a name="dlgRule"></a>Edit Rule</h2>
+<p>This dialog box allows you to edit the data of a rule.</p>
+<p><cite>Expression before the position</cite> -- Enter the regular expression 
+for the text just before the break point of this rule.</p>
+<p><cite>Expression after the position</cite> -- Enter the regular expression 
+for the text just after the break point of this rule.</p>
+<p><cite>Insert a segment break at this position</cite> -- Select this option to 
+define a segment break.</p>
+<p><cite>Do not break at this position</cite> -- Select this option to prevent a 
+segment break.</p>
+<p>Example:</p>
+<pre>    before: [Ee][Tt][Cc]\.
+     after: \s
+is a break: no
+
+    before: \.
+     after: \s
+is a break: yes</pre>
+<p>You should usually list non-break rules (exceptions) before break rules, so 
+they are evaluated before the break rules.</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>

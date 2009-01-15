@@ -24,6 +24,7 @@ import java.io.File;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -46,12 +47,12 @@ public class FileProcessingDialog {
 	private Text edOutput;
 	private Button chkHtmlOutput;
 	private String[] result = null;
-	private String helpRoot;
+	private IHelp help;
 
 	public FileProcessingDialog (Shell parent,
-		String helpRootParam)
+		IHelp helpParam)
 	{
-		this.helpRoot = helpRootParam;
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("testFileDlg.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -126,7 +127,7 @@ public class FileProcessingDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "testrules"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

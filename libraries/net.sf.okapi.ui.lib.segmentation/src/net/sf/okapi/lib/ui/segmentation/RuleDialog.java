@@ -23,6 +23,7 @@ package net.sf.okapi.lib.ui.segmentation;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -46,13 +47,13 @@ public class RuleDialog {
 	private Button rdBreak;
 	private Button rdNoBreak;
 	private Rule result = null;
-	private String helpRoot;
+	private IHelp help;
 
 	public RuleDialog (Shell parent,
 		Rule rule,
-		String helpRootParam)
+		IHelp helpParam)
 	{
-		this.helpRoot = helpRootParam;
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("ruleDlg.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
@@ -104,7 +105,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					UIUtil.callHelp(helpRoot, this, "srxeditor"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "editrule"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

@@ -1,0 +1,109 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="../../../help.css">
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Segmentation Rules Editor</title>
+</head>
+
+<body>
+
+<h1>Segmentation Rules Editor</h1>
+<p>This editor allows you to create, test and maintain 
+segmentation rules stored in SRX documents.</p>
+<ul>
+	<li><a href="#overview">Overview</a></li>
+	<li><a href="#mainWindow">Main Window</a></li>
+	<li><a href="#fileMenu">File Menu</a></li>
+	<li><a href="#toolsMenu">Tools Menu</a></li>
+	<li><a href="#helpMenu">Help Menu</a></li>
+</ul>
+<h2><a name="overview"></a>Overview</h2>
+<p>SRX (Segmentation Rules eXchange) is a standard format to store segmentation 
+rules. You can find the specifications of SRX 2.0 here:
+<a href="http://www.lisa.org/fileadmin/standards/srx20.html">
+http://www.lisa.org/fileadmin/standards/srx20.html</a>.</p>
+<p>Segmentation rules are used to indicate to translation and other 
+linguistic-oriented tools how to split a text into small meaningful sequence of 
+words (for example in sentences).</p>
+<p>This editor can load SRX version 1.0 documents, but they will be saved as 
+version 2.0 documents. You will be warned both when opeing and saving SRX 1.0 
+documents. Be aware that versions 1.0 and 2.0 of SRX may be 
+incompatible depending on how the version 1.0 document was interpreted by the 
+tool that created the file. For more information about SRX versions, see the
+<a href="srxversions.html">SRX Versions</a> section.</p>
+<h2><a name="mainWindow"></a>Main Window</h2>
+<p>The main window is divided in two parts:</p>
+<ul>
+	<li>The upper part list all the rules for the group currently selected.</li>
+	<li>The lower part is the example area where you can try out the rules and 
+	see how they behave on a give text.</li>
+</ul>
+<p><cite>Language rules currently displayed</cite> -- Select the language group 
+you want to work with. All the rules for the selected language group are display 
+in the list below.</p>
+<p><cite>Groups and Options</cite> -- Click this button to open the <cite>
+<a href="groupandoptions.html">Groups and Options</a></cite> dialog box where you 
+can specify language groups and how they are mapped to languages.</p>
+<p><cite>Add</cite> -- Click this button to add a new rule at the end of the 
+current group. This opens the <a href="editrule.html">Edit Rule</a> dialog.</p>
+<p><cite>Edit</cite> -- Click this button to edit the rule currently selected. 
+This opens the <a href="editrule.html">Edit Rule</a> dialog.</p>
+<p><cite>Remove</cite> -- Click this button to remove the rule currently 
+selected from the current group.</p>
+<p><cite>Move Up</cite> -- Click this button to move the rule currently selected 
+upward in the group.</p>
+<p><cite>Move down</cite> -- Click this button to move the rule currently 
+selected downward in the group.</p>
+<p><cite>Char Info</cite> -- Click this button to get information about the 
+character currently selected in the <cite>Sample text</cite> edit box.</p>
+<h2><a name="fileMenu"></a>File Menu</h2>
+<h3>New</h3>
+<p>Creates a new empty SRX document in the editor. If you have a modified 
+un-saved document already opened, the tool will ask you if you want to save your 
+changes before.</p>
+<p>Shortcut: <kbd>Ctrl+N</kbd></p>
+<h3>New With Simple Default Rules</h3>
+<p>Creates a new SRX document in the editor with simple default rules. Use this 
+command as a quick way to start a new document, or to test a few rules. If you 
+have a modified un-saved document already opened, the tool will ask you if you 
+want to save your changes before.</p>
+<h3>Open</h3>
+<p>Opens an existing SRX document in the editor. If you have a modified un-saved 
+document already opened, the tool will ask you if you want to save your changes 
+before.</p>
+<p>Shortcut: <kbd>Ctrl+O</kbd></p>
+<h3>Save</h3>
+<p>Saves the current document. If the document has no name, the tool will prompt 
+you to choose one. The tool will prompt you to confirm the save if the document 
+was loaded as an SRX version 1.0 file. All documents are saved to SRX version 
+2.0,</p>
+<p>Shortcut: <kbd>Ctrl+S</kbd></p>
+<h3>Save As</h3>
+<p>Saves the current document under a new name.</p>
+<h3>Exit</h3>
+<p>Exits the editor. If you have a modified un-saved document already opened, 
+the tool will ask you if you want to save your changes before.</p>
+<p>Shortcut: <kbd>Alt+F4</kbd></p>
+<h2><a name="toolsMenu"></a>Tools Menu</h2>
+<h3>Test Segmentation on a File</h3>
+<p>Takes an input file and segment it with the current SRX document and 
+settings, and generate an output file with the segments marked up. See
+<a href="testrules.html">Test Segmentation on a File</a> for more details on the 
+requirements for the input document.</p>
+<h2><a name="helpMenu"></a>Help Menu</h2>
+<h3>Help Topics</h3>
+<p>Opens the help page for this application.</p>
+<p>Shortcut: <kbd>F1</kbd></p>
+<h3>Send Feedback</h3>
+<p>Opens you email program to send a feedback message for this application.</p>
+<h3>Users Group</h3>
+<p>Opens the Okapi Framework users group page:
+<a href="http://tech.groups.yahoo.com/group/okapitools/">
+http://tech.groups.yahoo.com/group/okapitools/</a></p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
