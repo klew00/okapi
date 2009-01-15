@@ -101,6 +101,7 @@ th:
 a:
   ruleTypes: [INLINE]
   translatableAttributes: [title, accesskey]
+  writableLocalizableAttributes: [href]
 
 abbr:
   ruleTypes: [INLINE]
@@ -167,6 +168,7 @@ iframe:
 img:
   ruleTypes: [INLINE]
   translatableAttributes: [title, alt]
+  writableLocalizableAttributes: [href]
 
 input:
   ruleTypes: [INLINE]

@@ -7,4 +7,5 @@
 <path>/net.sf.okapi.filters.common/src</path>
 <path>/net.sf.okapi.filters.common/bin</path>
 </pydev_pathproperty>
+<pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
 </pydev_project>

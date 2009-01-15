@@ -48,10 +48,10 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.markupfilter.ExtractionRuleState;
 import net.sf.okapi.common.markupfilter.Parameters;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
+import net.sf.okapi.common.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends BaseFilter {
 	private Source htmlDocument;
@@ -178,7 +178,10 @@ public class HtmlFilter extends BaseFilter {
 				// We just hit a tag that could close the current TextUnit, but
 				// only if it was not opened with a TextUnit tag (i.e., complex
 				// TextUnits such as <p> etc.)
-				if (isCurrentTextUnit() && !isCurrentComplexTextUnit()) {
+				boolean inlineTag = false;
+				if (parameters.getTaggedConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT)
+					inlineTag = true;
+				if (isCurrentTextUnit() && !isCurrentComplexTextUnit() && !inlineTag) {
 					endTextUnit();
 				}
 
@@ -296,7 +299,7 @@ public class HtmlFilter extends BaseFilter {
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 
 			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
-				propertyTextUnitPlaceholders = createPropertyTextUnitPlacehlders(startTag);
+				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
 			} else {
@@ -354,6 +357,7 @@ public class HtmlFilter extends BaseFilter {
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
+			addCodeToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
 			ruleState.popGroupRule();
@@ -384,36 +388,35 @@ public class HtmlFilter extends BaseFilter {
 	private void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
-		Code code = new Code(tag.getName());
-		startCode(code);
+		TextFragment.TagType codeType;
 
+		// start tag or empty tag
 		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
 
 			// is this an empty tag?
 			if (startTag.isSyntacticalEmptyElementTag())
-				code.setTagType(TextFragment.TagType.PLACEHOLDER);
+				codeType = TextFragment.TagType.PLACEHOLDER;
 			else
-				code.setTagType(TextFragment.TagType.OPENING);
+				codeType = TextFragment.TagType.OPENING;
 
-			// check for attributes
 			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
-				propertyTextUnitPlaceholders = createPropertyTextUnitPlacehlders(startTag);
-				addToCode(propertyTextUnitPlaceholders);
+				// create a list of Property or Text placeholders for this tag
+				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+				// create code and add it to the current TextUnit 
+				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
 			}
-
-		} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-			code.setTagType(TextFragment.TagType.CLOSING);
-			code.setData(literalTag);
-		} else {
-			code.setTagType(TextFragment.TagType.PLACEHOLDER);
-			code.setData(literalTag);
+		} else {  // end or unknown tag			
+			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+			addToTextUnit(new Code(codeType, tag.getName(), literalTag));			
 		}
-
-		endCode();
 	}
 
-	private List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlacehlders(StartTag startTag) {
+	private List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(StartTag startTag) {
 		// list to hold the properties or TextUnits
 		List<PropertyTextUnitPlaceholder> propertyOrTextUnitPlaceholders = new LinkedList<PropertyTextUnitPlaceholder>();
 
@@ -428,11 +431,13 @@ public class HtmlFilter extends BaseFilter {
 				if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
 						attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag, attribute));
+							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
 				} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
 						attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag, attribute));
+							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
 				}
 			}
 		}
@@ -446,13 +451,17 @@ public class HtmlFilter extends BaseFilter {
 		int mainStartPos = attribute.getBegin() - tag.getBegin();
 		int mainEndPos = attribute.getEnd() - tag.getBegin();
 
+		// offset of value of the attribute
+		int valueStartPos = attribute.getValueSegment().getBegin() - tag.getBegin();
+		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
+
 		// normalize values for encoder
 		if (name.equals(HtmlEncoder.NATIVE_ENCODING)) {
 			name = HtmlEncoder.NORMALIZED_ENCODING;
 		} else if (name.equals(HtmlEncoder.NATIVE_LANGUAGE)) {
 			name = HtmlEncoder.NORMALIZED_LANGUAGE;
 		}
-		return new PropertyTextUnitPlaceholder(type, name, value, mainStartPos, mainEndPos);
+		return new PropertyTextUnitPlaceholder(type, name, value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
 	}
 
 	/*
@@ -461,6 +470,6 @@ public class HtmlFilter extends BaseFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#getName()
 	 */
 	public String getName() {
-		return "HTMLFilter"; //$NON-NLS-1$
+		return "HTML Filter"; //$NON-NLS-1$
 	}
 }

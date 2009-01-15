@@ -33,21 +33,17 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- * @author HargraveJE
- * 
- */
 public class HtmlParserTest {
 	private HtmlFilter htmlParser;
 
 	@Before
-	public void setUp() {		
+	public void setUp() {
 	}
 
 	@Test
 	public void excludeInclude() {
 		htmlParser = new HtmlFilter();		
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
+		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleSimpleTest.html");
 		htmlParser.open(htmlStream);			
 		while (htmlParser.hasNext()) {
 			FilterEvent event = htmlParser.next();
@@ -58,36 +54,19 @@ public class HtmlParserTest {
 			} else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP) {
 				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);				
 			}			
-			System.out.println(event.getEventType().toString());
+			System.out.print(event.getEventType().toString() + ": ");
 			if (event.getResource() != null) {
-				System.out.println(event.getResource().toString());
+				if (event.getResource() instanceof DocumentPart) {
+					System.out.println(((DocumentPart)event.getResource()).getSourcePropertyNames());
+				} else {
+					System.out.println(event.getResource().toString());
+				}
 				if (event.getResource().getSkeleton() != null) {
-					System.out.println(event.getResource().getSkeleton().toString());
+					System.out.println("Skeketon: " + event.getResource().getSkeleton().toString());
 				}
 			}
 		}
-		
-		// Test second pass with the same filter object
-		htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
-		htmlParser.open(htmlStream);		
-		while (htmlParser.hasNext()) {
-			FilterEvent event = htmlParser.next();
-			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
-				assertTrue(event.getResource() instanceof TextUnit);								
-			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
-				assertTrue(event.getResource() instanceof DocumentPart);				
-			} else if (event.getEventType() == FilterEventType.START_GROUP || event.getEventType() == FilterEventType.END_GROUP) {
-				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);				
-			}			
-			System.out.println(event.getEventType().toString());
-			if (event.getResource() != null) {
-				System.out.println(event.getResource().toString());
-				if (event.getResource().getSkeleton() != null) {
-					System.out.println(event.getResource().getSkeleton().toString());
-				}
-			}
-		}
-		
+
 		htmlParser.close();
 	}
 }

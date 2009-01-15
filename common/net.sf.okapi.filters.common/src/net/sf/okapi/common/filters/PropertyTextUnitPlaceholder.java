@@ -14,13 +14,18 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 
 	private int mainStartPos;
 	private int mainEndPos;
+	private int valueStartPos;
+	private int valueEndPos;
 
-	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int mainStartPos, int mainEndPos) {
+	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int mainStartPos,
+			int mainEndPos, int valueStartPos, int valueEndPos) {
 		this.type = type;
 		this.name = name;
 		this.value = value;
 		this.mainStartPos = mainStartPos;
 		this.mainEndPos = mainEndPos;
+		this.valueStartPos = valueStartPos;
+		this.valueEndPos = valueEndPos;
 	}
 
 	public PlaceholderType getType() {
@@ -61,6 +66,22 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 
 	public String getValue() {
 		return value;
+	}
+
+	public int getValueStartPos() {
+		return valueStartPos;
+	}
+
+	public void setValueStartPos(int valueStartPos) {
+		this.valueStartPos = valueStartPos;
+	}
+
+	public int getValueEndPos() {
+		return valueEndPos;
+	}
+
+	public void setValueEndPos(int valueEndPos) {
+		this.valueEndPos = valueEndPos;
 	}
 
 	/*
