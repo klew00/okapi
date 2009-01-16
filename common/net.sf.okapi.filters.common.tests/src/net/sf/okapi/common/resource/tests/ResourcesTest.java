@@ -26,6 +26,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -52,12 +53,54 @@ public class ResourcesTest extends TestCase {
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
 		skel.add("<meta http-equiv=\"keywords\" ");
-		skel.addExtRef(tu);
+		skel.addReference(tu);
 		skel.add("/>");
 		dp.setSkeleton(skel);
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
-		// Check the output
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+	
+	public void testComplexEmptyElement () {
+		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
+		System.out.println(" in: "+test);
+		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu = new TextUnit("t1", "text");
+		skel.add("text='");
+		skel.addContentPlaceholder(tu);
+		skel.add("'");		
+		tu.setIsReferent(true);
+		tu.setName("text");
+		tu.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		
+		skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);		
+		skel.add("<elem wr-prop1='");
+		dp.setSourceProperty(new Property("wr-prop1=", "wr-value1", false));
+		skel.addValuePlaceholder(dp, "wr-prop1", null);
+		skel.add("' ro-prop1'ro-value1' wr-prop2='");
+		dp.setSourceProperty(new Property("ro-prop1", "ro-value1"));
+		dp.setSourceProperty(new Property("wr-prop2", "wr-value2", false));
+		skel.addValuePlaceholder(dp, "wr-prop2", null);
+		skel.append("' ");
+		skel.addReference(tu);
+		skel.append("/>");
+		
+		dp.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+
+	private String generateOutput (ArrayList<FilterEvent> list,
+		String original)
+	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		EncoderManager em = new EncoderManager();
 		StringBuilder tmp = new StringBuilder();
@@ -73,7 +116,7 @@ public class ResourcesTest extends TestCase {
 			}
 		}
 		System.out.println("out: "+tmp.toString());
-		assertEquals(tmp.toString(), test);
+		return tmp.toString();
 	}
-	
+
 }

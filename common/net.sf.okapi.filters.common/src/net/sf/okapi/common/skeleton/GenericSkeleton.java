@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.skeleton;
 
@@ -33,25 +33,50 @@ public class GenericSkeleton implements ISkeleton {
 
 	private ArrayList<GenericSkeletonPart> list;
 	private boolean createNew = true;
-	
+
+	/**
+	 * Creates a new empty GenericSkeleton object.
+	 */
 	public GenericSkeleton () {
 		list = new ArrayList<GenericSkeletonPart>();
 	}
 
+	/**
+	 * Creates a new GenericSkeleton object and append some data to it.
+	 * @param data The data to append.
+	 */
 	public GenericSkeleton (String data) {
 		list = new ArrayList<GenericSkeletonPart>();
 		if ( data != null ) add(data);
 	}
 	
+	/**
+	 * Creates a new GenericSkeleton object and initialize it with the parts
+	 * of an existing one passed as a parameter.
+	 * @param skel The existing skeleton from which to copy the parts.
+	 */
 	public GenericSkeleton (GenericSkeleton skel) {
 		list = new ArrayList<GenericSkeletonPart>();		
-		if ( skel != null ) add(skel.toString());
+		if ( skel != null ) { 
+			for ( GenericSkeletonPart part : skel.list ) {
+				list.add(part);
+			}
+		}
 	}
 
+	/**
+	 * Indicates if this skeleton is empty or not.
+	 * @return True if this skeleton is empty, false if it has at least one part.
+	 */
 	public boolean isEmpty () {
 		return (list.size()==0);
 	}
 	
+	/**
+	 * Indicates if this skeleton is empty or not, considering the white-spaces
+	 * or not.
+	 * @return True if this skeleton is empty, false if it has at least one part.
+	 */
 	public boolean isEmpty (boolean ignoreWhitespaces) {
 		if ( ignoreWhitespaces ) {
 			for ( GenericSkeletonPart part : list ) {
@@ -68,22 +93,36 @@ public class GenericSkeleton implements ISkeleton {
 		}
 	}
 
+	/**
+	 * Adds a new part to this skeleton, and set a string data to it.
+	 * @param data The data to add.
+	 */
 	public void add (String data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
 		createNew = false;
 	}
 	
+	/**
+	 * Adds a new part to this skeleton, and set a character data to it.
+	 * @param data The data to add.
+	 */
 	public void add (char data) {
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
 		createNew = false;
 	}
 	
+	/**
+	 * Adds to this skeleton all the parts of a given skeleton.
+	 * @param skel The existing skeleton from which to copy the parts.
+	 */
 	public void add (GenericSkeleton skel) {
-		GenericSkeletonPart part = new GenericSkeletonPart(skel.toString());
-		list.add(part);
-		createNew = false;
+		if ( skel != null ) { 
+			for ( GenericSkeletonPart part : skel.list ) {
+				list.add(part);
+			}
+		}
 	}
 
 	public void append (String data) {
@@ -161,7 +200,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * which this skeleton is attached to.
 	 * @param referent The resource to refer to.
 	 */
-	public void addExtRef (IReferenceable referent) {
+	public void addReference (IReferenceable referent) {
 		GenericSkeletonPart part = new GenericSkeletonPart(
 			TextFragment.makeRefMarker(((IResource)referent).getId()));
 			part.language = null;
@@ -176,13 +215,17 @@ public class GenericSkeleton implements ISkeleton {
 		return list;
 	}
 	
+	/**
+	 * Gets a string representation of the content of all the part of the skeleton.
+	 * This should be used for display only.
+	 */
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		for (GenericSkeletonPart part : list) {
 			b.append(part.toString());
 		}
-		return b.toString();		
+		return b.toString();
 	}
 
 }
