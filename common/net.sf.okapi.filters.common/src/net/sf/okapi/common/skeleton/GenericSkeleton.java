@@ -29,6 +29,13 @@ import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
+/**
+ * Simple generic implementation of the ISkeleton interface.
+ * This class implements a skeleton as a list of parts: some are simple text storage
+ * string corresponding to the original code of the input document, others are
+ * place-holders for the content the the trxt units, or the values of modifiable
+ * properties. 
+ */
 public class GenericSkeleton implements ISkeleton {
 
 	private ArrayList<GenericSkeletonPart> list;
@@ -125,6 +132,12 @@ public class GenericSkeleton implements ISkeleton {
 		}
 	}
 
+	/**
+	 * Appends a string of data to this skeleton. The text is added to
+	 * the current part if the current part is already a data part, a new
+	 * part is created is necessary. 
+	 * @param data The string data to append.
+	 */
 	public void append (String data) {
 		if (( createNew ) || ( list.size() == 0 )) {
 			add(data);
@@ -134,6 +147,12 @@ public class GenericSkeleton implements ISkeleton {
 		}
 	}
 
+	/**
+	 * Appends a character data to this skeleton. The text is added to
+	 * the current part if the current part is already a data part, a new
+	 * part is created is necessary. 
+	 * @param data The character data to append.
+	 */
 	public void append (char data) {
 		if (( createNew ) || ( list.size() == 0 )) {
 			add(data);
@@ -211,6 +230,10 @@ public class GenericSkeleton implements ISkeleton {
 		
 	}
 	
+	/**
+	 * Gets a list of all the parts of this skeleton.
+	 * @return The list of all the parts of this skeleton.
+	 */
 	public List<GenericSkeletonPart> getParts () {
 		return list;
 	}

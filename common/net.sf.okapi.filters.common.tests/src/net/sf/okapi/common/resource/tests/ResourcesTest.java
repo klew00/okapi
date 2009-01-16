@@ -62,6 +62,36 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test), test);
 	}
 	
+	public void testPWithAttribute () {
+		String test = "<p title='my title'>Text of p</p>";
+		System.out.println(" in: "+test);
+		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu1 = new TextUnit("t1", "my title");
+		skel.add("title='");
+		skel.addContentPlaceholder(tu1);
+		skel.add("'");		
+		tu1.setIsReferent(true);
+		tu1.setName("title");
+		tu1.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		
+		skel = new GenericSkeleton();
+		TextUnit tu2 = new TextUnit("tu2", "Text of p");		
+		skel.add("<p ");
+		skel.addReference(tu1);
+		skel.add(">");
+		skel.addContentPlaceholder(tu2);
+		skel.append("</p>");
+		tu2.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+	
 	public void testComplexEmptyElement () {
 		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
 		System.out.println(" in: "+test);
@@ -81,9 +111,9 @@ public class ResourcesTest extends TestCase {
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
 		skel.add("<elem wr-prop1='");
-		dp.setSourceProperty(new Property("wr-prop1=", "wr-value1", false));
+		dp.setSourceProperty(new Property("wr-prop1", "wr-value1", false));
 		skel.addValuePlaceholder(dp, "wr-prop1", null);
-		skel.add("' ro-prop1'ro-value1' wr-prop2='");
+		skel.add("' ro-prop1='ro-value1' wr-prop2='");
 		dp.setSourceProperty(new Property("ro-prop1", "ro-value1"));
 		dp.setSourceProperty(new Property("wr-prop2", "wr-value2", false));
 		skel.addValuePlaceholder(dp, "wr-prop2", null);
@@ -102,9 +132,8 @@ public class ResourcesTest extends TestCase {
 		String original)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
-		EncoderManager em = new EncoderManager();
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart("en", "utf-8", null, em);
+		writer.processStart("en", "utf-8", null, new EncoderManager());
 		for ( FilterEvent event : list ) {
 			switch ( event.getEventType() ) {
 			case TEXT_UNIT:
