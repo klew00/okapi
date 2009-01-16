@@ -16,7 +16,8 @@ This utility should be used only with documents formats that provide identifiers
 (e.g. Properties files). Text units without identifier will not be aligned.</p>
 <p>Note:<br>
 The result of the alignment is generated in a single TMX document even when the 
-input is made of several input documents.</p>
+input is made of several input documents. You can use attribute to specify from 
+which document the entry came.</p>
 <h2>Common Parameters</h2>
 <ul>
 	<li>The list of the source documents to align.</li>
@@ -26,46 +27,62 @@ input is made of several input documents.</p>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
-<p>-- <cite>Full path of the TMX document to generate </cite>(Configuration key 
-= <code>tmxPath</code>)</p>
-<p>Enter the full path of the TMX document where to put the results of the 
-alignment. If the document already exists it will be overwritten.</p>
-<p>-- Create a translation memory with the following path (Configuration key =
-<code>createTM</code>)</p>
-<p>Set this option to create a translation memory from the results of the 
-alignment. Enter the full path of the translation memory to create. If the 
-translation memory already exists it will be overwritten.</p>
-<p>-- <cite>Generate Trados workarounds</cite> (Configuration key = <code>useTradosWorkarounds</code>)</p>
-<p>Set this option to generate Trados-specific output in the TMX document. This non-standard notation is needed 
-to prevent loosing some characters such a the backslash or the curly braces when 
-importing the TMX document in some versions of Trados Workbench.</p>
-<p>TMX documents generated with this option are not standard TMX files and will 
-likely not be imported correctly in tools correctly supporting TMX.</p>
-<p>-- <cite>Segment the extracted text using the following SRX rules</cite> 
-(Configuration key = <code>segment</code>)</p>
-<p>Set this option to segment the content of each extracted text unit. If this 
+<h4>Segmentation</h4>
+<p><cite>Segment the extracted text using the following SRX rules</cite> -- Set this option to segment the content of each extracted text unit. If this 
 option is set, the alignment is done first at the level of the text units (using 
 their identifiers), then within each text unit, at the level of the segments. If 
-this option is not set the alignment is done at the level of the text unit only.</p>
-<p>-- <cite>SRX file for the source</cite> (Configuration key = <code>sourceSrxPath</code>)</p>
-<p>Enter the path or URL of the SRX 
-document where to take the SRX rules for the source language.</p>
-<p>-- <cite>SRX file for the target</cite> (Configuration key = <code>targetSrxPath</code>)</p>
-<p>Enter the path or URL of the SRX 
+this option is not set the alignment is done at the level of the text unit only. 
+(Configuration key = <code>segment</code>)</p>
+<p><cite>SRX file for the source</cite> -- Enter the path or URL of the SRX 
+document where to take the SRX rules for the source language. (Configuration key 
+= <code>sourceSrxPath</code>)</p>
+<p><cite>SRX file for the target</cite> -- Enter the path or URL of the SRX 
 document where to take the SRX rules for the target language. Note that when the same document for both languages (most of the cases), the 
-document is read only once, saving processing time.</p>
-<p>-- <cite>Verify in-line codes for text units with single segment</cite> 
-(Configuration key = <code>checkSingleSegUnit</code>)</p>
-<p>Set this option to check the in-line codes of the text units that have only a 
+document is read only once, saving processing time. (Configuration key = <code>targetSrxPath</code>)</p>
+<h4>Verification and Correction</h4>
+<p><cite>Verify in-line codes for text units with single segment</cite> 
+-- Set this option to check the in-line codes of the text units that have only a 
 single segment. If this option is set the utility checks for possible issues and 
 may prompt the user to validate the alignment. If this option is not set the 
 utility assumes aligned text units with a single segment do not need manual 
-validation.</p>
-<p>-- <cite>Use auto-correction automatically</cite> (Configuration key = <code>
-useAutoCorrection</code>)</p>
-<p>Set this option to automatically try to correct text units that have a 
+validation. 
+(Configuration key = <code>checkSingleSegUnit</code>)</p>
+<p><cite>Use auto-correction automatically</cite> -- Set this option to automatically try to correct text units that have a 
 different number of source and target segments. The user is always prompted to 
-confirm the modifications made by auto-correction.</p>
+confirm the modifications made by auto-correction. (Configuration key = <code>
+useAutoCorrection</code>)</p>
+<h3>Output Tab</h3>
+<h4>TMX Output</h4>
+<p><cite>Create a translation memory with the following path</cite> -- Set this option to create a translation memory from the results of the 
+alignment. (Configuration key =
+<code>createTMX</code>)</p>
+<p>Enter the full path of the TMX document where to put the results of the 
+alignment. If the document already exists it will be overwritten. (Configuration key 
+= <code>tmxPath</code>)</p>
+<p><cite>Generate Trados workarounds</cite> -- Set this option to generate Trados-specific output in the TMX document. This non-standard notation is needed 
+to prevent loosing some characters such a the backslash or the curly braces when 
+importing the TMX document in some versions of Trados Workbench. (Configuration key = <code>useTradosWorkarounds</code>)</p>
+<p>TMX documents generated with this option are not standard TMX files and will 
+likely not be imported correctly in tools correctly supporting TMX.</p>
+<p><cite>Exclude segments where the source text matches this regular expression</cite> 
+-- Set this option to exclude some entries from the TMX output. (Configuration 
+key = <code>useExclusion</code>)</p>
+<p>Enter the regular expression pattern to use. Any entry where the source text 
+matches the given expression will be excluded from the output. (Configuration 
+key = <code>exclusion</code>)</p>
+<h4>SimpleTM Output</h4>
+<p><cite>Create a SimpleTM database with the following path</cite> -- Set this 
+option to generate a SimpleTM database from the results of the alignment. 
+(Configuration key = <code>createTM</code>)</p>
+<p>Enter the full path of the SimpleTM database where to put the results of the 
+alignment. If the document already exists it will be overwritten. (Configuration key 
+= <code>tmPath</code>)</p>
+<h4>Attributes</h4>
+<p><cite>Use the following attributes</cite> -- Set this option to include 
+attributes along with each aligned entry saved in the output files. 
+(Configuration key = <code>createAttributes</code>)</p>
+<p>Enter the list of pairs name = value for the attributes. use one line per 
+attribute. (Configuration key = <code>attributes</code>)</p>
 <p>&nbsp;</p>
 </body>
 </html>

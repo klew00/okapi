@@ -393,7 +393,7 @@ public abstract class BaseFilter implements IFilter {
 
 		if (startMarker != null) {
 			skel = new GenericSkeleton((GenericSkeleton) startMarker);
-			skel.addRef(tu);
+			skel.addContentPlaceholder(tu);
 		}
 
 		tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
@@ -661,7 +661,7 @@ public abstract class BaseFilter implements IFilter {
 				// set the skeleton on the TextUnit
 				tu.setSkeleton(new GenericSkeleton(finalWithRef));
 				tu.setIsReferent(true);
-				currentSkeleton.addRef(tu, language);
+				currentSkeleton.addContentPlaceholder(tu, language);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY
 					|| propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
@@ -672,7 +672,7 @@ public abstract class BaseFilter implements IFilter {
 				Property p = new Property(propOrText.getName(), propOrText.getValue(), readOnly);
 				dp.setProperty(p);
 				dp.setIsReferent(true);
-				currentSkeleton.addRef(dp, propOrText.getName(), language);
+				currentSkeleton.addValuePlaceholder(dp, propOrText.getName(), language);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");

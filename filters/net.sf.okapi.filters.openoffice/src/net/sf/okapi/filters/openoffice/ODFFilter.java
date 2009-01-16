@@ -434,7 +434,7 @@ public class ODFFilter implements IFilter {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
 			extract.pop();
-			skel.addRef(tu);
+			skel.addContentPlaceholder(tu);
 			tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);

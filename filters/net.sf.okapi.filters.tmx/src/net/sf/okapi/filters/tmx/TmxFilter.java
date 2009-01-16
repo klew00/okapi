@@ -245,7 +245,7 @@ public class TmxFilter implements IFilter {
 			skel = new GenericSkeleton();
 			startDoc.setProperty(new Property("encoding", encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addRef(startDoc, "encoding", "");
+			skel.addValuePlaceholder(startDoc, "encoding", "");
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}
@@ -469,9 +469,9 @@ public class TmxFilter implements IFilter {
 				case XMLStreamConstants.END_ELEMENT:
 					if(reader.getLocalName().equals(startElement)){
 						if(tuvType == 1){
-							skel.addRef(tu, null);
+							skel.addContentPlaceholder(tu, null);
 						}else if(tuvType == 2){
-							skel.addRef(tu, trgLang);
+							skel.addContentPlaceholder(tu, trgLang);
 						}
 						storeEndElement();
 						return true;

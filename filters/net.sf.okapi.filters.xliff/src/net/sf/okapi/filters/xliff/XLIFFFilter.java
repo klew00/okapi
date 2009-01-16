@@ -182,7 +182,7 @@ public class XLIFFFilter implements IFilter {
 			skel = new GenericSkeleton();
 			startDoc.setProperty(new Property("encoding", encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addRef(startDoc, "encoding", "");
+			skel.addValuePlaceholder(startDoc, "encoding", "");
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}
@@ -514,7 +514,7 @@ public class XLIFFFilter implements IFilter {
 				tu.setSourceProperty(new Property("coord", tmp, true));
 			}
 
-			skel.addRef(tu);
+			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( isSegSource ) {
 				//TODO
@@ -552,7 +552,7 @@ public class XLIFFFilter implements IFilter {
 				tu.setTargetProperty(trgLang, new Property("coord", tmp, true));
 			}
 
-			skel.addRef(tu, trgLang);
+			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
@@ -575,7 +575,7 @@ public class XLIFFFilter implements IFilter {
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
-		skel.addRef(tu, trgLang);
+		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("</target>");
 		skel.append("\n"); // TODO: use the line-break type of the original file
 		targetDone = true;

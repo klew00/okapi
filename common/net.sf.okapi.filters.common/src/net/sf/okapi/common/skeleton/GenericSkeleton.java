@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class GenericSkeleton implements ISkeleton {
 
@@ -103,13 +105,14 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	/**
-	 * Adds a reference to the resource itself to the skeleton. Defaults to source.
-	 * @param referent Resource object.
+	 * Adds to this skeleton a place-holder for the source content of the resource
+	 * to which this skeleton is attached.
+	 * @param textUnit The resource object.
 	 */
-	public void addRef (IResource referent)
+	public void addContentPlaceholder (TextUnit textUnit)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
-		part.parent = referent;
+		part.parent = textUnit;
 		part.language = null;
 		list.add(part);
 		// Flag that the next append() should start a new part
@@ -117,15 +120,16 @@ public class GenericSkeleton implements ISkeleton {
 	}
 	
 	/**
-	 * Adds a reference to the resource itself to the skeleton.
-	 * @param referent Resource object.
+	 * Adds to this skeleton a place-holder for the content (in a given language) of the resource
+	 * to which this skeleton is attached.
+	 * @param textUnit The resource object.
 	 * @param language Language or null if the reference is to the source.
 	 */
-	public void addRef (IResource referent,
+	public void addContentPlaceholder (TextUnit textUnit,
 		String language)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
-		part.parent = referent;
+		part.parent = textUnit;
 		part.language = language;
 		list.add(part);
 		// Flag that the next append() should start a new part
@@ -133,12 +137,13 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	/**
-	 * Adds a reference to the skeleton.
+	 * Adds to this skeleton a place-holder for the value of a property (in a given language)
+	 * of the resource to which this skeleton is attached.
 	 * @param referent Resource object.
-	 * @param propName Property name or null if the reference is to the text.
+	 * @param propName Property name.
 	 * @param language Language code; use null for the source; empty string for resource-level property.
 	 */
-	public void addRef (IResource referent,
+	public void addValuePlaceholder (IResource referent,
 		String propName,
 		String language)
 	{
@@ -149,6 +154,22 @@ public class GenericSkeleton implements ISkeleton {
 		list.add(part);
 		// Flag that the next append() should start a new part
 		createNew = true;
+	}
+	
+	/**
+	 * Adds to this skeleton a reference to an existing resource send before the one to 
+	 * which this skeleton is attached to.
+	 * @param referent The resource to refer to.
+	 */
+	public void addExtRef (IReferenceable referent) {
+		GenericSkeletonPart part = new GenericSkeletonPart(
+			TextFragment.makeRefMarker(((IResource)referent).getId()));
+			part.language = null;
+			part.parent = null; // This is a reference to a real referent
+			list.add(part);
+			// Flag that the next append() should start a new part
+			createNew = true;
+		
 	}
 	
 	public List<GenericSkeletonPart> getParts () {

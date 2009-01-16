@@ -123,7 +123,7 @@ public class DummyFilter implements IFilter {
 		tc = tu.setTarget(trgLang, new TextContainer());
 		tc.append("Target text");
 		skel = new GenericSkeleton("<text>\n<s>Source text</s>\n<t>");
-		skel.addRef(tu, trgLang);
+		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");
 		tu.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
@@ -132,7 +132,7 @@ public class DummyFilter implements IFilter {
 		tc = tu.getSource();
 		tc.append("Source text 2");
 		skel = new GenericSkeleton("<text>\n<s>Source text 2</s>\n<t>");
-		skel.addRef(tu, trgLang);
+		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");
 		tu.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));

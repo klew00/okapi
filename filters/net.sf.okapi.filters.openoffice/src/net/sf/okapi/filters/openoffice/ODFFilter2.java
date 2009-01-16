@@ -365,7 +365,7 @@ public class ODFFilter2 implements IFilter {
 	private void closeTextUnit () {
 		if ( tu == null ) return;
 		
-		skel.addRef(tu);
+		skel.addContentPlaceholder(tu);
 		tu.setSourceContent(tf);
 		tu.setId(String.valueOf(++tuId));
 		tu.setMimeType("text/x-odf");

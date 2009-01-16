@@ -231,7 +231,7 @@ public class MIFFilter implements IFilter {
 							TextUnit tu = new TextUnit(String.valueOf(++tuId));
 							tu.setSource(cont);
 							tu.setMimeType("text/x-mif");
-							skel.addRef(tu);
+							skel.addContentPlaceholder(tu);
 							tu.setSkeleton(skel);
 							queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 							return;

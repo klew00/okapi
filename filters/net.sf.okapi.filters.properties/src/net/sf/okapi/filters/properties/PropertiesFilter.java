@@ -389,7 +389,7 @@ public class PropertiesFilter implements IFilter {
 						keyBuffer.append(textLine.substring(0, startText));
 					}
 					skel.append(keyBuffer.toString());
-					skel.addRef(tuRes, null);
+					skel.addContentPlaceholder(tuRes, null);
 					// Line-break
 					skel.append(lineBreak);
 				}

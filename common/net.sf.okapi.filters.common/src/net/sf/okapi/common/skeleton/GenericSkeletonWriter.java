@@ -185,9 +185,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return "-ERR:INVALID-REF-MARKER-";
 		}
 		String propName = (String)marker[3];
-		
-		// We use part.parent always for these parts
-		if ( propName == null ) { // Reference to the content of the referent
+
+		// If we have a property name: It's a reference to a property of 
+		// the resource holding this skeleton
+		if ( propName != null ) { // Reference to the content of the referent
+			return getString((INameable)part.parent, propName, part.language, context);
+		}
+
+		// If a parent if set, it's a reference to the content of the resource
+		// holding this skeleton. And it's always a TextUnit
+		if ( part.parent != null ) {
 			if ( part.parent instanceof TextUnit ) {
 				if ( isMultilingual ) {
 					return getContent((TextUnit)part.parent,
@@ -206,9 +213,23 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
 			}
 		}
-
-		// Or to a property of the referent
-		return getString((INameable)part.parent, propName, part.language, context);
+		
+		// Else this is a true reference to a referent
+		IReferenceable ref = getReference((String)marker[0]);
+		if ( ref == null ) {
+			return "-ERR:REF-NOT-FOUND-";
+		}
+		if ( ref instanceof TextUnit ) {
+			return getString((TextUnit)ref, null, context); //TODO: fix langToUse
+		}
+		if ( ref instanceof GenericSkeletonPart ) {
+			return getString((GenericSkeletonPart)ref, context);
+		}
+		if ( ref instanceof StorageList ) { // == StartGroup
+			return getString((StorageList)ref, null, context); //TODO: fix langToUse
+		}
+		// Else: DocumentPart, StartDocument, StartSubDocument 
+		return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
 	}
 
 	private String getString (INameable ref,
