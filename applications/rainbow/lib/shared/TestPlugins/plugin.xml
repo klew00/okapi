@@ -167,6 +167,18 @@
    </info>
   </plugin>
 
+  <plugin type="utility"
+   id="oku_transcomparison"
+   version="1.0"
+   pluginClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Utility"
+   updateUri="http://okapi.sf.net/">
+   <info>
+    <name>Translation Comparison</name>
+    <description>Compare two sets of translations.</description>
+    <provider>Okapi Framework</provider>
+   </info>
+  </plugin>
+
 <!-- <plugin type="utility"
   id="oku_twbbatchanalysis"
   version="1.0"

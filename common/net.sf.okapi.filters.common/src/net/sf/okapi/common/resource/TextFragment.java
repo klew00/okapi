@@ -869,10 +869,10 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Compares and object with this TextFragment. If the object is also a TextFragment,
-	 * the methods returns the comparison between the coded text string of both TextFragments.
+	 * the methods returns the comparison between the coded text strings of both TextFragments.
 	 * If the object is not a TextFragment, the method returns the comparison between the two
 	 * toString() results of the two objects.
-	 * @return A value 0 if the objects are the same.
+	 * @return A value 0 if the objects are equals.
 	 */
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;

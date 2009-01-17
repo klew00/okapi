@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
@@ -201,7 +202,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param propName Property name.
 	 * @param language Language code; use null for the source; empty string for resource-level property.
 	 */
-	public void addValuePlaceholder (IResource referent,
+	public void addValuePlaceholder (INameable referent,
 		String propName,
 		String language)
 	{

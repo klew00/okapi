@@ -1,0 +1,37 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Translation Comparison</title>
+<link rel="stylesheet" type="text/css" href="../../../../help.css">
+</head>
+<body>
+<h1 class="util1">Utility – Translation Comparison</h1>
+<h2 class="util2">Overview</h2>
+<p>This utility allows you to compare two sets of translated text.</p>
+<p>The input is two document, the first one with the base translation, the 
+second one with the translation to compare to the base translation. The two 
+documents <b>must have the same number of entries</b> and the <b>entries must be in the same 
+order</b>.</p>
+<p>For each entry the utility compare the two translated text and calculate a 
+score that indicates how similar the text of the second document is from the 
+text of the first translation. the score is a number between 0 and 100. the 
+score is based on the <i>Levenstein distance</i> and additional processing. You 
+can find more information on that mertic at
+<a href="http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a> 
+and <a href="http://en.wikipedia.org/wiki/Levenshtein_distance">
+http://en.wikipedia.org/wiki/Levenshtein_distance</a>.</p>
+<p>The utility outputs an HTML document for each pair of input document. That 
+file list the pairs of text and the resulting score.</p>
+<h2>Input Parameters</h2>
+<ul>
+	<li>The list of the documents containing the base translation (Input list 1)</li>
+	<li>The list of the corresponding documents.containing the translation to 
+	compare to the base one (Input list 2)</li>
+	<li>The source language and default input encoding.</li>
+	<li>The target language and default input encoding.</li>
+</ul>
+<h2>Configuration</h2>
+<h3>Options Tab</h3>
+<p>&nbsp;</p>
+</body>
+</html>
