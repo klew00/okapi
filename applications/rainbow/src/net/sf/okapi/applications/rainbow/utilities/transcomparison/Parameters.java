@@ -27,6 +27,7 @@ public class Parameters extends BaseParameters {
 	public boolean generateTMX;
 	public String tmxPath;
 	public boolean generateHTML;
+	public boolean openOutput;
 
 	public Parameters () {
 		reset();
@@ -36,6 +37,7 @@ public class Parameters extends BaseParameters {
 		generateTMX = true;
 		tmxPath = "";
 		generateHTML = true;
+		openOutput = true;
 	}
 
 	public void fromString (String data) {
@@ -44,6 +46,7 @@ public class Parameters extends BaseParameters {
 		generateTMX = buffer.getBoolean("generateTMX", generateTMX);
 		tmxPath = buffer.getString("tmxPath", tmxPath);
 		generateHTML = buffer.getBoolean("generateHTML", generateHTML);
+		openOutput = buffer.getBoolean("openOutput", openOutput);
 	}
 
 	public String toString() {
@@ -51,6 +54,7 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter("generateTMX", generateTMX);
 		buffer.setParameter("tmxPath", tmxPath);
 		buffer.setParameter("generateHTML", generateHTML);
+		buffer.setParameter("openOutput", openOutput);
 		return buffer.toString();
 	}
 

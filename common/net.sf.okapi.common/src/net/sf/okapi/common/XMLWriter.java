@@ -117,7 +117,9 @@ public class XMLWriter {
 	 */
 	public void writeEndElementLineBreak () {
 		closeStartTag();
-		writer.println("</" + elements.pop() + ">");
+		if ( !elements.isEmpty() ) {
+			writer.println("</" + elements.pop() + ">");
+		}
 	}
 	
 	/**

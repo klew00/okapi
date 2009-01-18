@@ -370,6 +370,9 @@ public class TextUnit implements INameable, IReferenceable {
 		if (( trgCont == null ) || overwriteExisting ) {
 			trgCont = getSource().clone(
 				(creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
+			if ( creationOptions == CREATE_EMPTY ) {
+				trgCont.clear();
+			}
 			targets.put(language, trgCont);
 		}
 		return trgCont;

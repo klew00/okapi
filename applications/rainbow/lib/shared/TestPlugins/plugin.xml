@@ -171,6 +171,7 @@
    id="oku_transcomparison"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Utility"
+   editorClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Editor"
    updateUri="http://okapi.sf.net/">
    <info>
     <name>Translation Comparison</name>

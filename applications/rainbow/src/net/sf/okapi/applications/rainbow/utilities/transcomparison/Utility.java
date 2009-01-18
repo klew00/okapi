@@ -33,6 +33,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.ui.UIUtil;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -43,6 +44,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	TMXWriter tmx;
 	boolean isBaseMultilingual;
 	boolean isToCompareMultilingual;
+	String pathToOpen;
 	
 	public Utility () {
 		params = new Parameters();
@@ -55,26 +57,33 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 	public void preprocess () {
 		matcher = new TextMatcher();
-		writer = new XMLWriter();
+		if ( params.generateHTML ) {
+			writer = new XMLWriter();
+		}
 		// Start TMX writer (one for all input documents)
-		//if ( params.generateTMX ) {
-			//tmx = new TMXWriter();
-			//tmx.create(params.tmxPath);
-			//tmx.writeStartDocument(sourceLanguage, targetLanguage, creationTool, creationToolVersion, segType, originalTMFormat, dataType)
-		//}
+		if ( params.generateTMX ) {
+			tmx = new TMXWriter();
+			tmx.create(params.tmxPath);
+			tmx.writeStartDocument(srcLang, trgLang, "TODO", "TODO", "TODO", "TODO", "TODO");
+		}
+		pathToOpen = null;
 	}
 	
 	public void postprocess () {
 		matcher = null;
-		if ( writer != null ) {
+		if ( params.generateHTML && ( writer != null )) {
 			writer.close();
 			writer = null;
 		}
-		if ( tmx != null ) {
+		if ( params.generateTMX && ( tmx != null )) {
+			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
 		}
 		Runtime.getRuntime().gc();
+		if ( params.openOutput && ( pathToOpen != null )) {
+			UIUtil.start(pathToOpen);
+		}
 	}
 	
 	public IParameters getParameters () {
@@ -82,7 +91,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 
 	public boolean hasParameters () {
-		return false;
+		return true;
 	}
 
 	public boolean needsRoots () {
@@ -131,15 +140,21 @@ public class Utility extends BaseFilterDrivenUtility {
 			
 			// Start HTML output
 			if ( writer != null ) writer.close();
-			writer.create(getInputPath(0) + ".html");
-			writer.writeStartDocument();
-			writer.writeStartElement("html");
-			writer.writeStartElement("head");
-			writer.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />");
-			writer.writeRawXML("<style>td { font-family: monospace } td.s { border-bottom-style: solid; border-bottom-width: 1px }</style>");
-			writer.writeEndElement(); // head
-			writer.writeStartElement("body");
-			writer.writeStartElement("table");
+			if ( params.generateHTML ) {
+				// Use the to-compare file for the output name
+				if ( pathToOpen == null ) {
+					pathToOpen = getInputPath(1) + ".html"; //$NON-NLS-1$
+				}
+				writer.create(getInputPath(1) + ".html"); //$NON-NLS-1$
+				writer.writeStartDocument();
+				writer.writeStartElement("html"); //$NON-NLS-1$
+				writer.writeStartElement("head"); //$NON-NLS-1$
+				writer.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"); //$NON-NLS-1$
+				writer.writeRawXML("<style>td { font-family: monospace } td { vertical-align: top; } td.p { border-top-style: solid; border-top-width: 1px;}</style>"); //$NON-NLS-1$
+				writer.writeEndElement(); // head
+				writer.writeStartElement("body"); //$NON-NLS-1$
+				writer.writeStartElement("table"); //$NON-NLS-1$
+			}
 		}
 		catch (MalformedURLException e) {
 			throw new RuntimeException(e);
@@ -156,7 +171,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 	private void processEndDocument () {
     	if ( inputToCompare != null ) inputToCompare.close();
-    	if ( writer != null ) {
+    	if ( params.generateHTML ) {
 			writer.writeEndElement(); // table
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html
@@ -209,33 +224,40 @@ public class Utility extends BaseFilterDrivenUtility {
 		int n = matcher.compare(text1, text2);
 
 		// Output in HTML
-		if ( isBaseMultilingual ) {
-			writer.writeStartElement("tr");
-			writer.writeStartElement("td");
-			writer.writeString("src="+tu1.getSourceContent().toString());
-			writer.writeEndElement(); // td
-			writer.writeEndElement(); // tr
+		if ( params.generateHTML ) {
+			writer.writeRawXML("<tr><td class='p'>"); //$NON-NLS-1$
+			if ( isBaseMultilingual ) {
+				writer.writeString("src:");
+				writer.writeRawXML("</td>"); //$NON-NLS-1$
+				writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
+				writer.writeString(tu1.getSourceContent().toString());
+				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
+				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+			}
+			writer.writeString("t1:");
+			writer.writeRawXML("</td>"); //$NON-NLS-1$
+			if ( isBaseMultilingual ) writer.writeRawXML("<td>"); //$NON-NLS-1$
+			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
+			writer.writeString(text1.toString());
+			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
+			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+			writer.writeString("t2:");
+			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+			writer.writeString(text2.toString());
+			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
+			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+			writer.writeString("score:");
+			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
+			writer.writeString(String.valueOf(n));
+			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
-		writer.writeStartElement("tr");
-		writer.writeStartElement("td");
-		writer.writeString("t1="+text1.toString());
-		writer.writeEndElement(); // td
-		writer.writeEndElement(); // tr
-		writer.writeStartElement("tr");
-		writer.writeStartElement("td");
-		writer.writeString("t2="+text2.toString());
-		writer.writeEndElement(); // td
-		writer.writeEndElement(); // tr
-		writer.writeStartElement("tr");
-		writer.writeStartElement("td");
-		writer.writeAttributeString("class", "s");
-		writer.writeString("score="+String.valueOf(n));
-		writer.writeEndElement(); // td
-		writer.writeEndElementLineBreak(); // tr
 		
 		if ( params.generateTMX ) {
-			//TextUnit tmxTu = new TextUnit(tu1.getId());
-			//tmx.writeItem(tmxTu, null)
+			TextUnit tmxTu = new TextUnit(tu1.getId());
+			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
+			tmxTu.setTargetContent(trgLang, text1);
+			tmxTu.setTargetContent(trgLang+"-2", text2);
+			tmx.writeItem(tmxTu, null);
 		}
 	}
 
