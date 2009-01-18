@@ -71,7 +71,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>XSLT Transformation</name>
+   <name>XSL Transformation</name>
    <description>Processes an input XML document with a given XSLT template.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -84,7 +84,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Line-Breaks Conversion</name>
+   <name>Line-Break Conversion</name>
    <description>Converts the line-breaks of any text input file to a give type.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -97,7 +97,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Byte-Order-Marks Conversion</name>
+   <name>Byte-Order-Mark Conversion</name>
    <description>Adds or removes the Unicode Byte-Order-Mark of any text input file to a give type.</description>
    <provider>Okapi Framework</provider>
   </info>

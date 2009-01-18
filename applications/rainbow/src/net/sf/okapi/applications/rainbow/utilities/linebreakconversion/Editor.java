@@ -82,7 +82,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("Line-Breaks Conversion");
+		shell.setText("Line-Break Conversion");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;

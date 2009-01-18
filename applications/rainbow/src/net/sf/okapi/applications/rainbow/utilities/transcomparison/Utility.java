@@ -150,9 +150,15 @@ public class Utility extends BaseFilterDrivenUtility {
 				writer.writeStartElement("html"); //$NON-NLS-1$
 				writer.writeStartElement("head"); //$NON-NLS-1$
 				writer.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"); //$NON-NLS-1$
-				writer.writeRawXML("<style>td { font-family: monospace } td { vertical-align: top; } td.p { border-top-style: solid; border-top-width: 1px;}</style>"); //$NON-NLS-1$
+				writer.writeRawXML("<style>td { font-family: monospace } td { vertical-align: top; white-space: pre } td.p { border-top-style: solid; border-top-width: 1px;}</style>"); //$NON-NLS-1$
 				writer.writeEndElement(); // head
 				writer.writeStartElement("body"); //$NON-NLS-1$
+				writer.writeStartElement("p"); //$NON-NLS-1$
+				writer.writeString("Translation Comparison");
+				writer.writeEndElement();
+				writer.writeStartElement("p"); //$NON-NLS-1$
+				writer.writeString(String.format("Comparing %s (T2) against %s (T1).", getInputPath(1), getInputPath(0)));
+				writer.writeEndElement();
 				writer.writeStartElement("table"); //$NON-NLS-1$
 			}
 		}
@@ -227,32 +233,33 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.generateHTML ) {
 			writer.writeRawXML("<tr><td class='p'>"); //$NON-NLS-1$
 			if ( isBaseMultilingual ) {
-				writer.writeString("src:");
+				writer.writeString("Src:");
 				writer.writeRawXML("</td>"); //$NON-NLS-1$
 				writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
 				writer.writeString(tu1.getSourceContent().toString());
 				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			}
-			writer.writeString("t1:");
+			writer.writeString("T1:");
 			writer.writeRawXML("</td>"); //$NON-NLS-1$
 			if ( isBaseMultilingual ) writer.writeRawXML("<td>"); //$NON-NLS-1$
 			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
 			writer.writeString(text1.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
-			writer.writeString("t2:");
+			writer.writeString("T2:");
 			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
 			writer.writeString(text2.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
-			writer.writeString("score:");
+			writer.writeString("Score:");
 			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
 			writer.writeString(String.valueOf(n));
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
 		
 		if ( params.generateTMX ) {
+			//TODO: Fix the TMX output
 			TextUnit tmxTu = new TextUnit(tu1.getId());
 			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
 			tmxTu.setTargetContent(trgLang, text1);

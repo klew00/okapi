@@ -83,7 +83,7 @@ public class Editor implements IParametersEditor {
 	
 	private void create (Shell parent)
 	{
-		shell.setText("Byte-Order-Marks Conversion");
+		shell.setText("Byte-Order-Mark Conversion");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
