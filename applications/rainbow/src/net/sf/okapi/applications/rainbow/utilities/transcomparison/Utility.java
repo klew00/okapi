@@ -45,6 +45,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	boolean isBaseMultilingual;
 	boolean isToCompareMultilingual;
 	String pathToOpen;
+	int options;
 	
 	public Utility () {
 		params = new Parameters();
@@ -67,6 +68,11 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmx.writeStartDocument(srcLang, trgLang, "TODO", "TODO", "TODO", "TODO", "TODO");
 		}
 		pathToOpen = null;
+		
+		options = 0;
+		if ( params.ignoreCase ) options |= TextMatcher.IGNORE_CASE;
+		if ( params.ignoreWS ) options |= TextMatcher.IGNORE_WHITESPACES;
+		if ( params.ignorePunct ) options |= TextMatcher.IGNORE_PUNCTUATION;
 	}
 	
 	public void postprocess () {
@@ -81,7 +87,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmx = null;
 		}
 		Runtime.getRuntime().gc();
-		if ( params.openOutput && ( pathToOpen != null )) {
+		if ( params.autoOpen && ( pathToOpen != null )) {
 			UIUtil.start(pathToOpen);
 		}
 	}
@@ -205,51 +211,60 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( !tu1.isTranslatable() ) return;
 		TextUnit tu2 = (TextUnit)event.getResource();
 		
+		TextFragment srcFrag = null;
+		if ( isBaseMultilingual ) {
+			srcFrag = tu1.getSourceContent();
+		}
+		else {
+			if ( isToCompareMultilingual ) srcFrag = tu2.getSourceContent();
+		}
+		
 		// Get the text for the base translation
-		TextFragment text1;
-		if ( isBaseMultilingual ) text1 = tu1.getTargetContent(trgLang);
-		else  text1 = tu1.getSourceContent();
+		TextFragment trgFrag1;
+		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(trgLang);
+		else trgFrag1 = tu1.getSourceContent();
 
 		// Get the text for the to-compare translation
-		TextFragment text2;
-		if ( isToCompareMultilingual ) text2 = tu2.getTargetContent(trgLang);
-		else text2 = tu2.getSourceContent();
+		TextFragment trgFrag2;
+		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(trgLang);
+		else trgFrag2 = tu2.getSourceContent();
 		
 		// Do we have a base translation?
-		if ( text1 == null ) {
+		if ( trgFrag1 == null ) {
 			// No comparison if there is no base translation
 			return;
 		}
 		// Do we have a translation to compare to?
-		if ( text2 == null ) {
+		if ( trgFrag2 == null ) {
 			// Create and empty entry
-			text2 = new TextFragment();
+			trgFrag2 = new TextFragment();
 		}
 		
 		// Compute the distance
-		int n = matcher.compare(text1, text2);
+		int n = matcher.compare(trgFrag1, trgFrag2, options);
 
 		// Output in HTML
 		if ( params.generateHTML ) {
 			writer.writeRawXML("<tr><td class='p'>"); //$NON-NLS-1$
-			if ( isBaseMultilingual ) {
+			// Output source if we have one
+			if ( srcFrag != null ) {
 				writer.writeString("Src:");
 				writer.writeRawXML("</td>"); //$NON-NLS-1$
 				writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-				writer.writeString(tu1.getSourceContent().toString());
+				writer.writeString(srcFrag.toString());
 				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			}
 			writer.writeString("T1:");
 			writer.writeRawXML("</td>"); //$NON-NLS-1$
-			if ( isBaseMultilingual ) writer.writeRawXML("<td>"); //$NON-NLS-1$
+			if ( srcFrag != null ) writer.writeRawXML("<td>"); //$NON-NLS-1$
 			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-			writer.writeString(text1.toString());
+			writer.writeString(trgFrag1.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			writer.writeString("T2:");
 			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
-			writer.writeString(text2.toString());
+			writer.writeString(trgFrag2.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			writer.writeString("Score:");
@@ -257,13 +272,13 @@ public class Utility extends BaseFilterDrivenUtility {
 			writer.writeString(String.valueOf(n));
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
-		
+
 		if ( params.generateTMX ) {
 			//TODO: Fix the TMX output
 			TextUnit tmxTu = new TextUnit(tu1.getId());
 			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
-			tmxTu.setTargetContent(trgLang, text1);
-			tmxTu.setTargetContent(trgLang+"-2", text2);
+			tmxTu.setTargetContent(trgLang, trgFrag1);
+			tmxTu.setTargetContent(trgLang+"-2", trgFrag2);
 			tmx.writeItem(tmxTu, null);
 		}
 	}

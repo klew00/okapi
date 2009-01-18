@@ -7,13 +7,38 @@
 <body>
 <h1 class="util1">Utility – Used Characters Listing</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to</p>
-<h2>Common Parameters</h2>
+<p>This utility allows you to get a list of all characters used in the 
+translatable text of a give set of files.</p>
+<p>This is useful for example when you need to create a font for bitmap Japanese 
+characters for a game interface. You need to include in the font only the 
+characters actually used in the text, so you can reduce the size of the bitmap 
+font.</p>
+<p>The result file is a tab-delimited text file with three columns.</p>
+<ol>
+	<li>The Unicode code point</li>
+	<li>The actual character</li>
+	<li>The number of occurences found.</li>
+</ol>
+<p>For example:</p>
+<pre>U+2192 &#39;→&#39; 50
+U+00AE &#39;®&#39; 1
+U+00A0 &#39;&nbsp;&#39; 3
+U+007A &#39;z&#39; 10
+U+0079 &#39;y&#39; 320
+...</pre>
+<p>The output list is not sorted.</p>
+<h2>Input Parameters</h2>
 <ul>
-	<li></li>
+	<li>The list of the documents to process (Input list 1).</li>
+	<li>The default input encoding.</li>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
+<p><cite>Path of the result file</cite> -- Enter the full path of the result 
+file. (Configuration key = <code>outputPath</code>)</p>
+<p><cite>Open the result file after completion</cite> -- Set this option to 
+automatically open the result file after the process is complete. (Configuration 
+key = <code>autoOpen</code>).</p>
 <p>&nbsp;</p>
 </body>
 </html>

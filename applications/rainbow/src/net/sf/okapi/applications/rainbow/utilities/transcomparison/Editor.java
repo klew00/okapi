@@ -52,6 +52,9 @@ public class Editor implements IParametersEditor {
 	private Button chkGenerateHTML;
 	private Button btGetPath;
 	private Button chkOpenOutput;
+	private Button chkIgnoreCase;
+	private Button chkIgnoreWS;
+	private Button chkIgnorePunct;
 	private IHelp help;
 
 	public boolean edit (IParameters params,
@@ -93,12 +96,12 @@ public class Editor implements IParametersEditor {
 		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		//--- Options tab
+		//--- Output tab
 
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
+		tiTmp.setText("Output");
 		tiTmp.setControl(cmpTmp);
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
@@ -157,6 +160,30 @@ public class Editor implements IParametersEditor {
 			}
 		});
 
+		
+		//--- Options tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Options");
+		tiTmp.setControl(cmpTmp);
+		
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Comparison Options");
+		grpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+
+		chkIgnoreCase = new Button(grpTmp, SWT.CHECK);
+		chkIgnoreCase.setText("Ignore case differences");
+		
+		chkIgnoreWS = new Button(grpTmp, SWT.CHECK);
+		chkIgnoreWS.setText("Ignore white-spaces differences");
+		
+		chkIgnorePunct = new Button(grpTmp, SWT.CHECK);
+		chkIgnorePunct.setText("Ignore punctuation differences");
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -203,7 +230,10 @@ public class Editor implements IParametersEditor {
 		chkGenerateHTML.setSelection(params.generateHTML);
 		chkGenerateTMX.setSelection(params.generateTMX);
 		edTMXPath.setText(params.tmxPath);
-		chkOpenOutput.setSelection(params.openOutput);
+		chkOpenOutput.setSelection(params.autoOpen);
+		chkIgnoreCase.setSelection(params.ignoreCase);
+		chkIgnoreWS.setSelection(params.ignoreWS);
+		chkIgnorePunct.setSelection(params.ignorePunct);
 		// Enabling
 		chkOpenOutput.setEnabled(chkGenerateHTML.getSelection());
 		displayTMXPath();
@@ -219,9 +249,12 @@ public class Editor implements IParametersEditor {
 		}
 		params.generateTMX = doTMX;
 		params.tmxPath = edTMXPath.getText();
+		params.ignoreCase = chkIgnoreCase.getSelection();
+		params.ignoreWS = chkIgnoreWS.getSelection();
+		params.ignorePunct = chkIgnorePunct.getSelection();
 
 		params.generateHTML = chkGenerateHTML.getSelection();
-		params.openOutput = chkOpenOutput.getSelection();
+		params.autoOpen = chkOpenOutput.getSelection();
 		result = true;
 		return result;
 	}

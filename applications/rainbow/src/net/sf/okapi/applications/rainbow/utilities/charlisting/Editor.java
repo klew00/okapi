@@ -30,6 +30,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -99,19 +100,40 @@ public class Editor implements IParametersEditor {
 		//--- Options tab
 
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayout(new GridLayout(2, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Path of the result file:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 
 		edOutputPath = new Text(cmpTmp, SWT.BORDER);
 		edOutputPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		Button btGetPath = new Button(cmpTmp, SWT.PUSH);
+		btGetPath.setText("..."); //$NON-NLS-1$
+		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		btGetPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String path = Dialogs.browseFilenamesForSave(shell, "Result File", null,
+					"Text Files (*.*)\tAll Files (*.*)",
+					"*.*\t*.*");
+				if ( path != null ) {
+					edOutputPath.setText(path);
+				}
+			}
+		});
+		
 		chkAutoOpen = new Button(cmpTmp, SWT.CHECK);
 		chkAutoOpen.setText("Open the result file after completion");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAutoOpen.setLayoutData(gdTmp);
+		
 		
 		//--- Dialog-level buttons
 
@@ -130,11 +152,14 @@ public class Editor implements IParametersEditor {
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
-		setData();
-		inInit = false;
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 450 ) startSize.x = 450;
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
+		setData();
+		inInit = false;
 	}
 	
 	private boolean showDialog () {

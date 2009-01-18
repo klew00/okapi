@@ -298,89 +298,13 @@ public class CharacterInfoDialog {
 			edType.setText("Cn : UNASSIGNED"); //$NON-NLS-1$
 			break;
 		}
-		
+
 		edIsJavaSpace.setText(Character.isWhitespace(codePoint)? Res.getString("charInfoDlg.yes") : Res.getString("charInfoDlg.no")); //$NON-NLS-1$ //$NON-NLS-2$
 		edIsUnicodeSpace.setText(Character.isSpaceChar(codePoint)? Res.getString("charInfoDlg.yes") : Res.getString("charInfoDlg.no")); //$NON-NLS-1$ //$NON-NLS-2$
 		edNumValue.setText(String.valueOf(Character.getNumericValue(codePoint)));
-		
 		settingCodePoint = false;
 	}
 		
-/*	
-	case Character.DIRECTIONALITY_ARABIC_NUMBER:
-		edType.setText("AN : DIRECTIONALITY_ARABIC_NUMBER");
-		break;
-	case Character.DIRECTIONALITY_BOUNDARY_NEUTRAL:
-		edType.setText("BN : DIRECTIONALITY_BOUNDARY_NEUTRAL");
-		break;
-	case Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR:
-		edType.setText("CS : DIRECTIONALITY_COMMON_NUMBER_SEPARATOR");
-		break;
-	case Character.DIRECTIONALITY_EUROPEAN_NUMBER:
-		edType.setText("EN : DIRECTIONALITY_EUROPEAN_NUMBER");
-		break;
-	case Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR:
-		edType.setText("ES : DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR");
-		break;
-	case Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR: 
-		edType.setText("ET : DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR");
-		break;
-	case Character.DIRECTIONALITY_LEFT_TO_RIGHT:
-		edType.setText("L : DIRECTIONALITY_LEFT_TO_RIGHT");
-		break;
-	case Character.DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING:
-		edType.setText("LRE : DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING");
-		break;
-	case Character.DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE:
-		edType.setText("LRO : DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE");
-		break;
-	case Character.DIRECTIONALITY_NONSPACING_MARK 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Weak bidirectional character type "NSM" in the Unicode specification. 
-	case Character.DIRECTIONALITY_OTHER_NEUTRALS 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Neutral bidirectional character type "ON" in the Unicode specification. 
-	case Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Neutral bidirectional character type "B" in the Unicode specification. 
-	case Character.DIRECTIONALITY_POP_DIRECTIONAL_FORMAT 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Weak bidirectional character type "PDF" in the Unicode specification. 
-	case Character.DIRECTIONALITY_RIGHT_TO_LEFT 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Strong bidirectional character type "R" in the Unicode specification. 
-	case Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Strong bidirectional character type "AL" in the Unicode specification. 
-	case Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Strong bidirectional character type "RLE" in the Unicode specification. 
-	case Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Strong bidirectional character type "RLO" in the Unicode specification. 
-	case Character.DIRECTIONALITY_SEGMENT_SEPARATOR 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Neutral bidirectional character type "S" in the Unicode specification. 
-	case Character.DIRECTIONALITY_UNDEFINED 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Undefined bidirectional character type. 
-	case Character.DIRECTIONALITY_WHITESPACE 
-		edType.setText("Cc : CONTROL");
-		break;
-	          Neutral bidirectional character type "WS" in the Unicode specification. 
-		
-	}
-*/	
 	public void showDialog (int codePoint) {
 		setCodePoint(codePoint);
 		shell.open();

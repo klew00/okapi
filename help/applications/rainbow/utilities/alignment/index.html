@@ -10,14 +10,15 @@
 <p>This utility allows you to align the source and target content of documents 
 based on the identifiers of the text units. In addition, each text unit can be 
 segmented and this utility provides a basic default alignment of the segments, 
-along with a visual editor to fix any issue within those segments.</p>
-<p>Warning:<br>
-This utility should be used only with documents formats that provide identifiers 
+along with <a href="aligner.html">a visual editor</a> to fix any issue within those segments.</p>
+<p><b>Warning:</b>
+This utility is designed to be used only with documents formats that provide identifiers 
 (e.g. Properties files). Text units without identifier will not be aligned.</p>
-<p>Note:<br>
+<p><b>Note:</b>
 The result of the alignment is generated in a single TMX document even when the 
-input is made of several input documents. You can use attribute to specify from 
-which document the entry came.</p>
+input is made of several input documents. You can use an attribute with the 
+special variable <code>${filename}</code> to specify from 
+which document the entry came from. For example: <code>origin=${filename}</code></p>
 <h2>Input Parameters</h2>
 <ul>
 	<li>The list of the source documents to align (Input list 1).</li>
@@ -81,8 +82,13 @@ alignment. If the document already exists it will be overwritten. (Configuration
 <p><cite>Use the following attributes</cite> -- Set this option to include 
 attributes along with each aligned entry saved in the output files. 
 (Configuration key = <code>createAttributes</code>)</p>
-<p>Enter the list of pairs name = value for the attributes. use one line per 
+<p>Enter the list of pairs name = value for the attributes. Use one line per 
 attribute. (Configuration key = <code>attributes</code>)</p>
+<p>There are two special variables that can be used as attribute values:</p>
+<ul>
+	<li><code>${filename}</code> is the name of the document being aligned.</li>
+	<li><code>${resname}</code> is the identifier for the segment.</li>
+</ul>
 <p>&nbsp;</p>
 </body>
 </html>

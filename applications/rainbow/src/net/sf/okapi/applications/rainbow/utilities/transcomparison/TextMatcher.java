@@ -27,6 +27,10 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class TextMatcher {
 
+	public static final int IGNORE_CASE          = 0x01;
+	public static final int IGNORE_WHITESPACES   = 0x02;
+	public static final int IGNORE_PUNCTUATION   = 0x04;
+	
 	private static final int MAXTOKEN = 1024;
 	
 	private static short[] matP = null; // 'previous' cost array, horizontally
@@ -91,26 +95,46 @@ public class TextMatcher {
 	 * Compare two textFragment content. 
 	 * @param frag1 The base fragment.
 	 * @param frag2 the fragment to compare against the base fragment.
+	 * @param options Comparison options.
 	 * @return A score between 0 (no match) and 100 (exact match).
 	 */
 	public int compare (TextFragment frag1,
-		TextFragment frag2)
+		TextFragment frag2,
+		int options)
 	{
 		String text1 = frag1.getCodedText();
 		String text2 = frag2.getCodedText();
 		
-		// Check if there is only casing differences
+		// Check if it actually is exactly the same?
 		if ( text1.equals(text2) ) return 100;
+		// Check if there is only casing differences
 		if ( text1.equalsIgnoreCase(text2) ) {
-			return 99;
+			return (((options & IGNORE_CASE) == IGNORE_CASE) ? 100 : 99);
 		}
 
 		// Break down into tokens
-		List<String> tokens1 = tokenize(text1);
-		List<String> tokens2 = tokenize(text2);
+		List<String> tokens1;
+		List<String> tokens2;
+		
+		if ( (options & IGNORE_PUNCTUATION) == IGNORE_PUNCTUATION ) {
+			text1 = text1.replaceAll("\\p{Punct}", " ");
+			text2 = text2.replaceAll("\\p{Punct}", " ");
+		}
+		
+		if ( (options & IGNORE_CASE) == IGNORE_CASE ) {
+			tokens1 = tokenize(text1.toLowerCase());
+			tokens2 = tokenize(text2.toLowerCase());
+		}
+		else { // Keep case differences
+			tokens1 = tokenize(text1);
+			tokens2 = tokenize(text2);
+		}
 
 		int n = levenshtein(tokens1, tokens2);
-		if ( n == 100 ) return 99; // Differences are hidden by tokenization
+		if ( n == 100 ) {
+			// Differences are hidden tokenization
+			return 99;
+		}
 		else return n;
 	}
 

@@ -27,7 +27,10 @@ public class Parameters extends BaseParameters {
 	public boolean generateTMX;
 	public String tmxPath;
 	public boolean generateHTML;
-	public boolean openOutput;
+	public boolean autoOpen;
+	public boolean ignoreCase;
+	public boolean ignoreWS;
+	public boolean ignorePunct;
 
 	public Parameters () {
 		reset();
@@ -37,7 +40,10 @@ public class Parameters extends BaseParameters {
 		generateTMX = true;
 		tmxPath = "";
 		generateHTML = true;
-		openOutput = true;
+		autoOpen = true;
+		ignoreCase = false;
+		ignoreWS = false;
+		ignorePunct = false;
 	}
 
 	public void fromString (String data) {
@@ -46,7 +52,10 @@ public class Parameters extends BaseParameters {
 		generateTMX = buffer.getBoolean("generateTMX", generateTMX);
 		tmxPath = buffer.getString("tmxPath", tmxPath);
 		generateHTML = buffer.getBoolean("generateHTML", generateHTML);
-		openOutput = buffer.getBoolean("openOutput", openOutput);
+		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
+		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
+		ignoreWS = buffer.getBoolean("ignoreWS", ignoreWS);
+		ignorePunct = buffer.getBoolean("ignorePunct", ignorePunct);
 	}
 
 	public String toString() {
@@ -54,7 +63,10 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter("generateTMX", generateTMX);
 		buffer.setParameter("tmxPath", tmxPath);
 		buffer.setParameter("generateHTML", generateHTML);
-		buffer.setParameter("openOutput", openOutput);
+		buffer.setParameter("autoOpen", autoOpen);
+		buffer.setParameter("ignoreCase", ignoreCase);
+		buffer.setParameter("ignoreWS", ignoreWS);
+		buffer.setParameter("ignorePunct", ignorePunct);
 		return buffer.toString();
 	}
 
