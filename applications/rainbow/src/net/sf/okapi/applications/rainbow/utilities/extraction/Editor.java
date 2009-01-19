@@ -152,7 +152,7 @@ public class Editor implements IParametersEditor {
 		tiTmp.setControl(cmpTmp);
 
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Root of the output folder:");
+		stTmp.setText("Root of the output directory:");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		stTmp.setLayoutData(gdTmp);
@@ -197,7 +197,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Full path of the directory name:");
+		stTmp.setText("Full path of the output directory:");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		stTmp.setLayoutData(gdTmp);

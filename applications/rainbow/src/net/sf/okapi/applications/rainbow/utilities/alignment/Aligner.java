@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -317,7 +317,7 @@ public class Aligner {
 		btMoveUp = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Up", buttonWidth, -1);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				moveUp();
+				moveSegment(-1);
 			}
 		});
 	
@@ -358,7 +358,7 @@ public class Aligner {
 		btMoveDown = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Move Down", buttonWidth, -1);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				moveDown();
+				moveSegment(+1);
 			}
 		});
 		
@@ -600,18 +600,40 @@ public class Aligner {
 		updateTargetSegmentDisplay();
 	}
 	
-	private void moveUp () {
-		//TODO: move up
-		Dialogs.showError(shell, "Not implemented yet", null);
-		updateTargetSegmentDisplay();
+	/**
+	 * Moves the current target segment.
+	 * @param direction Use 1 to move up, -1 to move down.
+	 */
+	private void moveSegment (int direction) {
+		try {
+			int n = trgList.getSelectionIndex();
+			// Sanity checks
+			if (( direction != 1 ) && ( direction != -1 )) return;
+			if ( direction == 1 ) {
+				if ( n+1 > trgList.getItemCount() ) return;
+			}
+			else {
+				if ( n < 1 ) return;
+			}
+			// Swap current segment with the previous/next one
+			java.util.List<TextFragment> segs = target.getSegments();
+			TextFragment tf = segs.get(n+direction);
+			segs.set(n+direction, segs.get(n));
+			segs.set(n, tf);
+			// Update
+			updateTargetDisplay();
+			fillTargetList(n+direction);
+			trgList.setFocus();
+			// Re-check for issues, but don't select one
+			hasIssue(true, true, false);
+			synchronizeFromTarget();
+			manualCorrection = true;
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
 	}
-	
-	private void moveDown () {
-		//TODO: move down
-		Dialogs.showError(shell, "Not implemented yet", null);
-		updateTargetSegmentDisplay();
-	}
-	
+
 	private void mergeWithNext () {
 		try {
 			int n = trgList.getSelectionIndex();
@@ -621,7 +643,7 @@ public class Aligner {
 			fillTargetList(n);
 			trgList.setFocus();
 			// Re-check for issues
-			hasIssue(true, true);
+			hasIssue(true, true, true);
 			manualCorrection = true;
 		}
 		catch ( Throwable e) {
@@ -722,7 +744,7 @@ public class Aligner {
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
-		if ( hasIssue(false, true) ) {
+		if ( hasIssue(false, true, true) ) {
 			setData();
 			if ( issueType == 1 ) {
 				lbIssues.setSelection(0);
@@ -807,7 +829,7 @@ public class Aligner {
 				splitSegment(indexActiveSegment, sel.start, sel.end);
 			}
 			// Re-check for issues
-			hasIssue(true, true);
+			hasIssue(true, true, true);
 			
 			// Reset the controls
 			splitMode = false;
@@ -851,16 +873,17 @@ public class Aligner {
 					// genericCont is already set with the proper text
 					genericCont.updateFragment(edTrgSeg.getText(),
 						target.getSegments().get(indexActiveSegment), true);
-					manualCorrection = true;
 				}
 				catch ( InvalidContentException e ) {
 					Dialogs.showError(shell, e.getLocalizedMessage(), null);
+					return;
 					//TODO: recover by resetting the original, or prevent end of
 					//edit mode
 				}
+				manualCorrection = true;
 			}
 			// Re-check for issues
-			hasIssue(true, true);
+			hasIssue(true, true, true);
 			
 			// Reset the controls
 			editMode = false;
@@ -923,11 +946,14 @@ public class Aligner {
 	 * Tries to find some issue with the current alignment.
 	 * @param forceIssueDisplay True if we need to set the issue display.
 	 * Such display is not needed when calling the function when the dialog is hidden
-	 * and no issues are found. 
+	 * and no issues are found.
+	 * @param resetList True to reset the list of issues.
+	 * @param gotoIssue True to select the first issue and the corresponding segment.
 	 * @return True if an issue has been found. False if no issue has been found.
 	 */
 	private boolean hasIssue (boolean forceIssueDisplay,
-		boolean resetList)
+		boolean resetList,
+		boolean gotoIssue)
 	{
 		try {
 			if ( resetList ) resetIssues();
@@ -936,7 +962,7 @@ public class Aligner {
 			if ( source.getSegments().size() != target.getSegments().size() ) {
 				// Optional visual alignment to fix the problems
 				addIssue(2, "Error- Different number of segments in source and target.");
-				return updateIssueStatus();
+				return updateIssueStatus(gotoIssue);
 			}
 			// Assumes the list have same number of segments now
 			
@@ -944,7 +970,7 @@ public class Aligner {
 			if (( source.getSegments().size() == 1 ) && !chkCheckSingleSegUnit.getSelection() ) {
 				// We assume it's ok to align
 				if ( forceIssueDisplay ) addIssue(0, null);
-				return updateIssueStatus();
+				return updateIssueStatus(gotoIssue);
 			}
 			
 			// Sanity check using common anchors
@@ -957,7 +983,7 @@ public class Aligner {
 				checkAnchors(srcList.get(i), trgList.get(i), i);
 			}
 			if ( forceIssueDisplay ) addIssue(0, null);
-			return updateIssueStatus();
+			return updateIssueStatus(gotoIssue);
 		}
 		catch ( Throwable e) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
@@ -1140,7 +1166,7 @@ public class Aligner {
 				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
 				trgList.setFocus();
 				// Re-check for issues
-				hasIssue(true, false);
+				hasIssue(true, false, true);
 			}
 		}
 		catch ( Throwable e ) {
@@ -1165,7 +1191,7 @@ public class Aligner {
 		}
 	}
 	
-	private boolean updateIssueStatus () {
+	private boolean updateIssueStatus (boolean gotoIssue) {
 		switch ( issueType ) {
 		case 0:
 			edCause.setText("No issue automatically detected.");
@@ -1176,7 +1202,7 @@ public class Aligner {
 			edCause.setBackground(colorAmber);
 			if ( lbIssues.getItemCount() > 0 ) {
 				lbIssues.setSelection(0);
-				gotoIssue();
+				if ( gotoIssue ) gotoIssue();
 			}
 			break;
 		case 2:

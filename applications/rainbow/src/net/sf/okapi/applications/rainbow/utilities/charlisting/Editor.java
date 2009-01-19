@@ -140,11 +140,13 @@ public class Editor implements IParametersEditor {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
-				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
+					if ( !saveData() ) return;
+				}
 				shell.close();
 			};
 		};
@@ -178,6 +180,10 @@ public class Editor implements IParametersEditor {
 
 	private boolean saveData () {
 		if ( inInit ) return true;
+		if ( edOutputPath.getText().length() == 0 ) {
+			edOutputPath.setFocus();
+			return false;
+		}
 		params.outputPath = edOutputPath.getText();
 		params.autoOpen = chkAutoOpen.getSelection();
 		result = true;

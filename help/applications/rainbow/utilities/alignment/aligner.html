@@ -58,12 +58,23 @@ based on the presence of anchor points in different segments. If the option
 <cite>Try an auto-correction automatically</cite> is set you do not have to use 
 this button as the auto-correction is run each time you make a modification.</p>
 <p dir="ltr"><cite>Options</cite> -- Not implemented yet.</p>
-<p dir="ltr"><cite>Move Up</cite> -- Not implemented yet.</p>
-<p dir="ltr"><cite>Move Down</cite> -- Not implemented yet.</p>
-<p dir="ltr"><cite>Join Next</cite> -- </p>
-<p dir="ltr"><cite>Split</cite> --</p>
-<p dir="ltr"><cite>Accept</cite> --</p>
-<p dir="ltr"><cite>Skip</cite> --</p>
+<p dir="ltr"><cite>Move Up</cite> -- Swaps the target segment currently slected 
+with the one just above.</p>
+<p dir="ltr"><cite>Move Down</cite> -- Swaps the target segment currently 
+selected with the one just below.</p>
+<p dir="ltr"><cite>Join Next</cite> -- Joins the target segment currently 
+selected with the one just below, transforming both segments into a single new 
+one.</p>
+<p dir="ltr"><cite>Split</cite> -- Enables the target segment edit field so you 
+can select a location in the target segment currently selected where to split it 
+into two new segments. The segment will be split at the location of the cursor. 
+If you select part of the segment content, the selection will be left as a 
+non-segmented text between the two new segments.</p>
+<p dir="ltr"><cite>Accept</cite> -- Accepts the current alignment and moves to 
+the next text unit to align. this command is disabled if there is an error 
+detected in the current alignment.</p>
+<p dir="ltr"><cite>Skip</cite> -- Moves to the next text unit to align without 
+saving the current one into the TMX output.</p>
 <h4 dir="ltr">Issues Indicator</h4>
 <p dir="ltr">Warnings and error indicator. Warnings are shown in orange, error 
 in red.</p>

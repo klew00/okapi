@@ -212,7 +212,10 @@ public class Editor implements IParametersEditor {
 	}
 
 	private boolean saveData () {
-		//TODO: check path
+		if ( edXsltPath.getText().length() == 0 ) {
+			edXsltPath.setFocus();
+			return false;
+		}
 		params.xsltPath = edXsltPath.getText();
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
 		params.paramList = tmp.toString();
