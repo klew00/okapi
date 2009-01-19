@@ -72,7 +72,7 @@
 
 		<copy file="../../help/help.css" todir="${dist}/help"/>
 		<copy todir="${dist}/help/applications/rainbow">
-			<fileset dir="../../help/applications/rainbow" />
+			<fileset dir="../../help/applications/rainbow" excludes="**/*.psd" />
 		</copy>
 		<copy todir="${dist}/help/filters">
 			<fileset dir="../../help/filters" />

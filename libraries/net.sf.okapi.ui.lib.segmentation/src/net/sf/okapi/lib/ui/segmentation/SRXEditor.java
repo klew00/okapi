@@ -560,7 +560,7 @@ public class SRXEditor {
 					AboutDialog dlg = new AboutDialog(shell,
 						Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
 						Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
-						Res.getString("SRXEditor.aboutVersion")); //$NON-NLS-1$
+						Res.getString("SRXEditor.Version")); //$NON-NLS-1$
 					dlg.showDialog();
 	            }
 			});

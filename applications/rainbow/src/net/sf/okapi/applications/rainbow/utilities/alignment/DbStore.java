@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -163,11 +163,18 @@ public class DbStore {
 		}
 	}
 	
-	public int getTextUnitCount () {
+	public int getTextUnitCount (boolean nonSegmentsOnly) {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
-			ResultSet result = stm.executeQuery("SELECT COUNT(" + SOURCE_NKEY + ") FROM " + TBLNAME_SOURCE);
+			String query;
+			if ( nonSegmentsOnly ) { // Main entries have SegKey set to 0
+				query = String.format("SELECT COUNT(%s) FROM %s WHERE %s=0", SOURCE_NKEY, TBLNAME_SOURCE, SOURCE_NSEGKEY);
+			}
+			else {
+				query = "SELECT COUNT(" + SOURCE_NKEY + ") FROM " + TBLNAME_SOURCE;
+			}
+			ResultSet result = stm.executeQuery(query);
 			if ( !result.first() ) return 0;
 			return result.getInt(1);
 		}
@@ -203,7 +210,7 @@ public class DbStore {
 			pstm.setInt(1, 0);
 			pstm.setInt(2, gKey);
 			pstm.setString(3, tu.getId());
-			pstm.setInt(4, 0);
+			pstm.setInt(4, 0); // SegKey is 0 for the main entry
 			pstm.setString(5, tu.getName());
 			pstm.setString(6, tu.getType());
 			pstm.setString(7, tc.getCodedText());
@@ -218,7 +225,7 @@ public class DbStore {
 					pstm.setInt(1, 0);
 					pstm.setInt(2, gKey);
 					pstm.setString(3, tu.getId());
-					pstm.setInt(4, i);
+					pstm.setInt(4, i); // SegKey is >0 for the segments
 					pstm.setString(5, tu.getName());
 					pstm.setString(6, tu.getType());
 					pstm.setString(7, tf.getCodedText());

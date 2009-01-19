@@ -179,6 +179,12 @@ public class TextUnit implements INameable, IReferenceable {
 		return property;
 	}
 	
+	public void removeProperty (String name) {
+		if ( properties != null ) {
+			properties.remove(name);
+		}
+	}
+	
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		return properties.keySet();
@@ -202,6 +208,10 @@ public class TextUnit implements INameable, IReferenceable {
 		return source.getPropertyNames();
 	}
 	
+	public void removeSourceProperty (String name) {
+		source.removeProperty(name);
+	}
+	
 	public boolean hasSourceProperty (String name) {
 		if ( source.properties == null ) return false;
 		return source.properties.containsKey(name);
@@ -221,6 +231,15 @@ public class TextUnit implements INameable, IReferenceable {
 		return createTarget(language, false, IResource.CREATE_EMPTY).setProperty(property);
 	}
 
+	public void removeTargetProperty (String language,
+		String name)
+	{
+		TextContainer tc = getTarget(language);
+		if ( tc != null ) {
+			tc.removeProperty(name);
+		}
+	}
+	
 	public Set<String> getTargetPropertyNames (String language) {
 		TextContainer tc = createTarget(language, false, IResource.CREATE_EMPTY);
 		if ( tc.properties == null ) {

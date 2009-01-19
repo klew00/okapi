@@ -154,6 +154,12 @@ public class TextContainer extends TextFragment {
 		return property;
 	}
 	
+	public void removeProperty (String name) {
+		if ( properties != null ) {
+			properties.remove(name);
+		}
+	}
+	
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		return properties.keySet();

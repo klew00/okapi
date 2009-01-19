@@ -141,7 +141,7 @@ public class TMXWriter {
 			for ( int i=0; i<srcList.size(); i++ ) {
 				writeTU(srcList.get(i),
 					(i>trgList.size()-1) ? null : trgList.get(i),
-					String.format("%s_s%d", tuid, i+1),
+					String.format("%s_s%02d", tuid, i+1),
 					attributes);
 			}
 		}

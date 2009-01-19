@@ -508,7 +508,7 @@ public class MainForm implements IParametersProvider {
 				AboutDialog dlg = new AboutDialog(shell,
 					"About Rainbow",
 					"Rainbow - Okapi Localization Toolbox",
-					"Version "+Res.getString("VERSION")); //$NON-NLS-1$);
+					Res.getString("VERSION")); //$NON-NLS-1$);
 				dlg.showDialog();
 			}
 		});
@@ -1141,6 +1141,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void changeRoot () {
 		try {
+			saveSurfaceData();
 			InputDialog dlg = new InputDialog(shell,
 				String.format("Root for Input List %d", currentInput+1),
 				"New root folder:", prj.getInputRoot(currentInput), null, 1);

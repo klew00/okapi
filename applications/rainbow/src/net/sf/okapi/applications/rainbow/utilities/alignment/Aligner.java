@@ -28,6 +28,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -62,6 +63,9 @@ import org.eclipse.swt.widgets.Text;
 
 public class Aligner {
 	
+	protected static final String ALIGNSTATUS_KEY       = "AlignStatus";
+	protected static final String ALIGNSTATUS_TOREVIEW  = "TO-REVIEW";
+	
 	private Shell shell;
 	private int result = 0;
 	private ClosePanel pnlActions;
@@ -78,7 +82,7 @@ public class Aligner {
 	private Button btSkip;
 	private Button btEditRules;
 	private Button btEditSeg;
-	private Button btOptions;
+	private Button btToReview;
 	private Button btAutoCorrect;
 	private List lbIssues;
 	private Text edSource;
@@ -282,11 +286,11 @@ public class Aligner {
 			}
 		});
 		
-		chkCheckSingleSegUnit = new Button(cmpOptions, SWT.CHECK);
-		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
-
 		chkUseAutoCorrection = new Button(cmpOptions, SWT.CHECK);
 		chkUseAutoCorrection.setText("Try an auto-correction automatically");
+
+		chkCheckSingleSegUnit = new Button(cmpOptions, SWT.CHECK);
+		chkCheckSingleSegUnit.setText("Verify in-line codes for text-unit with a single segment");
 
 		// Main buttons
 		
@@ -300,17 +304,17 @@ public class Aligner {
 		gdTmp.horizontalSpan = 3;
 		cmpButtons.setLayoutData(gdTmp);
 
-		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth, -1);
-		btEditRules.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editRules();
-			}
-		});
-		
 		btAutoCorrect = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Try Auto-Fix", buttonWidth, -1);
 		btAutoCorrect.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				autoCorrect();
+			}
+		});
+		
+		btEditRules = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Rules...", buttonWidth, -1);
+		btEditRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editRules();
 			}
 		});
 		
@@ -341,17 +345,17 @@ public class Aligner {
 			}
 		});
 
+		btToReview = UIUtil.createGridButton(cmpButtons, SWT.CHECK, "To review later", buttonWidth, -1);
+		btToReview.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				toggleToReview();
+			}
+		});
+		
 		btEditSeg = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Edit Segment...", buttonWidth, -1);
 		btEditSeg.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				startEditMode();
-			}
-		});
-		
-		btOptions = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Options...", buttonWidth, -1);
-		btOptions.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editOptions();
 			}
 		});
 		
@@ -594,10 +598,13 @@ public class Aligner {
 		btSplit.setEnabled(( count > 0 ) && ( n > -1 ));
 	}
 
-	private void editOptions () {
-		//TODO: edit options (font, size, etc.)
-		Dialogs.showError(shell, "Not implemented yet", null);
-		updateTargetSegmentDisplay();
+	private void toggleToReview () {
+		if ( target.hasProperty(ALIGNSTATUS_KEY) ) {
+			target.removeProperty(ALIGNSTATUS_KEY);
+		}
+		else {
+			target.setProperty(new Property(ALIGNSTATUS_KEY, ALIGNSTATUS_TOREVIEW));
+		}
 	}
 	
 	/**
@@ -741,6 +748,7 @@ public class Aligner {
 		// Set the new values
 		source = tu.getSource();
 		target = tu.getTarget(targetLanguage);
+		btToReview.setSelection(false);
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
 		// Check for issues
@@ -922,7 +930,7 @@ public class Aligner {
 		btMerge.setVisible(!specialMode);
 		btSplit.setVisible(!specialMode);
 		btAutoCorrect.setVisible(!specialMode);
-		btOptions.setVisible(!specialMode);
+		btToReview.setVisible(!specialMode);
 		chkSyncScrolling.setVisible(!specialMode);
 		lbIssues.setEnabled(!specialMode);
 		

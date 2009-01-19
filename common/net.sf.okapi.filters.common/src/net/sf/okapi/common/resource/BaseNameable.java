@@ -106,6 +106,12 @@ public class BaseNameable implements INameable {
 		return property;
 	}
 	
+	public void removeProperty (String name) {
+		if ( properties != null ) {
+			properties.remove(name);
+		}
+	}
+	
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		return properties.keySet();
@@ -125,6 +131,12 @@ public class BaseNameable implements INameable {
 		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
 		sourceProperties.put(property.getName(), property);
 		return property;
+	}
+	
+	public void removeSourceProperty (String name) {
+		if ( sourceProperties != null ) {
+			sourceProperties.remove(name);
+		}
 	}
 	
 	public Set<String> getSourcePropertyNames () {
@@ -181,6 +193,18 @@ public class BaseNameable implements INameable {
 		return trgProps.keySet();
 	}
 
+	public void removeTargetProperty (String language,
+		String name)
+	{
+		if ( annotations != null ) {
+			TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
+			if ( tpa != null ) {
+				Map<String, Property> trgProps = tpa.get(language);
+				trgProps.remove(name);
+			}
+		}
+	}
+	
 	public boolean hasTargetProperty (String language,
 		String name)
 	{
@@ -252,5 +276,5 @@ public class BaseNameable implements INameable {
 	public void setPreserveWhitespaces (boolean value) {
 		preserveWS = value;
 	}
-	
+
 }

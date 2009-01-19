@@ -220,7 +220,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		readTargetToDb();
 		
 		dbStore = dbStoreBuilder.getDbStore();
-		targetCount = dbStore.getTextUnitCount();
+		targetCount = dbStore.getTextUnitCount(true);
 		aligned = 0;
 		noText = 0;
 		count = 0;
@@ -309,6 +309,15 @@ public class Utility extends BaseFilterDrivenUtility {
 						}
 					}
 				}
+				// Check for 'to-review' mark
+				if ( tu.hasTargetProperty(trgLang, Aligner.ALIGNSTATUS_KEY) ) { 
+					assignedAttributes.put(Aligner.ALIGNSTATUS_KEY,
+						tu.getTargetProperty(trgLang, Aligner.ALIGNSTATUS_KEY).getValue());
+				}
+				else {
+					assignedAttributes.remove(Aligner.ALIGNSTATUS_KEY);
+				}
+				
 				// Output to TMX
 				if ( params.createTMX ) {
 					tmxWriter.writeItem(tu, assignedAttributes);

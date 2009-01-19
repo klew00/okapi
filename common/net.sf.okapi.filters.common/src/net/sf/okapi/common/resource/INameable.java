@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource;
 
@@ -78,6 +78,13 @@ public interface INameable extends IResource {
 	public Property setProperty (Property property);
 	
 	/**
+	 * Removes a resource-level property of a given name. If the property does not exists
+	 * nothing happens.
+	 * @param name The name of the property to remove.
+	 */
+	public void removeProperty (String name);
+	
+	/**
 	 * Gets the names of all the resource-level properties for this resource.
 	 * @return All the names of the resource-level properties for this resource.
 	 */
@@ -103,6 +110,13 @@ public interface INameable extends IResource {
 	 * @return The property that has been set.
 	 */
 	public Property setSourceProperty (Property property);
+	
+	/**
+	 * Removes a source property of a given name. If the property does not exists
+	 * nothing happens.
+	 * @param name The name of the property to remove.
+	 */
+	public void removeSourceProperty (String name);
 	
 	/**
 	 * Gets the names of all the source properties for this resource.
@@ -135,6 +149,16 @@ public interface INameable extends IResource {
 	 */
 	public Property setTargetProperty (String language,
 		Property property);
+	
+	/**
+	 * Removes a target property of a given name. If the property does not exists
+	 * nothing happens.
+	 * @param language The target language for which this property should be set. The language code
+	 * is case-sensitive.
+	 * @param name The name of the property to remove.
+	 */
+	public void removeTargetProperty (String language,
+		String name);
 	
 	/**
 	 * Gets the names of all the properties for a given target language in this resource.
