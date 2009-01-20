@@ -309,6 +309,7 @@ public class TextFragment implements Comparable<Object> {
 			case MARKER_SEGMENT:
 				tmp.append(text.charAt(i));
 				tmp.append(text.charAt(++i));
+				//TODO: Do we need to do somthing for inline between WS?
 				break;
 			case ' ':
 			case '\t':
@@ -326,7 +327,7 @@ public class TextFragment implements Comparable<Object> {
 		}
 		frag.setCodedText(tmp.toString().trim());
 	}
-	
+
 	/**
 	 * Creates an empty TextFragment.
 	 */

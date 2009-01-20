@@ -182,12 +182,33 @@ public class Code {
 	}
 	
 	/**
-	 * Append to the current code data
-	 * @param data
+	 * Appends data to the current code data
+	 * @param data the data to append.
 	 */
 	public void append (String data) {
 		// TODO: Make this.data a StringBuilder for speed? But this method is probably not used often
 		this.data += data;
+	}
+	
+	/**
+	 * Appends a reference marker to the current code data.
+	 * @param id The ID of the referent resource.
+	 */
+	public void appendReference (String id) {
+		this.data += TextFragment.makeRefMarker(id);
+		setHasReference(true);
+	}
+	
+	/**
+	 * Appends a reference marker for a given property to the current code data.
+	 * @param id The ID of the referent resource where the property is located.
+	 * @param propertyName The name of the property.
+	 */
+	public void appendReference (String id,
+		String propertyName)
+	{
+		this.data += TextFragment.makeRefMarker(id, propertyName);
+		setHasReference(true);
 	}
 	
 	/**

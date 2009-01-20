@@ -25,9 +25,12 @@ import java.util.ArrayList;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import junit.framework.*;
@@ -127,6 +130,44 @@ public class ResourcesTest extends TestCase {
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
 	}
+
+	public void testPWithInline () {
+		String test = "<p>test an inline <img href=\"there\"/> tag</p>";
+		System.out.println(" in: "+test);
+		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu1 = new TextUnit("tu1", "there");
+		skel.add("href=\"");
+		skel.addContentPlaceholder(tu1);
+		skel.add("\"");		
+		tu1.setIsReferent(true);
+		tu1.setName("href");
+		tu1.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		
+		skel = new GenericSkeleton();
+		TextUnit tu2 = new TextUnit("tu2", "test an inline ");
+		TextFragment tf = tu2.getSourceContent();
+		Code code = new Code(TagType.PLACEHOLDER, "img");
+		code.append("<img ");
+		code.appendReference("tu1");
+		code.append("/>");
+		tf.append(code);
+		tf.append(" tag");
+		skel.add("<p>");
+		skel.addContentPlaceholder(tu2);
+		skel.append("</p>");
+		tu2.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+	
+	
+	
 
 	private String generateOutput (ArrayList<FilterEvent> list,
 		String original)
