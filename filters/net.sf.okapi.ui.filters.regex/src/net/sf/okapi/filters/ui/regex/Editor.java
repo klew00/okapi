@@ -74,7 +74,6 @@ public class Editor implements IParametersEditor {
 	private int ruleIndex = -1;
 	private Combo cbRuleType;
 	private Button chkPreserveWS;
-	private Button chkUnwrap;
 	private Button chkUseCodeFinder;
 	private Button btEditFinderRules;
 	private Button chkIgnoreCase;
@@ -193,12 +192,6 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkPreserveWS.setLayoutData(gdTmp);
-		
-		chkUnwrap = new Button(propGroup, SWT.CHECK);
-		chkUnwrap.setText(Res.getString("Editor.unwrap")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkUnwrap.setLayoutData(gdTmp);
 		
 		chkUseCodeFinder = new Button(propGroup, SWT.CHECK);
 		chkUseCodeFinder.setText(Res.getString("Editor.hasInlines")); //$NON-NLS-1$
@@ -355,6 +348,8 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkExtractOuterStrings.setLayoutData(gdTmp);
+//TODO: implement chkExtractOuterStrings		
+chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET		
 
 		label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("Editor.startOfString")); //$NON-NLS-1$
@@ -426,7 +421,6 @@ public class Editor implements IParametersEditor {
 		boolean enabled = (newRuleIndex > -1 );
 		cbRuleType.setEnabled(enabled);
 		chkPreserveWS.setEnabled(enabled);
-		chkUnwrap.setEnabled(enabled);
 		chkUseCodeFinder.setEnabled(enabled);
 
 		ruleIndex = newRuleIndex;
@@ -434,7 +428,6 @@ public class Editor implements IParametersEditor {
 			edExpression.setText(""); //$NON-NLS-1$
 			cbRuleType.select(0);
 			chkPreserveWS.setSelection(false);
-			chkUnwrap.setSelection(false);
 			chkUseCodeFinder.setSelection(false);
 			btEditFinderRules.setEnabled(false);
 			return;
@@ -443,7 +436,6 @@ public class Editor implements IParametersEditor {
 		edExpression.setText("(("+rule.getStart()+")(.*?)("+rule.getEnd()+"))"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		cbRuleType.select(rule.getRuleType());
 		chkPreserveWS.setSelection(rule.preserveWS());
-		chkUnwrap.setSelection(rule.unwrap());
 		chkUseCodeFinder.setSelection(rule.useCodeFinder());
 		updateEditFinderRulesButton();
 	}
@@ -472,7 +464,6 @@ public class Editor implements IParametersEditor {
 		Rule rule = rules.get(index);
 		rule.setRuleType(cbRuleType.getSelectionIndex());
 		rule.setPreserveWS(chkPreserveWS.getSelection());
-		rule.setUnwrap(chkUnwrap.getSelection());
 		rule.setUseCodeFinder(chkUseCodeFinder.getSelection());
 	}
 
@@ -635,4 +626,5 @@ public class Editor implements IParametersEditor {
 		if ( chkMultiline.getSelection() ) tmp |= Pattern.MULTILINE;
 		return tmp;
 	}
+
 }

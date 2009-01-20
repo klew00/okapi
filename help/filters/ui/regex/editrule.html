@@ -5,8 +5,33 @@
 <link rel="stylesheet" type="text/css" href="../../../help.css">
 </head>
 <body>
-<h2>Edit Rule</h2>
+<h1 class="dlgsec1">Regex Filter Parameters</h1>
+<h2 class="dlgsec2">Edit Rule</h2>
 <p>This dialog box allows you to edit a rule.</p>
+<h4>Boundaries of the content</h4>
+<p dir="ltr"><cite>Start</cite> -- Enter the regular expression matching just 
+before the content.</p>
+<p><cite>End</cite> -- Enter the regular expression matching just after the 
+content.</p>
+<p>You can enter a example of text to process in the edit field. The result of 
+the rule applied to the example is shown below as you modify the parameters.</p>
+<p>For example:</p>
+<pre>Start: \[.*?\]=
+  End: \}
+
+Sample: <span style="background-color: #00FF00">[ID100]={</span>Text to translate<span style="background-color: #00FF00">}</span></pre>
+<h4>Resource name</h4>
+<p><cite>Before the name</cite> -- Enter the regular expression matching just 
+before the name of the resource. This expression is applied on the text matched 
+by the <cite>Start</cite> expression.</p>
+<p><cite>After the name</cite> -- Enter the regular expression matching just 
+after the name of the resource. This expression is applied on the text matched 
+by the <cite>Start</cite> expression.</p>
+<p>For example:</p>
+<pre>Before the name: \[
+ After the name: \]
+
+Sample: <span style="background-color: #00FF00">[</span>ID100<span style="background-color: #00FF00">]</span>={Text to translate}</pre>
 <p>&nbsp;</p>
 </body>
 </html>

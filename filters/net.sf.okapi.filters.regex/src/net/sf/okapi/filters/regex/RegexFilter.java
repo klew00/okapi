@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.regex;
 
@@ -42,6 +42,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -149,6 +150,9 @@ public class RegexFilter implements IFilter {
 		
 		// Else: Send end of the skeleton if needed
 		if ( startSearch < inputText.length() ) {
+			// Treat strings outside rules
+//TODO: implement extract string out of rules
+			// Send the skeleton
 			addSkeletonToQueue(inputText.substring(startSkl, inputText.length()), true);
 		}
 
@@ -368,7 +372,12 @@ public class RegexFilter implements IFilter {
 	{
 		tuRes = new TextUnit(String.valueOf(++tuId), data);
 		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
-		tuRes.setPreserveWhitespaces(rule.preserveWS);
+		if ( rule.preserveWS ) {
+			tuRes.setPreserveWhitespaces(true);
+		}
+		else { // Unwrap the content
+			TextFragment.unwrap(tuRes.getSourceContent());
+		}
 
 		if ( rule.useCodeFinder ) {
 			rule.codeFinder.process(tuRes.getSourceContent());
@@ -482,7 +491,12 @@ public class RegexFilter implements IFilter {
 			tuRes = new TextUnit(String.valueOf(++tuId),
 				data.substring(start, end));
 			tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
-			tuRes.setPreserveWhitespaces(rule.preserveWS);
+			if ( rule.preserveWS ) {
+				tuRes.setPreserveWhitespaces(true);
+			}
+			else { // Unwrap the string
+				TextFragment.unwrap(tuRes.getSourceContent());
+			}
 			
 			if ( rule.useCodeFinder ) {
 				rule.codeFinder.process(tuRes.getSourceContent());

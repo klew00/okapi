@@ -37,7 +37,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset() {
-		generateTMX = true;
+		generateTMX = false;
 		tmxPath = "";
 		generateHTML = true;
 		autoOpen = true;

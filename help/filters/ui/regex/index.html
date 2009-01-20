@@ -10,10 +10,77 @@
 <p>This filter allows you to process any type of text-based formats where the 
 text can be captured using regular expressions.</p>
 <h2>Parameters</h2>
-<h3>Rules</h3>
-<p>&nbsp;</p>
-<h3>Options</h3>
-<p>&nbsp;</p>
+<h3>Rules Tab</h3>
+<p><cite>Add</cite> -- Click this button to add a new rule to the list. This 
+opens the <cite>Edit Rule</cite> dialog box with the new rule.</p>
+<p><cite>Rename</cite> -- Click this button to rename the rule currently 
+selected. Note that two rules can have the same name, but this is obviously not 
+recommended.</p>
+<p><cite>Remove</cite> -- Click this button to delete the rule currently 
+selected from the list. No confirmation is asked.</p>
+<p><cite>Edit</cite> -- Click this button to edit the rule currently selected. 
+This opens the <cite>Edit Rule</cite> dialog box.</p>
+<p><cite>Move Up</cite> -- Click this button to move the rule currently selected 
+up in the list. Rules are evaluated in the order of the list.</p>
+<p><cite>Move Down</cite> -- Click this button to move the rule currently 
+selected down in the list. Rules are evaluated in the order of the list.</p>
+<h4>Rule properties</h4>
+<p><cite>Action</cite> -- Select the type of action to perform for the rule 
+currently selected. There are four choices:</p>
+<ul>
+	<li><cite>Extract the strings inside the content</cite>: Extracts each 
+	strings within the content into a separate text unit.</li>
+	<li><cite>Extract the content itself</cite>: Extracts the whole text of the 
+	content into a single text unit.</li>
+	<li><cite>Treat the content as a comment</cite>: Does not extract anything, 
+	but process the content as a comment and search for localization directives 
+	if that option is set.</li>
+	<li><cite>Do not extract the content</cite>: Leaves the content alone.</li>
+</ul>
+<p><cite>Preserve white spaces</cite> -- Set this option to preserve all white 
+spaces of the extracted text. If this option is not set the extracted content is 
+unwrapped: That is any sequence of consecutive white spaces is replaced by a 
+single space character, and any white space character at the start or the end of 
+the content is trimed out. White spaces here are: spaces, tabs, carriage 
+returns, and line-feeds.</p>
+<p><cite>Has inline codes</cite> -- Set this option to enable the conversion of 
+some part of the extracted text into inline codes.</p>
+<p><cite>Edit Inline Codes Patterns</cite> -- Click this button to open the 
+Inline Codes Patterns dialog box where you can define rules for converting parts 
+of text into inline codes.</p>
+<h4>Regular expressions options</h4>
+<p>This set of options are used for all rules defined in the list. If you need 
+to overwrite an option for a given rule, use the <code>(?idmsux-idmsux)</code> 
+construct in the pattern for that rule.</p>
+<p><cite>Dot also matches line-feed</cite> -- Set this option to enable the dot 
+operator to match line-feeds.</p>
+<p><cite>Multi-line</cite> -- Set this option so the expressions <code>^</code> 
+and <code>$</code> match just after or just before, respectively, a line 
+terminator or the end of the input sequence. If this option is not set these 
+expressions only match at the beginning and the end of the entire input 
+sequence.</p>
+<p><cite>Ignore case differences</cite> -- Set this option to ignore differences 
+between letter cases. If this option is set &quot;abc&quot; is seen as identical as &quot;Abc&quot;. 
+If this option is not set, both strings are seen as different.</p>
+<h3>Options Tab</h3>
+<h4>Localization directives</h4>
+<p><cite>Use localization directives when they are present</cite> -- Set this 
+option to TODO</p>
+<p><cite>Extract items outside the scope of localization directives</cite> -- 
+Set this option to TODO</p>
+<h4>Strings</h4>
+<p><cite>Extract strings outside the rules</cite> -- Set this option to extract 
+all strings that are outside the scope of all the defined rules. NOT IMPLEMENTED 
+YET.</p>
+<p><cite>Beginning of string</cite> -- Enter the character specifing the start 
+of a string. Entering several characters defines several ways to start a string.</p>
+<p dir="ltr"><cite>End of string</cite> -- Enter the character specifying the 
+end of a string. If you have defined several beginning characters, you must 
+defined an equal number of end characters, and the position of each end 
+character must correspond to the position of its corresponding beginning 
+character.</p>
+<h4>Content type</h4>
+<p><cite>MIME type of the document</cite> -- Enter TODO</p>
 <p>&nbsp;</p>
 </body>
 </html>

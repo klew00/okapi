@@ -291,6 +291,43 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
+	 * Unwraps the content of a TextFragment. All sequences of consecutive white spaces
+	 * are replaced by a single space characters, and any white spaces at the head or
+	 * the end of the text is trimmed out. White spaces here are: space, tab, CR and LF. 
+	 * @param frag The text fragment to unwrap.
+	 */
+	public static void unwrap (TextFragment frag) {
+		String text = frag.getCodedText();
+		StringBuilder tmp = new StringBuilder(text.length());
+		boolean wasWS = true; // Removes leading white-spaces
+		// Process the text
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+			case MARKER_SEGMENT:
+				tmp.append(text.charAt(i));
+				tmp.append(text.charAt(++i));
+				break;
+			case ' ':
+			case '\t':
+			case '\r':
+			case '\n':
+				if ( wasWS ) continue;
+				wasWS = true;
+				tmp.append(' ');
+				break;
+			default:
+				wasWS = false;
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		frag.setCodedText(tmp.toString().trim());
+	}
+	
+	/**
 	 * Creates an empty TextFragment.
 	 */
 	public TextFragment () {

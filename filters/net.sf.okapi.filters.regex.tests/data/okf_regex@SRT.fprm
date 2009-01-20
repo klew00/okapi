@@ -6,6 +6,7 @@ endString="
 extractOuterStrings.b=false
 useBSlashEscape.b=true
 regexOptions.i=40
+mimeType=text/plain
 ruleCount.i=1
 rule0.ruleName=Rule
 rule0.ruleType.i=1

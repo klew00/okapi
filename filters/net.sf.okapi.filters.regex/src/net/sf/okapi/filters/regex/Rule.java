@@ -42,7 +42,6 @@ public class Rule {
 	protected String nameFormat;
 	protected int ruleType;
 	protected boolean preserveWS;
-	protected boolean unwrap;
 	protected boolean useCodeFinder;
 	protected InlineCodeFinder codeFinder;
 	protected String propertyName;
@@ -59,7 +58,6 @@ public class Rule {
 		nameFormat = "";
 		codeFinder = new InlineCodeFinder();
 		preserveWS = true;
-		unwrap = false;
 		sample = "";
 	}
 	
@@ -72,7 +70,6 @@ public class Rule {
 		nameFormat = obj.nameFormat;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
-		unwrap = obj.unwrap;
 		useCodeFinder = obj.useCodeFinder;
 		codeFinder = obj.codeFinder.clone();
 		propertyName = obj.propertyName;
@@ -159,14 +156,6 @@ public class Rule {
 		preserveWS = value;
 	}
 
-	public boolean unwrap () {
-		return unwrap;
-	}
-	
-	public void setUnwrap (boolean value) {
-		unwrap = value;
-	}
-	
 	public String getPropertyName () {
 		return propertyName;
 	}
@@ -210,7 +199,6 @@ public class Rule {
 		tmp.setString("nameEnd", nameEnd);
 		tmp.setString("nameFormat", nameFormat);
 		tmp.setBoolean("preserveWS", preserveWS);
-		tmp.setBoolean("unwrap", unwrap);
 		tmp.setBoolean("useCodeFinder", useCodeFinder);
 		tmp.setString("propertyName", propertyName);
 		tmp.setString("propertyValue", propertyValue);
@@ -229,7 +217,6 @@ public class Rule {
 		nameEnd = tmp.getString("nameEnd", nameEnd);
 		nameFormat = tmp.getString("nameFormat", nameFormat);
 		preserveWS = tmp.getBoolean("preserveWS", preserveWS);
-		unwrap = tmp.getBoolean("unwrap", unwrap);
 		propertyName = tmp.getString("propertyName", propertyName);
 		propertyValue = tmp.getString("propertyValue", propertyValue);
 		sample = tmp.getString("sample", sample);

@@ -121,7 +121,7 @@ public class RuleDialog {
 		
 		grpTmp = new Group(shell, SWT.NONE);
 		grpTmp.setText(Res.getString("RuleDialog.resourceName")); //$NON-NLS-1$
-		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		layTmp = new GridLayout(2, false);
 		grpTmp.setLayout(layTmp);
 
@@ -252,4 +252,5 @@ public class RuleDialog {
 	public Rule getRule () {
 		return rule;
 	}
+
 }
