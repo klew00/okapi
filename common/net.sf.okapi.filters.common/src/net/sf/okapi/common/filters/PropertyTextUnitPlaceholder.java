@@ -11,12 +11,47 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 
 	private String name;
 	private String value;
+	private String mimeType;
 
 	private int mainStartPos;
 	private int mainEndPos;
 	private int valueStartPos;
 	private int valueEndPos;
 
+	
+	/**
+	 * Constructor for properties only.
+	 * @param type
+	 * @param name
+	 * @param value
+	 */
+	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value) {
+		this(type, name, value, -1, -1, -1, -1);
+	}
+	
+	/**
+	 * Constructor for properties and text without a main sub-string
+	 * @param type
+	 * @param name
+	 * @param value
+	 * @param valueStartPos
+	 * @param valueEndPos
+	 */
+	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value,
+			int valueStartPos, int valueEndPos) {
+		this(type, name, value, valueStartPos, valueEndPos, valueStartPos, valueEndPos);
+	}
+	
+	/**
+	 * Default constructor for properties and text 
+	 * @param type
+	 * @param name
+	 * @param value
+	 * @param mainStartPos
+	 * @param mainEndPos
+	 * @param valueStartPos
+	 * @param valueEndPos
+	 */
 	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int mainStartPos,
 			int mainEndPos, int valueStartPos, int valueEndPos) {
 		this.type = type;
@@ -25,7 +60,7 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 		this.mainStartPos = mainStartPos;
 		this.mainEndPos = mainEndPos;
 		this.valueStartPos = valueStartPos;
-		this.valueEndPos = valueEndPos;
+		this.valueEndPos = valueEndPos;	
 	}
 
 	public PlaceholderType getType() {
@@ -82,6 +117,20 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 
 	public void setValueEndPos(int valueEndPos) {
 		this.valueEndPos = valueEndPos;
+	}
+
+	/**
+	 * @param mimeType the mimeType to set
+	 */
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	/**
+	 * @return the mimeType
+	 */
+	public String getMimeType() {
+		return mimeType;
 	}
 
 	/*

@@ -401,6 +401,10 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void endTextUnit(ISkeleton endMarker, List<Property> properties) {
 		FilterEvent tempTextUnit;
+		
+		if (hasUnfinishedSkeleton()) {
+			endDocument();
+		}
 
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
@@ -451,15 +455,30 @@ public abstract class BaseFilter implements IFilter {
 		endCode();
 	}
 
+	/**
+	 * Nothing is actionable within the tag (i.e., no properties or text)
+	 * 
+	 * @param codeType
+	 * @param literalCode
+	 * @param codeName
+	 */
+	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
+
+	}
+
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		addToTextUnit(codeType, literalCode, codeName, null, propertyTextUnitPlaceholders);
+	}
+
+	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		int propOrTextId = -1;
 
 		startCode(new Code(codeType, codeName));
 
 		// This TextUnit now references other resources
-		((TextUnit) peekMostRecentTextUnit().getResource()).setIsReferent(true);
-		currentCode.setHasReference(true);
+		((TextUnit) peekMostRecentTextUnit().getResource()).setIsReferent(true);		
 
 		// in place sort to make sure we do the Properties or Text in order
 		Collections.sort(propertyTextUnitPlaceholders);
@@ -481,35 +500,39 @@ public abstract class BaseFilter implements IFilter {
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				// begin a new TextUnit - also creates ID
 				TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-
-				// compose TextUnit skeleton with reference i.e.,
-				// content="#ref1"
-				StringBuffer TextUnitSkel = new StringBuffer(literalCode);
-				String valueRefMarker = TextFragment
-						.makeRefMarker(Integer.toString(propOrTextId), propOrText.getName());
-				TextUnitSkel = TextUnitSkel.replace(propOrText.getValueStartPos(), propOrText.getValueEndPos(),
-						valueRefMarker);
-				String finalWithRef = TextUnitSkel.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()+1);
+				tu.setName(propOrText.getName());
+				tu.setIsReferent(true);
 
 				// set the skeleton on the TextUnit
-				tu.setSkeleton(new GenericSkeleton(finalWithRef));
-				tu.setIsReferent(true);
-				currentCode.append(TextFragment.makeRefMarker(tu.getId(), propOrText.getName()));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+				skel.addContentPlaceholder(tu);
+				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+				tu.setSkeleton(skel);
+				currentCode.appendReference(TextFragment.makeRefMarker(tu.getId(), propOrText.getName()));
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY
-					|| propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
-				boolean readOnly = true;
-
-				if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY)
-					readOnly = false;
-
+			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				Property p = new Property(propOrText.getName(), propOrText.getValue(), readOnly);
-				dp.setSourceProperty(p);
-				dp.setIsReferent(true);
-				currentCode.append(TextFragment.makeRefMarker(dp.getId(), propOrText.getName()));
+				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+				skel.addValuePlaceholder(dp, propOrText.getName(), language);
+				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+				dp.setSkeleton(skel);				
+				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()));
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else {
+			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
+				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
+				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+				skel.addValuePlaceholder(dp, propOrText.getName(), language);
+				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+				dp.setSkeleton(skel);				
+				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()));
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			}  			
+			else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
 		}
@@ -625,7 +648,7 @@ public abstract class BaseFilter implements IFilter {
 		int propOrTextId = -1;
 
 		currentSkeleton = new GenericSkeleton();
-		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
+		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setType(name);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 
@@ -650,31 +673,34 @@ public abstract class BaseFilter implements IFilter {
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				// begin a new TextUnit - also creates ID
 				TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-				// compose TextUnit skeleton with reference i.e.,
-				// content="#ref1"
-				StringBuffer TextUnitSkel = new StringBuffer(part);
-				String valueRefMarker = TextFragment
-						.makeRefMarker(Integer.toString(propOrTextId), propOrText.getName());
-				TextUnitSkel = TextUnitSkel.replace(propOrText.getValueStartPos(), propOrText.getValueEndPos(),
-						valueRefMarker);
-				String finalWithRef = TextUnitSkel.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()+1);
+				tu.setName(propOrText.getName());
+
 				// set the skeleton on the TextUnit
-				tu.setSkeleton(new GenericSkeleton(finalWithRef));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+				skel.addContentPlaceholder(tu);
+				skel.add(part.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+				tu.setSkeleton(skel);
 				tu.setIsReferent(true);
-				currentSkeleton.addContentPlaceholder(tu, language);
+				tu.setMimeType(propOrText.getMimeType());
+				currentSkeleton.addReference(tu);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY
-					|| propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
-				boolean readOnly = true;
-				if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY)
-					readOnly = false;
+			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
+				// set skeleton on DocumentPart
 				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				Property p = new Property(propOrText.getName(), propOrText.getValue(), readOnly);
-				dp.setProperty(p);
-				dp.setIsReferent(true);
-				currentSkeleton.addValuePlaceholder(dp, propOrText.getName(), language);
+				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+				skel.addValuePlaceholder(dp, propOrText.getName(), language);
+				skel.add(part.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+				dp.setSkeleton(skel);
+				currentSkeleton.addReference(dp);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else {
+			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {				
+				currentDocumentPart.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+				currentSkeleton.add(part.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
+			}  
+			else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
 		}
@@ -688,7 +714,8 @@ public abstract class BaseFilter implements IFilter {
 		if (part != null) {
 			currentSkeleton.append(part);
 		}
-		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, currentDocumentPart, currentSkeleton));
+		currentDocumentPart.setSkeleton(currentSkeleton);
+		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, currentDocumentPart));
 		currentSkeleton = null;
 		currentDocumentPart = null;
 	}
