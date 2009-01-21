@@ -401,7 +401,7 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void endTextUnit(ISkeleton endMarker, List<Property> properties) {
 		FilterEvent tempTextUnit;
-		
+
 		if (hasUnfinishedSkeleton()) {
 			endDocument();
 		}
@@ -478,7 +478,7 @@ public abstract class BaseFilter implements IFilter {
 		startCode(new Code(codeType, codeName));
 
 		// This TextUnit now references other resources
-		((TextUnit) peekMostRecentTextUnit().getResource()).setIsReferent(true);		
+		((TextUnit) peekMostRecentTextUnit().getResource()).setIsReferent(true);
 
 		// in place sort to make sure we do the Properties or Text in order
 		Collections.sort(propertyTextUnitPlaceholders);
@@ -518,21 +518,18 @@ public abstract class BaseFilter implements IFilter {
 				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 				skel.addValuePlaceholder(dp, propOrText.getName(), language);
 				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);				
-				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()));
+				dp.setSkeleton(skel);
+				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()), propOrText.getName());
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
 				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-				skel.addValuePlaceholder(dp, propOrText.getName(), language);
-				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);				
+				GenericSkeleton skel = new GenericSkeleton(literalCode.substring(propOrText.getMainStartPos(),
+						propOrText.getMainEndPos()));
+				dp.setSkeleton(skel);
 				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()));
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			}  			
-			else {
+			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
 		}
@@ -686,7 +683,6 @@ public abstract class BaseFilter implements IFilter {
 				currentSkeleton.addReference(tu);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
-				// set skeleton on DocumentPart
 				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
 				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
 				GenericSkeleton skel = new GenericSkeleton();
@@ -696,11 +692,15 @@ public abstract class BaseFilter implements IFilter {
 				dp.setSkeleton(skel);
 				currentSkeleton.addReference(dp);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {				
-				currentDocumentPart.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-				currentSkeleton.add(part.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
-			}  
-			else {
+			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
+				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
+				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+				GenericSkeleton skel = new GenericSkeleton();
+				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
+				dp.setSkeleton(skel);
+				currentSkeleton.addReference(dp);
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
 		}

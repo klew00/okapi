@@ -36,7 +36,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private String defaultConfig;
-		
+
 	public BaseMarkupFilter() {
 		super();
 	}
@@ -47,10 +47,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
 	public IParameters getParameters() {
-		// TODO Auto-generated method stub
-		return null;
+		return parameters;
 	}
-	
+
 	public ExtractionRuleState getRuleState() {
 		return ruleState;
 	}
@@ -58,7 +57,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public void setRuleState(ExtractionRuleState ruleState) {
 		this.ruleState = ruleState;
 	}
-	
+
 	public TaggedFilterConfiguration getConfig() {
 		return parameters.getTaggedConfig();
 	}
@@ -86,7 +85,6 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 */
 	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
 			boolean generateSkeleton) {
-		// TODO: Implement generateSkeleton
 		setEncoding(defaultEncoding);
 		setSrcLang(sourceLanguage);
 	}
@@ -109,7 +107,6 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				document = new Source(input);
 			}
 		} catch (IOException e) {
-			// TODO Wrap unchecked exception
 			throw new RuntimeException(e);
 		}
 		initialize();
@@ -125,15 +122,14 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				document = new Source(input);
 			}
 		} catch (IOException e) {
-			// TODO: Wrap unchecked exception
 			throw new RuntimeException(e);
 		}
 		initialize();
 	}
-	
+
 	@Override
 	protected void initialize() {
-		super.initialize();		
+		super.initialize();
 
 		if (parameters == null) {
 			parameters = new Parameters();
@@ -146,7 +142,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		document.fullSequentialParse();
 		nodeIterator = document.getNodeIterator();
 	}
-	
+
 	protected void setDefaultConfig(String defaultConfig) {
 		this.defaultConfig = defaultConfig;
 	}
@@ -181,30 +177,28 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 					handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
-					handleSkeleton(tag);
+					handleDocTypeDeclaration(tag);
 				} else if (tag.getTagType() == StartTagType.CDATA_SECTION) {
 					handleCdataSection(tag);
 				} else if (tag.getTagType() == StartTagType.COMMENT) {
-					handleSkeleton(tag);
+					handleComment(tag);
 				} else if (tag.getTagType() == StartTagType.XML_DECLARATION) {
-					handleSkeleton(tag);
+					handleXmlDeclaration(tag);
 				} else if (tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
-					handleSkeleton(tag);
+					handleProcessingInstruction(tag);
 				} else if (tag.getTagType() == StartTagType.MARKUP_DECLARATION) {
-					handleSkeleton(tag);
+					handleMarkupDeclaration(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON) {
-					// TODO: Handle server formats
-					handleSkeleton(tag);
+					handleServerCommon(tag);
 				} else if (tag.getTagType() == StartTagType.SERVER_COMMON_ESCAPED) {
-					// TODO: Handle server formats
-					handleSkeleton(tag);
+					handleServerCommonEscaped(tag);
 				} else { // not classified explicitly by Jericho
 					if (tag instanceof StartTag) {
 						handleStartTag((StartTag) tag);
 					} else if (tag instanceof EndTag) {
 						handleEndTag((EndTag) tag);
 					} else {
-						handleSkeleton(tag);
+						handleDocumentPart(tag);
 					}
 				}
 			} else {
@@ -223,13 +217,31 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		// return one of the waiting events
 		return super.next();
 	}
-	
-	protected void handleCdataSection(Tag tag) {}
-	protected void handleText(Segment text) {}
-	protected void handleStartTag(StartTag startTag) {}
-	protected void handleEndTag(EndTag endTag) {}
-	protected void handleSkeleton(Tag endTag) {}
-	
+
+	protected abstract void handleServerCommonEscaped(Tag tag);
+
+	protected abstract void handleServerCommon(Tag tag);
+
+	protected abstract void handleMarkupDeclaration(Tag tag);
+
+	protected abstract void handleXmlDeclaration(Tag tag);
+
+	protected abstract void handleDocTypeDeclaration(Tag tag);
+
+	protected abstract void handleProcessingInstruction(Tag tag);
+
+	protected abstract void handleComment(Tag tag);
+
+	protected abstract void handleCdataSection(Tag tag);
+
+	protected abstract void handleText(Segment text);
+
+	protected abstract void handleStartTag(StartTag startTag);
+
+	protected abstract void handleEndTag(EndTag endTag);
+
+	protected abstract void handleDocumentPart(Tag endTag);
+
 	protected void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
@@ -248,16 +260,16 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
 				// create a list of Property or Text placeholders for this tag
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-				// create code and add it to the current TextUnit 
+				// create code and add it to the current TextUnit
 				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
 			}
-		} else {  // end or unknown tag			
+		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 				codeType = TextFragment.TagType.CLOSING;
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			addToTextUnit(new Code(codeType, tag.getName(), literalTag));			
+			addToTextUnit(new Code(codeType, tag.getName(), literalTag));
 		}
 	}
 

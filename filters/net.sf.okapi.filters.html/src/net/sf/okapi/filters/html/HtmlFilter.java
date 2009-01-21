@@ -69,7 +69,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 	}
 
 	@Override
-	protected void handleSkeleton(Tag tag) {
+	protected void handleDocumentPart(Tag tag) {
 		addToDocumentPart(tag.toString());
 	}
 
@@ -194,6 +194,62 @@ public class HtmlFilter extends BaseMarkupFilter {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleComment(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleDocTypeDeclaration(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleMarkupDeclaration(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleProcessingInstruction(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleServerCommon(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleServerCommonEscaped(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration(net.htmlparser.jericho.Tag)
+	 */
+	@Override
+	protected void handleXmlDeclaration(Tag tag) {
+		handleDocumentPart(tag);		
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
