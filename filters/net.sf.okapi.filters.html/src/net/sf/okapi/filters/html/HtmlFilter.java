@@ -33,6 +33,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 public class HtmlFilter extends MarkupFilter {	
 	public HtmlFilter() {
 		super();
+		setMimeType("text/html");
 		setDefaultConfig("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 	}
 	

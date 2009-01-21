@@ -36,7 +36,6 @@ public abstract class MarkupFilter extends BaseFilter {
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private String defaultConfig;
-
 		
 	public MarkupFilter() {
 		super();
@@ -51,7 +50,7 @@ public abstract class MarkupFilter extends BaseFilter {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	public ExtractionRuleState getRuleState() {
 		return ruleState;
 	}
@@ -134,9 +133,7 @@ public abstract class MarkupFilter extends BaseFilter {
 	
 	@Override
 	protected void initialize() {
-		super.initialize();
-
-		setMimeType("text/html"); //$NON-NLS-1$
+		super.initialize();		
 
 		if (parameters == null) {
 			parameters = new Parameters();
