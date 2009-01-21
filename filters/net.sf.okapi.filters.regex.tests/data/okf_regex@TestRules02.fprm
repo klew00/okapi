@@ -1,0 +1,23 @@
+
+useLD.b=true
+localizeOutside.b=true
+startString="
+endString="
+extractOuterStrings.b=false
+useBSlashEscape.b=true
+regexOptions.i=32
+mimeType=text/plain
+ruleCount.i=1
+rule0.ruleName=Rule1
+rule0.ruleType.i=1
+rule0.start=^|\n(?:\S)
+rule0.end=\n(?:\n)|$
+rule0.nameStart=
+rule0.nameEnd=
+rule0.nameFormat=
+rule0.preserveWS.b=false
+rule0.useCodeFinder.b=false
+rule0.sample=First line$0a$second line.x$0a$$0a$Pargaraph 2$0a$second line of para 2.$0a$$0a$Parag 3$0a$zzz$0a$$0a$$0a$$0a$
+rule0.codeFinderRules.count.i=0
+rule0.codeFinderRules.sample=
+rule0.codeFinderRules.useAllRulesWhenTesting.b=false

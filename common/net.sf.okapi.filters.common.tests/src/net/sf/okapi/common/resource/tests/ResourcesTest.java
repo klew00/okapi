@@ -37,7 +37,7 @@ import junit.framework.*;
 
 public class ResourcesTest extends TestCase {
 
-	public void testMETATag () {
+	public void testMETATag1 () {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		System.out.println(" in: "+test);
 		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
@@ -136,39 +136,52 @@ public class ResourcesTest extends TestCase {
 		System.out.println(" in: "+test);
 		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
 		
-		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "there");
-		skel.add("href=\"");
-		skel.addContentPlaceholder(tu1);
-		skel.add("\"");		
-		tu1.setIsReferent(true);
-		tu1.setName("href");
-		tu1.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		DocumentPart dp1 = new DocumentPart("dp1", true);
+		skel.add("<img href=\"");
+		skel.addValuePlaceholder(dp1, "href", null);
+		dp1.setSourceProperty(new Property("href", "there"));
+		skel.add("\"/>");
+		dp1.setName("href");
+		dp1.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
 		
 		skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "test an inline ");
-		TextFragment tf = tu2.getSourceContent();
+		TextUnit tu1 = new TextUnit("tu1", "test an inline ");
+		TextFragment tf = tu1.getSourceContent();
 		Code code = new Code(TagType.PLACEHOLDER, "img");
-		code.append("<img ");
-		code.appendReference("tu1");
-		code.append("/>");
+		code.appendReference("dp1");
 		tf.append(code);
 		tf.append(" tag");
 		skel.add("<p>");
-		skel.addContentPlaceholder(tu2);
+		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
-		tu2.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+		tu1.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+
+	
+	public void testMETATag2 () {
+		String test = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
+		System.out.println(" in: "+test);
+		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);		
+		skel.add("<meta http-equiv=\"Content-Language\" content=\"");
+		skel.addValuePlaceholder(dp, "language", null);
+		skel.add("\"/>");
+		dp.setSourceProperty(new Property("language", "en", false));
+		dp.setSkeleton(skel);
+		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
 	}
 	
-	
-	
-
 	private String generateOutput (ArrayList<FilterEvent> list,
 		String original)
 	{

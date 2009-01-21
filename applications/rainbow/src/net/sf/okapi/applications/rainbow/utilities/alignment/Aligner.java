@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class Aligner {
 	
-	protected static final String ALIGNSTATUS_KEY       = "AlignStatus";
+	protected static final String ALIGNSTATUS_KEY       = "Att::AlignStatus";
 	protected static final String ALIGNSTATUS_TOREVIEW  = "TO-REVIEW";
 	
 	private Shell shell;

@@ -430,7 +430,6 @@ public class TextFragmentTest extends TestCase {
 		// Annotate "<1>[w2] w3</1>]"
 		tf1.annotate(5, 7, "a3", null);
 		assertTrue(tf1.hasAnnotation("a3"));
-		String s = fmt.setContent(tf1).toString(false);
 		assertEquals(fmt.setContent(tf1).toString(false), "w1 <1><3>w2</3> w3</1> w4 <2>w5 w6</2> w7");
 		// Annotate "<1>w2 [w3]</1>]" (w1 xxyyw2yy w3xx)
 		tf1.annotate(12, 14, "a4", null);

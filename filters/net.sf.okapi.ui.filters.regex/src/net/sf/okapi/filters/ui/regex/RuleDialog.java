@@ -152,7 +152,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					help.showTopic(this, "editrule"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "editrule"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -170,7 +170,7 @@ public class RuleDialog {
 		setData();
 		Dialogs.centerWindow(shell, parent);
 	}
-	
+
 	public boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -185,20 +185,29 @@ public class RuleDialog {
 			fullPattern = Pattern.compile("("+edStart.getText()+")(.*?)("+edEnd.getText()+")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				regexOptions);
 			Matcher m1 = fullPattern.matcher(getSampleText());
-			if ( m1.find() ) {
+			StringBuilder tmp = new StringBuilder();
+			int startSearch = 0;
+			while ( m1.find(startSearch) ) {
 				startPattern = Pattern.compile(edStart.getText(), regexOptions);
 				Matcher m2 = startPattern.matcher(m1.group());
 				if ( m2.find() ) {
 					endPattern = Pattern.compile(edEnd.getText(), regexOptions);
 					Matcher m3 = endPattern.matcher(m1.group());
 					if ( m3.find(m2.end()) ) {
-						edResult.setText(Res.getString("RuleDialog.resultStart") + m2.group() + Res.getString("RuleDialog.resultContent") //$NON-NLS-1$ //$NON-NLS-2$
+						tmp.append(Res.getString("RuleDialog.resultStart") + m2.group() + Res.getString("RuleDialog.resultContent") //$NON-NLS-1$ //$NON-NLS-2$
 							+ m1.group().substring(m2.end(), m3.start())
-							+ Res.getString("RuleDialog.resultEnd") + m3.group() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+							+ Res.getString("RuleDialog.resultEnd") + m3.group() + "]\n"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
+				if ( startSearch == m1.end(0) ) break;
+				else startSearch = m1.end(0);
 			}
-			else edResult.setText(Res.getString("RuleDialog.noMatch")); //$NON-NLS-1$
+			// If there is no match: tell it
+			if ( tmp.length() == 0 ) {
+				tmp.append(Res.getString("RuleDialog.noMatch")); //$NON-NLS-1$
+			}
+			// Display the results
+			edResult.setText(tmp.toString());
 		}
 		catch ( Throwable e ) {
 			edResult.setText(Res.getString("RuleDialog.error")+e.getMessage()); //$NON-NLS-1$
@@ -212,7 +221,7 @@ public class RuleDialog {
 		tmp = tmp.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		return tmp.replace("\r", "\n");  //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	private boolean saveData () {
 		try {
 			if (( edStart.getText().length() == 0 )
@@ -239,7 +248,7 @@ public class RuleDialog {
 			return false;
 		}
 	}
-	
+
 	public void setData () {
 		edStart.setText(rule.getStart());
 		edEnd.setText(rule.getEnd());
@@ -248,7 +257,7 @@ public class RuleDialog {
 		edNameStart.setText(rule.getNameStart());
 		edSample.setText(rule.getSample());
 	}
-	
+
 	public Rule getRule () {
 		return rule;
 	}

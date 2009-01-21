@@ -14,9 +14,10 @@ before the content.</p>
 <p><cite>End</cite> -- Enter the regular expression matching just after the 
 content.</p>
 <p>You can enter a example of text to process in the edit field. The result of 
-the rule applied to the example is shown below as you modify the parameters.</p>
-<p>For example:</p>
-<pre>Start: \[.*?\]=
+the rule applied to the example is shown below the example, as you modify the parameters. 
+All matches for the given rule are provided.</p>
+<p>Example of expressions:</p>
+<pre>Start: \[.*?\]=\{
   End: \}
 
 Sample: <span style="background-color: #00FF00">[ID100]={</span>Text to translate<span style="background-color: #00FF00">}</span></pre>
@@ -27,11 +28,11 @@ by the <cite>Start</cite> expression.</p>
 <p><cite>After the name</cite> -- Enter the regular expression matching just 
 after the name of the resource. This expression is applied on the text matched 
 by the <cite>Start</cite> expression.</p>
-<p>For example:</p>
+<p>Example of expression:</p>
 <pre>Before the name: \[
  After the name: \]
 
-Sample: <span style="background-color: #00FF00">[</span>ID100<span style="background-color: #00FF00">]</span>={Text to translate}</pre>
+Sample: <span style="background-color: #00FF00">[</span>ID100<span style="background-color: #00FF00">]</span>={  &lt;-- Matching text for the start of content.</pre>
 <p>&nbsp;</p>
 </body>
 </html>

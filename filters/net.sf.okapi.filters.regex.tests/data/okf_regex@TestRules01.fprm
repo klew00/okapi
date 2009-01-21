@@ -1,0 +1,10 @@
+
+useLD.b=true
+localizeOutside.b=true
+startString="
+endString="
+extractOuterStrings.b=true
+useBSlashEscape.b=true
+regexOptions.i=40
+mimeType=text/plain
+ruleCount.i=0

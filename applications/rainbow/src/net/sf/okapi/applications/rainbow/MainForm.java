@@ -79,6 +79,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -127,6 +128,7 @@ public class MainForm implements IParametersProvider {
 	private boolean inTargetEncSelection;
 	private Button chkUseCustomParametersFolder;
 	private Text edParamsFolder;
+	private Button btGetParamsFolder; 
 	private TabItem tiInputList1;
 	private TabItem tiInputList2;
 	private TabItem tiInputList3;
@@ -523,7 +525,7 @@ public class MainForm implements IParametersProvider {
 		edInputRoot.setEditable(false);
 		
 		btGetRoot = new Button(shell, SWT.PUSH);
-		btGetRoot.setText(" ... "); //$NON-NLS-1$
+		btGetRoot.setText("..."); //$NON-NLS-1$
 		btGetRoot.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				changeRoot();
@@ -810,7 +812,7 @@ public class MainForm implements IParametersProvider {
 		pnlPathBuilder.setLayoutData(gdTmp);
 
 		group = new Group(comp, SWT.NONE);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(3, false));
 		group.setText("Filters Parameters");
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -819,7 +821,15 @@ public class MainForm implements IParametersProvider {
 		
 		edParamsFolder = new Text(group, SWT.BORDER);
 		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
+		
+		btGetParamsFolder = new Button(group, SWT.PUSH);
+		btGetParamsFolder.setText("..."); //$NON-NLS-1$
+		btGetParamsFolder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				browseParamsFolder();
+            }
+		});
+		
 		// Space-holder
 		new Label(group, SWT.NONE);
 		
@@ -831,10 +841,12 @@ public class MainForm implements IParametersProvider {
 				if ( !chkUseCustomParametersFolder.getSelection() ) {
 					prj.setCustomParametersFolder(edParamsFolder.getText());
 				}
+				btGetParamsFolder.setEnabled(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setEditable(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection(), true));
             }
 		});
+	
 		
 		// Tabs change event (define here to avoid triggering it while creating the content)
 		tabFolder.addSelectionListener(new SelectionAdapter() {
@@ -851,6 +863,21 @@ public class MainForm implements IParametersProvider {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(origSize);
+	}
+
+	private void browseParamsFolder () {
+		try {
+			DirectoryDialog dlg = new DirectoryDialog(shell);
+			dlg.setFilterPath(edParamsFolder.getText());
+			String dir = dlg.open();
+			if (  dir == null ) return;
+			edParamsFolder.setText(dir);
+			edParamsFolder.selectAll();
+			edParamsFolder.setFocus();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
 	}
 
 	private void updateTabInfo () {
@@ -1300,6 +1327,7 @@ public class MainForm implements IParametersProvider {
 		edTargetEnc.setText(prj.getTargetEncoding());
 		
 		chkUseCustomParametersFolder.setSelection(prj.useCustomParametersFolder());
+		btGetParamsFolder.setEnabled(chkUseCustomParametersFolder.getSelection());
 		edParamsFolder.setEditable(prj.useCustomParametersFolder());
 		edParamsFolder.setText(prj.getParametersFolder(true));
 		

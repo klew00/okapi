@@ -7,13 +7,29 @@
 <body>
 <h1 class="util1">Utility – Byte-Order-Mark Conversion</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to</p>
-<h2>Common Parameters</h2>
+<p>This utility allows you to add or remove the Byte-Order-Mark (BOM) of a 
+UTF-8, UTF-16, or UTF-32 files.</p>
+<p>The Byte-Order-Mark (or BOM) is a special Unicode mark (U+FEFF) that is used 
+to indicate if a file is in little-endian or big-endian mode. For more 
+information on the BOM see <a href="http://www.unicode.org/faq/utf_bom.html">
+http://www.unicode.org/faq/utf_bom.html</a>.</p>
+<h2>Input Parameters</h2>
 <ul>
-	<li></li>
+	<li>The list of the input files to modify (Input list 1).</li>
+	<li>The output options.</li>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
+<h4>Actions on the Byte-Order-Mark</h4>
+<p><cite>Remove the Byte-Order-Mark if it is present</cite> -- Select this 
+option to remove the BOM from the input files if one is detected. By default 
+only the BOM of UTF-8 files are removed.</p>
+<p><cite>Remove also UTF-16 and UTF-32 BOMs</cite> -- Select this option to also 
+remove the BOM from UTF-16 and UTF-32 files if one is detected. This is not 
+something that is recommanded: UTF-16 and UTF-32 files must have a BOM.</p>
+<p><cite>Add the Byte-Order-Mark if it is not already present</cite> -- Select 
+this option to add a BOM in the input files if one is not detected. Note that 
+the input files must be in UTF-8 or UTF-16.</p>
 <p>&nbsp;</p>
 </body>
 </html>
