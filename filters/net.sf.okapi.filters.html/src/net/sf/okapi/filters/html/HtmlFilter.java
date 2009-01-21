@@ -27,10 +27,10 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.markupfilter.MarkupFilter;
+import net.sf.okapi.common.markupfilter.BaseMarkupFilter;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class HtmlFilter extends MarkupFilter {	
+public class HtmlFilter extends BaseMarkupFilter {	
 	public HtmlFilter() {
 		super();
 		setMimeType("text/html");

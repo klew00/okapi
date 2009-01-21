@@ -30,14 +30,14 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-public abstract class MarkupFilter extends BaseFilter {
+public abstract class BaseMarkupFilter extends BaseFilter {
 	private Source document;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private String defaultConfig;
 		
-	public MarkupFilter() {
+	public BaseMarkupFilter() {
 		super();
 	}
 
@@ -137,7 +137,7 @@ public abstract class MarkupFilter extends BaseFilter {
 
 		if (parameters == null) {
 			parameters = new Parameters();
-			URL url = MarkupFilter.class.getResource(defaultConfig); //$NON-NLS-1$
+			URL url = BaseMarkupFilter.class.getResource(defaultConfig); //$NON-NLS-1$
 			parameters.setTaggedConfig(new TaggedFilterConfiguration(url));
 		}
 
