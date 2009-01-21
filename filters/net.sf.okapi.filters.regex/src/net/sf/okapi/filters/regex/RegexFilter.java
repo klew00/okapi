@@ -399,126 +399,132 @@ public class RegexFilter implements IFilter {
 		String name,
 		String data)
 	{
-		int state = 0;
 		int i = -1;
-		int j = 0;
-		int start = -1;
-		int end = -1;
+		int startSearch = 0;
 		String mark = params.startString;
 		
-		while (( ++i < data.length() ) && ( end == -1 )) {
-			
-			// Deal with \\, \" and \' escapes
-			if ( state > 0 ) {
-				if ( params.useBSlashEscape ) {
-					while ( data.codePointAt(i) == '\\' ) {
-						if ( i+2 < data.length() ) i += 2; // Now point to next
-						else throw new RuntimeException("Escape syntax error in ["+data+"]");
-					}
-				}
-			}
-		
-			// Check characters
-			switch ( state ) {
-			case 0:
-				if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-					if ( ++j == mark.length() ) {
-						// Start of string match found, set search info for end
-						start = i+1; // Start of the string content
-						state = 2;
-						mark = params.endString;
-						j = 0;
-					}
-					else state = 1;
-				}
-				break;
-				
-			case 1: // Look if we can finish a start match
-				if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-					if ( ++j == mark.length() ) {
-						// Start of string match found, set search info for end
-						start = i+1; // Start of the string content
-						state = 2;
-						mark = params.endString;
-						j = 0;
-					}
-					// Else: keep moving
-				}
-				else { // Was not a match
-					state = 0;
-					i -= (j-1); // Go back just after the trigger
-					j = 0; // And reset the mark index
-				}
-				break;
-				
-			case 2: // Look for an end mark
-				if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-					if ( ++j == mark.length() ) {
-						// End of string match found
-						// Set the end of the string position (will stop the loop too)
-						end = i-j+1;
-					}
-					else state = 3;
-				}
-				break;
-				
-			case 3: // Look if we can finish an end match
-				if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-					if ( ++j == mark.length() ) {
-						// End of string match found
-						// Set the end of the string position (will stop the loop too)
-						end = i-j+1;
-					}
-					// Else: Keep moving
-				}
-				else { // Was not a match
-					state = 2;
-					i -= (j-1); // Go back just after the trigger
-					j = 0; // And reset the mark index
-				}
-				break;
-			}
-		}
+		while ( true  ) {
+			int j = 0;
+			int start = startSearch;
+			int end = -1;
+			int state = 0;
 
-		// If we have found a string: process it
-		if ( end != -1 ) {
-			// Skeleton part before
-			if ( start > 0 ) {
-				addSkeletonToQueue(data.substring(0, start), false);
-			}
+			// Search string one by one
+			while ( end == -1 ) {
+				if ( ++i >= data.length() ) break;
+				
+				// Deal with \\, \" and \' escapes
+				if ( state > 0 ) {
+					if ( params.useBSlashEscape ) {
+						while ( data.codePointAt(i) == '\\' ) {
+							if ( i+2 < data.length() ) i += 2; // Now point to next
+							else throw new RuntimeException("Escape syntax error in ["+data+"]");
+						}
+					}
+				}
 			
-			// Item to extract
-			tuRes = new TextUnit(String.valueOf(++tuId),
-				data.substring(start, end));
-			tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
-			if ( rule.preserveWS ) {
-				tuRes.setPreserveWhitespaces(true);
-			}
-			else { // Unwrap the string
-				TextFragment.unwrap(tuRes.getSourceContent());
-			}
+				// Check characters
+				switch ( state ) {
+				case 0:
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// Start of string match found, set search info for end
+							start = i+1; // Start of the string content
+							state = 2;
+							mark = params.endString;
+							j = 0;
+						}
+						else state = 1;
+					}
+					break;
+				case 1: // Look if we can finish a start match
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// Start of string match found, set search info for end
+							start = i+1; // Start of the string content
+							state = 2;
+							mark = params.endString;
+							j = 0;
+						}
+						// Else: keep moving
+					}
+					else { // Was not a match
+						state = 0;
+						i -= (j-1); // Go back just after the trigger
+						j = 0; // And reset the mark index
+					}
+					break;
+				case 2: // Look for an end mark
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// End of string match found
+							// Set the end of the string position (will stop the loop too)
+							end = i-j+1;
+						}
+						else state = 3;
+					}
+					break;
+				case 3: // Look if we can finish an end match
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// End of string match found
+							// Set the end of the string position (will stop the loop too)
+							end = i-j+1;
+						}
+						// Else: Keep moving
+					}
+					else { // Was not a match
+						state = 2;
+						i -= (j-1); // Go back just after the trigger
+						j = 0; // And reset the mark index
+					}
+					break;
+				}
+			} // End of while end == -1
 			
-			if ( rule.useCodeFinder ) {
-				rule.codeFinder.process(tuRes.getSourceContent());
+			// If we have found a string: process it
+			if ( end != -1 ) {
+				// Skeleton part before
+				if ( start > startSearch ) {
+					addSkeletonToQueue(data.substring(startSearch, start), false);
+				}
+				
+				// Item to extract
+				tuRes = new TextUnit(String.valueOf(++tuId),
+					data.substring(start, end));
+				tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+				if ( rule.preserveWS ) {
+					tuRes.setPreserveWhitespaces(true);
+				}
+				else { // Unwrap the string
+					TextFragment.unwrap(tuRes.getSourceContent());
+				}
+				
+				if ( rule.useCodeFinder ) {
+					rule.codeFinder.process(tuRes.getSourceContent());
+				}
+
+				if ( name != null ) {
+					if ( rule.nameFormat.length() > 0 ) {
+						String tmp = rule.nameFormat.replace("<parentName>",
+							(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
+						tuRes.setName(tmp.replace("<self>", name));
+					}
+					else tuRes.setName(name);
+				}
+				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
+				// Reset the pointers: next skeleton will start from startSearch, end reset to -1
+				startSearch = end;
 			}
 
-			if ( name != null ) {
-				if ( rule.nameFormat.length() > 0 ) {
-					String tmp = rule.nameFormat.replace("<parentName>",
-						(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-					tuRes.setName(tmp.replace("<self>", name));
-				}
-				else tuRes.setName(name);
-			}
-			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
+			// Make sure we get out of the loop if needed
+			if ( i >= data.length() ) break;
 			
-			// Skeleton part after
-			if ( end < data.length() ) {
-				addSkeletonToQueue(data.substring(end), false);
-			}
-		}
-		else { // No string in this entry, all is skeleton
-			addSkeletonToQueue(data, true);
+		} // End of while true
+
+		// Skeleton part after the last string
+		if ( startSearch < data.length() ) {
+			addSkeletonToQueue(data.substring(startSearch), false);
 		}
 	}
 	

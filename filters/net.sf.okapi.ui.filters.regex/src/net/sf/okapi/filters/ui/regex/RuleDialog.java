@@ -115,7 +115,7 @@ public class RuleDialog {
 		edResult = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
-		gdTmp.heightHint = 64;
+		gdTmp.heightHint = 88;
 		edResult.setLayoutData(gdTmp);
 		edResult.setEditable(false);
 		

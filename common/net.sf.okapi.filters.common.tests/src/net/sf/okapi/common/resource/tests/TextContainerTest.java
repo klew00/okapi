@@ -81,7 +81,8 @@ public class TextContainerTest extends TestCase {
 		// "**** [seg3]"
 		//  01234567890
 		tc1.createSegment(5, 11);
-		assertEquals(tc1.toString().length(), 2+2+1+2);
+		assertEquals(tc1.toString().length(), 4);
+		assertEquals(tc1.getCodedText().length(), 2+2+1+2);
 		List<TextFragment> list = tc1.getSegments();
 		assertNotNull(list);
 		assertEquals(list.size(), 3);
@@ -100,7 +101,7 @@ public class TextContainerTest extends TestCase {
 		ranges.add(new Range(13, 19));
 		tc1.createSegments(ranges);
 		assertTrue(tc1.isSegmented());
-		assertEquals(tc1.toString().length(), 2+2+1+2);
+		assertEquals(tc1.getCodedText().length(), 2+2+1+2);
 		list = tc1.getSegments();
 		assertNotNull(list);
 		assertEquals(list.size(), 3);
