@@ -7,13 +7,46 @@
 <body>
 <h1 class="util1">Utility – Search And Replace</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to</p>
+<p>The Search And replace utility allows you to search for a set of text 
+patterns and replace then with another. You can use regular expression if needed. 
+The input files can be read through the filters, or as plain text.</p>
 <h2>Input Parameters</h2>
 <ul>
-	<li></li>
+	<li>The list of the source documents to search and replace (Input list 1). </li>
+	<li>Default input encoding. </li>
+	<li>Location and names for output files. </li>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
+<p><cite>Item list</cite> -- The items list contains three columns:
+<ul>
+	<li>The Use column where a check box indicates if the item should be used (checked) or not (un-checked).</li>
+	<li>The Search for column where the text or regular expression to search for is displayed.</li>
+	<li>The Replace by column where the replacement text or regular expression is displayed.</li>
+</ul>
+</p>
+<ul>
+	<p>To edit an item : Double-click the item, or click the Edit button. To check and un-check an item: Click the checkbox, or press Space when the item is selected.</p>
+	<li><cite>Add</cite> -- Click this button to add a new item in the list. This opens the Search and Replace Item dialog box.</li>
+	<li><cite>Edit</cite> -- Click this button to edit the item currently selected. This opens the Search and Replace Item dialog box.</li>
+	<li><cite>Remove</cite> -- Click this button to remove the item currently selected from the list.</li>
+	<li><cite>Move Up</cite> -- Click this button to move the item currently selected upward.</li>
+	<li><cite>Move Down</cite> -- Click this button to move the item currently selected downward.</li>
+</ul>		
+<p><cite>Process the files as plain text</cite> -- Set this option to process the input files as plain text, that is without reading them through a filter. When this option is set: all parts of the file are searched, also the file is seen exactly like it would be in a text editor (no conversion of escaped characters is done for example). when this option is not set: only the text seen as translatable by the filter associated with the input file will be modified.</p>
+<p><cite>Use regular expressions</cite> -- Set this option to enable the <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">Regular Expressions</a> mode.</p>
+<h4>Regular expression options</h4>
+<p>When this option is checked several regular expression options are accessible. They apply to all expressions, not just the selected one:</p>
+<p><cite>Ignore case</cite> -- Set this option to ignore the cases in the matches. for example "bear" matches "Bearcat", "BEARCAT", and "bearcat".</p>
+<p><cite>Multiline</cite> -- Set this option to changes the meaning of ^ and $ so that they match at the beginning and end of any line, not just the beginning and end of the whole string.</p>
+<p><cite>Dot also matches line-feed</cite> -- Set this option to changes the meaning of the period character '.' so that it matches every character instead of every character except \n.</p>
+<h2>Search And Replace Item Dialog</h2>
+<p><cite>Search expression</cite> -- Enter the text or the regular expression to search for.</p>
+<p><cite>Replacement expression</cite> -- Enter the text or regular expression to replace with.</p>
+
+<p><b>Note: </b>the line-break and tabulation characters cannot be entered directly. You should use the regular expression mode and can use \n and \t respectively.</p>
+<p>If you set the Use Regular Expression option, the search text can use any of the expressions defined in the regular expression syntax, and the replacement text can use any of the Substitutions or Escapes.</p>
+<p>If you do not set the Use Regular Expression option, the search and replacement text is use exactly like you type it: they are no escape mechanism of any sort (for example \t is seen as a '\' follow by a 't' not as a tabulation character).</p>
 <p>&nbsp;</p>
 </body>
 </html>

@@ -1,19 +1,40 @@
 ﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>ID-Based Alignment</title>
+<title>URI Conversion</title>
 <link rel="stylesheet" type="text/css" href="../../../../help.css">
 </head>
 <body>
 <h1>URI Conversion</h1>
 <h2>Overview</h2>
-<p>This utility allows you to</p>
-<h2>Common Parameters</h2>
+<p>This utility allows you to convert the content of an input file to and from <a href="http://en.wikipedia.org/wiki/URI">
+URI</a> escape notation.</p>
+<h2>Input Parameters</h2>
 <ul>
-	<li></li>
+	<li>The list of the input files to modify (Input list 1).</li>
+	<li>The output options.</li>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
+<p><cite>Un-escape the URI escape sequences</cite> -- Select this option to convert URI 
+escaped sequences into normal text.</p>
+<p><cite>Escape content to URI escape sequences</cite> -- Select this option to convert normal 
+text into a text where characters are escaped into URI escape sequences. Which characters get 
+escaped is specified by the list below.</p>
+<p><cite>List of the characters to escape</cite> -- Check each character you want to be escaped. 
+Note that the character '%' is always escaped.</p>
+<p><cite>Escape all extended characters</cite> -- Check this option to convert all 
+non-ASCII characters to a URI escape sequences.</p>
+<p><cite>All But URI-Marks</cite> -- Click this button to reset the list of the 
+characters to escape to all, except the characters specified as "marks" 
+in <a href="http://tools.ietf.org/html/rfc2396">
+RFC 2396</a> (which are: '-', '_', '.', '!', '~', '*',''', '(', and ')').</p>
+
+<p><cite>All But Marks And Reserved</cite> -- Click this button to reset the list 
+of the characters to escape to all, except the characters specified as "marks" in 
+<a href="http://tools.ietf.org/html/rfc2396">
+RFC 2396</a> (which are: '-', '_', '.', '!', '~', '*',''', '(', and ')'.), 
+as well as the ones specified as "reserved" (which are: ';', '/', '?', ':', '@', '&', '=', '+', '$', ',').</p>
 <p>&nbsp;</p>
 </body>
 </html>
