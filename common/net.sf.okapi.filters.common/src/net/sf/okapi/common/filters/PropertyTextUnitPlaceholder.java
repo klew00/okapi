@@ -5,7 +5,7 @@ import net.sf.okapi.common.HashCodeUtil;
 public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitPlaceholder> {
 	public enum PlaceholderType {
 		TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY
-	};
+	}
 
 	private PlaceholderType type;
 

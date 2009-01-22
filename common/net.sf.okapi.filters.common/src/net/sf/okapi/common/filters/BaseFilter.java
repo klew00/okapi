@@ -348,7 +348,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-		tu.setName(propOrText.getName());
+		// TODO tu.setName(propOrText.getName());
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
 
@@ -364,7 +364,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private DocumentPart embeddedWritableProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
 		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-		dp.setName(propOrText.getName());
+		// TODO dp.setName();
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
@@ -377,7 +377,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private DocumentPart embeddedReadonlyProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
 		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-		dp.setName(propOrText.getName());
+		// TODO dp.setName();
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
 		GenericSkeleton skel = new GenericSkeleton(tag.substring(propOrText.getMainStartPos(), propOrText
 				.getMainEndPos()));
@@ -409,9 +409,9 @@ public abstract class BaseFilter implements IFilter {
 				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
 				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
 				if (inlineCode) {
-					currentCode.append(tag.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
+					currentCode.append(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 				} else {
-					currentSkeleton.add(tag.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
+					currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 				}
 			}
 
@@ -426,7 +426,7 @@ public abstract class BaseFilter implements IFilter {
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				DocumentPart dp = embeddedWritableProp(propOrText, tag, language);
 				if (inlineCode) {
-					currentCode.appendReference(dp.getId(), propOrText.getName());
+					currentCode.appendReference(dp.getId());
 				} else {
 					currentSkeleton.addReference(dp);
 				}
@@ -434,7 +434,7 @@ public abstract class BaseFilter implements IFilter {
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				DocumentPart dp = embeddedReadonlyProp(propOrText, tag, language);
 				if (inlineCode) {
-					currentCode.appendReference(dp.getId(), propOrText.getName());
+					currentCode.appendReference(dp.getId());
 				} else {
 					currentSkeleton.addReference(dp);
 				}

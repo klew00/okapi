@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -133,7 +132,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		if (parameters == null) {
 			parameters = new Parameters();
-			URL url = BaseMarkupFilter.class.getResource(defaultConfig); //$NON-NLS-1$
+			URL url = BaseMarkupFilter.class.getResource(defaultConfig);
 			parameters.setTaggedConfig(new TaggedFilterConfiguration(url));
 		}
 
@@ -322,11 +321,12 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
 
 		// normalize values for encoder
+		String normalizedName = name;
 		if (name.equals(HtmlEncoder.NATIVE_ENCODING)) {
-			name = HtmlEncoder.NORMALIZED_ENCODING;
+			normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
 		} else if (name.equals(HtmlEncoder.NATIVE_LANGUAGE)) {
-			name = HtmlEncoder.NORMALIZED_LANGUAGE;
+			normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
 		}
-		return new PropertyTextUnitPlaceholder(type, name, value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
+		return new PropertyTextUnitPlaceholder(type, normalizedName, value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
 	}
 }
