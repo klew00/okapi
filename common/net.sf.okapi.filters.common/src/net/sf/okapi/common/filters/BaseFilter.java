@@ -32,7 +32,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
@@ -120,20 +119,6 @@ public abstract class BaseFilter implements IFilter {
 
 	private String createId(String name, int number) {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
-	}
-
-	private void addPropertiesToResource(INameable resource, List<Property> properties) {
-		if (properties != null) {
-			for (Property property : properties) {
-				addPropertyToResource(resource, property);
-			}
-		}
-	}
-
-	private void addPropertyToResource(INameable resource, Property property) {
-		if (property != null) {
-			resource.setProperty(property);
-		}
 	}
 
 	private FilterEvent peekTempEvent() {
@@ -357,6 +342,118 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
+	// Private methods used for processing properties and text embedded within
+	// tags
+	// ////////////////////////////////////////////////////////////////////////
+
+	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
+		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
+		tu.setName(propOrText.getName());
+		tu.setMimeType(propOrText.getMimeType());
+		tu.setIsReferent(true);
+
+		// set the skeleton on the TextUnit
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+		skel.addContentPlaceholder(tu);
+		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+		tu.setSkeleton(skel);
+
+		return tu;
+	}
+
+	private DocumentPart embeddedWritableProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
+		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
+		dp.setName(propOrText.getName());
+		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+		skel.addValuePlaceholder(dp, propOrText.getName(), language);
+		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+		dp.setSkeleton(skel);
+
+		return dp;
+	}
+
+	private DocumentPart embeddedReadonlyProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
+		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
+		dp.setName(propOrText.getName());
+		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+		GenericSkeleton skel = new GenericSkeleton(tag.substring(propOrText.getMainStartPos(), propOrText
+				.getMainEndPos()));
+		dp.setSkeleton(skel);
+
+		return dp;
+	}
+
+	private void processAllEmbedded(String tag, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode) {
+		int propOrTextId = -1;
+
+		// in place sort to make sure we do the Properties or Text in order
+		Collections.sort(propertyTextUnitPlaceholders);
+
+		// add the part up to the first prop or text
+		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
+		if (inlineCode) {
+			currentCode.append(tag.substring(0, pt.getMainStartPos()));
+		} else {
+			currentSkeleton.add(tag.substring(0, pt.getMainStartPos()));
+		}
+
+		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
+			propOrTextId++;
+
+			// add the markup between props or text
+			if (propOrTextId >= 1 && propOrTextId < propertyTextUnitPlaceholders.size()) {
+				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
+				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
+				if (inlineCode) {
+					currentCode.append(tag.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
+				} else {
+					currentSkeleton.add(tag.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
+				}
+			}
+
+			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
+				TextUnit tu = embeddedTextUnit(propOrText, tag);
+				if (inlineCode) {
+					currentCode.appendReference(tu.getId());
+				} else {
+					currentSkeleton.addReference(tu);
+				}
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
+				DocumentPart dp = embeddedWritableProp(propOrText, tag, language);
+				if (inlineCode) {
+					currentCode.appendReference(dp.getId(), propOrText.getName());
+				} else {
+					currentSkeleton.addReference(dp);
+				}
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
+				DocumentPart dp = embeddedReadonlyProp(propOrText, tag, language);
+				if (inlineCode) {
+					currentCode.appendReference(dp.getId(), propOrText.getName());
+				} else {
+					currentSkeleton.addReference(dp);
+				}
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			} else {
+				throw new BaseFilterException("Unkown Property or TextUnit type");
+			}
+		}
+
+		// add the remaining markup after the last prop or text
+		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
+		if (inlineCode) {
+			currentCode.append(tag.substring(pt.getMainEndPos()));
+		} else {
+			currentSkeleton.add(tag.substring(pt.getMainEndPos()));
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////////
 	// TextUnit Methods
 	// ////////////////////////////////////////////////////////////////////////
 
@@ -380,16 +477,20 @@ public abstract class BaseFilter implements IFilter {
 		endTextUnit(endMarker, null);
 	}
 
-	protected void startTextUnit(String text, ISkeleton startMarker, List<Property> properties) {
+	protected void startTextUnit(String text, ISkeleton startMarker,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		GenericSkeleton skel = null;
 
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
 
-		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
+		if (startMarker != null && propertyTextUnitPlaceholders != null) {
+			// TODO: language=null do we need to handle other cases?
+			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false);
+		}
 
-		addPropertiesToResource(tu, properties);
+		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
 
 		if (startMarker != null) {
 			skel = new GenericSkeleton((GenericSkeleton) startMarker);
@@ -399,7 +500,7 @@ public abstract class BaseFilter implements IFilter {
 		tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
 
-	protected void endTextUnit(ISkeleton endMarker, List<Property> properties) {
+	protected void endTextUnit(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		FilterEvent tempTextUnit;
 
 		if (hasUnfinishedSkeleton()) {
@@ -410,6 +511,11 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
 		}
 
+		if (endMarker != null && propertyTextUnitPlaceholders != null) {
+			// TODO: language=null do we need to handle other cases?
+			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
+		}
+
 		tempTextUnit = popTempEvent();
 
 		if (endMarker != null) {
@@ -417,14 +523,7 @@ public abstract class BaseFilter implements IFilter {
 			skel.add((GenericSkeleton) endMarker);
 		}
 
-		addPropertiesToResource((TextUnit) tempTextUnit.getResource(), properties);
-
-		if (hasParentTextUnit()) {
-			referencableFilterEvents.add(tempTextUnit);
-		} else {
-			filterEvents.add(tempTextUnit);
-		}
-
+		filterEvents.add(tempTextUnit);
 	}
 
 	protected void addToTextUnit(String text) {
@@ -435,16 +534,6 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
-	}
-
-	protected void addToTextUnit(Property property) {
-		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add property");
-		}
-
-		FilterEvent tempTextUnit = peekTempEvent();
-
-		addPropertyToResource((TextUnit) tempTextUnit.getResource(), property);
 	}
 
 	protected void addToTextUnit(Code code) {
@@ -463,7 +552,9 @@ public abstract class BaseFilter implements IFilter {
 	 * @param codeName
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
-
+		Code code = new Code(codeType, codeName, literalCode);
+		startCode(code);
+		endCode();
 	}
 
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName,
@@ -473,71 +564,12 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		int propOrTextId = -1;
-
-		startCode(new Code(codeType, codeName));
 
 		// This TextUnit now references other resources
 		((TextUnit) peekMostRecentTextUnit().getResource()).setIsReferent(true);
 
-		// in place sort to make sure we do the Properties or Text in order
-		Collections.sort(propertyTextUnitPlaceholders);
-
-		// add the part up to the first prop or text
-		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
-		currentCode.append(literalCode.substring(0, pt.getMainStartPos()));
-
-		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
-			propOrTextId++;
-
-			// add the markup between props or text
-			if (propOrTextId >= 1 && propOrTextId < propertyTextUnitPlaceholders.size()) {
-				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
-				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
-				currentCode.append(literalCode.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
-			}
-
-			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
-				// begin a new TextUnit - also creates ID
-				TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-				tu.setName(propOrText.getName());
-				tu.setIsReferent(true);
-
-				// set the skeleton on the TextUnit
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-				skel.addContentPlaceholder(tu);
-				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				tu.setSkeleton(skel);
-				currentCode.appendReference(TextFragment.makeRefMarker(tu.getId(), propOrText.getName()));
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
-				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(literalCode.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-				skel.addValuePlaceholder(dp, propOrText.getName(), language);
-				skel.add(literalCode.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);
-				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()), propOrText.getName());
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
-				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-				GenericSkeleton skel = new GenericSkeleton(literalCode.substring(propOrText.getMainStartPos(),
-						propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);
-				currentCode.appendReference(TextFragment.makeRefMarker(dp.getId()));
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else {
-				throw new BaseFilterException("Unkown Property or TextUnit type");
-			}
-		}
-
-		// add the remaining markup after the last prop or text
-		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
-		currentCode.append(literalCode.substring(pt.getMainEndPos()));
-
+		startCode(new Code(codeType, codeName));
+		processAllEmbedded(literalCode, language, propertyTextUnitPlaceholders, true);
 		endCode();
 	}
 
@@ -549,9 +581,14 @@ public abstract class BaseFilter implements IFilter {
 		startGroup(startMarker, null);
 	}
 
-	protected void startGroup(ISkeleton startMarker, List<Property> properties) {
+	protected void startGroup(ISkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
+		}
+
+		if (startMarker != null && propertyTextUnitPlaceholders != null) {
+			// TODO: language=null do we need to handle other cases?
+			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false);
 		}
 
 		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
@@ -562,7 +599,7 @@ public abstract class BaseFilter implements IFilter {
 
 		String gid = createId(START_GROUP, ++startGroupId);
 		StartGroup g = new StartGroup(parentId, gid);
-		addPropertiesToResource(g, properties);
+
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 
 		FilterEvent fe = new FilterEvent(FilterEventType.START_GROUP, g, skel);
@@ -583,10 +620,19 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void endGroup(ISkeleton endMarker) {
-		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
+		endGroup(endMarker, null);
+	}
+
+	protected void endGroup(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
 			throw new BaseFilterException("Start group not found. Cannot end group");
+		}
+		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
+
+		if (endMarker != null && propertyTextUnitPlaceholders != null) {
+			// TODO: language=null do we need to handle other cases?
+			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
 		}
 
 		popTempEvent();
@@ -613,7 +659,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
-		tu.getSource().append(currentCode);
+		tu.getSourceContent().append(currentCode);
 		currentCode = null;
 	}
 
@@ -642,72 +688,12 @@ public abstract class BaseFilter implements IFilter {
 	protected void startDocumentPart(String part, String name, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
-		int propOrTextId = -1;
-
 		currentSkeleton = new GenericSkeleton();
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setType(name);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 
-		// in place sort to make sure we do the Properties or Text in linear
-		// order
-		Collections.sort(propertyTextUnitPlaceholders);
-
-		// add the part up to the first prop or text
-		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
-		currentSkeleton.add(part.substring(0, pt.getMainStartPos()));
-
-		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
-			propOrTextId++;
-
-			// add the skel between props or text
-			if (propOrTextId >= 1 && propOrTextId < propertyTextUnitPlaceholders.size()) {
-				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
-				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
-				currentSkeleton.add(part.substring(pt1.getMainEndPos() - 1, pt2.getMainStartPos() - 1));
-			}
-
-			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
-				// begin a new TextUnit - also creates ID
-				TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-				tu.setName(propOrText.getName());
-
-				// set the skeleton on the TextUnit
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-				skel.addContentPlaceholder(tu);
-				skel.add(part.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				tu.setSkeleton(skel);
-				tu.setIsReferent(true);
-				tu.setMimeType(propOrText.getMimeType());
-				currentSkeleton.addReference(tu);
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
-				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-				skel.addValuePlaceholder(dp, propOrText.getName(), language);
-				skel.add(part.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);
-				currentSkeleton.addReference(dp);
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
-				DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-				dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-				GenericSkeleton skel = new GenericSkeleton();
-				skel.add(part.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
-				dp.setSkeleton(skel);
-				currentSkeleton.addReference(dp);
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} else {
-				throw new BaseFilterException("Unkown Property or TextUnit type");
-			}
-		}
-
-		// add the remaining skel after the last prop or text
-		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
-		currentSkeleton.add(part.substring(pt.getMainEndPos()));
+		processAllEmbedded(part, language, propertyTextUnitPlaceholders, false);
 	}
 
 	protected void endDocumentPart(String part) {

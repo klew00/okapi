@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -25,7 +26,6 @@ import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.common.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -166,7 +166,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				// only if it was not opened with a TextUnit tag (i.e., complex
 				// TextUnits such as <p> etc.)
 				boolean inlineTag = false;
-				if (parameters.getTaggedConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT)
+				if (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT)
 					inlineTag = true;
 				if (isCurrentTextUnit() && !isCurrentComplexTextUnit() && !inlineTag) {
 					endTextUnit();
@@ -257,11 +257,22 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			else
 				codeType = TextFragment.TagType.OPENING;
 
-			if (parameters.getTaggedConfig().hasActionableAttributes(startTag.getName())) {
-				// create a list of Property or Text placeholders for this tag
+			// create a list of Property or Text placeholders for this tag
+			// If this list is empty we know that there are no attributes that
+			// need special processing
+			propertyTextUnitPlaceholders = null;
+			// quick test so we can skip createPropertyTextUnitPlaceholders if
+			// there are no actionable attributes
+			if (getConfig().hasActionableAttributes(startTag.getName())) {
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-				// create code and add it to the current TextUnit
+			}
+
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				// add code and process actionable attributes
 				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
+			} else {
+				// no actionable attributes, just add the code as-is
+				addToTextUnit(codeType, literalTag, startTag.getName());
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -269,7 +280,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			addToTextUnit(new Code(codeType, tag.getName(), literalTag));
+			addToTextUnit(codeType, literalTag, tag.getName());
 		}
 	}
 
@@ -280,18 +291,16 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		// convert Jericho attributes to HashMap
 		Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
 		for (Attribute attribute : startTag.parseAttributes()) {
-			if (parameters.getTaggedConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			if (getConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderType.TRANSLATABLE,
 						attribute.getName(), attribute.getValue(), startTag, attribute));
 			} else {
 
-				if (parameters.getTaggedConfig().isReadOnlyLocalizableAttribute(startTag.getName(),
-						attribute.getName(), attrs)) {
+				if (getConfig().isReadOnlyLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 							attribute));
-				} else if (parameters.getTaggedConfig().isWritableLocalizableAttribute(startTag.getName(),
-						attribute.getName(), attrs)) {
+				} else if (getConfig().isWritableLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 							attribute));
