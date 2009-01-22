@@ -6,6 +6,7 @@ class ITSTrace {
 	boolean translate;
 	int dir;
 	int withinText;
+	boolean term;
 
 	ITSTrace () {
 	}
@@ -16,6 +17,7 @@ class ITSTrace {
 		translate = initialTrace.translate;
 		dir = initialTrace.dir;
 		withinText = initialTrace.withinText;
+		term = initialTrace.term;
 		this.isChildDone = isChildDone;
 	}
 

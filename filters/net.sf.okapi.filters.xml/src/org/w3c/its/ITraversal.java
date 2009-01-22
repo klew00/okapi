@@ -70,4 +70,5 @@ public interface ITraversal {
 	 * @return One of the WINTINTEXT_* values.
 	 */
 	int getWithinText ();
+	
 }

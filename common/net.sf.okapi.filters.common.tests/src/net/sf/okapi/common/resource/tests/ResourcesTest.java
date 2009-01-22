@@ -65,7 +65,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test), test);
 	}
 	
-	public void testPWithAttribute () {
+	public void testPWithAttributes () {
 		String test = "<p title='my title'>Text of p</p>";
 		System.out.println(" in: "+test);
 		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
@@ -131,28 +131,32 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test), test);
 	}
 
-	public void testPWithInline () {
-		String test = "<p>test an inline <img href=\"there\"/> tag</p>";
+	public void testPWithInlines () {
+		String test = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
 		System.out.println(" in: "+test);
 		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp1 = new DocumentPart("dp1", true);
-		skel.add("<img href=\"");
+		skel.add("<a href=\"");
 		skel.addValuePlaceholder(dp1, "href", null);
-		dp1.setSourceProperty(new Property("href", "there"));
+		dp1.setSourceProperty(new Property("href", "there", false));
 		skel.add("\"/>");
-		dp1.setName("href");
+		dp1.setName("a");
 		dp1.setSkeleton(skel);
 		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
 		
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "test an inline ");
+		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		TextFragment tf = tu1.getSourceContent();
-		Code code = new Code(TagType.PLACEHOLDER, "img");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("bold");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" ");
+		Code code = new Code(TagType.PLACEHOLDER, "a");
 		code.appendReference("dp1");
 		tf.append(code);
-		tf.append(" tag");
+		tf.append(" after.");
 		skel.add("<p>");
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
@@ -191,14 +195,32 @@ public class ResourcesTest extends TestCase {
 		for ( FilterEvent event : list ) {
 			switch ( event.getEventType() ) {
 			case TEXT_UNIT:
-				tmp.append(writer.processTextUnit((TextUnit)event.getResource()));
+				TextUnit tu = (TextUnit)event.getResource();
+				GenericSkeleton skl = (GenericSkeleton)tu.getSkeleton();
+				if ( skl != null ) {
+					System.out.println("TU:skl="+skl.toString());
+				}
+				else {
+					System.out.println("TU:skl=None");
+				}
+				System.out.println("  :txt="+tu.toString());
+				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:
-				tmp.append(writer.processDocumentPart((DocumentPart)event.getResource()));
+				DocumentPart dp = (DocumentPart)event.getResource();
+				skl = (GenericSkeleton)dp.getSkeleton();
+				if ( skl != null ) {
+					System.out.println("DP:skl="+skl.toString());
+				}
+				else {
+					System.out.println("DP:skl=None");
+				}
+				tmp.append(writer.processDocumentPart(dp));
 				break;
 			}
 		}
 		System.out.println("out: "+tmp.toString());
+		System.out.println("-----");
 		return tmp.toString();
 	}
 

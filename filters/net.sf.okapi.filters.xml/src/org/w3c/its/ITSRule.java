@@ -8,5 +8,8 @@ class ITSRule {
 	boolean translate;
 	int dir;
 	int withinText;
+	boolean term;
+	String termInfo;
+	int termInfoType;
 
 }

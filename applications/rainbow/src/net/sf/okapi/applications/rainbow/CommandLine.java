@@ -117,6 +117,10 @@ public class CommandLine {
 			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0
 				prj.setInputRoot(0, nextArg(args, ++i));
 			}
+			else if ( "-pd".equals(arg) ) {
+				prj.setCustomParametersFolder(nextArg(args, ++i));
+				prj.setUseCustomParametersFolder(true);
+			}
 			else if ( "-fs".equals(arg) ) {
 				Input inp = prj.getLastItem(0);
 				if ( inp == null ) { 

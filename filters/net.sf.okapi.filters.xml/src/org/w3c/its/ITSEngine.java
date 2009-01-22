@@ -34,6 +34,11 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
+	private static final int      FP_TERMINOLOGY      = 3;
+	
+	private static final int      TERMINFOTYPE_POINTER     = 0;
+	private static final int      TERMINFOTYPE_REF         = 1;
+	private static final int      TERMINFOTYPE_REFPOINTER  = 2;
 
 	private DocumentBuilderFactory fact; 
 	private Document doc;
@@ -176,6 +181,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
 						compileDirRule(ruleElem, isInternal);
 					}
+					else if ( "termRule".equals(ruleElem.getLocalName()) ) {
+						compileTermRule(ruleElem, isInternal);
+					}
 				}
 			}
 		}
@@ -241,19 +249,63 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	private void compileWithinTextRule (Element elem,
-		boolean isInternal)
-	{
-		ITSRule rule = new ITSRule();
-		rule.selector = elem.getAttribute("selector");
-		String value = elem.getAttribute("withinText");
-		if ( "yes".equals(value) ) rule.withinText = WITHINTEXT_YES;
-		else if ( "no".equals(value) ) rule.withinText = WITHINTEXT_NO;
-		else if ( "nested".equals(value) ) rule.withinText = WITHINTEXT_NESTED;
-		else throw new RuntimeException("Invalid value for 'withinText'.");
-		rule.ruleType = IProcessor.DC_WITHINTEXT;
-		rule.isInternal = isInternal;
-		rules.add(rule);
-	}
+			boolean isInternal)
+		{
+			ITSRule rule = new ITSRule();
+			rule.selector = elem.getAttribute("selector");
+			String value = elem.getAttribute("withinText");
+			if ( "yes".equals(value) ) rule.withinText = WITHINTEXT_YES;
+			else if ( "no".equals(value) ) rule.withinText = WITHINTEXT_NO;
+			else if ( "nested".equals(value) ) rule.withinText = WITHINTEXT_NESTED;
+			else throw new RuntimeException("Invalid value for 'withinText'.");
+			rule.ruleType = IProcessor.DC_WITHINTEXT;
+			rule.isInternal = isInternal;
+			rules.add(rule);
+		}
+
+	private void compileTermRule (Element elem,
+			boolean isInternal)
+		{
+			ITSRule rule = new ITSRule();
+			rule.selector = elem.getAttribute("selector");
+			// term
+			String value = elem.getAttribute("term");
+			if ( "yes".equals(value) ) rule.term = true;
+			else if ( "no".equals(value) ) rule.term = false;
+			else throw new RuntimeException("Invalid value for 'term'.");
+			
+			value = elem.getAttribute("termInfoPointer");
+			String value2 = elem.getAttribute("termInfoRef");
+			String value3 = elem.getAttribute("termInfoRefPointer");
+			
+			if ( value != null ) {
+				rule.termInfoType = TERMINFOTYPE_POINTER;
+				rule.termInfo = value;
+				if (( value2 != null ) || ( value3 != null )) {
+					throw new RuntimeException("Too many termInfoXXX attributes specified");
+				}
+			}
+			else {
+				if ( value2 != null ) {
+					rule.termInfoType = TERMINFOTYPE_REF;
+					rule.termInfo = value2;
+					if ( value3 != null ) {
+						throw new RuntimeException("Too many termInfoXXX attributes specified");
+					}
+				}
+				else {
+					if ( value3 != null ) {
+						rule.termInfoType = TERMINFOTYPE_REFPOINTER;
+						rule.termInfo = value3;
+					}
+					// Else: No associate information, rule.termInfo is null
+				}
+			}
+
+			rule.ruleType = IProcessor.DC_TERMINOLOGY;
+			rule.isInternal = isInternal;
+			rules.add(rule);
+		}
 
 	public void applyRules (int dataCategories) {
 		processGlobalRules(dataCategories);
@@ -383,8 +435,9 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( data == null ) return;
 		
 		// Otherwise: see if there are any flags to change
-		if ( data.charAt(FP_TRANSLATE) != '?' )
+		if ( data.charAt(FP_TRANSLATE) != '?' ) {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
+		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
@@ -416,6 +469,13 @@ public class ITSEngine implements IProcessor, ITraversal
 				break;
 			}
 		}
+		
+		if ( data.charAt(FP_TERMINOLOGY) != '?' ) {
+			trace.peek().term = (data.charAt(FP_TERMINOLOGY) == 'y');
+		//TODO: terminfo data
+		}
+		
+
 	}
 
 	public void startTraversal () {
@@ -467,6 +527,11 @@ public class ITSEngine implements IProcessor, ITraversal
 						setFlag(NL.item(i), FP_WITHINTEXT,
 							String.valueOf(rule.withinText).charAt(0), true);
 						break;
+					case IProcessor.DC_TERMINOLOGY:
+						//TODO: add the termInfo string too
+						setFlag(NL.item(i), FP_TERMINOLOGY,
+							(rule.term ? 'y' : 'n'), true);
+						break;
 					}
 				}
 		    }
@@ -513,6 +578,10 @@ public class ITSEngine implements IProcessor, ITraversal
 					setFlag(attr.getOwnerElement(), FP_DIRECTIONALITY,
 						String.format("%d", n).charAt(0), attr.getSpecified());
 				}
+			}
+			
+			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
+				//TODO: Locale term rule
 			}
 		}
 		catch ( XPathExpressionException e ) {
