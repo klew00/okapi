@@ -984,14 +984,19 @@ public class MainForm implements IParametersProvider {
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
 			PluginItem item = plugins.getItem(iter.next());
-			MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
-			menuItem.setText(item.name+"..."); //$NON-NLS-1$
-			menuItem.setData(item.id);
-			menuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					launchUtility((String)((MenuItem)event.getSource()).getData());
-				}
-			});
+			if ( item.type == -1 ) {
+				new MenuItem(dropMenu, SWT.SEPARATOR);
+			}
+			else {
+				MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+				menuItem.setText(item.name+"..."); //$NON-NLS-1$
+				menuItem.setData(item.id);
+				menuItem.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent event) {
+						launchUtility((String)((MenuItem)event.getSource()).getData());
+					}
+				});
+			}
 		}
 	}
 

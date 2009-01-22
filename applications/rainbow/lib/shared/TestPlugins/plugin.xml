@@ -2,6 +2,38 @@
 <okapiPlugins version="1.0">
  
  <plugin type="utility"
+  id="oku_extraction"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.extraction.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Translation Package Creation</name>
+   <description>Creates a translation package.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+  <info xml:lang="fr">
+   <name>Creer un Kit de Traduction</name>
+   <description>Crée un kit de traduction.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ 
+ <plugin type="utility"
+  id="oku_merging"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Translation Package Merging</name>
+   <description>Merges an existing translation package.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
+ <plugin type="separator"/>
+  
+ <plugin type="utility"
   id="oku_textrewriting"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
@@ -33,46 +65,31 @@
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
- 
- <plugin type="utility"
-  id="oku_extraction"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.extraction.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
-  updateUri="http://okapi.sf.net/">
-  <info>
-   <name>Translation Package Creation</name>
-   <description>Creates a translation package.</description>
-   <provider>Okapi Framework</provider>
-  </info>
-  <info xml:lang="fr">
-   <name>Creer un Kit de Traduction</name>
-   <description>Crée un kit de traduction.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
- 
- <plugin type="utility"
-  id="oku_merging"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
-  updateUri="http://okapi.sf.net/">
-  <info>
-   <name>Translation Package Merging</name>
-   <description>Merges an existing translation package.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
 
  <plugin type="utility"
-  id="oku_xsltransform"
+  id="oku_searchandreplace"
   version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>XSL Transformation</name>
-   <description>Processes an input XML document with a given XSLT template.</description>
+   <name>Search And Replace</name>
+   <description>Performs a search and replace on the input file.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+ 
+ <plugin type="separator"/>
+  
+ <plugin type="utility"
+  id="oku_encodingconversion"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>Encoding Conversion</name>
+   <description>Converts a text input file from one encoding to another.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
@@ -104,14 +121,41 @@
  </plugin>
 
  <plugin type="utility"
-  id="oku_encodingconversion"
+  id="oku_uriconversion"
   version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Editor"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Editor"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Encoding Conversion</name>
-   <description>Converts a text input file from one encoding to another.</description>
+   <name>URI Conversion</name>
+   <description>Performs a URI conversion on the input file.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
+ <plugin type="utility"
+   id="oku_rtfconversion"
+   version="1.0"
+   pluginClass="net.sf.okapi.applications.rainbow.utilities.rtfconversion.Utility"
+   updateUri="http://okapi.sf.net/">
+   <info>
+    <name>RTF Conversion</name>
+    <description>Convers the input RTF to different formats.</description>
+    <provider>Okapi Framework</provider>
+   </info>
+  </plugin>
+
+ <plugin type="separator"/>
+
+ <plugin type="utility"
+  id="oku_xsltransform"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
+  updateUri="http://okapi.sf.net/">
+  <info>
+   <name>XSL Transformation</name>
+   <description>Processes an input XML document with a given XSLT template.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
@@ -130,44 +174,6 @@
  </plugin>
 
  <plugin type="utility"
-  id="oku_searchandreplace"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Editor"
-  updateUri="http://okapi.sf.net/">
-  <info>
-   <name>Search And Replace</name>
-   <description>Performs a search and replace on the input file.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
- 
-  <plugin type="utility"
-  id="oku_uriconversion"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Editor"
-  updateUri="http://okapi.sf.net/">
-  <info>
-   <name>URI Conversion</name>
-   <description>Performs a URI conversion on the input file.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
-
-  <plugin type="utility"
-   id="oku_rtfconversion"
-   version="1.0"
-   pluginClass="net.sf.okapi.applications.rainbow.utilities.rtfconversion.Utility"
-   updateUri="http://okapi.sf.net/">
-   <info>
-    <name>RTF Conversion</name>
-    <description>Convers the input RTF to different formats.</description>
-    <provider>Okapi Framework</provider>
-   </info>
-  </plugin>
-
-  <plugin type="utility"
    id="oku_transcomparison"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Utility"

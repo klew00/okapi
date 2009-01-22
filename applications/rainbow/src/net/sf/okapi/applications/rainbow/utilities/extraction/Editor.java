@@ -61,7 +61,6 @@ public class Editor implements IParametersEditor {
 	private Text edName;
 	private Text edOutputFolder;
 	private Button chkCreateZip;
-	private Button chkIncludeMergeData;
 	private Text edSample;
 	private Button chkPreTranslate;
 	private Text edTmPath;
@@ -219,9 +218,6 @@ public class Editor implements IParametersEditor {
 		chkCreateZip = new Button(cmpTmp, SWT.CHECK);
 		chkCreateZip.setText("Compress the package into a ZIP file");
 
-		chkIncludeMergeData = new Button(cmpTmp, SWT.CHECK);
-		chkIncludeMergeData.setText("Includes the data to merge back the files");
-		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("Segmentation");
 		grpTmp.setLayout(new GridLayout());

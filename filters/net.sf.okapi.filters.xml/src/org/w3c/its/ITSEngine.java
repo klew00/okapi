@@ -278,23 +278,23 @@ public class ITSEngine implements IProcessor, ITraversal
 			String value2 = elem.getAttribute("termInfoRef");
 			String value3 = elem.getAttribute("termInfoRefPointer");
 			
-			if ( value != null ) {
+			if ( value.length() > 0 ) {
 				rule.termInfoType = TERMINFOTYPE_POINTER;
 				rule.termInfo = value;
-				if (( value2 != null ) || ( value3 != null )) {
+				if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
 					throw new RuntimeException("Too many termInfoXXX attributes specified");
 				}
 			}
 			else {
-				if ( value2 != null ) {
+				if ( value2.length() > 0 ) {
 					rule.termInfoType = TERMINFOTYPE_REF;
 					rule.termInfo = value2;
-					if ( value3 != null ) {
+					if ( value3.length() > 0 ) {
 						throw new RuntimeException("Too many termInfoXXX attributes specified");
 					}
 				}
 				else {
-					if ( value3 != null ) {
+					if ( value3.length() > 0 ) {
 						rule.termInfoType = TERMINFOTYPE_REFPOINTER;
 						rule.termInfo = value3;
 					}
@@ -552,10 +552,13 @@ public class ITSEngine implements IProcessor, ITraversal
 					// Skip irrelevant nodes
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "translateRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
-					// Set the flag on the others
-					//TODO: Validate values
-					setFlag(attr.getOwnerElement(), FP_TRANSLATE,
-						(attr.getValue().equals("yes") ? 'y' : 'n'), attr.getSpecified());
+					// Validate the value
+					String value = attr.getValue();
+					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
+						throw new RuntimeException("Invalid value for 'translate'.");
+					}
+					// Set the flag
+					setFlag(attr.getOwnerElement(), FP_TRANSLATE, value.charAt(0), attr.getSpecified());
 				}
 			}
 			
@@ -581,7 +584,22 @@ public class ITSEngine implements IProcessor, ITraversal
 			}
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
-				//TODO: Locale term rule
+				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term");
+				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				Attr attr;
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "termRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					// Validate the value
+					String value = attr.getValue();
+					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
+						throw new RuntimeException("Invalid value for 'term'.");
+					}
+					// Set the flag
+					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
+				}
 			}
 		}
 		catch ( XPathExpressionException e ) {
@@ -639,7 +657,19 @@ public class ITSEngine implements IProcessor, ITraversal
 	public int getWithinText () {
 		return trace.peek().withinText;
 	}
+	
+	public boolean isTerm () {
+		return trace.peek().term;
+	}
 
+	public boolean isTerm (Attr attribute) {
+		if ( attribute == null ) return false;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
+		// '?' and 'n' will return (correctly) false
+		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
+	}
+	
 	private String getDirectoryName (String path) {
 		int n = path.lastIndexOf(File.separator);
 		if ( n > 0 ) return path.substring(0, n);

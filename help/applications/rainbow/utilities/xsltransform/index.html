@@ -1,19 +1,31 @@
 ﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>XSL Transformation</title>
+<title>Utility – XSL Transformation</title>
 <link rel="stylesheet" type="text/css" href="../../../../help.css">
 </head>
 <body>
 <h1 class="util1">Utility – XSL Transformation</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to</p>
-<h2>Common Parameters</h2>
+<p>This utility allows you to apply a given XSL Transform template to a list of 
+input documents and generate the resulting files.</p>
+<h2>Input Parameters</h2>
 <ul>
-	<li></li>
+	<li>The list of the documents to process (Input list 1).</li>
+	<li>The locations and names for the output.</li>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
+<p><cite>Path of the XSLT template to apply</cite> -- Enter the full path of the 
+XSLT template to use to generate the output.</p>
+<p><cite>Parameters</cite> -- Enter the list of any required parameters for this 
+template. the format must be name=value with one parameter per line. For 
+example:</p>
+<pre>Lang=en
+tmFile=myTM.tmx</pre>
+<p><cite>Default Parameters</cite> -- Click this button to copy into the 
+parameters list all the default parameters declared in the template.</p>
+<p><cite>Open Template</cite> -- Click this button to open the template file.</p>
 <p>&nbsp;</p>
 </body>
 </html>

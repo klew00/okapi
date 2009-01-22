@@ -92,11 +92,20 @@ public class PluginsAccess {
 			String prefLang = Utils.getCurrentLanguage(); 
 			Element rootElem = doc.getDocumentElement();
 
+			int sep = 0;
 			NodeList nl = rootElem.getElementsByTagName("plugin");
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				Element elem = (Element)nl.item(i);
 				PluginItem item = new PluginItem();
 
+				String type = elem.getAttribute("type");
+				if ( type.equals("separator") ) {
+					item.type = -1;
+					item.id = String.format("__%d", ++sep);
+					items.put(item.id, item);
+					continue;
+				}
+				
 				item.id = elem.getAttribute("id");
 				if ( item.id.length() == 0 )
 					throw new Exception("Attribute 'id' invalid or missing");

@@ -1,18 +1,17 @@
 ﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Translation Package Creation</title>
+<title>Utility - Translation Package Creation</title>
 <link rel="stylesheet" type="text/css" href="../../../../help.css">
 </head>
 <body>
 <h1 class="util1">Utility – Translation Package Creation</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to create translation packages for a given set of 
+<p>This utility allows you to create a translation package for a given set of 
 input documents.</p>
-<p>&nbsp;</p>
 <h2>Input Parameters</h2>
 <ul>
-	<li>The list of the source documents to translate.</li>
+	<li>The list of the source documents to translate (Input list 1).</li>
 	<li>The source language and default input encoding.</li>
 	<li>The target language and default output encoding.</li>
 </ul>
@@ -20,14 +19,54 @@ input documents.</p>
 <h3>Package Format Tab</h3>
 <p><cite>Type of package to create</cite> -- Select the type of package you want 
 to create. Note that not all types of input document can be prepared using some 
-type of package. for example the type &quot;<code>Original + RTF Layer</code>&quot; cannot 
+type of package. For example, the type <cite>Original + RTF Layer</cite> cannot 
 be applied to original files that or in some kind of binary formats.</p>
+<p>There are several types of package available:</p>
+<ul>
+	<li><cite>Generic XLIFF</cite>: Simple package where all files to translate 
+	are extracted to XLIFF. You can translate this package with any XLIFF 
+	editor.</li>
+	<li>
+	<p dir="ltr"><cite>OmegaT</cite>: OmegaT project with all its files and 
+	directory structure in place. You can translate this package with OmegaT.</p>
+	</li>
+	<li>
+	<p dir="ltr"><cite>TagEditor TTX</cite>: Package where all the files to 
+	translate are extracted to Trados TTX format. You can translate this package 
+	with Trados TagEditor or any compatible tool.</p></li>
+	<li>
+	<p dir="ltr"><cite>Original + RTF Layer</cite>: Package where all the files 
+	to translate are converted into an RTF file with Trados-compatible styles. 
+	You can translate this package with Trados Translator&#39;s Workbench or any 
+	compatible tool.</p></li>
+</ul>
 <h3>Package Location Tab</h3>
 <p><cite>Root of the output directory</cite> -- Enter the root of the directory 
 where to generate the package.</p>
 <p><cite>Package name</cite> -- Enter the name of the package to generate.</p>
 <p>The combinaison of both entries makes up the full path of the output 
 directory.</p>
+<h3>Options Tab</h3>
+<p><cite>Compress the package into a ZIP file</cite> -- Select this option to 
+create a ZIP file that includes the whole package.</p>
+<h4>Segmentation</h4>
+<p><cite>Pre-segment the extracted text with the following SRX rules</cite> -- 
+Set this option to segment the content of each extracted text unit.</p>
+<p><cite>SRX file for the source</cite> -- Enter the path or URL of the SRX 
+document where to take the SRX rules for the source language.</p>
+<p><cite>SRX file for the target</cite> -- Enter the path or URL of the SRX 
+document where to take the SRX rules for the target language. Note that when the 
+same document for both languages (most of the cases), the document is read only 
+once, saving processing time.</p>
+<h3>Pre-Translation Tab</h3>
+<p><cite>Pre-translate the extracted text using the following TM</cite> -- Set 
+this option to use a SimpleTM translation memory to leverage any extact match 
+into the prepared document (if the package to generate allows to do so).</p>
+<p>Enter the full path of the SimpleTM file you want to use for the 
+pre-translation.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 <h3>Options Tab</h3>
 <p>&nbsp;</p>
 <h3>Pre-Translation Tab</h3>

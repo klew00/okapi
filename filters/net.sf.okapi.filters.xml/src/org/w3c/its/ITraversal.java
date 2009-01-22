@@ -14,7 +14,6 @@ public interface ITraversal {
 	public static final int WITHINTEXT_YES       = 1;
 	public static final int WITHINTEXT_NESTED    = 2;
 	
-	
 	/**
 	 * Starts the traversal of the document. This method must be called
 	 * once before you call {@link #nextNode()}.
@@ -70,5 +69,19 @@ public interface ITraversal {
 	 * @return One of the WINTINTEXT_* values.
 	 */
 	int getWithinText ();
+
+	/**
+	 * Indicates if the current node of the traversal is a term.
+	 * @return True if the current node is a tern, false otherwise.
+	 */
+	boolean isTerm ();
 	
+	/**
+	 * Indicates if a given attribute of the current element of the traversal is
+	 * a term.
+	 * @param attribute The attribute to query. The attribute must be in the current
+	 * node of the traversal.
+	 * @return True if the attribute is a term, false otherwise.
+	 */
+	boolean isTerm (Attr attribute);
 }

@@ -460,6 +460,12 @@ public class RegexFilter implements IFilter {
 							// End of string match found
 							// Set the end of the string position (will stop the loop too)
 							end = i-j+1;
+							// Check for empty strings
+							if ( end == start ) {
+								end = -1;
+								state = 0;
+								j = 0;
+							}
 						}
 						else state = 3;
 					}
@@ -470,6 +476,12 @@ public class RegexFilter implements IFilter {
 							// End of string match found
 							// Set the end of the string position (will stop the loop too)
 							end = i-j+1;
+							// Check for empty strings
+							if ( end == start ) {
+								end = -1;
+								state = 0;
+								j = 0;
+							}
 						}
 						// Else: Keep moving
 					}
@@ -488,7 +500,7 @@ public class RegexFilter implements IFilter {
 				if ( start > startSearch ) {
 					addSkeletonToQueue(data.substring(startSearch, start), false);
 				}
-				
+
 				// Item to extract
 				tuRes = new TextUnit(String.valueOf(++tuId),
 					data.substring(start, end));

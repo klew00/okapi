@@ -37,12 +37,6 @@ public class Parameters extends BaseParameters {
 	protected boolean createZip;
 	
 	/**
-	 * True to generate also the data needed to merge back the
-	 * extracted data.
-	 */
-	protected boolean includeMergeData;
-	
-	/**
 	 * Base-name of the package. 
 	 */
 	protected String pkgName;
@@ -90,7 +84,6 @@ public class Parameters extends BaseParameters {
 		pkgType = "xliff";
 		createZip = false;
 		pkgName = "pack1";
-		includeMergeData = false;
 		outputFolder = System.getProperty("user.home") + File.separator
 			+ "Localization Projects";
 		includeTargets = true;
@@ -108,7 +101,6 @@ public class Parameters extends BaseParameters {
 		createZip = buffer.getBoolean("createZip", createZip);
 		pkgName = buffer.getString("pkgName", pkgName);
 		outputFolder = buffer.getString("outputFolder", outputFolder);
-		includeMergeData = buffer.getBoolean("includeMergeData", includeMergeData);
 		includeTargets = buffer.getBoolean("includeTargets", includeTargets);
 		preSegment = buffer.getBoolean("preSegment", preSegment);
 		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
@@ -123,7 +115,6 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("createZip", createZip);
 		buffer.setString("pkgName", pkgName);
 		buffer.setString("outputFolder", outputFolder);
-		buffer.setBoolean("includeMergeData", includeMergeData);
 		buffer.setBoolean("includeTargets", includeTargets);
 		buffer.setBoolean("preSegment", preSegment);
 		buffer.setString("sourceSRX", sourceSRX);
