@@ -290,7 +290,8 @@ public class Project {
 
 				elem2 = getFirstElement(elem1, "root");
 				if ( elem2 == null ) throw new Exception("Element <root> missing.");
-				useCustomInputRoots.set(i, elem2.getAttribute("useCustom").equals("1"));
+				// Use !=='0' for backward compatibility: empty value will == custom
+				useCustomInputRoots.set(i, !elem2.getAttribute("useCustom").equals("0"));
 				inputRoots.set(i, elem2.getTextContent());
 
 				NodeList n2 = elem1.getElementsByTagName("fi");

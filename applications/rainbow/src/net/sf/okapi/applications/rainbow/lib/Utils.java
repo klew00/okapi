@@ -286,22 +286,6 @@ public class Utils {
         return "";
 	}
 	
-	public static String[] splitLanguageCode (String p_sCode) {
-		if (( p_sCode == null ) || ( p_sCode.length() == 0 )) return null;
-		String[] aRes = new String[2];
-		p_sCode = p_sCode.replace('_', '-');
-		int n = p_sCode.indexOf('-');
-		if ( n > -1 ) {
-			aRes[0] = p_sCode.substring(0, n);
-			aRes[1] = p_sCode.substring(n+1);
-		}
-		else {
-			aRes[0] = p_sCode;
-			aRes[1] = "";
-		}
-		return aRes;
-	}
-	
 	public static String makeID (String p_sText) {
 		int n = p_sText.hashCode();
 		return String.format("%s%X", ((n>0)?'P':'N'), n);

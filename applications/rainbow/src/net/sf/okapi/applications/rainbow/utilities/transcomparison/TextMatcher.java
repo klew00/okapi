@@ -20,8 +20,10 @@
 
 package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -36,6 +38,38 @@ public class TextMatcher {
 	private static short[] matP = null; // 'previous' cost array, horizontally
 	private static short[] matD = null; // cost array, horizontally
 
+	private BreakIterator breaker1;
+	private BreakIterator breaker2;
+
+	/**
+	 * Creates a new TextMatcher object.
+	 * @param language1 Language code of the first language.
+	 * @param language2 Language code of the second language.
+	 */
+	public TextMatcher (String language1,
+		String language2)
+	{
+		// Get the locale to use.
+		Locale loc;
+		String[] parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
+		if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
+		else loc = new Locale(parts[0]);
+
+		// Create the first breaker.
+		breaker1 = BreakIterator.getWordInstance(loc);
+		if ( language1.equals(language2) ) {
+			// Use the same one if the second language is the same.
+			breaker2 = breaker1;
+		}
+		else {
+			// If two different languages: create a second breaker.
+			parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
+			if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
+			else loc = new Locale(parts[0]);
+			breaker2 = BreakIterator.getWordInstance(loc);
+		}
+	}
+	
 	protected static short minimum (int value1,
 		int value2,
 		int value3)
@@ -122,12 +156,12 @@ public class TextMatcher {
 		}
 		
 		if ( (options & IGNORE_CASE) == IGNORE_CASE ) {
-			tokens1 = tokenize(text1.toLowerCase());
-			tokens2 = tokenize(text2.toLowerCase());
+			tokens1 = tokenize(text1.toLowerCase(), breaker1);
+			tokens2 = tokenize(text2.toLowerCase(), breaker2);
 		}
 		else { // Keep case differences
-			tokens1 = tokenize(text1);
-			tokens2 = tokenize(text2);
+			tokens1 = tokenize(text1, breaker1);
+			tokens2 = tokenize(text2, breaker2);
 		}
 
 		int n = levenshtein(tokens1, tokens2);
@@ -139,12 +173,24 @@ public class TextMatcher {
 	}
 
 	/**
-	 * Simple word tokenizer. It should work with CJK text, but will not 
-	 * tokenize much for languages not using whitespace-separated words (e.g. Thai)
-	 * @param text the coded text to tokenize.
-	 * @return A list of token.
+	 * Breaks the text into words (or equivalents).
+	 * @param text The text to break down.
+	 * @return The list of the "words" generated.
 	 */
-	private List<String> tokenize (String text) {
+	private List<String> tokenize (String text,
+		BreakIterator breakerToUse)
+	{
+		breakerToUse.setText(text);
+		ArrayList<String> list = new ArrayList<String>();
+		int start = breakerToUse.first();
+		for (int end = breakerToUse.next(); end != BreakIterator.DONE; start=end, end=breakerToUse.next()) {
+			list.add(text.substring(start,end));
+		}
+		return list;
+	}
+
+	/* ====== Old code
+	private List<String> tokenize_OLD (String text) {
 		int len = text.length();
 		boolean isWord = false;
 		StringBuilder token = new StringBuilder();
@@ -184,12 +230,13 @@ public class TextMatcher {
 		}
 		return list;
 	}
-
+	=== */
+	
 	/**
 	 * Checks if the given character is some-kind of CJK character
 	 * @param value The character to lookup.
 	 * @return True if it is recognized as a "CJK" character, false if not.
-	 */
+	 === Old code
 	private boolean isCJK (char value) {
 		// To go faster (most of the cases)
 		if ( value < 0x1100 ) return false;
@@ -233,5 +280,6 @@ public class TextMatcher {
 		// Default
 		return false;
 	}
+	=== */
 
 }

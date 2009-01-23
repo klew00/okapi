@@ -57,7 +57,9 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
 	public void preprocess () {
-		matcher = new TextMatcher();
+		// Both strings are in the target language.
+		matcher = new TextMatcher(trgLang, trgLang);
+		
 		if ( params.generateHTML ) {
 			writer = new XMLWriter();
 		}
@@ -65,7 +67,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.generateTMX ) {
 			tmx = new TMXWriter();
 			tmx.create(params.tmxPath);
-			tmx.writeStartDocument(srcLang, trgLang, "TODO", "TODO", "TODO", "TODO", "TODO");
+			tmx.writeStartDocument(srcLang, trgLang, getName(), null, null, null, null);
 		}
 		pathToOpen = null;
 		

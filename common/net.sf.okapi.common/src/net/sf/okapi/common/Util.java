@@ -545,4 +545,25 @@ public class Util {
 		return tmp;
 	}
 
+	/**
+	 * Splits a given ISO language tag into its components.
+	 * @param language The language code to process.
+	 * @return An array of two strings: 0=language, 1=region/country
+	 */
+	public static String[] splitLanguageCode (String language) {
+		if (( language == null ) || ( language.length() == 0 )) return null;
+		String[] parts = new String[2];
+		language = language.replace('_', '-');
+		int n = language.indexOf('-');
+		if ( n > -1 ) {
+			parts[0] = language.substring(0, n);
+			parts[1] = language.substring(n+1);
+		}
+		else {
+			parts[0] = language;
+			parts[1] = "";
+		}
+		return parts;
+	}
+	
 }

@@ -25,8 +25,8 @@
   pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
   updateUri="http://okapi.sf.net/">
   <info>
-   <name>Translation Package Merging</name>
-   <description>Merges an existing translation package.</description>
+   <name>Translation Package Post-Processing</name>
+   <description>Post-processes translation packages.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
