@@ -39,41 +39,47 @@ import org.w3c.dom.NodeList;
 
 public class Project {
 
-	protected ArrayList<ArrayList<Input>>   inputLists;
-	private ArrayList<String>               inputRoots;
-	private Hashtable<String, String>       utilityParams;
+	protected ArrayList<ArrayList<Input>> inputLists;
+	protected String path;
+	protected PathBuilder pathBuilder;
+	protected boolean isModified;
 	
-	protected String              path;
-	protected PathBuilder         pathBuilder;
-	protected boolean             isModified;
-	
-	private boolean               useOutputRoot;
-	private String                outputRoot;
-	private String                sourceLanguage;
-	private String                sourceEncoding;
-	private String                targetLanguage;
-	private String                targetEncoding;
-	private boolean               useCustomParamsFolder;
-	private String                customParamsFolder;
-	
-	private String                lastOutputFolder;
-	
+	private ArrayList<String> inputRoots;
+	private ArrayList<Boolean> useCustomInputRoots;
+	private Hashtable<String, String> utilityParams;
+	private boolean useOutputRoot;
+	private String outputRoot;
+	private String sourceLanguage;
+	private String sourceEncoding;
+	private String targetLanguage;
+	private String targetEncoding;
+	private boolean useCustomParamsFolder;
+	private String customParamsFolder;
+	private String lastOutputFolder;
 
 	public Project (LanguageManager lm) {
 		useCustomParamsFolder = false;
 		customParamsFolder = System.getProperty("user.home");
+		
 		useOutputRoot = false;
 		outputRoot = "";
 		
 		// Three lists
 		inputLists = new ArrayList<ArrayList<Input>>();
+		useCustomInputRoots = new ArrayList<Boolean>();
 		inputRoots = new ArrayList<String>();
+		
 		inputLists.add(new ArrayList<Input>());
 		inputRoots.add(System.getProperty("user.home"));
+		useCustomInputRoots.add(false);
+		
 		inputLists.add(new ArrayList<Input>());
 		inputRoots.add(System.getProperty("user.home"));
+		useCustomInputRoots.add(false);
+		
 		inputLists.add(new ArrayList<Input>());
 		inputRoots.add(System.getProperty("user.home"));
+		useCustomInputRoots.add(false);
 		
 		utilityParams = new Hashtable<String, String>();
 		
@@ -105,8 +111,9 @@ public class Project {
 		String filterSettings)
 	{
 		// Is the root OK?
-		if ( newPath.indexOf(inputRoots.get(listIndex)) == -1 ) return 1;
-		newPath = newPath.substring(inputRoots.get(listIndex).length()+1); // No leading separator
+		String inputRoot = getInputRoot(listIndex);
+		if ( newPath.indexOf(inputRoot) == -1 ) return 1;
+		newPath = newPath.substring(inputRoot.length()+1); // No leading separator
 		
 		// Does the path exists already?
 		for ( Input tmpInp : inputLists.get(listIndex) ) {
@@ -164,7 +171,10 @@ public class Project {
 			for ( ArrayList<Input> inputList : inputLists ) {
 				writer.writeStartElement("fileSet");
 				writer.writeAttributeString("id", String.format("%d", i+1));
-				writer.writeElementString("root", inputRoots.get(i));
+				writer.writeStartElement("root");
+				writer.writeAttributeString("useCustom", useCustomInputRoots.get(i) ? "1" : "0");
+				writer.writeString(inputRoots.get(i));
+				writer.writeEndElement(); // root
 				for ( Input item : inputList ) {
 					writer.writeStartElement("fi");
 					writer.writeAttributeString("fs", item.filterSettings);
@@ -280,6 +290,7 @@ public class Project {
 
 				elem2 = getFirstElement(elem1, "root");
 				if ( elem2 == null ) throw new Exception("Element <root> missing.");
+				useCustomInputRoots.set(i, elem2.getAttribute("useCustom").equals("1"));
 				inputRoots.set(i, elem2.getTextContent());
 
 				NodeList n2 = elem1.getElementsByTagName("fi");
@@ -368,18 +379,57 @@ public class Project {
 			throw E;
 		}
 	}
-	
+
+	/**
+	 * Sets the input root for a given list.
+	 * @param listIndex Index of the list to set.
+	 * @param newRoot The new root (If null or empty: use the project's folder).
+	 * @param useCustom True to use the passed newRoot, false to use the auto-root.
+	 */
 	public void setInputRoot (int listIndex,
-		String newRoot)
+		String newRoot,
+		boolean useCustom)
 	{
-		if ( !inputRoots.get(listIndex).equals(newRoot) ) {
-			inputRoots.set(listIndex, newRoot);
-			isModified = true;
+		// Empty or null root = auto root.
+		if (( newRoot == null ) || ( newRoot.length() == 0 )) {
+			useCustom = false;
+		}
+		// Set the root and the flag
+		if ( useCustom ) {
+			if ( !useCustomInputRoots.get(listIndex) ) isModified = true;
+			useCustomInputRoots.set(listIndex, true);
+			if ( !inputRoots.get(listIndex).equals(newRoot) ) {
+				inputRoots.set(listIndex, newRoot);
+				isModified = true;
+			}
+		}
+		else {
+			if ( useCustomInputRoots.get(listIndex) ) {
+				useCustomInputRoots.set(listIndex, false);
+				isModified = true;
+			}
 		}
 	}
 	
 	public String getInputRoot (int listIndex) {
-		return inputRoots.get(listIndex);
+		if ( useCustomInputRoots.get(listIndex) ) {
+			return inputRoots.get(listIndex);
+		}
+		// Else: use the same folder as the project
+		if ( path == null ) {
+			return System.getProperty("user.home");
+		}
+		return Util.getDirectoryName(path);
+	}
+	
+	public String getInputRootDisplay (int listIndex) {
+		if ( useCustomInputRoots.get(listIndex) ) {
+			return "<Custom>:  " + inputRoots.get(listIndex);
+		}
+		// Else: use the same folder as the project
+		return "<Auto>:  " + ((path == null)
+			? System.getProperty("user.home")
+			: Util.getDirectoryName(path));
 	}
 
 	public void setUseOutputRoot (boolean value) {
@@ -482,11 +532,11 @@ public class Project {
 		String prjFolder = path;
 		String folder = "";
 		if ( prjFolder == null ) {
-			if ( displayMode ) folder = "<User's home>:  ";
+			if ( displayMode ) folder = "<Auto>:  ";
 			folder += System.getProperty("user.home");
 		}
 		else {
-			if ( displayMode ) folder = "<Project's folder>:  ";			
+			if ( displayMode ) folder = "<Auto>:  ";			
 			folder += Util.getDirectoryName(prjFolder);
 		}
 		return folder;
@@ -501,8 +551,9 @@ public class Project {
 	public String buildTargetPath (int listIndex,
 		String relativeSourcePath)
 	{
-		return pathBuilder.getPath(inputRoots.get(listIndex) + File.separator + relativeSourcePath,
-			inputRoots.get(listIndex),
+		String inputRoot = getInputRoot(listIndex);
+		return pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
+			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
 			sourceLanguage,
 			targetLanguage);
@@ -511,20 +562,21 @@ public class Project {
 	public String buildRelativeTargetPath (int listIndex,
 		String relativeSourcePath)
 	{
-		String tmp = pathBuilder.getPath(inputRoots.get(listIndex) + File.separator + relativeSourcePath,
-				inputRoots.get(listIndex),
+		String inputRoot = getInputRoot(listIndex);
+		String tmp = pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
+			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
 			sourceLanguage,
 			targetLanguage);
 		if ( useOutputRoot ) {
-			return tmp.substring(inputRoots.get(listIndex).length());
+			return tmp.substring(inputRoot.length());
 		}
 		else return tmp.substring(outputRoot.length());
 	}
 	
 	public String buildOutputRoot (int listIndex) {
 		if ( useOutputRoot ) return outputRoot;
-		else return inputRoots.get(listIndex);
+		else return getInputRoot(listIndex);
 	}
 	
 	public String buildSourceEncoding (Input item) {
@@ -543,7 +595,7 @@ public class Project {
 		String[] inputs = new String[inputLists.get(listIndex).size()];
 		int i = -1;
 		for ( Input item : inputLists.get(listIndex) ) {
-			inputs[++i] = inputRoots.get(listIndex) + File.separator + item.relativePath;
+			inputs[++i] = getInputRoot(listIndex) + File.separator + item.relativePath;
 		}
 		return inputs;
 	}

@@ -81,9 +81,9 @@ public class CommandLine {
 		// Creates default project
 		FormatManager fm = new FormatManager();
 		prj = new Project(lm);
-		prj.setInputRoot(0, rootFolder);
-		prj.setInputRoot(1, rootFolder);
-		prj.setInputRoot(2, rootFolder);
+		prj.setInputRoot(0, rootFolder, true);
+		prj.setInputRoot(1, rootFolder, true);
+		prj.setInputRoot(2, rootFolder, true);
 		boolean setOutSearch = false;
 		int inpList = -1;
 		
@@ -115,7 +115,7 @@ public class CommandLine {
 				prj.setTargetLanguage(nextArg(args, ++i));
 			}
 			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0
-				prj.setInputRoot(0, nextArg(args, ++i));
+				prj.setInputRoot(0, nextArg(args, ++i), true);
 			}
 			else if ( "-pd".equals(arg) ) {
 				prj.setCustomParametersFolder(nextArg(args, ++i));
@@ -146,7 +146,7 @@ public class CommandLine {
 				File f = new File(arg);
 				String[] res = fm.guessFormat(f.getAbsolutePath());
 				prj.inputLists.get(inpList).clear();
-				prj.setInputRoot(inpList, Util.getDirectoryName(f.getAbsolutePath()));
+				prj.setInputRoot(inpList, Util.getDirectoryName(f.getAbsolutePath()), true);
 				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1]);
 			}
 			else {

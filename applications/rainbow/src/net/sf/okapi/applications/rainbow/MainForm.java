@@ -1176,12 +1176,14 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			InputDialog dlg = new InputDialog(shell,
 				String.format("Root for Input List %d", currentInput+1),
-				"New root folder:", prj.getInputRoot(currentInput), null, 1);
+				"New root folder:\n(Leave empty to use the folder where the project file is saved)",
+				prj.getInputRoot(currentInput), null, 1);
+			dlg.setAllowEmptyValue(true);
 			String newRoot = dlg.showDialog();
-			if ( newRoot == null ) return;
-			if ( newRoot.length() < 2 ) newRoot = System.getProperty("user.home"); //$NON-NLS-1$
+			if ( newRoot == null ) return; // Canceled
+			if ( newRoot.length() < 2 ) newRoot = ""; // Use project's //$NON-NLS-1$
 			//TODO: additional check, dir exists, no trailing separator, etc.
-			prj.setInputRoot(currentInput, newRoot);
+			prj.setInputRoot(currentInput, newRoot, newRoot.length()>0);
 			resetDisplay(currentInput);
 		}
 		catch ( Exception e ) {
@@ -1344,7 +1346,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateInputRoot () {
 		if ( currentInput == -1 ) return;
-		edInputRoot.setText(prj.getInputRoot(currentInput));
+		edInputRoot.setText(prj.getInputRootDisplay(currentInput));
 		updateOutputRoot();
 	}
 	

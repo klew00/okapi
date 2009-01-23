@@ -29,12 +29,14 @@ public class ITSEngine implements IProcessor, ITraversal
 	public static final String    XLINK_NS_URI   = "http://www.w3.org/1999/xlink";
 	
 	private static final String   FLAGNAME       = "\u00ff";
-	private static final String   FLAGSEP        = "|";
+	private static final String   FLAGSEP        = "\u001c";
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
 	private static final int      FP_TERMINOLOGY      = 3;
+
+	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 0;
 	private static final int      TERMINFOTYPE_REF         = 1;
@@ -584,21 +586,30 @@ public class ITSEngine implements IProcessor, ITraversal
 			}
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
-				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term");
+				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
+					+"//*/@"+ITS_NS_PREFIX+":termInfoPointer|//"+ITS_NS_PREFIX+":span/@termInfoPointer");
 				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				Attr attr;
+				String localName;
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					attr = (Attr)NL.item(i);
+					localName = attr.getLocalName();
 					// Skip irrelevant nodes
 					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
 						&& "termRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
-					// Validate the value
-					String value = attr.getValue();
-					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
-						throw new RuntimeException("Invalid value for 'term'.");
+					// term
+					if ( localName.equals("term") ) {
+						// Validate the value
+						String value = attr.getValue();
+						if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
+							throw new RuntimeException("Invalid value for 'term'.");
+						}
+						// Set the flag
+						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
 					}
-					// Set the flag
-					setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
+					else if ( localName.equals("termInfoPointer") ) {
+						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA, attr.getValue(), attr.getSpecified());
+					}
 				}
 			}
 		}
@@ -622,12 +633,46 @@ public class ITSEngine implements IProcessor, ITraversal
 	{
 		StringBuilder data = new StringBuilder();
 		if ( node.getUserData(FLAGNAME) == null )
-			data.append("????"+FLAGSEP);
+			data.append("????"+FLAGSEP+FLAGSEP);
 		else
 			data.append((String)node.getUserData(FLAGNAME));
 		// Set the new value (if not there yet or override requested)
 		if ( override || ( data.charAt(position) != '?' )) 
 			data.setCharAt(position, value);
+		node.setUserData(FLAGNAME, data.toString(), null);
+	}
+
+	/**
+	 * Sets the data for a flag for a given node.
+	 * @param node The node where to set the data.
+	 * @param position The position for the data category.
+	 * @param value The value to set.
+	 * @param override True if the value should override an existing value.
+	 * False should be used only for default attribute values.
+	 */
+	private void setFlag (Node node,
+		int position,
+		String value,
+		boolean override)
+	{
+		StringBuilder data = new StringBuilder();
+		if ( node.getUserData(FLAGNAME) == null )
+			data.append("????"+FLAGSEP+FLAGSEP);
+		else
+			data.append((String)node.getUserData(FLAGNAME));
+		// Get the data
+		int n1 = 0;
+		int n2 = 0;
+		int start = 0;
+		for ( int i=0; i<=position; i++ ) {
+			n1 = data.indexOf(FLAGSEP, start+1);
+			n2 = data.indexOf(FLAGSEP, n1+1);
+			start = n2;
+		}
+		// Set the new value (if not there yet or override requested)
+		if ( override || ( n2>n1+1 )) {
+			data.replace(n1+1, n2, value);
+		}
 		node.setUserData(FLAGNAME, data.toString(), null);
 	}
 
