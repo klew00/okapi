@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,15 +16,16 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.properties;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -46,6 +47,9 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
+/**
+ * Implements the IFilter interface for properties files.
+ */
 public class PropertiesFilter implements IFilter {
 
 	private static final int RESULT_END     = 0;
@@ -88,6 +92,7 @@ public class PropertiesFilter implements IFilter {
 				reader = null;
 			}
 			parseState = 0;
+			docName = null;
 		}
 		catch ( IOException e) {
 			throw new RuntimeException(e);
@@ -155,13 +160,14 @@ public class PropertiesFilter implements IFilter {
 
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-			reader = new BufferedReader(
-				new InputStreamReader(bis, bis.detectEncoding()));
+			// Correct the encoding if we have detected a different one
+			encoding = bis.detectEncoding();
+			commonOpen(new InputStreamReader(bis, encoding));
 			
 			// Initializes the variables
 			tuId = 0;
 			otherId = 0;
-			lineBreak = "\n"; //TODO: Auto-detection of line-break type or at least by platform
+			lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 			lineNumber = 0;
 			lineSince = 0;
 			position = 0;
@@ -198,8 +204,7 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	public void open (URL inputUrl) {
-		try { //TODO: Make sure this is actually working (encoding?, etc.)
-			// TODO: docRes should be always set with all opens... need better way
+		try {
 			docName = inputUrl.getPath();
 			open(inputUrl.openStream());
 		}
@@ -209,10 +214,10 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	public void open (CharSequence inputText) {
-		//TODO: Check for better solution, going from char to byte to read char is just not good
-		open(new ByteArrayInputStream(inputText.toString().getBytes())); 
+		encoding = "UTF-16";
+		commonOpen(new StringReader(inputText.toString()));
 	}
-
+	
 	public void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
@@ -232,6 +237,46 @@ public class PropertiesFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
+	}
+
+	private void commonOpen (Reader inputReader) {
+		close();
+		parseState = 1;
+		canceled = false;
+
+		// Open the input reader from the provided reader
+		reader = new BufferedReader(inputReader);
+		
+		// Initializes the variables
+		tuId = 0;
+		otherId = 0;
+		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
+		lineNumber = 0;
+		lineSince = 0;
+		position = 0;
+		// Compile conditions
+		if ( params.useKeyCondition ) {
+			keyConditionPattern = Pattern.compile(params.keyCondition); 
+		}
+		else {
+			keyConditionPattern = null;
+		}
+		// Compile code finder rules
+		if ( params.useCodeFinder ) {
+			params.codeFinder.compile();
+		}
+		// Set the start event
+		queue = new LinkedList<FilterEvent>();
+		queue.add(new FilterEvent(FilterEventType.START));
+
+		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		startDoc.setName(docName);
+		startDoc.setEncoding(encoding);
+		startDoc.setLanguage(srcLang);
+		startDoc.setFilterParameters(params);
+		startDoc.setType("text/x-properties");
+		startDoc.setMimeType("text/x-properties");
+		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 	}
 
 	private int readItem (boolean resetBuffer) {
@@ -429,7 +474,7 @@ public class PropertiesFilter implements IFilter {
 				lineSince++;
 				// We count char instead of byte, while the BaseStream.Length is in byte
 				// Not perfect, but better than nothing.
-				position += textLine.length() + 1; // +1 For the line-break //TODO: lb size could be 2
+				position += textLine.length() + lineBreak.length(); // +n For the line-break
 			}
 			return (textLine != null);
 		}

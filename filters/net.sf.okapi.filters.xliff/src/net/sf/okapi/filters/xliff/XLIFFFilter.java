@@ -23,6 +23,7 @@ package net.sf.okapi.filters.xliff;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -193,7 +194,12 @@ public class XLIFFFilter implements IFilter {
 
 	public void open (CharSequence inputText) {
 		//TODO: Check for better solution, going from char to byte to read char is just not good
-		open(new ByteArrayInputStream(inputText.toString().getBytes())); 
+		try {
+			open(new ByteArrayInputStream(inputText.toString().getBytes("UTF-8")));
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		} 
 	}
 
 	public void open (URL inputUrl) {

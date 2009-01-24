@@ -51,6 +51,7 @@ import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.MRUList;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
@@ -104,6 +105,7 @@ public class MainForm implements IParametersProvider {
 	private ILog log;
 	private LogHandler logHandler;
 	private UserConfiguration config;
+	private MRUList mruList;
 	private String rootFolder;
 	private String sharedFolder;
 	private BaseHelp help;
@@ -174,6 +176,8 @@ public class MainForm implements IParametersProvider {
 			config = new UserConfiguration();
 			config.setProperty("loadLastFile", "true"); // Defaults
 			config.load(APPNAME);
+			mruList = new MRUList(9);
+			mruList.getFromProperties(config);
 			
 			createContent();
 			createProject(false);
@@ -183,7 +187,7 @@ public class MainForm implements IParametersProvider {
 			}
 			else { // Load MRU project if needed
 				if ( config.getBoolean("loadLastFile") ) { //$NON-NLS-1$
-					String path = config.getProperty("lastFile"); //$NON-NLS-1$
+					String path = mruList.getfirst();
 					if ( path != null ) openProject(path);
 				}
 			}
@@ -265,6 +269,16 @@ public class MainForm implements IParametersProvider {
 		miSave.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
             	saveProject(null);
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.clearmru"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            	clearMRU();
             }
 		});
 		
@@ -1209,9 +1223,7 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void saveUserConfiguration () {
-		if ( prj != null ) {
-			config.setProperty("lastFile", prj.path); //$NON-NLS-1$
-		}
+		mruList.copyToProperties(config);
 		config.save(APPNAME, Res.getString("VERSION"));
 	}
 
@@ -1241,12 +1253,33 @@ public class MainForm implements IParametersProvider {
 		return true;
 	}
 	
+	private void clearMRU () {
+		try {
+			mruList.clear();
+			updateMRU();
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void updateMRU () {
+		try {
+			//TODO
+			
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	private void saveProject (String path) {
 		try {
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null,
 					"Rainbow Project (*.rnb)", ".rnb"); //$NON-NLS-2$
 				if ( path == null ) return;
+				mruList.add(path);
 			}
 			saveSurfaceData();
 			prj.save(path);
@@ -1305,6 +1338,7 @@ public class MainForm implements IParametersProvider {
 			}
 			prj = new Project(lm);
 			prj.load(path);
+			if ( mruList != null ) mruList.add(path);
 			resetDisplay(-1);
 		}
 		catch ( Exception e ) {

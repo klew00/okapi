@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,26 +16,43 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
- * Provides a common way to read a translation package generated with an implementation 
- * of IWriter. 
+ * Provides a common way to read a translation package generated with an 
+ * implementation of IWriter. 
  */
 public interface IReader {
 
-	public void openDocument (String p_sPath,
+	/**
+	 * Opens the translated document.
+	 * @param path The full path of the document to post-process.
+	 * @param sourceLanguage The code of the source language.
+	 * @param targetLanguage The code of the target language.
+	 */
+	public void openDocument (String path,
 		String sourceLanguage,
 		String targetLanguage);
 	
+	/**
+	 * Closes the document.
+	 */
 	public void closeDocument ();
 
+	/**
+	 * Reads the next item to post-process.
+	 * @return True if an item is available.
+	 */
 	public boolean readItem ();
 	
+	/**
+	 * Gets the last TextUnit object read.
+	 * @return The last TextUnit object read.
+	 */
 	public TextUnit getItem ();
 	
 }

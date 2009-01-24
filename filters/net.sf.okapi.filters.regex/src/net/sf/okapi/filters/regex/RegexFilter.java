@@ -21,7 +21,6 @@
 package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,7 +50,6 @@ public class RegexFilter implements IFilter {
 	private boolean canceled;
 	private Parameters params;
 	private String encoding;
-	private BufferedReader reader;
 	private String inputText;
 	private Stack<StartGroup> groupStack;
 	private int tuId;
@@ -73,17 +71,8 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void close () {
-		try {
-			inputText = null;
-			if ( reader != null ) {
-				reader.close();
-				reader = null;
-			}
-			parseState = 0;
-		}
-		catch ( IOException e) {
-			throw new RuntimeException(e);
-		}
+		inputText = null;
+		parseState = 0;
 	}
 
 	public String getName () {
@@ -166,11 +155,12 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void open (InputStream input) {
+		BufferedReader reader = null;
 		try {
-			close();
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-			reader = new BufferedReader(new InputStreamReader(bis, bis.detectEncoding()));
+			encoding = bis.detectEncoding();
+			reader = new BufferedReader(new InputStreamReader(bis, encoding));
 
 			// Read the whole file into one string
 			//TODO: detect the original line-break type
@@ -181,39 +171,24 @@ public class RegexFilter implements IFilter {
 				if ( tmp.length() > 0 ) tmp.append("\n");
 				tmp.append(buffer);
 			}
-			
-			close(); // We can free the file handle now
-			// Make sure to close before inputText is set
-			// so it does not get reset to null
-			inputText = tmp.toString();
-			parseState = 1;
-			canceled = false;
-			groupStack = new Stack<StartGroup>();
-			startSearch = 0;
-			startSkl = 0;
-			tuId = 0;
-			otherId = 0;
-
-			// Prepare the filter rules
-			params.compileRules();
-
-			// Set the start event
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
-			startDoc.setName(docName);
-			startDoc.setEncoding(encoding);
-			startDoc.setLanguage(srcLang);
-			startDoc.setFilterParameters(getParameters());
-			startDoc.setType(params.mimeType);
-			startDoc.setMimeType(params.mimeType);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			// Common open
+			commonOpen(tmp.toString());
 		}
 		catch ( UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
 		catch ( IOException e) {
 			throw new RuntimeException(e);
+		}
+		finally {
+			if ( reader != null ) {
+				try {
+					reader.close();
+				}
+				catch ( IOException e ) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 	}
 	
@@ -228,8 +203,7 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void open (CharSequence inputText) {
-		//TODO: Check for better solution, going from char to byte to read char is just not good
-		open(new ByteArrayInputStream(inputText.toString().getBytes())); 
+		commonOpen(inputText.toString());
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -253,6 +227,36 @@ public class RegexFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
+	private void commonOpen (String text) {
+		close(); // Just in case resources need to be freed
+		
+		// Set the input string
+		inputText = text;
+
+		parseState = 1;
+		canceled = false;
+		groupStack = new Stack<StartGroup>();
+		startSearch = 0;
+		startSkl = 0;
+		tuId = 0;
+		otherId = 0;
+
+		// Prepare the filter rules
+		params.compileRules();
+
+		// Set the start event
+		queue = new LinkedList<FilterEvent>();
+		queue.add(new FilterEvent(FilterEventType.START));
+		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		startDoc.setName(docName);
+		startDoc.setEncoding(encoding);
+		startDoc.setLanguage(srcLang);
+		startDoc.setFilterParameters(getParameters());
+		startDoc.setType(params.mimeType);
+		startDoc.setMimeType(params.mimeType);
+		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+	}
+	
 	private FilterEvent processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)

@@ -350,6 +350,7 @@ public class RTFFilter implements IFilter {
 
 	public void open (CharSequence inputText) {
 		// Not supported with RTF filter for now
+		//TODO: Support charsequence input
 		throw new UnsupportedOperationException();
 	}
 

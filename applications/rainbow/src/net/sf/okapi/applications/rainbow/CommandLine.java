@@ -210,12 +210,13 @@ public class CommandLine {
 		if ( ud == null ) {
 			ud = new UtilityDriver(log, fa, plugins, help);
 		}
-		// Get the data for the utility and instantiate it
+		// Get data for the utility and instantiate it
 		ud.setData(prj, utilityID);
-		// Run it
+		// Prompt to edit the parameters if requested 
 		if ( promptForOptions ) {
 			if ( !ud.checkParameters(shell) ) return;
 		}
+		// Run it
 		ud.execute(shell);
 	}
 

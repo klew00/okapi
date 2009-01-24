@@ -96,6 +96,14 @@ public class UtilityDriver implements CancelListener {
 				editor = (IParametersEditor)Class.forName(pluginItem.editorClass).newInstance();
 			}
 			else editor = null;
+
+			if ( utility.hasParameters() ) {
+				// Get any existing parameters for the utility in the project
+				String tmp = prj.getUtilityParameters(utility.getName());
+				if (( tmp != null ) && ( tmp.length() > 0 )) {
+					utility.getParameters().fromString(tmp);
+				}
+			}
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -114,11 +122,6 @@ public class UtilityDriver implements CancelListener {
 			// If there are no options to ask for,
 			// ask confirmation to launch the utility
 			if ( utility.hasParameters() ) {
-				// Get any existing parameters for the utility in the project
-				String tmp = prj.getUtilityParameters(utility.getName());
-				if (( tmp != null ) && ( tmp.length() > 0 )) {
-					utility.getParameters().fromString(tmp);
-				}
 				// Invoke the editor if there is one
 				if ( editor != null ) {
 					if ( !editor.edit(utility.getParameters(), shell, help) ) return false;

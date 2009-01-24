@@ -23,6 +23,7 @@ package net.sf.okapi.filters.openoffice;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -174,7 +175,12 @@ public class ODFFilter2 implements IFilter {
 
 	public void open (CharSequence input) {
 		//TODO: Check for better solution, going from char to byte to read char is just not good
-		open(new ByteArrayInputStream(input.toString().getBytes())); 
+		try {
+			open(new ByteArrayInputStream(input.toString().getBytes("UTF-8")));
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		} 
 	}
 
 	public void open (URL inputUrl) {

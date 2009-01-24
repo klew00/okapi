@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,16 +16,23 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.rtf;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Reader implements IReader {
+
+	private RTFFilter filter;
 	
 	public void closeDocument () {
+		if ( filter != null ) {
+			filter.close();
+			filter = null;
+		}
 	}
 
 	public TextUnit getItem () {
@@ -34,7 +41,13 @@ public class Reader implements IReader {
 
 	public void openDocument (String path,
 		String sourceLanguage,
-		String targetLanguage) {
+		String targetLanguage)
+	{
+		closeDocument();
+		filter = new RTFFilter();
+		filter.setOptions(sourceLanguage, targetLanguage, "windows-1252", false);
+//		URL url = new URL(path);
+//		filter.open(url.openStream());
 	}
 
 	public boolean readItem () {
