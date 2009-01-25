@@ -93,6 +93,8 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 public class MainForm implements IParametersProvider {
 	
@@ -163,6 +165,7 @@ public class MainForm implements IParametersProvider {
 	private MenuItem miOpenFolder;
 	private MenuItem cmiOpenFolder;
 	private MenuItem miOpenOutputFolder;
+	private MenuItem miMRU;
 
 	public MainForm (Shell shell,
 		String projectFile)
@@ -228,6 +231,9 @@ public class MainForm implements IParametersProvider {
 		//TODO: get default text editor from system if possible
 		fa.setDefaultEditor(tmp==null ? "notepad" : tmp); //$NON-NLS-1$
 
+		// Toolbar
+		createToolbar();
+		
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
@@ -245,6 +251,7 @@ public class MainForm implements IParametersProvider {
 				createProject(true);
             }
 		});
+		menuItem.setImage(rm.getImage("newproject")); //$NON-NLS-1$
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
@@ -253,6 +260,7 @@ public class MainForm implements IParametersProvider {
 				openProject(null);
             }
 		});
+		menuItem.setImage(rm.getImage("openproject")); //$NON-NLS-1$
 
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
@@ -263,6 +271,7 @@ public class MainForm implements IParametersProvider {
             	saveProject(prj.path);
             }
 		});
+		miSave.setImage(rm.getImage("saveproject")); //$NON-NLS-1$
 		
 		miSave = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miSave, "file.saveas"); //$NON-NLS-1$
@@ -274,6 +283,9 @@ public class MainForm implements IParametersProvider {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
+		miMRU = new MenuItem(dropMenu, SWT.CASCADE);
+		rm.setCommand(miMRU, "file.mru"); //$NON-NLS-1$
+		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.clearmru"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -353,6 +365,7 @@ public class MainForm implements IParametersProvider {
 				else log.show();
             }
 		});
+		menuItem.setImage(rm.getImage("log")); //$NON-NLS-1$
 		
 		// Input menu
 		miInput = new MenuItem(menuBar, SWT.CASCADE);
@@ -367,6 +380,7 @@ public class MainForm implements IParametersProvider {
 				addDocumentsFromList(null);
             }
 		});
+		menuItem.setImage(rm.getImage("addinput")); //$NON-NLS-1$
 		
 		miRemoveInputDocuments = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miRemoveInputDocuments, "input.removeDocuments"); //$NON-NLS-1$
@@ -403,6 +417,7 @@ public class MainForm implements IParametersProvider {
 				openContainingFolder(-1);
             }
 		});
+		miOpenFolder.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
@@ -413,6 +428,8 @@ public class MainForm implements IParametersProvider {
 				moveDocumentsUp();
 			}
 		});
+		miMoveDocumentsUp.setImage(rm.getImage("moveup")); //$NON-NLS-1$
+		
 		
 		miMoveDocumentsDown = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miMoveDocumentsDown, "input.moveDocumentsDown"); //$NON-NLS-1$
@@ -421,6 +438,7 @@ public class MainForm implements IParametersProvider {
 				moveDocumentsDown();
 			}
 		});
+		miMoveDocumentsDown.setImage(rm.getImage("movedown")); //$NON-NLS-1$
 
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
@@ -431,6 +449,7 @@ public class MainForm implements IParametersProvider {
 				editInputProperties(-1);
 			}
 		});
+		miEditInputProperties.setImage(rm.getImage("properties")); //$NON-NLS-1$
 		
 		// Utilities menu
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
@@ -478,6 +497,7 @@ public class MainForm implements IParametersProvider {
 				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
 			}
 		});
+		menuItem.setImage(rm.getImage("help")); //$NON-NLS-1$
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
@@ -590,6 +610,7 @@ public class MainForm implements IParametersProvider {
 				addDocumentsFromList(null);
             }
 		});
+		menuItem.setImage(rm.getImage("addinput")); //$NON-NLS-1$
 		
 		cmiRemoveInputDocuments = new MenuItem(inputTableMenu, SWT.PUSH);
 		rm.setCommand(cmiRemoveInputDocuments, "input.removeDocuments"); //$NON-NLS-1$
@@ -616,6 +637,7 @@ public class MainForm implements IParametersProvider {
 				openContainingFolder(-1);
             }
 		});
+		cmiOpenFolder.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
 		
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
@@ -626,6 +648,7 @@ public class MainForm implements IParametersProvider {
 				moveDocumentsUp();
 			}
 		});
+		cmiMoveDocumentsUp.setImage(rm.getImage("moveup")); //$NON-NLS-1$
 		
 		cmiMoveDocumentsDown = new MenuItem(inputTableMenu, SWT.PUSH);
 		rm.setCommand(cmiMoveDocumentsDown, "input.moveDocumentsDown"); //$NON-NLS-1$
@@ -634,6 +657,7 @@ public class MainForm implements IParametersProvider {
 				moveDocumentsDown();
 			}
 		});
+		cmiMoveDocumentsDown.setImage(rm.getImage("movedown")); //$NON-NLS-1$
 
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
 		
@@ -644,6 +668,7 @@ public class MainForm implements IParametersProvider {
 				editInputProperties(-1);
 			}
 		});
+		cmiEditInputProperties.setImage(rm.getImage("properties")); //$NON-NLS-1$
 
 		// Set the popup menus for the input lists
 		inputTables.get(0).setMenu(inputTableMenu);
@@ -870,6 +895,7 @@ public class MainForm implements IParametersProvider {
 		});
 
 		statusBar = new StatusBar(shell, SWT.NONE);
+		updateMRU();
 		
 		// Set the minimal size to the packed size
 		// And then reset the original start size
@@ -877,8 +903,115 @@ public class MainForm implements IParametersProvider {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(origSize);
+		if ( config.getBoolean("maximized") ) {
+			shell.setMaximized(true);
+		}
 	}
 
+	private void createToolbar () {
+		ToolBar toolbar = new ToolBar(shell, SWT.FLAT | SWT.WRAP);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		toolbar.setLayoutData(gdTmp);
+		
+		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("newproject")); //$NON-NLS-1$
+	    item.setToolTipText("New Project (Ctrl+N)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				createProject(true);
+			}
+		});
+	    
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("openproject")); //$NON-NLS-1$
+	    item.setToolTipText("Open Project (Ctrl+O)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				openProject(null);
+			}
+		});
+	    
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("saveproject")); //$NON-NLS-1$
+	    item.setToolTipText("Save Project (Ctrl+S)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				saveProject(prj.path);
+			}
+		});
+		
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("log")); //$NON-NLS-1$
+	    item.setToolTipText("Log (F9)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( log.isVisible() ) log.hide();
+				else log.show();
+			}
+		});
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("addinput")); //$NON-NLS-1$
+	    item.setToolTipText("Add Documents (Ctrl+Insert)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				addDocumentsFromList(null);
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
+	    item.setToolTipText("Open Containing Folder");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				openContainingFolder(-1);
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("moveup")); //$NON-NLS-1$
+	    item.setToolTipText("Move Up (Alt+Up)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsUp();
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("movedown")); //$NON-NLS-1$
+	    item.setToolTipText("Move Down (Alt+Down)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDocumentsDown();
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("properties")); //$NON-NLS-1$
+	    item.setToolTipText("Edit Input Properties (Alt+Enter)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editInputProperties(-1);
+			}
+		});
+
+		new ToolItem(toolbar, SWT.SEPARATOR);
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+	    item.setImage(rm.getImage("help")); //$NON-NLS-1$
+	    item.setToolTipText("Help Topics (F1)");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
+			}
+		});
+	}
+	
 	private void browseParamsFolder () {
 		try {
 			DirectoryDialog dlg = new DirectoryDialog(shell);
@@ -1173,8 +1306,20 @@ public class MainForm implements IParametersProvider {
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
 		rm.addImage("Rainbow"); //$NON-NLS-1$
+		rm.addImage("newproject"); //$NON-NLS-1$
+		rm.addImage("openproject"); //$NON-NLS-1$
+		rm.addImage("saveproject"); //$NON-NLS-1$
+		rm.addImage("log"); //$NON-NLS-1$
+		rm.addImage("addinput"); //$NON-NLS-1$
+		rm.addImage("openfolder"); //$NON-NLS-1$
+		rm.addImage("properties"); //$NON-NLS-1$
+		rm.addImage("moveup"); //$NON-NLS-1$
+		rm.addImage("movedown"); //$NON-NLS-1$
+		rm.addImage("help"); //$NON-NLS-1$
+		
 		//TODO: deal with commands localization
 		rm.loadCommands("commands.xml"); //$NON-NLS-1$
+
 		fm = new FormatManager();
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
@@ -1183,6 +1328,7 @@ public class MainForm implements IParametersProvider {
 		plugins = new PluginsAccess();
 		//TODO: Choose a better location 
 		plugins.addAllPackages(sharedFolder);
+
 	}
 	
 	private void changeRoot () {
@@ -1223,7 +1369,11 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void saveUserConfiguration () {
+		// Set the window placement
+		config.setProperty("maximized", shell.getMaximized());
+		// Set the MRU list
 		mruList.copyToProperties(config);
+		// Save to the user home directory as ".appname" file
 		config.save(APPNAME, Res.getString("VERSION"));
 	}
 
@@ -1265,8 +1415,38 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateMRU () {
 		try {
-			//TODO
-			
+			// miMRU is the MenuItem where to attached the sub-menu
+			// Remove and dispose of the previous sub-menu
+			Menu oldMenu = miMRU.getMenu();
+			miMRU.setMenu(null);
+			if ( oldMenu != null ) oldMenu.dispose();
+
+			// Set the new one
+			if ( mruList.getfirst() == null ) {
+				// No items to set: it's disabled
+				miMRU.setEnabled(false);
+			}
+			else { // One or more items
+				// Create the menu
+				Menu submenu = new Menu(shell, SWT.DROP_DOWN);
+				int i = 0;
+				String path;
+				MenuItem menuItem;
+				Iterator<String> iter = mruList.getIterator();
+				while ( iter.hasNext() ) {
+					menuItem = new MenuItem(submenu, SWT.PUSH);
+					path = iter.next();
+					menuItem.setText(String.format("&%d %s", ++i, path));
+					menuItem.setData(path);
+					menuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent event) {
+							openProject((String)((MenuItem)event.getSource()).getData());
+						}
+					});
+				}
+				miMRU.setMenu(submenu);
+				miMRU.setEnabled(true);
+			}
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1277,14 +1457,16 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null,
-					"Rainbow Project (*.rnb)", ".rnb"); //$NON-NLS-2$
+					"Rainbow Project (*.rnb)", "*.rnb"); //$NON-NLS-2$
 				if ( path == null ) return;
 				mruList.add(path);
+				updateMRU();
 			}
 			saveSurfaceData();
 			prj.save(path);
 			updateTitle();
 			edParamsFolder.setText(prj.getParametersFolder(true));
+			updateInputRoot();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1336,9 +1518,20 @@ public class MainForm implements IParametersProvider {
 				if ( paths == null ) return;
 				path = paths[0];
 			}
+			
+			// Check if the file exists
+			if ( !(new File(path)).exists() ) {
+				Dialogs.showError(shell, "The project file cannot be found:\n"+path, null);
+				mruList.remove(path);
+				updateMRU();
+				return;
+			}
+
+			// Load it and update the UI
 			prj = new Project(lm);
 			prj.load(path);
-			if ( mruList != null ) mruList.add(path);
+			mruList.add(path);
+			updateMRU();
 			resetDisplay(-1);
 		}
 		catch ( Exception e ) {

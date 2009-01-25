@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
@@ -26,6 +26,8 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import net.sf.okapi.common.Util;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -71,15 +73,15 @@ public class EncodingManager {
 				Node N = NL.item(i).getAttributes().getNamedItem("iana");
 				if ( N == null ) throw new RuntimeException("The attribute 'iana' is missing.");
 				item = new EncodingItem();
-				item.ianaName = N.getTextContent();
+				item.ianaName = Util.getTextContent(N);
 				N = NL.item(i).getAttributes().getNamedItem("cp");
 				if ( N == null ) item.codePage = -1;
-				else item.codePage = Integer.valueOf(N.getTextContent());
+				else item.codePage = Integer.valueOf(Util.getTextContent(N));
 				N = NL.item(i).getFirstChild();
 				while ( N != null ) {
 					if (( N.getNodeType() == Node.ELEMENT_NODE )
 						&& ( N.getNodeName().equals("name") )) {
-						item.name = N.getTextContent();
+						item.name = Util.getTextContent(N);
 						break;
 					}
 					else N = N.getNextSibling();

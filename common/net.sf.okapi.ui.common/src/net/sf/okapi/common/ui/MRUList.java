@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.ui;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -85,6 +86,15 @@ public class MRUList {
 	public void clear () {
 		list = new LinkedList<String>();
 	}
+
+	/**
+	 * Removes a given path from this MRU list. If the path does not
+	 * exists in the list, nothing happens.
+	 * @param path The path to remove.
+	 */
+	public void remove (String path) {
+		list.remove(path);
+	}
 	
 	/**
 	 * Adds at the top of the list, pushes all the other path downward,
@@ -124,4 +134,12 @@ public class MRUList {
 		else return null;
 	}
 
+	/**
+	 * Gets an iterator for the paths in this MRU list.
+	 * @return The iterator for the paths in this MRU list.
+	 */
+	public Iterator<String> getIterator () {
+		return list.iterator();
+	}
+	
 }

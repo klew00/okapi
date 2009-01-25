@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
@@ -27,6 +27,7 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
@@ -56,23 +57,23 @@ public class LanguageManager {
 				Node N = NL.item(i).getAttributes().getNamedItem("code");
 				if ( N == null ) throw new RuntimeException("The attribute 'code' is missing.");
 				LI = new LanguageItem();
-				LI.code = N.getTextContent().toUpperCase();
+				LI.code = Util.getTextContent(N).toUpperCase();
 				N = NL.item(i).getAttributes().getNamedItem("lcid");
 				if ( N == null ) LI.lcid = -1;
-				else LI.lcid = Integer.valueOf(N.getTextContent());
+				else LI.lcid = Integer.valueOf(Util.getTextContent(N));
 				N = NL.item(i).getAttributes().getNamedItem("encoding");
 				if ( N == null ) LI.setEncoding("UTF-8", UIUtil.PFTYPE_WIN);
-				else LI.setEncoding(N.getTextContent(), UIUtil.PFTYPE_WIN);
+				else LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_WIN);
 				N = NL.item(i).getAttributes().getNamedItem("macEncoding");
-				if ( N != null ) LI.setEncoding(N.getTextContent(), UIUtil.PFTYPE_MAC);
+				if ( N != null ) LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_MAC);
 				N = NL.item(i).getAttributes().getNamedItem("unixEncoding");
-				if ( N != null ) LI.setEncoding(N.getTextContent(), UIUtil.PFTYPE_UNIX);
+				if ( N != null ) LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_UNIX);
 				
 				N = NL.item(i).getFirstChild();
 				while ( N != null ) {
 					if (( N.getNodeType() == Node.ELEMENT_NODE )
 						&& ( N.getNodeName().equals("name") )) {
-						LI.name = N.getTextContent();
+						LI.name = Util.getTextContent(N);
 						break;
 					}
 					else N = N.getNextSibling();

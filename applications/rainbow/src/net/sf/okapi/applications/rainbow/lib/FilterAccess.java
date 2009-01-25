@@ -154,12 +154,12 @@ public class FilterAccess {
 				Node N = NL.item(i).getAttributes().getNamedItem("id");
 				if ( N == null ) throw new RuntimeException("The attribute 'id' is missing.");
 				FAI = new FilterAccessItem();
-				String sID = N.getTextContent();
+				String sID = Util.getTextContent(N);
 				N = NL.item(i).getAttributes().getNamedItem("inputFilterClass");
 				if ( N == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
-				FAI.inputFilterClass = N.getTextContent();
+				FAI.inputFilterClass = Util.getTextContent(N);
 				N = NL.item(i).getAttributes().getNamedItem("editorClass");
-				if ( N != null ) FAI.editorClass = N.getTextContent();
+				if ( N != null ) FAI.editorClass = Util.getTextContent(N);
 				m_htFilters.put(sID, FAI);
 			}
 		}

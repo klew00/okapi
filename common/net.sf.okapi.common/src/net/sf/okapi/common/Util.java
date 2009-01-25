@@ -35,6 +35,8 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 
+import org.w3c.dom.Node;
+
 /**
  * Collection of various all-purpose helper functions.
  */
@@ -566,4 +568,18 @@ public class Util {
 		return parts;
 	}
 	
+	/**
+	 * Gets the text content of the first child of an element node.
+	 * This is to use instead of node.getTextContent() which does not work with some
+	 * Macintosh Java VMs.
+	 * @param node The container element.
+	 * @return The text of the first child node.
+	 */
+	public static String getTextContent (Node node) {
+		//TODO: take in account non-text nodes before the first one!
+		Node n = node.getFirstChild();
+		if ( n == null ) return "";
+		return n.getNodeValue();
+	}
+
 }

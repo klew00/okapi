@@ -292,7 +292,7 @@ public class Project {
 				if ( elem2 == null ) throw new Exception("Element <root> missing.");
 				// Use !=='0' for backward compatibility: empty value will == custom
 				useCustomInputRoots.set(i, !elem2.getAttribute("useCustom").equals("0"));
-				inputRoots.set(i, elem2.getTextContent());
+				inputRoots.set(i, Util.getTextContent(elem2));
 
 				NodeList n2 = elem1.getElementsByTagName("fi");
 				Input item;
@@ -303,7 +303,7 @@ public class Project {
 					item.format = elem2.getAttribute("fo");
 					item.sourceEncoding = elem2.getAttribute("se");
 					item.targetEncoding = elem2.getAttribute("te");
-					item.relativePath = elem2.getTextContent();
+					item.relativePath = Util.getTextContent(elem2);
 					inputLists.get(i).add(item);
 				}
 			}
@@ -314,13 +314,13 @@ public class Project {
 			elem2 = getFirstElement(elem1, "root");
 			if ( elem2 != null ) {
 				useOutputRoot = elem2.getAttribute("use").equals("1");
-				outputRoot = elem2.getTextContent();
+				outputRoot = Util.getTextContent(elem2);
 			}
 			
 			elem2 = getFirstElement(elem1, "subFolder");
 			if ( elem2 != null ) {
 				pathBuilder.setUseSubfolder(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setSubfolder(elem2.getTextContent());
+				pathBuilder.setSubfolder(Util.getTextContent(elem2));
 			}
 			
 			elem2 = getFirstElement(elem1, "extension");
@@ -329,7 +329,7 @@ public class Project {
 				int n = Integer.valueOf(elem2.getAttribute("style"));
 				if (( n < 0 ) || ( n > 2 )) n = 2; // Sanity check
 				pathBuilder.setExtensionType(n);
-				pathBuilder.setExtension(elem2.getTextContent());
+				pathBuilder.setExtension(Util.getTextContent(elem2));
 			}
 
 			elem2 = getFirstElement(elem1, "replace");
@@ -342,13 +342,13 @@ public class Project {
 			elem2 = getFirstElement(elem1, "prefix");
 			if ( elem2 != null ) {
 				pathBuilder.setUsePrefix(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setPrefix(elem2.getTextContent());
+				pathBuilder.setPrefix(Util.getTextContent(elem2));
 			}
 
 			elem2 = getFirstElement(elem1, "suffix");
 			if ( elem2 != null ) {
 				pathBuilder.setUseSuffix(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setSuffix(elem2.getTextContent());
+				pathBuilder.setSuffix(Util.getTextContent(elem2));
 			}
 
 			elem1 = getFirstElement(rootElem, "options");
@@ -361,7 +361,7 @@ public class Project {
 			elem1 = getFirstElement(rootElem, "parametersFolder");
 			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
 			useCustomParamsFolder = elem1.getAttribute("useCustom").equals("1");
-			customParamsFolder = elem1.getTextContent();
+			customParamsFolder = Util.getTextContent(elem2);
 			
 			// Parameters for the utilities
 			elem1 = getFirstElement(rootElem, "utilities");
@@ -369,7 +369,7 @@ public class Project {
 				n1 = rootElem.getElementsByTagName("params");
 				for ( int i=0; i<n1.getLength(); i++ ) {
 					elem2 = (Element)n1.item(i);
-					utilityParams.put(elem2.getAttribute("id"), elem2.getTextContent());
+					utilityParams.put(elem2.getAttribute("id"), Util.getTextContent(elem2));
 				}
 			}
 

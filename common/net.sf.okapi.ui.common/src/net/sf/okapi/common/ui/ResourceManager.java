@@ -26,6 +26,8 @@ import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.okapi.common.Util;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -47,19 +49,6 @@ public class ResourceManager {
 	private String subdir = "images";
 	private Hashtable<String, CommandItem> commands;
 
-	/**
-	 * Gets the text content of the first child of an element node.
-	 * This is to use instead of node.getTextContent() which does not work with some
-	 * Macintosh Java VMs.
-	 * @param node The container element.
-	 * @return The text of the first child node.
-	 */
-	private static String getTextContent (Node node) {
-		Node n = node.getFirstChild();
-		if ( n == null ) return null;
-		return n.getNodeValue();
-	}
-	
 	/**
 	 * Creates a ResourceManager object.
 	 * @param p_Class Class to use to load the resources. This class must be in the 
@@ -204,20 +193,20 @@ public class ResourceManager {
 			String name;
 			for ( int i=0; i<NL.getLength(); i++ ) {
 				item = new CommandItem();
-				item.label = getTextContent(NL.item(i));
+				item.label = Util.getTextContent(NL.item(i));
 				Node N = NL.item(i).getAttributes().getNamedItem("name");
 				if ( N == null ) throw new Exception("The attribute 'name' is missing.");
-				else name = getTextContent(N);
+				else name = Util.getTextContent(N);
 				if ( (N = NL.item(i).getAttributes().getNamedItem("alt")) != null )
-					if ( getTextContent(N).equals("1") ) item.accelerator |= SWT.ALT;
+					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.ALT;
 				if ( (N = NL.item(i).getAttributes().getNamedItem("shift")) != null )
-					if ( getTextContent(N).equals("1") ) item.accelerator |= SWT.SHIFT;
+					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.SHIFT;
 				if ( (N = NL.item(i).getAttributes().getNamedItem("ctrl")) != null )
-					if ( getTextContent(N).equals("1") ) item.accelerator |= SWT.CONTROL;
+					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.CONTROL;
 				if ( (N = NL.item(i).getAttributes().getNamedItem("cmd")) != null )
-					if ( getTextContent(N).equals("1") ) item.accelerator |= SWT.COMMAND;
+					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.COMMAND;
 				if ( (N = NL.item(i).getAttributes().getNamedItem("key")) != null ) {
-					String key = getTextContent(N);
+					String key = Util.getTextContent(N);
 					if ( key.equals("F1") ) item.accelerator |= SWT.F1;
 					else if ( key.equals("F2") ) item.accelerator |= SWT.F2;
 					else if ( key.equals("F3") ) item.accelerator |= SWT.F3;

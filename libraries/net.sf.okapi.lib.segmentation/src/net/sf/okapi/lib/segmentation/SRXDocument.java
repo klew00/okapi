@@ -36,7 +36,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -76,19 +75,6 @@ public class SRXDocument {
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
 	private String maskRule;
 
-	/**
-	 * Gets the text content of the first child of an element node.
-	 * This is to use instead of node.getTextContent() which does not work with some
-	 * Macintosh Java VMs.
-	 * @param node The container element.
-	 * @return The text of the first child node.
-	 */
-	private static String getTextContent (Node node) {
-		Node n = node.getFirstChild();
-		if ( n == null ) return "";
-		return n.getNodeValue();
-	}
-	
 	public SRXDocument () {
 		resetAll();
 	}
@@ -623,7 +609,7 @@ public class SRXDocument {
 			// Extension: sample
 			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "sample", elem1);
 			if ( elem2 != null ) {
-				setSampleText(getTextContent(elem2));
+				setSampleText(Util.getTextContent(elem2));
 				tmp = elem2.getAttribute("language");
 				if ( tmp.length() > 0 ) setSampleLanguage(tmp);
 				tmp = elem2.getAttribute("useMappedRules");
@@ -633,7 +619,7 @@ public class SRXDocument {
 			// Extension: rangeRule
 			elem2 = getFirstElementByTagNameNS(NSURI_OKPSRX, "rangeRule", elem1);
 			if ( elem2 != null ) {
-				setMaskRule(getTextContent(elem2));
+				setMaskRule(Util.getTextContent(elem2));
 			}
 			
 			// Get the body element
@@ -657,9 +643,9 @@ public class SRXDocument {
 					tmp = elem4.getAttributeNS(NSURI_OKPSRX, "active");
 					if ( tmp.length() > 0 ) newRule.isActive = "yes".equals(tmp);
 					Element elem5 = getFirstElementByTagNameNS(ns, "beforebreak", elem4);
-					if ( elem5 != null ) newRule.before = getTextContent(elem5);
+					if ( elem5 != null ) newRule.before = Util.getTextContent(elem5);
 					elem5 = getFirstElementByTagNameNS(ns, "afterbreak", elem4);
-					if ( elem5 != null ) newRule.after = getTextContent(elem5);
+					if ( elem5 != null ) newRule.after = Util.getTextContent(elem5);
 					tmpList.add(newRule);
 				}
 				langRules.put(ruleName, tmpList);
