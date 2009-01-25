@@ -36,6 +36,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -49,6 +50,8 @@ public class Editor implements IParametersEditor {
 	private Parameters params;
 	private Button chkGenerateTMX;
 	private Text edTMXPath;
+	private Label stSuffix;
+	private Text edSuffix;
 	private Button chkGenerateHTML;
 	private Button btGetPath;
 	private Button chkOpenOutput;
@@ -125,16 +128,18 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData();
 		chkOpenOutput.setLayoutData(gdTmp);
 		
+		// TMX group
+		
 		grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("TMX Output");
-		grpTmp.setLayout(new GridLayout(2, false));
+		grpTmp.setLayout(new GridLayout(3, false));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 
 		chkGenerateTMX = new Button(grpTmp, SWT.CHECK);
 		chkGenerateTMX.setText("Generate a TMX output document");
 		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		chkGenerateTMX.setLayoutData(gdTmp);
 		chkGenerateTMX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -144,6 +149,7 @@ public class Editor implements IParametersEditor {
 
 		edTMXPath = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
 		edTMXPath.setLayoutData(gdTmp);
 		
 		btGetPath = new Button(grpTmp, SWT.PUSH);
@@ -160,6 +166,13 @@ public class Editor implements IParametersEditor {
 			}
 		});
 
+		stSuffix = new Label(grpTmp, SWT.NONE);
+		stSuffix.setText("Suffix for the second target language code:");
+		
+		edSuffix = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edSuffix.setLayoutData(gdTmp);
 		
 		//--- Options tab
 		
@@ -215,6 +228,8 @@ public class Editor implements IParametersEditor {
 	private void displayTMXPath () {
 		edTMXPath.setEnabled(chkGenerateTMX.getSelection());
 		btGetPath.setEnabled(chkGenerateTMX.getSelection());
+		stSuffix.setEnabled(chkGenerateTMX.getSelection());
+		edSuffix.setEnabled(chkGenerateTMX.getSelection());
 	}
 	
 	private boolean showDialog () {
@@ -230,6 +245,7 @@ public class Editor implements IParametersEditor {
 		chkGenerateHTML.setSelection(params.generateHTML);
 		chkGenerateTMX.setSelection(params.generateTMX);
 		edTMXPath.setText(params.tmxPath);
+		edSuffix.setText(params.trgSuffix);
 		chkOpenOutput.setSelection(params.autoOpen);
 		chkIgnoreCase.setSelection(params.ignoreCase);
 		chkIgnoreWS.setSelection(params.ignoreWS);
@@ -249,6 +265,8 @@ public class Editor implements IParametersEditor {
 		}
 		params.generateTMX = doTMX;
 		params.tmxPath = edTMXPath.getText();
+		params.trgSuffix = edSuffix.getText();
+		
 		params.ignoreCase = chkIgnoreCase.getSelection();
 		params.ignoreWS = chkIgnoreWS.getSelection();
 		params.ignorePunct = chkIgnorePunct.getSelection();

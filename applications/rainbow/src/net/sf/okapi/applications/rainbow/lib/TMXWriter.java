@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.XMLWriter;
@@ -147,7 +148,7 @@ public class TMXWriter {
 		}
 		// Else no TMX output needed for source segmented but not target
 	}
-	
+
 	private void writeTU (TextFragment source,
 		TextFragment target,
 		String tuid,
@@ -192,6 +193,83 @@ public class TMXWriter {
 		}
 		
 		writer.writeEndElementLineBreak(); // tu
+	}
+
+	/**
+	 * Writes a TextUnit (all targets) with all the properties associated to it.
+	 * @param item The text unit to write.
+	 */
+	public void writeFullItem (TextUnit item) {
+		if ( item == null ) throw new NullPointerException();
+		itemCount++;
+		
+		String tuid = item.getName();
+		if (( tuid == null ) || ( tuid.length() == 0 )) {
+			tuid = String.format("autoID%d", itemCount);
+		}
+
+		TextContainer srcCont = item.getSource();
+		Set<String> langs = item.getTargetLanguages();
+		
+//TODO: Support segmented output
+		if ( !srcCont.isSegmented() ) { // Source is not segmented
+			// Write start TU
+			writer.writeStartElement("tu");
+			if (( tuid != null ) && ( tuid.length() > 0 ))
+				writer.writeAttributeString("tuid", tuid);
+			writer.writeLineBreak();
+			
+			// Write any resource-level properties
+			Set<String> names = item.getPropertyNames();
+			for ( String name : names ) {
+				writer.writeStartElement("prop");
+				writer.writeAttributeString("type", name);
+				writer.writeString(item.getProperty(name).getValue());
+				writer.writeEndElementLineBreak(); // prop
+			}
+
+			// Write source TUV
+			writeTUV(srcCont, srcLang, srcCont);
+			
+			// Write each target TUV
+			for ( String lang : langs ) {
+				writeTUV(item.getTarget(lang), lang, item.getTarget(lang));
+			}
+			
+			// Write end TU
+			writer.writeEndElementLineBreak(); // tu
+		}
+	}
+
+	/**
+	 * Writes an TUV element.
+	 * @param frag The TextFragment for the content of this TUV. This can be
+	 * a segment of a TextContainer.
+	 * @param language The language for this TUV.
+	 * @param contForProp The TextContainer that has the properties to write for
+	 * this TUV, or null for no properties.
+	 */
+	private void writeTUV (TextFragment frag,
+		String language,
+		TextContainer contForProp)
+	{
+		writer.writeStartElement("tuv");
+		writer.writeAttributeString("xml:lang", language);
+		writer.writeStartElement("seg");
+		writer.writeRawXML(tmxCont.setContent(frag).toString());
+		writer.writeEndElement(); // seg
+
+		if ( contForProp != null ) {
+			Set<String> names = contForProp.getPropertyNames();
+			if ( names.size() > 0 ) writer.writeLineBreak();
+			for ( String name : names ) {
+				writer.writeStartElement("prop");
+				writer.writeAttributeString("type", name);
+				writer.writeString(contForProp.getProperty(name).getValue());
+				writer.writeEndElementLineBreak(); // prop
+			}
+		}
+		writer.writeEndElementLineBreak(); // tuv
 	}
 
 }

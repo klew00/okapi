@@ -76,10 +76,23 @@ public class UserConfiguration extends Properties {
 		else return super.setProperty(key, value);
 	}
 	
+	/**
+	 * Gets a boolean property value.
+	 * @param key The name of the property.
+	 * @return True if the property exists and is set to "true", false if it
+	 * does not exists or if it is set to "false".
+	 */
 	public boolean getBoolean (String key) {
 		return "true".equals(getProperty(key, "false"));
 	}
-	
+
+	/**
+	 * Sets a boolean property.
+	 * @param key The name of the property.
+	 * @param value The new value for the property.
+	 * @return The previous value of the property, or null if the
+	 * property did not exists yet.
+	 */
 	public Object setProperty (String key,
 		boolean value)
 	{

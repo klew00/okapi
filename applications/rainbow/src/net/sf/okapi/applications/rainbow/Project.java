@@ -101,14 +101,17 @@ public class Project {
 	 * @param listIndex Index of the input list where perform the operation.
 	 * @param newPath Full path of the document to add.
 	 * @param sourceEncoding Default sourceEncoding for the document (can be null).
-	 * @param filterSettings Filter settings string for the document (can be null). 
+	 * @param filterSettings Filter settings string for the document (can be null).
+	 * @param allowDuplicates True to allow adding a path that is already there,
+	 * false to not add the file and return 2 if it is a duplicate. 
 	 * @return 0=Document added, 1=bad root, 2=exists already
 	 */
 	public int addDocument (int listIndex,
 		String newPath,
 		String sourceEncoding,
 		String targetEncoding,
-		String filterSettings)
+		String filterSettings,
+		boolean allowDuplicates)
 	{
 		// Is the root OK?
 		String inputRoot = getInputRoot(listIndex);
@@ -116,8 +119,10 @@ public class Project {
 		newPath = newPath.substring(inputRoot.length()+1); // No leading separator
 		
 		// Does the path exists already?
-		for ( Input tmpInp : inputLists.get(listIndex) ) {
-			if ( tmpInp.relativePath.equalsIgnoreCase(newPath) ) return 2; 
+		if ( !allowDuplicates ) {
+			for ( Input tmpInp : inputLists.get(listIndex) ) {
+				if ( tmpInp.relativePath.equalsIgnoreCase(newPath) ) return 2;
+			}
 		}
 		
 		// Create the new entry and add it to the list
@@ -609,6 +614,10 @@ public class Project {
 	public void setUtilityParameters (String utilityID,
 		String parameters)
 	{
+		String prev = utilityParams.get(utilityID);
+		if ( prev != null ) {
+			if ( !prev.equals(parameters) ) isModified = true;
+		}
 		utilityParams.put(utilityID, parameters);
 	}
 	
@@ -617,6 +626,8 @@ public class Project {
 	}
 	
 	public void setLastOutpoutFolder (String value) {
+		// Do not set isModified as lastOutputFolder is not saved
 		lastOutputFolder = value;
 	}
+
 }

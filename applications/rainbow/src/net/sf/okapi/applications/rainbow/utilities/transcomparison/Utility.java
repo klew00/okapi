@@ -30,6 +30,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -46,6 +47,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	boolean isToCompareMultilingual;
 	String pathToOpen;
 	int options;
+	Property scoreProp;
 	
 	public Utility () {
 		params = new Parameters();
@@ -70,6 +72,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmx.writeStartDocument(srcLang, trgLang, getName(), null, null, null, null);
 		}
 		pathToOpen = null;
+		scoreProp = new Property("Txt::Score", "", false);
 		
 		options = 0;
 		if ( params.ignoreCase ) options |= TextMatcher.IGNORE_CASE;
@@ -243,7 +246,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		// Compute the distance
-		int n = matcher.compare(trgFrag1, trgFrag2, options);
+		int score = matcher.compare(trgFrag1, trgFrag2, options);
 
 		// Output in HTML
 		if ( params.generateHTML ) {
@@ -271,17 +274,23 @@ public class Utility extends BaseFilterDrivenUtility {
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			writer.writeString("Score:");
 			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
-			writer.writeString(String.valueOf(n));
+			writer.writeString(String.valueOf(score));
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
 
 		if ( params.generateTMX ) {
-			//TODO: Fix the TMX output
 			TextUnit tmxTu = new TextUnit(tu1.getId());
+			// Set the source: Use the tu1 if possible
 			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
+			else if ( srcFrag != null ) {
+				// Otherwise at least try to use the content of tu2
+				tmxTu.setSourceContent(srcFrag);
+			}
 			tmxTu.setTargetContent(trgLang, trgFrag1);
-			tmxTu.setTargetContent(trgLang+"-2", trgFrag2);
-			tmx.writeItem(tmxTu, null);
+			tmxTu.setTargetContent(trgLang+params.trgSuffix, trgFrag2);
+			scoreProp.setValue(String.format("%03d", score));
+			tmxTu.setTargetProperty(trgLang+params.trgSuffix, scoreProp);
+			tmx.writeFullItem(tmxTu);
 		}
 	}
 

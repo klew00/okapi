@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters {
 	public boolean ignoreCase;
 	public boolean ignoreWS;
 	public boolean ignorePunct;
+	public String trgSuffix;
 
 	public Parameters () {
 		reset();
@@ -44,6 +45,7 @@ public class Parameters extends BaseParameters {
 		ignoreCase = false;
 		ignoreWS = false;
 		ignorePunct = false;
+		trgSuffix = "-mt";
 	}
 
 	public void fromString (String data) {
@@ -56,6 +58,7 @@ public class Parameters extends BaseParameters {
 		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
 		ignoreWS = buffer.getBoolean("ignoreWS", ignoreWS);
 		ignorePunct = buffer.getBoolean("ignorePunct", ignorePunct);
+		trgSuffix = buffer.getString("trgSuffix", trgSuffix);
 	}
 
 	public String toString() {
@@ -67,6 +70,7 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter("ignoreCase", ignoreCase);
 		buffer.setParameter("ignoreWS", ignoreWS);
 		buffer.setParameter("ignorePunct", ignorePunct);
+		buffer.setParameter("trgSuffix", trgSuffix);
 		return buffer.toString();
 	}
 

@@ -147,7 +147,7 @@ public class CommandLine {
 				String[] res = fm.guessFormat(f.getAbsolutePath());
 				prj.inputLists.get(inpList).clear();
 				prj.setInputRoot(inpList, Util.getDirectoryName(f.getAbsolutePath()), true);
-				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1]);
+				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1], false);
 			}
 			else {
 				log.error("Invalid command line argument: "+args[i]);

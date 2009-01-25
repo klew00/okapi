@@ -1627,6 +1627,7 @@ public class MainForm implements IParametersProvider {
 		throws Exception
 	{
 		int n = 0;
+		boolean allowDup = config.getBoolean("allowDupInput");
 		for ( String path : paths ) {
 			if ( dir != null ) {
 				path = dir + File.separator + path;
@@ -1637,7 +1638,7 @@ public class MainForm implements IParametersProvider {
 			}
 			else {
 				String[] res = fm.guessFormat(path);
-				switch ( prj.addDocument(currentInput, path, res[0], null, res[1]) ) {
+				switch ( prj.addDocument(currentInput, path, res[0], null, res[1], allowDup) ) {
 				case 0: // OK
 					n++;
 					break;
@@ -1670,6 +1671,7 @@ public class MainForm implements IParametersProvider {
 			if ( aRes == null ) return;
 
 			// Update the file(s) data
+			if ( aRes[3] != null ) prj.isModified = true;
 			startWaiting("Updating project...", false);
 			if ( index < 0 ) {
 				int[] indices = table.getSelectionIndices();

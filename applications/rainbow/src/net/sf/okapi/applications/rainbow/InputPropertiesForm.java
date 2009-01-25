@@ -48,6 +48,7 @@ class InputPropertiesForm {
 	private OKCancelPanel pnlActions;
 	private FilterSettingsPanel pnlFilterSettings;
 	private IHelp help;
+	private String oldData;
 
 	InputPropertiesForm (Shell p_Parent,
 		IHelp helpParam,
@@ -133,6 +134,7 @@ class InputPropertiesForm {
 		String targetEncoding,
 		FilterAccess p_FA)
 	{
+		oldData = filterSettings + sourceEncoding + targetEncoding;
 		pnlFilterSettings.setData(filterSettings, p_FA);
 		edSrcEncoding.setText(sourceEncoding);
 		edTrgEncoding.setText(targetEncoding);
@@ -140,11 +142,14 @@ class InputPropertiesForm {
 
 	private boolean saveData () {
 		try {
-			results = new String[3];
+			results = new String[4];
 			results[0] = pnlFilterSettings.getData();
 			//TODO: Check if the parameters are still OK.
 			results[1] = edSrcEncoding.getText();
 			results[2] = edTrgEncoding.getText();
+			if ( !oldData.equals(results[0]+results[1]+results[2]) ) {
+				results[3] = "!";
+			} // Else: null means no changes
 		}
 		catch ( Exception E ) {
 			return false;
