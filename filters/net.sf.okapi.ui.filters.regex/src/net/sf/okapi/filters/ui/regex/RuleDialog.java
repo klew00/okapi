@@ -152,7 +152,7 @@ public class RuleDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "editrule"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "editRule"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

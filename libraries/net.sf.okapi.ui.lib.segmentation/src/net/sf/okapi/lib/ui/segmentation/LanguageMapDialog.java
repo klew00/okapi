@@ -84,7 +84,7 @@ public class LanguageMapDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "editlangmap"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "editLangMap"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

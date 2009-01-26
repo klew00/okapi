@@ -503,7 +503,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showTopic(this, "index.html", "howto.html"); //$NON-NLS-1$
+				if ( help != null ) help.showTopic(this, "index", "howTo.html"); //$NON-NLS-1$
 			}
 		});
 		
