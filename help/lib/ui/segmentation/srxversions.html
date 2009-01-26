@@ -12,22 +12,22 @@
 <h1>SRX Versions</h1>
 <p>There are two version of SRX: 1.0 and 2.0.</p>
 <p>SRX version 1.0 has been implemented by several tools that interpreted how to 
-process the SRX rules in different ways. As a result the same SRX&nbsp;1.0 documents 
+process the SRX rules in different ways. As a result the same SRX&nbsp;1.0 document 
 used on different tools may give you different segmentation.</p>
-<p>To resolve this issue, an updated specification, the version 2.0 has been 
-publish and provide better implementation guidelines. So, in theory, the same 
+<p>To resolve this issue, an updated version 2.0 specification has been 
+published and provides better implementation guidelines. So, in theory, the same 
 version 2.0 document should give you the same segmentation in all tools.</p>
 <p>You can find the specifications of SRX on the LISA web site:</p>
 <ul>
 	<li>SRX&nbsp;1.0: officially
 	<a href="http://www.lisa.org/fileadmin/standards/srx10.html">
 	http://www.lisa.org/fileadmin/standards/srx10.html</a> but that link is 
-	broken. until it's fixed there is a copy available here:
+	broken. Until it's fixed there is a copy available here:
 	<a href="http://www.lisa.org/fileadmin/standards/srx1.0.html">
 	http://www.lisa.org/fileadmin/standards/srx1.0.html</a>.</li>
 	<li>SRX&nbsp;2.0: <a href="http://www.lisa.org/fileadmin/standards/srx20.html">http://www.lisa.org/fileadmin/standards/srx20.html</a>.</li>
 </ul>
-<h2>Implementation Differences in SRX 1.0</h2>
+<h2>Implementation Differences Between SRX 1.0 and SRX 2.0</h2>
 <p>There are two main types of implementations of SRX 1.0: the intended one, and 
 one that use a cascading matching of the language maps.</p>
 <p>SDLX implements the intended one. Heartsome and Swordfish implements the 
@@ -107,23 +107,16 @@ specification:</p>
 SRX&nbsp;1.0 intended to use all the languagemap elements that match the given 
 language code the duplicated rules that are in Japanese would no be there, and 
 only the extra Japanese-specific rule would be listed there.</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>SRX&nbsp;1.0 rules coming from Heartsome, Swordfish are designed with cascading. 
+<h3>How to Convert to SRX 2.0?</h3>
+<p>When loading or importing SRX&nbsp;1.0 documents into an editor that uses SRX&nbsp;2.0, 
+you must be careful about setting properly the <code>cascade</code> option 
+(introduced in 2.0) depending on the provenance of the document.</p>
+<p>SRX&nbsp;1.0 rules coming from Heartsome, Swordfish, and some other toolsthat are designed with cascading. 
 So you should make sure that option is set after you have open the file. Ratel 
 does not set it automatically because it was not the expected behavior of 
 SRX&nbsp;1.0.</p>
-<p>SRX&nbsp;1.0 rules coming from Trados, SDLX are designed without cascading. So you 
+<p>SRX&nbsp;1.0 rules coming from Trados, SDLX, and some other tools that are designed without cascading. So you 
 should make sure that option is not set after you open the file.</p>
-<p dir="ltr">Rules order: Exceptions to breaks should be listed first, then the 
-break rules. SRX&nbsp;2.0 stops at the first rule that matches. That was the expected 
-behavior in SRX&nbsp;1.0 as well (the the example in the SRX&nbsp;1.0 specifiction), but 
-some tools did not implemented that way.</p>
-<p>&nbsp;</p>
-<p>What the open command of the Segmentation rules editor does when opeing an 
-SRX&nbsp;1.0 file?</p>
-<p>&nbsp;</p>
 <p>&nbsp;</p>
 
 </body>

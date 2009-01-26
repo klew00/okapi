@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.common.Util;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -125,11 +126,11 @@ public class PluginsAccess {
 					else if ( lang.length() == 0 ) n = 1;
 					if ( n > nDone ) {
 						Element elem2 = getFirstElement(elemInfo, "name");
-						item.name = elem2.getTextContent();
+						item.name = Util.getTextContent(elem2);
 						elem2 = getFirstElement(elemInfo, "description");
-						item.description = elem2.getTextContent();
+						item.description = Util.getTextContent(elem2);
 						elem2 = getFirstElement(elemInfo, "provider");
-						item.provider = elem2.getTextContent();
+						item.provider = Util.getTextContent(elem2);
 						nDone = n;
 					}
 					if ( nDone == 3 ) break; // Best match found

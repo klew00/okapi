@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -139,7 +140,7 @@ class TTXReader {
 				switch ( node.getNodeType() ) {
 				case Node.TEXT_NODE:
 				case Node.CDATA_SECTION_NODE:
-					String tmp = node.getTextContent();
+					String tmp = Util.getTextContent(node);
 					if ( (textType & SOURCE) == SOURCE ) srcCont.append(tmp);
 					if ( (textType & TARGET) == TARGET ) trgCont.append(tmp);
 					break;
@@ -197,7 +198,7 @@ class TTXReader {
 
 	private boolean processOuterUT () {
 		boolean result = false;
-		String text = node.getTextContent().trim();
+		String text = Util.getTextContent(node).trim();
 		if ( text.indexOf("<u ") == 0 ) {
 			inText = true;
 			textType = SOURCE;
@@ -249,7 +250,7 @@ class TTXReader {
 			case Node.TEXT_NODE:
 			case Node.CDATA_SECTION_NODE:
 				if ( inline == 0 ) {
-					String tmp = node.getTextContent();
+					String tmp = Util.getTextContent(node);
 					if ( (textType & SOURCE) == SOURCE ) srcCont.append(tmp);
 					if ( (textType & TARGET) == TARGET ) trgCont.append(tmp);
 				}

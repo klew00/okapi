@@ -576,7 +576,7 @@ public class Util {
 	 * @return The text of the first child node.
 	 */
 	public static String getTextContent (Node node) {
-		//TODO: take in account non-text nodes before the first one!
+		//TODO: take in account non-text nodes before the first one (e.g. comments)
 		Node n = node.getFirstChild();
 		if ( n == null ) return "";
 		return n.getNodeValue();

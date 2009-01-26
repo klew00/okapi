@@ -181,7 +181,7 @@ public class ResourceManager {
 		if ( cmd == null ) return "!"+resName+"!";
 		return cmd.label;
 	}
-	
+
 	public void loadCommands (String path) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();

@@ -21,6 +21,8 @@
 package net.sf.okapi.common.ui;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import net.sf.okapi.common.IHelp;
 
@@ -39,9 +41,16 @@ public class BaseHelp implements IHelp {
 			root += File.separator;
 		}
 	}
+
+	public void showTopic (Object object,
+		String filename)
+	{
+		showTopic(object, filename, null);
+	}
 	
 	public void showTopic (Object object,
-		String filenameWithoutExtension)
+		String filename,
+		String query)
 	{
 		String path = "";
 		if ( object != null ) {
@@ -51,12 +60,22 @@ public class BaseHelp implements IHelp {
 			// Remove the Okapi root
 			path = path.replace(PKGROOT, ""); //$NON-NLS-1$
 			// Replace the dots by the directories separators
-			path = path.replace(".", File.separator); //$NON-NLS-1$
+			path = path.replace(".", "/"); //$NON-NLS-1$
 		}
+		
 		// Now set the computed full path
-		path = root + path + File.separator + filenameWithoutExtension + ".html";; //$NON-NLS-1$
-		// Call the help
-		UIUtil.start(path);
+		path = root + path + File.separator + filename + ".html"; //$NON-NLS-1$
+		// Check if we need to add the file protocol
+		if ( path.indexOf("://") == -1 ) path = "file://"+path;
+		// Add the query if needed
+		if ( query != null ) path += ("?" + query); //$NON-NLS-1$
+		// Call the URL
+		try {
+			UIUtil.start(new URL(path));
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

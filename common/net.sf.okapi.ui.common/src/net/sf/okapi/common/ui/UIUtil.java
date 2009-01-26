@@ -43,20 +43,17 @@ public class UIUtil {
 	 * URL string (to open a browser), etc.
 	 */
 	static public void start (String command) {
-		Program.launch(command); 
+		Program.launch(command);
 	}
-	
+
 	/**
-	 * starts a program or a command.
-	 * @param url URL of the resource to open with its associated program. 
+	 * Finds the browser for this system and invoke it with a given URL.
+	 * @param url URL of the resource to open with its associated program (can be a file) 
 	 */
 	static public void start (URL url) {
 		if ( url == null ) return;
-		String param = url.getPath();
-		if ( "file".equals(url.getProtocol()) && param.startsWith("/") ) {
-			param = param.substring(1);
-		}
-		Program.launch(param);
+		Program p = Program.findProgram(".html");
+		if ( p!=null ) p.execute(url.toString());
 	}
 	
 	/**

@@ -32,6 +32,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.NSContextManager;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -244,7 +245,7 @@ public class Editor implements IParametersEditor {
 		    Element elem;
 		    for (int i = 0; i < nodes.getLength(); i++) {
 		    	elem = (Element)nodes.item(i);
-		    	paramList.add(elem.getAttribute("name"), elem.getTextContent()); //$NON-NLS-1$
+		    	paramList.add(elem.getAttribute("name"), Util.getTextContent(elem)); //$NON-NLS-1$
 		    }
 		    edParameters.setText(paramList.toString());
 		}
