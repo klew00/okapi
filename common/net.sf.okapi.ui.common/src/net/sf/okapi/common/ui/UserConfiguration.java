@@ -98,4 +98,28 @@ public class UserConfiguration extends Properties {
 	{
 		return super.setProperty(key, (value ? "true" : "false"));
 	}
+
+	/**
+	 * Gets an integer property.
+	 * @param key The name of the property.
+	 * @return The integer value of the property if it exists, 0 if it
+	 * does not exists.
+	 */
+	public int getInteger (String key) {
+		return Integer.valueOf(getProperty(key, "0"));
+	}
+	
+	/**
+	 * Sets an integer property.
+	 * @param key The name of the property.
+	 * @param value The new value for the property.
+	 * @return The previous value of the property, or null if the
+	 * property did not exist.
+	 */
+	public Object setProperty (String key,
+		int value)
+	{
+		return super.setProperty(key, String.valueOf(value));
+	}
+	
 }

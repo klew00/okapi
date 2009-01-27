@@ -47,6 +47,8 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class RTFFilter implements IFilter {
 
@@ -384,6 +386,10 @@ public class RTFFilter implements IFilter {
 	public void setParameters (IParameters params) {
 	}
 	
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
+	}
+
 	private void reset (String defaultEncoding) {
 		close();
 		canceled = false;

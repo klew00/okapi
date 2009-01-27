@@ -100,7 +100,8 @@ public class MainForm implements IParametersProvider {
 	
 	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
 	
-	public static final String OPT_ALLOWDUPINPUT = "allowDupInput";
+	public static final String OPT_ALLOWDUPINPUT = "allowDupInput"; //$NON-NLS-1$
+	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -180,8 +181,8 @@ public class MainForm implements IParametersProvider {
 			loadResources();
 
 			config = new UserConfiguration();
-			config.setProperty("loadLastFile", "true"); // Defaults
-			config.load(APPNAME);
+			config.setProperty(OPT_LOADMRU, "0"); // Defaults
+			config.load(APPNAME); // Load the current user preferences
 			mruList = new MRUList(9);
 			mruList.getFromProperties(config);
 			
@@ -189,12 +190,23 @@ public class MainForm implements IParametersProvider {
 			createProject(false);
 
 			if ( projectFile != null ) {
+				// Load project if passed as parameter
 				openProject(projectFile);
 			}
-			else { // Load MRU project if needed
-				if ( config.getBoolean("loadLastFile") ) { //$NON-NLS-1$
+			else { // Load MRU project if requested
+				int n = config.getInteger(OPT_LOADMRU); //$NON-NLS-1$
+				if ( n > 0 ) { // 1=ask, 2=load without asking
 					String path = mruList.getfirst();
-					if ( path != null ) openProject(path);
+					if ( path != null ) {
+						if ( n == 1 ) { // Ask
+							// Ask confirmation
+							MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+							dlg.setMessage("The most recently used project is:\n"+path+"\nDo you want to open it now?");
+							dlg.setText(APPNAME);
+							if ( dlg.open() == SWT.YES ) n = 2;
+						}
+						if ( n == 2 ) openProject(path);
+					}
 				}
 			}
 		}

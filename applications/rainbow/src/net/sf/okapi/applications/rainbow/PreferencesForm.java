@@ -112,11 +112,18 @@ class PreferencesForm {
 	void setData (UserConfiguration config) {
 		this.config = config;
 		chkAllowDuplicateInputs.setSelection(config.getBoolean(MainForm.OPT_ALLOWDUPINPUT));
+		int n = config.getInteger(MainForm.OPT_LOADMRU);
+		if ( n == 1 ) rdStartPrjAsk.setSelection(true);
+		else if ( n == 2 ) rdStartPrjLoad.setSelection(true);
+		else rdStartPrjDoNotLoad.setSelection(true);
 	}
 
 	private boolean saveData () {
 		try {
 			config.setProperty(MainForm.OPT_ALLOWDUPINPUT, chkAllowDuplicateInputs.getSelection());
+			if ( rdStartPrjAsk.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 1);
+			else if ( rdStartPrjLoad.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 2);
+			else config.setProperty(MainForm.OPT_LOADMRU, 0);
 		}
 		catch ( Exception E ) {
 			return false;

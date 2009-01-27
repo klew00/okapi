@@ -46,6 +46,8 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.tmx.Parameters;
 
 public class TmxFilter implements IFilter {
@@ -272,6 +274,10 @@ public class TmxFilter implements IFilter {
 		encoding = defaultEncoding;
 	}
 	
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
+	}
+
 	private boolean processStartGroup () {
 		storeStartElement();
 		

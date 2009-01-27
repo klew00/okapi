@@ -53,6 +53,8 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class XLIFFFilter implements IFilter {
 
@@ -231,6 +233,10 @@ public class XLIFFFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private boolean read () throws XMLStreamException {

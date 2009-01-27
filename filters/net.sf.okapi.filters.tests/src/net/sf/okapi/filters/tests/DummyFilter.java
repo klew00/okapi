@@ -33,6 +33,8 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class DummyFilter implements IFilter {
 
@@ -101,6 +103,10 @@ public class DummyFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private void reset () {

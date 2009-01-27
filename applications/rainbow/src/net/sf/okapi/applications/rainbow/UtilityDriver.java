@@ -38,7 +38,6 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
@@ -52,7 +51,6 @@ public class UtilityDriver implements CancelListener {
 	private Project prj;
 	private FilterAccess fa;
 	private IFilter filter;
-	private IFilterWriter filterWriter;
 	private IUtility utility;
 	private IParametersEditor editor;
 	private PluginItem pluginItem;
@@ -221,7 +219,6 @@ public class UtilityDriver implements CancelListener {
 		}
 		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
-			if ( filterWriter != null ) filterWriter.close();
 			if ( utility != null ) utility.postprocess();
 			logger.error("Error with utility.", e);
 		}

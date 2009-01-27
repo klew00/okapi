@@ -46,6 +46,8 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implements the IFilter interface for properties files.
@@ -237,6 +239,10 @@ public class PropertiesFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private void commonOpen (Reader inputReader) {

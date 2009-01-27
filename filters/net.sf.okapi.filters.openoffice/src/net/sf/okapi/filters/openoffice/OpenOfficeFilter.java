@@ -39,6 +39,8 @@ import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * This class implements the IFilter interface for Open-Office.org documents
@@ -151,6 +153,10 @@ public class OpenOfficeFilter implements IFilter {
 	
 	public void setParameters (IParameters params) {
 		odf.setParameters((Parameters)params);
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private FilterEvent openZipFile () throws IOException {

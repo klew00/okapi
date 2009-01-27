@@ -48,6 +48,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.openoffice.ElementData.WithinTextType;
 
 /**
@@ -237,6 +239,10 @@ public class ODFFilter2 implements IFilter {
 		boolean generateSkeleton)
 	{
 		language = sourceLanguage;
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private boolean read () {

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Provides a common set of methods to extract translatable text and its associated data.
@@ -127,4 +128,12 @@ public interface IFilter {
 	 */
 	public void setParameters (IParameters params);
 
+	/**
+	 * Creates a new skeleton writer object that corresponds to the type of skeleton 
+	 * this filter uses.
+	 * @return A new instance of a skeleton writer for the type of skeleton this filter
+	 * uses.
+	 */
+	public ISkeletonWriter createSkeletonWriter ();
+	
 }

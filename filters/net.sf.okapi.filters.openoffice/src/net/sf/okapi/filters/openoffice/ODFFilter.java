@@ -50,6 +50,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * This class implements IFilter for XML documents in Open-Document format (ODF).
@@ -243,6 +245,10 @@ public class ODFFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		language = sourceLanguage;
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private void read () {

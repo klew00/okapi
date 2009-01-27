@@ -44,6 +44,8 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class RegexFilter implements IFilter {
 
@@ -225,6 +227,10 @@ public class RegexFilter implements IFilter {
 
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
+	}
+
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private void commonOpen (String text) {

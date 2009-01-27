@@ -46,7 +46,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {
 				//TODO: Get the skeleton from the filter, somehow
-				filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+				filterWriter = new GenericFilterWriter(filter.createSkeletonWriter());
 				filterWriter.setOptions(trgLang, getOutputEncoding(0));
 				filterWriter.setOutput(getOutputPath(0));
 			}
