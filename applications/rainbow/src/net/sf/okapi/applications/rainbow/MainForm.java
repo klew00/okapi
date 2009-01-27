@@ -99,6 +99,8 @@ import org.eclipse.swt.widgets.ToolItem;
 public class MainForm implements IParametersProvider {
 	
 	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+	
+	public static final String OPT_ALLOWDUPINPUT = "allowDupInput";
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -114,6 +116,7 @@ public class MainForm implements IParametersProvider {
 	private Project prj;
 	private StatusBar statusBar;
 	private TabFolder tabFolder;
+	private Label stInputRoot;
 	private Text edInputRoot;
 	private Button btGetRoot;
 	private Button chkUseOutputRoot;
@@ -294,6 +297,16 @@ public class MainForm implements IParametersProvider {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.userpref"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editUserPreferences();
+            }
+		});
+
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -551,8 +564,8 @@ public class MainForm implements IParametersProvider {
 
 		
 		// Root panel
-		Label label = new Label(shell, SWT.NONE);
-		label.setText(Res.getString("MAIN_INPUTROOT")); //$NON-NLS-1$
+		stInputRoot = new Label(shell, SWT.NONE);
+		stInputRoot.setText("Root 0:"); //$NON-NLS-1$
 		
 		edInputRoot = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		edInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -687,7 +700,7 @@ public class MainForm implements IParametersProvider {
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout(4, false));
 		
-		label = new Label(group, SWT.NONE);
+		Label label = new Label(group, SWT.NONE);
 		label.setText(Res.getString("OPTTAB_LANG")); //$NON-NLS-1$
 		
 		edSourceLang = new Text(group, SWT.BORDER);
@@ -1331,6 +1344,18 @@ public class MainForm implements IParametersProvider {
 
 	}
 	
+	private void editUserPreferences () {
+		try {
+			saveSurfaceData();
+			PreferencesForm dlg = new PreferencesForm(shell, help);
+			dlg.setData(config);
+			dlg.showDialog();
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	private void changeRoot () {
 		try {
 			saveSurfaceData();
@@ -1573,6 +1598,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateInputRoot () {
 		if ( currentInput == -1 ) return;
+		stInputRoot.setText(String.format("Root %d:", currentInput+1));
 		edInputRoot.setText(prj.getInputRootDisplay(currentInput));
 		updateOutputRoot();
 	}
@@ -1627,7 +1653,7 @@ public class MainForm implements IParametersProvider {
 		throws Exception
 	{
 		int n = 0;
-		boolean allowDup = config.getBoolean("allowDupInput");
+		boolean allowDup = config.getBoolean(OPT_ALLOWDUPINPUT);
 		for ( String path : paths ) {
 			if ( dir != null ) {
 				path = dir + File.separator + path;
