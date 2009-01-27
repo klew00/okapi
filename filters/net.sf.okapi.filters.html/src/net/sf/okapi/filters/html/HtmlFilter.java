@@ -30,13 +30,13 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.markupfilter.BaseMarkupFilter;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class HtmlFilter extends BaseMarkupFilter {	
+public class HtmlFilter extends BaseMarkupFilter {
 	public HtmlFilter() {
 		super();
 		setMimeType("text/html");
 		setDefaultConfig("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 	}
-	
+
 	@Override
 	protected void handleCdataSection(Tag tag) {
 		addToDocumentPart(tag.toString());
@@ -106,12 +106,12 @@ public class HtmlFilter extends BaseMarkupFilter {
 			// the main while loop above
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 
-			if (getConfig().hasActionableAttributes(startTag.getName())) {
-				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
 			} else {
-				// This shouldn't happen if rules are consistent
+				// no attributes that need processing - just treat as skeleton
 				addToDocumentPart(startTag.toString());
 			}
 			break;
@@ -194,62 +194,89 @@ public class HtmlFilter extends BaseMarkupFilter {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seenet.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.
+	 * htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleComment(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration
+	 * (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleDocTypeDeclaration(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration
+	 * (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleMarkupDeclaration(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction
+	 * (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleProcessingInstruction(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon(
+	 * net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleServerCommon(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped
+	 * (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleServerCommonEscaped(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration(net.htmlparser.jericho.Tag)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration
+	 * (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleXmlDeclaration(Tag tag) {
-		handleDocumentPart(tag);		
+		handleDocumentPart(tag);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

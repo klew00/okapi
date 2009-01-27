@@ -31,6 +31,13 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
+# test read-only, writable attributes
+dummy: 
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [trans]  
+  writableLocalizableAttributes: [write]
+  readOnlyLocalizableAttributes: [readonly]
+
 # test group rules
 table: 
   ruleTypes: [GROUP]  
@@ -50,6 +57,7 @@ li:
 # test TextUnit rules
 p:
   ruleTypes: [TEXTUNIT]  
+  writableLocalizableAttributes: [dir]
 
 # exclude/include test
 exclude:
@@ -69,9 +77,10 @@ title:
 # with embedded skeketon 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, NOT_EQUALS, [generator, author, progid, date]]]}
+  #, [name, NOT_EQUALS, [generator, author, progid, date]]
+  translatableAttributes: {content: [http-equiv, EQUALS, keywords]}
   writableLocalizableAttributes: {content: [http-equiv, EQUALS, content-language], charset: ~}
-  readOnlyLocalizableAttributes: {content: [http-equiv, EQUALS, content-type]}
+  readOnlyLocalizableAttributes: {content: [[http-equiv, EQUALS, content-type], [name, EQUALS, [generator, author, progid, date]]]}
   
 area:
   ruleTypes: [ATTRIBUTES_ONLY]
@@ -168,7 +177,7 @@ iframe:
 img:
   ruleTypes: [INLINE]
   translatableAttributes: [title, alt]
-  writableLocalizableAttributes: [href]
+  writableLocalizableAttributes: [href, src]
 
 input:
   ruleTypes: [INLINE]

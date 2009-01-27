@@ -37,6 +37,8 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public abstract class BaseFilter implements IFilter {
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
@@ -115,6 +117,10 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent event = new FilterEvent(FilterEventType.CANCELED);
 		filterEvents.add(event);
 		finish();
+	}
+	
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
 	private String createId(String name, int number) {
@@ -348,11 +354,9 @@ public abstract class BaseFilter implements IFilter {
 
 	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
-		// TODO tu.setName(propOrText.getName());
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
 
-		// set the skeleton on the TextUnit
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		skel.addContentPlaceholder(tu);
@@ -362,32 +366,34 @@ public abstract class BaseFilter implements IFilter {
 		return tu;
 	}
 
-	private DocumentPart embeddedWritableProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
-		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-		// TODO dp.setName();
+	private void embeddedWritableProp(DocumentPart dp, GenericSkeleton skel, PropertyTextUnitPlaceholder propOrText,
+			String tag, String language) {
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
-		GenericSkeleton skel = new GenericSkeleton();
 		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		skel.addValuePlaceholder(dp, propOrText.getName(), language);
 		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
-		dp.setSkeleton(skel);
-
-		return dp;
 	}
 
-	private DocumentPart embeddedReadonlyProp(PropertyTextUnitPlaceholder propOrText, String tag, String language) {
-		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), true);
-		// TODO dp.setName();
+	private void embeddedReadonlyProp(DocumentPart dp, GenericSkeleton skel, PropertyTextUnitPlaceholder propOrText,
+			String tag, String language) {
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-		GenericSkeleton skel = new GenericSkeleton(tag.substring(propOrText.getMainStartPos(), propOrText
-				.getMainEndPos()));
-		dp.setSkeleton(skel);
-
-		return dp;
+		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));		
 	}
 
 	private void processAllEmbedded(String tag, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode) {
+
+		boolean readonly = false;
+		boolean writable = false;
+		boolean translatable = false;
+		
+		DocumentPart dp = null;
+		GenericSkeleton skel = null;
+		if (inlineCode) {
+			dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
+			skel = new GenericSkeleton();
+		}
+
 		int propOrTextId = -1;
 
 		// in place sort to make sure we do the Properties or Text in order
@@ -396,7 +402,7 @@ public abstract class BaseFilter implements IFilter {
 		// add the part up to the first prop or text
 		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
 		if (inlineCode) {
-			currentCode.append(tag.substring(0, pt.getMainStartPos()));
+			skel.add(tag.substring(0, pt.getMainStartPos()));
 		} else {
 			currentSkeleton.add(tag.substring(0, pt.getMainStartPos()));
 		}
@@ -409,36 +415,35 @@ public abstract class BaseFilter implements IFilter {
 				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
 				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
 				if (inlineCode) {
-					currentCode.append(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
+					skel.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 				} else {
 					currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 				}
 			}
 
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
+				translatable = true;
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
 				if (inlineCode) {
-					currentCode.appendReference(tu.getId());
+					skel.addReference(tu);
 				} else {
 					currentSkeleton.addReference(tu);
 				}
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
-				DocumentPart dp = embeddedWritableProp(propOrText, tag, language);
-				if (inlineCode) {
-					currentCode.appendReference(dp.getId());
+				writable = true;
+				if (inlineCode) {					
+					embeddedWritableProp(dp, skel, propOrText, tag, language);															
 				} else {
-					currentSkeleton.addReference(dp);
-				}
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+					embeddedWritableProp(currentDocumentPart, currentSkeleton, propOrText, tag, language);
+				}				
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
-				DocumentPart dp = embeddedReadonlyProp(propOrText, tag, language);
+				readonly = true;
 				if (inlineCode) {
-					currentCode.appendReference(dp.getId());
+					embeddedReadonlyProp(dp, skel, propOrText, tag, language);														
 				} else {
-					currentSkeleton.addReference(dp);
+					embeddedReadonlyProp(currentDocumentPart, currentSkeleton, propOrText, tag, language);					
 				}
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
@@ -447,7 +452,13 @@ public abstract class BaseFilter implements IFilter {
 		// add the remaining markup after the last prop or text
 		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
 		if (inlineCode) {
-			currentCode.append(tag.substring(pt.getMainEndPos()));
+			currentCode.appendReference(dp.getId());
+			skel.add(tag.substring(pt.getMainEndPos()));
+			dp.setSkeleton(skel);
+
+			if (readonly || writable) {				
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			} 
 		} else {
 			currentSkeleton.add(tag.substring(pt.getMainEndPos()));
 		}
@@ -455,7 +466,7 @@ public abstract class BaseFilter implements IFilter {
 
 	// ////////////////////////////////////////////////////////////////////////
 	// TextUnit Methods
-	// ////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////	
 
 	protected void startTextUnit(String text) {
 		startTextUnit(text, null, null);
@@ -690,7 +701,6 @@ public abstract class BaseFilter implements IFilter {
 
 		currentSkeleton = new GenericSkeleton();
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
-		currentDocumentPart.setType(name);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 
 		processAllEmbedded(part, language, propertyTextUnitPlaceholders, false);
