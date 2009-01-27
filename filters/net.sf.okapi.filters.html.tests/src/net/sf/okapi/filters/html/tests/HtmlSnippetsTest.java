@@ -36,7 +36,7 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testPWithAttributes() {
-		String snippet = "<p title='my title'>Text of p</p>";
+		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 

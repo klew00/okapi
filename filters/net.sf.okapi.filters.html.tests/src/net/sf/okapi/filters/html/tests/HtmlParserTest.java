@@ -62,7 +62,7 @@ public class HtmlParserTest {
 					System.out.println(event.getResource().toString());
 				}
 				if (event.getResource().getSkeleton() != null) {
-					System.out.println("Skeketon: " + event.getResource().getSkeleton().toString());
+					System.out.println("\tSkeketon: " + event.getResource().getSkeleton().toString());
 				}
 			}
 		}
