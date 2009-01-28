@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -66,7 +68,7 @@ public class HtmlSnippetsTest {
 	
 	@Test
 	public void testTableGroups() {
-		String snippet = "<table id=\"100\"><tr><td>text</td></tr><table>";
+		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 	
@@ -118,6 +120,26 @@ public class HtmlSnippetsTest {
 					System.out.println("DP:skl=None");
 				}
 				tmp.append(writer.processDocumentPart(dp));
+				break;
+			case START_GROUP:
+				StartGroup startGroup = (StartGroup) event.getResource();
+				skl = (GenericSkeleton) startGroup.getSkeleton();
+				if (skl != null) {
+					System.out.println("SG:skl=" + skl.toString());
+				} else {
+					System.out.println("SG:skl=None");
+				}
+				tmp.append(writer.processStartGroup(startGroup));
+				break;
+			case END_GROUP:
+				Ending ending = (Ending) event.getResource();
+				skl = (GenericSkeleton) ending.getSkeleton();
+				if (skl != null) {
+					System.out.println("EG:skl=" + skl.toString());
+				} else {
+					System.out.println("EG:skl=None");
+				}
+				tmp.append(writer.processEndGroup(ending));
 				break;
 			}
 		}
