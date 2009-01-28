@@ -336,6 +336,10 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void startSubDocument() {
+		if (hasUnfinishedSkeleton()) {
+			endDocumentPart();
+		}
+
 		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
 		FilterEvent event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
@@ -368,7 +372,8 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	private void embeddedWritableProp(DocumentPart dp, PropertyTextUnitPlaceholder propOrText,
-			String tag, String language) {		
+			String tag, String language) {	
+		// TODO: test language and use the right set method
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		currentSkeleton.addValuePlaceholder(dp, propOrText.getName(), language);
@@ -376,7 +381,8 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	private void embeddedReadonlyProp(DocumentPart dp, PropertyTextUnitPlaceholder propOrText,
-			String tag, String language) {		
+			String tag, String language) {
+		// TODO: test language and use the right set method
 		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));		
 	}
@@ -415,10 +421,18 @@ public abstract class BaseFilter implements IFilter {
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				writable = true;
-				embeddedWritableProp(dp, propOrText, tag, language);
+				if (inlineCode) {
+					embeddedWritableProp(dp, propOrText, tag, language);
+				} else {
+					embeddedWritableProp(currentDocumentPart, propOrText, tag, language);
+				}				
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				readonly = true;
-				embeddedReadonlyProp(dp, propOrText, tag, language);					
+				if (inlineCode) {
+					embeddedReadonlyProp(dp, propOrText, tag, language);
+				} else {
+					embeddedReadonlyProp(currentDocumentPart, propOrText, tag, language);
+				}									
 			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
@@ -485,10 +499,6 @@ public abstract class BaseFilter implements IFilter {
 
 	protected void endTextUnit(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		FilterEvent tempTextUnit;
-
-		if (hasUnfinishedSkeleton()) {
-			endDocument();
-		}
 
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
@@ -630,14 +640,14 @@ public abstract class BaseFilter implements IFilter {
 	// Code Methods
 	// ////////////////////////////////////////////////////////////////////////
 
-	protected void startCode(Code code) {
+	private void startCode(Code code) {
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot add a Code to a non-exisitant TextUnit.");
 		}
 		currentCode = code;
 	}
 
-	protected void endCode() {
+	private void endCode() {
 		if (currentCode == null) {
 			throw new BaseFilterException("Code not found. Cannot end a non-exisitant code.");
 		}
@@ -647,7 +657,7 @@ public abstract class BaseFilter implements IFilter {
 		currentCode = null;
 	}
 
-	protected void addToCode(String data) {
+	private void addToCode(String data) {
 		if (currentCode == null) {
 			throw new BaseFilterException("Code not found. Cannot add to a non-exisitant code.");
 		}
@@ -660,6 +670,10 @@ public abstract class BaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	protected void startDocumentPart(String part) {
+		
+		if (hasUnfinishedSkeleton()) {
+			endDocumentPart();
+		}
 		currentSkeleton = new GenericSkeleton(part);
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
@@ -673,6 +687,10 @@ public abstract class BaseFilter implements IFilter {
 	protected void startDocumentPart(String part, String name, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
+		if (hasUnfinishedSkeleton()) {
+			endDocumentPart();
+		}
+		
 		currentSkeleton = new GenericSkeleton();
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
