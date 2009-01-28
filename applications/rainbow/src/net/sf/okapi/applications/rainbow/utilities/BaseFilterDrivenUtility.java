@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility

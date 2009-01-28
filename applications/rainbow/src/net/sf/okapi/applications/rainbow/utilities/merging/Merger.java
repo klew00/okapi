@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
@@ -37,7 +37,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class Merger {
@@ -112,7 +111,7 @@ public class Merger {
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);
 			Util.createDirectories(outputFile);
-			outFilter = new GenericFilterWriter(new GenericSkeletonWriter());
+			outFilter = new GenericFilterWriter(inpFilter.createSkeletonWriter());
 			outFilter.setOptions(trgLang, item.getOutputEncoding());
 			outFilter.setOutput(outputFile);
 			

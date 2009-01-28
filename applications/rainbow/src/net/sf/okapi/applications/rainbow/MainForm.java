@@ -102,6 +102,7 @@ public class MainForm implements IParametersProvider {
 	
 	public static final String OPT_ALLOWDUPINPUT = "allowDupInput"; //$NON-NLS-1$
 	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
+	public static final String OPT_BOUNDS        = "bounds"; //$NON-NLS-1$
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -181,7 +182,7 @@ public class MainForm implements IParametersProvider {
 			loadResources();
 
 			config = new UserConfiguration();
-			config.setProperty(OPT_LOADMRU, "0"); // Defaults
+			config.setProperty(OPT_LOADMRU, "0"); // Defaults //$NON-NLS-1$
 			config.load(APPNAME); // Load the current user preferences
 			mruList = new MRUList(9);
 			mruList.getFromProperties(config);
@@ -201,7 +202,7 @@ public class MainForm implements IParametersProvider {
 						if ( n == 1 ) { // Ask
 							// Ask confirmation
 							MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-							dlg.setMessage("The most recently used project is:\n"+path+"\nDo you want to open it now?");
+							dlg.setMessage(Res.getString("MainForm.askMRU1")+path+Res.getString("MainForm.askMRU2")); //$NON-NLS-1$ //$NON-NLS-2$
 							dlg.setText(APPNAME);
 							if ( dlg.open() == SWT.YES ) n = 2;
 						}
@@ -528,7 +529,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showTopic(this, "index", "howTo.html"); //$NON-NLS-1$
+				if ( help != null ) help.showTopic(this, "index", "howTo.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		
@@ -539,7 +540,7 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
-				Dialogs.showError(shell, "Not implemented yet.", null);
+				Dialogs.showError(shell, Res.getString("MainForm.4"), null); //$NON-NLS-1$
 				//testRunnable();
 			}
 		});
@@ -548,7 +549,7 @@ public class MainForm implements IParametersProvider {
 		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Rainbow)");
+				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Rainbow)"); //$NON-NLS-1$
 			}
 		});
 		
@@ -567,8 +568,8 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				AboutDialog dlg = new AboutDialog(shell,
-					"About Rainbow",
-					"Rainbow - Okapi Localization Toolbox",
+					Res.getString("MainForm.aboutCaption"), //$NON-NLS-1$
+					Res.getString("MainForm.aboutAppName"), //$NON-NLS-1$
 					Res.getString("VERSION")); //$NON-NLS-1$);
 				dlg.showDialog();
 			}
@@ -577,7 +578,8 @@ public class MainForm implements IParametersProvider {
 		
 		// Root panel
 		stInputRoot = new Label(shell, SWT.NONE);
-		stInputRoot.setText("Root 0:"); //$NON-NLS-1$
+		// Text an approximative text for correct sizing
+		stInputRoot.setText(Res.getString("MainForm.inputRootSizingLabel")); //$NON-NLS-1$
 		
 		edInputRoot = new Text(shell, SWT.SINGLE | SWT.BORDER);
 		edInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -845,16 +847,16 @@ public class MainForm implements IParametersProvider {
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		tiOptions = new TabItem(tabFolder, SWT.NONE);
-		tiOptions.setText("Other Settings");
+		tiOptions.setText(Res.getString("MainForm.tabOtherSettings")); //$NON-NLS-1$
 		tiOptions.setControl(comp);
 		
 		group = new Group(comp, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
-		group.setText("Output");
+		group.setText(Res.getString("MainForm.outputGroup")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		chkUseOutputRoot = new Button(group, SWT.CHECK);
-		chkUseOutputRoot.setText("Use this root:");
+		chkUseOutputRoot.setText(Res.getString("MainForm.outputUseRoot")); //$NON-NLS-1$
 		chkUseOutputRoot.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edOutputRoot.setEnabled(chkUseOutputRoot.getSelection());
@@ -877,11 +879,11 @@ public class MainForm implements IParametersProvider {
 
 		group = new Group(comp, SWT.NONE);
 		group.setLayout(new GridLayout(3, false));
-		group.setText("Filters Parameters");
+		group.setText(Res.getString("MainForm.paramFolderGroup")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		label = new Label(group, SWT.NONE);
-		label.setText("Folder:");
+		label.setText(Res.getString("MainForm.paramFolder")); //$NON-NLS-1$
 		
 		edParamsFolder = new Text(group, SWT.BORDER);
 		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -898,7 +900,7 @@ public class MainForm implements IParametersProvider {
 		new Label(group, SWT.NONE);
 		
 		chkUseCustomParametersFolder = new Button(group, SWT.CHECK);
-		chkUseCustomParametersFolder.setText("Use custom parameters folder");
+		chkUseCustomParametersFolder.setText(Res.getString("MainForm.useCustomParamFolder")); //$NON-NLS-1$
 		chkUseCustomParametersFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				// First save the custom folder if it was custom (so !was)
@@ -923,13 +925,24 @@ public class MainForm implements IParametersProvider {
 		updateMRU();
 		
 		// Set the minimal size to the packed size
-		// And then reset the original start size
-		Point origSize = shell.getSize();
+		// And then set the start size
+		Point startSize = shell.getSize();
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-		shell.setSize(origSize);
-		if ( config.getBoolean("maximized") ) {
+		shell.setSize(startSize);
+		// Maximize if requested
+		if ( config.getBoolean("maximized") ) { //$NON-NLS-1$
 			shell.setMaximized(true);
+		}
+		else { // Or try to re-use the bounds of the previous session
+			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+			if ( ar != null ) {
+				Rectangle dr = shell.getDisplay().getBounds();
+				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+					&& dr.contains(ar.x, ar.y) ) {
+					shell.setBounds(ar);
+				}
+			}
 		}
 	}
 
@@ -941,7 +954,7 @@ public class MainForm implements IParametersProvider {
 		
 		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("newproject")); //$NON-NLS-1$
-	    item.setToolTipText("New Project (Ctrl+N)");
+	    item.setToolTipText(Res.getString("MainForm.newProjectTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				createProject(true);
@@ -950,7 +963,7 @@ public class MainForm implements IParametersProvider {
 	    
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("openproject")); //$NON-NLS-1$
-	    item.setToolTipText("Open Project (Ctrl+O)");
+	    item.setToolTipText(Res.getString("MainForm.openProjectTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				openProject(null);
@@ -959,7 +972,7 @@ public class MainForm implements IParametersProvider {
 	    
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("saveproject")); //$NON-NLS-1$
-	    item.setToolTipText("Save Project (Ctrl+S)");
+	    item.setToolTipText(Res.getString("MainForm.saveProjectTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				saveProject(prj.path);
@@ -970,7 +983,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("log")); //$NON-NLS-1$
-	    item.setToolTipText("Log (F9)");
+	    item.setToolTipText(Res.getString("MainForm.logTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( log.isVisible() ) log.hide();
@@ -982,7 +995,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("addinput")); //$NON-NLS-1$
-	    item.setToolTipText("Add Documents (Ctrl+Insert)");
+	    item.setToolTipText(Res.getString("MainForm.addDocsTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				addDocumentsFromList(null);
@@ -991,7 +1004,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
-	    item.setToolTipText("Open Containing Folder");
+	    item.setToolTipText(Res.getString("MainForm.openContFolderTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				openContainingFolder(-1);
@@ -1000,7 +1013,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("moveup")); //$NON-NLS-1$
-	    item.setToolTipText("Move Up (Alt+Up)");
+	    item.setToolTipText(Res.getString("MainForm.moveUpTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsUp();
@@ -1009,7 +1022,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("movedown")); //$NON-NLS-1$
-	    item.setToolTipText("Move Down (Alt+Down)");
+	    item.setToolTipText(Res.getString("MainForm.moveDownTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsDown();
@@ -1018,7 +1031,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("properties")); //$NON-NLS-1$
-	    item.setToolTipText("Edit Input Properties (Alt+Enter)");
+	    item.setToolTipText(Res.getString("MainForm.editInputPropTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editInputProperties(-1);
@@ -1029,7 +1042,7 @@ public class MainForm implements IParametersProvider {
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 	    item.setImage(rm.getImage("help")); //$NON-NLS-1$
-	    item.setToolTipText("Help Topics (F1)");
+	    item.setToolTipText(Res.getString("MainForm.helpTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
@@ -1199,7 +1212,7 @@ public class MainForm implements IParametersProvider {
 			ud.setData(prj, utilityID);
 			// Run it
 			if ( !ud.checkParameters(shell) ) return;
-			startWaiting("Processing files...", true);
+			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
 			ud.execute(shell);
 			// Gets the latest folder to open.
 			prj.setLastOutpoutFolder(ud.getUtility().getFolderAfterProcess());
@@ -1372,8 +1385,8 @@ public class MainForm implements IParametersProvider {
 		try {
 			saveSurfaceData();
 			InputDialog dlg = new InputDialog(shell,
-				String.format("Root for Input List %d", currentInput+1),
-				"New root folder:\n(Leave empty to use the folder where the project file is saved)",
+				String.format(Res.getString("MainForm.rootCaption"), currentInput+1), //$NON-NLS-1$
+				Res.getString("MainForm.editRootLabel"), //$NON-NLS-1$
 				prj.getInputRoot(currentInput), null, 1);
 			dlg.setAllowEmptyValue(true);
 			String newRoot = dlg.showDialog();
@@ -1407,11 +1420,13 @@ public class MainForm implements IParametersProvider {
 	
 	private void saveUserConfiguration () {
 		// Set the window placement
-		config.setProperty("maximized", shell.getMaximized());
+		config.setProperty("maximized", shell.getMaximized()); //$NON-NLS-1$
+		Rectangle r = shell.getBounds();
+		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height));
 		// Set the MRU list
 		mruList.copyToProperties(config);
 		// Save to the user home directory as ".appname" file
-		config.save(APPNAME, Res.getString("VERSION"));
+		config.save(APPNAME, Res.getString("VERSION")); //$NON-NLS-1$
 	}
 
 	private boolean canContinue () {
@@ -1421,7 +1436,7 @@ public class MainForm implements IParametersProvider {
 			else {
 				// Ask confirmation
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-				dlg.setMessage("Some project information or properties have been modified.\nDo you want to save the project?");
+				dlg.setMessage(Res.getString("MainForm.askToSave")); //$NON-NLS-1$
 				dlg.setText(APPNAME);
 				switch  ( dlg.open() ) {
 				case SWT.NO:
@@ -1473,7 +1488,7 @@ public class MainForm implements IParametersProvider {
 				while ( iter.hasNext() ) {
 					menuItem = new MenuItem(submenu, SWT.PUSH);
 					path = iter.next();
-					menuItem.setText(String.format("&%d %s", ++i, path));
+					menuItem.setText(String.format("&%d %s", ++i, path)); //$NON-NLS-1$
 					menuItem.setData(path);
 					menuItem.addSelectionListener(new SelectionAdapter() {
 						public void widgetSelected(SelectionEvent event) {
@@ -1493,8 +1508,8 @@ public class MainForm implements IParametersProvider {
 	private void saveProject (String path) {
 		try {
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save Project", null,
-					"Rainbow Project (*.rnb)", "*.rnb"); //$NON-NLS-2$
+				path = Dialogs.browseFilenamesForSave(shell, Res.getString("MainForm.saveProjectBrowseCaption"), null, //$NON-NLS-1$
+					Res.getString("MainForm.33"), "*.rnb");  //$NON-NLS-1$//$NON-NLS-2$
 				if ( path == null ) return;
 				mruList.add(path);
 				updateMRU();
@@ -1550,15 +1565,15 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( !canContinue() ) return;
 			if ( path == null ) {
-				String[] paths = Dialogs.browseFilenames(shell, "Open Project", false, null,
-					"Rainbow Projects (*.rnb)\tAll Files (*.*)", "*.rnb\t*.*"); //$NON-NLS-2$
+				String[] paths = Dialogs.browseFilenames(shell, Res.getString("MainForm.openProjectBrowsecaption"), false, null, //$NON-NLS-1$
+					Res.getString("MainForm.35"), "*.rnb\t*.*");  //$NON-NLS-1$//$NON-NLS-2$
 				if ( paths == null ) return;
 				path = paths[0];
 			}
 			
 			// Check if the file exists
 			if ( !(new File(path)).exists() ) {
-				Dialogs.showError(shell, "The project file cannot be found:\n"+path, null);
+				Dialogs.showError(shell, Res.getString("MainForm.projectNotFound")+path, null); //$NON-NLS-1$
 				mruList.remove(path);
 				updateMRU();
 				return;
@@ -1583,7 +1598,7 @@ public class MainForm implements IParametersProvider {
 		
 		//TODO: select the list to build output 
 		String sampleInput = prj.getInputRoot(0) + File.separator
-			+ "mySubFolder" + File.separator + "myFile.ext";
+			+ Res.getString("MainForm.37") + File.separator + Res.getString("MainForm.38"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		//TODO: select the list to build output 
 		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
@@ -1610,7 +1625,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void updateInputRoot () {
 		if ( currentInput == -1 ) return;
-		stInputRoot.setText(String.format("Root %d:", currentInput+1));
+		stInputRoot.setText(String.format(Res.getString("MainForm.inputRootLabel"), currentInput+1)); //$NON-NLS-1$
 		edInputRoot.setText(prj.getInputRootDisplay(currentInput));
 		updateOutputRoot();
 	}
@@ -1642,12 +1657,12 @@ public class MainForm implements IParametersProvider {
 		try {
 			// Get a list of paths if needed
 			if ( paths == null ) {
-				paths = Dialogs.browseFilenames(shell, "Add Documents",
+				paths = Dialogs.browseFilenames(shell, Res.getString("MainForm.addDocsBrowsecaption"), //$NON-NLS-1$
 					true, prj.getInputRoot(currentInput), null, null);
 			}
 			if ( paths == null ) return;
 			// Add all the selected files and folders
-			startWaiting("Adding input documents...", false);
+			startWaiting(Res.getString("MainForm.addingInputDocs"), false); //$NON-NLS-1$
 			doAddDocuments(paths, null);
 		}
 		catch ( Exception e ) {
@@ -1681,7 +1696,7 @@ public class MainForm implements IParametersProvider {
 					n++;
 					break;
 				case 1: // Bad root
-					Dialogs.showError(shell, "The file '"+path+"' does not have the same root as the project's input root.", null);
+					Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
 					return n;
 				}
 			}
@@ -1710,7 +1725,7 @@ public class MainForm implements IParametersProvider {
 
 			// Update the file(s) data
 			if ( aRes[3] != null ) prj.isModified = true;
-			startWaiting("Updating project...", false);
+			startWaiting(Res.getString("MainForm.updatingProject"), false); //$NON-NLS-1$
 			if ( index < 0 ) {
 				int[] indices = table.getSelectionIndices();
 				for ( int i=0; i<indices.length; i++ ) {
@@ -1825,7 +1840,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void showCharInfo () {
 		try {
-			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, "Character Information", help);
+			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, Res.getString("MainForm.charInfoCaption"), help); //$NON-NLS-1$
 			dlg.showDialog(0x9F99);
 		}
 		catch ( Exception e ) {
@@ -1837,8 +1852,8 @@ public class MainForm implements IParametersProvider {
 		try {
 			int count = 0;
 			int countAlias = 0;
-			startWaiting("List encodings...", true);
-			log.beginTask("List the encodings available on this machine:\n");
+			startWaiting(Res.getString("MainForm.listingEncodings"), true); //$NON-NLS-1$
+			log.beginTask(Res.getString("MainForm.listEncodingsTask")); //$NON-NLS-1$
 			SortedMap<String, Charset> charsets = Charset.availableCharsets();
 			for ( String key : charsets.keySet() ) {
 				log.message(charsets.get(key).displayName());
@@ -1849,8 +1864,8 @@ public class MainForm implements IParametersProvider {
 					countAlias++;
 				}
 			}
-			log.message(String.format("\nNumber of unique encodings available: %d", count));
-			log.message(String.format("and counting aliases: %d\n", count+countAlias));
+			log.message(String.format(Res.getString("MainForm.numEncodings"), count)); //$NON-NLS-1$
+			log.message(String.format(Res.getString("MainForm.numAliases"), count+countAlias)); //$NON-NLS-1$
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1870,13 +1885,13 @@ public class MainForm implements IParametersProvider {
 			}
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-			dlg.setMessage("You are going to remove the selected document(s) from the list.\nDo you want to proceed?");
+			dlg.setMessage(Res.getString("MainForm.askForRemove")); //$NON-NLS-1$
 			dlg.setText(APPNAME);
 			if ( dlg.open() != SWT.YES ) return;
 
 			refresh = true;
 			Input inp;
-			startWaiting("Updating project...", false);
+			startWaiting(Res.getString("MainForm.updatingProject"), false); //$NON-NLS-1$
 			Table table = inputTables.get(currentInput);
 			if ( index < 0 ) {
 				int[] indices = table.getSelectionIndices();

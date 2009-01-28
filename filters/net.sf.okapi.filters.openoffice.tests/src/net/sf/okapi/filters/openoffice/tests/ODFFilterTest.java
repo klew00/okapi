@@ -64,7 +64,7 @@ public class ODFFilterTest {
 	private void rewrite (IFilter filter) {
 		GenericFilterWriter writer = null;
 		try {
-			writer = new GenericFilterWriter(new GenericSkeletonWriter());
+			writer = new GenericFilterWriter(filter.createSkeletonWriter());
 			writer.setOptions("FR", "UTF-8");
 			writer.setOutput("TestDocument01.odt_content.out.xml");
 			while ( filter.hasNext() ) {

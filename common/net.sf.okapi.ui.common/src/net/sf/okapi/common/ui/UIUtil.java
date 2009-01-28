@@ -25,6 +25,7 @@ import java.net.URL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
@@ -125,6 +126,27 @@ public class UIUtil {
 		Image[] list = parent.getImages();
 		if (( list == null ) || ( list.length < 2 )) dialog.setImage(parent.getImage()); 
 		else dialog.setImages(list);
+	}
+
+	/**
+	 * Converts a string representation of 4 integers into a Rectangle object.
+	 * @param data The string to convert ("X,Y;W;H" or "X,Y,W,H" or "X Y W H").
+	 * @return A new rectangle or null if an error occurred. 
+	 */
+	public static Rectangle StringToRectangle (String data) {
+		try {
+			if ( data == null ) return null;
+			String[] parts = data.split("[,; ]");
+			if ( parts.length != 4 ) return null;
+			int x = Integer.valueOf(parts[0]);
+			int y = Integer.valueOf(parts[1]);
+			int w = Integer.valueOf(parts[2]);
+			int h = Integer.valueOf(parts[3]);
+			return new Rectangle(x, y, w, h);
+		}
+		catch ( Throwable e ) {
+			return null;
+		}
 	}
 
 }

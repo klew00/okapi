@@ -323,7 +323,7 @@ public class Main {
 			File f = new File("testdata/Test01.properties");
 			inputFlt.open(f.toURL());
 			
-			IFilterWriter outputFlt = new GenericFilterWriter(new GenericSkeletonWriter());
+			IFilterWriter outputFlt = new GenericFilterWriter(inputFlt.createSkeletonWriter());
 			outputFlt.setOptions("fr", "us-ascii");
 			outputFlt.setOutput("testdata/Test01.out.properties");
 
