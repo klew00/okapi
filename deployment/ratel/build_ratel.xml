@@ -47,6 +47,7 @@
 		<copy todir="${dist-bin}">
 			<fileset dir="${dist-bin}/${platform}"/>
 		</copy>
+		
 		<copy todir="${dist}">
 			<fileset dir="data/${platform}"/>
 			<fileset dir="data" includes="**/*.srx"/>
@@ -73,6 +74,10 @@
 		</delete>
 		
 	</target>
+	
+	<target name="linuxExePerm" if="is_gtk2-linux-x86">
+		<chmod file="${dist-bin}/${platform}/srxeditor-ratel" perm="ugo+rx"/>
+	</target>
 
 	<target name="winExe" if="is_win32-x86">
 		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
@@ -93,6 +98,6 @@
 		<delete file="${dist}/srxeditor-ratel_${platform}.tar"/>
 	</target>
 	
-	<target name="all" depends="compile, winExe, zipAll, gzipAll"/>
+	<target name="all" depends="compile, winExe, linuxExePerm, zipAll, gzipAll"/>
 
 </project>

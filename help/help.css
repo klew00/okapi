@@ -1,7 +1,7 @@
 body	{ font-family: sans-serif; font-size: 0.9em; margin: 8 8 8 8; }
 
 h1	{ font-weight: bold; font-size: 1.6em; background-color: #3399CC; color: white;
-		padding: 0.3em; margin-bottom: 0; margin-top: 0; margin-bottom: 0.8em; }
+		padding: 0.3em; margin-top: 0; margin-bottom: 0.8em; }
 
 h2	{ font-weight: bold; font-size: 1.2em; background-color: #BBDDFF; color: black;
 		padding: 0.3em 0.3em 0.3em 0.3em; margin-top: 1.4em; margin-bottom: 0.8em; }
@@ -41,7 +41,7 @@ h1.dlgsec1	{ font-weight: bold; font-size: 1.6em; background-color: #3399CC; col
 h2.dlgsec2	{ font-weight: bold; font-size: 1.3em; background-color: #BBDDFF;
 		padding: 0.2em 0.2em 0.2em 0.2em; margin-top: 1; }
 		
-div.toc p	{ margin: 1 0 0 0; }
+div.toc p	{ margin: 1 0 0 0; font-size: 0.8em; }
 div.toc a:link { text-decoration: none; color: black }
 div.toc a:visited { text-decoration: none; color: black }
 div.toc a:hover { background: #336699; color: white; }
@@ -52,9 +52,9 @@ h1.filt1	{ font-weight: bold; font-size: 1.6em; background-color: #3399CC; color
 h2.filt2	{ font-weight: bold; font-size: 1.3em; background-color: #008080; color: white;
 		padding: 0.2em 0.2em 0.2em 0.2em; margin-top: 1;}
 		
-body.appname { background-color: #336699; color: white; }
+body.appname { background-color: #336699; color: white; margin: 0 8 0 8; }
 
 h1.appname	{ background-color: #336699; color: white; 
-		font-weight: bold; font-size: 1.6em; margin-left: 30; padding: 0.3em;}
+		font-weight: bold; font-size: 1.6em; margin-left: 30; padding: 0.4em; }
 
 span.subname	{font-weight: normal; font-size: 0.8em; }

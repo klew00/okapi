@@ -78,7 +78,7 @@ public class HtmlSnippetsTest {
 			 + "<ul>"
 			 + "<li>Text of item 1</li>"
 			 + "<li>Text of item 2</li>"
-			 + "</u>"
+			 + "</ul>"
 			 + "and text after the list.</p>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}

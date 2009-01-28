@@ -27,7 +27,6 @@ import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
