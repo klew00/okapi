@@ -40,7 +40,7 @@ public class HtmlConfigurationTest {
 	public void defaultConfiguration() {		
 		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
-		assertEquals(rules.getMainRuleType("title"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE);
+		assertEquals(rules.getMainRuleType("title"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS);
 		assertEquals(rules.getMainRuleType("abbr"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
 		assertEquals(rules.getMainRuleType("area"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		assertEquals(rules.getMainRuleType("script"), TaggedFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);

@@ -18,6 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+
+//TODO: Test for properties
 public class HtmlSnippetsTest {
 	private HtmlFilter htmlFilter;
 	
@@ -44,7 +46,7 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testComplexEmptyElement() {
-		String snippet = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
+		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 
@@ -85,7 +87,8 @@ public class HtmlSnippetsTest {
 	
 	private ArrayList<FilterEvent> getEvents(String snippet) {
 		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
-		htmlFilter.open(snippet);	
+		htmlFilter.open(snippet);
+		htmlFilter.setDefaultConfig("net/sf/okapi/filters/html/tests/testConfiguration1.yml");
 		while (htmlFilter.hasNext()) {
 			FilterEvent event = htmlFilter.next();
 			list.add(event);
@@ -96,55 +99,33 @@ public class HtmlSnippetsTest {
 
 	private String generateOutput(ArrayList<FilterEvent> list, String original) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
 		writer.processStart("en", "utf-8", null, new EncoderManager());
 		for (FilterEvent event : list) {
 			switch (event.getEventType()) {
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
-				GenericSkeleton skl = (GenericSkeleton) tu.getSkeleton();
-				if (skl != null) {
-					System.out.println("TU:skl=" + skl.toString());
-				} else {
-					System.out.println("TU:skl=None");
-				}
-				System.out.println("  :txt=" + tu.toString());
+				skl = (GenericSkeleton) tu.getSkeleton();				
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:
 				DocumentPart dp = (DocumentPart) event.getResource();
-				skl = (GenericSkeleton) dp.getSkeleton();
-				if (skl != null) {
-					System.out.println("DP:skl=" + skl.toString());
-				} else {
-					System.out.println("DP:skl=None");
-				}
+				skl = (GenericSkeleton) dp.getSkeleton();			
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
 				StartGroup startGroup = (StartGroup) event.getResource();
-				skl = (GenericSkeleton) startGroup.getSkeleton();
-				if (skl != null) {
-					System.out.println("SG:skl=" + skl.toString());
-				} else {
-					System.out.println("SG:skl=None");
-				}
+				skl = (GenericSkeleton) startGroup.getSkeleton();				
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
 				Ending ending = (Ending) event.getResource();
 				skl = (GenericSkeleton) ending.getSkeleton();
-				if (skl != null) {
-					System.out.println("EG:skl=" + skl.toString());
-				} else {
-					System.out.println("EG:skl=None");
-				}
 				tmp.append(writer.processEndGroup(ending));
 				break;
 			}
-		}
-		System.out.println("out: " + tmp.toString());
-		System.out.println("-----");
+		}		
 		return tmp.toString();
 	}
 }
