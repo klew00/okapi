@@ -29,7 +29,7 @@ import net.sf.okapi.common.simplepipeline.SimplePipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.tests.HtmlParserTest;
+import net.sf.okapi.filters.html.tests.HtmlEventTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class HtmlFilterRoundtripTest {
 		IPipeline pipeline = new SimplePipeline();
 		
 		HtmlFilter htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleSimpleTest.html");
+		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleSimpleTest.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
 		htmlFilter.open(htmlStream);
 		

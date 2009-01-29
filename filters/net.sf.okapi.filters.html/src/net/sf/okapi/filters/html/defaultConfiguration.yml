@@ -7,7 +7,7 @@
 # PRESERVE_WHITESPACE turn on preserve whitespace.
 # SCRIPT Embedded scripting languatge - pass to another extractor
 # SERVER Embedded server language tags such as JSP, PHP, Mason etc.
-# ATTRIBUTE the rule lists an attribute, not an element
+# ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY these rules list an attribute, not an element
 # ATTRIBUTES_ONLY only attribute is translatable or localizable 
 
 #********************************************************************************************* 
@@ -31,14 +31,7 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-# test read-only, writable attributes
-dummy: 
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [trans]  
-  writableLocalizableAttributes: [write]
-  readOnlyLocalizableAttributes: [readonly]
-
-# test group rules
+# Group rules
 table: 
   ruleTypes: [GROUP]  
 
@@ -54,30 +47,26 @@ ul:
 li:
   ruleTypes: [GROUP]  
 
-# test TextUnit rules
+# TextUnit rules
 p:
   ruleTypes: [TEXTUNIT]  
-  writableLocalizableAttributes: [dir]
-
-# exclude/include test
-exclude:
-  ruleTypes: [EXCLUDE]  
-
-include:
-  ruleTypes: [INCLUDE]  
 
 # attributes that occur on many elements
 title:
-  ruleTypes: [ATTRIBUTE]
+  ruleTypes: [ATTRIBUTE_TRANS]
   onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script, title]
+
+dir:
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+  onlyTheseElements: []
+  allElementsExcept: [base, basefront, head, html, meta, param, script]
 
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
 # with embedded skeketon 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
-  #, [name, NOT_EQUALS, [generator, author, progid, date]]
   translatableAttributes: {content: [http-equiv, EQUALS, keywords]}
   writableLocalizableAttributes: {content: [http-equiv, EQUALS, content-language], charset: ~}
   readOnlyLocalizableAttributes: {content: [[http-equiv, EQUALS, content-type], [name, EQUALS, [generator, author, progid, date]]]}

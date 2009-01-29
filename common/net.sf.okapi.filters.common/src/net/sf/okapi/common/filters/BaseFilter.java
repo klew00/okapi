@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Stack;
 
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -118,7 +119,7 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(event);
 		finish();
 	}
-	
+
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
@@ -360,9 +361,9 @@ public abstract class BaseFilter implements IFilter {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
-		
+
 		GenericSkeleton skel = new GenericSkeleton();
-		
+
 		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		skel.addContentPlaceholder(tu);
 		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
@@ -371,40 +372,51 @@ public abstract class BaseFilter implements IFilter {
 		return tu;
 	}
 
-	private void embeddedWritableProp(DocumentPart dp, PropertyTextUnitPlaceholder propOrText,
-			String tag, String language) {	
+	private void embeddedWritableProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
+			String language) {
 		// TODO: test language and use the right set method
-		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
+		resource.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
-		currentSkeleton.addValuePlaceholder(dp, propOrText.getName(), language);
+		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(), language);
 		currentSkeleton.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
 	}
 
-	private void embeddedReadonlyProp(DocumentPart dp, PropertyTextUnitPlaceholder propOrText,
-			String tag, String language) {
+	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
+			String language) {
 		// TODO: test language and use the right set method
-		dp.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
-		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));		
+		resource.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
 	}
 
 	private void processAllEmbedded(String tag, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode) {
+		processAllEmbedded(tag, language, propertyTextUnitPlaceholders, inlineCode, null);
+	}
+
+	private void processAllEmbedded(String tag, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode, TextUnit parentTu) {
 
 		int propOrTextId = -1;
 		boolean readonly = false;
-		boolean writable = false; 
-				
-		// create DocumentPart to hold the references for the actionable tags and values
-		// if this is an inline code the document part is a referent itself
-		DocumentPart dp = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), inlineCode);			
-		
+		boolean writable = false;
+		INameable resource = null;
+
+		// set the resource that will hold all the references
+		if (parentTu != null) {
+			resource = parentTu;
+		} else if (inlineCode) {
+			resource = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), inlineCode);
+		} else {
+			resource = currentDocumentPart;
+		}
+
 		// sort to make sure we do the Properties or Text in order
 		Collections.sort(propertyTextUnitPlaceholders);
 
 		// add the part up to the first prop or text
 		PropertyTextUnitPlaceholder pt = propertyTextUnitPlaceholders.get(0);
 		currentSkeleton.add(tag.substring(0, pt.getMainStartPos()));
-		
+
 		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
 			propOrTextId++;
 
@@ -412,27 +424,19 @@ public abstract class BaseFilter implements IFilter {
 			if (propOrTextId >= 1 && propOrTextId < propertyTextUnitPlaceholders.size()) {
 				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
 				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
-				currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));		
+				currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 			}
 
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
-				currentSkeleton.addReference(tu);			
+				currentSkeleton.addReference(tu);
 				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				writable = true;
-				if (inlineCode) {
-					embeddedWritableProp(dp, propOrText, tag, language);
-				} else {
-					embeddedWritableProp(currentDocumentPart, propOrText, tag, language);
-				}				
+				embeddedWritableProp(resource, propOrText, tag, language);
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				readonly = true;
-				if (inlineCode) {
-					embeddedReadonlyProp(dp, propOrText, tag, language);
-				} else {
-					embeddedReadonlyProp(currentDocumentPart, propOrText, tag, language);
-				}									
+				embeddedReadonlyProp(resource, propOrText, tag, language);
 			} else {
 				throw new BaseFilterException("Unkown Property or TextUnit type");
 			}
@@ -441,18 +445,18 @@ public abstract class BaseFilter implements IFilter {
 		// add the remaining markup after the last prop or text
 		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
 		if (inlineCode) {
-			currentCode.appendReference(dp.getId());			
-			dp.setSkeleton(currentSkeleton);
-			if (readonly || writable) {				
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
-			} 
+			currentCode.appendReference(resource.getId());
+			resource.setSkeleton(currentSkeleton);
+			if ((readonly || writable) && parentTu == null) {
+				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, resource));
+			}
 		}
-		currentSkeleton.add(tag.substring(pt.getMainEndPos()));		
+		currentSkeleton.add(tag.substring(pt.getMainEndPos()));
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
 	// TextUnit Methods
-	// ////////////////////////////////////////////////////////////////////////	
+	// ////////////////////////////////////////////////////////////////////////
 
 	protected void startTextUnit(String text) {
 		startTextUnit(text, null, null);
@@ -470,31 +474,41 @@ public abstract class BaseFilter implements IFilter {
 		startTextUnit(null, startMarker, null);
 	}
 
+	protected void startTextUnit(ISkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		startTextUnit(null, startMarker, propertyTextUnitPlaceholders);
+	}
+
 	protected void endTextUnit(ISkeleton endMarker) {
 		endTextUnit(endMarker, null);
 	}
 
 	protected void startTextUnit(String text, ISkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		GenericSkeleton skel = null;
-
+		
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
 
-		if (startMarker != null && propertyTextUnitPlaceholders != null) {
-			// TODO: language=null do we need to handle other cases?
-			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false);
-		}
-
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
 
-		if (startMarker != null) {
-			skel = new GenericSkeleton((GenericSkeleton) startMarker);
+		if (startMarker != null && propertyTextUnitPlaceholders != null) {
+			// TODO: language=null do we need to handle other cases?
+			currentSkeleton = new GenericSkeleton();
+			
+			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false, tu);
+			tu.setSkeleton(currentSkeleton);
+			currentSkeleton.addContentPlaceholder(tu);
+			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, currentSkeleton));
+			currentSkeleton = null;
+			return;
+		} else if (startMarker != null) {
+			GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 			skel.addContentPlaceholder(tu);
+			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
+			return;
+		} else {
+			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 		}
-
-		tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
 	}
 
 	protected void endTextUnit(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -504,10 +518,10 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
 		}
 
-		if (endMarker != null && propertyTextUnitPlaceholders != null) {
-			// TODO: language=null do we need to handle other cases?
-			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
-		}
+//		if (endMarker != null && propertyTextUnitPlaceholders != null) {
+//			// TODO: language=null do we need to handle other cases?
+//			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
+//		}
 
 		tempTextUnit = popTempEvent();
 
@@ -556,14 +570,14 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
-			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {		
-		
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+
 		currentSkeleton = new GenericSkeleton();
-		
+
 		startCode(new Code(codeType, codeName));
 		processAllEmbedded(literalCode, language, propertyTextUnitPlaceholders, true);
 		endCode();
-		
+
 		currentSkeleton = null;
 	}
 
@@ -670,7 +684,7 @@ public abstract class BaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	protected void startDocumentPart(String part) {
-		
+
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
@@ -690,7 +704,7 @@ public abstract class BaseFilter implements IFilter {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
-		
+
 		currentSkeleton = new GenericSkeleton();
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);

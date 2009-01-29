@@ -31,7 +31,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.tests.HtmlParserTest;
+import net.sf.okapi.filters.html.tests.HtmlEventTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +49,7 @@ public class HtmlFilterRoundtripTest {
 		final IPipeline pipeline = new ThreadedPipeline();
 		
 		final HtmlFilter htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlParserTest.class.getResourceAsStream("/simpleTest.html");
+		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleTest.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
 		htmlFilter.open(htmlStream);
 		

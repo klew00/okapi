@@ -18,7 +18,9 @@ public class TaggedFilterConfiguration {
 	private static final String PRESERVE_WHITESPACE = "PRESERVE_WHITESPACE";
 	private static final String SCRIPT = "SCRIPT";
 	private static final String SERVER = "SERVER";
-	private static final String ATTRIBUTE = "ATTRIBUTE";
+	private static final String ATTRIBUTE_TRANS = "ATTRIBUTE_TRANS";
+	private static final String ATTRIBUTE_WRITABLE = "ATTRIBUTE_WRITABLE";
+	private static final String ATTRIBUTE_READONLY = "ATTRIBUTE_READONLY";
 	private static final String ATTRIBUTES_ONLY = "ATTRIBUTES_ONLY";
 
 	private static final String EQUALS = "EQUALS";
@@ -26,7 +28,7 @@ public class TaggedFilterConfiguration {
 	private static final String MATCH = "MATCH";
 
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE, ATTRIBUTES_ONLY, UNKOWN
+		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
 	};
 
 	private YamlConfigurationReader configReader;
@@ -74,13 +76,28 @@ public class TaggedFilterConfiguration {
 			return RULE_TYPE.SCRIPT_ELEMENT;
 		} else if (ruleType.equals(SERVER)) {
 			return RULE_TYPE.SERVER_ELEMENT;
-		} else if (ruleType.equals(ATTRIBUTE)) {
-			return RULE_TYPE.ATTRIBUTE;
+		} else if (ruleType.equals(ATTRIBUTE_TRANS)) {
+			return RULE_TYPE.ATTRIBUTE_TRANS;
+		} else if (ruleType.equals(ATTRIBUTE_WRITABLE)) {
+			return RULE_TYPE.ATTRIBUTE_WRITABLE;
+		} else if (ruleType.equals(ATTRIBUTE_READONLY)) {
+			return RULE_TYPE.ATTRIBUTE_READONLY;
 		} else if (ruleType.equals(ATTRIBUTES_ONLY)) {
 			return RULE_TYPE.ATTRIBUTES_ONLY;
 		} else {
 			return RULE_TYPE.UNKOWN;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isAttributeRule(String ruleName) {
+		Map rule = configReader.getRule(ruleName);
+		if (rule != null && getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_TRANS
+				|| getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_WRITABLE
+				|| getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_READONLY) {
+			return true;
+		}
+		return false;
 	}
 
 	public boolean hasActionableAttributes(String ruleName) {
@@ -126,7 +143,9 @@ public class TaggedFilterConfiguration {
 	}
 
 	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
+		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
+				|| isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
+				|| isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
 	}
 
 	public boolean isReadOnlyLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
@@ -143,6 +162,11 @@ public class TaggedFilterConfiguration {
 		Map elementRule = configReader.getRule(elementName);
 		if (elementRule == null) {
 			return false;
+		}
+
+		// catch attributes that may appear on any element
+		if (isActionableAttributeRule(elementName, attribute, type)) {
+			return true;
 		}
 
 		Object ta = elementRule.get(type);
@@ -166,10 +190,12 @@ public class TaggedFilterConfiguration {
 				} else {
 					// apply conditions
 					if (condition.get(0) instanceof List) {
-						// We have multiple conditions - individual results are OR'ed together
-						// so only one condition need be true for the rule to apply
+						// We have multiple conditions - individual results are
+						// OR'ed together
+						// so only one condition need be true for the rule to
+						// apply
 						for (int i = 0; i <= condition.size() - 1; i++) {
-							List c = (List)condition.get(i);
+							List c = (List) condition.get(i);
 							if (applyConditions(c, attribute, attributes)) {
 								return true;
 							}
@@ -183,6 +209,52 @@ public class TaggedFilterConfiguration {
 
 		}
 		return false;
+	}
+
+	/**
+	 * @param elementName
+	 * @param type
+	 * @return
+	 */
+	private boolean isActionableAttributeRule(String elementName, String attrName, String type) {
+		if (type.equals("translatableAttributes") && getMainRuleType(attrName) == RULE_TYPE.ATTRIBUTE_TRANS) {
+			if (isListedElement(elementName, attrName, type)) {
+				return true;
+			}
+		} else if (type.equals("readOnlyLocalizableAttributes")
+				&& getMainRuleType(attrName) == RULE_TYPE.ATTRIBUTE_READONLY) {
+			if (isListedElement(elementName, attrName, type)) {
+				return true;
+			}
+		} else if (type.equals("writableLocalizableAttributes")
+				&& getMainRuleType(attrName) == RULE_TYPE.ATTRIBUTE_WRITABLE) {
+			if (isListedElement(elementName, attrName, type)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param elementName
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private boolean isListedElement(String elementName, String attrName, String type) {
+		Map elementRule = configReader.getRule(attrName);
+		if (elementRule == null) {
+			return false;
+		}
+		
+		List excludedElements = (List) elementRule.get("allElementsExcept");
+		for (int i = 0; i <= excludedElements.size() - 1; i++) {
+			String elem = (String) excludedElements.get(i);
+			if (elem.equals(elementName)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")

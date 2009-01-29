@@ -30,8 +30,8 @@ import net.sf.okapi.common.filters.IEncoder;
 public class HtmlEncoder implements IEncoder {
 	public static final String NORMALIZED_LANGUAGE = "language";
 	public static final String NORMALIZED_ENCODING = "encoding";
-	public static final String NATIVE_LANGUAGE = "content-language";
-	public static final String NATIVE_ENCODING = "charset";
+	public static final String CONTENT = "content";
+	public static final String CHARSET = "charset";
 
 	public void setOptions (IParameters params,
 		String encoding)

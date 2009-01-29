@@ -20,7 +20,6 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -131,9 +130,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		super.initialize();
 
 		if (parameters == null) {
-			parameters = new Parameters();
-			URL url = BaseMarkupFilter.class.getResource(defaultConfig);
-			parameters.setTaggedConfig(new TaggedFilterConfiguration(url));
+			parameters = new Parameters(defaultConfig);			
 		}
 
 		// Segment iterator
@@ -142,7 +139,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		nodeIterator = document.getNodeIterator();
 	}
 
-	protected void setDefaultConfig(String defaultConfig) {
+	public void setDefaultConfig(String defaultConfig) {
 		this.defaultConfig = defaultConfig;
 	}
 
@@ -240,6 +237,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	protected abstract void handleEndTag(EndTag endTag);
 
 	protected abstract void handleDocumentPart(Tag endTag);
+	
+	abstract protected String normalizeAttributeName(String attrName, String attrValue, Tag tag);
 
 	protected void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
@@ -318,15 +317,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// offset of value of the attribute
 		int valueStartPos = attribute.getValueSegment().getBegin() - tag.getBegin();
-		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
-
-		// normalize values for encoder
-		String normalizedName = name;
-		if (name.equals(HtmlEncoder.NATIVE_ENCODING)) {
-			normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
-		} else if (name.equals(HtmlEncoder.NATIVE_LANGUAGE)) {
-			normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
-		}
-		return new PropertyTextUnitPlaceholder(type, normalizedName, value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
+		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();		
+	
+		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
 	}
 }

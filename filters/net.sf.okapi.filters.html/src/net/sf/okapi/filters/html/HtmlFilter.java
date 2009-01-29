@@ -26,6 +26,7 @@ import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.markupfilter.BaseMarkupFilter;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -129,7 +130,12 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case TEXT_UNIT_ELEMENT:
 			getRuleState().pushTextUnitRule(startTag.getName());
-			startTextUnit(new GenericSkeleton(startTag.toString()));
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startTextUnit(new GenericSkeleton(startTag.toString()), propertyTextUnitPlaceholders);
+			} else {
+				startTextUnit(new GenericSkeleton(startTag.toString()));
+			}
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
@@ -284,5 +290,39 @@ public class HtmlFilter extends BaseMarkupFilter {
 	 */
 	public String getName() {
 		return "HTML Filter"; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java.
+	 * lang.String)
+	 */
+	@Override
+	protected String normalizeAttributeName(String attrName, String attrValue, Tag tag) {
+		// normalize values for HTML
+		String normalizedName = attrName;
+
+		// <meta http-equiv="Content-Type"
+		// content="text/html; charset=ISO-2022-JP">
+		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
+			StartTag st = (StartTag) tag;
+			if (st.getAttributeValue("http-equiv").equals("Content-Type")) {
+				normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
+				return normalizedName;
+			}
+		}
+
+		// <meta http-equiv="Content-Language" content="en"
+		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
+			StartTag st = (StartTag) tag;
+			if (st.getAttributeValue("http-equiv").equals("Content-Language")) {
+				normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
+				return normalizedName;
+			}
+		}
+
+		return normalizedName;
 	}
 }
