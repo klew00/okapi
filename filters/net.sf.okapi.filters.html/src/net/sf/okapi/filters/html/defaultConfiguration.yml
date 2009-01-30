@@ -31,35 +31,20 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-# Group rules
-table: 
-  ruleTypes: [GROUP]  
-
-tr:
-  ruleTypes: [GROUP]  
-
-td:
-  ruleTypes: [GROUP]  
-
-ul:
-  ruleTypes: [GROUP]  
-
-li:
-  ruleTypes: [GROUP]  
-
-# TextUnit rules
-p:
-  ruleTypes: [TEXTUNIT]  
+# test read-only, writable attributes
+dummy: 
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [trans]  
+  writableLocalizableAttributes: [write]
+  readOnlyLocalizableAttributes: [readonly]
 
 # attributes that occur on many elements
 title:
   ruleTypes: [ATTRIBUTE_TRANS]
-  onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script, title]
 
 dir:
   ruleTypes: [ATTRIBUTE_WRITABLE]
-  onlyTheseElements: []
   allElementsExcept: [base, basefront, head, html, meta, param, script]
 
 # only attributes are localizable or translatable - no PCDATA
@@ -188,7 +173,7 @@ label:
   translatableAttributes: [accesskey]
  
 li:
-  ruleTypes: [GROUP]
+  ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [value]
 
 map:
@@ -242,7 +227,7 @@ symbol:
   ruleTypes: [INLINE]
  
 table:
-  ruleTypes: [GROUP]
+  ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [summary]
  
 textarea:
@@ -253,7 +238,7 @@ tt:
   ruleTypes: [INLINE]
  
 td:
-  ruleTypes: [GROUP]
+  ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [abbr]
  
 u:
