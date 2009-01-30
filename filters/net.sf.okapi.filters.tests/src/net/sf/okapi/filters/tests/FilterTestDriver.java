@@ -20,9 +20,13 @@
 
 package net.sf.okapi.filters.tests;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
@@ -37,6 +41,51 @@ public class FilterTestDriver {
 	private boolean showOnlyTextUnits = false;
 	private int warnings;
 	private boolean ok;
+	
+	static public  boolean compareEvents(ArrayList<FilterEvent> manual, ArrayList<FilterEvent> generated) {
+		if (manual.size() != generated.size()) {
+			return false;
+		}
+
+		Iterator<FilterEvent> manualIt = manual.iterator();
+		for (FilterEvent ge : generated) {
+			FilterEvent me = manualIt.next();
+			if (ge.getEventType() != me.getEventType()) {
+				return false;
+			}
+			IResource mr = me.getResource();
+			IResource gr = ge.getResource();
+			if (mr != null && gr != null && mr.getSkeleton() != null && gr.getSkeleton() != null) {
+				if (!(mr.getSkeleton().toString().equals(gr.getSkeleton().toString()))) {
+					return false;
+				}
+			}
+
+			switch (ge.getEventType()) {
+			case DOCUMENT_PART:
+				DocumentPart mdp = (DocumentPart) mr;
+				DocumentPart gdp = (DocumentPart) gr;
+				if (mdp.isReferent() != gdp.isReferent()) {
+					return false;
+				}
+				if (mdp.isTranslatable() != gdp.isTranslatable()) {
+					return false;
+				}
+				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
+					return false;
+				}
+				break;
+			case TEXT_UNIT:
+				TextUnit mtu = (TextUnit) mr;
+				TextUnit gtu = (TextUnit) gr;
+				if (!(mtu.toString().equals(gtu.toString()))) {
+					return false;
+				}
+				break;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Indicates to this driver to display the skeleton data.

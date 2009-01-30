@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +80,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -113,7 +114,7 @@ public class HtmlEventTest {
 		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
 
 		addEndEvents(events);
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -148,7 +149,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -187,7 +188,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -208,7 +209,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -260,7 +261,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -298,7 +299,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -359,7 +360,7 @@ public class HtmlEventTest {
 		
 		addEndEvents(events);
 
-		assertTrue(compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
 	private ArrayList<FilterEvent> getEvents(String snippet) {
@@ -382,51 +383,6 @@ public class HtmlEventTest {
 	private void addEndEvents(ArrayList<FilterEvent> events) {
 		events.add(new FilterEvent(FilterEventType.END_DOCUMENT));
 		events.add(new FilterEvent(FilterEventType.FINISHED));
-	}
-
-	private boolean compareEvents(ArrayList<FilterEvent> manual, ArrayList<FilterEvent> generated) {
-		if (manual.size() != generated.size()) {
-			return false;
-		}
-
-		Iterator<FilterEvent> manualIt = manual.iterator();
-		for (FilterEvent ge : generated) {
-			FilterEvent me = manualIt.next();
-			if (ge.getEventType() != me.getEventType()) {
-				return false;
-			}
-			IResource mr = me.getResource();
-			IResource gr = ge.getResource();
-			if (mr != null && gr != null && mr.getSkeleton() != null && gr.getSkeleton() != null) {
-				if (!(mr.getSkeleton().toString().equals(gr.getSkeleton().toString()))) {
-					return false;
-				}
-			}
-
-			switch (ge.getEventType()) {
-			case DOCUMENT_PART:
-				DocumentPart mdp = (DocumentPart) mr;
-				DocumentPart gdp = (DocumentPart) gr;
-				if (mdp.isReferent() != gdp.isReferent()) {
-					return false;
-				}
-				if (mdp.isTranslatable() != gdp.isTranslatable()) {
-					return false;
-				}
-				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
-					return false;
-				}
-				break;
-			case TEXT_UNIT:
-				TextUnit mtu = (TextUnit) mr;
-				TextUnit gtu = (TextUnit) gr;
-				if (!(mtu.toString().equals(gtu.toString()))) {
-					return false;
-				}
-				break;
-			}
-		}
-		return true;
 	}
 
 	// @Test
