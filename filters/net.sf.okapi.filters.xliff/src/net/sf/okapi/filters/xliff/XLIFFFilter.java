@@ -50,6 +50,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -60,7 +61,7 @@ public class XLIFFFilter implements IFilter {
 
 	public static final String    XML_NS_URI   = "http://www.w3.org/XML/1998/namespace";
 	
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -81,6 +82,7 @@ public class XLIFFFilter implements IFilter {
 	private String encoding;
 	private Stack<Integer> parentIds;
 	private AltTransAnnotation altTrans;
+	private Stack<Boolean> preserveSpaces;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -160,6 +162,8 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Need to auto-detect the encoding and update 'encoding' variable
 			// use reader.getCharacterEncodingScheme() ??? but start doc not reported
 			
+			preserveSpaces = new Stack<Boolean>();
+			preserveSpaces.push(false);
 			parentIds = new Stack<Integer>();
 			parentIds.push(0);
 			groupId = 0;
@@ -362,16 +366,23 @@ public class XLIFFFilter implements IFilter {
 				((prefix.length()>0) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
+		String attrName;
+		boolean ps = preserveSpaces.peek();
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i); 
-			skel.append(String.format(" %s%s=\"%s\"",
+			prefix = reader.getAttributePrefix(i);
+			attrName = String.format("%s%s",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i),
+				reader.getAttributeLocalName(i));
+			skel.append(String.format(" %s=\"%s\"", attrName,
 				reader.getAttributeValue(i)));
+			if ( attrName.equals("xml:space") ) {
+				ps = reader.getAttributeValue(i).equals("preserve");
+			}
 		}
 		skel.append(">");
+		preserveSpaces.push(ps);
 	}
 	
 	private void storeEndElement () {
@@ -382,6 +393,7 @@ public class XLIFFFilter implements IFilter {
 		else {
 			skel.append("</"+ns+":"+reader.getLocalName()+">");
 		}
+		preserveSpaces.pop();
 	}
 
 	private boolean processTransUnit () {
@@ -516,6 +528,8 @@ public class XLIFFFilter implements IFilter {
 			// Get the text content
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
+			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 			altTrans.addNew(lang, tc);
 		}
 		else {
@@ -532,6 +546,8 @@ public class XLIFFFilter implements IFilter {
 				//TODO
 			}
 			else {
+				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setSource(tc);
 			}
 			sourceDone = true;
@@ -547,6 +563,8 @@ public class XLIFFFilter implements IFilter {
 			// Get the text content
 			tc = processContent("target", true);
 			// Put the target in the alt-trans annotation
+			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 			altTrans.setTarget(lang, tc);
 		}
 		else {
@@ -568,6 +586,8 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
+				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setTarget(trgLang, tc);
 			}
 			targetDone = true;

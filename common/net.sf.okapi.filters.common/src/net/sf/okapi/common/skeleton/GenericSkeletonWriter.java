@@ -316,22 +316,27 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return getSegmentedText(tu.getSource(), trgCont, langToUse, encoderManager, context);
 		}
 		else { // Normal case: use the calculated target
+			
+			TextContainer cont;
+			if ( langToUse == null ) cont = srcCont;
+			else cont = trgCont;
+			
 			// Apply the layer if there is one
 			if ( layer == null ) {
-				return getContent(trgCont, langToUse, encoderManager, context);
+				return getContent(cont, langToUse, encoderManager, context);
 			}
 			else {
 				switch ( context ) {
 				case 1:
 					return layer.endCode()
-						+ getContent(trgCont, langToUse, encoderManager, context)
+						+ getContent(cont, langToUse, encoderManager, context)
 						+ layer.startCode();
 				case 2:
 					return layer.endInline()
-						+ getContent(trgCont, langToUse, encoderManager, context)
+						+ getContent(cont, langToUse, encoderManager, context)
 						+ layer.startInline();
 				default:
-					return getContent(trgCont, langToUse, encoderManager, context);
+					return getContent(cont, langToUse, encoderManager, context);
 				}
 			}
 		}
