@@ -59,11 +59,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public TaggedFilterConfiguration getConfig() {
 		return parameters.getTaggedConfig();
 	}
-
-	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
-		setOptions(language, null, defaultEncoding, generateSkeleton);
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -73,18 +69,6 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 */
 	public void setParameters(IParameters params) {
 		this.parameters = (Parameters) params;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
-	 * java.lang.String, java.lang.String, boolean)
-	 */
-	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
-			boolean generateSkeleton) {
-		setEncoding(defaultEncoding);
-		setSrcLang(sourceLanguage);
 	}
 
 	public void close() {

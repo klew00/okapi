@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.StartDocument;
@@ -122,6 +123,22 @@ public abstract class BaseFilter implements IFilter {
 
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
+	}
+	
+	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
+		setOptions(language, null, defaultEncoding, generateSkeleton);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
+	 * java.lang.String, java.lang.String, boolean)
+	 */
+	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
+			boolean generateSkeleton) {
+		setEncoding(defaultEncoding);
+		setSrcLang(sourceLanguage);
 	}
 
 	private String createId(String name, int number) {
@@ -470,15 +487,15 @@ public abstract class BaseFilter implements IFilter {
 		endTextUnit(null, null);
 	}
 
-	protected void startTextUnit(ISkeleton startMarker) {
+	protected void startTextUnit(GenericSkeleton startMarker) {
 		startTextUnit(null, startMarker, null);
 	}
 
-	protected void startTextUnit(ISkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	protected void startTextUnit(GenericSkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		startTextUnit(null, startMarker, propertyTextUnitPlaceholders);
 	}
 
-	protected void startTextUnit(String text, ISkeleton startMarker,
+	protected void startTextUnit(String text, GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		
 		if (hasUnfinishedSkeleton()) {
@@ -507,11 +524,11 @@ public abstract class BaseFilter implements IFilter {
 		}
 	}
 
-	protected void endTextUnit(ISkeleton endMarker) {
+	protected void endTextUnit(GenericSkeleton endMarker) {
 		endTextUnit(endMarker, null);
 	}
 
-	protected void endTextUnit(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	protected void endTextUnit(GenericSkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		FilterEvent tempTextUnit;
 
 		if (!isCurrentTextUnit()) {
@@ -578,11 +595,11 @@ public abstract class BaseFilter implements IFilter {
 	// Group Methods
 	// ////////////////////////////////////////////////////////////////////////
 
-	protected void startGroup(ISkeleton startMarker) {
+	protected void startGroup(GenericSkeleton startMarker) {
 		startGroup(startMarker, null);
 	}
 
-	protected void startGroup(ISkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	protected void startGroup(GenericSkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
@@ -620,11 +637,11 @@ public abstract class BaseFilter implements IFilter {
 		tempFilterEventStack.push(fe);
 	}
 
-	protected void endGroup(ISkeleton endMarker) {
+	protected void endGroup(GenericSkeleton endMarker) {
 		endGroup(endMarker, null);
 	}
 
-	protected void endGroup(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	protected void endGroup(GenericSkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
 			throw new BaseFilterException("Start group not found. Cannot end group");
@@ -662,14 +679,6 @@ public abstract class BaseFilter implements IFilter {
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
 		tu.getSourceContent().append(currentCode);
 		currentCode = null;
-	}
-
-	private void addToCode(String data) {
-		if (currentCode == null) {
-			throw new BaseFilterException("Code not found. Cannot add to a non-exisitant code.");
-		}
-
-		currentCode.append(data);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
