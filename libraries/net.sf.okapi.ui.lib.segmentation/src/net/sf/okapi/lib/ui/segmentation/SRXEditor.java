@@ -525,6 +525,19 @@ public class SRXEditor {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		if ( !asDialog ) {
+			menuItem = new MenuItem(dropMenu, SWT.PUSH);
+			rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
+			menuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					UIUtil.start("http://okapi.opentag.com/updates?ratel=" //$NON-NLS-1$
+						+Res.getString("SRXEditor.Version")); //$NON-NLS-1$
+				}
+			});
+		}
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {

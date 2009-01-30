@@ -50,7 +50,6 @@ public class DummyBaseFilter extends BaseFilter {
 	public void open(CharSequence inputText) {
 		if ( "2".equals(inputText) ) createCase2();
 		else createCase1();
-		
 	}
 
 	public void open (URL inputURL) {
@@ -98,7 +97,6 @@ public class DummyBaseFilter extends BaseFilter {
 		this.addToTextUnit(TagType.OPENING, "<b>", "bold");
 		this.addToTextUnit("Text");
 		this.addToTextUnit(TagType.CLOSING, "</b>", "bold");
-		this.endDocument();
 		this.finalize();
 	}
 

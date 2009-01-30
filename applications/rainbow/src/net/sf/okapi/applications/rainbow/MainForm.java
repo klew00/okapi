@@ -540,8 +540,8 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
-				Dialogs.showError(shell, Res.getString("MainForm.4"), null); //$NON-NLS-1$
-				//testRunnable();
+				UIUtil.start("http://okapi.opentag.com/updates?rainbow=" //$NON-NLS-1$
+					+Res.getString("VERSION")); //$NON-NLS-1$
 			}
 		});
 

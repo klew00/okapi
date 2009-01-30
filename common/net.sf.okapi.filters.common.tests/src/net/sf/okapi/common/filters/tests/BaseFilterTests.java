@@ -42,9 +42,9 @@ public class BaseFilterTests {
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
-//			filter.open("2");
-//			if ( !testDriver.process(filter) ) Assert.fail();
-//			filter.close();
+			filter.open("2");
+			if ( !testDriver.process(filter) ) Assert.fail();
+			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

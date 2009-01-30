@@ -21,8 +21,18 @@
 package net.sf.okapi.common.filters;
 
 /**
- * Represents a skeleton object.
+ * Represents a skeleton object. It is an object that is associated to a resource and carries data
+ * about the non extractable part of the resource. Skeleton objects are used by the SkeletonWriter
+ * object to reconstruct the original file format.
  */
 public interface ISkeleton {
+
+	/**
+	 * Gets a string representation of this skeleton object. The value of the returned string depends
+	 * on each implementation of class that implements ISkeleton. Different implementations may return
+	 * strings that cannot be compared in a meaningful way. 
+	 * @return The string representation of this skeleton object, or null.
+	 */
+	public String toString ();
 
 }
