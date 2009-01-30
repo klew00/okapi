@@ -55,24 +55,6 @@ public class DummyBaseFilter extends BaseFilter {
 	public void open (URL inputURL) {
 	}
 
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
-	}
-
-	public void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		super.setEncoding(defaultEncoding);
-		super.setSrcLang(sourceLanguage);
-		//TODO: why BaseFilter does not implement setOptions()???
-		
-	}
-
 	public void setParameters (IParameters params) {
 	}
 
