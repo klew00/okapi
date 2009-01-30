@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.markupfilter.Parameters;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -37,6 +36,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.filters.markupfilter.Parameters;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -430,7 +430,7 @@ public class HtmlEventTest {
 	}
 
 	// @Test
-	public void excludeInclude() {
+	public void printEvents() {
 		htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleSimpleTest.html");
 		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));

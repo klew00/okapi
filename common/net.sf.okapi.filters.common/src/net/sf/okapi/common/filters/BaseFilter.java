@@ -478,10 +478,6 @@ public abstract class BaseFilter implements IFilter {
 		startTextUnit(null, startMarker, propertyTextUnitPlaceholders);
 	}
 
-	protected void endTextUnit(ISkeleton endMarker) {
-		endTextUnit(endMarker, null);
-	}
-
 	protected void startTextUnit(String text, ISkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		
@@ -511,6 +507,10 @@ public abstract class BaseFilter implements IFilter {
 		}
 	}
 
+	protected void endTextUnit(ISkeleton endMarker) {
+		endTextUnit(endMarker, null);
+	}
+
 	protected void endTextUnit(ISkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		FilterEvent tempTextUnit;
 
@@ -518,6 +518,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
 		}
 
+// The ability to add internal placeholders to end tags is not currently support		
 //		if (endMarker != null && propertyTextUnitPlaceholders != null) {
 //			// TODO: language=null do we need to handle other cases?
 //			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
@@ -541,15 +542,7 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
-	}
-
-	protected void addToTextUnit(Code code) {
-		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add code");
-		}
-		startCode(code);
-		endCode();
-	}
+	}	
 
 	/**
 	 * Nothing is actionable within the tag (i.e., no properties or text)

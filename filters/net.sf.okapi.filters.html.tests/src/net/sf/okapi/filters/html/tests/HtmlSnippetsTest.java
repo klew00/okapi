@@ -24,12 +24,12 @@ public class HtmlSnippetsTest {
 	private HtmlFilter htmlFilter;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()  {
 		htmlFilter = new HtmlFilter();	
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 	}
 
 	@Test

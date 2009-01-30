@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.okapi.common.yaml.TaggedFilterConfiguration;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void defaultConfiguration() {		
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
 		assertEquals(rules.getMainRuleType("title"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS);
 		assertEquals(rules.getMainRuleType("abbr"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
@@ -62,6 +62,6 @@ public class HtmlConfigurationTest {
 		
 		attributes.clear();
 		attributes.put("name", "generator");
-		assertFalse(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
+		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
 	}
 }

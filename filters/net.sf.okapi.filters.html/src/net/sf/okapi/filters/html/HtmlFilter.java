@@ -28,8 +28,8 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.markupfilter.BaseMarkupFilter;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
 
 public class HtmlFilter extends BaseMarkupFilter {
 	public HtmlFilter() {
@@ -308,18 +308,22 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// content="text/html; charset=ISO-2022-JP">
 		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
-			if (st.getAttributeValue("http-equiv").equals("Content-Type")) {
-				normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
-				return normalizedName;
+			if (st.getAttributeValue("http-equiv") != null) {
+				if (st.getAttributeValue("http-equiv").equals("Content-Type")) {
+					normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
+					return normalizedName;
+				}
 			}
 		}
 
 		// <meta http-equiv="Content-Language" content="en"
 		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
-			if (st.getAttributeValue("http-equiv").equals("Content-Language")) {
-				normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
-				return normalizedName;
+			if (st.getAttributeValue("http-equiv") != null) {
+				if (st.getAttributeValue("http-equiv").equals("Content-Language")) {
+					normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
+					return normalizedName;
+				}
 			}
 		}
 
