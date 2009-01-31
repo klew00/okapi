@@ -28,7 +28,7 @@
  <command name="input.removeDocuments">&amp;Remove Documents...&#x9;Delete</command>
  <command name="input.editRoot" key="F2">&amp;Edit &amp;Root...&#x9;F2</command>
  <command name="input.openDocument">&amp;Open Document</command>
- <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Input Properties...&#x9;Alt+Enter</command>
+ <command name="input.editProperties" alt="1" key="Enter">&amp;Edit Document Properties...&#x9;Alt+Enter</command>
  <command name="input.openFolder">&amp;Open Containing Folder</command>
  <command name="input.moveDocumentsUp" alt="1" key="Up">Move &amp;Up&#x9;Alt+Up</command>
  <command name="input.moveDocumentsDown" alt="1" key="Down">Move &amp;Down&#x9;Alt+Down</command>
