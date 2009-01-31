@@ -171,6 +171,11 @@ public class MainForm implements IParametersProvider {
 	private MenuItem cmiOpenFolder;
 	private MenuItem miOpenOutputFolder;
 	private MenuItem miMRU;
+	private ToolItem tbiMoveUp;
+	private ToolItem tbiMoveDown;
+	private ToolItem tbiAddDocs;
+	private ToolItem tbiOpenFolder;
+	private ToolItem tbiEditDocProp;
 
 	public MainForm (Shell shell,
 		String projectFile)
@@ -993,46 +998,46 @@ public class MainForm implements IParametersProvider {
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
-		item = new ToolItem(toolbar, SWT.PUSH);
-	    item.setImage(rm.getImage("addinput")); //$NON-NLS-1$
-	    item.setToolTipText(Res.getString("MainForm.addDocsTip")); //$NON-NLS-1$
-		item.addSelectionListener(new SelectionAdapter() {
+		tbiAddDocs = new ToolItem(toolbar, SWT.PUSH);
+		tbiAddDocs.setImage(rm.getImage("addinput")); //$NON-NLS-1$
+		tbiAddDocs.setToolTipText(Res.getString("MainForm.addDocsTip")); //$NON-NLS-1$
+		tbiAddDocs.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				addDocumentsFromList(null);
 			}
 		});
 
-		item = new ToolItem(toolbar, SWT.PUSH);
-	    item.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
-	    item.setToolTipText(Res.getString("MainForm.openContFolderTip")); //$NON-NLS-1$
-		item.addSelectionListener(new SelectionAdapter() {
+		tbiOpenFolder = new ToolItem(toolbar, SWT.PUSH);
+		tbiOpenFolder.setImage(rm.getImage("openfolder")); //$NON-NLS-1$
+		tbiOpenFolder.setToolTipText(Res.getString("MainForm.openContFolderTip")); //$NON-NLS-1$
+		tbiOpenFolder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				openContainingFolder(-1);
 			}
 		});
 
-		item = new ToolItem(toolbar, SWT.PUSH);
-	    item.setImage(rm.getImage("moveup")); //$NON-NLS-1$
-	    item.setToolTipText(Res.getString("MainForm.moveUpTip")); //$NON-NLS-1$
-		item.addSelectionListener(new SelectionAdapter() {
+		tbiMoveUp = new ToolItem(toolbar, SWT.PUSH);
+		tbiMoveUp.setImage(rm.getImage("moveup")); //$NON-NLS-1$
+		tbiMoveUp.setToolTipText(Res.getString("MainForm.moveUpTip")); //$NON-NLS-1$
+		tbiMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsUp();
 			}
 		});
 
-		item = new ToolItem(toolbar, SWT.PUSH);
-	    item.setImage(rm.getImage("movedown")); //$NON-NLS-1$
-	    item.setToolTipText(Res.getString("MainForm.moveDownTip")); //$NON-NLS-1$
-		item.addSelectionListener(new SelectionAdapter() {
+		tbiMoveDown = new ToolItem(toolbar, SWT.PUSH);
+		tbiMoveDown.setImage(rm.getImage("movedown")); //$NON-NLS-1$
+		tbiMoveDown.setToolTipText(Res.getString("MainForm.moveDownTip")); //$NON-NLS-1$
+		tbiMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDocumentsDown();
 			}
 		});
 
-		item = new ToolItem(toolbar, SWT.PUSH);
-	    item.setImage(rm.getImage("properties")); //$NON-NLS-1$
-	    item.setToolTipText(Res.getString("MainForm.editInputPropTip")); //$NON-NLS-1$
-		item.addSelectionListener(new SelectionAdapter() {
+		tbiEditDocProp = new ToolItem(toolbar, SWT.PUSH);
+		tbiEditDocProp.setImage(rm.getImage("properties")); //$NON-NLS-1$
+		tbiEditDocProp.setToolTipText(Res.getString("MainForm.editInputPropTip")); //$NON-NLS-1$
+		tbiEditDocProp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editInputProperties(-1);
 			}
@@ -1074,8 +1079,15 @@ public class MainForm implements IParametersProvider {
 		}
 		updateCommands();
 		updateInputRoot();
+		
 		miInput.setEnabled(currentInput!=-1);
 		btGetRoot.setEnabled(currentInput!=-1);
+		
+		tbiAddDocs.setEnabled(currentInput!=-1);
+		tbiMoveUp.setEnabled(currentInput!=-1);
+		tbiMoveDown.setEnabled(currentInput!=-1);
+		tbiOpenFolder.setEnabled(currentInput!=-1);
+		tbiEditDocProp.setEnabled(currentInput!=-1);
 	}
 	
 	private void buildInputTab (int index,
@@ -1655,6 +1667,7 @@ public class MainForm implements IParametersProvider {
 
 	private void addDocumentsFromList (String[] paths) {
 		try {
+			if ( currentInput == -1 ) return;
 			// Get a list of paths if needed
 			if ( paths == null ) {
 				paths = Dialogs.browseFilenames(shell, Res.getString("MainForm.addDocsBrowsecaption"), //$NON-NLS-1$
@@ -1705,8 +1718,10 @@ public class MainForm implements IParametersProvider {
 	}
 	
 	private void editInputProperties (int index) {
-		Table table = inputTables.get(currentInput);
+		Table table = null;
 		try {
+			if ( currentInput == -1 ) return;
+			table = inputTables.get(currentInput);
 			saveSurfaceData();
 			int n = index;
 			if ( n < 0 ) {
@@ -1748,7 +1763,9 @@ public class MainForm implements IParametersProvider {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		finally {
-			inputTableMods.get(currentInput).updateTable(table.getSelectionIndices(), 0);
+			if ( table != null ) {
+				inputTableMods.get(currentInput).updateTable(table.getSelectionIndices(), 0);
+			}
 			stopWaiting();
 		}
 	}
@@ -1797,6 +1814,7 @@ public class MainForm implements IParametersProvider {
 
 	private void openDocument (int index) {
 		try {
+			if ( currentInput == -1 ) return;
 			if ( index < 0 ) {
 				if ( (index = getFocusedInputIndex()) < 0 ) return;
 			}
@@ -1811,6 +1829,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void openContainingFolder (int index) {
 		try {
+			if ( currentInput == -1 ) return;
 			if ( index < 0 ) {
 				if ( (index = getFocusedInputIndex()) < 0 ) return;
 			}
@@ -1921,6 +1940,7 @@ public class MainForm implements IParametersProvider {
 
 	private void moveDocumentsUp () {
 		try {
+			if ( currentInput == -1 ) return;
 			if ( getFocusedInputIndex() < 0 ) return;
 			// Get the selected documents
 			Table table = inputTables.get(currentInput);
@@ -1952,6 +1972,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void moveDocumentsDown () {
 		try {
+			if ( currentInput == -1 ) return;
 			if ( getFocusedInputIndex() < 0 ) return;
 			// Get the selected documents
 			Table table = inputTables.get(currentInput);
