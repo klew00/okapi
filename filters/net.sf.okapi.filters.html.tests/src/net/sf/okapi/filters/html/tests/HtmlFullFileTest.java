@@ -21,7 +21,7 @@ public class HtmlFullFileTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));
+		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/minimalistConfiguration.yml"));
 
 		// read all files in the test html directory
 		URL url = HtmlFullFileTest.class.getResource("/simpleTest.html");
@@ -41,7 +41,7 @@ public class HtmlFullFileTest {
 	}
 
 	@Test
-	public void TestAll() throws URISyntaxException {
+	public void testAll() throws URISyntaxException {
 		for (String f : testFileList) {
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
 			htmlFilter.open(htmlStream);
@@ -50,14 +50,14 @@ public class HtmlFullFileTest {
 					FilterEvent event = htmlFilter.next();
 				}
 			} catch (Exception e) {
-				System.err.println("Error for file: " + f + ": " + e.toString());
-				//throw new RuntimeException(e);
+				//System.err.println("Error for file: " + f + ": " + e.toString());
+				throw new RuntimeException("Error for file: " + f + ": " + e.toString());
 			}
 		}
 	}
 
 	@Test
-	public void TestNonwellformed() {
+	public void testNonwellformed() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/nonwellformed.specialtest");
 		htmlFilter.open(htmlStream);
 		while (htmlFilter.hasNext()) {

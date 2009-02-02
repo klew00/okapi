@@ -37,34 +37,7 @@ dummy:
   translatableAttributes: [trans]  
   writableLocalizableAttributes: [write]
   readOnlyLocalizableAttributes: [readonly]
-
-# test group rules
-table: 
-  ruleTypes: [GROUP]  
-
-tr:
-  ruleTypes: [GROUP]  
-
-td:
-  ruleTypes: [GROUP]  
-
-ul:
-  ruleTypes: [GROUP]  
-
-li:
-  ruleTypes: [GROUP]  
-
-# test TextUnit rules
-p:
-  ruleTypes: [TEXTUNIT]  
-
-# exclude/include test
-exclude:
-  ruleTypes: [EXCLUDE]  
-
-include:
-  ruleTypes: [INCLUDE]  
-
+    
 # attributes that occur on many elements
 title:
   ruleTypes: [ATTRIBUTE_TRANS]
@@ -199,10 +172,6 @@ label:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
-li:
-  ruleTypes: [GROUP]
-  translatableAttributes: [value]
-
 map:
   ruleTypes: [INLINE]
 
@@ -253,20 +222,12 @@ sup:
 symbol:
   ruleTypes: [INLINE]
  
-table:
-  ruleTypes: [GROUP]
-  translatableAttributes: [summary]
- 
 textarea:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
 tt:
   ruleTypes: [INLINE]
- 
-td:
-  ruleTypes: [GROUP]
-  translatableAttributes: [abbr]
  
 u:
   ruleTypes: [INLINE]
@@ -317,6 +278,3 @@ stylesheet:
 script:
   ruleTypes: [SCRIPT]
 
-# preserve whitespace
-pre:
-  ruleTypes: [PRESERVE_WHITESPACE]

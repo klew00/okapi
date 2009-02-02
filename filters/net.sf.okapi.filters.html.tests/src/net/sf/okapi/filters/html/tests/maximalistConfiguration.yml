@@ -166,9 +166,9 @@ dir:
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: {content: [http-equiv, EQUALS, keywords]}
-  writableLocalizableAttributes: {content: [http-equiv, EQUALS, content-language], charset: ~}
-  readOnlyLocalizableAttributes: {content: [[http-equiv, EQUALS, content-type], [name, EQUALS, [generator, author, progid, date]]]}
-  
+  writableLocalizableAttributes: {content: [[http-equiv, EQUALS, content-language],[http-equiv, EQUALS, content-type]] }
+  readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
+    
 area:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [accesskey, area]

@@ -58,7 +58,7 @@ public class HtmlConfigurationTest {
 
 		attributes.clear();
 		attributes.put("http-equiv", "content-type");
-		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
 		
 		attributes.clear();
 		attributes.put("name", "generator");

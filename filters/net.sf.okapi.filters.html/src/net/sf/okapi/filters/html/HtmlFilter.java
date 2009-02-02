@@ -308,8 +308,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// content="text/html; charset=ISO-2022-JP">
 		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
-			if (st.getAttributeValue("http-equiv") != null) {
-				if (st.getAttributeValue("http-equiv").equals("Content-Type")) {
+			if (st.getAttributeValue("http-equiv") != null && st.getAttributeValue("content") != null) {
+				if (st.getAttributeValue("http-equiv").equals("Content-Type") && st.getAttributeValue("content").contains("charset=")) {
 					normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
 					return normalizedName;
 				}

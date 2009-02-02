@@ -192,7 +192,7 @@ public class HtmlEventTest {
 	}
 
 	@Test
-	public void testMETATag2() {
+	public void testMETATagWithLanguage() {
 		String snippet = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
 		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
 
@@ -204,6 +204,27 @@ public class HtmlEventTest {
 		skel.addValuePlaceholder(dp, "language", null);
 		skel.add("\"/>");
 		dp.setSourceProperty(new Property("language", "en", false));
+		dp.setSkeleton(skel);
+		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+	
+	@Test
+	public void testMETATagWithEncoding() {
+		String snippet = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-2022-JP\">";
+		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+
+		addStartEvents(events);
+
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);
+		skel.add("<meta http-equiv=\"Content-Type\" content=\"");
+		skel.addValuePlaceholder(dp, "encoding", null);
+		skel.add("\">");
+		dp.setSourceProperty(new Property("encoding", "text/html; charset=ISO-2022-JP", false));
 		dp.setSkeleton(skel);
 		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 
