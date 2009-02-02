@@ -22,12 +22,14 @@ package net.sf.okapi.filters.html;
 
 import java.util.List;
 
+import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
 
@@ -292,6 +294,32 @@ public class HtmlFilter extends BaseMarkupFilter {
 		return "HTML Filter"; //$NON-NLS-1$
 	}
 
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
+			String value, Tag tag, Attribute attribute) {
+
+		// Test for charset in meta tag - we need to isolate the position of
+		// charset within the attribute value
+		// i.e., content="text/html; charset=ISO-2022-JP"
+		if (isMetaCharset(name, value, tag) && value.indexOf("charset=") != -1) {
+			// offset of attribute
+			int mainStartPos = attribute.getBegin() - tag.getBegin();
+			int mainEndPos = attribute.getEnd() - tag.getBegin();
+
+			// adjust offset of value of the attribute
+			int charsetValueOffset = value.lastIndexOf("charset=") + "charset=".length();
+
+			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset) - tag.getBegin();
+			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
+			// get the charset value (encoding)
+			value = tag.toString().substring(valueStartPos, valueEndPos);
+			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos, mainEndPos,
+					valueStartPos, valueEndPos);
+		}
+
+		// otherwise treat normally
+		return super.createPropertyTextUnitPlaceholder(type, name, value, tag, attribute);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -306,14 +334,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 		// <meta http-equiv="Content-Type"
 		// content="text/html; charset=ISO-2022-JP">
-		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
-			StartTag st = (StartTag) tag;
-			if (st.getAttributeValue("http-equiv") != null && st.getAttributeValue("content") != null) {
-				if (st.getAttributeValue("http-equiv").equals("Content-Type") && st.getAttributeValue("content").contains("charset=")) {
-					normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
-					return normalizedName;
-				}
-			}
+		if (isMetaCharset(attrName, attrValue, tag)) {
+			normalizedName = HtmlEncoder.NORMALIZED_ENCODING;
+			return normalizedName;
 		}
 
 		// <meta http-equiv="Content-Language" content="en"
@@ -328,5 +351,18 @@ public class HtmlFilter extends BaseMarkupFilter {
 		}
 
 		return normalizedName;
+	}
+
+	private boolean isMetaCharset(String attrName, String attrValue, Tag tag) {
+		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
+			StartTag st = (StartTag) tag;
+			if (st.getAttributeValue("http-equiv") != null && st.getAttributeValue("content") != null) {
+				if (st.getAttributeValue("http-equiv").equals("Content-Type")
+						&& st.getAttributeValue("content").contains("charset=")) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

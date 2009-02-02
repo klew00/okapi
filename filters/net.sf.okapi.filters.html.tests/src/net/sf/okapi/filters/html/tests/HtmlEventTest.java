@@ -222,9 +222,10 @@ public class HtmlEventTest {
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);
 		skel.add("<meta http-equiv=\"Content-Type\" content=\"");
+		skel.add("text/html; charset=");
 		skel.addValuePlaceholder(dp, "encoding", null);
 		skel.add("\">");
-		dp.setSourceProperty(new Property("encoding", "text/html; charset=ISO-2022-JP", false));
+		dp.setSourceProperty(new Property("encoding", "ISO-2022-JP", false));
 		dp.setSkeleton(skel);
 		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
 

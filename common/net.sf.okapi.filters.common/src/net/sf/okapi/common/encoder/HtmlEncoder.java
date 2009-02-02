@@ -61,11 +61,6 @@ public class HtmlEncoder implements IEncoder {
 	public String toNative (String propertyName,
 		String value)
 	{
-		// PROP_ENCODING: Same value in native
-		// PROP_LANGUGE: Same value in native
-
-		// No changes for the other values
 		return value;
 	}
-
 }
