@@ -26,21 +26,34 @@ import java.util.List;
 import java.util.Stack;
 
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
-import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
+// TODO: Auto-generated Javadoc
+/**
+ * BaseFilter provides basic services for filter writers and hides the powerful,
+ * but complex resource and skeleton API's (
+ * {@link net.sf.okapi.common.resource} and {@link net.sf.okapi.common.skeleton}
+ * ).
+ * 
+ * To create a new filter extend BaseFilter (or for tag based formats
+ * {@link net.sf.okapi.common.filters.markupfilter}) and call
+ * {@link net.sf.okapi.common.filters#initialize()} and
+ * {@link net.sf.okapi.common.filters#finalize()} methods at the beginning and
+ * end of each filter run.
+ */
 public abstract class BaseFilter implements IFilter {
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
 	private static final String END_GROUP = "eg"; //$NON-NLS-1$
@@ -74,8 +87,12 @@ public abstract class BaseFilter implements IFilter {
 	private Code currentCode;
 	private DocumentPart currentDocumentPart;
 
+	/**
+	 * Instantiates a new base filter.
+	 */
 	public BaseFilter() {
-		// reset is called in initialize method - no need to call it twice
+		// reset is called in initialize method - no need to call it in the
+		// constructor
 	}
 
 	/*
@@ -109,6 +126,11 @@ public abstract class BaseFilter implements IFilter {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#cancel()
+	 */
 	public void cancel() {
 		canceled = true;
 		// flush out all pending events
@@ -120,10 +142,21 @@ public abstract class BaseFilter implements IFilter {
 		finish();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#createSkeletonWriter()
+	 */
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
+	 * java.lang.String, boolean)
+	 */
 	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
 		setOptions(language, null, defaultEncoding, generateSkeleton);
 	}
@@ -158,36 +191,74 @@ public abstract class BaseFilter implements IFilter {
 		return tempFilterEventStack.pop();
 	}
 
+	/**
+	 * Gets the encoding.
+	 * 
+	 * @return the encoding
+	 */
 	protected String getEncoding() {
 		return encoding;
 	}
 
+	/**
+	 * Sets the encoding.
+	 * 
+	 * @param encoding the new encoding
+	 */
 	protected void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 
+	/**
+	 * Gets the src lang.
+	 * 
+	 * @return the src lang
+	 */
 	protected String getSrcLang() {
 		return srcLang;
 	}
 
+	/**
+	 * Sets the src lang.
+	 * 
+	 * @param srcLang the new src lang
+	 */
 	protected void setSrcLang(String srcLang) {
 		this.srcLang = srcLang;
 	}
 
+	/**
+	 * Gets the mime type.
+	 * 
+	 * @return the mime type
+	 */
 	protected String getMimeType() {
 		return mimeType;
 	}
 
+	/**
+	 * Sets the mime type.
+	 * 
+	 * @param mimeType the new mime type
+	 */
 	protected void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
 
+	/**
+	 * Initialize.
+	 */
 	protected void initialize() {
 		reset();
 		start();
 		startDocument();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#finalize()
+	 */
 	@Override
 	protected void finalize() {
 		if (hasUnfinishedSkeleton()) {
@@ -208,6 +279,11 @@ public abstract class BaseFilter implements IFilter {
 		finish();
 	}
 
+	/**
+	 * Checks if is current text unit.
+	 * 
+	 * @return true, if is current text unit
+	 */
 	protected boolean isCurrentTextUnit() {
 		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT) {
@@ -216,6 +292,11 @@ public abstract class BaseFilter implements IFilter {
 		return false;
 	}
 
+	/**
+	 * Checks if is current complex text unit.
+	 * 
+	 * @return true, if is current complex text unit
+	 */
 	protected boolean isCurrentComplexTextUnit() {
 		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT && e.getResource().getSkeleton() != null) {
@@ -224,6 +305,11 @@ public abstract class BaseFilter implements IFilter {
 		return false;
 	}
 
+	/**
+	 * Checks if is current group.
+	 * 
+	 * @return true, if is current group
+	 */
 	protected boolean isCurrentGroup() {
 		FilterEvent e = peekTempEvent();
 		if (e != null && e.getEventType() == FilterEventType.START_GROUP) {
@@ -232,10 +318,20 @@ public abstract class BaseFilter implements IFilter {
 		return false;
 	}
 
+	/**
+	 * Checks if is inside text run.
+	 * 
+	 * @return true, if is inside text run
+	 */
 	protected boolean isInsideTextRun() {
 		return isCurrentTextUnit();
 	}
 
+	/**
+	 * Can start new text unit.
+	 * 
+	 * @return true, if successful
+	 */
 	protected boolean canStartNewTextUnit() {
 		if (isCurrentTextUnit()) {
 			return false;
@@ -243,6 +339,11 @@ public abstract class BaseFilter implements IFilter {
 		return true;
 	}
 
+	/**
+	 * Checks for queued events.
+	 * 
+	 * @return true, if successful
+	 */
 	protected boolean hasQueuedEvents() {
 		if (filterEvents.isEmpty()) {
 			return false;
@@ -250,6 +351,11 @@ public abstract class BaseFilter implements IFilter {
 		return true;
 	}
 
+	/**
+	 * Peek most recent group.
+	 * 
+	 * @return the filter event
+	 */
 	protected FilterEvent peekMostRecentGroup() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
@@ -262,6 +368,11 @@ public abstract class BaseFilter implements IFilter {
 		return null;
 	}
 
+	/**
+	 * Peek most recent text unit.
+	 * 
+	 * @return the filter event
+	 */
 	protected FilterEvent peekMostRecentTextUnit() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
@@ -274,6 +385,11 @@ public abstract class BaseFilter implements IFilter {
 		return null;
 	}
 
+	/**
+	 * Checks for unfinished skeleton.
+	 * 
+	 * @return true, if successful
+	 */
 	protected boolean hasUnfinishedSkeleton() {
 		if (currentSkeleton == null) {
 			return false;
@@ -281,6 +397,11 @@ public abstract class BaseFilter implements IFilter {
 		return true;
 	}
 
+	/**
+	 * Checks for parent text unit.
+	 * 
+	 * @return true, if successful
+	 */
 	protected boolean hasParentTextUnit() {
 		if (tempFilterEventStack.isEmpty()) {
 			return false;
@@ -319,6 +440,11 @@ public abstract class BaseFilter implements IFilter {
 		currentDocumentPart = null;
 	}
 
+	/**
+	 * Checks if is canceled.
+	 * 
+	 * @return true, if is canceled
+	 */
 	protected boolean isCanceled() {
 		return canceled;
 	}
@@ -337,6 +463,9 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(event);
 	}
 
+	/**
+	 * Start document.
+	 */
 	protected void startDocument() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
 		startDocument.setEncoding(getEncoding());
@@ -346,12 +475,18 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(event);
 	}
 
+	/**
+	 * End document.
+	 */
 	protected void endDocument() {
 		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
 		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
+	/**
+	 * Start sub document.
+	 */
 	protected void startSubDocument() {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
@@ -362,6 +497,9 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(event);
 	}
 
+	/**
+	 * End sub document.
+	 */
 	protected void endSubDocument() {
 		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
 		FilterEvent event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, endDocument);
@@ -390,8 +528,8 @@ public abstract class BaseFilter implements IFilter {
 
 	private void embeddedWritableProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		// TODO: test language and use the right set method
-		resource.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), false));
+		resource = setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
+				.getValue(), false));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(), language);
 		currentSkeleton.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
@@ -399,9 +537,21 @@ public abstract class BaseFilter implements IFilter {
 
 	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		// TODO: test language and use the right set method
-		resource.setSourceProperty(new Property(propOrText.getName(), propOrText.getValue(), true));
+		resource = setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
+				.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
+	}
+
+	private INameable setPropertyBasedOnLanguage(INameable resource, String language, Property property) {
+		if (language == null) {
+			resource.setProperty(property);
+		} else if (language.equals("")) {
+			resource.setSourceProperty(property);
+		} else {
+			resource.setTargetProperty(language, property);
+		}
+
+		return resource;
 	}
 
 	private void processAllEmbedded(String tag, String language,
@@ -474,29 +624,65 @@ public abstract class BaseFilter implements IFilter {
 	// TextUnit Methods
 	// ////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Start text unit.
+	 * 
+	 * @param text the text
+	 */
 	protected void startTextUnit(String text) {
-		startTextUnit(text, null, null);
+		startTextUnit(text, null, "", null);
 	}
 
+	/**
+	 * Start text unit.
+	 */
 	protected void startTextUnit() {
-		startTextUnit(null, null, null);
+		startTextUnit(null, null, "", null);
 	}
 
-	protected void endTextUnit() {
-		endTextUnit(null, null);
-	}
-
+	/**
+	 * Start text unit.
+	 * 
+	 * @param startMarker the start marker
+	 */
 	protected void startTextUnit(GenericSkeleton startMarker) {
-		startTextUnit(null, startMarker, null);
+		startTextUnit(null, startMarker, "", null);
 	}
 
-	protected void startTextUnit(GenericSkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		startTextUnit(null, startMarker, propertyTextUnitPlaceholders);
+	/**
+	 * Start text unit.
+	 * 
+	 * @param startMarker the start marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 */
+	protected void startTextUnit(GenericSkeleton startMarker,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		startTextUnit(null, startMarker, "", propertyTextUnitPlaceholders);
 	}
-
+	
+	/**
+	 * Start text unit.
+	 * 
+	 * @param startMarker the start marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 * @param text the text
+	 */
 	protected void startTextUnit(String text, GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		
+		startTextUnit(text, startMarker, "", propertyTextUnitPlaceholders);
+	}
+
+	/**
+	 * Start text unit.
+	 * 
+	 * @param text the text
+	 * @param startMarker the start marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 * @param language the language
+	 */
+	protected void startTextUnit(String text, GenericSkeleton startMarker, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
@@ -504,10 +690,8 @@ public abstract class BaseFilter implements IFilter {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
 
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
-			// TODO: language=null do we need to handle other cases?
 			currentSkeleton = new GenericSkeleton();
-			
-			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false, tu);
+			processAllEmbedded(startMarker.toString(), language, propertyTextUnitPlaceholders, false, tu);
 			tu.setSkeleton(currentSkeleton);
 			currentSkeleton.addContentPlaceholder(tu);
 			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, currentSkeleton));
@@ -523,22 +707,43 @@ public abstract class BaseFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * End text unit.
+	 */
+	protected void endTextUnit() {
+		endTextUnit(null, "", null);
+	}
+	
+	/**
+	 * End text unit.
+	 * 
+	 * @param endMarker the end marker
+	 */
 	protected void endTextUnit(GenericSkeleton endMarker) {
-		endTextUnit(endMarker, null);
+		endTextUnit(endMarker, "", null);
 	}
 
-	protected void endTextUnit(GenericSkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	/**
+	 * End text unit.
+	 * 
+	 * @param endMarker the end marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 * @param language the language
+	 */
+	protected void endTextUnit(GenericSkeleton endMarker, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		FilterEvent tempTextUnit;
 
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
 		}
 
-// The ability to add internal placeholders to end tags is not currently support		
-//		if (endMarker != null && propertyTextUnitPlaceholders != null) {
-//			// TODO: language=null do we need to handle other cases?
-//			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
-//		}
+		// The ability to add internal placeholders to end tags is not currently
+		// support
+		// if (endMarker != null && propertyTextUnitPlaceholders != null) {
+		// processAllEmbedded(endMarker.toString(), language,
+		// propertyTextUnitPlaceholders, false);
+		// }
 
 		tempTextUnit = popTempEvent();
 
@@ -550,6 +755,11 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.add(tempTextUnit);
 	}
 
+	/**
+	 * Adds the to text unit.
+	 * 
+	 * @param text the text
+	 */
 	protected void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot add text");
@@ -558,14 +768,14 @@ public abstract class BaseFilter implements IFilter {
 		FilterEvent tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
-	}	
+	}
 
 	/**
 	 * Nothing is actionable within the tag (i.e., no properties or text)
 	 * 
-	 * @param codeType
-	 * @param literalCode
-	 * @param codeName
+	 * @param codeType the code type
+	 * @param literalCode the literal code
+	 * @param codeName the code name
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
 		Code code = new Code(codeType, codeName, literalCode);
@@ -573,11 +783,28 @@ public abstract class BaseFilter implements IFilter {
 		endCode();
 	}
 
+	/**
+	 * Adds the to text unit.
+	 * 
+	 * @param codeType the code type
+	 * @param literalCode the literal code
+	 * @param codeName the code name
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		addToTextUnit(codeType, literalCode, codeName, null, propertyTextUnitPlaceholders);
+		addToTextUnit(codeType, literalCode, codeName, "", propertyTextUnitPlaceholders);
 	}
 
+	/**
+	 * Adds the to text unit.
+	 * 
+	 * @param codeType the code type
+	 * @param literalCode the literal code
+	 * @param codeName the code name
+	 * @param language the language
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
@@ -594,18 +821,30 @@ public abstract class BaseFilter implements IFilter {
 	// Group Methods
 	// ////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Start group.
+	 * 
+	 * @param startMarker the start marker
+	 */
 	protected void startGroup(GenericSkeleton startMarker) {
-		startGroup(startMarker, null);
+		startGroup(startMarker, "", null);
 	}
 
-	protected void startGroup(GenericSkeleton startMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	/**
+	 * Start group.
+	 * 
+	 * @param startMarker the start marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 * @param language the language
+	 */
+	protected void startGroup(GenericSkeleton startMarker, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
 
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
-			// TODO: language=null do we need to handle other cases?
-			processAllEmbedded(startMarker.toString(), null, propertyTextUnitPlaceholders, false);
+			processAllEmbedded(startMarker.toString(), language, propertyTextUnitPlaceholders, false);
 		}
 
 		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
@@ -636,11 +875,24 @@ public abstract class BaseFilter implements IFilter {
 		tempFilterEventStack.push(fe);
 	}
 
+	/**
+	 * End group.
+	 * 
+	 * @param endMarker the end marker
+	 */
 	protected void endGroup(GenericSkeleton endMarker) {
-		endGroup(endMarker, null);
+		endGroup(endMarker, "", null);
 	}
 
-	protected void endGroup(GenericSkeleton endMarker, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	/**
+	 * End group.
+	 * 
+	 * @param endMarker the end marker
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 * @param language the language
+	 */
+	protected void endGroup(GenericSkeleton endMarker, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
 			throw new BaseFilterException("Start group not found. Cannot end group");
@@ -648,8 +900,7 @@ public abstract class BaseFilter implements IFilter {
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
 
 		if (endMarker != null && propertyTextUnitPlaceholders != null) {
-			// TODO: language=null do we need to handle other cases?
-			processAllEmbedded(endMarker.toString(), null, propertyTextUnitPlaceholders, false);
+			processAllEmbedded(endMarker.toString(), language, propertyTextUnitPlaceholders, false);
 		}
 
 		popTempEvent();
@@ -684,6 +935,11 @@ public abstract class BaseFilter implements IFilter {
 	// DocumentPart Methods
 	// ////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Start document part.
+	 * 
+	 * @param part the part
+	 */
 	protected void startDocumentPart(String part) {
 
 		if (hasUnfinishedSkeleton()) {
@@ -694,11 +950,26 @@ public abstract class BaseFilter implements IFilter {
 		currentDocumentPart.setSkeleton(currentSkeleton);
 	}
 
+	/**
+	 * Start document part.
+	 * 
+	 * @param part the part
+	 * @param name the name
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 */
 	protected void startDocumentPart(String part, String name,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		startDocumentPart(part, name, null, propertyTextUnitPlaceholders);
+		startDocumentPart(part, name, "", propertyTextUnitPlaceholders);
 	}
 
+	/**
+	 * Start document part.
+	 * 
+	 * @param part the part
+	 * @param name the name
+	 * @param language the language
+	 * @param propertyTextUnitPlaceholders the property text unit placeholders
+	 */
 	protected void startDocumentPart(String part, String name, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
@@ -713,6 +984,11 @@ public abstract class BaseFilter implements IFilter {
 		processAllEmbedded(part, language, propertyTextUnitPlaceholders, false);
 	}
 
+	/**
+	 * End document part.
+	 * 
+	 * @param part the part
+	 */
 	protected void endDocumentPart(String part) {
 		if (part != null) {
 			currentSkeleton.append(part);
@@ -722,10 +998,18 @@ public abstract class BaseFilter implements IFilter {
 		currentDocumentPart = null;
 	}
 
+	/**
+	 * End document part.
+	 */
 	protected void endDocumentPart() {
 		endDocumentPart(null);
 	}
 
+	/**
+	 * Adds the to document part.
+	 * 
+	 * @param part the part
+	 */
 	protected void addToDocumentPart(String part) {
 		if (currentSkeleton == null) {
 			startDocumentPart(part);

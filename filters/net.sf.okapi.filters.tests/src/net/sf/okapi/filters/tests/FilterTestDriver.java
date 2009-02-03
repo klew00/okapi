@@ -73,7 +73,7 @@ public class FilterTestDriver {
 				}
 				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
 					return false;
-				}
+				}				
 				break;
 			case TEXT_UNIT:
 				TextUnit mtu = (TextUnit) mr;

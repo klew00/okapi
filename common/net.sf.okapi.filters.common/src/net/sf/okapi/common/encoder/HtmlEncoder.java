@@ -25,24 +25,41 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IEncoder;
 
 /**
- * Implements IEncoder for XML format.
+ * Implements IEncoder for HTML format.
  */
 public class HtmlEncoder implements IEncoder {
+	
+	/** Normalized version of the HTML content */
 	public static final String NORMALIZED_LANGUAGE = "language";
+	
+	/** Normalized version of the HTML charset */
 	public static final String NORMALIZED_ENCODING = "encoding";
+	
+	/** HTML content attribute */
 	public static final String CONTENT = "content";
+	
+	/** HTML charset identifier */
 	public static final String CHARSET = "charset";
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IEncoder#setOptions(net.sf.okapi.common.IParameters, java.lang.String)
+	 */
 	public void setOptions (IParameters params,
 		String encoding)
 	{
 		// Nothing to do
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IEncoder#encode(java.lang.String, int)
+	 */
 	public String encode (String text, int context) {
 		return Util.escapeToXML(text, 1, false);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IEncoder#encode(char, int)
+	 */
 	public String encode (char value, int context) {
 		switch ( value ) {
 		case '<':
@@ -58,6 +75,9 @@ public class HtmlEncoder implements IEncoder {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.IEncoder#toNative(java.lang.String, java.lang.String)
+	 */
 	public String toNative (String propertyName,
 		String value)
 	{

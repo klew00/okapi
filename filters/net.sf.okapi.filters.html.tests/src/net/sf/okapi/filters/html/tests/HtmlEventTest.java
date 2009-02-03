@@ -21,14 +21,12 @@ package net.sf.okapi.filters.html.tests;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
