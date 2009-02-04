@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.filters.markupfilter;
 
 import java.io.BufferedReader;
@@ -10,6 +30,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
@@ -29,6 +52,8 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public abstract class BaseMarkupFilter extends BaseFilter {
+	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
+	
 	private Source document;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
