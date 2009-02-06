@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.eventpipeline;
+package net.sf.okapi.common.pipeline;
 
 public enum PipelineReturnValue {
 	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED

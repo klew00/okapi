@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.eventpipeline;
 
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
+
 public interface IEventPipeline {
 
 	public void execute();

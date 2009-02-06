@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
 public class EventPipeline implements IEventPipeline {
 	List<IEventPipelineStep> steps;
