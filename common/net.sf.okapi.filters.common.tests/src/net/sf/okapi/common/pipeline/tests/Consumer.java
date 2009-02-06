@@ -20,10 +20,10 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
+import net.sf.okapi.common.eventpipeline.BaseEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class Consumer extends BasePipelineStep {
+public class Consumer extends BaseEventPipelineStep {
 	public String getName() {
 		return "Consumer";
 	}

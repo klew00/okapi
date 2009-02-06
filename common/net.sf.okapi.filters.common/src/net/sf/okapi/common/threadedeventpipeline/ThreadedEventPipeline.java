@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.threadedeventpipeline;
 
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,12 +29,12 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.okapi.common.eventpipeline.IEventPipeline;
+import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ThreadedPipeline implements IPipeline {
+public class ThreadedEventPipeline implements IEventPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
 
 	private final PausableThreadPoolExecutor executor;
@@ -42,29 +42,29 @@ public class ThreadedPipeline implements IPipeline {
 	private final int blockingQueueSize;
 	private int totalThreads;
 	private PipelineReturnValue state;
-	private LinkedList<IPipelineStep> threadedSteps;
-	private LinkedList<IPipelineStep> nonThreadedSteps;
+	private LinkedList<IEventPipelineStep> threadedSteps;
+	private LinkedList<IEventPipelineStep> nonThreadedSteps;
 
 	private BlockingQueue<FilterEvent> previousQueue;
 
-	public ThreadedPipeline() {
+	public ThreadedEventPipeline() {
 		this(PausableThreadPoolExecutor.newCachedThreadPool(), DEFAULT_BLOCKING_QUEUE_SIZE);
 	}
 
-	public ThreadedPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
+	public ThreadedEventPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
 		totalThreads = 0;
 		this.executor = executor;
 		this.blockingQueueSize = blockingQueueSize;
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
 		this.executor.pause();
 		state = PipelineReturnValue.PAUSED;
-		threadedSteps = new LinkedList<IPipelineStep>();
-		nonThreadedSteps = new LinkedList<IPipelineStep>();
+		threadedSteps = new LinkedList<IEventPipelineStep>();
+		nonThreadedSteps = new LinkedList<IEventPipelineStep>();
 	}
 
 	public void execute() {
 		BlockingQueue<FilterEvent> queue = null;
-		for (IPipelineStep step : nonThreadedSteps) {
+		for (IEventPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
 				// first step is a producer wrap it with threaded adaptor
 				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
@@ -101,7 +101,7 @@ public class ThreadedPipeline implements IPipeline {
 		state = PipelineReturnValue.RUNNING;
 	}
 
-	public void addStep(IPipelineStep step) {
+	public void addStep(IEventPipelineStep step) {
 		nonThreadedSteps.add(step);
 	}
 
@@ -113,7 +113,7 @@ public class ThreadedPipeline implements IPipeline {
 
 	public void pause() {
 		executor.pause();
-		for (IPipelineStep step : threadedSteps) {
+		for (IEventPipelineStep step : threadedSteps) {
 			step.pause();
 		}
 		state = PipelineReturnValue.PAUSED;
@@ -121,7 +121,7 @@ public class ThreadedPipeline implements IPipeline {
 
 	public void resume() {
 		executor.resume();
-		for (IPipelineStep step : threadedSteps) {
+		for (IEventPipelineStep step : threadedSteps) {
 			step.resume();
 		}
 		state = PipelineReturnValue.RUNNING;

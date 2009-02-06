@@ -23,8 +23,8 @@ package net.sf.okapi.filters.xml;
 import java.io.InputStream;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.eventpipeline.IResourceBuilder;
 import net.sf.okapi.common.filters.IInputFilter;
-import net.sf.okapi.common.pipeline.IResourceBuilder;
 
 public class InputFilter implements IInputFilter {
 

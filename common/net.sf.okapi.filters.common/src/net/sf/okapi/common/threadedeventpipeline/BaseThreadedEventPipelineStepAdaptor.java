@@ -18,20 +18,20 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.threadedeventpipeline;
 
 import java.util.concurrent.Callable;
 
-import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.eventpipeline.BaseEventPipelineStep;
+import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public abstract class BaseThreadedPipelineStepAdaptor extends BasePipelineStep implements Callable<PipelineReturnValue> {
-	protected IPipelineStep step;
+public abstract class BaseThreadedEventPipelineStepAdaptor extends BaseEventPipelineStep implements Callable<PipelineReturnValue> {
+	protected IEventPipelineStep step;
 	private PipelineReturnValue result;
 	private volatile boolean pause;
 
-	public BaseThreadedPipelineStepAdaptor(IPipelineStep step) {
+	public BaseThreadedEventPipelineStepAdaptor(IEventPipelineStep step) {
 		this.step = step;
 	}
 

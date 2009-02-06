@@ -23,12 +23,12 @@ package net.sf.okapi.common.threadedpipeline.tests;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.eventpipeline.IEventPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipeline.tests.Consumer;
 import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
 import net.sf.okapi.common.pipeline.tests.Producer;
-import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
+import net.sf.okapi.common.threadedeventpipeline.ThreadedEventPipeline;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class ThreadedPipelineTest {
 
 	@Test
 	public void runPipelineAsThread() {
-		final IPipeline pipeline = new ThreadedPipeline();
+		final IEventPipeline pipeline = new ThreadedEventPipeline();
 
 		Runnable runnable = new Runnable() {
 			public void run() {
@@ -77,7 +77,7 @@ public class ThreadedPipelineTest {
 
 	//@Test
 	public void runPipeline() {
-		IPipeline pipeline = new ThreadedPipeline();
+		IEventPipeline pipeline = new ThreadedEventPipeline();
 		pipeline.addStep(new Producer());
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());

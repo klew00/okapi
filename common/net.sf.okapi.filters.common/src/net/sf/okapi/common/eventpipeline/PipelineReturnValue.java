@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 by the Okapi Framework contributors                    */
+/* Copyright (C) 2008 Jim Hargrave                                           */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -13,18 +13,13 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.eventpipeline;
 
-public class RuntimeInterruptedException extends RuntimeException {	
-	private static final long serialVersionUID = 8175096454212744354L;
-
-	public RuntimeInterruptedException(InterruptedException e) {
-		super(e);
-	}
-
+public enum PipelineReturnValue {
+	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED
 }

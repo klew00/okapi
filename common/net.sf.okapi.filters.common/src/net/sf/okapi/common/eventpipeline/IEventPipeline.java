@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Jim Hargrave                                           */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -13,18 +13,24 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.eventpipeline;
 
-import java.util.concurrent.BlockingQueue;
+public interface IEventPipeline {
 
-import net.sf.okapi.common.filters.FilterEvent;
+	public void execute();
 
-public interface IProducer {
-	
-	public void setProducerQueue(BlockingQueue<FilterEvent> producerQueue);	
+	public PipelineReturnValue getState();
+
+	public void cancel();
+
+	public void pause();
+
+	public void resume();
+
+	public void addStep(IEventPipelineStep step);
 }

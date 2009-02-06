@@ -22,10 +22,10 @@ package net.sf.okapi.common.simplepipeline.tests;
 
 import java.io.InputStream;
 
-import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.simplepipeline.SimplePipeline;
+import net.sf.okapi.common.eventpipeline.EventPipeline;
+import net.sf.okapi.common.eventpipeline.FilterPipelineStepAdaptor;
+import net.sf.okapi.common.eventpipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.eventpipeline.IEventPipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
@@ -44,7 +44,7 @@ public class HtmlFilterRoundtripTest {
 	
 	@Test
 	public void runPipeline() {
-		IPipeline pipeline = new SimplePipeline();
+		IEventPipeline pipeline = new EventPipeline();
 		
 		HtmlFilter htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleSimpleTest.html");

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Jim Hargrave                                           */
+/* Copyright (C) 2008 by the Okapi Framework contributors                    */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -13,13 +13,49 @@
 /*                                                                           */
 /* You should have received a copy of the GNU Lesser General Public License  */
 /* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
+/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline;
+package net.sf.okapi.common.eventpipeline;
 
-public enum PipelineReturnValue {
-	SUCCEDED,  FAILED, INTERRUPTED, RUNNING, PAUSED, CANCELLED
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IFilter;
+
+public class FilterPipelineStepAdaptor extends BaseEventPipelineStep {
+	private IFilter filter;
+	
+	public FilterPipelineStepAdaptor(IFilter filter) {
+		this.filter = filter;
+	}
+	
+	public IFilter getFilter() {
+		return filter;
+	}
+	
+	public String getName() {		
+		return filter.getName();
+	}		
+
+	@Override
+	public FilterEvent handleEvent(FilterEvent event) {
+		return filter.next();		
+	}
+	
+	public void preprocess() {}
+
+	public void postprocess() {
+		filter.close();
+	}
+	
+	public void cancel() {
+		filter.cancel();
+	}
+
+	public void pause() {
+	}
+
+	public void resume() {
+	}
 }

@@ -19,11 +19,11 @@
 /*===========================================================================*/
 package net.sf.okapi.common.pipeline.tests;
 
+import net.sf.okapi.common.eventpipeline.BaseEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class Producer extends BasePipelineStep {	
+public class Producer extends BaseEventPipelineStep {	
 	private int eventCount = -1;
 
 	public String getName() {

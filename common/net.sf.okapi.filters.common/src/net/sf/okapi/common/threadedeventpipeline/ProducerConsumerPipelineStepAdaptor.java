@@ -18,21 +18,21 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline;
+package net.sf.okapi.common.threadedeventpipeline;
 
 import java.util.concurrent.BlockingQueue;
 
+import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ProducerConsumerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer,
+public class ProducerConsumerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAdaptor implements IProducer,
 		IConsumer {
 	private BlockingQueue<FilterEvent> producerQueue;
 	private BlockingQueue<FilterEvent> consumerQueue;
 
-	public ProducerConsumerPipelineStepAdaptor(IPipelineStep step) {
+	public ProducerConsumerPipelineStepAdaptor(IEventPipelineStep step) {
 		super(step);
 	}
 
