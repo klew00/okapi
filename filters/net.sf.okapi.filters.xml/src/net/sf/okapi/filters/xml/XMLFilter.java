@@ -28,11 +28,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.IProcessor;
 import org.w3c.its.ITSEngine;
@@ -48,6 +50,8 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -62,6 +66,9 @@ public class XMLFilter implements IFilter {
 	private int tuId;
 	private int otherId;
 	private int parseState;
+	private TextFragment frag;
+	private GenericSkeleton skel;
+	private Stack<Node> stack;
 	
 	public void cancel () {
 		queue.clear();
@@ -206,7 +213,8 @@ public class XMLFilter implements IFilter {
 		
 		trav = itsEng;
 		trav.startTraversal();
-
+		stack = new Stack<Node>();
+		
 		// Set the start event
 		queue = new LinkedList<FilterEvent>();
 		queue.add(new FilterEvent(FilterEventType.START));
@@ -225,11 +233,13 @@ public class XMLFilter implements IFilter {
 
 	private void process () {
 		Node node;
+		frag = null;
+		skel = new GenericSkeleton();
+		
 		while ( true ) {
 			node = trav.nextNode();
 			if ( node == null ) { // No more node: we stop
 				Ending ending = new Ending(String.valueOf(++otherId));
-				//ending.setSkeleton(skel);
 				queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
 				parseState = 1;
 				return;
@@ -239,12 +249,130 @@ public class XMLFilter implements IFilter {
 			switch ( node.getNodeType() ) {
 			case Node.CDATA_SECTION_NODE:
 			case Node.TEXT_NODE:
-				TextUnit tu = new TextUnit(String.valueOf(++tuId));
-				tu.setSourceContent(new TextFragment(node.getNodeValue()));
-				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
-				return;
+				if ( frag == null ) {
+					skel.append(node.getNodeValue());
+				}
+				else {
+					frag.append(node.getNodeValue());
+				}
+				break;
+				
+			case Node.ELEMENT_NODE:
+				if ( processElement(node) ) return;
+				break;
+				
+			case Node.PROCESSING_INSTRUCTION_NODE:
+				//TODO: implement pi
+				break;
+				
+			case Node.COMMENT_NODE:
+				if ( frag == null ) {
+					skel.add("<!--"+node.getNodeValue()+"-->");
+				}
+				else {
+					frag.append(TagType.PLACEHOLDER, null, "<!--"+node.getNodeValue()+"-->");
+				}
+				break;
 			}
 		}
 	}
 
+	private String buildStartTag (Node node) {
+		StringBuilder tmp = new StringBuilder();
+		tmp.append("<"+node.getLocalName());
+		if ( node.hasAttributes() ) {
+			NamedNodeMap list = node.getAttributes();
+			Node attr;
+			for ( int i=0; i< list.getLength(); i++ ) {
+				attr = list.item(i);
+				tmp.append(" "+attr.getLocalName()+"=\""+attr.getNodeValue()+"\"");
+			}
+		}
+		if ( !node.hasChildNodes() ) tmp.append("/");
+		tmp.append(">");
+		return tmp.toString();
+	}
+
+	private String buildEndTag (Node node) {
+		if ( node.hasChildNodes() ) {
+			return "</"+node.getLocalName()+">";
+		}
+		else {
+			return "";
+		}
+	}
+
+	/**
+	 * Processes an element node.
+	 * @param node Node to process.
+	 * @return True if we need to return, false to continue processing.
+	 */
+	private boolean processElement (Node node) {
+		if ( trav.backTracking() ) {
+			if ( frag == null ) { // Not an extraction: in skeleton
+				skel.add(buildEndTag(node));
+			}
+			else { // Else we are within an extraction
+				if ( node == stack.peek() ) { // End of text-unit
+					addTextUnit(node);
+					return true;
+				}
+				else { // Within text
+					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
+				}
+			}
+		}
+		else { // Else: Start tag
+			switch ( trav.getWithinText() ) {
+			case ITraversal.WITHINTEXT_YES:
+			case ITraversal.WITHINTEXT_NESTED: //TODO: deal with nested elements
+				if ( frag == null ) { // Not yet in extraction
+					// Strange case: inline without parent???
+					//TODO: do something about this, warning?
+					assert(false);
+				}
+				else { // Already in extraction
+					frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));					
+				}
+				break;
+			default: // Not within text
+				skel.add(buildStartTag(node));
+				if ( frag == null ) { // Not yet in extraction
+					if ( node.hasChildNodes() && trav.translate() ) {
+						stack.push(node);
+						frag = new TextFragment();
+					}
+				}
+				else { // Already in extraction
+					// Queue the current item
+					addTextUnit(node);
+					// And create a new one
+					if ( node.hasChildNodes() && trav.translate() ) {
+						stack.push(node);
+						frag = new TextFragment();
+					}
+				}
+				break;
+			}
+		}
+		return false;
+	}
+
+	private void addTextUnit (Node node) {
+		stack.pop();
+		// Create a unit only if needed
+		if ( !frag.hasCode() && !frag.hasText(false) ) {
+			frag = null;
+			return;
+		}
+		// Create the unit
+		TextUnit tu = new TextUnit(String.valueOf(++tuId));
+		tu.setSourceContent(frag);
+		skel.addContentPlaceholder(tu);
+		skel.add(buildEndTag(node));
+		tu.setSkeleton(skel);
+		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		frag = null;
+	}
+	
 }
