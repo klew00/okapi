@@ -169,7 +169,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			break;
 		}
 	
-		if ( params.addPrefix || params.addSuffix || params.addName ) {
+		if ( params.addPrefix || params.addSuffix || params.addName || params.addID ) {
 			addText(tu);
 		}
 	}
