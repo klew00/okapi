@@ -28,7 +28,6 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.writer.GenericFilterWriter;
-import net.sf.okapi.filters.xml.XMLReader;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -202,33 +201,6 @@ public class Main {
 		System.out.println("---end testTranslationQuery---");
 	}
 
-	private static void testXMLReader () {
-		try {
-			System.out.println("---start testXMLReader---");
-			XMLReader reader = new XMLReader();
-			String inputName = "testdata\\Test02.xml";
-			InputStream input = new FileInputStream(inputName);
-			reader.open(input, inputName);
-			int n;
-			do {
-				n = reader.read();
-				TextUnit item = reader.getItem();
-				switch ( n ) {
-				case XMLReader.RESULT_STARTTRANSUNIT:
-					System.out.println("sTU:"+item.getType()+",'"+item.getSource().toString()+"'");
-					break;
-				case XMLReader.RESULT_ENDTRANSUNIT:
-					System.out.println("eTU:"+item.getType()+",'"+item.getSource().toString()+"'");
-					break;
-				}
-			} while ( n > XMLReader.RESULT_ENDINPUT );
-		}
-		catch ( Exception e ) {
-			e.printStackTrace();
-		}
-		System.out.println("---end testXMLReader---");
-	}
-	
 	private static void testITSEngine () {
 		try {
 			System.out.println("---start testITSEngine---");
@@ -564,7 +536,6 @@ public class Main {
 		testConfigString();
 		//testItem();
 		testITSEngine();
-		testXMLReader();
 	}		
 		
 }

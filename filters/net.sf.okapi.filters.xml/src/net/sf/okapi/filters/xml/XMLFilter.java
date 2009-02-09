@@ -60,6 +60,7 @@ public class XMLFilter implements IFilter {
 	private String docName;
 	private String encoding;
 	private String srcLang;
+	private String lineBreak;
 	private Document doc;
 	private ITraversal trav;
 	private LinkedList<FilterEvent> queue;
@@ -167,7 +168,7 @@ public class XMLFilter implements IFilter {
 		tuId = 0;
 		otherId = 0;
 		parseState = 0;
-		//lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
+		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 
 		// Create the document builder
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -228,6 +229,14 @@ public class XMLFilter implements IFilter {
 		//TODO: startDoc.setFilterParameters(params);
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
+		// Add the XML declaration
+		skel = new GenericSkeleton();
+		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
+		skel.add(" encoding=\"" + encoding + "\"");
+		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
+		skel.add("?>"+lineBreak);
+		startDoc.setSkeleton(skel);
+		// Put the start document in the queue
 		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 	}
 
@@ -240,6 +249,9 @@ public class XMLFilter implements IFilter {
 			node = trav.nextNode();
 			if ( node == null ) { // No more node: we stop
 				Ending ending = new Ending(String.valueOf(++otherId));
+				if (( skel != null ) && ( !skel.isEmpty() )) {
+					ending.setSkeleton(skel);
+				}
 				queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
 				parseState = 1;
 				return;
@@ -262,15 +274,20 @@ public class XMLFilter implements IFilter {
 				break;
 				
 			case Node.PROCESSING_INSTRUCTION_NODE:
-				//TODO: implement pi
+				if ( frag == null ) {
+					skel.add(buildPI(node));
+				}
+				else {
+					frag.append(TagType.PLACEHOLDER, null, buildPI(node));
+				}
 				break;
 				
 			case Node.COMMENT_NODE:
 				if ( frag == null ) {
-					skel.add("<!--"+node.getNodeValue()+"-->");
+					skel.add(buildComment(node));
 				}
 				else {
-					frag.append(TagType.PLACEHOLDER, null, "<!--"+node.getNodeValue()+"-->");
+					frag.append(TagType.PLACEHOLDER, null, buildComment(node));
 				}
 				break;
 			}
@@ -279,13 +296,19 @@ public class XMLFilter implements IFilter {
 
 	private String buildStartTag (Node node) {
 		StringBuilder tmp = new StringBuilder();
-		tmp.append("<"+node.getLocalName());
+		tmp.append("<"
+			+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
+			+ node.getLocalName());
 		if ( node.hasAttributes() ) {
 			NamedNodeMap list = node.getAttributes();
 			Node attr;
+			//TODO: Keep the original order... NamedNodeMap does not
 			for ( int i=0; i< list.getLength(); i++ ) {
 				attr = list.item(i);
-				tmp.append(" "+attr.getLocalName()+"=\""+attr.getNodeValue()+"\"");
+				tmp.append(" "
+					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
+					+ attr.getLocalName()
+					+ "=\"" + attr.getNodeValue() + "\"");
 			}
 		}
 		if ( !node.hasChildNodes() ) tmp.append("/");
@@ -295,11 +318,21 @@ public class XMLFilter implements IFilter {
 
 	private String buildEndTag (Node node) {
 		if ( node.hasChildNodes() ) {
-			return "</"+node.getLocalName()+">";
+			return "</"
+				+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
+				+ node.getLocalName() + ">";
 		}
 		else {
 			return "";
 		}
+	}
+	
+	private String buildPI (Node node) {
+		return "<?" + node.getNodeName() + " " + node.getNodeValue() + "?>";
+	}
+	
+	private String buildComment (Node node) {
+		return "<!--" + node.getNodeValue() + "-->";
 	}
 
 	/**
@@ -336,8 +369,8 @@ public class XMLFilter implements IFilter {
 				}
 				break;
 			default: // Not within text
-				skel.add(buildStartTag(node));
 				if ( frag == null ) { // Not yet in extraction
+					skel.add(buildStartTag(node));
 					if ( node.hasChildNodes() && trav.translate() ) {
 						stack.push(node);
 						frag = new TextFragment();
@@ -346,6 +379,7 @@ public class XMLFilter implements IFilter {
 				else { // Already in extraction
 					// Queue the current item
 					addTextUnit(node);
+					skel.add(buildStartTag(node));
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
 						stack.push(node);
@@ -362,17 +396,22 @@ public class XMLFilter implements IFilter {
 		stack.pop();
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
+			if ( !frag.isEmpty() ) { // Nothing but white spaces
+				skel.add(frag.toString()); // Pass them as skeleton
+			}
 			frag = null;
 			return;
 		}
 		// Create the unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
+		tu.setMimeType("text/xml");
 		tu.setSourceContent(frag);
 		skel.addContentPlaceholder(tu);
 		skel.add(buildEndTag(node));
 		tu.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 		frag = null;
+		skel = new GenericSkeleton();
 	}
 	
 }
