@@ -45,6 +45,9 @@ div.toc p	{ margin: 1 0 0 0; font-size: 0.8em; }
 div.toc a:link { text-decoration: none; color: black }
 div.toc a:visited { text-decoration: none; color: black }
 div.toc a:hover { background: #336699; color: white; }
+div.toc h1	{ margin: 4 0 0 0; font-size: 0.8em; background-color: #FFFFCC; color: black;
+		padding: 0em; }
+
 
 h1.filt1	{ font-weight: bold; font-size: 1.6em; background-color: #3399CC; color: #FFFFFF;
 		padding: 0.3em; margin-bottom: 0; }

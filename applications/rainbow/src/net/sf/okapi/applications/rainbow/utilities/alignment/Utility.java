@@ -129,7 +129,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		dbStoreBuilder.setSegmenters(trgSeg, null);
 		
 		if ( aligner == null ) {
-			aligner = new Aligner(shell, help);
+			aligner = new Aligner(shell, help, updateCommand);
 			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit,
 				params.useAutoCorrection, trgLang);
 		}

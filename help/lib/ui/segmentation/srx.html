@@ -4,16 +4,69 @@
 <link rel="stylesheet" type="text/css" href="../../../help.css">
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<title>Segmentation Rules Editor</title>
+<title>SRX Standard</title>
 </head>
 
 <body>
 
-<h1>SRX</h1>
-<p>SRX (Segmentation Rules eXchange) is a standard format to serialize 
+<h1>SRX Standard</h1>
+<p>The SRX (Segmentation Rules eXchange) format is a standard to serialize 
 segmentation rules so they can be used between different tools.</p>
-<p>&nbsp;</p>
-<h2><a name="SRXVersions"></a>SRX Version Issue</h2>
+<ul>
+	<li><a href="#Overview">Overview</a></li>
+	<li><a href="#SRXVersions">SRX Versions Issue</a></li>
+</ul>
+<h2><a name="Overview"></a>Overview</h2>
+<p>SRX rules use regular expressions to define the text parts before and after 
+inter-character location, and specify if the location should be a break or not. 
+Rules are grouped into named sets that are activated based the code of the 
+language of the text to process.</p>
+<p>Example of SRX simple rules:</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;srx xmlns=&quot;http://www.lisa.org/srx20&quot; version=&quot;2.0&quot;&gt;
+ &lt;header segmentsubflows=&quot;yes&quot; cascade=&quot;no&quot;&gt;
+  &lt;formathandle type=&quot;start&quot; include=&quot;no&quot;&gt;&lt;/formathandle&gt;
+  &lt;formathandle type=&quot;end&quot; include=&quot;yes&quot;&gt;&lt;/formathandle&gt;
+  &lt;formathandle type=&quot;isolated&quot; include=&quot;no&quot;&gt;&lt;/formathandle&gt;
+ &lt;/header&gt;
+ &lt;body&gt;
+  &lt;languagerules&gt;
+   &lt;languagerule languagerulename=&quot;default&quot;&gt;
+    &lt;rule break=&quot;no&quot;&gt;
+     &lt;beforebreak&gt;([A-Z]\.){2,}&lt;/beforebreak&gt;
+     &lt;afterbreak&gt;\s&lt;/afterbreak&gt;
+    &lt;/rule&gt;
+    &lt;rule break=&quot;yes&quot;&gt;
+     &lt;beforebreak&gt;\.&lt;/beforebreak&gt;
+     &lt;afterbreak&gt;\s&lt;/afterbreak&gt;
+    &lt;/rule&gt;
+   &lt;/languagerule&gt;
+  &lt;/languagerules&gt;
+  &lt;maprules&gt;
+   &lt;languagemap languagepattern=&quot;.*&quot; languagerulename=&quot;default&quot;&gt;&lt;/languagemap&gt;
+  &lt;/maprules&gt;
+ &lt;/body&gt;
+&lt;/srx&gt;</pre>
+<p>In this example, there are two rules.</p>
+<ul>
+	<li>The second one specifies that when an inter-character location is 
+	preceeded by a period and followed by a white space, the rule is to break at 
+	that position.</li>
+	<li>The first rule specifices that when an inter-character location is 
+	preceeded by the patter <code>([A-Z]\.){2,}</code> and followed by a white 
+	paces, the rule is to not break at that position. Because the first rule is 
+	placed befor ethe second rule it takes precedence.</li>
+</ul>
+<p>So, based on those rules, the following text:</p>
+<pre>I'm in the U.K. for now. But I plan to move to Papua New Guinea.</pre>
+<p>will break down into two segments:</p>
+<pre>[I'm in the U.K. for now.]
+[ But I plan to move to Papua New Guinea.]</pre>
+<p>If the first rule was not there, it would break down into three segments:</p>
+<pre>[I'm in the U.K.]
+[ for now.]
+[ But I plan to move to Papua New Guinea.]</pre>
+<h2><a name="SRXVersions"></a>SRX Versions Issue</h2>
 <p>There are two versions of SRX: 1.0 and 2.0.</p>
 <p>SRX version 1.0 has been implemented by several tools that interpreted how to 
 process the SRX rules in different ways. As a result the same SRX&nbsp;1.0 document 
@@ -24,12 +77,11 @@ version 2.0 document should give you the same segmentation in all tools.</p>
 <p>You can find the specifications of SRX on the LISA web site:</p>
 <ul>
 	<li>SRX&nbsp;1.0: officially
-	<a href="http://www.lisa.org/fileadmin/standards/srx10.html">
-	http://www.lisa.org/fileadmin/standards/srx10.html</a> but that link is 
+	<a target="_blank" href="http://www.lisa.org/fileadmin/standards/srx10.html">http://www.lisa.org/fileadmin/standards/srx10.html</a> but that link is 
 	broken. Until it is fixed there is a copy available here:
-	<a href="http://www.lisa.org/fileadmin/standards/srx1.0.html">
-	http://www.lisa.org/fileadmin/standards/srx1.0.html</a>.</li>
-	<li>SRX&nbsp;2.0: <a href="http://www.lisa.org/fileadmin/standards/srx20.html">http://www.lisa.org/fileadmin/standards/srx20.html</a>.</li>
+	<a target="_blank" href="http://www.lisa.org/fileadmin/standards/srx1.0.html">http://www.lisa.org/fileadmin/standards/srx1.0.html</a>.</li>
+	<li>SRX&nbsp;2.0: 
+	<a target="_blank" href="http://www.lisa.org/fileadmin/standards/srx20.html">http://www.lisa.org/fileadmin/standards/srx20.html</a>.</li>
 </ul>
 <h3>Implementation Differences Between SRX&nbsp;1.0 and SRX&nbsp;2.0</h3>
 <p>There are two main types of implementations of SRX 1.0: the intended one, and 

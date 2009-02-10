@@ -1846,7 +1846,8 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		SRXEditor dlg = null;
 		try {
-			dlg = new SRXEditor(shell, true, help);
+			dlg = new SRXEditor(shell, true, help,
+				"rainbow="+Res.getString("VERSION")); //$NON-NLS-1$ //$NON-NLS-2$
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {

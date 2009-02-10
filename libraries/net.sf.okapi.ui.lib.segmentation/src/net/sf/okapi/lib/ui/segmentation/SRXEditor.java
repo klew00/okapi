@@ -74,6 +74,7 @@ public class SRXEditor {
 	private static final String APPNAME = "Ratel"; //$NON-NLS-1$
 	
 	private Shell shell;
+	private String updateCommand;
 	private Text edSampleText;
 	private Text edResults;
 	private Table tblRules;
@@ -106,9 +107,17 @@ public class SRXEditor {
 		dispose();
 	}
 
+	/**
+	 * Creates a new SRXEditor dialog.
+	 * @param parent The parent shell.
+	 * @param asDialog True if used from another program.
+	 * @param helpParam The help engine to use.
+	 * @param updateCommand The update command to use (or null for Ratel).
+	 */
 	public SRXEditor (Shell parent,
 		boolean asDialog,
-		IHelp helpParam)
+		IHelp helpParam,
+		String updateCommand)
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
@@ -122,12 +131,14 @@ public class SRXEditor {
 		sampleText = new TextContainer(null);
 		sampleOutput = new GenericInlines();
 		fileProc = new FileProcessor();
-		
+
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
+			this.updateCommand = updateCommand;
 		}
 		else {
 			shell = parent;
+			this.updateCommand = "ratel="+Res.getString("SRXEditor.version"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
@@ -503,14 +514,21 @@ public class SRXEditor {
             }
 		});
 		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( help != null ) help.showTopic(this, "index", "howTo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		});
+
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("http://okapi.opentag.com/updates?ratel=" //$NON-NLS-1$
-					+Res.getString("SRXEditor.Version")); //$NON-NLS-1$
+				UIUtil.start("http://okapi.opentag.com/updates?"+updateCommand); //$NON-NLS-1$
 			}
 		});
 
@@ -548,7 +566,7 @@ public class SRXEditor {
 				AboutDialog dlg = new AboutDialog(shell,
 					Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
 					Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
-					Res.getString("SRXEditor.Version")); //$NON-NLS-1$
+					Res.getString("SRXEditor.version")); //$NON-NLS-1$
 				dlg.showDialog();
             }
 		});

@@ -150,7 +150,7 @@ public class UtilityDriver implements CancelListener {
 
 			// Set the run-time parameters
 			utility.setFilterAccess(fa, prj.getParametersFolder());
-			utility.setContextUI(shell, help);
+			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"));
 			if ( utility.needsRoots() ) {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}

@@ -45,9 +45,12 @@ public interface IUtility {
 	 * attached to the main UI shell from where the utilities are called.
 	 * @param contextUI The shell object to use.
 	 * @param help The IHelp object to display help.
+	 * @param updateCommand The string command to use to invoke the update
+	 * system for this utility.
 	 */
 	public void setContextUI (Object contextUI,
-		IHelp helpParam);
+		IHelp helpParam,
+		String updateCommand);
 
 	/**
 	 * Adds a cancel listener to this utility.

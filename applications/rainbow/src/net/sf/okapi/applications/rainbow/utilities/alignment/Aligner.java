@@ -115,6 +115,7 @@ public class Aligner {
 	private boolean manualCorrection;
 	private String targetLanguage;
 	private IHelp help;
+	private String updateCommand;
 
 	@Override
 	protected void finalize () {
@@ -150,9 +151,11 @@ public class Aligner {
 	}
 
 	public Aligner (Shell parent,
-		IHelp helpParam)
+		IHelp helpParam,
+		String updateCommand)
 	{
 		help = helpParam;
+		this.updateCommand = updateCommand;
 		warnOnClosing = true;
 		anchors = Pattern.compile("((\\d+[\\.,])*\\d+)");
 		
@@ -858,7 +861,7 @@ public class Aligner {
 	
 	private void editRules () {
 		try {
-			SRXEditor editor = new SRXEditor(shell, true, help);
+			SRXEditor editor = new SRXEditor(shell, true, help, updateCommand);
 			editor.showDialog(targetSrxPath);
 		}
 		catch ( Throwable e) {
