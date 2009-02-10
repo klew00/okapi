@@ -28,7 +28,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
-import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
@@ -395,27 +394,6 @@ public class SRXEditor {
 			public void shellIconified(ShellEvent event) {}
 		});
 
-		
-		//--- Dialog-level buttons
-		if ( asDialog ) {
-			SelectionAdapter closeActions = new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-						if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
-						return;
-					}
-					if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
-						shell.close();
-					}
-				};
-			};
-			ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, closeActions, true);
-			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-			gdTmp.horizontalSpan = 2;
-			pnlActions.setLayoutData(gdTmp);
-			shell.setDefaultButton(pnlActions.btClose);
-		}
-
 		// Size
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
@@ -527,16 +505,14 @@ public class SRXEditor {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
-		if ( !asDialog ) {
-			menuItem = new MenuItem(dropMenu, SWT.PUSH);
-			rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
-			menuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					UIUtil.start("http://okapi.opentag.com/updates?ratel=" //$NON-NLS-1$
-						+Res.getString("SRXEditor.Version")); //$NON-NLS-1$
-				}
-			});
-		}
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://okapi.opentag.com/updates?ratel=" //$NON-NLS-1$
+					+Res.getString("SRXEditor.Version")); //$NON-NLS-1$
+			}
+		});
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
@@ -564,21 +540,18 @@ public class SRXEditor {
             }
 		});
 		
-		if ( !asDialog ) {
-			menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
-			menuItem = new MenuItem(dropMenu, SWT.PUSH);
-			rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
-			menuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					AboutDialog dlg = new AboutDialog(shell,
-						Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
-						Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
-						Res.getString("SRXEditor.Version")); //$NON-NLS-1$
-					dlg.showDialog();
-	            }
-			});
-		}
-
+		menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				AboutDialog dlg = new AboutDialog(shell,
+					Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
+					Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
+					Res.getString("SRXEditor.Version")); //$NON-NLS-1$
+				dlg.showDialog();
+            }
+		});
 	}
 	
 	public void dispose () {
@@ -734,7 +707,7 @@ public class SRXEditor {
 		String filename;
 		if ( srxPath != null ) filename = Util.getFilename(srxPath, true);
 		else filename = Res.getString("SRXEditor.untitled");  //$NON-NLS-1$
-		String text = Res.getString(asDialog ? "edit.captionDlg" : "edit.captionApp");  //$NON-NLS-1$  //$NON-NLS-2$
+		String text = Res.getString("edit.captionApp");  //$NON-NLS-1$
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 	

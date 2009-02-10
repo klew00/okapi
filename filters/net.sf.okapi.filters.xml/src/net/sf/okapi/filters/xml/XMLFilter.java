@@ -43,6 +43,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
@@ -70,10 +71,10 @@ public class XMLFilter implements IFilter {
 	private TextFragment frag;
 	private GenericSkeleton skel;
 	private Stack<Node> stack;
+	private boolean canceled;
 	
 	public void cancel () {
-		queue.clear();
-		queue.add(new FilterEvent(FilterEventType.CANCELED));
+		canceled = true;
 	}
 
 	public void close () {
@@ -96,7 +97,12 @@ public class XMLFilter implements IFilter {
 	}
 
 	public FilterEvent next () {
+		if ( canceled ) {
+			queue = null;
+			return new FilterEvent(FilterEventType.CANCELED);
+		}
 		if ( queue == null ) return null;
+
 		// Process queue if it's not empty yet
 		if ( queue.size() > 0 ) {
 			return queue.poll();
@@ -165,6 +171,7 @@ public class XMLFilter implements IFilter {
 	{
 		close();
 		// Initializes the variables
+		canceled = false;
 		tuId = 0;
 		otherId = 0;
 		parseState = 0;
@@ -260,17 +267,35 @@ public class XMLFilter implements IFilter {
 			// Else: valid node
 			switch ( node.getNodeType() ) {
 			case Node.CDATA_SECTION_NODE:
-			case Node.TEXT_NODE:
 				if ( frag == null ) {
-					skel.append(node.getNodeValue());
+					skel.append(buildCDATA(node));
 				}
 				else {
-					frag.append(node.getNodeValue());
+					if ( trav.translate() ) {
+						frag.append(node.getNodeValue());
+					}
+					else {
+						frag.append(TagType.PLACEHOLDER, null, buildCDATA(node));
+					}
+				}
+				break;
+
+			case Node.TEXT_NODE:
+				if ( frag == null ) {
+					skel.append(Util.escapeToXML(node.getNodeValue(), 0, false));
+				}
+				else {
+					if ( trav.translate() ) {
+						frag.append(node.getNodeValue());
+					}
+					else {
+						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(node.getNodeValue(), 0, false));
+					}
 				}
 				break;
 				
 			case Node.ELEMENT_NODE:
-				if ( processElement(node) ) return;
+				if ( processElementTag(node) ) return;
 				break;
 				
 			case Node.PROCESSING_INSTRUCTION_NODE:
@@ -308,7 +333,7 @@ public class XMLFilter implements IFilter {
 				tmp.append(" "
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName()
-					+ "=\"" + attr.getNodeValue() + "\"");
+					+ "=\"" + Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
 			}
 		}
 		if ( !node.hasChildNodes() ) tmp.append("/");
@@ -328,19 +353,25 @@ public class XMLFilter implements IFilter {
 	}
 	
 	private String buildPI (Node node) {
+		//TODO: Need to escape???
 		return "<?" + node.getNodeName() + " " + node.getNodeValue() + "?>";
 	}
 	
+	private String buildCDATA (Node node) {
+		return "<![CDATA[" + node.getNodeValue() + "]]>";
+	}
+	
 	private String buildComment (Node node) {
+		//TODO: Need to escape???
 		return "<!--" + node.getNodeValue() + "-->";
 	}
 
 	/**
-	 * Processes an element node.
+	 * Processes the start or end tag of an element node.
 	 * @param node Node to process.
 	 * @return True if we need to return, false to continue processing.
 	 */
-	private boolean processElement (Node node) {
+	private boolean processElementTag (Node node) {
 		if ( trav.backTracking() ) {
 			if ( frag == null ) { // Not an extraction: in skeleton
 				skel.add(buildEndTag(node));

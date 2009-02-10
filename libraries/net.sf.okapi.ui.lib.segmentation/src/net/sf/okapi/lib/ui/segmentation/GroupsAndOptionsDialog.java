@@ -262,7 +262,7 @@ public class GroupsAndOptionsDialog {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "groupAndOptions"); //$NON-NLS-1$
+					if ( help != null ) help.showTopic(this, "index", "groupAndOptions.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) { //$NON-NLS-1$
