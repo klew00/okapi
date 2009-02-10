@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IEncoder;
@@ -29,14 +32,23 @@ import net.sf.okapi.common.filters.IEncoder;
  */
 public class XMLEncoder implements IEncoder {
 
+	private CharsetEncoder chsEnc;
+	
 	public void setOptions (IParameters params,
 		String encoding)
 	{
-		// Nothing to do
+		// Use an encoder only if the output is not UTF-8/16
+		// since those support all characters
+		if ( "utf-8".equals(encoding) || "utf-16".equals(encoding) ) {
+			chsEnc = null;
+		}
+		else {
+			chsEnc = Charset.forName(encoding).newEncoder();
+		}
 	}
 
 	public String encode (String text, int context) {
-		return Util.escapeToXML(text, 1, false);
+		return Util.escapeToXML(text, 1, false, chsEnc);
 	}
 
 	public String encode (char value, int context) {
@@ -50,6 +62,7 @@ public class XMLEncoder implements IEncoder {
 		case '&':
 			return "&amp;";
 		default:
+			//TODO: Escape unsupported chars
 			return String.valueOf(value);
 		}
 	}

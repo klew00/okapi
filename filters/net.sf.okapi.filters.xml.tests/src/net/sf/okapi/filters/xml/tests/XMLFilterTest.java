@@ -36,7 +36,7 @@ public class XMLFilterTest {
 			filter = new XMLFilter();
 			filter.setOptions("en", "es", "UTF-8", true);
 
-			filter.open("<doc attr='a1'><p>textp1</p><p>textp2</p></doc>");
+			filter.open("<doc><p>p1<q>q1</q>p2</p></doc>\n <!--com-->");
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			

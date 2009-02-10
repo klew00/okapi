@@ -71,8 +71,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		EncoderManager encoderManager)
 	{
 		this.encoderManager = encoderManager;
-		this.outputLang = language;
-		this.outputEncoding = encoding;
+		outputLang = language;
+		outputEncoding = encoding;
+		this.encoderManager.setDefaultOptions(null, outputEncoding);
 		this.layer = layer;
 		referents = new LinkedHashMap<String, IReferenceable>();
 		storageStack = new Stack<StorageList>();

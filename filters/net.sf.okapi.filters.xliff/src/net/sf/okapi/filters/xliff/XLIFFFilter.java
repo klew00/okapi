@@ -276,8 +276,8 @@ public class XLIFFFilter implements IFilter {
 				
 			case XMLStreamConstants.SPACE:
 			case XMLStreamConstants.CDATA:
-			case XMLStreamConstants.CHARACTERS:
-				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+			case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
+				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:
@@ -498,7 +498,8 @@ public class XLIFFFilter implements IFilter {
 							}
 						}
 					}
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					//TODO: escape unsupported chars
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					break;
 					
 				case XMLStreamConstants.COMMENT:
@@ -642,8 +643,8 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					content.append(reader.getText());
-					if ( store ) {
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					if ( store ) { //TODO: escape unsupported chars
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					}
 					break;
 		
@@ -804,10 +805,10 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					innerCode.append(reader.getText());
-					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
-					if ( store )
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					innerCode.append(reader.getText());//TODO: escape unsupported chars
+					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+					if ( store ) //TODO: escape unsupported chars
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					break;
 				}
 			}
@@ -830,8 +831,8 @@ public class XLIFFFilter implements IFilter {
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
-				case XMLStreamConstants.SPACE:
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+				case XMLStreamConstants.SPACE: //TODO: escape unsupported chars
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					tmp.append(reader.getText());
 					break;
 				case XMLStreamConstants.END_ELEMENT:

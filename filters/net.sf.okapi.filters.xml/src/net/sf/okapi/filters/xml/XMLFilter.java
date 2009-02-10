@@ -48,6 +48,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -236,10 +237,15 @@ public class XMLFilter implements IFilter {
 		//TODO: startDoc.setFilterParameters(params);
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
+
 		// Add the XML declaration
 		skel = new GenericSkeleton();
 		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
-		skel.add(" encoding=\"" + encoding + "\"");
+		skel.add(" encoding=\"");
+		skel.addValuePlaceholder(startDoc, "encoding", "");
+		skel.add("\"");
+		startDoc.setProperty(new Property("encoding", encoding, false));
+		
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
 		skel.add("?>"+lineBreak);
 		startDoc.setSkeleton(skel);
@@ -251,6 +257,13 @@ public class XMLFilter implements IFilter {
 		Node node;
 		frag = null;
 		skel = new GenericSkeleton();
+		
+		if ( stack.size() > 0 ) {
+			// If we are within an element, reset the frag to append to it
+			if ( trav.translate() ) { // The stack is up-to-date already
+				frag = new TextFragment();
+			}
+		}
 		
 		while ( true ) {
 			node = trav.nextNode();
@@ -281,15 +294,15 @@ public class XMLFilter implements IFilter {
 				break;
 
 			case Node.TEXT_NODE:
-				if ( frag == null ) {
-					skel.append(Util.escapeToXML(node.getNodeValue(), 0, false));
+				if ( frag == null ) {//TODO: escape unsupported chars
+					skel.append(Util.escapeToXML(node.getNodeValue(), 0, false, null));
 				}
 				else {
 					if ( trav.translate() ) {
 						frag.append(node.getNodeValue());
 					}
-					else {
-						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(node.getNodeValue(), 0, false));
+					else {//TODO: escape unsupported chars
+						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(node.getNodeValue(), 0, false, null));
 					}
 				}
 				break;
@@ -332,8 +345,8 @@ public class XMLFilter implements IFilter {
 				attr = list.item(i);
 				tmp.append(" "
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
-					+ attr.getLocalName()
-					+ "=\"" + Util.escapeToXML(attr.getNodeValue(), 3, false) + "\"");
+					+ attr.getLocalName() //TODO: escape unsupported chars
+					+ "=\"" + Util.escapeToXML(attr.getNodeValue(), 3, false, null) + "\"");
 			}
 		}
 		if ( !node.hasChildNodes() ) tmp.append("/");
@@ -375,11 +388,11 @@ public class XMLFilter implements IFilter {
 		if ( trav.backTracking() ) {
 			if ( frag == null ) { // Not an extraction: in skeleton
 				skel.add(buildEndTag(node));
+				if ( node.isSameNode(stack.peek()) ) stack.pop();
 			}
 			else { // Else we are within an extraction
-				if ( node == stack.peek() ) { // End of text-unit
-					addTextUnit(node);
-					return true;
+				if ( node.isSameNode(stack.peek()) ) { // End of possible text-unit
+					return addTextUnit(node, true);
 				}
 				else { // Within text
 					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
@@ -409,7 +422,7 @@ public class XMLFilter implements IFilter {
 				}
 				else { // Already in extraction
 					// Queue the current item
-					addTextUnit(node);
+					addTextUnit(node, false);
 					skel.add(buildStartTag(node));
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
@@ -423,26 +436,36 @@ public class XMLFilter implements IFilter {
 		return false;
 	}
 
-	private void addTextUnit (Node node) {
-		stack.pop();
+	/**
+	 * Adds a text unit to the queue if needed.
+	 * @param node The current node.
+	 * @param popStack True to pop the stack, false to leave the stack alone.
+	 * @return True if a text unit was added to the queue, false otherwise.
+	 */
+	private boolean addTextUnit (Node node,
+		boolean popStack)
+	{
+		if ( popStack ) stack.pop();
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toString()); // Pass them as skeleton
 			}
 			frag = null;
-			return;
+			if ( popStack ) skel.add(buildEndTag(node));
+			return false;
 		}
 		// Create the unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType("text/xml");
 		tu.setSourceContent(frag);
 		skel.addContentPlaceholder(tu);
-		skel.add(buildEndTag(node));
+		if ( popStack ) skel.add(buildEndTag(node));
 		tu.setSkeleton(skel);
 		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
 		frag = null;
 		skel = new GenericSkeleton();
+		return true;
 	}
 	
 }

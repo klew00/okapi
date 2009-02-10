@@ -81,8 +81,8 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));//TODO: escape unsupported chars
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("</bpt>");
 					}
 					if ( code.hasAnnotation("protected") ) {
@@ -98,8 +98,8 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("</ept>");
 					}
 					if ( code.hasAnnotation("protected") ) {
@@ -116,8 +116,8 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("</ph>");
 					}
 				}
@@ -190,8 +190,9 @@ public class XLIFFContent {
 				}
 				else {
 					tmp.append(String.format("<ph id=\"%d\">", code.getId()));
+					//TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT));
+						quoteMode, escapeGT, null)); 
 					tmp.append("</ph>");
 				}
 				break;
@@ -200,8 +201,9 @@ public class XLIFFContent {
 				code = codes.get(index);
 				if ( code.hasData() ) {
 					tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+					//TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT));
+						quoteMode, escapeGT, null));
 					tmp.append("</bpt>");
 				}
 				if ( code.hasAnnotation("protected") ) {
@@ -213,8 +215,9 @@ public class XLIFFContent {
 				code = codes.get(index);
 				if ( code.hasData() ) {
 					tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+					//TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT));
+						quoteMode, escapeGT, null));
 					tmp.append("</ept>");
 				}
 				if ( code.hasAnnotation("protected") ) {

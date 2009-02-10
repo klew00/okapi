@@ -138,7 +138,7 @@ public class FileProcessor {
 				List<TextFragment> list = textCont.getSegments();
 				for ( TextFragment frag : list ) {
 					writer.write("<p>"); //$NON-NLS-1$
-					writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false));
+					writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false, null));
 					writer.write("</p>"); //$NON-NLS-1$
 				}
 			}

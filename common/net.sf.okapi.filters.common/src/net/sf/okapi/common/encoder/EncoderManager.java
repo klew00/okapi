@@ -34,6 +34,7 @@ public class EncoderManager implements IEncoder {
 	private String mimeType = "";
 	private IEncoder encoder;
 	private Hashtable<String, String> mimeMap;
+	private String defEncoding;
 
 	/**
 	 * Creates a new encoder manager, with default pre-defined encoder loaded.
@@ -94,6 +95,9 @@ public class EncoderManager implements IEncoder {
 			}
 			// Else: Instantiate the encoder based on the class name
 			encoder = (IEncoder)Class.forName(name).newInstance();
+			// And set the options
+			//TODO: Handle parameters at some point
+			encoder.setOptions(null, defEncoding);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -162,6 +166,19 @@ public class EncoderManager implements IEncoder {
 		}
 		// No change if there is no encoder active
 		return value;
+	}
+
+	/**
+	 * Sets the default options for this encoder manager. The values
+	 * passed here are set as the values to use for each encoder as they
+	 * are invoked.
+	 * @param params The default parameter object.
+	 * @param encoding The default encoding.
+	 */
+	public void setDefaultOptions (IParameters params,
+		String encoding)
+	{
+		defEncoding = encoding;
 	}
 
 }

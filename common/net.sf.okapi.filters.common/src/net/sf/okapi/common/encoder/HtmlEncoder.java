@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IEncoder;
@@ -41,25 +44,25 @@ public class HtmlEncoder implements IEncoder {
 	/** HTML charset identifier */
 	public static final String CHARSET = "charset";
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IEncoder#setOptions(net.sf.okapi.common.IParameters, java.lang.String)
-	 */
+	private CharsetEncoder chsEnc;
+
 	public void setOptions (IParameters params,
 		String encoding)
 	{
-		// Nothing to do
+		// Use an encoder only if the output is not UTF-8/16
+		// since those support all characters
+		if ( "utf-8".equals(encoding) || "utf-16".equals(encoding) ) {
+			chsEnc = null;
+		}
+		else {
+			chsEnc = Charset.forName(encoding).newEncoder();
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IEncoder#encode(java.lang.String, int)
-	 */
 	public String encode (String text, int context) {
-		return Util.escapeToXML(text, 1, false);
+		return Util.escapeToXML(text, 1, false, chsEnc);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IEncoder#encode(char, int)
-	 */
 	public String encode (char value, int context) {
 		switch ( value ) {
 		case '<':
@@ -75,9 +78,6 @@ public class HtmlEncoder implements IEncoder {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IEncoder#toNative(java.lang.String, java.lang.String)
-	 */
 	public String toNative (String propertyName,
 		String value)
 	{

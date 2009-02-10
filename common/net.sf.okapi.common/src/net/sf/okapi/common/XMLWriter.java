@@ -132,7 +132,7 @@ public class XMLWriter {
 	{
 		closeStartTag();
 		writer.write("<" + name + ">");
-		writer.write(Util.escapeToXML(content, 0, false));
+		writer.write(Util.escapeToXML(content, 0, false, null));
 		writer.print("</" + name + ">");
 	}
 	
@@ -145,7 +145,7 @@ public class XMLWriter {
 	public void writeAttributeString (String name,
 		String value)
 	{
-		writer.write(" " + name + "=\"" + Util.escapeToXML(value, 3, false) + "\"");
+		writer.write(" " + name + "=\"" + Util.escapeToXML(value, 3, false, null) + "\"");
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class XMLWriter {
 	 */
 	public void writeString (String text) {
 		closeStartTag();
-		writer.write(Util.escapeToXML(text, 0, false));
+		writer.write(Util.escapeToXML(text, 0, false, null));
 	}
 	
 	/**

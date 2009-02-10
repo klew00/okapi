@@ -80,14 +80,14 @@ public class TMXContent {
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				id = codes.get(index).getId();
 				tmp.append(String.format("<bpt i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
 				tmp.append("</bpt>");
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				id = codes.get(index).getId();
 				tmp.append(String.format("<ept i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT));
+				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
 				tmp.append("</ept>");
 				break;
 			case TextFragment.MARKER_ISOLATED:
@@ -100,28 +100,28 @@ public class TMXContent {
 				case PLACEHOLDER:
 					if ( withTradosWorkarounds && code.getData().startsWith("\\") ) {
 						tmp.append("<ut>{\\cs6\\f1\\cf6\\lang1024 </ut>");
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("<ut>}</ut>");
 					}
 					else {
 						tmp.append(String.format("<ph x=\"%d\">", id));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("</ph>");
 					}
 					break;
 				case OPENING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 					tmp.append("</it>");
 					break;
 				case CLOSING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 					tmp.append("</it>");
 					break;
 				case SEGMENTHOLDER: // Should not really be used
 					tmp.append(String.format("<ph x=\"%d\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT));
+					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 					tmp.append("</ph>");
 					break;
 				}

@@ -164,8 +164,8 @@ public class TmxFilter implements IFilter {
 			
 			case XMLStreamConstants.SPACE:
 			case XMLStreamConstants.CDATA:
-			case XMLStreamConstants.CHARACTERS:
-				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+			case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
+				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:
@@ -383,8 +383,8 @@ public class TmxFilter implements IFilter {
 			while(reader.hasNext()){
 				int eventType = reader.next();
 				switch ( eventType ) {
-				case XMLStreamConstants.CHARACTERS:
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));					
+				case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));					
 					break;
 				case XMLStreamConstants.END_ELEMENT:
 					if(reader.getLocalName().equals(startElement)){
@@ -413,8 +413,8 @@ public class TmxFilter implements IFilter {
 				int eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
-
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					 //TODO: Check if it's ok to not check for unsupported chars
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					//--set the properties depending on the tuvType--
 					if(tuvType == 1){
 						tu.setSourceProperty(new Property(startElement, reader.getText(), true));	
@@ -449,10 +449,10 @@ public class TmxFilter implements IFilter {
 				int eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
-					if(tuvType == 1 || tuvType == 2){
-						tc.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
-					}else if (tuvType == 0){
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+					if(tuvType == 1 || tuvType == 2){ //TODO: Check if it's ok to not check for unsupported chars
+						tc.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+					}else if (tuvType == 0){ //TODO: Check if it's ok to not check for unsupported chars
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					}
 					break;
 				case XMLStreamConstants.START_ELEMENT:		
@@ -521,8 +521,8 @@ public class TmxFilter implements IFilter {
 					skel.append("<!--"+ reader.getText() + "-->");
 					break;
 					
-				case XMLStreamConstants.CHARACTERS:
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+				case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					break;
 				case XMLStreamConstants.START_ELEMENT:
 
@@ -594,8 +594,8 @@ public class TmxFilter implements IFilter {
 				int eventType = reader.next();
 				switch ( eventType ) {
 				//--process the document note content--
-				case XMLStreamConstants.CHARACTERS:
-					sb.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT));
+				case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
+					sb.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					break;
 				case XMLStreamConstants.END_ELEMENT:
 					if(reader.getLocalName().equals(startElement)){

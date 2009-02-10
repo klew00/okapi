@@ -130,11 +130,14 @@ public class Util {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt
+	 * @param encoder The character set encoder to use to detect un-supported character,
+	 * or null to never escape normal characters.
 	 * @return The escaped string.
 	 */
 	static public String escapeToXML (String text,
 		int quoteMode,
-		boolean escapeGT)
+		boolean escapeGT,
+		CharsetEncoder encoder)
 	{
 		if ( text == null ) return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
@@ -171,7 +174,22 @@ public class Util {
 				}
 				continue;
 			default:
-				sbTmp.append(text.charAt(i));
+				if ( text.charAt(i) > 127 ) {
+					if ( encoder != null ) {
+						if ( encoder.canEncode(text.charAt(i)) ) {
+							sbTmp.append(text.charAt(i));
+						}
+						else {
+							sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
+						}
+					}
+					else {
+						sbTmp.append(text.charAt(i));
+					}
+				}
+				else { // ASCII
+					sbTmp.append(text.charAt(i));
+				}
 				continue;
 			}
 		}

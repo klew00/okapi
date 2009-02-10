@@ -10,5 +10,6 @@
  <p><![CDATA[ Text &=amp, <=lt, >=gt, ]=cbracket, [=obracket ]]></p>
  <p its:translate="no"><![CDATA[ Text &=amp, <=lt, >=gt, ]=cbracket, [=obracket ]]></p>
  <p>Before <img attr1="&amp;=amp, &quot;=quot, &lt;=lt, &gt;=gt, &apos;=apos."/> after.</p>
+ <p>Text for p<q>embedded text for q</q> text for p again</p>
 </text>
 <?pi pival?><!--last comment-->
