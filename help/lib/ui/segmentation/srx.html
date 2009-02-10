@@ -9,8 +9,12 @@
 
 <body>
 
-<h1>SRX Versions</h1>
-<p>There are two version of SRX: 1.0 and 2.0.</p>
+<h1>SRX</h1>
+<p>SRX (Segmentation Rules eXchange) is a standard format to serialize 
+segmentation rules so they can be used between different tools.</p>
+<p>&nbsp;</p>
+<h2><a name="SRXVersions"></a>SRX Version Issue</h2>
+<p>There are two versions of SRX: 1.0 and 2.0.</p>
 <p>SRX version 1.0 has been implemented by several tools that interpreted how to 
 process the SRX rules in different ways. As a result the same SRX&nbsp;1.0 document 
 used on different tools may give you different segmentation.</p>
@@ -22,17 +26,17 @@ version 2.0 document should give you the same segmentation in all tools.</p>
 	<li>SRX&nbsp;1.0: officially
 	<a href="http://www.lisa.org/fileadmin/standards/srx10.html">
 	http://www.lisa.org/fileadmin/standards/srx10.html</a> but that link is 
-	broken. Until it's fixed there is a copy available here:
+	broken. Until it is fixed there is a copy available here:
 	<a href="http://www.lisa.org/fileadmin/standards/srx1.0.html">
 	http://www.lisa.org/fileadmin/standards/srx1.0.html</a>.</li>
 	<li>SRX&nbsp;2.0: <a href="http://www.lisa.org/fileadmin/standards/srx20.html">http://www.lisa.org/fileadmin/standards/srx20.html</a>.</li>
 </ul>
-<h2>Implementation Differences Between SRX 1.0 and SRX 2.0</h2>
+<h3>Implementation Differences Between SRX&nbsp;1.0 and SRX&nbsp;2.0</h3>
 <p>There are two main types of implementations of SRX 1.0: the intended one, and 
 one that use a cascading matching of the language maps.</p>
-<p>SDLX implements the intended one. Heartsome and Swordfish implements the 
-cascading one.</p>
-<h3>What is the Problem?</h3>
+<p>Tools like SDLX implement the intended SRX&nbsp;1.0 behavior (non-cascading). 
+Others, like Heartsome and Swordfish implement SRX&nbsp;1.0 with a 
+cascading behavior.</p>
 <p>In an SRX document, the segmentation rules are grouped into several <code>
 &lt;languagerule&gt;</code> elements. This way you can define different sets of rules 
 that you apply for different languages. The select of which which group of rules 
@@ -52,21 +56,23 @@ pointer to the group of rules for this entry.</p>
  &lt;languagemap languagepattern='ja.*' languagerulename='japanese'/&gt;
  &lt;languagemap languagepattern='.*' languagerulename='default'/&gt;
 &lt;/maprules&gt;</pre>
-<p>The difference between the implementation is how they lookup the &lt;maprules&gt; 
+<p>The difference between the SRX&nbsp;1.0 implementations is how they lookup the 
+<code>&lt;maprules&gt;</code> 
 for a given language code.</p>
 <ol>
-	<li>Some will use <b>only the first</b> &lt;languagemap&gt; that has a 
-	languagepattern matching the language code.</li>
-	<li>Other will use <b>all</b> &lt;languagemap&gt; that have a languagepattern 
+	<li>Some will use <b>only the first</b> <code>&lt;languagemap&gt;</code> that has a
+	<code>languagepattern</code> matching the language code.</li>
+	<li>Other will use <b>all</b> <code>&lt;languagemap&gt;</code> that have a 
+	<code>languagepattern</code> 
 	matching the language code.</li>
 </ol>
-<p>Which interpretation is correct in SRX&nbsp;1.0?</p>
-<p>The first one is correct: In SRX&nbsp;1.0 you use the only first &lt;languagemap&gt; 
+<p>The first interpretation is the correct one: In SRX&nbsp;1.0 you use the only first 
+<code>&lt;languagemap&gt;</code> 
 that matches the given language code.</p>
 <p>It is true that there is nothing in the SRX 1.0 specification that says 
 explicitely it should work that way. But there is also nothing explicitely (or 
-implicitely) that says all matching &lt;languagemap&gt; should be used.</p>
-<p>The only clue to the intended behavior is in the example of the SRX&nbsp;1.0 
+implicitely) that says all matching <code>&lt;languagemap&gt;</code> should be used.</p>
+<p>The clue to the intended behavior is in the example of the SRX&nbsp;1.0 
 specification:</p>
 <pre>&lt;languagerules&gt;
  &lt;languagerule languagerulename=&quot;Default&quot;&gt;
@@ -103,20 +109,25 @@ specification:</p>
   &lt;languagemap languagepattern=&quot;.*&quot; languagerulename=&quot;Default&quot;/&gt;
  &lt;/maprule&gt;
 &lt;/maprules&gt;</pre>
-<p>There is the same rules defined in both the Default and the Japanese. If the 
-SRX&nbsp;1.0 intended to use all the languagemap elements that match the given 
-language code the duplicated rules that are in Japanese would no be there, and 
-only the extra Japanese-specific rule would be listed there.</p>
-<h3>How to Convert to SRX 2.0?</h3>
-<p>When loading or importing SRX&nbsp;1.0 documents into an editor that uses SRX&nbsp;2.0, 
+<p dir="ltr">In this example, there is the same rules defined in both the 
+Default and the Japanese groups. If SRX&nbsp;1.0 intended to use all the <code>
+&lt;languagemap&gt;</code> elements that match the given language code, there would be 
+no point to have duplicated rules in Japanese. The Japanese group would have 
+only the extra Japanese-specific rules.</p>
+<h3>How to Convert From SRX 1.0 to SRX 2.0?</h3>
+<p>When loading or importing SRX&nbsp;1.0 documents into an SRX&nbsp;2.0 editor, 
 you must be careful about setting properly the <code>cascade</code> option 
-(introduced in 2.0) depending on the provenance of the document.</p>
-<p>SRX&nbsp;1.0 rules coming from Heartsome, Swordfish, and some other toolsthat are designed with cascading. 
-So you should make sure that option is set after you have open the file. Ratel 
-does not set it automatically because it was not the expected behavior of 
+(introduced in v2.0) depending on the provenance of the document.</p>
+<ul>
+	<li>SRX&nbsp;1.0 rules coming from Trados, SDLX, and some other tools that are designed without cascading 
+	(normal SRX&nbsp;1.0 behavior). So you 
+should make sure that option <b>is not set</b> after you open the file.</li>
+	<li>SRX&nbsp;1.0 rules coming from Heartsome, Swordfish, and some other tools that are designed with cascading. 
+So you should make sure that option <b>is set</b> after you have open the file.</li>
+</ul>
+<p>Note that Ratel 
+does not set the <code>cascade</code> automatically because it is not the expected behavior of 
 SRX&nbsp;1.0.</p>
-<p>SRX&nbsp;1.0 rules coming from Trados, SDLX, and some other tools that are designed without cascading. So you 
-should make sure that option is not set after you open the file.</p>
 <p>&nbsp;</p>
 
 </body>
