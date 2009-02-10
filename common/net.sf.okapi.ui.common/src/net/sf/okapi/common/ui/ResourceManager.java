@@ -48,6 +48,7 @@ public class ResourceManager {
 	private String ext = ".png";
 	private String subdir = "images";
 	private Hashtable<String, CommandItem> commands;
+	private Hashtable<String, Image[]> imageLists;
 
 	/**
 	 * Creates a ResourceManager object.
@@ -65,27 +66,38 @@ public class ResourceManager {
 		colors1 = new Hashtable<String, Color>();
 		colors2 = new Hashtable<Integer, Color>();
 		commands = new Hashtable<String, CommandItem>();
+		imageLists = new Hashtable<String, Image[]>();
 	}
 	
 	/**
 	 * Disposes of all the resources.
 	 */
 	public void dispose () {
-		Enumeration<Image> E1 = images.elements();
-		while ( E1.hasMoreElements() ) {
-			E1.nextElement().dispose();
+		Enumeration<Image> e1 = images.elements();
+		while ( e1.hasMoreElements() ) {
+			e1.nextElement().dispose();
 		}
 		images.clear();
 		
-		Enumeration<Color> E2 = colors1.elements();
-		while ( E2.hasMoreElements() ) {
-			E2.nextElement().dispose();
+		Enumeration<Image[]> e2 = imageLists.elements();
+		Image[] list;
+		while ( e2.hasMoreElements() ) {
+			list = e2.nextElement();
+			for ( Image image : list ) {
+				image.dispose();
+			}
+		}
+		imageLists.clear();
+		
+		Enumeration<Color> e3 = colors1.elements();
+		while ( e3.hasMoreElements() ) {
+			e3.nextElement().dispose();
 		}
 		colors1.clear();
 		
-		E2 = colors2.elements();
-		while ( E2.hasMoreElements() ) {
-			E2.nextElement().dispose();
+		e3 = colors2.elements();
+		while ( e3.hasMoreElements() ) {
+			e3.nextElement().dispose();
 		}
 		colors2.clear();
 
@@ -111,8 +123,8 @@ public class ResourceManager {
 	}
 
 	/**
-	 * Adds an image to the resource list.
-	 * @param p_sName Name of the image to load. This name is also the key name
+	 * Adds an image to this resource manager.
+	 * @param name Name of the image to load. This name is also the key name
 	 * to retrieve the resource later on and should be unique. If the name has 
 	 * no extension or no sub-directory, the default extension and sub-directory
 	 * will be added automatically for the load (but the key name stays as you 
@@ -123,49 +135,94 @@ public class ResourceManager {
 	 * m_RM.add("myImage.gif"); loads "images/myImage.gif" and the key is "myImage.gif".
 	 * m_RM.add("res/myImage.gif"); loads "res/myImage.gif" and the key is "res/myImage.gif".
 	 */
-	public void addImage (String p_sName) {
-		String sKey = p_sName;
-		if ( p_sName.lastIndexOf('.') == -1 ) {
-			p_sName += ext;
+	public void addImage (String name) {
+		String sKey = name;
+		if ( name.lastIndexOf('.') == -1 ) {
+			name += ext;
 		}
-		if (( p_sName.indexOf(File.separatorChar) == -1 ) && ( subdir.length() != 0 )) {
-			p_sName = subdir + "/" + p_sName; // Use '/' not File.separatorChar!
+		if (( name.indexOf(File.separatorChar) == -1 ) && ( subdir.length() != 0 )) {
+			name = subdir + "/" + name; // Use '/' not File.separatorChar!
 		}
-		images.put(sKey, new Image(display, cls.getResourceAsStream(p_sName)));
+		images.put(sKey, new Image(display, cls.getResourceAsStream(name)));
 	}
 	
-	public void addColor (String p_sName,
+	/**
+	 * Adds a list of two images to this resource manager.
+	 * @param listName Name of the list.
+	 * @param name1 Name of the first image to load. If the name has 
+	 * no extension or no sub-directory, the default extension and sub-directory
+	 * will be added automatically for the load.
+	 * @param name2 Name of the second image to load. If the name has 
+	 * no extension or no sub-directory, the default extension and sub-directory
+	 * will be added automatically for the load.
+	 */
+	public void addImages (String listName,
+		String name1,
+		String name2)
+	{
+		// Adjust image 1 name
+		if ( name1.lastIndexOf('.') == -1 ) {
+			name1 += ext;
+		}
+		if (( name1.indexOf(File.separatorChar) == -1 ) && ( subdir.length() != 0 )) {
+			name1 = subdir + "/" + name1; // Use '/' not File.separatorChar!
+		}
+		Image image1 = new Image(display, cls.getResourceAsStream(name1));
+
+		// Adjust image 2 name
+		if ( name2.lastIndexOf('.') == -1 ) {
+			name2 += ext;
+		}
+		if (( name2.indexOf(File.separatorChar) == -1 ) && ( subdir.length() != 0 )) {
+			name2 = subdir + "/" + name2; // Use '/' not File.separatorChar!
+		}
+		Image image2 = new Image(display, cls.getResourceAsStream(name2));
+	
+		// Add the list
+		imageLists.put(listName, new Image[]{image1, image2});
+	}
+	
+	/**
+	 * Gets the list of images for a given key.
+	 * @param name The name of the list.
+	 * @return The list of images for the given name.
+	 */
+	public Image[] getImages (String name) {
+		return imageLists.get(name);
+	}
+
+	public void addColor (String name,
 		int p_nRed,
 		int p_nGreen,
 		int p_nBlue)
 	{
-		colors1.put(p_sName, new Color(display, p_nRed, p_nGreen, p_nBlue));	
+		colors1.put(name, new Color(display, p_nRed, p_nGreen, p_nBlue));	
 	}
 		
-	public void addColor (int p_nID,
-		int p_nRed,
-		int p_nGreen,
-		int p_nBlue)
+	public void addColor (int id,
+		int red,
+		int green,
+		int blue)
 	{
-		colors2.put(p_nID, new Color(display, p_nRed, p_nGreen, p_nBlue));	
+		colors2.put(id, new Color(display, red, green, blue));	
 	}
 	
 	/**
 	 * Retrieves a loaded images from the resource list.
-	 * @param p_sName Key name of the resource. This name is the same you used to
+	 * @param name Key name of the resource. This name is the same you used to
 	 * add the resource to the list.
 	 * @return The image.
 	 */
-	public Image getImage (String p_sName) {
-		return images.get(p_sName);
+	public Image getImage (String name) {
+		return images.get(name);
 	}
 	
-	public Color getColor (String p_sName) {
-		return colors1.get(p_sName);
+	public Color getColor (String name) {
+		return colors1.get(name);
 	}
 
-	public Color getColor (int p_nID) {
-		return colors2.get(p_nID);
+	public Color getColor (int id) {
+		return colors2.get(id);
 	}
 
 	public void setCommand (MenuItem menuItem,

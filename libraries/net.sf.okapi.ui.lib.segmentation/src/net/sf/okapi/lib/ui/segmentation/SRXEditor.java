@@ -74,7 +74,6 @@ public class SRXEditor {
 	private static final String APPNAME = "Ratel"; //$NON-NLS-1$
 	
 	private Shell shell;
-	private boolean asDialog;
 	private Text edSampleText;
 	private Text edResults;
 	private Table tblRules;
@@ -117,7 +116,6 @@ public class SRXEditor {
 		testOutputPath = config.getProperty("testOutputPath"); //$NON-NLS-1$
 		htmlOutput = config.getBoolean("htmlOutput"); //$NON-NLS-1$
 
-		this.asDialog = asDialog;
 		help = helpParam;
 		srxDoc = new SRXDocument();
 		srxPath = null;
@@ -127,7 +125,6 @@ public class SRXEditor {
 		
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
-			UIUtil.inheritIcon(shell, parent);
 		}
 		else {
 			shell = parent;
@@ -135,7 +132,10 @@ public class SRXEditor {
 
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
 		rm.loadCommands("commands.xml"); //$NON-NLS-1$
-		
+
+		rm.addImages("ratel", "ratel16", "ratel32");
+		shell.setImages(rm.getImages("ratel"));
+
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 		
