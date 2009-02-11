@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.xml.tests;
 
+import java.net.URL;
+
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.xml.XMLFilter;
 
@@ -40,10 +42,10 @@ public class XMLFilterTest {
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			
-//			URL url = XMLFilterTest.class.getResource("/input.xml");
-//			filter.open(url);
-//			if ( !testDriver.process(filter) ) Assert.fail();
-//			filter.close();
+			URL url = XMLFilterTest.class.getResource("/Translate2.xml");
+			filter.open(url);
+			if ( !testDriver.process(filter) ) Assert.fail();
+			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

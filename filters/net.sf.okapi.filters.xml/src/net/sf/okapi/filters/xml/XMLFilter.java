@@ -362,6 +362,43 @@ public class XMLFilter implements IFilter {
 		return tmp.toString();
 	}
 
+	private void addStartTagToSkeleton (Node node) {
+		StringBuilder tmp = new StringBuilder();
+		tmp.append("<"
+			+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
+			+ node.getLocalName());
+		if ( node.hasAttributes() ) {
+			NamedNodeMap list = node.getAttributes();
+			Attr attr;
+			for ( int i=0; i<list.getLength(); i++ ) {
+				attr = (Attr)list.item(i);
+				if ( !attr.getSpecified() ) continue; // Skip auto-attributes
+				tmp.append(" "
+					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
+					+ attr.getLocalName() + "=\"");
+				// Extract if needed
+				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+					// Store the text part and reset the buffer
+					skel.append(tmp.toString());
+					tmp.setLength(0);
+					// Create the TU if needed
+					TextUnit tu = new TextUnit(String.valueOf(++tuId), attr.getValue(),
+						true, "text/xml");
+					skel.addReference(tu);
+					queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+					tmp.append("\"");
+				}
+				else { //TODO: escape unsupported chars
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
+				}
+			}
+		}
+		if ( !node.hasChildNodes() ) tmp.append("/");
+		tmp.append(">");
+		skel.append(tmp.toString());
+	}
+
 	private String buildEndTag (Node node) {
 		if ( node.hasChildNodes() ) {
 			return "</"
@@ -426,7 +463,7 @@ public class XMLFilter implements IFilter {
 				break;
 			default: // Not within text
 				if ( frag == null ) { // Not yet in extraction
-					skel.add(buildStartTag(node));
+					addStartTagToSkeleton(node); //skel.add(buildStartTag(node));
 					if ( node.hasChildNodes() && trav.translate() ) {
 						context.push(new ContextItem(node, trav.translate()));
 						frag = new TextFragment();
@@ -435,7 +472,7 @@ public class XMLFilter implements IFilter {
 				else { // Already in extraction
 					// Queue the current item
 					addTextUnit(node, false);
-					skel.add(buildStartTag(node));
+					addStartTagToSkeleton(node); //skel.add(buildStartTag(node));
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
 						context.push(new ContextItem(node, trav.translate()));

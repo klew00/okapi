@@ -193,22 +193,21 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return getString((INameable)part.parent, propName, part.language, context);
 		}
 
+		// Set the langToUse and the contextToUse parameters
+		// If lang==null: it's source, so use output language for monolingual
+		String langToUse = (part.language==null) ? outputLang : part.language;
+		int contextToUse = context;
+		if ( isMultilingual ) {
+			langToUse = part.language;
+			// If lang==null: it's source, so not text in multilingual
+			contextToUse = (part.language==null) ? 0 : context;
+		}
+		
 		// If a parent if set, it's a reference to the content of the resource
 		// holding this skeleton. And it's always a TextUnit
 		if ( part.parent != null ) {
 			if ( part.parent instanceof TextUnit ) {
-				if ( isMultilingual ) {
-					return getContent((TextUnit)part.parent,
-						part.language,
-						// If lang==null: it's source, so not text in multilingual
-						(part.language==null) ? 0 : context);
-				}
-				else {
-					return getContent((TextUnit)part.parent,
-						// If lang==null: it's source, so use output lang for monlingual
-						(part.language==null) ? outputLang : part.language,
-						context);
-				}
+				return getContent((TextUnit)part.parent, langToUse, contextToUse);
 			}
 			else {
 				throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
@@ -221,13 +220,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, null, context); //TODO: fix langToUse
+			return getString((TextUnit)ref, langToUse, contextToUse); //TODO: Test langToUse
 		}
 		if ( ref instanceof GenericSkeletonPart ) {
-			return getString((GenericSkeletonPart)ref, context);
+			return getString((GenericSkeletonPart)ref, contextToUse);
 		}
 		if ( ref instanceof StorageList ) { // == StartGroup
-			return getString((StorageList)ref, null, context); //TODO: fix langToUse
+			return getString((StorageList)ref, langToUse, contextToUse); //TODO: Test langToUse
 		}
 		// Else: DocumentPart, StartDocument, StartSubDocument 
 		return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);

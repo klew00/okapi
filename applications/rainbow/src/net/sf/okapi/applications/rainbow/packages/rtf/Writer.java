@@ -220,6 +220,7 @@ public class Writer extends BaseWriter {
 	}
 
 	private void processEndDocument (Ending resource) { 
+		writer.write(skelWriter.processEndDocument(resource));
 		writer.write(Util.RTF_ENDCODE+"}\n");
 		writer.close();
 		if ( manifest != null ) {
