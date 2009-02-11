@@ -3,6 +3,7 @@
   <its:withinTextRule withinText="yes" selector="//panelmsg|//ui"/>
  </its:rules>
  <msg num="123">Click the <ui>Resume</ui> button on the Status Display
-  or the <panelmsg its:translate="no">CONTINUE</panelmsg> button
+  or the <panelmsg its:translate="no">CONTINUE</panelmsg>
+  <?testPI data="&=amp,<=lt"?><!--test comments &=amp, <=lt--> button
   on the printer panel</msg>
 </messages>

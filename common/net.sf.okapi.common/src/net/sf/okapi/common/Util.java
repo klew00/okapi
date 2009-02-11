@@ -174,20 +174,15 @@ public class Util {
 				}
 				continue;
 			default:
-				if ( text.charAt(i) > 127 ) {
-					if ( encoder != null ) {
-						if ( encoder.canEncode(text.charAt(i)) ) {
-							sbTmp.append(text.charAt(i));
-						}
-						else {
-							sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
-						}
+				if ( text.charAt(i) > 127 ) { // Extended chars
+					if (( encoder != null ) && ( !encoder.canEncode(text.charAt(i)) )) {
+						sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
 					}
-					else {
+					else { // No encoder or char is supported
 						sbTmp.append(text.charAt(i));
 					}
 				}
-				else { // ASCII
+				else { // ASCII chars
 					sbTmp.append(text.charAt(i));
 				}
 				continue;

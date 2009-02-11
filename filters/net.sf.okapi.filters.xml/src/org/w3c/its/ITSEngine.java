@@ -1,6 +1,5 @@
 package org.w3c.its;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -75,7 +74,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				fact.setNamespaceAware(true);
 				fact.setValidating(false);
 			}
-			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docURI));
+			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			addExternalRules(rulesDoc, docURI);
 		}
 		catch ( SAXException e ) {
@@ -135,8 +134,9 @@ public class ITSEngine implements IProcessor, ITraversal
 
 					// xlink:href allows the use of xml:base so we need to calculate it
 					// The initial base is the folder of the current document
-					File tmpFile = new File(docURI);
-					String baseFolder = getDirectoryName(tmpFile.getPath());
+					String baseFolder = "";
+					if ( docURI != null) baseFolder = getPartBeforeFile(docURI);
+					
 					// Then we look for the last xml:base specified
 					Node node = rulesElem;
 					while ( node != null ) {
@@ -144,10 +144,10 @@ public class ITSEngine implements IProcessor, ITraversal
 							//TODO: Relative path with ../../ constructs
 							String xmlBase = ((Element)node).getAttribute("xml:base");
 							if ( xmlBase.length() > 0 ) {
-								if ( xmlBase.endsWith(File.separator) )
+								if ( xmlBase.endsWith("/") )
 									xmlBase = xmlBase.substring(0, xmlBase.length()-1);
-								if ( !baseFolder.startsWith(File.separator) )
-									baseFolder = xmlBase + File.separator + baseFolder;
+								if ( !baseFolder.startsWith("/") )
+									baseFolder = xmlBase + "/" + baseFolder;
 								else
 									baseFolder = xmlBase + baseFolder;
 							}
@@ -155,9 +155,9 @@ public class ITSEngine implements IProcessor, ITraversal
 						node = node.getParentNode(); // Back-track to parent
 					}
 					if ( baseFolder.length() > 0 ) {
-						if ( baseFolder.endsWith(File.separator) )
+						if ( baseFolder.endsWith("/") )
 							baseFolder = baseFolder.substring(0, baseFolder.length()-1);
-						if ( !href.startsWith("/") ) href = baseFolder + File.separator + href;
+						if ( !href.startsWith("/") ) href = baseFolder + "/" + href;
 						else href = baseFolder + href;
 					}
 
@@ -197,6 +197,13 @@ public class ITSEngine implements IProcessor, ITraversal
 		}
 	}
 	
+	private String getPartBeforeFile (URI uri) {
+		String tmp = uri.toString();
+		int n = tmp.lastIndexOf('/');
+		if ( n == -1 ) return uri.toString();
+		else return tmp.substring(0, n+1);
+	}
+	
 	private void loadLinkedRules (URI docURI,
 		boolean isInternal)
 	{
@@ -206,7 +213,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				fact.setNamespaceAware(true);
 				fact.setValidating(false);
 			}
-			Document rulesDoc = fact.newDocumentBuilder().parse(new File(docURI));
+			Document rulesDoc = fact.newDocumentBuilder().parse(docURI.toString());
 			compileRules(rulesDoc, docURI, isInternal);
 		}
 		catch ( SAXException e ) {
@@ -715,10 +722,4 @@ public class ITSEngine implements IProcessor, ITraversal
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
 	
-	private String getDirectoryName (String path) {
-		int n = path.lastIndexOf(File.separator);
-		if ( n > 0 ) return path.substring(0, n);
-		else return "";
-	}
-
 }

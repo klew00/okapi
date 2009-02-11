@@ -20,7 +20,6 @@
 
 package net.sf.okapi.filters.xml;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -33,6 +32,7 @@ import java.util.Stack;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -46,6 +46,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
@@ -71,7 +72,7 @@ public class XMLFilter implements IFilter {
 	private int parseState;
 	private TextFragment frag;
 	private GenericSkeleton skel;
-	private Stack<Node> stack;
+	private Stack<ContextItem> context;
 	private boolean canceled;
 	
 	public void cancel () {
@@ -136,9 +137,9 @@ public class XMLFilter implements IFilter {
 	public void open (URL inputURL) {
 		try {
 			docName = inputURL.getPath();
-			commonOpen(0, inputURL.openStream());
+			commonOpen(1, inputURL.toURI());
 		}
-		catch ( IOException e ) {
+		catch ( URISyntaxException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -164,7 +165,7 @@ public class XMLFilter implements IFilter {
 
 	/**
 	 * Shared open method for the public open() calls.
-	 * @param type Indicates the type of obj: 0=InputStream, 1=File, 2=InputSource.
+	 * @param type Indicates the type of obj: 0=InputStream, 1=URI, 2=InputSource.
 	 * @param obj The object to read.
 	 */
 	private void commonOpen (int type,
@@ -182,6 +183,7 @@ public class XMLFilter implements IFilter {
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
+		URI uri = null;
 		
 		// Load the document
 		try {
@@ -189,8 +191,9 @@ public class XMLFilter implements IFilter {
 			case 0: // InputStream
 				doc = fact.newDocumentBuilder().parse((InputStream)obj);
 				break;
-			case 1: // File
-				doc = fact.newDocumentBuilder().parse((File)obj);
+			case 1: // URI
+				uri = (URI)obj;
+				doc = fact.newDocumentBuilder().parse(uri.toString());
 				break;
 			case 2: // InputSource
 				doc = fact.newDocumentBuilder().parse((InputSource)obj);
@@ -209,12 +212,7 @@ public class XMLFilter implements IFilter {
 		
 		// Create the ITS engine
 		ITSEngine itsEng;
-		try {
-			itsEng = new ITSEngine(doc, new URI("http://test")); //doc.getDocumentURI()));
-		}
-		catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
+		itsEng = new ITSEngine(doc, uri);
 		
 		// Apply the all rules (external and internal) to the document
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO 
@@ -222,7 +220,7 @@ public class XMLFilter implements IFilter {
 		
 		trav = itsEng;
 		trav.startTraversal();
-		stack = new Stack<Node>();
+		context = new Stack<ContextItem>();
 		
 		// Set the start event
 		queue = new LinkedList<FilterEvent>();
@@ -242,9 +240,9 @@ public class XMLFilter implements IFilter {
 		skel = new GenericSkeleton();
 		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
 		skel.add(" encoding=\"");
-		skel.addValuePlaceholder(startDoc, "encoding", "");
+		skel.addValuePlaceholder(startDoc, IEncoder.PROP_ENCODING, "");
 		skel.add("\"");
-		startDoc.setProperty(new Property("encoding", encoding, false));
+		startDoc.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
 		
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
 		skel.add("?>"+lineBreak);
@@ -258,7 +256,7 @@ public class XMLFilter implements IFilter {
 		frag = null;
 		skel = new GenericSkeleton();
 		
-		if ( stack.size() > 0 ) {
+		if ( context.size() > 0 ) {
 			// If we are within an element, reset the frag to append to it
 			if ( trav.translate() ) { // The stack is up-to-date already
 				frag = new TextFragment();
@@ -339,14 +337,24 @@ public class XMLFilter implements IFilter {
 			+ node.getLocalName());
 		if ( node.hasAttributes() ) {
 			NamedNodeMap list = node.getAttributes();
-			Node attr;
+			Attr attr;
 			//TODO: Keep the original order... NamedNodeMap does not
-			for ( int i=0; i< list.getLength(); i++ ) {
-				attr = list.item(i);
+			for ( int i=0; i<list.getLength(); i++ ) {
+				attr = (Attr)list.item(i);
+				if ( !attr.getSpecified() ) continue; // Skip auto-attributes
 				tmp.append(" "
 					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
 					+ attr.getLocalName() //TODO: escape unsupported chars
-					+ "=\"" + Util.escapeToXML(attr.getNodeValue(), 3, false, null) + "\"");
+					+ "=\"");
+				//TODO: extract if needed
+				if ( trav.translate(attr) ) {
+					tmp.append("[["+Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "]]\"");
+				}
+				else {
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
+				}
 			}
 		}
 		if ( !node.hasChildNodes() ) tmp.append("/");
@@ -360,22 +368,23 @@ public class XMLFilter implements IFilter {
 				+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
 				+ node.getLocalName() + ">";
 		}
-		else {
+		else { // Start tag was set as an empty element
 			return "";
 		}
 	}
 	
 	private String buildPI (Node node) {
-		//TODO: Need to escape???
+		// Do not escape PI content
 		return "<?" + node.getNodeName() + " " + node.getNodeValue() + "?>";
 	}
 	
 	private String buildCDATA (Node node) {
+		// Do not escape CDATA content
 		return "<![CDATA[" + node.getNodeValue() + "]]>";
 	}
 	
 	private String buildComment (Node node) {
-		//TODO: Need to escape???
+		// Do not escape comments
 		return "<!--" + node.getNodeValue() + "-->";
 	}
 
@@ -388,10 +397,13 @@ public class XMLFilter implements IFilter {
 		if ( trav.backTracking() ) {
 			if ( frag == null ) { // Not an extraction: in skeleton
 				skel.add(buildEndTag(node));
-				if ( node.isSameNode(stack.peek()) ) stack.pop();
+				if ( node.isSameNode(context.peek().node) ) context.pop();
+				if ( isContextTranslatable() ) { // We are after non-translatable withinText='no', check parent again.
+					frag = new TextFragment();
+				}
 			}
 			else { // Else we are within an extraction
-				if ( node.isSameNode(stack.peek()) ) { // End of possible text-unit
+				if ( node.isSameNode(context.peek().node) ) { // End of possible text-unit
 					return addTextUnit(node, true);
 				}
 				else { // Within text
@@ -416,7 +428,7 @@ public class XMLFilter implements IFilter {
 				if ( frag == null ) { // Not yet in extraction
 					skel.add(buildStartTag(node));
 					if ( node.hasChildNodes() && trav.translate() ) {
-						stack.push(node);
+						context.push(new ContextItem(node, trav.translate()));
 						frag = new TextFragment();
 					}
 				}
@@ -426,7 +438,7 @@ public class XMLFilter implements IFilter {
 					skel.add(buildStartTag(node));
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
-						stack.push(node);
+						context.push(new ContextItem(node, trav.translate()));
 						frag = new TextFragment();
 					}
 				}
@@ -436,6 +448,11 @@ public class XMLFilter implements IFilter {
 		return false;
 	}
 
+	private boolean isContextTranslatable () {
+		if ( context.size() == 0 ) return false;
+		return context.peek().translate;
+	}
+	
 	/**
 	 * Adds a text unit to the queue if needed.
 	 * @param node The current node.
@@ -445,7 +462,7 @@ public class XMLFilter implements IFilter {
 	private boolean addTextUnit (Node node,
 		boolean popStack)
 	{
-		if ( popStack ) stack.pop();
+		if ( popStack ) context.pop();
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
