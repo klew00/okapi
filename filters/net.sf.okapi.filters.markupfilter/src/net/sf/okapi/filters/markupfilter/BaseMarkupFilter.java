@@ -97,6 +97,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	public void close() {
+		this.parameters = null;
+		this.document = null; // help Java GC
 	}
 
 	public void open(CharSequence input) {
