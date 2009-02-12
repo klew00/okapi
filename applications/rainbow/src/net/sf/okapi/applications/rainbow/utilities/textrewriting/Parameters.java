@@ -28,6 +28,7 @@ public class Parameters extends BaseParameters {
 	public static final int  TYPE_XNREPLACE = 1;
 	public static final int  TYPE_KEEPINLINE = 2;
 	public static final int  TYPE_TRANSLATEEXACTMATCHES = 3;
+	public static final int  TYPE_EXTREPLACE = 4;
 	
 	protected int type;
 	protected boolean addPrefix;

@@ -130,6 +130,7 @@ public class Editor implements IParametersEditor {
 		lbTypes.add("Replace letters by Xs and digits by Ns");
 		lbTypes.add("Remove text but keep inline codes");
 		lbTypes.add("Translate extact matches");
+		lbTypes.add("Replace selected ASCII letters by extended characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;

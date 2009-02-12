@@ -40,6 +40,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	private static final char TMPENDSEG = '\u0003';
 	private static final char STARTSEG = '[';
 	private static final char ENDSEG = ']';
+	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
+	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 	
 	private Parameters params;
 	private Segmenter srcSeg;
@@ -163,6 +165,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		switch ( params.type ) {
 		case Parameters.TYPE_XNREPLACE:
 			replaceWithXN(tu);
+			break;
+		case Parameters.TYPE_EXTREPLACE:
+			replaceWithExtendedChars(tu);
 			break;
 		case Parameters.TYPE_KEEPINLINE:
 			removeText(tu);
@@ -301,6 +306,34 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		catch ( Throwable e ) {
 			logger.warn("Error when updating content: '"+tmp+"'", e);
+		}
+	}
+	
+	private void replaceWithExtendedChars (TextUnit tu) {
+		StringBuilder tmp = new StringBuilder();
+		try {
+			tmp.append(tu.getTarget(trgLang).getCodedText());
+			int n;
+			for ( int i=0; i<tmp.length(); i++ ) {
+				switch ( tmp.charAt(i) ) {
+				case TextContainer.MARKER_OPENING:
+				case TextContainer.MARKER_CLOSING:
+				case TextContainer.MARKER_ISOLATED:
+				case TextContainer.MARKER_SEGMENT:
+					i++; // Normal skip
+					break;
+				default:
+					if ( (n = OLDCHARS.indexOf(tmp.charAt(i))) > -1 ) {
+						tmp.setCharAt(i, NEWCHARS.charAt(n));
+					}
+					break;
+				}
+			}
+			TextContainer cnt = tu.getTarget(trgLang); 
+			cnt.setCodedText(tmp.toString(), tu.getSourceContent().getCodes(), false);
+		}
+		catch ( Throwable e ) {
+			logger.warn("Error when updating content: '"+tmp.toString()+"'", e);
 		}
 	}
 	

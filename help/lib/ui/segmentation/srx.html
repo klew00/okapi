@@ -50,12 +50,12 @@ language of the text to process.</p>
 <p>In this example, there are two rules.</p>
 <ul>
 	<li>The second one specifies that when an inter-character location is 
-	preceeded by a period and followed by a white space, the rule is to break at 
+	preceded by a period and followed by a white space, the rule is to break at 
 	that position.</li>
-	<li>The first rule specifices that when an inter-character location is 
-	preceeded by the patter <code>([A-Z]\.){2,}</code> and followed by a white 
+	<li>The first rule specifies that when an inter-character location is 
+	preceded by the patter <code>([A-Z]\.){2,}</code> and followed by a white 
 	paces, the rule is to not break at that position. Because the first rule is 
-	placed befor ethe second rule it takes precedence.</li>
+	placed before the second rule it takes precedence.</li>
 </ul>
 <p>So, based on those rules, the following text:</p>
 <pre>I'm in the U.K. for now. But I plan to move to Papua New Guinea.</pre>
@@ -91,7 +91,7 @@ Others, like Heartsome and Swordfish implement SRX&nbsp;1.0 with a
 cascading behavior.</p>
 <p>In an SRX document, the segmentation rules are grouped into several <code>
 &lt;languagerule&gt;</code> elements. This way you can define different sets of rules 
-that you apply for different languages. The select of which which group of rules 
+that you apply for different languages. The select of which group of rules 
 is to use for a given language is driven by a table defined in the <code>
 &lt;maprules&gt;</code> element. Each entry in <code>&lt;maprules&gt;</code> is a <code>
 &lt;languagemap&gt;</code>. This entry has two information: a regular expression 
@@ -122,8 +122,8 @@ for a given language code.</p>
 <code>&lt;languagemap&gt;</code> 
 that matches the given language code.</p>
 <p>It is true that there is nothing in the SRX 1.0 specification that says 
-explicitely it should work that way. But there is also nothing explicitely (or 
-implicitely) that says all matching <code>&lt;languagemap&gt;</code> should be used.</p>
+explicitly it should work that way. But there is also nothing explicitly (or 
+implicitly) that says all matching <code>&lt;languagemap&gt;</code> should be used.</p>
 <p>The clue to the intended behavior is in the example of the SRX&nbsp;1.0 
 specification:</p>
 <pre>&lt;languagerules&gt;
