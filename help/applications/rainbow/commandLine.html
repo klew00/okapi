@@ -39,6 +39,13 @@ arguments of the command-line as described in the following table:</p>
 		<td>Sets the target language using <code>&lt;langCode&gt;</code>.</td>
 	</tr>
 	<tr>
+		<td nowrap align="left" valign="top"><code>-opt &lt;optionFilename&gt;</code></td>
+		<td>Sets the options file to use for the utility to execute. Use the
+		<code>-np</code> flag to be prompted or not to modify the options when 
+		the command line is executed. The options file must be for the utility 
+		defined with <code>-x</code>.</td>
+	</tr>
+	<tr>
 		<td nowrap align="left" valign="top"><code>-np</code></td>
 		<td>No prompt for utility&#39;s options.</td>
 	</tr>
@@ -57,7 +64,26 @@ arguments of the command-line as described in the following table:</p>
 		is specified, the output file path and name is build based on the output 
 		options of the project (loaded or default).</td>
 	</tr>
+	<tr>
+		<td nowrap align="left" valign="top"><code>-?</code> or <code>-h</code></td>
+		<td>Opens this help page.</td>
+	</tr>
 </table>
+<p>&nbsp;</p>
+<p>Here are some example of command lines in Windows. They assume Rainbow is 
+installed in <code>C:\rnb</code> directory.</p>
+<pre>C:\&gt;java -jar \rnb\lib\rainbow.jar -x oku_textrewriting -sl EN -tl FR -opt myOptions.opt myInput.xlf -o myOutput.xlf -np</pre>
+<p>The command-line above execute the Text Rewriting utility with the source 
+language set to <code>EN</code> and the target language set to <code>FR</code>. 
+The input document is the XLIFF file <code>myInput.xlf</code>, and the modified 
+file is saved as <code>myOutput.xlf</code>. The utility will use whatever 
+options are set in the options file named <code>myOptions.opt</code>. If that 
+file does not exist, one will be created with the default options for the Text 
+Rewriting utility. In both cases the user will not be prompted to change the 
+options (<code>-np</code> parameter).</p>
+<pre>C:\&gt;java -jar \rnb\lib\rainbow -h</pre>
+<p>The command-line above opens this help page.</p>
+<p>&nbsp;</p>
 <p>&nbsp;</p>
 </body>
 </html>

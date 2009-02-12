@@ -346,8 +346,8 @@ public class ITSEngine implements IProcessor, ITraversal
 			ITSTrace startTrace = new ITSTrace();
 			startTrace.translate = true;
 			startTrace.isChildDone = true;
-			trace.push(startTrace); // For #document root
-			node = doc.getDocumentElement();
+			trace.push(startTrace); // For first child
+			node = doc.getFirstChild();
 			trace.push(new ITSTrace(trace.peek(), false));
 			// Overwrite any default behaviors if needed
 			updateTraceData(node);

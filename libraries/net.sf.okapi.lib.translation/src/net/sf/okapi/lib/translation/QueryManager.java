@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -322,4 +323,37 @@ public class QueryManager {
 		}
 	}
 
+	/**
+	 * Saves all the settings to a file.
+	 * @param path Full path of the file to save.
+	 */
+	public void save (String path) {
+		XMLWriter writer = null;
+		try {
+			writer = new XMLWriter();
+			writer.writeStartDocument();
+			writer.writeStartElement("okapiQMSettings");
+			writer.writeAttributeString("version", "1.0");
+
+			ResourceItem ri;
+			for ( int id : resList.keySet() ) {
+				ri = resList.get(id);
+				writer.writeStartElement("resource");
+				writer.writeAttributeString("id", String.valueOf(id));
+				writer.writeAttributeString("name", ri.name);
+				writer.writeAttributeString("connection", ri.connectionString);
+				//TODO: save options, etc
+				writer.writeEndElement(); // resource
+			}
+			
+			writer.writeEndElement(); // okapiQMSettings
+		}
+		finally {
+			if ( writer != null ) {
+				writer.writeEndDocument();
+				writer.close();
+			}
+		}
+	}
+	
 }

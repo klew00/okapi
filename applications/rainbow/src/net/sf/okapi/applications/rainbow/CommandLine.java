@@ -31,6 +31,7 @@ import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.BaseHelp;
 
@@ -47,6 +48,7 @@ public class CommandLine {
 	private BatchLog log;
 	private LogHandler logHandler;
 	private String utilityId;
+	private String optionsFile;
 	private boolean promptForOptions = true;
 	private BaseHelp help;
 	
@@ -61,7 +63,7 @@ public class CommandLine {
 				return;
 			}
 			if ( utilityId != null ) {
-				launchUtility(utilityId);
+				launchUtility();
 			}
 		}
 		catch ( Throwable e ) {
@@ -86,6 +88,7 @@ public class CommandLine {
 		prj.setInputRoot(2, rootFolder, true);
 		boolean setOutSearch = false;
 		int inpList = -1;
+		optionsFile = null;
 		
 		for ( int i=0; i<args.length; i++ ) {
 			arg = args[i];
@@ -100,7 +103,7 @@ public class CommandLine {
 				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
-				help.showTopic(this, "index");
+				help.showTopic(this, "index", "commandLine.html");
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding
 				prj.setSourceEncoding(nextArg(args, ++i));
@@ -120,6 +123,9 @@ public class CommandLine {
 			else if ( "-pd".equals(arg) ) {
 				prj.setCustomParametersFolder(nextArg(args, ++i));
 				prj.setUseCustomParametersFolder(true);
+			}
+			else if ( "-opt".equals(arg) ) {
+				optionsFile = nextArg(args, ++i);
 			}
 			else if ( "-fs".equals(arg) ) {
 				Input inp = prj.getLastItem(0);
@@ -176,9 +182,10 @@ public class CommandLine {
 	}
 	
 	private void printBanner () {
-		System.out.println("---------------------------");
-		System.out.println("Rainbow - Command Line Mode");
-		System.out.println("---------------------------");
+		System.out.println("------------------------------------------------------------");
+		System.out.println("Rainbow - Command-Line Mode");
+		System.out.println("Version: "+Res.getString("VERSION"));
+		System.out.println("------------------------------------------------------------");
 	}
 	
 	private void initialize () throws Exception {
@@ -204,19 +211,35 @@ public class CommandLine {
 		plugins.addAllPackages(sharedFolder);
 	}
 	
-	private void launchUtility (String utilityID) {
-		if ( utilityID == null ) return;
-		// Save any pending data
+	private void launchUtility () {
+		if ( utilityId == null ) return;
+		// Create the utility driver if needed
 		if ( ud == null ) {
 			ud = new UtilityDriver(log, fa, plugins, help);
 		}
-		// Get data for the utility and instantiate it
-		ud.setData(prj, utilityID);
+		
+		// Get default/project data for the utility and instantiate the utility object
+		ud.setData(prj, utilityId);
+		IUtility util = ud.getUtility();
+		
+		// Override the options if a file is provided from the command-line
+		if ( optionsFile != null ) {
+			if ( util.hasParameters() ) {
+				// Ignore errors to allow to create an options file
+				util.getParameters().load(optionsFile, true);
+			}
+		}
+		
 		// Prompt to edit the parameters if requested 
 		if ( promptForOptions ) {
 			if ( !ud.checkParameters(shell) ) return;
+			// Save the file if needed
+			if (( optionsFile != null ) && ( util.hasParameters() )) {
+				util.getParameters().save(optionsFile);
+			}
 		}
-		// Run it
+		
+		// Run the utility
 		ud.execute(shell);
 	}
 

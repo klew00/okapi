@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -47,7 +48,7 @@ public class QueryManagerForm {
 		shell.setLayout(new GridLayout(1, false));
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Translation resources:");
+		grpTmp.setText("Translation resources");
 		grpTmp.setLayout(new GridLayout(6, false));
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
@@ -114,6 +115,27 @@ public class QueryManagerForm {
 			}
 		});
 
+		// Load and Save 
+
+		Composite cmpTmp = new Composite(shell, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout(2, false));
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		cmpTmp.setLayoutData(gdTmp);
+		
+		Button btSave = UIUtil.createGridButton(cmpTmp, SWT.PUSH, "Save...", stdWidth, 1);
+		btSave.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				save();
+			}
+		});
+		
+		Button btLoad = UIUtil.createGridButton(cmpTmp, SWT.PUSH, "Load...", stdWidth, 1);
+		btLoad.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				load();
+			}
+		});
+
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) {
@@ -150,6 +172,14 @@ public class QueryManagerForm {
 		btRemove.setEnabled(enabled);
 		btMoveUp.setEnabled(enabled);
 		btMoveDown.setEnabled(enabled);
+	}
+	
+	private void save () {
+		//qm.save();
+	}
+	
+	private void load () {
+		
 	}
 	
 	private void remove () {

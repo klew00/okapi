@@ -1,0 +1,14 @@
+
+type.i=4
+addPrefix.b=true
+prefix={START_
+addSuffix.b=true
+suffix=_END}
+applyToExistingTarget.b=true
+addName.b=true
+addID.b=true
+segment.b=false
+markSegments.b=true
+sourceSrxPath=
+targetSrxPath=
+tmPath=

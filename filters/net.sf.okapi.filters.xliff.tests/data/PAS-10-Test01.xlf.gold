@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<xliff version="1.0">
+    <file tool="PASSOLO 3.0" source-language="en" datatype="winres" original="C:\WINNT\NOTEPAD.EXE" ts="C:\TMP\NOTEPADfra.EXE">
+        <header></header>
+        <body>
+            <group restype="menu">
+                <group id="1">
+                    <trans-unit id="1" restype="menupopup" style="0x10" ts="0">
+                        <source>&amp;File</source>
+                    <target xml:lang="fr">{START_[&amp;Fìlè]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="9" restype="menuentry" ts="1">
+                        <source>&amp;New Ctrl+N</source>
+                    <target xml:lang="fr">{START_[&amp;Ñèw Çtrl+Ñ]_9_9_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="menuentry" ts="1">
+                        <source>&amp;Open... Ctrl+O</source>
+                    <target xml:lang="fr">{START_[&amp;Øpèñ... Çtrl+Ø]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="menuentry" ts="1">
+                        <source>&amp;Save Ctrl+S</source>
+                    <target xml:lang="fr">{START_[&amp;Såvè Çtrl+S]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="menuentry" ts="1">
+                        <source>Save &amp;As...</source>
+                    <target xml:lang="fr">{START_[Såvè &amp;Âs...]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="32" restype="menuentry" ts="1">
+                        <source>Page Set&amp;up...</source>
+                    <target xml:lang="fr">{START_[Pågè Sèt&amp;üp...]_32_32_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="menuentry" ts="1">
+                        <source>&amp;Print... Ctrl+P</source>
+                    <target xml:lang="fr">{START_[&amp;Prìñt... Çtrl+P]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="28" restype="menuentry" ts="1">
+                        <source>E&amp;xit</source>
+                    <target xml:lang="fr">{START_[É&amp;xìt]_28_28_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="menupopup" style="0x10" ts="0">
+                        <source>&amp;Edit</source>
+                    <target xml:lang="fr">{START_[&amp;Éðìt]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="25" restype="menuentry" ts="1">
+                        <source>&amp;Undo Ctrl+Z</source>
+                    <target xml:lang="fr">{START_[&amp;Ûñðõ Çtrl+Z]_25_25_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="768" restype="menuentry" ts="1">
+                        <source>Cu&amp;t Ctrl+X</source>
+                    <target xml:lang="fr">{START_[Çü&amp;t Çtrl+X]_768_768_END}</target>
+</trans-unit>
+                    <trans-unit id="769" restype="menuentry" ts="1">
+                        <source>&amp;Copy Ctrl+C</source>
+                    <target xml:lang="fr">{START_[&amp;Çõpÿ Çtrl+Ç]_769_769_END}</target>
+</trans-unit>
+                    <trans-unit id="770" restype="menuentry" ts="1">
+                        <source>&amp;Paste Ctrl+V</source>
+                    <target xml:lang="fr">{START_[&amp;Påstè Çtrl+V]_770_770_END}</target>
+</trans-unit>
+                    <trans-unit id="771" restype="menuentry" ts="1">
+                        <source>De&amp;lete Del</source>
+                    <target xml:lang="fr">{START_[Ðè&amp;lètè Ðèl]_771_771_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="menuentry" ts="1">
+                        <source>&amp;Find... Ctrl+F</source>
+                    <target xml:lang="fr">{START_[&amp;Fìñð... Çtrl+F]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="8" restype="menuentry" ts="1">
+                        <source>Find &amp;Next F3</source>
+                    <target xml:lang="fr">{START_[Fìñð &amp;Ñèxt F3]_8_8_END}</target>
+</trans-unit>
+                    <trans-unit id="40" restype="menuentry" ts="1">
+                        <source>&amp;Replace... Ctrl+H</source>
+                    <target xml:lang="fr">{START_[&amp;Rèplåçè... Çtrl+H]_40_40_END}</target>
+</trans-unit>
+                    <trans-unit id="41" restype="menuentry" ts="1">
+                        <source>&amp;Go To... Ctrl+G</source>
+                    <target xml:lang="fr">{START_[&amp;Gõ Tõ... Çtrl+G]_41_41_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="7" restype="menuentry" ts="1">
+                        <source>Select &amp;All Ctrl+A</source>
+                    <target xml:lang="fr">{START_[Sèlèçt &amp;Âll Çtrl+Â]_7_7_END}</target>
+</trans-unit>
+                    <trans-unit id="12" restype="menuentry" ts="1">
+                        <source>Time/&amp;Date F5</source>
+                    <target xml:lang="fr">{START_[Tìmè/&amp;Ðåtè F5]_12_12_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="menupopup" style="0x10" ts="0">
+                        <source>F&amp;ormat</source>
+                    <target xml:lang="fr">{START_[F&amp;õrmåt]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="27" restype="menuentry" ts="1">
+                        <source>&amp;Word Wrap</source>
+                    <target xml:lang="fr">{START_[&amp;Wõrð Wråp]_27_27_END}</target>
+</trans-unit>
+                    <trans-unit id="37" restype="menuentry" ts="1">
+                        <source>&amp;Font...</source>
+                    <target xml:lang="fr">{START_[&amp;Fõñt...]_37_37_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="menupopup" style="0x10" ts="0">
+                        <source>&amp;Help</source>
+                    <target xml:lang="fr">{START_[&amp;Hèlp]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="5" restype="menuentry" ts="1">
+                        <source>&amp;Help Topics</source>
+                    <target xml:lang="fr">{START_[&amp;Hèlp Tõpìçs]_5_5_END}</target>
+</trans-unit>
+                    <trans-unit id="0" restype="menuentry" style="0x800" ts="1">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="11" restype="menuentry" ts="1">
+                        <source>&amp;About Notepad</source>
+                    <target xml:lang="fr">{START_[&amp;Âbõüt Ñõtèpåð]_11_11_END}</target>
+</trans-unit>
+                </group>
+            </group>
+            <group restype="dialog">
+                <group id="NPSAVEDIALOG">
+                    <trans-unit id="0" restype="caption" style="0x44002444" coord="#;#;300;22" font="MS Shell Dlg;8;0">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="259" restype="static" style="0x50000000" coord="68;1;40;40">
+                        <source>&amp;Encoding:</source>
+                    <target xml:lang="fr">{START_[&amp;Éñçõðìñg:]_259_259_END}</target>
+</trans-unit>
+                    <trans-unit id="257" restype="combobox" style="0x50230003" coord="130;0;164;100">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_257_257_END}</target>
+</trans-unit>
+                </group>
+                <group id="11">
+                    <trans-unit id="0" restype="caption" style="0x90C800C0" coord="#;#;90;64" font="MS Shell Dlg;8;0">
+                        <source>Notepad</source>
+                    <target xml:lang="fr">{START_[Ñõtèpåð]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="button" style="0x50030001" coord="29;44;32;14">
+                        <source>Cancel</source>
+                    <target xml:lang="fr">{START_[Çåñçèl]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="65535" restype="static" style="0x50020001" coord="0;8;90;8">
+                        <source>Now Printing</source>
+                    <target xml:lang="fr">{START_[Ñõw Prìñtìñg]_65535_65535_END}</target>
+</trans-unit>
+                    <trans-unit id="20" restype="static" style="0x50020081" coord="0;18;90;8">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_20_20_END}</target>
+</trans-unit>
+                </group>
+                <group id="12">
+                    <trans-unit id="0" restype="caption" style="0x90C820C4" coord="#;#;356;196" font="MS Shell Dlg;8;0">
+                        <source>Page Setup</source>
+                    <target xml:lang="fr">{START_[Pågè Sètüp]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="1073" restype="groupbox" style="0x50020007" coord="8;8;224;56">
+                        <source>Paper</source>
+                    <target xml:lang="fr">{START_[Påpèr]_1073_1073_END}</target>
+</trans-unit>
+                    <trans-unit id="1089" restype="static" style="0x50020000" coord="16;24;36;8">
+                        <source>Si&amp;ze:</source>
+                    <target xml:lang="fr">{START_[Sì&amp;zè:]_1089_1089_END}</target>
+</trans-unit>
+                    <trans-unit id="1137" restype="combobox" style="0x50230103" coord="64;23;160;160">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1137_1137_END}</target>
+</trans-unit>
+                    <trans-unit id="1090" restype="static" style="0x50020000" coord="16;45;36;8">
+                        <source>&amp;Source:</source>
+                    <target xml:lang="fr">{START_[&amp;Sõürçè:]_1090_1090_END}</target>
+</trans-unit>
+                    <trans-unit id="1138" restype="combobox" style="0x50230103" coord="64;42;160;160">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1138_1138_END}</target>
+</trans-unit>
+                    <trans-unit id="1072" restype="groupbox" style="0x50020007" coord="8;69;64;56">
+                        <source>Orientation</source>
+                    <target xml:lang="fr">{START_[Ørìèñtåtìõñ]_1072_1072_END}</target>
+</trans-unit>
+                    <trans-unit id="1056" restype="radiobutton" style="0x50030009" coord="16;82;52;12">
+                        <source>P&amp;ortrait</source>
+                    <target xml:lang="fr">{START_[P&amp;õrtråìt]_1056_1056_END}</target>
+</trans-unit>
+                    <trans-unit id="1057" restype="radiobutton" style="0x50000009" coord="16;103;52;12">
+                        <source>L&amp;andscape</source>
+                    <target xml:lang="fr">{START_[L&amp;åñðsçåpè]_1057_1057_END}</target>
+</trans-unit>
+                    <trans-unit id="1075" restype="groupbox" style="0x50020007" coord="80;69;152;56">
+                        <source>Margins</source>
+                    <target xml:lang="fr">{START_[Mårgìñs]_1075_1075_END}</target>
+</trans-unit>
+                    <trans-unit id="1102" restype="static" style="0x50020000" coord="88;85;32;8">
+                        <source>&amp;Left:</source>
+                    <target xml:lang="fr">{START_[&amp;Lèft:]_1102_1102_END}</target>
+</trans-unit>
+                    <trans-unit id="1155" restype="editfield" style="0x50830000" coord="120;82;28;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1155_1155_END}</target>
+</trans-unit>
+                    <trans-unit id="1103" restype="static" style="0x50020000" coord="164;85;32;8">
+                        <source>&amp;Right:</source>
+                    <target xml:lang="fr">{START_[&amp;Rìght:]_1103_1103_END}</target>
+</trans-unit>
+                    <trans-unit id="1157" restype="editfield" style="0x50830000" coord="196;82;28;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1157_1157_END}</target>
+</trans-unit>
+                    <trans-unit id="1104" restype="static" style="0x50020000" coord="88;104;32;8">
+                        <source>&amp;Top:</source>
+                    <target xml:lang="fr">{START_[&amp;Tõp:]_1104_1104_END}</target>
+</trans-unit>
+                    <trans-unit id="1156" restype="editfield" style="0x50830000" coord="120;103;28;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1156_1156_END}</target>
+</trans-unit>
+                    <trans-unit id="1105" restype="static" style="0x50020000" coord="164;104;32;8">
+                        <source>&amp;Bottom:</source>
+                    <target xml:lang="fr">{START_[&amp;Bõttõm:]_1105_1105_END}</target>
+</trans-unit>
+                    <trans-unit id="1158" restype="editfield" style="0x50830000" coord="196;103;28;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1158_1158_END}</target>
+</trans-unit>
+                    <trans-unit id="32" restype="static" style="0x50020000" coord="8;135;29;8">
+                        <source>&amp;Header:</source>
+                    <target xml:lang="fr">{START_[&amp;Hèåðèr:]_32_32_END}</target>
+</trans-unit>
+                    <trans-unit id="30" restype="editfield" style="0x50810080" coord="56;134;174;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_30_30_END}</target>
+</trans-unit>
+                    <trans-unit id="33" restype="static" style="0x50020000" coord="8;154;29;8">
+                        <source>&amp;Footer:</source>
+                    <target xml:lang="fr">{START_[&amp;Fõõtèr:]_33_33_END}</target>
+</trans-unit>
+                    <trans-unit id="31" restype="editfield" style="0x50810080" coord="56;153;174;12">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_31_31_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="button" style="0x50030001" coord="190;174;50;14">
+                        <source>OK</source>
+                    <target xml:lang="fr">{START_[ØK]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="button" style="0x50010000" coord="244;174;50;14">
+                        <source>Cancel</source>
+                    <target xml:lang="fr">{START_[Çåñçèl]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="1026" restype="button" style="0x50010000" coord="298;174;50;14">
+                        <source>&amp;Printer...</source>
+                    <target xml:lang="fr">{START_[&amp;Prìñtèr...]_1026_1026_END}</target>
+</trans-unit>
+                    <trans-unit id="65535" restype="groupbox" style="0x50000007" coord="240;8;108;158">
+                        <source>Preview</source>
+                    <target xml:lang="fr">{START_[Prèvìèw]_65535_65535_END}</target>
+</trans-unit>
+                    <trans-unit id="1080" restype="rectangle" style="0x50000006" coord="254;46;80;80">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1080_1080_END}</target>
+</trans-unit>
+                    <trans-unit id="1081" restype="rectangle" style="0x50000005" coord="334;50;4;80">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1081_1081_END}</target>
+</trans-unit>
+                    <trans-unit id="1082" restype="rectangle" style="0x50000005" coord="262;122;80;4">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_1082_1082_END}</target>
+</trans-unit>
+                </group>
+                <group id="14">
+                    <trans-unit id="0" restype="caption" style="0x80C820C0" coord="#;#;138;47" font="MS Shell Dlg;8;0">
+                        <source>Goto line</source>
+                    <target xml:lang="fr">{START_[Gõtõ lìñè]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="258" restype="editfield" style="0x50810080" coord="7;7;57;16">
+                        <source></source>
+                    <target xml:lang="fr">{START_[]_258_258_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="button" style="0x50010001" coord="81;7;50;14">
+                        <source>OK</source>
+                    <target xml:lang="fr">{START_[ØK]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="button" style="0x50010000" coord="81;24;50;14">
+                        <source>Cancel</source>
+                    <target xml:lang="fr">{START_[Çåñçèl]_2_2_END}</target>
+</trans-unit>
+                </group>
+            </group>
+            <group restype="stringtable">
+                <group id="1">
+                    <trans-unit id="1" restype="string">
+                        <source>Cannot open the %% file.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Make sure a disk is in the drive you specified.</source>
+                    <target xml:lang="fr">{START_[Çåññõt õpèñ thè %% fìlè.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Måkè sürè å ðìsk ìs ìñ thè ðrìvè ÿõü spèçìfìèð.]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="string">
+                        <source>Cannot find the %% file.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Do you want to create a new file?</source>
+                    <target xml:lang="fr">{START_[Çåññõt fìñð thè %% fìlè.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Ðõ ÿõü wåñt tõ çrèåtè å ñèw fìlè?]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="5" restype="string">
+                        <source>The %% file already exists.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Do you want to overwrite it?</source>
+                    <target xml:lang="fr">{START_[Thè %% fìlè ålrèåðÿ èxìsts.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Ðõ ÿõü wåñt tõ õvèrwrìtè ìt?]_5_5_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="string">
+                        <source>The text in the %% file has changed.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Do you want to save the changes?</source>
+                    <target xml:lang="fr">{START_[Thè tèxt ìñ thè %% fìlè hås çhåñgèð.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Ðõ ÿõü wåñt tõ såvè thè çhåñgès?]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="11" restype="string">
+                        <source>Untitled</source>
+                    <target xml:lang="fr">{START_[Ûñtìtlèð]_11_11_END}</target>
+</trans-unit>
+                    <trans-unit id="12" restype="string">
+                        <source>- Notepad</source>
+                    <target xml:lang="fr">{START_[- Ñõtèpåð]_12_12_END}</target>
+</trans-unit>
+                </group>
+                <group id="2">
+                    <trans-unit id="0" restype="string">
+                        <source>Cannot find &quot;%%&quot;</source>
+                    <target xml:lang="fr">{START_[Çåññõt fìñð &quot;%%&quot;]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="string">
+                        <source>Not enough memory available to complete this operation. Quit one or more applications to increase available memory, and then try again.</source>
+                    <target xml:lang="fr">{START_[Ñõt èñõügh mèmõrÿ åvåìlåblè tõ çõmplètè thìs õpèråtìõñ. Qüìt õñè õr mõrè åpplìçåtìõñs tõ ìñçrèåsè åvåìlåblè mèmõrÿ, åñð thèñ trÿ ågåìñ.]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="string">
+                        <source>The %% file is too large for Notepad.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Use another editor to edit the file.</source>
+                    <target xml:lang="fr">{START_[Thè %% fìlè ìs tõõ lårgè fõr Ñõtèpåð.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Ûsè åñõthèr èðìtõr tõ èðìt thè fìlè.]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="string">
+                        <source>Notepad</source>
+                    <target xml:lang="fr">{START_[Ñõtèpåð]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="7" restype="string">
+                        <source>Failed to Initialize File Dialogs. Change the Filename and try again.</source>
+                    <target xml:lang="fr">{START_[Fåìlèð tõ Ïñìtìålìzè Fìlè Ðìålõgs. Çhåñgè thè Fìlèñåmè åñð trÿ ågåìñ.]_7_7_END}</target>
+</trans-unit>
+                    <trans-unit id="8" restype="string">
+                        <source>Failed to Initialize Print Dialogs. Make sure that your printer is connected properly and use Control Panel to verify that the printer is configured properly.</source>
+                    <target xml:lang="fr">{START_[Fåìlèð tõ Ïñìtìålìzè Prìñt Ðìålõgs. Måkè sürè thåt ÿõür prìñtèr ìs çõññèçtèð prõpèrlÿ åñð üsè Çõñtrõl Påñèl tõ vèrìfÿ thåt thè prìñtèr ìs çõñfìgürèð prõpèrlÿ.]_8_8_END}</target>
+</trans-unit>
+                    <trans-unit id="9" restype="string">
+                        <source>Cannot print the %% file. Be sure that your printer is connected properly and use Control Panel to verify that the printer is configured properly.</source>
+                    <target xml:lang="fr">{START_[Çåññõt prìñt thè %% fìlè. Bè sürè thåt ÿõür prìñtèr ìs çõññèçtèð prõpèrlÿ åñð üsè Çõñtrõl Påñèl tõ vèrìfÿ thåt thè prìñtèr ìs çõñfìgürèð prõpèrlÿ.]_9_9_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="string">
+                        <source>Not a valid file name.</source>
+                    <target xml:lang="fr">{START_[Ñõt å vålìð fìlè ñåmè.]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="string">
+                        <source>Cannot create the %% file.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Make sure that the path and filename are correct.</source>
+                    <target xml:lang="fr">{START_[Çåññõt çrèåtè thè %% fìlè.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Måkè sürè thåt thè påth åñð fìlèñåmè årè çõrrèçt.]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="15" restype="string">
+                        <source>Cannot carry out the Word Wrap command because there is too much text in the file.</source>
+                    <target xml:lang="fr">{START_[Çåññõt çårrÿ õüt thè Wõrð Wråp çõmmåñð bèçåüsè thèrè ìs tõõ müçh tèxt ìñ thè fìlè.]_15_15_END}</target>
+</trans-unit>
+                </group>
+                <group id="3">
+                    <trans-unit id="0" restype="string">
+                        <source>%%</source>
+                    <target xml:lang="fr">{START_[%%]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="string">
+                        <source>\*.txt</source>
+                    <target xml:lang="fr">{START_[\*.txt]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="string">
+                        <source>notepad.hlp</source>
+                    <target xml:lang="fr">{START_[ñõtèpåð.hlp]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="string">
+                        <source>The Margin values are not correct. Either they are not numeric characters or they don&apos;t fit the dimensions of the page. Try either entering a number or decreasing the margins.</source>
+                    <target xml:lang="fr">{START_[Thè Mårgìñ vålüès årè ñõt çõrrèçt. Éìthèr thèÿ årè ñõt ñümèrìç çhåråçtèrs õr thèÿ ðõñ&apos;t fìt thè ðìmèñsìõñs õf thè pågè. Trÿ èìthèr èñtèrìñg å ñümbèr õr ðèçrèåsìñg thè mårgìñs.]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="4" restype="string">
+                        <source>&amp;f</source>
+                    <target xml:lang="fr">{START_[&amp;f]_4_4_END}</target>
+</trans-unit>
+                    <trans-unit id="5" restype="string">
+                        <source>Page &amp;p</source>
+                    <target xml:lang="fr">{START_[Pågè &amp;p]_5_5_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="string">
+                        <source>fFpPtTdDcCrRlL</source>
+                    <target xml:lang="fr">{START_[fFpPtTðÐçÇrRlL]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="11" restype="string">
+                        <source>Cannot open the %% file.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Cannot print the file because it can&apos;t be found or is currently being used by another application. Be sure that the path and filename are correct, or wait until the application is finished, and then try again</source>
+                    <target xml:lang="fr">{START_[Çåññõt õpèñ thè %% fìlè.<x id="1" ctype="lb"></x><x id="1" ctype="lb"></x>Çåññõt prìñt thè fìlè bèçåüsè ìt çåñ&apos;t bè fõüñð õr ìs çürrèñtlÿ bèìñg üsèð bÿ åñõthèr åpplìçåtìõñ. Bè sürè thåt thè påth åñð fìlèñåmè årè çõrrèçt, õr wåìt üñtìl thè åpplìçåtìõñ ìs fìñìshèð, åñð thèñ trÿ ågåìñ]_11_11_END}</target>
+</trans-unit>
+                    <trans-unit id="12" restype="string">
+                        <source>Text Documents (*.txt)</source>
+                    <target xml:lang="fr">{START_[Tèxt Ðõçümèñts (*.txt)]_12_12_END}</target>
+</trans-unit>
+                    <trans-unit id="13" restype="string">
+                        <source>All Files</source>
+                    <target xml:lang="fr">{START_[Âll Fìlès]_13_13_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="string">
+                        <source>Open</source>
+                    <target xml:lang="fr">{START_[Øpèñ]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="15" restype="string">
+                        <source>Save As</source>
+                    <target xml:lang="fr">{START_[Såvè Âs]_15_15_END}</target>
+</trans-unit>
+                </group>
+                <group id="4">
+                    <trans-unit id="0" restype="string">
+                        <source>You cannot quit Windows because the Save As dialog<x id="1" ctype="lb"></x>box in Notepad is open. Switch to Notepad, close this<x id="1" ctype="lb"></x>dialog box, and then try quitting Windows again.</source>
+                    <target xml:lang="fr">{START_[Ýõü çåññõt qüìt Wìñðõws bèçåüsè thè Såvè Âs ðìålõg<x id="1" ctype="lb"></x>bõx ìñ Ñõtèpåð ìs õpèñ. Swìtçh tõ Ñõtèpåð, çlõsè thìs<x id="1" ctype="lb"></x>ðìålõg bõx, åñð thèñ trÿ qüìttìñg Wìñðõws ågåìñ.]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="string">
+                        <source>Cannot access your printer.<x id="1" ctype="lb"></x>Be sure that your printer is connected properly and use Control Panel to verify that the printer is configured properly.</source>
+                    <target xml:lang="fr">{START_[Çåññõt åççèss ÿõür prìñtèr.<x id="1" ctype="lb"></x>Bè sürè thåt ÿõür prìñtèr ìs çõññèçtèð prõpèrlÿ åñð üsè Çõñtrõl Påñèl tõ vèrìfÿ thåt thè prìñtèr ìs çõñfìgürèð prõpèrlÿ.]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="string">
+                        <source>%%<x id="1" ctype="lb"></x>You do not have permission to open this file. See the owner of the file or an administrator to obtain permission.</source>
+                    <target xml:lang="fr">{START_[%%<x id="1" ctype="lb"></x>Ýõü ðõ ñõt håvè pèrmìssìõñ tõ õpèñ thìs fìlè. Sèè thè õwñèr õf thè fìlè õr åñ åðmìñìstråtõr tõ õbtåìñ pèrmìssìõñ.]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="4" restype="string">
+                        <source>%%<x id="1" ctype="lb"></x>This file contains characters in Unicode format which will be lost if you save this file as a text document. To keep the Unicode information, select the Unicode encoding in the Save As dialog box. Continue? <x id="1" ctype="lb"></x></source>
+                    <target xml:lang="fr">{START_[%%<x id="1" ctype="lb"></x>Thìs fìlè çõñtåìñs çhåråçtèrs ìñ Ûñìçõðè fõrmåt whìçh wìll bè lõst ìf ÿõü såvè thìs fìlè ås å tèxt ðõçümèñt. Tõ kèèp thè Ûñìçõðè ìñfõrmåtìõñ, sèlèçt thè Ûñìçõðè èñçõðìñg ìñ thè Såvè Âs ðìålõg bõx. Çõñtìñüè? <x id="1" ctype="lb"></x>]_4_4_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="string">
+                        <source>Page too small to print one line.<x id="1" ctype="lb"></x>Try printing using smaller font.</source>
+                    <target xml:lang="fr">{START_[Pågè tõõ småll tõ prìñt õñè lìñè.<x id="1" ctype="lb"></x>Trÿ prìñtìñg üsìñg smållèr fõñt.]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="15" restype="string">
+                        <source>Common Dialog error (0x%04x)</source>
+                    <target xml:lang="fr">{START_[Çõmmõñ Ðìålõg èrrõr (0x%04x)]_15_15_END}</target>
+</trans-unit>
+                </group>
+                <group id="5">
+                    <trans-unit id="6" restype="string">
+                        <source>Notepad - Goto Line</source>
+                    <target xml:lang="fr">{START_[Ñõtèpåð - Gõtõ Lìñè]_6_6_END}</target>
+</trans-unit>
+                    <trans-unit id="7" restype="string">
+                        <source>Line number out of range</source>
+                    <target xml:lang="fr">{START_[Lìñè ñümbèr õüt õf råñgè]_7_7_END}</target>
+</trans-unit>
+                </group>
+                <group id="6">
+                    <trans-unit id="0" restype="string">
+                        <source>ANSI</source>
+                    <target xml:lang="fr">{START_[ÂÑSÏ]_0_0_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="string">
+                        <source>Unicode</source>
+                    <target xml:lang="fr">{START_[Ûñìçõðè]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="2" restype="string">
+                        <source>Unicode big endian</source>
+                    <target xml:lang="fr">{START_[Ûñìçõðè bìg èñðìåñ]_2_2_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="string">
+                        <source>UTF-8</source>
+                    <target xml:lang="fr">{START_[ÛTF-8]_3_3_END}</target>
+</trans-unit>
+                </group>
+            </group>
+            <group restype="acceleratortable">
+                <group id="MAINACC">
+                    <trans-unit id="9" restype="accelerator">
+                        <source>^N</source>
+                    <target xml:lang="fr">{START_[^Ñ]_9_9_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="accelerator">
+                        <source>^O</source>
+                    <target xml:lang="fr">{START_[^Ø]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="accelerator">
+                        <source>^S</source>
+                    <target xml:lang="fr">{START_[^S]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="accelerator">
+                        <source>^P</source>
+                    <target xml:lang="fr">{START_[^P]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="769" restype="accelerator">
+                        <source>Ctrl+VK_INSERT</source>
+                    <target xml:lang="fr">{START_[Çtrl+VK_ÏÑSÉRT]_769_769_END}</target>
+</trans-unit>
+                    <trans-unit id="5" restype="accelerator">
+                        <source>VK_F1</source>
+                    <target xml:lang="fr">{START_[VK_F1]_5_5_END}</target>
+</trans-unit>
+                    <trans-unit id="8" restype="accelerator">
+                        <source>VK_F3</source>
+                    <target xml:lang="fr">{START_[VK_F3]_8_8_END}</target>
+</trans-unit>
+                    <trans-unit id="12" restype="accelerator">
+                        <source>VK_F5</source>
+                    <target xml:lang="fr">{START_[VK_F5]_12_12_END}</target>
+</trans-unit>
+                    <trans-unit id="41" restype="accelerator">
+                        <source>^G</source>
+                    <target xml:lang="fr">{START_[^G]_41_41_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="accelerator">
+                        <source>Ctrl+F</source>
+                    <target xml:lang="fr">{START_[Çtrl+F]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="40" restype="accelerator">
+                        <source>Ctrl+H</source>
+                    <target xml:lang="fr">{START_[Çtrl+H]_40_40_END}</target>
+</trans-unit>
+                    <trans-unit id="25" restype="accelerator">
+                        <source>Alt+VK_BACK</source>
+                    <target xml:lang="fr">{START_[Âlt+VK_BÂÇK]_25_25_END}</target>
+</trans-unit>
+                    <trans-unit id="25" restype="accelerator">
+                        <source>^Z</source>
+                    <target xml:lang="fr">{START_[^Z]_25_25_END}</target>
+</trans-unit>
+                    <trans-unit id="768" restype="accelerator">
+                        <source>^X</source>
+                    <target xml:lang="fr">{START_[^X]_768_768_END}</target>
+</trans-unit>
+                    <trans-unit id="769" restype="accelerator">
+                        <source>^C</source>
+                    <target xml:lang="fr">{START_[^Ç]_769_769_END}</target>
+</trans-unit>
+                    <trans-unit id="770" restype="accelerator">
+                        <source>^V</source>
+                    <target xml:lang="fr">{START_[^V]_770_770_END}</target>
+</trans-unit>
+                    <trans-unit id="7" restype="accelerator">
+                        <source>^A</source>
+                    <target xml:lang="fr">{START_[^Â]_7_7_END}</target>
+</trans-unit>
+                </group>
+                <group id="SLIPUPACC">
+                    <trans-unit id="9" restype="accelerator">
+                        <source>^N</source>
+                    <target xml:lang="fr">{START_[^Ñ]_9_9_END}</target>
+</trans-unit>
+                    <trans-unit id="10" restype="accelerator">
+                        <source>^O</source>
+                    <target xml:lang="fr">{START_[^Ø]_10_10_END}</target>
+</trans-unit>
+                    <trans-unit id="1" restype="accelerator">
+                        <source>^S</source>
+                    <target xml:lang="fr">{START_[^S]_1_1_END}</target>
+</trans-unit>
+                    <trans-unit id="14" restype="accelerator">
+                        <source>^P</source>
+                    <target xml:lang="fr">{START_[^P]_14_14_END}</target>
+</trans-unit>
+                    <trans-unit id="769" restype="accelerator">
+                        <source>Ctrl+VK_INSERT</source>
+                    <target xml:lang="fr">{START_[Çtrl+VK_ÏÑSÉRT]_769_769_END}</target>
+</trans-unit>
+                    <trans-unit id="5" restype="accelerator">
+                        <source>VK_F1</source>
+                    <target xml:lang="fr">{START_[VK_F1]_5_5_END}</target>
+</trans-unit>
+                    <trans-unit id="8" restype="accelerator">
+                        <source>VK_F3</source>
+                    <target xml:lang="fr">{START_[VK_F3]_8_8_END}</target>
+</trans-unit>
+                    <trans-unit id="12" restype="accelerator">
+                        <source>VK_F5</source>
+                    <target xml:lang="fr">{START_[VK_F5]_12_12_END}</target>
+</trans-unit>
+                    <trans-unit id="41" restype="accelerator">
+                        <source>^G</source>
+                    <target xml:lang="fr">{START_[^G]_41_41_END}</target>
+</trans-unit>
+                    <trans-unit id="3" restype="accelerator">
+                        <source>Ctrl+F</source>
+                    <target xml:lang="fr">{START_[Çtrl+F]_3_3_END}</target>
+</trans-unit>
+                    <trans-unit id="40" restype="accelerator">
+                        <source>Ctrl+H</source>
+                    <target xml:lang="fr">{START_[Çtrl+H]_40_40_END}</target>
+</trans-unit>
+                    <trans-unit id="25" restype="accelerator">
+                        <source>Alt+VK_BACK</source>
+                    <target xml:lang="fr">{START_[Âlt+VK_BÂÇK]_25_25_END}</target>
+</trans-unit>
+                    <trans-unit id="25" restype="accelerator">
+                        <source>^Z</source>
+                    <target xml:lang="fr">{START_[^Z]_25_25_END}</target>
+</trans-unit>
+                    <trans-unit id="768" restype="accelerator">
+                        <source>^X</source>
+                    <target xml:lang="fr">{START_[^X]_768_768_END}</target>
+</trans-unit>
+                    <trans-unit id="769" restype="accelerator">
+                        <source>^C</source>
+                    <target xml:lang="fr">{START_[^Ç]_769_769_END}</target>
+</trans-unit>
+                    <trans-unit id="770" restype="accelerator">
+                        <source>^V</source>
+                    <target xml:lang="fr">{START_[^V]_770_770_END}</target>
+</trans-unit>
+                    <trans-unit id="7" restype="accelerator">
+                        <source>^A</source>
+                    <target xml:lang="fr">{START_[^Â]_7_7_END}</target>
+</trans-unit>
+                    <trans-unit id="28" restype="accelerator">
+                        <source>VK_ESCAPE</source>
+                    <target xml:lang="fr">{START_[VK_ÉSÇÂPÉ]_28_28_END}</target>
+</trans-unit>
+                    <trans-unit id="28" restype="accelerator">
+                        <source>Ctrl+C</source>
+                    <target xml:lang="fr">{START_[Çtrl+Ç]_28_28_END}</target>
+</trans-unit>
+                    <trans-unit id="28" restype="accelerator">
+                        <source>Ctrl+D</source>
+                    <target xml:lang="fr">{START_[Çtrl+Ð]_28_28_END}</target>
+</trans-unit>
+                    <trans-unit id="28" restype="accelerator">
+                        <source>Ctrl+Z</source>
+                    <target xml:lang="fr">{START_[Çtrl+Z]_28_28_END}</target>
+</trans-unit>
+                </group>
+            </group>
+            <group restype="version">
+                <group id="1">
+                    <trans-unit id="CompanyName" restype="versionstring">
+                        <source>Microsoft Corporation</source>
+                    <target xml:lang="fr">{START_[Mìçrõsõft Çõrpõråtìõñ]_CompanyName_CompanyName_END}</target>
+</trans-unit>
+                    <trans-unit id="FileDescription" restype="versionstring">
+                        <source>Notepad</source>
+                    <target xml:lang="fr">{START_[Ñõtèpåð]_FileDescription_FileDescription_END}</target>
+</trans-unit>
+                    <trans-unit id="FileVersion" restype="versionstring">
+                        <source>5.00.2140.1</source>
+                    <target xml:lang="fr">{START_[5.00.2140.1]_FileVersion_FileVersion_END}</target>
+</trans-unit>
+                    <trans-unit id="InternalName" restype="versionstring">
+                        <source>Notepad</source>
+                    <target xml:lang="fr">{START_[Ñõtèpåð]_InternalName_InternalName_END}</target>
+</trans-unit>
+                    <trans-unit id="LegalCopyright" restype="versionstring">
+                        <source>Copyright (C) Microsoft Corp. 1981-1999</source>
+                    <target xml:lang="fr">{START_[Çõpÿrìght (Ç) Mìçrõsõft Çõrp. 1981-1999]_LegalCopyright_LegalCopyright_END}</target>
+</trans-unit>
+                    <trans-unit id="OriginalFilename" restype="versionstring">
+                        <source>NOTEPAD.EXE</source>
+                    <target xml:lang="fr">{START_[ÑØTÉPÂÐ.ÉXÉ]_OriginalFilename_OriginalFilename_END}</target>
+</trans-unit>
+                    <trans-unit id="ProductName" restype="versionstring">
+                        <source>Microsoft(R) Windows (R) 2000 Operating System</source>
+                    <target xml:lang="fr">{START_[Mìçrõsõft(R) Wìñðõws (R) 2000 Øpèråtìñg Sÿstèm]_ProductName_ProductName_END}</target>
+</trans-unit>
+                    <trans-unit id="ProductVersion" restype="versionstring">
+                        <source>5.00.2140.1</source>
+                    <target xml:lang="fr">{START_[5.00.2140.1]_ProductVersion_ProductVersion_END}</target>
+</trans-unit>
+                </group>
+            </group>
+        </body>
+    </file>
+</xliff>

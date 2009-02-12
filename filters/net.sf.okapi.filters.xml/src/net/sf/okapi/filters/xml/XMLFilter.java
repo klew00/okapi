@@ -29,11 +29,13 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.its.IProcessor;
@@ -42,6 +44,7 @@ import org.w3c.its.ITraversal;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
@@ -179,24 +182,31 @@ public class XMLFilter implements IFilter {
 		parseState = 0;
 		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 
-		// Create the document builder
+		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
+		// Create the document builder
+		DocumentBuilder docBuilder;
+		try {
+			docBuilder = fact.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		docBuilder.setEntityResolver(new DefaultEntityResolver());
 		URI uri = null;
-		
 		// Load the document
 		try {
 			switch ( type ) {
 			case 0: // InputStream
-				doc = fact.newDocumentBuilder().parse((InputStream)obj);
+				doc = docBuilder.parse((InputStream)obj);
 				break;
 			case 1: // URI
 				uri = (URI)obj;
-				doc = fact.newDocumentBuilder().parse(uri.toString());
+				doc = docBuilder.parse(uri.toString());
 				break;
 			case 2: // InputSource
-				doc = fact.newDocumentBuilder().parse((InputSource)obj);
+				doc = docBuilder.parse((InputSource)obj);
 				break;
 			}
 		}
@@ -204,9 +214,6 @@ public class XMLFilter implements IFilter {
 			throw new RuntimeException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
 		}
 		
@@ -243,9 +250,18 @@ public class XMLFilter implements IFilter {
 		skel.addValuePlaceholder(startDoc, IEncoder.PROP_ENCODING, "");
 		skel.add("\"");
 		startDoc.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
-		
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
 		skel.add("?>"+lineBreak);
+
+		// Add the DTD if needed
+		DocumentType dt = doc.getDoctype();
+		if ( dt != null ) {
+			skel.add(String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">"+lineBreak,
+				dt.getName(),
+				dt.getPublicId(),
+				dt.getSystemId()));
+		}
+		
 		startDoc.setSkeleton(skel);
 		// Put the start document in the queue
 		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
@@ -325,6 +341,14 @@ public class XMLFilter implements IFilter {
 				else {
 					frag.append(TagType.PLACEHOLDER, null, buildComment(node));
 				}
+				break;
+				
+			case Node.NOTATION_NODE:
+				//TODO: handle notations
+				break;
+				
+			case Node.DOCUMENT_TYPE_NODE:
+				// Handled in the start document process
 				break;
 			}
 		}
