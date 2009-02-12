@@ -51,6 +51,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -354,38 +355,6 @@ public class XMLFilter implements IFilter {
 		}
 	}
 
-	private String buildStartTag (Node node) {
-		StringBuilder tmp = new StringBuilder();
-		tmp.append("<"
-			+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
-			+ node.getLocalName());
-		if ( node.hasAttributes() ) {
-			NamedNodeMap list = node.getAttributes();
-			Attr attr;
-			//TODO: Keep the original order... NamedNodeMap does not
-			for ( int i=0; i<list.getLength(); i++ ) {
-				attr = (Attr)list.item(i);
-				if ( !attr.getSpecified() ) continue; // Skip auto-attributes
-				tmp.append(" "
-					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
-					+ attr.getLocalName() //TODO: escape unsupported chars
-					+ "=\"");
-				//TODO: extract if needed
-				if ( trav.translate(attr) ) {
-					tmp.append("[["+Util.escapeToXML(attr.getNodeValue(), 3, false, null)
-						+ "]]\"");
-				}
-				else {
-					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
-						+ "\"");
-				}
-			}
-		}
-		if ( !node.hasChildNodes() ) tmp.append("/");
-		tmp.append(">");
-		return tmp.toString();
-	}
-
 	private void addStartTagToSkeleton (Node node) {
 		StringBuilder tmp = new StringBuilder();
 		tmp.append("<"
@@ -405,11 +374,8 @@ public class XMLFilter implements IFilter {
 					// Store the text part and reset the buffer
 					skel.append(tmp.toString());
 					tmp.setLength(0);
-					// Create the TU if needed
-					TextUnit tu = new TextUnit(String.valueOf(++tuId), attr.getValue(),
-						true, "text/xml");
-					skel.addReference(tu);
-					queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+					// Create the TU
+					addAttributeTextUnit(attr, true);
 					tmp.append("\"");
 				}
 				else { //TODO: escape unsupported chars
@@ -423,6 +389,50 @@ public class XMLFilter implements IFilter {
 		skel.append(tmp.toString());
 	}
 
+	private void addStartTagToFragment (Node node) {
+		StringBuilder tmp = new StringBuilder();
+		String id = null;
+		tmp.append("<"
+			+ ((node.getPrefix()==null) ? "" : node.getPrefix()+":")
+			+ node.getLocalName());
+		if ( node.hasAttributes() ) {
+			NamedNodeMap list = node.getAttributes();
+			Attr attr;
+			for ( int i=0; i<list.getLength(); i++ ) {
+				attr = (Attr)list.item(i);
+				if ( !attr.getSpecified() ) continue; // Skip auto-attributes
+				tmp.append(" "
+					+ ((attr.getPrefix()==null) ? "" : attr.getPrefix()+":")
+					+ attr.getLocalName() + "=\"");
+				// Extract if needed
+				if (( trav.translate(attr) ) && ( attr.getValue().length() > 0 )) {
+					id = addAttributeTextUnit(attr, false);
+					tmp.append(TextFragment.makeRefMarker(id));
+					tmp.append("\"");
+				}
+				else { //TODO: escape unsupported chars
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
+				}
+			}
+		}
+		if ( !node.hasChildNodes() ) tmp.append("/");
+		tmp.append(">");
+		// Set the inline code
+		Code code = frag.append(TagType.OPENING, node.getLocalName(), tmp.toString());
+		code.setHasReference(id!=null); // Set reference flag if we created TU(s)
+	}
+
+	private String addAttributeTextUnit (Attr attr,
+		boolean addToSkeleton)
+	{
+		String id = String.valueOf(++tuId);
+		TextUnit tu = new TextUnit(id, attr.getValue(), true, "text/xml");
+		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		if ( addToSkeleton ) skel.addReference(tu);
+		return id;
+	}
+	
 	private String buildEndTag (Node node) {
 		if ( node.hasChildNodes() ) {
 			return "</"
@@ -482,12 +492,13 @@ public class XMLFilter implements IFilter {
 					assert(false);
 				}
 				else { // Already in extraction
-					frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));					
+					//frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));
+					addStartTagToFragment(node);
 				}
 				break;
 			default: // Not within text
 				if ( frag == null ) { // Not yet in extraction
-					addStartTagToSkeleton(node); //skel.add(buildStartTag(node));
+					addStartTagToSkeleton(node);
 					if ( node.hasChildNodes() && trav.translate() ) {
 						context.push(new ContextItem(node, trav.translate()));
 						frag = new TextFragment();
@@ -496,7 +507,7 @@ public class XMLFilter implements IFilter {
 				else { // Already in extraction
 					// Queue the current item
 					addTextUnit(node, false);
-					addStartTagToSkeleton(node); //skel.add(buildStartTag(node));
+					addStartTagToSkeleton(node);
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
 						context.push(new ContextItem(node, trav.translate()));
