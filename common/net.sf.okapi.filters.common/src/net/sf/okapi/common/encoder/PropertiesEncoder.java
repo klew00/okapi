@@ -32,14 +32,14 @@ import net.sf.okapi.common.filters.IEncoder;
 public class PropertiesEncoder implements IEncoder {
 	
 	private CharsetEncoder outputEncoder;
-	private boolean escapeAll = false;
+	private boolean escapeAll;
 
 	/**
 	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding, and
 	 * escaping all extended characters.
 	 */
 	public PropertiesEncoder () {
-		escapeAll = false;
+		escapeAll = true;
 		outputEncoder = Charset.forName("us-ascii").newEncoder();
 	}
 	

@@ -38,6 +38,7 @@ public class Parameters extends BaseParameters {
 
 	public void fromString (String data) {
 		reset();
+		//TODO: Fix bug where value escaped char is not read properly
 		buffer.fromString(data);
 		lineBreak = buffer.getString("lineBreak", lineBreak);
 	}

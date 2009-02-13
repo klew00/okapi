@@ -70,11 +70,13 @@ public class ParametersString {
 	
 	private String escape (String value) {
 		if ( value == null ) return value;
+		value = value.replace("\r", "$0d$");
 		return value.replace("\n", "$0a$");
 	}
 	
 	private String unescape (String value) {
 		if ( value == null ) return value;
+		value = value.replace("$0d$", "\r");
 		return value.replace("$0a$", "\n");
 	}
 	

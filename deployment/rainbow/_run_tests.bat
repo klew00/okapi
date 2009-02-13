@@ -10,6 +10,11 @@ del ..\..\filters\net.sf.okapi.filters.xliff.tests\data\*.out
 java -jar dist_win32-x86\lib\rainbow.jar -x oku_textrewriting -sl en -tl fr -opt ..\..\filters\net.sf.okapi.filters.xliff.tests\data\rewriteAll.opt -np  ..\..\filters\net.sf.okapi.filters.xliff.tests\data\PAS-10-Test01.xlf -o ..\..\filters\net.sf.okapi.filters.xliff.tests\data\PAS-10-Test01.xlf.out
 comp ..\..\filters\net.sf.okapi.filters.xliff.tests\data\*.out ..\..\filters\net.sf.okapi.filters.xliff.tests\data\*.gold
 
+del tests\*.out
+java -jar dist_win32-x86\lib\rainbow.jar -p tests\BOM_Add.rnb -x oku_bomconversion -np
+java -jar dist_win32-x86\lib\rainbow.jar -p tests\LineBreak_ToDos.rnb -x oku_linebreakconversion -np
+comp tests\*.out tests\*.gold
+
 
 
 
