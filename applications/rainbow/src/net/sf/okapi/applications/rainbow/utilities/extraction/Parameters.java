@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
-import java.io.File;
-
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -84,8 +82,7 @@ public class Parameters extends BaseParameters {
 		pkgType = "xliff";
 		createZip = false;
 		pkgName = "pack1";
-		outputFolder = System.getProperty("user.home") + File.separator
-			+ "Localization Projects";
+		outputFolder = "${ProjDir}";
 		includeTargets = true;
 		preSegment = false;
 		sourceSRX = "";

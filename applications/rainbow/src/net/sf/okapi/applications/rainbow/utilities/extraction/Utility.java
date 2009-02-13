@@ -45,6 +45,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private Segmenter sourceSeg;
 	private Segmenter targetSeg;
 	private QueryManager qm;
+	private String resolvedOutputDir;
 	
 	public Utility () {
 		params = new Parameters();
@@ -88,24 +89,13 @@ public class Utility extends BaseFilterDrivenUtility {
 				params.tmPath, params.tmPath);
 		}
 		
-		String outputDir = params.outputFolder + File.separator + params.pkgName;
-		/*if ( (new File(outputDir)).exists() ) {
-			// Ask confirmation for cleaning existing folder
-			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-			dlg.setMessage("\nDo you want to save the project?");
-			dlg.setText("Rainbow");
-			switch  ( dlg.open() ) {
-			case SWT.NO:
-				return true;
-			case SWT.CANCEL:
-				return false;
-			}
-		}*/
-		Util.deleteDirectory(outputDir, false);
+		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;
+		resolvedOutputDir = resolvedOutputDir.replace("${ProjDir}", projectDir);
+		Util.deleteDirectory(resolvedOutputDir, false);
 		
 		id = 0;
 		writer.setInformation(srcLang, trgLang,
-			"TODO:projectID", outputDir, params.makePackageID(), inputRoot);
+			"TODO:projectID", resolvedOutputDir, params.makePackageID(), inputRoot);
 		writer.writeStartPackage();
 	}
 
@@ -146,7 +136,7 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	@Override
 	public String getFolderAfterProcess () {
-		return params.outputFolder;
+		return resolvedOutputDir;
 	}
 
 	public FilterEvent handleEvent (FilterEvent event) {

@@ -78,7 +78,8 @@ public class Editor implements IParametersEditor {
 	
 	public boolean edit (IParameters params,
 		Object object,
-		IHelp helpParam)
+		IHelp helpParam,
+		String projectDir)
 	{
 		boolean bRes = false;
 		try {

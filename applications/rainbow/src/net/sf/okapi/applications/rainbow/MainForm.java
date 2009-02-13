@@ -1732,7 +1732,7 @@ public class MainForm implements IParametersProvider {
 				table.getItem(n).getText(0));
 
 			// Call the dialog
-			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this);
+			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, prj.getProjectFolder());
 			dlg.setData(inp.filterSettings, inp.sourceEncoding,
 				inp.targetEncoding, fa);
 			String[] aRes = dlg.showDialog();

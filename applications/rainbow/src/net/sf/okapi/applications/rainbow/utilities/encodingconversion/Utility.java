@@ -62,7 +62,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 	
 	public void preprocess () {
-		buffer = CharBuffer.allocate(13); //TODO: change to real length
+		buffer = CharBuffer.allocate(1024);
 		commonFolder = null; // Reset
 
 		String tmp = "";

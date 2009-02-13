@@ -122,7 +122,7 @@ public class UtilityDriver implements CancelListener {
 			if ( utility.hasParameters() ) {
 				// Invoke the editor if there is one
 				if ( editor != null ) {
-					if ( !editor.edit(utility.getParameters(), shell, help) ) return false;
+					if ( !editor.edit(utility.getParameters(), shell, help, prj.getProjectFolder()) ) return false;
 					// Save the parameters in memory
 					prj.setUtilityParameters(utility.getName(),
 						utility.getParameters().toString());
@@ -150,7 +150,7 @@ public class UtilityDriver implements CancelListener {
 
 			// Set the run-time parameters
 			utility.setFilterAccess(fa, prj.getParametersFolder());
-			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"));
+			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"), prj.getProjectFolder());
 			if ( utility.needsRoots() ) {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}

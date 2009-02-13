@@ -48,6 +48,7 @@ public abstract class BaseUtility implements IUtility {
 	protected String trgLang;
 	protected String commonFolder;
 	protected String updateCommand;
+	protected String projectDir;
 
 	public BaseUtility () {
 		inputs = new ArrayList<InputData>();
@@ -64,11 +65,13 @@ public abstract class BaseUtility implements IUtility {
 
 	public void setContextUI (Object contextUI,
 		IHelp helpParam,
-		String updateCommand)
+		String updateCommand,
+		String projectDir)
 	{
 		shell = (Shell)contextUI;
 		help = helpParam;
 		this.updateCommand = updateCommand;
+		this.projectDir = projectDir;
 	}
 
 	public void setOptions (String sourceLanguage,

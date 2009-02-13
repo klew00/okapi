@@ -38,12 +38,14 @@ public interface IParametersEditor {
 	 * implementation for details. Because not all callers may be able to
 	 * provide the proper context, passing a null value is allowed.
 	 * @param helpParam The IHelp object responsible for displaying the help.
+	 * @param projectDir Project directory (without separator). This is used for the ${ProjDir} variable.
 	 * @return True if the edit was successful, false if the user canceled or if 
 	 * an error occurred. 
 	 */
 	public boolean edit (IParameters paramsObject,
 		Object uiContext,
-		IHelp helpParam);
+		IHelp helpParam,
+		String projectDir);
 	
 	/**
 	 * Creates an instance of the parameters object the editor can edit (with

@@ -523,11 +523,11 @@ public class Project {
 			isModified = true;
 		}
 	}
-	
+
 	public String getParametersFolder () {
 		return getParametersFolder(useCustomParamsFolder, false);
 	}
-	
+
 	public String getParametersFolder (boolean displayMode) {
 		return getParametersFolder(useCustomParamsFolder, displayMode);
 	}
@@ -630,6 +630,11 @@ public class Project {
 	public void setLastOutpoutFolder (String value) {
 		// Do not set isModified as lastOutputFolder is not saved
 		lastOutputFolder = value;
+	}
+	
+	public String getProjectFolder () {
+		if ( path == null ) return System.getProperty("user.home"); 
+		else return Util.getDirectoryName(path);
 	}
 
 }

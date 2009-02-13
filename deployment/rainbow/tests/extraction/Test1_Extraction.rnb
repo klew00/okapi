@@ -3,7 +3,7 @@
 pkgType=xliff
 createZip.b=false
 pkgName=test1_out
-outputFolder=C:\OkapiJava\trunk\deployment\rainbow\tests\extraction
+outputFolder=${ProjDir}
 includeTargets.b=true
 preSegment.b=false
 sourceSRX=

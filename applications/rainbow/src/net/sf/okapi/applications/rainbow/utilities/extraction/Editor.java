@@ -68,6 +68,7 @@ public class Editor implements IParametersEditor {
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
 	private IHelp help;
+	private String projectDir;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -76,13 +77,15 @@ public class Editor implements IParametersEditor {
 	 */
 	public boolean edit (IParameters params,
 		Object object,
-		IHelp helpParam)
+		IHelp helpParam,
+		String projectDir)
 	{
 		boolean bRes = false;
 		try {
 			shell = null;
 			help = helpParam;
 			this.params = (Parameters)params;
+			this.projectDir = projectDir;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
 			return showDialog();
@@ -345,7 +348,7 @@ public class Editor implements IParametersEditor {
 	
 	private void updateSample () {
 		saveData();
-//TODO		String[] aRes = m_Opt.makePackageName("<ProjectID>", "<Lang>");
-		edSample.setText(edOutputFolder.getText() + File.separator + edName.getText()); //TODO aRes[1]);
+		String out = edOutputFolder.getText() + File.separator + edName.getText();
+		edSample.setText(out.replace("${ProjDir}", projectDir));
 	}
 }

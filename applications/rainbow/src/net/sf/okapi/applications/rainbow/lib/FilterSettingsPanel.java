@@ -53,15 +53,18 @@ public class FilterSettingsPanel extends Composite {
 	private IParametersProvider paramsProv;
 	private String[] paramsList;
 	private IHelp help;
+	private String projectDir;
 	
 	public FilterSettingsPanel(Composite p_Parent,
 		IHelp helpParam,
 		int p_nFlags,
-		IParametersProvider paramProv)
+		IParametersProvider paramProv,
+		String projectDir)
 	{
 		super(p_Parent, SWT.NONE);
 		help = helpParam;
 		this.paramsProv = paramProv;
+		this.projectDir = projectDir;
 		createContent();
 	}
 	
@@ -240,7 +243,7 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the UI side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3]) ) {
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3], projectDir) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);
@@ -281,7 +284,7 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the client side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3]) ) {
+			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3], projectDir) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);

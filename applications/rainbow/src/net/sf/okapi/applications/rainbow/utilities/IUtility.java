@@ -47,10 +47,12 @@ public interface IUtility {
 	 * @param help The IHelp object to display help.
 	 * @param updateCommand The string command to use to invoke the update
 	 * system for this utility.
+	 * @param projectDir Project directory (without trailing separator).
 	 */
 	public void setContextUI (Object contextUI,
 		IHelp helpParam,
-		String updateCommand);
+		String updateCommand,
+		String projectDir);
 
 	/**
 	 * Adds a cancel listener to this utility.

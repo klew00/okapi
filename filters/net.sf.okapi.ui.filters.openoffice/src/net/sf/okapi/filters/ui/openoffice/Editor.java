@@ -56,7 +56,8 @@ public class Editor implements IParametersEditor {
 	 */
 	public boolean edit (IParameters p_Options,
 		Object p_Object,
-		IHelp helpParam)
+		IHelp helpParam,
+		String projectDir)
 	{
 		help = helpParam;
 		boolean bRes = false;

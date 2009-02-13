@@ -295,7 +295,8 @@ public class FilterAccess {
 		IParameters paramObject,
 		Object uiContext,
 		IHelp helpParam,
-		String paramsPath)
+		String paramsPath,
+		String projectDir)
 	{
 		IParametersEditor paramsEditor = loadEditor(filterID);
 		boolean result = false;
@@ -304,7 +305,7 @@ public class FilterAccess {
 				UIUtil.execute(defaultEditor, paramsPath);
 			}
 		}
-		else result = paramsEditor.edit(paramObject, uiContext, helpParam);
+		else result = paramsEditor.edit(paramObject, uiContext, helpParam, projectDir);
 		return result;
 	}
 	

@@ -52,7 +52,8 @@ class InputPropertiesForm {
 
 	InputPropertiesForm (Shell p_Parent,
 		IHelp helpParam,
-		IParametersProvider paramsProv)
+		IParametersProvider paramsProv,
+		String projectDir)
 	{
 		help = helpParam;
 		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -64,7 +65,7 @@ class InputPropertiesForm {
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		comp.setLayout(new GridLayout(2, false));
 
-		pnlFilterSettings = new FilterSettingsPanel(comp, help, SWT.NONE, paramsProv);
+		pnlFilterSettings = new FilterSettingsPanel(comp, help, SWT.NONE, paramsProv, projectDir);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlFilterSettings.setLayoutData(gdTmp);
