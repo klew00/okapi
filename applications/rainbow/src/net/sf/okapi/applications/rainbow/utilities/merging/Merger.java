@@ -116,7 +116,7 @@ public class Merger {
 			outFilter.setOutput(outputFile);
 			
 			// Do it
-			FilterEvent event;
+			FilterEvent event;			
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();
 				if ( event.getEventType() == FilterEventType.TEXT_UNIT ) {
@@ -127,7 +127,8 @@ public class Merger {
 		}
 		catch ( Exception e ) {
 			// Log and move on to the next file
-			logger.error("Merging error. " + e.getCause().getLocalizedMessage(), e);
+			Throwable e2 = e.getCause();
+			logger.error("Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( outFilter != null ) {

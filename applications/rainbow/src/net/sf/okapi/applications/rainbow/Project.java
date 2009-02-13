@@ -279,7 +279,8 @@ public class Project {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document doc = Fact.newDocumentBuilder().parse(new File(newPath));
+			File file = new File(newPath);
+			Document doc = Fact.newDocumentBuilder().parse(file);
 			
 			Element rootElem = doc.getDocumentElement();
 			String tmp = rootElem.getAttribute("version");
@@ -379,7 +380,8 @@ public class Project {
 			}
 
 			isModified = false;
-			path = newPath;
+			// Make sure we set the absolute path, as it may be used for root
+			path = file.getAbsolutePath();
 		}
 		catch (Exception E ) {
 			throw E;

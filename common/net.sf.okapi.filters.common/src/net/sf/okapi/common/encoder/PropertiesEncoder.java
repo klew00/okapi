@@ -88,13 +88,13 @@ public class PropertiesEncoder implements IEncoder {
 	{
 		if ( value > 127 ) {
 			if ( escapeAll ) {
-				return String.format("\\u%04x", value); 
+				return String.format("\\u%04x", (int)value);
 			}
 			else {
 				if ( outputEncoder.canEncode(value) )
 					return String.valueOf(value);
 				else
-					return String.format("\\u%04x", value);
+					return String.format("\\u%04x", (int)value);
 			}
 		}
 		else {

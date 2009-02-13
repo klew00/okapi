@@ -51,7 +51,7 @@ class LogHandler extends Handler {
 	public void publish (LogRecord record) {
 		if ( record.getLevel() == Level.SEVERE ) {
 			log.error(record.getMessage());
-			log.message(record.getThrown().getLocalizedMessage());
+			log.message(record.getThrown().getMessage());
 			log.message(" @ "+record.getThrown().toString());
 		}
 		else if ( record.getLevel() == Level.WARNING ) {
