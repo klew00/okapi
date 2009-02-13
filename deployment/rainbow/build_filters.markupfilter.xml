@@ -1,15 +1,19 @@
 <?xml version="1.0"?>
-<project name="filters.common" default="all" basedir="."> 
+<project name="filters.openoffice" default="all" basedir="."> 
 
 	<property name="platform" value="win32-x86"/> 
-	<property name="proj" value="../../common/net.sf.okapi.filters.common"/> 
+	<property name="proj" value="../../filters/net.sf.okapi.filters.markupfilter"/> 
 	<property name="src" value="${proj}/src"/> 
  	<property name="tmp" value="tmp"/>
 	<property name="dist" value="dist_${platform}"/>
 	<property name="dist-bin" value="${dist}/lib"/>
-
+ 
 	<path id="mainClassPath">
 		<pathelement location="${tmp}"/>
+		<pathelement location="${proj}/lib/jericho-html-3.0-beta1.jar"/>
+		<pathelement location="${proj}/lib/jyaml-1.3.jar"/>
+		<pathelement location="${proj}/lib/kwalify.jar"/>
+		<pathelement location="../../user-libs/slf4j-api-1.5.0.jar"/>
 	</path>
 	
 	<target name="init">
@@ -19,6 +23,7 @@
 
 	<target name="all" depends="init"> 
 		<ant antfile="build_common.xml" inheritAll="false"/>
+		<ant antfile="build_filters.common.xml" inheritAll="false"/>
  		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
 		<copy todir="${tmp}">
 			<fileset dir="${src}" excludes="**/*.java"/>
