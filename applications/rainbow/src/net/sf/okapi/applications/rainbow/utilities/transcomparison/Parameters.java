@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
+import java.io.File;
+
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -39,7 +41,7 @@ public class Parameters extends BaseParameters {
 	
 	public void reset() {
 		generateTMX = false;
-		tmxPath = "";
+		tmxPath = "${ProjDir}"+File.separator+"output.tmx";
 		generateHTML = true;
 		autoOpen = true;
 		ignoreCase = false;

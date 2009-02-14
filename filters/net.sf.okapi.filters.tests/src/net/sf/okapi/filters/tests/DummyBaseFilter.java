@@ -21,7 +21,7 @@
 package net.sf.okapi.filters.tests;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.IParameters;
@@ -52,7 +52,7 @@ public class DummyBaseFilter extends BaseFilter {
 		else createCase1();
 	}
 
-	public void open (URL inputURL) {
+	public void open (URI inputURI) {
 	}
 
 	public void setParameters (IParameters params) {

@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import java.io.File;
-import java.net.MalformedURLException;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
@@ -52,7 +51,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 
 			// Setup the filter
 			File f = new File(getInputPath(0)); 
-			filter.open(f.toURL());
+			filter.open(f.toURI());
 		
 			// Process the document
 			FilterEvent event;
@@ -63,9 +62,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 					filterWriter.handleEvent(event);
 				}
 			}
-		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException(e);
 		}
 		finally {
 			if ( filterWriter != null ) filterWriter.close();

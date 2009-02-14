@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -241,15 +240,12 @@ public class Utility extends BaseFilterDrivenUtility {
 
 			// Open the file
 			File f = new File(getInputPath(1));
-			trgFilter.open(f.toURL());
+			trgFilter.open(f.toURI());
 			
 			// Fill the database with the target file
 			while ( trgFilter.hasNext() ) {
 				dbStoreBuilder.handleEvent(trgFilter.next());
 			}
-    	}
-    	catch ( MalformedURLException e ) {
-    		throw new RuntimeException(e);
     	}
     	finally {
     		if ( trgFilter != null ) trgFilter.close();

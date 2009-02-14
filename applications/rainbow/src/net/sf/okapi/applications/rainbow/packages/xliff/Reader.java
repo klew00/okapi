@@ -56,7 +56,7 @@ public class Reader implements IReader {
 			// Encoding is not really used so we can hard-code
 			reader.setOptions(sourceLanguage, targetLanguage, "UTF-8", false);
 			File f = new File(path);
-			reader.open(f.toURL());
+			reader.open(f.toURI());
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);

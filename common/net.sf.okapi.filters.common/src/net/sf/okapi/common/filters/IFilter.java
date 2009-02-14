@@ -21,7 +21,7 @@
 package net.sf.okapi.common.filters;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -87,12 +87,12 @@ public interface IFilter {
 	public void open (CharSequence inputText);
 
 	/**
-	 * Opens the input document through its URL.
+	 * Opens the input document through its URI.
 	 * You must call {@link #setOptions(String, String, boolean)} or
 	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
-	 * @param inputURL The URL of the input document.
+	 * @param inputURI The URI of the input document.
 	 */
-	public void open (URL inputURL);
+	public void open (URI inputURI);
 
 	/**
 	 * Closes the input document.

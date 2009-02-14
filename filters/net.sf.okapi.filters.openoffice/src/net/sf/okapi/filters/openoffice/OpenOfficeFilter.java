@@ -24,6 +24,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -123,8 +125,13 @@ public class OpenOfficeFilter implements IFilter {
 			"Method is not supported for this filter.");
 	}
 	
-	public void open (URL inputUrl) {
-		this.inputUrl = inputUrl;
+	public void open (URI inputURI) {
+		try {
+			this.inputUrl = inputURI.toURL();
+		} 
+		catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 		queue = new LinkedList<FilterEvent>();
 		queue.add(new FilterEvent(FilterEventType.START));
 		nextAction = StateType.OPENZIP;

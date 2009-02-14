@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.openoffice.tests;
 
+import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
@@ -38,7 +39,7 @@ public class OpenOfficeFilterTest {
 			filter = new OpenOfficeFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = OpenOfficeFilterTest.class.getResource("/TestDocument01.odt");
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 		}
 		catch ( Throwable e ) {

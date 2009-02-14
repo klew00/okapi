@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.rtf;
 
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -356,10 +356,10 @@ public class RTFFilter implements IFilter {
 		throw new UnsupportedOperationException();
 	}
 
-	public void open (URL inputUrl) {
+	public void open (URI inputURI) {
 		try {
-			docName = inputUrl.getPath();
-			open(inputUrl.openStream());
+			docName = inputURI.getPath();
+			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

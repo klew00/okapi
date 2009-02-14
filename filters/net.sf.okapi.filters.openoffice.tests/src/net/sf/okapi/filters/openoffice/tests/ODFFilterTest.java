@@ -20,10 +20,10 @@
 
 package net.sf.okapi.filters.openoffice.tests;
 
+import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.openoffice.ODFFilter2;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -43,12 +43,12 @@ public class ODFFilterTest {
 			filter = new ODFFilter2();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = ODFFilterTest.class.getResource("/TestDocument01.odt_content.xml");
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
 			// Test a simple re-write
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			rewrite(filter);
 			filter.close();
 		}

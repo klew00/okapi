@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.xliff.tests;
 
+import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.common.filters.FilterEvent;
@@ -45,7 +46,7 @@ public class XLIFFFilterTest {
 			filter = new XLIFFFilter();
 			filter.setOptions("en", "es", "UTF-8", true);
 			URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

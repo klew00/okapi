@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -205,10 +205,10 @@ public class PropertiesFilter implements IFilter {
 		}
 	}
 
-	public void open (URL inputUrl) {
+	public void open (URI inputURI) {
 		try {
-			docName = inputUrl.getPath();
-			open(inputUrl.openStream());
+			docName = inputURI.getPath();
+			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

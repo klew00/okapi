@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.mif.tests;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class MIFFilterTest {
 			filter = new MIFFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = MIFFilterTest.class.getResource("/Test01.mif");
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 		}
 		catch ( Throwable e ) {

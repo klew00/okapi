@@ -24,7 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -121,14 +121,14 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		initialize();
 	}
 
-	public void open(URL input) {
+	public void open(URI inputURI) {
 		try {
 			if (getEncoding() != null) {
-				BufferedReader r = new BufferedReader(new InputStreamReader(input.openStream(), getEncoding()));
+				BufferedReader r = new BufferedReader(new InputStreamReader(inputURI.toURL().openStream(), getEncoding()));
 				document = new Source(r);
 			} else {
 				// try to guess encoding
-				document = new Source(input);
+				document = new Source(inputURI.toURL());
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

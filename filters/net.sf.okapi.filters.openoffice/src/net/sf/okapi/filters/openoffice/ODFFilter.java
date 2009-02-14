@@ -24,7 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -191,10 +191,10 @@ public class ODFFilter implements IFilter {
 		} 
 	}
 
-	public void open (URL inputUrl) {
+	public void open (URI inputURI) {
 		try {
-			docName = inputUrl.getPath();
-			open(inputUrl.openStream());
+			docName = inputURI.getPath();
+			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

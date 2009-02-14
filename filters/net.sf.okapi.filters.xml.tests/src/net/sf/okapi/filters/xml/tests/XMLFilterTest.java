@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.xml.tests;
 
+import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -43,7 +44,7 @@ public class XMLFilterTest {
 			filter.close();
 			
 			URL url = XMLFilterTest.class.getResource("/Translate2.xml");
-			filter.open(url);
+			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

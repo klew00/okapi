@@ -106,7 +106,7 @@ public class Merger {
 			inpFilter.setOptions(manifest.getSourceLanguage(), trgLang,
 				item.getInputEncoding(), true);
 			File f = new File(originalFile);
-			inpFilter.open(f.toURL());
+			inpFilter.open(f.toURI());
 			
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);

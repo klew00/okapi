@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
@@ -51,7 +50,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			// Open the RTF input
 			filter.setOptions(srcLang, trgLang, getInputEncoding(0), false);
 			File f = new File(getInputPath(0));
-			filter.open(f.toURL());
+			filter.open(f.toURI());
 			
 			// Open the output document
 			Util.createDirectories(getOutputPath(0));
@@ -65,9 +64,6 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 				writer.write(buf.toString());
 				writer.write(lineBreak);
 			}
-		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException(e);
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);

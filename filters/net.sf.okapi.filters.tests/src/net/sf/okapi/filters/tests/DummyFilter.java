@@ -21,7 +21,7 @@
 package net.sf.okapi.filters.tests;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.LinkedList;
 
 import net.sf.okapi.common.IParameters;
@@ -82,7 +82,7 @@ public class DummyFilter implements IFilter {
 		reset();
 	}
 
-	public void open (URL inputURL) {
+	public void open (URI inputURI) {
 		reset();
 	}
 

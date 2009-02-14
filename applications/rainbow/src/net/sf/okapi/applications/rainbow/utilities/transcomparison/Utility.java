@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
 import java.io.File;
-import java.net.MalformedURLException;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
@@ -68,7 +67,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Start TMX writer (one for all input documents)
 		if ( params.generateTMX ) {
 			tmx = new TMXWriter();
-			tmx.create(params.tmxPath);
+			tmx.create(params.tmxPath.replace("${ProjDir}", projectDir));
 			tmx.writeStartDocument(srcLang, trgLang, getName(), null, null, null, null);
 		}
 		pathToOpen = null;
@@ -141,40 +140,35 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 
 	private void processStart () {
-		try {
-			// Initialize the filter to read the translation to compare
-			inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-				getInputFilterSettings(1), inputToCompare);
-			inputToCompare.setOptions(srcLang, trgLang, getInputEncoding(1), false);
-			File f = new File(getInputPath(1));
-			inputToCompare.open(f.toURL());
+		// Initialize the filter to read the translation to compare
+		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
+			getInputFilterSettings(1), inputToCompare);
+		inputToCompare.setOptions(srcLang, trgLang, getInputEncoding(1), false);
+		File f = new File(getInputPath(1));
+		inputToCompare.open(f.toURI());
 			
-			// Start HTML output
-			if ( writer != null ) writer.close();
-			if ( params.generateHTML ) {
-				// Use the to-compare file for the output name
-				if ( pathToOpen == null ) {
-					pathToOpen = getInputPath(1) + ".html"; //$NON-NLS-1$
-				}
-				writer.create(getInputPath(1) + ".html"); //$NON-NLS-1$
-				writer.writeStartDocument();
-				writer.writeStartElement("html"); //$NON-NLS-1$
-				writer.writeStartElement("head"); //$NON-NLS-1$
-				writer.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"); //$NON-NLS-1$
-				writer.writeRawXML("<style>td { font-family: monospace } td { vertical-align: top; white-space: pre } td.p { border-top-style: solid; border-top-width: 1px;}</style>"); //$NON-NLS-1$
-				writer.writeEndElement(); // head
-				writer.writeStartElement("body"); //$NON-NLS-1$
-				writer.writeStartElement("p"); //$NON-NLS-1$
-				writer.writeString("Translation Comparison");
-				writer.writeEndElement();
-				writer.writeStartElement("p"); //$NON-NLS-1$
-				writer.writeString(String.format("Comparing %s (T2) against %s (T1).", getInputPath(1), getInputPath(0)));
-				writer.writeEndElement();
-				writer.writeStartElement("table"); //$NON-NLS-1$
+		// Start HTML output
+		if ( writer != null ) writer.close();
+		if ( params.generateHTML ) {
+			// Use the to-compare file for the output name
+			if ( pathToOpen == null ) {
+				pathToOpen = getInputPath(1) + ".html"; //$NON-NLS-1$
 			}
-		}
-		catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			writer.create(getInputPath(1) + ".html"); //$NON-NLS-1$
+			writer.writeStartDocument();
+			writer.writeStartElement("html"); //$NON-NLS-1$
+			writer.writeStartElement("head"); //$NON-NLS-1$
+			writer.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"); //$NON-NLS-1$
+			writer.writeRawXML("<style>td { font-family: monospace } td { vertical-align: top; white-space: pre } td.p { border-top-style: solid; border-top-width: 1px;}</style>"); //$NON-NLS-1$
+			writer.writeEndElement(); // head
+			writer.writeStartElement("body"); //$NON-NLS-1$
+			writer.writeStartElement("p"); //$NON-NLS-1$
+			writer.writeString("Translation Comparison");
+			writer.writeEndElement();
+			writer.writeStartElement("p"); //$NON-NLS-1$
+			writer.writeString(String.format("Comparing %s (T2) against %s (T1).", getInputPath(1), getInputPath(0)));
+			writer.writeEndElement();
+			writer.writeStartElement("table"); //$NON-NLS-1$
 		}
 	}
 

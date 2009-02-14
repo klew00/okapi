@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Stack;
 
@@ -138,14 +136,9 @@ public class XMLFilter implements IFilter {
 		commonOpen(2, is);
 	}
 
-	public void open (URL inputURL) {
-		try {
-			docName = inputURL.getPath();
-			commonOpen(1, inputURL.toURI());
-		}
-		catch ( URISyntaxException e ) {
-			throw new RuntimeException(e);
-		}
+	public void open (URI inputURI) {
+		docName = inputURI.getPath();
+		commonOpen(1, inputURI);
 	}
 
 	public void setOptions (String sourceLanguage,
