@@ -16,6 +16,7 @@ java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\BOM_Add.rnb -x oku_
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\LineBreak_ToDos.rnb -x oku_linebreakconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test1.rnb -x oku_encodingconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test2.rnb -x oku_encodingconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test3.rnb -x oku_encodingconversion -np
 comp miscellaneous\*.out miscellaneous\*.gold >> _tests_results.txt
 
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -x oku_extraction -np

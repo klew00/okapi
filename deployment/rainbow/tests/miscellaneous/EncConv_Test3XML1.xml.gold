@@ -1,0 +1,8 @@
+<?xml version="1.0"
+   encoding="windows-1250"?>
+<doc>
+<p>This is a test. <br/> Next sentence. Third sentence.</p>
+<p>Text in <b>bold</b>.</p>
+<p>&lt;=lt, &amp;=amp, &gt;=gt, &quot;=quot, '=apos. ©=copyright, €=euro.</p>
+<p>&#xDE;=Eth, ß=Szet, <font face="Times New Roman">Ê=E-ogenek, È=C-caron.</font></p>
+</doc>

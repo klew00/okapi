@@ -409,7 +409,7 @@ public class Util {
 	/**
 	 * Gets the extension of a given path or filename.
 	 * @param path The original path or filename.
-	 * @return The last extension of the filename, or an empty string if the filename
+	 * @return The last extension of the filename (including the period), or an empty string if the filename
 	 * ends with a period, or null if there is no period in the filename.
 	 */
 	static public String getExtension (String path) {

@@ -51,7 +51,14 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	private Hashtable<String, Character> CharEntities;
 	private CharBuffer buffer;
 	private Pattern pattern;
+	private Pattern xmlEncDecl;
+	private Pattern xmlDecl;
+	private Pattern htmlEncDecl;
+	private Pattern htmlDecl;
+	private Pattern htmlHead;
 	private String prevBuf;
+	private boolean isXML;
+	private boolean isHTML;
 
 	public Utility () {
 		params = new Parameters();
@@ -65,6 +72,15 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		buffer = CharBuffer.allocate(1024);
 		commonFolder = null; // Reset
 
+		// Pre-compile the patterns for declaration detection
+		xmlEncDecl = Pattern.compile("((<\\?xml)(.*?)(encoding(\\s*?)=(\\s*?)(\\'|\\\")))", Pattern.DOTALL);
+		xmlDecl = Pattern.compile("((<\\?xml)(.*?)(version(\\s*?)=(\\s*?)(\\'|\\\")))", Pattern.DOTALL);
+		htmlEncDecl = Pattern.compile("(<meta)([^>]*?)(content)(\\s*?)=(\\s*?)[\\'|\\\"](\\s*?)text/html(\\s*?);(\\s*?)charset(\\s*?)=(\\s*?)([^\\s]+?)(\\s|\\\"|\\')",
+			Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		htmlDecl = Pattern.compile("(<html)", Pattern.CASE_INSENSITIVE);
+		htmlHead = Pattern.compile("<head>", Pattern.CASE_INSENSITIVE);
+		
+		// Pre-compile pattern for un-escaping
 		String tmp = "";
 		if ( params.unescapeNCR ) {
 			tmp += "&#([0-9]*?);|&#[xX]([0-9a-fA-F]*?);";
@@ -143,10 +159,29 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
 		try {
-			// Open the input document
+			isXML = false;
+			isHTML = false;
+			String ext = Util.getExtension(getInputPath(0));
+			if ( ext != null ) {
+				isHTML = (ext.toLowerCase().indexOf(".htm")==0);
+				isXML = ext.equalsIgnoreCase(".xml");
+			}
+			
+			// Try to auto-detect the encoding for HTML/XML
+			String inputEncoding = getInputEncoding(0);
+			reader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(getInputPath(0)), inputEncoding));
+			reader.read(buffer);
+			String detectedEncoding = checkDeclaration(inputEncoding);
+			if ( !detectedEncoding.equalsIgnoreCase(inputEncoding) ) {
+				inputEncoding = detectedEncoding;
+			}
+			reader.close();
+
+			// Open the input document with BOM-aware reader
 			BOMAwareInputStream bis = new BOMAwareInputStream(
-				new FileInputStream(getInputPath(0)), getInputEncoding(0));
-			String inputEncoding = bis.detectEncoding();
+				new FileInputStream(getInputPath(0)), inputEncoding);
+			inputEncoding = bis.detectEncoding();
 			reader = new BufferedReader(new InputStreamReader(bis, inputEncoding));
 			logger.info("Input encoding: " + inputEncoding);
 			
@@ -162,6 +197,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			CharBuffer tmpBuf = CharBuffer.allocate(1);
 			ByteBuffer encBuf;
 			boolean canEncode;
+			boolean checkDeclaration = true;
 
 			while ( true ) {
 				buffer.clear();
@@ -183,6 +219,11 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 					}
 					else break; // No previous, no read: Done
 				}
+				
+				if ( checkDeclaration ) {
+					checkDeclaration(inputEncoding);
+					checkDeclaration = false;
+				}
 
 				// Un-escape if requested
 				if ( pattern != null ) {
@@ -196,7 +237,8 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 				for ( int i=0; i<n; i++ ) {
 					if ( !(canEncode = outputEncoder.canEncode(buffer.get(i))) ) {
 						if ( params.reportUnsupported ) {
-							logger.warn(String.format("Un-supported character: U+%04X", (int)buffer.get(i)));
+							logger.warn(String.format("Un-supported character: U+%04X ('%c')",
+								(int)buffer.get(i), buffer.get(i)));
 						}
 					}
 					
@@ -258,6 +300,92 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		}
 	}
 
+	private String checkDeclaration (String defEncoding) {
+		// Convert the CharBuffer to a string
+		buffer.limit(buffer.position());
+		buffer.position(0);
+		StringBuffer text = new StringBuffer(buffer.toString());
+		
+		// Look for XML encoding declaration
+		String encoding = defEncoding;
+		Matcher m = xmlEncDecl.matcher(text);
+		if ( m.find() ) { // We have an XML encoding declaration
+			isXML = true;
+			// Get the declared encoding
+			String delim = String.valueOf(text.charAt(m.end()-1));
+			int end = text.indexOf(delim, m.end());
+			if ( end != -1 ) {
+				encoding = text.substring(m.end(), end);
+				// End replace the current declaration by the new one
+				text.replace(m.end(), end, getOutputEncoding(0));
+			}
+		}
+		else { // No XML encoding declaration found: Check if it is XML
+			m = xmlDecl.matcher(text);
+			if ( m.find() ) { // It is XML without encoding declaration
+				isXML = true;
+				// Encoding should UTF-8 or UTF-16/32, we will detect those later
+				encoding = "UTF-8";
+				// Add the encoding after the version
+				String delim = String.valueOf(text.charAt(m.end()-1));
+				int end = text.indexOf(delim, m.end());
+				if ( end != -1 ) {
+					text.insert(end+1, " encoding=\""+getOutputEncoding(0)+"\"");
+				}
+			}
+			else { // No XML declaration found, maybe it's an XML without one
+				if ( isXML ) { // Was a .xml extension, assume UTF-8
+					encoding = "UTF-8";
+					text.insert(0, "<?xml version=\"1.0\" encoding=\""+getOutputEncoding(0)+"\" ?>");
+				}
+			}
+		}
+
+		// Look for HTML declarations
+		m = htmlEncDecl.matcher(text);
+		if ( m.find() ) {
+			isHTML = true;
+			// Group 11 contains the encoding name
+			encoding = m.group(11);
+			// Replace it by the new encoding
+			int n = text.indexOf(encoding, m.start());
+			text.replace(n, n+encoding.length(), getOutputEncoding(0));
+		}
+		else if ( isHTML ) { // No HTML encoding found, but try to update if it was seen as HTML from extension 
+			// Try to place it after <head>
+			m = htmlHead.matcher(text);
+			if ( m.find() ) {
+				text.insert(m.end(), String.format(
+					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"></meta>",
+					getOutputEncoding(0)));
+			}
+			else { // If no <head>, try <html>
+				m = htmlDecl.matcher(text);
+				if ( m.find() ) {
+					int n = text.indexOf(">", m.end());
+					if ( n != -1 ) {
+						text.insert(n+1, String.format(
+							"<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"></meta></head>",
+							getOutputEncoding(0)));
+					}
+				}
+			}
+		}
+		
+		// Convert the string back to a CharBuffer
+		int len = text.length();
+		// Make sure we have room for added characters
+		if ( len > buffer.capacity() ) {
+			buffer = CharBuffer.allocate(len);
+		}
+		else {
+			buffer.clear();
+		}
+		buffer.append(text.toString());
+		buffer.limit(len);
+		return encoding;
+	}
+	
 	private void checkSplitSequence () {
 		int len = buffer.position();
 		buffer.position(0);
