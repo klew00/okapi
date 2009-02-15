@@ -10,6 +10,10 @@
 <p>This utility allows you to convert the type of line-breaks of a input 
 document.</p>
 <p>This utility does not use filters.</p>
+<p>The encoding of the document is not modified in any way. The output document 
+has a Byte-Order-Mark only if the input document does have one.</p>
+<p>The type of line-break in the input file is detected automatically, and the 
+file may contain a mix of different types of line-breaks.</p>
 <h2>Common Parameters</h2>
 <ul>
 	<li>The list of the documents to modify (Input list 1).</li>
@@ -17,6 +21,13 @@ document.</p>
 </ul>
 <h2>Configuration</h2>
 <h3>Options Tab</h3>
-<p>TODO</p>
+<h4>New type of line-break</h4>
+<p><cite>DOS/Windows</cite> -- Select this option to change all the line-breaks 
+to DOS/Windows line-breaks (CR+LF).</p>
+<p><cite>Unix/Linux</cite> -- Select this option to change all the line-breaks 
+to Unix/Linux line-breaks (LF).</p>
+<p><cite>Macintosh</cite> -- Select this option to change all the line-breaks to 
+Macintosh line-breaks (CR).</p>
+<p>&nbsp;</p>
 </body>
 </html>

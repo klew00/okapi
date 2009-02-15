@@ -95,7 +95,8 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			// Open the output
 			OutputStream output = new FileOutputStream(getOutputPath(0));
 			writer = new OutputStreamWriter(new BufferedOutputStream(output), encoding);
-			Util.writeBOMIfNeeded(writer, true, encoding);
+			// Write BOM if there was one
+			Util.writeBOMIfNeeded(writer, (bis.getBOMSize()>0), encoding);
 			
 			// Set the variables
 			CharBuffer buffer = CharBuffer.allocate(1024);

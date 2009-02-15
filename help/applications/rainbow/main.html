@@ -53,38 +53,96 @@ and select <cite>Edit Document Properties</cite> in the <cite>Input</cite> menu
 where you can make changes.</p>
 <h2><a name="LangAndEnc"></a>Languages and Encodings</h2>
 <h3>Source</h3>
-<p>Language --</p>
-<p>Encoding --</p>
+<p><cite>Language</cite> -- Enter or select the code of the source language.</p>
+<p><cite>Encoding</cite> -- Enter or select the name of the encoding for the 
+source language. This is the default source encoding. You can overwrite this 
+value for each input document in the <cite>
+<a href="inputDocProp.html">Input Document Properties</a></cite> dialog.</p>
 <h3>Target</h3>
-<p>Language --</p>
-<p>Encoding --</p>
+<p><cite>Language</cite> -- Enter or select the code of the target language.</p>
+<p><cite>Encoding</cite> -- Enter or select the name of the encoding for the 
+target language. This is the default target encoding. You can overwrite this 
+value for each input document in the <cite>
+<a href="inputDocProp.html">Input Document Properties</a></cite> dialog.</p>
+<p>The names of each encoding must be one of the IANA charset names. You can 
+obtain a list of all encodings supported by your system with the <cite>
+<a href="commands.html#ListEncodings">List Available Encodings</a></cite> 
+command.</p>
+<p>When used as an input encoding, the encoding defined here and in the <cite>
+<a href="inputDocProp.html">Input Document Properties</a></cite> dialog, may be 
+superseded by the encoding automatically detected in the input file.</p>
 <h2><a name="OtherSettings"></a>Other Settings</h2>
 <h3>Output</h3>
 <p>Some utilities generate one output document for each input document (e.g. <b>
 Encoding Conversion</b>). You can choose the location and the name of these 
 output files here.</p>
-<p><cite>Use this root</cite> -- Select </p>
-<p><cite>Custom sub-folder</cite> -- Select</p>
-<p><cite>Use an extension</cite> -- Select this option to use a specific 
+<p><cite>Use this root</cite> -- Set this option to replace the input root by 
+the root entered in this field.</p>
+<p><cite>Custom sub-folder</cite> -- Set this option to add an extra 
+sub-directory between the root and the relative path of the output file. For 
+example:</p>
+<pre>Original input root = C:\myProject
+Relative input path = mySubDir\myFile.ext
+      Use this root = D:\myOutput
+  Custom sub-folder = ExtraSubDir
+
+Before = C:\myProject\mySubDir\myFile.ext
+ After = D:\myOutput\ExtrasubDir\\mySubDir\myFile.ext</pre>
+<p><cite>Use an extension</cite> -- Set this option to use a specific 
 extension in the output file. Enter the extension (with its period) in the 
 field.</p>
-<p><cite>Replace</cite> -- Select this option to replace the extension of the 
+<p><cite>Replace</cite> -- Set this option to replace the extension of the 
 input filename by the one defined here. (For example: &quot;<code>file.old</code>&quot; 
 becomes &quot;<code>file.new</code>&quot;). The old extension is the last part of the text 
 preceded by a period. (For example: &quot;<code>file.old1.old2</code>&quot; becomes &quot;<code>file.old1.new</code>&quot;).</p>
-<p><cite>Append</cite> -- Select this option to add the extension defined here 
+<p><cite>Append</cite> -- Set this option to add the extension defined here 
 at the end of the existing one. (For example: &quot;<code>file.old</code>&quot; becomes &quot;<code>file.old.new</code>&quot;).</p>
-<p><cite>Prepend</cite> -- Select this option to place the extension defined 
+<p><cite>Prepend</cite> -- Set this option to place the extension defined 
 here just before the existing one.&nbsp; (For example: &quot;<code>file.old</code>&quot; 
 becomes &quot;<code>file.new.old</code>&quot;).</p>
-<p><cite>Add the following prefix</cite> -- Select this option to add a specific 
+<p><cite>Add the following prefix</cite> -- Set this option to add a specific 
 prefix text at the beginning of the filename. Enter the prefix string.</p>
-<p><cite>Add the following suffix</cite> -- Select the option to add a specific 
+<p><cite>Add the following suffix</cite> -- Set the option to add a specific 
 suffix at the end of the filename (before any &#39;<code>.</code>&#39; character).</p>
-<p><cite>Replace this text</cite> --</p>
-<p><cite>By this text</cite> --</p>
+<p><cite>Replace this text</cite> -- Set this option to replace the text given 
+in this field by the one given in the <cite>By this text</cite> field.</p>
+<p><cite>By this text</cite> -- Enter the text to replace the one provided in 
+the <cite>Replace this text</cite> field.</p>
+<p>Anywhere in the output fields you can use following variables. they will be 
+replaced by their corresponding runtime equivalents:</p>
+<ul>
+	<li><code>${SrcLang}</code> = Source language code as defined in the
+	<a href="#LangAndEnc">source <cite>Language</cite></a> field. For example:
+	<code>en-US</code>.</li>
+	<li><code>${SrcLangU}</code> = Source language code in uppercase. For 
+	example: <code>EN-US</code>.</li>
+	<li><code>${SrcLangL}</code> = Source language code in lowercase. For 
+	example: <code>en-us</code>.</li>
+	<li><code>${SrcLoc}</code> = Source locale code (with a _ separator). For 
+	example: <code>en_US</code>.</li>
+	<li><code>${SrcLocLang}</code> = The language part of the source locale. For 
+	example: <code>en</code>.</li>
+	<li><code>${SrcLocReg}</code> = The region part of the source locale. For 
+	example: <code>US</code>. Or empty if no region is specified.</li>
+	<li><code>${TrgLang}</code> = Target language code as defined in the
+	<a href="#LangAndEnc">target <cite>Language</cite></a> field. For example:
+	<code>fr-CA</code>.</li>
+	<li><code>${TrgLangU}</code> = Target language code in uppercase. For 
+	example: <code>FR-CA</code>.</li>
+	<li><code>${TrgLangU}</code> = Target language code in uppercase. For 
+	example: <code>fr-ca</code>.</li>
+	<li><code>${TrgLoc}</code> = Target locale code (with a _ separator). For 
+	example: <code>fr_CA</code>.</li>
+	<li><code>${TrgLocLang}</code> = The language part of the target locale. For 
+	example: <code>fr</code>.</li>
+	<li><code>${TrgLocReg}</code> = The region part of the target locale. For 
+	example: <code>CA</code>. Or empty if no region is specified.</li>
+</ul>
 <h3>Filter Parameters</h3>
-<p><cite>Use custom parameters folder</cite> --</p>
+<p><cite>Use custom parameters folder</cite> -- Set this option to define an 
+absolute location for the directory where the filter parameters files reside. If 
+this option is not set, the filter parameters files are expected to be in the 
+project directory.</p>
 <p>&nbsp;</p>
 </body>
 </html>

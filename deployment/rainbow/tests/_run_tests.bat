@@ -2,6 +2,7 @@
 del _tests_results.txt
 del /S /Q extraction\test1\*.*
 del miscellaneous\*.out
+del miscellaneous\TransComp_MT.txt.html
 cls
 
 @echo ============================================================
@@ -17,6 +18,7 @@ java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\LineBreak_ToDos.rnb
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test1.rnb -x oku_encodingconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test2.rnb -x oku_encodingconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test3.rnb -x oku_encodingconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\TransComp_Test1.rnb -x oku_transcomparison -np
 comp miscellaneous\*.out miscellaneous\*.gold >> _tests_results.txt
 
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -x oku_extraction -np

@@ -35,14 +35,16 @@ public class BOMAwareInputStream extends InputStream {
 	private PushbackInputStream initStream;
 	private InputStream input;
 
-	public String defaultEncoding;
-	public String detectedEncoding;
+	private String defaultEncoding;
+	private String detectedEncoding;
+	private int bomSize;
 
 	public BOMAwareInputStream (InputStream input,
 		String defaultEncoding)
 	{
 		this.input = input;
 		this.defaultEncoding = defaultEncoding;
+		bomSize = 0;
 	}
 	
 	public String detectEncoding ()
@@ -51,17 +53,18 @@ public class BOMAwareInputStream extends InputStream {
 		initStream = new PushbackInputStream(input, BUFFER_SIZE);
 		byte bom[] = new byte[BUFFER_SIZE];
 		int n = initStream.read(bom, 0, bom.length);
-		
 		int unread;
 		if (( bom[0] == (byte)0xEF )
 			&& ( bom[1] == (byte)0xBB )
 			&& ( bom[2] == (byte)0xBF )) {
 			detectedEncoding = "UTF-8";
+			bomSize = 3;
 			unread = n-3;
 		}
 		else if (( bom[0] == (byte)0xFE )
 			&& ( bom[1] == (byte)0xFF )) {
 			detectedEncoding = "UTF-16BE";
+			bomSize = 2;
 			unread = n-2;
 		}
 		else if (( bom[0] == (byte)0xFF )
@@ -69,11 +72,13 @@ public class BOMAwareInputStream extends InputStream {
 			&& ( bom[2] == (byte)0x00 )
 			&& ( bom[3] == (byte)0x00 )) {
 			detectedEncoding = "UTF-32LE";
+			bomSize = 4;
 			unread = n-4;
 		}
 		else if (( bom[0] == (byte)0xFF )
 			&& ( bom[1] == (byte)0xFE )) {
 			detectedEncoding = "UTF-16LE";
+			bomSize = 2;
 			unread = n-2;
 		}
 		else if (( bom[0] == (byte)0x00 )
@@ -81,10 +86,12 @@ public class BOMAwareInputStream extends InputStream {
 			&& ( bom[2] == (byte)0xFE )
 			&& ( bom[3] == (byte)0xFF )) {
 			detectedEncoding = "UTF-32BE";
+			bomSize = 4;
 			unread = n-4;
 		}
 		else { // No BOM
 			detectedEncoding = defaultEncoding;
+			bomSize = 0;
 			unread = n;
 		}
 
@@ -94,6 +101,14 @@ public class BOMAwareInputStream extends InputStream {
 		}
 
 		return detectedEncoding;
+	}
+
+	public String getDetectedEncoding () {
+		return detectedEncoding;
+	}
+	
+	public int getBOMSize () {
+		return bomSize;
 	}
 	
 	@Override

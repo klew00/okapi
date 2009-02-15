@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
@@ -44,34 +44,35 @@ public class PathBuilder {
 	private String search;
 	private String replace;
 
-	static public String replaceVariables (String p_sInput,
+	static public String replaceVariables (String input,
 		String srcLang,
 		String trgLang)
 	{
 		// Macros
-		if ( p_sInput.indexOf("${") == -1 ) return p_sInput;
+		if ( input.indexOf("${") == -1 ) return input;
 
-		p_sInput = p_sInput.replace("${SrcLangU}", srcLang.toUpperCase());
-		p_sInput = p_sInput.replace("${$SrcLang}", srcLang.toLowerCase());
-		p_sInput = p_sInput.replace("${TrgLangU}", trgLang.toUpperCase());
-		p_sInput = p_sInput.replace("${$TrgLang}", trgLang.toLowerCase());
+		input = input.replace("${SrcLangU}", srcLang.toUpperCase());
+		input = input.replace("${SrcLangL}", srcLang.toLowerCase());
+		input = input.replace("${SrcLang}", srcLang);
+		input = input.replace("${TrgLangU}", trgLang.toUpperCase());
+		input = input.replace("${TrgLangL}", trgLang.toLowerCase());
+		input = input.replace("${TrgLang}", trgLang);
 
-//TODO		Locale LC;
-		try {
-//			String[] aRes = Utils.splitLanguageCode(p_sLang);
-//			LC = new Locale(aRes[0], aRes[1]);
+		if ( input.indexOf("${SrcLoc") != -1 ) {
+			String[] res = Util.splitLanguageCode(srcLang);
+			input = input.replace("${SrcLoc}", srcLang.replace('-', '_'));
+			input = input.replace("${SrcLocLang}", res[0]);
+			input = input.replace("${SrcLocReg}", res[1]);
 		}
-		catch (Exception E ) {
-			// On error, replace by error place-holder
-			p_sInput = p_sInput.replace("${SrcLangNameE}", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("${SrcLangWin3}", Res.getString("BLDPATH_NOVARVALUE"));
-			p_sInput = p_sInput.replace("${SrcLCID}", Res.getString("BLDPATH_NOVARVALUE"));
-			return p_sInput.replace("${SrcLangNameN}", Res.getString("BLDPATH_NOVARVALUE"));
+		
+		if ( input.indexOf("${TrgLoc") != -1 ) {
+			String[] res = Util.splitLanguageCode(trgLang);
+			input = input.replace("${TrgLoc}", trgLang.replace('-', '_'));
+			input = input.replace("${TrgLocLang}", res[0]);
+			input = input.replace("${TrgLocReg}", res[1]);
 		}
-		p_sInput = p_sInput.replace("${SrcLangNameE}", "TODO"); //CI.EnglishName);
-		//TODO p_sInput = p_sInput.replace("${LWin3}", "TODO"); //CI.ThreeLetterWindowsLanguageName);
-		//TODO p_sInput = p_sInput.replace("${LCID}", "TODO"); //CI.LCID.ToString());
-		return p_sInput.replace("${SrcLangNameN}", "TODO"); //CI.NativeName);
+
+		return input;
 	}
 
 	public PathBuilder () {

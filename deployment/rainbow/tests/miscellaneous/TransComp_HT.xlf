@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2">
+<file original='Test01' source-language='EN-US' target-language='FR-FR' datatype='plaintext'>
+<body>
+<trans-unit id='1'>
+<source>88 mm (W) x 100 mm (D) x 32 mm (H) / approx. 295 g</source>
+<target>88 mm (L) x 100 mm (P) x 32 mm (H) / 295 g environ</target>
+</trans-unit>
+<trans-unit id='2'>
+<source>From Name</source>
+<target>Nom de l'image</target>
+</trans-unit>
+<trans-unit id='3'>
+<source>Sending  Documents</source>
+<target>Envoi de documents</target>
+</trans-unit>
+<trans-unit id='4'>
+<source>See the procedure for dynamic installation in Chapter 2, "Getting Started," in the UFR Driver Guide.</source>
+<target>Voir la procédure d'installation dynamique dans le chapitre 2, Prise en main, du Guide du pilote UFR.</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

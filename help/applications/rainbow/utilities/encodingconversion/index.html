@@ -70,10 +70,10 @@ if this option is set and the output encoding is Shift-JIS.</p>
 <h2>Updating Encoding Declarations</h2>
 <p>This utility can update automatically the encoding declarations of XML and 
 HTML documents, given a few conditions.</p>
+<p>The following algorithms are run on the first 1024 characters of each 
+document. Note that the routine is not XML or HTML aware and cannot make 
+distinction between normal XML/HTML code and XML/HTML comments.</p>
 <h3>Detection of XML Documents</h3>
-<p>The utility detects an XML document when it has a .xml extension, or when it 
-has an XML declaration in its 1024 first characters (regardless where, so even 
-in comments).</p>
 <ul>
 	<li>If an XML encoding declaration is detected:<ul>
 		<li>The encoding value is updated.</li>
@@ -84,7 +84,7 @@ in comments).</p>
 		after the version.</li>
 	</ul>
 	</li>
-	<li>Otherwise, if the file ends with a <code>.xml</code> extension:<ul>
+	<li>Otherwise, if the name of the file ends with a <code>.xml</code> extension:<ul>
 		<li>An XML declaration (with an encoding declaration of the output 
 		encoding) is added at the top of the document.</li>
 	</ul>
@@ -92,8 +92,23 @@ in comments).</p>
 </ul>
 <h3>Detection of the HTML Documents</h3>
 <ul>
-	<li></li>
+	<li>If an HTML charset declaration is detected:</li>
+	<li>Otherwise, if the name of the file ends with an extension that starts 
+	with <code>.htm</code>:<ul>
+	<li>If a <code>&lt;head&gt;</code> element is found:<ul>
+	<li>A charset declaration is added just after.</li>
 </ul>
+	</li>
+	<li>Otherwise, if a <code>&lt;htm</code> string is detected:<ul>
+	<li>A <code>&lt;head&gt;</code> and a charset declaration are added after the 
+	first &#39;<code>&gt;</code>&#39; after the string found.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+</ul>
+<p>Note that a document can be both and XML and HTML document and have both 
+types of encoding/charset declarations.</p>
 <p>&nbsp;</p>
 </body>
 </html>

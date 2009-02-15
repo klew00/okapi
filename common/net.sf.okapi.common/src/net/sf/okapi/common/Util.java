@@ -527,7 +527,7 @@ public class Util {
 			String tmp = encoding.toLowerCase();
 			
 			// Check UTF-8 first (most cases)
-			if (( bomOnUTF8 ) && ( tmp.equals("utf-8") )) { 
+			if (( bomOnUTF8 ) && ( tmp.equalsIgnoreCase("utf-8") )) { 
 				writer.write("\ufeff");
 				return;
 			}
@@ -563,7 +563,7 @@ public class Util {
 	/**
 	 * Splits a given ISO language tag into its components.
 	 * @param language The language code to process.
-	 * @return An array of two strings: 0=language, 1=region/country
+	 * @return An array of two strings: 0=language, 1=region/country (or empty)
 	 */
 	public static String[] splitLanguageCode (String language) {
 		if (( language == null ) || ( language.length() == 0 )) return null;

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4"><header creationtool="oku_transcomparison" creationtoolversion="unknown" segtype="paragraph" o-tmf="unknown" adminlang="en" srclang="EN-US" datatype="unknown"></header><body>
+<tu tuid="autoID1">
+<tuv xml:lang="EN-US"><seg>88 mm (W) x 100 mm (D) x 32 mm (H) / approx. 295 g</seg></tuv>
+<tuv xml:lang="FR-FR-mt"><seg>88 mm (L) x 100 mm (P) x 32 mm (H) / 295 g</seg>
+<prop type="Txt::Score">094</prop>
+</tuv>
+<tuv xml:lang="FR-FR"><seg>88 mm (L) x 100 mm (P) x 32 mm (H) / 295 g environ</seg></tuv>
+</tu>
+<tu tuid="autoID2">
+<tuv xml:lang="EN-US"><seg>From Name</seg></tuv>
+<tuv xml:lang="FR-FR-mt"><seg>Nom</seg>
+<prop type="Txt::Score">020</prop>
+</tuv>
+<tuv xml:lang="FR-FR"><seg>Nom de l&apos;image</seg></tuv>
+</tu>
+<tu tuid="autoID3">
+<tuv xml:lang="EN-US"><seg>Sending Documents</seg></tuv>
+<tuv xml:lang="FR-FR-mt"><seg>envoi de documents</seg>
+<prop type="Txt::Score">100</prop>
+</tuv>
+<tuv xml:lang="FR-FR"><seg>Envoi de documents</seg></tuv>
+</tu>
+<tu tuid="autoID4">
+<tuv xml:lang="EN-US"><seg>See the procedure for dynamic installation in Chapter 2, &quot;Getting Started,&quot; in the UFR Driver Guide.</seg></tuv>
+<tuv xml:lang="FR-FR-mt"><seg>Voir la procédure d&apos;installation dynamique dans le chapitre 2, Mise en route, du Guide du pilote UFR.</seg>
+<prop type="Txt::Score">094</prop>
+</tuv>
+<tuv xml:lang="FR-FR"><seg>Voir la procédure d&apos;installation dynamique dans le chapitre 2, Prise en main, du Guide du pilote UFR.</seg></tuv>
+</tu>
+</body>
+</tmx>

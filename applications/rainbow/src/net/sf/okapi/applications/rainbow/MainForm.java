@@ -1245,6 +1245,7 @@ public class MainForm implements IParametersProvider {
 			lbSourceLang.setSelection(n);
 			lbSourceLang.showSelection();
 		}
+		pnlPathBuilder.setSourceLanguage(edSourceLang.getText());
 	}
 
 	private void updateTargetLanguageSelection () {
@@ -1254,6 +1255,7 @@ public class MainForm implements IParametersProvider {
 			lbTargetLang.setSelection(n);
 			lbTargetLang.showSelection();
 		}
+		pnlPathBuilder.setTargetLanguage(edTargetLang.getText());
 	}
 
 	private void updateSourceEncodingSelection () {
