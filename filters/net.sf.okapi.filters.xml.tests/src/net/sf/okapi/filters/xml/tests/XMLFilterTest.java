@@ -20,7 +20,6 @@
 
 package net.sf.okapi.filters.xml.tests;
 
-import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -38,15 +37,16 @@ public class XMLFilterTest {
 		try {
 			filter = new XMLFilter();
 			filter.setOptions("en", "es", "UTF-8", true);
+			
+			URL url = XMLFilterTest.class.getResource("/Test1_XML.xml");
+			filter.open(url.toURI());
+			if ( !testDriver.process(filter) ) Assert.fail();
+			filter.close();
 
-			filter.open("<doc><p>p1<q>q1</q>p2</p></doc>\n <!--com-->");
+			filter.open("<doc>\n <h>\n  <t>text1</t>\n  <t>text2</t></h></doc>");
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			
-			URL url = XMLFilterTest.class.getResource("/Translate2.xml");
-			filter.open(new URI(url.toString()));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

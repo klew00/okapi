@@ -503,9 +503,9 @@ public class XMLFilter implements IFilter {
 					addStartTagToSkeleton(node);
 					// And create a new one
 					if ( node.hasChildNodes() && trav.translate() ) {
-						context.push(new ContextItem(node, trav.translate()));
 						frag = new TextFragment();
 					}
+					context.push(new ContextItem(node, trav.translate()));
 				}
 				break;
 			}
