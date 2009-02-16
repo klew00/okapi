@@ -73,7 +73,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	MemMappedCharSequence(final String string) {
+	public MemMappedCharSequence(final String string) {
 		tempText = new char[string.length()];
 		text = CharBuffer.wrap(tempText);
 		string.getChars(0, string.length(), tempText, 0);
@@ -88,7 +88,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	MemMappedCharSequence(final URI tempUTF16BEfile) {
+	public MemMappedCharSequence(final URI tempUTF16BEfile) {
 		tempText = null; // not needed with buffered CharBuffer
 		text = null;
 		FileChannel fc = null;
