@@ -1,6 +1,8 @@
 package net.sf.okapi.filters.html.tests;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -62,6 +64,17 @@ public class HtmlFullFileTest {
 		htmlFilter.open(htmlStream);
 		while (htmlFilter.hasNext()) {
 			FilterEvent event = htmlFilter.next();
+		}
+	}
+	
+	@Test
+	public void testTmx() throws FileNotFoundException {
+		htmlFilter.setOptions("en", "UTF-16LE", true);
+		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.filters.html.tests/html/FCH.tmx");
+		htmlFilter.open(in);			
+		while (htmlFilter.hasNext()) {
+			FilterEvent event = htmlFilter.next();
+			System.out.print(event.getEventType().toString());
 		}
 	}
 }

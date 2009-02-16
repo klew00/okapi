@@ -69,6 +69,12 @@ public class HtmlSnippetsTest {
 	}
 	
 	@Test
+	public void testPWithInlineTextOnly() {
+		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";
+		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+	}
+	
+	@Test
 	public void testTableGroups() {
 		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
@@ -82,6 +88,12 @@ public class HtmlSnippetsTest {
 			 + "<li>Text of item 2</li>"
 			 + "</ul>"
 			 + "and text after the list.</p>";
+		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+	}
+
+	@Test
+	public void testInput() {
+		String snippet = "<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 	
