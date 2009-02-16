@@ -146,7 +146,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-		document.fullSequentialParse();
+		document.fullSequentialParse(); // optimizes jericho parsing
 		nodeIterator = document.getNodeIterator();
 	}
 
