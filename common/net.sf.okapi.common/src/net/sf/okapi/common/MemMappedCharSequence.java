@@ -94,10 +94,15 @@ public final class MemMappedCharSequence implements CharSequence {
 		FileChannel fc = null;
 		try {
 			fc = new RandomAccessFile(tempUTF16BEfile.getPath(), "rw").getChannel();
-			MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.READ_WRITE, 0, fc.size());
+			MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.PRIVATE, 0, fc.size());
 			byteBuffer.order(ByteOrder.BIG_ENDIAN);
 			text = byteBuffer.asCharBuffer();
 			fc.close();
+			
+			// lowercase the buffer
+			for (int i = 0; i < text.length(); i++)
+				text.put(i, Character.toLowerCase(text.get(i)));
+			
 		} catch (FileNotFoundException fnfx) {
 			throw new RuntimeException(fnfx);
 		} catch (IOException iox) {
