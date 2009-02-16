@@ -27,19 +27,27 @@ public class ITSEngine implements IProcessor, ITraversal
 	public static final String    ITS_NS_PREFIX  = "its";
 	public static final String    XLINK_NS_URI   = "http://www.w3.org/1999/xlink";
 	
-	private static final String   FLAGNAME       = "\u00ff";
-	private static final String   FLAGSEP        = "\u001c";
+	private static final String   FLAGNAME            = "\u00ff";
+	private static final String   FLAGSEP             = "\u001c";
+	private static final String   FLAGDEFAULTDATA     = "?????"+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
 	private static final int      FP_TERMINOLOGY      = 3;
+	private static final int      FP_LOCNOTE          = 4;
 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
+	private static final int      FP_LOCNOTE_DATA          = 1;
 	
-	private static final int      TERMINFOTYPE_POINTER     = 0;
-	private static final int      TERMINFOTYPE_REF         = 1;
-	private static final int      TERMINFOTYPE_REFPOINTER  = 2;
+	private static final int      TERMINFOTYPE_POINTER     = 1;
+	private static final int      TERMINFOTYPE_REF         = 2;
+	private static final int      TERMINFOTYPE_REFPOINTER  = 3;
+	
+	private static final int      LOCNOTETYPE_TEXT         = 1;
+	private static final int      LOCNOTETYPE_POINTER      = 2;
+	private static final int      LOCNOTETYPE_REF          = 3;
+	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
 
 	private DocumentBuilderFactory fact; 
 	private Document doc;
@@ -183,6 +191,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
 						compileDirRule(ruleElem, isInternal);
 					}
+					else if ( "locNoteRule".equals(ruleElem.getLocalName()) ) {
+						compileLocNoteRule(ruleElem, isInternal);
+					}
 					else if ( "termRule".equals(ruleElem.getLocalName()) ) {
 						compileTermRule(ruleElem, isInternal);
 					}
@@ -230,91 +241,141 @@ public class ITSEngine implements IProcessor, ITraversal
 	private void compileTranslateRule (Element elem,
 		boolean isInternal)
 	{
-		ITSRule rule = new ITSRule();
+		ITSRule rule = new ITSRule(IProcessor.DC_TRANSLATE);
 		rule.selector = elem.getAttribute("selector");
-		String value = elem.getAttribute("translate");
-		if ( "yes".equals(value) ) rule.translate = true;
-		else if ( "no".equals(value) ) rule.translate = false;
-		else throw new RuntimeException("Invalid value for 'translate'.");
-		rule.ruleType = IProcessor.DC_TRANSLATE;
 		rule.isInternal = isInternal;
+		
+		String value = elem.getAttribute("translate");
+		if ( "yes".equals(value) ) rule.flag = true;
+		else if ( "no".equals(value) ) rule.flag = false;
+		else throw new RuntimeException("Invalid value for 'translate'.");
+		
 		rules.add(rule);
 	}
 
 	private void compileDirRule (Element elem,
 		boolean isInternal)
 	{
-		ITSRule rule = new ITSRule();
+		ITSRule rule = new ITSRule(IProcessor.DC_DIRECTIONALITY);
 		rule.selector = elem.getAttribute("selector");
-		String value = elem.getAttribute("dir");
-		if ( "ltr".equals(value) ) rule.dir = DIR_LTR;
-		else if ( "rtl".equals(value) ) rule.dir = DIR_RTL;
-		else if ( "lro".equals(value) ) rule.dir = DIR_LRO;
-		else if ( "rlo".equals(value) ) rule.dir = DIR_RLO;
-		else throw new RuntimeException("Invalid value for 'dir'.");
-		rule.ruleType = IProcessor.DC_DIRECTIONALITY;
 		rule.isInternal = isInternal;
+		
+		String value = elem.getAttribute("dir");
+		if ( "ltr".equals(value) ) rule.value = DIR_LTR;
+		else if ( "rtl".equals(value) ) rule.value = DIR_RTL;
+		else if ( "lro".equals(value) ) rule.value = DIR_LRO;
+		else if ( "rlo".equals(value) ) rule.value = DIR_RLO;
+		else throw new RuntimeException("Invalid value for 'dir'.");
+		
 		rules.add(rule);
 	}
 
 	private void compileWithinTextRule (Element elem,
 			boolean isInternal)
 		{
-			ITSRule rule = new ITSRule();
+			ITSRule rule = new ITSRule(IProcessor.DC_WITHINTEXT);
 			rule.selector = elem.getAttribute("selector");
-			String value = elem.getAttribute("withinText");
-			if ( "yes".equals(value) ) rule.withinText = WITHINTEXT_YES;
-			else if ( "no".equals(value) ) rule.withinText = WITHINTEXT_NO;
-			else if ( "nested".equals(value) ) rule.withinText = WITHINTEXT_NESTED;
-			else throw new RuntimeException("Invalid value for 'withinText'.");
-			rule.ruleType = IProcessor.DC_WITHINTEXT;
 			rule.isInternal = isInternal;
+			
+			String value = elem.getAttribute("withinText");
+			if ( "yes".equals(value) ) rule.value = WITHINTEXT_YES;
+			else if ( "no".equals(value) ) rule.value = WITHINTEXT_NO;
+			else if ( "nested".equals(value) ) rule.value = WITHINTEXT_NESTED;
+			else throw new RuntimeException("Invalid value for 'withinText'.");
+			
 			rules.add(rule);
 		}
 
 	private void compileTermRule (Element elem,
-			boolean isInternal)
-		{
-			ITSRule rule = new ITSRule();
-			rule.selector = elem.getAttribute("selector");
-			// term
-			String value = elem.getAttribute("term");
-			if ( "yes".equals(value) ) rule.term = true;
-			else if ( "no".equals(value) ) rule.term = false;
-			else throw new RuntimeException("Invalid value for 'term'.");
-			
-			value = elem.getAttribute("termInfoPointer");
-			String value2 = elem.getAttribute("termInfoRef");
-			String value3 = elem.getAttribute("termInfoRefPointer");
-			
-			if ( value.length() > 0 ) {
-				rule.termInfoType = TERMINFOTYPE_POINTER;
-				rule.termInfo = value;
-				if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_TERMINOLOGY);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		// term
+		String value = elem.getAttribute("term");
+		if ( "yes".equals(value) ) rule.flag = true;
+		else if ( "no".equals(value) ) rule.flag = false;
+		else throw new RuntimeException("Invalid value for 'term'.");
+		
+		value = elem.getAttribute("termInfoPointer");
+		String value2 = elem.getAttribute("termInfoRef");
+		String value3 = elem.getAttribute("termInfoRefPointer");
+		
+		if ( value.length() > 0 ) {
+			rule.infoType = TERMINFOTYPE_POINTER;
+			rule.info = value;
+			if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
+				throw new RuntimeException("Too many termInfoXXX attributes specified");
+			}
+		}
+		else {
+			if ( value2.length() > 0 ) {
+				rule.infoType = TERMINFOTYPE_REF;
+				rule.info = value2;
+				if ( value3.length() > 0 ) {
 					throw new RuntimeException("Too many termInfoXXX attributes specified");
 				}
 			}
 			else {
-				if ( value2.length() > 0 ) {
-					rule.termInfoType = TERMINFOTYPE_REF;
-					rule.termInfo = value2;
-					if ( value3.length() > 0 ) {
-						throw new RuntimeException("Too many termInfoXXX attributes specified");
+				if ( value3.length() > 0 ) {
+					rule.infoType = TERMINFOTYPE_REFPOINTER;
+					rule.info = value3;
+				}
+				// Else: No associate information, rule.termInfo is null
+			}
+		}
+
+		rules.add(rule);
+	}
+
+	private void compileLocNoteRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_LOCNOTE);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		String value1 = elem.getAttribute("locNote");
+		String value2 = elem.getAttribute("locNotePointer");
+		String value3 = elem.getAttribute("locNoteRef");
+		String value4 = elem.getAttribute("locNoteRefPointer");
+		
+		if ( value1.length() > 0 ) {
+			rule.infoType = LOCNOTETYPE_TEXT;
+			rule.info = value1;
+			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
+				throw new RuntimeException("Too many locNoteXXX attributes specified");
+			}
+		}
+		else {
+			if ( value2.length() > 0 ) {
+				rule.infoType = LOCNOTETYPE_POINTER;
+				rule.info = value2;
+				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
+					throw new RuntimeException("Too many locNoteXXX attributes specified");
+				}
+			}
+			else {
+				if ( value3.length() > 0 ) {
+					rule.infoType = TERMINFOTYPE_REF;
+					rule.info = value3;
+					if ( value4.length() > 0 ) {
+						throw new RuntimeException("Too many locNoteXXX attributes specified");
 					}
 				}
 				else {
-					if ( value3.length() > 0 ) {
-						rule.termInfoType = TERMINFOTYPE_REFPOINTER;
-						rule.termInfo = value3;
+					if ( value4.length() > 0 ) {
+						rule.infoType = TERMINFOTYPE_REFPOINTER;
+						rule.info = value4;
 					}
-					// Else: No associate information, rule.termInfo is null
 				}
 			}
-
-			rule.ruleType = IProcessor.DC_TERMINOLOGY;
-			rule.isInternal = isInternal;
-			rules.add(rule);
 		}
+
+		rules.add(rule);
+	}
 
 	public void applyRules (int dataCategories) {
 		processGlobalRules(dataCategories);
@@ -481,10 +542,12 @@ public class ITSEngine implements IProcessor, ITraversal
 		
 		if ( data.charAt(FP_TERMINOLOGY) != '?' ) {
 			trace.peek().term = (data.charAt(FP_TERMINOLOGY) == 'y');
-		//TODO: terminfo data
+			trace.peek().termInfo = getFlagData(data, FP_TERMINOLOGY_DATA);
 		}
 		
-
+		if ( data.charAt(FP_LOCNOTE) != '?' ) {
+			trace.peek().locNote = getFlagData(data, FP_LOCNOTE_DATA);
+		}
 	}
 
 	public void startTraversal () {
@@ -525,21 +588,46 @@ public class ITSEngine implements IProcessor, ITraversal
 				for ( int i=0; i<NL.getLength(); i++ ) {
 					switch ( rule.ruleType ) {
 					case IProcessor.DC_TRANSLATE:
-						setFlag(NL.item(i), FP_TRANSLATE,
-							(rule.translate ? 'y' : 'n'), true);
+						setFlag(NL.item(i), FP_TRANSLATE, (rule.flag ? 'y' : 'n'), true);
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
-							String.valueOf(rule.dir).charAt(0), true);
+							String.valueOf(rule.value).charAt(0), true);
 						break;
 					case IProcessor.DC_WITHINTEXT:
 						setFlag(NL.item(i), FP_WITHINTEXT,
-							String.valueOf(rule.withinText).charAt(0), true);
+							String.valueOf(rule.value).charAt(0), true);
 						break;
 					case IProcessor.DC_TERMINOLOGY:
-						//TODO: add the termInfo string too
-						setFlag(NL.item(i), FP_TERMINOLOGY,
-							(rule.term ? 'y' : 'n'), true);
+						setFlag(NL.item(i), FP_TERMINOLOGY, (rule.flag ? 'y' : 'n'), true);
+						switch ( rule.infoType ) {
+						case TERMINFOTYPE_POINTER:
+							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, resolvePointer(NL.item(i), rule.info), true);
+							break;
+						case TERMINFOTYPE_REF:
+							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+rule.info, true);
+							break;
+						case TERMINFOTYPE_REFPOINTER:
+							setFlag(NL.item(i), FP_TERMINOLOGY_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
+							break;
+						}
+						break;
+					case IProcessor.DC_LOCNOTE:
+						setFlag(NL.item(i), FP_LOCNOTE, 'y', true);
+						switch ( rule.infoType ) {
+						case LOCNOTETYPE_TEXT:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, rule.info, true);
+							break;
+						case LOCNOTETYPE_POINTER:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, resolvePointer(NL.item(i), rule.info), true);
+							break;
+						case LOCNOTETYPE_REF:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+rule.info, true);
+							break;
+						case LOCNOTETYPE_REFPOINTER:
+							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
+							break;
+						}
 						break;
 					}
 				}
@@ -594,7 +682,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			
 			if ( (dataCategories & IProcessor.DC_TERMINOLOGY) > 0 ) {
 				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":term|//"+ITS_NS_PREFIX+":span/@term"
-					+"//*/@"+ITS_NS_PREFIX+":termInfoPointer|//"+ITS_NS_PREFIX+":span/@termInfoPointer");
+					+"//*/@"+ITS_NS_PREFIX+":termInfoRef|//"+ITS_NS_PREFIX+":span/@termInfoRef");
 				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
 				Attr attr;
 				String localName;
@@ -615,7 +703,32 @@ public class ITSEngine implements IProcessor, ITraversal
 						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());
 					}
 					else if ( localName.equals("termInfoPointer") ) {
-						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA, attr.getValue(), attr.getSpecified());
+						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY_DATA,
+							"REF:"+resolvePointer(attr.getOwnerElement(), attr.getValue()), attr.getSpecified());
+					}
+				}
+			}
+
+			if ( (dataCategories & IProcessor.DC_LOCNOTE) > 0 ) {
+				XPathExpression expr = xpath.compile("//*/@"+ITS_NS_PREFIX+":locNote|//"+ITS_NS_PREFIX+":span/@locNote"
+					+"//*/@"+ITS_NS_PREFIX+":locNoteRef|//"+ITS_NS_PREFIX+":span/@locNoteRef");
+				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				Attr attr;
+				String localName;
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					localName = attr.getLocalName();
+					// Skip irrelevant nodes
+					if ( ITS_NS_URI.equals(attr.getOwnerElement().getNamespaceURI())
+						&& "locNoteRule".equals(attr.getOwnerElement().getLocalName()) ) continue;
+					setFlag(attr.getOwnerElement(), FP_LOCNOTE, 'y', attr.getSpecified());
+					if ( localName.equals("locNote") ) {
+						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
+							attr.getValue(), attr.getSpecified());
+					}
+					else if ( localName.equals("termInfoPointer") ) {
+						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
+							"REF:"+resolvePointer(attr.getOwnerElement(), attr.getValue()), attr.getSpecified());
 					}
 				}
 			}
@@ -625,6 +738,41 @@ public class ITSEngine implements IProcessor, ITraversal
 		}
 	}
 
+	/**
+	 * Gets the content of a simple element. This is to work around the implementation issue of 
+	 * node.gettextContent() in some VM of the Macintosh.
+	 * @param node The element node to process.
+	 * @return The content of the element.
+	 */
+	private String getTextContent (Node node) {
+		//TODO: take in account non-text nodes before the first one (e.g. comments)
+		Node n = node.getFirstChild();
+		if ( n == null ) return "";
+		return n.getNodeValue();
+	}
+	
+	private String resolvePointer (Node node,
+		String pointer)
+	{
+		try {
+			XPathExpression expr = xpath.compile(pointer);
+			NodeList list = (NodeList)expr.evaluate(node, XPathConstants.NODESET);
+			if (( list == null ) || ( list.getLength() == 0 )) {
+				return "";
+			}
+			switch ( list.item(0).getNodeType() ) {
+			case Node.ELEMENT_NODE:
+				return getTextContent(list.item(0));
+			case Node.ATTRIBUTE_NODE:
+				return list.item(0).getNodeValue();
+			}
+		}
+		catch (XPathExpressionException e) {
+			return "Bab XPath expression in pointer \""+pointer+"\".";
+		}
+		return "pointer("+pointer+")";
+	}
+	
 	/**
 	 * Sets the flag for a given node.
 	 * @param node The node to flag.
@@ -640,7 +788,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	{
 		StringBuilder data = new StringBuilder();
 		if ( node.getUserData(FLAGNAME) == null )
-			data.append("????"+FLAGSEP+FLAGSEP);
+			data.append(FLAGDEFAULTDATA);
 		else
 			data.append((String)node.getUserData(FLAGNAME));
 		// Set the new value (if not there yet or override requested)
@@ -664,23 +812,34 @@ public class ITSEngine implements IProcessor, ITraversal
 	{
 		StringBuilder data = new StringBuilder();
 		if ( node.getUserData(FLAGNAME) == null )
-			data.append("????"+FLAGSEP+FLAGSEP);
+			data.append(FLAGDEFAULTDATA);
 		else
 			data.append((String)node.getUserData(FLAGNAME));
 		// Get the data
 		int n1 = 0;
-		int n2 = 0;
-		int start = 0;
+		int n2 = data.indexOf(FLAGSEP, 0);
 		for ( int i=0; i<=position; i++ ) {
-			n1 = data.indexOf(FLAGSEP, start+1);
+			n1 = n2;
 			n2 = data.indexOf(FLAGSEP, n1+1);
-			start = n2;
 		}
 		// Set the new value (if not there yet or override requested)
 		if ( override || ( n2>n1+1 )) {
 			data.replace(n1+1, n2, value);
 		}
 		node.setUserData(FLAGNAME, data.toString(), null);
+	}
+	
+	private String getFlagData (String data,
+		int position)
+	{
+		int n1 = 0;
+		int n2 = data.indexOf(FLAGSEP, 0);
+		for ( int i=0; i<=position; i++ ) {
+			n1 = n2;
+			n2 = data.indexOf(FLAGSEP, n1+1);
+		}
+		if ( n2>n1+1 ) return data.substring(n1+1, n2);
+		else return "";
 	}
 
 	public boolean translate () {
@@ -721,5 +880,17 @@ public class ITSEngine implements IProcessor, ITraversal
 		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TERMINOLOGY) == 'y');
 	}
+
+	public String getNote () {
+		return trace.peek().locNote;
+	}
 	
+	public String getNote (Attr attribute) {
+		if ( attribute == null ) return null;
+		String tmp;
+		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
+		if ( tmp.charAt(FP_LOCNOTE) != 'y' ) return null;
+		return getFlagData(tmp, FP_LOCNOTE_DATA);
+	}
+
 }

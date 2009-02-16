@@ -1,6 +1,7 @@
 @echo OFF
 del _tests_results.txt
-del /S /Q extraction\test1\*.*
+del /S /Q extraction\test1_out\*.*
+del /S /Q extraction\test2_out\*.*
 del miscellaneous\*.out
 del miscellaneous\TransComp_MT.txt.html
 cls
@@ -25,6 +26,11 @@ java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Translation.rnb -x oku_textrewriting -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Merging.rnb -x oku_merging -np
 comp extraction\test1_out\done\*.* extraction\test1_gold\*.* >> _tests_results.txt
+
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test2_Extraction.rnb -x oku_extraction -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test2_Translation.rnb -x oku_textrewriting -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test2_Merging.rnb -x oku_merging -np
+comp extraction\test2_out\done\*.* extraction\test2_gold\*.* >> _tests_results.txt
 
 start _tests_results.txt
 

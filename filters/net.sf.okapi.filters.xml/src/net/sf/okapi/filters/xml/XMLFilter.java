@@ -493,7 +493,7 @@ public class XMLFilter implements IFilter {
 				if ( frag == null ) { // Not yet in extraction
 					addStartTagToSkeleton(node);
 					if ( node.hasChildNodes() && trav.translate() ) {
-						context.push(new ContextItem(node, trav.translate()));
+						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
 						frag = new TextFragment();
 					}
 				}
@@ -505,7 +505,7 @@ public class XMLFilter implements IFilter {
 					if ( node.hasChildNodes() && trav.translate() ) {
 						frag = new TextFragment();
 					}
-					context.push(new ContextItem(node, trav.translate()));
+					context.push(new ContextItem(node, trav.translate(), trav.getNote()));
 				}
 				break;
 			}
@@ -527,6 +527,7 @@ public class XMLFilter implements IFilter {
 	private boolean addTextUnit (Node node,
 		boolean popStack)
 	{
+		String locNote = context.peek().locNote;
 		if ( popStack ) context.pop();
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
@@ -541,6 +542,10 @@ public class XMLFilter implements IFilter {
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType("text/xml");
 		tu.setSourceContent(frag);
+		if ( locNote != null ) {
+			//TODO: implement real notes
+			tu.setProperty(new Property("locnote", locNote));
+		}
 		skel.addContentPlaceholder(tu);
 		if ( popStack ) skel.add(buildEndTag(node));
 		tu.setSkeleton(skel);

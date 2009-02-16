@@ -84,4 +84,22 @@ public interface ITraversal {
 	 * @return True if the attribute is a term, false otherwise.
 	 */
 	boolean isTerm (Attr attribute);
+	
+	/**
+	 * Gets the localization notes of the current element of the traversal, or null
+	 * if the node has no localization notes.
+	 * @return The localization note of the current element, or null if the
+	 * node has no localization note.
+	 */
+	String getNote ();
+	
+	/**
+	 * Get the localization note of the given attribute of the current element.
+	 * @param attribute The attribute to query. The attribute must be in the current
+	 * node of the traversal.
+	 * @return The localization note of the attribute, or null if the
+	 * attribute has no localization note.
+	 */
+	String getNote (Attr attribute);
+	
 }

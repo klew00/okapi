@@ -26,12 +26,15 @@ class ContextItem {
 	
 	Node node;
 	boolean translate;
+	String locNote;
 
 	public ContextItem (Node node,
-		boolean translate)
+		boolean translate,
+		String locNote)
 	{
 		this.node = node;
 		this.translate = translate;
+		this.locNote = locNote;
 	}
 
 }
