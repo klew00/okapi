@@ -20,7 +20,7 @@
 
 // Modified by Jim Hargrave for the Okapi project licensed under the LGPL
 
-package net.sf.okapi.filters.markupfilter;
+package net.htmlparser.jericho;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +54,7 @@ import java.nio.channels.FileChannel;
  * <code>ParseText</code> instances are obtained using the
  * {@link Source#getParseText()} method.
  */
-public final class MemMappedCharSequence implements CharSequence {
+public final class ParseBufferedText implements CharSequence {
 	private CharBuffer text;
 	private char[] tempText = null;
 
@@ -73,7 +73,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	MemMappedCharSequence(final String string) {
+	ParseBufferedText(final String string) {
 		tempText = new char[string.length()];
 		text = CharBuffer.wrap(tempText);
 		string.getChars(0, string.length(), tempText, 0);
@@ -88,7 +88,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	MemMappedCharSequence(final URI tempUTF16BEfile) {
+	ParseBufferedText(final URI tempUTF16BEfile) {
 		tempText = null; // not needed with buffered CharBuffer
 		text = null;
 		FileChannel fc = null;
