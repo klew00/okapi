@@ -70,7 +70,7 @@ public class HtmlSnippetsTest {
 	
 	@Test
 	public void testPWithInlineTextOnly() {
-		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";
+		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";		
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 	
