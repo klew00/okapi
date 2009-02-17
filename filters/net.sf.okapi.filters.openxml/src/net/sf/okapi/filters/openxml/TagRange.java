@@ -14,6 +14,7 @@ public class TagRange
 	boolean bChangeToStandalone;
 	boolean bAddBeginningBracket;
 	boolean bAddEndBracket;
+
 	public TagRange(String tag, long lBegin, Long lEnd, int iTagType, 
 			boolean bAddBeginningBracket, boolean bAddFakeTagName,
 			boolean bAddEndBracket)
