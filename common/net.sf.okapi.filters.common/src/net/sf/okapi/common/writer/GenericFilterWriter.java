@@ -44,12 +44,6 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 /**
  * This class implements the filter writer interface for filters that use the
  * GenericSkeleton skeleton.
- * <p>Recognized properties:</p>
- * <ul>
- * <li><code>encoding</code> - The value of the <code>encoding</code> resource-level property in the 
- * <code>START_DOCUMENT</code> event is replaced by the value of the encoding provided with
- * the {@link #setOptions(String, String)} method.</li>
- * </ul>
  */
 public class GenericFilterWriter implements IFilterWriter {
 

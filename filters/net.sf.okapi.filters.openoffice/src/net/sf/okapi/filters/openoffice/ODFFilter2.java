@@ -196,7 +196,7 @@ public class ODFFilter2 implements IFilter {
 	}
 
 	public String getName () {
-		return "ODFFilter";
+		return "okf_odf";
 	}
 
 	public IParameters getParameters () {

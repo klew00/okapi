@@ -165,40 +165,6 @@ public class PropertiesFilter implements IFilter {
 			// Correct the encoding if we have detected a different one
 			encoding = bis.detectEncoding();
 			commonOpen(new InputStreamReader(bis, encoding));
-			
-			// Initializes the variables
-			tuId = 0;
-			otherId = 0;
-			lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
-			lineNumber = 0;
-			lineSince = 0;
-			position = 0;
-			// Compile conditions
-			if ( params.useKeyCondition ) {
-				keyConditionPattern = Pattern.compile(params.keyCondition); 
-			}
-			else {
-				keyConditionPattern = null;
-			}
-			// Compile code finder rules
-			if ( params.useCodeFinder ) {
-				params.codeFinder.compile();
-			}
-			// Set the start event
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
-
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
-			startDoc.setName(docName);
-			startDoc.setEncoding(encoding);
-			startDoc.setLanguage(srcLang);
-			startDoc.setFilterParameters(params);
-			startDoc.setType("text/x-properties");
-			startDoc.setMimeType("text/x-properties");
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

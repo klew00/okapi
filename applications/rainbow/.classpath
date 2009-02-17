@@ -29,5 +29,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/YAML-1.3"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.mif"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.idml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

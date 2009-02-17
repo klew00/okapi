@@ -248,7 +248,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		String value = elem.getAttribute("translate");
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
-		else throw new RuntimeException("Invalid value for 'translate'.");
+		else throw new ITSException("Invalid value for 'translate'.");
 		
 		rules.add(rule);
 	}
@@ -265,7 +265,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		else if ( "rtl".equals(value) ) rule.value = DIR_RTL;
 		else if ( "lro".equals(value) ) rule.value = DIR_LRO;
 		else if ( "rlo".equals(value) ) rule.value = DIR_RLO;
-		else throw new RuntimeException("Invalid value for 'dir'.");
+		else throw new ITSException("Invalid value for 'dir'.");
 		
 		rules.add(rule);
 	}
@@ -281,7 +281,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			if ( "yes".equals(value) ) rule.value = WITHINTEXT_YES;
 			else if ( "no".equals(value) ) rule.value = WITHINTEXT_NO;
 			else if ( "nested".equals(value) ) rule.value = WITHINTEXT_NESTED;
-			else throw new RuntimeException("Invalid value for 'withinText'.");
+			else throw new ITSException("Invalid value for 'withinText'.");
 			
 			rules.add(rule);
 		}
@@ -297,7 +297,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		String value = elem.getAttribute("term");
 		if ( "yes".equals(value) ) rule.flag = true;
 		else if ( "no".equals(value) ) rule.flag = false;
-		else throw new RuntimeException("Invalid value for 'term'.");
+		else throw new ITSException("Invalid value for 'term'.");
 		
 		value = elem.getAttribute("termInfoPointer");
 		String value2 = elem.getAttribute("termInfoRef");
@@ -307,7 +307,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = TERMINFOTYPE_POINTER;
 			rule.info = value;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 )) {
-				throw new RuntimeException("Too many termInfoXXX attributes specified");
+				throw new ITSException("Too many termInfoXXX attributes specified");
 			}
 		}
 		else {
@@ -315,7 +315,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				rule.infoType = TERMINFOTYPE_REF;
 				rule.info = value2;
 				if ( value3.length() > 0 ) {
-					throw new RuntimeException("Too many termInfoXXX attributes specified");
+					throw new ITSException("Too many termInfoXXX attributes specified");
 				}
 			}
 			else {
@@ -337,6 +337,11 @@ public class ITSEngine implements IProcessor, ITraversal
 		rule.selector = elem.getAttribute("selector");
 		rule.isInternal = isInternal;
 		
+		String type = elem.getAttribute("locNoteType");
+		if ( type.length() == 0 ) {
+			throw new ITSException("locNoteType attribute missing.");
+		}
+		
 		String value1 = elem.getAttribute("locNote");
 		String value2 = elem.getAttribute("locNotePointer");
 		String value3 = elem.getAttribute("locNoteRef");
@@ -346,7 +351,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = LOCNOTETYPE_TEXT;
 			rule.info = value1;
 			if (( value2.length() > 0 ) || ( value3.length() > 0 ) || ( value4.length() > 0 )) {
-				throw new RuntimeException("Too many locNoteXXX attributes specified");
+				throw new ITSException("Too many locNoteXXX attributes specified");
 			}
 		}
 		else {
@@ -354,7 +359,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				rule.infoType = LOCNOTETYPE_POINTER;
 				rule.info = value2;
 				if (( value3.length() > 0 ) || ( value4.length() > 0 )) {
-					throw new RuntimeException("Too many locNoteXXX attributes specified");
+					throw new ITSException("Too many locNoteXXX attributes specified");
 				}
 			}
 			else {
@@ -362,7 +367,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					rule.infoType = TERMINFOTYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
-						throw new RuntimeException("Too many locNoteXXX attributes specified");
+						throw new ITSException("Too many locNoteXXX attributes specified");
 					}
 				}
 				else {
@@ -442,52 +447,6 @@ public class ITSEngine implements IProcessor, ITraversal
 		updateTraceData(node);
 		return node;
 	}
-	
-/*	public Node OLD_nextNode () {
-		// Check for start or end
-		backTracking = false;
-		if ( startTraversal ) {
-			startTraversal = false;
-			// Set the initial trace with default behaviors
-			ITSTrace startTrace = new ITSTrace();
-			startTrace.translate = true;
-			startTrace.isChildDone = false;
-			trace.push(startTrace);
-			node = doc.getDocumentElement();
-			// Overwrite any default behaviors if needed
-			updateTraceData(node);
-			return node;
-		}
-		if ( node == null ) {
-			return node;
-		}
-
-		while ( true ) {
-			// Check for child
-			if ( !trace.peek().isChildDone && node.hasChildNodes() ) {
-				trace.peek().isChildDone = true;
-				trace.push(new ITSTrace(trace.peek(), false));
-				node = node.getFirstChild();
-				updateTraceData(node);
-				return node;
-			}
-			
-			// Check for sibling
-			if ( node.getNextSibling() != null ) {
-				trace.pop(); // Remove previous sibling
-				trace.push(new ITSTrace(trace.peek(), false));
-				node = node.getNextSibling();
-				updateTraceData(node);
-				return node;
-			}
-
-			// Else: move back to parent
-			trace.pop();
-			node = node.getParentNode();
-			backTracking = true;
-			if (( node == null ) || ( trace.empty() )) return null;
-		}
-	}*/
 	
 	/**
 	 * Updates the trace stack.
@@ -652,7 +611,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					// Validate the value
 					String value = attr.getValue();
 					if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
-						throw new RuntimeException("Invalid value for 'translate'.");
+						throw new ITSException("Invalid value for 'translate'.");
 					}
 					// Set the flag
 					setFlag(attr.getOwnerElement(), FP_TRANSLATE, value.charAt(0), attr.getSpecified());
@@ -674,7 +633,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					else if ( "ltr".equals(attr.getValue()) ) n = DIR_RTL; 
 					else if ( "rlo".equals(attr.getValue()) ) n = DIR_RLO; 
 					else if ( "lro".equals(attr.getValue()) ) n = DIR_LRO;
-					else throw new RuntimeException("Invalid value for 'dir'."); 
+					else throw new ITSException("Invalid value for 'dir'."); 
 					setFlag(attr.getOwnerElement(), FP_DIRECTIONALITY,
 						String.format("%d", n).charAt(0), attr.getSpecified());
 				}
@@ -697,7 +656,7 @@ public class ITSEngine implements IProcessor, ITraversal
 						// Validate the value
 						String value = attr.getValue();
 						if (( !"yes".equals(value) ) && ( !"no".equals(value) )) {
-							throw new RuntimeException("Invalid value for 'term'.");
+							throw new ITSException("Invalid value for 'term'.");
 						}
 						// Set the flag
 						setFlag(attr.getOwnerElement(), FP_TERMINOLOGY, value.charAt(0), attr.getSpecified());

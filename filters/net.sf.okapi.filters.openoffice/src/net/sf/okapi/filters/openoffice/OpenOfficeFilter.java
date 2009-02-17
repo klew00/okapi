@@ -85,7 +85,7 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "OpenOfficeFilter";
+		return "okf_openoffice";
 	}
 
 	public IParameters getParameters () {
@@ -127,7 +127,7 @@ public class OpenOfficeFilter implements IFilter {
 	
 	public void open (URI inputURI) {
 		try {
-			this.inputUrl = inputURI.toURL();
+			inputUrl = inputURI.toURL();
 		} 
 		catch (MalformedURLException e) {
 			throw new RuntimeException(e);

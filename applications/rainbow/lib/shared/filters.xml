@@ -44,4 +44,8 @@
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
  >FrameMaker MIF</filter>
   
+ <filter id="okf_idml"
+  inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
+ >InDesign Markup Language Filter MIF</filter>
+  
 </okapiFilters>
