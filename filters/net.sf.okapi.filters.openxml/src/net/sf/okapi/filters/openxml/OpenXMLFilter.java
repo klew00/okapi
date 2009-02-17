@@ -314,7 +314,8 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 					   					sDocType.equals("endnotes+xml") ||
 				                        sDocType.equals("header+xml") ||
 				                        sDocType.equals("footer+xml") ||
-				                        sDocType.equals("comments+xml"))) ||
+				                        sDocType.equals("comments+xml") ||
+				                        sDocType.equals("glossary+xml"))) ||
 				   (filetype==MSEXCEL && (sDocType.equals("worksheet+xml") ||
 						   				  sDocType.equals("sharedStrings+xml") ||
 						   				  sDocType.equals("comments+xml"))) ||
