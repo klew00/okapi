@@ -22,14 +22,30 @@
 
 package net.sf.okapi.common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.net.URI;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.UnsupportedCharsetException;
 
 /**
  * Represents the text from the {@linkplain Source source} document that is to
@@ -80,6 +96,30 @@ public final class MemMappedCharSequence implements CharSequence {
 		for (int i = 0; i < tempText.length; i++)
 			tempText[i] = Character.toLowerCase(tempText[i]);
 	}
+	
+	/**
+	 * Constructs a new <code>ParseText</code> object based on the specified
+	 * file name. The file is assumed to be encoded as UTF-16BE.
+	 * 
+	 * @param inputSource
+	 *            Reader.
+	 */
+	public MemMappedCharSequence(final Reader inputSource) {
+		tempText = null; // not needed with buffered CharBuffer		
+		createMemMappedCharBuffer(Channels.newChannel(new ReaderInputStream(inputSource)), "UTF-16BE");
+	}
+	
+	/**
+	 * Constructs a new <code>ParseText</code> object based on the specified
+	 * file name. The file is assumed to be encoded as UTF-16BE.
+	 * 
+	 * @param string
+	 *            the string upon which the parse text is based.
+	 */
+	public MemMappedCharSequence(final InputStream inputSource, String encoding) {
+		tempText = null; // not needed with buffered CharBuffer
+		createMemMappedCharBuffer(Channels.newChannel(inputSource), encoding);
+	}
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
@@ -88,21 +128,39 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	public MemMappedCharSequence(final URI tempUTF16BEfile) {
+	public MemMappedCharSequence(final URL inputSource, String encoding) {
 		tempText = null; // not needed with buffered CharBuffer
+		try {
+			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding);		
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private void createMemMappedCharBuffer(final ReadableByteChannel inputSource, String encoding) {
 		text = null;
 		FileChannel fc = null;
+
 		try {
-			fc = new RandomAccessFile(tempUTF16BEfile.getPath(), "rw").getChannel();
+			// create temp mem map file and convert it to UTF-16(either BE or LE
+			// depending on the native order of the platform)
+			File tempUTF16BEfile = File.createTempFile("memmap", ".tmp");
+			BufferedWriter tempOut = new BufferedWriter(new FileWriter(tempUTF16BEfile));			
+			decodeChannel(inputSource, tempOut, Charset.forName(encoding));
+			tempOut.close();
+			
+			fc = new RandomAccessFile(tempUTF16BEfile, "rw").getChannel();
 			MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.PRIVATE, 0, fc.size());
 			byteBuffer.order(ByteOrder.BIG_ENDIAN);
 			text = byteBuffer.asCharBuffer();
 			fc.close();
-			
+
+			// TODO: Would it be faster to do this per method call - at least it
+			// would be in memory?
 			// lowercase the buffer
 			for (int i = 0; i < text.length(); i++)
 				text.put(i, Character.toLowerCase(text.get(i)));
-			
+
 		} catch (FileNotFoundException fnfx) {
 			throw new RuntimeException(fnfx);
 		} catch (IOException iox) {
@@ -115,7 +173,7 @@ public final class MemMappedCharSequence implements CharSequence {
 					// ignore
 				}
 			}
-		}
+		}				
 	}
 
 	/**
@@ -548,5 +606,94 @@ public final class MemMappedCharSequence implements CharSequence {
 	public String toString() {
 		text.rewind();
 		return text.toString();
+	}
+
+	/**
+	 * General purpose static method which reads bytes from a Channel, decodes
+	 * them according to the given charset
+	 * 
+	 * @param source
+	 *            A ReadableByteChannel object which will be read to EOF as a
+	 *            source of encoded bytes.
+	 * @param writer
+	 *            A Writer object to which decoded chars will be written.
+	 * @param charset
+	 *            A Charset object, whose CharsetDecoder will be used to do the
+	 *            character set decoding.
+	 */
+	public static void decodeChannel(ReadableByteChannel source, Writer writer, Charset charset)
+			throws UnsupportedCharsetException, IOException {
+		// get a decoder instance from the Charset
+		CharsetDecoder decoder = charset.newDecoder();
+
+		// tell decoder to replace bad chars with default marker
+		decoder.onMalformedInput(CodingErrorAction.REPORT);
+		decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+
+		// allocate radically different input and output buffer sizes
+		// for testing purposes
+		ByteBuffer bb = ByteBuffer.allocateDirect(16 * 1024);
+		CharBuffer cb = CharBuffer.allocate(57);		
+		// buffer starts empty, indicate input is needed
+		CoderResult result = CoderResult.UNDERFLOW;
+		boolean eof = false;
+
+		while (!eof) {
+			// input buffer underflow, decoder wants more input
+			if (result == CoderResult.UNDERFLOW) {
+				// decoder consumed all input, prepare to refill
+				bb.clear();
+
+				// fill the input buffer, watch for EOF
+				eof = (source.read(bb) == -1);
+
+				// prepare the buffer for reading by decoder
+				bb.flip();
+			}
+
+			// decode input bytes to output chars, pass EOF flag
+			result = decoder.decode(bb, cb, eof);
+
+			// if output buffer is full, drain output
+			if (result == CoderResult.OVERFLOW) {
+				drainCharBuf(cb, writer);
+			}
+		}
+
+		// flush any remaining state from the decoder, being careful
+		// to detect output buffer overflow(s).
+		while (decoder.flush(cb) == CoderResult.OVERFLOW) {
+			drainCharBuf(cb, writer);
+		}
+
+		// drain any chars remaining in the output buffer
+		drainCharBuf(cb, writer);
+
+		// close the channel, push out any buffered data to stdout
+		source.close();
+		writer.flush();
+	}
+
+	/**
+	 * Helper method to drain the char buffer and write its content to the given
+	 * Writer object. Upon return, the buffer is empty and ready to be refilled.
+	 * 
+	 * @param cb
+	 *            A CharBuffer containing chars to be written.
+	 * @param writer
+	 *            A Writer object to consume the chars in cb.
+	 */
+	static private void drainCharBuf(CharBuffer cb, Writer writer) throws IOException {
+		cb.flip(); // prepare buffer for draining
+
+		// This writes the chars contained in the CharBuffer but
+		// doesn't actually modify the state of the buffer.
+		// If the char buffer was being drained by calls to get(),
+		// a loop might be needed here.
+		if (cb.hasRemaining()) {
+			writer.write(cb.toString());
+		}
+
+		cb.clear(); // prepare buffer to be filled again
 	}
 }
