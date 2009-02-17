@@ -111,7 +111,7 @@ public class Merger {
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docID);
 			Util.createDirectories(outputFile);
-			outFilter = new GenericFilterWriter(inpFilter.createSkeletonWriter());
+			outFilter = inpFilter.createFilterWriter();
 			outFilter.setOptions(trgLang, item.getOutputEncoding());
 			outFilter.setOutput(outputFile);
 			

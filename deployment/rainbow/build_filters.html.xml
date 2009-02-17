@@ -11,7 +11,6 @@
 	<path id="mainClassPath">
 		<pathelement location="${tmp}"/>
 		<pathelement location="../../user-libs/slf4j-api-1.5.0.jar"/>
-		<pathelement location="${dist-bin}/jericho-html-3.0-beta1.jar"/>
 	</path>
 	
 	<target name="init">

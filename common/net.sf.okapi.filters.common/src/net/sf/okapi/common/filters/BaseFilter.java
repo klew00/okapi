@@ -25,8 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import org.omg.CosNaming.IstringHelper;
-
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -40,9 +38,9 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -152,6 +150,10 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
+	}
+
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	/*

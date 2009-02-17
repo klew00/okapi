@@ -129,11 +129,19 @@ public interface IFilter {
 	public void setParameters (IParameters params);
 
 	/**
-	 * Creates a new skeleton writer object that corresponds to the type of skeleton 
+	 * Creates a new ISkeletonWriter object that corresponds to the type of skeleton 
 	 * this filter uses.
-	 * @return A new instance of a skeleton writer for the type of skeleton this filter
+	 * @return A new instance of ISkeletonWriter for the type of skeleton this filter
 	 * uses.
 	 */
 	public ISkeletonWriter createSkeletonWriter ();
+	
+	/**
+	 * Creates a new IFilterWriter object that is the preferred implementation to
+	 * use to create an output in the same format. 
+	 * @return A new instance of IFilterWriter for the preferred implementation
+	 * for this filter.
+	 */
+	public IFilterWriter createFilterWriter ();
 	
 }

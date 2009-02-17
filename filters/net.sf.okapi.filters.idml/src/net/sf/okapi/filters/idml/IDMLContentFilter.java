@@ -42,17 +42,18 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class IDMLContentFilter implements IFilter {
 
@@ -86,6 +87,10 @@ public class IDMLContentFilter implements IFilter {
 
 	public ISkeletonWriter createSkeletonWriter () {
 		return new GenericSkeletonWriter();
+	}
+	
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	public String getName () {
@@ -162,6 +167,7 @@ public class IDMLContentFilter implements IFilter {
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
+		// Ignore encoding: We always output UTF-8 here
 		srcLang = sourceLanguage;
 	}
 
@@ -235,6 +241,7 @@ public class IDMLContentFilter implements IFilter {
 					else {
 						TextUnit tu = new TextUnit(String.valueOf(++tuId));
 						tu.setSourceContent(frag);
+						tu.setMimeType("text/xml");
 						skel.addContentPlaceholder(tu);
 						storeEndElement();
 						return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
@@ -242,8 +249,9 @@ public class IDMLContentFilter implements IFilter {
 					
 				case XMLStreamConstants.SPACE:
 				case XMLStreamConstants.CDATA:
-				case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
+				case XMLStreamConstants.CHARACTERS:
 					if ( frag == null ) {
+						// UTF-8 is the encoding, no need to escape normal characters
 						skel.append(Util.escapeToXML(reader.getText(), 0, false, null));
 					}
 					else {
@@ -312,7 +320,7 @@ public class IDMLContentFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
 			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
+				((prefix!=null) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
@@ -323,8 +331,9 @@ public class IDMLContentFilter implements IFilter {
 			attrName = String.format("%s%s",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
+			// UTF-8 is the encoding so no need to escape the normal characters
 			skel.append(String.format(" %s=\"%s\"", attrName,
-				reader.getAttributeValue(i)));
+				Util.escapeToXML(reader.getAttributeValue(i), 3, false, null)));
 		}
 		skel.append(">");
 	}

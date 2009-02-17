@@ -43,6 +43,7 @@ import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -57,6 +58,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class XLIFFFilter implements IFilter {
 
@@ -244,6 +246,10 @@ public class XLIFFFilter implements IFilter {
 		return new GenericSkeletonWriter();
 	}
 
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
+	}
+
 	private boolean read () throws XMLStreamException {
 		skel = new GenericSkeleton();
 		int eventType;
@@ -364,7 +370,7 @@ public class XLIFFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
 			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
+				((prefix!=null) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
@@ -685,7 +691,7 @@ public class XLIFFFilter implements IFilter {
 						for ( int i=0; i<count; i++ ) {
 							prefix = reader.getNamespacePrefix(i);
 							tmpg.append(String.format(" xmlns:%s=\"%s\"",
-								((prefix.length()>0) ? ":"+prefix : ""),
+								((prefix!=null) ? ":"+prefix : ""),
 								reader.getNamespaceURI(i)));
 						}
 						count = reader.getAttributeCount();
@@ -777,7 +783,7 @@ public class XLIFFFilter implements IFilter {
 					for ( int i=0; i<count; i++ ) {
 						prefix = reader.getNamespacePrefix(i);
 						tmpg.append(String.format(" xmlns:%s=\"%s\"",
-							((prefix.length()>0) ? ":"+prefix : ""),
+							((prefix!=null) ? ":"+prefix : ""),
 							reader.getNamespaceURI(i)));
 					}
 					count = reader.getAttributeCount();

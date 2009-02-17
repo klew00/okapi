@@ -15,7 +15,6 @@
 	
 	<target name="init">
 		<mkdir dir="${tmp}"/>
-		<mkdir dir="${dist-bin}"/>
  	</target>
 
 	<target name="all" depends="init"> 

@@ -37,6 +37,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -46,6 +47,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class RegexFilter implements IFilter {
 
@@ -231,6 +233,10 @@ public class RegexFilter implements IFilter {
 
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
+	}
+
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	private void commonOpen (String text) {

@@ -42,6 +42,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -49,6 +50,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class RTFFilter implements IFilter {
 
@@ -388,6 +390,10 @@ public class RTFFilter implements IFilter {
 	
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
+	}
+
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	private void reset (String defaultEncoding) {

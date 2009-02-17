@@ -78,7 +78,7 @@ public class IDMLFilter implements IFilter {
 	}
 
 	public ISkeletonWriter createSkeletonWriter () {
-		return null; //TODO: zip skeleton
+		return null; // There is no corresponding skeleton writer
 	}
 	
 	public IFilterWriter createFilterWriter () {

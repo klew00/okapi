@@ -38,14 +38,14 @@ public class XMLFilterTest {
 			filter = new XMLFilter();
 			filter.setOptions("en", "es", "UTF-8", true);
 			
-			URL url = XMLFilterTest.class.getResource("/Test1_XML.xml");
+			URL url = XMLFilterTest.class.getResource("/input.xml");
 			filter.open(url.toURI());
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
-			filter.open("<doc>\n <h>\n  <t>text1</t>\n  <t>text2</t></h></doc>");
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
+//			filter.open("<doc>\n <h>\n  <t>text1</t>\n  <t>text2</t></h></doc>");
+//			if ( !testDriver.process(filter) ) Assert.fail();
+//			filter.close();
 			
 		}
 		catch ( Throwable e ) {

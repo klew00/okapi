@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -41,6 +40,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -48,6 +48,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.writer.GenericFilterWriter;
 
 /**
  * Implements the IFilter interface for properties files.
@@ -209,6 +210,10 @@ public class PropertiesFilter implements IFilter {
 
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
+	}
+
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	private void commonOpen (Reader inputReader) {

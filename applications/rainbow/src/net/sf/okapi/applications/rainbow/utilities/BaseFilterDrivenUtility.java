@@ -25,7 +25,6 @@ import java.io.File;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
-import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility
 	implements IFilterDrivenUtility {
@@ -44,7 +43,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {
 				//TODO: Get the skeleton from the filter, somehow
-				filterWriter = new GenericFilterWriter(filter.createSkeletonWriter());
+				filterWriter = filter.createFilterWriter();
 				filterWriter.setOptions(trgLang, getOutputEncoding(0));
 				filterWriter.setOutput(getOutputPath(0));
 			}
