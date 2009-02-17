@@ -25,6 +25,7 @@ public class OpenXMLSnippetsTest {
 	private static final int MSWORD=1;
 	private static final int MSEXCEL=2;
 	private static final int MSPOWERPOINT=3;
+	private String snappet;
 	
 	@Before
 	public void setUp()  {
@@ -36,21 +37,31 @@ public class OpenXMLSnippetsTest {
 	}
 
 	@Test
+	public void testAuthor() {
+		String snippet = "<comments><author>Dan Higinbotham</author></comments>";
+		snappet = generateOutput(getEvents(snippet, MSEXCEL), snippet);
+		assertEquals(snappet, snippet);
+	}
+
+	@Test
 	public void testInlineLanguage() {
-		String snippet = "<w:p><w:lang w:val=\"en-US\" w:eastAsia=\"zh-TW\"/></w:p>";				
-		assertEquals(generateOutput(getEvents(snippet, MSWORD), snippet), snippet);
+		String snippet = "<w:p><w:lang w:val=\"en-US\" w:eastAsia=\"zh-TW\"/></w:p>";
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, snippet);
 	}
 
 	@Test
 	public void testInlineTranslatable() {
 		String snippet = "<w:p><wp:docPr id=\"2\" name=\"Picture 1\"></w:p>";
-		assertEquals(generateOutput(getEvents(snippet, MSWORD), snippet), snippet);
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, snippet);
 	}
 
 	@Test
 	public void testLostDocParts() {
 		String snippet = "<w:p><w:rPr><w:lang w:val=\"en-US\" w:eastAsia=\"zh-TW\"/></w:rPr><wp:docPr name=\"Picture 1\"><pic:cNvPr name=\"Picture 1\"><a:stretch/></w:p>";				
-		assertEquals(generateOutput(getEvents(snippet, MSWORD), snippet), snippet);
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, snippet);
 	}
 /*
 	@Test

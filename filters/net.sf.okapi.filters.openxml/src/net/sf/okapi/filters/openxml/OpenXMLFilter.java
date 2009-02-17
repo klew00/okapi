@@ -127,7 +127,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 					return false; // filter failed because of bad configuration file
 				}
 				
-				if (dbg>3)
+				if (dbg>2)
 				{
 					String glorp = getParameters().toString();
 					System.out.println(glorp); // This lists what YAML actually read out of the configuration file
@@ -148,6 +148,11 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 				continue;
 			isInputStream = tmSubdocs.get(sDocName);
 			open(isInputStream);
+			if (dbg>2)
+			{
+				String glorp = getParameters().toString();
+				System.out.println(glorp); // This lists what YAML actually read out of the configuration file
+			}
 			// put out beginning group with name sDocName
 			if (dbg>2)
 			{
@@ -258,6 +263,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			configurationType = MSPOWERPOINT;
 		}
 		setDefaultConfig(sConfigFileName); // DWH 1-23-09
+		setParameters(new Parameters(sConfigFileName)); // DWH 2-17-09 it doesn't update automatically from setDefaultConfig
 	}
 	
 	private TreeMap<String,InputStream> openZip(Package p)
@@ -298,7 +304,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			for (PackagePart part : p.getParts())
 			{
 			   
-			   if (dbg>3)
+			   if (dbg>2)
 				   System.out.println(part.getPartName().getURI() + " -> " + part.getContentType());
 			   sDocType = part.getContentType();
 			   iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
@@ -310,7 +316,8 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 				                        sDocType.equals("footer+xml") ||
 				                        sDocType.equals("comments+xml"))) ||
 				   (filetype==MSEXCEL && (sDocType.equals("worksheet+xml") ||
-						   				  sDocType.equals("sharedStrings+xml"))) ||
+						   				  sDocType.equals("sharedStrings+xml") ||
+						   				  sDocType.equals("comments+xml"))) ||
 				   (filetype==MSPOWERPOINT && (sDocType.equals("slide+xml") ||
 						   				       sDocType.equals("notesSlide+xml"))))
 			   {
