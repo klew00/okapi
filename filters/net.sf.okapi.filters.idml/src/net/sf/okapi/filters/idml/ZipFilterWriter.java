@@ -39,9 +39,7 @@ import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 
@@ -101,13 +99,9 @@ public class ZipFilterWriter implements IFilterWriter {
 			processEndSubDocument((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
-			break;
 		case START_GROUP:
-			processStartGroup((StartGroup)event.getResource());
-			break;
 		case END_GROUP:
-			processEndGroup((Ending)event.getResource());
+			subDocWriter.handleEvent(event);
 			break;
 		case CANCELED:
 		case FINISHED:
@@ -228,18 +222,6 @@ public class ZipFilterWriter implements IFilterWriter {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	private void processTextUnit (TextUnit tu) {
-		//TODO
-	}
-
-	private void processStartGroup (StartGroup res) {
-		//TODO
-	}
-
-	private void processEndGroup (Ending res) {
-		//TODO
 	}
 	
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="filters.openoffice" default="all" basedir="."> 
+<project name="filters.html" default="all" basedir="."> 
 
 	<property name="platform" value="win32-x86"/> 
 	<property name="proj" value="../../filters/net.sf.okapi.filters.html"/> 

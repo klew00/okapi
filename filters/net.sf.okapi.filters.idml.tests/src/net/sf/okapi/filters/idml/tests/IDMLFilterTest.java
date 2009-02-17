@@ -37,7 +37,9 @@ public class IDMLFilterTest {
 		try {
 			filter = new IDMLFilter();
 			filter.setOptions("en", "UTF-8", true);
-			URL url = IDMLFilterTest.class.getResource("/helloworld-1.idml");
+			//URL url = IDMLFilterTest.class.getResource("/helloworld-1.idml");
+			//URL url = IDMLFilterTest.class.getResource("/private/100_101_CentreofGalaxy.idml");
+			URL url = IDMLFilterTest.class.getResource("/private/iPhone_2_A_MASTER.idml");
 			filter.open(new URI(url.toString()));
 			
 			ZipFilterWriter writer = new ZipFilterWriter();

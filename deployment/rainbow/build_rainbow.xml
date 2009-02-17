@@ -43,6 +43,7 @@
 		<ant antfile="build_filters.properties.xml" inheritAll="false"/>
 		<ant antfile="build_filters.regex.xml" inheritAll="false"/>
 		<ant antfile="build_filters.xliff.xml" inheritAll="false"/>
+		<ant antfile="build_filters.idml.xml" inheritAll="false"/>
 		<ant antfile="build_filters.rtf.xml" inheritAll="false"/>
 		<ant antfile="build_filters.xml.xml" inheritAll="false"/>
 		<ant antfile="build_filters.openoffice.xml" inheritAll="false"/>

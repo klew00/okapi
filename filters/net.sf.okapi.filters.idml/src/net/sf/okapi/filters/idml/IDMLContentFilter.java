@@ -46,6 +46,10 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -60,6 +64,7 @@ public class IDMLContentFilter implements IFilter {
 	private int tuId;
 	private int otherId;
 	private GenericSkeleton skel;
+	private TextFragment frag;
 	private boolean canceled;
 
 	public void cancel () {
@@ -208,6 +213,7 @@ public class IDMLContentFilter implements IFilter {
 
 	private FilterEvent read () {
 		skel = new GenericSkeleton();
+		frag = null;
 		int eventType;
 		try {
 			while ( reader.hasNext() ) {
@@ -215,25 +221,53 @@ public class IDMLContentFilter implements IFilter {
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
 					storeStartElement();
+					if ( reader.getLocalName().equals("Content") ) {
+						frag = new TextFragment(); 
+					}
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
-					storeEndElement();
-					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-					return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
+					if ( frag == null ) {
+						storeEndElement();
+						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+						return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
+					}
+					else {
+						TextUnit tu = new TextUnit(String.valueOf(++tuId));
+						tu.setSourceContent(frag);
+						skel.addContentPlaceholder(tu);
+						storeEndElement();
+						return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
+					}
 					
 				case XMLStreamConstants.SPACE:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(reader.getText(), 0, false, null));
+					if ( frag == null ) {
+						skel.append(Util.escapeToXML(reader.getText(), 0, false, null));
+					}
+					else {
+						frag.append(reader.getText());
+					}
 					break;
 					
 				case XMLStreamConstants.COMMENT:
-					skel.append("<!--"+ reader.getText() + "-->");
+					if ( frag == null ) {
+						skel.append("<!--"+ reader.getText() + "-->");
+					}
+					else {
+						frag.append(TagType.PLACEHOLDER, null, "<!--"+ reader.getText() + "-->");
+					}
 					break;
 					
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+					if ( frag == null ) {
+						skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+					}
+					else {
+						frag.append(TagType.PLACEHOLDER, null,
+							"<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+					}
 					break;
 					
 				case XMLStreamConstants.DTD:
@@ -247,13 +281,15 @@ public class IDMLContentFilter implements IFilter {
 				case XMLStreamConstants.ATTRIBUTE:
 					break;
 				case XMLStreamConstants.START_DOCUMENT:
-					break;
 				case XMLStreamConstants.END_DOCUMENT:
 					break;
 				}
 			}
 		}
 		catch ( XMLStreamException e ) {
+			throw new RuntimeException(e);
+		}
+		catch ( Throwable e ) {
 			throw new RuntimeException(e);
 		}
 		
