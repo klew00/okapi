@@ -439,6 +439,10 @@ public class Project {
 			? System.getProperty("user.home")
 			: Util.getDirectoryName(path));
 	}
+	
+	public boolean useCustomeInputRoot (int listIndex) {
+		return useCustomInputRoots.get(listIndex);
+	}
 
 	public void setUseOutputRoot (boolean value) {
 		if ( useOutputRoot != value ) {

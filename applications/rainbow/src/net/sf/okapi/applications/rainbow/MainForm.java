@@ -1706,13 +1706,29 @@ public class MainForm implements IParametersProvider {
 			}
 			else {
 				String[] res = fm.guessFormat(path);
-				switch ( prj.addDocument(currentInput, path, res[0], null, res[1], allowDup) ) {
-				case 0: // OK
-					n++;
-					break;
-				case 1: // Bad root
-					Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
-					return n;
+				int m = 0;
+				out: while ( true ) {
+					switch ( prj.addDocument(currentInput, path, res[0], null, res[1], allowDup) ) {
+					case 0: // OK
+						n++;
+						break out;
+					case 1: // Bad root
+						// Try to fix it if possible.
+						if (( prj.inputLists.get(currentInput).size() == 0 )
+							&& !prj.useCustomeInputRoot(currentInput) 
+							&& ( ++m < 2 ) ) // Re-try once only
+						{
+							prj.setInputRoot(currentInput, Util.getDirectoryName(path), true);
+							resetDisplay(currentInput);
+							break; // Re-try
+						}
+						else { // Otherwise, just tell the user
+							Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
+						}
+						return n;
+					default:
+						break out;
+					}
 				}
 			}
 		}
