@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities.charlisting;
 
+import java.io.File;
+
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -32,7 +34,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset() {
-		outputPath = "";
+		outputPath = "${ProjDir}"+File.separator+"charlist.txt";
 		autoOpen = true;
 	}
 

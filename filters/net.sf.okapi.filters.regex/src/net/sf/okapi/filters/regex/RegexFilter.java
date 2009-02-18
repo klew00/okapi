@@ -137,8 +137,11 @@ public class RegexFilter implements IFilter {
 				endResult = m.toMatchResult();
 			}
 			else throw new RuntimeException("Inconsistant rule finding.");
-			// Process the match we just found
-			return processMatch(bestRule, startResult, endResult);
+			// Check for boundary to avoid infinite loop
+			if ( startResult.start() != inputText.length() ) {
+				// Process the match we just found
+				return processMatch(bestRule, startResult, endResult);
+			}
 		}
 		
 		// Else: Send end of the skeleton if needed

@@ -37,7 +37,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class Merger {
 

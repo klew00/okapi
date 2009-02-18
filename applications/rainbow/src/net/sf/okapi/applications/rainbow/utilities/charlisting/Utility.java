@@ -37,6 +37,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
+	private String finalOutput;
 	
 	public Utility () {
 		params = new Parameters();
@@ -55,17 +56,18 @@ public class Utility extends BaseFilterDrivenUtility  {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
-			String path = params.outputPath;
-			logger.info("Output: " + path);
-			Util.createDirectories(path);
-			writer = new PrintWriter(path, "UTF-8");
+			finalOutput = params.outputPath.replace("${ProjDir}", projectDir);
+			logger.info("Output: " + finalOutput);
+			Util.createDirectories(finalOutput);
+			writer = new PrintWriter(finalOutput, "UTF-8");
+			//TODO: generate UTF based on user choice or at least platform
 			writer.write('\uFEFF'); // BOM
 			// Process all characters
 			for ( char key : charList.keySet() ) {
 				writer.println(String.format("U+%04X\t'%c'\t%d", (int)key, key, charList.get(key)));
 			}
 			if ( params.autoOpen ) {
-				UIUtil.start(path);
+				UIUtil.start(finalOutput);
 			}
 		}
 		catch ( FileNotFoundException e ) {
@@ -108,7 +110,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 
 	@Override
 	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.outputPath);
+		return Util.getDirectoryName(finalOutput);
 	}
 
 	public FilterEvent handleEvent (FilterEvent event) {
