@@ -22,16 +22,17 @@
 
 package net.sf.okapi.common;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -89,14 +90,20 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	public MemMappedCharSequence(final String string) {
+	public MemMappedCharSequence(final String string, boolean lowercase) {
 		tempText = new char[string.length()];
 		text = CharBuffer.wrap(tempText);
 		string.getChars(0, string.length(), tempText, 0);
-		for (int i = 0; i < tempText.length; i++)
-			tempText[i] = Character.toLowerCase(tempText[i]);
+		if (lowercase) {
+			for (int i = 0; i < tempText.length; i++)
+				tempText[i] = Character.toLowerCase(tempText[i]);
+		}
 	}
-	
+
+	public MemMappedCharSequence(final String string) {
+		this(string, false);
+	}
+
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
 	 * file name. The file is assumed to be encoded as UTF-16BE.
@@ -105,10 +112,26 @@ public final class MemMappedCharSequence implements CharSequence {
 	 *            Reader.
 	 */
 	public MemMappedCharSequence(final Reader inputSource) {
-		tempText = null; // not needed with buffered CharBuffer		
-		createMemMappedCharBuffer(Channels.newChannel(new ReaderInputStream(inputSource)), "UTF-16BE");
+		this(inputSource, false);
 	}
-	
+
+	/**
+	 * Constructs a new <code>ParseText</code> object based on the specified
+	 * file name. The file is assumed to be encoded as UTF-16BE.
+	 * 
+	 * @param inputSource
+	 *            Reader.
+	 */
+	public MemMappedCharSequence(final Reader inputSource, boolean lowercase) {
+		tempText = null; // not needed with buffered CharBuffer
+		try {
+			createMemMappedCharBuffer(Channels.newChannel(new ReaderInputStream(inputSource, "UTF-16BE")), "UTF-16BE",
+					lowercase);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
 	 * file name. The file is assumed to be encoded as UTF-16BE.
@@ -117,8 +140,19 @@ public final class MemMappedCharSequence implements CharSequence {
 	 *            the string upon which the parse text is based.
 	 */
 	public MemMappedCharSequence(final InputStream inputSource, String encoding) {
+		this(inputSource, encoding, false);
+	}
+
+	/**
+	 * Constructs a new <code>ParseText</code> object based on the specified
+	 * file name. The file is assumed to be encoded as UTF-16BE.
+	 * 
+	 * @param string
+	 *            the string upon which the parse text is based.
+	 */
+	public MemMappedCharSequence(final InputStream inputSource, String encoding, boolean lowercase) {
 		tempText = null; // not needed with buffered CharBuffer
-		createMemMappedCharBuffer(Channels.newChannel(inputSource), encoding);
+		createMemMappedCharBuffer(Channels.newChannel(inputSource), encoding, lowercase);
 	}
 
 	/**
@@ -129,43 +163,67 @@ public final class MemMappedCharSequence implements CharSequence {
 	 *            the string upon which the parse text is based.
 	 */
 	public MemMappedCharSequence(final URL inputSource, String encoding) {
+		this(inputSource, encoding, false);
+	}
+
+	/**
+	 * Constructs a new <code>ParseText</code> object based on the specified
+	 * file name. The file is assumed to be encoded as UTF-16BE.
+	 * 
+	 * @param string
+	 *            the string upon which the parse text is based.
+	 */
+	public MemMappedCharSequence(final URL inputSource, String encoding, boolean lowercase) {
 		tempText = null; // not needed with buffered CharBuffer
 		try {
-			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding);		
+			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding, lowercase);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private void createMemMappedCharBuffer(final ReadableByteChannel inputSource, String encoding) {
+
+	private void createMemMappedCharBuffer(final ReadableByteChannel inputSource, String encoding, boolean lowercase) {
 		text = null;
 		FileChannel fc = null;
+		File tempUTF16BEfile = null;
 
 		try {
 			// create temp mem map file and convert it to UTF-16(either BE or LE
 			// depending on the native order of the platform)
-			File tempUTF16BEfile = File.createTempFile("memmap", ".tmp");
-			BufferedWriter tempOut = new BufferedWriter(new FileWriter(tempUTF16BEfile));			
+			tempUTF16BEfile = File.createTempFile("memmap", ".tmp");
+			BufferedWriter tempOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempUTF16BEfile),
+					"UTF-16BE"));
 			decodeChannel(inputSource, tempOut, Charset.forName(encoding));
 			tempOut.close();
-			
-			fc = new RandomAccessFile(tempUTF16BEfile, "rw").getChannel();
-			MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.PRIVATE, 0, fc.size());
-			byteBuffer.order(ByteOrder.BIG_ENDIAN);
-			text = byteBuffer.asCharBuffer();
-			fc.close();
 
-			// TODO: Would it be faster to do this per method call - at least it
-			// would be in memory?
+			// set up modes based on what we need to do with the buffer
+			String mode = "r";
+			FileChannel.MapMode mapMode = FileChannel.MapMode.READ_ONLY;
+			if (lowercase) {
+				mode = "rw";
+				mapMode = FileChannel.MapMode.PRIVATE;
+			}
+
+			// memory map the UTF-16BE temp file and create a CharBuffer view
+			fc = new RandomAccessFile(tempUTF16BEfile, mode).getChannel();
+			MappedByteBuffer byteBuffer = fc.map(mapMode, 0, fc.size());
+			byteBuffer.order(ByteOrder.BIG_ENDIAN);
+			text = byteBuffer.asCharBuffer();			
+
+			// TODO: Would it be faster to do this per method call?
 			// lowercase the buffer
-			for (int i = 0; i < text.length(); i++)
-				text.put(i, Character.toLowerCase(text.get(i)));
+			if (lowercase) {
+				for (int i = 0; i < text.length(); i++)
+					text.put(i, Character.toLowerCase(text.get(i)));
+			}
 
 		} catch (FileNotFoundException fnfx) {
 			throw new RuntimeException(fnfx);
 		} catch (IOException iox) {
 			throw new RuntimeException(iox);
 		} finally {
+			if (tempUTF16BEfile != null)
+				tempUTF16BEfile.deleteOnExit();
 			if (fc != null) {
 				try {
 					fc.close();
@@ -173,7 +231,7 @@ public final class MemMappedCharSequence implements CharSequence {
 					// ignore
 				}
 			}
-		}				
+		}
 	}
 
 	/**
@@ -633,7 +691,7 @@ public final class MemMappedCharSequence implements CharSequence {
 		// allocate radically different input and output buffer sizes
 		// for testing purposes
 		ByteBuffer bb = ByteBuffer.allocateDirect(16 * 1024);
-		CharBuffer cb = CharBuffer.allocate(57);		
+		CharBuffer cb = CharBuffer.allocate(57);
 		// buffer starts empty, indicate input is needed
 		CoderResult result = CoderResult.UNDERFLOW;
 		boolean eof = false;
@@ -653,6 +711,9 @@ public final class MemMappedCharSequence implements CharSequence {
 
 			// decode input bytes to output chars, pass EOF flag
 			result = decoder.decode(bb, cb, eof);
+			if (result.isError()) {
+				throw new RuntimeException(result.toString());
+			}
 
 			// if output buffer is full, drain output
 			if (result == CoderResult.OVERFLOW) {
@@ -670,7 +731,7 @@ public final class MemMappedCharSequence implements CharSequence {
 		drainCharBuf(cb, writer);
 
 		// close the channel, push out any buffered data to stdout
-		source.close();
+		// source.close();
 		writer.flush();
 	}
 
