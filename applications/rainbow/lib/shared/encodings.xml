@@ -133,8 +133,8 @@
  <encoding iana="ibm861" cp="861">
   <name>Icelandic (DOS)</name>
  </encoding>
- <encoding iana="MacIcelandic" cp="10079">
-  <name>Japanese (Macintosh)</name>
+ <encoding iana="MacIceland" cp="10079">
+  <name>Icelandic (Macintosh)</name>
  </encoding>
  <encoding iana="euc-jp" cp="51932">
   <name>Japanese (EUC)</name>

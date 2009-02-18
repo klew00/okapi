@@ -498,9 +498,11 @@ public class XMLFilter implements IFilter {
 			default: // Not within text
 				if ( frag == null ) { // Not yet in extraction
 					addStartTagToSkeleton(node);
-					if ( node.hasChildNodes() && trav.translate() ) {
-						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
+					if ( trav.translate() ) {
 						frag = new TextFragment();
+					}
+					if ( node.hasChildNodes() ) {
+						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
 					}
 				}
 				else { // Already in extraction
@@ -508,10 +510,12 @@ public class XMLFilter implements IFilter {
 					addTextUnit(node, false);
 					addStartTagToSkeleton(node);
 					// And create a new one
-					if ( node.hasChildNodes() && trav.translate() ) {
+					if ( trav.translate() ) {
 						frag = new TextFragment();
 					}
-					context.push(new ContextItem(node, trav.translate(), trav.getNote()));
+					if ( node.hasChildNodes() ) {
+						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
+					}
 				}
 				break;
 			}

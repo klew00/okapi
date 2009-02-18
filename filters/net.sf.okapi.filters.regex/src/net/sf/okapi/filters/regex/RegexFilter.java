@@ -111,37 +111,50 @@ public class RegexFilter implements IFilter {
 		MatchResult startResult = null;
 		MatchResult endResult = null;
 		int i = 0;
-		for ( Rule rule : params.rules ) {
-			Matcher m = rule.pattern.matcher(inputText);
-			if ( m.find(startSearch) ) {
-				if ( m.start() < bestPosition ) {
-					bestPosition = m.start();
-					bestRule = rule;
-				}
-			}
-			i++;
-		}
 		
-		if ( bestRule != null ) {
-			// Find the start pattern
-			Pattern p = Pattern.compile(bestRule.start, params.regexOptions);
-			Matcher m = p.matcher(inputText);
-			if ( m.find(bestPosition) ) {
-				startResult = m.toMatchResult();
+		while ( true ) {
+			for ( Rule rule : params.rules ) {
+				Matcher m = rule.pattern.matcher(inputText);
+				if ( m.find(startSearch) ) {
+					if ( m.start() < bestPosition ) {
+						bestPosition = m.start();
+						bestRule = rule;
+					}
+				}
+				i++;
 			}
-			else throw new RuntimeException("Inconsistant rule finding.");
-			// Find the end pattern
-			p = Pattern.compile(bestRule.end, params.regexOptions);
-			m = p.matcher(inputText);
-			if ( m.find(startResult.end()) ) {
-				endResult = m.toMatchResult();
+			
+			if ( bestRule != null ) {
+				// Find the start pattern
+				Pattern p = Pattern.compile(bestRule.start, params.regexOptions);
+				Matcher m = p.matcher(inputText);
+				if ( m.find(bestPosition) ) {
+					startResult = m.toMatchResult();
+				}
+				else throw new RuntimeException("Inconsistant rule finding.");
+				// Find the end pattern
+				p = Pattern.compile(bestRule.end, params.regexOptions);
+				m = p.matcher(inputText);
+				if ( m.find(startResult.end()) ) {
+					endResult = m.toMatchResult();
+				}
+				else throw new RuntimeException("Inconsistant rule finding.");
+				// Check for empty content
+				if ( startResult.start() == endResult.start() ) {
+					if ( startSearch+1 < inputText.length() ) {
+						startSearch++;
+						continue;
+					}
+					else break; // Done
+				}
+				// Check for boundary to avoid infinite loop
+				else if ( startResult.start() != inputText.length() ) {
+					// Process the match we just found
+					return processMatch(bestRule, startResult, endResult);
+				}
+				else break; // Done
 			}
-			else throw new RuntimeException("Inconsistant rule finding.");
-			// Check for boundary to avoid infinite loop
-			if ( startResult.start() != inputText.length() ) {
-				// Process the match we just found
-				return processMatch(bestRule, startResult, endResult);
-			}
+			else break; // Done
 		}
 		
 		// Else: Send end of the skeleton if needed
@@ -218,7 +231,6 @@ public class RegexFilter implements IFilter {
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
-		//TODO: Implement generateSkeleton
 		encoding = defaultEncoding;
 		srcLang = sourceLanguage;
 	}
@@ -390,7 +402,8 @@ public class RegexFilter implements IFilter {
 		String data)
 	{
 		tuRes = new TextUnit(String.valueOf(++tuId), data);
-		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+		//TODO: handle un-escaping and mime-type
+		
 		if ( rule.preserveWS ) {
 			tuRes.setPreserveWhitespaces(true);
 		}
