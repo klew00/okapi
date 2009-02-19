@@ -46,6 +46,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
+import java.security.AccessController;
 
 /**
  * Represents the text from the {@linkplain Source source} document that is to
@@ -72,6 +73,8 @@ import java.nio.charset.UnsupportedCharsetException;
  */
 public final class MemMappedCharSequence implements CharSequence {
 	private CharBuffer text;
+	private MappedByteBuffer byteBuffer;
+	private File tempUTF16BEfile;
 	private char[] tempText = null;
 
 	/**
@@ -94,8 +97,7 @@ public final class MemMappedCharSequence implements CharSequence {
 		text = CharBuffer.wrap(tempText);
 		string.getChars(0, string.length(), tempText, 0);
 		if (lowercase) {
-			for (int i = 0; i < tempText.length; i++)
-				tempText[i] = Character.toLowerCase(tempText[i]);
+			toLowercase();
 		}
 	}
 
@@ -184,7 +186,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	private void createMemMappedCharBuffer(final ReadableByteChannel inputSource, String encoding, boolean lowercase) {
 		text = null;
 		FileChannel fc = null;
-		File tempUTF16BEfile = null;
+		tempUTF16BEfile = null;
 
 		try {
 			// create temp mem map file and convert it to UTF-16(either BE or LE
@@ -205,15 +207,14 @@ public final class MemMappedCharSequence implements CharSequence {
 
 			// memory map the UTF-16BE temp file and create a CharBuffer view
 			fc = new RandomAccessFile(tempUTF16BEfile, mode).getChannel();
-			MappedByteBuffer byteBuffer = fc.map(mapMode, 0, fc.size());
+			byteBuffer = fc.map(mapMode, 0, fc.size());
 			byteBuffer.order(ByteOrder.BIG_ENDIAN);
-			text = byteBuffer.asCharBuffer();			
+			text = byteBuffer.asCharBuffer();
 
 			// TODO: Would it be faster to do this per method call?
 			// lowercase the buffer
 			if (lowercase) {
-				for (int i = 0; i < text.length(); i++)
-					text.put(i, Character.toLowerCase(text.get(i)));
+				toLowercase();
 			}
 
 		} catch (FileNotFoundException fnfx) {
@@ -664,6 +665,12 @@ public final class MemMappedCharSequence implements CharSequence {
 		text.rewind();
 		return text.toString();
 	}
+	
+	public void toLowercase() {
+		text.rewind();
+		for (int i = 0; i < text.length(); i++)
+			text.put(i, Character.toLowerCase(text.get(i)));
+	}
 
 	/**
 	 * General purpose static method which reads bytes from a Channel, decodes
@@ -755,5 +762,29 @@ public final class MemMappedCharSequence implements CharSequence {
 		}
 
 		cb.clear(); // prepare buffer to be filled again
+	}
+
+	@SuppressWarnings("unchecked")
+	public void close() {
+		if (byteBuffer == null)
+			return;
+		AccessController.doPrivileged(new java.security.PrivilegedAction() {
+			public Object run() {
+				try {
+					java.lang.reflect.Method getCleanerMethod = byteBuffer.getClass()
+							.getMethod("cleaner", new Class[0]);
+					getCleanerMethod.setAccessible(true);
+					sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(byteBuffer, new Object[0]);
+					cleaner.clean();
+					if (byteBuffer != null)
+						tempUTF16BEfile.delete();
+					byteBuffer = null;
+					System.gc();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				return null;
+			}
+		});
 	}
 }

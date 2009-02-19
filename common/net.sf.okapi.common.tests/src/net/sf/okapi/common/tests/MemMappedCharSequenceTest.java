@@ -42,7 +42,8 @@ public class MemMappedCharSequenceTest {
 		assertEquals(7257720, charSequence.length());
 		assertEquals('<', charSequence.charAt(1));
 		assertEquals('U', charSequence.charAt(31));
-		assertEquals(7257718, charSequence.lastIndexOf(">", charSequence.length()-1));				
+		assertEquals(7257718, charSequence.lastIndexOf(">", charSequence.length()-1));			
+		charSequence.close();
 	}
 	
 	@Test
@@ -50,6 +51,7 @@ public class MemMappedCharSequenceTest {
 		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
+		charSequence.close();
 	}
 	
 	@Test
@@ -57,10 +59,12 @@ public class MemMappedCharSequenceTest {
 		long before = System.currentTimeMillis(); // Start timing
 
 		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test_large.txt");
-		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);				
+		charSequence = new MemMappedCharSequence(in, "UTF-16LE");				
 		
 		long  after = System.currentTimeMillis(); // End timing
 		long fastTime = after - before;
 		System.out.println("Speed " + fastTime + " ms.");
+		
+		charSequence.close();
 	}
 }
