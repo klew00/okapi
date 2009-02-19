@@ -40,6 +40,22 @@ author:
 t:
   ruleTypes: [TEXTUNIT]
 
+# used in comments file
+text:
+  ruleTypes: [TEXTUNIT]
 
+# used in workbook file
+sheet:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [name]
+
+# next two used in table definition file
+table:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [name]
+
+tablecolumn:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [name]
 
 

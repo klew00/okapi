@@ -8,7 +8,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses({OpenXMLSnippetsTest.class})
+@SuiteClasses({OpenXMLFullFileTest.class})
 public class AllOpenXMLTests {
 
   public static Test suite() {

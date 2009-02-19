@@ -102,21 +102,36 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		Iterator<String> it;
 		InputStream isInputStream;
 		PipedInputStream squishedInputStream;
-		final PipedOutputStream pios = new PipedOutputStream();
+		PipedOutputStream pios=null;
 		String sDocName;
 		this.dbg = dbg; // DWH 2-16-09
 		tmSubdocs = pryopen(sOneFileName,filetype);
-		if (filetype==MSWORD)
+		for(it = tmSubdocs.keySet().iterator(); it.hasNext();)
 		{
-			isInputStream = tmSubdocs.get("Document");
-			
+			sDocName = (String)it.next();
+			isInputStream = tmSubdocs.get(sDocName);
 			if (isInputStream!=null)
-			{
-				squishedInputStream = (PipedInputStream)combineRepeatedFormat(isInputStream,pios); // DWH 2-3-09
+			{				
 				try
 				{
-				  open(squishedInputStream); // DWH 2-3-09 was isInputStream
-//				  open(isInputStream); // DWH temporary till get squished working
+					if (sDocName.equals("Document") || sDocName.endsWith("slide+xml"))
+						// main document in Word or slide in Powerpoint
+					{
+						if (pios!=null)
+						{
+							try {
+								pios.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						pios = new PipedOutputStream(); // DWH 2-19-09 this may need to be final
+						squishedInputStream = (PipedInputStream)combineRepeatedFormat(isInputStream,pios); // DWH 2-3-09
+					    open(squishedInputStream); // DWH 2-3-09 was isInputStream
+					}
+					else
+						open(isInputStream);						
 				}
 				catch(RuntimeException e) // DWH 2-13-09
 				{
@@ -126,38 +141,17 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 					pryclosed();
 					return false; // filter failed because of bad configuration file
 				}
-				
 				if (dbg>2)
 				{
 					String glorp = getParameters().toString();
 					System.out.println(glorp); // This lists what YAML actually read out of the configuration file
 				}
-
-				// put out beginning group
+				// put out beginning group with name sDocName
 				if (dbg>2)
 				{
-					System.out.println("\n\n<<<<<<< "+sOneFileName+" : Main Document >>>>>>>");
+					System.out.println("\n\n<<<<<<< "+sOneFileName+" : "+sDocName+" >>>>>>>");
 					displayEvents(); // DWH 2-14-09
 				}
-			}
-		}
-		for(it = tmSubdocs.keySet().iterator(); it.hasNext();)
-		{
-			sDocName = (String)it.next();
-			if (sDocName.equals("Document")) // main document in MSEXCEL and MSPOWERPOINT are irrelevant
-				continue;
-			isInputStream = tmSubdocs.get(sDocName);
-			open(isInputStream);
-			if (dbg>2)
-			{
-				String glorp = getParameters().toString();
-				System.out.println(glorp); // This lists what YAML actually read out of the configuration file
-			}
-			// put out beginning group with name sDocName
-			if (dbg>2)
-			{
-				System.out.println("\n\n<<<<<<< "+sOneFileName+" : "+sDocName+" >>>>>>>");
-				displayEvents(); // DWH 2-14-09
 			}
 		}			
 		pryclosed();
@@ -316,16 +310,18 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 				                        sDocType.equals("footer+xml") ||
 				                        sDocType.equals("comments+xml") ||
 				                        sDocType.equals("glossary+xml"))) ||
-				   (filetype==MSEXCEL && (sDocType.equals("worksheet+xml") ||
+				   (filetype==MSEXCEL && (sDocType.equals("main+xml") ||
+						   				  sDocType.equals("worksheet+xml") ||
 						   				  sDocType.equals("sharedStrings+xml") ||
+						   				  sDocType.equals("table+xml") ||
 						   				  sDocType.equals("comments+xml"))) ||
 				   (filetype==MSPOWERPOINT && (sDocType.equals("slide+xml") ||
 						   				       sDocType.equals("notesSlide+xml"))))
 			   {
-				   sDocName = part.getPartName().getName();
 				   inStream = part.getInputStream();
+				   sDocName = part.getPartName().getName();
 				   if (sDocName!=null && sDocName!="" && inStream!=null)
-					   tmWordSubdocs.put(sDocName,inStream);
+					   tmWordSubdocs.put(sDocName+":"+sDocType,inStream);
 			   }
 			}
 			System.out.println("");
@@ -435,7 +431,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	      }
 	      private void havatag(String tug,String tugname)
 	      {
-	    	  if (tugname.equals("w:p"))
+	    	  if (tugname.equals("w:p") || tugname.equals("a:p"))
 	    	  {
 	    		  onp = tug;
 	    		  bInap = true;
@@ -443,7 +439,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	    		  bHavr1 = false;
 	    		  bB4text = false;
 	    	  }
-	    	  else if (tugname.equals("/w:p"))
+	    	  else if (tugname.equals("/w:p") || tugname.equals("/a:p"))
 	    	  {
 	    		  offp = tug;
 	    		  bInap = false;
@@ -451,7 +447,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	    	  }
 	    	  else if (bInap)
 	    	  {
-		    	  if (tugname.equals("w:r"))
+		    	  if (tugname.equals("w:r") || tugname.equals("a:r"))
 		    	  {
 		    		  if (!bInr)
 		    		  {
@@ -463,7 +459,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		    			  bB4text = true;
 		    		  }
 		    	  }
-		    	  else if (tugname.equals("/w:r"))
+		    	  else if (tugname.equals("/w:r") || tugname.equals("/a:r"))
 		    	  {
 		    		  bInr = false;
 		    		  if (bHavr1)
@@ -830,6 +826,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	protected String normalizeAttributeName(String attrName, String attrValue, Tag tag) {
 		// normalize values for HTML
 		String normalizedName = attrName;
+		String tagName; // DWH 2-19-09 */
 // Any attribute that encodes language should be renamed here to "language"
 // Any attribute that encodes locale or charset should be normalized too
 // Ask Jim what that means
@@ -853,10 +850,20 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		}
 */
 		// <w:lang w:val="en-US" ...>
-		if (tag.getName().equals("w:lang"))
+		tagName = tag.getName();
+		if (tagName.equals("w:lang"))
 		{
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("w:val") != null)
+			{
+				normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
+				return normalizedName;
+			}
+		}
+		else if (tagName.equals("a:endpararpr") || tagName.equals("a:rpr"))
+		{
+			StartTag st = (StartTag) tag;
+			if (st.getAttributeValue("lang") != null)
 			{
 				normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
 				return normalizedName;
