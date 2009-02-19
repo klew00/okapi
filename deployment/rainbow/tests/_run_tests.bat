@@ -20,6 +20,13 @@ java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test1.rnb -
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test2.rnb -x oku_encodingconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test3.rnb -x oku_encodingconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\TransComp_Test1.rnb -x oku_transcomparison -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_decoded.rnb -x oku_uriconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_encoded_default.rnb -x oku_uriconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_encoded_default_all_extended.rnb -x oku_uriconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_encoded_all_but_uri_marks.rnb -x oku_uriconversion -np
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_encoded_all_but_uri_marks_and_res.rnb -x oku_uriconversion -np
+
+
 comp miscellaneous\*.out miscellaneous\*.gold >> _tests_results.txt
 
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -x oku_extraction -np

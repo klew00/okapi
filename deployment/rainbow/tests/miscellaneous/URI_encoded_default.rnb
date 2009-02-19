@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rainbowProject version="4"><fileSet id="1"><root useCustom="0">C:\Documents and Settings\fliden</root><fi fs="okf_properties@no_escaping_of_extended" fo="" se="" te="">URI_encoded_default.properties</fi></fileSet><fileSet id="2"><root useCustom="0">C:\Documents and Settings\fliden</root></fileSet><fileSet id="3"><root useCustom="0">C:\Documents and Settings\fliden</root></fileSet><output><root use="0"></root><subFolder use="0"></subFolder><extension use="1" style="1">.out</extension><replace use="0" oldText="" newText=""></replace><prefix use="0"></prefix><suffix use="0"></suffix></output><options sourceLanguage="EN-US" sourceEncoding="utf-8" targetLanguage="FR-FR" targetEncoding="utf-8"></options><parametersFolder useCustom="0"></parametersFolder><utilities xml:spaces="preserve"><params id="oku_extraction">
+pkgType=rtf
+createZip.b=false
+pkgName=pack2
+outputFolder=${ProjDir}
+includeTargets.b=true
+preSegment.b=false
+sourceSRX=
+targetSRX=
+preTranslate.b=false
+tmPath=</params><params id="oku_encodingconversion">
+unescapeNCR.b=true
+unescapeCER.b=true
+unescapeJava.b=true
+escapeAll.b=false
+escapeNotation.i=0
+userFormat=%d
+useBytes.b=false
+BOMonUTF8.b=true
+reportUnsupported.b=true</params><params id="oku_uriconversion">
+conversionType.i=1
+updateAll.b=false
+escapeList=%&amp;(){}[]</params></utilities></rainbowProject>

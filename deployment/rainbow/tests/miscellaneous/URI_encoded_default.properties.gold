@@ -1,0 +1,4 @@
+﻿test1=BEGIN%s ! * ' %28 %29 ; : @ %26 = + $ , / ? %25 # %5B %5D END
+test2=BEGIN%s   ~ ` ! @ # $ ^ %26 * %28 %29 \u00a0 + - = %7B %7D | %5B %5D  : " ; ' < > , . ? / END
+test3=BEGIN%s \u00e5 \u00e4 \u00f6 \uc548 \ub140 \ud558 \uc138 \uc694 END
+test4=BEGIN %25 END
