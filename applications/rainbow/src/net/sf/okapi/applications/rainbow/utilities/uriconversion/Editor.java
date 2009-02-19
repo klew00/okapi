@@ -241,7 +241,6 @@ public class Editor implements IParametersEditor {
 
 
 	private void setData () {
-		
 		if(params.conversionType==0){
 			chkUnescape.setSelection(true);
 			chkEscape.setSelection(false);
@@ -260,7 +259,6 @@ public class Editor implements IParametersEditor {
 			btnFirstOption.setEnabled(true);
 			btnSecondOption.setEnabled(true);			
 		}
-		
 		chkUpdateAll.setSelection(params.updateAll);
 		
 		String allItems = " ~`!@#$^&*() +-={}|[]\\:\";'<>,.?/";
@@ -277,7 +275,6 @@ public class Editor implements IParametersEditor {
 	}
 
 	private boolean saveData () {
-
 		params.reset();
 		
 		if(chkUnescape.getSelection()){
@@ -285,24 +282,16 @@ public class Editor implements IParametersEditor {
 		}else{
 			params.conversionType=1;
 		}
-		
 		params.updateAll = chkUpdateAll.getSelection();
-		
 		StringBuilder selectedItems = new StringBuilder();
-
+		selectedItems.append("%");
 		for ( int i=0; i<table.getItemCount(); i++ ) {
 			TableItem ti = table.getItem(i);
 			if(ti.getChecked()){
 				selectedItems.append(ti.getText(0));
 			}
 		};
-		
-		// make sure the list is not empty
-		if (table.getItemCount()==0){
-			Dialogs.showError(shell, "You need to provide a search expression", null);
-			return false;
-		}
-		
+		params.escapeList = selectedItems.toString();
 		result = true;
 		return result;
 	}

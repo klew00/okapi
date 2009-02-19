@@ -107,12 +107,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			
 			if ( params.conversionType == UNESCAPE ){
 				//--do unescape
-
+				
 				//--loop all characters--
 				for ( int i=0; i<result.length(); i++ ) {
-				
 					switch ( result.charAt(i) ) {
-
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
@@ -135,7 +133,6 @@ public class Utility extends BaseFilterDrivenUtility {
 						break;
 					}
 				}				
-				
 				sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 
 			}else{
@@ -181,7 +178,6 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Exception e ) {
-			System.out.println("Error");
 			logger.warn("Error when updating content: '"+tmp+"'", e);
 		}
 	}
