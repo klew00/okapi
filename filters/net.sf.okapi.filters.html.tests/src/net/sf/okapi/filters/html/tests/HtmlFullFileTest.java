@@ -1,13 +1,12 @@
 package net.sf.okapi.filters.html.tests;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
@@ -61,20 +60,10 @@ public class HtmlFullFileTest {
 	@Test
 	public void testNonwellformed() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/nonwellformed.specialtest");
-		htmlFilter.open(htmlStream);
+		MemMappedCharSequence charSequence = new MemMappedCharSequence(htmlStream, "UTF-8");
+		htmlFilter.open(charSequence);
 		while (htmlFilter.hasNext()) {
 			FilterEvent event = htmlFilter.next();
-		}
-	}
-	
-	@Test
-	public void testTmx() throws FileNotFoundException {
-		htmlFilter.setOptions("en", "UTF-16LE", true);
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.filters.html.tests/html/FCH.tmx");
-		htmlFilter.open(in);			
-		while (htmlFilter.hasNext()) {
-			FilterEvent event = htmlFilter.next();
-			System.out.print(event.getEventType().toString());
 		}
 	}
 }

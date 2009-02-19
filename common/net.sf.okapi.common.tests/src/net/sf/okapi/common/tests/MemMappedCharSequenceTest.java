@@ -37,7 +37,7 @@ public class MemMappedCharSequenceTest {
 
 	@Test
 	public void testLarge() throws FileNotFoundException {
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/FCH.tmx");
+		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE");
 		assertEquals(7257720, charSequence.length());
 		assertEquals('<', charSequence.charAt(1));
@@ -47,8 +47,20 @@ public class MemMappedCharSequenceTest {
 	
 	@Test
 	public void testLowercase() throws FileNotFoundException {
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/FCH.tmx");
+		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
+	}
+	
+	@Test
+	public void testStressTest() throws FileNotFoundException {
+		long before = System.currentTimeMillis(); // Start timing
+
+		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test_large.txt");
+		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);				
+		
+		long  after = System.currentTimeMillis(); // End timing
+		long fastTime = after - before;
+		System.out.println("Speed " + fastTime + " ms.");
 	}
 }
