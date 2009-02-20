@@ -76,6 +76,13 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		manifest.load(manifestPath);
 		// Check the package where the manifest has been found
 		manifest.checkPackageContent();
+		
+		// UI check
+		ManifestDialog dlg = new ManifestDialog(shell, help);
+		if ( !dlg.showDialog(manifest) ) {
+			return;
+		}
+		
 		// Initialize the merger for this manifest
 		merger.initialize(manifest);
 		

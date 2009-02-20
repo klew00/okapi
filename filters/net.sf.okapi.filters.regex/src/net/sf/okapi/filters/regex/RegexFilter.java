@@ -82,6 +82,10 @@ public class RegexFilter implements IFilter {
 	public String getName () {
 		return "okf_regex";
 	}
+	
+	public String getMimeType () {
+		return "text/x-regex";
+	}
 
 	public IParameters getParameters () {
 		return params;

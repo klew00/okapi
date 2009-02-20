@@ -143,5 +143,11 @@ public interface IFilter {
 	 * for this filter.
 	 */
 	public IFilterWriter createFilterWriter ();
+
+	/**
+	 * Gets the MIME type of the format supported by this filter.
+	 * @return The MIME type of the format supported by this filter.
+	 */
+	public String getMimeType ();
 	
 }

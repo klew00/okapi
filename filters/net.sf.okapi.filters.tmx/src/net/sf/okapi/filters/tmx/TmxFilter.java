@@ -96,6 +96,10 @@ public class TmxFilter implements IFilter {
 		return "okf_tmx";
 	}
 	
+	public String getMimeType () {
+		return "text/x-tmx"; //TODO: check
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}
@@ -239,8 +243,8 @@ public class TmxFilter implements IFilter {
 			startDoc.setEncoding(encoding);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setType("text/tmx");
-			startDoc.setMimeType("text/tmx");
+			startDoc.setType("text/x-tmx");
+			startDoc.setMimeType("text/x-tmx");
 			startDoc.setIsMultilingual(true);
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));			
 			

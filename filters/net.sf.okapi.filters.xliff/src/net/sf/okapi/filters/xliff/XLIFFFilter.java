@@ -112,6 +112,10 @@ public class XLIFFFilter implements IFilter {
 		return "XLIFFFilter";
 	}
 
+	public String getMimeType () {
+		return "text/x-xliff";
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}

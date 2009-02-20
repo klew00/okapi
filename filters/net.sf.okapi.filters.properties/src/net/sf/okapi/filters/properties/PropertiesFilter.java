@@ -105,6 +105,10 @@ public class PropertiesFilter implements IFilter {
 	public String getName () {
 		return "okf_properties";
 	}
+	
+	public String getMimeType () {
+		return "text/x-properties"; //TODO: check
+	}
 
 	public IParameters getParameters () {
 		return params;

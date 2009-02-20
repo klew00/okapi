@@ -200,6 +200,10 @@ public class ODFFilter2 implements IFilter {
 	public String getName () {
 		return "okf_odf";
 	}
+	
+	public String getMimeType () {
+		return "text/x-odf"; //TODO: check
+	}
 
 	public IParameters getParameters () {
 		return params;

@@ -46,7 +46,8 @@ import net.sf.okapi.common.writer.GenericFilterWriter;
 
 public class MIFFilter implements IFilter {
 	
-	static final Hashtable<String, Character> charTable = initCharTable();
+	private static final String MIMETYPE = "text/x-mif"; // TODO: check value
+	private static final Hashtable<String, Character> charTable = initCharTable();
 
 	private String docName;
 	private BufferedReader reader;
@@ -106,6 +107,10 @@ public class MIFFilter implements IFilter {
 	public String getName () {
 		return "MIFFilter";
 	}
+	
+	public String getMimeType () {
+		return MIMETYPE;
+	}
 
 	public IParameters getParameters () {
 		return null;
@@ -155,7 +160,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/x-mif");
-			startDoc.setMimeType("text/x-mif");
+			startDoc.setMimeType(MIMETYPE);
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {

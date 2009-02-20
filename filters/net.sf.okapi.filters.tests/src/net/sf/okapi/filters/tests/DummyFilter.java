@@ -60,6 +60,10 @@ public class DummyFilter implements IFilter {
 		return "DummyFilter";
 	}
 
+	public String getMimeType () {
+		return "text/xml";
+	}
+
 	public IParameters getParameters () {
 		return null;
 	}

@@ -89,7 +89,7 @@ public class Merger {
 			if ( reader == null ) {
 				reader = (IReader)Class.forName(manifest.getReaderClass()).newInstance();
 			}
-			logger.info("Merging: " + fileToMerge);
+			logger.info("\nMerging: " + fileToMerge);
 
 			// Original and parameters files
 			String originalFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()

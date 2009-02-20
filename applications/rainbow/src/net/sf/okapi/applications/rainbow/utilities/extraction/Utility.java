@@ -65,7 +65,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else if ( params.pkgType.equals("rtf") )
 			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer(
-				new GenericSkeletonWriter()); //TODO: Use createSkeletonWriter() instead
+				new GenericSkeletonWriter());
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 	

@@ -287,6 +287,10 @@ public class RTFFilter implements IFilter {
 	public String getName () {
 		return "okf_rtf";
 	}
+	
+	public String getMimeType () {
+		return "text/rtf"; //TODO: check
+	}
 
 	public IParameters getParameters () {
 		return null;

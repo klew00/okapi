@@ -239,7 +239,7 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @return the mime type
 	 */
-	protected String getMimeType() {
+	public String getMimeType() {
 		return mimeType;
 	}
 

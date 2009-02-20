@@ -48,6 +48,7 @@ public class IDMLFilter implements IFilter {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
 	}
 
+	private final String MIMETYPE = "application/vnd.adobe.indesign-idml-package";
 	private final String docId = "sd";
 	
 	private ZipFile zipFile;
@@ -87,6 +88,10 @@ public class IDMLFilter implements IFilter {
 
 	public String getName () {
 		return "okf_idml";
+	}
+
+	public String getMimeType () {
+		return MIMETYPE;
 	}
 
 	public IParameters getParameters () {
@@ -166,7 +171,7 @@ public class IDMLFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
 			startDoc.setLanguage(srcLang);
-			startDoc.setMimeType("application/vnd.adobe.indesign-idml-package");
+			startDoc.setMimeType(MIMETYPE);
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc, skel));
 			

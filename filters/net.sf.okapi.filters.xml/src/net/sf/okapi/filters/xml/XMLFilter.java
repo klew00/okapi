@@ -97,6 +97,10 @@ public class XMLFilter implements IFilter {
 	public String getName () {
 		return "okf_xml";
 	}
+	
+	public String getMimeType () {
+		return "text/xml";
+	}
 
 	public IParameters getParameters () {
 		return null;

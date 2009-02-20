@@ -210,7 +210,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				return getContent((TextUnit)part.parent, langToUse, contextToUse);
 			}
 			else {
-				throw new RuntimeException("self-references to this skeleton part must be a text-unit.");
+				throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
 			}
 		}
 		
@@ -441,7 +441,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		IEncoder encoder,
 		int context)
 	{
-		context = 0; //TODO: Handle the case of non-trans inline at a high level
+		//context = 1;
 		
 		// Output simple text
 		if ( !tf.hasCode() ) {

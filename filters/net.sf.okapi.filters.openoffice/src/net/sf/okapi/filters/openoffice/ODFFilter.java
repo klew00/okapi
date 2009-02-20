@@ -207,6 +207,10 @@ public class ODFFilter implements IFilter {
 		return "ODFFilter";
 	}
 
+	public String getMimeType () {
+		return "text/x-odf"; //TODO: check
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}

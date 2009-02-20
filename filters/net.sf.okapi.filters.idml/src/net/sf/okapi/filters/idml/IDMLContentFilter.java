@@ -96,6 +96,10 @@ public class IDMLContentFilter implements IFilter {
 	public String getName () {
 		return "okf_idmlcontent";
 	}
+	
+	public String getMimeType () {
+		return "text/xml"; //TODO: check if IDML has its own
+	}
 
 	public IParameters getParameters () {
 		// TODO Auto-generated method stub

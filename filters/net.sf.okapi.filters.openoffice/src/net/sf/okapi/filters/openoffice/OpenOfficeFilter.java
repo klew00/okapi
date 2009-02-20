@@ -89,6 +89,10 @@ public class OpenOfficeFilter implements IFilter {
 	public String getName () {
 		return "okf_openoffice";
 	}
+	
+	public String getMimeType () {
+		return "text/x-odf"; //TODO: check
+	}
 
 	public IParameters getParameters () {
 		return odf.getParameters();
