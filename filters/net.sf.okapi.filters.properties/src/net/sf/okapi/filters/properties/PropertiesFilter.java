@@ -79,6 +79,7 @@ public class PropertiesFilter implements IFilter {
 	private GenericSkeleton skel;
 	private String docName;
 	private String srcLang;
+	private boolean hasUTF8BOM;
 	
 	public PropertiesFilter () {
 		params = new Parameters();
@@ -169,6 +170,7 @@ public class PropertiesFilter implements IFilter {
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			// Correct the encoding if we have detected a different one
 			encoding = bis.detectEncoding();
+			hasUTF8BOM = bis.hasUTF8BOM();
 			commonOpen(new InputStreamReader(bis, encoding));
 		}
 		catch ( IOException e ) {
@@ -188,6 +190,7 @@ public class PropertiesFilter implements IFilter {
 
 	public void open (CharSequence inputText) {
 		encoding = "UTF-16";
+		hasUTF8BOM = false;
 		commonOpen(new StringReader(inputText.toString()));
 	}
 	
@@ -252,9 +255,10 @@ public class PropertiesFilter implements IFilter {
 
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
-		startDoc.setEncoding(encoding);
+		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
+		startDoc.setLineBreak(lineBreak);
 		startDoc.setType("text/x-properties");
 		startDoc.setMimeType("text/x-properties");
 		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));

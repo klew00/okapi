@@ -156,7 +156,7 @@ public class MIFFilter implements IFilter {
 			queue.add(new FilterEvent(FilterEventType.START));
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
-			startDoc.setEncoding(encoding);
+			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/x-mif");

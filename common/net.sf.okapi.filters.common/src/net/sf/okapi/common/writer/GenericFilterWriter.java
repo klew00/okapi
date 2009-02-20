@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -130,8 +131,6 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	private void processStart () {
-		// Create the output
-		createWriter();
 		skelWriter.processStart(language, encoding, null, encoderManager);
 	}
 
@@ -141,6 +140,8 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 	
 	private void processStartDocument(StartDocument resource) throws IOException {
+		// Create the output
+		createWriter(resource);
 		writer.write(skelWriter.processStartDocument(resource));
 	}
 
@@ -192,15 +193,39 @@ public class GenericFilterWriter implements IFilterWriter {
 	public void setParameters (IParameters params) {
 	}
 
-	private void createWriter () {
+	private void createWriter (StartDocument resource) {
 		try {
 			// Create the output writer from the provided stream
 			// or from the path if there is no stream provided
 			if ( output == null ) {
 				output = new BufferedOutputStream(new FileOutputStream(outputPath));
 			}
+			
+			// Get the encoding of the original document
+			String originalEnc = resource.getEncoding();
+			// If it's undefined, assume it's the default of the system
+			if ( originalEnc == null ) {
+				originalEnc = Charset.defaultCharset().name();
+			}
+			// Check if the output encoding is defined
+			if ( encoding == null ) {
+				// if not: Fall back on the encoding of the original
+				encoding = originalEnc;
+			}
+			// Create the output
 			writer = new OutputStreamWriter(output, encoding);
-			Util.writeBOMIfNeeded(writer, true, encoding);
+			// Set default UTF-8 BOM usage
+			boolean useUTF8BOM = false; //TODO: use platform default
+			// Check if the output encoding is UTF-8
+			if ( "utf-8".equalsIgnoreCase(encoding) ) {
+				// If the original was UTF-8 too
+				if ( "utf-8".equalsIgnoreCase(originalEnc) ) {
+					// Check whether it had a BOM or not
+					useUTF8BOM = resource.hasUTF8BOM();
+				}
+			}
+			// Write out the BOM if needed
+			Util.writeBOMIfNeeded(writer, useUTF8BOM, encoding);
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);

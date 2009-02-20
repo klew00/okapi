@@ -38,6 +38,7 @@ public class BOMAwareInputStream extends InputStream {
 	private String defaultEncoding;
 	private String detectedEncoding;
 	private int bomSize;
+	private boolean hasUTF8BOM;
 
 	public BOMAwareInputStream (InputStream input,
 		String defaultEncoding)
@@ -45,6 +46,7 @@ public class BOMAwareInputStream extends InputStream {
 		this.input = input;
 		this.defaultEncoding = defaultEncoding;
 		bomSize = 0;
+		hasUTF8BOM = false;
 	}
 	
 	public String detectEncoding ()
@@ -59,6 +61,7 @@ public class BOMAwareInputStream extends InputStream {
 			&& ( bom[2] == (byte)0xBF )) {
 			detectedEncoding = "UTF-8";
 			bomSize = 3;
+			hasUTF8BOM = true;
 			unread = n-3;
 		}
 		else if (( bom[0] == (byte)0xFE )
@@ -109,6 +112,10 @@ public class BOMAwareInputStream extends InputStream {
 	
 	public int getBOMSize () {
 		return bomSize;
+	}
+	
+	public boolean hasUTF8BOM () {
+		return hasUTF8BOM;
 	}
 	
 	@Override

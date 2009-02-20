@@ -31,6 +31,8 @@ public class StartDocument extends BaseNameable {
 	protected String encoding;
 	protected boolean isMultilingual;
 	protected IParameters params;
+	protected boolean hasUTF8BOM;
+	protected String lineBreak;
 
 	public StartDocument (String id) {
 		super();
@@ -67,14 +69,19 @@ public class StartDocument extends BaseNameable {
 	 * Sets the character set encoding of this document.
 	 * @param encoding The string identifying the character set encoding of this document.
 	 * For example "UTF-8".
+	 * @param hasUTF8BOM True if this document is UTf-8 and has a Byte-Order-Mark.
+	 * False in all other cases.
 	 */
-	public void setEncoding (String encoding) {
+	public void setEncoding (String encoding,
+		boolean hasUTF8BOM)
+	{
 		this.encoding = encoding;
+		this.hasUTF8BOM = hasUTF8BOM;
 	}
 	
 	/**
 	 * Indicates if this document is multilingual.
-	 * @return True if this document is multi-lingual, false otherwise.
+	 * @return True if this document is multilingual, false otherwise.
 	 */
 	public boolean isMultilingual () {
 		return isMultilingual;
@@ -88,7 +95,34 @@ public class StartDocument extends BaseNameable {
 	public void setIsMultilingual (boolean value) {
 		isMultilingual = value;
 	}
-
+	
+	/**
+	 * Indicates if this document is encoded as UTF8 and has a Byte-Order-Mark.
+	 * @return True if this document is encoded as UTF8 and has a Byte-Order-Mark.
+	 * False if the document is not encoded in UTF-8 or if if it is encoded in
+	 * UTF-8 and has not a Byte-Order-Mark. 
+	 */
+	public boolean hasUTF8BOM () {
+		return hasUTF8BOM;
+	}
+	
+	/**
+	 * Gets the type of line-break used in the original document.
+	 * @return The type of line-break used in the original document.
+	 */
+	public String getLineBreak () {
+		return lineBreak;
+	}
+	
+	/**
+	 * Sets the type of line-break used in the original document.
+	 * @param value The type of line-break of the original document, for
+	 * example: "\r\n" (for Windows/DOS line-break).
+	 */
+	public void setLineBreak (String value) {
+		lineBreak = value;
+	}
+	
 	/**
 	 * Gets the current parameters for this document.
 	 * @return The object containing the parameters for this document.

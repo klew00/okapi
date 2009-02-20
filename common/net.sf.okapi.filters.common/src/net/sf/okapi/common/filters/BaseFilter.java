@@ -476,7 +476,7 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected void startDocument() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
-		startDocument.setEncoding(getEncoding());
+		startDocument.setEncoding(getEncoding(), false); //TODO: UTF-8 BOM detection
 		startDocument.setLanguage(getSrcLang());
 		startDocument.setMimeType(getMimeType());
 		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);

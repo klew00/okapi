@@ -241,9 +241,10 @@ public class XMLFilter implements IFilter {
 		startDoc.setName(docName);
 		String realEnc = doc.getInputEncoding();
 		if ( realEnc != null ) encoding = realEnc;
-		startDoc.setEncoding(encoding);
+		startDoc.setEncoding(encoding, false); //TODO: UTF-8 BOM detection
+		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);
-		//TODO: startDoc.setFilterParameters(params);
+		startDoc.setFilterParameters(getParameters());
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
 

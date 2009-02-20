@@ -65,6 +65,8 @@ public class RegexFilter implements IFilter {
 	private int startSkl;
 	private int parseState = 0;
 	private String srcLang;
+	private String lineBreak;
+	private boolean hasUTF8BOM;
 	
 	public RegexFilter () {
 		params = new Parameters();
@@ -184,10 +186,11 @@ public class RegexFilter implements IFilter {
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			encoding = bis.detectEncoding();
+			hasUTF8BOM = bis.hasUTF8BOM();
 			reader = new BufferedReader(new InputStreamReader(bis, encoding));
 
 			// Read the whole file into one string
-			//TODO: detect the original line-break type
+			lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 			//TODO: Optimize this with a better 'readToEnd()'
 			StringBuilder tmp = new StringBuilder();
 			String buffer;
@@ -227,6 +230,8 @@ public class RegexFilter implements IFilter {
 	}
 
 	public void open (CharSequence inputText) {
+		encoding = "UTF-16";
+		hasUTF8BOM = false;
 		commonOpen(inputText.toString());
 	}
 
@@ -280,8 +285,9 @@ public class RegexFilter implements IFilter {
 		queue.add(new FilterEvent(FilterEventType.START));
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
-		startDoc.setEncoding(encoding);
+		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
+		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setType(params.mimeType);
 		startDoc.setMimeType(params.mimeType);
