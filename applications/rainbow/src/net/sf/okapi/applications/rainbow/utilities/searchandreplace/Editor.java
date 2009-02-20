@@ -202,61 +202,8 @@ public class Editor implements IParametersEditor {
 		
 		int standardWidth = 80;
 
-		btMoveUp = new Button(cmpTmp, SWT.PUSH);
-		btMoveUp.setText("Move Up");
-		btMoveUp.setEnabled(false);
-		btMoveUp.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if ( table.getSelectionIndex()!=-1 ) {
-
-			        int index = table.getSelectionIndex();
-			        boolean isChecked=false;
-			        
-			        TableItem ti = table.getItem(index);
-			        isChecked = ti.getChecked();
-			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
-			        ti.dispose();
-
-					ti = new TableItem (table, SWT.NONE,index-1);
-					ti.setChecked(isChecked);
-					String [] strs =values;
-					ti.setText(strs);
-					table.select(index-1);
-					
-					updateUpDownBtnState();
-				}
-			}
-		});	
 		RowData rdTmp = new RowData();
 		rdTmp.width = standardWidth;
-		btMoveUp.setLayoutData(rdTmp);
-		
-		btMoveDown = new Button(cmpTmp, SWT.PUSH);
-		btMoveDown.setText("Move Down");
-		btMoveDown.setEnabled(false);
-		btMoveDown.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-
-				if ( table.getSelectionIndex()!=-1 ) {
-					
-			        int index = table.getSelectionIndex();
-			        boolean isChecked=false;
-			        
-			        TableItem ti = table.getItem(index);
-			        isChecked = ti.getChecked();
-			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
-			        ti.dispose();
-
-					ti = new TableItem (table, SWT.NONE,index+1);
-					ti.setChecked(isChecked);
-					String [] strs =values;
-					ti.setText(strs);
-					table.select(index+1);
-					
-					updateUpDownBtnState();
-				}
-			}
-		});	
 
 		// Add, edit, delete buttons
 		Composite cmpTmp2 = new Composite(cmpTmp0, SWT.NONE);
@@ -306,7 +253,63 @@ public class Editor implements IParametersEditor {
 			}
 		});	
 		btRemove.setLayoutData(rdTmp);
+		
 
+		btMoveUp = new Button(cmpTmp2, SWT.PUSH);
+		btMoveUp.setText("Move Up");
+		btMoveUp.setEnabled(false);
+		btMoveUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( table.getSelectionIndex()!=-1 ) {
+
+			        int index = table.getSelectionIndex();
+			        boolean isChecked=false;
+			        
+			        TableItem ti = table.getItem(index);
+			        isChecked = ti.getChecked();
+			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
+			        ti.dispose();
+
+					ti = new TableItem (table, SWT.NONE,index-1);
+					ti.setChecked(isChecked);
+					String [] strs =values;
+					ti.setText(strs);
+					table.select(index-1);
+					
+					updateUpDownBtnState();
+				}
+			}
+		});	
+		btMoveUp.setLayoutData(rdTmp);
+		
+		btMoveDown = new Button(cmpTmp2, SWT.PUSH);
+		btMoveDown.setText("Move Down");
+		btMoveDown.setEnabled(false);
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+
+				if ( table.getSelectionIndex()!=-1 ) {
+					
+			        int index = table.getSelectionIndex();
+			        boolean isChecked=false;
+			        
+			        TableItem ti = table.getItem(index);
+			        isChecked = ti.getChecked();
+			        String[] values = {ti.getText(0), ti.getText(1), ti.getText(2)};
+			        ti.dispose();
+
+					ti = new TableItem (table, SWT.NONE,index+1);
+					ti.setChecked(isChecked);
+					String [] strs =values;
+					ti.setText(strs);
+					table.select(index+1);
+					
+					updateUpDownBtnState();
+				}
+			}
+		});			
+		btMoveDown.setLayoutData(rdTmp);
+		
 		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
 		chkPlainText.setText("Process the files as plain text (not using filters)");
 		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
