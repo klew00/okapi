@@ -54,6 +54,7 @@ public class FilterSettingsPanel extends Composite {
 	private String[] paramsList;
 	private IHelp help;
 	private String projectDir;
+//For later:	private Text edParamsDir;
 	
 	public FilterSettingsPanel(Composite p_Parent,
 		IHelp helpParam,
@@ -105,7 +106,7 @@ public class FilterSettingsPanel extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e2) {}
 		});
 
-		// place-holder
+		// Place-holder
 		new Label(this, SWT.NONE);
 		
 		int nWidth = 80;
@@ -145,6 +146,20 @@ public class FilterSettingsPanel extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
+/*For later		Composite comp = new Composite(this, SWT.NONE);
+		layTmp = new GridLayout(2, false);
+		layTmp.marginWidth = 0;
+		comp.setLayout(layTmp);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		comp.setLayoutData(gdTmp);
+		
+		edParamsDir = new Text(comp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edParamsDir.setLayoutData(gdTmp);
+		edParamsDir.setEditable(false);
+*/		
 	}
 	
 	public void setData (String filterSettings,

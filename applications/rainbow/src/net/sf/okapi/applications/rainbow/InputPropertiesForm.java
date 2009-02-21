@@ -34,7 +34,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -61,38 +61,35 @@ class InputPropertiesForm {
 		UIUtil.inheritIcon(shell, p_Parent);
 		shell.setLayout(new GridLayout());
 		
-		Composite comp = new Composite(shell, SWT.BORDER);
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		comp.setLayout(new GridLayout(2, false));
+		Group grpTmp = new Group(shell, SWT.NONE);
+		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayout(new GridLayout(1, false));
+		grpTmp.setText(Res.getString("INPROP_GRPPARAMS")); //$NON-NLS-1$
 
-		pnlFilterSettings = new FilterSettingsPanel(comp, help, SWT.NONE, paramsProv, projectDir);
+		pnlFilterSettings = new FilterSettingsPanel(grpTmp, help, SWT.NONE, paramsProv, projectDir);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
 		pnlFilterSettings.setLayoutData(gdTmp);
 		
-		int verticalIndent = 8;
+		grpTmp = new Group(shell, SWT.NONE);
+		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayout(new GridLayout(2, false));
+		grpTmp.setText(Res.getString("INPROP_GRPENCODINGS")); //$NON-NLS-1$
 		
-		Label label = new Label(comp, SWT.NONE); // Place-holder
-		gdTmp = new GridData();
-		gdTmp.verticalIndent = verticalIndent;
-		label.setLayoutData(gdTmp);
+		new Label(grpTmp, SWT.NONE); // Place-holder
 		
-		label = new Label(comp, SWT.NONE);
+		Label label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("INPROP_ENCNOTE")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.verticalIndent = verticalIndent;
-		label.setLayoutData(gdTmp);
 
-		label = new Label(comp, SWT.NONE);
+		label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("INPROP_SRCENCODING")); //$NON-NLS-1$
 		
-		edSrcEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		edSrcEncoding = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edSrcEncoding.setLayoutData(gdTmp);
 		
-		label = new Label(comp, SWT.NONE);
+		label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("INPROP_TRGENCODING")); //$NON-NLS-1$
-		edTrgEncoding = new Text(comp, SWT.BORDER | SWT.SINGLE);
+		edTrgEncoding = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		edTrgEncoding.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		// Dialog-level buttons
@@ -149,7 +146,7 @@ class InputPropertiesForm {
 			results[1] = edSrcEncoding.getText();
 			results[2] = edTrgEncoding.getText();
 			if ( !oldData.equals(results[0]+results[1]+results[2]) ) {
-				results[3] = "!";
+				results[3] = "!"; //$NON-NLS-1$
 			} // Else: null means no changes
 		}
 		catch ( Exception E ) {

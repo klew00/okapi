@@ -267,5 +267,5 @@ public class FilterTestDriver {
 		System.out.println("StartDocument MIME type = "+startDoc.getMimeType());
 		System.out.println("StartDocument Type = "+startDoc.getType());
 	}
-	
+
 }
