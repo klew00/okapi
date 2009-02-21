@@ -45,7 +45,6 @@ import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -81,7 +80,6 @@ public class ODFFilter implements IFilter {
 	private GenericSkeleton skel;
 	private TextFragment tf;
 	private TextUnit tu;
-	private Stack<INameable> stack;
 	private boolean canceled;
 	private boolean hasNext;
 
@@ -163,7 +161,6 @@ public class ODFFilter implements IFilter {
 			
 			extract = new Stack<Boolean>();
 			extract.push(false);
-			stack = new Stack<INameable>();
 			otherId = 0;
 			tuId = 0;
 
