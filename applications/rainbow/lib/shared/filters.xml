@@ -34,11 +34,11 @@
   
  <filter id="okf_openoffice"
   inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
- >OpenOffice.org Document</filter>
+ >OpenOffice.org Documents (ODT, ODS, ODG, ODP)</filter>
   
  <filter id="okf_odf"
   inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
- >Open Document</filter>
+ >Open Document (ODF)</filter>
   
  <filter id="okf_mif"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
@@ -46,6 +46,10 @@
   
  <filter id="okf_idml"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
- >InDesign Markup Language Filter MIF</filter>
+ >InDesign Markup Language (IDML)</filter>
+  
+ <filter id="okf_idmlcontent"
+  inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
+ >InDesign IDML Content Document</filter>
   
 </okapiFilters>

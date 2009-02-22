@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
@@ -58,11 +59,13 @@ import net.sf.okapi.common.writer.GenericFilterWriter;
  * This class implements IFilter for XML documents in Open-Document format (ODF).
  * The expected input is the XML document itself. It can be used on ODF documents
  * that are not in Open-Office.org files (i.e. directly on the content.xml of the .odt).
- * For processing ODT, ODS, ODP or ODG zipped documents, use the OpenDocumentFilter class,
+ * For processing ODT, ODS, etc. documents, use the OpenDocumentFilter class,
  * which calls this filter as needed.
  */
 public class ODFFilter implements IFilter {
 
+	private static final String MIMETYPE = "text/x-odf";
+	
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 
@@ -171,8 +174,9 @@ public class ODFFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setLanguage(language);
 			startDoc.setName(docName);
-			startDoc.setMimeType("text/x-odf"); //TODO Use proper mime type value
+			startDoc.setMimeType(MIMETYPE);
 			startDoc.setType(startDoc.getMimeType());
+			startDoc.setEncoding("UTF-8", false);
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e ) {
@@ -205,7 +209,7 @@ public class ODFFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return "text/x-odf"; //TODO: check
+		return MIMETYPE;
 	}
 
 	public IParameters getParameters () {
@@ -267,8 +271,12 @@ public class ODFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					if ( extract.peek() ) tf.append(reader.getText());
-					else skel.append(reader.getText()); //TODO: need to escape
+					if ( extract.peek() ) {
+						tf.append(reader.getText());
+					}
+					else { // UTF-8 element content: no escape of quote nor extended chars
+						skel.append(Util.escapeToXML(reader.getText(), 0, false, null));
+					}
 					break;
 					
 				case XMLStreamConstants.START_DOCUMENT:
@@ -294,11 +302,22 @@ public class ODFFilter implements IFilter {
 					break;
 				
 				case XMLStreamConstants.COMMENT:
-					skel.append("<!--" + reader.getText() + "-->");
+					if ( extract.peek() ) {
+						tf.append(TagType.PLACEHOLDER, null, "<!--" + reader.getText() + "-->");
+					}
+					else {
+						skel.append("<!--" + reader.getText() + "-->");
+					}
 					break;
 
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					skel.append("<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
+					if ( extract.peek() ) {
+						tf.append(TagType.PLACEHOLDER, null,
+							"<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
+					}
+					else {
+						skel.append("<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
+					}
 					break;
 				}
 			} // End of main while		
@@ -326,7 +345,7 @@ public class ODFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
 			tmp.append(String.format(" xmlns%s=\"%s\"",
-				((prefix.length()>0) ? ":"+prefix : ""),
+				((prefix!=null) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 
@@ -383,7 +402,7 @@ public class ODFFilter implements IFilter {
 					tf.append(" ");
 				}
 			}
-			else skel.append(" "); // Default=1
+			else tf.append(" "); // Default=1
 			reader.nextTag(); // Eat the end-element event
 		}
 		else if ( extract.peek() && name.equals("text:tab") ) {
@@ -457,7 +476,7 @@ public class ODFFilter implements IFilter {
 			tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);
-			tu.setMimeType("text/x-odf");
+			tu.setMimeType(MIMETYPE);
 			// Add line break because ODF files don't have any
 			// They are needed for example in RTF output
 			//TODO: Maybe have this as an options set through the parameters but not user-driven?
@@ -473,6 +492,8 @@ public class ODFFilter implements IFilter {
 			}
 			else {
 				skel.append(buildEndTag(name));
+				// Add extra line for some element to make things
+				// more readable in plain-text format
 				if ( name.equals("style:style")
 					|| ( name.equals("text:list-style"))
 					|| ( name.equals("draw:frame"))
