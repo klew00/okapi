@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 public final class NewlineDetector {
-	private static final String CR = "\r";
-	private static final String LF = "\n";
-	private static final String CRLF = "\r\n";
+	public static final String CR = "\r";
+	public static final String LF = "\n";
+	public static final String CRLF = "\r\n";
 
 	/**
 	 * Returns the <a target="_blank"
