@@ -215,7 +215,7 @@ public class CommandLine {
 		if ( utilityId == null ) return;
 		// Create the utility driver if needed
 		if ( ud == null ) {
-			ud = new UtilityDriver(log, fa, plugins, help);
+			ud = new UtilityDriver(log, fa, plugins, help, false);
 		}
 		
 		// Get default/project data for the utility and instantiate the utility object

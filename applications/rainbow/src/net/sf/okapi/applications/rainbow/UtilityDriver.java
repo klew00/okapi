@@ -58,16 +58,19 @@ public class UtilityDriver implements CancelListener {
 	private String outputFolder;
 	private boolean stopProcess;
 	private IHelp help;
+	private boolean canPrompt;
 	
 	public UtilityDriver (ILog log,
-		FilterAccess newFA,
-		PluginsAccess newPlugins,
-		IHelp helpParam)
+		FilterAccess fa,
+		PluginsAccess plugins,
+		IHelp help,
+		boolean canPrompt)
 	{
 		this.log = log;
-		fa = newFA;
-		plugins = newPlugins;
-		help = helpParam;
+		this.fa = fa;
+		this.plugins = plugins;
+		this.help = help;
+		this.canPrompt = canPrompt;
 	}
 	
 	/**
@@ -150,7 +153,8 @@ public class UtilityDriver implements CancelListener {
 
 			// Set the run-time parameters
 			utility.setFilterAccess(fa, prj.getParametersFolder());
-			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"), prj.getProjectFolder());
+			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"),
+				prj.getProjectFolder(), canPrompt);
 			if ( utility.needsRoots() ) {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
 			}

@@ -159,8 +159,8 @@ public class MIFFilter implements IFilter {
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setType("text/x-mif");
-			startDoc.setMimeType(MIMETYPE);
+			startDoc.setType(getMimeType());
+			startDoc.setMimeType(getMimeType());
 			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {

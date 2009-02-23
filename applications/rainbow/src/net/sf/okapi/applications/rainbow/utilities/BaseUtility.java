@@ -49,6 +49,7 @@ public abstract class BaseUtility implements IUtility {
 	protected String commonFolder;
 	protected String updateCommand;
 	protected String projectDir;
+	protected boolean canPrompt;
 
 	public BaseUtility () {
 		inputs = new ArrayList<InputData>();
@@ -66,12 +67,14 @@ public abstract class BaseUtility implements IUtility {
 	public void setContextUI (Object contextUI,
 		IHelp helpParam,
 		String updateCommand,
-		String projectDir)
+		String projectDir,
+		boolean canPrompt)
 	{
 		shell = (Shell)contextUI;
 		help = helpParam;
 		this.updateCommand = updateCommand;
 		this.projectDir = projectDir;
+		this.canPrompt = canPrompt;
 	}
 
 	public void setOptions (String sourceLanguage,

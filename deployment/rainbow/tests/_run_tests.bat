@@ -28,7 +28,6 @@ java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\URI_encoded_all_but
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\SearchReplaceFilter_Test.rnb -x oku_searchandreplace -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\SearchReplaceNoFilter_Test.rnb -x oku_searchandreplace -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\SearchReplaceNoFilterRegEx_Test.rnb -x oku_searchandreplace -np
-
 comp miscellaneous\*.out miscellaneous\*.gold >> _tests_results.txt
 
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -x oku_extraction -np

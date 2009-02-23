@@ -48,11 +48,14 @@ public interface IUtility {
 	 * @param updateCommand The string command to use to invoke the update
 	 * system for this utility.
 	 * @param projectDir Project directory (without trailing separator).
+	 * @param canPrompt False if the utility should try to avoid prompting the user
+	 * (used in batch mode for example).
 	 */
 	public void setContextUI (Object contextUI,
 		IHelp helpParam,
 		String updateCommand,
-		String projectDir);
+		String projectDir,
+		boolean canPrompt);
 
 	/**
 	 * Adds a cancel listener to this utility.

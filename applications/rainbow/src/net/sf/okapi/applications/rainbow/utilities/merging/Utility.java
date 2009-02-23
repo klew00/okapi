@@ -46,7 +46,6 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public IParameters getParameters () {
-		// Not used in this utility.
 		return null;
 	}
 
@@ -59,7 +58,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public void setParameters (IParameters paramsObject) {
-		// Not used in this utility.
+		// Not used in this utility
 	}
 
 	public boolean isFilterDriven () {
@@ -78,9 +77,11 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		manifest.checkPackageContent();
 		
 		// UI check
-		ManifestDialog dlg = new ManifestDialog(shell, help);
-		if ( !dlg.showDialog(manifest) ) {
-			return;
+		if ( canPrompt ) {
+			ManifestDialog dlg = new ManifestDialog(shell, help);
+			if ( !dlg.showDialog(manifest) ) {
+				return;
+			}
 		}
 		
 		// Initialize the merger for this manifest
