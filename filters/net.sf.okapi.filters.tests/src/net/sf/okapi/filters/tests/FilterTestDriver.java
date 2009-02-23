@@ -29,6 +29,7 @@ import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -73,7 +74,15 @@ public class FilterTestDriver {
 				}
 				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
 					return false;
-				}				
+				}	
+				
+				for (String propName : gdp.getSourcePropertyNames()) {
+					Property gdpProp = gdp.getSourceProperty(propName);
+					Property mdpProp = mdp.getSourceProperty(propName);					
+					if (gdpProp.isReadOnly() != mdpProp.isReadOnly()) {
+						return false;
+					}
+				}
 				break;
 			case TEXT_UNIT:
 				TextUnit mtu = (TextUnit) mr;

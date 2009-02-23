@@ -43,6 +43,12 @@ public class HtmlSnippetsTest {
 		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
+	
+	@Test
+	public void testLang() {
+		String snippet = "<p lang='en'>Text of p</p>";
+		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+	}
 
 	@Test
 	public void testComplexEmptyElement() {

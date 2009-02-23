@@ -179,14 +179,15 @@ public class TaggedFilterConfiguration {
 	@SuppressWarnings("unchecked")
 	private boolean isActionableAttribute(String type, String elementName, String attribute,
 			Map<String, String> attributes) {
-		Map elementRule = configReader.getRule(elementName);
-		if (elementRule == null) {
-			return false;
-		}
-
+		
 		// catch attributes that may appear on any element
 		if (isActionableAttributeRule(elementName, attribute, type)) {
 			return true;
+		}
+		
+		Map elementRule = configReader.getRule(elementName);
+		if (elementRule == null) {
+			return false;
 		}
 
 		Object ta = elementRule.get(type);

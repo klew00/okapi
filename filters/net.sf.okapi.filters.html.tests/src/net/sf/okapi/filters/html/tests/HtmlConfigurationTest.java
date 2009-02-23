@@ -78,4 +78,25 @@ public class HtmlConfigurationTest {
 		assertFalse(rules.isRuleType("stylesheet", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertFalse(rules.isRuleType("p", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));		
 	}
+	
+	@Test
+	public void langAndXmlLang() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		
+		Map<String, String> attributes = new HashMap<String, String>();
+		attributes.clear();
+		attributes.put("lang", "en");
+		assertTrue(rules.isWritableLocalizableAttribute("x", "lang", attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("x", "lang", attributes));
+		assertFalse(rules.isTranslatableAttribute("x", "lang", attributes));
+		
+		assertTrue(rules.isWritableLocalizableAttribute("p", "lang", attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("p", "lang", attributes));
+		assertFalse(rules.isTranslatableAttribute("p", "lang", attributes));
+		
+		attributes.clear();
+		attributes.put("xml:lang", "en");
+		assertTrue(rules.isWritableLocalizableAttribute("x", "xml:lang", attributes));
+	}
 }
