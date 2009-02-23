@@ -26,6 +26,8 @@ public class TaggedFilterConfiguration {
 	private static final String EQUALS = "EQUALS";
 	private static final String NOT_EQUALS = "NOT_EQUALS";
 	private static final String MATCH = "MATCH";
+	
+	private static final String ELEMENT_TYPE = "elementType";
 
 	public static enum RULE_TYPE {
 		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
@@ -107,6 +109,15 @@ public class TaggedFilterConfiguration {
 			}
 		}
 		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String getElementType(String elementName) {
+		Map<String, Object> rule = configReader.getRule(elementName);
+		if (rule == null || rule.containsValue(ELEMENT_TYPE)) {
+			return null;
+		}
+		return (String) rule.get(ELEMENT_TYPE);		
 	}
 
 	@SuppressWarnings("unchecked")

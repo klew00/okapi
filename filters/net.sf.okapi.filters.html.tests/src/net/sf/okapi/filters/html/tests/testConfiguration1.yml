@@ -116,6 +116,7 @@ th:
 # inline tags
 a:
   ruleTypes: [INLINE]
+  elementType: link
   translatableAttributes: [title, accesskey]
   writableLocalizableAttributes: [href]
 
@@ -137,6 +138,7 @@ acronym:
 
 b:
   ruleTypes: [INLINE]
+  elementType: bold
   
 bdo:
   ruleTypes: [INLINE]
@@ -177,12 +179,14 @@ font:
 
 i:
   ruleTypes: [INLINE]
+  elementType: italic
 
 iframe:
   ruleTypes: [INLINE]
  
 img:
   ruleTypes: [INLINE]
+  elementType: image
   translatableAttributes: [title, alt]
   writableLocalizableAttributes: [href, src]
 
@@ -276,6 +280,7 @@ td:
  
 u:
   ruleTypes: [INLINE]
+  elementType: underlined
 
 var:
   ruleTypes: [INLINE]

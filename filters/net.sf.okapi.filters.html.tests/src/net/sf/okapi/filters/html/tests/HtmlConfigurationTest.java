@@ -99,4 +99,18 @@ public class HtmlConfigurationTest {
 		attributes.put("xml:lang", "en");
 		assertTrue(rules.isWritableLocalizableAttribute("x", "xml:lang", attributes));
 	}
+	
+	@Test
+	public void genericCodeTypes() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		
+		assertEquals(rules.getElementType("b"), "bold");
+		assertEquals(rules.getElementType("i"), "italic");
+		assertEquals(rules.getElementType("u"), "underlined");
+		assertEquals(rules.getElementType("img"), "image");
+		assertEquals(rules.getElementType("a"), "link");
+		assertNull(rules.getElementType("p"));
+		assertNull(rules.getElementType("x"));
+	}
 }
