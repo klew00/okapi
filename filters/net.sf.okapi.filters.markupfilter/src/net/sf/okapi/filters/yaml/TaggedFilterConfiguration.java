@@ -79,7 +79,7 @@ public class TaggedFilterConfiguration {
 			return RULE_TYPE.UNKOWN;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public RULE_TYPE getMainRuleType(String ruleName) {
 		Map<String, Object> rule = configReader.getRule(ruleName);
@@ -268,6 +268,12 @@ public class TaggedFilterConfiguration {
 		}
 
 		List excludedElements = (List) elementRule.get("allElementsExcept");
+
+		if (excludedElements == null) {
+			// means no exceptions - all tags can have this attribute/rule
+			return true;
+		}
+
 		for (int i = 0; i <= excludedElements.size() - 1; i++) {
 			String elem = (String) excludedElements.get(i);
 			if (elem.equals(elementName)) {

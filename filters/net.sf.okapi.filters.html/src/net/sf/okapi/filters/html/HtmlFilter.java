@@ -361,6 +361,10 @@ public class HtmlFilter extends BaseMarkupFilter {
 				}
 			}
 		}
+		
+		if (attrName.equals("lang") || attrName.equals("xml:lang")) {
+			normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
+		}
 
 		return normalizedName;
 	}

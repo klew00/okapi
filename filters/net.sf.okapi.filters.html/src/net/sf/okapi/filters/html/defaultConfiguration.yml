@@ -47,6 +47,12 @@ dir:
   ruleTypes: [ATTRIBUTE_WRITABLE]
   allElementsExcept: [base, basefront, head, html, meta, param, script]
 
+lang:
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+  
+'xml:lang':
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+  
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
 # with embedded skeketon 

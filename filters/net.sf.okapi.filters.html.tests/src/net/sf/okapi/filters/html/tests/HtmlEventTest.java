@@ -114,6 +114,50 @@ public class HtmlEventTest {
 		addEndEvents(events);
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
+	
+	@Test
+	public void testLang() {
+		String snippet = "<dummy lang=\"en\"/>";
+		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+
+		addStartEvents(events);
+
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp1 = new DocumentPart("dp1", false);
+		skel.add("<dummy lang=\"");
+		dp1.setSourceProperty(new Property("language", "en", false));
+		skel.addValuePlaceholder(dp1, "language", null);		
+		skel.add("\"/>");
+		dp1.setSkeleton(skel);
+		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+	
+	@Test
+	public void testXmlLang() {
+		String snippet = "<dummy xml:lang=\"en\"/>";
+		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+
+		addStartEvents(events);
+
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp1 = new DocumentPart("dp1", false);
+		skel.add("<dummy xml:lang=\"");
+		dp1.setSourceProperty(new Property("language", "en", false));
+		skel.addValuePlaceholder(dp1, "language", null);		
+		skel.add("\"/>");
+		dp1.setSkeleton(skel);
+		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
 
 	@Test
 	public void testComplexEmptyElement() {
