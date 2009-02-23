@@ -42,7 +42,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 		
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {
-				//TODO: Get the skeleton from the filter, somehow
 				filterWriter = filter.createFilterWriter();
 				filterWriter.setOptions(trgLang, getOutputEncoding(0));
 				filterWriter.setOutput(getOutputPath(0));
@@ -63,8 +62,8 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			}
 		}
 		finally {
-			if ( filterWriter != null ) filterWriter.close();
 			if ( filter != null ) filter.close();
+			if ( filterWriter != null ) filterWriter.close();
 		}
 	}
 

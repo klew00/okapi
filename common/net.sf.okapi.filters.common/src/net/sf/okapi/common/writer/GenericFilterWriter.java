@@ -21,12 +21,16 @@
 package net.sf.okapi.common.writer;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.nio.charset.Charset;
 
 import net.sf.okapi.common.IParameters;
@@ -55,6 +59,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	private String language;
 	private String encoding;
 	private EncoderManager encoderManager;
+	private File tempFile;
 	
 	public GenericFilterWriter (ISkeletonWriter skelWriter) {
 		this.skelWriter = skelWriter;
@@ -62,15 +67,57 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 	
 	public void close () {
+		if ( writer == null ) return;
+		IOException err = null;
+		InputStream orig = null;
+		OutputStream dest = null;
 		try {
-			if ( writer != null ) {
-				writer.close();
-				writer = null;
-				//TODO: do we need to close the underlying stream???
+			// Close the output
+			writer.close();
+			writer = null;
+
+			// If it was in a temporary file, copy it over the existing one
+			// If the IFilter.close() is called before IFilterWriter.close()
+			// this should allow to overwrite the input.
+			if ( tempFile != null ) {
+				dest = new FileOutputStream(outputPath);
+				orig = new FileInputStream(tempFile); 
+				byte[] buffer = new byte[2048];
+				int len;
+				while ( (len = orig.read(buffer)) > 0 ) {
+					dest.write(buffer, 0, len);
+				}
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			err = e;
+		}
+		finally {
+			// Make sure we close both files
+			if ( dest != null ) {
+				try {
+					dest.close();
+				}
+				catch ( IOException e ) {
+					err = e;
+				}
+				dest = null;
+			}
+			if ( orig != null ) {
+				try {
+					orig.close();
+				} catch ( IOException e ) {
+					err = e;
+				}
+				orig = null;
+				if ( err != null ) throw new RuntimeException(err);
+				else {
+					if ( tempFile != null ) {
+						tempFile.delete();
+						tempFile = null;
+					}
+				}
+			}
 		}
 	}
 
@@ -195,10 +242,26 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	private void createWriter (StartDocument resource) {
 		try {
-			// Create the output writer from the provided stream
-			// or from the path if there is no stream provided
+			tempFile = null;
+			// If needed, create the output stream from the path provided
 			if ( output == null ) {
-				output = new BufferedOutputStream(new FileOutputStream(outputPath));
+				boolean useTemp = false;
+				File f = new File(outputPath);
+				if ( f.exists() ) {
+					// If the file exists, try to remove
+					useTemp = !f.delete();
+				}
+				if ( useTemp ) {
+					// Use a temporary output if we can overwrite for now
+					// If it's the input file, IFilter.close() will free it before we
+					// call close() here (that is if IFilter.close() is called correctly
+					tempFile = File.createTempFile("gfwTmp", null);
+					output = new BufferedOutputStream(new FileOutputStream(tempFile.getAbsolutePath()));
+				}
+				else { // Make sure the directory exists
+					Util.createDirectories(outputPath);
+					output = new BufferedOutputStream(new FileOutputStream(outputPath));
+				}
 			}
 			
 			// Get the encoding of the original document
@@ -230,7 +293,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
-		catch ( UnsupportedEncodingException e ) {
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 	}

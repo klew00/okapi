@@ -94,9 +94,9 @@ public class PropertiesFilter implements IFilter {
 			if ( reader != null ) {
 				reader.close();
 				reader = null;
+				docName = null;
 			}
 			parseState = 0;
-			docName = null;
 		}
 		catch ( IOException e) {
 			throw new RuntimeException(e);
