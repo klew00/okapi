@@ -53,18 +53,58 @@ public class ZipFilterWriter implements IFilterWriter {
 	private ZipEntry subDocEntry;
 	private IFilterWriter subDocWriter;
 	private File tempFile;
-	
+	private File tempZip;
+
 	public void close () {
-		if ( zipOut != null ) {
-			try {
-				zipOut.close();
-				buffer = null;
+		if ( zipOut == null ) return;
+		IOException err = null;
+		InputStream orig = null;
+		OutputStream dest = null;
+		try {
+			// Close the output
+			zipOut.close();
+			zipOut = null;
+			// If it was in a temporary file, copy it over the existing one
+			// If the IFilter.close() is called before IFilterWriter.close()
+			// this should allow to overwrite the input.
+			if ( tempZip != null ) {
+				dest = new FileOutputStream(outputPath);
+				orig = new FileInputStream(tempZip); 
+				int len;
+				while ( (len = orig.read(buffer)) > 0 ) {
+					dest.write(buffer, 0, len);
+				}
 			}
-			catch (IOException e) {
-				throw new RuntimeException(e);
+			buffer = null;
+		}
+		catch ( IOException e ) {
+			err = e;
+		}
+		finally {
+			// Make sure we close both files
+			if ( dest != null ) {
+				try {
+					dest.close();
+				}
+				catch ( IOException e ) {
+					err = e;
+				}
+				dest = null;
 			}
-			finally {
-				zipOut = null;
+			if ( orig != null ) {
+				try {
+					orig.close();
+				} catch ( IOException e ) {
+					err = e;
+				}
+				orig = null;
+				if ( err != null ) throw new RuntimeException(err);
+				else {
+					if ( tempZip != null ) {
+						tempZip.delete();
+						tempZip = null;
+					}
+				}
 			}
 		}
 	}
@@ -138,10 +178,30 @@ public class ZipFilterWriter implements IFilterWriter {
 		try {
 			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 			zipOriginal = skel.getOriginal();
-			Util.createDirectories(outputPath);
-			zipOut = new ZipOutputStream(new FileOutputStream(outputPath));
+			
+			tempZip = null;
+			boolean useTemp = false;
+			File f = new File(outputPath);
+			if ( f.exists() ) {
+				// If the file exists, try to remove
+				useTemp = !f.delete();
+			}
+			if ( useTemp ) {
+				// Use a temporary output if we can overwrite for now
+				// If it's the input file, IFilter.close() will free it before we
+				// call close() here (that is if IFilter.close() is called correctly
+				tempZip = File.createTempFile("zipTmp", null);
+				zipOut = new ZipOutputStream(new FileOutputStream(tempZip.getAbsolutePath()));
+			}
+			else { // Make sure the directory exists
+				Util.createDirectories(outputPath);
+				zipOut = new ZipOutputStream(new FileOutputStream(outputPath));
+			}
 		}
 		catch ( FileNotFoundException e ) {
+    		throw new RuntimeException(e);
+		}
+		catch ( IOException e ) {
     		throw new RuntimeException(e);
 		}
 	}

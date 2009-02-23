@@ -33,9 +33,9 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * MyUtlity myUtility = new MyUtility(); // Some object that do things with filter events
  * IFilter filter = new MyFilter(); // A filter implementation
  * filter.setOptions("en", "UTF-8", true);
- * filter.open(new URL("myFile.ext"));
+ * filter.open(new URI("myFile.ext"));
  * while ( filter.hasNext() ) {
- *    myUtilityhandleEvent(filter.next());
+ *    myUtility.handleEvent(filter.next());
  * }
  * filter.close();
  * </pre>
@@ -95,7 +95,10 @@ public interface IFilter {
 	public void open (URI inputURI);
 
 	/**
-	 * Closes the input document.
+	 * Closes the input document. Developers should call this method from within their code
+	 * before sending the last event: This can allow writer objects to overwrite the input file
+	 * when they receive the last event. This method must also be safe to call even
+	 * if the input document is not opened.
 	 */
 	public void close ();
 

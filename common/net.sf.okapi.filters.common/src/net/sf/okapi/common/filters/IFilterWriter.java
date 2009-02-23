@@ -64,7 +64,8 @@ public interface IFilterWriter {
 	public FilterEvent handleEvent (FilterEvent event);
 
 	/**
-	 * Closes the output.
+	 * Closes the output. Developers must make sure this method is safe to call
+	 * even if there is nothing to close.
 	 */
 	public void close ();
 

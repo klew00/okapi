@@ -130,10 +130,6 @@ public class Merger {
 			logger.error("Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
-			if ( outFilter != null ) {
-				outFilter.close();
-				outFilter = null;
-			}
 			if ( reader != null ) {
 				reader.closeDocument();
 				reader = null;
@@ -141,6 +137,10 @@ public class Merger {
 			if ( inpFilter != null ) {
 				inpFilter.close();
 				inpFilter = null;
+			}
+			if ( outFilter != null ) {
+				outFilter.close();
+				outFilter = null;
 			}
 		}
 	}
