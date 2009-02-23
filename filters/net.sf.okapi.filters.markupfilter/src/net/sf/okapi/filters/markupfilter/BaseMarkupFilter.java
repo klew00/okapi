@@ -332,4 +332,12 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	
 		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
 	}
+	
+	protected void handlePreserveWhiteSpace(String tagName) {
+		if (getConfig().isRuleType(tagName, RULE_TYPE.PRESERVE_WHITESPACE)) {
+			setPreserveWhitespace(true);
+		} else {
+			setPreserveWhitespace(false);
+		}
+	}
 }

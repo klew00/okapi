@@ -389,5 +389,5 @@ stylesheet:
 
 # javascript etc.
 script:
-  ruleTypes: [SCRIPT]
+  ruleTypes: [SCRIPT, PRESERVE_WHITESPACE]
 

@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
@@ -63,5 +64,16 @@ public class HtmlConfigurationTest {
 		attributes.clear();
 		attributes.put("name", "generator");
 		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
+	}
+	
+	@Test
+	public void preserveWhileSpace() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		
+		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		assertEquals(rules.getMainRuleType("style"), TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
+		assertTrue(rules.isRuleType("style", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
+		assertFalse(rules.isRuleType("stylesheet", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 	}
 }

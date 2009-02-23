@@ -102,8 +102,11 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
+		// settings for preserving whitespace
+		handlePreserveWhiteSpace(startTag.getName());
+		
 		switch (getConfig().getMainRuleType(startTag.getName())) {
-		case INLINE_ELEMENT:
+		case INLINE_ELEMENT:			
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
@@ -175,6 +178,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
+		// settings for preserving whitespace
+		handlePreserveWhiteSpace(endTag.getName());
+
 		switch (getConfig().getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -199,7 +205,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 			endTextUnit(new GenericSkeleton(endTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
-			getRuleState().popPreserverWhitespaceRule();
+			getRuleState().popPreserverWhitespaceRule();			
 			addToDocumentPart(endTag.toString());
 			break;
 		default:

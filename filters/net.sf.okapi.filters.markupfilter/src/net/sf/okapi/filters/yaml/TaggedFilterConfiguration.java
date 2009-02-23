@@ -50,16 +50,7 @@ public class TaggedFilterConfiguration {
 		return configReader.toString();
 	}
 
-	@SuppressWarnings("unchecked")
-	public RULE_TYPE getMainRuleType(String ruleName) {
-		Map<String, Object> rule = configReader.getRule(ruleName);
-		if (rule == null) {
-			return RULE_TYPE.UNKOWN;
-		}
-
-		List ruleTypes = (List) rule.get("ruleTypes");
-		String ruleType = (String) ruleTypes.get(0);
-
+	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
 		if (ruleType.equals(INLINE)) {
 			return RULE_TYPE.INLINE_ELEMENT;
 		} else if (ruleType.equals(GROUP)) {
@@ -87,6 +78,35 @@ public class TaggedFilterConfiguration {
 		} else {
 			return RULE_TYPE.UNKOWN;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public RULE_TYPE getMainRuleType(String ruleName) {
+		Map<String, Object> rule = configReader.getRule(ruleName);
+		if (rule == null) {
+			return RULE_TYPE.UNKOWN;
+		}
+
+		List ruleTypes = (List) rule.get("ruleTypes");
+		String ruleType = (String) ruleTypes.get(0);
+		return convertRuleAsStringToRuleType(ruleType);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean isRuleType(String ruleName, RULE_TYPE ruleType) {
+		Map<String, Object> rule = configReader.getRule(ruleName);
+		if (rule == null) {
+			return false;
+		}
+
+		List ruleTypes = (List) rule.get("ruleTypes");
+		for (Object r : ruleTypes) {
+			String rt = (String) r;
+			if (convertRuleAsStringToRuleType(rt) == ruleType) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -246,7 +266,7 @@ public class TaggedFilterConfiguration {
 		if (elementRule == null) {
 			return false;
 		}
-		
+
 		List excludedElements = (List) elementRule.get("allElementsExcept");
 		for (int i = 0; i <= excludedElements.size() - 1; i++) {
 			String elem = (String) excludedElements.get(i);

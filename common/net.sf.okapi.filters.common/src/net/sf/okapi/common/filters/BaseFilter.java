@@ -83,6 +83,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private boolean canceled = false;
 	private boolean done = false;
+	private boolean preserveWhitespace;
 
 	private GenericSkeleton currentSkeleton;
 	private Code currentCode;
@@ -521,6 +522,8 @@ public abstract class BaseFilter implements IFilter {
 
 	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
+		tu.setPreserveWhitespaces(isPreserveWhitespace());
+		
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
 
@@ -735,6 +738,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
+		tu.setPreserveWhitespaces(isPreserveWhitespace());
 
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
 			currentSkeleton = new GenericSkeleton();
@@ -1106,5 +1110,19 @@ public abstract class BaseFilter implements IFilter {
 			return;
 		}
 		currentSkeleton.append(part);
+	}
+
+	/**
+	 * @param preserveWhitespace the preserveWhitespace to set
+	 */
+	protected void setPreserveWhitespace(boolean preserveWhitespace) {
+		this.preserveWhitespace = preserveWhitespace;
+	}
+
+	/**
+	 * @return the preserveWhitespace
+	 */
+	protected boolean isPreserveWhitespace() {
+		return preserveWhitespace;
 	}
 }
