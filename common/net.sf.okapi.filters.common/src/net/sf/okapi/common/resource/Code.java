@@ -32,6 +32,13 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class Code {
 
+	public static final String TYPE_BOLD = "bold";
+	public static final String TYPE_ITALIC = "italic";
+	public static final String TYPE_UNDERLINED = "underlined";
+	public static final String TYPE_LB = "lb"; // Line-break
+	public static final String TYPE_LINK = "link";
+	public static final String TYPE_IMAGE = "image";
+	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
 	 */
