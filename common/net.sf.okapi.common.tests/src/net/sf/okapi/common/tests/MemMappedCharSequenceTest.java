@@ -54,7 +54,7 @@ public class MemMappedCharSequenceTest {
 		charSequence.close();
 	}
 	
-	@Test
+	//@Test
 	public void testStressTest() throws FileNotFoundException {
 		long before = System.currentTimeMillis(); // Start timing
 
