@@ -20,7 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.IEventPipelineStep;
 
 public interface IFilterDrivenUtility extends IUtility, IEventPipelineStep {
 
