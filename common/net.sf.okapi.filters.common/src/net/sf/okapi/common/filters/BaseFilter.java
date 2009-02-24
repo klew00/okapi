@@ -889,7 +889,7 @@ public abstract class BaseFilter implements IFilter {
 		currentSkeleton = new GenericSkeleton();
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
 		startCode(new Code(codeType, codeName));
-		boolean textPlaceholdersOnly = processAllEmbedded(literalCode, language, propertyTextUnitPlaceholders, true, tu);
+		processAllEmbedded(literalCode, language, propertyTextUnitPlaceholders, true, tu);
 		endCode();		
 
 		currentSkeleton = null;
