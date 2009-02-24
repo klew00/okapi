@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedpipeline.tests;
+package net.sf.okapi.filters.html.tests;
 
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
@@ -31,13 +31,12 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.threadedeventpipeline.ThreadedEventPipeline;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.tests.HtmlEventTest;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HtmlFilterRoundtripTest {
+public class HtmlFilterThreadedRoundtripTest {
 
 	@Before
 	public void setUp() {

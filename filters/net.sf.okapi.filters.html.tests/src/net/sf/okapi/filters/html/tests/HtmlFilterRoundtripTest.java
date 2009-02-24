@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.simplepipeline.tests;
+package net.sf.okapi.filters.html.tests;
 
 import java.io.InputStream;
 
@@ -29,7 +29,6 @@ import net.sf.okapi.common.eventpipeline.IEventPipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.tests.HtmlEventTest;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,13 +46,13 @@ public class HtmlFilterRoundtripTest {
 		IEventPipeline pipeline = new EventPipeline();
 		
 		HtmlFilter htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleSimpleTest.html");
+		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/testBOM.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
 		htmlFilter.open(htmlStream);
 		
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
-		genericFilterWriter.setOptions("es", "windows-1252");
+		genericFilterWriter.setOptions("es", "UTF-16LE");
 		genericFilterWriter.setOutput("genericOutput.txt");
 
 		
