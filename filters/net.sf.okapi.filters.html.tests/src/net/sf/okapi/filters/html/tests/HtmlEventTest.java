@@ -214,11 +214,16 @@ public class HtmlEventTest {
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		TextFragment tf = tu1.getSourceContent();
-		tf.append(TagType.OPENING, "b", "<b>");
+		Code code = new Code(TagType.OPENING, "b", "<b>");
+		code.setType(Code.TYPE_BOLD);
+		tf.append(code);
 		tf.append("bold");
-		tf.append(TagType.CLOSING, "b", "</b>");
+		code = new Code(TagType.CLOSING, "b", "</b>");
+		code.setType(Code.TYPE_BOLD);
+		tf.append(code);
 		tf.append(" ");
-		Code code = new Code(TagType.PLACEHOLDER, "a");
+		code = new Code(TagType.PLACEHOLDER, "a");
+		code.setType(Code.TYPE_LINK);
 		code.appendReference("dp1");
 		tf.append(code);
 		tf.append(" after.");
@@ -309,11 +314,16 @@ public class HtmlEventTest {
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		TextFragment tf = tu1.getSourceContent();
-		tf.append(TagType.OPENING, "b", "<b>");
+		Code code = new Code(TagType.OPENING, "b", "<b>");
+		code.setType(Code.TYPE_BOLD);
+		tf.append(code);
 		tf.append("bold");
-		tf.append(TagType.CLOSING, "b", "</b>");
+		code = new Code(TagType.CLOSING, "b", "</b>");
+		code.setType(Code.TYPE_BOLD);
+		tf.append(code);
 		tf.append(" ");
-		Code code = new Code(TagType.PLACEHOLDER, "a");
+		code = new Code(TagType.PLACEHOLDER, "img");
+		code.setType(Code.TYPE_IMAGE);
 		code.appendReference("dp1");
 		tf.append(code);
 		tf.append(" after.");
@@ -411,7 +421,7 @@ public class HtmlEventTest {
 		events.add(new FilterEvent(FilterEventType.END_GROUP, e3));
 		
 		TextFragment tf = tu3.getSourceContent();
-		Code c = new Code(TagType.PLACEHOLDER, "<ul>", TextFragment.makeRefMarker("sg1"));
+		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
 		c.setHasReference(true);
 		tf.append(c);
 		

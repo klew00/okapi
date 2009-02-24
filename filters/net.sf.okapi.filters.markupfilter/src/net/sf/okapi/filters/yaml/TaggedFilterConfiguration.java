@@ -114,10 +114,11 @@ public class TaggedFilterConfiguration {
 	@SuppressWarnings("unchecked")
 	public String getElementType(String elementName) {
 		Map<String, Object> rule = configReader.getRule(elementName);
-		if (rule == null || rule.containsValue(ELEMENT_TYPE)) {
-			return null;
+		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {			
+			return (String) rule.get(ELEMENT_TYPE);
 		}
-		return (String) rule.get(ELEMENT_TYPE);		
+				
+		return elementName;
 	}
 
 	@SuppressWarnings("unchecked")

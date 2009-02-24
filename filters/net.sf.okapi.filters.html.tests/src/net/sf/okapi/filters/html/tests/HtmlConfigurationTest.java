@@ -110,7 +110,7 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getElementType("u"), "underlined");
 		assertEquals(rules.getElementType("img"), "image");
 		assertEquals(rules.getElementType("a"), "link");
-		assertNull(rules.getElementType("p"));
-		assertNull(rules.getElementType("x"));
+		assertEquals(rules.getElementType("p"), "p");
+		assertEquals(rules.getElementType("x"), "x");
 	}
 }

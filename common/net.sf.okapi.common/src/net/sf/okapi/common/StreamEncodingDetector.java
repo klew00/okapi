@@ -48,7 +48,7 @@ import java.nio.charset.*;
  * http://www.w3.org/TR/REC-xml/#sec-guessing-no-ext-info
  * http://www.w3.org/TR/html401/charset.html#h-5.2
  */
-final class StreamEncodingDetector {
+public final class StreamEncodingDetector {
 	private final InputStream inputStream;
 	private String encoding=null;
 	private String encodingSpecificationInfo=null;

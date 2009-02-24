@@ -26,6 +26,7 @@ import java.util.Iterator;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IResource;
@@ -42,8 +43,8 @@ public class FilterTestDriver {
 	private boolean showOnlyTextUnits = false;
 	private int warnings;
 	private boolean ok;
-	
-	static public  boolean compareEvents(ArrayList<FilterEvent> manual, ArrayList<FilterEvent> generated) {
+
+	static public boolean compareEvents(ArrayList<FilterEvent> manual, ArrayList<FilterEvent> generated) {
 		if (manual.size() != generated.size()) {
 			return false;
 		}
@@ -74,11 +75,11 @@ public class FilterTestDriver {
 				}
 				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
 					return false;
-				}	
-				
+				}
+
 				for (String propName : gdp.getSourcePropertyNames()) {
 					Property gdpProp = gdp.getSourceProperty(propName);
-					Property mdpProp = mdp.getSourceProperty(propName);					
+					Property mdpProp = mdp.getSourceProperty(propName);
 					if (gdpProp.isReadOnly() != mdpProp.isReadOnly()) {
 						return false;
 					}
@@ -90,6 +91,21 @@ public class FilterTestDriver {
 				if (!(mtu.toString().equals(gtu.toString()))) {
 					return false;
 				}
+
+				if (mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size()) {
+					return false;
+				}
+
+				int i = -1;
+				for (Code c : mtu.getSource().getCodes()) {
+					i++;
+					if (c.getType() != null) {
+						if (!c.getType().equals(gtu.getSource().getCode(i).getType())) {
+							return false;
+						}
+					}
+				}
+
 				break;
 			}
 		}
@@ -98,28 +114,36 @@ public class FilterTestDriver {
 
 	/**
 	 * Indicates to this driver to display the skeleton data.
-	 * @param value True to display the skeleton, false to not display the skeleton.
+	 * 
+	 * @param value
+	 *            True to display the skeleton, false to not display the
+	 *            skeleton.
 	 */
-	public void setShowSkeleton (boolean value) {
+	public void setShowSkeleton(boolean value) {
 		showSkeleton = value;
-	}
-	
-	/**
-	 * Indicates to this driver that only the TEXT_UNIT event should be displayed.
-	 * @param value True to show only the text units, false to show all events. 
-	 */
-	public void setShowOnlyTextUnits (boolean value) {
-		showOnlyTextUnits = value;
-		
 	}
 
 	/**
-	 * Process the input document. You must have called the setOptions() and open() methods 
-	 * of the filter before calling this method.
-	 * @param filter Filter to process.
+	 * Indicates to this driver that only the TEXT_UNIT event should be
+	 * displayed.
+	 * 
+	 * @param value
+	 *            True to show only the text units, false to show all events.
+	 */
+	public void setShowOnlyTextUnits(boolean value) {
+		showOnlyTextUnits = value;
+
+	}
+
+	/**
+	 * Process the input document. You must have called the setOptions() and
+	 * open() methods of the filter before calling this method.
+	 * 
+	 * @param filter
+	 *            Filter to process.
 	 * @return False if an error occurred, true if all was OK.
 	 */
-	public boolean process (IFilter filter) {
+	public boolean process(IFilter filter) {
 		ok = true;
 		warnings = 0;
 		int start = 0;
@@ -130,151 +154,162 @@ public class FilterTestDriver {
 		int endGroup = 0;
 		int startSubDoc = 0;
 		int endSubDoc = 0;
-		
+
 		System.out.println("================================================");
 		FilterEvent event;
-		while ( filter.hasNext() ) {
+		while (filter.hasNext()) {
 			event = filter.next();
-			switch ( event.getEventType() ) {
+			switch (event.getEventType()) {
 			case START:
 				start++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---Start");
 				break;
 			case FINISHED:
 				finished++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---Finished");
 				break;
 			case START_DOCUMENT:
 				startDoc++;
 				System.out.println("---Start Document");
-				checkStartDocument((StartDocument)event.getResource());
-				if ( showOnlyTextUnits ) break;
+				checkStartDocument((StartDocument) event.getResource());
+				if (showOnlyTextUnits)
+					break;
 				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
 				endDoc++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---End Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
 				startSubDoc++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---Start Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
 				endSubDoc++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---End Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_GROUP:
 				startGroup++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---Start Group");
 				printSkeleton(event.getResource());
 				break;
 			case END_GROUP:
 				endGroup++;
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---End Group");
 				printSkeleton(event.getResource());
 				break;
 			case TEXT_UNIT:
 				System.out.println("---Text Unit");
-				TextUnit tu = (TextUnit)event.getResource();
-				System.out.println("S=["+tu.toString()+"]");
-				for ( String lang : tu.getTargetLanguages() ) {
-					System.out.println("T("+lang+")=["+tu.getTarget(lang).toString()+"]");
+				TextUnit tu = (TextUnit) event.getResource();
+				System.out.println("S=[" + tu.toString() + "]");
+				for (String lang : tu.getTargetLanguages()) {
+					System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
 				}
 				printResource(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
-				if ( showOnlyTextUnits ) break;
+				if (showOnlyTextUnits)
+					break;
 				System.out.println("---Document Part");
-				printResource((INameable)event.getResource());
+				printResource((INameable) event.getResource());
 				printSkeleton(event.getResource());
 				break;
 			}
 		}
-		
-		if ( start != 1 ) {
+
+		if (start != 1) {
 			System.out.println(String.format("*****ERROR: START = %d", start));
 			ok = false;
 		}
-		if ( startDoc != 1 ) {
+		if (startDoc != 1) {
 			System.out.println(String.format("*****ERROR: START_DOCUMENT = %d", startDoc));
 			ok = false;
 		}
-		if ( endDoc != 1 ) {
+		if (endDoc != 1) {
 			System.out.println(String.format("*****ERROR: END_DOCUMENT = %d", endDoc));
 			ok = false;
 		}
-		if ( finished != 1 ) {
+		if (finished != 1) {
 			System.out.println(String.format("*****ERROR: FINISHED = %d", finished));
 			ok = false;
 		}
-		if ( startSubDoc != endSubDoc ) {
-			System.out.println(String.format("*****ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc, endSubDoc));
+		if (startSubDoc != endSubDoc) {
+			System.out.println(String.format("*****ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc,
+					endSubDoc));
 			ok = false;
 		}
-		if ( startGroup != endGroup ) {
+		if (startGroup != endGroup) {
 			System.out.println(String.format("*****ERROR: START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
 			ok = false;
 		}
 		System.out.println(String.format("Number of warnings = %d", warnings));
 		return ok;
 	}
-	
-	private void printResource (INameable res) {
-		if ( res == null ) {
+
+	private void printResource(INameable res) {
+		if (res == null) {
 			System.out.println("NULL resource.");
 			ok = false;
 		}
-		System.out.print("  id='"+res.getId()+"'");
-		System.out.print(" name='"+res.getName()+"'");
-		System.out.print(" type='"+res.getType()+"'");
-		System.out.println(" mimeType='"+res.getMimeType()+"'");
+		System.out.print("  id='" + res.getId() + "'");
+		System.out.print(" name='" + res.getName() + "'");
+		System.out.print(" type='" + res.getType() + "'");
+		System.out.println(" mimeType='" + res.getMimeType() + "'");
 	}
 
-	private void printSkeleton (IResource res) {
-		if ( !showSkeleton ) return;
+	private void printSkeleton(IResource res) {
+		if (!showSkeleton)
+			return;
 		ISkeleton skel = res.getSkeleton();
-		if ( skel != null ) {
+		if (skel != null) {
 			System.out.println("---");
 			System.out.println(skel.toString());
 			System.out.println("---");
 		}
 	}
-	
-	private void checkStartDocument (StartDocument startDoc) {
+
+	private void checkStartDocument(StartDocument startDoc) {
 		String tmp = startDoc.getEncoding();
-		if (( tmp == null ) || ( tmp.length() == 0 )) {
+		if ((tmp == null) || (tmp.length() == 0)) {
 			System.out.println("*****WARNING: No encoding specified in StartDocument.");
 			warnings++;
-		}
-		else System.out.println("StartDocument encoding = "+tmp);
-		
+		} else
+			System.out.println("StartDocument encoding = " + tmp);
+
 		tmp = startDoc.getLanguage();
-		if (( tmp == null ) || ( tmp.length() == 0 )) {
+		if ((tmp == null) || (tmp.length() == 0)) {
 			System.out.println("*****WARNING: No language specified in StartDocument.");
 			warnings++;
-		}
-		else System.out.println("StartDocument language = "+tmp);
-		
+		} else
+			System.out.println("StartDocument language = " + tmp);
+
 		tmp = startDoc.getName();
-		if (( tmp == null ) || ( tmp.length() == 0 )) {
+		if ((tmp == null) || (tmp.length() == 0)) {
 			System.out.println("*****WARNING: No name specified in StartDocument.");
 			warnings++;
-		}
-		else System.out.println("StartDocument name = "+tmp);
+		} else
+			System.out.println("StartDocument name = " + tmp);
 
-		System.out.println("StartDocument MIME type = "+startDoc.getMimeType());
-		System.out.println("StartDocument Type = "+startDoc.getType());
+		System.out.println("StartDocument MIME type = " + startDoc.getMimeType());
+		System.out.println("StartDocument Type = " + startDoc.getType());
 	}
 
 }

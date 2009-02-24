@@ -20,7 +20,6 @@
 
 package net.sf.okapi.filters.markupfilter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,7 +41,9 @@ import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.StreamEncodingDetector;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -53,7 +54,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public abstract class BaseMarkupFilter extends BaseFilter {
 	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
-	
+
 	private Source document;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
@@ -84,7 +85,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public TaggedFilterConfiguration getConfig() {
 		return parameters.getTaggedConfig();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,11 +110,17 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public void open(InputStream input) {
 		try {
 			if (getEncoding() != null) {
-				BufferedReader r = new BufferedReader(new InputStreamReader(input, getEncoding()));
+				BOMAwareInputStream bomis = new BOMAwareInputStream(input, getEncoding());
+				bomis.detectEncoding();
+				InputStreamReader r = new InputStreamReader(bomis, getEncoding());
 				document = new Source(r);
 			} else {
 				// try to guess encoding
-				document = new Source(input);
+				StreamEncodingDetector ed = new StreamEncodingDetector(input);
+				BOMAwareInputStream bomis = new BOMAwareInputStream(ed.getInputStream(), ed.getEncoding());
+				bomis.detectEncoding();
+				InputStreamReader r = new InputStreamReader(bomis, ed.getEncoding());
+				document = new Source(r);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -124,11 +131,17 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public void open(URI inputURI) {
 		try {
 			if (getEncoding() != null) {
-				BufferedReader r = new BufferedReader(new InputStreamReader(inputURI.toURL().openStream(), getEncoding()));
+				BOMAwareInputStream bomis = new BOMAwareInputStream(inputURI.toURL().openStream(), getEncoding());
+				bomis.detectEncoding();
+				InputStreamReader r = new InputStreamReader(bomis, getEncoding());				
 				document = new Source(r);
 			} else {
 				// try to guess encoding
-				document = new Source(inputURI.toURL());
+				StreamEncodingDetector ed = new StreamEncodingDetector(inputURI.toURL().openStream());
+				BOMAwareInputStream bomis = new BOMAwareInputStream(ed.getInputStream(), ed.getEncoding());
+				bomis.detectEncoding();
+				InputStreamReader r = new InputStreamReader(bomis, ed.getEncoding());
+				document = new Source(r);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -141,7 +154,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		super.initialize();
 
 		if (parameters == null) {
-			parameters = new Parameters(defaultConfig);			
+			parameters = new Parameters(defaultConfig);
 		}
 
 		// Segment iterator
@@ -168,6 +181,12 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
+
+				// settings for preserving whitespace
+				handlePreserveWhiteSpace(tag.getName());
+
+				// set generic tag type
+				setTagType(getConfig().getElementType(tag.getName()));
 
 				// We just hit a tag that could close the current TextUnit, but
 				// only if it was not opened with a TextUnit tag (i.e., complex
@@ -208,6 +227,10 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 						handleDocumentPart(tag);
 					}
 				}
+
+				// unset current tag type
+				setTagType(null);
+
 			} else {
 				handleText(segment);
 			}
@@ -248,7 +271,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	protected abstract void handleEndTag(EndTag endTag);
 
 	protected abstract void handleDocumentPart(Tag endTag);
-	
+
 	abstract protected String normalizeAttributeName(String attrName, String attrValue, Tag tag);
 
 	protected void addCodeToCurrentTextUnit(Tag tag) {
@@ -328,11 +351,12 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// offset of value of the attribute
 		int valueStartPos = attribute.getValueSegment().getBegin() - tag.getBegin();
-		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();		
-	
-		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
+		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
+
+		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos,
+				mainEndPos, valueStartPos, valueEndPos);
 	}
-	
+
 	protected void handlePreserveWhiteSpace(String tagName) {
 		if (getConfig().isRuleType(tagName, RULE_TYPE.PRESERVE_WHITESPACE)) {
 			setPreserveWhitespace(true);

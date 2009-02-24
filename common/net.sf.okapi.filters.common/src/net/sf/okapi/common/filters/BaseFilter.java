@@ -68,6 +68,8 @@ public abstract class BaseFilter implements IFilter {
 	private String encoding;
 	private String srcLang;
 	private String mimeType;
+	
+	private String currentTagType;
 
 	private int startGroupId = 0;
 	private int endGroupId = 0;
@@ -1003,6 +1005,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot add a Code to a non-exisitant TextUnit.");
 		}
 		currentCode = code;
+		currentCode.setType(currentTagType);
 	}
 
 	private void endCode() {
@@ -1124,5 +1127,12 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected boolean isPreserveWhitespace() {
 		return preserveWhitespace;
+	}
+
+	/**
+	 * @param currentElementType the currentElementType to set
+	 */
+	public void setTagType(String tagType) {
+		this.currentTagType = tagType;
 	}
 }

@@ -101,9 +101,6 @@ public class HtmlFilter extends BaseMarkupFilter {
 			}
 			return;
 		}
-
-		// settings for preserving whitespace
-		handlePreserveWhiteSpace(startTag.getName());
 		
 		switch (getConfig().getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:			
@@ -177,10 +174,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 			return;
 		}
-
-		// settings for preserving whitespace
-		handlePreserveWhiteSpace(endTag.getName());
-
+		
 		switch (getConfig().getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -362,6 +356,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 			}
 		}
 		
+		// <x lang="en"> or <x xml:lang="en">
 		if (attrName.equals("lang") || attrName.equals("xml:lang")) {
 			normalizedName = HtmlEncoder.NORMALIZED_LANGUAGE;
 		}
