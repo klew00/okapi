@@ -61,7 +61,7 @@ public class Merger {
 	    rootFolder = Util.getDirectoryName(rootFolder);
 		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
 
-		//Load the FilterAccess list
+		// Load the FilterAccess list
 		fa.loadList(sharedFolder + File.separator + "filters.xml");
 	}
 

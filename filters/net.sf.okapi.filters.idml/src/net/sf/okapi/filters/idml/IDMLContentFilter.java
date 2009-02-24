@@ -67,7 +67,16 @@ public class IDMLContentFilter implements IFilter {
 	private GenericSkeleton skel;
 	private TextFragment frag;
 	private boolean canceled;
+	private int stack;
+	private StringBuilder elemTag;
+	private String elemName;
+	private String elemPrefix;
+	private Parameters params;
 
+	public IDMLContentFilter () {
+		params = new Parameters();
+	}
+	
 	public void cancel () {
 		canceled = true;
 	}
@@ -102,8 +111,7 @@ public class IDMLContentFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -176,7 +184,7 @@ public class IDMLContentFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		this.params = (Parameters)params;
 	}
 
 	private void commonOpen (Reader inputReader) {
@@ -197,10 +205,12 @@ public class IDMLContentFilter implements IFilter {
 		// use reader.getCharacterEncodingScheme() ??? but start doc not reported
 		
 		// Set the start event
+		stack = 0;
 		tuId = 0;
 		otherId = 0;
 		queue = new LinkedList<FilterEvent>();
 		queue.add(new FilterEvent(FilterEventType.START));
+		elemTag = new StringBuilder();
 		
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
@@ -230,26 +240,45 @@ public class IDMLContentFilter implements IFilter {
 				eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
-					storeStartElement();
-					if ( reader.getLocalName().equals("Content") ) {
-						frag = new TextFragment(); 
+					if ( frag == null ) { // Not extracting yet
+						skel.append(buildStartElement());
+						if ( !params.breakAtContent && elemName.equals("ParagraphStyleRange") ) {
+							frag = new TextFragment();
+							stack++;
+						}
+						else if ( elemName.equals("Content") ) {
+							frag = new TextFragment();
+							stack++;
+						}
+					}
+					else { // In extraction
+						stack++;
+						buildStartElement();
+						frag.append(TagType.OPENING, elemName, elemTag.toString());
 					}
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					if ( frag == null ) {
-						storeEndElement();
+						skel.append(buildEndElement());
 						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 						return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
 					}
 					else {
-						TextUnit tu = new TextUnit(String.valueOf(++tuId));
-						tu.setSourceContent(frag);
-						tu.setMimeType("text/xml");
-						skel.addContentPlaceholder(tu);
-						storeEndElement();
-						return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
+						if ( --stack == 0 ) {
+							TextUnit tu = new TextUnit(String.valueOf(++tuId));
+							tu.setSourceContent(frag);
+							tu.setMimeType("text/xml");
+							skel.addContentPlaceholder(tu);
+							skel.append(buildEndElement());
+							return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
+						}
+						else {
+							buildEndElement();
+							frag.append(TagType.CLOSING, elemName, elemTag.toString());
+						}
 					}
+					break;
 					
 				case XMLStreamConstants.SPACE:
 				case XMLStreamConstants.CDATA:
@@ -311,45 +340,51 @@ public class IDMLContentFilter implements IFilter {
 		return new FilterEvent(FilterEventType.END_DOCUMENT, ending, skel);
 	}
 
-	private void storeStartElement () {
-		String prefix = reader.getPrefix();
-		if (( prefix == null ) || ( prefix.length()==0 )) {
-			skel.append("<"+reader.getLocalName());
+	private String buildStartElement () {
+		elemTag.setLength(0);
+		elemPrefix = reader.getPrefix();
+		if (( elemPrefix == null ) || ( elemPrefix.length()==0 )) {
+			elemName = reader.getLocalName();
 		}
 		else {
-			skel.append("<"+prefix+":"+reader.getLocalName());
+			elemName = elemPrefix+":"+reader.getLocalName();
 		}
+		elemTag.append("<"+elemName);
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
-			prefix = reader.getNamespacePrefix(i);
-			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix!=null) ? ":"+prefix : ""),
+			elemPrefix = reader.getNamespacePrefix(i);
+			elemTag.append(String.format(" xmlns%s=\"%s\"",
+				((elemPrefix!=null) ? ":"+elemPrefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i);
+			elemPrefix = reader.getAttributePrefix(i);
 			attrName = String.format("%s%s",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+				(((elemPrefix==null)||(elemPrefix.length()==0)) ? "" : elemPrefix+":"),
 				reader.getAttributeLocalName(i));
 			// UTF-8 is the encoding so no need to escape the normal characters
-			skel.append(String.format(" %s=\"%s\"", attrName,
+			elemTag.append(String.format(" %s=\"%s\"", attrName,
 				Util.escapeToXML(reader.getAttributeValue(i), 3, false, null)));
 		}
-		skel.append(">");
+		elemTag.append(">");
+		return elemTag.toString();
 	}
 	
-	private void storeEndElement () {
-		String ns = reader.getPrefix();
-		if (( ns == null ) || ( ns.length()==0 )) {
-			skel.append("</"+reader.getLocalName()+">");
+	private String buildEndElement () {
+		elemPrefix = reader.getPrefix();
+		if (( elemPrefix == null ) || ( elemPrefix.length()==0 )) {
+			elemName = reader.getLocalName();
 		}
 		else {
-			skel.append("</"+ns+":"+reader.getLocalName()+">");
+			elemName = elemPrefix+":"+reader.getLocalName();
 		}
+		elemTag.setLength(0);
+		elemTag.append("</"+elemName+">");
+		return elemTag.toString();
 	}
 
 }

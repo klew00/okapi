@@ -472,6 +472,14 @@ public class ODFFilter implements IFilter {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
 			extract.pop();
+			if ( tf.isEmpty() ) { // Send a document part if there is no content
+				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+				skel.append(buildEndTag(name)+"\n");
+				dp.setSkeleton(skel);
+				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+				return true;
+			}
+			// Else: Send a text unit
 			skel.addContentPlaceholder(tu);
 			tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
