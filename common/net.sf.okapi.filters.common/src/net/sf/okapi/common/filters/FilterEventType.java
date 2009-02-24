@@ -95,6 +95,11 @@ public enum FilterEventType {
 	 * Indicates that the user has canceled the processing.
 	 * No resource are associated with this event.  
 	 */
-	CANCELED
+	CANCELED,
+	
+	/**
+	 * File level event. A File resource should be associated with this event.
+	 */
+	FILE
 
 }

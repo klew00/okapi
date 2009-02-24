@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedeventpipeline;
+package net.sf.okapi.common.threadedpipeline;
 
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,9 +29,9 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.okapi.common.eventpipeline.IEventPipeline;
-import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.pipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.IEventPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
 public class ThreadedEventPipeline implements IEventPipeline {

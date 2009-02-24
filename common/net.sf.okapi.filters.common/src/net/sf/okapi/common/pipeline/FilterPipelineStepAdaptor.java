@@ -18,92 +18,44 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.eventpipeline;
+package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.IFilter;
 
-public abstract class BaseEventPipelineStep implements IEventPipelineStep {
+public class FilterPipelineStepAdaptor extends BaseEventPipelineStep {
+	private IFilter filter;
+	
+	public FilterPipelineStepAdaptor(IFilter filter) {
+		this.filter = filter;
+	}
+	
+	public IFilter getFilter() {
+		return filter;
+	}
+	
+	public String getName() {		
+		return filter.getName();
+	}		
 
+	@Override
 	public FilterEvent handleEvent(FilterEvent event) {
-		switch (event.getEventType()) {
-
-		case START:
-			handleStart(event);
-			break;
-
-		case FINISHED:
-			handleFinished(event);
-			break;
-
-		case START_DOCUMENT:
-			handleStartDocument(event);
-			break;
-
-		case END_DOCUMENT:
-			handleEndDocument(event);
-			break;
-
-		case START_SUBDOCUMENT:
-			handleStartSubDocument(event);
-			break;
-
-		case END_SUBDOCUMENT:
-			handleEndSubDocument(event);
-			break;
-
-		case START_GROUP:
-			handleStartGroup(event);
-			break;
-
-		case END_GROUP:
-			handleEndGroup(event);
-			break;
-
-		case TEXT_UNIT:
-			handleTextUnit(event);
-			break;
-
-		case DOCUMENT_PART:
-			handleDocumentPart(event);
-			break;
-
-		default:
-			break;
-		}
-
-		return event;
-	}
-
-	// By default we eat all events - override these methods if need to process
-	// the event
-	
-	protected void handleDocumentPart(FilterEvent event) {
+		return filter.next();		
 	}
 	
-	protected void handleFinished(FilterEvent event) {
+	public void preprocess() {}
+
+	public void postprocess() {
+		filter.close();
+	}
+	
+	public void cancel() {
+		filter.cancel();
 	}
 
-	protected void handleStart(FilterEvent event) {
+	public void pause() {
 	}
 
-	protected void handleStartDocument(FilterEvent event) {
-	}
-
-	protected void handleEndDocument(FilterEvent event) {
-	}
-
-	protected void handleStartSubDocument(FilterEvent event) {
-	}
-
-	protected void handleEndSubDocument(FilterEvent event) {
-	}
-
-	protected void handleStartGroup(FilterEvent event) {
-	}
-
-	protected void handleEndGroup(FilterEvent event) {
-	}
-
-	protected void handleTextUnit(FilterEvent event) {
+	public void resume() {
 	}
 }

@@ -18,13 +18,12 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedeventpipeline;
+package net.sf.okapi.common.threadedpipeline;
 
 import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.filters.FilterEvent;
 
-public interface IProducer {
-	
-	public void setProducerQueue(BlockingQueue<FilterEvent> producerQueue);	
+public interface IConsumer {
+	public void setConsumerQueue(BlockingQueue<FilterEvent> consumerQueue);
 }

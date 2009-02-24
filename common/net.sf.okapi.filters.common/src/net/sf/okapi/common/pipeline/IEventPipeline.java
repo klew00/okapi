@@ -18,9 +18,8 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.eventpipeline;
+package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
 public interface IEventPipeline {
 

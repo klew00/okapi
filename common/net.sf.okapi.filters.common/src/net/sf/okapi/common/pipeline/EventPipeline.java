@@ -18,52 +18,76 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.threadedeventpipeline;
+package net.sf.okapi.common.pipeline;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.sf.okapi.common.eventpipeline.IEventPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ConsumerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAdaptor implements IConsumer {	
-	private BlockingQueue<FilterEvent> consumerQueue;
+public class EventPipeline implements IEventPipeline {
+	List<IEventPipelineStep> steps;
+	IEventPipelineStep initialStep;
+	boolean cancel = false;
+	boolean pause = false;
+	boolean stop = false;
+	boolean first = true;
 
-	public ConsumerPipelineStepAdaptor(IEventPipelineStep step) {
-		super(step);		
+	public EventPipeline() {
+		steps = new ArrayList<IEventPipelineStep>();
 	}
 
-	public void setConsumerQueue(BlockingQueue<FilterEvent> consumerQueue) {
-		this.consumerQueue = consumerQueue;
+	public void addStep(IEventPipelineStep step) {
+		if (first) {
+			initialStep = step;
+			first = false;
+		} else {
+			steps.add(step);
+		}
 	}
 
-	protected FilterEvent takeFromQueue() {
-		if (consumerQueue == null) {
-			throw new RuntimeException("This class is a producer not a consumer");
+	public void cancel() {
+		cancel = true;
+	}
+
+	public void execute() {
+		// preprocess
+		initialStep.preprocess();
+		for (IEventPipelineStep step : steps) {
+			if (cancel)
+				return;
+			step.preprocess();
 		}
 
-		FilterEvent event;
-		try {
-			event = consumerQueue.take();
-		} catch (InterruptedException e) {
-			throw new RuntimeInterruptedException(e);
+		while (!stop) {
+			if (pause)
+				continue;
+			FilterEvent event = initialStep.handleEvent(null);
+			for (IEventPipelineStep step : steps) {
+				step.handleEvent(event);
+			}
+			if (event.getEventType() == FilterEventType.FINISHED) {
+				stop = true;
+			}
 		}
-		return event;
+
+		// postprocess (cleanup)
+		initialStep.postprocess();
+		for (IEventPipelineStep step : steps) {
+			step.postprocess();
+		}
 	}
 
-	public FilterEvent handleEvent(FilterEvent event) {
-		FilterEvent e = takeFromQueue();
-		step.handleEvent(e);
-		return e;
+	public PipelineReturnValue getState() {
+		return null;
 	}
 
-	@Override
-	protected PipelineReturnValue processBlockingQueue() {
-		FilterEvent event = handleEvent(null);
-		if (event.getEventType() == FilterEventType.FINISHED) {
-			return PipelineReturnValue.SUCCEDED;
-		}
-		return PipelineReturnValue.RUNNING;
+	public void pause() {
+		pause = true;
+	}
+
+	public void resume() {
+		pause = false;
 	}
 }

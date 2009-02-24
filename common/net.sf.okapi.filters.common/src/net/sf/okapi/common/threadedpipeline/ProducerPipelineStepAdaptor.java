@@ -18,44 +18,49 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.eventpipeline;
+package net.sf.okapi.common.threadedpipeline;
+
+import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.IFilterWriter;
+import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class FilterWriterPipelineStepAdaptor extends BaseEventPipelineStep {
-	private IFilterWriter filterWriter;
-
-	public FilterWriterPipelineStepAdaptor(IFilterWriter filterWriter) {
-		this.filterWriter = filterWriter;
+public class ProducerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAdaptor implements IProducer {	
+	private BlockingQueue<FilterEvent> producerQueue;
+	
+	public ProducerPipelineStepAdaptor(IEventPipelineStep step) {
+		super(step);		
 	}
 	
-	public IFilterWriter getFilterWriter() {
-		return filterWriter;
+	public void setProducerQueue(BlockingQueue<FilterEvent> producerQueue) {
+		this.producerQueue = producerQueue;
 	}
-
-	public void cancel() {
+	
+	protected void addToQueue(FilterEvent event) {
+		if (producerQueue == null) {
+			throw new RuntimeException("This class is a consumer not a producer");
+		}
+		try {
+			producerQueue.put(event);
+		} catch (InterruptedException e) {
+			throw new RuntimeInterruptedException(e);
+		}
 	}
-
-	public String getName() {
-		return filterWriter.getName();
+	
+	public FilterEvent handleEvent(FilterEvent event) {	
+		FilterEvent e = step.handleEvent(event);
+		addToQueue(e);
+		return e;		
 	}
 	
 	@Override
-	public FilterEvent handleEvent(FilterEvent event) {
-		return filterWriter.handleEvent(event);		
-	}
-
-	public void pause() {
-	}
-
-	public void postprocess() {
-		filterWriter.close();
-	}
-
-	public void preprocess() {
-	}
-
-	public void resume() {
+	protected PipelineReturnValue processBlockingQueue() {
+		FilterEvent event = handleEvent(null);
+		if (event.getEventType() == FilterEventType.FINISHED) {
+			return PipelineReturnValue.SUCCEDED;
+		}
+		return PipelineReturnValue.RUNNING;
 	}
 }

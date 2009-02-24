@@ -20,8 +20,8 @@
 
 package net.sf.okapi.common.simplepipeline.tests;
 
-import net.sf.okapi.common.eventpipeline.EventPipeline;
-import net.sf.okapi.common.eventpipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.EventPipeline;
+import net.sf.okapi.common.pipeline.IEventPipeline;
 import net.sf.okapi.common.pipeline.tests.Consumer;
 import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
 import net.sf.okapi.common.pipeline.tests.Producer;

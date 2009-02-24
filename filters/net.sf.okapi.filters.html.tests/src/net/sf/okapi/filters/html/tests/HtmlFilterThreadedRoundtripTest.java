@@ -24,11 +24,11 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.sf.okapi.common.eventpipeline.FilterPipelineStepAdaptor;
-import net.sf.okapi.common.eventpipeline.FilterWriterPipelineStepAdaptor;
-import net.sf.okapi.common.eventpipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.IEventPipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.common.threadedeventpipeline.ThreadedEventPipeline;
+import net.sf.okapi.common.threadedpipeline.ThreadedEventPipeline;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 

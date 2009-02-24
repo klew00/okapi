@@ -18,77 +18,92 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.eventpipeline;
-
-import java.util.ArrayList;
-import java.util.List;
+package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class EventPipeline implements IEventPipeline {
-	List<IEventPipelineStep> steps;
-	IEventPipelineStep initialStep;
-	boolean cancel = false;
-	boolean pause = false;
-	boolean stop = false;
-	boolean first = true;
+public abstract class BaseEventPipelineStep implements IEventPipelineStep {
 
-	public EventPipeline() {
-		steps = new ArrayList<IEventPipelineStep>();
-	}
+	public FilterEvent handleEvent(FilterEvent event) {
+		switch (event.getEventType()) {
 
-	public void addStep(IEventPipelineStep step) {
-		if (first) {
-			initialStep = step;
-			first = false;
-		} else {
-			steps.add(step);
+		case START:
+			handleStart(event);
+			break;
+
+		case FINISHED:
+			handleFinished(event);
+			break;
+
+		case START_DOCUMENT:
+			handleStartDocument(event);
+			break;
+
+		case END_DOCUMENT:
+			handleEndDocument(event);
+			break;
+
+		case START_SUBDOCUMENT:
+			handleStartSubDocument(event);
+			break;
+
+		case END_SUBDOCUMENT:
+			handleEndSubDocument(event);
+			break;
+
+		case START_GROUP:
+			handleStartGroup(event);
+			break;
+
+		case END_GROUP:
+			handleEndGroup(event);
+			break;
+
+		case TEXT_UNIT:
+			handleTextUnit(event);
+			break;
+
+		case DOCUMENT_PART:
+			handleDocumentPart(event);
+			break;
+
+		default:
+			break;
 		}
+
+		return event;
 	}
 
-	public void cancel() {
-		cancel = true;
+	// By default we eat all events - override these methods if need to process
+	// the event
+	
+	protected void handleDocumentPart(FilterEvent event) {
+	}
+	
+	protected void handleFinished(FilterEvent event) {
 	}
 
-	public void execute() {
-		// preprocess
-		initialStep.preprocess();
-		for (IEventPipelineStep step : steps) {
-			if (cancel)
-				return;
-			step.preprocess();
-		}
-
-		while (!stop) {
-			if (pause)
-				continue;
-			FilterEvent event = initialStep.handleEvent(null);
-			for (IEventPipelineStep step : steps) {
-				step.handleEvent(event);
-			}
-			if (event.getEventType() == FilterEventType.FINISHED) {
-				stop = true;
-			}
-		}
-
-		// postprocess (cleanup)
-		initialStep.postprocess();
-		for (IEventPipelineStep step : steps) {
-			step.postprocess();
-		}
+	protected void handleStart(FilterEvent event) {
 	}
 
-	public PipelineReturnValue getState() {
-		return null;
+	protected void handleStartDocument(FilterEvent event) {
 	}
 
-	public void pause() {
-		pause = true;
+	protected void handleEndDocument(FilterEvent event) {
 	}
 
-	public void resume() {
-		pause = false;
+	protected void handleStartSubDocument(FilterEvent event) {
+	}
+
+	protected void handleEndSubDocument(FilterEvent event) {
+	}
+
+	protected void handleStartGroup(FilterEvent event) {
+	}
+
+	protected void handleEndGroup(FilterEvent event) {
+	}
+
+	protected void handleTextUnit(FilterEvent event) {
 	}
 }

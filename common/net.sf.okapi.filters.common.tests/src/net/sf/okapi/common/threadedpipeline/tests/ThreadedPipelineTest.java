@@ -23,12 +23,12 @@ package net.sf.okapi.common.threadedpipeline.tests;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import net.sf.okapi.common.eventpipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.IEventPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipeline.tests.Consumer;
 import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
 import net.sf.okapi.common.pipeline.tests.Producer;
-import net.sf.okapi.common.threadedeventpipeline.ThreadedEventPipeline;
+import net.sf.okapi.common.threadedpipeline.ThreadedEventPipeline;
 
 import org.junit.After;
 import org.junit.Before;

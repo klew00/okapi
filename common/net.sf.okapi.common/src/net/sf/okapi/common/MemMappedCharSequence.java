@@ -672,6 +672,10 @@ public final class MemMappedCharSequence implements CharSequence {
 			text.put(i, Character.toLowerCase(text.get(i)));
 	}
 
+	public char[] array() {
+		return text.array();
+	}
+	
 	/**
 	 * General purpose static method which reads bytes from a Channel, decodes
 	 * them according to the given charset
