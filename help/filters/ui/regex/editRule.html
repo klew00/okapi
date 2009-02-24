@@ -22,12 +22,16 @@ All matches for the given rule are provided.</p>
 
 Sample: <span style="background-color: #00FF00">[ID100]={</span>Text to translate<span style="background-color: #00FF00">}</span></pre>
 <h4>Resource name</h4>
+<p>For each rule, you can capture a resource name. This name can be used as the 
+identifier of the text extracted in this rule. For example, the value may be 
+used as the value for the <code>resname</code> attribute in XLIFF.</p>
 <p><cite>Before the name</cite> -- Enter the regular expression matching just 
 before the name of the resource. This expression is applied on the text matched 
 by the <cite>Start</cite> expression.</p>
 <p><cite>After the name</cite> -- Enter the regular expression matching just 
 after the name of the resource. This expression is applied on the text matched 
 by the <cite>Start</cite> expression.</p>
+<p><cite>Format</cite> -- Reserved for later usage.</p>
 <p>Example of expression:</p>
 <pre>Before the name: \[
  After the name: \]

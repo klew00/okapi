@@ -29,7 +29,9 @@ selected down in the list. Rules are evaluated in the order of the list.</p>
 currently selected. There are four choices:</p>
 <ul>
 	<li><cite>Extract the strings inside the content</cite>: Extracts each 
-	strings within the content into a separate text unit.</li>
+	strings within the content into a separate text unit. The beginning and 
+	ending of the strings are defined <a href="#OptionsStrings">in the <cite>
+	Options</cite> tab</a>.</li>
 	<li><cite>Extract the content itself</cite>: Extracts the whole text of the 
 	content into a single text unit.</li>
 	<li><cite>Treat the content as a comment</cite>: Does not extract anything, 
@@ -65,10 +67,15 @@ If this option is not set, both strings are seen as different.</p>
 <h3>Options Tab</h3>
 <h4>Localization directives</h4>
 <p><cite>Use localization directives when they are present</cite> -- Set this 
-option to TODO</p>
+option to enable the filter to recognize localization directives. If this option 
+is not set, any localization directive in the input file will be ignored.</p>
 <p><cite>Extract items outside the scope of localization directives</cite> -- 
-Set this option to TODO</p>
-<h4>Strings</h4>
+Set this option to extract any translatable item that is not within the scope of 
+a localization directive. Selecting to extract or not outside localization 
+directives allows you to mark up fewer parts of the source document. This option 
+is enabled only when the <cite>Use localization directives when they are present</cite> 
+option is set.</p>
+<h4><a name="OptionsStrings"></a>Strings</h4>
 <p><cite>Extract strings outside the rules</cite> -- Set this option to extract 
 all strings that are outside the scope of all the defined rules. NOT IMPLEMENTED 
 YET.</p>
@@ -80,7 +87,10 @@ defined an equal number of end characters, and the position of each end
 character must correspond to the position of its corresponding beginning 
 character.</p>
 <h4>Content type</h4>
-<p><cite>MIME type of the document</cite> -- Enter TODO</p>
+<p><cite>MIME type of the document</cite> -- Enter the MIME type value to use 
+when extracting content with this parameters. The value is used to identify the 
+type of document. It may also change the way the text is written back into the 
+original format. Most of the time <code>text/plain</code> should be fine.</p>
 <p>&nbsp;</p>
 </body>
 </html>
