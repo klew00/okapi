@@ -60,7 +60,12 @@ public class IDMLFilter implements IFilter {
 	private LinkedList<FilterEvent> queue;
 	private String srcLang;
 	private IDMLContentFilter filter;
+	private Parameters params;
 
+	public IDMLFilter () {
+		params = new Parameters();
+	}
+	
 	public void cancel () {
 		// TODO Auto-generated method stub
 	}
@@ -95,8 +100,7 @@ public class IDMLFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -158,7 +162,7 @@ public class IDMLFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		this.params = (Parameters)params;
 	}
 
 	private FilterEvent openZipFile () {
@@ -207,7 +211,8 @@ public class IDMLFilter implements IFilter {
 	}
 	
 	private FilterEvent openSubDocument () {
-		filter.close();
+		filter.close(); // Make sure the previous is closed
+		filter.setParameters(params);
 		filter.setOptions(srcLang, "UTF-8", true);
 		FilterEvent event;
 		try {

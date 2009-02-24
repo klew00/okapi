@@ -67,11 +67,14 @@ public class IDMLContentFilter implements IFilter {
 	private GenericSkeleton skel;
 	private TextFragment frag;
 	private boolean canceled;
+	private boolean checkForEmpty;
 	private int stack;
 	private StringBuilder elemTag;
 	private String elemName;
 	private String elemPrefix;
 	private Parameters params;
+	private boolean wasEmpty;
+	private boolean forSkel;
 
 	public IDMLContentFilter () {
 		params = new Parameters();
@@ -107,7 +110,7 @@ public class IDMLContentFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return "text/xml"; //TODO: check if IDML has its own
+		return "text/xml";
 	}
 
 	public IParameters getParameters () {
@@ -211,6 +214,7 @@ public class IDMLContentFilter implements IFilter {
 		queue = new LinkedList<FilterEvent>();
 		queue.add(new FilterEvent(FilterEventType.START));
 		elemTag = new StringBuilder();
+		checkForEmpty = false;
 		
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
@@ -238,29 +242,32 @@ public class IDMLContentFilter implements IFilter {
 		try {
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
+				if ( checkForEmpty ) checkForEmpty();
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( frag == null ) { // Not extracting yet
-						skel.append(buildStartElement());
+						buildStartElement(); // Tag will be added when checking for empty
 						if ( !params.breakAtContent && elemName.equals("ParagraphStyleRange") ) {
 							frag = new TextFragment();
 							stack++;
+							forSkel = true;
 						}
 						else if ( elemName.equals("Content") ) {
 							frag = new TextFragment();
 							stack++;
+							forSkel = true;
 						}
 					}
 					else { // In extraction
 						stack++;
-						buildStartElement();
-						frag.append(TagType.OPENING, elemName, elemTag.toString());
+						buildStartElement(); // Tag will be added when checking for empty
+						//frag.append(TagType.OPENING, elemName, elemTag.toString());
 					}
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					if ( frag == null ) {
-						skel.append(buildEndElement());
+						if ( !wasEmpty ) skel.append(buildEndElement());
 						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 						return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
 					}
@@ -274,10 +281,13 @@ public class IDMLContentFilter implements IFilter {
 							return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
 						}
 						else {
-							buildEndElement();
-							frag.append(TagType.CLOSING, elemName, elemTag.toString());
+							if ( !wasEmpty ) {
+								buildEndElement();
+								frag.append(TagType.CLOSING, elemName, elemTag.toString());
+							}
 						}
 					}
+					wasEmpty = false;
 					break;
 					
 				case XMLStreamConstants.SPACE:
@@ -370,7 +380,8 @@ public class IDMLContentFilter implements IFilter {
 			elemTag.append(String.format(" %s=\"%s\"", attrName,
 				Util.escapeToXML(reader.getAttributeValue(i), 3, false, null)));
 		}
-		elemTag.append(">");
+		//elemTag.append(">");
+		checkForEmpty = true;
 		return elemTag.toString();
 	}
 	
@@ -385,6 +396,32 @@ public class IDMLContentFilter implements IFilter {
 		elemTag.setLength(0);
 		elemTag.append("</"+elemName+">");
 		return elemTag.toString();
+	}
+
+	private void checkForEmpty () {
+		checkForEmpty = false;
+		
+		wasEmpty = false;
+		if ( reader.getEventType() == XMLStreamConstants.END_ELEMENT ) {
+			wasEmpty = elemName.equals(reader.getName().toString());
+			//TODO: consume the end tag of the empty element
+		}
+		
+		// Add the ending of previous element
+		if ( wasEmpty ) {
+			elemTag.append("/>");
+		}
+		else {
+			elemTag.append(">");
+		}
+		if (( frag == null ) || forSkel ) {
+			skel.append(elemTag.toString());
+			forSkel = false;
+		}
+		else {
+			frag.append((wasEmpty ? TagType.PLACEHOLDER : TagType.OPENING),
+				elemName, elemTag.toString());
+		}
 	}
 
 }
