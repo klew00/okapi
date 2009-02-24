@@ -65,16 +65,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return ref;
 	}
 
-	public void processStart (String language,
-		String encoding,
-		ILayerProvider layer,
-		EncoderManager encoderManager)
-	{
-		this.encoderManager = encoderManager;
-		outputLang = language;
-		outputEncoding = encoding;
-		this.encoderManager.setDefaultOptions(null, outputEncoding);
-		this.layer = layer;
+	public void processStart () {
 		referents = new LinkedHashMap<String, IReferenceable>();
 		storageStack = new Stack<StorageList>();
 	}
@@ -86,8 +77,19 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		storageStack = null;
 	}
 	
-	public String processStartDocument (StartDocument resource) {
+	public String processStartDocument (String outputLanguage,
+		String outputEncoding,
+		ILayerProvider layer,
+		EncoderManager encoderManager,
+		StartDocument resource)
+	{
+		this.outputLang = outputLanguage;
+		this.encoderManager = encoderManager;
+		this.outputEncoding = outputEncoding;
+		this.encoderManager.setDefaultOptions(null, outputEncoding);
+		this.layer = layer;
 		isMultilingual = resource.isMultilingual();
+		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
@@ -160,7 +162,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
-	private String getString (ISkeleton skeleton, int context) {
+	private String getString (ISkeleton skeleton,
+		int context)
+	{
 		if ( skeleton == null ) return "";
 		StringBuilder tmp = new StringBuilder();
 		for ( GenericSkeletonPart part : ((GenericSkeleton)skeleton).getParts() ) {

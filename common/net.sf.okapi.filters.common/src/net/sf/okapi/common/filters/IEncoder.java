@@ -38,7 +38,8 @@ public interface IEncoder {
 	 * specific to this encoder.
 	 * @param encoding The name of the charset encoding to use.
 	 */
-	public void setOptions (IParameters params, String encoding);
+	public void setOptions (IParameters params,
+		String encoding);
 	
 	/**
 	 * Encodes a given text with this encoder.

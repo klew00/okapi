@@ -126,6 +126,9 @@ public class Writer extends BaseWriter {
 	public FilterEvent handleEvent (FilterEvent event) {
 		try {
 			switch ( event.getEventType() ) {
+			case START:
+				skelWriter.processStart();
+				break;
 			case FINISHED:
 				processFinished();
 				break;
@@ -176,7 +179,6 @@ public class Writer extends BaseWriter {
 	private void processStartDocument (StartDocument resource) {
 		try {
 			close();
-			skelWriter.processStart(trgLang, encoding, layer, encoderManager);
 			Util.createDirectories(outputPath);
 			writer = new PrintWriter(outputPath, encoding);
 		}
@@ -216,7 +218,7 @@ public class Writer extends BaseWriter {
 			Util.RTF_STARTCODE);
 
 		// Write the skeleton
-		writer.write(skelWriter.processStartDocument(resource));
+		writer.write(skelWriter.processStartDocument(trgLang, encoding, layer, encoderManager, resource));
 	}
 
 	private void processEndDocument (Ending resource) { 

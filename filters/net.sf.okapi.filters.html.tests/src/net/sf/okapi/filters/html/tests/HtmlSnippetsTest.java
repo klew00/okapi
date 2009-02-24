@@ -8,6 +8,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -119,9 +120,13 @@ public class HtmlSnippetsTest {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart("en", "utf-8", null, new EncoderManager());
+		writer.processStart();
 		for (FilterEvent event : list) {
 			switch (event.getEventType()) {
+			case START_DOCUMENT:
+				writer.processStartDocument("en", "utf-8", null, new EncoderManager(),
+					(StartDocument)event.getResource());
+				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
 				skl = (GenericSkeleton) tu.getSkeleton();				

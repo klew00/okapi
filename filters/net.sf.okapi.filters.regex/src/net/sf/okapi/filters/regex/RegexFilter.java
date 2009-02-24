@@ -164,7 +164,7 @@ public class RegexFilter implements IFilter {
 		}
 		
 		// Else: Send end of the skeleton if needed
-		if ( startSearch < inputText.length() ) {
+		if ( startSearch <= inputText.length() ) {
 			// Treat strings outside rules
 //TODO: implement extract string out of rules
 			// Send the skeleton

@@ -138,7 +138,7 @@ public class GenericFilterWriter implements IFilterWriter {
 				processFinished();
 				break;
 			case START_DOCUMENT:
-				processStartDocument((StartDocument)event.getResource());
+				processStartDocument(language, encoding, null, encoderManager, (StartDocument)event.getResource());
 				break;
 			case END_DOCUMENT:
 				processEndDocument((Ending)event.getResource());
@@ -177,7 +177,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 
 	private void processStart () {
-		skelWriter.processStart(language, encoding, null, encoderManager);
+		skelWriter.processStart();
 	}
 
 	private void processFinished () {
@@ -185,10 +185,16 @@ public class GenericFilterWriter implements IFilterWriter {
 		close();
 	}
 	
-	private void processStartDocument(StartDocument resource) throws IOException {
+	private void processStartDocument(String outputLanguage,
+		String outputEncoding,
+		ILayerProvider layer,
+		EncoderManager encoderManager,
+		StartDocument resource) throws IOException
+	{
 		// Create the output
 		createWriter(resource);
-		writer.write(skelWriter.processStartDocument(resource));
+		writer.write(skelWriter.processStartDocument(outputLanguage,
+			outputEncoding, layer, encoderManager, resource));
 	}
 
 	private void processEndDocument(Ending resource) throws IOException {

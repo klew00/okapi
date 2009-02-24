@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IEncoder;
 
 /**
@@ -47,8 +46,62 @@ public class XMLEncoder implements IEncoder {
 		}
 	}
 
-	public String encode (String text, int context) {
-		return Util.escapeToXML(text, 1, false, chsEnc);
+	public String encode (String text, 
+		int context)
+	{
+		if ( text == null ) return "";
+		boolean escapeGT = false;
+		int quoteMode = 1;
+		
+		StringBuffer sbTmp = new StringBuffer(text.length());
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case '<':
+				sbTmp.append("&lt;");
+				continue;
+			case '>':
+				if ( escapeGT ) sbTmp.append("&gt;");
+				else {
+					if (( i > 0 ) && ( text.charAt(i-1) == ']' )) sbTmp.append("&gt;");
+					else sbTmp.append('>');
+				}
+				continue;
+			case '&':
+				sbTmp.append("&amp;");
+				continue;
+			case '"':
+				if ( quoteMode > 0 ) sbTmp.append("&quot;");
+				else sbTmp.append('"');
+				continue;
+			case '\'':
+				switch ( quoteMode ) {
+				case 1:
+					sbTmp.append("&apos;");
+					break;
+				case 2:
+					sbTmp.append("&#39;");
+					break;
+				default:
+					sbTmp.append(text.charAt(i));
+					break;
+				}
+				continue;
+			default:
+				if ( text.charAt(i) > 127 ) { // Extended chars
+					if (( chsEnc != null ) && ( !chsEnc.canEncode(text.charAt(i)) )) {
+						sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
+					}
+					else { // No encoder or char is supported
+						sbTmp.append(text.charAt(i));
+					}
+				}
+				else { // ASCII chars
+					sbTmp.append(text.charAt(i));
+				}
+				continue;
+			}
+		}
+		return sbTmp.toString();
 	}
 
 	public String encode (char value, int context) {
@@ -62,8 +115,17 @@ public class XMLEncoder implements IEncoder {
 		case '&':
 			return "&amp;";
 		default:
-			//TODO: Escape unsupported chars
-			return String.valueOf(value);
+			if ( value > 127 ) { // Extended chars
+				if (( chsEnc != null ) && ( !chsEnc.canEncode(value) )) {
+					return String.format("&#x%04x;", (int)value);
+				}
+				else { // No encoder or char is supported
+					return String.valueOf(value);
+				}
+			}
+			else { // ASCII chars
+				return String.valueOf(value);
+			}
 		}
 	}
 

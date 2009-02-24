@@ -256,12 +256,12 @@ public class XMLFilter implements IFilter {
 		skel.add("\"");
 		startDoc.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
-		skel.add("?>"+lineBreak);
+		skel.add("?>\n");
 
 		// Add the DTD if needed
 		DocumentType dt = doc.getDoctype();
 		if ( dt != null ) {
-			skel.add(String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">"+lineBreak,
+			skel.add(String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">\n",
 				dt.getName(),
 				dt.getPublicId(),
 				dt.getSystemId()));

@@ -149,6 +149,7 @@ public class EncoderManager implements IEncoder {
 	 * @param params The parameters object with all the configuration information 
 	 * specific to this encoder.
 	 * @param encoding The name of the charset encoding to use.
+	 * @param lineBreak Type of line-break to use in the output.
 	 */
 	public void setOptions (IParameters params,
 		String encoding)

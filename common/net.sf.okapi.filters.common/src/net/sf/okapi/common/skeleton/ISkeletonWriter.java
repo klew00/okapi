@@ -36,15 +36,8 @@ public interface ISkeletonWriter {
 
 	/**
 	 * Processes the START event.
-	 * @param language Code of the output language. 
-	 * @param encoding Name of the output charset encoding.
-	 * @param layer Layer provider to use.
-	 * @param encoderManager Encoder manager to use.
 	 */
-	public void processStart (String language,
-		String encoding,
-		ILayerProvider layer,
-		EncoderManager encoderManager);
+	public void processStart ();
 	
 	/**
 	 * Processes the FINISHED event.
@@ -53,10 +46,18 @@ public interface ISkeletonWriter {
 	
 	/**
 	 * Processes the START_DOCUMENT event.
+	 * @param outputLanguage Code of the output language. 
+	 * @param outputEncoding Name of the output charset encoding.
+	 * @param layer Layer provider to use.
+	 * @param encoderManager Encoder manager to use.
 	 * @param resource The StartDocument resource associated with the event.
 	 * @return The string output corresponding to this event.
 	 */
-	public String processStartDocument (StartDocument resource);
+	public String processStartDocument (String outputLanguage,
+		String outputEncoding,
+		ILayerProvider layer,
+		EncoderManager encoderManager,
+		StartDocument resource);
 	
 	/**
 	 * Processes the END_DOCUMENT event.

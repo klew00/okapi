@@ -28,6 +28,7 @@ import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -191,9 +192,13 @@ public class ResourcesTest extends TestCase {
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart("en", "utf-8", null, new EncoderManager());
+		writer.processStart();
 		for ( FilterEvent event : list ) {
 			switch ( event.getEventType() ) {
+			case START_DOCUMENT:
+				writer.processStartDocument("en", "utf-8", null, new EncoderManager(),
+					(StartDocument)event.getResource());
+				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit)event.getResource();
 				GenericSkeleton skl = (GenericSkeleton)tu.getSkeleton();
