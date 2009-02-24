@@ -31,13 +31,7 @@ import net.sf.okapi.common.filters.IEncoder;
  * Implements IEncoder for HTML format.
  */
 public class HtmlEncoder implements IEncoder {
-	
-	/** Normalized version of the HTML content */
-	public static final String NORMALIZED_LANGUAGE = "language";
-	
-	/** Normalized version of the HTML charset */
-	public static final String NORMALIZED_ENCODING = "encoding";
-	
+			
 	/** HTML content attribute */
 	public static final String CONTENT = "content";
 	
