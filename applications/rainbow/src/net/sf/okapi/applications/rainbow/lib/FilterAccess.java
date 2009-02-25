@@ -302,7 +302,10 @@ public class FilterAccess {
 		boolean result = false;
 		if ( paramsEditor == null ) {
 			if ( defaultEditor != null ) {
+				paramObject.save(paramsPath);
+				// Call the default editor
 				UIUtil.execute(defaultEditor, paramsPath);
+				result = true;
 			}
 		}
 		else result = paramsEditor.edit(paramObject, uiContext, helpParam, projectDir);

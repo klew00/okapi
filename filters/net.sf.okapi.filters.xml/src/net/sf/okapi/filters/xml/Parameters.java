@@ -46,6 +46,11 @@ import net.sf.okapi.common.IParameters;
 
 public class Parameters implements IParameters {
 	
+	private final static String DEFAULTS = "<?xml version='1.0' encoding='UTF-8'?>\n"
+		+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='1.0'>\n"
+		+ "<!-- See ITS specification at: http://www.w3.org/TR/its/ -->\n"
+		+ "</its:rules>\n";
+	
 	private String path;
 	private URI docURI;
 	private Document doc;
@@ -56,7 +61,6 @@ public class Parameters implements IParameters {
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
-
 		// Create the document builder
 		try {
 			docBuilder = fact.newDocumentBuilder();
@@ -69,6 +73,9 @@ public class Parameters implements IParameters {
 
 	@Override
 	public String toString () {
+		if ( doc == null ) {
+			return DEFAULTS;
+		}
 		StringWriter sw = new StringWriter();
 		Result result = new StreamResult(sw);
 		// Write the DOM document to the file
@@ -97,7 +104,7 @@ public class Parameters implements IParameters {
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
-		} 
+		}
 	}
 
 	public String getPath () {
@@ -127,6 +134,9 @@ public class Parameters implements IParameters {
 	}
 
 	public void save (String filePath) {
+		if ( doc == null ) {
+			fromString(DEFAULTS);
+		}
 		// Prepare the output file
 		File f = new File(filePath);
 		Result result = new StreamResult(f);
