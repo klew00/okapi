@@ -69,6 +69,9 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
@@ -706,7 +709,35 @@ public class MainForm implements IParametersProvider {
 		inputTables.get(0).setMenu(inputTableMenu);
 		inputTables.get(1).setMenu(inputTableMenu);
 		inputTables.get(2).setMenu(inputTableMenu);
+		
+		//--Adds code to pop up the property editor dlg by dbl-clicking
+		MouseAdapter ma = new MouseAdapter(){
+			public void mouseDoubleClick(MouseEvent e)
+			{
+				Table t = (Table) e.getSource();				
+				if(e.x > t.getColumn(0).getWidth() && e.x < t.getColumn(0).getWidth()+t.getColumn(1).getWidth()){
+					editInputProperties(-1);
+				}
+			}
+		};
+		inputTables.get(0).addMouseListener(ma);
+		inputTables.get(1).addMouseListener(ma);
+		inputTables.get(2).addMouseListener(ma);
 
+		//--Adds code to select all items by clicking ctrl + a
+		KeyAdapter ka = new KeyAdapter(){	
+			public void keyPressed(KeyEvent e)
+			{
+				if (((e.stateMask & SWT.CTRL) != 0) && e.keyCode==97){
+					Table t = (Table) e.getSource();
+					t.setSelection(t.getItems());
+				}
+			}
+		};
+		inputTables.get(0).addKeyListener(ka);
+		inputTables.get(1).addKeyListener(ka);
+		inputTables.get(2).addKeyListener(ka);
+			
 		// Options tab
 		comp = new Composite(tabFolder, SWT.NONE);
 		comp.setLayout(new GridLayout());
