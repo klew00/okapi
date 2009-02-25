@@ -60,13 +60,17 @@ public class LayerProvider implements ILayerProvider {
 	}
 	
 	// context: 0=in text, 1=in skeleton, 2=in inline
-	public String encode (String text, int context) {
-		//TODO: change to better faster support
+	public String encode (String text,
+		int context)
+	{
+		// Context here can be used for lineBreak type
 		return Util.escapeToRTF(text, true, context, outputEncoder);
 	}
 
-	public String encode (char value, int context) {
-		//TODO: change to better faster support
+	public String encode (char value,
+		int context)
+	{
+		// Context here can be used for lineBreak type
 		return Util.escapeToRTF(String.valueOf(value), true, context, outputEncoder);
 	}
 
@@ -77,7 +81,9 @@ public class LayerProvider implements ILayerProvider {
 	}
 
 	// Not used for a layer provider
-	public String toNative(String propertyName, String value) {
+	public String toNative(String propertyName,
+		String value)
+	{
 		return value; // No modification
 	}
 

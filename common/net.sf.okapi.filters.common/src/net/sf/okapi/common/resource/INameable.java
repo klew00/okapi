@@ -200,12 +200,31 @@ public interface INameable extends IResource {
 		boolean overwriteExisting,
 		int creationOptions);
 
+	/**
+	 * Indicates if the content of this resource is translatable.
+	 * By default this indicator is set to true for all resources. 
+	 * @return True if the content of this resource is translatable. False if
+	 * it is not translatable.
+	 */
 	public boolean isTranslatable ();
 	
+	/**
+	 * Sets the flag indicating if the content of this resource is translatable.
+	 * @param value True to indicate that the content of this resource is translatable.
+	 */
 	public void setIsTranslatable (boolean value);
 
+	/**
+	 * Indicates if the white-spaces in the content of this resource should be preserved.
+	 * By default this indicator is set to false for all resources. 
+	 * @return True if the white-spaces in the content of this resource should be preserved.
+	 */
 	public boolean preserveWhitespaces ();
-	
+
+	/**
+	 * sets the flag indicating if the white-spaces in the content of this resource should be preserved.
+	 * @param value True to indicate that the white-spaces in the content of this resource should be preserved.
+	 */
 	public void setPreserveWhitespaces (boolean value);
 	
 }

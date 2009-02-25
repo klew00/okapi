@@ -78,6 +78,11 @@ public class XMLFilter implements IFilter {
 	private GenericSkeleton skel;
 	private Stack<ContextItem> context;
 	private boolean canceled;
+	private Parameters params;
+
+	public XMLFilter () {
+		params = new Parameters();
+	}
 	
 	public void cancel () {
 		canceled = true;
@@ -103,7 +108,7 @@ public class XMLFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -168,6 +173,7 @@ public class XMLFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
 	}
 
 	/**
@@ -190,6 +196,9 @@ public class XMLFilter implements IFilter {
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
+		
+		fact.setExpandEntityReferences(false);
+		
 		// Create the document builder
 		DocumentBuilder docBuilder;
 		try {
@@ -197,7 +206,10 @@ public class XMLFilter implements IFilter {
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
+		
+		//TODO: Do this only as an option
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
+		
 		URI uri = null;
 		// Load the document
 		try {
@@ -224,6 +236,12 @@ public class XMLFilter implements IFilter {
 		// Create the ITS engine
 		ITSEngine itsEng;
 		itsEng = new ITSEngine(doc, uri);
+		// Load the parameters file if there is one
+		if ( params != null ) {
+			if ( params.getDocument()!= null ) {
+				itsEng.addExternalRules(params.getDocument(), params.getURI());
+			}
+		}
 		
 		// Apply the all rules (external and internal) to the document
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO 
@@ -261,10 +279,19 @@ public class XMLFilter implements IFilter {
 		// Add the DTD if needed
 		DocumentType dt = doc.getDoctype();
 		if ( dt != null ) {
-			skel.add(String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">\n",
-				dt.getName(),
-				dt.getPublicId(),
-				dt.getSystemId()));
+			String tmp;
+			if ( dt.getPublicId() != null ) {
+				tmp = String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">\n",
+						dt.getName(),
+						dt.getPublicId(),
+						dt.getSystemId());
+			}
+			else {
+				tmp = String.format("<!DOCTYPE %s SYSTEM \"%s\">\n",
+						dt.getName(),
+						dt.getSystemId());
+			}
+			skel.add(tmp);
 		}
 		
 		startDoc.setSkeleton(skel);

@@ -38,8 +38,8 @@ public class BaseNameable implements INameable {
 	protected String name;
 	protected String type;
 	protected String mimeType;
-	protected boolean isTranslatable = true;
-	protected boolean preserveWS;
+	protected boolean isTranslatable = true; // Default for all resources
+	protected boolean preserveWS = false; // Default for all resources
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
 	protected Hashtable<String, Property> sourceProperties;

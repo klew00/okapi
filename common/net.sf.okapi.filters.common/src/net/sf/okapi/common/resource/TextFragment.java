@@ -327,6 +327,18 @@ public class TextFragment implements Comparable<Object> {
 		}
 		frag.setCodedText(tmp.toString().trim());
 	}
+	
+	/**
+	 * Helper method that check if a given character is an inline code marker.
+	 * @param ch The character to check.
+	 * @return True if the character is a code marker, false if it is not.
+	 */
+	public static boolean isMarker (char ch) {
+		return (( ch == MARKER_OPENING )
+			|| ( ch == MARKER_CLOSING )
+			|| ( ch == MARKER_ISOLATED )
+			|| ( ch == MARKER_SEGMENT )); 
+	}
 
 	/**
 	 * Creates an empty TextFragment.

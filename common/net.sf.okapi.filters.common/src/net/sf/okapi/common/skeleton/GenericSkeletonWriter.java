@@ -173,7 +173,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getString (GenericSkeletonPart part, int context) {
+	private String getString (GenericSkeletonPart part,
+		int context)
+	{
 		// If it is not a reference marker, just use the data
 		if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
 			if ( layer == null ) {
@@ -289,7 +291,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param tu The text unit to process.
 	 * @param langToUse Language to output. Use null for the source, or the language
 	 * code for the target languages.
-	 * @param content Context flag: 0=no-change, 1=skeleton, 2=in-line.
+	 * @param content Context flag: 0=text, 1=skeleton, 2=inline.
 	 * @return The string representation of the text unit content.
 	 */
 	private String getContent (TextUnit tu,
@@ -298,6 +300,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	{
 		// Update the encoder from the TU's MIME type
 		encoderManager.updateEncoder(tu.getMimeType());
+		
 		// Get the right text container
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
@@ -320,7 +323,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return getSegmentedText(tu.getSource(), trgCont, langToUse, encoderManager, context);
 		}
 		else { // Normal case: use the calculated target
-			
 			TextContainer cont;
 			if ( langToUse == null ) cont = srcCont;
 			else cont = trgCont;
@@ -445,8 +447,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		IEncoder encoder,
 		int context)
 	{
-		//context = 1;
-		
 		// Output simple text
 		if ( !tf.hasCode() ) {
 			if ( encoder == null ) {
@@ -463,8 +463,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				else {
 					return layer.encode(
-						encoder.encode(tf.toString(), context),
-						context);
+						encoder.encode(tf.toString(), context), context);
 				}
 			}
 		}
@@ -521,7 +520,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		String codeTmp = code.getOuterData();
 		if ( layer != null ) {
 			codeTmp = layer.startInline() 
-				+ layer.encode(codeTmp, context)
+				+ layer.encode(codeTmp, 2)
 				+ layer.endInline();
 		}
 		if ( !code.hasReference() ) {
@@ -533,8 +532,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				return "[SEG-"+code.getData()+"]";
 			}
 			else {
-				return layer.startCode()
-					+ layer.encode("[SEG-"+code.getData()+"]", context)
+				return layer.startInline()
+					+ layer.encode("[SEG-"+code.getData()+"]", 2)
 					+ layer.endInline();
 			}
 		}
