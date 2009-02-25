@@ -24,9 +24,26 @@ import java.io.IOException;
 import java.io.Reader;
 
 public final class NewlineDetector {
-	public static final String CR = "\r";
-	public static final String LF = "\n";
-	public static final String CRLF = "\r\n";
+
+	public enum NewlineType {
+		CR {
+			public String toString() {
+				return "\r";
+			}
+		},
+
+		LF {
+			public String toString() {
+				return "\n";
+			}
+		},
+
+		CRLF {
+			public String toString() {
+				return "\r\n";
+			}
+		}
+	}
 
 	/**
 	 * Returns the <a target="_blank"
@@ -44,29 +61,29 @@ public final class NewlineDetector {
 	 *         sequence used in the source document, or <code>null</code> if
 	 *         none is present.
 	 */
-	public static String getNewLine(String text) {
+	public static NewlineType getNewLineType(CharSequence text) {
 		for (int i = 0; i < text.length(); i++) {
 			char ch = text.charAt(i);
 			if (ch == '\n')
-				return LF;
+				return NewlineType.LF;
 			if (ch == '\r')
-				return (++i < text.length() && text.charAt(i) == '\n') ? CRLF : CR;
+				return (++i < text.length() && text.charAt(i) == '\n') ? NewlineType.CRLF : NewlineType.CR;
 		}
 		return null;
 	}
 
-	public static String getNewLine(Reader reader) {
+	public static NewlineType getNewLineType(Reader reader) {
 		char c;
 		try {
 			while ((c = (char) reader.read()) != -1) {
 				if (c == '\n')
-					return LF;
+					return NewlineType.LF;
 				if (c == '\r') {
 					char c2 = (char) reader.read();
 					if (c2 == -1)
-						return CR;
+						return NewlineType.CR;
 					else
-						return (reader.read() == '\n') ? CRLF : CR;
+						return (reader.read() == '\n') ? NewlineType.CRLF : NewlineType.CR;
 				}
 			}
 		} catch (IOException e) {
@@ -74,12 +91,5 @@ public final class NewlineDetector {
 		}
 
 		return null;
-	}
-
-	public static String getBestGuessNewLine(String text) {
-		final String newLine = getNewLine(text);
-		if (newLine != null)
-			return newLine;
-		return System.getProperty("line.separator");
 	}
 }

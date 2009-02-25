@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 
 import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.NewlineDetector;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.filters.ISkeleton;
@@ -41,19 +42,25 @@ import net.sf.okapi.common.filters.ISkeleton;
  * 
  */
 public class File implements IResource {
-
 	private Annotations annotations;
 	private String id;
 	private String encoding;
+	private String locale;
+	private NewlineDetector.NewlineType originalNewlineType;
 	private InputStream inputStream;
 	private URI inputURI;
 	private MemMappedCharSequence inputMemMappedCharSequence;
+	private String mimeType;
+	private Reader reader;
 
-	public File(URI inputURI, String encoding) {
+	public File(URI inputURI, String encoding, String mimeType, String locale) {
 		this.annotations = new Annotations();
 		setInputURI(inputURI);
+		setMimeType(mimeType);
+		setLocale(locale);
 		try {
 			setInputStream(inputURI.toURL().openStream());
+			setOriginalNewlineType(NewlineDetector.getNewLineType(getReader()));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -61,16 +68,22 @@ public class File implements IResource {
 		}		
 	}
 
-	public File(InputStream inputStream, String encoding) {
+	public File(InputStream inputStream, String encoding, String mimeType, String locale) {
 		this.annotations = new Annotations();
 		setEncoding(encoding);		
+		setMimeType(mimeType);
+		setLocale(locale);
 		setInputStream(inputStream);
+		setOriginalNewlineType(NewlineDetector.getNewLineType(getReader()));
 	}
 
-	public File(MemMappedCharSequence inputMemMappedCharSequence) {
+	public File(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
 		this.annotations = new Annotations();		 
 		setInputMemMappedCharSequence(inputMemMappedCharSequence);
 		setEncoding("UTF-16BE");
+		setMimeType(mimeType);
+		setLocale(locale);
+		setOriginalNewlineType(NewlineDetector.getNewLineType(getInputMemMappedCharSequence()));
 	}
 
 	/*
@@ -178,7 +191,47 @@ public class File implements IResource {
 		this.encoding = encoding;
 	}
 	
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
+	}
+
+	/**
+	 * @param mimeType the mimeType to set
+	 */
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	/**
+	 * @return the mimeType
+	 */
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	/**
+	 * @param originalNewlineType the originalNewlineType to set
+	 */
+	public void setOriginalNewlineType(NewlineDetector.NewlineType originalNewlineType) {
+		this.originalNewlineType = originalNewlineType;
+	}
+
+	/**
+	 * @return the originalNewlineType
+	 */
+	public NewlineDetector.NewlineType getOriginalNewlineType() {
+		return originalNewlineType;
+	}
+
 	public Reader getReader() {
+		if (reader != null) {
+			return reader;
+		}
+		
 		if (getInputStream() != null)
 			try {
 				return new InputStreamReader(getInputStream(), getEncoding());
@@ -189,5 +242,25 @@ public class File implements IResource {
 			return new CharArrayReader(getInputMemMappedCharSequence().array());
 		
 		return null;
+	}
+	
+	public void close() {
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		if (getInputStream() != null)
+			try {
+				getInputStream().close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		if (getInputMemMappedCharSequence() != null) {
+			getInputMemMappedCharSequence().close();
+		}					
 	}
 }

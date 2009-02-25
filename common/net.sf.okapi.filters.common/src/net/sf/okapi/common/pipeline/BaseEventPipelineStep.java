@@ -66,6 +66,10 @@ public abstract class BaseEventPipelineStep implements IEventPipelineStep {
 		case DOCUMENT_PART:
 			handleDocumentPart(event);
 			break;
+			
+		case FILE:
+			handleFile(event);
+			break;
 
 		default:
 			break;
@@ -105,5 +109,8 @@ public abstract class BaseEventPipelineStep implements IEventPipelineStep {
 	}
 
 	protected void handleTextUnit(FilterEvent event) {
+	}
+	
+	protected void handleFile(FilterEvent event) {				
 	}
 }
