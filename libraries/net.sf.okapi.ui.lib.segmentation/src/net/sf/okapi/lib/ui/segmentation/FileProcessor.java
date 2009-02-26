@@ -121,12 +121,11 @@ public class FileProcessor {
 			}
 			
 			// Read the whole file into one string
-			//TODO: Optimize this with a better 'readToEnd()'
 			StringBuilder tmp = new StringBuilder();
-			String buffer;
-			while ( (buffer = reader.readLine()) != null ) {
-				if ( tmp.length() > 0 ) tmp.append("\n"); //$NON-NLS-1$
-				tmp.append(buffer);
+			char[] buf = new char[1024];
+			int count = 0;
+			while (( count = reader.read(buf)) != -1 ) {
+				tmp.append(buf, 0, count);
 			}
 			
 			TextContainer textCont = new TextContainer();

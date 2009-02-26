@@ -102,11 +102,12 @@ public class GoogleMTConnector implements IQuery {
 
 			// Get the response
 	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	        String line;
 	        StringBuilder res = new StringBuilder();
-	        while ( (line = rd.readLine()) != null ) {
-	        	res.append(line);
-	        }
+			char[] buf = new char[2048];
+			int count = 0;
+			while (( count = rd.read(buf)) != -1 ) {
+				res.append(buf, 0, count);
+			}
 	        rd.close();
 	        
 	        Matcher m = pattern.matcher(res.toString());

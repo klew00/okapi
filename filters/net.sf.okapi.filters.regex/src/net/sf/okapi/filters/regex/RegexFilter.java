@@ -192,12 +192,15 @@ public class RegexFilter implements IFilter {
 			// Read the whole file into one string
 			lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 			//TODO: Optimize this with a better 'readToEnd()'
+			//TODO: Fix issue that this code cannot read a lone \n at the end.
 			StringBuilder tmp = new StringBuilder();
-			String buffer;
-			while ( (buffer = reader.readLine()) != null ) {
-				if ( tmp.length() > 0 ) tmp.append("\n");
-				tmp.append(buffer);
+			char[] buf = new char[2048];
+			int count = 0;
+			while (( count = reader.read(buf)) != -1 ) {
+				tmp.append(buf, 0, count);
 			}
+			reader.readLine();
+			
 			// Common open
 			commonOpen(tmp.toString());
 		}
