@@ -36,7 +36,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 
 public class ManifestDialog {
 	
@@ -45,6 +48,12 @@ public class ManifestDialog {
 	private ManifestTableModel tableMod;
 	private SelectionAdapter CloseActions;
 	private boolean result;
+	private Text edPkgType;
+	private Text edPkgID;
+	private Text edSource;
+	private Text edTarget;
+	private Text edDate;
+	private Text edMergeInputRoot;
 
 	public ManifestDialog (Shell parent,
 		IHelp helpParam)
@@ -52,18 +61,20 @@ public class ManifestDialog {
 		result = false;
 		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Manifest");
+		shell.setText("Translation Package Manifest");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
-		Composite cmpTmp = new Composite(shell, SWT.BORDER);
-		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout(1, false);
-		cmpTmp.setLayout(layTmp);
+		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
+		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		//--- Documents tab
 		
-		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("List of the documents in the manifest:");
-		stTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Documents");
+		tiTmp.setControl(cmpTmp);
 		
 		final Table tableDocs = new Table(cmpTmp, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
@@ -75,6 +86,53 @@ public class ManifestDialog {
 		tableMod = new ManifestTableModel();
 		tableMod.linkTable(tableDocs);
 
+		edMergeInputRoot = new Text(cmpTmp, SWT.BORDER);
+		edMergeInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edMergeInputRoot.setEditable(false);
+		
+		//--- Information tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout(2, false));
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Information");
+		tiTmp.setControl(cmpTmp);
+
+		Label stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Package type:");
+		stTmp.setLayoutData(new GridData());
+		edPkgType = new Text(cmpTmp, SWT.BORDER);
+		edPkgType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edPkgType.setEditable(false);
+		
+		stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Package ID:");
+		stTmp.setLayoutData(new GridData());
+		edPkgID = new Text(cmpTmp, SWT.BORDER);
+		edPkgID.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edPkgID.setEditable(false);
+		
+		stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Source language:");
+		stTmp.setLayoutData(new GridData());
+		edSource = new Text(cmpTmp, SWT.BORDER);
+		edSource.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edSource.setEditable(false);
+		
+		stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Target language:");
+		stTmp.setLayoutData(new GridData());
+		edTarget = new Text(cmpTmp, SWT.BORDER);
+		edTarget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edTarget.setEditable(false);
+		
+		stTmp = new Label(cmpTmp, SWT.NONE);
+		stTmp.setText("Creation date:");
+		stTmp.setLayoutData(new GridData());
+		edDate = new Text(cmpTmp, SWT.BORDER);
+		edDate.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edDate.setEditable(false);
+				
 		//--- Dialog-level buttons
 
 		CloseActions = new SelectionAdapter() {
@@ -91,7 +149,7 @@ public class ManifestDialog {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, (help!=null));
-		pnlActions.btOK.setText("Merge");
+		pnlActions.btOK.setText("Execute");
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
@@ -110,8 +168,18 @@ public class ManifestDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void setData (Manifest manifest) {
+		edMergeInputRoot.setText(manifest.getMergeInputRoot());
+		edPkgType.setText(manifest.getPackageType());
+		edPkgID.setText(manifest.getPackageID());
+		edSource.setText(manifest.getSourceLanguage());
+		edTarget.setText(manifest.getTargetLanguage());
+		edDate.setText(manifest.getDate());
+	}
+	
 	public boolean showDialog (Manifest manifest) {
 		tableMod.setManifest(manifest);
+		setData(manifest);
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )

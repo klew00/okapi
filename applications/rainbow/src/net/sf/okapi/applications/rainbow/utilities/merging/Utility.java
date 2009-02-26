@@ -50,7 +50,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public boolean hasParameters () {
-		return false;
+		return true;
 	}
 
 	public boolean needsRoots () {

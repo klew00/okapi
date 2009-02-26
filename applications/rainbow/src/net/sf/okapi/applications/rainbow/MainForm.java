@@ -71,7 +71,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
@@ -710,12 +709,12 @@ public class MainForm implements IParametersProvider {
 		inputTables.get(1).setMenu(inputTableMenu);
 		inputTables.get(2).setMenu(inputTableMenu);
 		
-		//--Adds code to pop up the property editor dlg by dbl-clicking
+		// Pop up the property editor by double-clicking
 		MouseAdapter ma = new MouseAdapter(){
-			public void mouseDoubleClick(MouseEvent e)
-			{
+			public void mouseDoubleClick(MouseEvent e) {
 				Table t = (Table) e.getSource();				
-				if(e.x > t.getColumn(0).getWidth() && e.x < t.getColumn(0).getWidth()+t.getColumn(1).getWidth()){
+				if (( e.x > t.getColumn(0).getWidth() )
+					&& ( e.x < t.getColumn(0).getWidth()+t.getColumn(1).getWidth() )) {
 					editInputProperties(-1);
 				}
 			}
@@ -724,11 +723,10 @@ public class MainForm implements IParametersProvider {
 		inputTables.get(1).addMouseListener(ma);
 		inputTables.get(2).addMouseListener(ma);
 
-		//--Adds code to select all items by clicking ctrl + a
+		// Select all items by clicking Ctrl+A
 		KeyAdapter ka = new KeyAdapter(){	
-			public void keyPressed(KeyEvent e)
-			{
-				if (((e.stateMask & SWT.CTRL) != 0) && e.keyCode==97){
+			public void keyPressed(KeyEvent e) {
+				if ((( e.stateMask & SWT.CTRL) != 0 ) && ( e.keyCode==97 )) {
 					Table t = (Table) e.getSource();
 					t.setSelection(t.getItems());
 				}
@@ -1170,13 +1168,6 @@ public class MainForm implements IParametersProvider {
 				if ( FT.isSupportedType(e.currentDataType) ) {
 					String[] paths = (String[])e.data;
 					if ( paths != null ) {
-						if ( paths.length == 1 ) {
-							//TODO: implement list of input for manifest
-							//if ( Utils.getFilename(aPaths[0], true).toLowerCase().equals("manifest.xml") ) {  //$NON-NLS-1$
-							//	m_C.importPackage(aPaths[0]);
-							//	return;
-							//}
-						}
 						addDocumentsFromList(paths);
 					}
 				}

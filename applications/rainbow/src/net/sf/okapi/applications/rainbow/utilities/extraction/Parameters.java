@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
+import java.util.UUID;
+
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -122,8 +124,7 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public String makePackageID () {
-		//TODO: create package ID value
-		return "TODO:packageID";
+		return UUID.randomUUID().toString();
 	}
 
 }

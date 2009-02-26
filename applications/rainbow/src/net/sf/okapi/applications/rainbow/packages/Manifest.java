@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages;
 
@@ -56,6 +56,7 @@ public class Manifest {
 	private String targetDir;
 	private String doneDir;
 	private String readerClass;
+	private String date;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, ManifestItem>();
@@ -168,6 +169,14 @@ public class Manifest {
 		else doneDir = value;
 	}
 
+	public void setDate (String value) {
+		date = value;
+	}
+	
+	public String getDate () {
+		return date;
+	}
+	
 	/**
 	 * Adds a document to the manifest.
 	 * @param docID Key of the document. Must be unique within the manifest.
@@ -191,6 +200,11 @@ public class Manifest {
 		return rootFolder + File.separator
 			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
 			+ docs.get(docID).getRelativeWorkPath();
+	}
+	
+	public String getMergeInputRoot () {
+		return rootFolder + File.separator
+			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator));
 	}
 
 	public String getFileToGeneratePath (int docID) {
@@ -304,6 +318,9 @@ public class Manifest {
 
 		    tmp = elem.getAttribute("doneDir");
 		    setDoneLocation(tmp);
+		    
+		    tmp = elem.getAttribute("date");
+		    setDate(tmp);
 
 		    String inPath, outPath, inEnc, outEnc, filterID;
 		    docs.clear();
@@ -363,15 +380,15 @@ public class Manifest {
 	public int checkPackageContent () {
 		int nErrors = 0;
 		Iterator<Integer> iter = docs.keySet().iterator();
-		int nDKey;
-		ManifestItem MI;
+		int docId;
+		ManifestItem mi;
 		while ( iter.hasNext() ) {
-			nDKey = iter.next();
-			MI = docs.get(nDKey);
-			File F = new File(getFileToMergePath(nDKey));
+			docId = iter.next();
+			mi = docs.get(docId);
+			File F = new File(getFileToMergePath(docId));
 			if ( !F.exists() ) {
 				nErrors++;
-				MI.setExists(false);
+				mi.setExists(false);
 			}
 		}
 		return nErrors;

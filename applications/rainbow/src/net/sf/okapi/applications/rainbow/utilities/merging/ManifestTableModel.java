@@ -36,7 +36,7 @@ class ManifestTableModel {
 	public void linkTable (Table newTable) {
 		table = newTable;
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Documents to Merge");
+		col.setText("Documents to Post-Process");
 		col = new TableColumn(table, SWT.NONE);
 		col.setText("Missing?");
 		col = new TableColumn(table, SWT.NONE);
@@ -56,8 +56,8 @@ class ManifestTableModel {
 		for ( int i : manifest.getItems().keySet() ) {
 			mi = manifest.getItem(i);
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, mi.getRelativeInputPath());
-			if ( !mi.exists() ) item.setText(0, "missing");
+			item.setText(0, mi.getRelativeWorkPath());
+			if ( !mi.exists() ) item.setText(1, "missing");
 			item.setText(2, mi.getRelativeOutputPath());
 			item.setChecked(mi.selected());
 		}

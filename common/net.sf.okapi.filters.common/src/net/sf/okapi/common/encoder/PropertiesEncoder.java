@@ -39,7 +39,7 @@ public class PropertiesEncoder implements IEncoder {
 	 * escaping all extended characters.
 	 */
 	public PropertiesEncoder () {
-		escapeAll = true;
+		escapeAll = false; //TODO: Default should be false, but can do this until params get passed
 		outputEncoder = Charset.forName("us-ascii").newEncoder();
 	}
 	
