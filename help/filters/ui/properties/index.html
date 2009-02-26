@@ -1,0 +1,81 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Filters - Properties Filter</title>
+<link rel="stylesheet" type="text/css" href="../../../help.css">
+</head>
+<body>
+<h1 class="filt1">Filters – Properties Filter</h1>
+<h2 class="filt2">Overview</h2>
+<p>This filter allows you to process Properties files.</p>
+<p>The following is an example of a very simple properties file. The translatable text 
+is marked in <b>bold</b>.</p>
+<pre># This is a comment
+
+Key1 : <b>This the text for Key1</b>
+Key2 = <b>This is the text for Key2</b>
+
+</pre>
+<h2>Parameters</h2>
+<h3>Options Tab</h3>
+<h4>Localization directives</h4>
+<p>Localization directives are special comments you can use to override the default behavior of the filter regarding the parts to extract. The syntax and behavior of the directives are the same across all Okapi filters. See the <cite><a href="locdirectives.html">Localization Directives</a></cite> pages for detail information about what you can do with the mechanism.
+Note that the directives override key conditions.</p>
+<p><cite>Use localization directives when they are present</cite> -- Set this option to enable the filter to recognize localization directives. If this option is not set, any localization directive in the input file will be ignored.</p>
+<p><cite>Extract items outside the scope of localization directives</cite> -- Set this option to extract any translatable item that is not within the scope of a localization directive. Selecting to extract or not outside localization directives allows you to mark up fewer parts of the source document. This option is enabled only when the <cite>Use localization directives when they are present</cite> option is set.</p>
+<h4>Key filtering</h4>
+<p><cite>Use the following key condition:</cite> -- Set this option to extract items based on their keys. You specify a regular expression pattern, if the key matches the pattern, the item is extracted or not depending on the action you specify. Note that directives have precedence over key condition.</p>
+<p><cite>Extract only the items with a key matching the given expression</cite> -- Select this option to extract only the items with keys that match the specified pattern.</p>
+<p><cite>Do not extract the items with a key matching the given expression</cite> -- Select this option to not extract the items with keys that match the specified pattern.</p>
+<p>Enter the pattern to test against the key. The pattern must be a valid
+<a href="../../Shared/Help/regex.htm">regular expression</a>. For example, 
+with the following settings:</p>
+<pre>Use the following key condition = set
+Extract only the items with a key matching the specified pattern = set
+Pattern = .*text.*</pre>
+<p>The extracted text is highlighted:</p>
+<pre>key1 = <b>Text for key1</b>
+
+text.err1 = <span style="font-weight: 700; background-color: #FFFF00">Text for text.err1</span>
+menu_text_file = <span style="font-weight: 700; background-color: #FFFF00">Text for menu_text_file</span></pre>
+<p><cite>Support additional comments</cite> -- Set this option to take into account other comment styles in addition to the strict Java comments (single-line starting with '#' or '!'). When this option is set, the filter also recognizes comments single-lines starting with ';', as well as single-line where '//' is the first no-whitespace sequence. (Note that // after a = are considered part of the value of the entry, not a comment).</p>
+
+<h3>In-line Codes Tab</h3>
+<p><cite>Has in-line codes as defined below:</cite> -- Set this option to use the specified regular expression to be use against the text of the extracted items. Any match will be converted to an inline code. By default the expression is:</p>
+<pre>((%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn])
+|((\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v)
+|(\{\d.*?\}))</pre>
+<p><cite>Add</cite> -- Click this button to add a new rule.</p>
+<p><cite>Remove</cite> -- Click this button to remove the current rule.</p>
+<p><cite>Move Up</cite> -- Click this button to move the current rule upward.</p>
+<p><cite>Move down</cite> -- Click this button to move the current rule 
+downward.</p>
+<p><cite>[Top-right text box]</cite> -- Enter the regular expression for the 
+current rule. Use the <cite>Modify</cite> button to enter the edit mode. The 
+expression must be a valid regular expression according the syntax described in 
+the <a href="regex.htm">Regular Expression</a> section. You can check the syntax 
+(and the effect of the rule) as it automatically tests it against the test data in the text box below and shows the result in the bottom-right text box.</p>
+<p><cite>Modify</cite> -- Click this button to edit the expression of the 
+current rule. This button is labeled <cite>Accept</cite> when you are in 
+edit mode.</p>
+<p><cite>Accept</cite> -- Click this button to save any changes you have 
+made to the expression and leave the edit mode. This button is labeled <cite>
+Modify</cite> when you are not in edit mode.</p>
+<p><cite>Discard</cite> -- Click this button to leave the edit mode and 
+revert the current rule to the expression it had before you started the edit 
+mode.</p>
+<p><cite>Patterns</cite> -- Click this button to display a list of "guidline" regular 
+expression patterns then select a pattern to insert it the edit box. The inserted text replaces whatever text is 
+currently selected.</p>
+<p><cite>Test Using all rules</cite> -- Set this option to test all the rules at the same 
+time. The syntax of the current rule is automatically checked. See the effect it has on the sample text. The result of the test are displayed in the bottom right result box. The parts of the text that are 
+matches of the expressions are displayed in <> brackets. If the <cite>Test using all rules</cite> option is set, the test takes all rules of the set in account, if it is not set only the current rule is 
+tested.</p>
+<p><cite>[Middle-right text box]</cite> -- Optional test data to test the regular expression for the 
+current rule or all rules depending on the <cite>Test Using all rules</cite> option.</p>
+<p><cite>[Bottom-right text box]</cite> -- Shows the result of the regular expression applied to the test data.</p>
+<h3>Options Tab</h3>
+<p><cite>Escape all extended characters</cite> -- Set this option to convert all character above U+007F into Unicode escape sequences (\uHHHH). When this option is not set, only the characters not supported by the output encoding are escaped.</p>
+
+</body>
+</html>
