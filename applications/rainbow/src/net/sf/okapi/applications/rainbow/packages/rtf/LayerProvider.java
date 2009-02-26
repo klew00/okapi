@@ -59,7 +59,7 @@ public class LayerProvider implements ILayerProvider {
 		return String.format("%s%d%s", "}{\\cs15\\v\\cf12\\sub\\f2 <\\}", leverage, "\\{>}");
 	}
 	
-	// context: 0=in text, 1=in skeleton, 2=in inline
+	// Context: 0=in text, 1=in skeleton, 2=in inline
 	public String encode (String text,
 		int context)
 	{
@@ -80,11 +80,11 @@ public class LayerProvider implements ILayerProvider {
 		outputEncoder = Charset.forName(encoding).newEncoder();
 	}
 
-	// Not used for a layer provider
 	public String toNative(String propertyName,
 		String value)
 	{
-		return value; // No modification
+		// No modification: The layer provider does not change the value
+		return value;
 	}
 
 }

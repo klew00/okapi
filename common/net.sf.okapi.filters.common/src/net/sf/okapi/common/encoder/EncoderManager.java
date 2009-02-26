@@ -117,7 +117,9 @@ public class EncoderManager implements IEncoder {
 	 * @param context The context of the text: 0=text, 1=skeleton, 2=inline.
 	 * @return The encoded text.
 	 */
-	public String encode (String text, int context) {
+	public String encode (String text,
+		int context)
+	{
 		if ( encoder != null ) return encoder.encode(text, context);
 		else return text;
 	}
@@ -130,7 +132,9 @@ public class EncoderManager implements IEncoder {
 	 * @return The encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
-	public String encode (char value, int context) {
+	public String encode (char value,
+		int context)
+	{
 		if ( encoder != null ) return encoder.encode(value, context);
 		else return String.valueOf(value);
 	}

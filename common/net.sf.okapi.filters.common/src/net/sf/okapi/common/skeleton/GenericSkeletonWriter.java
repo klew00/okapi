@@ -266,7 +266,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param tu The text unit to process.
 	 * @param langToUse Language to output. Use null for the source, or the language
 	 * code for the target languages.
-	 * @param content Context flag: 0=no-change, 1=skeleton, 2=in-line.
+	 * @param content Context flag: 0=text, 1=skeleton, 2=in-line.
 	 * @return The string representation of the text unit. 
 	 */
 	private String getString (TextUnit tu,
@@ -320,7 +320,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Check for segmentation
 		if ( srcCont.isSegmented() ) {
 			// Special case of segmented entry: source + target
-			return getSegmentedText(tu.getSource(), trgCont, langToUse, encoderManager, context);
+			return getSegmentedText(tu.getSource(), trgCont, langToUse, context);
 		}
 		else { // Normal case: use the calculated target
 			TextContainer cont;
@@ -329,20 +329,20 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			
 			// Apply the layer if there is one
 			if ( layer == null ) {
-				return getContent(cont, langToUse, encoderManager, context);
+				return getContent(cont, langToUse, context);
 			}
 			else {
 				switch ( context ) {
 				case 1:
 					return layer.endCode()
-						+ getContent(cont, langToUse, encoderManager, context)
+						+ getContent(cont, langToUse, 0)
 						+ layer.startCode();
 				case 2:
 					return layer.endInline()
-						+ getContent(cont, langToUse, encoderManager, context)
+						+ getContent(cont, langToUse, 0)
 						+ layer.startInline();
 				default:
-					return getContent(cont, langToUse, encoderManager, context);
+					return getContent(cont, langToUse, context);
 				}
 			}
 		}
@@ -351,7 +351,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
 		String langToUse,
-		IEncoder encoder,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -381,10 +380,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				// Write it
 				if ( layer == null ) {
 					if ( trgFrag == null ) {
-						tmp.append(getContent(srcSegs.get(n), null, encoderManager, context));
+						tmp.append(getContent(srcSegs.get(n), null, context));
 					}
 					else { // No target available: use the source
-						tmp.append(getContent(trgFrag, langToUse, encoderManager, context));
+						tmp.append(getContent(trgFrag, langToUse, context));
 					}
 				}
 				else {
@@ -392,33 +391,33 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					case 1:
 						tmp.append(layer.endCode()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ getContent(srcSegs.get(n), null, 0)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
 					case 2:
 						tmp.append(layer.endInline()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ getContent(srcSegs.get(n), null, 0)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
 					default:
 						tmp.append(layer.startSegment()
-							+ getContent(srcSegs.get(n), null, encoderManager, context)
+							+ getContent(srcSegs.get(n), null, context)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, encoderManager, context))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, context))
 							+ layer.endSegment());
 						break;
 					}
 				}
 				break;
 			default:
-				if ( encoder == null ) {
+				if ( encoderManager == null ) {
 					if ( layer == null ) {
 						tmp.append(text.charAt(i));
 					}
@@ -428,11 +427,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				else {
 					if ( layer == null ) {
-						tmp.append(encoder.encode(text.charAt(i), context));
+						tmp.append(encoderManager.encode(text.charAt(i), context));
 					}
 					else {
 						tmp.append(layer.encode(
-							encoder.encode(text.charAt(i), context),
+							encoderManager.encode(text.charAt(i), context),
 							context));
 					}
 				}
@@ -444,12 +443,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private String getContent (TextFragment tf,
 		String langToUse,
-		IEncoder encoder,
 		int context)
 	{
 		// Output simple text
 		if ( !tf.hasCode() ) {
-			if ( encoder == null ) {
+			if ( encoderManager == null ) {
 				if ( layer == null ) {
 					return tf.toString();
 				}
@@ -459,11 +457,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 			else {
 				if ( layer == null ) {
-					return encoder.encode(tf.toString(), context);
+					return encoderManager.encode(tf.toString(), context);
 				}
 				else {
 					return layer.encode(
-						encoder.encode(tf.toString(), context), context);
+							encoderManager.encode(tf.toString(), context), context);
 				}
 			}
 		}
@@ -489,7 +487,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			default:
-				if ( encoder == null ) {
+				if ( encoderManager == null ) {
 					if ( layer == null ) {
 						tmp.append(text.charAt(i));
 					}
@@ -499,11 +497,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				else {
 					if ( layer == null ) {
-						tmp.append(encoder.encode(text.charAt(i), context));
+						tmp.append(encoderManager.encode(text.charAt(i), context));
 					}
 					else {
 						tmp.append(layer.encode(
-							encoder.encode(text.charAt(i), context),
+								encoderManager.encode(text.charAt(i), context),
 							context));
 					}
 				}
@@ -553,16 +551,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					getPropertyValue((INameable)ref, propName, langToUse));
 			}
 			else if ( ref instanceof TextUnit ) {
-				tmp.replace(start, end, getString((TextUnit)ref, langToUse, context));
+				tmp.replace(start, end, getString((TextUnit)ref, langToUse, 2));
 			}
 			else if ( ref instanceof GenericSkeletonPart ) {
-				tmp.replace(start, end, getString((GenericSkeletonPart)ref, context));
+				tmp.replace(start, end, getString((GenericSkeletonPart)ref, 2));
 			}
 			else if ( ref instanceof StorageList ) { // == StartGroup
-				tmp.replace(start, end, getString((StorageList)ref, langToUse, context));
+				tmp.replace(start, end, getString((StorageList)ref, langToUse, 2));
 			}
 			else { // DocumentPart, StartDocument, StartSubDocument 
-				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), context));
+				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), 2));
 			}
 		}
 		return tmp.toString();
