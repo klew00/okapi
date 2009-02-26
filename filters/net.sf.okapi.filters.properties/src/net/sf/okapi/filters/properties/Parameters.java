@@ -59,7 +59,7 @@ public class Parameters extends BaseParameters {
 		extractOnlyMatchingKey = true;
 		keyCondition = ".*text.*";
 
-		extraComments = true;
+		extraComments = false;
 	}
 
 	@Override
@@ -70,6 +70,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useKeyCondition", useKeyCondition);
 		buffer.setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		buffer.setString("keyCondition", keyCondition);
+		buffer.setBoolean("extraComments", extraComments);
 		buffer.setBoolean("escapeExtendedChars", escapeExtendedChars);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setGroup("codeFinderRules", codeFinder.toString());
@@ -85,6 +86,7 @@ public class Parameters extends BaseParameters {
 		useKeyCondition = buffer.getBoolean("useKeyCondition", useKeyCondition);
 		extractOnlyMatchingKey = buffer.getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		keyCondition = buffer.getString("keyCondition", keyCondition);
+		extraComments = buffer.getBoolean("extraComments",extraComments);
 		escapeExtendedChars = buffer.getBoolean("escapeExtendedChars", escapeExtendedChars);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
 		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
