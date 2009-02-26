@@ -100,6 +100,5 @@ public enum FilterEventType {
 	/**
 	 * File level event. A File resource should be associated with this event.
 	 */
-	FILE
-
+	FILE_RESOURCE
 }

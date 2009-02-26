@@ -82,4 +82,20 @@ public class DummyBaseFilter extends BaseFilter {
 		this.finalize();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.BaseFilter#hasUtf8Bom()
+	 */
+	@Override
+	protected boolean hasUtf8Bom() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.filters.BaseFilter#hasUtf8Encoding()
+	 */
+	@Override
+	protected boolean hasUtf8Encoding() {
+		return false;
+	}
+
 }

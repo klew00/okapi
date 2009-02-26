@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.threadedpipeline.ThreadedEventPipeline;
 import net.sf.okapi.common.writer.GenericFilterWriter;
@@ -45,7 +45,7 @@ public class HtmlFilterThreadedRoundtripTest {
 
 	@Test
 	public void runPipeline() {
-		final IEventPipeline pipeline = new ThreadedEventPipeline();
+		final IPipeline pipeline = new ThreadedEventPipeline();
 		
 		final HtmlFilter htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleTest.html");

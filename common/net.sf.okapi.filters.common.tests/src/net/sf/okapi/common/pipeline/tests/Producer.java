@@ -21,9 +21,9 @@ package net.sf.okapi.common.pipeline.tests;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.BaseEventPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class Producer extends BaseEventPipelineStep {	
+public class Producer extends BasePipelineStep {	
 	private int eventCount = -1;
 
 	public String getName() {

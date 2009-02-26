@@ -20,18 +20,74 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IEventPipeline {
+import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.filters.FilterEventType;
 
-	public void execute();
+public class Pipeline implements IPipeline {
+	List<IPipelineStep> steps;
+	IPipelineStep initialStep;
+	boolean cancel = false;
+	boolean pause = false;
+	boolean stop = false;
+	boolean first = true;
 
-	public PipelineReturnValue getState();
+	public Pipeline() {
+		steps = new ArrayList<IPipelineStep>();
+	}
 
-	public void cancel();
+	public void addStep(IPipelineStep step) {
+		if (first) {
+			initialStep = step;
+			first = false;
+		} else {
+			steps.add(step);
+		}
+	}
 
-	public void pause();
+	public void cancel() {
+		cancel = true;
+	}
 
-	public void resume();
+	public void execute() {
+		// preprocess
+		initialStep.preprocess();
+		for (IPipelineStep step : steps) {
+			if (cancel)
+				return;
+			step.preprocess();
+		}
 
-	public void addStep(IEventPipelineStep step);
+		while (!stop) {
+			if (pause)
+				continue;
+			FilterEvent event = initialStep.handleEvent(null);
+			for (IPipelineStep step : steps) {
+				step.handleEvent(event);
+			}
+			if (event.getEventType() == FilterEventType.FINISHED) {
+				stop = true;
+			}
+		}
+
+		// postprocess (cleanup)
+		initialStep.postprocess();
+		for (IPipelineStep step : steps) {
+			step.postprocess();
+		}
+	}
+
+	public PipelineReturnValue getState() {
+		return null;
+	}
+
+	public void pause() {
+		pause = true;
+	}
+
+	public void resume() {
+		pause = false;
+	}
 }

@@ -55,24 +55,27 @@ public final class StreamEncodingDetector {
 	private boolean definitive=true;
 	private boolean documentSpecifiedEncodingPossible=true;
 	
-	private static final String UTF_16="UTF-16";
-	private static final String UTF_16BE="UTF-16BE";
-	private static final String UTF_16LE="UTF-16LE";
-	private static final String UTF_8="UTF-8";
-	private static final String ISO_8859_1="ISO-8859-1";
-	private static final String EBCDIC="Cp037"; // aka IBM037, not guaranteed, but available on most platforms
+	public static final String UTF_16="UTF-16";
+	public static final String UTF_16BE="UTF-16BE";
+	public static final String UTF_16LE="UTF-16LE";
+	public static final String UTF_8="UTF-8";
+	public static final String ISO_8859_1="ISO-8859-1";
+	public static final String EBCDIC="Cp037"; // aka IBM037, not guaranteed, but available on most platforms
 
 	// All of the following encodings are generally not supported in java and will usually throw an exception if decoding is attempted.
 	// Specified explicitly using Byte Order Mark:
-	private static final String SCSU="SCSU";
-	private static final String UTF_7="UTF-7";
-	private static final String UTF_EBCDIC="UTF-EBCDIC";
-	private static final String BOCU_1="BOCU-1";
-	private static final String UTF_32="UTF-32";
+	public static final String SCSU="SCSU";
+	public static final String UTF_7="UTF-7";
+	public static final String UTF_EBCDIC="UTF-EBCDIC";
+	public static final String BOCU_1="BOCU-1";
+	public static final String UTF_32="UTF-32";
 	// Guessed from presence of 00 bytes in first four bytes:
-	private static final String UTF_32BE="UTF-32BE";
-	private static final String UTF_32LE="UTF-32LE";
-
+	public static final String UTF_32BE="UTF-32BE";
+	public static final String UTF_32LE="UTF-32LE";
+	
+	private boolean hasUtf8Bom;
+	private boolean hasUtf7Bom;
+	
 	public StreamEncodingDetector(final InputStream inputStream) throws IOException {
 		this.inputStream=inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		init();
@@ -111,6 +114,8 @@ public final class StreamEncodingDetector {
 	}
 
 	private boolean init() throws IOException {
+		hasUtf8Bom = false;
+		hasUtf7Bom = false;
 		inputStream.mark(4);
 		final int b1=inputStream.read();
 		if (b1==-1) return setEncoding(null,"empty input stream");
@@ -120,7 +125,10 @@ public final class StreamEncodingDetector {
 		inputStream.reset();
 		// Check for Unicode Byte Order Mark:
 		if (b1==0xEF) {
-			if (b2==0xBB && b3==0xBF) return setEncoding(UTF_8,"UTF-8 Byte Order Mark (EF BB BF)");
+			if (b2==0xBB && b3==0xBF) {
+				hasUtf8Bom = true;
+				return setEncoding(UTF_8,"UTF-8 Byte Order Mark (EF BB BF)");
+			}
 		} else if (b1==0xFE) {
  			if (b2==0xFF) return setEncoding(UTF_16,"UTF-16 big-endian Byte Order Mark (FE FF)");
 		} else if (b1==0xFF) {
@@ -133,7 +141,10 @@ public final class StreamEncodingDetector {
 		} else if (b1==0x0E) {
  			if (b2==0xFE && b3==0xFF) return setEncoding(SCSU,"SCSU Byte Order Mark (0E FE FF)");
 		} else if (b1==0x2B) {
- 			if (b2==0x2F && b3==0x76) return setEncoding(UTF_7,"UTF-7 Byte Order Mark (2B 2F 76)");
+ 			if (b2==0x2F && b3==0x76) {
+ 				hasUtf7Bom = true;
+ 				return setEncoding(UTF_7,"UTF-7 Byte Order Mark (2B 2F 76)");
+ 			}
 		} else if (b1==0xDD) {
  			if (b2==0x73 && b3==0x66 && b4==0x73) return setEncoding(UTF_EBCDIC,"UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
 		} else if (b1==0xFB) {
@@ -215,5 +226,13 @@ public final class StreamEncodingDetector {
 		// UTF-8 bytes with a value >= 0x80 indicate the presence of a multi-byte character, and there are many byte values that are illegal.
 		// Therefore, choose the only true 8-bit encoding that accepts all byte values and is guaranteed to be available on all java implementations.
 		return setEncoding(ISO_8859_1,"default 8-bit ASCII-compatible encoding (no 00 bytes present in first four bytes of stream)");
+	}
+	
+	public boolean hasUtf8Bom() {
+		return hasUtf8Bom;
+	}
+	
+	public boolean hasUtf7Bom() {
+		return hasUtf7Bom;
 	}
 }

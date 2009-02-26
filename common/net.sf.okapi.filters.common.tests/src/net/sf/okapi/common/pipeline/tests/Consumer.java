@@ -21,9 +21,9 @@
 package net.sf.okapi.common.pipeline.tests;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.pipeline.BaseEventPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class Consumer extends BaseEventPipelineStep {
+public class Consumer extends BasePipelineStep {
 	public String getName() {
 		return "Consumer";
 	}
@@ -37,6 +37,10 @@ public class Consumer extends BaseEventPipelineStep {
 	}
 	
 	protected void handleTextUnit(FilterEvent event) {
+		System.out.println("EventType: " + event.getEventType().name());
+	}
+	
+	protected void handleFile(FilterEvent event) {
 		System.out.println("EventType: " + event.getEventType().name());
 	}
 

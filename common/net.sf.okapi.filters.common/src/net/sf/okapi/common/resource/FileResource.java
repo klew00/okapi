@@ -41,7 +41,7 @@ import net.sf.okapi.common.filters.ISkeleton;
  * into events in the pipeline.
  * 
  */
-public class File implements IResource {
+public class FileResource implements IResource {
 	private Annotations annotations;
 	private String id;
 	private String encoding;
@@ -53,8 +53,30 @@ public class File implements IResource {
 	private String mimeType;
 	private Reader reader;
 
-	public File(URI inputURI, String encoding, String mimeType, String locale) {
+	public FileResource(URI inputURI, String encoding, String mimeType, String locale) {
 		this.annotations = new Annotations();
+		reset(inputURI, encoding, mimeType, locale);
+	}
+
+	public FileResource(InputStream inputStream, String encoding, String mimeType, String locale) {
+		this.annotations = new Annotations();
+		reset(inputStream, encoding, mimeType, locale);
+	}
+
+	public FileResource(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
+		this.annotations = new Annotations();
+		reset(inputMemMappedCharSequence, mimeType, locale);
+	}
+	
+	public void reset(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
+		setInputMemMappedCharSequence(inputMemMappedCharSequence);
+		setEncoding("UTF-16BE");
+		setMimeType(mimeType);
+		setLocale(locale);
+		setOriginalNewlineType(NewlineDetector.getNewLineType(getInputMemMappedCharSequence()));		
+	}
+	
+	public void reset(URI inputURI, String encoding, String mimeType, String locale) {
 		setInputURI(inputURI);
 		setMimeType(mimeType);
 		setLocale(locale);
@@ -65,25 +87,15 @@ public class File implements IResource {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}		
+		}				
 	}
-
-	public File(InputStream inputStream, String encoding, String mimeType, String locale) {
-		this.annotations = new Annotations();
+	
+	public void reset(InputStream inputStream, String encoding, String mimeType, String locale) {
 		setEncoding(encoding);		
 		setMimeType(mimeType);
 		setLocale(locale);
 		setInputStream(inputStream);
 		setOriginalNewlineType(NewlineDetector.getNewLineType(getReader()));
-	}
-
-	public File(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
-		this.annotations = new Annotations();		 
-		setInputMemMappedCharSequence(inputMemMappedCharSequence);
-		setEncoding("UTF-16BE");
-		setMimeType(mimeType);
-		setLocale(locale);
-		setOriginalNewlineType(NewlineDetector.getNewLineType(getInputMemMappedCharSequence()));
 	}
 
 	/*

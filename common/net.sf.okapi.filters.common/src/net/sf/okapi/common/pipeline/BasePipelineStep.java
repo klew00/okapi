@@ -22,7 +22,7 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.filters.FilterEvent;
 
-public abstract class BaseEventPipelineStep implements IEventPipelineStep {
+public abstract class BasePipelineStep implements IPipelineStep {
 
 	public FilterEvent handleEvent(FilterEvent event) {
 		switch (event.getEventType()) {
@@ -67,8 +67,8 @@ public abstract class BaseEventPipelineStep implements IEventPipelineStep {
 			handleDocumentPart(event);
 			break;
 			
-		case FILE:
-			handleFile(event);
+		case FILE_RESOURCE:
+			handleFileResource(event);
 			break;
 
 		default:
@@ -111,6 +111,6 @@ public abstract class BaseEventPipelineStep implements IEventPipelineStep {
 	protected void handleTextUnit(FilterEvent event) {
 	}
 	
-	protected void handleFile(FilterEvent event) {				
+	protected void handleFileResource(FilterEvent event) {				
 	}
 }

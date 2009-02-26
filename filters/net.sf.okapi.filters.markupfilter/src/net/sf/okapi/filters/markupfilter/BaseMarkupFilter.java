@@ -60,9 +60,14 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private String defaultConfig;
+	private boolean hasUtf8Bom;
+	private boolean hasUtf8Encoding;
+	StreamEncodingDetector encodingDetector;
 
 	public BaseMarkupFilter() {
 		super();
+		hasUtf8Bom = false;
+		hasUtf8Encoding = false;
 	}
 
 	/*
@@ -109,6 +114,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public void open(InputStream input) {
 		try {
+			encodingDetector = new StreamEncodingDetector(input);
+
 			if (getEncoding() != null) {
 				BOMAwareInputStream bomis = new BOMAwareInputStream(input, getEncoding());
 				bomis.detectEncoding();
@@ -116,10 +123,10 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				document = new Source(r);
 			} else {
 				// try to guess encoding
-				StreamEncodingDetector ed = new StreamEncodingDetector(input);
-				BOMAwareInputStream bomis = new BOMAwareInputStream(ed.getInputStream(), ed.getEncoding());
+				BOMAwareInputStream bomis = new BOMAwareInputStream(encodingDetector.getInputStream(), encodingDetector
+						.getEncoding());
 				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, ed.getEncoding());
+				InputStreamReader r = new InputStreamReader(bomis, encodingDetector.getEncoding());
 				document = new Source(r);
 			}
 		} catch (IOException e) {
@@ -130,17 +137,19 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public void open(URI inputURI) {
 		try {
+			StreamEncodingDetector ed = new StreamEncodingDetector(inputURI.toURL().openStream());
+
 			if (getEncoding() != null) {
 				BOMAwareInputStream bomis = new BOMAwareInputStream(inputURI.toURL().openStream(), getEncoding());
 				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, getEncoding());				
+				InputStreamReader r = new InputStreamReader(bomis, getEncoding());
 				document = new Source(r);
 			} else {
 				// try to guess encoding
-				StreamEncodingDetector ed = new StreamEncodingDetector(inputURI.toURL().openStream());
-				BOMAwareInputStream bomis = new BOMAwareInputStream(ed.getInputStream(), ed.getEncoding());
+				BOMAwareInputStream bomis = new BOMAwareInputStream(encodingDetector.getInputStream(), encodingDetector
+						.getEncoding());
 				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, ed.getEncoding());
+				InputStreamReader r = new InputStreamReader(bomis, encodingDetector.getEncoding());
 				document = new Source(r);
 			}
 		} catch (IOException e) {
@@ -152,7 +161,12 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	@Override
 	protected void initialize() {
 		super.initialize();
-
+		
+		if (encodingDetector != null) {
+			hasUtf8Bom = encodingDetector.hasUtf8Bom();
+			hasUtf8Encoding = encodingDetector.getEncoding().equals(StreamEncodingDetector.UTF_8) ? true : false;
+		}
+		
 		if (parameters == null) {
 			parameters = new Parameters(defaultConfig);
 		}
@@ -363,5 +377,13 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		} else {
 			setPreserveWhitespace(false);
 		}
+	}
+
+	protected boolean hasUtf8Encoding() {
+		return hasUtf8Encoding;
+	}
+
+	protected boolean hasUtf8Bom() {
+		return hasUtf8Bom;
 	}
 }

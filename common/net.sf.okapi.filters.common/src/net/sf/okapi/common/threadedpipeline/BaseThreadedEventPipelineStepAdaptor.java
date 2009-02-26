@@ -22,16 +22,16 @@ package net.sf.okapi.common.threadedpipeline;
 
 import java.util.concurrent.Callable;
 
-import net.sf.okapi.common.pipeline.BaseEventPipelineStep;
-import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public abstract class BaseThreadedEventPipelineStepAdaptor extends BaseEventPipelineStep implements Callable<PipelineReturnValue> {
-	protected IEventPipelineStep step;
+public abstract class BaseThreadedEventPipelineStepAdaptor extends BasePipelineStep implements Callable<PipelineReturnValue> {
+	protected IPipelineStep step;
 	private PipelineReturnValue result;
 	private volatile boolean pause;
 
-	public BaseThreadedEventPipelineStepAdaptor(IEventPipelineStep step) {
+	public BaseThreadedEventPipelineStepAdaptor(IPipelineStep step) {
 		this.step = step;
 	}
 

@@ -20,8 +20,8 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
-import net.sf.okapi.common.pipeline.EventPipeline;
-import net.sf.okapi.common.pipeline.IEventPipeline;
+import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipeline.IPipeline;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class SimplePipelineTest {
 	
 	@Test
 	public void runPipeline() {
-		IEventPipeline pipeline = new EventPipeline();
+		IPipeline pipeline = new Pipeline();
 		pipeline.addStep(new Producer());
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());

@@ -24,13 +24,13 @@ import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.FilterEventType;
-import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
 public class ConsumerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAdaptor implements IConsumer {	
 	private BlockingQueue<FilterEvent> consumerQueue;
 
-	public ConsumerPipelineStepAdaptor(IEventPipelineStep step) {
+	public ConsumerPipelineStepAdaptor(IPipelineStep step) {
 		super(step);		
 	}
 

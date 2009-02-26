@@ -30,11 +30,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.pipeline.IEventPipeline;
-import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ThreadedEventPipeline implements IEventPipeline {
+public class ThreadedEventPipeline implements IPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
 
 	private final PausableThreadPoolExecutor executor;
@@ -42,8 +42,8 @@ public class ThreadedEventPipeline implements IEventPipeline {
 	private final int blockingQueueSize;
 	private int totalThreads;
 	private PipelineReturnValue state;
-	private LinkedList<IEventPipelineStep> threadedSteps;
-	private LinkedList<IEventPipelineStep> nonThreadedSteps;
+	private LinkedList<IPipelineStep> threadedSteps;
+	private LinkedList<IPipelineStep> nonThreadedSteps;
 
 	private BlockingQueue<FilterEvent> previousQueue;
 
@@ -58,13 +58,13 @@ public class ThreadedEventPipeline implements IEventPipeline {
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
 		this.executor.pause();
 		state = PipelineReturnValue.PAUSED;
-		threadedSteps = new LinkedList<IEventPipelineStep>();
-		nonThreadedSteps = new LinkedList<IEventPipelineStep>();
+		threadedSteps = new LinkedList<IPipelineStep>();
+		nonThreadedSteps = new LinkedList<IPipelineStep>();
 	}
 
 	public void execute() {
 		BlockingQueue<FilterEvent> queue = null;
-		for (IEventPipelineStep step : nonThreadedSteps) {
+		for (IPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
 				// first step is a producer wrap it with threaded adaptor
 				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
@@ -101,7 +101,7 @@ public class ThreadedEventPipeline implements IEventPipeline {
 		state = PipelineReturnValue.RUNNING;
 	}
 
-	public void addStep(IEventPipelineStep step) {
+	public void addStep(IPipelineStep step) {
 		nonThreadedSteps.add(step);
 	}
 
@@ -113,7 +113,7 @@ public class ThreadedEventPipeline implements IEventPipeline {
 
 	public void pause() {
 		executor.pause();
-		for (IEventPipelineStep step : threadedSteps) {
+		for (IPipelineStep step : threadedSteps) {
 			step.pause();
 		}
 		state = PipelineReturnValue.PAUSED;
@@ -121,7 +121,7 @@ public class ThreadedEventPipeline implements IEventPipeline {
 
 	public void resume() {
 		executor.resume();
-		for (IEventPipelineStep step : threadedSteps) {
+		for (IPipelineStep step : threadedSteps) {
 			step.resume();
 		}
 		state = PipelineReturnValue.RUNNING;
