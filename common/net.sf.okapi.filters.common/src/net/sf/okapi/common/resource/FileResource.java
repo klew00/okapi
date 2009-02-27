@@ -29,8 +29,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.NewlineDetector;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.filters.ISkeleton;
@@ -46,7 +47,7 @@ public class FileResource implements IResource {
 	private String id;
 	private String encoding;
 	private String locale;
-	private NewlineDetector.NewlineType originalNewlineType;
+	private BOMNewlineEncodingDetector.NewlineType originalNewlineType;
 	private InputStream inputStream;
 	private URI inputURI;
 	private MemMappedCharSequence inputMemMappedCharSequence;
@@ -73,7 +74,7 @@ public class FileResource implements IResource {
 		setEncoding("UTF-16BE");
 		setMimeType(mimeType);
 		setLocale(locale);
-		setOriginalNewlineType(NewlineDetector.getNewLineType(getInputMemMappedCharSequence()));		
+		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewLineType(getInputMemMappedCharSequence()));		
 	}
 	
 	public void reset(URI inputURI, String encoding, String mimeType, String locale) {
@@ -81,8 +82,9 @@ public class FileResource implements IResource {
 		setMimeType(mimeType);
 		setLocale(locale);
 		try {
-			setInputStream(inputURI.toURL().openStream());
-			setOriginalNewlineType(NewlineDetector.getNewLineType(getReader()));
+			InputStream inputStream = inputURI.toURL().openStream();
+			setInputStream(inputStream);
+			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewLineType());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -95,7 +97,11 @@ public class FileResource implements IResource {
 		setMimeType(mimeType);
 		setLocale(locale);
 		setInputStream(inputStream);
-		setOriginalNewlineType(NewlineDetector.getNewLineType(getReader()));
+		try {
+			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewLineType());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*
@@ -228,14 +234,14 @@ public class FileResource implements IResource {
 	/**
 	 * @param originalNewlineType the originalNewlineType to set
 	 */
-	public void setOriginalNewlineType(NewlineDetector.NewlineType originalNewlineType) {
+	public void setOriginalNewlineType(BOMNewlineEncodingDetector.NewlineType originalNewlineType) {
 		this.originalNewlineType = originalNewlineType;
 	}
 
 	/**
 	 * @return the originalNewlineType
 	 */
-	public NewlineDetector.NewlineType getOriginalNewlineType() {
+	public BOMNewlineEncodingDetector.NewlineType getOriginalNewlineType() {
 		return originalNewlineType;
 	}
 

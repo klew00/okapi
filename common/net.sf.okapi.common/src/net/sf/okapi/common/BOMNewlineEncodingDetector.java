@@ -48,7 +48,28 @@ import java.nio.charset.*;
  * http://www.w3.org/TR/REC-xml/#sec-guessing-no-ext-info
  * http://www.w3.org/TR/html401/charset.html#h-5.2
  */
-public final class StreamEncodingDetector {
+public final class BOMNewlineEncodingDetector {
+	
+	public enum NewlineType {
+		CR {
+			public String toString() {
+				return "\r";
+			}
+		},
+
+		LF {
+			public String toString() {
+				return "\n";
+			}
+		},
+
+		CRLF {
+			public String toString() {
+				return "\r\n";
+			}
+		}
+	}
+	
 	private final InputStream inputStream;
 	private String encoding=null;
 	private String encodingSpecificationInfo=null;
@@ -75,10 +96,44 @@ public final class StreamEncodingDetector {
 	
 	private boolean hasUtf8Bom;
 	private boolean hasUtf7Bom;
+	private boolean hasBom;
 	
-	public StreamEncodingDetector(final InputStream inputStream) throws IOException {
+	public BOMNewlineEncodingDetector(final InputStream inputStream) throws IOException {
 		this.inputStream=inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		init();
+	}
+	
+	public static NewlineType getNewLineType(CharSequence text) {
+		for (int i = 0; i < text.length(); i++) {
+			char ch = text.charAt(i);
+			if (ch == '\n')
+				return NewlineType.LF;
+			if (ch == '\r')
+				return (++i < text.length() && text.charAt(i) == '\n') ? NewlineType.CRLF : NewlineType.CR;
+		}
+		return null;
+	}
+
+	public NewlineType getNewLineType() {
+		char c;
+		try {
+			Reader reader = openReader();
+			while ((c = (char) reader.read()) != -1) {
+				if (c == '\n')
+					return NewlineType.LF;
+				if (c == '\r') {
+					char c2 = (char) reader.read();
+					if (c2 == -1)
+						return NewlineType.CR;
+					else
+						return (reader.read() == '\n') ? NewlineType.CRLF : NewlineType.CR;
+				}
+			}
+		} catch (IOException e) {
+			return null;
+		}
+
+		return null;
 	}
 	
 	public InputStream getInputStream() {
@@ -102,7 +157,8 @@ public final class StreamEncodingDetector {
 	}
 
 	public Reader openReader() throws UnsupportedEncodingException {
-		if (encoding==null) return new InputStreamReader(inputStream,ISO_8859_1); // encoding==null only if input stream is empty so use an arbitrary encoding.
+		// encoding==null only if input stream is empty so use an arbitrary encoding.
+		if (encoding==null) return new InputStreamReader(inputStream,ISO_8859_1); 
 		if (!Charset.isSupported(encoding)) throw new UnsupportedEncodingException(encoding+" - "+encodingSpecificationInfo);
 		return new InputStreamReader(inputStream,encoding);
 	}
@@ -116,6 +172,7 @@ public final class StreamEncodingDetector {
 	private boolean init() throws IOException {
 		hasUtf8Bom = false;
 		hasUtf7Bom = false;
+		hasBom = false;
 		inputStream.mark(4);
 		final int b1=inputStream.read();
 		if (b1==-1) return setEncoding(null,"empty input stream");
@@ -127,28 +184,49 @@ public final class StreamEncodingDetector {
 		if (b1==0xEF) {
 			if (b2==0xBB && b3==0xBF) {
 				hasUtf8Bom = true;
+				hasBom = true;
 				return setEncoding(UTF_8,"UTF-8 Byte Order Mark (EF BB BF)");
 			}
 		} else if (b1==0xFE) {
- 			if (b2==0xFF) return setEncoding(UTF_16,"UTF-16 big-endian Byte Order Mark (FE FF)");
+ 			if (b2==0xFF) {
+ 				hasBom = true;
+ 				return setEncoding(UTF_16,"UTF-16 big-endian Byte Order Mark (FE FF)");
+ 			}
 		} else if (b1==0xFF) {
  			if (b2==0xFE) {
- 				if (b3==0 && b4==0) return setEncoding(UTF_32,"UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
+ 				if (b3==0 && b4==0) {
+ 					hasBom = true;
+ 					return setEncoding(UTF_32,"UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
+ 				}
+ 				hasBom = true;
 				return setEncoding(UTF_16,"UTF-16 little-endian Byte Order Mark (FF EE)");
 			}
 		} else if (b1==0) {
- 			if (b2==0 && b3==0xFE && b4==0xFF) return setEncoding(UTF_32,"UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
+ 			if (b2==0 && b3==0xFE && b4==0xFF) {
+ 				hasBom = true;
+ 				return setEncoding(UTF_32,"UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
+ 			}
 		} else if (b1==0x0E) {
- 			if (b2==0xFE && b3==0xFF) return setEncoding(SCSU,"SCSU Byte Order Mark (0E FE FF)");
+ 			if (b2==0xFE && b3==0xFF) {
+ 				hasBom = true;
+ 				return setEncoding(SCSU,"SCSU Byte Order Mark (0E FE FF)");
+ 			}
 		} else if (b1==0x2B) {
  			if (b2==0x2F && b3==0x76) {
  				hasUtf7Bom = true;
+ 				hasBom = true;
  				return setEncoding(UTF_7,"UTF-7 Byte Order Mark (2B 2F 76)");
  			}
 		} else if (b1==0xDD) {
- 			if (b2==0x73 && b3==0x66 && b4==0x73) return setEncoding(UTF_EBCDIC,"UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
+ 			if (b2==0x73 && b3==0x66 && b4==0x73) {
+ 				hasBom = true;
+ 				return setEncoding(UTF_EBCDIC,"UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
+ 			}
 		} else if (b1==0xFB) {
- 			if (b2==0xEE && b3==0x28) return setEncoding(BOCU_1,"BOCU-1 Byte Order Mark (FB EE 28)");
+ 			if (b2==0xEE && b3==0x28) {
+ 				hasBom = true;
+ 				return setEncoding(BOCU_1,"BOCU-1 Byte Order Mark (FB EE 28)");
+ 			}
 		}
 		// No Unicode Byte Order Mark found.  Have to start guessing.
 		definitive=false;
@@ -226,6 +304,10 @@ public final class StreamEncodingDetector {
 		// UTF-8 bytes with a value >= 0x80 indicate the presence of a multi-byte character, and there are many byte values that are illegal.
 		// Therefore, choose the only true 8-bit encoding that accepts all byte values and is guaranteed to be available on all java implementations.
 		return setEncoding(ISO_8859_1,"default 8-bit ASCII-compatible encoding (no 00 bytes present in first four bytes of stream)");
+	}
+	
+	public boolean hasBom() {
+		return hasBom;	
 	}
 	
 	public boolean hasUtf8Bom() {

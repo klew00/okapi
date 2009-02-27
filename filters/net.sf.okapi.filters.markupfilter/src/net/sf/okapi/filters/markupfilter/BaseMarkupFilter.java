@@ -20,9 +20,11 @@
 
 package net.sf.okapi.filters.markupfilter;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,7 +45,7 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.StreamEncodingDetector;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -55,14 +57,16 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 public abstract class BaseMarkupFilter extends BaseFilter {
 	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
 
+	private static final int PREVIEW_BYTE_COUNT = 2048;
+
 	private Source document;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private String defaultConfig;
+	private BOMNewlineEncodingDetector bomEncodingDetector;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
-	StreamEncodingDetector encodingDetector;
 
 	public BaseMarkupFilter() {
 		super();
@@ -76,6 +80,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
 	public IParameters getParameters() {
+		if (parameters == null)
+			return new Parameters(defaultConfig);
 		return parameters;
 	}
 
@@ -107,6 +113,23 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		this.document = null; // help Java GC
 	}
 
+	public Source getParsedHeader(final InputStream inputStream) {
+		try {
+			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
+			int i;
+			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
+				final int nextByte = inputStream.read();
+				if (nextByte == -1)
+					break;
+				bytes[i] = (byte) nextByte;
+			}
+			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0, i));
+			return parsedInput;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void open(CharSequence input) {
 		document = new Source(input);
 		initialize();
@@ -114,21 +137,21 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public void open(InputStream input) {
 		try {
-			encodingDetector = new StreamEncodingDetector(input);
+			Source parsedHeader = getParsedHeader(input);
+			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
-			if (getEncoding() != null) {
-				BOMAwareInputStream bomis = new BOMAwareInputStream(input, getEncoding());
-				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, getEncoding());
-				document = new Source(r);
-			} else {
-				// try to guess encoding
-				BOMAwareInputStream bomis = new BOMAwareInputStream(encodingDetector.getInputStream(), encodingDetector
-						.getEncoding());
-				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, encodingDetector.getEncoding());
-				document = new Source(r);
+			if (detectedEncoding == null && getEncoding() != null) {
+				detectedEncoding = getEncoding();
+				// TODO: do we warn that the detected encoding is different?
+			} else if (getEncoding() == null) {
+				detectedEncoding = parsedHeader.getEncoding(); // get best guess
+				// TODO: do we warn that the detected encoding is different?
 			}
+
+			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
+			bomis.detectEncoding();
+			document = new Source(new InputStreamReader(bomis, detectedEncoding));
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -137,36 +160,23 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public void open(URI inputURI) {
 		try {
-			StreamEncodingDetector ed = new StreamEncodingDetector(inputURI.toURL().openStream());
-
-			if (getEncoding() != null) {
-				BOMAwareInputStream bomis = new BOMAwareInputStream(inputURI.toURL().openStream(), getEncoding());
-				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, getEncoding());
-				document = new Source(r);
-			} else {
-				// try to guess encoding
-				BOMAwareInputStream bomis = new BOMAwareInputStream(encodingDetector.getInputStream(), encodingDetector
-						.getEncoding());
-				bomis.detectEncoding();
-				InputStreamReader r = new InputStreamReader(bomis, encodingDetector.getEncoding());
-				document = new Source(r);
-			}
+			open(inputURI.toURL().openStream());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		initialize();
 	}
 
 	@Override
 	protected void initialize() {
 		super.initialize();
-		
-		if (encodingDetector != null) {
-			hasUtf8Bom = encodingDetector.hasUtf8Bom();
-			hasUtf8Encoding = encodingDetector.getEncoding().equals(StreamEncodingDetector.UTF_8) ? true : false;
+
+		if (bomEncodingDetector != null) {
+			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
+			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
 		}
-		
+
 		if (parameters == null) {
 			parameters = new Parameters(defaultConfig);
 		}

@@ -111,6 +111,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	protected void handleTextUnit(FilterEvent event) {
 	}
 	
-	protected void handleFileResource(FilterEvent event) {				
+	protected void handleFileResource(FilterEvent event) {
+		// TODO: specific exception
+		throw new RuntimeException();
 	}
 }
