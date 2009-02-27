@@ -20,10 +20,10 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.filters.FilterEvent;
 
-public class UtilityStep implements IEventPipelineStep {
+public class UtilityStep implements IPipelineStep {
 
 	private IFilterDrivenUtility utility;
 

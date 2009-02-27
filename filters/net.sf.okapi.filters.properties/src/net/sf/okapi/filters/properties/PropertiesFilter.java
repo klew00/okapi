@@ -300,9 +300,9 @@ public class PropertiesFilter implements IFilter {
 
 					// Comments
 					boolean isComment = (( tmp.charAt(0) == '#' ) || ( tmp.charAt(0) == '!' ));
-					if ( !isComment &&  params.extraComments ) {
-						isComment = (tmp.charAt(0) == ';'); // .NET style
-						if ( tmp.startsWith("//") ) isComment = true; // C++/Java-style
+					if ( params.extraComments && !isComment ) {
+						if ( tmp.charAt(0) == ';' ) isComment = true; // .NET-style
+						else if ( tmp.startsWith("//") ) isComment = true; // C++/Java-style,
 					}
 
 					if ( isComment ) {

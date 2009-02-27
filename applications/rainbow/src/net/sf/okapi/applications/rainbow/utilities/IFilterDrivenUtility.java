@@ -20,9 +20,9 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-import net.sf.okapi.common.pipeline.IEventPipelineStep;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 
-public interface IFilterDrivenUtility extends IUtility, IEventPipelineStep {
+public interface IFilterDrivenUtility extends IUtility, IPipelineStep {
 
 	public void processFilterInput ();
 
