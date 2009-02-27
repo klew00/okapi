@@ -13,9 +13,7 @@ is marked in <b>bold</b>.</p>
 <pre># This is a comment
 
 Key1 : <b>This the text for Key1</b>
-Key2 = <b>This is the text for Key2</b>
-
-</pre>
+Key2 = <b>This is the text for Key2</b></pre>
 <h2>Parameters</h2>
 <h3>Options Tab</h3>
 <h4>Localization directives</h4>
@@ -28,7 +26,7 @@ Note that the directives override key conditions.</p>
 <p><cite>Extract only the items with a key matching the given expression</cite> -- Select this option to extract only the items with keys that match the specified pattern.</p>
 <p><cite>Do not extract the items with a key matching the given expression</cite> -- Select this option to not extract the items with keys that match the specified pattern.</p>
 <p>Enter the pattern to test against the key. The pattern must be a valid
-<a href="../../Shared/Help/regex.htm">regular expression</a>. For example, 
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">regular expression</a>. For example, 
 with the following settings:</p>
 <pre>Use the following key condition = set
 Extract only the items with a key matching the specified pattern = set
@@ -50,10 +48,11 @@ menu_text_file = <span style="font-weight: 700; background-color: #FFFF00">Text 
 <p><cite>Move Up</cite> -- Click this button to move the current rule upward.</p>
 <p><cite>Move down</cite> -- Click this button to move the current rule 
 downward.</p>
-<p><cite>[Top-right text box]</cite> -- Enter the regular expression for the 
+<p>[Top-right text box] -- Enter the regular expression for the 
 current rule. Use the <cite>Modify</cite> button to enter the edit mode. The 
-expression must be a valid regular expression according the syntax described in 
-the <a href="regex.htm">Regular Expression</a> section. You can check the syntax 
+expression must be a valid
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">
+regular expression</a>. You can check the syntax 
 (and the effect of the rule) as it automatically tests it against the test data in the text box below and shows the result in the bottom-right text box.</p>
 <p><cite>Modify</cite> -- Click this button to edit the expression of the 
 current rule. This button is labeled <cite>Accept</cite> when you are in 
@@ -67,15 +66,17 @@ mode.</p>
 <p><cite>Patterns</cite> -- Click this button to display a list of "guidline" regular 
 expression patterns then select a pattern to insert it the edit box. The inserted text replaces whatever text is 
 currently selected.</p>
-<p><cite>Test Using all rules</cite> -- Set this option to test all the rules at the same 
+<p><cite>Test using all rules</cite> -- Set this option to test all the rules at the same 
 time. The syntax of the current rule is automatically checked. See the effect it has on the sample text. The result of the test are displayed in the bottom right result box. The parts of the text that are 
 matches of the expressions are displayed in <> brackets. If the <cite>Test using all rules</cite> option is set, the test takes all rules of the set in account, if it is not set only the current rule is 
 tested.</p>
-<p><cite>[Middle-right text box]</cite> -- Optional test data to test the regular expression for the 
-current rule or all rules depending on the <cite>Test Using all rules</cite> option.</p>
-<p><cite>[Bottom-right text box]</cite> -- Shows the result of the regular expression applied to the test data.</p>
+<p>[Middle-right text box] -- Optional test data to test the regular expression for the 
+current rule or all rules depending on the <cite>Test using all rules</cite> option.</p>
+<p>[Bottom-right text box] -- Shows the result of the regular expression applied to the test data.</p>
 <h3>Options Tab</h3>
-<p><cite>Escape all extended characters</cite> -- Set this option to convert all character above U+007F into Unicode escape sequences (\uHHHH). When this option is not set, only the characters not supported by the output encoding are escaped.</p>
+<p><cite>Escape all extended characters</cite> -- Set this option to convert all character above U+007F into Unicode escape sequences (<code>\uHHHH</code>). When this option is not set, only the characters not supported by the output encoding are escaped.</p>
+
+<p>&nbsp;</p>
 
 </body>
 </html>

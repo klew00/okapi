@@ -160,7 +160,7 @@ public class Code {
 	{
 		id = -1;
 		this.tagType = tagType;
-		this.flag = CLONEABLE | DELETEABLE;
+		flag = 0; // Default: not cloneable, not deleteable
 		// Never let the type to be null
 		if ( type == null ) this.type = "null";
 		else this.type = type;
