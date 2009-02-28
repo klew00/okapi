@@ -37,10 +37,10 @@ import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
@@ -74,7 +74,7 @@ public class XLIFFFilter implements IFilter {
 	private int groupId;
 	private String srcLang;
 	private String trgLang;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
 	private TextUnit tu;
@@ -124,12 +124,12 @@ public class XLIFFFilter implements IFilter {
 		return hasNext;
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		try {
 			// Check for cancellation first
 			if ( canceled ) {
 				queue.clear();
-				queue.add(new FilterEvent(FilterEventType.CANCELED));
+				queue.add(new Event(EventType.CANCELED));
 				hasNext = false;
 			}
 			
@@ -138,13 +138,13 @@ public class XLIFFFilter implements IFilter {
 				if ( !read() ) {
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
-					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-					queue.add(new FilterEvent(FilterEventType.FINISHED));
+					queue.add(new Event(EventType.END_DOCUMENT, ending));
+					queue.add(new Event(EventType.FINISHED));
 				}
 			}
 			
 			// Return the head of the queue
-			if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+			if ( queue.peek().getEventType() == EventType.FINISHED ) {
 				hasNext = false;
 			}
 			return queue.poll();
@@ -178,8 +178,8 @@ public class XLIFFFilter implements IFilter {
 			otherId = 0;
 			// Set the start event
 			hasNext = true;
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
+			queue = new LinkedList<Event>();
+			queue.add(new Event(EventType.START));
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
@@ -189,7 +189,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setType("text/x-xliff");
 			startDoc.setMimeType("text/x-xliff");
 			startDoc.setIsMultilingual(true);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
 			// The XML declaration is not reported by the parser, so we need to
 			// create it as a document part when starting
@@ -325,7 +325,7 @@ public class XLIFFFilter implements IFilter {
 		if ( !skel.isEmpty(true) ) {
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
 			skel = new GenericSkeleton(); // And create a new skeleton for the next event
-			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		
 		storeStartElement();
@@ -350,14 +350,14 @@ public class XLIFFFilter implements IFilter {
 		}
 		
 		startSubDoc.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDoc));
+		queue.add(new Event(EventType.START_SUBDOCUMENT, startSubDoc));
 		return true;
 	}
 
 	private boolean processEndFile () {
 		Ending ending = new Ending(String.valueOf(+otherId));
 		ending.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.END_SUBDOCUMENT, ending));
+		queue.add(new Event(EventType.END_SUBDOCUMENT, ending));
 		return true;
 	}
 	
@@ -415,7 +415,7 @@ public class XLIFFFilter implements IFilter {
 			if ( !skel.isEmpty(true) ) {
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
 				skel = new GenericSkeleton(); // And create a new skeleton for the next event
-				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
 			}
 			
 			// Process trans-unit
@@ -488,7 +488,7 @@ public class XLIFFFilter implements IFilter {
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType("text/xml");
-						queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						return true;
 					}
 					// Else: just store the end
@@ -881,7 +881,7 @@ public class XLIFFFilter implements IFilter {
 			String.valueOf(++groupId));
 		group.setSkeleton(skel);
 		parentIds.push(groupId);
-		queue.add(new FilterEvent(FilterEventType.START_GROUP, group));
+		queue.add(new Event(EventType.START_GROUP, group));
 
 		// Get resname (can be null)
 		tmp = reader.getAttributeValue("", "resname");
@@ -906,7 +906,7 @@ public class XLIFFFilter implements IFilter {
 		// Else: it's a structural group
 		Ending ending = new Ending(String.valueOf(id));
 		ending.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.END_GROUP, ending));
+		queue.add(new Event(EventType.END_GROUP, ending));
 		return true;
 	}
 

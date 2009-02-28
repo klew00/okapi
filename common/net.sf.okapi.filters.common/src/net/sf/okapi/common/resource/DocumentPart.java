@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.resource;
 
-import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.ISkeleton;
 
 /**
  * Represents the resource associated with the filter events DOCUMENT_PART,

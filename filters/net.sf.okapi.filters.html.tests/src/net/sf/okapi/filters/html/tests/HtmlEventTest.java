@@ -22,8 +22,8 @@ package net.sf.okapi.filters.html.tests;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -53,7 +53,7 @@ public class HtmlEventTest {
 	@Test
 	public void testMETATag1() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -66,7 +66,7 @@ public class HtmlEventTest {
 		tu.setIsReferent(true);
 		tu.setName("content");
 		tu.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		events.add(new Event(EventType.TEXT_UNIT, tu));
 
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);
@@ -74,7 +74,7 @@ public class HtmlEventTest {
 		skel.addReference(tu);
 		skel.add("/>");
 		dp.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		addEndEvents(events);
 
@@ -84,7 +84,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithAttributes() {
 		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -97,7 +97,7 @@ public class HtmlEventTest {
 		tu2.setIsReferent(true);
 		tu2.setName("title");
 		tu2.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Text of p");
@@ -109,7 +109,7 @@ public class HtmlEventTest {
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
 		tu1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		addEndEvents(events);
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
@@ -118,7 +118,7 @@ public class HtmlEventTest {
 	@Test
 	public void testLang() {
 		String snippet = "<dummy lang=\"en\"/>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -130,7 +130,7 @@ public class HtmlEventTest {
 		skel.addValuePlaceholder(dp1, "language", null);		
 		skel.add("\"/>");
 		dp1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		addEndEvents(events);
 
@@ -140,7 +140,7 @@ public class HtmlEventTest {
 	@Test
 	public void testXmlLang() {
 		String snippet = "<dummy xml:lang=\"en\"/>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -152,7 +152,7 @@ public class HtmlEventTest {
 		skel.addValuePlaceholder(dp1, "language", null);		
 		skel.add("\"/>");
 		dp1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		addEndEvents(events);
 
@@ -162,7 +162,7 @@ public class HtmlEventTest {
 	@Test
 	public void testComplexEmptyElement() {
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\"/>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -175,7 +175,7 @@ public class HtmlEventTest {
 		tu.setIsReferent(true);
 		tu.setName("content");
 		tu.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		events.add(new Event(EventType.TEXT_UNIT, tu));
 
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);
@@ -187,7 +187,7 @@ public class HtmlEventTest {
 		skel.addReference(tu);
 		skel.add("/>");
 		dp.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		addEndEvents(events);
 
@@ -197,7 +197,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithInlines() {
 		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -209,7 +209,7 @@ public class HtmlEventTest {
 		skel.add("\"/>");
 		dp1.setName("a");
 		dp1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
@@ -231,7 +231,7 @@ public class HtmlEventTest {
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
 		tu1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		addEndEvents(events);
 
@@ -241,7 +241,7 @@ public class HtmlEventTest {
 	@Test
 	public void testMETATagWithLanguage() {
 		String snippet = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -252,7 +252,7 @@ public class HtmlEventTest {
 		skel.add("\"/>");
 		dp.setSourceProperty(new Property("language", "en", false));
 		dp.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		addEndEvents(events);
 
@@ -262,7 +262,7 @@ public class HtmlEventTest {
 	@Test
 	public void testMETATagWithEncoding() {
 		String snippet = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-2022-JP\">";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -274,7 +274,7 @@ public class HtmlEventTest {
 		skel.add("\">");
 		dp.setSourceProperty(new Property("encoding", "ISO-2022-JP", false));
 		dp.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		addEndEvents(events);
 
@@ -284,7 +284,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithInlines2() {
 		String snippet = "<p>Before <b>bold</b> <img href=\"there\" alt=\"text\"/> after.</p>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
@@ -296,7 +296,7 @@ public class HtmlEventTest {
 		tu2.setIsReferent(true);
 		tu2.setName("alt");
 		tu2.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		skel = new GenericSkeleton();
 		DocumentPart dp1 = new DocumentPart("dp1", true);
@@ -309,7 +309,7 @@ public class HtmlEventTest {
 		dp1.setIsReferent(true);
 		dp1.setName("img");
 		dp1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
@@ -331,7 +331,7 @@ public class HtmlEventTest {
 		skel.addContentPlaceholder(tu2);
 		skel.append("</p>");
 		tu1.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		addEndEvents(events);
 
@@ -341,35 +341,35 @@ public class HtmlEventTest {
 	@Test
 	public void testTableGroups() {
 		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
 		StartGroup g1 = new StartGroup("ssd0", "sg1");
 		g1.setSkeleton(new GenericSkeleton("<table id=\"100\">"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g1));
+		events.add(new Event(EventType.START_GROUP, g1));
 
 		StartGroup g2 = new StartGroup("sg1", "sg2");
 		g2.setSkeleton(new GenericSkeleton("<tr>"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g2));
+		events.add(new Event(EventType.START_GROUP, g2));
 
 		StartGroup g3 = new StartGroup("sg2", "sg3");
 		g3.setSkeleton(new GenericSkeleton("<td>"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g3));
+		events.add(new Event(EventType.START_GROUP, g3));
 
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, new TextUnit("tu1", "text")));
+		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu1", "text")));
 
 		Ending e1 = new Ending("eg1");
 		e1.setSkeleton(new GenericSkeleton("</td>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e1));
+		events.add(new Event(EventType.END_GROUP, e1));
 
 		Ending e2 = new Ending("eg2");
 		e2.setSkeleton(new GenericSkeleton("</tr>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e2));
+		events.add(new Event(EventType.END_GROUP, e2));
 
 		Ending e3 = new Ending("eg3");
 		e3.setSkeleton(new GenericSkeleton("</table>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e3));
+		events.add(new Event(EventType.END_GROUP, e3));
 
 		addEndEvents(events);
 
@@ -383,7 +383,7 @@ public class HtmlEventTest {
 		"<li>Text of item 1</li>" + 
 		"<li>Text of item 2</li>" + 
 		"</ul>" + "and text after the list.</p>";
-		ArrayList<FilterEvent> events = new ArrayList<FilterEvent>();
+		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 		
@@ -394,31 +394,31 @@ public class HtmlEventTest {
 		StartGroup g1 = new StartGroup("tu3", "sg1");
 		g1.setIsReferent(true);
 		g1.setSkeleton(new GenericSkeleton("<ul>"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g1));
+		events.add(new Event(EventType.START_GROUP, g1));
 
 		StartGroup g2 = new StartGroup("sg1", "sg2");
 		g2.setSkeleton(new GenericSkeleton("<li>"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g2));
+		events.add(new Event(EventType.START_GROUP, g2));
 
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, new TextUnit("tu1", "Text of item 1")));
+		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu1", "Text of item 1")));
 		
 		Ending e1 = new Ending("eg1");
 		e1.setSkeleton(new GenericSkeleton("</li>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e1));
+		events.add(new Event(EventType.END_GROUP, e1));
 
 		StartGroup g3 = new StartGroup("sg1", "sg3");
 		g3.setSkeleton(new GenericSkeleton("<li>"));
-		events.add(new FilterEvent(FilterEventType.START_GROUP, g3));
+		events.add(new Event(EventType.START_GROUP, g3));
 
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, new TextUnit("tu2", "Text of item 2")));
+		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu2", "Text of item 2")));
 
 		Ending e2 = new Ending("eg2");
 		e2.setSkeleton(new GenericSkeleton("</li>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e2));
+		events.add(new Event(EventType.END_GROUP, e2));
 
 		Ending e3 = new Ending("eg3");
 		e3.setSkeleton(new GenericSkeleton("</ul>"));
-		events.add(new FilterEvent(FilterEventType.END_GROUP, e3));
+		events.add(new Event(EventType.END_GROUP, e3));
 		
 		TextFragment tf = tu3.getSourceContent();
 		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
@@ -430,33 +430,31 @@ public class HtmlEventTest {
 		skel.addContentPlaceholder(tu3);
 		skel.append("</p>");
 		tu3.setSkeleton(skel);
-		events.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu3));
+		events.add(new Event(EventType.TEXT_UNIT, tu3));
 		
 		addEndEvents(events);
 
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 
-	private ArrayList<FilterEvent> getEvents(String snippet) {
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));
 		htmlFilter.open(snippet);
 		while (htmlFilter.hasNext()) {
-			FilterEvent event = htmlFilter.next();
+			Event event = htmlFilter.next();
 			list.add(event);
 		}
 		htmlFilter.close();
 		return list;
 	}
 
-	private void addStartEvents(ArrayList<FilterEvent> events) {
-		events.add(new FilterEvent(FilterEventType.START));
-		events.add(new FilterEvent(FilterEventType.START_DOCUMENT));
+	private void addStartEvents(ArrayList<Event> events) {		
+		events.add(new Event(EventType.START_DOCUMENT));
 	}
 
-	private void addEndEvents(ArrayList<FilterEvent> events) {
-		events.add(new FilterEvent(FilterEventType.END_DOCUMENT));
-		events.add(new FilterEvent(FilterEventType.FINISHED));
+	private void addEndEvents(ArrayList<Event> events) {
+		events.add(new Event(EventType.END_DOCUMENT));
 	}
 
 	// @Test
@@ -466,13 +464,13 @@ public class HtmlEventTest {
 		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));
 		htmlFilter.open(htmlStream);
 		while (htmlFilter.hasNext()) {
-			FilterEvent event = htmlFilter.next();
-			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
+			Event event = htmlFilter.next();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
 				assertTrue(event.getResource() instanceof TextUnit);
-			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 				assertTrue(event.getResource() instanceof DocumentPart);
-			} else if (event.getEventType() == FilterEventType.START_GROUP
-					|| event.getEventType() == FilterEventType.END_GROUP) {
+			} else if (event.getEventType() == EventType.START_GROUP
+					|| event.getEventType() == EventType.END_GROUP) {
 				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
 			}
 			System.out.print(event.getEventType().toString() + ": ");

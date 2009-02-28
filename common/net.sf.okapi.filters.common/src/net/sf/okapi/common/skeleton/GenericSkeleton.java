@@ -23,10 +23,10 @@ package net.sf.okapi.common.skeleton;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.filters.ISkeleton;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 

@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 
@@ -56,7 +56,7 @@ public class OpenXMLFullFileTest {
 				else if (f.endsWith(".pptx"))
 					openXMLFilter.doOneOpenXMLFile(ff,MSPOWERPOINT,3);
 				while (openXMLFilter.hasNext()) {
-					FilterEvent event = openXMLFilter.next();
+					Event event = openXMLFilter.next();
 				}
 			} catch (Exception e) {
 				//System.err.println("Error for file: " + f + ": " + e.toString());
@@ -69,7 +69,7 @@ public class OpenXMLFullFileTest {
 	public void testNonwellformed() {
 		openXMLFilter.doOneOpenXMLFile("/nonwellformed.specialtest",MSWORD,3);
 		while (openXMLFilter.hasNext()) {
-			FilterEvent event = openXMLFilter.next();
+			Event event = openXMLFilter.next();
 		}
 	}
 }

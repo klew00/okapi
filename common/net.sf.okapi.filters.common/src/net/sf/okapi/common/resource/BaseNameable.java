@@ -24,9 +24,10 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.ISkeleton;
 
 /**
  * Implements a nameable resource.

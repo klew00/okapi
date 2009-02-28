@@ -20,9 +20,10 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.ISkeleton;
 
 /**
  * Represents the resource associated with the filter events END_DOCUMENT,

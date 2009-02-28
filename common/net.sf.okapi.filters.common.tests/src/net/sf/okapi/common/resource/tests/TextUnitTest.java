@@ -22,7 +22,7 @@ package net.sf.okapi.common.resource.tests;
 
 import java.util.Set;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;

@@ -43,10 +43,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
@@ -70,7 +70,7 @@ public class XMLFilter implements IFilter {
 	private String lineBreak;
 	private Document doc;
 	private ITraversal trav;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private int tuId;
 	private int otherId;
 	private int parseState;
@@ -115,10 +115,10 @@ public class XMLFilter implements IFilter {
 		return (queue != null);
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		if ( canceled ) {
 			queue = null;
-			return new FilterEvent(FilterEventType.CANCELED);
+			return new Event(EventType.CANCELED);
 		}
 		if ( queue == null ) return null;
 
@@ -138,7 +138,7 @@ public class XMLFilter implements IFilter {
 
 		// Else: we are done
 		queue = null;
-		return new FilterEvent(FilterEventType.FINISHED, null);
+		return new Event(EventType.FINISHED, null);
 	}
 
 	public void open (InputStream input) {
@@ -252,8 +252,8 @@ public class XMLFilter implements IFilter {
 		context = new Stack<ContextItem>();
 		
 		// Set the start event
-		queue = new LinkedList<FilterEvent>();
-		queue.add(new FilterEvent(FilterEventType.START));
+		queue = new LinkedList<Event>();
+		queue.add(new Event(EventType.START));
 
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
@@ -296,7 +296,7 @@ public class XMLFilter implements IFilter {
 		
 		startDoc.setSkeleton(skel);
 		// Put the start document in the queue
-		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 
 	private void process () {
@@ -318,7 +318,7 @@ public class XMLFilter implements IFilter {
 				if (( skel != null ) && ( !skel.isEmpty() )) {
 					ending.setSkeleton(skel);
 				}
-				queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+				queue.add(new Event(EventType.END_DOCUMENT, ending));
 				parseState = 1;
 				return;
 			}
@@ -459,7 +459,7 @@ public class XMLFilter implements IFilter {
 	{
 		String id = String.valueOf(++tuId);
 		TextUnit tu = new TextUnit(id, attr.getValue(), true, "text/xml");
-		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
 	}
@@ -591,7 +591,7 @@ public class XMLFilter implements IFilter {
 		skel.addContentPlaceholder(tu);
 		if ( popStack ) skel.add(buildEndTag(node));
 		tu.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		frag = null;
 		skel = new GenericSkeleton();
 		return true;

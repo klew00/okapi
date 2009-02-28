@@ -20,7 +20,8 @@
 
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 
 public class FilterPipelineStepAdaptor extends BasePipelineStep {
@@ -39,8 +40,11 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	}		
 
 	@Override
-	public FilterEvent handleEvent(FilterEvent event) {
-		return filter.next();		
+	public Event handleEvent(Event event) {
+		if (event.getEventType() == EventType.START || event.getEventType() == EventType.FINISHED) {
+			return super.handleEvent(event);
+		}
+		return filter.next();
 	}
 	
 	public void preprocess() {}

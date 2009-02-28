@@ -31,10 +31,11 @@ import java.net.URI;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.ISkeleton;
 
 /**
  * File resource which holds a URI, InputStream or MemMappedCharSequence

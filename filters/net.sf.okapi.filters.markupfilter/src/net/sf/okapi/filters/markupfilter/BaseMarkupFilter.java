@@ -44,10 +44,10 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.filters.BaseFilter;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.TextFragment;
@@ -192,7 +192,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	@Override
-	public FilterEvent next() {
+	public Event next() {
 		// reset state flags and buffers
 		ruleState.reset();
 

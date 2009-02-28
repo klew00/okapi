@@ -36,10 +36,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.codehaus.stax2.XMLInputFactory2;
 
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
@@ -61,7 +61,7 @@ public class IDMLContentFilter implements IFilter {
 	private String encoding;
 	private String docName;
 	private XMLStreamReader reader;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private int tuId;
 	private int otherId;
 	private GenericSkeleton skel;
@@ -121,17 +121,17 @@ public class IDMLContentFilter implements IFilter {
 		return (queue != null);
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Handle cancellation
 		if ( canceled ) {
 			queue = null;
-			return new FilterEvent(FilterEventType.CANCELED);
+			return new Event(EventType.CANCELED);
 		}
 		
 		// Send any event already in the queue 
 		if ( queue.size() > 0 ) {
-			FilterEvent event = queue.poll();
-			if ( event.getEventType() == FilterEventType.FINISHED ) {
+			Event event = queue.poll();
+			if ( event.getEventType() == EventType.FINISHED ) {
 				queue = null;
 			}
 			return event;
@@ -211,8 +211,8 @@ public class IDMLContentFilter implements IFilter {
 		stack = 0;
 		tuId = 0;
 		otherId = 0;
-		queue = new LinkedList<FilterEvent>();
-		queue.add(new FilterEvent(FilterEventType.START));
+		queue = new LinkedList<Event>();
+		queue.add(new Event(EventType.START));
 		elemTag = new StringBuilder();
 		checkForEmpty = false;
 		
@@ -223,7 +223,7 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
-		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
 		// The XML declaration is not reported by the parser, so we need to
 		// create it as a document part when starting
@@ -235,7 +235,7 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setSkeleton(skel);
 	}
 
-	private FilterEvent read () {
+	private Event read () {
 		skel = new GenericSkeleton();
 		frag = null;
 		int eventType;
@@ -269,7 +269,7 @@ public class IDMLContentFilter implements IFilter {
 					if ( frag == null ) {
 						if ( !wasEmpty ) skel.append(buildEndElement());
 						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-						return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
+						return new Event(EventType.DOCUMENT_PART, dp, skel);
 					}
 					else {
 						if ( --stack == 0 ) {
@@ -278,7 +278,7 @@ public class IDMLContentFilter implements IFilter {
 							tu.setMimeType("text/xml");
 							skel.addContentPlaceholder(tu);
 							skel.append(buildEndElement());
-							return new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel);
+							return new Event(EventType.TEXT_UNIT, tu, skel);
 						}
 						else {
 							if ( !wasEmpty ) {
@@ -345,9 +345,9 @@ public class IDMLContentFilter implements IFilter {
 		}
 		
 		// No more XML events
-		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		queue.add(new Event(EventType.FINISHED));
 		Ending ending = new Ending(String.valueOf(++otherId));
-		return new FilterEvent(FilterEventType.END_DOCUMENT, ending, skel);
+		return new Event(EventType.END_DOCUMENT, ending, skel);
 	}
 
 	private String buildStartElement () {

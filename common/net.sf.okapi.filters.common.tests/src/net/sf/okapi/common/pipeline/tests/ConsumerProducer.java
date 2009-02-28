@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class ConsumerProducer extends BasePipelineStep {
@@ -36,7 +36,7 @@ public class ConsumerProducer extends BasePipelineStep {
 		System.out.println(getName() + " preprocess");
 	}
 	
-	protected void handleTextUnit(FilterEvent event) {
+	protected void handleTextUnit(Event event) {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {

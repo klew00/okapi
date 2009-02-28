@@ -38,9 +38,9 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
@@ -146,7 +146,7 @@ public class RTFFilter implements IFilter {
 	private int currentDBCSCodepage;
 	private String currentCSName;
 	private ByteBuffer byteBuffer;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private String docName;
 	private int tuId;
@@ -300,11 +300,11 @@ public class RTFFilter implements IFilter {
 		return hasNext;
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Check for cancellation first
 		if ( canceled ) {
 			queue.clear();
-			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			queue.add(new Event(EventType.CANCELED));
 			hasNext = false;
 		}
 		
@@ -314,7 +314,7 @@ public class RTFFilter implements IFilter {
 		}
 		
 		// Return the head of the queue
-		if ( queue.peek().getEventType() == FilterEventType.END_DOCUMENT ) {
+		if ( queue.peek().getEventType() == EventType.END_DOCUMENT ) {
 			hasNext = false;
 		}
 		return queue.poll();
@@ -324,13 +324,13 @@ public class RTFFilter implements IFilter {
 		TextUnit textUnit = new TextUnit(String.valueOf(++tuId));
 		if ( !getSegment(textUnit) ) {
 			// Send the end-document event
-			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
+			queue.add(new Event(EventType.END_DOCUMENT,
 				new Ending(String.valueOf(++otherId))));
 			// Store the finished event
-			queue.add(new FilterEvent(FilterEventType.FINISHED));
+			queue.add(new Event(EventType.FINISHED));
 		}
 		else {
-			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, textUnit));
+			queue.add(new Event(EventType.TEXT_UNIT, textUnit));
 		}
 	}
 
@@ -348,8 +348,8 @@ public class RTFFilter implements IFilter {
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
 			startDoc.setIsMultilingual(true);
-			queue.add(new FilterEvent(FilterEventType.START));
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			queue.add(new Event(EventType.START));
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -436,7 +436,7 @@ public class RTFFilter implements IFilter {
 		hasNext = true;
 		tuId = 0;
 		otherId = 0;
-		queue = new LinkedList<FilterEvent>();
+		queue = new LinkedList<Event>();
 	}
 
 	public boolean getSegment (TextUnit tu) {

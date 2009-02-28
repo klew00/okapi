@@ -24,15 +24,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IEncoder;
-import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;

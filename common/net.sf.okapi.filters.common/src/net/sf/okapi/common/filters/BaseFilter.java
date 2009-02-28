@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -78,10 +80,10 @@ public abstract class BaseFilter implements IFilter {
 	private int documentId = 0;
 	private int documentPartId = 0;
 
-	private Stack<FilterEvent> tempFilterEventStack;
+	private Stack<Event> tempFilterEventStack;
 
-	private List<FilterEvent> filterEvents;
-	private List<FilterEvent> referencableFilterEvents;
+	private List<Event> filterEvents;
+	private List<Event> referencableFilterEvents;
 
 	private boolean canceled = false;
 	private boolean done = false;
@@ -113,15 +115,15 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#next()
 	 */
-	public FilterEvent next() {
-		FilterEvent event;
+	public Event next() {
+		Event event;
 
 		if (hasNext()) {
 			if (!referencableFilterEvents.isEmpty()) {
 				return referencableFilterEvents.remove(0);
 			} else if (!filterEvents.isEmpty()) {
 				event = filterEvents.remove(0);
-				if (event.getEventType() == FilterEventType.FINISHED)
+				if (event.getEventType() == EventType.END_DOCUMENT)
 					done = true;
 				return event;
 			}
@@ -141,9 +143,8 @@ public abstract class BaseFilter implements IFilter {
 		filterEvents.clear();
 		referencableFilterEvents.clear();
 
-		FilterEvent event = new FilterEvent(FilterEventType.CANCELED);
+		Event event = new Event(EventType.CANCELED);
 		filterEvents.add(event);
-		finish();
 	}
 
 	/*
@@ -185,14 +186,14 @@ public abstract class BaseFilter implements IFilter {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
 	}
 
-	private FilterEvent peekTempEvent() {
+	private Event peekTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
 		return tempFilterEventStack.peek();
 	}
 
-	private FilterEvent popTempEvent() {
+	private Event popTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
@@ -261,7 +262,6 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected void initialize() {
 		reset();
-		start();
 		startDocument();
 	}
 
@@ -277,17 +277,16 @@ public abstract class BaseFilter implements IFilter {
 		} else if (!tempFilterEventStack.isEmpty()) {
 			// go through filtered object stack and close them one by one
 			while (!tempFilterEventStack.isEmpty()) {
-				FilterEvent fe = tempFilterEventStack.pop();
-				if (fe.getEventType() == FilterEventType.START_GROUP) {
+				Event fe = tempFilterEventStack.pop();
+				if (fe.getEventType() == EventType.START_GROUP) {
 					//TODO: Do we need this?? endGroup(new GenericSkeleton("")); //$NON-NLS-1$
-				} else if (fe.getEventType() == FilterEventType.TEXT_UNIT) {
+				} else if (fe.getEventType() == EventType.TEXT_UNIT) {
 					filterEvents.add(fe);
 				}
 			}
 		}
 
 		endDocument();
-		finish();
 	}
 
 	/**
@@ -296,8 +295,8 @@ public abstract class BaseFilter implements IFilter {
 	 * @return true, if is current text unit
 	 */
 	protected boolean isCurrentTextUnit() {
-		FilterEvent e = peekTempEvent();
-		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT) {
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
 			return true;
 		}
 		return false;
@@ -309,8 +308,8 @@ public abstract class BaseFilter implements IFilter {
 	 * @return true, if is current complex text unit
 	 */
 	protected boolean isCurrentComplexTextUnit() {
-		FilterEvent e = peekTempEvent();
-		if (e != null && e.getEventType() == FilterEventType.TEXT_UNIT && e.getResource().getSkeleton() != null) {
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.TEXT_UNIT && e.getResource().getSkeleton() != null) {
 			return true;
 		}
 		return false;
@@ -322,8 +321,8 @@ public abstract class BaseFilter implements IFilter {
 	 * @return true, if is current group
 	 */
 	protected boolean isCurrentGroup() {
-		FilterEvent e = peekTempEvent();
-		if (e != null && e.getEventType() == FilterEventType.START_GROUP) {
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.START_GROUP) {
 			return true;
 		}
 		return false;
@@ -367,12 +366,12 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @return the filter event
 	 */
-	protected FilterEvent peekMostRecentGroup() {
+	protected Event peekMostRecentGroup() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
-		for (FilterEvent fe : tempFilterEventStack) {
-			if (fe.getEventType() == FilterEventType.START_GROUP) {
+		for (Event fe : tempFilterEventStack) {
+			if (fe.getEventType() == EventType.START_GROUP) {
 				return fe;
 			}
 		}
@@ -384,12 +383,12 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @return the filter event
 	 */
-	protected FilterEvent peekMostRecentTextUnit() {
+	protected Event peekMostRecentTextUnit() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
-		for (FilterEvent fe : tempFilterEventStack) {
-			if (fe.getEventType() == FilterEventType.TEXT_UNIT) {
+		for (Event fe : tempFilterEventStack) {
+			if (fe.getEventType() == EventType.TEXT_UNIT) {
 				return fe;
 			}
 		}
@@ -419,8 +418,8 @@ public abstract class BaseFilter implements IFilter {
 		}
 		boolean first = true;
 		// skip current TextUnit - the one we are currently processing
-		for (FilterEvent fe : tempFilterEventStack) {
-			if (fe.getEventType() == FilterEventType.TEXT_UNIT && !first) {
+		for (Event fe : tempFilterEventStack) {
+			if (fe.getEventType() == EventType.TEXT_UNIT && !first) {
 				return true;
 			}
 			first = false;
@@ -441,10 +440,10 @@ public abstract class BaseFilter implements IFilter {
 		canceled = false;
 		done = false;
 
-		referencableFilterEvents = new LinkedList<FilterEvent>();
-		filterEvents = new LinkedList<FilterEvent>();
+		referencableFilterEvents = new LinkedList<Event>();
+		filterEvents = new LinkedList<Event>();
 
-		tempFilterEventStack = new Stack<FilterEvent>();
+		tempFilterEventStack = new Stack<Event>();
 
 		currentCode = null;
 		currentSkeleton = null;
@@ -464,16 +463,6 @@ public abstract class BaseFilter implements IFilter {
 	// Start and Finish Methods
 	// ////////////////////////////////////////////////////////////////////////
 
-	private void start() {
-		FilterEvent event = new FilterEvent(FilterEventType.START);
-		filterEvents.add(event);
-	}
-
-	private void finish() {
-		FilterEvent event = new FilterEvent(FilterEventType.FINISHED);
-		filterEvents.add(event);
-	}
-
 	/**
 	 * Start document.
 	 */
@@ -482,7 +471,7 @@ public abstract class BaseFilter implements IFilter {
 		startDocument.setEncoding(getEncoding(), hasUtf8Encoding() && hasUtf8Bom());
 		startDocument.setLanguage(getSrcLang());
 		startDocument.setMimeType(getMimeType());
-		FilterEvent event = new FilterEvent(FilterEventType.START_DOCUMENT, startDocument);
+		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 	}
 
@@ -491,7 +480,7 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected void endDocument() {
 		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
-		FilterEvent event = new FilterEvent(FilterEventType.END_DOCUMENT, endDocument);
+		Event event = new Event(EventType.END_DOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
@@ -504,7 +493,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
-		FilterEvent event = new FilterEvent(FilterEventType.START_SUBDOCUMENT, startSubDocument);
+		Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
 	}
 
@@ -513,7 +502,7 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected void endSubDocument() {
 		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
-		FilterEvent event = new FilterEvent(FilterEventType.END_SUBDOCUMENT, endDocument);
+		Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
 	}
 
@@ -629,7 +618,7 @@ public abstract class BaseFilter implements IFilter {
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
 				currentSkeleton.addReference(tu);	
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+				referencableFilterEvents.add(new Event(EventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				embeddedWritableProp(resource, propOrText, tag, language);
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
@@ -650,7 +639,7 @@ public abstract class BaseFilter implements IFilter {
 				resource.setSkeleton(currentSkeleton);
 				// we needed to create a document part to hold the
 				// writable/localizables
-				referencableFilterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, resource));
+				referencableFilterEvents.add(new Event(EventType.DOCUMENT_PART, resource));
 			} else {
 				// all text - the parent TU hold the references instead of a DocumentPart
 				currentCode.append(currentSkeleton.toString());
@@ -747,16 +736,16 @@ public abstract class BaseFilter implements IFilter {
 			processAllEmbedded(startMarker.toString(), language, propertyTextUnitPlaceholders, false, tu);
 			tu.setSkeleton(currentSkeleton);
 			currentSkeleton.addContentPlaceholder(tu);
-			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, currentSkeleton));
+			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu, currentSkeleton));
 			currentSkeleton = null;
 			return;
 		} else if (startMarker != null) {
 			GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 			skel.addContentPlaceholder(tu);
-			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu, skel));
+			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu, skel));
 			return;
 		} else {
-			tempFilterEventStack.push(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu));
 		}
 	}
 
@@ -789,7 +778,7 @@ public abstract class BaseFilter implements IFilter {
 	 */
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		FilterEvent tempTextUnit;
+		Event tempTextUnit;
 
 		if (!isCurrentTextUnit()) {
 			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
@@ -823,7 +812,7 @@ public abstract class BaseFilter implements IFilter {
 			throw new BaseFilterException("TextUnit not found. Cannot add text");
 		}
 
-		FilterEvent tempTextUnit = peekTempEvent();
+		Event tempTextUnit = peekTempEvent();
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		tu.getSource().append(text);
 	}
@@ -930,7 +919,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
-		FilterEvent parentGroup = peekMostRecentGroup();
+		Event parentGroup = peekMostRecentGroup();
 		if (parentGroup != null) {
 			parentId = parentGroup.getResource().getId();
 		}
@@ -940,7 +929,7 @@ public abstract class BaseFilter implements IFilter {
 
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 
-		FilterEvent fe = new FilterEvent(FilterEventType.START_GROUP, g, skel);
+		Event fe = new Event(EventType.START_GROUP, g, skel);
 
 		if (isCurrentComplexTextUnit()) {
 			// add this group as a code of the complex TextUnit
@@ -993,7 +982,7 @@ public abstract class BaseFilter implements IFilter {
 
 		Ending eg = new Ending(createId(END_GROUP, ++endGroupId));
 
-		filterEvents.add(new FilterEvent(FilterEventType.END_GROUP, eg, skel));
+		filterEvents.add(new Event(EventType.END_GROUP, eg, skel));
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -1089,7 +1078,7 @@ public abstract class BaseFilter implements IFilter {
 		if (part != null) {
 			currentSkeleton.append(part);
 		}
-		filterEvents.add(new FilterEvent(FilterEventType.DOCUMENT_PART, currentDocumentPart));
+		filterEvents.add(new Event(EventType.DOCUMENT_PART, currentDocumentPart));
 		currentSkeleton = null;
 		currentDocumentPart = null;
 	}

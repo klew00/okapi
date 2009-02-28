@@ -22,23 +22,23 @@ package net.sf.okapi.common.threadedpipeline;
 
 import java.util.concurrent.BlockingQueue;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ProducerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAdaptor implements IProducer {	
-	private BlockingQueue<FilterEvent> producerQueue;
+public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer {	
+	private BlockingQueue<Event> producerQueue;
 	
 	public ProducerPipelineStepAdaptor(IPipelineStep step) {
 		super(step);		
 	}
 	
-	public void setProducerQueue(BlockingQueue<FilterEvent> producerQueue) {
+	public void setProducerQueue(BlockingQueue<Event> producerQueue) {
 		this.producerQueue = producerQueue;
 	}
 	
-	protected void addToQueue(FilterEvent event) {
+	protected void addToQueue(Event event) {
 		if (producerQueue == null) {
 			throw new RuntimeException("This class is a consumer not a producer");
 		}
@@ -49,16 +49,16 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedEventPipelineStepAd
 		}
 	}
 	
-	public FilterEvent handleEvent(FilterEvent event) {	
-		FilterEvent e = step.handleEvent(event);
+	public Event handleEvent(Event event) {			
+		Event e = step.handleEvent(event);
 		addToQueue(e);
 		return e;		
 	}
 	
 	@Override
 	protected PipelineReturnValue processBlockingQueue() {
-		FilterEvent event = handleEvent(null);
-		if (event.getEventType() == FilterEventType.FINISHED) {
+		Event event = handleEvent(null);
+		if (event.getEventType() == EventType.FINISHED) {
 			return PipelineReturnValue.SUCCEDED;
 		}
 		return PipelineReturnValue.RUNNING;

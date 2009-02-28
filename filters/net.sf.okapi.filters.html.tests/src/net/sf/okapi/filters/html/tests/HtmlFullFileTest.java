@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 
@@ -48,7 +48,7 @@ public class HtmlFullFileTest {
 			htmlFilter.open(htmlStream);
 			try {
 				while (htmlFilter.hasNext()) {
-					FilterEvent event = htmlFilter.next();
+					Event event = htmlFilter.next();
 				}
 			} catch (Exception e) {
 				//System.err.println("Error for file: " + f + ": " + e.toString());
@@ -63,7 +63,7 @@ public class HtmlFullFileTest {
 		MemMappedCharSequence charSequence = new MemMappedCharSequence(htmlStream, "UTF-8");
 		htmlFilter.open(charSequence);
 		while (htmlFilter.hasNext()) {
-			FilterEvent event = htmlFilter.next();
+			Event event = htmlFilter.next();
 		}
 	}
 }

@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 
 public interface IPipelineStep {
 
@@ -28,7 +28,7 @@ public interface IPipelineStep {
 	
 	void preprocess(); 	
 		
-	FilterEvent handleEvent(FilterEvent event);
+	Event handleEvent(Event event);
 	
 	void postprocess();
 	

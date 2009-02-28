@@ -18,10 +18,9 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.resource;
+package net.sf.okapi.common;
 
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.ISkeleton;
 
 /**
  * This interface provides access to the features common to all the types of resources for the filter events.  

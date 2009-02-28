@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartGroup;
@@ -105,12 +105,12 @@ public class OpenXMLSnippetsTest {
 		assertEquals(generateOutput(getEvents(snippet, MSWORD), snippet), snippet);
 	}
 */	
-	private ArrayList<FilterEvent> getEvents(String snippet, int filetype) {
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+	private ArrayList<Event> getEvents(String snippet, int filetype) {
+		ArrayList<Event> list = new ArrayList<Event>();
 		openXMLFilter.setUpConfig(filetype);
 		openXMLFilter.open(snippet);
 		while (openXMLFilter.hasNext()) {
-			FilterEvent event = openXMLFilter.next();
+			Event event = openXMLFilter.next();
 			openXMLFilter.displayOneEvent(event);
 			list.add(event);
 		}
@@ -118,12 +118,12 @@ public class OpenXMLSnippetsTest {
 		return list;
 	}
 
-	private String generateOutput(ArrayList<FilterEvent> list, String original) {
+	private String generateOutput(ArrayList<Event> list, String original) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
 		writer.processStart("en-US", "utf-8", null, new EncoderManager()); // DWH 2-18-09 changed en to en-US
-		for (FilterEvent event : list) {
+		for (Event event : list) {
 			switch (event.getEventType()) {
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();

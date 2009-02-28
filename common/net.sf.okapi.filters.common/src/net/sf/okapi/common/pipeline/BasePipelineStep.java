@@ -20,19 +20,23 @@
 
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	public FilterEvent handleEvent(FilterEvent event) {
+	public Event handleEvent(Event event) {
+		if (event == null) {
+			return null;
+		}
+
 		switch (event.getEventType()) {
 
 		case START:
-			handleStart(event);
+			preprocess();
 			break;
 
 		case FINISHED:
-			handleFinished(event);
+			postprocess();
 			break;
 
 		case START_DOCUMENT:
@@ -66,53 +70,47 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		case DOCUMENT_PART:
 			handleDocumentPart(event);
 			break;
-			
+
 		case FILE_RESOURCE:
 			handleFileResource(event);
 			break;
 
 		default:
-			break;
+			// TODO: specific exception
+			throw new RuntimeException("Unkown event");
 		}
 
 		return event;
 	}
 
-	// By default we eat all events - override these methods if need to process
+	// By default we simply pass the event on to the next step. Override these
+	// methods if need to process
 	// the event
-	
-	protected void handleDocumentPart(FilterEvent event) {
-	}
-	
-	protected void handleFinished(FilterEvent event) {
+
+	protected void handleDocumentPart(Event event) {
 	}
 
-	protected void handleStart(FilterEvent event) {
+	protected void handleStartDocument(Event event) {
 	}
 
-	protected void handleStartDocument(FilterEvent event) {
+	protected void handleEndDocument(Event event) {
 	}
 
-	protected void handleEndDocument(FilterEvent event) {
+	protected void handleStartSubDocument(Event event) {
 	}
 
-	protected void handleStartSubDocument(FilterEvent event) {
+	protected void handleEndSubDocument(Event event) {
 	}
 
-	protected void handleEndSubDocument(FilterEvent event) {
+	protected void handleStartGroup(Event event) {
 	}
 
-	protected void handleStartGroup(FilterEvent event) {
+	protected void handleEndGroup(Event event) {
 	}
 
-	protected void handleEndGroup(FilterEvent event) {
+	protected void handleTextUnit(Event event) {
 	}
 
-	protected void handleTextUnit(FilterEvent event) {
-	}
-	
-	protected void handleFileResource(FilterEvent event) {
-		// TODO: specific exception
-		throw new RuntimeException();
+	protected void handleFileResource(Event event) {
 	}
 }

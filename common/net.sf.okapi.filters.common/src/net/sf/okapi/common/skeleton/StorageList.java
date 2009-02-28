@@ -23,11 +23,11 @@ package net.sf.okapi.common.skeleton;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 

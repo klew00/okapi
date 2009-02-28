@@ -33,9 +33,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -60,7 +60,7 @@ public class RegexFilter implements IFilter {
 	private int otherId;
 	private String docName;
 	private TextUnit tuRes;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private int startSearch;
 	private int startSkl;
 	private int parseState = 0;
@@ -97,12 +97,12 @@ public class RegexFilter implements IFilter {
 		return (parseState > 0);
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Cancel if requested
 		if ( canceled ) {
 			parseState = 0;
 			queue.clear();
-			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			queue.add(new Event(EventType.CANCELED));
 		}
 		
 		// Process queue if it's not empty yet
@@ -174,9 +174,9 @@ public class RegexFilter implements IFilter {
 		// End finally set the end
 		// Set the ending call
 		Ending ending = new Ending(String.format("%d", ++otherId));
-		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+		queue.add(new Event(EventType.END_DOCUMENT, ending));
 		// Store the last event
-		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
+		queue.add(new Event(EventType.FINISHED, null));
 		return nextEvent();
 	}
 
@@ -284,8 +284,8 @@ public class RegexFilter implements IFilter {
 		params.compileRules();
 
 		// Set the start event
-		queue = new LinkedList<FilterEvent>();
-		queue.add(new FilterEvent(FilterEventType.START));
+		queue = new LinkedList<Event>();
+		queue.add(new Event(EventType.START));
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
@@ -294,10 +294,10 @@ public class RegexFilter implements IFilter {
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setType(params.mimeType);
 		startDoc.setMimeType(params.mimeType);
-		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 	
-	private FilterEvent processMatch (Rule rule,
+	private Event processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)
 	{
@@ -315,7 +315,7 @@ public class RegexFilter implements IFilter {
 				params.locDir.process(skel.toString());
 			}
 			// Then just return one skeleton event
-			return new FilterEvent(FilterEventType.DOCUMENT_PART,
+			return new Event(EventType.DOCUMENT_PART,
 				new DocumentPart(String.format("%d", ++otherId), false, skel));
 			
 		case Rule.RULETYPE_OPENGROUP:
@@ -342,13 +342,13 @@ public class RegexFilter implements IFilter {
 					}
 				}
 				groupStack.push(startGroup);
-				return new FilterEvent(FilterEventType.START_GROUP, startGroup);
+				return new Event(EventType.START_GROUP, startGroup);
 			}
 			else { // Close group
 				groupStack.pop();
 				Ending ending = new Ending(String.valueOf(++otherId));  
 				ending.setSkeleton(skel);
-				return new FilterEvent(FilterEventType.END_GROUP, ending);
+				return new Event(EventType.END_GROUP, ending);
 				
 			}
 		}
@@ -437,7 +437,7 @@ public class RegexFilter implements IFilter {
 			else tuRes.setName(name);
 		}
 
-		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
+		queue.add(new Event(EventType.TEXT_UNIT, tuRes));
 	}
 	
 	private void processStrings (Rule rule,
@@ -569,7 +569,7 @@ public class RegexFilter implements IFilter {
 					}
 					else tuRes.setName(name);
 				}
-				queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tuRes));
+				queue.add(new Event(EventType.TEXT_UNIT, tuRes));
 				// Reset the pointers: next skeleton will start from startSearch, end reset to -1
 				startSearch = end;
 			}
@@ -599,13 +599,13 @@ public class RegexFilter implements IFilter {
 		}
 		// Else: create a new skeleton entry
 		skel = new GenericSkeleton(data);
-		queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART,
+		queue.add(new Event(EventType.DOCUMENT_PART,
 			new DocumentPart(String.valueOf(++otherId), false, skel)));
 	}
 
-	private FilterEvent nextEvent () {
+	private Event nextEvent () {
 		if ( queue.size() == 0 ) return null;
-		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.FINISHED ) {
 			parseState = 0; // No more event after
 		}
 		return queue.poll();

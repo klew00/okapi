@@ -29,13 +29,14 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ThreadedEventPipeline implements IPipeline {
-	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 10;
+public class ThreadedPipeline implements IPipeline {
+	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 50;
 
 	private final PausableThreadPoolExecutor executor;
 	private final CompletionService<PipelineReturnValue> completionService;
@@ -45,13 +46,13 @@ public class ThreadedEventPipeline implements IPipeline {
 	private LinkedList<IPipelineStep> threadedSteps;
 	private LinkedList<IPipelineStep> nonThreadedSteps;
 
-	private BlockingQueue<FilterEvent> previousQueue;
+	private BlockingQueue<Event> previousQueue;
 
-	public ThreadedEventPipeline() {
+	public ThreadedPipeline() {
 		this(PausableThreadPoolExecutor.newCachedThreadPool(), DEFAULT_BLOCKING_QUEUE_SIZE);
 	}
 
-	public ThreadedEventPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
+	public ThreadedPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
 		totalThreads = 0;
 		this.executor = executor;
 		this.blockingQueueSize = blockingQueueSize;
@@ -63,13 +64,14 @@ public class ThreadedEventPipeline implements IPipeline {
 	}
 
 	public void execute() {
-		BlockingQueue<FilterEvent> queue = null;
+		BlockingQueue<Event> queue = null;
 		for (IPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
 				// first step is a producer wrap it with threaded adaptor
-				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
-				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
+				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);			
+				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);				
 				producerStep.setProducerQueue(queue);
+				producerStep.addToQueue(new Event(EventType.START));
 				completionService.submit(producerStep);
 				threadedSteps.add(producerStep);
 			} else if (step == nonThreadedSteps.getLast()) {
@@ -87,7 +89,7 @@ public class ThreadedEventPipeline implements IPipeline {
 					throw new RuntimeException("Previous queue should not be null");
 				}
 				ProducerConsumerPipelineStepAdaptor producerConsumerStep = new ProducerConsumerPipelineStepAdaptor(step);
-				queue = new ArrayBlockingQueue<FilterEvent>(blockingQueueSize, false);
+				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);
 				producerConsumerStep.setProducerQueue(queue);
 				producerConsumerStep.setConsumerQueue(previousQueue);
 				completionService.submit(producerConsumerStep);

@@ -52,9 +52,9 @@ import net.htmlparser.jericho.Tag;
 //import net.sf.okapi.common.encoder.HtmlEncoder;
 //import net.sf.okapi.common.filters.BaseFilter;
 //import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 //import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
@@ -160,7 +160,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 
 	public void displayEvents()
 	{
-		FilterEvent event;
+		Event event;
 		while (hasNext()) {
 			event = next();
 			displayOneEvent(event); // DWh 2-16-09 broke this out
@@ -169,15 +169,15 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		System.out.println("");
 	}
 
-	public void displayOneEvent(FilterEvent event)
+	public void displayOneEvent(Event event)
 	{
 		String etyp=event.getEventType().toString();
-		if (event.getEventType() == FilterEventType.TEXT_UNIT) {
+		if (event.getEventType() == EventType.TEXT_UNIT) {
 //			assertTrue(event.getResource() instanceof TextUnit);
-		} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
+		} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 //			assertTrue(event.getResource() instanceof DocumentPart);
-		} else if (event.getEventType() == FilterEventType.START_GROUP
-				|| event.getEventType() == FilterEventType.END_GROUP) {
+		} else if (event.getEventType() == EventType.START_GROUP
+				|| event.getEventType() == EventType.END_GROUP) {
 //			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
 		}
 		if (etyp.equals("START"))

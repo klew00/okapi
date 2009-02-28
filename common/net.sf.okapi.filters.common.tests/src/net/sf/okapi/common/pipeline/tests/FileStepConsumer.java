@@ -1,12 +1,12 @@
 package net.sf.okapi.common.pipeline.tests;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class FileStepConsumer extends BasePipelineStep {
 
 	@Override
-	protected void handleFileResource(FilterEvent event) {
+	protected void handleFileResource(Event event) {
 		System.out.println("EventType: " + event.getEventType().name());
 	}
 	

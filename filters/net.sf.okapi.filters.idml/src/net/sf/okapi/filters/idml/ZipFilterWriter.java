@@ -31,10 +31,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -119,7 +119,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		return null;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START:
 			processStart();
@@ -212,7 +212,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		close();
 	}
 	
-	private void processDocumentPart (FilterEvent event) {
+	private void processDocumentPart (Event event) {
 		// Treat top-level ZipSkeleton events
 		DocumentPart res = (DocumentPart)event.getResource();
 		if ( res.getSkeleton() instanceof ZipSkeleton ) {
@@ -255,18 +255,18 @@ public class ZipFilterWriter implements IFilterWriter {
 		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
-		subDocWriter.handleEvent(new FilterEvent(FilterEventType.START));
+		subDocWriter.handleEvent(new Event(EventType.START));
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setSkeleton(res.getSkeleton());
-		subDocWriter.handleEvent(new FilterEvent(FilterEventType.START_DOCUMENT, sd));
+		subDocWriter.handleEvent(new Event(EventType.START_DOCUMENT, sd));
 	}
 	
 	private void processEndSubDocument (Ending res) {
 		try {
 			// Finish writing the sub-document
-			subDocWriter.handleEvent(new FilterEvent(FilterEventType.END_DOCUMENT, res));
-			subDocWriter.handleEvent(new FilterEvent(FilterEventType.FINISHED));
+			subDocWriter.handleEvent(new Event(EventType.END_DOCUMENT, res));
+			subDocWriter.handleEvent(new Event(EventType.FINISHED));
 			subDocWriter.close();
 
 			// Create the new entry from the temporary output file

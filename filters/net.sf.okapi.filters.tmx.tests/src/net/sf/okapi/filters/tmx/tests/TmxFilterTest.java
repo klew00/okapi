@@ -1,12 +1,13 @@
 package net.sf.okapi.filters.tmx.tests;
 
 import java.io.InputStream;
-import net.sf.okapi.common.filters.FilterEvent;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tmx.TmxFilter;
@@ -46,7 +47,7 @@ public class TmxFilterTest {
 	private void process (IFilter filter) {
 		
 		System.out.println("==================================================");
-		FilterEvent event;
+		Event event;
 		while ( filter.hasNext() ) {
 			event = filter.next();
 			switch ( event.getEventType() ) {

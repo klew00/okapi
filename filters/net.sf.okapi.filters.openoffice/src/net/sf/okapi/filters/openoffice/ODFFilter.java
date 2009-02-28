@@ -37,10 +37,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.codehaus.stax2.XMLInputFactory2;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
@@ -72,7 +72,7 @@ public class ODFFilter implements IFilter {
 	private Hashtable<String, ElementRule> toExtract;
 	private ArrayList<String> toProtect;
 	private ArrayList<String> subFlow;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private String docName;
 	private XMLStreamReader reader;
 	private Stack<Boolean> extract;
@@ -167,8 +167,8 @@ public class ODFFilter implements IFilter {
 			otherId = 0;
 			tuId = 0;
 
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
+			queue = new LinkedList<Event>();
+			queue.add(new Event(EventType.START));
 			hasNext = true;
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
@@ -177,7 +177,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setType(startDoc.getMimeType());
 			startDoc.setEncoding("UTF-8", false);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
@@ -216,11 +216,11 @@ public class ODFFilter implements IFilter {
 		return params;
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Treat cancel
 		if ( canceled ) {
 			queue.clear();
-			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			queue.add(new Event(EventType.CANCELED));
 			hasNext = false;
 		}
 		// Fill the queue if it's empty
@@ -228,7 +228,7 @@ public class ODFFilter implements IFilter {
 			read();
 		}
 		// Update hasNext flag on the FINISHED event
-		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.FINISHED ) {
 			hasNext = false;
 		}
 		// Return the head of the queue
@@ -289,8 +289,8 @@ public class ODFFilter implements IFilter {
 				case XMLStreamConstants.END_DOCUMENT:
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
-					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-					queue.add(new FilterEvent(FilterEventType.FINISHED));
+					queue.add(new Event(EventType.END_DOCUMENT, ending));
+					queue.add(new Event(EventType.FINISHED));
 					return;
 				
 				case XMLStreamConstants.START_ELEMENT:
@@ -384,7 +384,7 @@ public class ODFFilter implements IFilter {
 			if ( !skel.isEmpty(true) ) {
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 				dp.setSkeleton(skel);
-				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
 				skel = new GenericSkeleton(); // Start new skeleton 
 			}
 			// Start the new text-unit
@@ -476,7 +476,7 @@ public class ODFFilter implements IFilter {
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 				skel.append(buildEndTag(name)+"\n");
 				dp.setSkeleton(skel);
-				queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
 				return true;
 			}
 			// Else: Send a text unit
@@ -491,7 +491,7 @@ public class ODFFilter implements IFilter {
 			// Note: we may keep adding extra lines if one exists already!
 			//TODO: find a way to add \n only if needed
 			skel.append(buildEndTag(name)+"\n");
-			queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+			queue.add(new Event(EventType.TEXT_UNIT, tu));
 			return true;
 		}
 		else {

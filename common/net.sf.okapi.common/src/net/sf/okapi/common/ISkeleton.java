@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common;
 
 /**
  * Represents a skeleton object. It is an object that is associated to a resource and carries data

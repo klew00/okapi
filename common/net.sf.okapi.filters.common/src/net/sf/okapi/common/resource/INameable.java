@@ -22,6 +22,8 @@ package net.sf.okapi.common.resource;
 
 import java.util.Set;
 
+import net.sf.okapi.common.IResource;
+
 /**
  * Provides the methods common to all resources that can be named and have properties. 
  */

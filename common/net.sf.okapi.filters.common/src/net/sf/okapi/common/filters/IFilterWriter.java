@@ -22,6 +22,7 @@ package net.sf.okapi.common.filters;
 
 import java.io.OutputStream;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -61,7 +62,7 @@ public interface IFilterWriter {
 	 * @param event The event to process.
 	 * @return The event that was processed.
 	 */
-	public FilterEvent handleEvent (FilterEvent event);
+	public Event handleEvent (Event event);
 
 	/**
 	 * Closes the output. Developers must make sure this method is safe to call

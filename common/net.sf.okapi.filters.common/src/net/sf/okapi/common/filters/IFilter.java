@@ -23,6 +23,7 @@ package net.sf.okapi.common.filters;
 import java.io.InputStream;
 import java.net.URI;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -110,9 +111,9 @@ public interface IFilter {
 
 	/**
 	 * Gets the next event available.
-	 * @return The next event available.
+	 * @return The next event available or null if there are no events.
 	 */
-	public FilterEvent next ();	
+	public Event next ();	
 
 	/**
 	 * Cancels the current process.

@@ -28,7 +28,7 @@ import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipeline.tests.Consumer;
 import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
 import net.sf.okapi.common.pipeline.tests.Producer;
-import net.sf.okapi.common.threadedpipeline.ThreadedEventPipeline;
+import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class ThreadedPipelineTest {
 
 	@Test
 	public void runPipelineAsThread() {
-		final IPipeline pipeline = new ThreadedEventPipeline();
+		final IPipeline pipeline = new ThreadedPipeline();
 
 		Runnable runnable = new Runnable() {
 			public void run() {
@@ -77,7 +77,7 @@ public class ThreadedPipelineTest {
 
 	//@Test
 	public void runPipeline() {
-		IPipeline pipeline = new ThreadedEventPipeline();
+		IPipeline pipeline = new ThreadedPipeline();
 		pipeline.addStep(new Producer());
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());

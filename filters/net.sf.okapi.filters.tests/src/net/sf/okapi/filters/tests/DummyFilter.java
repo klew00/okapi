@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.LinkedList;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
@@ -41,7 +41,7 @@ import net.sf.okapi.common.writer.GenericFilterWriter;
 public class DummyFilter implements IFilter {
 
 	private boolean canceled;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private String srcLang;
 	private String trgLang;
 
@@ -72,10 +72,10 @@ public class DummyFilter implements IFilter {
 		return (( queue != null ) && ( !queue.isEmpty() )); 
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		if ( canceled ) {
 			queue.clear();
-			return new FilterEvent(FilterEventType.CANCELED);
+			return new Event(EventType.CANCELED);
 		}
 		return queue.poll();
 	}
@@ -121,9 +121,9 @@ public class DummyFilter implements IFilter {
 
 	private void reset () {
 		close();
-		queue = new LinkedList<FilterEvent>();
+		queue = new LinkedList<Event>();
 
-		queue.add(new FilterEvent(FilterEventType.START));
+		queue.add(new Event(EventType.START));
 		
 		StartDocument sd = new StartDocument("sd1");
 		sd.setLanguage(srcLang);
@@ -131,7 +131,7 @@ public class DummyFilter implements IFilter {
 		sd.setMimeType("text/xml");
 		GenericSkeleton skel = new GenericSkeleton("<doc>\n");
 		sd.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, sd));
+		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
 		TextUnit tu = new TextUnit("tu1");
 		TextContainer tc = tu.getSource();
@@ -142,7 +142,7 @@ public class DummyFilter implements IFilter {
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");
 		tu.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		tu = new TextUnit("tu2");
 		tc = tu.getSource();
@@ -151,14 +151,14 @@ public class DummyFilter implements IFilter {
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");
 		tu.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		Ending ending = new Ending("ed1");
 		skel = new GenericSkeleton("</doc>\n");
 		ending.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
+		queue.add(new Event(EventType.END_DOCUMENT, ending));
 		
-		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		queue.add(new Event(EventType.FINISHED));
 	}
 
 }

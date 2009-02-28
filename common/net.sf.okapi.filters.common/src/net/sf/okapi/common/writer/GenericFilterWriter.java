@@ -32,10 +32,10 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -128,7 +128,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		return null;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
 			case START:

@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -104,24 +104,24 @@ public class HtmlSnippetsTest {
 		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
 	}
 	
-	private ArrayList<FilterEvent> getEvents(String snippet) {
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.open(snippet);
 		htmlFilter.setDefaultConfig("net/sf/okapi/filters/html/tests/testConfiguration1.yml");
 		while (htmlFilter.hasNext()) {
-			FilterEvent event = htmlFilter.next();
+			Event event = htmlFilter.next();
 			list.add(event);
 		}
 		htmlFilter.close();
 		return list;
 	}
 
-	private String generateOutput(ArrayList<FilterEvent> list, String original) {
+	private String generateOutput(ArrayList<Event> list, String original) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
 		writer.processStart();
-		for (FilterEvent event : list) {
+		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
 				writer.processStartDocument("en", "utf-8", null, new EncoderManager(),

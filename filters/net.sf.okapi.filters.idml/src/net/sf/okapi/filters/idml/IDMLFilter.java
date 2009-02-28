@@ -30,9 +30,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -57,7 +57,7 @@ public class IDMLFilter implements IFilter {
 	private URI docURI;
 	private Enumeration<? extends ZipEntry> entries;
 	private int subDocId;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private String srcLang;
 	private IDMLContentFilter filter;
 	private Parameters params;
@@ -107,7 +107,7 @@ public class IDMLFilter implements IFilter {
 		return ((( queue != null ) && ( !queue.isEmpty() )) || ( nextAction != NextAction.DONE ));
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Send remaining event from the queue first
 		if ( queue.size() > 0 ) {
 			return queue.poll();
@@ -142,7 +142,7 @@ public class IDMLFilter implements IFilter {
 		close();
 		docURI = inputURI;
 		nextAction = NextAction.OPENZIP;
-		queue = new LinkedList<FilterEvent>();
+		queue = new LinkedList<Event>();
 		filter = new IDMLContentFilter();
 	}
 
@@ -165,7 +165,7 @@ public class IDMLFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
-	private FilterEvent openZipFile () {
+	private Event openZipFile () {
 		try {
 			zipFile = new ZipFile(new File(docURI));
 			entries = zipFile.entries();
@@ -177,9 +177,9 @@ public class IDMLFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc, skel));
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc, skel));
 			
-			return new FilterEvent(FilterEventType.START);
+			return new Event(EventType.START);
 		}
 		catch ( ZipException e ) {
 			throw new RuntimeException(e);
@@ -189,7 +189,7 @@ public class IDMLFilter implements IFilter {
 		}
 	}
 	
-	private FilterEvent nextInZipFile () {
+	private Event nextInZipFile () {
 		while( entries.hasMoreElements() ) {
 			entry = entries.nextElement();
 			if ( entry.getName().startsWith("Stories/")
@@ -199,22 +199,22 @@ public class IDMLFilter implements IFilter {
 			else {
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
-				return new FilterEvent(FilterEventType.DOCUMENT_PART, dp, skel);
+				return new Event(EventType.DOCUMENT_PART, dp, skel);
 			}
 		}
 
 		// No more sub-documents: end of the ZIP document
 		close();
-		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		queue.add(new Event(EventType.FINISHED));
 		Ending ending = new Ending("ed");
-		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
+		return new Event(EventType.END_DOCUMENT, ending);
 	}
 	
-	private FilterEvent openSubDocument () {
+	private Event openSubDocument () {
 		filter.close(); // Make sure the previous is closed
 		filter.setParameters(params);
 		filter.setOptions(srcLang, "UTF-8", true);
-		FilterEvent event;
+		Event event;
 		try {
 			filter.open(zipFile.getInputStream(entry));
 			filter.next(); // START
@@ -230,11 +230,11 @@ public class IDMLFilter implements IFilter {
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
 			(GenericSkeleton)event.getResource().getSkeleton(), entry);
-		return new FilterEvent(FilterEventType.START_SUBDOCUMENT, sd, skel);
+		return new Event(EventType.START_SUBDOCUMENT, sd, skel);
 	}
 	
-	private FilterEvent nextInSubDocument () {
-		FilterEvent event;
+	private Event nextInSubDocument () {
+		Event event;
 		while ( filter.hasNext() ) {
 			event = filter.next();
 			switch ( event.getEventType() ) {
@@ -246,7 +246,7 @@ public class IDMLFilter implements IFilter {
 				nextAction = NextAction.NEXTINZIP;
 				ZipSkeleton skel = new ZipSkeleton(
 					(GenericSkeleton)event.getResource().getSkeleton(), entry);
-				return new FilterEvent(FilterEventType.END_SUBDOCUMENT, ending, skel);
+				return new Event(EventType.END_SUBDOCUMENT, ending, skel);
 			
 			default: // Else: just pass the event through
 				return event;

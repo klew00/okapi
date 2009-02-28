@@ -1,8 +1,8 @@
 package net.sf.okapi.common.pipeline.tests;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.FileResource;
 
@@ -10,14 +10,14 @@ public class FileStepProducer extends BasePipelineStep {
 	private boolean hasNext = true;
 	
 	@Override
-	public FilterEvent handleEvent(FilterEvent event) {	
+	public Event handleEvent(Event event) {	
 		if (!hasNext) {
-			FilterEvent e = new FilterEvent(FilterEventType.FINISHED, null);
+			Event e = new Event(EventType.FINISHED, null);
 			return e;
 		}
 		
 		FileResource r = new FileResource(new MemMappedCharSequence("Test a file event"), "plain/txt", "en");
-		FilterEvent e = new FilterEvent(FilterEventType.FILE_RESOURCE, r);
+		Event e = new Event(EventType.FILE_RESOURCE, r);
 		hasNext = false;
 		return e;
 	}

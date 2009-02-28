@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.skeleton;
 
-import net.sf.okapi.common.resource.IResource;
+import net.sf.okapi.common.IResource;
 
 public class GenericSkeletonPart {
 

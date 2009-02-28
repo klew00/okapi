@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.pipeline;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.IFilterWriter;
 
 public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
@@ -42,7 +42,7 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	}
 	
 	@Override
-	public FilterEvent handleEvent(FilterEvent event) {
+	public Event handleEvent(Event event) {		
 		return filterWriter.handleEvent(event);		
 	}
 

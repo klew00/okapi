@@ -32,10 +32,11 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.codehaus.stax2.XMLInputFactory2;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -63,7 +64,7 @@ public class TmxFilter implements IFilter {
 	private TextUnit tu;
 	private Parameters params;
 	private Stack<Integer> parentIds;
-	private Queue<FilterEvent> queue;
+	private Queue<Event> queue;
 	private String srcLang;
 	private String trgLang;
 	private int groupId;
@@ -108,12 +109,12 @@ public class TmxFilter implements IFilter {
 		return hasNext;		
 	}
 	
-	public FilterEvent next () {
+	public Event next () {
 		try {		
 			// Check for cancellation first
 			if ( canceled ) {
 				queue.clear();
-				queue.add(new FilterEvent(FilterEventType.CANCELED));
+				queue.add(new Event(EventType.CANCELED));
 				hasNext = false;
 			}
 			
@@ -122,13 +123,13 @@ public class TmxFilter implements IFilter {
 				if ( !read() ) {
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
-					queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-					queue.add(new FilterEvent(FilterEventType.FINISHED));
+					queue.add(new Event(EventType.END_DOCUMENT, ending));
+					queue.add(new Event(EventType.FINISHED));
 				}
 			}
 
 			// Return the head of the queue
-			if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+			if ( queue.peek().getEventType() == EventType.FINISHED ) {
 				hasNext = false;
 			}
 			return queue.poll();		
@@ -235,8 +236,8 @@ public class TmxFilter implements IFilter {
 			}
 			
 			// Set the start event
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
+			queue = new LinkedList<Event>();
+			queue.add(new Event(EventType.START));
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
@@ -246,7 +247,7 @@ public class TmxFilter implements IFilter {
 			startDoc.setType("text/x-tmx");
 			startDoc.setMimeType("text/x-tmx");
 			startDoc.setIsMultilingual(true);
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));			
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc));			
 			
 			// The XML declaration is not reported by the parser, so we need to
 			// create it as a document part when starting			
@@ -295,7 +296,7 @@ public class TmxFilter implements IFilter {
 		group.setName(reader.getLocalName());
 		group.setSkeleton(skel);
 		parentIds.push(groupId);
-		queue.add(new FilterEvent(FilterEventType.START_GROUP, group));
+		queue.add(new Event(EventType.START_GROUP, group));
 		return true;
 	}	
 	
@@ -305,7 +306,7 @@ public class TmxFilter implements IFilter {
 
 		Ending ending = new Ending(String.valueOf(id));
 		ending.setSkeleton(skel);
-		queue.add(new FilterEvent(FilterEventType.END_GROUP, ending));
+		queue.add(new Event(EventType.END_GROUP, ending));
 		return true;
 	}
 
@@ -400,7 +401,7 @@ public class TmxFilter implements IFilter {
 					if(reader.getLocalName().equals(startElement)){
 						storeEndElement();
 						dp.setSkeleton(skel);
-						queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+						queue.add(new Event(EventType.DOCUMENT_PART, dp));
 						return true;						
 					}
 					break;
@@ -510,7 +511,7 @@ public class TmxFilter implements IFilter {
 		if ( !skel.isEmpty(true) ) {
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
 			skel = new GenericSkeleton(); // And create a new skeleton for the next event
-			queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		
 		tuvType=0;	//--1 for source, 2 for target, otherwise 0 language independent--
@@ -562,7 +563,7 @@ public class TmxFilter implements IFilter {
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType("text/xml");
-						queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						return true;
 					}else if(localName.equals("tuv")){
 						storeEndElement();

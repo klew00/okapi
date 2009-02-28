@@ -23,8 +23,8 @@ package net.sf.okapi.common.pipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
@@ -52,30 +52,28 @@ public class Pipeline implements IPipeline {
 	}
 
 	public void execute() {
-		// preprocess
-		initialStep.preprocess();
+		// send intial start event
+		Event startEvent = new Event(EventType.START);		
 		for (IPipelineStep step : steps) {
-			if (cancel)
-				return;
-			step.preprocess();
+			step.handleEvent(startEvent);
 		}
-
+		
 		while (!stop) {
 			if (pause)
 				continue;
-			FilterEvent event = initialStep.handleEvent(null);
-			for (IPipelineStep step : steps) {
-				step.handleEvent(event);
-			}
-			if (event.getEventType() == FilterEventType.FINISHED) {
-				stop = true;
-			}
+			Event event = initialStep.handleEvent(null);
+			if (event != null) {
+				for (IPipelineStep step : steps) {
+					step.handleEvent(event);
+				}
+	
+			} else stop = true;			
 		}
-
-		// postprocess (cleanup)
-		initialStep.postprocess();
+		
+		Event finishEvent = new Event(EventType.FINISHED);
+		initialStep.handleEvent(finishEvent);
 		for (IPipelineStep step : steps) {
-			step.postprocess();
+			step.handleEvent(finishEvent);
 		}
 	}
 

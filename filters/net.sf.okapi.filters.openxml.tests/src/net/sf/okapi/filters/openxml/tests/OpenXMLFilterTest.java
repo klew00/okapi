@@ -19,8 +19,8 @@
 
 package net.sf.okapi.filters.openxml.tests;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 
@@ -100,15 +100,15 @@ public class OpenXMLFilterTest {
 	
 	public void displayEvents()
 	{
-		FilterEvent event;
+		Event event;
 		while (openXMLFilter.hasNext()) {
 			event = openXMLFilter.next();
-			if (event.getEventType() == FilterEventType.TEXT_UNIT) {
+			if (event.getEventType() == EventType.TEXT_UNIT) {
 				assertTrue(event.getResource() instanceof TextUnit);
-			} else if (event.getEventType() == FilterEventType.DOCUMENT_PART) {
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 				assertTrue(event.getResource() instanceof DocumentPart);
-			} else if (event.getEventType() == FilterEventType.START_GROUP
-					|| event.getEventType() == FilterEventType.END_GROUP) {
+			} else if (event.getEventType() == EventType.START_GROUP
+					|| event.getEventType() == EventType.END_GROUP) {
 				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
 			}
 			System.out.println(event.getEventType().toString() + ": ");

@@ -35,10 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
@@ -66,7 +66,7 @@ public class PropertiesFilter implements IFilter {
 	private boolean canceled;
 	private String encoding;
 	private TextUnit tuRes;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private String textLine;
 	private int lineNumber;
 	private int lineSince;
@@ -119,12 +119,12 @@ public class PropertiesFilter implements IFilter {
 		return (parseState > 0);
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Cancel if requested
 		if ( canceled ) {
 			parseState = 0;
 			queue.clear();
-			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			queue.add(new Event(EventType.CANCELED));
 		}
 		
 		// Process queue if it's not empty yet
@@ -144,7 +144,7 @@ public class PropertiesFilter implements IFilter {
 				break;
 			case RESULT_ITEM:
 				// It's a text-unit, the skeleton is already set
-				return new FilterEvent(FilterEventType.TEXT_UNIT, tuRes);
+				return new Event(EventType.TEXT_UNIT, tuRes);
 			default:
 				resetBuffer = true;
 				break;
@@ -152,12 +152,12 @@ public class PropertiesFilter implements IFilter {
 		} while ( n > RESULT_END );
 		
 		// Store the ending for next call
-		queue.add(new FilterEvent(FilterEventType.FINISHED, null));
+		queue.add(new Event(EventType.FINISHED, null));
 		// Set the ending call
 		Ending ending = new Ending(String.valueOf(++otherId));
 		ending.setSkeleton(skel);
 		parseState = 2;
-		return new FilterEvent(FilterEventType.END_DOCUMENT, ending);
+		return new Event(EventType.END_DOCUMENT, ending);
 	}
 
 	public void open (InputStream input) {
@@ -250,8 +250,8 @@ public class PropertiesFilter implements IFilter {
 			params.codeFinder.compile();
 		}
 		// Set the start event
-		queue = new LinkedList<FilterEvent>();
-		queue.add(new FilterEvent(FilterEventType.START));
+		queue = new LinkedList<Event>();
+		queue.add(new Event(EventType.START));
 
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
@@ -261,7 +261,7 @@ public class PropertiesFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType("text/x-properties");
 		startDoc.setMimeType("text/x-properties");
-		queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 
 	private int readItem (boolean resetBuffer) {

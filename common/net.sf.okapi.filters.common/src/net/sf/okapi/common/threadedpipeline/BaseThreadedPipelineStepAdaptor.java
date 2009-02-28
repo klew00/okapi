@@ -26,12 +26,12 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public abstract class BaseThreadedEventPipelineStepAdaptor extends BasePipelineStep implements Callable<PipelineReturnValue> {
+public abstract class BaseThreadedPipelineStepAdaptor extends BasePipelineStep implements Callable<PipelineReturnValue> {
 	protected IPipelineStep step;
 	private PipelineReturnValue result;
 	private volatile boolean pause;
 
-	public BaseThreadedEventPipelineStepAdaptor(IPipelineStep step) {
+	public BaseThreadedPipelineStepAdaptor(IPipelineStep step) {
 		this.step = step;
 	}
 

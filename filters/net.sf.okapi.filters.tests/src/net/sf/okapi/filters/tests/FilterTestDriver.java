@@ -23,13 +23,13 @@ package net.sf.okapi.filters.tests;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.ISkeleton;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -44,14 +44,14 @@ public class FilterTestDriver {
 	private int warnings;
 	private boolean ok;
 
-	static public boolean compareEvents(ArrayList<FilterEvent> manual, ArrayList<FilterEvent> generated) {
+	static public boolean compareEvents(ArrayList<Event> manual, ArrayList<Event> generated) {
 		if (manual.size() != generated.size()) {
 			return false;
 		}
 
-		Iterator<FilterEvent> manualIt = manual.iterator();
-		for (FilterEvent ge : generated) {
-			FilterEvent me = manualIt.next();
+		Iterator<Event> manualIt = manual.iterator();
+		for (Event ge : generated) {
+			Event me = manualIt.next();
 			if (ge.getEventType() != me.getEventType()) {
 				return false;
 			}
@@ -156,7 +156,7 @@ public class FilterTestDriver {
 		int endSubDoc = 0;
 
 		System.out.println("================================================");
-		FilterEvent event;
+		Event event;
 		while (filter.hasNext()) {
 			event = filter.next();
 			switch (event.getEventType()) {

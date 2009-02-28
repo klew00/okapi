@@ -19,8 +19,8 @@
 /*===========================================================================*/
 package net.sf.okapi.common.pipeline.tests;
 
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Producer extends BasePipelineStep {	
@@ -38,14 +38,15 @@ public class Producer extends BasePipelineStep {
 		System.out.println(getName() + " preprocess");		
 	}
 
-	public FilterEvent handleEvent(FilterEvent event) {		
+	public Event handleEvent(Event event) {	
+		super.handleEvent(event);
+		
 		eventCount++;
-		if (eventCount >= 10) {
-			event = new FilterEvent(FilterEventType.FINISHED, null); 				
-			return event;
+		if (eventCount >= 10) {					
+			return null;
 		}
 		
-		event = new FilterEvent(FilterEventType.TEXT_UNIT, null);		
+		event = new Event(EventType.TEXT_UNIT, null);		
 		return event;
 	}
 

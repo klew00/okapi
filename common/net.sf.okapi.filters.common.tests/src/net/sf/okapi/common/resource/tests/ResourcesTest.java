@@ -22,9 +22,9 @@ package net.sf.okapi.common.resource.tests;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -41,7 +41,7 @@ public class ResourcesTest extends TestCase {
 	public void testMETATag1 () {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		System.out.println(" in: "+test);
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
@@ -52,7 +52,7 @@ public class ResourcesTest extends TestCase {
 		tu.setIsReferent(true);
 		tu.setName("content");
 		tu.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		list.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
@@ -60,7 +60,7 @@ public class ResourcesTest extends TestCase {
 		skel.addReference(tu);
 		skel.add("/>");
 		dp.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
@@ -69,7 +69,7 @@ public class ResourcesTest extends TestCase {
 	public void testPWithAttributes () {
 		String test = "<p title='my title'>Text of p</p>";
 		System.out.println(" in: "+test);
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
@@ -80,7 +80,7 @@ public class ResourcesTest extends TestCase {
 		tu1.setIsReferent(true);
 		tu1.setName("title");
 		tu1.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		list.add(new Event(EventType.TEXT_UNIT, tu1));
 		
 		skel = new GenericSkeleton();
 		TextUnit tu2 = new TextUnit("tu2", "Text of p");		
@@ -90,7 +90,7 @@ public class ResourcesTest extends TestCase {
 		skel.addContentPlaceholder(tu2);
 		skel.append("</p>");
 		tu2.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu2));
+		list.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
@@ -99,7 +99,7 @@ public class ResourcesTest extends TestCase {
 	public void testComplexEmptyElement () {
 		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
 		System.out.println(" in: "+test);
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
@@ -110,7 +110,7 @@ public class ResourcesTest extends TestCase {
 		tu.setIsReferent(true);
 		tu.setName("text");
 		tu.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+		list.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
@@ -126,7 +126,7 @@ public class ResourcesTest extends TestCase {
 		skel.append("/>");
 		
 		dp.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
@@ -135,7 +135,7 @@ public class ResourcesTest extends TestCase {
 	public void testPWithInlines () {
 		String test = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
 		System.out.println(" in: "+test);
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		ArrayList<Event> list = new ArrayList<Event>();
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp1 = new DocumentPart("dp1", true);
@@ -145,7 +145,7 @@ public class ResourcesTest extends TestCase {
 		skel.add("\"/>");
 		dp1.setName("a");
 		dp1.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp1));
+		list.add(new Event(EventType.DOCUMENT_PART, dp1));
 		
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
@@ -162,7 +162,7 @@ public class ResourcesTest extends TestCase {
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
 		tu1.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu1));
+		list.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
@@ -172,7 +172,7 @@ public class ResourcesTest extends TestCase {
 	public void testMETATag2 () {
 		String test = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
 		System.out.println(" in: "+test);
-		ArrayList<FilterEvent> list = new ArrayList<FilterEvent>();
+		ArrayList<Event> list = new ArrayList<Event>();
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
@@ -181,19 +181,19 @@ public class ResourcesTest extends TestCase {
 		skel.add("\"/>");
 		dp.setSourceProperty(new Property("language", "en", false));
 		dp.setSkeleton(skel);
-		list.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
 	}
 	
-	private String generateOutput (ArrayList<FilterEvent> list,
+	private String generateOutput (ArrayList<Event> list,
 		String original)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		writer.processStart();
-		for ( FilterEvent event : list ) {
+		for ( Event event : list ) {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
 				writer.processStartDocument("en", "utf-8", null, new EncoderManager(),

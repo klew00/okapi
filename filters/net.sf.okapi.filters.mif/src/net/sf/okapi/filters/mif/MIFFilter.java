@@ -29,9 +29,9 @@ import java.net.URI;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -60,7 +60,7 @@ public class MIFFilter implements IFilter {
 	private int level;
 	private TextContainer cont;
 	private boolean canceled;
-	private LinkedList<FilterEvent> queue;
+	private LinkedList<Event> queue;
 	private String srcLang;
 	private GenericSkeleton skel;
 	private boolean hasNext;
@@ -152,8 +152,8 @@ public class MIFFilter implements IFilter {
 			canceled = false;
 			hasNext = true;
 			
-			queue = new LinkedList<FilterEvent>();
-			queue.add(new FilterEvent(FilterEventType.START));
+			queue = new LinkedList<Event>();
+			queue.add(new Event(EventType.START));
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
@@ -161,7 +161,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType(getMimeType());
 			startDoc.setMimeType(getMimeType());
-			queue.add(new FilterEvent(FilterEventType.START_DOCUMENT, startDoc));
+			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);
@@ -186,11 +186,11 @@ public class MIFFilter implements IFilter {
 	public void setParameters (IParameters params) {
 	}
 
-	public FilterEvent next () {
+	public Event next () {
 		// Treat cancel
 		if ( canceled ) {
 			queue.clear();
-			queue.add(new FilterEvent(FilterEventType.CANCELED));
+			queue.add(new Event(EventType.CANCELED));
 			hasNext = false;
 		}
 		// Fill the queue if it's empty
@@ -198,7 +198,7 @@ public class MIFFilter implements IFilter {
 			read();
 		}
 		// Update hasNext flag on the FINISHED event
-		if ( queue.peek().getEventType() == FilterEventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.FINISHED ) {
 			hasNext = false;
 		}
 		// Return the head of the queue
@@ -249,7 +249,7 @@ public class MIFFilter implements IFilter {
 							tu.setMimeType("text/x-mif");
 							skel.addContentPlaceholder(tu);
 							tu.setSkeleton(skel);
-							queue.add(new FilterEvent(FilterEventType.TEXT_UNIT, tu));
+							queue.add(new Event(EventType.TEXT_UNIT, tu));
 							return;
 						}
 					}
@@ -257,7 +257,7 @@ public class MIFFilter implements IFilter {
 					level--;
 					// Return skeleton
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
-					queue.add(new FilterEvent(FilterEventType.DOCUMENT_PART, dp));
+					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					return;
 				case '`':
 					if (( inPara > -1 ) && ( level == inString )) {
@@ -275,17 +275,17 @@ public class MIFFilter implements IFilter {
 			}
 			
 			Ending ending = new Ending(String.valueOf(++otherId)); 
-			queue.add(new FilterEvent(FilterEventType.END_DOCUMENT, ending));
-			queue.add(new FilterEvent(FilterEventType.FINISHED));
+			queue.add(new Event(EventType.END_DOCUMENT, ending));
+			queue.add(new Event(EventType.FINISHED));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
 
 		// Else: we are done
-		queue.add(new FilterEvent(FilterEventType.END_DOCUMENT,
+		queue.add(new Event(EventType.END_DOCUMENT,
 			new Ending(String.valueOf(++otherId))));
-		queue.add(new FilterEvent(FilterEventType.FINISHED));
+		queue.add(new Event(EventType.FINISHED));
 	}
 
 	private void readComment () throws IOException {
