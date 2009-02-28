@@ -25,8 +25,8 @@ import java.net.URL;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.filters.idml.IDMLFilter;
-import net.sf.okapi.filters.idml.ZipFilterWriter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class IDMLFilterTest {
 			URL url = IDMLFilterTest.class.getResource("/private/iPhone_2_A_MASTER.idml");
 			filter.open(new URI(url.toString()));
 			
-			ZipFilterWriter writer = new ZipFilterWriter();
+			IFilterWriter writer = filter.createFilterWriter();
 			writer.setOptions("en", "UTF-8");
 			writer.setOutput("output.idml");
 			

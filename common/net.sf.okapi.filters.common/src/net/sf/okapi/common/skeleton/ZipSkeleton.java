@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.idml;
+package net.sf.okapi.common.skeleton;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;

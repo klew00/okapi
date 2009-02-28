@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.idml;
+package net.sf.okapi.common.writer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,8 +41,14 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 
+/**
+ * Implements the IFilterWriter interface for filters that handle formats made of
+ * a ZIP package with embedded extractable documents, such as IDML or
+ * OpenOffice.org files (ODT, ODS, ODP, etc.)
+ */
 public class ZipFilterWriter implements IFilterWriter {
 
 	private String outputPath;
@@ -260,6 +266,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
+		subDocWriter.handleEvent(new Event(EventType.START));
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setSkeleton(res.getSkeleton());
@@ -270,6 +277,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		try {
 			// Finish writing the sub-document
 			subDocWriter.handleEvent(new Event(EventType.END_DOCUMENT, res));
+			subDocWriter.handleEvent(new Event(EventType.FINISHED));
 			subDocWriter.close();
 
 			// Create the new entry from the temporary output file

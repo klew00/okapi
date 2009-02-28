@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
- * This class implements the filter writer interface for filters that use the
+ * Implements the IFilterWriter interface for filters that use the
  * GenericSkeleton skeleton.
  */
 public class GenericFilterWriter implements IFilterWriter {

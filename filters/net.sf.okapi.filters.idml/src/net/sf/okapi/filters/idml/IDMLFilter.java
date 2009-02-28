@@ -41,6 +41,8 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.skeleton.ZipSkeleton;
+import net.sf.okapi.common.writer.ZipFilterWriter;
 
 public class IDMLFilter implements IFilter {
 
