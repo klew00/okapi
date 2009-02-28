@@ -20,8 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.filters.FilterEvent;
 
 public class UtilityStep implements IPipelineStep {
 
@@ -31,7 +31,7 @@ public class UtilityStep implements IPipelineStep {
 		this.utility = utility;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		utility.handleEvent(event);
 		return event;
 	}

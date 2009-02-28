@@ -27,10 +27,10 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -123,7 +123,7 @@ public class Writer extends BaseWriter {
 		// Nothing to do
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
 			case START:

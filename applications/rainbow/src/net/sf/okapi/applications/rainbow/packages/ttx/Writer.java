@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -133,7 +133,7 @@ public class Writer extends BaseWriter {
 	public void setParameters (IParameters params) {
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument();

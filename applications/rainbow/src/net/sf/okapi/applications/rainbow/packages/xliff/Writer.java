@@ -23,10 +23,10 @@ package net.sf.okapi.applications.rainbow.packages.xliff;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -143,7 +143,7 @@ public class Writer extends BaseWriter {
 	public void setParameters (IParameters params) {
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());

@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.OutputStream;
 import java.util.Stack;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.Segmenter;
@@ -68,7 +68,7 @@ class DbStoreBuilder implements IFilterWriter {
 		return null;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument();

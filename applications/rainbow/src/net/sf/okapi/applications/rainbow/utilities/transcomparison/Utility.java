@@ -24,10 +24,10 @@ import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -121,7 +121,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return 2;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START:
 			processStart();
@@ -175,7 +175,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private void processStartDocument (StartDocument startDoc) {
 		isBaseMultilingual = startDoc.isMultilingual();
 		// Move to start document
-		FilterEvent event = synchronize(FilterEventType.START_DOCUMENT);
+		Event event = synchronize(EventType.START_DOCUMENT);
 		StartDocument res = (StartDocument)event.getResource();
 		isToCompareMultilingual = res.isMultilingual();
 	}
@@ -190,9 +190,9 @@ public class Utility extends BaseFilterDrivenUtility {
     	}
     }
 
-	private FilterEvent synchronize (FilterEventType untilType) {
+	private Event synchronize (EventType untilType) {
 		boolean found = false;
-		FilterEvent event = null;
+		Event event = null;
 		while ( !found && inputToCompare.hasNext() ) {
 			event = inputToCompare.next();
 			found = (event.getEventType() == untilType);
@@ -205,7 +205,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 	private void processTextUnit (TextUnit tu1) {
 		// Move to the next TU
-		FilterEvent event = synchronize(FilterEventType.TEXT_UNIT);
+		Event event = synchronize(EventType.TEXT_UNIT);
 		// Skip non-translatable
 		if ( !tu1.isTranslatable() ) return;
 		TextUnit tu2 = (TextUnit)event.getResource();

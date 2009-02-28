@@ -23,8 +23,8 @@ package net.sf.okapi.applications.rainbow.packages.xliff;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
@@ -34,7 +34,7 @@ import net.sf.okapi.filters.xliff.XLIFFFilter;
 public class Reader implements IReader {
 	
 	XLIFFFilter reader;
-	FilterEvent event;
+	Event event;
 	
 	public void closeDocument () {
 		if ( reader != null ) {
@@ -66,7 +66,7 @@ public class Reader implements IReader {
 	public boolean readItem () {
 		while ( reader.hasNext() ) {
 			event = reader.next();
-			if ( event.getEventType() == FilterEventType.TEXT_UNIT ) {
+			if ( event.getEventType() == EventType.TEXT_UNIT ) {
 				return true;
 			}
 		}

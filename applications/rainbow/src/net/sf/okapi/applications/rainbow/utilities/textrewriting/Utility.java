@@ -21,10 +21,10 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -107,7 +107,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return 1;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());

@@ -30,12 +30,12 @@ import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
-import net.sf.okapi.common.filters.FilterEventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
-import net.sf.okapi.common.resource.IResource;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Merger {
@@ -115,10 +115,10 @@ public class Merger {
 			outFilter.setOutput(outputFile);
 			
 			// Do it
-			FilterEvent event;			
+			Event event;			
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();
-				if ( event.getEventType() == FilterEventType.TEXT_UNIT ) {
+				if ( event.getEventType() == EventType.TEXT_UNIT ) {
 					processTextUnit((TextUnit)event.getResource());
 				}
 				outFilter.handleEvent(event);

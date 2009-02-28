@@ -22,7 +22,7 @@ package net.sf.okapi.applications.rainbow.utilities;
 
 import java.io.File;
 
-import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 
@@ -52,7 +52,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			filter.open(f.toURI());
 		
 			// Process the document
-			FilterEvent event;
+			Event event;
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				handleEvent(event);

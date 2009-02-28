@@ -25,9 +25,9 @@ import java.io.File;
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -139,7 +139,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return resolvedOutputDir;
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());

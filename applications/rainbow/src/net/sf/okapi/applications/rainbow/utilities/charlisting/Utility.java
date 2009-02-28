@@ -26,9 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterEvent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.UIUtil;
@@ -113,7 +113,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 		return Util.getDirectoryName(finalOutput);
 	}
 
-	public FilterEvent handleEvent (FilterEvent event) {
+	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
