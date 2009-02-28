@@ -471,6 +471,7 @@ public abstract class BaseFilter implements IFilter {
 		startDocument.setEncoding(getEncoding(), hasUtf8Encoding() && hasUtf8Bom());
 		startDocument.setLanguage(getSrcLang());
 		startDocument.setMimeType(getMimeType());
+		startDocument.setFilterParameters(getParameters());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 	}
