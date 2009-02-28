@@ -53,7 +53,8 @@ public class Pipeline implements IPipeline {
 
 	public void execute() {
 		// send intial start event
-		Event startEvent = new Event(EventType.START);		
+		Event startEvent = new Event(EventType.START);
+		initialStep.handleEvent(startEvent);
 		for (IPipelineStep step : steps) {
 			step.handleEvent(startEvent);
 		}

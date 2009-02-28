@@ -41,9 +41,11 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 
 	@Override
 	public Event handleEvent(Event event) {
-		if (event.getEventType() == EventType.START || event.getEventType() == EventType.FINISHED) {
+		if (( event != null ) && 
+			( event.getEventType() == EventType.START || event.getEventType() == EventType.FINISHED )) {
 			return super.handleEvent(event);
 		}
+		//TODO: What about hasNext()???
 		return filter.next();
 	}
 	
