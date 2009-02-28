@@ -146,8 +146,6 @@ public class FilterTestDriver {
 	public boolean process(IFilter filter) {
 		ok = true;
 		warnings = 0;
-		int start = 0;
-		int finished = 0;
 		int startDoc = 0;
 		int endDoc = 0;
 		int startGroup = 0;
@@ -160,18 +158,6 @@ public class FilterTestDriver {
 		while (filter.hasNext()) {
 			event = filter.next();
 			switch (event.getEventType()) {
-			case START:
-				start++;
-				if (showOnlyTextUnits)
-					break;
-				System.out.println("---Start");
-				break;
-			case FINISHED:
-				finished++;
-				if (showOnlyTextUnits)
-					break;
-				System.out.println("---Finished");
-				break;
 			case START_DOCUMENT:
 				startDoc++;
 				System.out.println("---Start Document");
@@ -235,20 +221,12 @@ public class FilterTestDriver {
 			}
 		}
 
-		if (start != 1) {
-			System.out.println(String.format("*****ERROR: START = %d", start));
-			ok = false;
-		}
 		if (startDoc != 1) {
 			System.out.println(String.format("*****ERROR: START_DOCUMENT = %d", startDoc));
 			ok = false;
 		}
 		if (endDoc != 1) {
 			System.out.println(String.format("*****ERROR: END_DOCUMENT = %d", endDoc));
-			ok = false;
-		}
-		if (finished != 1) {
-			System.out.println(String.format("*****ERROR: FINISHED = %d", finished));
 			ok = false;
 		}
 		if (startSubDoc != endSubDoc) {

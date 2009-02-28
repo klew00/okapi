@@ -128,17 +128,17 @@ public class XMLFilter implements IFilter {
 		}
 
 		// Process the next item, filling the queue
-		if ( parseState != 1 ) {
-			process();
-			// Send next event after processing, if there is one
-			if ( queue.size() > 0 ) {
-				return queue.poll();
+		process();
+		// Send next event after processing, if there is one
+		if ( queue.size() > 0 ) {
+			if ( parseState == 1 ) {
+				Event event = queue.poll();
+				queue = null;
+				return event;
 			}
+			return queue.poll();
 		}
-
-		// Else: we are done
-		queue = null;
-		return new Event(EventType.FINISHED, null);
+		return null;
 	}
 
 	public void open (InputStream input) {
@@ -253,7 +253,6 @@ public class XMLFilter implements IFilter {
 		
 		// Set the start event
 		queue = new LinkedList<Event>();
-		queue.add(new Event(EventType.START));
 
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);

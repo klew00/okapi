@@ -83,6 +83,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		EncoderManager encoderManager,
 		StartDocument resource)
 	{
+		referents.clear();
+		storageStack.clear();
+
 		this.outputLang = outputLanguage;
 		this.encoderManager = encoderManager;
 		this.outputEncoding = outputEncoding;

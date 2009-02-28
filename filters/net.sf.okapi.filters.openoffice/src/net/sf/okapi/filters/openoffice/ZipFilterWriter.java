@@ -253,7 +253,6 @@ public class ZipFilterWriter implements IFilterWriter {
 		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
-		subDocWriter.handleEvent(new Event(EventType.START));
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setSkeleton(res.getSkeleton());
@@ -264,7 +263,6 @@ public class ZipFilterWriter implements IFilterWriter {
 		try {
 			// Finish writing the sub-document
 			subDocWriter.handleEvent(new Event(EventType.END_DOCUMENT, res));
-			subDocWriter.handleEvent(new Event(EventType.FINISHED));
 			subDocWriter.close();
 
 			// Create the new entry from the temporary output file

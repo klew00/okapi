@@ -168,9 +168,6 @@ public class ODFFilter implements IFilter {
 			tuId = 0;
 
 			queue = new LinkedList<Event>();
-			queue.add(new Event(EventType.START));
-			hasNext = true;
-			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setLanguage(language);
 			startDoc.setName(docName);
@@ -178,6 +175,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setType(startDoc.getMimeType());
 			startDoc.setEncoding("UTF-8", false);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
+			hasNext = true;
 		}
 		catch ( XMLStreamException e ) {
 			throw new RuntimeException(e);
@@ -228,7 +226,7 @@ public class ODFFilter implements IFilter {
 			read();
 		}
 		// Update hasNext flag on the FINISHED event
-		if ( queue.peek().getEventType() == EventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.END_DOCUMENT ) {
 			hasNext = false;
 		}
 		// Return the head of the queue
@@ -290,7 +288,6 @@ public class ODFFilter implements IFilter {
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
 					queue.add(new Event(EventType.END_DOCUMENT, ending));
-					queue.add(new Event(EventType.FINISHED));
 					return;
 				
 				case XMLStreamConstants.START_ELEMENT:

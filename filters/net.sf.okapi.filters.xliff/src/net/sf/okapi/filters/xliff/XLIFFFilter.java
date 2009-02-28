@@ -139,12 +139,11 @@ public class XLIFFFilter implements IFilter {
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
 					queue.add(new Event(EventType.END_DOCUMENT, ending));
-					queue.add(new Event(EventType.FINISHED));
 				}
 			}
 			
 			// Return the head of the queue
-			if ( queue.peek().getEventType() == EventType.FINISHED ) {
+			if ( queue.peek().getEventType() == EventType.END_DOCUMENT ) {
 				hasNext = false;
 			}
 			return queue.poll();
@@ -179,7 +178,6 @@ public class XLIFFFilter implements IFilter {
 			// Set the start event
 			hasNext = true;
 			queue = new LinkedList<Event>();
-			queue.add(new Event(EventType.START));
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);

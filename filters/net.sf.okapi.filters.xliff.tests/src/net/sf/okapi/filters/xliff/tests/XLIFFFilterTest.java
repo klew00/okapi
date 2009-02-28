@@ -24,7 +24,7 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IFilter;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.resource.INameable;

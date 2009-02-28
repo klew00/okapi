@@ -129,7 +129,6 @@ public class PropertiesFilter implements IFilter {
 		
 		// Process queue if it's not empty yet
 		if ( queue.size() > 0 ) {
-			if ( parseState == 2 ) parseState = 0; // End
 			return queue.poll();
 		}
 		
@@ -151,12 +150,10 @@ public class PropertiesFilter implements IFilter {
 			}
 		} while ( n > RESULT_END );
 		
-		// Store the ending for next call
-		queue.add(new Event(EventType.FINISHED, null));
 		// Set the ending call
 		Ending ending = new Ending(String.valueOf(++otherId));
 		ending.setSkeleton(skel);
-		parseState = 2;
+		parseState = 0;
 		return new Event(EventType.END_DOCUMENT, ending);
 	}
 

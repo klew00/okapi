@@ -177,9 +177,7 @@ public class IDMLFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
-			queue.add(new Event(EventType.START_DOCUMENT, startDoc, skel));
-			
-			return new Event(EventType.START);
+			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
 		catch ( ZipException e ) {
 			throw new RuntimeException(e);
@@ -205,7 +203,6 @@ public class IDMLFilter implements IFilter {
 
 		// No more sub-documents: end of the ZIP document
 		close();
-		queue.add(new Event(EventType.FINISHED));
 		Ending ending = new Ending("ed");
 		return new Event(EventType.END_DOCUMENT, ending);
 	}
@@ -217,7 +214,6 @@ public class IDMLFilter implements IFilter {
 		Event event;
 		try {
 			filter.open(zipFile.getInputStream(entry));
-			filter.next(); // START
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {
@@ -239,8 +235,6 @@ public class IDMLFilter implements IFilter {
 			event = filter.next();
 			switch ( event.getEventType() ) {
 			case END_DOCUMENT:
-				// Read the FINISHED event
-				filter.next();
 				// Change the END_DOCUMENT to END_SUBDOCUMENT
 				Ending ending = new Ending(String.valueOf(subDocId));
 				nextAction = NextAction.NEXTINZIP;

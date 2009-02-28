@@ -175,8 +175,6 @@ public class RegexFilter implements IFilter {
 		// Set the ending call
 		Ending ending = new Ending(String.format("%d", ++otherId));
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
-		// Store the last event
-		queue.add(new Event(EventType.FINISHED, null));
 		return nextEvent();
 	}
 
@@ -285,7 +283,6 @@ public class RegexFilter implements IFilter {
 
 		// Set the start event
 		queue = new LinkedList<Event>();
-		queue.add(new Event(EventType.START));
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
@@ -605,7 +602,7 @@ public class RegexFilter implements IFilter {
 
 	private Event nextEvent () {
 		if ( queue.size() == 0 ) return null;
-		if ( queue.peek().getEventType() == EventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.END_DOCUMENT ) {
 			parseState = 0; // No more event after
 		}
 		return queue.poll();

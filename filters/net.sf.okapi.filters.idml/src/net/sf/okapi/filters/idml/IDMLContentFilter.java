@@ -128,17 +128,18 @@ public class IDMLContentFilter implements IFilter {
 			return new Event(EventType.CANCELED);
 		}
 		
-		// Send any event already in the queue 
+		// Send any event already in the queue
+		Event event;
 		if ( queue.size() > 0 ) {
-			Event event = queue.poll();
-			if ( event.getEventType() == EventType.FINISHED ) {
+			event = queue.poll();
+		}
+		else { // Process the next event
+			event = read();
+			if ( event.getEventType() == EventType.END_DOCUMENT ) {
 				queue = null;
 			}
-			return event;
 		}
-		
-		// Process the next event
-		return read();
+		return event;
 	}
 
 	public void open (InputStream input) {
@@ -212,7 +213,6 @@ public class IDMLContentFilter implements IFilter {
 		tuId = 0;
 		otherId = 0;
 		queue = new LinkedList<Event>();
-		queue.add(new Event(EventType.START));
 		elemTag = new StringBuilder();
 		checkForEmpty = false;
 		
@@ -345,7 +345,6 @@ public class IDMLContentFilter implements IFilter {
 		}
 		
 		// No more XML events
-		queue.add(new Event(EventType.FINISHED));
 		Ending ending = new Ending(String.valueOf(++otherId));
 		return new Event(EventType.END_DOCUMENT, ending, skel);
 	}

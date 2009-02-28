@@ -23,6 +23,8 @@ package net.sf.okapi.filters.idml.tests;
 import java.net.URI;
 import java.net.URL;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import net.sf.okapi.filters.idml.ZipFilterWriter;
 
@@ -46,9 +48,11 @@ public class IDMLFilterTest {
 			writer.setOptions("en", "UTF-8");
 			writer.setOutput("output.idml");
 			
+			writer.handleEvent(new Event(EventType.START));
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}
+			writer.handleEvent(new Event(EventType.FINISHED));
 			writer.close();
 		}
 		catch ( Throwable e ) {

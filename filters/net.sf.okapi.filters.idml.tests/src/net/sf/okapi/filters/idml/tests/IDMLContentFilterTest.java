@@ -23,6 +23,8 @@ package net.sf.okapi.filters.idml.tests;
 import java.net.URI;
 import java.net.URL;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.idml.IDMLContentFilter;
@@ -67,9 +69,11 @@ public class IDMLContentFilterTest {
 			writer = new GenericFilterWriter(filter.createSkeletonWriter());
 			writer.setOptions("FR", "UTF-8");
 			writer.setOutput("Story_story1.out.xml");
+			writer.handleEvent(new Event(EventType.START));
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}
+			writer.handleEvent(new Event(EventType.FINISHED));
 		}
 		finally {
 			if ( writer != null ) writer.close();
