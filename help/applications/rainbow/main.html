@@ -26,9 +26,15 @@ another type of tab is selected.</p>
 	<li>or press <kbd>F2</kbd>,</li>
 	<li>or click on the browse button near the root.</li>
 </ul>
+<h3>Roots</h3>
 <p>To use for root the directory where the project is saved leaves the root 
 field empty. If the project is not saved yet, the root will point to your home 
 directory.</p>
+<p dir="ltr">When a new project has not been saved yet, the default root is the 
+user&#39;s home directory. The first time you add a document to one of the input 
+lists, Rainbow will automatically change the root of that list as well as the
+<cite><a href="#filterParameters">Filter Parameters</a></cite> to the directory 
+where the added document is located.</p>
 <h3>Input Documents</h3>
 <p>To add a document in a list:</p>
 <ul>
@@ -140,7 +146,7 @@ replaced by their corresponding runtime equivalents:</p>
 	<li><code>${TrgLocReg}</code> = The region part of the target locale. For 
 	example: <code>CA</code>. Or empty if no region is specified.</li>
 </ul>
-<h3>Filter Parameters</h3>
+<h3><a name="filterParameters"></a>Filter Parameters</h3>
 <p><cite>Use custom parameters folder</cite> -- Set this option to define an 
 absolute location for the directory where the filter parameters files reside. If 
 this option is not set, the filter parameters files are expected to be in the 

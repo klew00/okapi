@@ -843,7 +843,12 @@ public class TextFragment implements Comparable<Object> {
 	{
 		isBalanced = false;
 		text = new StringBuilder(newCodedText);
-		if ( newCodes == null ) codes = null;
+		if ( newCodes == null ) {
+			if (( codes != null ) && !allowCodeDeletion ) {
+				throw new InvalidContentException("Missing codes in the new list: "+codes.size());
+			} // Else: OK to delete all codes
+			codes = null;
+		}
 		else codes = new ArrayList<Code>(newCodes);
 		if (( codes == null ) || ( codes.size() == 0 )) {
 			lastCodeID = 0;

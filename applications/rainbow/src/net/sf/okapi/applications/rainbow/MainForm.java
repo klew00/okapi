@@ -1728,29 +1728,32 @@ public class MainForm implements IParametersProvider {
 			}
 			else {
 				String[] res = fm.guessFormat(path);
-				int m = 0;
-				out: while ( true ) {
-					switch ( prj.addDocument(currentInput, path, res[0], null, res[1], allowDup) ) {
-					case 0: // OK
-						n++;
-						break out;
-					case 1: // Bad root
-						// Try to fix it if possible.
-						if (( prj.inputLists.get(currentInput).size() == 0 )
-							&& !prj.useCustomeInputRoot(currentInput) 
-							&& ( ++m < 2 ) ) // Re-try once only
-						{
-							prj.setInputRoot(currentInput, Util.getDirectoryName(path), true);
-							resetDisplay(currentInput);
-							break; // Re-try
-						}
-						else { // Otherwise, just tell the user
-							Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						return n;
-					default:
-						break out;
-					}
+				
+				// If project is not saved and it's the first added file:
+				if (( prj.path == null )
+					&& ( prj.inputLists.get(currentInput).size() == 0 )
+					&& !prj.useCustomeInputRoot(currentInput) )
+				{
+					// Set the root and the parameters folder to the file's directory
+					String root = Util.getDirectoryName(path);
+					prj.setInputRoot(currentInput, root, true);
+					chkUseCustomParametersFolder.setSelection(true);
+					edParamsFolder.setText(root);
+					prj.setCustomParametersFolder(root);
+					prj.setUseCustomParametersFolder(true);
+					resetDisplay(currentInput);
+				}
+				
+				switch ( prj.addDocument(currentInput, path, res[0], null, res[1], allowDup) ) {
+				case 0: // OK
+					n++;
+					break;
+				case 1: // Bad root
+					// Tell the user
+					Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
+					return n;
+				default:
+					break;
 				}
 			}
 		}

@@ -149,8 +149,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			break;
 		}
 		// All events then go to the actual writer
-		writer.handleEvent(event);
-		return event;
+		return writer.handleEvent(event);
 	}
 	
     private void processStartDocument (StartDocument resource) {
