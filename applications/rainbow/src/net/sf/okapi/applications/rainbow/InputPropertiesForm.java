@@ -150,6 +150,7 @@ class InputPropertiesForm {
 			} // Else: null means no changes
 		}
 		catch ( Exception E ) {
+			results = null;
 			return false;
 		}
 		return true;

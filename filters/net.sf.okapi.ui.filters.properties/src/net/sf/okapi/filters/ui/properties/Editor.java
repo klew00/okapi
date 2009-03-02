@@ -218,9 +218,6 @@ public class Editor implements IParametersEditor {
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
-					if ( pnlCodeFinder.inEditMode() ) {
-						pnlCodeFinder.endEditMode(true);
-					}
 					if ( !saveData() ) return;
 					result = true;
 				}
@@ -266,14 +263,6 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private boolean saveData () {
-		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
-		params.useKeyCondition = chkUseKeyFilter.getSelection();
-		params.keyCondition = edKeyCondition.getText();
-		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
-		params.extraComments = chkExtraComments.getSelection();
-		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
-		params.useCodeFinder = chkUseCodeFinder.getSelection();
-		//TODO: check regexp
 		String tmp = pnlCodeFinder.getData();
 		if ( tmp == null ) {
 			return false;
@@ -281,6 +270,13 @@ public class Editor implements IParametersEditor {
 		else {
 			params.codeFinder.fromString(tmp);
 		}
+		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
+		params.useKeyCondition = chkUseKeyFilter.getSelection();
+		params.keyCondition = edKeyCondition.getText();
+		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
+		params.extraComments = chkExtraComments.getSelection();
+		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
+		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		return true;
 	}
 	

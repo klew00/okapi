@@ -60,6 +60,7 @@ public class InlineCodeFinderPanel extends Composite {
 	private boolean wasNew;
 	private TextContainer textCont;
 	private GenericInlines genericCont;
+	private boolean canUpdateTest = true;
 
 	public InlineCodeFinderPanel (Composite parent,
 		int flags)
@@ -256,7 +257,9 @@ public class InlineCodeFinderPanel extends Composite {
 			if ( createNew ) {
 				lbRules.add("");
 				lbRules.setSelection(lbRules.getItemCount()-1);
+				canUpdateTest = false;
 				updateDisplay();
+				canUpdateTest = true;
 			}
 			int n = lbRules.getSelectionIndex();
 			if ( n == -1 ) return;
@@ -267,12 +270,12 @@ public class InlineCodeFinderPanel extends Composite {
 		}
 	}
 	
-	public void endEditMode (boolean accept) {
+	public boolean endEditMode (boolean accept) {
 		if ( accept ) {
 			if ( edExpression.getText().length() == 0 ) {
 				Dialogs.showError(getShell(), "You must enter an expression.", null);
 				edExpression.setFocus();
-				return;
+				return false;
 			}
 			lbRules.setItem(lbRules.getSelectionIndex(), edExpression.getText());
 		}
@@ -280,6 +283,7 @@ public class InlineCodeFinderPanel extends Composite {
 			if ( wasNew ) removeExpression();
 		}
 		toggleMode(false);
+		return true;
 	}
 	
 	private void toggleMode (boolean editMode) {
@@ -321,10 +325,10 @@ public class InlineCodeFinderPanel extends Composite {
 		btModify.setEnabled(n>-1);
 		if ( n == -1 ) edExpression.setText("");
 		else edExpression.setText(lbRules.getItem(n));
-		//updateTest();
 	}
 	
 	private void updateTest () {
+		if ( !canUpdateTest ) return; // No updates in some contexts
 		try {
 			int n = lbRules.getSelectionIndex();
 			if ( n == -1 ) return;
@@ -373,7 +377,9 @@ public class InlineCodeFinderPanel extends Composite {
 	}
 
 	public String getData () {
-		if ( editMode ) endEditMode(true);
+		if ( editMode ) {
+			if ( !endEditMode(true) ) return null;
+		}
 		codeFinder.getRules().clear();
 		for ( String pattern : lbRules.getItems() ) {
 			codeFinder.addRule(pattern);
