@@ -399,6 +399,9 @@ public class PropertiesFilter implements IFilter {
 								extract = false;
 						}
 					}
+					else { // Outside directive scope: check if we extract text outside
+						extract = params.locDir.localizeOutside();
+					}
 				}
 
 				if ( extract ) {
