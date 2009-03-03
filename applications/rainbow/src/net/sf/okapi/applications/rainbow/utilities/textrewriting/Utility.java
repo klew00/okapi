@@ -59,12 +59,14 @@ public class Utility extends BaseFilterDrivenUtility {
 	public void preprocess () {
 		// Load the segmentation rules
 		if ( params.segment ) {
+			String src = params.sourceSrxPath.replace(VAR_PROJDIR, projectDir);
+			String trg = params.targetSrxPath.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
-			doc.loadRules(params.sourceSrxPath);
+			doc.loadRules(src);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			srcSeg = doc.applyLanguageRules(srcLang, null);
-			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
-				doc.loadRules(params.targetSrxPath);
+			if ( !src.equals(trg) ) {
+				doc.loadRules(trg);
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			trgSeg = doc.applyLanguageRules(trgLang, null);
@@ -72,7 +74,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
 			tmQ = new SimpleTMConnector();
-			tmQ.open(params.tmPath);
+			tmQ.open(params.tmPath.replace(VAR_PROJDIR, projectDir));
 		}
 	}
 	
@@ -159,6 +161,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Merge all segments if needed
 		if ( params.segment || params.markSegments ) {
 			mergeSegments(tu.getTarget(trgLang));
+			// Merge also the source to be in synch.
+			tu.getSource().mergeAllSegments();
 		}
 
 		// Other text modification are done after merging all segments
