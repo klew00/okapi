@@ -134,12 +134,7 @@ public class SegmentationPanel extends Composite {
 			"SRX Documents (*.srx)\tAll Files (*.*)",
 			"*.srx\t*.*");
 		if ( paths == null ) return;
-		String oriPath = edTextField.getText().replace("${ProjDir}", projectDir);
-		if ( !paths[0].equalsIgnoreCase(oriPath) ) {
-			edTextField.setText(paths[0]);
-		}
-		edTextField.selectAll();
-		edTextField.setFocus();
+		Utils.checkProjectDirAfterPick(paths[0], edTextField, projectDir);
 	}
 	
 	private void editSRXFile (Text edTextField) {
@@ -150,14 +145,7 @@ public class SegmentationPanel extends Composite {
 			if ( oriPath.length() == 0 ) oriPath = null;
 			editor.showDialog(oriPath);
 			String newPath = editor.getPath();
-			if ( newPath != null ) {
-				// Set the path only if it's different from the original
-				if (( oriPath == null ) || ( !newPath.equalsIgnoreCase(oriPath) )) {
-					edTextField.setText(newPath);
-				}
-				edTextField.selectAll();
-				edTextField.setFocus();
-			}
+			Utils.checkProjectDirAfterPick(newPath, edTextField, projectDir);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);

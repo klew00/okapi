@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -59,6 +60,7 @@ public class Editor implements IParametersEditor {
 	private Button chkIgnoreWS;
 	private Button chkIgnorePunct;
 	private IHelp help;
+	private String projectDir;
 
 	public boolean edit (IParameters params,
 		Object object,
@@ -69,6 +71,7 @@ public class Editor implements IParametersEditor {
 		try {
 			shell = null;
 			help = helpParam;
+			this.projectDir = projectDir;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
@@ -161,9 +164,7 @@ public class Editor implements IParametersEditor {
 				String path = Dialogs.browseFilenamesForSave(shell, "TMX Document", null,
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
-				if ( path != null ) {
-					edTMXPath.setText(path);
-				}
+				Utils.checkProjectDirAfterPick(path, edTMXPath, projectDir);
 			}
 		});
 

@@ -27,6 +27,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -63,6 +64,7 @@ public class Editor implements IParametersEditor {
 	private Text edXsltPath;
 	private Text edParameters;
 	private IHelp help;
+	private String projectDir;
 
 	public boolean edit (IParameters params,
 		Object object,
@@ -73,6 +75,7 @@ public class Editor implements IParametersEditor {
 		try {
 			shell = null;
 			help = helpParam;
+			this.projectDir = projectDir;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
@@ -134,9 +137,8 @@ public class Editor implements IParametersEditor {
 					false, null,
 					Res.getString("editor.filterSelectTemplate"), //$NON-NLS-1$
 					"*.xsl;*.xslt\t*.*"); //$NON-NLS-1$
-				if ( paths != null ) {
-					edXsltPath.setText(paths[0]);
-				}
+				if ( paths == null ) return;
+				Utils.checkProjectDirAfterPick(paths[0], edXsltPath, projectDir);
 			}
 		});
 

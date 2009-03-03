@@ -58,7 +58,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			
 			// Create the source for the XSLT
 			xsltInput = new javax.xml.transform.stream.StreamSource(
-				new File(params.xsltPath));
+				new File(params.xsltPath.replace(VAR_PROJDIR, projectDir)));
 			
 			// Create an instance of TransformerFactory
 			javax.xml.transform.TransformerFactory fact =

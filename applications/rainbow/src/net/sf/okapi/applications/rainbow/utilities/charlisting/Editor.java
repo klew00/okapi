@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities.charlisting;
 
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -51,6 +52,7 @@ public class Editor implements IParametersEditor {
 	private boolean inInit = true;
 	private Button chkAutoOpen;
 	private IHelp help;
+	private String projectDir;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -66,6 +68,7 @@ public class Editor implements IParametersEditor {
 		try {
 			shell = null;
 			help = helpParam;
+			this.projectDir = projectDir;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)object);
@@ -123,9 +126,7 @@ public class Editor implements IParametersEditor {
 				String path = Dialogs.browseFilenamesForSave(shell, "Result File", null,
 					"Text Files (*.*)\tAll Files (*.*)",
 					"*.*\t*.*");
-				if ( path != null ) {
-					edOutputPath.setText(path);
-				}
+				Utils.checkProjectDirAfterPick(path, edOutputPath, projectDir);
 			}
 		});
 		

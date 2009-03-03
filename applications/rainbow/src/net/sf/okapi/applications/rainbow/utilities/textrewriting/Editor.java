@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -220,16 +221,14 @@ public class Editor implements IParametersEditor {
 		btGetTMPath.setText("...");
 		btGetTMPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String[] path = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
+				String[] paths = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
-				if ( path == null ) return;
-				if ( path[0].endsWith(Database.DATAFILE_EXT) ) {
-					path[0] = path[0].substring(0, path[0].length()-Database.DATAFILE_EXT.length());
+				if ( paths == null ) return;
+				if ( paths[0].endsWith(Database.DATAFILE_EXT) ) {
+					paths[0] = paths[0].substring(0, paths[0].length()-Database.DATAFILE_EXT.length());
 				}
-				edTMPath.setText(path[0]);
-				edTMPath.selectAll();
-				edTMPath.setFocus();
+				Utils.checkProjectDirAfterPick(paths[0], edTMPath, projectDir);
 			}
 		});
 

@@ -27,6 +27,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
+
+import org.eclipse.swt.widgets.Text;
+
 public class Utils {
 
 	static public String escapeToRTF (String p_sText,
@@ -353,4 +357,16 @@ public class Utils {
 		return (char)0; // Does not contain any characters listed in p_sCharList 
 	}
 
+	public static void checkProjectDirAfterPick (String path,
+		Text edField,
+		String projectDir)
+	{
+		if ( path == null ) return;
+		String oriPath = edField.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
+		if ( !path.equals(oriPath) ) {
+			edField.setText(path);
+		}
+		edField.selectAll();
+		edField.setFocus();
+	}
 }

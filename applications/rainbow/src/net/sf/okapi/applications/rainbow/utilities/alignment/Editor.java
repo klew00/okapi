@@ -21,7 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
-import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -180,13 +180,7 @@ public class Editor implements IParametersEditor {
 				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
-				if ( path == null ) return;
-				String oriPath = edTMXPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
-				if ( !path.equalsIgnoreCase(oriPath) ) {
-					edTMXPath.setText(path);
-				}
-				edTMXPath.selectAll();
-				edTMXPath.setFocus();
+				Utils.checkProjectDirAfterPick(path, edTMXPath, projectDir);				
 			}
 		});
 		
@@ -240,13 +234,7 @@ public class Editor implements IParametersEditor {
 				String path = Dialogs.browseFilenamesForSave(shell, "Simple TM File", null,
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
-				if ( path == null ) return;
-				String oriPath = edTMPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
-				if ( !path.equalsIgnoreCase(oriPath ) ) {
-					edTMPath.setText(path);
-				}
-				edTMPath.selectAll();
-				edTMPath.setFocus();
+				Utils.checkProjectDirAfterPick(path, edTMPath, projectDir);
 			}
 		});
 		

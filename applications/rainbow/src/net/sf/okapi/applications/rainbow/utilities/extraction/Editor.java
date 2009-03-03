@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -261,12 +262,7 @@ public class Editor implements IParametersEditor {
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
 				if ( paths == null ) return;
-				String oriPath = edTmPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
-				if ( !paths[0].equalsIgnoreCase(oriPath) ) {
-					edTmPath.setText(paths[0]);
-				}
-				edTmPath.selectAll();
-				edTmPath.setFocus();
+				Utils.checkProjectDirAfterPick(paths[0], edTmPath, projectDir);
 			}
 		});
 		
@@ -353,6 +349,6 @@ public class Editor implements IParametersEditor {
 	private void updateSample () {
 		saveData();
 		String out = edOutputFolder.getText() + File.separator + edName.getText();
-		edSample.setText(out.replace("${ProjDir}", projectDir));
+		edSample.setText(out.replace(BaseUtility.VAR_PROJDIR, projectDir));
 	}
 }
