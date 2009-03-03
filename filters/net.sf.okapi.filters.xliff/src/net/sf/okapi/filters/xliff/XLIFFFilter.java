@@ -342,7 +342,7 @@ public class XLIFFFilter implements IFilter {
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
-			if ( tmp.compareTo(trgLang) != 0 ) { // Warn about target language
+			if ( tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
 				logger.warn(String.format("The target language declared in <file> is '%s'.", tmp));
 			}
 		}
@@ -395,12 +395,12 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void storeEndElement () {
-		String ns = reader.getPrefix();
-		if (( ns == null ) || ( ns.length()==0 )) {
-			skel.append("</"+reader.getLocalName()+">");
+		String prefix = reader.getPrefix();
+		if (( prefix != null ) && ( prefix.length()>0 )) {
+			skel.append("</"+prefix+":"+reader.getLocalName()+">");
 		}
 		else {
-			skel.append("</"+ns+":"+reader.getLocalName()+">");
+			skel.append("</"+reader.getLocalName()+">");
 		}
 		preserveSpaces.pop();
 	}
@@ -539,8 +539,21 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
 			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
-			altTrans.addNew(lang, tc);
-			altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+			// Store in altTrans only when we are witnin alt-trans
+			if ( altTrans != null ) {
+				if ( isSegSource ) {
+					// TODO: handle seg-source
+					//TODO: content of seg-source should be the one to use???
+					//TODO: what if they are different?
+				}
+				else {
+					altTrans.addNew(lang, tc);
+					altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+				}
+			}
+			else { // It's seg-source just after a <source> (not in alt-trans)
+				//TODO: Handle segmented content
+			}
 		}
 		else {
 			// Get the coord attribute if available
@@ -552,14 +565,9 @@ public class XLIFFFilter implements IFilter {
 
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
-			if ( isSegSource ) {
-				//TODO
-			}
-			else {
-				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
-				tu.setPreserveWhitespaces(preserveSpaces.peek());
-				tu.setSource(tc);
-			}
+			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			tu.setPreserveWhitespaces(preserveSpaces.peek());
+			tu.setSource(tc);
 			sourceDone = true;
 		}
 	}
@@ -614,6 +622,8 @@ public class XLIFFFilter implements IFilter {
 	
 	private void addTargetIfNeeded () {
 		if ( targetDone ) return; // Nothing to add
+		// If the target language is the same as the source, we should not create new <target>
+		if ( srcLang.equalsIgnoreCase(trgLang) ) return;
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
@@ -624,8 +634,7 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	/**
-	 * Processes a segment content. Set the 'inCode' gobal variables 
-	 * before calling this method with <source> or <target>.
+	 * Processes a segment content.
 	 * @param tagName The name of the element content that is being processed.
 	 * @param store True if the data must be stored in the skeleton.
 	 * This is used to merge later on.
@@ -662,32 +671,34 @@ public class XLIFFFilter implements IFilter {
 					if ( name.equals(tagName) ) {
 						return content;
 					}
-					else if ( name.equals("g") || name.equals("mrk") ) {
+					else if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						if ( store ) storeEndElement();
 						code = content.append(TagType.CLOSING, name, name); 
 						idStack.pop();
 						String tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
-							tmp = tmp+":";
+							code.setOuterData("</"+tmp+":"+name+">");
 						}
-						code.setOuterData("</"+tmp+name+">");
+						else {
+							code.setOuterData("</"+name+">");
+						}
 					}
 					break;
 					
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
 					name = reader.getLocalName();
-					if ( name.equals("g") || name.equals("mrk") ) {
+					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						idStack.push(++id);
 						code = content.append(TagType.OPENING, name, name);
 						// Get the outer code
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
-						if (( prefix == null ) || ( prefix.length()==0 )) {
-							tmpg.append("<"+reader.getLocalName());
+						if (( prefix != null ) && ( prefix.length()>0 )) {
+							tmpg.append("<"+prefix+":"+reader.getLocalName());
 						}
 						else {
-							tmpg.append("<"+prefix+":"+reader.getLocalName());
+							tmpg.append("<"+reader.getLocalName());
 						}
 						int count = reader.getNamespaceCount();
 						for ( int i=0; i<count; i++ ) {
