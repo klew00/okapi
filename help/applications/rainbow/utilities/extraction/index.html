@@ -56,17 +56,21 @@ create a ZIP file that includes the whole package.</p>
 <p><cite>Pre-segment the extracted text with the following SRX rules</cite> -- 
 Set this option to segment the content of each extracted text unit.</p>
 <p><cite>SRX file for the source</cite> -- Enter the path or URL of the SRX 
-document where to take the SRX rules for the source language.</p>
+document where to take the SRX rules for the source language. You can use the 
+variable <code>${ProjDir}</code> 
+to specify the directory of your project.</p>
 <p><cite>SRX file for the target</cite> -- Enter the path or URL of the SRX 
 document where to take the SRX rules for the target language. Note that when the 
 same document for both languages (most of the cases), the document is read only 
-once, saving processing time.</p>
+once, saving processing time. You can use the variable <code>${ProjDir}</code> 
+to specify the directory of your project.</p>
 <h3>Pre-Translation Tab</h3>
 <p><cite>Pre-translate the extracted text using the following TM</cite> -- Set 
 this option to use a SimpleTM translation memory to leverage any exact match 
 into the prepared document (if the package to generate allows to do so).</p>
 <p>Enter the full path of the SimpleTM file you want to use for the 
-pre-translation.</p>
+pre-translation. You can use the variable <code>${ProjDir}</code> 
+to specify the directory of your project.</p>
 <p>&nbsp;</p>
 </body>
 </html>

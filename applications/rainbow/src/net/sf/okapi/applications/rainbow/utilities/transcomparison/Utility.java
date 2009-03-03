@@ -67,7 +67,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Start TMX writer (one for all input documents)
 		if ( params.generateTMX ) {
 			tmx = new TMXWriter();
-			tmx.create(params.tmxPath.replace("${ProjDir}", projectDir));
+			tmx.create(params.tmxPath.replace(VAR_PROJDIR, projectDir));
 			tmx.writeStartDocument(srcLang, trgLang, getName(), null, null, null, null);
 		}
 		pathToOpen = null;

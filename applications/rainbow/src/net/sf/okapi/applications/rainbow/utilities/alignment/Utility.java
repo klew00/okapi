@@ -63,6 +63,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private int targetCount;
 	private Map<String, String> originalAttributes;
 	private Map<String, String> assignedAttributes;
+	private String resolvedTmxPath;
 
 	public Utility () {
 		params = new Parameters();
@@ -75,13 +76,15 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 	public void preprocess () {
 		// Load the segmentation rules
+		String trgSrxPath = params.targetSrxPath.replace(VAR_PROJDIR, projectDir);
 		if ( params.segment ) {
+			String srcSrxPath = params.sourceSrxPath.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
-			doc.loadRules(params.sourceSrxPath);
+			doc.loadRules(srcSrxPath);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			srcSeg = doc.applyLanguageRules(srcLang, null);
-			if ( !params.sourceSrxPath.equals(params.targetSrxPath) ) {
-				doc.loadRules(params.targetSrxPath);
+			if ( !srcSrxPath.equals(trgSrxPath) ) {
+				doc.loadRules(trgSrxPath);
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			trgSeg = doc.applyLanguageRules(trgLang, null);
@@ -94,7 +97,8 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmxWriter = null;
 			}
 			tmxWriter = new TMXWriter();
-			tmxWriter.create(params.tmxPath);
+			resolvedTmxPath = params.tmxPath.replace(VAR_PROJDIR, projectDir);
+			tmxWriter.create(resolvedTmxPath);
 			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
 			tmxWriter.writeStartDocument(srcLang, trgLang,
 				getName(), null, (params.segment ? "sentence" : "paragraph"),
@@ -104,7 +108,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Prepare the simpletm database
 		if ( params.createTM ) {
 			simpleTm = new Database();
-			simpleTm.create(params.tmPath, true, trgLang);
+			simpleTm.create(params.tmPath.replace(VAR_PROJDIR, projectDir), true, trgLang);
 		}
 		
 		// Prepare the attributes if needed
@@ -130,7 +134,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		if ( aligner == null ) {
 			aligner = new Aligner(shell, help, updateCommand);
-			aligner.setInfo(params.targetSrxPath, params.checkSingleSegUnit,
+			aligner.setInfo(trgSrxPath, params.checkSingleSegUnit,
 				params.useAutoCorrection, trgLang);
 		}
 		
@@ -194,7 +198,7 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	@Override
 	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(params.tmxPath);
+		return Util.getDirectoryName(resolvedTmxPath);
 	}
 
 	public Event handleEvent (Event event) {

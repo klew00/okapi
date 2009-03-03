@@ -71,12 +71,15 @@ public class Utility extends BaseFilterDrivenUtility {
 	
 		// Load SRX file(s) and create segmenters if required
 		if ( params.preSegment ) {
+			String src = params.sourceSRX.replace(VAR_PROJDIR, projectDir);
+			String trg = params.targetSRX.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
-			doc.loadRules(params.sourceSRX);
+			doc.loadRules(src);
 			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			sourceSeg = doc.applyLanguageRules(srcLang, null);
-			if ( !params.sourceSRX.equalsIgnoreCase(params.targetSRX) ) {
-				doc.loadRules(params.targetSRX);
+			//TODO: This is not working cross-platform!
+			if ( !src.equalsIgnoreCase(trg) ) {
+				doc.loadRules(trg);
 				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
 			}
 			targetSeg = doc.applyLanguageRules(trgLang, null);
@@ -85,12 +88,12 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preTranslate ) {
 			qm = new QueryManager();
 			qm.setLanguages(srcLang, trgLang);
-			qm.addAndInitializeResource(new SimpleTMConnector(),
-				params.tmPath, params.tmPath);
+			String path = params.tmPath.replace(VAR_PROJDIR, projectDir);
+			qm.addAndInitializeResource(new SimpleTMConnector(), path, path);
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;
-		resolvedOutputDir = resolvedOutputDir.replace("${ProjDir}", projectDir);
+		resolvedOutputDir = resolvedOutputDir.replace(VAR_PROJDIR, projectDir);
 		Util.deleteDirectory(resolvedOutputDir, false);
 		
 		id = 0;

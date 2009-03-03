@@ -56,7 +56,7 @@ public class Utility extends BaseFilterDrivenUtility  {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
-			finalOutput = params.outputPath.replace("${ProjDir}", projectDir);
+			finalOutput = params.outputPath.replace(VAR_PROJDIR, projectDir);
 			logger.info("Output: " + finalOutput);
 			Util.createDirectories(finalOutput);
 			writer = new PrintWriter(finalOutput, "UTF-8");

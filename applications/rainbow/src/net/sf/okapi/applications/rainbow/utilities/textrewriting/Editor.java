@@ -65,6 +65,7 @@ public class Editor implements IParametersEditor {
 	private Button btGetTMPath;
 	private SegmentationPanel pnlSegmentation;
 	private IHelp help;
+	private String projectDir;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -79,6 +80,7 @@ public class Editor implements IParametersEditor {
 		boolean bRes = false;
 		try {
 			shell = null;
+			this.projectDir = projectDir;
 			help = helpParam;
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -232,7 +234,7 @@ public class Editor implements IParametersEditor {
 		});
 
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Apply the following segmentation rules:", null);
+			"Apply the following segmentation rules:", null, projectDir);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Dialog-level buttons

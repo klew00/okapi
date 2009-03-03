@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -66,6 +67,7 @@ public class Editor implements IParametersEditor {
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
 	private IHelp help;
+	private String projectDir;
 
 	/**
 	 * Invokes the editor for the parameters of this utility.
@@ -81,6 +83,7 @@ public class Editor implements IParametersEditor {
 		try {
 			shell = null;
 			help = helpParam;
+			this.projectDir = projectDir;
 			params = (Parameters)p_Options;
 			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)p_Object);
@@ -127,7 +130,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(gdTmp);
 		
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Segment the extracted text using the following SRX rules:", help);
+			"Segment the extracted text using the following SRX rules:", help, projectDir);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	
 		grpTmp = new Group(cmpTmp, SWT.NONE);
@@ -178,7 +181,10 @@ public class Editor implements IParametersEditor {
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
 				if ( path == null ) return;
-				edTMXPath.setText(path);
+				String oriPath = edTMXPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
+				if ( !path.equalsIgnoreCase(oriPath) ) {
+					edTMXPath.setText(path);
+				}
 				edTMXPath.selectAll();
 				edTMXPath.setFocus();
 			}
@@ -235,7 +241,10 @@ public class Editor implements IParametersEditor {
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
 				if ( path == null ) return;
-				edTMPath.setText(path);
+				String oriPath = edTMPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
+				if ( !path.equalsIgnoreCase(oriPath ) ) {
+					edTMPath.setText(path);
+				}
 				edTMPath.selectAll();
 				edTMPath.setFocus();
 			}

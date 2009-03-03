@@ -34,6 +34,8 @@ import net.sf.okapi.common.Util;
 
 public abstract class BaseUtility implements IUtility {
 
+	public static final String VAR_PROJDIR = "${ProjDir}";
+	
 	protected final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterAccess fa;

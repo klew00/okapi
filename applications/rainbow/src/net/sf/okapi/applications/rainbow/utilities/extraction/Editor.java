@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
+import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -227,7 +228,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Pre-segment the extracted text with the following rules:", null);
+			"Pre-segment the extracted text with the following rules:", null, projectDir);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		//--- Pre-translation tab
@@ -260,7 +261,10 @@ public class Editor implements IParametersEditor {
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
 				if ( paths == null ) return;
-				edTmPath.setText(paths[0]);
+				String oriPath = edTmPath.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
+				if ( !paths[0].equalsIgnoreCase(oriPath) ) {
+					edTmPath.setText(paths[0]);
+				}
 				edTmPath.selectAll();
 				edTmPath.setFocus();
 			}
