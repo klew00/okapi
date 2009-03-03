@@ -320,9 +320,22 @@ public class QueryManager {
 			qr = next();
 			if ( qr.score < 100 ) return;
 			tc.setCodedText(qr.target.getCodedText(), false);
+			// Un-segmented entries that we have leveraged should be like
+			// a tu with a single segment
+			makeSingleSegment(tu);
 		}
 	}
 
+	private void makeSingleSegment (TextUnit tu) {
+		//TODO
+		TextContainer srcTc = tu.getSource();
+		// Leave it alone if it's just whitespaces
+		if ( !srcTc.hasText(false) ) return;
+		// Else create a single segment that is the whole content
+		srcTc.createSegment(0, -1);
+		tu.getTarget(trgLang).createSegment(0, -1);
+	}
+	
 	/**
 	 * Saves all the settings to a file.
 	 * @param path Full path of the file to save.

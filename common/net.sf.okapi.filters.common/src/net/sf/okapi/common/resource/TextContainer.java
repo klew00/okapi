@@ -189,6 +189,15 @@ public class TextContainer extends TextFragment {
 	public List<TextFragment> getSegments () {
 		return segments;
 	}
+	
+	/**
+	 * Gets the number of segments in this object. If the object is not segmented it returns 0.
+	 * @return The number of segments or 0 if it is not segmented.
+	 */
+	public int getSegmentCount () {
+		if ( segments == null ) return 0;
+		return segments.size();
+	}
 
 	/**
 	 * Segments this object into one or more segments corresponding to given ranges in 
@@ -235,7 +244,13 @@ public class TextContainer extends TextFragment {
 			diff = (text.length()-oriLength);
 		}
 		// Return the number of segments
-		return segments.size();
+		if ( segments.size() == 0 ) {
+			segments = null;
+			return 0;
+		}
+		else {
+			return segments.size();
+		}
 	}
 	
 	/**

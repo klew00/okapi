@@ -167,35 +167,35 @@ public class Utility extends BaseFilterDrivenUtility {
 			res[1], resource.getFilterParameters());
     }
 	
-    private void processTextUnit (TextUnit item ) {
+    private void processTextUnit (TextUnit tu) {
 		if ( params.includeTargets ) {
 			//TODO: Find a solution to not output item with
 			// existing target
 		}
 	
 		// Segment if requested
-		if (( params.preSegment ) && !"no".equals(item.getProperty("canSegment")) ) {
+		if (( params.preSegment ) && !"no".equals(tu.getProperty("canSegment")) ) {
 			try {
 				TextContainer cont;
-				cont = item.getSource();
+				cont = tu.getSource();
 				sourceSeg.computeSegments(cont);
 				cont.createSegments(sourceSeg.getSegmentRanges());
-				if ( item.hasTarget(trgLang) ) {
-					cont = item.getTarget(trgLang);
+				if ( tu.hasTarget(trgLang) ) {
+					cont = tu.getTarget(trgLang);
 					targetSeg.computeSegments(cont);
 					cont.createSegments(targetSeg.getSegmentRanges());
 				}
 			}
 			catch ( Throwable e ) {
 				logger.error(String.format("Error segmenting text unit id=%s: "
-					+e.getMessage(), item.getId()));
+					+e.getMessage(), tu.getId()));
 			}
 		}
 		
 		// Leverage if requested
 		if ( qm != null ) {
-			qm.setAttribute("GroupName", item.getName());
-			qm.leverage(item);
+			qm.setAttribute("GroupName", tu.getName());
+			qm.leverage(tu);
 		}
 	}
     

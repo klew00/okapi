@@ -753,7 +753,7 @@ public class Aligner {
 		target = tu.getTarget(targetLanguage);
 		btToReview.setSelection(false);
 		// Check if both are segmented
-		if ( !source.isSegmented() || !target.isSegmented() ) return 2;
+		if ( !source.isSegmented() || !target.isSegmented() ) return 1;
 		// Check for issues
 		if ( hasIssue(false, true, true) ) {
 			setData();

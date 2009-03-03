@@ -285,8 +285,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			srcSeg.computeSegments(tu.getSource());
 			tu.getSource().createSegments(srcSeg.getSegmentRanges());
 			if ( !tu.getSource().isSegmented() ) {
-				noText++;
-				return;
+				if ( !tu.getSource().hasText(false) ) {
+					noText++;
+					return;
+				}
 			}
 		}
 		// Retrieve the corresponding target(s)
@@ -294,6 +296,11 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
 			tu.setTarget(trgLang, trgTC);
+			// If source has no segment, merge all the one of the target ("#" -> "Num." case)
+			if ( !tu.getSource().isSegmented() && ( trgTC.getSegmentCount() > 0 )) {
+				trgTC.mergeAllSegments();
+			}
+			
 			switch ( aligner.align(tu, count, targetCount) ) {
 			case 1:
 				aligned++;
