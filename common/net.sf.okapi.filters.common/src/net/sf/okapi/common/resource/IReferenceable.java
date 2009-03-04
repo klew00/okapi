@@ -26,8 +26,8 @@ package net.sf.okapi.common.resource;
 public interface IReferenceable {
 
 	/**
-	 * Sets the flag indicating if this resource is a referent (i.e. is referred to by 
-	 * another resource) or not.
+	 * Sets the flag indicating if this resource is a referent (i.e. is referred to by another 
+	 * resource) or not. This also sets the count of time this referent is referenced to 1.
 	 * @param value True if the resource is a referent, false if it is not.
 	 */
 	public void setIsReferent (boolean value);
@@ -39,8 +39,16 @@ public interface IReferenceable {
 	 */
 	public boolean isReferent ();
 
+	/**
+	 * Gets the number of time this referent is referenced to.
+	 * @return the number of time this referent is referenced to.
+	 */
 	public int getReferenceCount ();
 	
+	/**
+	 * Sets the number of time this referent is referenced to.
+	 * @param value the number of time this referent is referenced to.
+	 */
 	public void setReferenceCount (int value);
 	
 }

@@ -174,5 +174,9 @@ public abstract class BaseUtility implements IUtility {
 	public void resume () {
 		// TODO: implement resume
 	}
+	
+	public void close () {
+		// TODO: implement resume
+	}
 
 }
