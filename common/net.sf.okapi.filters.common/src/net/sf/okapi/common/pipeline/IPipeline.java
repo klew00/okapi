@@ -67,8 +67,8 @@ public interface IPipeline {
 	public void addStep(IPipelineStep step);
 
 	/**
-	 * Close this pipeline and call close on each pipeline step. Cleanup code
+	 * Destroy this pipeline and call destroy on each pipeline step. Cleanup code
 	 * should go here.
 	 */
-	public void close();
+	public void destroy();
 }

@@ -54,5 +54,5 @@ public interface IPipelineStep {
 	/**
 	 * Cleanup code should go here. Called once at the end of the pipeline lifecycle.
 	 */
-	void close();
+	void destroy();
 }

@@ -44,10 +44,7 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	@Override
 	public Event handleEvent(Event event) {
 		return filterWriter.handleEvent(event);
-	}
-
-	public void pause() {
-	}
+	}	
 
 	@Override
 	public void postprocess() {
@@ -56,12 +53,9 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	@Override
 	public void preprocess() {
 	}
-
+	
 	@Override
-	public void close() {
+	public void destroy() {
 		filterWriter.close();
-	}
-
-	public void resume() {
-	}
+	}	
 }

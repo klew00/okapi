@@ -11,9 +11,8 @@ public class FileStepProducer extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent(Event event) {	
-		if (!hasNext) {
-			Event e = new Event(EventType.FINISHED, null);
-			return e;
+		if (!hasNext) {			
+			return null;
 		}
 		
 		FileResource r = new FileResource(new MemMappedCharSequence("Test a file event"), "plain/txt", "en");

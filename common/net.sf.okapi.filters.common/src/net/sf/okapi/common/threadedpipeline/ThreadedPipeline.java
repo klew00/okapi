@@ -171,10 +171,10 @@ public class ThreadedPipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
 	 */
-	public void close() {
+	public void destroy() {
 		executor.pause();
 		for (IPipelineStep step : threadedSteps) {
-			step.close();
+			step.destroy();
 		}
 	}
 

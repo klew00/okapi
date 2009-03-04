@@ -58,7 +58,7 @@ public class HtmlFilterRoundtripTest {
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
 					
 		pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");		
-		pipeline.close();
+		pipeline.destroy();
 	}
 	
 	@Test
@@ -78,7 +78,7 @@ public class HtmlFilterRoundtripTest {
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
 					
 		pipeline.process(HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html"));		
-		pipeline.close();
+		pipeline.destroy();
 	}
 
 	@After

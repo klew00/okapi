@@ -88,7 +88,7 @@ public class FileResourcePipelineStepAdaptor extends BasePipelineStep implements
 	}
 	
 	@Override
-	public void close() {
+	public void destroy() {
 		filter.close();
 	}
 	

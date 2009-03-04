@@ -27,7 +27,6 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.MemMappedCharSequence;
 
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
@@ -66,15 +65,6 @@ public class Pipeline implements IPipeline {
 	private void execute() {
 		initialize();
 
-		// START event is only sent once during the lifecycle of the pipeline
-		// the pipeline produces this event on behalf of the intial step
-		if (!startEventSent) {
-			startEventSent = true;
-			Event event = new Event(EventType.START);			
-			for (IPipelineStep step : steps) {
-				step.handleEvent(event);
-			}
-		}
 		// loop through the events until we run out
 		while (((IInitialStep) initialStep).hasNext()) {
 			Event event = initialStep.handleEvent(null);
@@ -132,16 +122,10 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
 	 */
-	public void close() {
-		// send FINISH event
-		Event event = new Event(EventType.FINISHED);		
+	public void destroy() {		
+		initialStep.destroy();
 		for (IPipelineStep step : steps) {
-			step.handleEvent(event);
-		}
-
-		initialStep.close();
-		for (IPipelineStep step : steps) {
-			step.close();
+			step.destroy();
 		}
 	}
 

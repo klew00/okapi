@@ -30,7 +30,7 @@ public class FilebasedPipelineTest {
 
 		System.out.println("START PIPELINE");		
 		pipeline.process(new URI("DUMMY"));		
-		pipeline.close();
+		pipeline.destroy();
 		System.out.println("CLEANUP PIPELINE");		
 	}
 

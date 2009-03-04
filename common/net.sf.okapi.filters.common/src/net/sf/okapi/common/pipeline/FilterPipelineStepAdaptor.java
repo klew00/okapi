@@ -99,9 +99,8 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInit
 	@Override
 	public void postprocess() {
 	}
-
-	@Override
-	public void close() {
+	
+	public void destroy() {
 		filter.close();
 	}
 

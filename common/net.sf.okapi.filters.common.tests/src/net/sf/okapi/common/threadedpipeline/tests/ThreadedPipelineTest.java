@@ -57,7 +57,7 @@ public class ThreadedPipelineTest {
 				} catch (URISyntaxException e) {
 					throw new RuntimeException(e);
 				}				
-				pipeline.close();
+				pipeline.destroy();
 			}
 		};
 
