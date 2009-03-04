@@ -24,12 +24,6 @@ public class FileStepConsumer extends BasePipelineStep {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IPipelineStep#pause()
-	 */
-	public void pause() {
-	}
-
-	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IPipelineStep#postprocess()
 	 */
 	public void postprocess() {
@@ -41,11 +35,5 @@ public class FileStepConsumer extends BasePipelineStep {
 	 */
 	public void preprocess() {
 		System.out.println(getName() + " preprocess");	
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IPipelineStep#resume()
-	 */
-	public void resume() {
 	}
 }

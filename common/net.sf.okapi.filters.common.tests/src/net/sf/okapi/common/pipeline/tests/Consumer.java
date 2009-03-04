@@ -44,13 +44,6 @@ public class Consumer extends BasePipelineStep {
 		System.out.println("EventType: " + event.getEventType().name());
 	}
 
-	public void pause() {
-	}
-
-	public void resume() {
-	}
-
-
 	public void cancel() {
 	}
 }

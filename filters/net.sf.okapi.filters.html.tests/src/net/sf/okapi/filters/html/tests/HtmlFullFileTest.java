@@ -7,13 +7,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class HtmlFullFileTest {
 	private HtmlFilter htmlFilter;
@@ -65,5 +68,31 @@ public class HtmlFullFileTest {
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 		}
+	}
+	
+	@Test
+	public void testOkapiIntro() {
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");		
+		htmlFilter.setOptions("en", "windows-1252", true);
+		htmlFilter.open(htmlStream);
+		boolean foundText = false;
+		boolean first = true;
+		String lastText = "";
+		String firstText = "";
+		while (htmlFilter.hasNext()) {
+			Event event = htmlFilter.next();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+				TextUnit tu = (TextUnit)event.getResource();
+				if (first) {
+					first = false;
+					firstText = tu.getSource().toString();;
+				}
+				foundText = true;
+				lastText = tu.getSource().toString();
+			}
+		}
+		assertTrue(foundText);
+		assertTrue(firstText.equals("Okapi Framework"));
+		assertTrue(lastText.equals("&nbsp;"));		
 	}
 }

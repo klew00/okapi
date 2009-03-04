@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.threadedpipeline;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -31,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.pipeline.IInitialStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
@@ -45,6 +49,7 @@ public class ThreadedPipeline implements IPipeline {
 	private PipelineReturnValue state;
 	private LinkedList<IPipelineStep> threadedSteps;
 	private LinkedList<IPipelineStep> nonThreadedSteps;
+	private IInitialStep initalStep;
 
 	private BlockingQueue<Event> previousQueue;
 
@@ -68,15 +73,16 @@ public class ThreadedPipeline implements IPipeline {
 		for (IPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
 				// first step is a producer wrap it with threaded adaptor
-				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);			
-				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);				
+				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);
+				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
 				producerStep.setProducerQueue(queue);
 				producerStep.addToQueue(new Event(EventType.START));
 				completionService.submit(producerStep);
 				threadedSteps.add(producerStep);
+				initalStep = (IInitialStep) producerStep;
 			} else if (step == nonThreadedSteps.getLast()) {
 				// last step it is a consumer
-				if (previousQueue == null) {					
+				if (previousQueue == null) {
 					throw new RuntimeException("Previous queue should not be null");
 				}
 				ConsumerPipelineStepAdaptor consumerStep = new ConsumerPipelineStepAdaptor(step);
@@ -108,37 +114,32 @@ public class ThreadedPipeline implements IPipeline {
 	}
 
 	public void cancel() {
-		pause(); 
+		executor.pause();
 		executor.shutdownNow();
 		state = PipelineReturnValue.CANCELLED;
 	}
 
-	public void pause() {
-		executor.pause();
-		for (IPipelineStep step : threadedSteps) {
-			step.pause();
-		}
-		state = PipelineReturnValue.PAUSED;
-	}
-
-	public void resume() {
-		executor.resume();
-		for (IPipelineStep step : threadedSteps) {
-			step.resume();
-		}
-		state = PipelineReturnValue.RUNNING;
-	}
+	/*
+	 * TODO: Do we want pause and resume at the pipeline level? Or should steps
+	 * handle this individually?
+	 * 
+	 * public void pause() { executor.pause(); for (IPipelineStep step :
+	 * threadedSteps) { step.pause(); } state = PipelineReturnValue.PAUSED; }
+	 * 
+	 * public void resume() { executor.resume(); for (IPipelineStep step :
+	 * threadedSteps) { step.resume(); } state = PipelineReturnValue.RUNNING; }
+	 */
 
 	public PipelineReturnValue getState() {
 		if (state == PipelineReturnValue.CANCELLED) {
 			return PipelineReturnValue.CANCELLED;
 		}
 
-		if (state == PipelineReturnValue.PAUSED) {			
-			try {				
+		if (state == PipelineReturnValue.PAUSED) {
+			try {
 				// TODO: will this interfere with SWT GUI thread?
 				Thread.sleep(100);
-			} catch (InterruptedException e) {				
+			} catch (InterruptedException e) {
 			}
 			return PipelineReturnValue.PAUSED;
 		}
@@ -163,5 +164,81 @@ public class ThreadedPipeline implements IPipeline {
 		} catch (ExecutionException e) {
 			return PipelineReturnValue.FAILED;
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
+	 */
+	public void close() {
+		executor.pause();
+		for (IPipelineStep step : threadedSteps) {
+			step.close();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
+	 */
+	public void postprocess() {
+		executor.pause();
+		for (IPipelineStep step : threadedSteps) {
+			step.postprocess();
+		}
+		executor.resume();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
+	 */
+	public void preprocess() {
+		executor.pause();
+		for (IPipelineStep step : threadedSteps) {
+			step.preprocess();
+		}
+		executor.resume();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
+	 */
+	public void process(URI input) {
+		execute();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
+	 */
+	public void process(InputStream input) {
+		execute();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(net.sf.okapi.common.
+	 * MemMappedCharSequence)
+	 */
+	public void process(MemMappedCharSequence input) {
+		execute();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IPipeline#process(java.lang.CharSequence)
+	 */
+	public void process(CharSequence input) {
+		execute();
 	}
 }

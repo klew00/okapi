@@ -42,13 +42,11 @@ public class HtmlFilterRoundtripTest {
 	}
 	
 	@Test
-	public void runPipeline() {
+	public void runPipelineFromString() {
 		IPipeline pipeline = new Pipeline();
 		
 		HtmlFilter htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/testBOM.html");
 		htmlFilter.setOptions("en", "UTF-8", true);
-		htmlFilter.open(htmlStream);
 		
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
@@ -59,7 +57,32 @@ public class HtmlFilterRoundtripTest {
 		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
 		
-		pipeline.execute();		
+		pipeline.preprocess();		
+		pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");
+		pipeline.postprocess();
+		pipeline.close();
+	}
+	
+	@Test
+	public void runPipelineFromStream() {
+		IPipeline pipeline = new Pipeline();
+		
+		HtmlFilter htmlFilter = new HtmlFilter();
+		htmlFilter.setOptions("en", "UTF-8", true);
+		
+		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
+		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
+		genericFilterWriter.setOptions("es", "UTF-8");
+		genericFilterWriter.setOutput("genericOutput.txt");
+
+		
+		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
+		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
+		
+		pipeline.preprocess();		
+		pipeline.process(HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html"));
+		pipeline.postprocess();
+		pipeline.close();
 	}
 
 	@After

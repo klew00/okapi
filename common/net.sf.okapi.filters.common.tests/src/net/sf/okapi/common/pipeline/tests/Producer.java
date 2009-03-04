@@ -50,12 +50,6 @@ public class Producer extends BasePipelineStep {
 		return event;
 	}
 
-	public void pause() {
-	}
-
-	public void resume() {
-	}
-
 	public void cancel() {
 	}
 

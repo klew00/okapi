@@ -31,14 +31,6 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 		switch (event.getEventType()) {
 
-		case START:
-			preprocess();
-			break;
-
-		case FINISHED:
-			postprocess();
-			break;
-
 		case START_DOCUMENT:
 			handleStartDocument(event);
 			break;
@@ -83,8 +75,20 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		return event;
 	}
 
+	// override these if there is a need for specialized pre or post processing.
+	// These methods are called once for every pipeline execution.
+	public void preprocess() {
+	}
+
+	public void postprocess() {
+	}
+	
+	// used to cleanup any resources, close files etc.. Only called at the end of the Pipeline lifrcycle.
+	public void close() {
+	}
+
 	// By default we simply pass the event on to the next step. Override these
-	// methods if need to process
+	// methods if we need to process
 	// the event
 
 	protected void handleDocumentPart(Event event) {

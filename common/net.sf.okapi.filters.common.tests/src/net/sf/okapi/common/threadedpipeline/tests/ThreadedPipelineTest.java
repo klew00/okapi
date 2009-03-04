@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.threadedpipeline.tests;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -50,7 +52,14 @@ public class ThreadedPipelineTest {
 				pipeline.addStep(new Producer());
 				pipeline.addStep(new ConsumerProducer());
 				pipeline.addStep(new Consumer());
-				pipeline.execute();
+				pipeline.preprocess();
+				try {
+					pipeline.process(new URI("DUMMY"));
+				} catch (URISyntaxException e) {
+					throw new RuntimeException(e);
+				}
+				pipeline.postprocess();
+				pipeline.close();
 			}
 		};
 
@@ -71,43 +80,6 @@ public class ThreadedPipelineTest {
 			default:
 				// still running
 				break;
-			}
-		}
-	}
-
-	//@Test
-	public void runPipeline() {
-		IPipeline pipeline = new ThreadedPipeline();
-		pipeline.addStep(new Producer());
-		pipeline.addStep(new ConsumerProducer());
-		pipeline.addStep(new Consumer());
-
-		System.out.println("START PIPELINE");
-		pipeline.execute();
-		while (pipeline.getState() == PipelineReturnValue.RUNNING || pipeline.getState() == PipelineReturnValue.PAUSED) {
-			pipeline.pause();
-			if (pipeline.getState() == PipelineReturnValue.PAUSED) {
-				System.out.println("Paused");
-			} else {
-				System.out.println("Running");
-			}
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			pipeline.resume();
-			if (pipeline.getState() == PipelineReturnValue.PAUSED) {
-				System.out.println("Paused");
-			} else {
-				System.out.println("Running");
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 	}

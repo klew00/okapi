@@ -20,48 +20,92 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.io.InputStream;
+import java.net.URI;
+
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.filters.IFilter;
 
-public class FilterPipelineStepAdaptor extends BasePipelineStep {
+public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
 	private IFilter filter;
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
+	 */
+	public void setInput(URI input) {
+		filter.open(input);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
+	 */
+	public void setInput(InputStream input) {
+		filter.open(input);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common
+	 * .MemMappedCharSequence)
+	 */
+	public void setInput(MemMappedCharSequence input) {
+		filter.open(input);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence
+	 * )
+	 */
+	public void setInput(CharSequence input) {
+		filter.open(input);
+	}
+
 	public FilterPipelineStepAdaptor(IFilter filter) {
 		this.filter = filter;
 	}
-	
+
 	public IFilter getFilter() {
 		return filter;
 	}
-	
-	public String getName() {		
+
+	public String getName() {
 		return filter.getName();
-	}		
+	}
 
 	@Override
-	public Event handleEvent(Event event) {
-		if (( event != null ) && 
-			( event.getEventType() == EventType.START || event.getEventType() == EventType.FINISHED )) {
-			return super.handleEvent(event);
-		}
-		//TODO: What about hasNext()???
-		return filter.next();
+	public Event handleEvent(Event event) {		
+		return filter.next();		
 	}
-	
-	public void preprocess() {}
 
+	public boolean hasNext() {
+		return filter.hasNext();
+	}
+
+	@Override
+	public void preprocess() {
+	}
+
+	@Override
 	public void postprocess() {
+	}
+
+	@Override
+	public void close() {
 		filter.close();
 	}
-	
+
 	public void cancel() {
 		filter.cancel();
-	}
-
-	public void pause() {
-	}
-
-	public void resume() {
 	}
 }

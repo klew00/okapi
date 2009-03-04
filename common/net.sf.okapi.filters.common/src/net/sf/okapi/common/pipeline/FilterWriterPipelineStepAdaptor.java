@@ -29,7 +29,7 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	public FilterWriterPipelineStepAdaptor(IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;
 	}
-	
+
 	public IFilterWriter getFilterWriter() {
 		return filterWriter;
 	}
@@ -40,20 +40,26 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	public String getName() {
 		return filterWriter.getName();
 	}
-	
+
 	@Override
-	public Event handleEvent(Event event) {		
-		return filterWriter.handleEvent(event);		
+	public Event handleEvent(Event event) {
+		return filterWriter.handleEvent(event);
 	}
 
 	public void pause() {
 	}
 
+	@Override
 	public void postprocess() {
-		filterWriter.close();
 	}
 
+	@Override
 	public void preprocess() {
+	}
+
+	@Override
+	public void close() {
+		filterWriter.close();
 	}
 
 	public void resume() {

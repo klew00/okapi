@@ -45,12 +45,6 @@ public class ConsumerProducer extends BasePipelineStep {
 		}
 	}
 
-	public void pause() {
-	}
-
-	public void resume() {
-	}
-
 	public void cancel() {
 	}
 }

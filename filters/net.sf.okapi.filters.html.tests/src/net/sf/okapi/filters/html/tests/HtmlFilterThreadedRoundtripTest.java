@@ -61,7 +61,10 @@ public class HtmlFilterThreadedRoundtripTest {
 			public void run() {
 				pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
 				pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-				pipeline.execute();
+				pipeline.preprocess();		
+				pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");
+				pipeline.postprocess();
+				pipeline.close();
 			}
 		};
 

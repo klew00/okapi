@@ -24,17 +24,35 @@ import net.sf.okapi.common.Event;
 
 public interface IPipelineStep {
 
+	/**
+	 * Get the UI displayable name of this step.
+	 */
 	public String getName();
-	
-	void preprocess(); 	
-		
-	Event handleEvent(Event event);
-	
+
+	/**
+	 * Preprocessing is done before any events are processed. Called once per
+	 * pipeline execution.
+	 */
+	void preprocess();
+
+	/**
+	 * Postprocessing is done after all events are processed. Called once per
+	 * pipeline execution.
+	 */
 	void postprocess();
-	
+
+	/**
+	 * Process each event sent though the pipeline.
+	 */
+	Event handleEvent(Event event);
+
+	/**
+	 * Cancel current pipeline processing.
+	 */
 	void cancel();
-	
-	void pause();
-	
-	void resume();
+
+	/**
+	 * Cleanup code should go here. Called once at the end of the pipeline lifecycle.
+	 */
+	void close();
 }

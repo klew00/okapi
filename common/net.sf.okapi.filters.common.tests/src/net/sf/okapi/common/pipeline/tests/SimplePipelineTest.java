@@ -20,34 +20,28 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class SimplePipelineTest {
-
-	@Before
-	public void setUp() {
-
-	}
 	
 	@Test
-	public void runPipeline() {
+	public void runPipeline() throws URISyntaxException {
 		IPipeline pipeline = new Pipeline();
 		pipeline.addStep(new Producer());
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());
 
 		System.out.println("START PIPELINE");
-		pipeline.execute();		
-	}
-
-	@After
-	public void cleanUp() {
+		pipeline.preprocess();
+		pipeline.process(new URI("DUMMY"));
+		pipeline.preprocess();
+		pipeline.close();
 		System.out.println("CLEANUP PIPELINE");
 	}
-
 }

@@ -57,7 +57,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 public abstract class BaseMarkupFilter extends BaseFilter {
 	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
 
-	private static final int PREVIEW_BYTE_COUNT = 2048;
+	private static final int PREVIEW_BYTE_COUNT = 1024;
 
 	private Source document;
 	private ExtractionRuleState ruleState;
@@ -115,6 +115,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public Source getParsedHeader(final InputStream inputStream) {
 		try {
+			inputStream.mark(0);
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
 			int i;
 			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
@@ -124,6 +125,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				bytes[i] = (byte) nextByte;
 			}
 			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0, i));
+			inputStream.reset();
 			return parsedInput;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -149,7 +151,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			}
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
-			bomis.detectEncoding();
+			bomis.detectEncoding(); // TODO why do we need to call this?
 			document = new Source(new InputStreamReader(bomis, detectedEncoding));
 
 		} catch (IOException e) {

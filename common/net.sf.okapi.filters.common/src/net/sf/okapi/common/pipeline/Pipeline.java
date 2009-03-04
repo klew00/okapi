@@ -20,22 +20,30 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MemMappedCharSequence;
 
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
 	IPipelineStep initialStep;
 	boolean cancel = false;
-	boolean pause = false;
-	boolean stop = false;
 	boolean first = true;
+	boolean startEventSent = false;
 
 	public Pipeline() {
 		steps = new ArrayList<IPipelineStep>();
+		initialize();
+	}
+
+	private void initialize() {
+		cancel = false;
+		first = true;
 	}
 
 	public void addStep(IPipelineStep step) {
@@ -48,45 +56,118 @@ public class Pipeline implements IPipeline {
 	}
 
 	public void cancel() {
+		// TODO handle cancel - do we put execute on its own thread?
 		cancel = true;
 	}
 
-	public void execute() {
-		// send intial start event
-		Event startEvent = new Event(EventType.START);
-		initialStep.handleEvent(startEvent);
-		for (IPipelineStep step : steps) {
-			step.handleEvent(startEvent);
+	private void execute() {
+		initialize();
+
+		// START event is only sent once during the lifecycle of the pipeline
+		// the pipeline produces this event on behalf of the intial step
+		if (!startEventSent) {
+			startEventSent = true;
+			Event event = new Event(EventType.START);			
+			for (IPipelineStep step : steps) {
+				step.handleEvent(event);
+			}
 		}
-		
-		while (!stop) {
-			if (pause)
-				continue;
+		// loop through the events until we run out
+		while (((IInitialStep) initialStep).hasNext()) {
 			Event event = initialStep.handleEvent(null);
-			if (event != null) {
-				for (IPipelineStep step : steps) {
-					step.handleEvent(event);
-				}
-	
-			} else stop = true;			
-		}
-		
-		Event finishEvent = new Event(EventType.FINISHED);
-		initialStep.handleEvent(finishEvent);
-		for (IPipelineStep step : steps) {
-			step.handleEvent(finishEvent);
+			for (IPipelineStep step : steps) {
+				step.handleEvent(event);
+			}
 		}
 	}
 
 	public PipelineReturnValue getState() {
-		return null;
+		if (cancel)
+			return PipelineReturnValue.CANCELLED;
+		
+		return PipelineReturnValue.SUCCEDED;
 	}
 
-	public void pause() {
-		pause = true;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
+	 */
+	public void process(URI input) {
+		((IInitialStep) initialStep).setInput(input);
+		execute();
 	}
 
-	public void resume() {
-		pause = false;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
+	 */
+	public void process(InputStream input) {
+		((IInitialStep) initialStep).setInput(input);
+		execute();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(net.sf.okapi.common.
+	 * MemMappedCharSequence)
+	 */
+	public void process(MemMappedCharSequence input) {
+		((IInitialStep) initialStep).setInput(input);
+		execute();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(CharSequence)
+	 */
+	public void process(CharSequence input) {
+		((IInitialStep) initialStep).setInput(input);
+		execute();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
+	 */
+	public void close() {
+		// send FINISH event
+		Event event = new Event(EventType.FINISHED);		
+		for (IPipelineStep step : steps) {
+			step.handleEvent(event);
+		}
+
+		initialStep.close();
+		for (IPipelineStep step : steps) {
+			step.close();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
+	 */
+	public void postprocess() {
+		initialStep.postprocess();
+		for (IPipelineStep step : steps) {
+			step.postprocess();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
+	 */
+	public void preprocess() {
+		initialStep.preprocess();
+		for (IPipelineStep step : steps) {
+			step.preprocess();
+		}
 	}
 }
