@@ -38,7 +38,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private static final int TARGETS_INITCAP = 2;
 	
 	private String id;
-	private boolean isReferent;
+	private int refCount;
 	private String name;
 	private String type;
 	private boolean isTranslatable = true;
@@ -107,7 +107,7 @@ public class TextUnit implements INameable, IReferenceable {
 	{
 		targets = new ConcurrentHashMap<String, TextContainer>(TARGETS_INITCAP);
 		this.id = id;
-		this.isReferent = isReferent;
+		refCount = (isReferent ? 1 : 0); 
 		this.mimeType = mimeType;
 		source = new TextContainer();
 		if ( sourceText != null ) {
@@ -300,11 +300,19 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	public boolean isReferent () {
-		return isReferent;
+		return (refCount > 0);
 	}
 
 	public void setIsReferent (boolean value) {
-		isReferent = value;
+		refCount = (value ? 1 : 0 );
+	}
+	
+	public int getReferenceCount () {
+		return refCount;
+	}
+	
+	public void setReferenceCount (int value) {
+		refCount = value;
 	}
 
 	/**

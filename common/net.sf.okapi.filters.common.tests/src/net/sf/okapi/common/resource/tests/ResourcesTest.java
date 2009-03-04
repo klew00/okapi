@@ -62,7 +62,7 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
 	public void testPWithAttributes () {
@@ -91,7 +91,7 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
 	public void testComplexEmptyElement () {
@@ -126,7 +126,7 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, "en"), test);
 	}
 
 	public void testPWithInlines () {
@@ -161,13 +161,19 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, "en"), test);
 	}
 
 	public void testMETATag2 () {
 		String test = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
 		ArrayList<Event> list = new ArrayList<Event>();
 		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("en");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
+
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp = new DocumentPart("dp1", false);		
 		skel.add("<meta http-equiv=\"Content-Language\" content=\"");
@@ -178,14 +184,20 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
 	public void testTMXTU () {
 		String test = "<tu><tuv xml:lang='EN'><seg>T1-en<sub>Sub-en</sub>T2-en</seg></tuv>"
 			+"<tuv xml:lang='SV'><seg>T1-sv<sub>Sub-sv</sub>T2-sv</seg></tuv></tu>";
 		ArrayList<Event> list = new ArrayList<Event>();
-		String trgLang = "sv";
+		String trgLang = "SV";
+		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("EN");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
 
 		// Create the main tu and its skeleton
 		TextUnit tu = new TextUnit("tu");
@@ -196,7 +208,7 @@ public class ResourcesTest extends TestCase {
 		TextFragment src = tu.getSourceContent();
 		src.append("T1-en");
 		
-		// Add the <su> element of the source
+		// Add the <sub> element of the source
 		Code code = src.append(TagType.PLACEHOLDER, null, "<sub>");
 		// Create the tu for sub as a reference
 		TextUnit tuSub = new TextUnit("tuSub", "Sub-en", true);
@@ -228,8 +240,11 @@ public class ResourcesTest extends TestCase {
 		// Add the reference to the tu of the sub,
 		// because it's in the target fragment it will get the target 
 		code.appendReference("tuSub");
+		// Increment the number of time tuSub is referenced
+		tuSub.setReferenceCount(tuSub.getReferenceCount()+1);
+		
 		code.append("</sub>");
-		trg.append("T2-en");
+		trg.append("T2-sv");
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.add("</seg></tuv></tu>");
 
@@ -242,11 +257,12 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		// Output and compare
-		assertEquals(generateOutput(list, test), test);
+		assertEquals(generateOutput(list, test, trgLang), test);
 	}
 	
 	private String generateOutput (ArrayList<Event> list,
-		String original)
+		String original,
+		String outputLang)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
@@ -254,7 +270,7 @@ public class ResourcesTest extends TestCase {
 		for ( Event event : list ) {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
-				writer.processStartDocument("en", "utf-8", null, new EncoderManager(),
+				writer.processStartDocument(outputLang, "utf-8", null, new EncoderManager(),
 					(StartDocument)event.getResource());
 				break;
 			case TEXT_UNIT:

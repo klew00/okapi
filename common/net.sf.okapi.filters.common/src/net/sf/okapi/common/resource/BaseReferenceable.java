@@ -25,17 +25,25 @@ package net.sf.okapi.common.resource;
  */
 public class BaseReferenceable extends BaseNameable implements IReferenceable {
 
-	protected boolean isReferent;
+	protected int refCount;
 	protected String parentId;
 	
 	public boolean isReferent () {
-		return isReferent;
+		return (refCount > 0);
 	}
 
 	public void setIsReferent (boolean value) {
-		isReferent = value;
+		refCount = (value ? 1 : 0);
 	}
 
+	public int getReferenceCount () {
+		return refCount;
+	}
+	
+	public void setReferenceCount (int value) {
+		refCount = value;
+	}
+	
 	/**
 	 * Gets the ID of the parent resource of this resource.
 	 * @return The ID of this resource's parent, or null if there is none.

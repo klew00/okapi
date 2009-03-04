@@ -49,7 +49,7 @@ public class StartGroup extends BaseReferenceable {
 		super();
 		this.parentId = parentId;
 		this.id = id;
-		this.isReferent = isReference;
+		this.refCount = (isReference ? 1 : 0);
 	}
 
 }

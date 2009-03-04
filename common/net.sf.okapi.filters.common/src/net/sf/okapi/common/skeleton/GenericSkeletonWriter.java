@@ -48,7 +48,7 @@ import net.sf.okapi.common.writer.ILayerProvider;
 public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private Stack<StorageList> storageStack;
-	private LinkedHashMap<String, IReferenceable> referents;
+	private LinkedHashMap<String, Referent> referents;
 	private String outputLang;
 	private String outputEncoding;
 	private boolean isMultilingual;
@@ -57,16 +57,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
-		IReferenceable ref = referents.get(id);
+		//IReferenceable ref = referents.get(id);
+		Referent ref = referents.get(id);
 		// Remove the object found from the list
-		if ( ref != null ) {
+		if (( ref != null ) && ( (--ref.count)==0 )) {
 			referents.remove(id);
 		}
-		return ref;
+		return ref.ref;
 	}
 
 	public void processStart () {
-		referents = new LinkedHashMap<String, IReferenceable>();
+		referents = new LinkedHashMap<String, Referent>();
 		storageStack = new Stack<StorageList>();
 	}
 	
@@ -121,7 +122,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	public String processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			StorageList sl = new StorageList(resource);
-			referents.put(sl.getId(), sl);
+			referents.put(sl.getId(), new Referent(sl));
 			storageStack.push(sl);
 			return "";
 		}
@@ -145,7 +146,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	public String processTextUnit (TextUnit resource) {
 		if ( resource.isReferent() ) {
-			referents.put(resource.getId(), resource);
+			referents.put(resource.getId(), new Referent(resource));
 			return "";
 		}
 		if ( storageStack.size() > 0 ) {
@@ -157,7 +158,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	public String processDocumentPart (DocumentPart resource) {
 		if ( resource.isReferent() ) {
-			referents.put(resource.getId(), resource);
+			referents.put(resource.getId(), new Referent(resource));
 			return "";
 		}
 		if ( storageStack.size() > 0 ) {
@@ -211,7 +212,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( isMultilingual ) {
 			langToUse = part.language;
 			// If lang==null: it's source, so not text in multilingual
-			contextToUse = (part.language==null) ? 0 : context;
+			contextToUse = (langToUse==null) ? 0 : context;
 		}
 		
 		// If a parent if set, it's a reference to the content of the resource

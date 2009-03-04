@@ -39,4 +39,8 @@ public interface IReferenceable {
 	 */
 	public boolean isReferent ();
 
+	public int getReferenceCount ();
+	
+	public void setReferenceCount (int value);
+	
 }

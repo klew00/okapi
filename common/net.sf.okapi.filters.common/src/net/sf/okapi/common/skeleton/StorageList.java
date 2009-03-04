@@ -65,6 +65,14 @@ class StorageList extends ArrayList<IResource>
 	public void setIsReferent (boolean value) {
 		// Not implemented: read-only info
 	}
+	
+	public int getReferenceCount () {
+		return startGroup.getReferenceCount();
+	}
+	
+	public void setReferenceCount (int value) {
+		// Not implemented: read-only info
+	}
 
 	public String getName () {
 		return startGroup.getName();

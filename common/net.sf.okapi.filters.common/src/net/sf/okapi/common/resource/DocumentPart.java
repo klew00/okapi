@@ -37,7 +37,7 @@ public class DocumentPart extends BaseReferenceable {
 		boolean isReferent)
 	{
 		this.id = id;
-		this.isReferent = isReferent;
+		this.refCount = (isReferent ? 1 : 0);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class DocumentPart extends BaseReferenceable {
 		ISkeleton skeleton)
 	{
 		this.id = id;
-		this.isReferent = isReferent;
+		this.refCount = (isReferent ? 1 : 0);
 		setSkeleton(skeleton);
 	}
 	
