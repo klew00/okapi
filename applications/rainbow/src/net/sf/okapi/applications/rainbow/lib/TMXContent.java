@@ -108,7 +108,11 @@ public class TMXContent {
 				// Use <ph> or <it> depending on underlying tagType
 				switch ( code.getTagType() ) {
 				case PLACEHOLDER:
-					if ( withTradosWorkarounds && code.getData().startsWith("\\") ) {
+					if ( withTradosWorkarounds
+						&& ((code.getData().indexOf('{') != -1 )
+							|| (code.getData().indexOf('}') != -1 )
+							|| (code.getData().indexOf('\\') != -1 )))
+					{
 						tmp.append("<ut>{\\cs6\\f1\\cf6\\lang1024 </ut>");
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("<ut>}</ut>");
