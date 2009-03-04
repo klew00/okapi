@@ -40,7 +40,6 @@ public class ResourcesTest extends TestCase {
 
 	public void testMETATag1 () {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
-		System.out.println(" in: "+test);
 		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
@@ -68,7 +67,6 @@ public class ResourcesTest extends TestCase {
 	
 	public void testPWithAttributes () {
 		String test = "<p title='my title'>Text of p</p>";
-		System.out.println(" in: "+test);
 		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
@@ -98,7 +96,6 @@ public class ResourcesTest extends TestCase {
 	
 	public void testComplexEmptyElement () {
 		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
-		System.out.println(" in: "+test);
 		ArrayList<Event> list = new ArrayList<Event>();
 		
 		// Build the input
@@ -134,7 +131,6 @@ public class ResourcesTest extends TestCase {
 
 	public void testPWithInlines () {
 		String test = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
-		System.out.println(" in: "+test);
 		ArrayList<Event> list = new ArrayList<Event>();
 		
 		GenericSkeleton skel = new GenericSkeleton();
@@ -168,10 +164,8 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test), test);
 	}
 
-	
 	public void testMETATag2 () {
 		String test = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
-		System.out.println(" in: "+test);
 		ArrayList<Event> list = new ArrayList<Event>();
 		
 		GenericSkeleton skel = new GenericSkeleton();
@@ -183,6 +177,70 @@ public class ResourcesTest extends TestCase {
 		dp.setSkeleton(skel);
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
+		// Output and compare
+		assertEquals(generateOutput(list, test), test);
+	}
+	
+	public void testTMXTU () {
+		String test = "<tu><tuv xml:lang='EN'><seg>T1-en<sub>Sub-en</sub>T2-en</seg></tuv>"
+			+"<tuv xml:lang='SV'><seg>T1-sv<sub>Sub-sv</sub>T2-sv</seg></tuv></tu>";
+		ArrayList<Event> list = new ArrayList<Event>();
+		String trgLang = "sv";
+
+		// Create the main tu and its skeleton
+		TextUnit tu = new TextUnit("tu");
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.add("<tu><tuv xml:lang='EN'><seg>");
+		
+		// Store the tuv content of the source
+		TextFragment src = tu.getSourceContent();
+		src.append("T1-en");
+		
+		// Add the <su> element of the source
+		Code code = src.append(TagType.PLACEHOLDER, null, "<sub>");
+		// Create the tu for sub as a reference
+		TextUnit tuSub = new TextUnit("tuSub", "Sub-en", true);
+		// Create the skeleton for the tu of sub, just to hold the content
+		GenericSkeleton skelSub = new GenericSkeleton();
+		skelSub.addContentPlaceholder(tuSub);
+		code.appendReference("tuSub");
+		// But the <sub> tags go in the inline code because if they were in the
+		// skeleton of the sub it would be identical for source and target
+		// but that cannot be: we have to allow for different <sub> tags
+		code.append("</sub>");
+		
+		// Add the second part of the source text
+		src.append("T2-en");
+		// Add the placeholder for the source tu
+		skel.addContentPlaceholder(tu);
+
+		// Add the skeleton between source and target
+		skel.add("</seg></tuv><tuv xml:lang='SV'><seg>");
+
+		// Create the target main content 
+		TextFragment trg = tu.setTargetContent(trgLang, new TextFragment());
+		trg.append("T1-sv");
+		
+		// Add the sub inline in the target
+		code = trg.append(TagType.PLACEHOLDER, null, "<sub>");
+		// Set the content of the target sub in the tu of the sub
+		tuSub.setTargetContent(trgLang, new TextFragment("Sub-sv"));
+		// Add the reference to the tu of the sub,
+		// because it's in the target fragment it will get the target 
+		code.appendReference("tuSub");
+		code.append("</sub>");
+		trg.append("T2-en");
+		skel.addContentPlaceholder(tu, trgLang);
+		skel.add("</seg></tuv></tu>");
+
+		// Send the tu of the sub
+		tuSub.setSkeleton(skelSub);
+		list.add(new Event(EventType.TEXT_UNIT, tuSub));
+		
+		// Send the main tu
+		tu.setSkeleton(skel);
+		list.add(new Event(EventType.TEXT_UNIT, tu));
+		
 		// Output and compare
 		assertEquals(generateOutput(list, test), test);
 	}
@@ -224,6 +282,7 @@ public class ResourcesTest extends TestCase {
 				break;
 			}
 		}
+		System.out.println(" in: "+original);
 		System.out.println("out: "+tmp.toString());
 		System.out.println("-----");
 		return tmp.toString();

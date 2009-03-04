@@ -89,9 +89,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		this.outputLang = outputLanguage;
 		this.encoderManager = encoderManager;
 		this.outputEncoding = outputEncoding;
-		this.encoderManager.setDefaultOptions(null, outputEncoding);
 		this.layer = layer;
 		isMultilingual = resource.isMultilingual();
+		if ( this.encoderManager != null ) {
+			this.encoderManager.setDefaultOptions(null, outputEncoding);
+		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
@@ -302,7 +304,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context) 
 	{
 		// Update the encoder from the TU's MIME type
-		encoderManager.updateEncoder(tu.getMimeType());
+		if ( encoderManager != null ) {
+			encoderManager.updateEncoder(tu.getMimeType());
+		}
 		
 		// Get the right text container
 		TextContainer srcCont = tu.getSource();
@@ -628,8 +632,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		else if ( IEncoder.PROP_ENCODING.equals(name) ) {
 			value = outputEncoding;
 		}
-		// Return the native value
-		return encoderManager.toNative(name, value);
+		// Return the native value if possible
+		if ( encoderManager == null ) return value;
+		else return encoderManager.toNative(name, value);
 	}
 	
 }
