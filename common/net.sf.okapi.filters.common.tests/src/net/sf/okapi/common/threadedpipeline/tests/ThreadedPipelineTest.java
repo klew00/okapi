@@ -51,14 +51,12 @@ public class ThreadedPipelineTest {
 			public void run() {
 				pipeline.addStep(new Producer());
 				pipeline.addStep(new ConsumerProducer());
-				pipeline.addStep(new Consumer());
-				pipeline.preprocess();
+				pipeline.addStep(new Consumer());				
 				try {
 					pipeline.process(new URI("DUMMY"));
 				} catch (URISyntaxException e) {
 					throw new RuntimeException(e);
-				}
-				pipeline.postprocess();
+				}				
 				pipeline.close();
 			}
 		};

@@ -28,10 +28,8 @@ public class FilebasedPipelineTest {
 		pipeline.addStep(new FileStepConsumer());
 		pipeline.addStep(new Consumer());
 
-		System.out.println("START PIPELINE");
-		pipeline.preprocess();
-		pipeline.process(new URI("DUMMY"));
-		pipeline.preprocess();
+		System.out.println("START PIPELINE");		
+		pipeline.process(new URI("DUMMY"));		
 		pipeline.close();
 		System.out.println("CLEANUP PIPELINE");		
 	}

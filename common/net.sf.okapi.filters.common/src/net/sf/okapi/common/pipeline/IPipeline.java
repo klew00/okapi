@@ -23,21 +23,7 @@ package net.sf.okapi.common.pipeline;
 import java.io.InputStream;
 import java.net.URI;
 
-import net.sf.okapi.common.MemMappedCharSequence;
-
-public interface IPipeline {
-
-	/**
-	 * Call preprocess on all steps in the pipeline. Throws an exception if no
-	 * steps are found in the pipeline.
-	 */
-	public void preprocess();
-
-	/**
-	 * Call postprocess on all steps in the pipeline. Throws an exception if no
-	 * steps are found in the pipeline.
-	 */
-	public void postprocess();
+public interface IPipeline {	
 
 	/**
 	 * Run the pipeline using a URI as input.
@@ -52,13 +38,6 @@ public interface IPipeline {
 	 * @param input
 	 */
 	public void process(InputStream input);
-
-	/**
-	 * Run the pipeline using an MemMappedCharSequence as input.
-	 * 
-	 * @param input
-	 */
-	public void process(MemMappedCharSequence input);
 
 	/**
 	 * Run the pipeline using a CharSequence as input.

@@ -98,7 +98,9 @@ public class Pipeline implements IPipeline {
 	 */
 	public void process(URI input) {
 		((IInitialStep) initialStep).setInput(input);
+		preprocess();
 		execute();
+		postprocess();
 	}
 
 	/*
@@ -107,19 +109,10 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
 	 */
 	public void process(InputStream input) {
+		preprocess();
 		((IInitialStep) initialStep).setInput(input);
 		execute();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(net.sf.okapi.common.
-	 * MemMappedCharSequence)
-	 */
-	public void process(MemMappedCharSequence input) {
-		((IInitialStep) initialStep).setInput(input);
-		execute();
+		postprocess();
 	}
 	
 	/*
@@ -129,7 +122,9 @@ public class Pipeline implements IPipeline {
 	 */
 	public void process(CharSequence input) {
 		((IInitialStep) initialStep).setInput(input);
+		preprocess();
 		execute();
+		postprocess();
 	}
 
 	/*
@@ -155,7 +150,7 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
 	 */
-	public void postprocess() {
+	private void postprocess() {
 		initialStep.postprocess();
 		for (IPipelineStep step : steps) {
 			step.postprocess();
@@ -167,7 +162,7 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
 	 */
-	public void preprocess() {
+	private void preprocess() {
 		initialStep.preprocess();
 		for (IPipelineStep step : steps) {
 			step.preprocess();
