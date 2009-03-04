@@ -82,4 +82,9 @@ public interface IFilterWriter {
 	 */
 	public void setParameters (IParameters params);
 
+	/**
+	 * Cancels the current process.
+	 */
+	public void cancel ();
+
 }

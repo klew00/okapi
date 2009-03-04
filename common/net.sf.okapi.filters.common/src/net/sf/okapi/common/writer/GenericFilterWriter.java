@@ -65,6 +65,10 @@ public class GenericFilterWriter implements IFilterWriter {
 		encoderManager = new EncoderManager();
 	}
 	
+	public void cancel () {
+		//TODO: implement cancel()
+	}
+	
 	public void close () {
 		if ( writer == null ) return;
 		IOException err = null;

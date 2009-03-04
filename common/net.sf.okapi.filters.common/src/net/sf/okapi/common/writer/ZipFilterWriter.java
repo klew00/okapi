@@ -61,6 +61,10 @@ public class ZipFilterWriter implements IFilterWriter {
 	private File tempFile;
 	private File tempZip;
 
+	public void cancel () {
+		//TODO: implement cancel()
+	}
+	
 	public void close () {
 		if ( zipOut == null ) return;
 		IOException err = null;

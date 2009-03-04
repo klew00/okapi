@@ -55,6 +55,10 @@ class DbStoreBuilder implements IFilterWriter {
 		this.trgSeg = trgSeg;
 	}
 	
+	public void cancel () {
+		//TODO: implement cancel()
+	}
+	
 	public void close () {
 		// Nothing to do
 	}

@@ -20,6 +20,8 @@
  <command name="help.howtouse">How To &amp;Use Ratel</command>
  <command name="help.update">&amp;Check For Updates</command>
  <command name="help.feedback">&amp;Send Feedback</command>
+ <command name="help.bugreport">Submit &amp;Bug Report</command>
+ <command name="help.featurerequest">Submit &amp;Feature Request</command>
  <command name="help.users">Users &amp;Group</command>
  <command name="help.srx20">SRX 2.0 Sp&amp;ecification</command>
  <command name="help.about">&amp;About Ratel...</command>

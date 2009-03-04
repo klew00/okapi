@@ -541,6 +541,22 @@ public class SRXEditor {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.bugreport"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://code.google.com/p/okapi/issues/list"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.featurerequest"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://code.google.com/p/okapi/issues/list"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "help.users"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {

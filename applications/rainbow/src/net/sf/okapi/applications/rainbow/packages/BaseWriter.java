@@ -52,6 +52,10 @@ public abstract class BaseWriter implements IWriter {
 		tmxWriter = new TMXWriter();
 	}
 	
+	public void cancel () {
+		//TODO: implement cancel()
+	}
+	
 	public void setInformation (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
