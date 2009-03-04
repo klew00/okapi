@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.CharacterEntityReference;
 import net.htmlparser.jericho.EndTag;
+import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
@@ -62,19 +64,23 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
+		// convert all character and numeric entities to Unicode		
+		String decodedText = CharacterEntityReference.decode(text.toString(), false);
+		decodedText = NumericCharacterReference.decode(decodedText, false);
+		
 		// check for ignorable whitespace and add it to the skeleton
 		// The Jericho html parser always pulls out the largest stretch of text
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
-			addToDocumentPart(text.toString());
+			addToDocumentPart(decodedText);
 			return;
-		}
-
+		}				
+		
 		if (canStartNewTextUnit()) {
-			startTextUnit(text.toString());
+			startTextUnit(decodedText);
 		} else {
-			addToTextUnit(text.toString());
+			addToTextUnit(decodedText);
 		}
 	}
 
@@ -324,7 +330,10 @@ public class HtmlFilter extends BaseMarkupFilter {
 		}
 
 		// otherwise treat normally
-		return super.createPropertyTextUnitPlaceholder(type, name, value, tag, attribute);
+		// convert all enetities to Unicode		
+		String decodedValue = CharacterEntityReference.decode(value, true);
+		decodedValue = NumericCharacterReference.decode(value, true);
+		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
 	}
 
 	/*

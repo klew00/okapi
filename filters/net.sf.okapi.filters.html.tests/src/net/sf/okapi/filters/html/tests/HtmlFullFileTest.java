@@ -85,14 +85,14 @@ public class HtmlFullFileTest {
 				TextUnit tu = (TextUnit)event.getResource();
 				if (first) {
 					first = false;
-					firstText = tu.getSource().toString();;
+					firstText = tu.getSource().toString();
 				}
 				foundText = true;
 				lastText = tu.getSource().toString();
 			}
 		}
 		assertTrue(foundText);
-		assertTrue(firstText.equals("Okapi Framework"));
-		assertTrue(lastText.equals("&nbsp;"));		
+		assertEquals("Okapi Framework", firstText);
+		assertEquals("\u00A0", lastText);		
 	}
 }

@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.Config;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
@@ -174,6 +175,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	protected void initialize() {
 		super.initialize();
 
+		Config.ConvertNonBreakingSpaces = false;
+		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
+		// TODO: will this fix logging problems??? Config.LoggerProvider = ;
 		if (bomEncodingDetector != null) {
 			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
 			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
@@ -184,7 +188,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 
 		// Segment iterator
-		ruleState = new ExtractionRuleState();
+		ruleState = new ExtractionRuleState();		
 		document.fullSequentialParse(); // optimizes jericho parsing
 		nodeIterator = document.getNodeIterator();
 	}
