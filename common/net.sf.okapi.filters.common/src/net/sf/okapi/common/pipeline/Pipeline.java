@@ -48,6 +48,9 @@ public class Pipeline implements IPipeline {
 
 	public void addStep(IPipelineStep step) {
 		if (first) {
+			if (!(initialStep instanceof IInitialStep)) {
+				throw new RuntimeException("Intial step must implement IInitialStep");
+			}
 			initialStep = step;
 			first = false;
 		} else {
