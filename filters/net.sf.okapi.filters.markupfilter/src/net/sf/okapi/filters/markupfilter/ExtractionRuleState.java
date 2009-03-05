@@ -29,7 +29,7 @@ import net.sf.okapi.filters.markupfilter.ExtractionRule.EXTRACTION_RULE_TYPE;
  */
 public class ExtractionRuleState {
 
-	final class RuleType {
+	private static final class RuleType {
 
 		public RuleType(String ruleName, EXTRACTION_RULE_TYPE ruleType) {
 			this.ruleName = ruleName;

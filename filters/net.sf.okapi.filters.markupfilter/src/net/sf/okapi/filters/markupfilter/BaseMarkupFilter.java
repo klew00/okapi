@@ -69,13 +69,14 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
 
-	public BaseMarkupFilter() {
-		super();
-		
+	static {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
 		// TODO: will this fix logging problems??? Config.LoggerProvider = ;
-
+	}
+	
+	public BaseMarkupFilter() {
+		super();		
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 	}
@@ -273,7 +274,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 
 		if (!nodeIterator.hasNext()) {
-			finalize(); // we are done
+			super.finalize(); // we are done
 		}
 
 		// return one of the waiting events

@@ -540,7 +540,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		resource = setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
+		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
 				.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
 	}

@@ -44,7 +44,7 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getMainRuleType("title"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS);
 		assertEquals(rules.getMainRuleType("abbr"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
 		assertEquals(rules.getMainRuleType("area"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
-		assertEquals(rules.getMainRuleType("script"), TaggedFilterConfiguration.RULE_TYPE.SCRIPT_ELEMENT);
+		assertEquals(rules.getMainRuleType("script"), TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
 		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
 		assertEquals(rules.getMainRuleType("meta"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		
