@@ -36,7 +36,9 @@ import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
+import net.sf.okapi.mt.google.GoogleMTConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -57,6 +59,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -113,9 +117,11 @@ public class Aligner {
 	private boolean trimCodes = false;//TODO: take from SRX rules
 	private boolean trimWS = true;//TODO: take from SRX rules
 	private boolean manualCorrection;
-	private String targetLanguage;
+	private String srcLang;
+	private String trgLang;
 	private IHelp help;
 	private String updateCommand;
+	private IQuery mtQuery;
 
 	@Override
 	protected void finalize () {
@@ -142,6 +148,10 @@ public class Aligner {
 		if ( colorRed != null ) {
 			colorRed.dispose();
 			colorRed = null;
+		}
+		if ( mtQuery != null ) {
+			mtQuery.close();
+			mtQuery = null;
 		}
 	}
 	
@@ -242,6 +252,8 @@ public class Aligner {
 			}
 		});
 
+		createListContextMenus();
+		
 		//=== Bottom sash
 		
 		SashForm sashBottom = new SashForm(sashTop, SWT.VERTICAL);
@@ -488,7 +500,12 @@ public class Aligner {
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btClose.setText("Cancel");
 		shell.setDefaultButton(btAccept);
+		
+		// Query engine
+		mtQuery = new GoogleMTConnector();
+		mtQuery.open(null);
 
+		// Size and position of dialog
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Point startSize = shell.getMinimumSize();
@@ -496,6 +513,30 @@ public class Aligner {
 		if ( startSize.y < 700 ) startSize.y = 700; 
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
+	}
+
+	private void createListContextMenus () {
+		// Context menu for the input list
+		Menu contextMenu = new Menu(shell, SWT.POP_UP);
+		
+		MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		menuItem.setText("Get Machine Translation of &Source");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				getGist(false);
+            }
+		});
+		
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		menuItem.setText("Get Machine Translation of &Target");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				getGist(true);
+            }
+		});
+		
+		srcList.setMenu(contextMenu);
+		trgList.setMenu(contextMenu);
 	}
 	
 	public boolean wasModifiedManually () {
@@ -512,7 +553,7 @@ public class Aligner {
 			return (dlg.open() == SWT.YES);
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		return false;
 	}
@@ -526,9 +567,11 @@ public class Aligner {
 	public void setInfo (String targetSrxPath,
 		boolean checkSingleSegUnit,
 		boolean useAutoCorrection,
+		String sourceLanguage,
 		String targetLanguage)
 	{
-		this.targetLanguage = targetLanguage;
+		this.srcLang = sourceLanguage;
+		this.trgLang = targetLanguage;
 		this.targetSrxPath = targetSrxPath;
 		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
 		chkUseAutoCorrection.setSelection(useAutoCorrection);
@@ -546,7 +589,7 @@ public class Aligner {
 			}
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -640,7 +683,7 @@ public class Aligner {
 			manualCorrection = true;
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
@@ -657,7 +700,7 @@ public class Aligner {
 			manualCorrection = true;
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -747,10 +790,10 @@ public class Aligner {
 	{
 		manualCorrection = false;
 		// Make sure we do have a target to align
-		if ( !tu.hasTarget(targetLanguage) ) return 2;
+		if ( !tu.hasTarget(trgLang) ) return 2;
 		// Set the new values
 		source = tu.getSource();
-		target = tu.getTarget(targetLanguage);
+		target = tu.getTarget(trgLang);
 		btToReview.setSelection(false);
 		// Check if both are segmented
 		if ( !source.isSegmented() || !target.isSegmented() ) return 1;
@@ -855,7 +898,7 @@ public class Aligner {
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -865,7 +908,7 @@ public class Aligner {
 			editor.showDialog(targetSrxPath);
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
@@ -886,7 +929,7 @@ public class Aligner {
 						target.getSegments().get(indexActiveSegment), true);
 				}
 				catch ( InvalidContentException e ) {
-					Dialogs.showError(shell, e.getLocalizedMessage(), null);
+					Dialogs.showError(shell, e.getMessage(), null);
 					return;
 					//TODO: recover by resetting the original, or prevent end of
 					//edit mode
@@ -909,7 +952,7 @@ public class Aligner {
 			trgList.setFocus();
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
@@ -997,7 +1040,7 @@ public class Aligner {
 			return updateIssueStatus(gotoIssue);
 		}
 		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 			return false;
 		}
 	}
@@ -1182,7 +1225,7 @@ public class Aligner {
 		}
 		catch ( Throwable e ) {
 			addIssue(2, "Error- Auto-correction error occured.");
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		return modified;
 	}
@@ -1226,4 +1269,38 @@ public class Aligner {
 		return (issueType>0);
 	}
 
+	private void getGist (boolean targetToSource) {
+		try {
+			int n;
+			TextFragment oriFrag;
+			if ( targetToSource ) {
+				if ( (n = trgList.getSelectionIndex()) == -1 ) return;
+				mtQuery.setLanguages(trgLang, srcLang);
+				oriFrag = target.getSegments().get(n);
+			}
+			else {
+				if ( (n = srcList.getSelectionIndex()) == -1 ) return;
+				mtQuery.setLanguages(srcLang, trgLang);
+				oriFrag = source.getSegments().get(n);
+			}
+			
+			mtQuery.query(oriFrag);
+			String text;
+			if ( mtQuery.hasNext() ) {
+				text = "original segment:\n" + oriFrag.toString()
+					+ "\n\nPossible translation:\n" + mtQuery.next().target.toString();
+			}
+			else {
+				text = "No translation found for the select segment.";
+			}
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
+			dlg.setMessage(text);
+			dlg.setText("translation Query");
+			dlg.open();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 }

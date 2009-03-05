@@ -134,7 +134,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( aligner == null ) {
 			aligner = new Aligner(shell, help, updateCommand);
 			aligner.setInfo(trgSrxPath, params.checkSingleSegUnit,
-				params.useAutoCorrection, trgLang);
+				params.useAutoCorrection, srcLang, trgLang);
 		}
 		
 		alignedTotal = 0;
