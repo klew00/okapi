@@ -266,7 +266,6 @@ public class ResourcesTest extends TestCase {
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart();
 		for ( Event event : list ) {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
@@ -298,6 +297,7 @@ public class ResourcesTest extends TestCase {
 				break;
 			}
 		}
+		writer.close();
 		System.out.println(" in: "+original);
 		System.out.println("out: "+tmp.toString());
 		System.out.println("-----");

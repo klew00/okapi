@@ -161,9 +161,7 @@ public interface IUtility {
 	public void postprocess ();
 	
 	public void cancel ();
-
-	public void pause ();
-
-	public void resume ();
+	
+	public void destroy ();
 
 }

@@ -66,12 +66,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return ref.ref;
 	}
 
-	public void processStart () {
-		referents = new LinkedHashMap<String, Referent>();
-		storageStack = new Stack<StorageList>();
-	}
-	
-	public void processFinished () {
+	public void close () {
 		referents.clear();
 		referents = null;
 		storageStack.clear();
@@ -84,8 +79,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		EncoderManager encoderManager,
 		StartDocument resource)
 	{
-		referents.clear();
-		storageStack.clear();
+		referents = new LinkedHashMap<String, Referent>();
+		storageStack = new Stack<StorageList>();
 
 		this.outputLang = outputLanguage;
 		this.encoderManager = encoderManager;
@@ -637,5 +632,5 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( encoderManager == null ) return value;
 		else return encoderManager.toNative(name, value);
 	}
-	
+
 }

@@ -114,11 +114,8 @@ public class Merger {
 			outFilter.setOptions(trgLang, item.getOutputEncoding());
 			outFilter.setOutput(outputFile);
 			
-			// Send the START event
-			Event event = new Event(EventType.START);
-			outFilter.handleEvent(event);
-			
 			// process the document
+			Event event;
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
@@ -126,11 +123,6 @@ public class Merger {
 				}
 				outFilter.handleEvent(event);
 			}
-
-			// Send the FINISHED event
-			event = new Event(EventType.FINISHED);
-			outFilter.handleEvent(event);
-			
 		}
 		catch ( Exception e ) {
 			// Log and move on to the next file

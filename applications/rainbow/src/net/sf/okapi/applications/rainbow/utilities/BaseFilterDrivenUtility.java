@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.utilities;
 import java.io.File;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterWriter;
 
@@ -47,32 +46,20 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 				filterWriter.setOptions(trgLang, getOutputEncoding(0));
 				filterWriter.setOutput(getOutputPath(0));
 			}
+			else filterWriter = null;
 
 			// Setup the filter
 			File f = new File(getInputPath(0)); 
 			filter.open(f.toURI());
-		
-			// Send the START event
-			Event event = new Event(EventType.START);
-			handleEvent(event);
-			if ( needsSelfOutput ) { // Only if needed
-				filterWriter.handleEvent(event);
-			}
+			Event event;
 			
 			// Process the document
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				handleEvent(event);
-				if ( needsSelfOutput ) { // Only if needed
+				if ( filterWriter != null ) { // Only if needed
 					filterWriter.handleEvent(event);
 				}
-			}
-
-			// Send the FINISHED event
-			event = new Event(EventType.FINISHED);
-			handleEvent(event);
-			if ( needsSelfOutput ) { // Only if needed
-				filterWriter.handleEvent(event);
 			}
 		}
 		finally {

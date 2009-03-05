@@ -248,7 +248,6 @@ public class PropertiesFilter implements IFilter {
 		}
 		// Set the start event
 		queue = new LinkedList<Event>();
-		queue.add(new Event(EventType.START));
 
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);

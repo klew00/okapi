@@ -65,12 +65,6 @@ public class XLIFFFilterTest {
 		while ( filter.hasNext() ) {
 			event = filter.next();
 			switch ( event.getEventType() ) {
-			case START:
-				System.out.println("---Start");
-				break;
-			case FINISHED:
-				System.out.println("---Finished");
-				break;
 			case START_DOCUMENT:
 				System.out.println("---Start Document");
 				printSkeleton(event.getResource());

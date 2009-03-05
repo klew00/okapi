@@ -64,7 +64,16 @@ public class Utility extends BaseFilterDrivenUtility  {
 			writer.write('\uFEFF'); // BOM
 			// Process all characters
 			for ( char key : charList.keySet() ) {
-				writer.println(String.format("U+%04X\t'%c'\t%d", (int)key, key, charList.get(key)));
+				switch ( key ) {
+				case '\t':
+				case '\r':
+				case '\n':
+					writer.println(String.format("U+%04X\t'0x%d'\t%d", (int)key, (int)key, charList.get(key)));
+					break;
+				default:
+					writer.println(String.format("U+%04X\t'%c'\t%d", (int)key, key, charList.get(key)));
+				break;
+				}
 			}
 			if ( params.autoOpen ) {
 				UIUtil.start(finalOutput);

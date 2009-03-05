@@ -34,15 +34,7 @@ import net.sf.okapi.common.writer.ILayerProvider;
  */
 public interface ISkeletonWriter {
 
-	/**
-	 * Processes the START event.
-	 */
-	public void processStart ();
-	
-	/**
-	 * Processes the FINISHED event.
-	 */
-	public void processFinished ();
+	public void close ();
 	
 	/**
 	 * Processes the START_DOCUMENT event.

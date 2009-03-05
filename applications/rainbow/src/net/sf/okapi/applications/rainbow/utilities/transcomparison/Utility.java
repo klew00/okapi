@@ -123,9 +123,6 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
-		case START:
-			processStart();
-			break;
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());
 			break;
@@ -139,7 +136,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return event;
 	}
 
-	private void processStart () {
+	private void initializeData () {
 		// Initialize the filter to read the translation to compare
 		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 			getInputFilterSettings(1), inputToCompare);
@@ -173,6 +170,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 
 	private void processStartDocument (StartDocument startDoc) {
+		initializeData();
 		isBaseMultilingual = startDoc.isMultilingual();
 		// Move to start document
 		Event event = synchronize(EventType.START_DOCUMENT);

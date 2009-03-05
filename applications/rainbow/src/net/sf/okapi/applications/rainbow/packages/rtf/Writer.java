@@ -95,6 +95,10 @@ public class Writer extends BaseWriter {
 	}
 
 	public void close () {
+		if ( skelWriter != null ) {
+			skelWriter.close();
+			skelWriter = null;
+		}
 		if ( writer != null ) {
 			writer.close();
 			writer = null;
@@ -126,12 +130,6 @@ public class Writer extends BaseWriter {
 	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
-			case START:
-				skelWriter.processStart();
-				break;
-			case FINISHED:
-				processFinished();
-				break;
 			case START_DOCUMENT:
 				processStartDocument((StartDocument)event.getResource());
 				break;
@@ -169,11 +167,6 @@ public class Writer extends BaseWriter {
 			throw new RuntimeException(e);
 		}
 		return event;
-	}
-
-	private void processFinished () {
-		skelWriter.processFinished();
-		close();
 	}
 
 	private void processStartDocument (StartDocument resource) {

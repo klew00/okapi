@@ -112,7 +112,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm = null;
 		}
 	}
-
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -198,5 +198,5 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.leverage(tu);
 		}
 	}
-    
+
 }

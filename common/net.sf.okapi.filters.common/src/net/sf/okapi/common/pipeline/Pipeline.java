@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;

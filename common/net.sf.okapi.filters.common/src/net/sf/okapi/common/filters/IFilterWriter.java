@@ -56,7 +56,7 @@ public interface IFilterWriter {
 	 * @param output Output stream to use for the output.
 	 */
 	public void setOutput (OutputStream output);
-
+	
 	/**
 	 * Handles the filter events.
 	 * @param event The event to process.

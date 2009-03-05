@@ -69,11 +69,9 @@ public class ODFFilterTest {
 			writer = new GenericFilterWriter(filter.createSkeletonWriter());
 			writer.setOptions("FR", "UTF-8");
 			writer.setOutput("TestDocument01.odt_content.out.xml");
-			writer.handleEvent(new Event(EventType.START));
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}
-			writer.handleEvent(new Event(EventType.FINISHED));
 		}
 		finally {
 			if ( writer != null ) writer.close();

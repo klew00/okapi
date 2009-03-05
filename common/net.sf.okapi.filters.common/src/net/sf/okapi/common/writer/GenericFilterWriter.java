@@ -71,6 +71,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	
 	public void close () {
 		if ( writer == null ) return;
+		if ( skelWriter != null ) skelWriter.close();
 		IOException err = null;
 		InputStream orig = null;
 		OutputStream dest = null;
@@ -135,12 +136,6 @@ public class GenericFilterWriter implements IFilterWriter {
 	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
-			case START:
-				processStart();
-				break;
-			case FINISHED:
-				processFinished();
-				break;
 			case START_DOCUMENT:
 				processStartDocument(language, encoding, null, encoderManager, (StartDocument)event.getResource());
 				break;
@@ -180,15 +175,6 @@ public class GenericFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	private void processStart () {
-		skelWriter.processStart();
-	}
-
-	private void processFinished () {
-		skelWriter.processFinished();
-		close();
-	}
-	
 	private void processStartDocument(String outputLanguage,
 		String outputEncoding,
 		ILayerProvider layer,

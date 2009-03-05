@@ -20,8 +20,6 @@
 
 package net.sf.okapi.filters.html.tests;
 
-import java.io.InputStream;
-
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;

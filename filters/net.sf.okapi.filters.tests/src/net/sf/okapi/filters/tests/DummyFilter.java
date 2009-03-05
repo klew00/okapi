@@ -123,8 +123,6 @@ public class DummyFilter implements IFilter {
 		close();
 		queue = new LinkedList<Event>();
 
-		queue.add(new Event(EventType.START));
-		
 		StartDocument sd = new StartDocument("sd1");
 		sd.setLanguage(srcLang);
 		sd.setIsMultilingual(true);
@@ -157,8 +155,6 @@ public class DummyFilter implements IFilter {
 		skel = new GenericSkeleton("</doc>\n");
 		ending.setSkeleton(skel);
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
-		
-		queue.add(new Event(EventType.FINISHED));
 	}
 
 }

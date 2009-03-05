@@ -153,7 +153,6 @@ public class MIFFilter implements IFilter {
 			hasNext = true;
 			
 			queue = new LinkedList<Event>();
-			queue.add(new Event(EventType.START));
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
@@ -198,7 +197,7 @@ public class MIFFilter implements IFilter {
 			read();
 		}
 		// Update hasNext flag on the FINISHED event
-		if ( queue.peek().getEventType() == EventType.FINISHED ) {
+		if ( queue.peek().getEventType() == EventType.END_DOCUMENT ) {
 			hasNext = false;
 		}
 		// Return the head of the queue
@@ -276,7 +275,6 @@ public class MIFFilter implements IFilter {
 			
 			Ending ending = new Ending(String.valueOf(++otherId)); 
 			queue.add(new Event(EventType.END_DOCUMENT, ending));
-			queue.add(new Event(EventType.FINISHED));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -285,7 +283,6 @@ public class MIFFilter implements IFilter {
 		// Else: we are done
 		queue.add(new Event(EventType.END_DOCUMENT,
 			new Ending(String.valueOf(++otherId))));
-		queue.add(new Event(EventType.FINISHED));
 	}
 
 	private void readComment () throws IOException {

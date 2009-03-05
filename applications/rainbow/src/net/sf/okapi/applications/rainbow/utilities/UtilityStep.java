@@ -55,7 +55,7 @@ public class UtilityStep implements IPipelineStep {
 		utility.preprocess();
 	}
 
-	public void close () {
-		//TODO: Figure out what needs to be done. Thought this was done in postprocess 
+	public void destroy () {
+		utility.destroy(); 
 	}
 }

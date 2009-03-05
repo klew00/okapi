@@ -86,6 +86,7 @@ public class ZipFilterWriter implements IFilterWriter {
 					dest.write(buffer, 0, len);
 				}
 			}
+			buffer = null;
 		}
 		catch ( IOException e ) {
 			err = e;
@@ -130,9 +131,6 @@ public class ZipFilterWriter implements IFilterWriter {
 
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
-		case START:
-			processStart();
-			break;
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());
 			break;
@@ -154,9 +152,6 @@ public class ZipFilterWriter implements IFilterWriter {
 			subDocWriter.handleEvent(event);
 			break;
 		case CANCELED:
-			break;
-		case FINISHED:
-			processFinished();
 			break;
 		}
 		return event;
@@ -182,16 +177,9 @@ public class ZipFilterWriter implements IFilterWriter {
 		// TODO Auto-generated method stub
 	}
 
-	private void processStart () {
-		buffer = new byte[2048];
-	}
-	
-	private void processFinished () {
-		buffer = null;
-	}
-	
 	private void processStartDocument (StartDocument res) {
 		try {
+			buffer = new byte[2048];
 			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 			zipOriginal = skel.getOriginal();
 			
@@ -270,7 +258,6 @@ public class ZipFilterWriter implements IFilterWriter {
 		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
-		subDocWriter.handleEvent(new Event(EventType.START));
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setSkeleton(res.getSkeleton());
@@ -281,7 +268,6 @@ public class ZipFilterWriter implements IFilterWriter {
 		try {
 			// Finish writing the sub-document
 			subDocWriter.handleEvent(new Event(EventType.END_DOCUMENT, res));
-			subDocWriter.handleEvent(new Event(EventType.FINISHED));
 			subDocWriter.close();
 
 			// Create the new entry from the temporary output file

@@ -11,7 +11,6 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -118,9 +117,7 @@ public class HtmlSnippetsTest {
 
 	private String generateOutput(ArrayList<Event> list, String original) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
-		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
@@ -129,26 +126,24 @@ public class HtmlSnippetsTest {
 				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
-				skl = (GenericSkeleton) tu.getSkeleton();				
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:
 				DocumentPart dp = (DocumentPart) event.getResource();
-				skl = (GenericSkeleton) dp.getSkeleton();			
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
 				StartGroup startGroup = (StartGroup) event.getResource();
-				skl = (GenericSkeleton) startGroup.getSkeleton();				
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
 				Ending ending = (Ending) event.getResource();
-				skl = (GenericSkeleton) ending.getSkeleton();
 				tmp.append(writer.processEndGroup(ending));
 				break;
 			}
-		}		
+		}
+		writer.close();
 		return tmp.toString();
 	}
+
 }

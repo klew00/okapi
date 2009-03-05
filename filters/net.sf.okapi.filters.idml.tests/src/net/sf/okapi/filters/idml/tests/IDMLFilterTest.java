@@ -48,11 +48,9 @@ public class IDMLFilterTest {
 			writer.setOptions("en", "UTF-8");
 			writer.setOutput("output.idml");
 			
-			writer.handleEvent(new Event(EventType.START));
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}
-			writer.handleEvent(new Event(EventType.FINISHED));
 			writer.close();
 		}
 		catch ( Throwable e ) {

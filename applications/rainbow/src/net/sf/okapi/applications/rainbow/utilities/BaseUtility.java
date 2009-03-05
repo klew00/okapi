@@ -167,16 +167,8 @@ public abstract class BaseUtility implements IUtility {
 		fireCancelEvent(new CancelEvent(this));
 	}
 
-	public void pause () {
-		// TODO: implement pause
-	}
-
-	public void resume () {
-		// TODO: implement resume
-	}
-	
-	public void close () {
-		// TODO: implement resume
+	public void destroy () {
+		// Do nothing by default
 	}
 
 }

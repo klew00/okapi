@@ -326,8 +326,6 @@ public class RTFFilter implements IFilter {
 			// Send the end-document event
 			queue.add(new Event(EventType.END_DOCUMENT,
 				new Ending(String.valueOf(++otherId))));
-			// Store the finished event
-			queue.add(new Event(EventType.FINISHED));
 		}
 		else {
 			queue.add(new Event(EventType.TEXT_UNIT, textUnit));
@@ -348,7 +346,6 @@ public class RTFFilter implements IFilter {
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
 			startDoc.setIsMultilingual(true);
-			queue.add(new Event(EventType.START));
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {

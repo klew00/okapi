@@ -28,7 +28,6 @@ import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
@@ -247,14 +246,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			File f = new File(getInputPath(1));
 			trgFilter.open(f.toURI());
 			
-			// Send the START event
-			dbStoreBuilder.handleEvent(new Event(EventType.START));
 			// Fill the database with the target file
 			while ( trgFilter.hasNext() ) {
 				dbStoreBuilder.handleEvent(trgFilter.next());
 			}
-			// Send the FINISHED event
-			dbStoreBuilder.handleEvent(new Event(EventType.FINISHED));
     	}
     	finally {
     		if ( trgFilter != null ) trgFilter.close();
