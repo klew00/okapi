@@ -1,7 +1,6 @@
 package net.sf.okapi.filters.properties.tests;
 
 import java.net.URI;
-import java.net.URL;
 
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
@@ -11,7 +10,6 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class PropertiesPipelineFilterTest {
@@ -37,10 +35,8 @@ public class PropertiesPipelineFilterTest {
 		pipeline.addStep(new FilterPipelineStepAdaptor(propertiesFilter));
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
 		
-		pipeline.preprocess();		
 		pipeline.process(new URI(basePath+"/data/Test02.properties"));
-		pipeline.postprocess();
-		pipeline.close();
+		pipeline.destroy();
 		
 		//--Second--
 		IPipeline pipeline2 = new Pipeline();
@@ -56,9 +52,7 @@ public class PropertiesPipelineFilterTest {
 		pipeline2.addStep(new FilterPipelineStepAdaptor(propertiesFilter2));
 		pipeline2.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter2));
 		
-		pipeline2.preprocess();		
 		pipeline2.process(new URI(basePath+"/data/Test01_first_trip.properties"));
-		pipeline2.postprocess();
-		pipeline2.close();
+		pipeline2.destroy();
 	}
 }
