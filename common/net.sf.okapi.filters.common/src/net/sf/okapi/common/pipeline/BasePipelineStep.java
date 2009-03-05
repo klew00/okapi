@@ -82,6 +82,10 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	public void postprocess() {
 	}
+	
+	public void cancel() {
+		
+	}
 
 	// used to cleanup any resources, close files etc.. Only called at the end
 	// of the Pipeline life cycle.
