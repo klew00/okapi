@@ -95,4 +95,26 @@ public class HtmlFullFileTest {
 		assertEquals("Okapi Framework", firstText);
 		assertEquals("\u00A0", lastText);		
 	}
+	
+	@Test
+	public void testSkippedScriptandStyleElements() {
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");			
+		htmlFilter.open(htmlStream);
+		boolean foundText = false;
+		boolean first = true;
+		String firstText = "";
+		while (htmlFilter.hasNext()) {
+			Event event = htmlFilter.next();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+				TextUnit tu = (TextUnit)event.getResource();
+				if (first) {
+					first = false;
+					firstText = tu.getSource().toString();
+				}
+				foundText = true;				
+			}
+		}
+		assertTrue(foundText);
+		assertEquals("First Text", firstText);		
+	}
 }

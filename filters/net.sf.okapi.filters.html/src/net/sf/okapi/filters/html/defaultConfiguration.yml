@@ -301,7 +301,7 @@ stylesheet:
 
 # javascript etc.
 script:
-  ruleTypes: [SCRIPT, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
 
 # preserve whitespace
 pre:
