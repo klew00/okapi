@@ -71,6 +71,11 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public BaseMarkupFilter() {
 		super();
+		
+		Config.ConvertNonBreakingSpaces = false;
+		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
+		// TODO: will this fix logging problems??? Config.LoggerProvider = ;
+
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 	}
@@ -174,10 +179,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	@Override
 	protected void initialize() {
 		super.initialize();
-
-		Config.ConvertNonBreakingSpaces = false;
-		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
-		// TODO: will this fix logging problems??? Config.LoggerProvider = ;
+		
 		if (bomEncodingDetector != null) {
 			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
 			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;

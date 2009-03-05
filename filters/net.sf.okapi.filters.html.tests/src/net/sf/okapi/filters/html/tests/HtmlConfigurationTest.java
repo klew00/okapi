@@ -113,4 +113,15 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getElementType("p"), "p");
 		assertEquals(rules.getElementType("x"), "x");
 	}
+	
+	@Test
+	public void collapseWhitespace() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertTrue(rules.collapseWhitespace());
+		
+		url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/maximalistConfiguration.yml");
+		rules = new TaggedFilterConfiguration(url);
+		assertTrue(rules.collapseWhitespace());
+	}
 }

@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.html;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,20 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
 
 public class HtmlFilter extends BaseMarkupFilter {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(HtmlFilter.class);
-	
+
+	/* HTML whitespace
+	 * space (U+0020) 
+	 * tab (U+0009) 
+	 * form feed (U+000C) 
+	 * line feed (U+000A)
+	 * carriage return (U+000D) 
+	 * zero-width space (U+200B) (IE6 does not recognize these, they are treated as unprintable characters)
+	 */
+	private static final String HTML_WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
+	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
+
 	public HtmlFilter() {
 		super();
 		setMimeType("text/html");
@@ -64,24 +76,34 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
-		// convert all character and numeric entities to Unicode		
-		String decodedText = CharacterEntityReference.decode(text.toString(), false);
-		decodedText = NumericCharacterReference.decode(decodedText, false);
-		
 		// check for ignorable whitespace and add it to the skeleton
 		// The Jericho html parser always pulls out the largest stretch of text
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
-			addToDocumentPart(decodedText);
+			addToDocumentPart(text.toString());
 			return;
-		}				
-		
+		}
+
+		// convert all character and numeric entities to Unicode
+		String decodedText = CharacterEntityReference.decode(text.toString(), false);
+		decodedText = NumericCharacterReference.decode(decodedText, false);
+
+		// collapse whitespace only if config says we can and preserve
+		// whitespace is false
+		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
+			decodedText = collapseWhitespace(decodedText);
+		}
+
 		if (canStartNewTextUnit()) {
 			startTextUnit(decodedText);
 		} else {
 			addToTextUnit(decodedText);
 		}
+	}
+
+	private String collapseWhitespace(String text) {
+		return HTML_WHITESPACE_PATTERN.matcher(text).replaceAll(" ");
 	}
 
 	@Override
@@ -108,9 +130,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 			}
 			return;
 		}
-		
+
 		switch (getConfig().getMainRuleType(startTag.getName())) {
-		case INLINE_ELEMENT:			
+		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
@@ -181,7 +203,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 			return;
 		}
-		
+
 		switch (getConfig().getMainRuleType(endTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -206,7 +228,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 			endTextUnit(new GenericSkeleton(endTag.toString()));
 			break;
 		case PRESERVE_WHITESPACE:
-			getRuleState().popPreserverWhitespaceRule();			
+			getRuleState().popPreserverWhitespaceRule();
 			addToDocumentPart(endTag.toString());
 			break;
 		default:
@@ -325,14 +347,17 @@ public class HtmlFilter extends BaseMarkupFilter {
 			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
 			// get the charset value (encoding)
 			value = tag.toString().substring(valueStartPos, valueEndPos);
-			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos, mainEndPos,
-					valueStartPos, valueEndPos);
+			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos,
+					mainEndPos, valueStartPos, valueEndPos);
 		}
 
 		// otherwise treat normally
-		// convert all enetities to Unicode		
+		// convert all enetities to Unicode
 		String decodedValue = CharacterEntityReference.decode(value, true);
 		decodedValue = NumericCharacterReference.decode(value, true);
+		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
+			decodedValue = collapseWhitespace(decodedValue);
+		}
 		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
 	}
 
@@ -365,7 +390,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 				}
 			}
 		}
-		
+
 		// <x lang="en"> or <x xml:lang="en">
 		if (attrName.equals("lang") || attrName.equals("xml:lang")) {
 			normalizedName = IEncoder.PROP_LANGUAGE;

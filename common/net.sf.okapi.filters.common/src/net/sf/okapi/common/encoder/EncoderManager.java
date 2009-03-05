@@ -46,6 +46,7 @@ public class EncoderManager implements IEncoder {
 		mimeMap.put("text/x-odf", "net.sf.okapi.common.encoder.XMLEncoder");
 		mimeMap.put("text/x-properties", "net.sf.okapi.common.encoder.PropertiesEncoder");
 		mimeMap.put("text/x-mif", "net.sf.okapi.common.encoder.MIFEncoder");
+		mimeMap.put("text/html", "net.sf.okapi.common.encoder.HtmlEncoder");
 	}
 
 	/**

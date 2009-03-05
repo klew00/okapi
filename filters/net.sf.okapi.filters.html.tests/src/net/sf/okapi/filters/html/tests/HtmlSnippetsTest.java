@@ -35,55 +35,55 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testMETATag1() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";				
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
 	public void testPWithAttributes() {
 		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 	
 	@Test
 	public void testLang() {
 		String snippet = "<p lang='en'>Text of p</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
 	public void testComplexEmptyElement() {
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
 	public void testPWithInlines() {
 		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
 	public void testMETATag2() {
 		String snippet = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 	
 	@Test
 	public void testPWithInlines2() {
 		String snippet = "<p>Before <img href=\"img.png\" alt=\"text\"/> after.</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 	
 	@Test
 	public void testPWithInlineTextOnly() {
 		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";		
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 	
 	@Test
 	public void testTableGroups() {
 		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 	
 	@Test
@@ -94,13 +94,37 @@ public class HtmlSnippetsTest {
 			 + "<li>Text of item 2</li>"
 			 + "</ul>"
 			 + "and text after the list.</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
 	public void testInput() {
 		String snippet = "<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>";
-		assertEquals(generateOutput(getEvents(snippet), snippet), snippet);
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+	}
+	
+	@Test
+	public void testCollapseWhitespaceWithPre() {
+		String snippet = "<pre>   \n   \r <x/>  \f    </pre>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+	}
+	
+	@Test
+	public void testCollapseWhitespaceWithoutPre() {
+		String snippet = "<b>   \t\n\r\f    </b>";
+		assertEquals("<b> </b>", generateOutput(getEvents(snippet), snippet));
+	}
+	
+	@Test
+	public void testEscapeEntities() {
+		String snippet = "&nbsp;M&#x0033;";
+		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet));
+	}
+	
+	@Test
+	public void testNormailzeNewlines() {
+		String snippet = "<pre>\r\nX\rY\n</pre>";
+		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet));
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {

@@ -80,6 +80,11 @@ public class YamlConfigurationReader  {
 	}
 	
 	@SuppressWarnings("unchecked")
+	public Object getProperty(String property) {
+		return config.get(property);
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void addProperty(String property, boolean value) {
 		config.put(property, value);
 	}

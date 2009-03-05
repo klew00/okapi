@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class TaggedFilterConfiguration {
+	private static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
 	private static final String INLINE = "INLINE";
 	private static final String GROUP = "GROUP";
 	private static final String EXCLUDE = "EXCLUDE";
@@ -26,7 +27,7 @@ public class TaggedFilterConfiguration {
 	private static final String EQUALS = "EQUALS";
 	private static final String NOT_EQUALS = "NOT_EQUALS";
 	private static final String MATCH = "MATCH";
-	
+
 	private static final String ELEMENT_TYPE = "elementType";
 
 	public static enum RULE_TYPE {
@@ -50,6 +51,10 @@ public class TaggedFilterConfiguration {
 	@Override
 	public String toString() {
 		return configReader.toString();
+	}
+
+	public boolean collapseWhitespace() {
+		return ((Boolean)configReader.getProperty(COLLAPSE_WHITSPACE)).booleanValue();
 	}
 
 	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
@@ -110,14 +115,14 @@ public class TaggedFilterConfiguration {
 		}
 		return false;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public String getElementType(String elementName) {
 		Map<String, Object> rule = configReader.getRule(elementName);
-		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {			
+		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
 			return (String) rule.get(ELEMENT_TYPE);
 		}
-				
+
 		return elementName;
 	}
 
@@ -191,12 +196,12 @@ public class TaggedFilterConfiguration {
 	@SuppressWarnings("unchecked")
 	private boolean isActionableAttribute(String type, String elementName, String attribute,
 			Map<String, String> attributes) {
-		
+
 		// catch attributes that may appear on any element
 		if (isActionableAttributeRule(elementName, attribute, type)) {
 			return true;
 		}
-		
+
 		Map elementRule = configReader.getRule(elementName);
 		if (elementRule == null) {
 			return false;
