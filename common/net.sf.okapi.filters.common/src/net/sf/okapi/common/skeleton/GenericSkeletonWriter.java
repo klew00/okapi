@@ -67,10 +67,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 
 	public void close () {
-		referents.clear();
-		referents = null;
-		storageStack.clear();
-		storageStack = null;
+		if ( referents != null ) {
+			referents.clear();
+			referents = null;
+		}
+		if ( storageStack != null ) {
+			storageStack.clear();
+			storageStack = null;
+		}
 	}
 	
 	public String processStartDocument (String outputLanguage,

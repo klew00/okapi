@@ -171,7 +171,6 @@ public class Writer extends BaseWriter {
 
 	private void processStartDocument (StartDocument resource) {
 		try {
-			close();
 			Util.createDirectories(outputPath);
 			writer = new PrintWriter(outputPath, encoding);
 		}

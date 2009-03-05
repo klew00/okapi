@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters implements IParameters {
 	
@@ -55,8 +56,13 @@ public class Parameters implements IParameters {
 	private URI docURI;
 	private Document doc;
 	private DocumentBuilder docBuilder;
+
+	public boolean useCodeFinder;
+	public InlineCodeFinder codeFinder;
 	
 	public Parameters () {
+		codeFinder = new InlineCodeFinder();
+		
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
@@ -131,6 +137,9 @@ public class Parameters implements IParameters {
 	public void reset () {
 		doc = null;
 		docURI = null;
+
+		useCodeFinder = false;
+		codeFinder.reset();
 	}
 
 	public void save (String filePath) {
