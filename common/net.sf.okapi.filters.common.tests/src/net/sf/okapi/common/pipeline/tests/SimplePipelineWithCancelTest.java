@@ -20,28 +20,42 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class SimplePipelineTest {
+public class SimplePipelineWithCancelTest {
 	
 	@Test
-	public void runPipeline() throws URISyntaxException {
-		IPipeline pipeline = new Pipeline();
-		pipeline.addStep(new Producer());
-		pipeline.addStep(new ConsumerProducer());
-		pipeline.addStep(new Consumer());
+	public void runPipelineAndCancel() throws URISyntaxException, InterruptedException {
+		final IPipeline pipeline = new Pipeline();
+		
+		Runnable runnable = new Runnable() {
+			public void run() {
+				pipeline.addStep(new Producer());
+				pipeline.addStep(new ConsumerProducer());
+				pipeline.addStep(new Consumer());				
+				try {
+					pipeline.process(new URI("DUMMY"));
+				} catch (URISyntaxException e) {
+					throw new RuntimeException(e);
+				}				
+				pipeline.destroy();
+			}
+		};
 
-		pipeline.process(new URI("DUMMY"));		
-		pipeline.destroy();
-		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());		
+		ExecutorService e = Executors.newSingleThreadExecutor();
+		e.execute(runnable);
+		Thread.sleep(2000);
+		pipeline.cancel();
+		assertEquals(PipelineReturnValue.CANCELLED, pipeline.getState());		
 	}
 }

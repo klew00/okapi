@@ -20,14 +20,17 @@
 
 package net.sf.okapi.common.threadedpipeline;
 
+import java.io.InputStream;
+import java.net.URI;
 import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.pipeline.IInitialStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer {	
+public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer, IInitialStep {	
 	private BlockingQueue<Event> producerQueue;
 	
 	public ProducerPipelineStepAdaptor(IPipelineStep step) {
@@ -62,5 +65,45 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 			return PipelineReturnValue.SUCCEDED;
 		}
 		return PipelineReturnValue.RUNNING;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#hasNext()
+	 */
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
+	 */
+	public void setInput(URI input) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
+	 */
+	public void setInput(InputStream input) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common.MemMappedCharSequence)
+	 */
+	public void setInput(MemMappedCharSequence input) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence)
+	 */
+	public void setInput(CharSequence input) {
+		// TODO Auto-generated method stub
+		
 	}
 }

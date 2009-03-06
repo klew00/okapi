@@ -30,9 +30,10 @@ import net.sf.okapi.common.Event;
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
 	IPipelineStep initialStep;
-	boolean cancel = false;
+	volatile boolean cancel = false;
 	boolean first = true;
 	boolean startEventSent = false;
+	private boolean done = false;
 
 	public Pipeline() {
 		steps = new ArrayList<IPipelineStep>();
@@ -62,22 +63,32 @@ public class Pipeline implements IPipeline {
 	}
 
 	private void execute() {
+		done = false;
 		initialize();
 
 		// loop through the events until we run out
-		while (((IInitialStep) initialStep).hasNext()) {
+		while (((IInitialStep) initialStep).hasNext() && !cancel) {
 			Event event = initialStep.handleEvent(null);
 			for (IPipelineStep step : steps) {
 				step.handleEvent(event);
 			}
 		}
+		if (cancel) {
+			initialStep.cancel();
+			for (IPipelineStep step : steps) {
+				step.cancel();
+			}
+		}
+		done = true;
 	}
 
 	public PipelineReturnValue getState() {
 		if (cancel)
 			return PipelineReturnValue.CANCELLED;
-		
-		return PipelineReturnValue.SUCCEDED;
+		else if (done)		
+			return PipelineReturnValue.SUCCEDED;
+		else
+			return PipelineReturnValue.RUNNING;
 	}
 
 	/*
