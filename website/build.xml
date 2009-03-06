@@ -1,0 +1,27 @@
+<?xml version="1.0"?> 
+<project name="javadoc" default="all" basedir="."> 
+
+	<property name="help" value="help"/>
+	<property name="javadoc" value="javadoc"/>
+ 
+	<target name="all"> 
+	
+		<delete dir="${help}" failonerror="false"/>
+		<mkdir dir="${help}"/>
+		<copy todir="${help}">
+			<fileset dir="../help" />
+		</copy>
+		
+		<delete dir="${javadoc}" failonerror="false"/>
+		<mkdir dir="${javadoc}"/>
+		<javadoc destdir="${javadoc}">
+			<packageset dir="..\common\net.sf.okapi.common\src" defaultexcludes="yes"/>
+			<packageset dir="..\common\net.sf.okapi.filters.common\src" defaultexcludes="yes"/>
+			<packageset dir="..\common\net.sf.okapi.ui.common\src" defaultexcludes="yes"/>
+			<packageset dir="..\libraries\net.sf.okapi.lib.segmentation\src" defaultexcludes="yes"/>
+			<packageset dir="..\libraries\net.sf.okapi.lib.translation\src" defaultexcludes="yes"/>
+		</javadoc>
+
+	</target>
+
+</project>
