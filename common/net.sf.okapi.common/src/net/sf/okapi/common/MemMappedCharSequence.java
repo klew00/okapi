@@ -92,10 +92,8 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	public MemMappedCharSequence(final String string, boolean lowercase) {
-		tempText = new char[string.length()];
-		text = CharBuffer.wrap(tempText);
-		string.getChars(0, string.length(), tempText, 0);
+	public MemMappedCharSequence(final String string, boolean lowercase) {		
+		text = CharBuffer.wrap(string, 0, string.length());		
 		if (lowercase) {
 			toLowercase();
 		}
