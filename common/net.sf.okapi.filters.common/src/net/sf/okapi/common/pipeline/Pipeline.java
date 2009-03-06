@@ -31,9 +31,9 @@ public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
 	IPipelineStep initialStep;
 	volatile boolean cancel = false;
-	boolean first = true;
-	boolean startEventSent = false;
+	boolean firstStep = true;
 	private boolean done = false;
+	private boolean destroyed = false;
 
 	public Pipeline() {
 		steps = new ArrayList<IPipelineStep>();
@@ -42,28 +42,31 @@ public class Pipeline implements IPipeline {
 
 	private void initialize() {
 		cancel = false;
-		first = true;
+		done = false;
+		destroyed = false;
 	}
 
 	public void addStep(IPipelineStep step) {
-		if (first) {
+		if (destroyed) {
+			throw new RuntimeException("Pipeline has been destroyed and must be reinitialized");
+		}
+		
+		if (firstStep) {
 			if (!(step instanceof IInitialStep)) {
 				throw new RuntimeException("Intial step must implement IInitialStep");
 			}
 			initialStep = step;
-			first = false;
+			firstStep = false;
 		} else {
 			steps.add(step);
 		}
 	}
 
 	public void cancel() {
-		// TODO handle cancel - do we put execute on its own thread?
 		cancel = true;
 	}
 
 	private void execute() {
-		done = false;
 		initialize();
 
 		// loop through the events until we run out
@@ -83,7 +86,9 @@ public class Pipeline implements IPipeline {
 	}
 
 	public PipelineReturnValue getState() {
-		if (cancel)
+		if (destroyed)
+			return PipelineReturnValue.DESTROYED;
+		else if (cancel)
 			return PipelineReturnValue.CANCELLED;
 		else if (done)		
 			return PipelineReturnValue.SUCCEDED;
@@ -137,6 +142,7 @@ public class Pipeline implements IPipeline {
 		for (IPipelineStep step : steps) {
 			step.destroy();
 		}
+		destroyed = true;
 	}
 
 	/*

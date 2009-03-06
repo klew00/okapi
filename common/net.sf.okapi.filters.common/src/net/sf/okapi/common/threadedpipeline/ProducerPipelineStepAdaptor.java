@@ -71,8 +71,7 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#hasNext()
 	 */
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
+		return ((IInitialStep)step).hasNext();
 	}
 
 	/* (non-Javadoc)

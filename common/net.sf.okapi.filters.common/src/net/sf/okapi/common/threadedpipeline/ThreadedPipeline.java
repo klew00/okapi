@@ -42,9 +42,9 @@ import net.sf.okapi.common.pipeline.PipelineReturnValue;
 public class ThreadedPipeline implements IPipeline {
 	private static final int DEFAULT_BLOCKING_QUEUE_SIZE = 50;
 
-	private final PausableThreadPoolExecutor executor;
-	private final CompletionService<PipelineReturnValue> completionService;
-	private final int blockingQueueSize;
+	private PausableThreadPoolExecutor executor;
+	private CompletionService<PipelineReturnValue> completionService;
+	private int blockingQueueSize;
 	private int totalThreads;
 	private PipelineReturnValue state;
 	private LinkedList<IPipelineStep> threadedSteps;
@@ -58,17 +58,21 @@ public class ThreadedPipeline implements IPipeline {
 	}
 
 	public ThreadedPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
-		totalThreads = 0;
+		nonThreadedSteps = new LinkedList<IPipelineStep>();
 		this.executor = executor;
 		this.blockingQueueSize = blockingQueueSize;
+		initialize();
+	}
+	
+	private void initialize() {
+		totalThreads = 0;
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
 		this.executor.pause();
 		state = PipelineReturnValue.PAUSED;
 		threadedSteps = new LinkedList<IPipelineStep>();
-		nonThreadedSteps = new LinkedList<IPipelineStep>();
 	}
 
-	public void execute() {
+	private void execute() {
 		BlockingQueue<Event> queue = null;
 		for (IPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
@@ -209,6 +213,7 @@ public class ThreadedPipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
 	 */
 	public void process(URI input) {
+		initialize();
 		execute();
 	}
 
@@ -218,6 +223,7 @@ public class ThreadedPipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
 	 */
 	public void process(InputStream input) {
+		initialize();
 		execute();
 	}
 
@@ -228,6 +234,7 @@ public class ThreadedPipeline implements IPipeline {
 	 * MemMappedCharSequence)
 	 */
 	public void process(MemMappedCharSequence input) {
+		initialize();
 		execute();
 	}
 
@@ -238,6 +245,7 @@ public class ThreadedPipeline implements IPipeline {
 	 * net.sf.okapi.common.pipeline.IPipeline#process(java.lang.CharSequence)
 	 */
 	public void process(CharSequence input) {
+		initialize();
 		execute();
 	}
 }

@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipeline.tests.Consumer;
 import net.sf.okapi.common.pipeline.tests.ConsumerProducer;
 import net.sf.okapi.common.pipeline.tests.Producer;
@@ -57,7 +56,6 @@ public class ThreadedPipelineTest {
 				} catch (URISyntaxException e) {
 					throw new RuntimeException(e);
 				}				
-				pipeline.destroy();
 			}
 		};
 
@@ -72,6 +70,7 @@ public class ThreadedPipelineTest {
 			case FAILED:
 			case INTERRUPTED:
 				stop = true;
+				pipeline.destroy();
 				e.shutdownNow();
 				break;
 

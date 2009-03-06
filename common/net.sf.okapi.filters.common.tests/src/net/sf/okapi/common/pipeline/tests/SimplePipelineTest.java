@@ -41,7 +41,8 @@ public class SimplePipelineTest {
 		pipeline.addStep(new Consumer());
 
 		pipeline.process(new URI("DUMMY"));		
+		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());
 		pipeline.destroy();
-		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());		
+		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}
 }
