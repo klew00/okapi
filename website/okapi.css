@@ -1,0 +1,43 @@
+body	{ font-family: sans-serif; font-size: 0.9em; margin: 8 8 8 8; }
+
+cite	{ font-weight: bold; color: #000080; font-style:normal; }
+
+kbd	{ font-weight: bold; color: maroon; font-family: sans-serif; }
+
+code	{ font-family: monospace; font-size: 1em; }
+
+pre	{ font-family: monospace; font-size: 1em; background-color: #FFFFEE; border-style: solid; 
+		border-width: 1px; border-color: silver; padding: 10; }
+
+td.head { padding: 0; margin: 0; vertical-align: top; }
+h1.head { margin: 0 0 0 0; color: white; background-color: #336699; padding: 0.3em; }
+
+h2.head { vertical-align: top; margin: 2 0 0 2; color: white; background-color: #008080; 
+	font-weight: normal; padding: 0.5em 0.5em 0.5em 1.5em; font-size: 1.4em; }
+
+h2.head2 { vertical-align: top; margin: 2 0 0 0; color: white; background-color: #008080; 
+	font-weight: normal; padding: 0.5em 0.5em 0.5em 1.5em; font-size: 1.4em; }
+
+h2 { background: #DDEEFF; font-weight: bold; padding: 0.3em; margin-top: 20; font-size: 1.1em; }
+
+td.toc { margin: 0 0 0 0; font-size: 0.73em; text-align: left; vertical-align: top; background-color: #336699; padding: 7; }
+
+td.toc p { margin: 0 0 0 0; color: black; padding: 0.2em; background-color: #CFCFCF;
+	vertical-align: middle; border-bottom: 1px solid #336699; }
+
+td.toc p.current { background-color: #FFCC00; font-weight: bold; padding: 0.3em;}
+
+td.toc a:link { display: block; text-decoration: none; color: black; padding: 0.2em;}
+td.toc a:visited { display: block; text-decoration: none; color: black; padding: 0.2em; }
+td.toc a:hover { display: block; background: navy; color: white; font-weight: bold; padding: 0.2em;}
+
+pre	{ font-family: monospace; font-size: 1em; background-color: #FFFFEE; border-style: solid; 
+		border-width: 1px; border-color: silver; padding: 10; }
+		
+p.question {padding: 0.3em; margin-left: 2em; margin-bottom: 2px; background-color: #CCFFCC; border-style: solid; 
+		border-width: 1px; border-color: silver; }
+
+p.answer {padding: 0.3em; margin-left: 2em; margin-top: 0; background-color: #EEEEEE; background-color: #CCFFCC; border-style: solid; 
+		border-width: 1px; border-color: silver; }
+		
+p.smallnote { margin-left: 2em; font-size: 0.8em; }

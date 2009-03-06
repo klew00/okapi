@@ -1,0 +1,100 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+<script type="text/javascript" language="JavaScript">
+<!--
+
+function CheckVersion (p_sName, p_sUserVersion, p_sLatestVersion)
+{
+	var sBuf = "";
+	
+	sBuf += "<table border='0' cellpadding='5'>"
+	sBuf += "<tr><td align='right'>Product:</td><td>" + p_sName + "</td></tr>";
+	sBuf += "<tr><td align='right'>Your version:</td><td>" + p_sUserVersion + "</td></tr>";
+	sBuf += "<tr><td align='right'>Latest version:</td><td>" + p_sLatestVersion + "</td></tr>";
+	sBuf += "<tr><td align='right'>Recommendation:</td><td>";
+
+	if ( p_sUserVersion == p_sLatestVersion )
+	{
+		sBuf += "No upgrade is needed at this time.";
+	}
+	else if ( p_sUserVersion > p_sLatestVersion )
+	{
+		sBuf += "No upgrade is needed at this time.";
+	}
+	else if ( p_sUserVersion < p_sLatestVersion )
+	{
+		sBuf += "<b>We recommend you to upgrade to the latest released version.</b><br />";
+	}
+	
+	sBuf += "</td></tr></table>";
+	return sBuf;
+}
+
+
+function CheckVersions ()
+{
+	//=============================================================
+	// These variables must be set to the latest released versions
+	//-------------------------------------------------------------
+	var sRainbowVersion = "6.0.1_Beta16";
+	var sRatelVersion = "1.0.1_Beta16";
+	//=============================================================
+
+	var sParam, aParams;
+	var sBuf = "";
+	var sBuf1;
+	
+	sParam = new String(window.self.location.search);
+	sParam = sParam.slice(1);
+	aParams = sParam.split('=');
+	
+	if ( aParams[0] == "ratel" )
+	{
+		sBuf1 = document.getElementById('placeholder').innerHTML;
+		document.getElementById('placeholder').innerHTML
+			= sBuf1 + CheckVersion("ratel", aParams[1], sRatelVersion);
+	}
+	else if ( aParams[0] == "rainbow" )
+	{
+		sBuf1 = document.getElementById('placeholder').innerHTML;
+		document.getElementById('placeholder').innerHTML
+			= sBuf1 + CheckVersion("rainbow", aParams[1], sRainbowVersion);
+	}
+	else
+	{
+		sBuf1 = document.getElementById('placeholder').innerHTML;
+		document.getElementById('placeholder').innerHTML
+			= sBuf1 + "<p>Unknown application keyword. <br>This application is not registered in Okapi's version checking system.</p>";
+	}
+}
+
+//-->
+</script>
+
+<title>Okapi Framework - Updates</title>
+<link rel="stylesheet" type="text/css" href="okapi.css">
+</head>
+
+<body onload='CheckVersions()'>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head"><h1 class="head">Okapi Framework</h1>
+		<h2 class="head2">Updates</h2></td>
+	</tr>
+</table>
+
+<div id="placeholder"></div>
+
+<ul>
+	<li><a href="downloads.html">Downloads</a></li>
+	<li><a href="index.html">Overview</a></li>
+</ul>
+<p>&nbsp;</p>
+
+</body>
+</html>

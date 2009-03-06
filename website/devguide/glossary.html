@@ -1,0 +1,105 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Okapi Framework Developer's Guide - Glossary</title>
+<link rel="stylesheet" type="text/css" href="../okapi.css">
+</head>
+
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head"><h1 class="head">Okapi Framework - Developer's Guide</h1>
+		<h2 class="head2">Glossary</h2></td>
+	</tr>
+</table>
+
+<h3><a name="codedText"></a>Coded text</h3>
+<p>TODO</p>
+<h3><a name="codeType"></a>Code type</h3>
+<p>The code type of a Code object is an indicator of what this code represent. 
+Several code types are pre-defined and should be used whenever possible. for 
+example: <code>Code.TYPE_BOLD</code>, <code>Code.TYPE_ITALIC</code>, <code>
+Code.TYPE_UNDERLINED</code>, <code>Code.TYPE_IMAGE</code>, <code>Code.TYPE_LINK</code>, 
+etc.</p>
+<p>The code type of a code is used extensively to link opening and closing 
+codes: both opening and closing codes of the same pair must have the same code 
+type. You can use <code>null</code> for code type, but then loose any pairing 
+mechanism.</p>
+<p>As opposed to the <a href="#tagType">tag type</a>, a code type is never 
+changed automatically by the basic methods of the text unit objects.</p>
+<h3><a name="event"></a>Event</h3>
+<p>An event is object used to carry information through the <a href="#pipeline">
+pipeline</a>. Events can be associated with <a href="#resource">resources</a>, 
+and in the case of filter events, with <a href="#skeleton">skeleton</a>.</p>
+<ul>
+	<li>The <code>START</code> and <code>FINISHED</code> events are always the 
+	first and last events going through the pipeline.</li>
+	<li>The <code>FILE_RESOURCE</code> event is used to pass along a complete 
+	document.</li>
+	<li>The filter events (<code>START_DOCUMENT</code>, <code>START_SUBDOCUMENT</code>,
+	<code>START_GROUP</code>, <code>DOCUMENT_PART</code>, <code>TEXT_UNIT</code>,
+	<code>END_GROUP</code>, <code>END_SUBDOCUMENT</code>, and <code>END_DOCUMENT</code>) 
+	are used to pass along a document broken down into parts where translatable 
+	and non-translatable content is stored.</li>
+</ul>
+
+<h3><a name="filter"></a>Filter</h3>
+<p>TODO</p>
+<h3><a name="filterWriter"></a>Filter writer</h3>
+<p dir="ltr">A filter writer class is an implementation of the <code>
+IFilterWriter</code> interface. Its purpose is to output the document processed 
+by a <a href="#filter">filter</a>. The format of the output can be different for 
+each filter writer. There is normally one filter writer that is capable of 
+re-constructing the original format of the input document.</p>
+<h3><a name="inlineCode"></a>Inline code</h3>
+<p>TODO</p>
+<h3><a name="inlineCodeMarker"></a>Inline code marker</h3>
+<p>An inline code marker is a pair of two special Unicode characters that are 
+inside a <a href="#codedText">coded text</a> to hold the place of an
+<a href="#inlineCode">inline code</a>.</p>
+<p>The marker is composed of the following two special characters:</p>
+<ul>
+	<li>A code marker that indicates if the inline code should be represented as 
+	an opening (<code>TextFragment.MARKER_OPENING</code>), closing (<code>TextFragment.MARKER_CLOSING</code>), 
+	or isolated (<code>TextFragment.MARKER_ISOLATED</code>) code, or if it is a 
+	segment (<code>TextFragment.MARKER_SEGMENT</code>). These values are U+E101, 
+	U+E102, U+E103, and U+E104 (part of the Private Use Area of Unicode).</li>
+	<li>An index value that points to a <code>Code</code> object in the list of 
+	codes for the TextFragment where this code occurs. The value is the 
+	zero-based index of the code + 57616 converted to a character: that is 0 is 
+	U+E110, 1 is U+E111, 2 is U+E112, etc. Those characters are in the Private 
+	Use Area of Unicode and allow for several thousands of index values.</li>
+</ul>
+<p>In the example below, the inline code markers for &quot;<code>&lt;b&gt;</code>&quot; and &quot;<code>&lt;/b&gt;</code>&quot; 
+are highlighted. (Note for display purpose, the special characters are noted 
+here as <code>\uHHHH</code> where <code>HHHH</code> is there Unicode value, but 
+they are raw characters in the coded text string.</p>
+<pre>Normal text: &quot;Text in &lt;b&gt;bold&lt;/b&gt;&quot;
+ Coded text: &quot;Text in <span style="background-color: #FFFF00">\uE101\u110</span>bold<span style="background-color: #00FF00">\uE102\uE111</span>&quot;</pre>
+<pre>&quot;..in <span style="background-color: #FFFF00">\uE101\uE110</span>bol...&quot;
+        |     |
+        |     +--- Index of the code
+        |
+        +--- Code marker</pre>
+<h3><a name="pipeline"></a>Pipeline</h3>
+<p>TODO</p>
+<h3><a name="resource"></a>Resource</h3>
+<p>TODO</p>
+<h3><a name="skeleton"></a>Skeleton</h3>
+<p>TODO</p>
+<h3><a name="tagType"></a>Tag type</h3>
+<p>TODO</p>
+<h3><a name="textUnit"></a>Text unit</h3>
+<p dir="ltr">The text unit is the basic item used by a <a href="#filter">filter</a> 
+to store extracted text and its associated information, it is implemented by the
+<code>TextUnit</code> class. Text unit <a href="#resource">resources</a> are 
+associated with the <code>TEXT_UNIT</code> <a href="#event">events</a> generated 
+by the <a href="#filter">filters</a>.</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
