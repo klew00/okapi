@@ -86,6 +86,12 @@ public enum EventType {
 	CANCELED,
 	
 	/**
+	 * Use by some pipelines to notify steps that events have been exhausted.
+	 * No resource are associated with this event.  
+	 */
+	FINISHED,
+	
+	/**
 	 * File level event. A File resource should be associated with this event.
 	 */
 	FILE_RESOURCE

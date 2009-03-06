@@ -73,7 +73,6 @@ public class ThreadedPipelineTest {
 				pipeline.destroy();
 				e.shutdownNow();
 				break;
-
 			default:
 				// still running
 				break;

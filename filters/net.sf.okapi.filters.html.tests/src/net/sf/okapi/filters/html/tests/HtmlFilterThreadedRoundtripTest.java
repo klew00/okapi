@@ -20,6 +20,18 @@
 
 package net.sf.okapi.filters.html.tests;
 
+import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.threadedpipeline.ThreadedPipeline;
+import net.sf.okapi.common.writer.GenericFilterWriter;
+import net.sf.okapi.filters.html.HtmlFilter;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +45,7 @@ public class HtmlFilterThreadedRoundtripTest {
 
 	@Test
 	public void runPipeline() {
-/*		final IPipeline pipeline = new ThreadedPipeline();
+		final IPipeline pipeline = new ThreadedPipeline();
 		
 		final HtmlFilter htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleTest.html");
@@ -49,8 +61,7 @@ public class HtmlFilterThreadedRoundtripTest {
 			public void run() {
 				pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
 				pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-				pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");				
-				pipeline.close();
+				pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");						
 			}
 		};
 
@@ -65,13 +76,14 @@ public class HtmlFilterThreadedRoundtripTest {
 			case FAILED:
 			case INTERRUPTED:			
 				stop = true;
+				pipeline.destroy();
 				e.shutdownNow();
 				break;
 			default:
 				// still running
 				break;
 			}
-		}*/
+		}
 	}
 
 	@After

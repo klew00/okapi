@@ -58,6 +58,7 @@ public class SimplePipelineWithCancelTest {
 		pipeline.cancel();
 		assertEquals(PipelineReturnValue.CANCELLED, pipeline.getState());
 		pipeline.destroy();
+		e.shutdownNow();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}
 }

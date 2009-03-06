@@ -32,7 +32,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.pipeline.IInitialStep;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -46,7 +45,7 @@ public class ThreadedPipeline implements IPipeline {
 	private CompletionService<PipelineReturnValue> completionService;
 	private int blockingQueueSize;
 	private int totalThreads;
-	private PipelineReturnValue state;
+	private volatile PipelineReturnValue state;
 	private LinkedList<IPipelineStep> threadedSteps;
 	private LinkedList<IPipelineStep> nonThreadedSteps;
 	private IInitialStep initalStep;
@@ -63,7 +62,7 @@ public class ThreadedPipeline implements IPipeline {
 		this.blockingQueueSize = blockingQueueSize;
 		initialize();
 	}
-	
+
 	private void initialize() {
 		totalThreads = 0;
 		this.completionService = new ExecutorCompletionService<PipelineReturnValue>(this.executor);
@@ -79,7 +78,7 @@ public class ThreadedPipeline implements IPipeline {
 				// first step is a producer wrap it with threaded adaptor
 				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);
 				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
-				producerStep.setProducerQueue(queue);				
+				producerStep.setProducerQueue(queue);
 				completionService.submit(producerStep);
 				threadedSteps.add(producerStep);
 				initalStep = (IInitialStep) producerStep;
@@ -107,7 +106,7 @@ public class ThreadedPipeline implements IPipeline {
 			totalThreads += 1;
 			previousQueue = queue;
 		}
-
+		
 		executor.resume();
 		state = PipelineReturnValue.RUNNING;
 	}
@@ -122,16 +121,21 @@ public class ThreadedPipeline implements IPipeline {
 		state = PipelineReturnValue.CANCELLED;
 	}
 
-	/*
-	 * TODO: Do we want pause and resume at the pipeline level? Or should steps
-	 * handle this individually?
-	 * 
-	 * public void pause() { executor.pause(); for (IPipelineStep step :
-	 * threadedSteps) { step.pause(); } state = PipelineReturnValue.PAUSED; }
-	 * 
-	 * public void resume() { executor.resume(); for (IPipelineStep step :
-	 * threadedSteps) { step.resume(); } state = PipelineReturnValue.RUNNING; }
-	 */
+	public void pause() {
+		executor.pause();
+		for (IPipelineStep step : threadedSteps) {
+			((BaseThreadedPipelineStepAdaptor)step).pause();
+		}
+		state = PipelineReturnValue.PAUSED;
+	}
+
+	public void resume() {
+		executor.resume();
+		for (IPipelineStep step : threadedSteps) {
+			((BaseThreadedPipelineStepAdaptor)step).resume();
+		}
+		state = PipelineReturnValue.RUNNING;
+	}
 
 	public PipelineReturnValue getState() {
 		if (state == PipelineReturnValue.CANCELLED) {
@@ -174,37 +178,13 @@ public class ThreadedPipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
 	 */
-	public void destroy() {
-		executor.pause();
+	public void destroy() {		
 		for (IPipelineStep step : threadedSteps) {
 			step.destroy();
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
-	 */
-	public void postprocess() {
-		executor.pause();
-		for (IPipelineStep step : threadedSteps) {
-			step.postprocess();
-		}
-		executor.resume();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
-	 */
-	public void preprocess() {
-		executor.pause();
-		for (IPipelineStep step : threadedSteps) {
-			step.preprocess();
-		}
-		executor.resume();
+		executor.purge();
+		executor.shutdownNow();
+		state = PipelineReturnValue.DESTROYED;
 	}
 
 	/*

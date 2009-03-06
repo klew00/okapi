@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.pipeline.IInitialStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -52,8 +53,13 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 		}
 	}
 	
-	public Event handleEvent(Event event) {			
-		Event e = step.handleEvent(event);
+	public Event handleEvent(Event event) {
+		Event e;
+		if (hasNext()) {
+			e = step.handleEvent(event);			
+		} else { 
+			e = new Event(EventType.FINISHED);
+		}
 		addToQueue(e);
 		return e;		
 	}
@@ -61,7 +67,7 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 	@Override
 	protected PipelineReturnValue processBlockingQueue() {
 		Event event = handleEvent(null);
-		if (event == null) {
+		if (event.getEventType() == EventType.FINISHED) {
 			return PipelineReturnValue.SUCCEDED;
 		}
 		return PipelineReturnValue.RUNNING;
@@ -78,31 +84,27 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
 	 */
 	public void setInput(URI input) {
-		// TODO Auto-generated method stub
-		
+		((IInitialStep)step).setInput(input);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
 	 */
 	public void setInput(InputStream input) {
-		// TODO Auto-generated method stub
-		
+		((IInitialStep)step).setInput(input);	
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common.MemMappedCharSequence)
 	 */
 	public void setInput(MemMappedCharSequence input) {
-		// TODO Auto-generated method stub
-		
+		((IInitialStep)step).setInput(input);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence)
 	 */
 	public void setInput(CharSequence input) {
-		// TODO Auto-generated method stub
-		
-	}
+		((IInitialStep)step).setInput(input);	
+		}
 }
