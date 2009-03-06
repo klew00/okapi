@@ -27,7 +27,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ConsumerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IConsumer {	
+class ConsumerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IConsumer {	
 	private BlockingQueue<Event> consumerQueue;
 
 	public ConsumerPipelineStepAdaptor(IPipelineStep step) {

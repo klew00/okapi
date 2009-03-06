@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.filters.IFilter;
 
 public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
@@ -46,17 +45,6 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInit
 	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
 	 */
 	public void setInput(InputStream input) {
-		filter.open(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common
-	 * .MemMappedCharSequence)
-	 */
-	public void setInput(MemMappedCharSequence input) {
 		filter.open(input);
 	}
 
@@ -90,14 +78,6 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInit
 
 	public boolean hasNext() {
 		return filter.hasNext();
-	}
-
-	@Override
-	public void preprocess() {
-	}
-
-	@Override
-	public void postprocess() {
 	}
 	
 	public void destroy() {

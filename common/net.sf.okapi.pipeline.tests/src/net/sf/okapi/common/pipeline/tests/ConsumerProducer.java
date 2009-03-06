@@ -28,14 +28,17 @@ public class ConsumerProducer extends BasePipelineStep {
 		return "ProducerConsumer";
 	}
 
+	@Override
 	public void postprocess() {
 		System.out.println(getName() + " postprocess");
 	}
 
+	@Override
 	public void preprocess() {
 		System.out.println(getName() + " preprocess");
 	}
 	
+	@Override
 	protected void handleTextUnit(Event event) {
 		try {
 			Thread.sleep(1000);
@@ -43,8 +46,5 @@ public class ConsumerProducer extends BasePipelineStep {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public void cancel() {
 	}
 }

@@ -48,7 +48,7 @@ public class ThreadedPipeline implements IPipeline {
 	private volatile PipelineReturnValue state;
 	private LinkedList<IPipelineStep> threadedSteps;
 	private LinkedList<IPipelineStep> nonThreadedSteps;
-	private IInitialStep initalStep;
+	private IInitialStep initialStep;
 
 	private BlockingQueue<Event> previousQueue;
 
@@ -59,7 +59,7 @@ public class ThreadedPipeline implements IPipeline {
 	public ThreadedPipeline(PausableThreadPoolExecutor executor, int blockingQueueSize) {
 		nonThreadedSteps = new LinkedList<IPipelineStep>();
 		this.executor = executor;
-		this.blockingQueueSize = blockingQueueSize;
+		this.blockingQueueSize = blockingQueueSize;		
 		initialize();
 	}
 
@@ -71,7 +71,7 @@ public class ThreadedPipeline implements IPipeline {
 		threadedSteps = new LinkedList<IPipelineStep>();
 	}
 
-	private void execute() {
+	private void prepareThreadedSteps() {
 		BlockingQueue<Event> queue = null;
 		for (IPipelineStep step : nonThreadedSteps) {
 			if (threadedSteps.isEmpty()) {
@@ -80,8 +80,8 @@ public class ThreadedPipeline implements IPipeline {
 				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
 				producerStep.setProducerQueue(queue);
 				completionService.submit(producerStep);
-				threadedSteps.add(producerStep);
-				initalStep = (IInitialStep) producerStep;
+				threadedSteps.add(producerStep);	
+				initialStep = producerStep;
 			} else if (step == nonThreadedSteps.getLast()) {
 				// last step it is a consumer
 				if (previousQueue == null) {
@@ -105,10 +105,7 @@ public class ThreadedPipeline implements IPipeline {
 			}
 			totalThreads += 1;
 			previousQueue = queue;
-		}
-		
-		executor.resume();
-		state = PipelineReturnValue.RUNNING;
+		}				
 	}
 
 	public void addStep(IPipelineStep step) {
@@ -144,8 +141,7 @@ public class ThreadedPipeline implements IPipeline {
 
 		if (state == PipelineReturnValue.PAUSED) {
 			try {
-				// TODO: will this interfere with SWT GUI thread?
-				Thread.sleep(100);
+				Thread.sleep(10);
 			} catch (InterruptedException e) {
 			}
 			return PipelineReturnValue.PAUSED;
@@ -186,6 +182,14 @@ public class ThreadedPipeline implements IPipeline {
 		executor.shutdownNow();
 		state = PipelineReturnValue.DESTROYED;
 	}
+	
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process()
+	 */
+	public void process() {
+		initialize();
+		prepareThreadedSteps();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -194,7 +198,10 @@ public class ThreadedPipeline implements IPipeline {
 	 */
 	public void process(URI input) {
 		initialize();
-		execute();
+		prepareThreadedSteps();
+		((IInitialStep) initialStep).setInput(input);
+		executor.resume();
+		state = PipelineReturnValue.RUNNING;
 	}
 
 	/*
@@ -203,19 +210,11 @@ public class ThreadedPipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
 	 */
 	public void process(InputStream input) {
-		initialize();
-		execute();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(net.sf.okapi.common.
-	 * MemMappedCharSequence)
-	 */
-	public void process(MemMappedCharSequence input) {
-		initialize();
-		execute();
+		initialize();		
+		prepareThreadedSteps();
+		((IInitialStep) initialStep).setInput(input);
+		executor.resume();
+		state = PipelineReturnValue.RUNNING;
 	}
 
 	/*
@@ -225,7 +224,10 @@ public class ThreadedPipeline implements IPipeline {
 	 * net.sf.okapi.common.pipeline.IPipeline#process(java.lang.CharSequence)
 	 */
 	public void process(CharSequence input) {
-		initialize();
-		execute();
+		initialize();		
+		prepareThreadedSteps();
+		((IInitialStep) initialStep).setInput(input);
+		executor.resume();
+		state = PipelineReturnValue.RUNNING;
 	}
 }

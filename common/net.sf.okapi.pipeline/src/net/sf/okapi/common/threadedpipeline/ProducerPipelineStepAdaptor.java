@@ -26,22 +26,21 @@ import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.pipeline.IInitialStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 
-public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer, IInitialStep {	
+class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor implements IProducer, IInitialStep {
 	private BlockingQueue<Event> producerQueue;
-	
+
 	public ProducerPipelineStepAdaptor(IPipelineStep step) {
-		super(step);		
+		super(step);
 	}
-	
+
 	public void setProducerQueue(BlockingQueue<Event> producerQueue) {
 		this.producerQueue = producerQueue;
 	}
-	
+
 	protected void addToQueue(Event event) {
 		if (producerQueue == null) {
 			throw new RuntimeException("This class is a consumer not a producer");
@@ -52,18 +51,18 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 			throw new RuntimeInterruptedException(e);
 		}
 	}
-	
+
 	public Event handleEvent(Event event) {
 		Event e;
 		if (hasNext()) {
-			e = step.handleEvent(event);			
-		} else { 
+			e = step.handleEvent(event);
+		} else {
 			e = new Event(EventType.FINISHED);
 		}
 		addToQueue(e);
-		return e;		
+		return e;
 	}
-	
+
 	@Override
 	protected PipelineReturnValue processBlockingQueue() {
 		Event event = handleEvent(null);
@@ -73,38 +72,42 @@ public class ProducerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 		return PipelineReturnValue.RUNNING;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#hasNext()
 	 */
 	public boolean hasNext() {
-		return ((IInitialStep)step).hasNext();
+		return ((IInitialStep) step).hasNext();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
 	 */
 	public void setInput(URI input) {
-		((IInitialStep)step).setInput(input);
+		((IInitialStep) step).setInput(input);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
 	 */
 	public void setInput(InputStream input) {
-		((IInitialStep)step).setInput(input);	
+		((IInitialStep) step).setInput(input);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common.MemMappedCharSequence)
-	 */
-	public void setInput(MemMappedCharSequence input) {
-		((IInitialStep)step).setInput(input);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence
+	 * )
 	 */
 	public void setInput(CharSequence input) {
-		((IInitialStep)step).setInput(input);	
-		}
+		((IInitialStep) step).setInput(input);
+	}
 }

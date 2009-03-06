@@ -24,6 +24,6 @@ import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.Event;
 
-public interface IConsumer {
+interface IConsumer {
 	public void setConsumerQueue(BlockingQueue<Event> consumerQueue);
 }

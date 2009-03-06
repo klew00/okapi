@@ -24,83 +24,75 @@ import java.io.InputStream;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.FileResource;
 
-public class FileResourcePipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
-	private IFilter filter;
-	
-	/* (non-Javadoc)
+public class FileResourceInitialPipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
+	private FileResource fileResource;
+	private boolean eventSent = false;
+
+	public FileResourceInitialPipelineStepAdaptor(FileResource fileResource) {
+		this.fileResource = fileResource;
+		eventSent = false;
+	}
+
+	public FileResource getFileResource() {
+		return fileResource;
+	}
+
+	public String getName() {
+		return fileResource.getId();
+	}
+
+	@Override
+	public Event handleEvent(Event event) {
+		eventSent = true;
+		return new Event(EventType.FILE_RESOURCE, fileResource);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
 	 */
 	public void setInput(URI input) {
-		filter.close();
-		filter.open(input);
+		fileResource.setInputURI(input);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
 	 */
 	public void setInput(InputStream input) {
-		filter.close();
-		filter.open(input);
+		fileResource.setInputStream(input);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common.MemMappedCharSequence)
-	 */
-	public void setInput(MemMappedCharSequence input) {
-		filter.close();
-		filter.open(input);
-	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(CharSequence)
 	 */
 	public void setInput(CharSequence input) {
-		filter.close();
-		filter.open(input);
+		fileResource.setInputCharSequence(input);
 	}
-	
-	public FileResourcePipelineStepAdaptor(IFilter filter) {
-		this.filter = filter;
-	}
-	
-	public IFilter getFilter() {
-		return filter;
-	}
-	
-	public String getName() {		
-		return filter.getName();
-	}		
 
-	@Override
-	public Event handleEvent(Event event) {		
-		return filter.next();
-	}
-	
-	@Override
-	public void preprocess() {}
-
-	@Override
-	public void postprocess() {
-		filter.close();
-	}
-	
 	@Override
 	public void destroy() {
-		filter.close();
-	}
-	
-	public void cancel() {
-		filter.cancel();
+		fileResource.close();
 	}
 
-	/* (non-Javadoc)
+	public void cancel() {
+		destroy();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#hasNext()
 	 */
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
+		return !eventSent;
 	}
 }

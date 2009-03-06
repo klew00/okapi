@@ -23,9 +23,6 @@ package net.sf.okapi.common.pipeline;
 import java.io.InputStream;
 import java.net.URI;
 
-import net.sf.okapi.common.MemMappedCharSequence;
-
-
 public interface IInitialStep {
 	
 	/**
@@ -47,13 +44,6 @@ public interface IInitialStep {
 	 * @param input
 	 */
 	public void setInput(InputStream input);
-
-	/**
-	 * Run the pipeline using an MemMappedCharSequence as input.
-	 * 
-	 * @param input
-	 */
-	public void setInput(MemMappedCharSequence input);
 	
 	/**
 	 * Run the pipeline using a CharSequence as input.

@@ -24,7 +24,6 @@ import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.IInitialStep;
 
@@ -35,22 +34,22 @@ public class Producer extends BasePipelineStep implements IInitialStep {
 		return "Producer";
 	}
 
+	@Override
 	public void postprocess() {	
 		System.out.println(getName() + " postprocess");
 	}
 
+	@Override
 	public void preprocess() {
 		System.out.println(getName() + " preprocess");		
 	}
 
+	@Override
 	public Event handleEvent(Event event) {	
 		super.handleEvent(event);
 				
 		event = new Event(EventType.TEXT_UNIT, null);		
 		return event;
-	}
-
-	public void cancel() {
 	}
 
 	public boolean hasNext() {
@@ -64,32 +63,18 @@ public class Producer extends BasePipelineStep implements IInitialStep {
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
 	 */
-	public void setInput(URI input) {
-		// TODO Auto-generated method stub
-		
+	public void setInput(URI input) {		
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
 	 */
-	public void setInput(InputStream input) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(net.sf.okapi.common.MemMappedCharSequence)
-	 */
-	public void setInput(MemMappedCharSequence input) {
-		// TODO Auto-generated method stub
-		
+	public void setInput(InputStream input) {		
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence)
 	 */
-	public void setInput(CharSequence input) {
-		// TODO Auto-generated method stub
-		
+	public void setInput(CharSequence input) {		
 	}
 }

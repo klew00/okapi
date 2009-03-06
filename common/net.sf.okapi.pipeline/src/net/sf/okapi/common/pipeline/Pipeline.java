@@ -55,6 +55,7 @@ public class Pipeline implements IPipeline {
 			if (!(step instanceof IInitialStep)) {
 				throw new RuntimeException("Intial step must implement IInitialStep");
 			}
+
 			initialStep = step;
 			firstStep = false;
 		} else {
@@ -96,6 +97,15 @@ public class Pipeline implements IPipeline {
 			return PipelineReturnValue.RUNNING;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process()
+	 */
+	public void process() {
+		preprocess();
+		execute();
+		postprocess();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

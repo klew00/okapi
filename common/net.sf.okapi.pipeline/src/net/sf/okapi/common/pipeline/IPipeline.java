@@ -26,6 +26,13 @@ import java.net.URI;
 public interface IPipeline {	
 
 	/**
+	 * Run the pipeline relying in the initial event to send the input.
+	 * 
+	 * @param input
+	 */
+	public void process();
+	
+	/**
 	 * Run the pipeline using a URI as input.
 	 * 
 	 * @param input

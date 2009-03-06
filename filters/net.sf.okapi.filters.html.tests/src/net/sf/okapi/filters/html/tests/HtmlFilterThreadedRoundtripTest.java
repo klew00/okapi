@@ -39,9 +39,7 @@ import org.junit.Test;
 public class HtmlFilterThreadedRoundtripTest {
 
 	@Before
-	public void setUp() {
-
-	}
+	public void setUp() {}
 
 	@Test
 	public void runPipeline() {
@@ -87,7 +85,5 @@ public class HtmlFilterThreadedRoundtripTest {
 	}
 
 	@After
-	public void cleanUp() {
-	}
-
+	public void cleanUp() {}
 }

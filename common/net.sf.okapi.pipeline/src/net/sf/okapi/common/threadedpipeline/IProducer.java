@@ -24,7 +24,6 @@ import java.util.concurrent.BlockingQueue;
 
 import net.sf.okapi.common.Event;
 
-public interface IProducer {
-	
+interface IProducer {	
 	public void setProducerQueue(BlockingQueue<Event> producerQueue);	
 }

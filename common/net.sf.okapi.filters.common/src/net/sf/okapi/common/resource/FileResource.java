@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -50,7 +51,7 @@ public class FileResource implements IResource {
 	private BOMNewlineEncodingDetector.NewlineType originalNewlineType;
 	private InputStream inputStream;
 	private URI inputURI;
-	private MemMappedCharSequence inputMemMappedCharSequence;
+	private CharSequence inputCharSequence;
 	private String mimeType;
 	private Reader reader;
 
@@ -64,17 +65,17 @@ public class FileResource implements IResource {
 		reset(inputStream, encoding, mimeType, locale);
 	}
 
-	public FileResource(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
+	public FileResource(CharSequence inputCharSequence, String mimeType, String locale) {
 		this.annotations = new Annotations();
-		reset(inputMemMappedCharSequence, mimeType, locale);
+		reset(inputCharSequence, mimeType, locale);
 	}
 	
-	public void reset(MemMappedCharSequence inputMemMappedCharSequence, String mimeType, String locale) {
-		setInputMemMappedCharSequence(inputMemMappedCharSequence);
+	public void reset(CharSequence inputCharSequence, String mimeType, String locale) {
+		setInputCharSequence(inputCharSequence);
 		setEncoding("UTF-16BE");
 		setMimeType(mimeType);
 		setLocale(locale);
-		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewLineType(getInputMemMappedCharSequence()));		
+		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewLineType(getInputCharSequence()));		
 	}
 	
 	public void reset(URI inputURI, String encoding, String mimeType, String locale) {
@@ -190,15 +191,15 @@ public class FileResource implements IResource {
 	 * @param inputMemMappedCharSequence
 	 *            the inputMemMappedCharSequence to set
 	 */
-	public void setInputMemMappedCharSequence(MemMappedCharSequence inputMemMappedCharSequence) {
-		this.inputMemMappedCharSequence = inputMemMappedCharSequence;
+	public void setInputCharSequence(CharSequence inputCharSequence) {
+		this.inputCharSequence = inputCharSequence;
 	}
 
 	/**
 	 * @return the inputMemMappedCharSequence
 	 */
-	public MemMappedCharSequence getInputMemMappedCharSequence() {
-		return inputMemMappedCharSequence;
+	public CharSequence getInputCharSequence() {
+		return inputCharSequence;
 	}
 
 	public String getEncoding() {
@@ -252,14 +253,14 @@ public class FileResource implements IResource {
 		
 		if (getInputStream() != null)
 			try {
-				return new InputStreamReader(getInputStream(), getEncoding());
+				reader = new InputStreamReader(getInputStream(), getEncoding());
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
-		if (getInputMemMappedCharSequence() != null)
-			return new CharArrayReader(getInputMemMappedCharSequence().array());
+		if (getInputCharSequence() != null)
+			reader = new StringReader(getInputCharSequence().toString()); 
 		
-		return null;
+		return reader;
 	}
 	
 	public void close() {
@@ -277,8 +278,11 @@ public class FileResource implements IResource {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		if (getInputMemMappedCharSequence() != null) {
-			getInputMemMappedCharSequence().close();
+		if (getInputCharSequence() != null) {
+			CharSequence cs = getInputCharSequence(); 
+			// if this is a MemMappedCharSequence we need to close it
+			if (cs instanceof MemMappedCharSequence)
+				((MemMappedCharSequence)cs).close();
 		}					
 	}
 }
