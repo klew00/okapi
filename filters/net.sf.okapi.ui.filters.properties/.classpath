@@ -4,9 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.properties"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
-	<classpathentry kind="lib" path="lib/win32-x86/swt.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.common"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

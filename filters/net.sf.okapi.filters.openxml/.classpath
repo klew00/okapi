@@ -5,10 +5,8 @@
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/openxml4j-bin-beta.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter"/>
-	<classpathentry kind="lib" path="/net.sf.okapi.filters.common/lib/slf4j-api-1.5.0.jar"/>
-	<classpathentry kind="lib" path="/net.sf.okapi.filters.common/lib/slf4j-jdk14-1.5.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/third-party.logger-slf4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

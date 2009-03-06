@@ -2,10 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry kind="lib" path="lib/shared/wstx-lgpl-3.9.2.jar"/>
-	<classpathentry kind="lib" path="lib/shared/stax-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/shared/slf4j-api-1.5.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/third-party.logger-slf4j"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/third-party.stax-wstx"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

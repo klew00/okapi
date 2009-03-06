@@ -17,9 +17,8 @@
 		<javadoc destdir="${javadoc}">
 			<packageset dir="..\common\net.sf.okapi.common\src" defaultexcludes="yes"/>
 			<packageset dir="..\common\net.sf.okapi.filters.common\src" defaultexcludes="yes"/>
-			<packageset dir="..\common\net.sf.okapi.ui.common\src" defaultexcludes="yes"/>
-			<packageset dir="..\libraries\net.sf.okapi.lib.segmentation\src" defaultexcludes="yes"/>
-			<packageset dir="..\libraries\net.sf.okapi.lib.translation\src" defaultexcludes="yes"/>
+<!--			<packageset dir="..\libraries\net.sf.okapi.lib.segmentation\src" defaultexcludes="yes"/>-->
+<!--			<packageset dir="..\libraries\net.sf.okapi.lib.translation\src" defaultexcludes="yes"/>-->
 		</javadoc>
 
 	</target>
