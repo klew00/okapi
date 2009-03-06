@@ -280,10 +280,12 @@ img:
 
 input:
   ruleTypes: [INLINE]
-  translatableAttributes: [accesskey, alt, value]
-# value if type equals button, default, submit, reset
-# title if type equals button, default, submit, reset
- 
+  translatableAttributes: 
+    alt: [type, NOT_EQUALS, [file, hidden, image, Password]] 
+    value: [type, NOT_EQUALS, [file, hidden, image, Password]] 
+    accesskey: [type, NOT_EQUALS, [file, hidden, image, Password]] 
+    title: [type, NOT_EQUALS, [file, hidden, image, Password]]
+    
 ins:
   ruleTypes: [INLINE]
 

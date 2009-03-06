@@ -54,7 +54,7 @@ public class TaggedFilterConfiguration {
 	}
 
 	public boolean collapseWhitespace() {
-		return ((Boolean)configReader.getProperty(COLLAPSE_WHITSPACE)).booleanValue();
+		return ((Boolean) configReader.getProperty(COLLAPSE_WHITSPACE)).booleanValue();
 	}
 
 	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
@@ -197,13 +197,12 @@ public class TaggedFilterConfiguration {
 	private boolean isActionableAttribute(String type, String elementName, String attribute,
 			Map<String, String> attributes) {
 
-		// catch attributes that may appear on any element
-		if (isActionableAttributeRule(elementName, attribute, type)) {
-			return true;
-		}
-
 		Map elementRule = configReader.getRule(elementName);
 		if (elementRule == null) {
+			// catch attributes that may appear on any element
+			if (isActionableAttributeRule(elementName, attribute, type)) {
+				return true;
+			}
 			return false;
 		}
 
@@ -246,6 +245,12 @@ public class TaggedFilterConfiguration {
 			}
 
 		}
+		
+		// catch attributes that may appear on any element
+		if (isActionableAttributeRule(elementName, attribute, type)) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -315,13 +320,25 @@ public class TaggedFilterConfiguration {
 		// '=', '!=' or regex
 		String compareType = (String) condition.get(1);
 
-		// multiple condition values OR'ed together
 		if (condition.get(2) instanceof List) {
 			List conditionValues = (List) condition.get(2);
-			for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
-				String value = i.next();
-				if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
-					return true;
+
+			// multiple condition values of type NOT_EQUAL are AND'ed together
+			if (compareType.equals(NOT_EQUALS)) {
+				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
+					String value = i.next();
+					if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
+						return false;
+					}
+				}
+				return true;
+			} else { // multiple condition values of type EQUAL or MATCH are
+						// OR'ed together
+				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
+					String value = i.next();
+					if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
+						return true;
+					}
 				}
 			}
 		}
@@ -340,7 +357,7 @@ public class TaggedFilterConfiguration {
 		if (compareType.equals(EQUALS)) {
 			return attributeValue.equalsIgnoreCase(conditionValue);
 		} else if (compareType.equals(NOT_EQUALS)) {
-			return !(attributeValue.equalsIgnoreCase(conditionValue));
+			return attributeValue.equalsIgnoreCase(conditionValue);
 		} else if (compareType.equals(MATCH)) {
 			boolean result = false;
 			Pattern matchPattern = Pattern.compile(conditionValue);

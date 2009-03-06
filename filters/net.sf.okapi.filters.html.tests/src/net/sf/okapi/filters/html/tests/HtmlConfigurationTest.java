@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
@@ -46,7 +45,13 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getMainRuleType("area"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		assertEquals(rules.getMainRuleType("script"), TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
 		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
-		assertEquals(rules.getMainRuleType("meta"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
+		assertEquals(rules.getMainRuleType("meta"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);				
+	}
+	
+	@Test
+	public void metaTag() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
 		
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put("http-equiv", "keywords");		
@@ -124,4 +129,41 @@ public class HtmlConfigurationTest {
 		rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.collapseWhitespace());
 	}
+	
+	@Test
+	public void inputAttributes() {
+		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		
+		Map<String, String> attributes = new HashMap<String, String>();
+		
+		attributes.clear();
+		attributes.put("type", "hidden");		
+		assertFalse(rules.isTranslatableAttribute("input", "alt", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "value", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "accesskey", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "title", attributes));
+		
+		attributes.clear();
+		attributes.put("type", "image");		
+		assertFalse(rules.isTranslatableAttribute("input", "alt", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "value", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "accesskey", attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "title", attributes));			
+		
+		attributes.clear();
+		attributes.put("type", "submit");		
+		assertTrue(rules.isTranslatableAttribute("input", "alt", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "value", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "accesskey", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "title", attributes));	
+		
+		attributes.clear();
+		attributes.put("type", "button");		
+		assertTrue(rules.isTranslatableAttribute("input", "alt", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "value", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "accesskey", attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "title", attributes));	
+	}
+
 }
