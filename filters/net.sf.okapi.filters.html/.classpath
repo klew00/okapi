@@ -6,6 +6,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SLF4J-API-1.5.0"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

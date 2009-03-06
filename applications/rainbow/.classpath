@@ -29,5 +29,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.mif"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.idml"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.pipeline"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
