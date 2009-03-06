@@ -75,8 +75,7 @@ public class ThreadedPipeline implements IPipeline {
 				// first step is a producer wrap it with threaded adaptor
 				queue = new ArrayBlockingQueue<Event>(blockingQueueSize, false);
 				ProducerPipelineStepAdaptor producerStep = new ProducerPipelineStepAdaptor(step);
-				producerStep.setProducerQueue(queue);
-				producerStep.addToQueue(new Event(EventType.START));
+				producerStep.setProducerQueue(queue);				
 				completionService.submit(producerStep);
 				threadedSteps.add(producerStep);
 				initalStep = (IInitialStep) producerStep;

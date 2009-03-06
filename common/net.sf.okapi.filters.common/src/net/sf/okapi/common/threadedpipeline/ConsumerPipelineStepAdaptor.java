@@ -61,7 +61,7 @@ public class ConsumerPipelineStepAdaptor extends BaseThreadedPipelineStepAdaptor
 	@Override
 	protected PipelineReturnValue processBlockingQueue() {
 		Event event = handleEvent(null);
-		if (event.getEventType() == EventType.FINISHED) {
+		if (event == null) {
 			return PipelineReturnValue.SUCCEDED;
 		}
 		return PipelineReturnValue.RUNNING;
