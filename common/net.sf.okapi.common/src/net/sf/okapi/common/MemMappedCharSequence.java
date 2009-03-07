@@ -75,7 +75,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	private CharBuffer text;
 	private MappedByteBuffer byteBuffer;
 	private File tempUTF16BEfile;
-	private char[] tempText = null;
+	
 
 	/**
 	 * A value to use as the <code>breakAtIndex</code> argument in certain
@@ -121,8 +121,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param inputSource
 	 *            Reader.
 	 */
-	public MemMappedCharSequence(final Reader inputSource, boolean lowercase) {
-		tempText = null; // not needed with buffered CharBuffer
+	public MemMappedCharSequence(final Reader inputSource, boolean lowercase) {		
 		try {
 			createMemMappedCharBuffer(Channels.newChannel(new ReaderInputStream(inputSource, "UTF-16BE")), "UTF-16BE",
 					lowercase);
@@ -149,8 +148,7 @@ public final class MemMappedCharSequence implements CharSequence {
 	 * @param string
 	 *            the string upon which the parse text is based.
 	 */
-	public MemMappedCharSequence(final InputStream inputSource, String encoding, boolean lowercase) {
-		tempText = null; // not needed with buffered CharBuffer
+	public MemMappedCharSequence(final InputStream inputSource, String encoding, boolean lowercase) {		
 		createMemMappedCharBuffer(Channels.newChannel(inputSource), encoding, lowercase);
 	}
 
@@ -173,7 +171,6 @@ public final class MemMappedCharSequence implements CharSequence {
 	 *            the string upon which the parse text is based.
 	 */
 	public MemMappedCharSequence(final URL inputSource, String encoding, boolean lowercase) {
-		tempText = null; // not needed with buffered CharBuffer
 		try {
 			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding, lowercase);
 		} catch (IOException e) {
