@@ -23,7 +23,7 @@ package net.sf.okapi.common.ui.filters;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.common.writer.GenericContent;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -59,7 +59,7 @@ public class InlineCodeFinderPanel extends Composite {
 	private boolean editMode;
 	private boolean wasNew;
 	private TextContainer textCont;
-	private GenericInlines genericCont;
+	private GenericContent genericCont;
 	private boolean canUpdateTest = true;
 
 	public InlineCodeFinderPanel (Composite parent,
@@ -68,7 +68,7 @@ public class InlineCodeFinderPanel extends Composite {
 		super(parent, flags);
 		codeFinder = new InlineCodeFinder();
 		textCont = new TextContainer();
-		genericCont = new GenericInlines();
+		genericCont = new GenericContent();
 		createContent();
 	}
 	

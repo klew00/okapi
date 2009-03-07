@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.resource;
 
-import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,7 +40,6 @@ import net.sf.okapi.common.annotation.IAnnotation;
  * File resource which holds a URI, InputStream or MemMappedCharSequence
  * referencing a file to be processed in the pipeline. File's can be decomposed
  * into events in the pipeline.
- * 
  */
 public class FileResource implements IResource {
 	private Annotations annotations;

@@ -24,7 +24,7 @@ import java.io.File;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterWriter;
+import net.sf.okapi.common.writer.IFilterWriter;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility
 	implements IFilterDrivenUtility {

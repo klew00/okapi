@@ -23,7 +23,6 @@ package net.sf.okapi.common.encoder;
 import java.util.Hashtable;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.IEncoder;
 
 /**
  * Provides caching and lookup mechanism for the text encoders used when writing out text

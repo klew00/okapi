@@ -31,25 +31,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.its.IProcessor;
-import org.w3c.its.ITSEngine;
-import org.w3c.its.ITraversal;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IEncoder;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
@@ -61,6 +49,18 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
+import net.sf.okapi.common.writer.IFilterWriter;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.its.IProcessor;
+import org.w3c.its.ITSEngine;
+import org.w3c.its.ITraversal;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class XMLFilter implements IFilter {
 

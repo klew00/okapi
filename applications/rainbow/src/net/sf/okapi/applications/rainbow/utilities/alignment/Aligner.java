@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.common.writer.GenericContent;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.mt.google.GoogleMTConnector;
@@ -104,7 +104,7 @@ public class Aligner {
 	private boolean splitMode = false;
 	private boolean editMode = false;
 	private int indexActiveSegment;
-	private GenericInlines genericCont;
+	private GenericContent genericCont;
 	private String targetSrxPath;
 	private Color colorGreen;
 	private Color colorAmber;
@@ -173,7 +173,7 @@ public class Aligner {
 		colorAmber = new Color(null, 255, 153, 0);
 		colorRed = new Color(null, 220, 20, 60);
 		
-		genericCont = new GenericInlines();
+		genericCont = new GenericContent();
 		
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | 
 			SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);

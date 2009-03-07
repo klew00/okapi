@@ -22,9 +22,6 @@ package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
@@ -35,8 +32,11 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterWriter;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.writer.IFilterWriter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Merger {
 

@@ -33,7 +33,7 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
-import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.common.writer.GenericContent;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -92,7 +92,7 @@ public class SRXEditor {
 	private Button rdTestOnLanguage;
 	private Button rdTestOnSelectedGroup;
 	private Text edSampleLanguage;
-	private GenericInlines sampleOutput;
+	private GenericContent sampleOutput;
 	private Font sampleFont;
 	private ResourceManager rm;
 	private FileProcessor fileProc;
@@ -129,7 +129,7 @@ public class SRXEditor {
 		srxDoc = new SRXDocument();
 		srxPath = null;
 		sampleText = new TextContainer(null);
-		sampleOutput = new GenericInlines();
+		sampleOutput = new GenericContent();
 		fileProc = new FileProcessor();
 
 		if ( asDialog ) {

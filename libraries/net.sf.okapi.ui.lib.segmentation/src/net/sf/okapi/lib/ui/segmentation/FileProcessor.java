@@ -36,7 +36,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.common.writer.GenericContent;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 public class FileProcessor {
@@ -44,13 +44,13 @@ public class FileProcessor {
 	private Pattern patternOpening;
 	private Pattern patternClosing;
 	private Pattern patternPlaceholder;
-	private GenericInlines sampleOutput;
+	private GenericContent sampleOutput;
 	
 	public FileProcessor () {
 		patternOpening = Pattern.compile("\\<(\\w+[^\\>]*)\\>"); //$NON-NLS-1$
 		patternClosing = Pattern.compile("\\</(\\w+[^\\>]*)\\>"); //$NON-NLS-1$
 		patternPlaceholder = Pattern.compile("\\<(\\w+[^\\>]*)/\\>"); //$NON-NLS-1$
-		sampleOutput = new GenericInlines();
+		sampleOutput = new GenericContent();
 	}
 	
 	/**

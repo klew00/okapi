@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common.writer;
 
-import net.sf.okapi.common.filters.IEncoder;
+import net.sf.okapi.common.encoder.IEncoder;
 
 /**
  * Provides common methods for encoding a layer on top of a text

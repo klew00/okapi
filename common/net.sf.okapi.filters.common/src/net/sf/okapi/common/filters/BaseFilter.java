@@ -43,6 +43,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.writer.GenericFilterWriter;
+import net.sf.okapi.common.writer.IFilterWriter;
 
 // TODO: Auto-generated Javadoc
 /**

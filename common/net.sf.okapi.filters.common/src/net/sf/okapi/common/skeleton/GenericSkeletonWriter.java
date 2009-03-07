@@ -27,7 +27,7 @@ import java.util.Stack;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filters.IEncoder;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;

@@ -33,7 +33,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.xliff.XLIFFContent;
+import net.sf.okapi.common.writer.XLIFFContent;
 
 /**
  * Implements IWriter for generic XLIFF translation packages.

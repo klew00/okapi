@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.encoder;
 
 import net.sf.okapi.common.IParameters;
 

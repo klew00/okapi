@@ -35,7 +35,7 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.filters.IEncoder;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;

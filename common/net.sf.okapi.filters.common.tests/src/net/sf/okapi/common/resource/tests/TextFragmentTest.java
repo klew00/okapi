@@ -28,17 +28,17 @@ import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.writer.GenericInlines;
+import net.sf.okapi.common.writer.GenericContent;
 import junit.framework.*;
 
 public class TextFragmentTest extends TestCase {
 
-	private GenericInlines fmt;
+	private GenericContent fmt;
 	
 	@Override
 	public void setUp () throws Exception {
 		super.setUp();
-		fmt = new GenericInlines();
+		fmt = new GenericContent();
 	}
 	
 	public void testConstructors () {

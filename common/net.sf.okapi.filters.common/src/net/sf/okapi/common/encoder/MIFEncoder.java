@@ -21,7 +21,6 @@
 package net.sf.okapi.common.encoder;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.IEncoder;
 
 /**
  * Implements IEncoder for Adobe FrameMaker MIF format.

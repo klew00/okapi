@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.filters;
+package net.sf.okapi.common.writer;
 
 import java.io.OutputStream;
 

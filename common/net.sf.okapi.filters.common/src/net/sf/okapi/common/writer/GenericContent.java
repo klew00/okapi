@@ -34,7 +34,7 @@ import net.sf.okapi.common.resource.TextFragment;
 /**
  * Handles the conversion between a coded text object and a generic markup string.
  */
-public class GenericInlines {
+public class GenericContent {
 
 	private String codedText;
 	private List<Code> codes;
@@ -42,15 +42,15 @@ public class GenericInlines {
 	private Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
 	private Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
 
-	public GenericInlines () {
+	public GenericContent () {
 		codedText = "";
 	}
 	
-	public GenericInlines (TextFragment content) {
+	public GenericContent (TextFragment content) {
 		setContent(content);
 	}
 	
-	public GenericInlines setContent (TextFragment content) {
+	public GenericContent setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;
