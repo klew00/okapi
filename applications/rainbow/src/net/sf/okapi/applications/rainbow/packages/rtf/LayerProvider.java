@@ -25,7 +25,7 @@ import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.writer.ILayerProvider;
+import net.sf.okapi.common.filterwriter.ILayerProvider;
 
 public class LayerProvider implements ILayerProvider {
 

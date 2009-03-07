@@ -25,8 +25,8 @@ import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-import net.sf.okapi.common.writer.IFilterWriter;
 
 /**
  * Provides a common set of methods to extract translatable text and its associated data.

@@ -23,7 +23,7 @@ package net.sf.okapi.filters.idml.tests;
 import java.net.URI;
 import java.net.URL;
 
-import net.sf.okapi.common.writer.IFilterWriter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.filters.idml.IDMLFilter;
 
 import org.junit.Assert;

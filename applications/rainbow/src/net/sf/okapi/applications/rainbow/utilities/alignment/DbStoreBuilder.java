@@ -27,8 +27,8 @@ import java.util.Stack;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.writer.IFilterWriter;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 class DbStoreBuilder implements IFilterWriter {

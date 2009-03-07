@@ -22,14 +22,14 @@ package net.sf.okapi.common.resource.tests;
 
 import java.util.List;
 
+import junit.framework.TestCase;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.AnnotatedSpan;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.writer.GenericContent;
-import junit.framework.*;
 
 public class TextFragmentTest extends TestCase {
 

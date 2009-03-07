@@ -21,7 +21,7 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.writer.IFilterWriter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 
 /**
  * Provides a common way create a translation package. 

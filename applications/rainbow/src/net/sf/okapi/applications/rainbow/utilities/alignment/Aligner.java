@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
@@ -35,7 +36,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.writer.GenericContent;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.mt.google.GoogleMTConnector;

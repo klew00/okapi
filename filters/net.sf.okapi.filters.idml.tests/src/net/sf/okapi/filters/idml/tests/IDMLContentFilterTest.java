@@ -24,7 +24,7 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.writer.GenericFilterWriter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.filters.idml.IDMLContentFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 

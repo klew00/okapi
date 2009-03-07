@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.writer;
+package net.sf.okapi.common.filterwriter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +41,6 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.common.writer.GenericFilterWriter;
 
 /**
  * Implements the IFilterWriter interface for filters that handle formats made of

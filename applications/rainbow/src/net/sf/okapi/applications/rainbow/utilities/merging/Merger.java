@@ -32,8 +32,8 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.writer.IFilterWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

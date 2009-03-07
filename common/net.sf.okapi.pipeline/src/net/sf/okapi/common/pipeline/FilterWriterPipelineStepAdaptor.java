@@ -21,7 +21,7 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.writer.IFilterWriter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 
 public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	private IFilterWriter filterWriter;

@@ -20,12 +20,12 @@
 
 package net.sf.okapi.filters.html.tests;
 
-import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.common.writer.GenericFilterWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.After;
