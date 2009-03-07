@@ -131,7 +131,7 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testNormalizeNewlinesInPre() {
 		String snippet = "<pre>\r\nX\rY\n</pre>";
-		assertEquals("<pre>\r\nX\rY\n</pre>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet));
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {

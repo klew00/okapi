@@ -34,6 +34,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
+import java.util.regex.Pattern;
 
 import org.w3c.dom.Node;
 
@@ -54,7 +55,18 @@ public class Util {
 	public static final String   RTF_MIDMARKER1  = "}{\\cs15\\v\\cf12\\sub\\f2 <\\}";
 	public static final String   RTF_MIDMARKER2  = "\\{>}";
 	public static final String   RTF_ENDMARKER   = "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
+	
+	private static final String NEWLINES_REGEX = "\r[\n]?";
+	private static final Pattern NEWLINES_REGEX_PATTERN = Pattern.compile(NEWLINES_REGEX);
 
+	/**
+	 * Convert all .r\n and \r to linefeed (\n)
+	 * @param text
+	 * @return converted string
+	 */
+	static public String normalizeNewlines(String text) {
+		return NEWLINES_REGEX_PATTERN.matcher(text).replaceAll("\n");
+	}
 
 	/**
 	 * Removes from the from of a string any of the specified characters. 

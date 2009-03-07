@@ -33,6 +33,7 @@ import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -93,6 +94,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// whitespace is false
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedText = collapseWhitespace(decodedText);
+		} else {
+			decodedText = Util.normalizeNewlines(decodedText);
 		}
 
 		if (canStartNewTextUnit()) {
