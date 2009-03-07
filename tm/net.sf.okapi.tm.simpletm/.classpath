@@ -4,6 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
-	<classpathentry kind="lib" path="lib/h2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/h2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
