@@ -439,7 +439,7 @@ public class HtmlEventTest {
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));
+		htmlFilter.setParametersFromURL(HtmlEventTest.class.getResource("testConfiguration1.yml"));
 		htmlFilter.open(snippet);
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
@@ -455,37 +455,5 @@ public class HtmlEventTest {
 
 	private void addEndEvents(ArrayList<Event> events) {
 		events.add(new Event(EventType.END_DOCUMENT));
-	}
-
-	// @Test
-	public void printEvents() {
-		htmlFilter = new HtmlFilter();
-		InputStream htmlStream = HtmlEventTest.class.getResourceAsStream("/simpleSimpleTest.html");
-		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/testConfiguration1.yml"));
-		htmlFilter.open(htmlStream);
-		while (htmlFilter.hasNext()) {
-			Event event = htmlFilter.next();
-			if (event.getEventType() == EventType.TEXT_UNIT) {
-				assertTrue(event.getResource() instanceof TextUnit);
-			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
-				assertTrue(event.getResource() instanceof DocumentPart);
-			} else if (event.getEventType() == EventType.START_GROUP
-					|| event.getEventType() == EventType.END_GROUP) {
-				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
-			}
-			System.out.print(event.getEventType().toString() + ": ");
-			if (event.getResource() != null) {
-				if (event.getResource() instanceof DocumentPart) {
-					System.out.println(((DocumentPart) event.getResource()).getSourcePropertyNames());
-				} else {
-					System.out.println(event.getResource().toString());
-				}
-				if (event.getResource().getSkeleton() != null) {
-					System.out.println("\tSkeketon: " + event.getResource().getSkeleton().toString());
-				}
-			}
-		}
-
-		htmlFilter.close();
 	}
 }

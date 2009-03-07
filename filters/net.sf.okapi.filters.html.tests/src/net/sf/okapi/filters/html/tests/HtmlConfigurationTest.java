@@ -124,10 +124,10 @@ public class HtmlConfigurationTest {
 		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.collapseWhitespace());
-		
-		url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/maximalistConfiguration.yml");
+				
+		url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
-		assertTrue(rules.collapseWhitespace());
+		assertFalse(rules.collapseWhitespace());
 	}
 	
 	@Test

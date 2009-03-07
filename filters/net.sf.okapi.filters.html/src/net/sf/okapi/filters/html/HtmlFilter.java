@@ -58,7 +58,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 	public HtmlFilter() {
 		super();
 		setMimeType("text/html");
-		setDefaultConfig("/net/sf/okapi/filters/html/defaultConfiguration.yml");
+		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
 
 	@Override

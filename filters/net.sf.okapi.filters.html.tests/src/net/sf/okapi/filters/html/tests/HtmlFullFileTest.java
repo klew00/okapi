@@ -25,8 +25,7 @@ public class HtmlFullFileTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		htmlFilter.setParameters(new Parameters("/net/sf/okapi/filters/html/tests/minimalistConfiguration.yml"));
-
+		
 		// read all files in the test html directory
 		URL url = HtmlFullFileTest.class.getResource("/simpleTest.html");
 		File dir = new File(url.toURI()).getParentFile();

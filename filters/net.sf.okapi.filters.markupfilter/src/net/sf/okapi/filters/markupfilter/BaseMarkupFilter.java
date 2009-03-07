@@ -21,11 +21,13 @@
 package net.sf.okapi.filters.markupfilter;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -64,7 +66,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
-	private String defaultConfig;
+	private URL defaultConfig;
 	private BOMNewlineEncodingDetector bomEncodingDetector;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
@@ -195,9 +197,21 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		document.fullSequentialParse(); // optimizes jericho parsing
 		nodeIterator = document.getNodeIterator();
 	}
+	
+	protected void setDefaultConfig(URL classPathToConfig) {
+		this.defaultConfig = classPathToConfig;
+	}
 
-	public void setDefaultConfig(String defaultConfig) {
-		this.defaultConfig = defaultConfig;
+	public void setParametersFromURL(URL config) {
+		parameters = new Parameters(config);
+	}
+	
+	public void setParametersFromFile(File config) {
+		parameters = new Parameters(config);
+	}
+	
+	public void setParametersFromString(String config) {
+		parameters = new Parameters(config);
 	}
 
 	@Override

@@ -74,8 +74,8 @@ public class HtmlFilterRoundtripTest {
 		
 		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-					
-		pipeline.process(HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html"));		
+		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")			
+		pipeline.process("\r\nX\rY\n");		
 		pipeline.destroy();
 	}
 

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.markupfilter;
 
+import java.io.File;
 import java.net.URL;
 
 import net.sf.okapi.common.BaseParameters;
@@ -28,12 +29,22 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 public class Parameters extends BaseParameters {
 	private TaggedFilterConfiguration taggedConfig;
 
-	public Parameters(String configClassPath) {		
-		reset();
-		URL url = BaseMarkupFilter.class.getResource(configClassPath);
-		setTaggedConfig(new TaggedFilterConfiguration(url));
+	public Parameters(URL configPath) {		
+		reset();		
+		setTaggedConfig(new TaggedFilterConfiguration(configPath));
 	}
 
+	public Parameters(File configFile) {		
+		reset();		
+		setTaggedConfig(new TaggedFilterConfiguration(configFile));
+	}
+
+	public Parameters(String configAsString) {		
+		reset();		
+		setTaggedConfig(new TaggedFilterConfiguration(configAsString));
+	}
+
+	
 	/*
 	 * (non-Javadoc)
 	 * 
