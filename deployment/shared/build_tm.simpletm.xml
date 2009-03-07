@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="tm.simpletm" default="tm.simpletm"> 
+
+	<property name="proj_tm.simpletm" value="../../tm/net.sf.okapi.tm.simpletm"/> 
+	<property name="src_tm.simpletm" value="${proj_tm.simpletm}/src"/> 
+	<property name="lib_tm.simpletm" value="${proj_tm.simpletm}/lib"/> 
+ 
+	<path id="mainClassPath_tm.simpletm">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="tm.simpletm"> 
+		<ant antfile="../shared/build_lib.translation.xml" inheritAll="true"/>
+
+ 		<javac srcdir="${src_tm.simpletm}" destdir="${tmp}" classpathref="mainClassPath_tm.simpletm"/>
+
+		<copy todir="${tmp}">
+			<fileset dir="${src_tm.simpletm}" excludes="**/*.java"/>
+		</copy>
+		<copy todir="${distlib}">
+			<fileset dir="${lib_tm.simpletm}"/>
+		</copy>
+	</target>
+
+</project>

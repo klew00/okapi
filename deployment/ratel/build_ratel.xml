@@ -1,13 +1,13 @@
 <?xml version="1.0"?> 
 <project name="ratel" default="all" basedir="."> 
 
+	<property name="jarname" value="srxeditor-ratel"/>
 	<property name="platform" value="win32-x86"/>
-	<property name="proj" value="../../applications/ratel"/> 
-	<property name="src" value="${proj}/src"/> 
-	<property name="build" value="build"/>
+	<property name="proj_ratel" value="../../applications/ratel"/> 
+	<property name="src_ratel" value="${proj_ratel}/src"/> 
  	<property name="tmp" value="tmp"/>
 	<property name="dist" value="dist_${platform}"/>
-	<property name="dist-bin" value="${dist}/lib"/>
+	<property name="distlib" value="${dist}/lib"/>
  
 	<condition property="is_win32-x86">
 		<equals arg1="${platform}" arg2="win32-x86"/>
@@ -19,9 +19,9 @@
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
 
-	<path id="mainClassPath">
+	<path id="mainClassPath_ratel">
 		<pathelement location="${tmp}"/>
-		<pathelement location="${dist-bin}/${platform}/swt.jar"/>
+		<pathelement location="${distlib}/swt.jar"/>
 	</path>
 	
 	<target name="init">
@@ -30,22 +30,17 @@
 			<fileset dir="${dist}"/>
 		</delete>
 		<mkdir dir="${tmp}"/>
-		<mkdir dir="${dist-bin}"/>
+		<mkdir dir="${distlib}"/>
  	</target>
 
-	<target name="compile" depends="init"> 
-		<ant antfile="build_common.xml" inheritAll="false"/>
-		<ant antfile="build_filters.common.xml" inheritAll="false"/>
-		<ant antfile="build_lib.segmentation.xml" inheritAll="false"/>
-		<ant antfile="build_ui.common.xml" inheritAll="false"/>
-		<ant antfile="build_ui.lib.segmentation.xml" inheritAll="false"/>
- 		<javac srcdir="${src}" destdir="${tmp}" classpathref="mainClassPath"/>
-		<copy todir="${tmp}">
-			<fileset dir="${src}" excludes="**/*.java"/>
-		</copy>
+	<target name="compile" depends="init">
+		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 		
-		<copy todir="${dist-bin}">
-			<fileset dir="${dist-bin}/${platform}"/>
+		<ant antfile="../shared/build_ui.lib.segmentation.xml" inheritAll="true"/>
+
+ 		<javac srcdir="${src_ratel}" destdir="${tmp}" classpathref="mainClassPath_ratel"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_ratel}" excludes="**/*.java"/>
 		</copy>
 		
 		<copy todir="${dist}">
@@ -54,18 +49,14 @@
 			<fileset dir="data" includes="**/*.txt"/>
 		</copy>
 
-		<delete includeEmptyDirs="true">
-			<fileset dir="${dist-bin}/win32-x86"/>
-			<fileset dir="${dist-bin}/gtk2-linux-x86"/>
-			<fileset dir="${dist-bin}/carbon-macosx"/>
-		</delete>
-		
+		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
+		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Main-Class" value="net.sf.okapi.applications.ratel.Main"/>
 			<attribute name="Class-Path" value="swt.jar"/>
   		</manifest>
 
-		<jar jarfile="${dist-bin}/ratel.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+		<jar jarfile="${distlib}/ratel.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
 			excludes="MANIFEST.MF"
   		/>
 
@@ -76,7 +67,7 @@
 	</target>
 	
 	<target name="linuxExePerm" if="is_gtk2-linux-x86">
-		<chmod file="${dist-bin}/${platform}/srxeditor-ratel" perm="ugo+rx"/>
+		<chmod file="${dist-bin}/${platform}/${jarname}" perm="ugo+rx"/>
 	</target>
 
 	<target name="winExe" if="is_win32-x86">
@@ -89,13 +80,13 @@
 	</target>
 	
 	<target name="zipAll" unless="is_gtk2-linux-x86">
-		<zip destfile="${dist}/srxeditor-ratel_${platform}.zip" basedir="${dist}"/>
+		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
 	</target>
 
 	<target name="gzipAll" if="is_gtk2-linux-x86">
-		<tar destfile="${dist}/srxeditor-ratel_${platform}.tar" basedir="${dist}"/>
-		<gzip destfile="${dist}/srxeditor-ratel_${platform}.tar.gz" src="${dist}/srxeditor-ratel_${platform}.tar"/>
-		<delete file="${dist}/srxeditor-ratel_${platform}.tar"/>
+		<tar destfile="${dist}/${jarname}_${platform}.tar" basedir="${dist}"/>
+		<gzip destfile="${dist}/${jarname}_${platform}.tar.gz" src="${dist}/${jarname}_${platform}.tar"/>
+		<delete file="${dist}/${jarname}_${platform}.tar"/>
 	</target>
 	
 	<target name="all" depends="compile, winExe, linuxExePerm, zipAll, gzipAll"/>

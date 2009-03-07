@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="pipeline" default="pipeline"> 
+
+	<property name="proj_pipeline" value="../../common/net.sf.okapi.pipeline"/> 
+	<property name="src_pipeline" value="${proj_pipeline}/src"/> 
+	<property name="lib_pipeline" value="${proj_pipeline}/lib"/> 
+
+	<path id="mainClassPath_pipeline">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="pipeline"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_pipeline}" destdir="${tmp}" classpathref="mainClassPath_pipeline"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_pipeline}" excludes="**/*.java"/>
+		</copy>
+		<copy todir="${distlib}">
+			<fileset dir="${lib_pipeline}"/>
+		</copy>
+	</target>
+
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="filters.openoffice" default="filters.openoffice"> 
+
+	<property name="proj_filters.openoffice" value="../../filters/net.sf.okapi.filters.openoffice"/> 
+	<property name="src_filters.openoffice" value="${proj_filters.openoffice}/src"/> 
+ 
+	<path id="mainClassPath_filters.openoffice">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/stax-api-1.0.1.jar"/>
+		<pathelement location="${distlib}/wstx-lgpl-3.2.8.jar"/>
+	</path>
+
+	<target name="filters.openoffice"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.openoffice}" destdir="${tmp}" classpathref="mainClassPath_filters.openoffice"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.openoffice}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

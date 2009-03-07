@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="ui.lib.segmentation" default="ui.lib.segmentation"> 
+
+	<property name="proj_ui.lib.segmentation" value="../../libraries/net.sf.okapi.ui.lib.segmentation"/> 
+	<property name="src_ui.lib.segmentation" value="${proj_ui.lib.segmentation}/src"/> 
+ 
+	<path id="mainClassPath_ui.lib.segmentation">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/swt.jar"/>
+	</path>
+	
+	<target name="ui.lib.segmentation"> 
+		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
+		
+ 		<javac srcdir="${src_ui.lib.segmentation}" destdir="${tmp}" classpathref="mainClassPath_ui.lib.segmentation"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_ui.lib.segmentation}" excludes="**/*.java"/>
+		</copy>
+
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/lib/ui/segmentation">
+			<fileset dir="../../help/lib/ui/segmentation" />
+		</copy>
+	</target>
+
+</project>

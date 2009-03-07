@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="filters.regex" default="filters.regex"> 
+
+	<property name="proj_filters.regex" value="../../filters/net.sf.okapi.filters.regex"/> 
+	<property name="src_filters.regex" value="${proj_filters.regex}/src"/> 
+ 
+	<path id="mainClassPath_filters.regex">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/slf4j-api-1.5.0.jar"/>
+	</path>
+	
+	<target name="filters.regex"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.regex}" destdir="${tmp}" classpathref="mainClassPath_filters.regex"/>
+
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.regex}" excludes="**/*.java"/>
+		</copy>
+
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/regex">
+			<fileset dir="../../help/filters/ui/regex" />
+		</copy>
+		
+	</target>
+
+</project>

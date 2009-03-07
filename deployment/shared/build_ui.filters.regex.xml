@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="ui.filters.regex" default="ui.filters.regex"> 
+
+	<property name="proj_ui.filters.regex" value="../../filters/net.sf.okapi.ui.filters.regex"/> 
+	<property name="src_ui.filters.regex" value="${proj_ui.filters.regex}/src"/> 
+ 
+	<path id="mainClassPath_ui.filters.regex">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/swt.jar"/>
+	</path>
+	
+	<target name="ui.filters.regex"> 
+		<ant antfile="../shared/build_filters.regex.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
+
+ 		<javac srcdir="${src_ui.filters.regex}" destdir="${tmp}" classpathref="mainClassPath_ui.filters.regex"/>
+
+		<copy todir="${tmp}">
+			<fileset dir="${src_ui.filters.regex}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

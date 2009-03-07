@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<project name="third-party.logger-slf4j" default="third-party.logger-slf4j"> 
+
+	<target name="third-party.logger-slf4j"> 
+		<copy todir="${distlib}">
+			<fileset dir="../../third-party/shared/logger-slf4j/lib" />
+		</copy>
+	</target>
+
+</project>

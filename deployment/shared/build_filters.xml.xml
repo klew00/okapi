@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<project name="filters.xml" default="filters.xml"> 
+
+	<property name="proj_filters.xml" value="../../filters/net.sf.okapi.filters.xml"/> 
+	<property name="src_filters.xml" value="${proj_filters.xml}/src"/> 
+ 
+	<path id="mainClassPath_filters.xml">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/slf4j-api-1.5.0.jar"/>
+	</path>
+	
+	<target name="filters.xml"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.xml}" destdir="${tmp}" classpathref="mainClassPath_filters.xml"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.xml}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

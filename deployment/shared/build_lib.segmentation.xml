@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="lib.segmentation" default="lib.segmentation"> 
+
+	<property name="proj_lib.segmentation" value="../../libraries/net.sf.okapi.lib.segmentation"/> 
+	<property name="src_lib.segmentation" value="${proj_lib.segmentation}/src"/> 
+ 
+	<path id="mainClassPath_lib.segmentation">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="lib.segmentation"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+		
+ 		<javac srcdir="${src_lib.segmentation}" destdir="${tmp}" classpathref="mainClassPath_lib.segmentation"/>
+		
+		<copy todir="${tmp}">
+			<fileset dir="${src_lib.segmentation}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

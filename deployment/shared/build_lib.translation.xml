@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="lib.translation" default="lib.translation"> 
+
+	<property name="proj_lib.translation" value="../../libraries/net.sf.okapi.lib.translation"/> 
+	<property name="src_lib.translation" value="${proj_lib.translation}/src"/> 
+ 
+	<path id="mainClassPath_lib.translation">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="lib.translation"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+		
+ 		<javac srcdir="${src_lib.translation}" destdir="${tmp}" classpathref="mainClassPath_lib.translation"/>
+		
+		<copy todir="${tmp}">
+			<fileset dir="${src_lib.translation}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

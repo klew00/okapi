@@ -1,19 +1,22 @@
 <?xml version="1.0"?> 
-<project name="Ratel all distributions" default="all" basedir="."> 
+<project name="Okapi libraries all distributions" default="all" basedir="."> 
 
 	<target name="all">
 
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="tmp"/>
+			<fileset dir="dist_win32-x86"/>
+			<fileset dir="dist_gtk2-linux-x86"/>
+			<fileset dir="dist_carbon-macosx"/>
 		</delete>
 
-		<ant antfile="build_ratel.xml">
+		<ant antfile="build_okapi-lib.xml">
 			<property name="platform" value="win32-x86"/>
 		</ant>
-		<ant antfile="build_ratel.xml">
+		<ant antfile="build_okapi-lib.xml">
 			<property name="platform" value="gtk2-linux-x86"/>
 		</ant>
-		<ant antfile="build_ratel.xml">
+		<ant antfile="build_okapi-lib.xml">
 			<property name="platform" value="carbon-macosx"/>
 		</ant>
 	</target>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project name="filters.xliff" default="filters.xliff"> 
+
+	<property name="proj_filters.xliff" value="../../filters/net.sf.okapi.filters.xliff"/> 
+	<property name="src_filters.xliff" value="${proj_filters.xliff}/src"/> 
+ 
+	<path id="mainClassPath_filters.xliff">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/slf4j-api-1.5.0.jar"/>
+		<pathelement location="${distlib}/stax-api-1.0.1.jar"/>
+		<pathelement location="${distlib}/wstx-lgpl-3.2.8.jar"/>
+	</path>
+	
+	<target name="filters.xliff"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.xliff}" destdir="${tmp}" classpathref="mainClassPath_filters.xliff"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.xliff}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>
