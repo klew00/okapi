@@ -19,10 +19,11 @@
 			- <a href="#Languages">Languages</a><br/>
 			- <a href="#Encodings">Encodings</a><br/>
 			- <a href="#LineBreaks">Line-Breaks</a><br/>
-			- <a href="#InlineCodes">Inline Codes</a>
-		</p></td>
+			- <a href="#InlineCodes">Inline Codes</a><br>
+			- <a href="#filterParameters">Filter Parameters</a></p></td>
 		<td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
+				<td><a href="glossary.html">Glossary</a></td>
 				<td><a href="index.html">Guide Content</a></td>
 				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
 			</tr></table></div>
@@ -224,8 +225,6 @@ use the append() method to append a code with an annotation when constructing a
 coded text. Or you can use the annotate() method to apply an annotation to a 
 selection of a coded text.</p>
 <p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
 <p>Original codes - Codes that hold a chunk of data of the original format that 
 is not part of the text and denote some kind or formatting or function. Such 
 codes can work as a pair )(when they mark a start and its corresponding end), or 
@@ -238,6 +237,22 @@ original format. Such codes have no chunk of original data associated. For
 example, in a C++ string <code>&quot;File name: %s&quot;</code>, the text <code>&quot;%s&quot;</code> 
 should never be deleted.</p>
 <p>In a TextFragment object both are represented using inline codes.</p>
+<h2><a name="filterParameters"></a>Filter Parameters</h2>
+<p>TODO</p>
+<p>&nbsp;</p>
+<pre>// Create the filter we will use
+IFilter filter = new PropertiesFilter();
+// Get the default parameters
+IParameters params = filter.getParameters();
+if ( params != null ) {
+   params.save(&quot;defaultParameters.txt&quot;);
+   // Create the editor class
+   IParametersEditor editor = new net.sf.okapi.filters.ui.properties.Editor();
+   if ( editor.edit(params, null, null, null) ) {
+      params.save(&quot;editedParameters.txt&quot;);
+   }
+}</pre>
+<p>&nbsp;</p>
 <p>&nbsp;</p>
 
 </body>

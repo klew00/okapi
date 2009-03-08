@@ -133,10 +133,9 @@ public class Editor implements IParametersEditor {
 		lbTypes = new List(cmpTmp, SWT.BORDER);
 		lbTypes.add("Generic XLIFF");
 		lbTypes.add("OmegaT");
-		lbTypes.add("TagEditor TTX");
 		lbTypes.add("Original + RTF layer");
 		// Access the list through key rather than index
-		lbTypes.setData("xliff\tomegat\tttx\trtf");
+		lbTypes.setData("xliff\tomegat\trtf");
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		lbTypes.setLayoutData(gdTmp);

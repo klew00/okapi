@@ -37,12 +37,18 @@
 		<mkdir dir="${tmp}"/>
 		<mkdir dir="${distlib}"/>
  	</target>
-
-	<target name="compile" depends="init"> 
+ 	
+ 	<target name="doLibs">
 		<ant antfile="../shared/build_third-party.logger-slf4j.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_third-party.stax-wstx.xml" inheritAll="true"/>
 		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
-		
+ 	</target>
+ 	
+ 	<target name="winProjects" if="is_win32-x86">
+		<ant antfile="../shared/build_tm.trados.xml" inheritAll="true"/>
+ 	</target>
+ 	
+	<target name="compile" depends="init, doLibs, winProjects"> 
 		<ant antfile="../shared/build_common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
@@ -67,7 +73,6 @@
 		<ant antfile="../shared/build_ui.filters.openoffice.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.regex.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.lib.segmentation.xml" inheritAll="true"/>
-
 
  		<javac srcdir="${src_rainbow}" destdir="${tmp}" classpathref="mainClassPath_rainbow"/>
 		<copy todir="${tmp}">

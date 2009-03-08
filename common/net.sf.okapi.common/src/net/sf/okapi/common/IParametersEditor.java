@@ -36,9 +36,13 @@ public interface IParametersEditor {
 	 * parent window from where the editor is called. The type and value of
 	 * uiContext depend on each implementation. See the documentation of the 
 	 * implementation for details. Because not all callers may be able to
-	 * provide the proper context, passing a null value is allowed.
+	 * provide the proper context passing a null value is allowed.
 	 * @param helpParam The IHelp object responsible for displaying the help.
-	 * @param projectDir Project directory (without separator). This is used for the ${ProjDir} variable.
+	 * Because not all callers may be able to provide the proper object 
+	 * passing a null value is allowed.
+	 * @param projectDir Project directory (without separator). This is used 
+	 * for the ${ProjDir} variable. Because not all callers may be able to
+	 * provide the proper project directory passing a null value is allowed.
 	 * @return True if the edit was successful, false if the user canceled or if 
 	 * an error occurred. 
 	 */

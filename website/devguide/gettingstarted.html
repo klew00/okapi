@@ -19,10 +19,10 @@
 			- <a href="#Overview">Overview</a><br/>
 			- <a href="#ReadingDocument">Reading a Document</a><br/>
 			- <a href="#ModifyingDocument">Modifying a Document</a><br/>
-			- <a href="#TextUnits">Working with Text Units</a>
-		</p></td>
+			- <a href="#TextUnits">Working with Text Units</a></p></td>
 		<td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
+				<td><a href="glossary.html">Glossary</a></td>
 				<td><a href="index.html">Guide Content</a></td>
 				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
 			</tr></table></div>
@@ -167,6 +167,15 @@ method <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">
 IFilter.getParameters()</a></code> allows you to retrieve the current 
 parameters.</p>
+<p class="question"><b>Question</b>: Is there an easy way to edit the 
+filter-specific parameters?</p>
+<p class="answer">It depends. The parameters are accessible through the <code>
+<a href="../javadoc/net/sf/okapi/common/IParameters.html">IParameters</a></code> 
+interface and, at the least, this interface allows to save the parameters to a 
+file, that file can be a simple property-like text file. Some filters also 
+provide UI for modifying their parameters. See the
+<a href="filters.html#filterParameters">Filter Parameters</a> section of the 
+guide for more details.</p>
 <h3><a name="openInputDoc"></a>Opening the Input Document</h3>
 <p>Once all the options are set, the next step is to open the input document. 
 There are different methods to do this:</p>

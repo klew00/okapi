@@ -21,7 +21,8 @@ The input files can be read through the filters, or as plain text.</p>
 <h3>Options Tab</h3>
 <p>The items list contains three columns:
 <ul>
-	<li>The <cite>Use</cite> column where a check box indicates if the item should be used (checked) or not (un-checked).</li>
+	<li>The <cite>Use</cite> column where a check box indicates if the given 
+	pattern should be used (checked) or not (un-checked).</li>
 	<li>The <cite>Search for</cite> column where the text or regular expression to search for is displayed.</li>
 	<li>The <cite>Replace by</cite> column where the replacement text or regular expression is displayed.</li>
 </ul>
@@ -34,7 +35,9 @@ The input files can be read through the filters, or as plain text.</p>
 <p><cite>Remove</cite> -- Click this button to remove the item currently selected from the list.</p>
 <p><cite>Move Up</cite> -- Click this button to move the item currently selected upward.</p>
 <p><cite>Move Down</cite> -- Click this button to move the item currently selected downward.</p>
-<p><cite>Process the files as plain text</cite> -- Set this option to process the input files as plain text, that is without reading them through a filter. When this option is set: all parts of the file are searched, also the file is seen exactly like it would be in a text editor (no conversion of escaped characters is done for example). when this option is not set: only the text seen as translatable by the filter associated with the input file will be modified.</p>
+<p><cite>Process the files as plain text</cite> -- Set this option to process the input files as plain text, that is without reading them through a filter 
+(even if it has filter settings). When this option is set: all parts of the file are searched, also the file is seen exactly like it would be in a text editor (no conversion of escaped characters is done for example). 
+When this option is not set: only the text seen as translatable by the filter associated with the input file will be modified.</p>
 <p><cite>Use regular expressions</cite> -- Set this option to enable the <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">Regular Expressions</a> mode.</p>
 <h4>Regular expression options</h4>
 <p>When this option is checked several regular expression options are accessible. They apply to all expressions, not just the selected one:</p>

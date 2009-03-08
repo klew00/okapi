@@ -95,9 +95,9 @@ public class Writer extends BaseWriter {
 	}
 
 	public void close () {
+		// Do not nullify the skelWriter as it is not created in this class
 		if ( skelWriter != null ) {
 			skelWriter.close();
-			skelWriter = null;
 		}
 		if ( writer != null ) {
 			writer.close();
