@@ -44,6 +44,8 @@ import java.io.*;
 import java.nio.charset.*;
 
 /**
+ * Helper class to detect byte-order-mark and some type of encodings, as well as
+ * the type of line-break used in a given input.
  * Based on information in:
  * http://www.w3.org/TR/REC-xml/#sec-guessing-no-ext-info
  * http://www.w3.org/TR/html401/charset.html#h-5.2

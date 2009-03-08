@@ -22,7 +22,7 @@ package net.sf.okapi.common;
 
 /**
  * Common way of calling the help topics, regardless of the underlying system
- * (e.g. eclipse application or simple Java application).
+ * (for example: eclipse application or simple Java application).
  */
 public interface IHelp {
 

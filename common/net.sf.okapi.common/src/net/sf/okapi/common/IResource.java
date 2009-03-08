@@ -23,7 +23,8 @@ package net.sf.okapi.common;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * This interface provides access to the features common to all the types of resources for the filter events.  
+ * This interface provides access to the features common to all the types of resources
+ * associated with events.  
  */
 public interface IResource {
 	
