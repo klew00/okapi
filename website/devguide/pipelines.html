@@ -16,7 +16,83 @@
 	</tr>
 </table>
 
-<p>TODO</p>
+<ul>
+	<li><a href="#overview">Overview</a></li>
+	<li><a href="#simplePipeline">Simple Pipeline</a></li>
+	<li><a href="#creatingStep">Creating Steps</a></li>
+</ul>
+<h2><a name="overview"></a>Overview</h2>
+<p>Pipelines are a powerful mechanism to apply a sequences of actions to an 
+input document. They allow you to construct processes customized to specific 
+projects very easily.</p>
+<p>Extract the text &gt;&gt; Apply some change to the text &gt;&gt; Merge back the text into 
+its original format.</p>
+<p>With the framework this type of sequence is implemented as follow:</p>
+<p><code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html">IFilter</a></code> 
+&gt;&gt; <code><a href="../javadoc/net/sf/okapi/common/pipeline/IPipelineStep.html">
+IPipelineStep</a></code> &gt;&gt; <code>
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">
+IFilterWriter</a></code></p>
+<p>The pipelines allow you to extend this model to include as many steps as you 
+need.</p>
+<h2><a name="simplePipeline"></a>Simple Pipeline</h2>
+<p>A pipeline is represented by a <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/IPipeline.html">IPipeline</a></code> 
+interface, and the framework offers a simple implementation for it: The <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/Pipeline.html">Pipeline</a></code> 
+class.</p>
+<pre>// Create the pipeline
+IPipeline pipeline = new Pipeline();</pre>
+<p>The framework provides you with pre-defined classes for using any <code>
+<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html">IFilter</a></code> 
+and any <code>
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">
+IFilterWriter</a></code>: The <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/FilterPipelineStepAdaptor.html">
+FilterPipelineStepAdaptor</a></code> and the <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/FilterWriterPipelineStepAdaptor.html">
+FilterWriterPipelineStepAdaptor</a></code> classes.</p>
+<p>Creating the initial step for the filter is easy:</p>
+<pre>// Create the filter we will use
+IFilter filter = new HtmlFilter();
+// Create the filter step
+IPipelineStep filterStep = new FilterPipelineStepAdaptor(filter);
+// Add this step to the pipeline
+pipeline.addStep(filterStep);</pre>
+<p>Creating the last step for the filter writer is also quite easy:</p>
+<pre>// Create the writer we will use
+IFilterWriter writer = filter.createFilterWriter();
+// Create the writer step (using the writer provider by our filter)
+IPipelineStep writerStep = new FilterWriterPipelineStepAdaptor(writer);
+// Add this step to the pipeline
+pipeline.addStep(writerStep);</pre>
+<p>Now we have a two-steps pipeline that can read and re-write a given HTML 
+document. To use it, you have to set the input and output options just like when 
+you are not using any pipeline:</p>
+<pre>// Sets the filter options
+filter.setOptions(&quot;en&quot;, &quot;UTF-16&quot;, true);
+
+// Sets the writer options and output
+writer.setOptions(&quot;fr&quot;, &quot;UTF-8&quot;);
+writer.setOutput(&quot;myPipelineOutput.html&quot;);
+
+String input = &quot;&lt;html&gt;&lt;head&gt;\n&quot;
++ &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
++ &quot;&lt;body&gt;\n&quot;
++ &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
++ &quot;&lt;/body&gt;&lt;/html&gt;&quot;;</pre>
+<p>Once all is set you can one of the <code>process()</code> methods provided by 
+the pipeline. That method initiates the first call to the filter and triggers 
+the flow of events to go through all the steps. Once the pipeline is not needed 
+anymore, you should call <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/IPipeline.html#destroy()">
+IPipeline.destroy()</a></code> to clean up any resource used by the steps:</p>
+<pre>// Launch the execution
+pipeline.process(input);
+
+// Clean up all the pipeline resources
+pipeline.destroy();</pre>
+<h2><a name="creatingStep"></a>Creating Steps</h2>
 <p>&nbsp;</p>
 
 </body>

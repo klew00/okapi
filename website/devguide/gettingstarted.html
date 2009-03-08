@@ -70,42 +70,54 @@ kinds of event that can go through a pipeline.</p>
 	</tr>
 	<tr>
 		<td><code>FILE_RESOURCE</code></td>
-		<td><code>FileResource</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/FileResource.html">FileResource</a></code></td>
 		<td>no</td>
 	</tr>
 	<tr>
 		<td><code>START_DOCUMENT</code></td>
-		<td><code>StartDocument</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>START_SUBDOCUMENT</code></td>
-		<td><code>StartSubDocument</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/StartSubDocument.html">StartSubDocument</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>START_GROUP</code></td>
-		<td><code>StartGroup</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/StartGroup.html">StartGroup</a></code></td>
+		<td>yes</td>
+	</tr>
+	<tr>
+		<td><code>DOCUMENT_PART</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/DocumentPart.html">
+		DocumentPart</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>TEXT_UNIT</code></td>
-		<td><code>TextUnit</code></td>
+		<td><code>
+		<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html">TextUnit</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>END_GROUP</code></td>
-		<td><code>Ending</code></td>
+		<td><code><a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>END_SUBDOCUMENT</code></td>
-		<td><code>Ending</code></td>
+		<td><code><a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code></td>
 		<td>yes</td>
 	</tr>
 	<tr>
 		<td><code>END_DOCUMENT</code></td>
-		<td><code>Ending</code></td>
+		<td><code><a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code></td>
 		<td>yes</td>
 	</tr>
 	</table>
@@ -204,7 +216,7 @@ while ( filter.hasNext() ) {
 <p>Once you have an event, you query its type using <code>
 <a href="../javadoc/net/sf/okapi/common/Event.html#getEventType()">Event.getEventType()</a></code>. The value retuned is one of the constants 
 defined in <code>
-<a href="../javadoc/net/sf/okapi/EventType.html">EventType</a></code>. Then, depending on the type, you can get 
+<a href="../javadoc/net/sf/okapi/common/EventType.html">EventType</a></code>. Then, depending on the type, you can get 
 the resource associated with this event (<code><a href="../javadoc/net/sf/okapi/common/Event.html#getResource()">Event.getResource()</a></code>) and access the data in the resource.</p>
 <p>After the last event for the input document (<code>END_DOCUMENT</code>) has been read, <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#hasNext()">IFilter.hasNext()</a></code> 
@@ -250,7 +262,7 @@ events. A resource may or may not have an associated skeleton object.</p>
 <p>To re-construct the original file format you need both the 
 extracted resources and the skeleton parts passed through the events. The framework 
 provides the <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html">IFilterWriter</a></code> 
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 interface to do all this transparently.</p>
 <h3><a name="creatingFilterAndWriter"></a>Creating the Filter and the Writer</h3>
 <p>First you must prepare the filter, just like before, except that we will use 
@@ -260,18 +272,17 @@ IFilter filter = new HtmlFilter();
 // Set the filter general options
 filter.setOptions(&quot;en&quot;, &quot;UTF-16&quot;, true);</pre>
 <p>Then, you need to create an <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html">IFilterWriter</a></code> 
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 object. You do this by calling a method of the filter itself (<code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#createFilterWriter()">IFilter.createFilterWriter()</a></code>) 
 that provides you with the proper implementation of <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html">IFilterWriter</a></code> 
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 for the given format it supports.</p>
 <pre>// Create the writer
 IFilterWriter writer = filter.createFilterWriter();</pre>
 <h3><a name="configuringWriter"></a>Configuring the Writer</h3>
 <p>Once the writer object created you need to set its options. This is done with 
 the <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">
-IFilterWriter.setOptions()</a></code> method.</p>
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOptions()</a></code> method.</p>
 <p>We need to set the output language, here French (but it could be also the 
 same language as the input if needed). And we need to indicate in what encoding the 
 output should be written, in our example we will choose Latin-1.</p>
@@ -308,8 +319,7 @@ filter.open(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
 <h3><a name="processDocWithoutDhanges"></a>Processing the Document Without Making Changes</h3>
 <p>Now that all is set, we can process the document.</p>
 <p>Re-writing the input document is achieved simply: You call the <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html#handleEvent(net.sf.okapi.common.Event)">
-IFilterWriter.handleEvent()</a></code> method each time you get an event from 
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#handleEvent(net.sf.okapi.common.Event)">IFilterWriter.handleEvent()</a></code> method each time you get an event from 
 the filter, and then close both input and output when all events have been 
 processed. (Remember that you should always close the input document before the 
 output document, in case you are writing on the same file).</p>
