@@ -20,6 +20,21 @@ h2.head2 { vertical-align: top; margin: 2 0 0 0; color: white; background-color:
 
 h2 { background: #DDEEFF; font-weight: bold; padding: 0.3em; margin-top: 20; font-size: 1.1em; }
 
+td.smalltoc { padding: 10px; }
+td.smalltoc p { margin-left: 5; border-left: solid 4px #008080; padding-left: 5; }
+
+td.hmenu { text-align: right; vertical-align: top; marging: 0px; padding: 2px 0px 0px 0px; }
+div.hmenu table { margin: 0px; padding: 0px; border: 0px; }
+div.hmenu table tr { margin: 0px; padding: 0px; border: 0px; }
+div.hmenu table tr td { margin: 0px; padding: 0px; border: 0px; text-align: center; }
+div.hmenu a { width: 140px; display: block; font-size: 0.75em; border-bottom: 1px solid; border-right: 1px solid; padding: 4; }
+div.hmenu a:link { background: #CFCFCF; text-decoration: none; color: black; }
+div.hmenu a:visited { background: #CFCFCF; text-decoration: none; color: black; }
+div.hmenu a:hover { background: navy; color: white; font-weight: bold; }
+div.hmenu a:link.current { background: #FFCC00; text-decoration: none; color: black;  font-weight: bold; }
+div.hmenu a:visited.current { background: #FFCC00; text-decoration: none; color: black;  font-weight: bold; }
+div.hmenu a:hover.current { background: #FFCC00; color: black; font-weight: bold;  font-weight: bold; }
+
 td.toc { margin: 0 0 0 0; font-size: 0.73em; text-align: left; vertical-align: top; background-color: #336699; padding: 7; }
 
 td.toc p { margin: 0 0 0 0; color: black; padding: 0.2em; background-color: #CFCFCF;
