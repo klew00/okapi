@@ -117,7 +117,13 @@ public class HtmlSnippetsTest {
 		String snippet = "<pre><code>&lt;b></code></pre>";
 		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet));
 	}
-	
+
+	@Test
+	public void testEascapes() {
+		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
+		assertEquals("<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>", generateOutput(getEvents(snippet), snippet));
+	}
+
 	@Test
 	public void testEscapeEntities() {
 		String snippet = "&nbsp;M&#x0033;";
