@@ -106,7 +106,7 @@ public class XMLEncoder implements IEncoder {
 	public String encode (char value, int context) {
 		switch ( value ) {
 		case '<':
-			return "&lt";
+			return "&lt;";
 		case '\"':
 			return "&quot;";
 		case '\'':
