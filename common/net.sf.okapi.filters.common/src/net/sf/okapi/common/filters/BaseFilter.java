@@ -278,11 +278,12 @@ public abstract class BaseFilter implements IFilter {
 		} else if (!tempFilterEventStack.isEmpty()) {
 			// go through filtered object stack and close them one by one
 			while (!tempFilterEventStack.isEmpty()) {
-				Event fe = tempFilterEventStack.pop();
+				Event fe = tempFilterEventStack.peek();
 				if (fe.getEventType() == EventType.START_GROUP) {
-					//TODO: Do we need this?? endGroup(new GenericSkeleton("")); //$NON-NLS-1$
+					StartGroup sg = (StartGroup)fe.getResource();
+					endGroup((GenericSkeleton)sg.getSkeleton());
 				} else if (fe.getEventType() == EventType.TEXT_UNIT) {
-					filterEvents.add(fe);
+					endTextUnit();					
 				}
 			}
 		}

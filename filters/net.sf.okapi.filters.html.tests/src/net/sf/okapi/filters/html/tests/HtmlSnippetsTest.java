@@ -19,7 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-//TODO: Test for properties
 public class HtmlSnippetsTest {
 	private HtmlFilter htmlFilter;
 	private URL parameters;
@@ -109,10 +108,16 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testCollapseWhitespaceWithoutPre() {
-		String snippet = " <b>   \t\n\r\f    </b> ";
-		assertEquals("<b> </b>", generateOutput(getEvents(snippet), snippet));
+		String snippet = " <b>   text1\t\n\r\ftext2    </b> ";
+		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet));
 	}
 
+	@Test
+	public void testEascapedCodesInisdePre() {
+		String snippet = "<pre><code>&lt;b></code></pre>";
+		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet));
+	}
+	
 	@Test
 	public void testEscapeEntities() {
 		String snippet = "&nbsp;M&#x0033;";

@@ -226,6 +226,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		while (nodeIterator.hasNext() && !isCanceled()) {
 			Segment segment = nodeIterator.next();
 
+			preProcess(segment);
+			
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
@@ -233,7 +235,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				handlePreserveWhiteSpace(tag.getName());
 
 				// set generic tag type
-				setTagType(getConfig().getElementType(tag.getName()));
+				setTagType(getConfig().getElementType(tag.getName()));								
 
 				// We just hit a tag that could close the current TextUnit, but
 				// only if it was not opened with a TextUnit tag (i.e., complex
@@ -275,7 +277,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 					}
 				}
 
-				// unset current tag type
+				// unset current generic tag type (bold, underlined etc.)
 				setTagType(null);
 
 			} else {
@@ -294,6 +296,13 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		// return one of the waiting events
 		return super.next();
 	}
+
+
+	/**
+	 * Do any handling needed before the current Segment is processed.
+	 * @param segment
+	 */
+	protected void preProcess(Segment segment) {};
 
 	protected abstract void handleServerCommonEscaped(Tag tag);
 
