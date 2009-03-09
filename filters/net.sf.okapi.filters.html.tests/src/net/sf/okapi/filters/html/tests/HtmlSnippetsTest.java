@@ -113,19 +113,25 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
-	public void testEascapedCodesInisdePre() {
+	public void testEscapedCodesInisdePre() {
 		String snippet = "<pre><code>&lt;b></code></pre>";
 		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
-	public void testEascapes() {
+	public void testCdataSection() {
+		String snippet = "<![CDATA[&lt;b>]]>";
+		assertEquals("<![CDATA[&lt;b>]]>", generateOutput(getEvents(snippet), snippet));
+	}
+
+	@Test
+	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
 		assertEquals("<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>", generateOutput(getEvents(snippet), snippet));
 	}
 
 	@Test
-	public void testEscapeEntities() {
+	public void testEscapedEntities() {
 		String snippet = "&nbsp;M&#x0033;";
 		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet));
 	}
