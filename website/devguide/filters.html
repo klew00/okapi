@@ -125,10 +125,51 @@ START_GROUP</code> event. It is associated with a <code>
 <a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code> 
 resource.</p>
 <h3>DOCUMENT_PART</h3>
-<p>TODO</p>
+<p>The <code>DOCUMENT_PART</code> event may be sent by a filter to carry parts 
+of the original document that do not contain directly translatable text. It is 
+associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/DocumentPart.html">DocumentPart</a></code> 
+resource. Note that a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/DocumentPart.html">DocumentPart</a></code> 
+may have read-only or modifiable properties, and may have references to previous 
+events that have translatable text or other read-only or modifiable properties. 
+All translatable text is always passed through using the <code>TEXT_UNIT</code> 
+event.</p>
 <h3>TEXT_UNIT</h3>
-<p>TODO</p>
-<p>A text unit can have </p>
+<p>The <code>TEXT_UNIT</code> event may be sent by a filter to carry parts of 
+the original document that has extractable text. Note that a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html">TextUnit</a></code> 
+may have read-only or modifiable properties, and may have references to previous 
+events that have translatable text or other read-only or modifiable properties.</p>
+<p>A <a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html"><code>
+TextUnit</code></a> resource provides various information related to the 
+extracted text:</p>
+<ul>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">
+	getName()</a></code> gives the original identified the resource, for example 
+	the key of entry in a Java properties file.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">
+	getId()</a></code> gives the unique extraction-ID for this text unit. This 
+	value is filter specific and does not represent any information related to 
+	the input document. Some filters may return the same values for <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">
+	getId()</a></code> and <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">
+	getName()</a></code>, but both object represent different things.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#isTranslatable()">
+	isTranslatable()</a></code> indicates if this text unit is translatable.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getMimeType()">
+	getMimeType()</a></code> gives the type of content the text unit contains.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#preserveWhitespaces()">
+	preserveWhitespaces()</a></code> indicates if the white spaces inside the 
+	content of the text unit must be preserved (for example, as the content of a 
+	HTML <code>&lt;pre&gt;</code> element).</li>
+</ul>
 
 <h2><a name="Languages"></a>Languages</h2>
 <p>The documents a filter processes can be monolingual or multilingual. The 
