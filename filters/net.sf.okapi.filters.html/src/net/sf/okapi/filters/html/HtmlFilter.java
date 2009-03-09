@@ -39,7 +39,6 @@ import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
@@ -71,9 +70,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 	@Override
 	protected void handleCdataSection(Tag tag) {
-		addToDocumentPart(tag.toString());
-		// TODO: special handling for CDATA sections (may call sub-filters or
-		// unescape content etc.)
+		addToDocumentPart(tag.toString());		
 	}
 
 	@Override
@@ -119,14 +116,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
-		String decodedText = text.toString();
-		
-		// convert all character and numeric entities to Unicode
-		// but only if we are not in a pre element
-		if (!getRuleState().isPreserveWhitespaceState()) {
-			decodedText = CharacterEntityReference.decode(text.toString(), false);
-			decodedText = NumericCharacterReference.decode(decodedText, false);
-		}
+		String decodedText = text.toString();				
+		decodedText = CharacterEntityReference.decode(text.toString(), false);
+		decodedText = NumericCharacterReference.decode(decodedText, false);
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false

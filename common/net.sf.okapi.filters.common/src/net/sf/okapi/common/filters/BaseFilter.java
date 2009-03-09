@@ -732,6 +732,7 @@ public abstract class BaseFilter implements IFilter {
 		}
 
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
+		tu.setMimeType(getMimeType());
 		tu.setPreserveWhitespaces(isPreserveWhitespace());
 
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
