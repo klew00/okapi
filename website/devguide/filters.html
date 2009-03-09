@@ -16,6 +16,7 @@
 	</tr>
 	<tr>
 		<td class="smalltoc"><p>
+			- <a href="#filterEvents">Filter Events</a><br>
 			- <a href="#Languages">Languages</a><br/>
 			- <a href="#Encodings">Encodings</a><br/>
 			- <a href="#LineBreaks">Line-Breaks</a><br/>
@@ -32,6 +33,102 @@
 </table>
 
 <p>UNDER CONSTRUCTION - DO NOT REVIEW YET</p>
+<h2><a name="filterEvents"></a>Filter Events</h2>
+<p>A filter sends at least two events: <code>START_DOCUMENT</code> and <code>
+END_DOCUMENT</code>. All other filter events may or may not be send depending on 
+the filter and the input document. The possible sequence of filter events can be 
+expressed as follow:</p>
+<pre>         FilterEvents ::= START_DOCUMENT, DocumentContentEvents, END_DOCUMENT
+DocumentContentEvents ::= (SubDocumentEvents | SimpleEvents)*
+    SubDocumentEvents ::= START_SUBDOCUMENT, SimpleEvents, END_SUBDOCUMENT
+         SimpleEvents ::= (GroupEvents | TEXT_UNIT | DOCUMENT_PART)*
+          GroupEvents ::= START_GROUP, SimpleEvents, END_GROUP</pre>
+<h3>START_DOCUMENT</h3>
+<p>The <code>START_DOCUMENT</code> is sent as the first event for the document. 
+It is associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">
+StartDocument</a></code> resource that contains general information about the 
+document. Each <code>
+<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">
+StartDocument</a></code> resource is expected to have at least the following 
+information:</p>
+<ul>
+	<li>
+	<p dir="ltr"><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/BaseNameable.html#getName()">
+	getName()</a></code> gives name of the full path or URI of the document when 
+	possible.</p></li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getEncoding()">
+	getEncoding()</a></code> gives the encoding that is being used to read the 
+	document. It may be different from the default encoding provided in the
+	<code>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">
+	IFilter.setOptions()</a></code> method, for example when the filter can 
+	detect automatically the real encoding of the document.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#hasUTF8BOM()">
+	hasUTF8BOM()</a></code> indicates if the input document is encoded in UTF-8 
+	and has a Byte-Order-Mark.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">
+	getLanguage()</a></code> gives the code of the source language of the 
+	document (the same as the one specified with <code>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">
+	IFilter.setOptions()</a></code>).</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">
+	isMultilingual()</a></code> indicates if the document is multilingual (See 
+	more on Monolingual and Multilingual).</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLineBreak(java.lang.String)">
+	getLineBreak()</a></code> gives the type of line-break used in the document.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getFilterParameters()">
+	getFilterParameters()</a></code> gives the parameters used for processing 
+	this document, it may return <code>null</code> if the filter does not use 
+	parameters.</li>
+</ul>
+<p>Each <code>START_DOCUMENT</code> must have a corresponding <code>END_DOCUMENT</code> 
+event sent as the last event for this document.</p>
+<h3>END_DOCUMENT</h3>
+<p>The <code>END_DOCUMENT</code> event is sent to close a previous <code>
+START_DOCUMENT</code> event. It is associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code> 
+resource.</p>
+<h3>START_SUBDOCUMENT</h3>
+<p>The <code>START_SUBDOCUMENT</code> may be sent by a filter when the input 
+document is composed of several separate logical parts. For example, an IDML 
+document (InDesign file) is really a ZIP file that may contain dozens of 
+different XML documents (stories) that may have translatable text: each one is a 
+sub-document. Another example is an XLIFF document: It may be composed of 
+several <code>&lt;file&gt;</code> elements, each corresponding to a separate 
+sub-document.</p>
+<h3>END_SUBDOCUMENT</h3>
+<p>The <code>END_SUBDOCUMENT</code> event is sent to close a previous <code>
+START_SUBDOCUMENT</code> event. It is associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code> 
+resource.</p>
+<h3>START_GROUP</h3>
+<p dir="ltr">The <code>START_GROUP</code> event may be sent by a filter to 
+indicate the start of some logical grouping of events, for example to indicate 
+the start of a <code>&lt;table&gt;</code>, a <code>&lt;script&gt;</code>, or a <code>&lt;style&gt;</code> 
+element in an HTML document, or a dialog box in a Windows RC file.</p>
+<p>A group may contain other groups. Each <code>START_GROUP</code> must have a 
+corresponding <code>END_GROUP</code> event, and groups must not overlap. It is 
+associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/StartGroup.html">StartGroup</a></code> 
+resource.</p>
+<h3>END_GROUP</h3>
+<p>The <code>END_GROUP</code> event is sent to close a previous <code>
+START_GROUP</code> event. It is associated with a <code>
+<a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code> 
+resource.</p>
+<h3>DOCUMENT_PART</h3>
+<p>TODO</p>
+<h3>TEXT_UNIT</h3>
+<p>TODO</p>
+<p>A text unit can have </p>
 
 <h2><a name="Languages"></a>Languages</h2>
 <p>The documents a filter processes can be monolingual or multilingual. The 
