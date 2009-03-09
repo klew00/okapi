@@ -558,6 +558,14 @@ public class TextFragment implements Comparable<Object> {
 		lastCodeID = 0;
 		isBalanced = true;
 	}
+	
+	/**
+	 * Trim whitespace from beginning and end of the TextFragment.
+	 * @see String
+	 */
+	public void trim() {
+		text = new StringBuilder(text.toString().trim());
+	}
 
 	/**
 	 * Gets the coded text representation of the fragment.
