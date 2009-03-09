@@ -33,17 +33,23 @@ import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends BaseMarkupFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(HtmlFilter.class);
+	
+	private StringBuilder bufferedWhitespace;
 
 	/* HTML whitespace
 	 * space (U+0020) 
@@ -58,6 +64,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 	public HtmlFilter() {
 		super();
+		bufferedWhitespace = new StringBuilder();
 		setMimeType("text/html");
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
@@ -69,6 +76,29 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// unescape content etc.)
 	}
 
+	@Override
+	protected void preProcess(Segment segment) {
+		boolean isInsideTextRun = false;
+		if (segment instanceof Tag) {
+			isInsideTextRun = getConfig().getMainRuleType(((Tag)segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+		}
+		
+		// add buffered whitespace to the current translatable text
+		if (bufferedWhitespace.length() > 0 && isInsideTextRun) {
+			if (canStartNewTextUnit()) {
+				startTextUnit(bufferedWhitespace.toString());
+			} else {
+				addToTextUnit(bufferedWhitespace.toString());
+			}
+		} else if (bufferedWhitespace.length() > 0) {
+			// otherwise add it as non-translatable
+			addToDocumentPart(bufferedWhitespace.toString());			
+		}
+		// reset buffer for next pass
+		bufferedWhitespace.setLength(0);
+		bufferedWhitespace.trimToSize();		
+	}
+	
 	@Override
 	protected void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
@@ -82,13 +112,21 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
-			addToDocumentPart(text.toString());
+			if (bufferedWhitespace.length() <= 0) {
+				// buffer the whitespace until we know that we are not inside translatable text.
+				bufferedWhitespace.append(text.toString());				
+			} 
 			return;
 		}
 
+		String decodedText = text.toString();
+		
 		// convert all character and numeric entities to Unicode
-		String decodedText = CharacterEntityReference.decode(text.toString(), false);
-		decodedText = NumericCharacterReference.decode(decodedText, false);
+		// but only if we are not in a pre element
+		if (!getRuleState().isPreserveWhitespaceState()) {
+			decodedText = CharacterEntityReference.decode(text.toString(), false);
+			decodedText = NumericCharacterReference.decode(decodedText, false);
+		}
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
@@ -103,6 +141,17 @@ public class HtmlFilter extends BaseMarkupFilter {
 		} else {
 			addToTextUnit(decodedText);
 		}
+	}
+	
+	@Override
+	protected void endTextUnit() {		
+		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {			
+			Event e = peekMostRecentTextUnit();
+			TextUnit tu = (TextUnit)e.getResource();
+			tu.getSourceContent().trim();	
+		}			
+		
+		super.endTextUnit();		
 	}
 
 	private String collapseWhitespace(String text) {
