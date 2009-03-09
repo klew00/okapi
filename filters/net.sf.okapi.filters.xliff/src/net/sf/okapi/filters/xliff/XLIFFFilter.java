@@ -163,6 +163,11 @@ public class XLIFFFilter implements IFilter {
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+			
+			//fact.setXMLResolver(new DefaultXMLResolver());
+			//TODO: resole the re-construction of the DTD, for now just skip it
+			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+			
 			reader = fact.createXMLStreamReader(input);
 
 			//TODO: Need to auto-detect the encoding and update 'encoding' variable
@@ -298,7 +303,8 @@ public class XLIFFFilter implements IFilter {
 				break;
 				
 			case XMLStreamConstants.DTD:
-				//TODO: processDTD();
+				//TODO: Reconstruct the DTD declaration
+				// but how? nothing is available to do that
 				break;
 				
 			case XMLStreamConstants.ENTITY_REFERENCE:

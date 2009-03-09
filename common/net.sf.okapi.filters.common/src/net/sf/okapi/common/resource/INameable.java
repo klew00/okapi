@@ -30,7 +30,10 @@ import net.sf.okapi.common.IResource;
 public interface INameable extends IResource {
 
 	/**
-	 * Gets the name of this resource. The resource name is the equivalent of the XLIFF resname attribute.
+	 * Gets the name of this resource. The resource name corresponds to different things depending
+	 * on the type of resource. For a StartDocument the name is the URI of the document. Otherwise,
+	 * in most cases the name is the identifier of the resource (This is the equivalent of the XLIFF 
+	 * resname attribute).
 	 * @return This resource name, or null if there is none.
 	 */
 	public String getName () ;
