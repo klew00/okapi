@@ -165,7 +165,7 @@ public class XLIFFFilter implements IFilter {
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
-			//TODO: resole the re-construction of the DTD, for now just skip it
+			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 			
 			reader = fact.createXMLStreamReader(input);

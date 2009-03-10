@@ -63,8 +63,8 @@
 			excludes="MANIFEST.MF"
   		/>
 
-		<copy todir="${dist}/samples">
-			<fileset dir="data/samples" />
+		<copy todir="${dist}/examples/java">
+			<fileset dir="../../examples/java" />
 		</copy>
 
 		<delete includeEmptyDirs="true" failonerror="false">

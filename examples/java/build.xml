@@ -2,7 +2,7 @@
 <project name="samples" default="all" basedir="."> 
 
 	<path id="mainClassPath">
-		<pathelement location="../../lib/okapilib.jar"/>
+		<pathelement location="../../lib/okapi-lib.jar"/>
 	</path>
 
 	<target name="all">
