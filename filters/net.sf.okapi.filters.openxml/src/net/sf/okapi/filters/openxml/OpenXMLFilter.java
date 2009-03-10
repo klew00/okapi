@@ -1,173 +1,70 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 Jim Hargrave, Dan Higinbotham                          */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA              */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.openxml4j.exceptions.InvalidFormatException;
-import org.openxml4j.exceptions.InvalidOperationException;
-import org.openxml4j.exceptions.OpenXML4JException;
-import org.openxml4j.opc.Package;
-import org.openxml4j.opc.*;
+//import org.apache.log4j.BasicConfigurator;
+//import org.apache.log4j.Level;
+//import org.apache.log4j.Logger;
 
-import java.lang.*;
 import java.io.*;
-//import java.net.URL;
-//import java.util.HashMap;
+import java.net.URL;
+import java.util.Hashtable;
 import java.util.Iterator;
-//import java.util.LinkedList;
 import java.util.List;
-//import java.util.Map;
 import java.util.TreeMap; // DWH 10-10-08
 
-import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.EndTag;
-//import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
-import net.htmlparser.jericho.Source;
+//import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
-//import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
-//import net.sf.okapi.common.IParameters;
-//import net.sf.okapi.common.encoder.HtmlEncoder;
-//import net.sf.okapi.common.filters.BaseFilter;
-//import net.sf.okapi.common.filters.FilterEvent;
+import net.sf.okapi.common.encoder.IEncoder;
+//import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-//import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
-import net.sf.okapi.filters.markupfilter.ExtractionRuleState;
 import net.sf.okapi.filters.markupfilter.Parameters;
-import net.sf.okapi.filters.markupfilter.ExtractionRule.EXTRACTION_RULE_TYPE;
-//import net.sf.okapi.common.resource.Code;
-//import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-//import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
-//import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class OpenXMLFilter extends BaseMarkupFilter {
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
 
-//	private Source htmlDocument;
-//	private Iterator<Segment> nodeIterator;
-//	private ExtractionRuleState ruleState;
-//	private Parameters parameters; // 1-6-09
-//	private GroovyFilterConfiguration configuration; 1-6-09
 	private int configurationType;
-//	private int oldConfigurationType=0;
 	private Package p=null;
-	private int filetype; // DWH 10-15-08
+//	private int filetype; // DWH 10-15-08
 	private String sConfigFileName; // DWH 10-15-08
-	private int dbg; // DWH 2-16-09
+	private URL urlConfig; // DWH 3-9-09
+	private int dbg=0; // DWH 2-16-09
+	private Hashtable htXMLFileType=null;
 
-	static Logger logr = Logger.getLogger("net.sf.okapi.filters.openxml");
+//	static Logger logr = Logger.getLogger("net.sf.okapi.filters.openxml");
     // see http://logging.apache.org/log4j/1.2/manual.html
 
 	public OpenXMLFilter() {
 		super(); // 1-6-09
-		setMimeType("text/html");
-	}
-
-	public boolean doOneOpenXMLFile(String sOneFileName, int filetype, int dbg)
-	{
-		TreeMap<String,InputStream> tmSubdocs;
-		Iterator<String> it;
-		InputStream isInputStream;
-		PipedInputStream squishedInputStream;
-		PipedOutputStream pios=null;
-		String sDocName;
-		this.dbg = dbg; // DWH 2-16-09
-		tmSubdocs = pryopen(sOneFileName,filetype);
-		for(it = tmSubdocs.keySet().iterator(); it.hasNext();)
-		{
-			sDocName = (String)it.next();
-			isInputStream = tmSubdocs.get(sDocName);
-			if (isInputStream!=null)
-			{				
-				try
-				{
-					if (sDocName.equals("Document") || sDocName.endsWith("slide+xml"))
-						// main document in Word or slide in Powerpoint
-					{
-						if (pios!=null)
-						{
-							try {
-								pios.close();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						pios = new PipedOutputStream(); // DWH 2-19-09 this may need to be final
-						squishedInputStream = (PipedInputStream)combineRepeatedFormat(isInputStream,pios); // DWH 2-3-09
-					    open(squishedInputStream); // DWH 2-3-09 was isInputStream
-					}
-					else
-						open(isInputStream);						
-				}
-				catch(RuntimeException e) // DWH 2-13-09
-				{
-					String err = "Problem with configuration file "+sConfigFileName+"; "+sOneFileName+" cannot be filtered.";
-					System.out.println(err);
-					logr.log(Level.ERROR,err);
-					pryclosed();
-					return false; // filter failed because of bad configuration file
-				}
-				if (dbg>2)
-				{
-					String glorp = getParameters().toString();
-					System.out.println(glorp); // This lists what YAML actually read out of the configuration file
-				}
-				// put out beginning group with name sDocName
-				if (dbg>2)
-				{
-					System.out.println("\n\n<<<<<<< "+sOneFileName+" : "+sDocName+" >>>>>>>");
-					displayEvents(); // DWH 2-14-09
-				}
-			}
-		}			
-		pryclosed();
-		return(true); // filter succeeded and events are ready
-	}
-
-	public void displayEvents()
-	{
-		Event event;
-		while (hasNext()) {
-			event = next();
-			displayOneEvent(event); // DWh 2-16-09 broke this out
-		}
-		System.out.println("");
-		System.out.println("");
+		setMimeType("text/xml");
 	}
 
 	public void displayOneEvent(Event event)
@@ -197,49 +94,6 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		}
 		
 	}
-	
-	public void pryclosed()
-	{
-		if (p!=null)
-			p.revert();
-	}
-	
-	public TreeMap<String,InputStream> pryopen(String filename, int filetype)
-	{
-		// Open the package
-		TreeMap<String,InputStream> tmSubdocs=null;
-//		Package p;
-		PackageProperties pp;
-		
-		this.filetype = filetype; // DWH 10-15-08 Word, Excel, or Powerpoint
-		setUpConfig(filetype); // DWH 2-16-09
-		BasicConfigurator.configure();
-
-		logr.setLevel(Level.WARN);
-		
-		
-		try
-		{
-			p = Package.open(filename, PackageAccess.READ);
-			pp = p.getPackageProperties();
-			tmSubdocs = openZip(p);
-//			p.revert();
-		}
-		catch(InvalidOperationException e)
-		{
-			System.out.println(e.getMessage()+'\n'+e.getStackTrace());
-		}
-		catch(InvalidFormatException e)
-		{
-			System.out.println(e.getMessage()+'\n'+e.getStackTrace());
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getMessage()+'\n'+e.getStackTrace());
-		}
-		return(tmSubdocs);
-	}
-	
 	public void setUpConfig(int filetype)
 	{
 		if (filetype==MSWORD)
@@ -257,85 +111,9 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			sConfigFileName = "/net/sf/okapi/filters/openxml/powerpointConfiguration.yml"; // DWH 1-5-09 groovy -> yml
 			configurationType = MSPOWERPOINT;
 		}
-		setDefaultConfig(sConfigFileName); // DWH 1-23-09
-		setParameters(new Parameters(sConfigFileName)); // DWH 2-17-09 it doesn't update automatically from setDefaultConfig
-	}
-	
-	private TreeMap<String,InputStream> openZip(Package p)
-	{
-		TreeMap<String,InputStream> tmWordSubdocs = new TreeMap<String,InputStream>();
-		PackageRelationship coreDocumentRelationship;
-		PackagePart coreDocumentPart;
-		InputStream inStream;
-		String sDocName,sDocType,sReverse;
-		int iCute;
-		try
-		{
-			// Get documents core properties part relationship
-			coreDocumentRelationship = p.getRelationshipsByType( PackageRelationshipTypes.CORE_DOCUMENT) .getRelationship(0);
-	
-			// Get core properties part from the relationship.
-			coreDocumentPart = p.getPart(coreDocumentRelationship);
-	
-			inStream = coreDocumentPart.getInputStream();
-/*
-			if (inStream==null)
-			{
-				try
-				{
-					FixXML fx = new FixXML("SampleDocxDocumentNoFix.xml","t-m-p.xml");
-					 // this needs to use inStream as the first parameter
-					fx.DoFix();
-					inStream = coreDocumentPart.getInputStream();
-				}
-//				catch(InvalidFormatException e) {}
-				catch(IOException e)
-				{
-					
-				}
-			}
-*/
-			tmWordSubdocs.put("Document", inStream);
-			for (PackagePart part : p.getParts())
-			{
-			   
-			   if (dbg>2)
-				   System.out.println(part.getPartName().getURI() + " -> " + part.getContentType());
-			   sDocType = part.getContentType();
-			   iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
-			   if (iCute>0)
-				   sDocType = sDocType.substring(iCute+1);
-			   if ((filetype==MSWORD && (sDocType.equals("footnotes+xml") ||
-					   					sDocType.equals("endnotes+xml") ||
-				                        sDocType.equals("header+xml") ||
-				                        sDocType.equals("footer+xml") ||
-				                        sDocType.equals("comments+xml") ||
-				                        sDocType.equals("glossary+xml"))) ||
-				   (filetype==MSEXCEL && (sDocType.equals("main+xml") ||
-						   				  sDocType.equals("worksheet+xml") ||
-						   				  sDocType.equals("sharedStrings+xml") ||
-						   				  sDocType.equals("table+xml") ||
-						   				  sDocType.equals("comments+xml"))) ||
-				   (filetype==MSPOWERPOINT && (sDocType.equals("slide+xml") ||
-						   				       sDocType.equals("notesSlide+xml"))))
-			   {
-				   inStream = part.getInputStream();
-				   sDocName = part.getPartName().getName();
-				   if (sDocName!=null && sDocName!="" && inStream!=null)
-					   tmWordSubdocs.put(sDocName+":"+sDocType,inStream);
-			   }
-			}
-			System.out.println("");
-		}
-		catch(IOException e)
-		{
-			
-		}
-		catch(OpenXML4JException e)
-		{
-			
-		}
-		return(tmWordSubdocs);
+		urlConfig = OpenXMLFilter.class.getResource(sConfigFileName); // DWH 3-9-09
+		setDefaultConfig(urlConfig); // DWH 3-9-09
+		setParameters(new Parameters(urlConfig)); // DWH 3-9-09 it doesn't update automatically from setDefaultConfig
 	}
 	
 	public InputStream combineRepeatedFormat(final InputStream in, final PipedOutputStream pios)
@@ -359,7 +137,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	      String r1b4text="",r1aftext="",t1="";
 	      String r2b4text="",r2aftext="",t2="";
 	      int i,n;
-	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false,bInr=false,bB4text=true;
+	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false,bInr=false,bB4text=true,bInInnerR=false;
 	      public void run()
 	      {
 	        try
@@ -437,6 +215,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	    		  onp = tug;
 	    		  bInap = true;
 	    		  bInr = false;
+	    		  bInInnerR = false; // DWH 3-9-09
 	    		  bHavr1 = false;
 	    		  bB4text = false;
 	    	  }
@@ -450,7 +229,12 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	    	  {
 		    	  if (tugname.equals("w:r") || tugname.equals("a:r"))
 		    	  {
-		    		  if (!bInr)
+		    		  if (bInr)
+		    		  {
+		    			  bInInnerR = true; // DWH 3-2-09 ruby text has embedded <w:r> codes
+		    			  innanar(tug);
+		    		  }
+		    		  else
 		    		  {
 		    			  if (bHavr1)
 		    				  r2b4text = tug;
@@ -462,45 +246,36 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		    	  }
 		    	  else if (tugname.equals("/w:r") || tugname.equals("/a:r"))
 		    	  {
-		    		  bInr = false;
-		    		  if (bHavr1)
+		    		  if (bInInnerR)
 		    		  {
-		    			  r2aftext = r2aftext + tug;
-		    			  if (r1b4text.equals(r2b4text) && r2aftext.equals(r2aftext))
-		    			  {
-		    				  t1 = t1 + t2;
-		    				  r2b4text = "";
-		    				  r2aftext = "";
-		    				  t2 = "";
-		    			  }
-		    			  else
-		    			  {
-		    				  streamTheCurrentStuff();
-		    			  }
+		    			  bInInnerR = false; // DWH 3-2-09
+		    			  innanar(tug);
 		    		  }
 		    		  else
 		    		  {
-		    			  r1aftext = r1aftext + tug;
-		    			  bHavr1 = true;
+			    		  bInr = false;
+			    		  if (bHavr1)
+			    		  {
+			    			  r2aftext = r2aftext + tug;
+			    			  if (r1b4text.equals(r2b4text) && r2aftext.equals(r2aftext))
+			    			  {
+			    				  t1 = t1 + t2;
+			    				  r2b4text = "";
+			    				  r2aftext = "";
+			    				  t2 = "";
+			    			  }
+			    			  else
+			    				  streamTheCurrentStuff();
+			    		  }
+			    		  else
+			    		  {
+			    			  r1aftext = r1aftext + tug;
+			    			  bHavr1 = true;
+			    		  }
 		    		  }
 		    	  }
 		    	  else if (bInr)
-		    	  {
-		    		  if (bHavr1)
-		    		  {
-		    			  if (bB4text)
-		    				  r2b4text = r2b4text + tug;
-		    			  else
-		    				  r2aftext = r2aftext + tug;
-		    		  }
-		    		  else
-		    		  {
-		    			  if (bB4text)
-		    				  r1b4text = r1b4text + tug;
-		    			  else
-		    				  r1aftext = r1aftext + tug;
-		    		  }
-		    	  }
+		    		  innanar(tug);
 		    	  else
 		    	  {
 		    		  streamTheCurrentStuff();
@@ -511,17 +286,39 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 	    	  else
 				rat(tug);
 	      }
+	      private void innanar(String tug)
+	      {
+    		  if (bHavr1)
+    		  {
+    			  if (bB4text)
+    				  r2b4text = r2b4text + tug;
+    			  else
+    				  r2aftext = r2aftext + tug;
+    		  }
+    		  else
+    		  {
+    			  if (bB4text)
+    				  r1b4text = r1b4text + tug;
+    			  else
+    				  r1aftext = r1aftext + tug;
+    		  }	    	  
+	      }
 	      private void havtext(String curtext)
 	      {
 	    	  if (bInap)
 	    	  {
-		    	  bB4text = false;
-	    		  if (bHavr1)
-		    	  {
-		    		  t2 = curtext;
-		    	  }
+		    	  if (bInInnerR) // DWH 3-2-09 (just the condition) ruby text has embedded <w:r> codes
+		    		  innanar(curtext);
 		    	  else
-		    		  t1 = curtext;
+		    	  {
+		    		  bB4text = false;
+		    		  if (bHavr1)
+			    	  {
+			    		  t2 = curtext;
+			    	  }
+			    	  else
+			    		  t1 = curtext;
+		    	  }
 	    	  }
 	    	  else
 				rat(curtext);
@@ -554,12 +351,13 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 					bHavr1 = false;
 	    	  }
 	      }
-	      private void rat(String s)
+	      private void rat(String s) // the Texan form of "write"
 	      {
 	    	try
 	    	{
 				bw.write(s);
-//				System.out.println(s); // temporary, for debugging only
+				if (dbg>3)
+					System.out.println(s); // for debugging only
 			} catch (IOException e) {
 				// do some logging here
 				// e.printStackTrace();
@@ -617,26 +415,30 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 
 	@Override
 	protected void handleStartTag(StartTag startTag) {
+		String sTagName = startTag.getName(); // DWH 2-26-09
+		String sTagString; // DWH 2-26-09
+		String sPartName; // DWH 2-26-09 for PartName attribute in [Content_Types].xml
+		String sContentType; // DWH 2-26-09 for ContentType attribute in [Content_Types].xml
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(startTag.toString());
 			// process these tag types to update parser state
-			switch (getConfig().getMainRuleType(startTag.getName())) {
+			switch (getConfig().getMainRuleType(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
-				getRuleState().pushExcludedRule(startTag.getName());
+				getRuleState().pushExcludedRule(sTagName);
 				break;
 			case INCLUDED_ELEMENT:
-				getRuleState().pushIncludedRule(startTag.getName());
+				getRuleState().pushIncludedRule(sTagName);
 				break;
 			case PRESERVE_WHITESPACE:
-				getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+				getRuleState().pushPreserverWhitespaceRule(sTagName);
 				break;
 			}
 			return;
 		}
-
-		switch (getConfig().getMainRuleType(startTag.getName())) {
+		sTagString = startTag.toString(); // DWH 2-26-09
+		switch (getConfig().getMainRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -656,38 +458,45 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			{
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
 				if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) { // 1-29-09
-					startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+					startDocumentPart(sTagString, sTagName, propertyTextUnitPlaceholders);
 				 // DWH 1-29-09
 					endDocumentPart();
 				} else {
 				// no attributes that need processing - just treat as skeleton
-					addToDocumentPart(startTag.toString());
+					addToDocumentPart(sTagString);
 				}
 			}
 			break;
 		case GROUP_ELEMENT:
-			getRuleState().pushGroupRule(startTag.getName());
-			startGroup(new GenericSkeleton(startTag.toString()));
+			getRuleState().pushGroupRule(sTagName);
+			startGroup(new GenericSkeleton(sTagString));
 			break;
 		case EXCLUDED_ELEMENT:
-			getRuleState().pushExcludedRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			getRuleState().pushExcludedRule(sTagName);
+			addToDocumentPart(sTagString);
 			break;
 		case INCLUDED_ELEMENT:
-			getRuleState().pushIncludedRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			getRuleState().pushIncludedRule(sTagName);
+			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
-			getRuleState().pushTextUnitRule(startTag.getName());
-			startTextUnit(new GenericSkeleton(startTag.toString())); // DWH 1-29-09
+			getRuleState().pushTextUnitRule(sTagName);
+			startTextUnit(new GenericSkeleton(sTagString)); // DWH 1-29-09
 			break;
 		case PRESERVE_WHITESPACE:
-			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			getRuleState().pushPreserverWhitespaceRule(sTagName);
+			addToDocumentPart(sTagString);
 			break;
 		default:
+			if (sTagName.equals("override")) // DWH 2-26-09 in [Content_Types].xml
+			{ // it could be slow to do this test every time; I wonder if there is a better way
+				sPartName = startTag.getAttributeValue("PartName");
+				sContentType = startTag.getAttributeValue("ContentType");
+				if (htXMLFileType!=null)
+					htXMLFileType.put(sPartName, sContentType);
+			}
 			if (canStartNewTextUnit()) // DWH 1-14-09 then not currently in text unit; added else
-				addToDocumentPart(startTag.toString()); // 1-5-09
+				addToDocumentPart(sTagString); // 1-5-09
 			else
 				addCodeToCurrentTextUnit(startTag);				
 		}
@@ -830,7 +639,6 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		String tagName; // DWH 2-19-09 */
 // Any attribute that encodes language should be renamed here to "language"
 // Any attribute that encodes locale or charset should be normalized too
-// Ask Jim what that means
 /*
 		// <meta http-equiv="Content-Type"
 		// content="text/html; charset=ISO-2022-JP">
@@ -872,83 +680,23 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 		}
 		return normalizedName;
 	}
-/*
-	@Override
-	public FilterEvent next() {
-		// reset state flags and buffers
-//		ruleState.reset(); DWH 2-2-09
-		super.getRuleState().reset(); // DWH 2-2-09 kludge; hopefully this doesn't just reset a copy
-
-		while (hasQueuedEvents()) {
-			return super.next();
-		}
-
-		while (nodeIterator.hasNext() && !isCanceled()) {
-			Segment segment = nodeIterator.next();
-
-			handleSegment(segment); // DWH 2-2-09
-
-			if (hasQueuedEvents()) {
-				break;
-			}
-		}
-
-		if (!nodeIterator.hasNext()) {
-			finalize(); // we are done
-		}
-
-		// return one of the waiting events
-		return super.next();
-	}
-
-	protected void handleSegment(Segment segment)
+	protected void initFileTypes() // DWH 2-26-09
 	{
-		if (segment instanceof Tag) {
-			final Tag tag = (Tag) segment;
-
-			// We just hit a tag that could close the current TextUnit, but
-			// only if it was not opened with a TextUnit tag (i.e., complex
-			// TextUnits such as <p> etc.)
-			boolean inlineTag = false;
-			if (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT)
-				inlineTag = true;
-			if (isCurrentTextUnit() && !isCurrentComplexTextUnit() && !inlineTag) {
-				endTextUnit();
-			}
-
-			if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-				handleStartTag((StartTag) tag);
-			} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-				handleEndTag((EndTag) tag);
-			} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
-				handleDocTypeDeclaration(tag);
-			} else if (tag.getTagType() == StartTagType.CDATA_SECTION) {
-				handleCdataSection(tag);
-			} else if (tag.getTagType() == StartTagType.COMMENT) {
-				handleComment(tag);
-			} else if (tag.getTagType() == StartTagType.XML_DECLARATION) {
-				handleXmlDeclaration(tag);
-			} else if (tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
-				handleProcessingInstruction(tag);
-			} else if (tag.getTagType() == StartTagType.MARKUP_DECLARATION) {
-				handleMarkupDeclaration(tag);
-			} else if (tag.getTagType() == StartTagType.SERVER_COMMON) {
-				handleServerCommon(tag);
-			} else if (tag.getTagType() == StartTagType.SERVER_COMMON_ESCAPED) {
-				handleServerCommonEscaped(tag);
-			} else { // not classified explicitly by Jericho
-				if (tag instanceof StartTag) {
-					handleStartTag((StartTag) tag);
-				} else if (tag instanceof EndTag) {
-					handleEndTag((EndTag) tag);
-				} else {
-					handleDocumentPart(tag);
-				}
-			}
-		} else {
-			handleText(segment);
-		}		
+		htXMLFileType = new Hashtable();
 	}
-*/
+	protected String getContentType(String sPartName) // DWH 2-26-09
+	{
+		String rslt="",tmp;
+		if (sPartName!=null)
+		{
+			tmp = (String)htXMLFileType.get(sPartName);
+			if (tmp!=null)
+				rslt = tmp;
+		}
+		return(rslt);
+	}
+	public void setDbg(int dbg)
+	{
+		this.dbg = dbg;
+	}
 }
-
