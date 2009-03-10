@@ -258,6 +258,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		
 		StartDocument sd = new StartDocument("sd");
+		sd.setLineBreak("\n");
 		sd.setSkeleton(res.getSkeleton());
 		subDocWriter.handleEvent(new Event(EventType.START_DOCUMENT, sd));
 	}

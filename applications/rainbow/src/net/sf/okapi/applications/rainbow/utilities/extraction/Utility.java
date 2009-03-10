@@ -28,6 +28,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.FileResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -150,9 +151,20 @@ public class Utility extends BaseFilterDrivenUtility {
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
 			break;
+		case FILE_RESOURCE:
+			processFileResource((FileResource)event.getResource());
+			break;
 		}
 		// All events then go to the actual writer
 		return writer.handleEvent(event);
+	}
+
+	/**
+	 * Handles files without any associated filter settings (.png, etc.)
+	 * @param fr The file resource to process.
+	 */
+	private void processFileResource (FileResource fr) {
+		//TODO
 	}
 	
     private void processStartDocument (StartDocument resource) {

@@ -37,9 +37,11 @@ public interface IEncoder {
 	 * @param params The parameters object with all the configuration information 
 	 * specific to this encoder.
 	 * @param encoding The name of the charset encoding to use.
+	 * @param lineBreak The type of line break to usee.
 	 */
 	public void setOptions (IParameters params,
-		String encoding);
+		String encoding,
+		String lineBreak);
 	
 	/**
 	 * Encodes a given text with this encoder.

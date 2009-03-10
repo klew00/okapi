@@ -473,6 +473,7 @@ public abstract class BaseFilter implements IFilter {
 		startDocument.setEncoding(getEncoding(), hasUtf8Encoding() && hasUtf8Bom());
 		startDocument.setLanguage(getSrcLang());
 		startDocument.setMimeType(getMimeType());
+		startDocument.setLineBreak(getLineBreak());
 		startDocument.setFilterParameters(getParameters());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
@@ -1132,4 +1133,7 @@ public abstract class BaseFilter implements IFilter {
 	abstract protected boolean hasUtf8Encoding();
 	
 	abstract protected boolean hasUtf8Bom();
+	
+	abstract protected String getLineBreak();
+	
 }

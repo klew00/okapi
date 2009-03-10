@@ -88,7 +88,8 @@ public class MIFEncoder implements IEncoder {
 	}
 
 	public void setOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
 		// Nothing to do
 	}

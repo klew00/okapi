@@ -178,6 +178,7 @@ public class IDMLFilter implements IFilter {
 			startDoc.setName(docURI.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
+			startDoc.setLineBreak("\n");
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}

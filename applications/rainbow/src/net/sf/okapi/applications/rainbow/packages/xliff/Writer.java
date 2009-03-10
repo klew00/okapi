@@ -268,12 +268,12 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, false));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.isSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, true));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
@@ -292,7 +292,7 @@ public class Writer extends BaseWriter {
 			}
 		}
 		// Now tc hold the content to write. Write it with or without marks
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 1, true, tc.isSegmented()));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented()));
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note

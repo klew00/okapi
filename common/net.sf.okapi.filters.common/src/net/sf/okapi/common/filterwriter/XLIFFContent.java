@@ -162,6 +162,16 @@ public class XLIFFContent {
 		return tmp.toString();
 	}
 	
+	/**
+	 * Generates an XLIFF string from a given text container.
+	 * @param container The container to write out.
+	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
+	 * and 3=quot only.
+	 * @param escapeGT True to always escape '>' to gt
+	 * @param withMarkers True to output mrk elements, false to output only 
+	 * the content of mrk element.
+	 * @return The coded string.
+	 */
 	public String toSegmentedString (TextContainer container,
 		int quoteMode,
 		boolean escapeGT,

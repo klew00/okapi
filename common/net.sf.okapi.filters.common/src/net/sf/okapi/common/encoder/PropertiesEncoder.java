@@ -32,7 +32,7 @@ public class PropertiesEncoder implements IEncoder {
 	
 	private CharsetEncoder outputEncoder;
 	private boolean escapeAll;
-
+	
 	/**
 	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding, and
 	 * escaping all extended characters.
@@ -43,8 +43,11 @@ public class PropertiesEncoder implements IEncoder {
 	}
 	
 	public void setOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
+		// lineBreak: They are converted to \n in this format
+		
 		outputEncoder = Charset.forName(encoding).newEncoder();
 		//TODO: get escapeAll from params
 	}

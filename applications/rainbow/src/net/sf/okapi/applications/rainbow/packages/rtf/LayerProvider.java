@@ -75,7 +75,8 @@ public class LayerProvider implements ILayerProvider {
 	}
 
 	public void setOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
 		outputEncoder = Charset.forName(encoding).newEncoder();
 	}

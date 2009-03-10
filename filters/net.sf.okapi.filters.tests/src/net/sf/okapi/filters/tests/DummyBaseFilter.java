@@ -97,5 +97,10 @@ public class DummyBaseFilter extends BaseFilter {
 	protected boolean hasUtf8Encoding() {
 		return false;
 	}
+	
+	@Override
+	protected String getLineBreak () {
+		return "\n";
+	}
 
 }

@@ -70,6 +70,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private BOMNewlineEncodingDetector bomEncodingDetector;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
+	private String lineBreak;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -81,6 +82,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		super();		
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
+		lineBreak = System.getProperty("line.separator");
 	}
 
 	/*
@@ -186,6 +188,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		if (bomEncodingDetector != null) {
 			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
 			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
+			lineBreak = bomEncodingDetector.getNewLineType().toString();
 		}
 
 		if (parameters == null) {
@@ -428,4 +431,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	protected boolean hasUtf8Bom() {
 		return hasUtf8Bom;
 	}
+	
+	protected String getLineBreak () {
+		return lineBreak;
+	}
+
 }

@@ -172,9 +172,6 @@ public class UtilityDriver implements CancelListener {
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
-				// Skip item without filter if it's a filter-driven utility
-				if ( utility.isFilterDriven() && ( item.filterSettings.length() == 0 )) continue;
-				// Otherwise: process
 				log.message("-- Input: "+item.relativePath);
 
 				// Initialize the main input
@@ -192,16 +189,16 @@ public class UtilityDriver implements CancelListener {
 					// Do we have a corresponding input?
 					if ( prj.inputLists.get(j).size() > f ) {
 						// Data is available
-						Input addtem = prj.getList(j).get(f);
+						Input addItem = prj.getList(j).get(f);
 						// Input
 						utility.addInputData(
-							prj.getInputRoot(j) + File.separator + addtem.relativePath,
-							prj.buildSourceEncoding(addtem),
-							addtem.filterSettings);
+							prj.getInputRoot(j) + File.separator + addItem.relativePath,
+							prj.buildSourceEncoding(addItem),
+							addItem.filterSettings);
 						// Output
 						utility.addOutputData(
-							prj.buildTargetPath(j, addtem.relativePath),
-							prj.buildTargetEncoding(addtem));
+							prj.buildTargetPath(j, addItem.relativePath),
+							prj.buildTargetEncoding(addItem));
 					}
 					else throw new RuntimeException("No more input files available.");
 				}

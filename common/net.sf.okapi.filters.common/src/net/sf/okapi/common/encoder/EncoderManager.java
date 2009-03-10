@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.security.InvalidParameterException;
 import java.util.Hashtable;
 
 import net.sf.okapi.common.IParameters;
@@ -34,6 +35,7 @@ public class EncoderManager implements IEncoder {
 	private IEncoder encoder;
 	private Hashtable<String, String> mimeMap;
 	private String defEncoding;
+	private String defLineBreak;
 
 	/**
 	 * Creates a new encoder manager, with default pre-defined encoder loaded.
@@ -97,7 +99,7 @@ public class EncoderManager implements IEncoder {
 			encoder = (IEncoder)Class.forName(name).newInstance();
 			// And set the options
 			//TODO: Handle parameters at some point
-			encoder.setOptions(null, defEncoding);
+			encoder.setOptions(null, defEncoding, defLineBreak);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -156,10 +158,11 @@ public class EncoderManager implements IEncoder {
 	 * @param lineBreak Type of line-break to use in the output.
 	 */
 	public void setOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
 		if ( encoder != null ) {
-			encoder.setOptions(params, encoding);
+			encoder.setOptions(params, encoding, lineBreak);
 		}
 	}
 
@@ -181,9 +184,14 @@ public class EncoderManager implements IEncoder {
 	 * @param encoding The default encoding.
 	 */
 	public void setDefaultOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
 		defEncoding = encoding;
+		if ( lineBreak == null ) {
+			throw new InvalidParameterException("lineBreak parameter is null");
+		}
+		defLineBreak = lineBreak;
 	}
 
 }

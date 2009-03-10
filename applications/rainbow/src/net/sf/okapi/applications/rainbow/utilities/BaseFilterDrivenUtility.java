@@ -23,8 +23,10 @@ package net.sf.okapi.applications.rainbow.utilities;
 import java.io.File;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.FileResource;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility
 	implements IFilterDrivenUtility {
@@ -35,18 +37,28 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 
 	public void processFilterInput () {
 		try {
+			filterWriter = null;
+
+			// If there is no associated filter: send the file as a FILE_RESOURCE
+			if (( getInputFilterSettings(0) == null ) || ( getInputFilterSettings(0).length() == 0 ) ) {
+				FileResource fr = new FileResource(new File(getInputPath(0)).toURI(),
+					getInputEncoding(0), null, srcLang);
+				handleEvent(new Event(EventType.FILE_RESOURCE, fr));
+				return;
+			}
+			
+			// Process as a filter-drive input
 			// Load the filter if needed
 			filter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 				getInputFilterSettings(0), filter);
 			filter.setOptions(srcLang, trgLang, getInputEncoding(0), true);
-		
+	
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {
 				filterWriter = filter.createFilterWriter();
 				filterWriter.setOptions(trgLang, getOutputEncoding(0));
 				filterWriter.setOutput(getOutputPath(0));
 			}
-			else filterWriter = null;
 
 			// Setup the filter
 			File f = new File(getInputPath(0)); 

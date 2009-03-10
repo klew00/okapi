@@ -31,10 +31,13 @@ import net.sf.okapi.common.IParameters;
 public class XMLEncoder implements IEncoder {
 
 	private CharsetEncoder chsEnc;
+	private String lineBreak;
 	
 	public void setOptions (IParameters params,
-		String encoding)
+		String encoding,
+		String lineBreak)
 	{
+		this.lineBreak = lineBreak;
 		// Use an encoder only if the output is not UTF-8/16
 		// since those support all characters
 		if ( "utf-8".equals(encoding) || "utf-16".equals(encoding) ) {
@@ -85,6 +88,9 @@ public class XMLEncoder implements IEncoder {
 					break;
 				}
 				continue;
+			case '\n':
+				sbTmp.append(lineBreak);
+				break;
 			default:
 				if ( text.charAt(i) > 127 ) { // Extended chars
 					if (( chsEnc != null ) && ( !chsEnc.canEncode(text.charAt(i)) )) {
@@ -113,6 +119,8 @@ public class XMLEncoder implements IEncoder {
 			return "&apos;";
 		case '&':
 			return "&amp;";
+		case '\n':
+			return lineBreak;
 		default:
 			if ( value > 127 ) { // Extended chars
 				if (( chsEnc != null ) && ( !chsEnc.canEncode(value) )) {
@@ -133,8 +141,6 @@ public class XMLEncoder implements IEncoder {
 	{
 		// PROP_ENCODING: Same value in native
 		// PROP_LANGUGE: Same value in native
-
-		// No changes for the other values
 		return value;
 	}
 

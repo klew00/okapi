@@ -86,6 +86,7 @@ public class XLIFFFilter implements IFilter {
 	private Stack<Integer> parentIds;
 	private AltTransAnnotation altTrans;
 	private Stack<Boolean> preserveSpaces;
+	private String lineBreak;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -173,6 +174,7 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Need to auto-detect the encoding and update 'encoding' variable
 			// use reader.getCharacterEncodingScheme() ??? but start doc not reported
 			
+			lineBreak = System.getProperty("line.separator"); //TODO: get real line break
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			parentIds = new Stack<Integer>();
@@ -192,6 +194,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setType("text/x-xliff");
 			startDoc.setMimeType("text/x-xliff");
 			startDoc.setIsMultilingual(true);
+			startDoc.setLineBreak(lineBreak);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
 			// The XML declaration is not reported by the parser, so we need to
@@ -635,7 +638,7 @@ public class XLIFFFilter implements IFilter {
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("</target>");
-		skel.append("\n"); // TODO: use the line-break type of the original file
+		skel.append(lineBreak);
 		targetDone = true;
 	}
 	

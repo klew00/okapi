@@ -117,10 +117,10 @@ public class Writer extends BaseWriter {
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		//TODO: Fix encoding so we use a windows-able one (especially for utf-16)
+		//TODO: Fix encoding so we use a windows-enabled one (especially for UTF-16)
 		super.setOptions(language, defaultEncoding);
 		layer = new LayerProvider();
-		layer.setOptions(null, encoding);
+		layer.setOptions(null, encoding, null);
 	}
 
 	public void setParameters (IParameters params) {

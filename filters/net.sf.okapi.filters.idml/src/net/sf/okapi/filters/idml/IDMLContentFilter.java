@@ -223,6 +223,7 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
+		startDoc.setLineBreak("\n");
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
 		// The XML declaration is not reported by the parser, so we need to

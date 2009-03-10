@@ -92,7 +92,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		this.layer = layer;
 		isMultilingual = resource.isMultilingual();
 		if ( this.encoderManager != null ) {
-			this.encoderManager.setDefaultOptions(null, outputEncoding);
+			this.encoderManager.setDefaultOptions(null, outputEncoding, resource.getLineBreak());
 		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
@@ -468,7 +468,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				else {
 					return layer.encode(
-							encoderManager.encode(tf.toString(), context), context);
+						encoderManager.encode(tf.toString(), context), context);
 				}
 			}
 		}
@@ -508,7 +508,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					}
 					else {
 						tmp.append(layer.encode(
-								encoderManager.encode(text.charAt(i), context),
+							encoderManager.encode(text.charAt(i), context),
 							context));
 					}
 				}
