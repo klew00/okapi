@@ -93,6 +93,9 @@
 		<copy todir="${dist}/help/filters">
 			<fileset dir="../../help/filters" />
 		</copy>
+		<copy todir="${dist}/help/common">
+			<fileset dir="../../help/common" />
+		</copy>
 
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
