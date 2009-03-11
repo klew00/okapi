@@ -21,7 +21,7 @@
 package net.sf.okapi.common;
 
 /**
- * This interface provides a way for a component to expose its
+ * Common way for a component to expose its
  * parameters in a generic way.  
  */
 public interface IParameters {

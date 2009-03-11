@@ -521,7 +521,7 @@ public class Util {
 		// May not work on all platforms,
 		// But should on basic Windows, Mac and Linux
 		// (Use Windows file separator-type to guess the OS)
-		return File.separator.equals("\\");
+		return !File.separator.equals("\\");
 	}
 	
 	/**
@@ -596,7 +596,7 @@ public class Util {
 	/**
 	 * Gets the text content of the first child of an element node.
 	 * This is to use instead of node.getTextContent() which does not work with some
-	 * Macintosh Java VMs.
+	 * MacIntosh Java VMs.
 	 * @param node The container element.
 	 * @return The text of the first child node.
 	 */
@@ -606,4 +606,17 @@ public class Util {
 		if ( n == null ) return "";
 		return n.getNodeValue();
 	}
+
+	/**
+	 * Calculates safely a percentage. If the total is 0, the methods return 1.
+	 * @param part The part of the total.
+	 * @param total the total.
+	 * @return The percentage of part in total.
+	 */
+	public static int getPercentage (int part,
+		int total)
+	{
+		return Math.round((float)part/(float)((total==0)?1:total)*100);
+	}
+
 }

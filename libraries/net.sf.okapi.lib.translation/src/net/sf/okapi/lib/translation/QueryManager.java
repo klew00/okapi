@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -177,6 +178,14 @@ public class QueryManager {
 	}
 	
 	/**
+	 * Reset the current result to the first one if there is one.
+	 */
+	public void rewind () {
+		if ( results.size() > 0 ) current = 0;
+		else current = -1;
+	}
+	
+	/**
 	 * Indicates of there is a hit available.
 	 * @return True if a hit is available, false if not.
 	 */
@@ -305,29 +314,81 @@ public class QueryManager {
 		if ( tu.hasTarget(trgLang) ) return;
 		
 		TextContainer tc = tu.setTarget(trgLang, tu.getSource().clone());
+		ScoresAnnotation scores = new ScoresAnnotation();
+		tc.setAnnotation(scores);
 		QueryResult qr;
+		int count;
+		
 		if ( tc.isSegmented() ) {
 			List<TextFragment> segList = tc.getSegments();
 			for ( int i=0; i<segList.size(); i++ ) {
-				if ( query(segList.get(i)) != 1 ) continue;
+				count = query(segList.get(i));
+				if ( count == 0 ) {
+					scores.add(0);
+					continue;
+				}
 				qr = next();
-				if ( qr.score < 100 ) continue;
 				segList.set(i, qr.target);
+				// First is not 100%: use it and move on
+				if ( qr.score < 100 ) {
+					scores.add(qr.score);
+					continue;
+				}
+				// Else: one or more matches, first is 100%
+				// Check if they are several and if they have the same translation
+				if ( !exactsHaveSameTranslation() ) {
+					// If we do: Use the first one and lower the score to 99%
+					scores.add(99);
+					continue;
+				}
+				// Else: Only one 100% or several that have the same translations 
+				scores.add(qr.score); // That's 1005 then
 			}
 		}
-		else {
-			if ( query(tc) != 1 ) return;
+		else { // Case of un-segmented entries
+			count = query(tc);
+			if ( count == 0 ) {
+				scores.add(0);
+				return;
+			}
 			qr = next();
-			if ( qr.score < 100 ) return;
 			tc.setCodedText(qr.target.getCodedText(), false);
 			// Un-segmented entries that we have leveraged should be like
-			// a tu with a single segment
+			// a text unit with a single segment
 			makeSingleSegment(tu);
+
+			// First is not 100%: use it and move on
+			if ( qr.score < 100 ) {
+				scores.add(qr.score);
+				return;
+			}
+			// Else: one or more matches, first is 100%
+			// Check if they are several and if they have the same translation
+			if ( !exactsHaveSameTranslation() ) {
+				// If we do: Use the first one and lower the score to 99%
+				scores.add(99);
+				return;
+			}
+			// Else: Only one 100% or several that have the same translations 
+			scores.add(qr.score); // That's 1005 then
 		}
+	}
+	
+	private boolean exactsHaveSameTranslation () {
+		rewind();
+		QueryResult qr = next();
+		if ( qr == null ) return false;
+		if ( qr.score < 100 ) return false;
+		TextFragment firsFrag = qr.target;
+		while ( hasNext() ) {
+			qr = next();
+			if ( qr.score < 100 ) return true;
+			if ( qr.target.compareTo(firsFrag) != 0 ) return false;
+		}
+		return true;
 	}
 
 	private void makeSingleSegment (TextUnit tu) {
-		//TODO
 		TextContainer srcTc = tu.getSource();
 		// Leave it alone if it's just whitespaces
 		if ( !srcTc.hasText(false) ) return;

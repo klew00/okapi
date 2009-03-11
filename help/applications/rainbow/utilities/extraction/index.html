@@ -64,6 +64,78 @@ into the prepared document (if the package to generate allows to do so).</p>
 <p>Enter the full path of the SimpleTM file you want to use for the 
 pre-translation. You can use the variable <code>${ProjDir}</code> 
 to specify the directory of your project.</p>
+<p><cite>Use the FileName attribute</cite> -- Set this option to 
+filter the TM matches based on the values of <code>FileName</code> attribute. When this option is set, only the matches that 
+have, not only the source text but also the values for <code>FileName</code> that match are leveraged. When this option is not set, 
+the leveraging is not filtered by the <code>FileName</code> attribute.</p>
+<p><cite>Use the GroupName attribute</cite> -- Set this option to 
+filter the TM matches based on the values of <code>GroupName</code> attribute. When this option is set, only the matches that 
+have, not only the source text but also the values for <code>GroupName</code> that match are leveraged. When this option is not set, 
+the leveraging is not filtered by the <code>GroupName</code> attribute.</p>
+<h3>About SimpleTM</h3>
+<p>SimpleTM is a provisional simple TM engine that can match only exact matches, 
+and use attributes. It also allows multiple translations of the same source 
+text. When the attributes are not used, You may get several exact matches, if at 
+least of of them has a different translation, the segment is matched at 99% 
+only. The only types of matches SimpleTM can generate are: 100%, 99%, and 0%.</p>
+<p>Using the attributes with a SimpleTM memory filters out any candidate that 
+does not have matching values for the given attributes:</p>
+<p>For example, given an segment to leverage that is:<br>
+Text = &quot;Segment text.&quot;<br>
+FileName = myFile.ext<br>
+GroupName = myGroup</p>
+<table border="1" id="table1" cellspacing="0" cellpadding="5">
+	<tr>
+		<td>Candidates in the TM</td>
+		<td>FileName Off<br>
+		GroupName Off</td>
+		<td>FileName On<br>
+		GroupName Off</td>
+		<td>FileName Off<br>
+		GroupName On</td>
+		<td>FileName On<br>
+		GroupName On</td>
+	</tr>
+	<tr>
+		<td>Text = &quot;Segment text&quot;<br>
+		FileName = myFile.ext<br>
+		groupName = myGroup</td>
+		<td>Match 100%</td>
+		<td>Match 100%</td>
+		<td>Match 100%</td>
+		<td>Match 100%</td>
+	</tr>
+	<tr>
+		<td>Text = &quot;Segment text&quot;<br>
+		FileName = someFile.ext<br>
+		groupName = myGroup</td>
+		<td>Match 100%</td>
+		<td>No Match</td>
+		<td>Match 100%</td>
+		<td>No Match</td>
+	</tr>
+	<tr>
+		<td>Text = &quot;Segment text&quot;<br>
+		FileName = myFile.ext<br>
+		groupName = someGroup</td>
+		<td>Match 100%</td>
+		<td>Match 100%</td>
+		<td>No Match</td>
+		<td>No Match</td>
+	</tr>
+	<tr>
+		<td>Text = &quot;Segment text&quot;<br>
+		FileName = someFile.ext<br>
+		groupName = someGroup</td>
+		<td>Match 100%</td>
+		<td>No Match</td>
+		<td>No Match</td>
+		<td>No Match</td>
+	</tr>
+</table>
+<p>&nbsp;</p>
+<p>SimpleTM will be replaced by more a powerful TM engine in the future.</p>
+<p>&nbsp;</p>
 <p>&nbsp;</p>
 </body>
 </html>

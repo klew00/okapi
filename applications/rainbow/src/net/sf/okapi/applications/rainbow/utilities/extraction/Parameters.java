@@ -26,55 +26,18 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	/**
-	 * Type of package.
-	 */
-	protected String pkgType;
-	
-	/**
-	 * True to zip the package. 
-	 */
-	protected boolean createZip;
-	
-	/**
-	 * Base-name of the package. 
-	 */
-	protected String pkgName;
-	
-	/**
-	 * Folder where to output the package.
-	 */
-	protected String outputFolder;
-	
-	/**
-	 * When possible, include target items in package.
-	 */
-	protected boolean includeTargets;
-
-	/**
-	 * Pre-segment the output when possible.
-	 */
-	protected boolean preSegment;
-	
-	/**
-	 * Path of the SRX file to use for source segmentation.
-	 */
-	protected String sourceSRX;
-	
-	/**
-	 * Path of the SRX file to use for target segmentation.
-	 */
-	protected String targetSRX;
-
-	/**
-	 * Indicates if the output should be pre-translated.
-	 */
-	protected boolean preTranslate;
-	
-	/**
-	 * Path of the TM fiel to use for pre-translation.
-	 */
-	protected String tmPath;
+	public String pkgType;
+	public boolean createZip;
+	public String pkgName;
+	public String outputFolder;
+	public boolean includeTargets;
+	public boolean preSegment;
+	public String sourceSRX;
+	public String targetSRX;
+	public boolean preTranslate;
+	public String tmPath;
+	public boolean useFileName;
+	public boolean useGroupName;
 
 	public Parameters () {
 		reset();
@@ -91,6 +54,8 @@ public class Parameters extends BaseParameters {
 		targetSRX = "";
 		preTranslate = false;
 		tmPath = "";
+		useFileName = true;
+		useGroupName = true;
 	}
 
 	public void fromString(String data) {
@@ -106,6 +71,8 @@ public class Parameters extends BaseParameters {
 		targetSRX = buffer.getString("targetSRX", targetSRX);
 		preTranslate = buffer.getBoolean("preTranslate", preTranslate);
 		tmPath = buffer.getString("tmPath", tmPath);
+		useFileName = buffer.getBoolean("useFileName", useFileName);
+		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
 	}
 
 	public String toString() {
@@ -120,6 +87,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString("targetSRX", targetSRX);
 		buffer.setBoolean("preTranslate", preTranslate);
 		buffer.setString("tmPath", tmPath);
+		buffer.setBoolean("useFileName", useFileName);
+		buffer.setBoolean("useGroupName", useGroupName);
 		return buffer.toString();
 	}
 	

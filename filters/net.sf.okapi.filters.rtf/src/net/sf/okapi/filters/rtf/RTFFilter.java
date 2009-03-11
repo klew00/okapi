@@ -38,6 +38,7 @@ import java.util.Stack;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -346,6 +347,7 @@ public class RTFFilter implements IFilter {
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
 			startDoc.setIsMultilingual(true);
+			startDoc.setLineBreak(Util.LINEBREAK_DOS);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {

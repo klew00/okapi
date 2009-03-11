@@ -26,6 +26,7 @@ import java.util.Stack;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
@@ -363,7 +364,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		StringBuilder tmp = new StringBuilder();
 		List<TextFragment> srcSegs = srcCont.getSegments();
 		List<TextFragment> trgSegs = null;
-		if ( trgCont != null ) trgSegs = trgCont.getSegments();
+		ScoresAnnotation scores = null;
+		if ( trgCont != null ) {
+			trgSegs = trgCont.getSegments();
+			scores = trgCont.getAnnotation(ScoresAnnotation.class);
+		}
 		String text = srcCont.getCodedText();
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
@@ -381,7 +386,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				int lev = 0;
 				if (( trgSegs != null ) && ( n < trgSegs.size() )) {
 					trgFrag = trgSegs.get(n);
-					lev = 100;
+					if ( scores != null ) lev = scores.getScore(n);
 				}
 				//TODO: Else, source/target segments do not match
 				// Write it

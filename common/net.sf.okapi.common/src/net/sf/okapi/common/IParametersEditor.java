@@ -21,8 +21,8 @@
 package net.sf.okapi.common;
 
 /**
- * This interface provides a way to call in a generic way an editor
- * to modify the parameters of a component. The parameters are implemented
+ * Common way to call in an editor to modify the parameters of 
+ * a component. The parameters are implemented
  * through the IParameters interface. 
  */
 public interface IParametersEditor {

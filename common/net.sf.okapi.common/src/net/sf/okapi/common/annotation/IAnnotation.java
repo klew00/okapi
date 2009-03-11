@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.annotation;
 
+/**
+ * Common handle for an annotation.
+ */
 public interface IAnnotation {
 
 }

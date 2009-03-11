@@ -131,7 +131,7 @@ public class TMXWriter {
 		
 		TextContainer srcTC = item.getSource();
 		TextContainer trgTC = item.getTarget(trgLang);
-		
+//TODO: Output only the items with real match or translations		
 		if ( !srcTC.isSegmented() ) { // Source is not segmented
 			writeTU(srcTC, trgTC, tuid, attributes);
 		}

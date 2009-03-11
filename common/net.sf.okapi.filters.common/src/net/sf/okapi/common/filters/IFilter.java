@@ -29,7 +29,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
- * Provides a common set of methods to extract translatable text and its associated data.
+ * Common set of methods to extract translatable text and its associated data.
  * <p>The following example shows a typical use of IFilter:
  * <pre>
  * MyUtlity myUtility = new MyUtility(); // Some object that do things with filter events

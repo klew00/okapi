@@ -67,6 +67,8 @@ public class Editor implements IParametersEditor {
 	private Button chkPreTranslate;
 	private Text edTmPath;
 	private Button btGetTmPath;
+	private Button chkUseFileName;
+	private Button chkUseGroupName;
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
 	private IHelp help;
@@ -265,6 +267,18 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
+		chkUseFileName = new Button(cmpTmp, SWT.CHECK);
+		chkUseFileName.setText("Use the FileName attribute");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseFileName.setLayoutData(gdTmp);
+
+		chkUseGroupName = new Button(cmpTmp, SWT.CHECK);
+		chkUseGroupName.setText("Use the GroupName attribute");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseGroupName.setLayoutData(gdTmp);
+
 		
 		//--- Dialog-level buttons
 
@@ -296,6 +310,8 @@ public class Editor implements IParametersEditor {
 	private void updatePretranslate () {
 		edTmPath.setEnabled(chkPreTranslate.getSelection());
 		btGetTmPath.setEnabled(chkPreTranslate.getSelection());
+		chkUseFileName.setEnabled(chkPreTranslate.getSelection());
+		chkUseGroupName.setEnabled(chkPreTranslate.getSelection());
 	}
 	
 	private boolean showDialog () {
@@ -324,6 +340,8 @@ public class Editor implements IParametersEditor {
 		pnlSegmentation.setData(params.preSegment, params.sourceSRX, params.targetSRX);
 		chkPreTranslate.setSelection(params.preTranslate);
 		edTmPath.setText(params.tmPath);
+		chkUseFileName.setSelection(params.useFileName);
+		chkUseGroupName.setSelection(params.useGroupName);
 		updatePretranslate();
 		updateSample();
 	}
@@ -341,6 +359,8 @@ public class Editor implements IParametersEditor {
 		params.targetSRX = pnlSegmentation.getTargetSRX();
 		params.preTranslate = chkPreTranslate.getSelection();
 		params.tmPath = edTmPath.getText();
+		params.useFileName = chkUseFileName.getSelection();
+		params.useGroupName = chkUseGroupName.getSelection();
 		result = true;
 		return true;
 	}

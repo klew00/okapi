@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common;
 
+/**
+ * Common way to get access to the parameters of a given component.
+ */
 public interface IParametersProvider {
 
 	/**

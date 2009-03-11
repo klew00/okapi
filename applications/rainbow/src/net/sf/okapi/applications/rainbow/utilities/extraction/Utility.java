@@ -28,6 +28,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.FileResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -47,6 +48,12 @@ public class Utility extends BaseFilterDrivenUtility {
 	private Segmenter targetSeg;
 	private QueryManager qm;
 	private String resolvedOutputDir;
+	private int segDocCount;
+	private int segTotalCount;
+	private int exactDocCount;
+	private int fuzzyDocCount;
+	private int exactTotalCount;
+	private int fuzzyTotalCount;
 	
 	public Utility () {
 		params = new Parameters();
@@ -101,6 +108,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		writer.setInformation(srcLang, trgLang,
 			"TODO:projectID", resolvedOutputDir, params.makePackageID(), inputRoot);
 		writer.writeStartPackage();
+		
+		segTotalCount = exactTotalCount = fuzzyTotalCount = 0;
 	}
 
 	public void postprocess () {
@@ -112,6 +121,17 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.close();
 			qm = null;
 		}
+		
+		// Statistics
+		logger.info(String.format("\nTotal exact matches = %d (%3d%%)", exactTotalCount,
+			Util.getPercentage(exactTotalCount, segTotalCount)));
+		logger.info(String.format("Total Fuzzy matches = %d (%3d%%)", fuzzyTotalCount,
+			Util.getPercentage(fuzzyTotalCount, segTotalCount)));
+		int n = segTotalCount-(exactTotalCount+fuzzyTotalCount);
+		logger.info(String.format("Total No matches = %d (%3d%%)", n,
+			Util.getPercentage(n, segTotalCount)));
+		logger.info(String.format("Total segments = %d", segTotalCount));
+		
 	}
 	
 	public IParameters getParameters () {
@@ -148,6 +168,19 @@ public class Utility extends BaseFilterDrivenUtility {
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());
 			break;
+		case END_DOCUMENT:
+			segTotalCount += segDocCount;
+			exactTotalCount += exactDocCount;
+			fuzzyTotalCount += fuzzyDocCount;
+			logger.info(String.format("Exact matches = %d (%3d%%)", exactDocCount,
+				Util.getPercentage(exactDocCount, segDocCount)));
+			logger.info(String.format("Fuzzy matches = %d (%3d%%)", fuzzyDocCount,
+				Util.getPercentage(fuzzyDocCount, segDocCount)));
+			int n = segDocCount-(exactDocCount+fuzzyDocCount);
+			logger.info(String.format("No matches = %d (%3d%%)", n,
+				Util.getPercentage(n, segDocCount)));					
+			logger.info(String.format("Segments = %d", segDocCount));
+			break;
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
 			break;
@@ -168,7 +201,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
     private void processStartDocument (StartDocument resource) {
-		if ( qm != null ) {
+    	segDocCount = exactDocCount = fuzzyDocCount = 0;
+		if (( qm != null ) && params.useFileName ) {
 			qm.setAttribute("FileName", Util.getFilename(getInputPath(0), true));
 		}
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
@@ -185,10 +219,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			// existing target
 		}
 	
+		TextContainer cont = null;
 		// Segment if requested
 		if (( params.preSegment ) && !"no".equals(tu.getProperty("canSegment")) ) {
 			try {
-				TextContainer cont;
 				cont = tu.getSource();
 				sourceSeg.computeSegments(cont);
 				cont.createSegments(sourceSeg.getSegmentRanges());
@@ -204,10 +238,27 @@ public class Utility extends BaseFilterDrivenUtility {
 			}
 		}
 		
+		// Compute the statistics
+		segDocCount += tu.getSource().getSegmentCount();
+
 		// Leverage if requested
 		if ( qm != null ) {
-			qm.setAttribute("GroupName", tu.getName());
+			if ( params.useGroupName ) {
+				qm.setAttribute("GroupName", tu.getName());
+			}
 			qm.leverage(tu);
+			cont = tu.getTarget(trgLang);
+
+			// Compute statistics
+			if ( cont != null ) {
+				ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
+				if ( scores != null ) {
+					for ( int score : scores.getList() ) {
+						if ( score > 99 ) exactDocCount++;
+						else if ( score != 0 ) fuzzyDocCount++;
+					}
+				}
+			}
 		}
 	}
 
