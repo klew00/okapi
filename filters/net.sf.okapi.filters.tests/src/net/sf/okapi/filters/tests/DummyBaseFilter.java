@@ -71,6 +71,7 @@ public class DummyBaseFilter extends BaseFilter {
 
 	private void createCase2 () {
 		setMimeType("text/xml");
+		setNewlineType("\n");
 		initialize();
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();
 		list.add(new PropertyTextUnitPlaceholder(PlaceholderType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
@@ -96,11 +97,5 @@ public class DummyBaseFilter extends BaseFilter {
 	@Override
 	protected boolean hasUtf8Encoding() {
 		return false;
-	}
-	
-	@Override
-	protected String getLineBreak () {
-		return "\n";
-	}
-
+	}	
 }

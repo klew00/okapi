@@ -73,7 +73,7 @@ public class FileResource implements IResource {
 		setEncoding("UTF-16BE");
 		setMimeType(mimeType);
 		setLocale(locale);
-		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewLineType(getInputCharSequence()));		
+		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewlineType(getInputCharSequence()));		
 	}
 	
 	public void reset(URI inputURI, String encoding, String mimeType, String locale) {
@@ -83,7 +83,7 @@ public class FileResource implements IResource {
 		try {
 			InputStream inputStream = inputURI.toURL().openStream();
 			setInputStream(inputStream);
-			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewLineType());
+			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewlineType());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
@@ -97,7 +97,7 @@ public class FileResource implements IResource {
 		setLocale(locale);
 		setInputStream(inputStream);
 		try {
-			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewLineType());
+			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewlineType());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

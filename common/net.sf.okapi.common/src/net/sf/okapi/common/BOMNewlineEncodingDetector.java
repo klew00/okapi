@@ -105,7 +105,7 @@ public final class BOMNewlineEncodingDetector {
 		init();
 	}
 	
-	public static NewlineType getNewLineType(CharSequence text) {
+	public static NewlineType getNewlineType(CharSequence text) {
 		for (int i = 0; i < text.length(); i++) {
 			char ch = text.charAt(i);
 			if (ch == '\n')
@@ -116,7 +116,7 @@ public final class BOMNewlineEncodingDetector {
 		return null;
 	}
 
-	public NewlineType getNewLineType() {
+	public NewlineType getNewlineType() {
 		char c;
 		try {
 			Reader reader = openReader();

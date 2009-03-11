@@ -71,6 +71,7 @@ public abstract class BaseFilter implements IFilter {
 	private String encoding;
 	private String srcLang;
 	private String mimeType;
+	private String newlineType;
 	
 	private String currentTagType;
 
@@ -441,6 +442,9 @@ public abstract class BaseFilter implements IFilter {
 
 		canceled = false;
 		done = false;
+		preserveWhitespace = true;
+		
+		newlineType = "\n";
 
 		referencableFilterEvents = new LinkedList<Event>();
 		filterEvents = new LinkedList<Event>();
@@ -473,7 +477,7 @@ public abstract class BaseFilter implements IFilter {
 		startDocument.setEncoding(getEncoding(), hasUtf8Encoding() && hasUtf8Bom());
 		startDocument.setLanguage(getSrcLang());
 		startDocument.setMimeType(getMimeType());
-		startDocument.setLineBreak(getLineBreak());
+		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
@@ -1134,6 +1138,11 @@ public abstract class BaseFilter implements IFilter {
 	
 	abstract protected boolean hasUtf8Bom();
 	
-	abstract protected String getLineBreak();
-	
+	protected String getNewlineType() {
+		return newlineType;
+	}
+
+	protected void setNewlineType(String newlineType) {
+		this.newlineType = newlineType;
+	}	
 }
