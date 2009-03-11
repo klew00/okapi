@@ -70,7 +70,6 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	private BOMNewlineEncodingDetector bomEncodingDetector;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
-	private String lineBreak;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -82,7 +81,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		super();		
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
-		lineBreak = System.getProperty("line.separator");
+		setNewlineType(System.getProperty("line.separator"));
 	}
 
 	/*
@@ -121,7 +120,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	public void close() {
 		this.parameters = null;
-		this.document = null; // help Java GC
+		this.document = null; // help Java GC		
 	}
 
 	public Source getParsedHeader(final InputStream inputStream) {
@@ -143,13 +142,19 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 	}
 
-	public void open(CharSequence input) {
+	public void open(CharSequence input) {				
+		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());		
 		document = new Source(input);
 		initialize();
 	}
 
 	public void open(InputStream input) {
-		try {
+		try {							
+			bomEncodingDetector = new BOMNewlineEncodingDetector(input);			
+			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
+			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;		
+			setNewlineType(bomEncodingDetector.getNewlineType().toString());
+			
 			Source parsedHeader = getParsedHeader(input);
 			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
@@ -162,9 +167,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			}
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
-			bomis.detectEncoding(); // TODO why do we need to call this?
+			bomis.detectEncoding(); // TODO: why do we need to call this?
 			document = new Source(new InputStreamReader(bomis, detectedEncoding));
-
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -182,16 +186,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	@Override
-	protected void initialize() {
-		super.initialize();
+	protected void initialize() {				
+		super.initialize();		
 		
-		if (bomEncodingDetector != null) {
-			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
-			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
-			lineBreak = bomEncodingDetector.getNewlineType().toString();
-			setNewlineType(lineBreak);
-		}
-
 		if (parameters == null) {
 			parameters = new Parameters(defaultConfig);
 		}

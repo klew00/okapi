@@ -11,7 +11,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.markupfilter.Parameters;
 
 import org.junit.After;
 import org.junit.Before;
@@ -50,8 +49,9 @@ public class HtmlFullFileTest {
 			htmlFilter.open(htmlStream);
 			try {
 				while (htmlFilter.hasNext()) {
+					@SuppressWarnings("unused")
 					Event event = htmlFilter.next();
-				}
+				}				
 			} catch (Exception e) {
 				//System.err.println("Error for file: " + f + ": " + e.toString());
 				throw new RuntimeException("Error for file: " + f + ": " + e.toString());
@@ -65,6 +65,7 @@ public class HtmlFullFileTest {
 		MemMappedCharSequence charSequence = new MemMappedCharSequence(htmlStream, "UTF-8");
 		htmlFilter.open(charSequence);
 		while (htmlFilter.hasNext()) {
+			@SuppressWarnings("unused")
 			Event event = htmlFilter.next();
 		}
 	}

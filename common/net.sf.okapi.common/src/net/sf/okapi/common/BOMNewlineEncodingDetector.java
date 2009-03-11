@@ -102,6 +102,7 @@ public final class BOMNewlineEncodingDetector {
 	
 	public BOMNewlineEncodingDetector(final InputStream inputStream) throws IOException {
 		this.inputStream=inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
+		inputStream.mark(0);
 		init();
 	}
 	
@@ -113,14 +114,15 @@ public final class BOMNewlineEncodingDetector {
 			if (ch == '\r')
 				return (++i < text.length() && text.charAt(i) == '\n') ? NewlineType.CRLF : NewlineType.CR;
 		}
-		return null;
+		return NewlineType.LF;
 	}
 
 	public NewlineType getNewlineType() {
-		char c;
+		int c;
+		Reader reader = null;
 		try {
-			Reader reader = openReader();
-			while ((c = (char) reader.read()) != -1) {
+			reader = openReader();
+			while ((c = reader.read()) != -1) {
 				if (c == '\n')
 					return NewlineType.LF;
 				if (c == '\r') {
@@ -132,10 +134,16 @@ public final class BOMNewlineEncodingDetector {
 				}
 			}
 		} catch (IOException e) {
-			return null;
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				inputStream.reset();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
-		return null;
+		return NewlineType.LF;
 	}
 	
 	public InputStream getInputStream() {
@@ -158,11 +166,11 @@ public final class BOMNewlineEncodingDetector {
 		return documentSpecifiedEncodingPossible;
 	}
 
-	public Reader openReader() throws UnsupportedEncodingException {
+	public Reader openReader() throws UnsupportedEncodingException {		
 		// encoding==null only if input stream is empty so use an arbitrary encoding.
 		if (encoding==null) return new InputStreamReader(inputStream,ISO_8859_1); 
 		if (!Charset.isSupported(encoding)) throw new UnsupportedEncodingException(encoding+" - "+encodingSpecificationInfo);
-		return new InputStreamReader(inputStream,encoding);
+		return new InputStreamReader(inputStream, encoding);
 	}
 
 	private boolean setEncoding(final String encoding, final String encodingSpecificationInfo) {
@@ -174,8 +182,8 @@ public final class BOMNewlineEncodingDetector {
 	private boolean init() throws IOException {
 		hasUtf8Bom = false;
 		hasUtf7Bom = false;
-		hasBom = false;
-		inputStream.mark(4);
+		hasBom = false;		
+		
 		final int b1=inputStream.read();
 		if (b1==-1) return setEncoding(null,"empty input stream");
 		final int b2=inputStream.read();
