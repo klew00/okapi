@@ -175,6 +175,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+		propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+
 		switch (getConfig().getMainRuleType(startTag.getName())) {
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -182,13 +185,9 @@ public class HtmlFilter extends BaseMarkupFilter {
 			}
 			addCodeToCurrentTextUnit(startTag);
 			break;
-
 		case ATTRIBUTES_ONLY:
 			// we assume we have already ended any (non-complex) TextUnit in
-			// the main while loop above
-			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
-
-			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			// the main while loop in BaseMarkupFilter
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
@@ -199,15 +198,38 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().pushGroupRule(startTag.getName());
-			startGroup(new GenericSkeleton(startTag.toString()));
+			
+			// catch tags which are not listed in the config but have attributes that require processing
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startGroup(new GenericSkeleton(startTag.toString()), startTag.getName(), propertyTextUnitPlaceholders);
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				startGroup(new GenericSkeleton(startTag.toString()));
+			}
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().pushExcludedRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			
+			// catch tags which are not listed in the config but have attributes that require processing
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				addToDocumentPart(startTag.toString());
+			}
 			break;
 		case INCLUDED_ELEMENT:
 			getRuleState().pushIncludedRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				addToDocumentPart(startTag.toString());
+			}
+
 			break;
 		case TEXT_UNIT_ELEMENT:
 			getRuleState().pushTextUnitRule(startTag.getName());
@@ -220,10 +242,24 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-			addToDocumentPart(startTag.toString());
+			
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				addToDocumentPart(startTag.toString());
+			}
 			break;
 		default:
-			addToDocumentPart(startTag.toString());
+			// catch tags which are not listed in the config but have attributes that require processing
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				addToDocumentPart(startTag.toString());
+			}
 		}
 	}
 
@@ -401,6 +437,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 		decodedValue = NumericCharacterReference.decode(value, true);
 		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
 			decodedValue = collapseWhitespace(decodedValue);
+		} else {
+			decodedValue = Util.normalizeNewlines(decodedValue);
 		}
 		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
 	}

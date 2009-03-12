@@ -137,7 +137,7 @@ public class HtmlEventTest {
 	
 	@Test
 	public void testXmlLang() {
-		String snippet = "<dummy xml:lang=\"en\"/>";
+		String snippet = "<yyy xml:lang=\"en\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
@@ -145,7 +145,7 @@ public class HtmlEventTest {
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp1 = new DocumentPart("dp1", false);
-		skel.add("<dummy xml:lang=\"");
+		skel.add("<yyy xml:lang=\"");
 		dp1.setSourceProperty(new Property("language", "en", false));
 		skel.addValuePlaceholder(dp1, "language", null);		
 		skel.add("\"/>");

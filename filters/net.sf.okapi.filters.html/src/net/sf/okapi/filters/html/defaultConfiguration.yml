@@ -50,7 +50,7 @@ lang:
   
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
-# with embedded skeketon 
+# with embedded skeleton 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: {content: [http-equiv, EQUALS, keywords]}
@@ -289,14 +289,14 @@ face:
 
 # Excluded elements
 style:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
 stylesheet:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
 # javascript etc.
 script:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
 # preserve whitespace
 pre:

@@ -232,11 +232,10 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
-				// settings for preserving whitespace
-				handlePreserveWhiteSpace(tag.getName());
-
-				// set generic tag type
-				setTagType(getConfig().getElementType(tag.getName()));								
+				// set generic inline tag type
+				setTagType(getConfig().getElementType(tag.getName()));
+				
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
 
 				// We just hit a tag that could close the current TextUnit, but
 				// only if it was not opened with a TextUnit tag (i.e., complex
@@ -414,19 +413,18 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				mainEndPos, valueStartPos, valueEndPos);
 	}
 
-	protected void handlePreserveWhiteSpace(String tagName) {
-		if (getConfig().isRuleType(tagName, RULE_TYPE.PRESERVE_WHITESPACE)) {
-			setPreserveWhitespace(true);
-		} else {
-			setPreserveWhitespace(false);
-		}
-	}
-
 	protected boolean hasUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
 
 	protected boolean hasUtf8Bom() {
 		return hasUtf8Bom;
-	}	
+	}
+	
+	protected boolean keepOriginalFormatting() {
+		if (getRuleState().isPreserveWhitespaceState() && !getConfig().collapseWhitespace()) {
+			return true;
+		}
+		return false;
+	}
 }

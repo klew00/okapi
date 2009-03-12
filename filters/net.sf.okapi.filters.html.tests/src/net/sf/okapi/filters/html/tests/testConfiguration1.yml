@@ -323,14 +323,14 @@ face:
 
 # Excluded elements
 style:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
 stylesheet:
   ruleTypes: [EXCLUDE]
 
 # javascript etc.
 script:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
 # preserve whitespace
 pre:

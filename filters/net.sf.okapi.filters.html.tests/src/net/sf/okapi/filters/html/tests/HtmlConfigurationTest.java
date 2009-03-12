@@ -78,7 +78,6 @@ public class HtmlConfigurationTest {
 		
 		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
 		assertEquals(rules.getMainRuleType("style"), TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
-		assertTrue(rules.isRuleType("style", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertFalse(rules.isRuleType("stylesheet", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertFalse(rules.isRuleType("p", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));		

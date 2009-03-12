@@ -404,5 +404,5 @@ stylesheet:
 
 # javascript etc.
 script:
-  ruleTypes: [EXCLUDE, PRESERVE_WHITESPACE]
+  ruleTypes: [EXCLUDE]
 
