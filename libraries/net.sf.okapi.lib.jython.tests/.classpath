@@ -5,5 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.jython"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.pipeline"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
