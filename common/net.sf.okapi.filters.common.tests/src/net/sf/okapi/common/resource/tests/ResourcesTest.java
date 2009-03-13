@@ -42,6 +42,13 @@ public class ResourcesTest extends TestCase {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		ArrayList<Event> list = new ArrayList<Event>();
 		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("en");
+		sd.setLineBreak("\n");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
+
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnit tu = new TextUnit("t1", "one,two,three");
@@ -69,6 +76,13 @@ public class ResourcesTest extends TestCase {
 		String test = "<p title='my title'>Text of p</p>";
 		ArrayList<Event> list = new ArrayList<Event>();
 		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("en");
+		sd.setLineBreak("\n");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
+
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("t1", "my title");
@@ -98,6 +112,13 @@ public class ResourcesTest extends TestCase {
 		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
 		ArrayList<Event> list = new ArrayList<Event>();
 		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("en");
+		sd.setLineBreak("\n");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
+
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnit tu = new TextUnit("t1", "text");
@@ -133,6 +154,13 @@ public class ResourcesTest extends TestCase {
 		String test = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
 		ArrayList<Event> list = new ArrayList<Event>();
 		
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-16", false);
+		sd.setIsMultilingual(true);
+		sd.setLanguage("en");
+		sd.setLineBreak("\n");
+		list.add(new Event(EventType.START_DOCUMENT, sd));
+
 		GenericSkeleton skel = new GenericSkeleton();
 		DocumentPart dp1 = new DocumentPart("dp1", true);
 		skel.add("<a href=\"");
@@ -172,6 +200,7 @@ public class ResourcesTest extends TestCase {
 		sd.setEncoding("UTF-16", false);
 		sd.setIsMultilingual(true);
 		sd.setLanguage("en");
+		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
 		GenericSkeleton skel = new GenericSkeleton();
@@ -197,6 +226,7 @@ public class ResourcesTest extends TestCase {
 		sd.setEncoding("UTF-16", false);
 		sd.setIsMultilingual(true);
 		sd.setLanguage("EN");
+		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
 		// Create the main tu and its skeleton
@@ -257,6 +287,8 @@ public class ResourcesTest extends TestCase {
 		list.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		// Output and compare
+		//FAIL TEST: content of sub is en instead of sv
+		//This is a reported issue.
 		assertEquals(generateOutput(list, test, trgLang), test);
 	}
 	

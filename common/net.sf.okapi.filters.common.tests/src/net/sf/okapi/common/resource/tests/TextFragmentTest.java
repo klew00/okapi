@@ -185,12 +185,12 @@ public class TextFragmentTest extends TestCase {
 		
 		code1 = new Code(TagType.PLACEHOLDER, "t", "d");
 		assertFalse(code1.hasReference());
-		assertTrue(code1.isCloneable());
-		assertTrue(code1.isDeleteable());
+		assertFalse(code1.isCloneable());
+		assertFalse(code1.isDeleteable());
 		code2 = code1.clone();
 		assertFalse(code2.hasReference());
-		assertTrue(code2.isCloneable());
-		assertTrue(code2.isDeleteable());
+		assertFalse(code2.isCloneable());
+		assertFalse(code2.isDeleteable());
 		
 		code1.setHasReference(true);
 		code1.setIsCloneable(true);
