@@ -3,6 +3,13 @@
 	<name>python.pipeline</name>
 	<comment></comment>
 	<projects>
+		<project>net.sf.okapi.common</project>
+		<project>net.sf.okapi.filters.common</project>
+		<project>net.sf.okapi.filters.html</project>
+		<project>net.sf.okapi.filters.markupfilter</project>
+		<project>net.sf.okapi.pipeline</project>
+		<project>third-party.logger-slf4j</project>
+		<project>third-party.stax-wstx</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
