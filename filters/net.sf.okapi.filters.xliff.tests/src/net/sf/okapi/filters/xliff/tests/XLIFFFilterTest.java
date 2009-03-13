@@ -23,14 +23,14 @@ package net.sf.okapi.filters.xliff.tests;
 import java.net.URI;
 import java.net.URL;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.TextUnit;
+//import net.sf.okapi.common.Event;
+//import net.sf.okapi.common.filters.IFilter;
+//import net.sf.okapi.common.IResource;
+//import net.sf.okapi.common.ISkeleton;
+//import net.sf.okapi.common.resource.INameable;
+//import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.xliff.AltTransAnnotation;
+//import net.sf.okapi.filters.xliff.AltTransAnnotation;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 import org.junit.Assert;
@@ -59,7 +59,7 @@ public class XLIFFFilterTest {
 		}
 	}
 	
-	private void process (IFilter filter) {
+/*	private void process (IFilter filter) {
 		System.out.println("================================================");
 		Event event;
 		while ( filter.hasNext() ) {
@@ -148,5 +148,5 @@ public class XLIFFFilterTest {
 		}
 		System.out.println("---end of AltTransAnnotation---");
 	}
-
+*/
 }

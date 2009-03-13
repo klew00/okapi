@@ -26,13 +26,17 @@ import java.util.Iterator;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
  * Driver to test filter output.
@@ -290,4 +294,42 @@ public class FilterTestDriver {
 		System.out.println("StartDocument Type = " + startDoc.getType());
 	}
 
+	/**
+	 * create a string output from a list of events.
+	 * @param list The list of events.
+	 * @param original The original string.
+	 * @return The generated output string
+	 */
+	public static String generateOutput(ArrayList<Event> list, String original) {
+		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+		StringBuilder tmp = new StringBuilder();
+		for (Event event : list) {
+			switch (event.getEventType()) {
+			case START_DOCUMENT:
+				tmp.append(writer.processStartDocument("en", "utf-8", null, new EncoderManager(),
+					(StartDocument) event.getResource()));
+				break;
+			case END_DOCUMENT:
+				tmp.append(writer.processEndDocument((Ending)event.getResource()));
+				break;
+			case TEXT_UNIT:
+				TextUnit tu = (TextUnit) event.getResource();
+				tmp.append(writer.processTextUnit(tu));
+				break;
+			case DOCUMENT_PART:
+				DocumentPart dp = (DocumentPart) event.getResource();
+				tmp.append(writer.processDocumentPart(dp));
+				break;
+			case START_GROUP:
+				StartGroup startGroup = (StartGroup) event.getResource();
+				tmp.append(writer.processStartGroup(startGroup));
+				break;
+			case END_GROUP:
+				tmp.append(writer.processEndGroup((Ending)event.getResource()));
+				break;
+			}
+		}
+		writer.close();
+		return tmp.toString();
+	}
 }

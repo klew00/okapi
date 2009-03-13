@@ -20,15 +20,27 @@
 
 package net.sf.okapi.filters.xml.tests;
 
-import java.net.URL;
+import static org.junit.Assert.assertEquals;
 
+import java.net.URL;
+import java.util.ArrayList;
+
+import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.xml.XMLFilter;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class XMLFilterTest {
+
+	private XMLFilter xmlFilter;
+
+	@Before
+	public void setUp() {
+		xmlFilter = new XMLFilter();
+	}
 
 	@Test
 	public void runTest () {
@@ -36,7 +48,7 @@ public class XMLFilterTest {
 		XMLFilter filter = null;		
 		try {
 			filter = new XMLFilter();
-			filter.setOptions("en", "es", "UTF-8", true);
+			filter.setOptions("en", "es", "UTF-16", true);
 			
 			URL url = XMLFilterTest.class.getResource("/input.xml");
 			filter.open(url.toURI());
@@ -57,4 +69,39 @@ public class XMLFilterTest {
 		}
 	}
 
+	@Test
+	public void basicElement () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><!--c--></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><?pi ?></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc>T</doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc/>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+	}
+	
+	@Test
+	public void simpleContent () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><p>test</p></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+	}
+	
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		xmlFilter.open(snippet);
+		while (xmlFilter.hasNext()) {
+			Event event = xmlFilter.next();
+			list.add(event);
+		}
+		xmlFilter.close();
+		return list;
+	}
+
+	
 }
