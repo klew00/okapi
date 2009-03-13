@@ -39,7 +39,7 @@ public class ODFFilterTest {
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(false);
-			testDriver.setShowOnlyTextUnits(false);
+			testDriver.setDisplayLevel(0);
 			filter = new ODFFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = ODFFilterTest.class.getResource("/TestDocument01.odt_content.xml");

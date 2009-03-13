@@ -43,7 +43,7 @@ public class RegexFilterTest {
 		RegexFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
-			testDriver.setShowOnlyTextUnits(false);
+			testDriver.setDisplayLevel(0);
 			testDriver.setShowSkeleton(true);
 			filter = new RegexFilter();
 			IParameters params = new Parameters();

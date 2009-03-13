@@ -43,7 +43,7 @@ public class MIFFilterTest {
 		try {
 			testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(false);
-			testDriver.setShowOnlyTextUnits(false);
+			testDriver.setDisplayLevel(0);
 			filter = new MIFFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = MIFFilterTest.class.getResource("/Test01.mif");

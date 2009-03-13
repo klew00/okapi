@@ -44,7 +44,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 public class FilterTestDriver {
 
 	private boolean showSkeleton = true;
-	private boolean showOnlyTextUnits = false;
+	private int displayLevel = 0;
 	private int warnings;
 	private boolean ok;
 
@@ -128,14 +128,13 @@ public class FilterTestDriver {
 	}
 
 	/**
-	 * Indicates to this driver that only the TEXT_UNIT event should be
-	 * displayed.
+	 * Indicates what to display.
 	 * 
 	 * @param value
-	 *            True to show only the text units, false to show all events.
+	 *            0=display nothing, 1=display TU only, >1=display all.
 	 */
-	public void setShowOnlyTextUnits(boolean value) {
-		showOnlyTextUnits = value;
+	public void setDisplayLevel (int value) {
+		displayLevel = value;
 
 	}
 
@@ -157,67 +156,57 @@ public class FilterTestDriver {
 		int startSubDoc = 0;
 		int endSubDoc = 0;
 
-		System.out.println("================================================");
 		Event event;
 		while (filter.hasNext()) {
 			event = filter.next();
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
 				startDoc++;
-				System.out.println("---Start Document");
 				checkStartDocument((StartDocument) event.getResource());
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
+				System.out.println("---Start Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
 				endDoc++;
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---End Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
 				startSubDoc++;
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---Start Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
 				endSubDoc++;
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---End Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_GROUP:
 				startGroup++;
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---Start Group");
 				printSkeleton(event.getResource());
 				break;
 			case END_GROUP:
 				endGroup++;
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---End Group");
 				printSkeleton(event.getResource());
 				break;
 			case TEXT_UNIT:
-				System.out.println("---Text Unit");
-				TextUnit tu = (TextUnit) event.getResource();
-				System.out.println("S=[" + tu.toString() + "]");
-				for (String lang : tu.getTargetLanguages()) {
-					System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
-				}
+				TextUnit tu = (TextUnit)event.getResource();
+				if ( displayLevel < 1 ) break;
+				printTU(tu);
+				if ( displayLevel < 2 ) break;
 				printResource(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
-				if (showOnlyTextUnits)
-					break;
+				if ( displayLevel < 2 ) break;
 				System.out.println("---Document Part");
 				printResource((INameable) event.getResource());
 				printSkeleton(event.getResource());
@@ -225,25 +214,32 @@ public class FilterTestDriver {
 			}
 		}
 
-		if (startDoc != 1) {
-			System.out.println(String.format("*****ERROR: START_DOCUMENT = %d", startDoc));
+		if ( startDoc != 1 ) {
+			System.err.println(String.format("ERROR: START_DOCUMENT = %d", startDoc));
 			ok = false;
 		}
-		if (endDoc != 1) {
-			System.out.println(String.format("*****ERROR: END_DOCUMENT = %d", endDoc));
+		if ( endDoc != 1 ) {
+			System.err.println(String.format("ERROR: END_DOCUMENT = %d", endDoc));
 			ok = false;
 		}
-		if (startSubDoc != endSubDoc) {
-			System.out.println(String.format("*****ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc,
-					endSubDoc));
+		if ( startSubDoc != endSubDoc ) {
+			System.err.println(String.format("ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc,
+				endSubDoc));
 			ok = false;
 		}
-		if (startGroup != endGroup) {
-			System.out.println(String.format("*****ERROR: START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
+		if ( startGroup != endGroup ) {
+			System.out.println(String.format("ERROR: START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
 			ok = false;
 		}
-		System.out.println(String.format("Number of warnings = %d", warnings));
 		return ok;
+	}
+
+	private void printTU (TextUnit tu) {
+		System.out.println("---Text Unit");
+		System.out.println("S=[" + tu.toString() + "]");
+		for (String lang : tu.getTargetLanguages()) {
+			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
+		}
 	}
 
 	private void printResource(INameable res) {
@@ -271,42 +267,45 @@ public class FilterTestDriver {
 	private void checkStartDocument(StartDocument startDoc) {
 		String tmp = startDoc.getEncoding();
 		if ((tmp == null) || (tmp.length() == 0)) {
-			System.out.println("*****WARNING: No encoding specified in StartDocument.");
+			System.err.println("WARNING: No encoding specified in StartDocument.");
 			warnings++;
 		} else
 			System.out.println("StartDocument encoding = " + tmp);
 
 		tmp = startDoc.getLanguage();
 		if ((tmp == null) || (tmp.length() == 0)) {
-			System.out.println("*****WARNING: No language specified in StartDocument.");
+			System.err.println("WARNING: No language specified in StartDocument.");
 			warnings++;
 		} else
 			System.out.println("StartDocument language = " + tmp);
 
 		tmp = startDoc.getName();
 		if ((tmp == null) || (tmp.length() == 0)) {
-			System.out.println("*****WARNING: No name specified in StartDocument.");
+			System.err.println("WARNING: No name specified in StartDocument.");
 			warnings++;
 		} else
 			System.out.println("StartDocument name = " + tmp);
-
-		System.out.println("StartDocument MIME type = " + startDoc.getMimeType());
-		System.out.println("StartDocument Type = " + startDoc.getType());
+		if ( displayLevel < 2 ) return;
+		System.err.println("StartDocument MIME type = " + startDoc.getMimeType());
+		System.err.println("StartDocument Type = " + startDoc.getType());
 	}
 
 	/**
 	 * create a string output from a list of events.
 	 * @param list The list of events.
 	 * @param original The original string.
+	 * @param trgLang Code of the target (output) language.
 	 * @return The generated output string
 	 */
-	public static String generateOutput(ArrayList<Event> list, String original) {
+	public static String generateOutput(ArrayList<Event> list,
+		String original,
+		String trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				tmp.append(writer.processStartDocument("en", "utf-8", null, new EncoderManager(),
+				tmp.append(writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(),
 					(StartDocument) event.getResource()));
 				break;
 			case END_DOCUMENT:

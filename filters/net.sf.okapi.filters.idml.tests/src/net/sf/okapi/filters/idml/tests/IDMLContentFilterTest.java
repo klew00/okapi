@@ -39,7 +39,7 @@ public class IDMLContentFilterTest {
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(false);
-			testDriver.setShowOnlyTextUnits(false);
+			testDriver.setDisplayLevel(0);
 			filter = new IDMLContentFilter();
 			filter.setOptions("en", "UTF-8", true);
 			URL url = IDMLContentFilterTest.class.getResource("/Story_story1.xml");

@@ -73,23 +73,31 @@ public class XMLFilterTest {
 	public void basicElement () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><!--c--></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><?pi ?></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc>T</doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc/>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 	}
 	
 	@Test
 	public void simpleContent () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><p>test</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc xml:lang='en'>test</doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc xml:lang='FR'>test</doc>";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
