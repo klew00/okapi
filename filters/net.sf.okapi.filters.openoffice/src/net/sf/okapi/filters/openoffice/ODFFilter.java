@@ -130,6 +130,7 @@ public class ODFFilter implements IFilter {
 		toProtect.add("text:object-count");
 		toProtect.add("dc:date");
 		toProtect.add("dc:creator");
+		toProtect.add("text:bookmark-ref");
 	}
 
 	public void close () {
