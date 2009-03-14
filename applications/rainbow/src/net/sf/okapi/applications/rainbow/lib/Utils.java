@@ -298,17 +298,12 @@ public class Utils {
 	/**
 	 * Tries to detect the encoding and optionally the line-break type of a given file.
 	 * @param p_sPath the full path of the file.
-	 * @param p_bDetectLB True to try to detect line-break
-	 * @return A string array: 0=encoding, 1=Line-break type. If the encoding could not be detected
-	 * a value null is return for it. If the line-break could not be detected, a value null is
-	 * return for it.
+	 * @return The detected encoding or null.
 	 */
-	public static String[] detectFileInformation (String p_sPath,
-		boolean p_bDetectLB)
-	{
+	public static String detectEncoding (String p_sPath) {
 		// Set defaults
 		FileInputStream IS = null;
-		String[] aInfo = new String[2];
+		String encoding = null;
 		try {
 			// Opens the file
 			IS = new FileInputStream(p_sPath);
@@ -318,15 +313,13 @@ public class Utils {
 			//TODO: add detection for UTF-32			
 			if ( nRead > 1 ) {
 				// Try to get detect the encoding values
-				if (( Buf[0]==(byte)0xFE ) && ( Buf[1]==(byte)0xFF )) aInfo[0] = "UTF-16BE";
-				if (( Buf[0]==(byte)0xFF ) && ( Buf[1]==(byte)0xFE )) aInfo[0] = "UTF-16LE";
+				if (( Buf[0]==(byte)0xFE ) && ( Buf[1]==(byte)0xFF )) encoding = "UTF-16BE";
+				if (( Buf[0]==(byte)0xFF ) && ( Buf[1]==(byte)0xFE )) encoding = "UTF-16LE";
 				if ( nRead > 2 ) {
 					if (( Buf[0]==(byte)0xEF ) && ( Buf[1]==(byte)0xBB ) && ( Buf[3]==(byte)0xBF ))
-						aInfo[0] = "UTF-8";
+						encoding = "UTF-8";
 				}
 			}
-
-			//TODO: LB auto-detection
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -335,7 +328,7 @@ public class Utils {
 			if ( IS != null )
 				try { IS.close(); } catch ( IOException e ){};
 		}
-		return aInfo;
+		return encoding;
 	}
 	
 	/**

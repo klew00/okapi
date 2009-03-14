@@ -45,7 +45,8 @@ public class Editor implements IParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
-	private Button chkExtractComments;
+	private Button chkExtractNotes;
+	private Button chkExtractReferences;
 	private Parameters params;
 	private IHelp help;
 
@@ -84,7 +85,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void create (Shell parent) {
-		shell.setText("OpenOffice Filter Parameters");
+		shell.setText("OpenOffice/ODF Filter Parameters");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -101,8 +102,11 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
-		chkExtractComments = new Button(cmpTmp, SWT.CHECK);
-		chkExtractComments.setText("Extract comments (office:annotation)");
+		chkExtractNotes = new Button(cmpTmp, SWT.CHECK);
+		chkExtractNotes.setText("Extract notes (office:annotation)");
+
+		chkExtractReferences = new Button(cmpTmp, SWT.CHECK);
+		chkExtractReferences.setText("Extract references (text:bookmark-ref)");
 
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
@@ -151,11 +155,13 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		chkExtractComments.setSelection(params.extractComments);
+		chkExtractNotes.setSelection(params.extractNotes);
+		chkExtractReferences.setSelection(params.extractReferences);
 	}
 	
 	private boolean saveData () {
-		params.extractComments = chkExtractComments.getSelection();
+		params.extractNotes = chkExtractNotes.getSelection();
+		params.extractReferences = chkExtractReferences.getSelection();
 		return true;
 	}
 	

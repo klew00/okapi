@@ -33,7 +33,8 @@ public class FormatManager {
 	 * 1=guessed filter settings or null,
 	 */
 	public String[] guessFormat (String p_sPath) {
-		String[] aRes = Utils.detectFileInformation(p_sPath, false);
+		String[] aRes = new String[2];
+		aRes[0] = Utils.detectEncoding(p_sPath);
 		aRes[1] = null; 
 		String sExt = Utils.getExtension(p_sPath).toLowerCase();
 		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";

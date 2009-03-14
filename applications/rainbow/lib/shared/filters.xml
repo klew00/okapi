@@ -34,10 +34,12 @@
   
  <filter id="okf_openoffice"
   inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
+  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
  >OpenOffice.org Documents (ODT, ODS, ODG, ODP)</filter>
   
  <filter id="okf_odf"
   inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
+  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
  >Open Document (ODF)</filter>
   
  <filter id="okf_mif"
@@ -51,5 +53,13 @@
  <filter id="okf_idmlcontent"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
  >InDesign IDML Content Document</filter>
+
+ <filter id="okf_msoffice"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLZipFilter"
+ >Microsoft Office 2007 (DOCX, XSLX, PTTX)</filter>
+  
+ <filter id="okf_openxml"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
+ >Microsoft OpenXML Documents (Used in Microsoft Office 2007)</filter>
   
 </okapiFilters>

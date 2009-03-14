@@ -67,7 +67,12 @@ public class OpenOfficeFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String srcLang;
 	private ODFFilter filter;
+	private Parameters params;
 
+	public OpenOfficeFilter () {
+		params = new Parameters();
+	}
+	
 	public void cancel () {
 		// TODO Auto-generated method stub
 	}
@@ -94,7 +99,7 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "okf_idml";
+		return "okf_openoffice";
 	}
 
 	public String getMimeType () {
@@ -102,12 +107,13 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
+		// Should be the same as the internal ODF filter already 
+		return params;
 	}
 
 	public boolean hasNext () {
-		return ((( queue != null ) && ( !queue.isEmpty() )) || ( nextAction != NextAction.DONE ));
+		return ((( queue != null ) && ( !queue.isEmpty() ))
+			|| ( nextAction != NextAction.DONE ));
 	}
 
 	public Event next () {
@@ -147,6 +153,7 @@ public class OpenOfficeFilter implements IFilter {
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		filter = new ODFFilter();
+		filter.setParameters(params);
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -165,7 +172,8 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		this.params = (Parameters)params;
+		if ( filter != null ) filter.setParameters(params);
 	}
 
 	private Event openZipFile () {

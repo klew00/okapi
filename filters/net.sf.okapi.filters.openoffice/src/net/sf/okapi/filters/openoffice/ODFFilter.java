@@ -68,6 +68,8 @@ public class ODFFilter implements IFilter {
 	
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
+	
+	protected static final String TEXT_BOOKMARK_REF = "text:bookmark-ref";
 
 	private Hashtable<String, ElementRule> toExtract;
 	private ArrayList<String> toProtect;
@@ -75,7 +77,6 @@ public class ODFFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String docName;
 	private XMLStreamReader reader;
-	private Stack<Boolean> extract;
 	private int otherId;
 	private int tuId;
 	private String language;
@@ -88,8 +89,6 @@ public class ODFFilter implements IFilter {
 	private Stack<Context> units;
 
 	public ODFFilter () {
-		params = new Parameters();
-		
 		toExtract = new Hashtable<String, ElementRule>();
 		toExtract.put("text:p", new ElementRule("text:p", null));
 		toExtract.put("text:h", new ElementRule("text:h", null));
@@ -113,9 +112,6 @@ public class ODFFilter implements IFilter {
 		toProtect.add("text:print-time");
 		toProtect.add("text:print-date");
 		toProtect.add("text:printed-by");
-		toProtect.add("text:title");
-		toProtect.add("text:subject");
-		toProtect.add("text:keywords");
 		toProtect.add("text:editing-cycles");
 		toProtect.add("text:editing-duration");
 		toProtect.add("text:modification-time");
@@ -130,7 +126,18 @@ public class ODFFilter implements IFilter {
 		toProtect.add("text:object-count");
 		toProtect.add("dc:date");
 		toProtect.add("dc:creator");
-		toProtect.add("text:bookmark-ref");
+
+		toProtect.add("text:tracked-changes");
+
+		toProtect.add("text:title"); // Content is defined elsewhere
+		toProtect.add("text:subject"); // Content is defined elsewhere
+		toProtect.add("text:keywords"); // Content is defined elsewhere
+
+		toProtect.add(TEXT_BOOKMARK_REF); // Content is defined elsewhere
+
+		// Do it last to update the defaults if needed
+		params = new Parameters();
+		applyParameters();
 	}
 
 	public void close () {
@@ -157,6 +164,7 @@ public class ODFFilter implements IFilter {
 	public void open (InputStream input) {
 		try {
 			close();
+			applyParameters();
 			canceled = false;
 			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
@@ -166,8 +174,6 @@ public class ODFFilter implements IFilter {
 			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 			reader = fact.createXMLStreamReader(input);
 			
-			extract = new Stack<Boolean>();
-			extract.push(false);
 			units = new Stack<Context>();
 			units.push(new Context("", false));
 			otherId = 0;
@@ -240,8 +246,8 @@ public class ODFFilter implements IFilter {
 		return queue.poll();
 	}
 	
-	public void setParameters (IParameters params) {
-		params = (Parameters)params;
+	public void setParameters (IParameters newParams) {
+		params = (Parameters)newParams;
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -276,7 +282,7 @@ public class ODFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					if ( extract.peek() ) {
+					if ( units.peek().extract ) {
 						tf.append(reader.getText());
 					}
 					else { // UTF-8 element content: no escape of quote nor extended chars
@@ -306,7 +312,7 @@ public class ODFFilter implements IFilter {
 					break;
 				
 				case XMLStreamConstants.COMMENT:
-					if ( extract.peek() ) {
+					if ( units.peek().extract ) {
 						tf.append(TagType.PLACEHOLDER, null, "<!--" + reader.getText() + "-->");
 					}
 					else {
@@ -315,7 +321,7 @@ public class ODFFilter implements IFilter {
 					break;
 
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					if ( extract.peek() ) {
+					if ( units.peek().extract ) {
 						tf.append(TagType.PLACEHOLDER, null,
 							"<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
 					}
@@ -388,7 +394,7 @@ public class ODFFilter implements IFilter {
 				// Create the new id for the new sub-flow
 				String id = String.valueOf(++tuId);
 				// Add the reference to the current context
-				if ( extract.peek() ) {
+				if ( units.peek().extract ) {
 					Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
 					code.setHasReference(true);
 				}
@@ -407,7 +413,6 @@ public class ODFFilter implements IFilter {
 				// Set the new variables are the new context
 				units.push(new Context(name, true));
 				units.peek().setVariables(tf, skel, tu);
-				extract.push(true);
 			}
 			else { // Not nested
 				// Send document-part if there is a non-whitespace skeleton
@@ -424,14 +429,13 @@ public class ODFFilter implements IFilter {
 				setTUInfo(name);
 				units.push(new Context(name, true));
 				units.peek().setVariables(tf, skel, tu);
-				extract.push(true);
 			}
 		}
 		else if ( subFlow.contains(name) ) { // Is it a sub-flow (not extractable)
 			// Create the new id for the new sub-flow
 			String id = String.valueOf(++tuId);
 			// Add the reference to the current context
-			if ( extract.peek() ) {
+			if ( units.peek().extract ) {
 				Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
 				code.setHasReference(true);
 			}
@@ -451,9 +455,8 @@ public class ODFFilter implements IFilter {
 			// Set the new variables are the new context
 			units.push(new Context(name, true));
 			units.peek().setVariables(tf, skel, tu);
-			extract.push(true);
 		}
-		else if ( extract.peek() && name.equals("text:s") ) {
+		else if ( units.peek().extract && name.equals("text:s") ) {
 			String tmp = reader.getAttributeValue(NSURI_TEXT, "c");
 			if ( tmp != null ) {
 				int count = Integer.valueOf(tmp);
@@ -464,16 +467,16 @@ public class ODFFilter implements IFilter {
 			else tf.append(" "); // Default=1
 			reader.nextTag(); // Eat the end-element event
 		}
-		else if ( extract.peek() && name.equals("text:tab") ) {
+		else if ( units.peek().extract && name.equals("text:tab") ) {
 			tf.append("\t");
 			reader.nextTag(); // Eat the end-element event
 		}
-		else if ( extract.peek() && name.equals("text:line-break") ) {
+		else if ( units.peek().extract && name.equals("text:line-break") ) {
 			tf.append(new Code(TagType.PLACEHOLDER, "lb", "<text:line-break/>"));
 			reader.nextTag(); // Eat the end-element event
 		}
 		else {
-			if ( extract.peek() ) {
+			if ( units.peek().extract ) {
 				if ( name.equals("text:a") ) processStartALink(name);
 				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
 				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
@@ -557,7 +560,6 @@ public class ODFFilter implements IFilter {
 			if ( units.size() > 2 ) { // Is it a nested TU
 				// Add it to the queue
 				addTU(name);
-				extract.pop();
 				units.pop();
 				// Reset the current variable to the correct context
 				tf = units.peek().tf;
@@ -567,7 +569,6 @@ public class ODFFilter implements IFilter {
 				return false;
 			}
 			else { // Not embedded, pop first
-				extract.pop();
 				units.pop();
 				addTU(name);
 				// Trigger the events to be sent
@@ -575,7 +576,7 @@ public class ODFFilter implements IFilter {
 			}
 		}
 		else {
-			if ( extract.peek() ) {
+			if ( units.peek().extract ) {
 				tf.append(new Code(TagType.CLOSING, name, buildEndTag(name)));
 			}
 			else {
@@ -594,4 +595,17 @@ public class ODFFilter implements IFilter {
 		return false;
 	}
 
+	private void applyParameters () {
+		// Update the driver lists if needed
+		if ( toProtect.contains(TEXT_BOOKMARK_REF) ) {
+			if ( params.extractReferences ) {
+				toProtect.remove(TEXT_BOOKMARK_REF);
+			}
+		}
+		else { // Not protected 
+			if ( !params.extractReferences ) {
+				toProtect.add(TEXT_BOOKMARK_REF);
+			}
+		}
+	}
 }
