@@ -129,6 +129,7 @@ public class ODFFilter implements IFilter {
 		toProtect.add("text:image-count");
 		toProtect.add("text:object-count");
 		toProtect.add("dc:date");
+		toProtect.add("dc:creator");
 	}
 
 	public void close () {
@@ -524,9 +525,11 @@ public class ODFFilter implements IFilter {
 		}		
 	}
 
-	private void addTU (String name)
-	{
-		if ( tf.isEmpty() ) { // Send a document part if there is no content
+	private void addTU (String name) {
+		// Send a document part if there is no content
+		// But if it's in nested context, the parent is already refering to tu, and
+		// changing that reference to dp is hard, so we just send an empty tu
+		if ( tf.isEmpty() && ( units.size() < 3 )) {
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 			skel.append(buildEndTag(name)+"\n");
 			dp.setSkeleton(skel);

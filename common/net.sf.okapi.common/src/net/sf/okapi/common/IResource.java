@@ -34,7 +34,9 @@ public interface IResource {
 
 	/**
 	 * Gets the ID of the resource. This ID is unique per extracted document and by type of resource.
-	 * It and may be different from one extraction of the same document to the next.
+	 * This value is filter-specific. It and may be different from one extraction 
+	 * of the same document to the next. It can a sequential number or not, incremental 
+	 * or not, and it can be not a number.
 	 * It has no correspondence in the source document ("IDs" coming from the source document
 	 * are "names" and not available for all resources).
 	 * @return The id of this resource.
