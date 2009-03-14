@@ -102,6 +102,7 @@ public class ODFFilter implements IFilter {
 
 		subFlow = new ArrayList<String>();
 		subFlow.add("text:note");
+		subFlow.add("office:annotation");
 		
 		toProtect = new ArrayList<String>();
 		toProtect.add("text:initial-creator");
@@ -382,23 +383,26 @@ public class ODFFilter implements IFilter {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
 			if (( units.size() > 1 ) || ( subFlow.contains(name) )) { // Use nested mode
-				// Create an ID for the new tU
+				// Create the new id for the new sub-flow
 				String id = String.valueOf(++tuId);
-				// Add the reference marker to the current ontent or skeleton
+				// Add the reference to the current context
 				if ( extract.peek() ) {
-					tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
+					Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
+					code.setHasReference(true);
 				}
-				else { // Or to the skeleton
+				else { // Or in the skeleton
 					skel.addReference(tu);
 				}
-				// Create the new variable
+				// Create the new text unit
 				tu = new TextUnit(id);
+				// Set it as a referent, and set the info
+				tu.setIsReferent(true);
 				setTUInfo(name);
-				tu.setIsReferent(true); // make sure to indicate the new tu is a referent
+				// Create the new fragment and skeleton
+				// And add the start tag of the sub-flow to the new skeleton
 				tf = new TextFragment();
-				// Create the new skeleton and ppend the tstart tag
 				skel = new GenericSkeleton(buildStartTag(name));
-				// Create the bew context
+				// Set the new variables are the new context
 				units.push(new Context(name, true));
 				units.peek().setVariables(tf, skel, tu);
 				extract.push(true);
@@ -421,22 +425,28 @@ public class ODFFilter implements IFilter {
 				extract.push(true);
 			}
 		}
-		else if ( subFlow.contains(name) ) { // Is it a sub-flow (not extractable
-			//TODO: need a way to set the TextUnit's name/id/restype/etc.
+		else if ( subFlow.contains(name) ) { // Is it a sub-flow (not extractable)
+			// Create the new id for the new sub-flow
 			String id = String.valueOf(++tuId);
-			tu = new TextUnit(id);
-			tu.setIsReferent(true);
-			tf = new TextFragment();
-			setTUInfo(name);
-			// Add the start-tag and the marker to the tu of the sub-flow in the parent.
+			// Add the reference to the current context
 			if ( extract.peek() ) {
-				tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
-				tf.append(TagType.OPENING, name, TextFragment.makeRefMarker(id));
+				Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
+				code.setHasReference(true);
 			}
 			else { // Or in the skeleton
-				skel.append(buildStartTag(name));
 				skel.addReference(tu);
 			}
+			// Create the new text unit
+			tu = new TextUnit(id);
+			// Set it as a referent, and set the info
+			tu.setIsReferent(true);
+			setTUInfo(name);
+			// Create the new fragment and skeleton
+			tf = new TextFragment();
+			// Create the skeleton and add the start tag
+			skel = new GenericSkeleton(buildStartTag(name));
+			// Add the start-tag to the new context 
+			// Set the new variables are the new context
 			units.push(new Context(name, true));
 			units.peek().setVariables(tf, skel, tu);
 			extract.push(true);
@@ -514,8 +524,7 @@ public class ODFFilter implements IFilter {
 		}		
 	}
 
-	private void addTU (String name,
-		boolean nested)
+	private void addTU (String name)
 	{
 		if ( tf.isEmpty() ) { // Send a document part if there is no content
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
@@ -529,12 +538,10 @@ public class ODFFilter implements IFilter {
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);
 			tu.setMimeType(MIMETYPE);
+			// Add closing tag to the fragment or skeleton
 			// Add line break because ODF files don't have any
 			// They are needed for example in RTF output
-			//TODO: Maybe have this as an options set through the parameters but not user-driven?
-			// Note: we may keep adding extra lines if one exists already!
-			//TODO: find a way to add \n only if needed
-			if ( !nested ) skel.append(buildEndTag(name)+"\n");
+			skel.append(buildEndTag(name)+"\n");
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}
 	}
@@ -542,26 +549,23 @@ public class ODFFilter implements IFilter {
 	// Return true when it's ready to send an event
 	private boolean processEndElement () {
 		String name = makePrintName();
-		//if ( toExtract.containsKey(name) ) {
 		if ( units.peek().extract && name.equals(units.peek().name) ) {
 			if ( units.size() > 2 ) { // Is it a nested TU
 				// Add it to the queue
-				addTU(name, true);
+				addTU(name);
 				extract.pop();
 				units.pop();
 				// Reset the current variable to the correct context
 				tf = units.peek().tf;
 				tu = units.peek().tu;
 				skel = units.peek().skel;
-				// Add the closing tag of the nested element to its parent
-				tf.append(new Code(TagType.CLOSING, name, buildEndTag(name)));
 				// No trigger of the events yet
 				return false;
 			}
-			else {
+			else { // Not embedded, pop first
 				extract.pop();
 				units.pop();
-				addTU(name, false);
+				addTU(name);
 				// Trigger the events to be sent
 				return true;
 			}

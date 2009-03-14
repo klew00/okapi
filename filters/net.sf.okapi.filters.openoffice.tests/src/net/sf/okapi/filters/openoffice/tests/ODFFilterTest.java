@@ -38,7 +38,7 @@ public class ODFFilterTest {
 		ODFFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
-			testDriver.setShowSkeleton(false);
+			testDriver.setShowSkeleton(true);
 			testDriver.setDisplayLevel(3);
 			filter = new ODFFilter();
 			filter.setOptions("en", "UTF-8", true);
@@ -48,9 +48,9 @@ public class ODFFilterTest {
 			filter.close();
 
 			// Test a simple re-write
-//			filter.open(new URI(url.toString()));
-//			rewrite(filter);
-//			filter.close();
+			filter.open(new URI(url.toString()));
+			rewrite(filter);
+			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

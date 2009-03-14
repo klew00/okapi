@@ -254,8 +254,7 @@ public class FilterTestDriver {
 	}
 
 	private void printSkeleton(IResource res) {
-		if (!showSkeleton)
-			return;
+		if ( !showSkeleton ) return;
 		ISkeleton skel = res.getSkeleton();
 		if (skel != null) {
 			System.out.println("---");
