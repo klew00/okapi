@@ -111,5 +111,4 @@ public class XMLFilterTest {
 		return list;
 	}
 
-	
 }

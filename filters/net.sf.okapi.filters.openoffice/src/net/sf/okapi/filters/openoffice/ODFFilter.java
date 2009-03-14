@@ -85,6 +85,7 @@ public class ODFFilter implements IFilter {
 	private TextUnit tu;
 	private boolean canceled;
 	private boolean hasNext;
+	private Stack<Context> units;
 
 	public ODFFilter () {
 		params = new Parameters();
@@ -164,6 +165,8 @@ public class ODFFilter implements IFilter {
 			
 			extract = new Stack<Boolean>();
 			extract.push(false);
+			units = new Stack<Context>();
+			units.push(new Context("", false));
 			otherId = 0;
 			tuId = 0;
 
@@ -326,7 +329,7 @@ public class ODFFilter implements IFilter {
 		}
 	}
 
-	private void gatherInfo (String name) {
+	private void setTUInfo (String name) {
 		tu.setType("x-"+name);
 		//lang?? 
 		//id???
@@ -378,18 +381,64 @@ public class ODFFilter implements IFilter {
 	private void processStartElement () throws XMLStreamException {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
-			// Send document-part if there is non-whitespace skeleton
-			if ( !skel.isEmpty(true) ) {
-				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-				dp.setSkeleton(skel);
-				queue.add(new Event(EventType.DOCUMENT_PART, dp));
-				skel = new GenericSkeleton(); // Start new skeleton 
+			if (( units.size() > 1 ) || ( subFlow.contains(name) )) { // Use nested mode
+				// Create an ID for the new tU
+				String id = String.valueOf(++tuId);
+				// Add the reference marker to the current ontent or skeleton
+				if ( extract.peek() ) {
+					tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
+				}
+				else { // Or to the skeleton
+					skel.addReference(tu);
+				}
+				// Create the new variable
+				tu = new TextUnit(id);
+				setTUInfo(name);
+				tu.setIsReferent(true); // make sure to indicate the new tu is a referent
+				tf = new TextFragment();
+				// Create the new skeleton and ppend the tstart tag
+				skel = new GenericSkeleton(buildStartTag(name));
+				// Create the bew context
+				units.push(new Context(name, true));
+				units.peek().setVariables(tf, skel, tu);
+				extract.push(true);
 			}
-			// Start the new text-unit
-			skel.append(buildStartTag(name));
+			else { // Not nested
+				// Send document-part if there is a non-whitespace skeleton
+				if ( !skel.isEmpty(true) ) {
+					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+					dp.setSkeleton(skel);
+					queue.add(new Event(EventType.DOCUMENT_PART, dp));
+					skel = new GenericSkeleton(); // Start new skeleton 
+				}
+				// Start the new text-unit
+				skel.append(buildStartTag(name));
+				//TODO: need a way to set the TextUnit's name/id/restype/etc.
+				tu = new TextUnit(null); // ID set only if needed
+				setTUInfo(name);
+				units.push(new Context(name, true));
+				units.peek().setVariables(tf, skel, tu);
+				extract.push(true);
+			}
+		}
+		else if ( subFlow.contains(name) ) { // Is it a sub-flow (not extractable
 			//TODO: need a way to set the TextUnit's name/id/restype/etc.
-			tu = new TextUnit(null); // ID set only if needed
-			gatherInfo(name);
+			String id = String.valueOf(++tuId);
+			tu = new TextUnit(id);
+			tu.setIsReferent(true);
+			tf = new TextFragment();
+			setTUInfo(name);
+			// Add the start-tag and the marker to the tu of the sub-flow in the parent.
+			if ( extract.peek() ) {
+				tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
+				tf.append(TagType.OPENING, name, TextFragment.makeRefMarker(id));
+			}
+			else { // Or in the skeleton
+				skel.append(buildStartTag(name));
+				skel.addReference(tu);
+			}
+			units.push(new Context(name, true));
+			units.peek().setVariables(tf, skel, tu);
 			extract.push(true);
 		}
 		else if ( extract.peek() && name.equals("text:s") ) {
@@ -464,22 +513,19 @@ public class ODFFilter implements IFilter {
 			}
 		}		
 	}
-	
-	// Return true when it's ready to send an event
-	private boolean processEndElement () {
-		String name = makePrintName();
-		if ( toExtract.containsKey(name) ) {
-			extract.pop();
-			if ( tf.isEmpty() ) { // Send a document part if there is no content
-				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-				skel.append(buildEndTag(name)+"\n");
-				dp.setSkeleton(skel);
-				queue.add(new Event(EventType.DOCUMENT_PART, dp));
-				return true;
-			}
-			// Else: Send a text unit
+
+	private void addTU (String name,
+		boolean nested)
+	{
+		if ( tf.isEmpty() ) { // Send a document part if there is no content
+			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+			skel.append(buildEndTag(name)+"\n");
+			dp.setSkeleton(skel);
+			queue.add(new Event(EventType.DOCUMENT_PART, dp));
+		}
+		else { // Else: Send a text unit
 			skel.addContentPlaceholder(tu);
-			tu.setId(String.valueOf(++tuId));
+			if ( tu.getId() == null ) tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);
 			tu.setMimeType(MIMETYPE);
@@ -488,9 +534,37 @@ public class ODFFilter implements IFilter {
 			//TODO: Maybe have this as an options set through the parameters but not user-driven?
 			// Note: we may keep adding extra lines if one exists already!
 			//TODO: find a way to add \n only if needed
-			skel.append(buildEndTag(name)+"\n");
+			if ( !nested ) skel.append(buildEndTag(name)+"\n");
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
-			return true;
+		}
+	}
+	
+	// Return true when it's ready to send an event
+	private boolean processEndElement () {
+		String name = makePrintName();
+		//if ( toExtract.containsKey(name) ) {
+		if ( units.peek().extract && name.equals(units.peek().name) ) {
+			if ( units.size() > 2 ) { // Is it a nested TU
+				// Add it to the queue
+				addTU(name, true);
+				extract.pop();
+				units.pop();
+				// Reset the current variable to the correct context
+				tf = units.peek().tf;
+				tu = units.peek().tu;
+				skel = units.peek().skel;
+				// Add the closing tag of the nested element to its parent
+				tf.append(new Code(TagType.CLOSING, name, buildEndTag(name)));
+				// No trigger of the events yet
+				return false;
+			}
+			else {
+				extract.pop();
+				units.pop();
+				addTU(name, false);
+				// Trigger the events to be sent
+				return true;
+			}
 		}
 		else {
 			if ( extract.peek() ) {

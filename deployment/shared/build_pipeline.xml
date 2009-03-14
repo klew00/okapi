@@ -3,7 +3,6 @@
 
 	<property name="proj_pipeline" value="../../common/net.sf.okapi.pipeline"/> 
 	<property name="src_pipeline" value="${proj_pipeline}/src"/> 
-	<property name="lib_pipeline" value="${proj_pipeline}/lib"/> 
 
 	<path id="mainClassPath_pipeline">
 		<pathelement location="${tmp}"/>
@@ -14,9 +13,6 @@
  		<javac srcdir="${src_pipeline}" destdir="${tmp}" classpathref="mainClassPath_pipeline"/>
 		<copy todir="${tmp}">
 			<fileset dir="${src_pipeline}" excludes="**/*.java"/>
-		</copy>
-		<copy todir="${distlib}">
-			<fileset dir="${lib_pipeline}"/>
 		</copy>
 	</target>
 

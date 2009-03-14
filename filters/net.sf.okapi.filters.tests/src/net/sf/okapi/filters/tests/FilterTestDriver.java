@@ -269,22 +269,23 @@ public class FilterTestDriver {
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No encoding specified in StartDocument.");
 			warnings++;
-		} else
+		} else if ( displayLevel > 1 )
 			System.out.println("StartDocument encoding = " + tmp);
 
 		tmp = startDoc.getLanguage();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No language specified in StartDocument.");
 			warnings++;
-		} else
+		} else if ( displayLevel > 1 )
 			System.out.println("StartDocument language = " + tmp);
 
 		tmp = startDoc.getName();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No name specified in StartDocument.");
 			warnings++;
-		} else
+		} else if ( displayLevel > 1 )
 			System.out.println("StartDocument name = " + tmp);
+
 		if ( displayLevel < 2 ) return;
 		System.err.println("StartDocument MIME type = " + startDoc.getMimeType());
 		System.err.println("StartDocument Type = " + startDoc.getType());

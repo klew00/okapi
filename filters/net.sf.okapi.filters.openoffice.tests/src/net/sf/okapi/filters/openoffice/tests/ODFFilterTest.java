@@ -32,25 +32,25 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ODFFilterTest {
-
+	
 	@Test
 	public void runTest () {
 		ODFFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(false);
-			testDriver.setDisplayLevel(0);
+			testDriver.setDisplayLevel(3);
 			filter = new ODFFilter();
 			filter.setOptions("en", "UTF-8", true);
-			URL url = ODFFilterTest.class.getResource("/TestDocument01.odt_content.xml");
+			URL url = ODFFilterTest.class.getResource("/ODFTest_footnote.xml");
 			filter.open(new URI(url.toString()));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
 			// Test a simple re-write
-			filter.open(new URI(url.toString()));
-			rewrite(filter);
-			filter.close();
+//			filter.open(new URI(url.toString()));
+//			rewrite(filter);
+//			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
@@ -66,7 +66,7 @@ public class ODFFilterTest {
 		try {
 			writer = new GenericFilterWriter(filter.createSkeletonWriter());
 			writer.setOptions("FR", "UTF-8");
-			writer.setOutput("TestDocument01.odt_content.out.xml");
+			writer.setOutput("ODFTest_footnote.out.xml");
 			while ( filter.hasNext() ) {
 				writer.handleEvent(filter.next());
 			}
