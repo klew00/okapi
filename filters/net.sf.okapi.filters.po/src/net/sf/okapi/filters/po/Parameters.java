@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.po;
 
@@ -26,10 +26,7 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	public static final int MODE_BILINGUAL = 0;
-	public static final int MODE_MONLINGUAL = 1;
-	
-	public int mode;
+	public boolean bilingualMode;
 	public boolean useCodeFinder;
 	public InlineCodeFinder codeFinder;
 	public LocalizationDirectives locDir;
@@ -43,7 +40,7 @@ public class Parameters extends BaseParameters {
 	
 	public void reset () {
 		locDir.reset();
-		mode = MODE_BILINGUAL;
+		bilingualMode = true;
 		makeID = true;
 		useCodeFinder = true;
 		codeFinder.reset();
@@ -59,7 +56,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setInteger("mode", mode);
+		buffer.setBoolean("bilingualMode", bilingualMode);
 		buffer.setBoolean("makeID", makeID);
 		buffer.setBoolean("useLD", locDir.useLD());
 		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
@@ -71,7 +68,7 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		mode = buffer.getInteger("mode", mode);
+		bilingualMode = buffer.getBoolean("bilingualMode", bilingualMode);
 		makeID = buffer.getBoolean("makeID", makeID);
 		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
 		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());

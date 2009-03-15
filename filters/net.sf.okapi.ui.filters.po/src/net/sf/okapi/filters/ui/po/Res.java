@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,13 +18,13 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.ui.properties;
+package net.sf.okapi.filters.ui.po;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 class Res {
-	private static final String BUNDLE_NAME = "net.sf.okapi.filters.ui.properties.Res";
+	private static final String BUNDLE_NAME = "net.sf.okapi.filters.ui.po.Res";
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 		.getBundle(BUNDLE_NAME);

@@ -240,7 +240,7 @@ public class POFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType("text/x-po");
 		startDoc.setMimeType("text/x-po");
-		startDoc.setIsMultilingual(params.mode==Parameters.MODE_BILINGUAL);
+		startDoc.setIsMultilingual(params.bilingualMode);
 		return new Event(EventType.START_DOCUMENT, startDoc);
 	}
 	
@@ -307,7 +307,7 @@ public class POFilter implements IFilter {
 				if ( locNote.length() > 0 ) locNote += lineBreak;
 				locNote += textLine.substring(2).trim();
 				// Check for directives
-				params.locDir.process(textLine);
+				//TODO: for later: params.locDir.process(textLine);
 				continue;
 			}
 			
@@ -339,9 +339,9 @@ public class POFilter implements IFilter {
 			// Check for flags
 			if ( textLine.startsWith("#,") ) {
 				String value = textLine.substring(2).trim();
-				String[] flags = value.split("[, \t]", 0);
+//				String[] flags = value.split("[, \t]", 0);
 //TODO: fix this to work with multiple flags				
-				if ( value.equals("fuzzy") ) {
+				if ( params.bilingualMode && value.equals("fuzzy") ) {
 					if ( tu == null ) {
 						tu = new TextUnit(null); // No id yet, it will be set later
 					}
@@ -390,7 +390,7 @@ public class POFilter implements IFilter {
 			
 			// Check for the message ID
 			if ( textLine.startsWith("msgid") ) {
-				if ( !hasFuzzyFlag ) {
+				if ( params.bilingualMode && !hasFuzzyFlag ) {
 					// Add the place for a fuzzy flag
 					// So the value can be created at output if needed
 					if ( tu == null ) {
@@ -411,20 +411,6 @@ public class POFilter implements IFilter {
 				// Else continue
 				continue;
 			}
-			
-/*---to move [[			
-			// Check directives cases
-			if ( params.locDir.useLD() ) {
-				// Reset the condition at each new entry
-				if ( textLine.indexOf("msgid") == 0 ) {
-					skip = !params.locDir.isLocalizable(true);
-				}
-				if ( skip ) {
-					skel.append(textLine+lineBreak);
-					continue;
-				}
-			}
----- ]]*/
 			
 			// Anything else: just add to the skeleton
 			skel.append(textLine+lineBreak);
@@ -520,7 +506,7 @@ public class POFilter implements IFilter {
 
 		// Set the text and possibly its translation
 		// depending on the processing mode
-		if ( params.mode == Parameters.MODE_BILINGUAL ) {
+		if ( params.bilingualMode ) {
 			String sID = msgID;
 			if (( pluralMode != 0 ) && ( pluralCount-1 > 0 )) {
 				sID = msgIDPlural;

@@ -48,6 +48,7 @@
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_ui.filters.properties.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.po.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.openoffice.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.regex.xml" inheritAll="true"/>
 

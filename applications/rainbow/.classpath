@@ -27,5 +27,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/third-party.logger-slf4j"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openxml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.po"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.po"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

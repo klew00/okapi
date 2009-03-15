@@ -64,6 +64,7 @@
   
  <filter id="okf_po"
   inputFilterClass="net.sf.okapi.filters.po.POFilter"
+  editorClass="net.sf.okapi.filters.ui.po.Editor"
  >Gettext PO Files</filter>
   
 </okapiFilters>

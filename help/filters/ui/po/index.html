@@ -8,8 +8,6 @@
 <h1 class="filt1">Filters – PO Filter</h1>
 <h2 class="filt2">Overview</h2>
 <p>This filter allows you to process Gettext PO files.</p>
-<p>================ UNDER CONSTRUCTION 
-============================================</p>
 
 <h2><a name="Overview"></a>Overview</h2>
 <p>The PO Filter is an Okapi component that implements the IFilter interface for 
@@ -169,6 +167,62 @@ output document.</p>
 <h3>No-X-Format Flag</h3>
 <p>TODO</p>
 <h2><a name="Parameters_Options"></a>Parameters</h2>
+<h3>Options Tab</h3>
+<h4>Processing mode</h4>
+<p><cite>Bilingual mode</cite> -- Select this option to process the input 
+document as a bilingual file. In this mode the <code>msgid</code> entry is the 
+source text, and the <code>msgstr</code> is the translation. Most PO files are 
+bilingual documents.</p>
+<p><cite>Generate identifiers from the source text</cite> -- Set this option to 
+generate identifiers from the source text of the <code>msgid</code> entry. The 
+values are constructed from the has code of the source text, and possibly with a 
+domain prefix. Note that the value may not be unique if the source text is not 
+unique within the same domain. The value generated is accessible from <code>
+getName()</code> method of the extracted resource. This option is enabled only 
+in bilingual mode.</p>
+<p><cite>Monolingual mode</cite> -- Select this option to process the input 
+document as a monolingual file. In this mode the <code>msgid</code> entry is a 
+real identifier (rather than the source text), and the corresponding text is in 
+the <code>msgstr</code> entry.</p>
+
+<p>In monolingual mode the <code>msgid</code> value is used as the identifier 
+for the entry. To access it, use the <code>getName()</code> method of the 
+extracted resource.</p>
+<h3>Inline Codes Tab</h3>
+<p><cite>Has inline codes as defined below:</cite> -- Set this option to use the specified regular expression to be use against the text of the extracted items. Any match will be converted to an inline code. By default the expression is:</p>
+<pre>((%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn])
+|((\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v)
+|(\{\d.*?\}))</pre>
+<p><cite>Add</cite> -- Click this button to add a new rule.</p>
+<p><cite>Remove</cite> -- Click this button to remove the current rule.</p>
+<p><cite>Move Up</cite> -- Click this button to move the current rule upward.</p>
+<p><cite>Move down</cite> -- Click this button to move the current rule 
+downward.</p>
+<p>[Top-right text box] -- Enter the regular expression for the 
+current rule. Use the <cite>Modify</cite> button to enter the edit mode. The 
+expression must be a valid
+<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html">
+regular expression</a>. You can check the syntax 
+(and the effect of the rule) as it automatically tests it against the test data in the text box below and shows the result in the bottom-right text box.</p>
+<p><cite>Modify</cite> -- Click this button to edit the expression of the 
+current rule. This button is labeled <cite>Accept</cite> when you are in 
+edit mode.</p>
+<p><cite>Accept</cite> -- Click this button to save any changes you have 
+made to the expression and leave the edit mode. This button is labeled <cite>
+Modify</cite> when you are not in edit mode.</p>
+<p><cite>Discard</cite> -- Click this button to leave the edit mode and 
+revert the current rule to the expression it had before you started the edit 
+mode.</p>
+<p><cite>Patterns</cite> -- Click this button to display a list of "guidline" regular 
+expression patterns then select a pattern to insert it the edit box. The inserted text replaces whatever text is 
+currently selected.</p>
+<p><cite>Test using all rules</cite> -- Set this option to test all the rules at the same 
+time. The syntax of the current rule is automatically checked. See the effect it has on the sample text. The result of the test are displayed in the bottom right result box. The parts of the text that are 
+matches of the expressions are displayed in <> brackets. If the <cite>Test using all rules</cite> option is set, the test takes all rules of the set in account, if it is not set only the current rule is 
+tested.</p>
+<p>[Middle-right text box] -- Optional test data to test the regular expression for the 
+current rule or all rules depending on the <cite>Test using all rules</cite> option.</p>
+<p>[Bottom-right text box] -- Shows the result of the regular expression applied to the test data.</p>
 <p>&nbsp;</p>
 
 </body>
