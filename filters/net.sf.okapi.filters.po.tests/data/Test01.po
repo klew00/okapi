@@ -1,0 +1,21 @@
+# Test
+
+msgid "Could not find folder %s"
+msgstr "Impossible de trouver %s"
+
+msgid "Second entry"
+msgstr ""
+
+#. 'folder' here = 'directory'
+#, fuzzy
+msgid "Folder %s"
+msgstr "Dossier"
+
+#, fuzzy, c-format
+msgid "Folder %s is full"
+msgstr "Dossier vide: %s"
+
+#, c-format, fuzzy
+msgid "Trash %d is full"
+msgstr "Poubelle numero %d"
+

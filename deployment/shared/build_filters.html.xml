@@ -16,9 +16,16 @@
 	<target name="filters.html">
 		<ant antfile="../shared/build_filters.markupfilter.xml" inheritAll="true"/>
  		<javac srcdir="${src_filters.html}" destdir="${tmp}" classpathref="mainClassPath_filters.html"/>
+ 		
 		<copy todir="${tmp}">
 			<fileset dir="${src_filters.html}" excludes="**/*.java"/>
 		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/html">
+			<fileset dir="../../help/filters/ui/html" />
+		</copy>
+
 	</target>
 
 </project>

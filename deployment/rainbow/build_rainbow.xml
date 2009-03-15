@@ -55,6 +55,7 @@
 		
 		<ant antfile="../shared/build_filters.html.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.po.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.regex.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.xml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.xliff.xml" inheritAll="true"/>
@@ -89,9 +90,6 @@
 		<copy file="../../help/help.css" todir="${dist}/help"/>
 		<copy todir="${dist}/help/applications/rainbow">
 			<fileset dir="../../help/applications/rainbow" excludes="**/*.psd" />
-		</copy>
-		<copy todir="${dist}/help/filters">
-			<fileset dir="../../help/filters" />
 		</copy>
 		<copy todir="${dist}/help/common">
 			<fileset dir="../../help/common" />

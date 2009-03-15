@@ -12,8 +12,14 @@
 	<target name="filters.xml"> 
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
  		<javac srcdir="${src_filters.xml}" destdir="${tmp}" classpathref="mainClassPath_filters.xml"/>
+ 		
 		<copy todir="${tmp}">
 			<fileset dir="${src_filters.xml}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/xml">
+			<fileset dir="../../help/filters/ui/xml" />
 		</copy>
 	</target>
 

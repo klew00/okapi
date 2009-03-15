@@ -13,8 +13,14 @@
 	<target name="filters.openoffice"> 
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
  		<javac srcdir="${src_filters.openoffice}" destdir="${tmp}" classpathref="mainClassPath_filters.openoffice"/>
+ 		
 		<copy todir="${tmp}">
 			<fileset dir="${src_filters.openoffice}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/openoffice">
+			<fileset dir="../../help/filters/ui/openoffice" />
 		</copy>
 	</target>
 

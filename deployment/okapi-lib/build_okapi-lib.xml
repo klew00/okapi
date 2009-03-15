@@ -37,6 +37,7 @@
 		
 		<ant antfile="../shared/build_filters.html.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.po.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.regex.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.xml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.xliff.xml" inheritAll="true"/>

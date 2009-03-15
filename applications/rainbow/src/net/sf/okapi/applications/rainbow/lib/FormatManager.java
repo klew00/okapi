@@ -53,6 +53,7 @@ public class FormatManager {
 		else if ( sExt.equals(".mif") ) aRes[1] = "okf_mif";
 		else if ( sExt.equals(".rtf") ) aRes[1] = "okf_rtf";
 		else if ( sExt.equals(".idml") ) aRes[1] = "okf_idml";
+		else if ( sExt.equals(".po") ) aRes[1] = "okf_po";
 		return aRes;
 	}
 }

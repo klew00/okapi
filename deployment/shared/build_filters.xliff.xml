@@ -14,8 +14,14 @@
 	<target name="filters.xliff"> 
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
  		<javac srcdir="${src_filters.xliff}" destdir="${tmp}" classpathref="mainClassPath_filters.xliff"/>
+ 		
 		<copy todir="${tmp}">
 			<fileset dir="${src_filters.xliff}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/xliff">
+			<fileset dir="../../help/filters/ui/xliff" />
 		</copy>
 	</target>
 

@@ -40,7 +40,8 @@ public class Property {
 	 * Creates a new property object with a name, a vale and its read-only flag.
 	 * @param name Name of the property (case-sensitive).
 	 * @param value Value of the property.
-	 * @param isReadOnly True if the property is not modifiable, false if it can be modified.
+	 * @param isReadOnly True if the property is protected, false if it is not protected
+	 * and can be modified.
 	 */
 	public Property (String name, String value, boolean isReadOnly) {
 		this.name = name;

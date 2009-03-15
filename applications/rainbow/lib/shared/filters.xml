@@ -62,4 +62,8 @@
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
  >Microsoft OpenXML Documents (Used in Microsoft Office 2007)</filter>
   
+ <filter id="okf_po"
+  inputFilterClass="net.sf.okapi.filters.po.POFilter"
+ >Gettext PO Files</filter>
+  
 </okapiFilters>

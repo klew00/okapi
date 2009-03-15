@@ -253,7 +253,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
-			return getPropertyValue((INameable)ref, propName, langToUse);
+			return getPropertyValue((INameable)ref, propName, langToUse, context);
 		}
 		if ( ref instanceof TextUnit ) {
 			return getString((TextUnit)ref, langToUse, context);
@@ -560,7 +560,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 			else if ( propName != null ) {
 				tmp.replace(start, end,
-					getPropertyValue((INameable)ref, propName, langToUse));
+					getPropertyValue((INameable)ref, propName, langToUse, 2));
 			}
 			else if ( ref instanceof TextUnit ) {
 				tmp.replace(start, end, getString((TextUnit)ref, langToUse, 2));
@@ -605,7 +605,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private String getPropertyValue (INameable resource,
 		String name,
-		String langToUse)
+		String langToUse,
+		int context)
 	{
 		// Get the value based on the output language
 		Property prop;
@@ -638,8 +639,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			value = outputEncoding;
 		}
 		// Return the native value if possible
-		if ( encoderManager == null ) return value;
-		else return encoderManager.toNative(name, value);
+		if ( encoderManager == null ) {
+			if ( layer == null ) return value;
+			else return layer.encode(value, context); //TODO: context correct??
+		}
+		else {
+			if ( layer == null ) return encoderManager.toNative(name, value);
+			else return layer.encode(encoderManager.toNative(name, value), context);
+		}
 	}
 
 }

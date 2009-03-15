@@ -228,8 +228,13 @@ public class Writer extends BaseWriter {
 		if ( !inFile ) writeStartFile(relativeSourcePath, docMimeType);
 		writer.writeStartElement("group");
 		writer.writeAttributeString("id", resource.getId());
-		if ( resource.getName() != null ) {
-			writer.writeAttributeString("resname", resource.getName());
+		String tmp = resource.getName();
+		if (( tmp != null ) && ( tmp.length() != 0 )) {
+			writer.writeAttributeString("resname", tmp);
+		}
+		tmp = resource.getType();
+		if (( tmp != null ) && ( tmp.length() != 0 )) {
+			writer.writeAttributeString("restype", tmp);
 		}
 		writer.writeLineBreak();
 	}
@@ -256,6 +261,12 @@ public class Writer extends BaseWriter {
 		}
 		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
+
+		if ( tu.hasTargetProperty(trgLang, "approved") ) {
+			writer.writeAttributeString("approved",
+				(tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ? "yes" : "no"));
+		}
+		
 		if ( tu.preserveWhitespaces() )
 			writer.writeAttributeString("xml:space", "preserve");
 		writer.writeLineBreak();

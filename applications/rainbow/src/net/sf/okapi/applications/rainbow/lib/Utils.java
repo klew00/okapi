@@ -290,11 +290,6 @@ public class Utils {
         return "";
 	}
 	
-	public static String makeID (String p_sText) {
-		int n = p_sText.hashCode();
-		return String.format("%s%X", ((n>0)?'P':'N'), n);
-	}
-
 	/**
 	 * Tries to detect the encoding and optionally the line-break type of a given file.
 	 * @param p_sPath the full path of the file.

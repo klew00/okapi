@@ -619,4 +619,14 @@ public class Util {
 		return Math.round((float)part/(float)((total==0)?1:total)*100);
 	}
 
+	/**
+	 * Creates a string ID based on the hash code of the given text.
+	 * @param text The text to make an ID for.
+	 * @return The string ID for the given text.
+	 */
+	public static String makeID (String p_sText) {
+		int n = p_sText.hashCode();
+		return String.format("%s%X", ((n>0)?'P':'N'), n);
+	}
+
 }
