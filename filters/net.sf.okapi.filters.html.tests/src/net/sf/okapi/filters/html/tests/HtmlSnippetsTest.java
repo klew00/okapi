@@ -36,104 +36,118 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testMETATag1() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testPWithAttributes() {
 		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testLang() {
 		String snippet = "<p lang='en'>Text of p</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+	}
+
+	@Test
+	public void testLangUpdate() {
+		String snippet = "<p lang='en'>Text <span lang='en'>text</span> text</p>";
+		assertEquals("<p lang='FR'>Text <span lang='FR'>text</span> text</p>",
+			generateOutput(getEvents(snippet), snippet, "FR"));
+	}
+
+	@Test
+	public void testMultilangUpdate() {
+		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
+		assertEquals("<p lang='FR'>Text</p><p lang='ja'>JA text</p>",
+			generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 
 	@Test
 	public void testComplexEmptyElement() {
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testPWithInlines() {
 		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testMETATag2() {
 		String snippet = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testPWithInlines2() {
 		String snippet = "<p>Before <img href=\"img.png\" alt=\"text\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testPWithInlineTextOnly() {
 		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testTableGroups() {
 		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testGroupInPara() {
 		String snippet = "<p>Text before list:" + "<ul>" + "<li>Text of item 1</li>" + "<li>Text of item 2</li>"
 				+ "</ul>" + "and text after the list.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testInput() {
 		String snippet = "<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testCollapseWhitespaceWithPre() {
 		String snippet = "<pre>   \n   \r <x/>  \f    </pre>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testCollapseWhitespaceWithoutPre() {
 		String snippet = " <b>   text1\t\n\r\ftext2    </b> ";
-		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testEscapedCodesInisdePre() {
 		String snippet = "<pre><code>&lt;b></code></pre>";
-		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testCdataSection() {
 		String snippet = "<![CDATA[&lt;b>]]>";
-		assertEquals("<![CDATA[&lt;b>]]>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<![CDATA[&lt;b>]]>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
-		assertEquals("<p><b>Question</b>: When the &quot;<code>&lt;b></code>&quot; code was added</p>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<p><b>Question</b>: When the &quot;<code>&lt;b></code>&quot; code was added</p>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
 	public void testEscapedEntities() {
 		String snippet = "&nbsp;M&#x0033;";
-		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet));
+		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
@@ -141,14 +155,14 @@ public class HtmlSnippetsTest {
 		String snippet = "\r\nX\rY\n";
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("collapseWhitespaceOff.yml");
-		assertEquals("\nX\nY\n", generateOutput(getEvents(snippet), snippet));
+		assertEquals("\nX\nY\n", generateOutput(getEvents(snippet), snippet, "en"));
 		parameters = originalParameters; 
 	}
 
 	@Test
 	public void testNormalizeNewlinesInPre() {
 		String snippet = "<pre>\r\nX\rY\n</pre>";
-		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet));
+		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
@@ -163,13 +177,13 @@ public class HtmlSnippetsTest {
 		return list;
 	}
 
-	private String generateOutput(ArrayList<Event> list, String original) {
+	private String generateOutput(ArrayList<Event> list, String original, String trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument("en", "utf-8", null, new EncoderManager(), (StartDocument) event
+				writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(), (StartDocument) event
 						.getResource());
 				break;
 			case TEXT_UNIT:
