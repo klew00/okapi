@@ -263,8 +263,10 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("translate", "no");
 
 		if ( tu.hasTargetProperty(trgLang, "approved") ) {
-			writer.writeAttributeString("approved",
-				(tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ? "yes" : "no"));
+			if ( tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ) {
+				writer.writeAttributeString("approved", "yes");
+			}
+			// "no" is the default
 		}
 		
 		if ( tu.preserveWhitespaces() )

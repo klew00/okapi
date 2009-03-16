@@ -22,9 +22,15 @@ package net.sf.okapi.applications.rainbow.lib;
 
 class FilterAccessItem {
 
+	public String id;
 	public String name;
-	public String description;
 	public String inputFilterClass;
 	public String editorClass;
+	public String description;
+	
+	@Override
+	public String toString () {
+		return name + "  [" + id + "]";
+	}
 	
 }

@@ -44,7 +44,7 @@ public class POFilterTest {
 			testDriver.setDisplayLevel(3);
 			filter = new POFilter();
 			filter.setOptions("en", "fr", "UTF-8", true);
-			InputStream input = POFilterTest.class.getResourceAsStream("/Test03.po");
+			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
 			filter.open(input);
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();

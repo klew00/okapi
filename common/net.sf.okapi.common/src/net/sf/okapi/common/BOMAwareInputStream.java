@@ -39,6 +39,7 @@ public class BOMAwareInputStream extends InputStream {
 	private String detectedEncoding;
 	private int bomSize;
 	private boolean hasUTF8BOM;
+	private boolean autoDetected;
 
 	public BOMAwareInputStream (InputStream input,
 		String defaultEncoding)
@@ -47,8 +48,15 @@ public class BOMAwareInputStream extends InputStream {
 		this.defaultEncoding = defaultEncoding;
 		bomSize = 0;
 		hasUTF8BOM = false;
+		autoDetected = false;
 	}
-	
+
+	/**
+	 * Tries to detect the presence of a Byte-Order-Mark. 
+	 * @return The encoding guessed after the try. If nothing has been found,
+	 * the default encoding is returned.
+	 * @throws IOException
+	 */
 	public String detectEncoding ()
 		throws IOException
 	{
@@ -62,11 +70,13 @@ public class BOMAwareInputStream extends InputStream {
 			detectedEncoding = "UTF-8";
 			bomSize = 3;
 			hasUTF8BOM = true;
+			autoDetected = true;
 			unread = n-3;
 		}
 		else if (( bom[0] == (byte)0xFE )
 			&& ( bom[1] == (byte)0xFF )) {
 			detectedEncoding = "UTF-16BE";
+			autoDetected = true;
 			bomSize = 2;
 			unread = n-2;
 		}
@@ -75,12 +85,14 @@ public class BOMAwareInputStream extends InputStream {
 			&& ( bom[2] == (byte)0x00 )
 			&& ( bom[3] == (byte)0x00 )) {
 			detectedEncoding = "UTF-32LE";
+			autoDetected = true;
 			bomSize = 4;
 			unread = n-4;
 		}
 		else if (( bom[0] == (byte)0xFF )
 			&& ( bom[1] == (byte)0xFE )) {
 			detectedEncoding = "UTF-16LE";
+			autoDetected = true;
 			bomSize = 2;
 			unread = n-2;
 		}
@@ -89,6 +101,7 @@ public class BOMAwareInputStream extends InputStream {
 			&& ( bom[2] == (byte)0xFE )
 			&& ( bom[3] == (byte)0xFF )) {
 			detectedEncoding = "UTF-32BE";
+			autoDetected = true;
 			bomSize = 4;
 			unread = n-4;
 		}
@@ -106,14 +119,36 @@ public class BOMAwareInputStream extends InputStream {
 		return detectedEncoding;
 	}
 
+	/**
+	 * Gets the encoding that was guessed. It can be the default encoding.
+	 * @return the guessed encoding.
+	 */
 	public String getDetectedEncoding () {
 		return detectedEncoding;
 	}
 	
+	/**
+	 * Indicates if the guessed encoding was auto-detected. If not it is the
+	 * default encoding that was provided.
+	 * @return True if the guessed encoding was auto-detected, false if not.
+	 */
+	public boolean autoDtected () {
+		return autoDetected;
+	}
+
+	/**
+	 * Gets the number of bytes used by the Byte-Order-mark in this document.
+	 * @return The byte size of the BOM in this document.
+	 */
 	public int getBOMSize () {
 		return bomSize;
 	}
 	
+	/**
+	 * Indicates if the guessed encoding is UTF-8 and this file has a BOM.
+	 * @return True if the guessed encoding is UTF-8 and this file has a BOM,
+	 * false otherwise.
+	 */
 	public boolean hasUTF8BOM () {
 		return hasUTF8BOM;
 	}

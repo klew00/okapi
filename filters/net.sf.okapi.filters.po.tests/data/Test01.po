@@ -19,3 +19,7 @@ msgstr "Dossier vide: %s"
 msgid "Trash %d is full"
 msgstr "Poubelle numero %d"
 
+#, c-format
+msgid "text of the message"
+msgstr ""
+

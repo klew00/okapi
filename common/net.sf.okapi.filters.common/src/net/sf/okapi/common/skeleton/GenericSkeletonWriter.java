@@ -608,6 +608,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		String langToUse,
 		int context)
 	{
+		// Update the encoder from the TU's MIME type
+		if ( encoderManager != null ) {
+			encoderManager.updateEncoder(resource.getMimeType());
+		}
+
 		// Get the value based on the output language
 		Property prop;
 		if ( langToUse == null ) { // Use the source

@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr "Project-Id-Version: MyApplication 1.0\n"
 "Report-Msgid-Bugs-To: myapp@example.com\n"
 "POT-Creation-Date: 2005-09-25 19:22+1000\n"

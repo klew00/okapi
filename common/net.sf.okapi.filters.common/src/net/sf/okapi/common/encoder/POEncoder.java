@@ -57,7 +57,7 @@ public class POEncoder implements IEncoder {
 		// No changes for the other values
 		if ( propertyName.equals("approved") ) {
 			if (( value != null ) && ( value.equals("no") )) {
-				return "#, fuzzy"+lineBreak;
+				return "fuzzy";
 			}
 			else { // Don't set the fuzzy flag
 				return "";

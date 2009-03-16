@@ -58,8 +58,10 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  */
 public class POFilter implements IFilter {
 
-	private static final String RESNAME_NODOMAIN = "messages::";
-	private static final String RESNAME_DEFAULTDOMAIN = "default::";
+	private static final String DOMAIN_SEP = "::";
+	private static final String DOMAIN_NONE = "messages";
+	private static final String DOMAIN_DEFAULT = "default";
+	private static final String PROP_APPROVED = "approved";
 
 	private static final Pattern pluralPattern = Pattern.compile(
 		"nplurals(\\s*?)=(\\s*?)(\\d*?)([\\\\|;|\\n])",
@@ -73,6 +75,7 @@ public class POFilter implements IFilter {
 	private BufferedReader reader;
 	private boolean canceled;
 	private String encoding;
+	private boolean autoDetected;
 	private String textLine;
 	private int tuId;
 	private int otherId;
@@ -94,7 +97,7 @@ public class POFilter implements IFilter {
 	private String transNote;
 	private String references;
 	private String msgIDPlural;
-	private String resnameDomain;
+	private String domain;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -150,6 +153,7 @@ public class POFilter implements IFilter {
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			// Correct the encoding if we have detected a different one
 			encoding = bis.detectEncoding();
+			autoDetected = bis.autoDtected();
 			hasUTF8BOM = bis.hasUTF8BOM();
 			commonOpen(new InputStreamReader(bis, encoding));
 		}
@@ -171,6 +175,7 @@ public class POFilter implements IFilter {
 	public void open (CharSequence inputText) {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
+		autoDetected = true;
 		commonOpen(new StringReader(inputText.toString()));
 	}
 	
@@ -221,12 +226,12 @@ public class POFilter implements IFilter {
 		readLine = true;
 		msgIDPlural = "";
 		level = 0;
-		resnameDomain = RESNAME_NODOMAIN; // Default domain prefix
+		domain = DOMAIN_NONE; // Default domain prefix
 		// Compile code finder rules
 		if ( params.useCodeFinder ) {
 			params.codeFinder.compile();
 		}
-
+		// Try to read the header info
 		detectInformation();
 	}
 	
@@ -339,19 +344,33 @@ public class POFilter implements IFilter {
 			// Check for flags
 			if ( textLine.startsWith("#,") ) {
 				String value = textLine.substring(2).trim();
-//				String[] flags = value.split("[, \t]", 0);
-//TODO: fix this to work with multiple flags				
-				if ( params.bilingualMode && value.equals("fuzzy") ) {
-					if ( tu == null ) {
-						tu = new TextUnit(null); // No id yet, it will be set later
+				String[] flags = value.split("[\\s,]");
+				if ( tu == null ) {
+					tu = new TextUnit(null); // No id yet, it will be set later
+				}
+				int start = 0;
+				int pos = 0;
+				for ( String flag : flags ) {
+					if ( flag.equals("fuzzy") ) {
+						if ( params.bilingualMode ) {
+							pos = textLine.indexOf(flag);
+							skel.append(textLine.substring(start, pos));
+							start = pos+5; // After "fuzzy"
+							skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
+							tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "no", false));
+							hasFuzzyFlag = true;
+							skel.append(textLine.substring(start));
+							break;
+						}
 					}
-					skel.addValuePlaceholder(tu, "approved", trgLang);
+				}
+				if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
+					skel.append(textLine+", ");
+					skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
+					tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "yes", false));
 					hasFuzzyFlag = true;
-					tu.setTargetProperty(trgLang, new Property("approved", "no", false));
 				}
-				else {
-					skel.append(textLine+lineBreak);
-				}
+				skel.append(lineBreak);
 				continue;
 			}
 
@@ -361,7 +380,7 @@ public class POFilter implements IFilter {
 				if ( level > 0 ) {
 					readLine = false; // Do not re-read this line next call
 					level--;
-					resnameDomain = RESNAME_NODOMAIN; // Default
+					domain = DOMAIN_NONE; // Default
 					Ending ending = new Ending(String.valueOf(++otherId));
 					ending.setSkeleton(skel);
 					return new Event(EventType.END_GROUP, ending);
@@ -396,9 +415,11 @@ public class POFilter implements IFilter {
 					if ( tu == null ) {
 						tu = new TextUnit(null); // No id yet, it will be set later
 					}
-					skel.addValuePlaceholder(tu, "approved", trgLang);
+					skel.append("#, ");
+					skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
+					skel.append(lineBreak);
 					hasFuzzyFlag = true;
-					tu.setTargetProperty(trgLang, new Property("approved", "yes", false));
+					tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "yes", false));
 				}
 				msgID = getQuotedString(true);
 				continue;
@@ -517,10 +538,10 @@ public class POFilter implements IFilter {
 			if ( params.makeID ) {
 				// Note we always use msgID for resname, not msgIDPlural
 				if ( pluralMode == 0 ) {
-					tu.setName(Util.makeID(resnameDomain+msgID));
+					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID));
 				}
 				else {
-					tu.setName(Util.makeID(resnameDomain+msgID)
+					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID)
 						+ String.format("-%d", pluralCount-1));
 				}
 			}
@@ -534,13 +555,16 @@ public class POFilter implements IFilter {
 				// for now, treat it as non-translated
 				// also: take fuzzy flag in account
 			}
+			else { // Correct the approved property
+				tu.getTargetProperty(trgLang, PROP_APPROVED).setValue("no");
+			}
 		}
 		else { // Parameters.MODE_MONOLINGUAL
 			if ( pluralMode == 0 ) {
-				tu.setName(resnameDomain+msgID);
+				tu.setName(domain+DOMAIN_SEP+msgID);
 			}
 			else {
-				tu.setName(resnameDomain+msgID
+				tu.setName(domain+DOMAIN_SEP+msgID
 					+ String.format("-%d", pluralCount-1));
 			}
 			// Add the source and parse it 
@@ -637,15 +661,16 @@ public class POFilter implements IFilter {
 	}
 	
 	private void setDomainName (INameable res) {
-		// The domain name is the second token of the line
+		// The domain name is the second part of the line
 		String[] aTokens = textLine.split("\\s");
+		//TODO: Is domain quoted or not???
 		if ( aTokens.length < 2 ) {
 			// No name, use a default
-			resnameDomain = RESNAME_DEFAULTDOMAIN;
+			domain = DOMAIN_DEFAULT;
 		}
 		else {
-			resnameDomain = aTokens[1] + "::";
-			res.setName(resnameDomain);
+			domain = aTokens[1];
+			res.setName(domain);
 		}
 	}
 
@@ -655,8 +680,8 @@ public class POFilter implements IFilter {
  		try {
  			// Read the a chunk of the beginning of the file
 			reader.mark(1024);
-	 		buffer = new char[1000];
-	 		int n = reader.read(buffer, 0, 1000);
+	 		buffer = new char[1024];
+	 		int n = reader.read(buffer, 0, 1024);
 	 		reader.reset();
 	 		String tmp = new String(buffer);  
 
@@ -672,15 +697,30 @@ public class POFilter implements IFilter {
 				// Else: same as default
 			}
 	 		
-			// Try to detect plural intomation
-				
-			Matcher m1 = pluralPattern.matcher(tmp);
-			if ( m1.find() ) {
-				nbPlurals = Integer.valueOf(m1.group(3));
+			// Try to detect plural information
+			Matcher m = pluralPattern.matcher(tmp);
+			if ( m.find() ) {
+				nbPlurals = Integer.valueOf(m.group(3));
 			}
-			// Else: no definition, use default
+			// Else: no plural definition found, use default
 
-			//TODO: Detect ENCODING in header and update current value!!!
+			// Try to detect encoding information
+			m = charsetPattern.matcher(tmp);
+			if ( m.find() ) {
+				if ( autoDetected ) {
+					if ( !encoding.equalsIgnoreCase(m.group(6)) ) {
+						// Difference between auto-detected and internal
+						// Auto-detected wins
+						//TODO: Warning that the internal encoding may be wrong!
+					}
+					// Else: same as auto-detected, keep that one
+				}
+				else { // No auto-detection before
+					// Internal wins over default
+					encoding = m.group(6);
+				}
+			}
+			// Else: use the encoding already set
 			
 		}
  		catch ( IOException e ) {

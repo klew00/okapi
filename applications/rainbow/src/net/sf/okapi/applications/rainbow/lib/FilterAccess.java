@@ -22,7 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 
 public class FilterAccess {
 	
-	private Hashtable<String, FilterAccessItem> m_htFilters;
+	private LinkedHashMap<String, FilterAccessItem> m_htFilters;
 	private String defaultEditor;
 	
 	/**
@@ -128,7 +128,7 @@ public class FilterAccess {
 	}
 
 	public FilterAccess () {
-		m_htFilters = new Hashtable<String, FilterAccessItem>();
+		m_htFilters = new LinkedHashMap<String, FilterAccessItem>();
 	}
 	
 	/**
@@ -147,20 +147,29 @@ public class FilterAccess {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Document doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
-			NodeList NL = doc.getElementsByTagName("filter");
+			NodeList list = doc.getElementsByTagName("filter");
 			m_htFilters.clear();
-			FilterAccessItem FAI;
-			for ( int i=0; i<NL.getLength(); i++ ) {
-				Node N = NL.item(i).getAttributes().getNamedItem("id");
-				if ( N == null ) throw new RuntimeException("The attribute 'id' is missing.");
-				FAI = new FilterAccessItem();
-				String sID = Util.getTextContent(N);
-				N = NL.item(i).getAttributes().getNamedItem("inputFilterClass");
-				if ( N == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
-				FAI.inputFilterClass = Util.getTextContent(N);
-				N = NL.item(i).getAttributes().getNamedItem("editorClass");
-				if ( N != null ) FAI.editorClass = Util.getTextContent(N);
-				m_htFilters.put(sID, FAI);
+			FilterAccessItem item;
+			for ( int i=0; i<list.getLength(); i++ ) {
+				Node node = list.item(i).getAttributes().getNamedItem("id");
+				if ( node == null ) throw new RuntimeException("The attribute 'id' is missing.");
+				item = new FilterAccessItem();
+				item.id = Util.getTextContent(node);
+
+				node = list.item(i).getAttributes().getNamedItem("inputFilterClass");
+				if ( node == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
+				item.inputFilterClass = Util.getTextContent(node);
+				
+				node = list.item(i).getAttributes().getNamedItem("editorClass");
+				if ( node != null ) item.editorClass = Util.getTextContent(node);
+				node = list.item(i).getAttributes().getNamedItem("editorClass");
+
+				node = list.item(i).getAttributes().getNamedItem("name");
+				if ( node != null ) item.name = Util.getTextContent(node);
+				else item.name = item.id;
+
+				item.description = Util.getTextContent(list.item(i));
+				m_htFilters.put(item.id, item);
 			}
 		}
 		catch ( IOException e ) {

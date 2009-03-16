@@ -20,7 +20,9 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -38,6 +40,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Implements a common UI to select a filter settings string.
@@ -46,6 +49,7 @@ public class FilterSettingsPanel extends Composite {
 
 	private FilterAccess fa;
 	private Combo cbFilters;
+	private Text edDescription;
 	private Combo cbParameters;
 	private Button btEdit;
 	private Button btCreate;
@@ -81,6 +85,7 @@ public class FilterSettingsPanel extends Composite {
 		cbFilters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
+		gdTmp.widthHint = 340;
 		cbFilters.setLayoutData(gdTmp);
 		cbFilters.setVisibleItemCount(15);
 		cbFilters.addSelectionListener(new SelectionListener() {
@@ -90,6 +95,15 @@ public class FilterSettingsPanel extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e2) {}
 		});
 
+		new Label(this, SWT.NONE); // Place-holder
+		
+		edDescription = new Text(this, SWT.BORDER | SWT.MULTI | SWT.WRAP);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 3;
+		gdTmp.heightHint = 40;
+		edDescription.setLayoutData(gdTmp);
+		edDescription.setEditable(false);
+		
 		label = new Label(this, SWT.NONE);
 		label.setText("Parameters:");
 		
@@ -106,8 +120,7 @@ public class FilterSettingsPanel extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e2) {}
 		});
 
-		// Place-holder
-		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE); // Place-holder
 		
 		int nWidth = 80;
 		btEdit = new Button(this, SWT.PUSH);
@@ -166,12 +179,10 @@ public class FilterSettingsPanel extends Composite {
 		FilterAccess fa)
 	{
 		this.fa = fa;
-
 		// Get the list of available filters
 		cbFilters.add("<None>");
-		Iterator<String> Iter = fa.getItems().keySet().iterator();
-		while ( Iter.hasNext() ) {
-			cbFilters.add(Iter.next());
+		for ( FilterAccessItem item : fa.getItems().values() ) {
+			cbFilters.add(item.toString());
 		}
 
 		// Get the list of available parameters
@@ -181,7 +192,8 @@ public class FilterSettingsPanel extends Composite {
 		String[] aRes = paramsProv.splitLocation(filterSettings);
 		int n = -1;
 		for ( int i=0; i<cbFilters.getItemCount(); i++ ) {
-			if ( cbFilters.getItem(i).equals(aRes[1]) ) {
+			String name = getFilterName(cbFilters.getItem(i));
+			if ( name.equals(aRes[1]) ) {
 				n = i;
 				break;
 			}
@@ -208,8 +220,14 @@ public class FilterSettingsPanel extends Composite {
 		if ( !cbParameters.getText().startsWith("<") )
 			return cbParameters.getText();
 		if ( !cbFilters.getText().startsWith("<") )
-			return cbFilters.getText();
+			return getFilterName(cbFilters.getText());
 		return "";
+	}
+
+	private String getFilterName (String listEntry) {
+		int pos = listEntry.indexOf('[');
+		if ( pos == -1 ) return listEntry;
+		return listEntry.substring(pos+1, listEntry.length()-1);
 	}
 	
 	private void fillParametersList (int index,
@@ -219,9 +237,10 @@ public class FilterSettingsPanel extends Composite {
 		
 		cbParameters.removeAll();
 		cbParameters.add("<Defaults>");
+		String filterName = getFilterName(cbFilters.getText());
 		int i = 1;
 		for ( String item : paramsList ) {
-			if ( item.startsWith(cbFilters.getText()) ) {
+			if ( item.startsWith(filterName) ) {
 				cbParameters.add(item);
 				if ( selection != null ) {
 					if ( selection.equals(item) ) index = i;
@@ -229,6 +248,11 @@ public class FilterSettingsPanel extends Composite {
 				i++;
 			}
 		}
+		
+		FilterAccessItem item = fa.getItems().get(filterName);
+		if ( item == null ) edDescription.setText("");
+		else edDescription.setText(item.description);
+		
 		cbParameters.select(index);
 		btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
 		btDelete.setEnabled(btEdit.getEnabled());
@@ -277,7 +301,7 @@ public class FilterSettingsPanel extends Composite {
 					"Name:", "myParameters", null, 0);
 				String newName = dlg.showDialog();
 				if ( newName == null ) return;
-				filterSettings = cbFilters.getText() + FilterSettingsMarkers.PARAMETERSSEP + newName;
+				filterSettings = getFilterName(cbFilters.getText()) + FilterSettingsMarkers.PARAMETERSSEP + newName;
 				boolean found = false;
 				for ( String item : cbParameters.getItems() ) {
 					if ( item.equalsIgnoreCase(filterSettings) ) {

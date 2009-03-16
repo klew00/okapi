@@ -1,70 +1,87 @@
 <?xml version="1.0"?>
 <okapiFilters>
  
+ <filter id="okf_html"
+  name="HTML Filter"
+  inputFilterClass="net.sf.okapi.filters.html.HtmlFilter"
+ >Filter for simple HTML and XHTML documents. No script-support yet.</filter>
+  
+ <filter id="okf_properties"
+  name="Properties Files"
+  inputFilterClass="net.sf.okapi.filters.properties.PropertiesFilter"
+  editorClass="net.sf.okapi.filters.ui.properties.Editor"
+ >Filter for Java and Java-like properties files.</filter>
+  
  <filter id="okf_regex"
+  name="Regex Filter"
   parserClass="net.sf.okapi.filters.regex.Parser"
   inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
   editorClass="net.sf.okapi.filters.ui.regex.Editor"
- >Regular Expressions</filter>
-  
- <filter id="okf_properties"
-  inputFilterClass="net.sf.okapi.filters.properties.PropertiesFilter"
-  editorClass="net.sf.okapi.filters.ui.properties.Editor"
- >Properties</filter>
+ >Filter for regular-expression parsing on text-based files.</filter>
   
  <filter id="okf_xliff"
+  name="XLIFF Filter"
   inputFilterClass="net.sf.okapi.filters.xliff.XLIFFFilter"
- >XLIFF</filter>
-  
- <filter id="okf_xml"
-  inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
- >XML</filter>
-  
- <filter id="okf_html"
-  inputFilterClass="net.sf.okapi.filters.html.HtmlFilter"
- >HTML</filter>
-  
- <filter id="okf_tmx"
-  inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
- >TMX</filter>
-  
- <filter id="okf_rtf"
-  inputFilterClass="net.sf.okapi.filters.rtf.RTFFilter"
- >Trados RTF</filter>
-  
- <filter id="okf_openoffice"
-  inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
-  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
- >OpenOffice.org Documents (ODT, ODS, ODG, ODP)</filter>
+ >Filter for XML Localisation Interchange File Format (XLIFF) documents.</filter>
   
  <filter id="okf_odf"
+  name="(BETA) ODF-Content Filter"
   inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
   editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
- >Open Document (ODF)</filter>
+ >Filter for ODF-Content documents.</filter>
   
- <filter id="okf_mif"
-  inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
- >FrameMaker MIF</filter>
-  
- <filter id="okf_idml"
-  inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
- >InDesign Markup Language (IDML)</filter>
-  
- <filter id="okf_idmlcontent"
-  inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
- >InDesign IDML Content Document</filter>
-
- <filter id="okf_msoffice"
-  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLZipFilter"
- >Microsoft Office 2007 (DOCX, XSLX, PTTX)</filter>
-  
- <filter id="okf_openxml"
-  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
- >Microsoft OpenXML Documents (Used in Microsoft Office 2007)</filter>
+ <filter id="okf_openoffice"
+  name="(BETA) OpenOffice Filter"
+  inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
+  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
+ >Filter for OpenOffice.org documents such as ODT, ODS, ODG, and ODP files.</filter>
   
  <filter id="okf_po"
+  name="(BETA) PO Filter"
   inputFilterClass="net.sf.okapi.filters.po.POFilter"
   editorClass="net.sf.okapi.filters.ui.po.Editor"
- >Gettext PO Files</filter>
+ >Filter for Gettext Portable-Object (PO) files.</filter>
   
+ <filter id="okf_xml"
+  name="(BETA) XML Filter"
+  inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
+ >Filter for XML documents</filter>
+  
+ <filter id="okf_idml"
+  name="(ALPHA-TEST-ONLY) IDML Filter"
+  inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
+ >Filter for Adobe In-Design Markup Language (IDML) documents.</filter>
+  
+ <filter id="okf_idmlcontent"
+  name="(ALPHA-TEST-ONLY) IDML-Content Filter"
+  inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
+ >Filter for IDML-Content documents.</filter>
+
+<filter id="okf_msoffice"
+  name="(ALPHA-TEST-ONLY) MS-Office 2007"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLZipFilter"
+ >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
+ 
+ <filter id="okf_openxml"
+  name="(ALPHA-TEST-ONLY) OpenXML-Content Filter"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
+ >Filter for OpenXML-Content documents.</filter>
+  
+ <filter id="okf_tmx"
+  name="(ALPHA-TEST-ONLY) TMX Filter"
+  inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
+ >Filter for Translation Memory eXchange (TMX) documents</filter>
+  
+ <filter id="okf_mif"
+  name="(ALPHA-DON'T-EVEN-TRY) FrameMaker MIF"
+  inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
+ >Filter for Adobe FrameMaker MIF files.</filter>
+  
+ <!--
+ <filter id="okf_rtf"
+  name="Trados-RTF Filter"
+  inputFilterClass="net.sf.okapi.filters.rtf.RTFFilter"
+ >Trados-RTF Filter</filter>
+ -->
+ 
 </okapiFilters>
