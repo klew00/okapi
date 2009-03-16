@@ -5,11 +5,26 @@
 <link rel="stylesheet" type="text/css" href="../../../help.css">
 </head>
 <body>
-<h1 class="filt1">Filters – PO Filter</h1>
-<h2 class="filt2">Overview</h2>
-<p>This filter allows you to process Gettext PO files.</p>
 
-<h2><a name="Overview"></a>Overview</h2>
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Filters</h1>
+		<h2 class="head2">PO Filter</h2></td>
+	</tr>
+	<tr>
+		<td class="smalltoc"><p>
+			- <a href="#overview">Overview</a><br>
+			- <a href="#processing">Processing Details</a><br>
+			- <a href="#parameters">Parameters</a><td class="hmenu">
+			<div class="hmenu"><table align="right"><tr>
+				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer&#39;s Guide</a></td>
+				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
+			</tr></table></div>
+		</td>
+	</tr>
+</table>
+
+<h2><a name="overview"></a>Overview</h2>
 <p>The PO Filter is an Okapi component that implements the IFilter interface for 
 Gettext PO (Portable Object) resource files.</p>
 <p>The implementation is based on the PO specifications found in the
@@ -43,7 +58,7 @@ msgid &quot;<b>You have selected %d file for deletion</b>&quot;
 msgid_plural &quot;<b>You have selected %d files for deletion</b>&quot;
 msgstr[0] &quot;&quot;
 msgstr[1] &quot;&quot;</pre>
-<h2><a name="Processing"></a>Processing Details</h2>
+<h2><a name="processing"></a>Processing Details</h2>
 <h3>Input Encoding</h3>
 <p>The filter decides which encoding to use for the input file using the 
 following logic:</p>
@@ -154,8 +169,9 @@ rarely used.</p>
 <p>PO files may may a &quot;fuzzy flag&quot; indicated as &quot;<code>#, fuzzy</code>&quot;. This 
 indicates that the text in the <code>msgstr</code> entry is only a proposed 
 translation, and may or may not be correct for the source.</p>
-<p>The filter provides access to this flag through the <i>approved</i> target 
-property. If the flag is set the <i>approved</i> property is set to &quot;<code>no</code>&quot;. 
+<p>When on bilingual mode, the filter provides access to this flag through the <i>approved</i> target 
+property.</p>
+<p>If the flag is set the <i>approved</i> property is set to &quot;<code>no</code>&quot;. 
 If the flag does not exists, the <i>approved</i> property is not defined.</p>
 <p>If the <i>approved</i> property was defined by the filter, and is deleted, or 
 set to a different value than &quot;<code>no</code>&quot;, the flag is removed from the 
@@ -166,7 +182,7 @@ output document.</p>
 <p>TODO</p>
 <h3>No-X-Format Flag</h3>
 <p>TODO</p>
-<h2><a name="Parameters_Options"></a>Parameters</h2>
+<h2><a name="parameters"></a>Parameters</h2>
 <h3>Options Tab</h3>
 <h4>Processing mode</h4>
 <p><cite>Bilingual mode</cite> -- Select this option to process the input 
