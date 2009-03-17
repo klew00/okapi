@@ -20,14 +20,9 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.FileResource;
 
 public class Consumer extends BasePipelineStep {
 	public String getName() {
