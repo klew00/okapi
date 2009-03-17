@@ -349,12 +349,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			// If this list is empty we know that there are no attributes that
 			// need special processing
 			propertyTextUnitPlaceholders = null;
-			// quick test so we can skip createPropertyTextUnitPlaceholders if
-			// there are no actionable attributes
-			if (getConfig().hasActionableAttributes(startTag.getName())) {
-				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-			}
 
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
 				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);

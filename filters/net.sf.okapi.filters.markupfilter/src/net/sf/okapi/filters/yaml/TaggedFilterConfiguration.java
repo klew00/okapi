@@ -137,6 +137,11 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
+	/*
+	TODO:
+	These methods do not detect attributes that occur on many elements. Since no client 
+	is using these anyway comment them out for now and set TODO for later refactor or delete.
+	 
 	public boolean hasActionableAttributes(String ruleName) {
 		return hasTranslatableAttributes(ruleName) || hasLocalizableAttributes(ruleName);
 	}
@@ -177,7 +182,7 @@ public class TaggedFilterConfiguration {
 			return true;
 		}
 		return false;
-	}
+	}*/
 
 	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
 		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
