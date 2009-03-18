@@ -1856,11 +1856,11 @@ public class MainForm implements IParametersProvider {
 		paramsObject.save(aRes[3]);
 	}
 	
-	public void deleteParameters (String location) {
+	public boolean deleteParameters (String location) {
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
 			location);
 		File file = new File(aRes[3]);
-		file.delete();
+		return file.delete();
 	}
 
 	public String[] splitLocation (String location) {

@@ -32,13 +32,13 @@ public class XMLEncoder implements IEncoder {
 
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
-	private IParameters params;
+	private boolean escapeGt;
+	private boolean escapeNbsp;
 	
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
-		this.params = params;
 		this.lineBreak = lineBreak;
 		// Use an encoder only if the output is not UTF-8/16
 		// since those support all characters
@@ -48,13 +48,17 @@ public class XMLEncoder implements IEncoder {
 		else {
 			chsEnc = Charset.forName(encoding).newEncoder();
 		}
+		
+		if ( params != null ) {
+			escapeGt = params.getBoolean("escapeGt");
+			escapeNbsp = params.getBoolean("escapeNbsp");
+		}
 	}
 
 	public String encode (String text, 
 		int context)
 	{
 		if ( text == null ) return "";
-		boolean escapeGT = false;
 		int quoteMode = 1;
 		
 		StringBuffer sbTmp = new StringBuffer(text.length());
@@ -64,7 +68,7 @@ public class XMLEncoder implements IEncoder {
 				sbTmp.append("&lt;");
 				continue;
 			case '>':
-				if ( escapeGT ) sbTmp.append("&gt;");
+				if ( escapeGt ) sbTmp.append("&gt;");
 				else {
 					if (( i > 0 ) && ( text.charAt(i-1) == ']' )) sbTmp.append("&gt;");
 					else sbTmp.append('>');
@@ -93,6 +97,9 @@ public class XMLEncoder implements IEncoder {
 			case '\n':
 				sbTmp.append(lineBreak);
 				break;
+			case '\u00A0':
+				if ( escapeNbsp ) sbTmp.append("&#x00a0;");
+				// Else: fall through
 			default:
 				if ( text.charAt(i) > 127 ) { // Extended chars
 					if (( chsEnc != null ) && ( !chsEnc.canEncode(text.charAt(i)) )) {

@@ -147,7 +147,7 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp.widthHint = nWidth;
 		btDelete.setLayoutData(gdTmp);
 		btDelete.addSelectionListener(new SelectionAdapter () {
-			public void widgetSelected(SelectionAdapter e) {
+			public void widgetSelected(SelectionEvent e) {
 				deleteParameters();
 			}
 		});
@@ -299,7 +299,13 @@ public class FilterSettingsPanel extends Composite {
 				for ( String item : cbParameters.getItems() ) {
 					if ( item.equalsIgnoreCase(filterSettings) ) {
 						found = true;
-						break;
+						// Ask confirmation for overwriting
+						MessageBox confDlg = new MessageBox(getParent().getShell(),
+							SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+						confDlg.setMessage(String.format("The parameters file '%s' exists already.\n"
+							+"Do you want to overwrite it?", filterSettings));
+						confDlg.setText("Rainbow");
+						found = (confDlg.open()!=SWT.YES);
 					}
 				}
 				if ( !found ) break; // Name OK
@@ -345,7 +351,10 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Else: delete the parameters
-			paramsProv.deleteParameters(filterSettings);
+			if ( !paramsProv.deleteParameters(filterSettings) ) {
+				Dialogs.showError(getShell(),
+					String.format("Could not delete %s", filterSettings), null);
+			}
 			// Refresh the list of parameters
 			paramsList = paramsProv.getParametersList();
 			fillParametersList(0, null);

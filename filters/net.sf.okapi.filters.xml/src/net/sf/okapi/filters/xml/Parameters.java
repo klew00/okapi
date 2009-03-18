@@ -48,7 +48,8 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 public class Parameters implements IParameters {
 	
 	private final static String DEFAULTS = "<?xml version='1.0' encoding='UTF-8'?>\n"
-		+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='1.0'>\n"
+		+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='1.0'\n"
+		+ ">\n"
 		+ "<!-- See ITS specification at: http://www.w3.org/TR/its/ -->\n"
 		+ "</its:rules>\n";
 	
@@ -59,10 +60,11 @@ public class Parameters implements IParameters {
 
 	public boolean useCodeFinder;
 	public InlineCodeFinder codeFinder;
+	public boolean escapeGt;
+	public boolean escapeNbsp;
 	
 	public Parameters () {
 		codeFinder = new InlineCodeFinder();
-		
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
@@ -70,7 +72,8 @@ public class Parameters implements IParameters {
 		// Create the document builder
 		try {
 			docBuilder = fact.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
+		}
+		catch ( ParserConfigurationException e ) {
 			throw new RuntimeException(e);
 		}
 		
@@ -140,30 +143,41 @@ public class Parameters implements IParameters {
 
 		useCodeFinder = false;
 		codeFinder.reset();
+		escapeGt = true;
+		escapeNbsp = true;
 	}
 
 	public void save (String filePath) {
-		if ( doc == null ) {
-			fromString(DEFAULTS);
-		}
-		// Prepare the output file
-		File f = new File(filePath);
-		Result result = new StreamResult(f);
-		// Write the DOM document to the file
-		Transformer trans;
+		Result result = null;
+		Transformer trans = null;
 		try {
-			trans = TransformerFactory.newInstance().newTransformer();
-			trans.transform(new DOMSource(doc), result);
+			if ( doc == null ) {
+				fromString(DEFAULTS);
+			}
+			// Prepare the output file
+			File f = new File(filePath);
+			result = new StreamResult(f);
+			// Write the DOM document to the file
+			try {
+				trans = TransformerFactory.newInstance().newTransformer();
+				trans.transform(new DOMSource(doc), result);
+			}
+			catch ( TransformerConfigurationException e ) {
+				throw new RuntimeException(e);
+	        }
+			catch ( TransformerException e ) {
+				throw new RuntimeException(e);
+			}
+			// Update path and URI
+			path = filePath;
+			docURI = f.toURI();
 		}
-		catch ( TransformerConfigurationException e ) {
-			throw new RuntimeException(e);
-        }
-		catch ( TransformerException e ) {
-			throw new RuntimeException(e);
+		finally {
+			// Try to make sure the file is not locked
+			trans = null;
+			result = null;
+			System.gc();
 		}
-		// Update path and URI
-		path = filePath;
-		docURI = f.toURI();
 	}
 
 	public Document getDocument () {
@@ -175,7 +189,9 @@ public class Parameters implements IParameters {
 	}
 
 	public boolean getBoolean (String name) {
-		// TODO Auto-generated method stub
+		//TODO: Use DOM to store these
+		if ( name.equals("escapeGt") ) return escapeGt;
+		if ( name.equals("escapeNbsp") ) return escapeNbsp;
 		return false;
 	}
 

@@ -60,8 +60,9 @@ public interface IParametersProvider {
 	 * Deletes a parameters object at a given location. 
 	 * @param location The string that encodes the target location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
+	 * @return True if the parameters object was delete, false if it was not.
 	 */
-	public void deleteParameters (String location);
+	public boolean deleteParameters (String location);
 	
 	/**
 	 * Split a given location into its components.
