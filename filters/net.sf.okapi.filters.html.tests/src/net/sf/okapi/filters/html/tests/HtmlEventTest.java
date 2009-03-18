@@ -252,8 +252,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		TextFragment tf = tu1.getSourceContent();
-		Code code = new Code(TagType.PLACEHOLDER, "COMMENT", "<!--comment-->");
-		code.setType(Code.TYPE_COMMENT); // TODO: add comment type to general COde.TYPE list?
+		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_COMMENT, "<!--comment-->");
 		tf.append(code);
 		tf.append(" after.");
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
@@ -278,8 +277,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		TextFragment tf = tu1.getSourceContent();
-		Code code = new Code(TagType.PLACEHOLDER, "XML_PI", "<?PI?>");
-		code.setType(Code.TYPE_XML_PROCESSING_INSTRUCTION); // TODO: add PI type to general COde.TYPE list?
+		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_XML_PROCESSING_INSTRUCTION, "<?PI?>");		
 		tf.append(code);
 		tf.append(" after.");
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
