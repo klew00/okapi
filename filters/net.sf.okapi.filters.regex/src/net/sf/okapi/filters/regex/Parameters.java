@@ -41,6 +41,7 @@ public class Parameters extends BaseParameters {
 	public Parameters () {
 		locDir = new LocalizationDirectives();
 		reset();
+		toString(); // fill the list
 	}
 	
 	public void reset () {

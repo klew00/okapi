@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters {
 		locDir = new LocalizationDirectives();
 		codeFinder = new InlineCodeFinder();
 		reset();
+		toString(); // fill the list
 	}
 	
 	public void reset () {

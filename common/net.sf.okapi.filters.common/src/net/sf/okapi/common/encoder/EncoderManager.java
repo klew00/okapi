@@ -36,6 +36,7 @@ public class EncoderManager implements IEncoder {
 	private Hashtable<String, String> mimeMap;
 	private String defEncoding;
 	private String defLineBreak;
+	private IParameters defParams;
 
 	/**
 	 * Creates a new encoder manager, with default pre-defined encoder loaded.
@@ -100,7 +101,7 @@ public class EncoderManager implements IEncoder {
 			encoder = (IEncoder)Class.forName(name).newInstance();
 			// And set the options
 			//TODO: Handle parameters at some point
-			encoder.setOptions(null, defEncoding, defLineBreak);
+			encoder.setOptions(defParams, defEncoding, defLineBreak);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -188,6 +189,7 @@ public class EncoderManager implements IEncoder {
 		String encoding,
 		String lineBreak)
 	{
+		defParams = params;
 		defEncoding = encoding;
 		if ( lineBreak == null ) {
 			throw new InvalidParameterException("lineBreak parameter is null");

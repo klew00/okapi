@@ -20,10 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
@@ -31,6 +27,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -112,12 +109,11 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp.horizontalSpan = 3;
 		cbParameters.setLayoutData(gdTmp);
 		cbParameters.setVisibleItemCount(15);
-		cbParameters.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e1) {
+		cbParameters.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
 				btEdit.setEnabled(!cbParameters.getText().startsWith("<"));
 				btDelete.setEnabled(btEdit.getEnabled());
-			}
-			public void widgetDefaultSelected(SelectionEvent e2) {}
+            }
 		});
 
 		new Label(this, SWT.NONE); // Place-holder
@@ -128,11 +124,10 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btEdit.setLayoutData(gdTmp);
-		btEdit.addSelectionListener(new SelectionListener () {
+		btEdit.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				editParameters();
 			}
-			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
 		btCreate = new Button(this, SWT.PUSH);
@@ -140,11 +135,10 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btCreate.setLayoutData(gdTmp);
-		btCreate.addSelectionListener(new SelectionListener () {
+		btCreate.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				createParameters();
 			}
-			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
 		btDelete = new Button(this, SWT.PUSH);
@@ -152,11 +146,10 @@ public class FilterSettingsPanel extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btDelete.setLayoutData(gdTmp);
-		btDelete.addSelectionListener(new SelectionListener () {
-			public void widgetSelected(SelectionEvent e) {
+		btDelete.addSelectionListener(new SelectionAdapter () {
+			public void widgetSelected(SelectionAdapter e) {
 				deleteParameters();
 			}
-			public void widgetDefaultSelected(SelectionEvent e) {};
 		});
 
 /*For later		Composite comp = new Composite(this, SWT.NONE);

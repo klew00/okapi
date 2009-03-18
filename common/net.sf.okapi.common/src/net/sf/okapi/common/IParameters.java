@@ -70,4 +70,19 @@ public interface IParameters {
 	 * was not loaded nor saved.
 	 */
 	public String getPath ();
+	
+	/**
+	 * Gets the boolean value for the given parameter name.
+	 * @param name The name of the boolean parameter to retrieve.
+	 * @return The value of the given parameter, or false if it is not defined.
+	 */
+	public boolean getBoolean (String name);
+	
+	/**
+	 * Gets the string value for a given parameter name.
+	 * @param name The name of the string parameter to retrieve.
+	 * @return The value of the given parameter, or null if it is not defined.
+	 */
+	public String getString (String name);
+	
 }

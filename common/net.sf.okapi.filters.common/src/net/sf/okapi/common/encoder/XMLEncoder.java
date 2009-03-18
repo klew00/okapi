@@ -32,11 +32,13 @@ public class XMLEncoder implements IEncoder {
 
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
+	private IParameters params;
 	
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
+		this.params = params;
 		this.lineBreak = lineBreak;
 		// Use an encoder only if the output is not UTF-8/16
 		// since those support all characters

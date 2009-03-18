@@ -174,4 +174,14 @@ public class Parameters implements IParameters {
 		return docURI;
 	}
 
+	public boolean getBoolean (String name) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public String getString (String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

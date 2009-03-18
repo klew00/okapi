@@ -28,6 +28,7 @@ public class Parameters extends BaseParameters {
 
 	public Parameters () {
 		reset();
+		toString(); // fill the list
 	}
 	
 	public void reset () {

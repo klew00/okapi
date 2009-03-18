@@ -27,6 +27,11 @@ public class Parameters extends BaseParameters {
 	public boolean extractNotes;
 	public boolean extractReferences;
 	
+	public Parameters () {
+		reset();
+		toString(); // fill the list
+	}
+	
 	public void reset () {
 		extractNotes = false;
 		extractReferences = false;

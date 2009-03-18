@@ -93,7 +93,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		this.layer = layer;
 		isMultilingual = resource.isMultilingual();
 		if ( this.encoderManager != null ) {
-			this.encoderManager.setDefaultOptions(null, outputEncoding, resource.getLineBreak());
+			this.encoderManager.setDefaultOptions(resource.getFilterParameters(), outputEncoding,
+				resource.getLineBreak());
 		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);

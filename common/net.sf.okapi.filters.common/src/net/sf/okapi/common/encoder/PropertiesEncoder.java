@@ -31,14 +31,14 @@ import net.sf.okapi.common.IParameters;
 public class PropertiesEncoder implements IEncoder {
 	
 	private CharsetEncoder outputEncoder;
-	private boolean escapeAll;
+	private boolean escapeExtendedChars;
 	
 	/**
 	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding, and
 	 * escaping all extended characters.
 	 */
 	public PropertiesEncoder () {
-		escapeAll = false; //TODO: Default should be false, but can do this until params get passed
+		escapeExtendedChars = false;
 		outputEncoder = Charset.forName("us-ascii").newEncoder();
 	}
 	
@@ -47,9 +47,12 @@ public class PropertiesEncoder implements IEncoder {
 		String lineBreak)
 	{
 		// lineBreak: They are converted to \n in this format
-		
 		outputEncoder = Charset.forName(encoding).newEncoder();
-		//TODO: get escapeAll from params
+		
+		// Get the output options
+		if ( params != null ) {
+			escapeExtendedChars = params.getBoolean("escapeExtendedChars");
+		}
 	}
 
 	public String encode (String text,
@@ -58,7 +61,7 @@ public class PropertiesEncoder implements IEncoder {
 		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( text.codePointAt(i) > 127 ) {
-				if ( escapeAll ) {
+				if ( escapeExtendedChars ) {
 					escaped.append(String.format("\\u%04x", text.codePointAt(i))); 
 				}
 				else {
@@ -89,7 +92,7 @@ public class PropertiesEncoder implements IEncoder {
 		int context)
 	{
 		if ( value > 127 ) {
-			if ( escapeAll ) {
+			if ( escapeExtendedChars ) {
 				return String.format("\\u%04x", (int)value);
 			}
 			else {

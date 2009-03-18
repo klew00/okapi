@@ -96,4 +96,15 @@ public abstract class BaseParameters implements IParameters {
 				try { SW.close(); } catch ( IOException e ) {};
 		}
 	}
+	
+	public boolean getBoolean (String name) {
+		if ( buffer == null ) return false;
+		else return buffer.getBoolean(name);
+	}
+	
+	public String getString (String name) {
+		if ( buffer == null ) return null;
+		else return buffer.getString(name);
+	}
+	
 }

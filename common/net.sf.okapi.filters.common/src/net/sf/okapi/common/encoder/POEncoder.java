@@ -27,13 +27,13 @@ import net.sf.okapi.common.IParameters;
  */
 public class POEncoder implements IEncoder {
 	
-	private String lineBreak;
+//	private String lineBreak;
 	
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
-		this.lineBreak = lineBreak;
+		//this.lineBreak = lineBreak;
 	}
 
 	public String encode (String text,
