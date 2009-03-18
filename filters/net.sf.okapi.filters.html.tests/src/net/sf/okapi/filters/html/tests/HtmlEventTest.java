@@ -19,6 +19,7 @@
 
 package net.sf.okapi.filters.html.tests;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -42,10 +43,12 @@ import static org.junit.Assert.*;
 
 public class HtmlEventTest {
 	private HtmlFilter htmlFilter;
-
+	private URL parameters;
+	
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
+		parameters = HtmlEventTest.class.getResource("testConfiguration1.yml");
 	}
 
 	@Test
@@ -234,6 +237,58 @@ public class HtmlEventTest {
 		addEndEvents(events);
 
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+
+	@Test
+	public void testPWithComment() {
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("minimalistConfiguration.yml");
+		
+		String snippet = "<p>Before <!--comment--> after.</p>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
+		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		TextFragment tf = tu1.getSourceContent();
+		Code code = new Code(TagType.PLACEHOLDER, "COMMENT", "<!--comment-->");
+		code.setType(Code.TYPE_COMMENT); // TODO: add comment type to general COde.TYPE list?
+		tf.append(code);
+		tf.append(" after.");
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2",false, new GenericSkeleton("</p>"))));		
+		
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		parameters = originalParameters;
+	}
+
+	@Test
+	public void testPWithProcessingInstruction() {
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("minimalistConfiguration.yml");
+
+		String snippet = "<p>Before <?PI?> after.</p>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
+		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		TextFragment tf = tu1.getSourceContent();
+		Code code = new Code(TagType.PLACEHOLDER, "XML_PI", "<?PI?>");
+		code.setType(Code.TYPE_XML_PROCESSING_INSTRUCTION); // TODO: add PI type to general COde.TYPE list?
+		tf.append(code);
+		tf.append(" after.");
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2",false, new GenericSkeleton("</p>"))));
+		
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		parameters = originalParameters;
 	}
 
 	@Test
@@ -437,7 +492,7 @@ public class HtmlEventTest {
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		htmlFilter.setParametersFromURL(HtmlEventTest.class.getResource("testConfiguration1.yml"));
+		htmlFilter.setParametersFromURL(parameters);
 		htmlFilter.open(snippet);
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();

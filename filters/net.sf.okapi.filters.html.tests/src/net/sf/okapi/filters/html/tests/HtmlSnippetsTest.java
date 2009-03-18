@@ -61,7 +61,7 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testMultilangUpdate() {
 		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
-		assertEquals("<p lang='FR'>Text</p><p lang='FR'>JA text</p>",
+		assertEquals("<p lang='FR'>Text</p><p lang='jp'>JA text</p>",
 			generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 
