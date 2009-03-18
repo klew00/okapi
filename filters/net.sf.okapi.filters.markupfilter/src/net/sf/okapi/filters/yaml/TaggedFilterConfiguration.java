@@ -9,6 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.htmlparser.jericho.StartTagType;
+import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.resource.Code;
+
 public class TaggedFilterConfiguration {
 	private static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
 	private static final String INLINE = "INLINE";
@@ -117,11 +121,29 @@ public class TaggedFilterConfiguration {
 	}
 
 	@SuppressWarnings("unchecked")
+	public String getElementType(Tag element) {
+		if (element.getTagType() == StartTagType.COMMENT) {
+			return Code.TYPE_COMMENT;
+		}
+		
+		if (element.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
+			return Code.TYPE_XML_PROCESSING_INSTRUCTION;
+		}
+		
+		Map<String, Object> rule = configReader.getRule(element.getName());
+		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
+			return (String) rule.get(ELEMENT_TYPE);
+		}		
+
+		return element.getName();
+	}
+	
+	@SuppressWarnings("unchecked")
 	public String getElementType(String elementName) {
 		Map<String, Object> rule = configReader.getRule(elementName);
 		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
 			return (String) rule.get(ELEMENT_TYPE);
-		}
+		}		
 
 		return elementName;
 	}
