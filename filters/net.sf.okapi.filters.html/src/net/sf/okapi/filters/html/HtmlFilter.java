@@ -325,7 +325,11 @@ public class HtmlFilter extends BaseMarkupFilter {
 	 */
 	@Override
 	protected void handleComment(Tag tag) {
-		handleDocumentPart(tag);
+		if (!isInsideTextRun()) {
+			handleDocumentPart(tag);
+		} else {
+			addCodeToCurrentTextUnit(tag);
+		}
 	}
 
 	/*
@@ -361,7 +365,12 @@ public class HtmlFilter extends BaseMarkupFilter {
 	 */
 	@Override
 	protected void handleProcessingInstruction(Tag tag) {
-		handleDocumentPart(tag);
+		if (!isInsideTextRun()) {
+			handleDocumentPart(tag);
+		} else {
+			addCodeToCurrentTextUnit(tag);
+		}
+
 	}
 
 	/*
@@ -432,7 +441,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 		}
 
 		// otherwise treat normally
-		// convert all enetities to Unicode
+		// convert all entities to Unicode
 		String decodedValue = CharacterEntityReference.decode(value, true);
 		decodedValue = NumericCharacterReference.decode(value, true);
 		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
