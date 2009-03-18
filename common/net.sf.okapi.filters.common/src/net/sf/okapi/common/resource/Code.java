@@ -38,6 +38,8 @@ public class Code {
 	public static final String TYPE_LB = "lb"; // Line-break
 	public static final String TYPE_LINK = "link";
 	public static final String TYPE_IMAGE = "image";
+	public static final String TYPE_COMMENT = "comment";
+	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing instruction";
 	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
