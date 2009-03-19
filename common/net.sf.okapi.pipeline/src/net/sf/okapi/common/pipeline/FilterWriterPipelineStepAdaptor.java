@@ -34,9 +34,6 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 		return filterWriter;
 	}
 
-	public void cancel() {
-	}
-
 	public String getName() {
 		return filterWriter.getName();
 	}
@@ -45,14 +42,6 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	public Event handleEvent(Event event) {
 		return filterWriter.handleEvent(event);
 	}	
-
-	@Override
-	public void postprocess() {
-	}
-
-	@Override
-	public void preprocess() {
-	}
 	
 	@Override
 	public void destroy() {
