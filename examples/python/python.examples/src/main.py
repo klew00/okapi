@@ -50,10 +50,9 @@ def pipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, out
     pipeline.destroy();
 
 if __name__ == '__main__':        
-    
+   
     # example using HTML filter
     input = File("../myFile.html").toURI()
-    print input
     pipeline(input, HtmlFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.html')
     
     # example using XML filter
