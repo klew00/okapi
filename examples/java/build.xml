@@ -11,7 +11,7 @@
 		</delete>
 		<mkdir dir="tmp"/>
 
- 		<javac srcdir="." destdir="tmp" classpathref="mainClassPath"/> 
+ 		<javac srcdir="src" destdir="tmp" classpathref="mainClassPath"/> 
 
 		<delete file="Main.jar"/>
 		<manifest file="MANIFEST.MF">
