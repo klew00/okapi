@@ -7,6 +7,9 @@
 		<project>net.sf.okapi.filters.common</project>
 		<project>net.sf.okapi.filters.html</project>
 		<project>net.sf.okapi.filters.markupfilter</project>
+		<project>net.sf.okapi.filters.openoffice</project>
+		<project>net.sf.okapi.filters.properties</project>
+		<project>net.sf.okapi.filters.xml</project>
 		<project>net.sf.okapi.pipeline</project>
 		<project>third-party.logger-slf4j</project>
 		<project>third-party.stax-wstx</project>
