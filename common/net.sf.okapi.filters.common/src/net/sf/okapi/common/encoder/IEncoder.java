@@ -52,7 +52,10 @@ public interface IEncoder {
 	public String encode (String text, int context);
 	
 	/**
-	 * Encodes a given code-point with this encoding.
+	 * Encodes a given code-point with this encoding. If this method is called from
+	 * a loop it is assumed that the code point is tested by the caller to know 
+	 * if it is a supplemental one or not and and any index update to skip the
+	 * low surrogate part of the pair is done on the caller side.
 	 * @param codePoint The code-point to encode.
 	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
 	 * @return The encoded character 9as a string since it can be now made up of
