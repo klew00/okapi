@@ -10,6 +10,9 @@
 		</xsl:copy>
 	</xsl:template>		
 	
+	<!--remove b tags-->
+	<xsl:template match="b"/>
+	
 	<xsl:template match="comment()">
 		<xsl:comment><xsl:value-of select="."/></xsl:comment> 
 	</xsl:template>		

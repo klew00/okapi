@@ -57,6 +57,6 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayInputStream transformedInput = new ByteArrayInputStream(tempStream.toByteArray());
 			
 		// overwrite our event to the new transformed content	
-		event = new Event(EventType.FILE_RESOURCE, new FileResource(transformedInput, "UTF-8", "text/xml", "en"));
+		event.setResource(new FileResource(transformedInput, "UTF-8", "text/xml", "en"));
 	}
 }
