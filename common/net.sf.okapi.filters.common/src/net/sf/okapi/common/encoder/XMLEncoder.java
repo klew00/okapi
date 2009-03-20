@@ -118,7 +118,9 @@ public class XMLEncoder implements IEncoder {
 		return sbTmp.toString();
 	}
 
-	public String encode (char value, int context) {
+	public String encode (char value,
+		int context)
+	{
 		switch ( value ) {
 		case '<':
 			return "&lt;";
@@ -141,6 +143,43 @@ public class XMLEncoder implements IEncoder {
 			}
 			else { // ASCII chars
 				return String.valueOf(value);
+			}
+		}
+	}
+
+	public String encode (int value,
+		int context)
+	{
+		switch ( value ) {
+		case '<':
+			return "&lt;";
+		case '\"':
+			return "&quot;";
+		case '\'':
+			return "&apos;";
+		case '&':
+			return "&amp;";
+		case '\n':
+			return lineBreak;
+		default:
+			if ( value > 127 ) { // Extended chars
+				if ( Character.isSupplementaryCodePoint(value) ) {
+					String tmp = new String(Character.toChars(value));
+					if (( chsEnc != null ) && !chsEnc.canEncode(tmp) ) {
+						return String.format("&#x%x;", value);
+					}
+					return tmp;
+				}
+				// Should be able to fold to char, supplementary case will be treated
+				if (( chsEnc != null ) && !chsEnc.canEncode((char)value) ) {
+					return String.format("&#x%04x;", value);
+				}
+				else { // No encoder or char is supported
+					return String.valueOf((char)value);
+				}
+			}
+			else { // ASCII chars
+				return String.valueOf((char)value);
 			}
 		}
 	}

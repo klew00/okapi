@@ -48,6 +48,15 @@ public class POEncoder implements IEncoder {
 		return String.valueOf(value);
 	}
 
+	public String encode (int value,
+		int context)
+	{
+		if ( Character.isSupplementaryCodePoint(value) ) {
+			return new String(Character.toChars(value));
+		}
+		return String.valueOf((char)value); 
+	}
+
 	public String toNative (String propertyName,
 		String value)
 	{

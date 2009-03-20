@@ -52,6 +52,15 @@ public interface IEncoder {
 	public String encode (String text, int context);
 	
 	/**
+	 * Encodes a given code-point with this encoding.
+	 * @param codePoint The code-point to encode.
+	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded character 9as a string since it can be now made up of
+	 * more than one character).
+	 */
+	public String encode (int codePoint, int context);
+	
+	/**
 	 * Encodes a given character with this encoding.
 	 * @param value The character to encode.
 	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.

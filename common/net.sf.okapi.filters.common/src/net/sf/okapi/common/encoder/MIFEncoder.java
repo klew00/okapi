@@ -87,6 +87,32 @@ public class MIFEncoder implements IEncoder {
 		}
 	}
 
+	public String encode (int value,
+		int context)
+	{
+		switch ( value ) {
+		case '\t':
+			return "\\t";
+		case '>':
+			return "\\>";
+		case '\'':
+			return "\\q";
+		case '`':
+			return "\\Q";
+		case '\\':
+			return "\\\\";
+		default:
+			//TODO: supplemental chars
+			if ( value > 127 ) {
+				return String.format("\\u%04X", value);
+				//TODO: Do we need legacy \xHH using MIF encoding?
+			}
+			else {
+				return String.valueOf((char)value);
+			}
+		}
+	}
+
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)

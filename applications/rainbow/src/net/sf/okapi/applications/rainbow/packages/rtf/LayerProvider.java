@@ -74,6 +74,18 @@ public class LayerProvider implements ILayerProvider {
 		return Util.escapeToRTF(String.valueOf(value), true, context, outputEncoder);
 	}
 
+	public String encode (int value,
+		int context)
+	{
+		// Context here can be used for lineBreak type
+		if ( Character.isSupplementaryCodePoint(value) ) {
+			return Util.escapeToRTF(new String(Character.toChars(value)),
+				true, context, outputEncoder);
+		}
+		return Util.escapeToRTF(String.valueOf((char)value),
+			true, context, outputEncoder);
+	}
+
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)

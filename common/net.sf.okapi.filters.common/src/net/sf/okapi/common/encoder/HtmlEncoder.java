@@ -132,6 +132,28 @@ public class HtmlEncoder implements IEncoder {
 		}
 	}
 
+	public String encode (int value,
+		int context)
+	{
+		switch ( value ) {
+		case '<':
+			return "&lt;";
+		case '\"':
+			return "&quot;";
+		case '\'':
+			return "&apos;";
+		case '&':
+			return "&amp;";
+		case '\n':
+			return lineBreak;
+		default:
+			if ( Character.isSupplementaryCodePoint(value) ) {
+				return new String(Character.toChars(value));
+			}
+			return String.valueOf((char)value); 
+		}
+	}
+
 	public String toNative (String propertyName,
 		String value)
 	{

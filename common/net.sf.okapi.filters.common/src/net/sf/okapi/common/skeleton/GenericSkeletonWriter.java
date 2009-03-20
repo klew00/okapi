@@ -372,8 +372,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		String text = srcCont.getCodedText();
 		Code code;
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
+			ch = text.charAt(i);
+			switch ( ch ) {
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
 			case TextFragment.MARKER_ISOLATED:
@@ -430,22 +432,46 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				break;
 			default:
-				if ( encoderManager == null ) {
-					if ( layer == null ) {
-						tmp.append(text.charAt(i));
+				if ( Character.isHighSurrogate(ch) ) {
+					int cp = text.codePointAt(i);
+					i++; // Skip low-surrogate
+					if ( encoderManager == null ) {
+						if ( layer == null ) {
+							tmp.append(new String(Character.toChars(cp)));
+						}
+						else {
+							tmp.append(layer.encode(cp, context));
+						}
 					}
 					else {
-						tmp.append(layer.encode(text.charAt(i), context));
+						if ( layer == null ) {
+							tmp.append(encoderManager.encode(cp, context));
+						}
+						else {
+							tmp.append(layer.encode(
+								encoderManager.encode(cp, context),
+								context));
+						}
 					}
 				}
-				else {
-					if ( layer == null ) {
-						tmp.append(encoderManager.encode(text.charAt(i), context));
+				else { // Non-supplemental case
+					if ( encoderManager == null ) {
+						if ( layer == null ) {
+							tmp.append(ch);
+						}
+						else {
+							tmp.append(layer.encode(ch, context));
+						}
 					}
 					else {
-						tmp.append(layer.encode(
-							encoderManager.encode(text.charAt(i), context),
-							context));
+						if ( layer == null ) {
+							tmp.append(encoderManager.encode(ch, context));
+						}
+						else {
+							tmp.append(layer.encode(
+								encoderManager.encode(ch, context),
+								context));
+						}
 					}
 				}
 				break;
@@ -484,8 +510,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		StringBuilder tmp = new StringBuilder();
 		String text = tf.getCodedText();
 		Code code;
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
+			ch = text.charAt(i);
+			switch ( ch ) {
 			case TextFragment.MARKER_OPENING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, langToUse, context));
@@ -500,22 +528,46 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			default:
-				if ( encoderManager == null ) {
-					if ( layer == null ) {
-						tmp.append(text.charAt(i));
+				if ( Character.isHighSurrogate(ch) ) {
+					int cp = text.codePointAt(i);
+					i++; // Skip low-surrogate
+					if ( encoderManager == null ) {
+						if ( layer == null ) {
+							tmp.append(new String(Character.toChars(cp)));
+						}
+						else {
+							tmp.append(layer.encode(cp, context));
+						}
 					}
 					else {
-						tmp.append(layer.encode(text.charAt(i), context));
+						if ( layer == null ) {
+							tmp.append(encoderManager.encode(cp, context));
+						}
+						else {
+							tmp.append(layer.encode(
+								encoderManager.encode(cp, context),
+								context));
+						}
 					}
 				}
-				else {
-					if ( layer == null ) {
-						tmp.append(encoderManager.encode(text.charAt(i), context));
+				else { // Non-supplemental case
+					if ( encoderManager == null ) {
+						if ( layer == null ) {
+							tmp.append(ch);
+						}
+						else {
+							tmp.append(layer.encode(ch, context));
+						}
 					}
 					else {
-						tmp.append(layer.encode(
-							encoderManager.encode(text.charAt(i), context),
-							context));
+						if ( layer == null ) {
+							tmp.append(encoderManager.encode(ch, context));
+						}
+						else {
+							tmp.append(layer.encode(
+								encoderManager.encode(ch, context),
+								context));
+						}
 					}
 				}
 				break;

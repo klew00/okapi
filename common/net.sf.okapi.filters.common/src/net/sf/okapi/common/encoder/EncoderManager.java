@@ -140,7 +140,27 @@ public class EncoderManager implements IEncoder {
 		int context)
 	{
 		if ( encoder != null ) return encoder.encode(value, context);
-		else return String.valueOf(value);
+		else return String.valueOf(value); 
+	}
+
+	/**
+	 * Encodes a given code-point with the encoder currently cached. If no encoder is currently
+	 * cached, the character is returned as its string value.
+	 * @param codePoint The code-point to encode.
+	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return The encoded character 9as a string since it can be now made up of
+	 * more than one character).
+	 */
+	public String encode (int codePoint,
+		int context)
+	{
+		if ( encoder != null ) return encoder.encode(codePoint, context);
+		else {
+			if ( Character.isSupplementaryCodePoint(codePoint) ) {
+				return new String(Character.toChars(codePoint));
+			}
+			return String.valueOf((char)codePoint); 
+		}
 	}
 
 	/**

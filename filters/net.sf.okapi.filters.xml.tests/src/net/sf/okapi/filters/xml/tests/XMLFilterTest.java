@@ -45,12 +45,14 @@ public class XMLFilterTest {
 	@Test
 	public void runTest () {
 		FilterTestDriver testDriver = new FilterTestDriver();
+		testDriver.setDisplayLevel(3);
+		testDriver.setShowSkeleton(true);
 		XMLFilter filter = null;		
 		try {
 			filter = new XMLFilter();
 			filter.setOptions("en", "es", "UTF-16", true);
 			
-			URL url = XMLFilterTest.class.getResource("/input.xml");
+			URL url = XMLFilterTest.class.getResource("/Translate4.xml");
 			filter.open(url.toURI());
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
