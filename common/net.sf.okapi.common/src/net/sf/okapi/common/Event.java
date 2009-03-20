@@ -75,4 +75,10 @@ public class Event {
 		return resource;
 	}
 
+	/**
+	 * Sets the resource associated to this event.
+	 */
+	public void setResource(IResource resource) {
+		this.resource = resource;
+	}
 }
