@@ -76,7 +76,7 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements
 
 	@Override
 	public Event handleEvent(Event event) {		
-		if (event.getEventType() == EventType.FILE_RESOURCE) {
+		if (event != null && event.getEventType() == EventType.FILE_RESOURCE) {
 			FileResource fileResource = (FileResource)event.getResource();
 			filter.setOptions(fileResource.getLocale(), fileResource.getEncoding(), true);			
 			if (fileResource.getInputCharSequence() != null) {
