@@ -24,9 +24,12 @@ import java.io.InputStream;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.FileResource;
 
-public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
+public class FilterPipelineStepAdaptor extends BasePipelineStep implements
+		IInitialStep {
 	private IFilter filter;
 
 	/*
@@ -73,13 +76,24 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements IInit
 
 	@Override
 	public Event handleEvent(Event event) {		
+		if (event.getEventType() == EventType.FILE_RESOURCE) {
+			FileResource fileResource = (FileResource)event.getResource();
+			filter.setOptions(fileResource.getLocale(), fileResource.getEncoding(), true);			
+			if (fileResource.getInputCharSequence() != null) {
+				setInput(fileResource.getInputCharSequence());
+			} else if (fileResource.getInputURI() != null) {				
+				setInput(fileResource.getInputURI());		
+			} else if (fileResource.getInputStream() != null) {
+				setInput(fileResource.getInputStream());
+			}				
+		}
 		return filter.next();		
 	}
 
 	public boolean hasNext() {
 		return filter.hasNext();
 	}
-	
+
 	public void destroy() {
 		filter.close();
 	}
