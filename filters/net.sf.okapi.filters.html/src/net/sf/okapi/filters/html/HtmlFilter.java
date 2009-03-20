@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterEntityReference;
+import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
@@ -116,9 +117,10 @@ public class HtmlFilter extends BaseMarkupFilter {
 			return;
 		}
 
-		String decodedText = text.toString();				
-		decodedText = CharacterEntityReference.decode(text.toString(), false);
-		decodedText = NumericCharacterReference.decode(decodedText, false);
+		String decodedText = text.toString();	
+		decodedText = CharacterReference.decode(text.toString(), false);
+		//decodedText = CharacterEntityReference.decode(text.toString(), false);
+		//decodedText = NumericCharacterReference.decode(decodedText, false);
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
@@ -442,8 +444,12 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 		// otherwise treat normally
 		// convert all entities to Unicode
-		String decodedValue = CharacterEntityReference.decode(value, true);
-		decodedValue = NumericCharacterReference.decode(value, true);
+		
+		//String decodedValue = CharacterEntityReference.decode(value, true);
+		//decodedValue = NumericCharacterReference.decode(value, true);
+		
+		String decodedValue = CharacterReference.decode(value, true);
+		
 		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
 			decodedValue = collapseWhitespace(decodedValue);
 		} else {
