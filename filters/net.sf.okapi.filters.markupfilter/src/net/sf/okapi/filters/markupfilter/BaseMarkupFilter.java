@@ -202,8 +202,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-		document.fullSequentialParse(); // optimizes jericho parsing
-		nodeIterator = document.getNodeIterator();
+		//document.fullSequentialParse(); // optimizes jericho parsing
+		//nodeIterator = document.getNodeIterator();
+		nodeIterator = new NoCacheNodeIterator(document);
 	}
 
 	protected void setDefaultConfig(URL classPathToConfig) {
