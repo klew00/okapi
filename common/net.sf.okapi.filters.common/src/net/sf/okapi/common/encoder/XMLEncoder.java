@@ -62,8 +62,10 @@ public class XMLEncoder implements IEncoder {
 		int quoteMode = 1;
 		
 		StringBuffer sbTmp = new StringBuffer(text.length());
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
+			ch = text.charAt(i);
+			switch ( ch ) {
 			case '<':
 				sbTmp.append("&lt;");
 				continue;
@@ -90,7 +92,7 @@ public class XMLEncoder implements IEncoder {
 					sbTmp.append("&#39;");
 					break;
 				default:
-					sbTmp.append(text.charAt(i));
+					sbTmp.append(ch);
 					break;
 				}
 				continue;
@@ -101,18 +103,29 @@ public class XMLEncoder implements IEncoder {
 				if ( escapeNbsp ) sbTmp.append("&#x00a0;");
 				// Else: fall through
 			default:
-				if ( text.charAt(i) > 127 ) { // Extended chars
-					if (( chsEnc != null ) && ( !chsEnc.canEncode(text.charAt(i)) )) {
-						sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
+				if ( ch > 127 ) { // Extended chars
+					if ( Character.isHighSurrogate(ch) ) {
+						int cp = text.codePointAt(i++);
+						String tmp = new String(Character.toChars(cp));
+						if (( chsEnc != null ) && !chsEnc.canEncode(tmp) ) {
+							sbTmp.append(String.format("&#x%x;", cp));
+						}
+						else {
+							sbTmp.append(tmp);
+						}
 					}
-					else { // No encoder or char is supported
-						sbTmp.append(text.charAt(i));
+					else { // Should be able to fold to char, supplementary case will be treated
+						if (( chsEnc != null ) && !chsEnc.canEncode(ch) ) {
+							sbTmp.append(String.format("&#x%04x;", ch));
+						}
+						else { // No encoder or char is supported
+							sbTmp.append(String.valueOf(ch));
+						}
 					}
 				}
 				else { // ASCII chars
-					sbTmp.append(text.charAt(i));
+					sbTmp.append(ch);
 				}
-				continue;
 			}
 		}
 		return sbTmp.toString();
