@@ -27,10 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.CharacterEntityReference;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.EndTag;
-import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
