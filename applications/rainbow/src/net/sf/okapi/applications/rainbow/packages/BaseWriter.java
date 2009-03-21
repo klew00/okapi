@@ -173,6 +173,30 @@ public abstract class BaseWriter implements IWriter {
 		setOutput(outputPath);
 	}
 
+	public void createCopies (int docID,
+		String relativeSourcePath)
+	{
+		if ( relativeSourcePath == null ) throw new NullPointerException();
+
+		String inputPath = inputRoot + File.separator + relativeSourcePath;
+		String outputPath = manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+			+ relativeSourcePath;
+
+		// If needed copy the original input to the package
+		String subFolder = manifest.getOriginalLocation();
+		if (( subFolder != null ) && ( subFolder.length() > 0 )) {
+			String docPrefix = String.format("%d.", docID);
+			String destination = manifest.getRoot() + File.separator + subFolder
+				+ File.separator + docPrefix + "ori"; // docPrefix has a dot
+			Util.copyFile(inputPath, destination, false);
+		}
+			
+		// Copy to the work folder
+		Util.createDirectories(outputPath);
+		Util.copyFile(inputPath, outputPath, false);
+	}
+
 	public void setOptions (String language,
 		String defaultEncoding)
 	{

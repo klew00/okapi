@@ -197,7 +197,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	 * @param fr The file resource to process.
 	 */
 	private void processFileResource (FileResource fr) {
-		//TODO
+		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
+		writer.createCopies(++id, relativeInput);
 	}
 	
     private void processStartDocument (StartDocument resource) {

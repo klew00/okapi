@@ -27,6 +27,27 @@
 
 <h2><a name="overview"></a>Overview</h2>
 <p>This filter allows you to process XML documents.</p>
+
+<p>The following is an example of a simple XML document. The translatable text 
+is underlined. Because each format based on XML is different, you need 
+information on what are the translatable parts, what are the inline elements, 
+etc. The XML Filter <a href="#itsSupport">implements the ITS W3C Recommendation</a> 
+to address this issue.</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;myDoc&gt;
+ &lt;prolog&gt;
+  &lt;author&gt;Zebulon Fairfield&lt;/author&gt;
+  &lt;version&gt;version 12, revision 2 - 2006-08-14&lt;/version&gt;
+  &lt;keywords&gt;&lt;kw&gt;<u>horse</u>&lt;/kw&gt;&lt;kw&gt;<u>appaloosa</u>&lt;/kw&gt;&lt;/keywords&gt;
+  &lt;storageKey&gt;articles-6D272BA9-3B89CAD8&lt;/storageKey&gt;
+ &lt;/prolog&gt;
+ &lt;body&gt;
+  &lt;title&gt;<u>Appaloosa</u>&lt;/title&gt;
+  &lt;p&gt;<u>The Appaloosas are rugged horses originally breed by 
+the </u>&lt;kw&gt;<u>Nez-Perce</u>&lt;/kw&gt;<u> tribe in the US Northwest.</u>&lt;/p&gt;
+  &lt;p&gt;<u>They are often characterized by their spotted coats.</u>&lt;/p&gt;
+ &lt;/body&gt;
+&lt;/myDoc&gt;</pre>
 <h2><a name="itsSupport"></a>ITS Support</h2>
 <p>The <b>Internationalization Tag set (ITS )</b> is a W3C recommendation that 
 defines a set of elements and attributes you can use to specify different 
@@ -47,8 +68,41 @@ with ITS rules. This can be done different ways:</p>
 	filter. The parameter file being a set of external ITS global rules.</li>
 </ul>
 
+<p>When processing a document, the filter...</p>
+<ol>
+	<li>Assumes that all element content is translatable, and none of the 
+	attribute values are translatable.</li>
+	<li>Applies the global rules found in the (optional) parameters file 
+	associated with the input document.</li>
+	<li>Applies the global rules found in the document.</li>
+	<li>And finally, applies the local rules within the document. </li>
+</ol>
+<p>For example, assuming that <code>ITSForDoc.xml</code> is the ITS file 
+associated with the input file <code>Document.xml</code>, the translatable text 
+is listed below.</p>
+<p>ITSForDoc.xml:</p>
+<pre>&lt;its:rules xmlns:its=&quot;http://www.w3.org/2005/11/its&quot; version=&quot;1.0&quot;&gt;
+ &lt;its:translateRule selector=&quot;//head&quot; translate=&quot;no&quot;/&gt;
+ &lt;its:withinTextRule selector=&quot;//b|//code|//img&quot; withinText=&quot;yes&quot;/&gt;
+&lt;/its:rules&gt;</pre>
+<p>Document.xml:</p>
+<pre>&lt;doc&gt;
+ &lt;head&gt;
+  &lt;update&gt;2009-03-21&lt;/update&gt;
+  &lt;author&gt;Mirabelle McIntosh&lt;/author&gt;
+ &lt;/head&gt;
+ &lt;body&gt;
+  &lt;p&gt;Paragraph with &lt;img ref=&quot;eg.png&quot;/&gt; and &lt;b&gt;bolded text&lt;/b&gt;.&lt;/p&gt;
+  &lt;p&gt;Paragraph with &lt;code&gt;data codes&lt;/code&gt; and text.&lt;/p&gt;
+ &lt;/body&gt;
+&lt;/doc&gt;</pre>
+<p>The resulting text units are (in XLIFF 1.2 notation):</p>
+<pre>1: &quot;Paragraph with &lt;x id=&#39;1&#39;&gt; and &lt;g id=&#39;2&#39;&gt;bolded text&lt;/g&gt;.&quot;
+2: &quot;Paragraph with &lt;g id=&#39;1&#39;&gt;&lt;x id=&#39;2&#39;/&gt;&lt;/g&gt; and text.&quot;</pre>
+<p>&nbsp;</p>
 <h2><a name="processing"></a>Processing Details</h2>
 <p>TODO</p>
+<p>&nbsp;</p>
 
 <h2><a name="parameters"></a>Parameters</h2>
 <p>TODO</p>

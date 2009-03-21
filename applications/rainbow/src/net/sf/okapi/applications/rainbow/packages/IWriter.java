@@ -60,4 +60,7 @@ public interface IWriter extends IFilterWriter {
 		String filterSettings,
 		IParameters filterParams);
 
+	public void createCopies (int docID,
+		String relativeSourcePath);
+
 }

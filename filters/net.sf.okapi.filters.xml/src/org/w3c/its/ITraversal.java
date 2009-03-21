@@ -18,26 +18,26 @@ public interface ITraversal {
 	 * Starts the traversal of the document. This method must be called
 	 * once before you call {@link #nextNode()}.
 	 */
-	void startTraversal ();
+	public void startTraversal ();
 	
 	/**
 	 * Moves to the next node in the traversal of the document.
 	 * @return The current node of the traversal. Null if the document is traversed.
 	 */
-	Node nextNode ();
+	public Node nextNode ();
 	
 	/**
 	 * Indicates whether the current node is found while backtracking. For example,
 	 * for an element node, this indicate the equivalent of a closing tag.
 	 * @return True if the current node is found while backtracking, false otherwise. 
 	 */
- 	boolean backTracking ();
+	public boolean backTracking ();
 
 	/**
 	 * Indicates if the current node of the traversal is translatable.
 	 * @return True if the current node is translatable, false otherwise.
 	 */
-	boolean translate ();
+ 	public boolean translate ();
 	
 	/**
 	 * Indicates if a given attribute of the current element of the traversal is
@@ -46,14 +46,14 @@ public interface ITraversal {
 	 * node of the traversal.
 	 * @return True if the attribute is translatable, false otherwise.
 	 */
-	boolean translate (Attr attribute);
+	public boolean translate (Attr attribute);
 	
 	/**
 	 * Gets the directionality for the text of the current node of the
 	 * traversal.
 	 * @return One of the DIR_* values.
 	 */
-	int getDirectionality ();
+	public int getDirectionality ();
 	
 	/**
 	 * Gets the directionality for the text of a given attribute of the current 
@@ -62,19 +62,19 @@ public interface ITraversal {
 	 * node of the traversal.
 	 * @return One of the DIR_* values.
 	 */
-	int getDirectionality (Attr attribute);
+	public int getDirectionality (Attr attribute);
 	
 	/**
 	 * Gets the element-withinText-related information for the current element.
 	 * @return One of the WINTINTEXT_* values.
 	 */
-	int getWithinText ();
+	public int getWithinText ();
 
 	/**
 	 * Indicates if the current node of the traversal is a term.
 	 * @return True if the current node is a tern, false otherwise.
 	 */
-	boolean isTerm ();
+	public boolean isTerm ();
 	
 	/**
 	 * Indicates if a given attribute of the current element of the traversal is
@@ -83,7 +83,7 @@ public interface ITraversal {
 	 * node of the traversal.
 	 * @return True if the attribute is a term, false otherwise.
 	 */
-	boolean isTerm (Attr attribute);
+	public boolean isTerm (Attr attribute);
 	
 	/**
 	 * Gets the localization notes of the current element of the traversal, or null
@@ -91,7 +91,7 @@ public interface ITraversal {
 	 * @return The localization note of the current element, or null if the
 	 * node has no localization note.
 	 */
-	String getNote ();
+	public String getNote ();
 	
 	/**
 	 * Get the localization note of the given attribute of the current element.
@@ -100,7 +100,7 @@ public interface ITraversal {
 	 * @return The localization note of the attribute, or null if the
 	 * attribute has no localization note.
 	 */
-	String getNote (Attr attribute);
+	public String getNote (Attr attribute);
 
 	/**
 	 * Indicates if the white spaces of the current element of the traversal
@@ -108,6 +108,12 @@ public interface ITraversal {
 	 * @return True if the white spaces of the current element must be preserve,
 	 * false if they may or may not be preserved.
 	 */
-	boolean preserveWS ();
+	public boolean preserveWS ();
+
+	/**
+	 * Gets the language for the current element of the traversal.
+	 * @return The language code for the current element. 
+	 */
+	public String getLanguage ();
 	
 }

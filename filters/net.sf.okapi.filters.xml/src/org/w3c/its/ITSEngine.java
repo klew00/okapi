@@ -27,11 +27,13 @@ public class ITSEngine implements IProcessor, ITraversal
 	public static final String    XML_NS_PREFIX  = "xml";
 	public static final String    ITS_NS_URI     = "http://www.w3.org/2005/11/its";
 	public static final String    ITS_NS_PREFIX  = "its";
+	public static final String    ITSX_NS_URI     = "http://www.w3.org/2008/12/its-extensions";
+	public static final String    ITSX_NS_PREFIX  = "itsx";
 	public static final String    XLINK_NS_URI   = "http://www.w3.org/1999/xlink";
 	
 	private static final String   FLAGNAME            = "\u00ff";
 	private static final String   FLAGSEP             = "\u001c";
-	private static final String   FLAGDEFAULTDATA     = "??????"+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
@@ -39,9 +41,11 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_TERMINOLOGY      = 3;
 	private static final int      FP_LOCNOTE          = 4;
 	private static final int      FP_PRESERVEWS       = 5;
+	private static final int      FP_LANGINFO         = 6;
 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
+	private static final int      FP_LANGINFO_DATA         = 2;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -190,6 +194,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					}
 					else if ( "withinTextRule".equals(ruleElem.getLocalName()) ) {
 						compileWithinTextRule(ruleElem, isInternal);
+					}
+					if ( "langRule".equals(ruleElem.getLocalName()) ) {
+						compileLangRule(ruleElem, isInternal);
 					}
 					else if ( "dirRule".equals(ruleElem.getLocalName()) ) {
 						compileDirRule(ruleElem, isInternal);
@@ -385,6 +392,20 @@ public class ITSEngine implements IProcessor, ITraversal
 		rules.add(rule);
 	}
 
+	private void compileLangRule (Element elem,
+		boolean isInternal)
+	{
+		ITSRule rule = new ITSRule(IProcessor.DC_LANGINFO);
+		rule.selector = elem.getAttribute("selector");
+		rule.isInternal = isInternal;
+		
+		rule.info = elem.getAttribute("langPointer");
+		if ( rule.info.length() == 0 ) {
+			throw new ITSException("langPointer attribute missing.");
+		}
+		rules.add(rule);
+	}
+
 	public void applyRules (int dataCategories) {
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
@@ -516,6 +537,10 @@ public class ITSEngine implements IProcessor, ITraversal
 			trace.peek().preserveWS = (data.charAt(FP_PRESERVEWS) == 'y');
 		}
 		
+		if ( data.charAt(FP_LANGINFO) != '?' ) {
+			trace.peek().language = getFlagData(data, FP_LANGINFO_DATA);
+		}
+
 	}
 
 	public void startTraversal () {
@@ -596,6 +621,10 @@ public class ITSEngine implements IProcessor, ITraversal
 							setFlag(NL.item(i), FP_LOCNOTE_DATA, "REF:"+resolvePointer(NL.item(i), rule.info), true);
 							break;
 						}
+						break;
+					case IProcessor.DC_LANGINFO:
+						setFlag(NL.item(i), FP_LANGINFO, 'y', true);
+						setFlag(NL.item(i), FP_LANGINFO_DATA, resolvePointer(NL.item(i), rule.info), true);
 						break;
 					}
 				}
@@ -698,6 +727,19 @@ public class ITSEngine implements IProcessor, ITraversal
 						setFlag(attr.getOwnerElement(), FP_LOCNOTE_DATA,
 							"REF:"+resolvePointer(attr.getOwnerElement(), attr.getValue()), attr.getSpecified());
 					}
+				}
+			}
+
+			if ( (dataCategories & IProcessor.DC_LANGINFO) > 0 ) {
+				XPathExpression expr = xpath.compile("//*/@"+XML_NS_PREFIX+":lang");
+				NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+				Attr attr;
+				for ( int i=0; i<NL.getLength(); i++ ) {
+					attr = (Attr)NL.item(i);
+					// Skip irrelevant nodes
+					setFlag(attr.getOwnerElement(), FP_LANGINFO, 'y', attr.getSpecified());
+					setFlag(attr.getOwnerElement(), FP_LANGINFO_DATA,
+						attr.getValue(), attr.getSpecified());
 				}
 			}
 			
@@ -882,4 +924,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		return trace.peek().preserveWS;
 	}
 
+	public String getLanguage () {
+		return trace.peek().language;
+	}
 }
