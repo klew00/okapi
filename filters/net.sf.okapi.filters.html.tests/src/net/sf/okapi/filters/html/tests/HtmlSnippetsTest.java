@@ -165,6 +165,12 @@ public class HtmlSnippetsTest {
 		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
+	@Test
+	public void testSupplementalSupport() {
+		String snippet = "<p>[&#x20000;]=U+D840,U+DC00</p>";
+		assertEquals("<p>[\uD840,\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
+	}
+
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
