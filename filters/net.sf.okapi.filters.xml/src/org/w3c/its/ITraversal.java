@@ -101,5 +101,13 @@ public interface ITraversal {
 	 * attribute has no localization note.
 	 */
 	String getNote (Attr attribute);
+
+	/**
+	 * Indicates if the white spaces of the current element of the traversal
+	 * must be preserved. 
+	 * @return True if the white spaces of the current element must be preserve,
+	 * false if they may or may not be preserved.
+	 */
+	boolean preserveWS ();
 	
 }

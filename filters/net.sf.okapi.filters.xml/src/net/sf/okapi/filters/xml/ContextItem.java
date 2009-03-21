@@ -21,20 +21,36 @@
 package net.sf.okapi.filters.xml;
 
 import org.w3c.dom.Node;
+import org.w3c.its.ITraversal;
 
 class ContextItem {
 	
 	Node node;
 	boolean translate;
 	String locNote;
+	boolean preserveWS;
 
 	public ContextItem (Node node,
-		boolean translate,
-		String locNote)
+			boolean translate,
+			String locNote,
+			boolean preserveWS)
+		{
+			this.node = node;
+			this.translate = translate;
+			this.locNote = locNote;
+			this.preserveWS = preserveWS;
+		}
+		
+	public ContextItem (Node node,
+		ITraversal trav)
 	{
 		this.node = node;
-		this.translate = translate;
-		this.locNote = locNote;
+		// Context is always an element node
+		this.translate = trav.translate();
+		this.locNote = trav.getNote();
+		this.preserveWS = trav.preserveWS();
 	}
+		
+	
 
 }

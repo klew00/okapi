@@ -153,8 +153,10 @@ public class Util {
 	{
 		if ( text == null ) return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
+			ch = text.charAt(i);
+			switch ( ch ) {
 			case '<':
 				sbTmp.append("&lt;");
 				continue;
@@ -187,11 +189,23 @@ public class Util {
 				continue;
 			default:
 				if ( text.charAt(i) > 127 ) { // Extended chars
-					if (( encoder != null ) && ( !encoder.canEncode(text.charAt(i)) )) {
-						sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
+					if ( Character.isHighSurrogate(ch) ) {
+						int cp = text.codePointAt(i++);
+						String tmp = new String(Character.toChars(cp));
+						if (( encoder != null ) && !encoder.canEncode(tmp) ) {
+							sbTmp.append(String.format("&#x%x;", cp));
+						}
+						else {
+							sbTmp.append(tmp);
+						}
 					}
-					else { // No encoder or char is supported
-						sbTmp.append(text.charAt(i));
+					else {
+						if (( encoder != null ) && ( !encoder.canEncode(text.charAt(i)) )) {
+							sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
+						}
+						else { // No encoder or char is supported
+							sbTmp.append(text.charAt(i));
+						}
 					}
 				}
 				else { // ASCII chars

@@ -60,7 +60,7 @@ public class POEncoder implements IEncoder {
 	public String toNative (String propertyName,
 		String value)
 	{
-		// PROP_LANGUGE: Not applicable
+		// PROP_LANGUAGE: Not applicable
 		// PROP_ENCODING: No change
 		
 		// No changes for the other values

@@ -52,7 +52,7 @@ public class XMLFilterTest {
 			filter = new XMLFilter();
 			filter.setOptions("en", "es", "UTF-16", true);
 			
-			URL url = XMLFilterTest.class.getResource("/Translate4.xml");
+			URL url = XMLFilterTest.class.getResource("/Translate1.xml");
 			filter.open(url.toURI());
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
@@ -72,7 +72,7 @@ public class XMLFilterTest {
 	}
 
 	@Test
-	public void basicElement () {
+	public void basicElementTest () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><!--c--></doc>";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
@@ -88,18 +88,55 @@ public class XMLFilterTest {
 	}
 	
 	@Test
-	public void simpleContent () {
+	public void simpleContent1Test () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><p>test</p></doc>";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
-		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+	}
+
+	@Test
+	public void simpleContent2Test () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
-		snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+	}
+	
+	@Test
+	public void simpleContent3Test () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc xml:lang='en'>test</doc>";
 		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc xml:lang='FR'>test</doc>";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
+	}
+	
+	@Test
+	public void supplementalCharsTest () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<p>[&#x20000;]=U+D840,U+DC00</p>";
+		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<p>[\uD840\uDC00]=U+D840,U+DC00</p>";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+	}
+	
+	@Test
+	public void whitespacesTest () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><p>part 1\r\npart 2</p>"
+			+ "<p xml:space=\"preserve\">part 1\r\npart 2</p></doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><p>part 1 part 2</p>"
+			+ "<p xml:space=\"preserve\">part 1\r\npart 2</p></doc>";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+	}
+	
+	@Test
+	public void whitespaces2Test () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<p>part 1\r\npart 2<x> part3</x> part4</p>";
+		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<p>part 1 part 2<x> part3</x> part4</p>";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {

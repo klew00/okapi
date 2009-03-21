@@ -408,6 +408,12 @@ public class XMLFilter implements IFilter {
 					addAttributeTextUnit(attr, true);
 					tmp.append("\"");
 				}
+				else if ( attr.getName().equals("xml:lang") ) {
+					//String x = attr.getValue();
+					//TODO: handle xml:lang
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
+				}
 				else { //TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
@@ -439,6 +445,13 @@ public class XMLFilter implements IFilter {
 					id = addAttributeTextUnit(attr, false);
 					tmp.append(TextFragment.makeRefMarker(id));
 					tmp.append("\"");
+				}
+				else if ( attr.getName().equals("xml:lang") ) { // xml:lang
+					if ( attr.getValue().equalsIgnoreCase(srcLang) ) {
+						//TODO
+					}
+					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
+						+ "\"");
 				}
 				else { //TODO: escape unsupported chars
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
@@ -533,7 +546,7 @@ public class XMLFilter implements IFilter {
 						frag = new TextFragment();
 					}
 					if ( node.hasChildNodes() ) {
-						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
+						context.push(new ContextItem(node, trav));
 					}
 				}
 				else { // Already in extraction
@@ -545,7 +558,7 @@ public class XMLFilter implements IFilter {
 						frag = new TextFragment();
 					}
 					if ( node.hasChildNodes() ) {
-						context.push(new ContextItem(node, trav.translate(), trav.getNote()));
+						context.push(new ContextItem(node, trav));
 					}
 				}
 				break;
@@ -568,27 +581,42 @@ public class XMLFilter implements IFilter {
 	private boolean addTextUnit (Node node,
 		boolean popStack)
 	{
-		String locNote = context.peek().locNote;
-		if ( popStack ) context.pop();
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toString()); // Pass them as skeleton
 			}
 			frag = null;
-			if ( popStack ) skel.add(buildEndTag(node));
+			if ( popStack ) {
+				context.pop();
+				skel.add(buildEndTag(node));
+			}
 			return false;
 		}
 		// Create the unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType("text/xml");
 		tu.setSourceContent(frag);
+
+		String locNote = context.peek().locNote;
 		if ( locNote != null ) {
 			//TODO: implement real notes
 			tu.setProperty(new Property("locnote", locNote));
 		}
+		
+		if ( context.peek().preserveWS ) {
+			tu.setPreserveWhitespaces(true);
+		}
+		else {
+			tu.setPreserveWhitespaces(false);
+			TextFragment.unwrap(tu.getSourceContent());
+		}
+		
 		skel.addContentPlaceholder(tu);
-		if ( popStack ) skel.add(buildEndTag(node));
+		if ( popStack ) {
+			context.pop();
+			skel.add(buildEndTag(node));
+		}
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		frag = null;

@@ -23,19 +23,22 @@ import org.xml.sax.SAXException;
 
 public class ITSEngine implements IProcessor, ITraversal  
 {
+	public static final String    XML_NS_URI     = "http://www.w3.org/XML/1998/namespace";
+	public static final String    XML_NS_PREFIX  = "xml";
 	public static final String    ITS_NS_URI     = "http://www.w3.org/2005/11/its";
 	public static final String    ITS_NS_PREFIX  = "its";
 	public static final String    XLINK_NS_URI   = "http://www.w3.org/1999/xlink";
 	
 	private static final String   FLAGNAME            = "\u00ff";
 	private static final String   FLAGSEP             = "\u001c";
-	private static final String   FLAGDEFAULTDATA     = "?????"+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "??????"+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
 	private static final int      FP_WITHINTEXT       = 2;
 	private static final int      FP_TERMINOLOGY      = 3;
 	private static final int      FP_LOCNOTE          = 4;
+	private static final int      FP_PRESERVEWS       = 5;
 
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
@@ -507,6 +510,12 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( data.charAt(FP_LOCNOTE) != '?' ) {
 			trace.peek().locNote = getFlagData(data, FP_LOCNOTE_DATA);
 		}
+
+		// Preserve white spaces
+		if ( data.charAt(FP_PRESERVEWS) != '?' ) {
+			trace.peek().preserveWS = (data.charAt(FP_PRESERVEWS) == 'y');
+		}
+		
 	}
 
 	public void startTraversal () {
@@ -691,6 +700,23 @@ public class ITSEngine implements IProcessor, ITraversal
 					}
 				}
 			}
+			
+			// xml:space always applied
+			XPathExpression expr = xpath.compile("//*/@"+XML_NS_PREFIX+":space");
+			NodeList NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+			Attr attr;
+			for ( int i=0; i<NL.getLength(); i++ ) {
+				attr = (Attr)NL.item(i);
+				// Validate the value
+				String value = attr.getValue();
+				if (( !"preserve".equals(value) ) && ( !"default".equals(value) )) {
+					throw new ITSException("Invalid value for 'xml;space'.");
+				}
+				// Set the flag
+				setFlag(attr.getOwnerElement(), FP_PRESERVEWS,
+					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
+			}
+			
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
@@ -850,6 +876,10 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return null;
 		if ( tmp.charAt(FP_LOCNOTE) != 'y' ) return null;
 		return getFlagData(tmp, FP_LOCNOTE_DATA);
+	}
+
+	public boolean preserveWS () {
+		return trace.peek().preserveWS;
 	}
 
 }

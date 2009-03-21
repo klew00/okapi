@@ -45,7 +45,7 @@
  <filter id="okf_xml"
   name="(BETA) XML Filter"
   inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
- >Filter for XML documents</filter>
+ >Filter for XML documents. This filter supports the Internationalization Tag Set (ITS).</filter>
   
  <filter id="okf_idml"
   name="(ALPHA-TEST-ONLY) IDML Filter"
