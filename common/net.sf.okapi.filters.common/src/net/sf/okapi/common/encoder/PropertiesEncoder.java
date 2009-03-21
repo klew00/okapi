@@ -59,20 +59,35 @@ public class PropertiesEncoder implements IEncoder {
 		int context)
 	{
 		StringBuilder escaped = new StringBuilder();
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			if ( text.codePointAt(i) > 127 ) {
-				if ( escapeExtendedChars ) {
-					escaped.append(String.format("\\u%04x", text.codePointAt(i))); 
+			ch = text.charAt(i);
+			
+			if ( ch > 127 ) { // Extended chars
+				if ( Character.isHighSurrogate(ch) ) {
+					int cp = text.codePointAt(i++);
+					String tmp = new String(Character.toChars(cp));
+					if ( escapeExtendedChars
+						|| (( chsEnc != null ) && !chsEnc.canEncode(tmp) )) {
+						escaped.append(String.format("\\u%04x\\u%04x",
+							(int)tmp.charAt(0), (int)tmp.charAt(1)));
+					}
+					else {
+						escaped.append(tmp);
+					}
 				}
-				else {
-					if ( chsEnc.canEncode(text.charAt(i)) )
-						escaped.append(text.charAt(i));
-					else
-						escaped.append(String.format("\\u%04x", text.codePointAt(i)));
+				else { // Should be able to fold to char, supplementary case will be treated
+					if ( escapeExtendedChars
+						|| (( chsEnc != null ) && !chsEnc.canEncode(ch) )) {
+						escaped.append(String.format("&#x%04x;", (int)ch));
+					}
+					else { // No encoder or char is supported
+						escaped.append(String.valueOf(ch));
+					}
 				}
 			}
-			else {
-				switch ( text.charAt(i) ) {
+			else { // ASCII chars
+				switch ( ch ) {
 				case '\n':
 					escaped.append("\\n");
 					break;
@@ -80,7 +95,7 @@ public class PropertiesEncoder implements IEncoder {
 					escaped.append("\\t");
 					break;
 				default:
-					escaped.append(text.charAt(i));
+					escaped.append(ch);
 					break;
 				}
 			}
@@ -92,14 +107,11 @@ public class PropertiesEncoder implements IEncoder {
 		int context)
 	{
 		if ( value > 127 ) {
-			if ( escapeExtendedChars ) {
+			if ( escapeExtendedChars || !chsEnc.canEncode(value) ) {
 				return String.format("\\u%04x", (int)value);
 			}
 			else {
-				if ( chsEnc.canEncode(value) )
-					return String.valueOf(value);
-				else
-					return String.format("\\u%04x", (int)value);
+				return String.valueOf(value);
 			}
 		}
 		else {
@@ -120,31 +132,21 @@ public class PropertiesEncoder implements IEncoder {
 		if ( value > 127 ) {
 			if ( Character.isSupplementaryCodePoint(value) ) {
 				String tmp = new String(Character.toChars(value));
-				if ( escapeExtendedChars ) {
+				if ( escapeExtendedChars || !chsEnc.canEncode(tmp) ) { 
 					return String.format("\\u%04x\\u%04x",
 						(int)tmp.charAt(0), (int)tmp.charAt(1));
 				}
 				else {
-					if ( !chsEnc.canEncode(tmp) ) {
-						return String.format("\\u%04x\\u%04x",
-							(int)tmp.charAt(0), (int)tmp.charAt(1));
-					}
-					else {
-						return tmp;
-					}
+					return tmp;
 				}
 			}
 			else { // Extended not supplemental
-				if ( escapeExtendedChars ) {
-					return String.format("\\u%04x", value);
+				if ( escapeExtendedChars 
+					|| (( chsEnc != null ) && !chsEnc.canEncode((char)value) )) {
+						return String.format("&#x%x;", value);
 				}
 				else {
-					if (( chsEnc != null ) && !chsEnc.canEncode((char)value) ) {
-						return String.format("&#x%x;", value);
-					}
-					else {
-						return String.valueOf((char)value);
-					}
+					return String.valueOf((char)value);
 				}
 			}
 		}			

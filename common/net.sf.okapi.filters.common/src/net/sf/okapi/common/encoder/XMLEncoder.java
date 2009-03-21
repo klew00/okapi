@@ -100,7 +100,10 @@ public class XMLEncoder implements IEncoder {
 				sbTmp.append(lineBreak);
 				break;
 			case '\u00A0':
-				if ( escapeNbsp ) sbTmp.append("&#x00a0;");
+				if ( escapeNbsp ) {
+					sbTmp.append("&#x00a0;");
+					break;
+				}
 				// Else: fall through
 			default:
 				if ( ch > 127 ) { // Extended chars
@@ -143,8 +146,16 @@ public class XMLEncoder implements IEncoder {
 			return "&apos;";
 		case '&':
 			return "&amp;";
+		case '>':
+			if ( escapeGt ) return "&gt;";
+			else return ">";
 		case '\n':
 			return lineBreak;
+		case '\u00A0':
+			if ( escapeNbsp ) {
+				return "&#x00a0;";
+			}
+			// Else: fall through
 		default:
 			if ( value > 127 ) { // Extended chars
 				if (( chsEnc != null ) && ( !chsEnc.canEncode(value) )) {
@@ -172,8 +183,16 @@ public class XMLEncoder implements IEncoder {
 			return "&apos;";
 		case '&':
 			return "&amp;";
+		case '>':
+			if ( escapeGt ) return "&gt;";
+			else return ">";
 		case '\n':
 			return lineBreak;
+		case '\u00A0':
+			if ( escapeNbsp ) {
+				return "&#x00a0;";
+			}
+			// Else: fall through
 		default:
 			if ( value > 127 ) { // Extended chars
 				if ( Character.isSupplementaryCodePoint(value) ) {

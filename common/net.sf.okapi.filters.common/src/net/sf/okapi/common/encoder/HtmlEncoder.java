@@ -163,10 +163,25 @@ public class HtmlEncoder implements IEncoder {
 		case '\n':
 			return lineBreak;
 		default:
-			if ( Character.isSupplementaryCodePoint(value) ) {
-				return new String(Character.toChars(value));
+			if ( value > 127 ) { // Extended chars
+				if ( Character.isSupplementaryCodePoint(value) ) {
+					String tmp = new String(Character.toChars(value));
+					if (( chsEnc != null ) && !chsEnc.canEncode(tmp) ) {
+						return String.format("&#x%x;", value);
+					}
+					return tmp;
+				}
+				// Should be able to fold to char, supplementary case will be treated
+				if (( chsEnc != null ) && !chsEnc.canEncode((char)value) ) {
+					return String.format("&#x%04x;", value);
+				}
+				else { // No encoder or char is supported
+					return String.valueOf((char)value);
+				}
 			}
-			return String.valueOf((char)value); 
+			else { // ASCII chars
+				return String.valueOf((char)value);
+			}
 		}
 	}
 
