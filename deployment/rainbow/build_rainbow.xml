@@ -1,14 +1,6 @@
 <?xml version="1.0"?> 
 <project name="rainbow" default="all" basedir="."> 
 
-	<property name="proj_rainbow" value="../../applications/rainbow"/> 
-	<property name="src_rainbow" value="${proj_rainbow}/src"/> 
-	<property name="lib_rainbow" value="${proj_rainbow}/lib"/> 
-	<property name="build" value="build"/>
- 	<property name="tmp" value="tmp"/>
-	<property name="dist" value="dist_${platform}"/>
-	<property name="distlib" value="${dist}/lib"/>
- 
 	<condition property="platform" value="win32-x86">
 		<os family="windows"/>
 	</condition>
@@ -28,6 +20,14 @@
 		<os name="Linux"/>
 	</condition>
 
+	<property name="proj_rainbow" value="../../applications/rainbow"/> 
+	<property name="src_rainbow" value="${proj_rainbow}/src"/> 
+	<property name="lib_rainbow" value="${proj_rainbow}/lib"/> 
+	<property name="build" value="build"/>
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="distlib" value="${dist}/lib"/>
+ 
 	<path id="mainClassPath_rainbow">
 		<pathelement location="${tmp}"/>
 		<pathelement location="${distlib}/swt.jar"/>
