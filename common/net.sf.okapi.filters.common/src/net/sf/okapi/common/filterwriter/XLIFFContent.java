@@ -52,7 +52,7 @@ public class XLIFFContent {
 	
 	@Override
 	public String toString () {
-		return toString(1, true, false);
+		return toString(1, true, false, false);
 	}
 
 	/**
@@ -61,12 +61,14 @@ public class XLIFFContent {
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt
 	 * @param codeOnlyMode True when the in-line codes are to be set as raw-values.
+	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
 	 * This option is to be used when the in-line code is an XLIFF-in-line code itself.
 	 * @return The coded string.
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT,
-		boolean codeOnlyMode)
+		boolean codeOnlyMode,
+		boolean gMode)
 	{
 		StringBuilder tmp = new StringBuilder();
 		int index;
@@ -81,9 +83,14 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));//TODO: escape unsupported chars
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</bpt>");
+						if ( gMode ) {
+							tmp.append(String.format("<g id=\"%d\">", code.getId()));
+						}
+						else {
+							tmp.append(String.format("<bpt id=\"%d\">", code.getId()));//TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</bpt>");
+						}
 					}
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("<mrk mtype=\"protected\">");
@@ -98,9 +105,14 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</ept>");
+						if ( gMode ) {
+							tmp.append("</g>");
+						}
+						else {
+							tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</ept>");
+						}
 					}
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("</mrk>");
@@ -116,9 +128,14 @@ public class XLIFFContent {
 				}
 				else {
 					if ( code.hasData() ) {
-						tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</ph>");
+						if ( gMode ) {
+							tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+						}
+						else {
+							tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</ph>");
+						}
 					}
 				}
 				break;
@@ -170,12 +187,14 @@ public class XLIFFContent {
 	 * @param escapeGT True to always escape '>' to gt
 	 * @param withMarkers True to output mrk elements, false to output only 
 	 * the content of mrk element.
+	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
 	 * @return The coded string.
 	 */
 	public String toSegmentedString (TextContainer container,
 		int quoteMode,
 		boolean escapeGT,
-		boolean withMarkers)
+		boolean withMarkers,
+		boolean gMode)
 	{
 		codedText = container.getCodedText();
 		codes = container.getCodes();
@@ -195,26 +214,34 @@ public class XLIFFContent {
 					}
 					index = Integer.valueOf(code.getData());
 					innerContent.setContent(container.getSegments().get(index));
-					tmp.append(innerContent.toString(quoteMode, escapeGT, false));
+					tmp.append(innerContent.toString(quoteMode, escapeGT, false, gMode));
 					if ( withMarkers ) tmp.append("</mrk>");
 				}
 				else {
-					tmp.append(String.format("<ph id=\"%d\">", code.getId()));
-					//TODO: escape unsupported chars
-					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT, null)); 
-					tmp.append("</ph>");
+					if ( gMode ) {
+						tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+					}
+					else {
+						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(),
+							quoteMode, escapeGT, null)); //TODO: escape unsupported chars 
+						tmp.append("</ph>");
+					}
 				}
 				break;
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.hasData() ) {
-					tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
-					//TODO: escape unsupported chars
-					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT, null));
-					tmp.append("</bpt>");
+					if ( gMode ) {
+						tmp.append(String.format("<g id=\"%d\">", code.getId()));
+					}
+					else {
+						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(),
+							quoteMode, escapeGT, null)); //TODO: escape unsupported chars
+						tmp.append("</bpt>");
+					}
 				}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("<mrk mtype=\"protected\">");
@@ -224,11 +251,15 @@ public class XLIFFContent {
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.hasData() ) {
-					tmp.append(String.format("<ept id=\"%d\">", code.getId()));
-					//TODO: escape unsupported chars
-					tmp.append(Util.escapeToXML(code.toString(),
-						quoteMode, escapeGT, null));
-					tmp.append("</ept>");
+					if ( gMode ) {
+						tmp.append("</g>");
+					}
+					else {
+						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(),
+							quoteMode, escapeGT, null)); //TODO: escape unsupported chars
+						tmp.append("</ept>");
+					}
 				}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("</mrk>");

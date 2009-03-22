@@ -28,7 +28,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -50,6 +49,7 @@ public class Writer extends BaseWriter {
 	private boolean inFile;
 	private String srcLang;
 	private String docMimeType;
+	private boolean gMode = true;
 
 	public Writer () {
 		super();
@@ -282,12 +282,12 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, gMode));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.isSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true, gMode));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
@@ -308,7 +308,7 @@ public class Writer extends BaseWriter {
 		super.writeTMXEntries(tu);
 		
 		// Now tc hold the content to write. Write it with or without marks
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented()));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(), gMode));
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note

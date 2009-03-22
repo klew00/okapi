@@ -25,12 +25,13 @@ type of package. For example, the type <cite>Original + RTF Layer</cite> cannot
 be applied to original files that or in some kind of binary formats.</p>
 <p>There are several types of package available:</p>
 <ul>
-	<li><cite>Generic XLIFF</cite>: Simple package where all files to translate 
+	<li><cite><a href="#genericXLIFF">Generic XLIFF</a></cite>: Simple package where all files to translate 
 	are extracted to XLIFF. You can translate this package with any XLIFF 
 	editor.</li>
-	<li><cite>OmegaT</cite>: OmegaT project with all its files and 
-	directory structure in place. You can translate this package with OmegaT.</li>
-	<li><cite>Original + RTF Layer</cite>: Package where all the files 
+	<li><cite><a href="#omegat">OmegaT</a></cite>: OmegaT project with all its files and 
+	directory structure in place. You can translate this package with 
+	<a target="_blank" href="http://www.omegat.org/">OmegaT</a>.</li>
+	<li><cite><a href="#originalPlusRTF">Original + RTF Layer</a></cite>: Package where all the files 
 	to translate are converted into an RTF file with Trados-compatible styles. 
 	You can translate this package with Trados Translator&#39;s Workbench or any 
 	compatible tool.</li>
@@ -135,7 +136,90 @@ GroupName = myGroup</p>
 </table>
 <p>&nbsp;</p>
 <p>SimpleTM will be replaced by more a powerful TM engine in the future.</p>
-<p>&nbsp;</p>
+<h2><a name="processing"></a>Processing Details</h2>
+<p>The output of this utility varies depending on which type of package is 
+selected.</p>
+<h3><a name="genericXLIFF"></a>Generic XLIFF Package</h3>
+<p>This package is an output where all translatable documents are extracted into 
+XLIFF. You can translate this package with any XLIFF editor.</p>
+<p>All the files to translated are in the <code>work</code> sub-directory.</p>
+<p>The <code>original</code> sub-directory contains all the original documents 
+and the parameters with which they have been extracted. You want to keep this 
+sub-directory: It is used to merge back the extracted files into their original 
+formats.</p>
+<p>At the root of the package you will find:</p>
+<ul>
+	<li>The <code>manifest.xml</code> file. Do not modify, rename, or change 
+	otherwise this file. It will be used to merge back the extracted files into 
+	their original formats.</li>
+	<li>Any <a href="#tmxOutput">TMX output</a> file that was generated.</li>
+</ul>
+<p>To merge back the translation of this package use the <cite>
+<a href="../merging/index.html">Translation Package Post-Processing</a></cite> 
+utility.</p>
+<h3><a name="omegat"></a>OmegaT Package</h3>
+<p>this package is an output where all translatable documents are extracted into 
+XLIFF-compatible files and an OmegaT project is created, with all its files and 
+directory structure in place. You can translate this package with
+<a target="_blank" href="http://www.omegat.org/">OmegaT</a>.</p>
+<p>All the files to translated are in the <code>source</code> sub-directory.</p>
+<p>The <code>original</code> sub-directory contains all the original documents 
+and the parameters with which they have been extracted. You want to keep this 
+sub-directory: It is used to merge back the extracted files into their original 
+formats.</p>
+<p>At the root of the package you will find:</p>
+<ul>
+	<li>The <code>manifest.xml</code> file. Do not modify, rename, or change 
+	otherwise this file. It may be used to post-process the converted files into 
+	their original formats.</li>
+	<li>The <code>omegat.project</code> file. this is the file that contains all 
+	the settings for the OmegaT project.</li>
+</ul>
+<p>The <code>tm</code> sub-directory contains the <code><a href="#tmxOutput">
+unapproved.tmx</a></code> and <code><a href="#tmxOutput">alternate.tmx</a></code> 
+files if they were generated.</p>
+<p>The <code>omegat</code> sub-directory contains the <code>
+<a href="#tmxOutput">approved.tmx</a></code> file if it was generated.</p>
+<p>To merge back the translation of this package:</p>
+<ul>
+	<li>Use the <cite>Create Translated Documents</cite> command from the <cite>
+	Project</cite> menu of OmegaT. This will generate translated XLIFF documents 
+	in the <code>target</code> sub-directory.</li>
+	<li>Then use the <cite><a href="../merging/index.html">Translation Package 
+	Post-Processing</a></cite> utility.</li>
+</ul>
+<h3><a name="originalPlusRTF"></a>Original + RTF Layer Package</h3>
+<p>This package is an output where all the translatable documents are converted 
+into RTF files with Trados-compatible styles. 
+	You can translate this package with Trados Translator&#39;s Workbench or any 
+	compatible tool.</p>
+<p>All the files to translated are in the <code>work</code> sub-directory.</p>
+<p>The <code>original</code> sub-directory contains all the original documents 
+and the parameters with which they have been extracted. You want to keep this 
+sub-directory: It is used to merge back the extracted files into their original 
+formats.</p>
+<p>At the root of the package you will find:</p>
+<ul>
+	<li>The <code>manifest.xml</code> file. Do not modify, rename, or change 
+	otherwise this file. It may be used to post-process the converted files into 
+	their original formats.</li>
+	<li>Any <a href="#tmxOutput">TMX output</a> file that was generated.</li>
+</ul>
+<h3><a name="tmxOutput"></a>TMX Output</h3>
+<p>In all packages you may have one or more TMX documents generated. they 
+correspond to possible existing translations obtained from the input documents 
+themselves (some input formats such as PO or XLIFF may have been pre-translated 
+already).</p>
+<p>The <code>approved.tmx</code> document contains all the translations that 
+were found and had an <i>approved</i> target property set to &quot;<code>yes</code>&quot;.</p>
+<p>The <code>unapproved.tmx</code> document contains all the translations that 
+were found and had no <i>approved</i> target property or an <i>approved</i> 
+target property set to something else than &quot;<code>yes</code>&quot;.</p>
+<p>The <code>alternate.tmx</code> document contains all the alternative 
+translation that were found along with the text units. For example the 
+translation found in the <code>&lt;alt-trans&gt;</code> elements of XLIFF files.</p>
+<p>Note that if one of these TMX output does not contain any entry it is not 
+generated.</p>
 <p>&nbsp;</p>
 </body>
 </html>
