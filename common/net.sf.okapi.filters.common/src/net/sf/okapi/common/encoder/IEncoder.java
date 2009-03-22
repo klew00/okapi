@@ -29,9 +29,6 @@ import net.sf.okapi.common.IParameters;
  */
 public interface IEncoder {
 
-	public static final String PROP_ENCODING = "encoding";
-	public static final String PROP_LANGUAGE = "language";
-	
 	/**
 	 * Sets the options for this encoder.
 	 * @param params The parameters object with all the configuration information 

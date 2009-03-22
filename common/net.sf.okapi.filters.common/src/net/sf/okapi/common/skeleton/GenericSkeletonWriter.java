@@ -28,7 +28,6 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -690,10 +689,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		
 		// Else: We got the property value
 		// Check if it needs to be auto-modified
-		if ( IEncoder.PROP_LANGUAGE.equals(name) ) {
+		if ( Property.LANGUAGE.equals(name) ) {
 			value = outputLang;
 		}
-		else if ( IEncoder.PROP_ENCODING.equals(name) ) {
+		else if ( Property.ENCODING.equals(name) ) {
 			value = outputEncoding;
 		}
 		// Return the native value if possible

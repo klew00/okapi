@@ -36,7 +36,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -61,7 +60,6 @@ public class POFilter implements IFilter {
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
-	private static final String PROP_APPROVED = "approved";
 
 	private static final Pattern pluralPattern = Pattern.compile(
 		"nplurals(\\s*?)=(\\s*?)(\\d*?)([\\\\|;|\\n])",
@@ -356,8 +354,8 @@ public class POFilter implements IFilter {
 							pos = textLine.indexOf(flag);
 							skel.append(textLine.substring(start, pos));
 							start = pos+5; // After "fuzzy"
-							skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
-							tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "no", false));
+							skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+							tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
 							hasFuzzyFlag = true;
 							skel.append(textLine.substring(start));
 							break;
@@ -366,8 +364,8 @@ public class POFilter implements IFilter {
 				}
 				if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
 					skel.append(textLine+", ");
-					skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
-					tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "yes", false));
+					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
 					hasFuzzyFlag = true;
 				}
 				skel.append(lineBreak);
@@ -416,10 +414,10 @@ public class POFilter implements IFilter {
 						tu = new TextUnit(null); // No id yet, it will be set later
 					}
 					skel.append("#, ");
-					skel.addValuePlaceholder(tu, PROP_APPROVED, trgLang);
+					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
 					skel.append(lineBreak);
 					hasFuzzyFlag = true;
-					tu.setTargetProperty(trgLang, new Property(PROP_APPROVED, "yes", false));
+					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
 				}
 				msgID = getQuotedString(true);
 				continue;
@@ -478,7 +476,7 @@ public class POFilter implements IFilter {
 			// Create the modifiable property for the encoding in the header
 			Matcher m = charsetPattern.matcher(tmp);
 			if ( m.find() ) { // Replace the encoding by the reference marker
-				dp.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
+				dp.setProperty(new Property(Property.ENCODING, encoding, false));
 				part1 = "\""+lineBreak+"\""+tmp.substring(0, m.start(6));
 				hasProp = true;
 				part2 = tmp.substring(m.end(6))+"\""+lineBreak;
@@ -495,7 +493,7 @@ public class POFilter implements IFilter {
 			// Add the parts to the skeleton
 			skel.append(part1);
 			if ( hasProp ) {
-				skel.addValuePlaceholder(dp, IEncoder.PROP_ENCODING, "");
+				skel.addValuePlaceholder(dp, Property.ENCODING, "");
 			}
 			if ( part2 != null ) {
 				skel.append(part2);
@@ -556,7 +554,7 @@ public class POFilter implements IFilter {
 				// also: take fuzzy flag in account
 			}
 			else { // Correct the approved property
-				tu.getTargetProperty(trgLang, PROP_APPROVED).setValue("no");
+				tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
 			}
 		}
 		else { // Parameters.MODE_MONOLINGUAL

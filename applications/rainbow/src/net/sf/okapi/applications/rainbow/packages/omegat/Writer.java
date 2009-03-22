@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.omegat;
 
@@ -52,6 +52,11 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			+ "alternate.tmx";
 		// Call the base class method
 		super.writeStartPackage();
+
+		// Force OmegaT-specific settings
+		options.gMode = true;
+		options.message = "THIS FILE IS INTENDED TO BE USED WITH OMEGAT ONLY. "
+			+ "It uses specific XLIFF constructs in ways that may not work with other XLIFF tools.";
 		
 		// Create the OmegaT-specific directories
 		Util.createDirectories(manifest.getRoot() + File.separator + "glossary" + File.separator);

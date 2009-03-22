@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.packages.xliff;
 
@@ -29,6 +29,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -42,6 +43,8 @@ public class Writer extends BaseWriter {
 	
 	private static final String   EXTENSION = ".xlf";
 
+	protected Options options;
+
 	private XMLWriter writer = null;
 	private XLIFFContent xliffCont;
 	private boolean excludeNoTranslate = false;
@@ -49,10 +52,10 @@ public class Writer extends BaseWriter {
 	private boolean inFile;
 	private String srcLang;
 	private String docMimeType;
-	private boolean gMode = true;
 
 	public Writer () {
 		super();
+		options = new Options();
 		xliffCont = new XLIFFContent();
 	}
 	
@@ -179,6 +182,9 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
 		docMimeType = resource.getMimeType();
+		if (( options.message != null ) && ( options.message.length() > 0 )) {
+			writer.writeComment(options.message);
+		}
 	}
 
 	private void processEndDocument () {
@@ -263,9 +269,9 @@ public class Writer extends BaseWriter {
 		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
 
-		if ( tu.hasTargetProperty(trgLang, "approved") ) {
-			if ( tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ) {
-				writer.writeAttributeString("approved", "yes");
+		if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
+			if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {
+				writer.writeAttributeString(Property.APPROVED, "yes");
 			}
 			// "no" is the default
 		}
@@ -282,12 +288,14 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, gMode));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false,
+			options.gMode));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.isSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true, gMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true,
+				options.gMode));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
@@ -308,7 +316,8 @@ public class Writer extends BaseWriter {
 		super.writeTMXEntries(tu);
 		
 		// Now tc hold the content to write. Write it with or without marks
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(), gMode));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(),
+			options.gMode));
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note
@@ -319,6 +328,14 @@ public class Writer extends BaseWriter {
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
+	}
+
+	public IParameters getOptions () {
+		return options;
+	}
+
+	public void setOptions (IParameters options) {
+		this.options = (Options)options;
 	}
 
 }

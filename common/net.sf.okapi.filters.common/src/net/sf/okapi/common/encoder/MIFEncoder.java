@@ -21,6 +21,7 @@
 package net.sf.okapi.common.encoder;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.Property;
 
 /**
  * Implements IEncoder for Adobe FrameMaker MIF format.
@@ -123,7 +124,7 @@ public class MIFEncoder implements IEncoder {
 	public String toNative (String propertyName,
 		String value)
 	{
-		if ( PROP_ENCODING.equals(propertyName) ) {
+		if ( Property.ENCODING.equals(propertyName) ) {
 			if ( "shift-jis".equals(value) ) return "\u65E5\u672C\u8A9E";
 			//TODO: CJK etc...
 		}

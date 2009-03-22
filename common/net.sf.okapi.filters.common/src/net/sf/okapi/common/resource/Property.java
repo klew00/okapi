@@ -31,6 +31,10 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class Property {
 	
+	public static final String ENCODING = "encoding";
+	public static final String LANGUAGE = "language";
+	public static final String APPROVED = "approved"; 
+	
 	private final String name;
 	private String value;
 	private final boolean isReadOnly;

@@ -70,6 +70,7 @@ public class ODFFilter implements IFilter {
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 	
 	protected static final String TEXT_BOOKMARK_REF = "text:bookmark-ref";
+	protected static final String OFFICE_ANNOTATION = "office:annotation";
 
 	private Hashtable<String, ElementRule> toExtract;
 	private ArrayList<String> toProtect;
@@ -86,7 +87,7 @@ public class ODFFilter implements IFilter {
 	private TextUnit tu;
 	private boolean canceled;
 	private boolean hasNext;
-	private Stack<Context> units;
+	private Stack<Context> context;
 
 	public ODFFilter () {
 		toExtract = new Hashtable<String, ElementRule>();
@@ -175,8 +176,8 @@ public class ODFFilter implements IFilter {
 			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 			reader = fact.createXMLStreamReader(input);
 			
-			units = new Stack<Context>();
-			units.push(new Context("", false));
+			context = new Stack<Context>();
+			context.push(new Context("", false));
 			otherId = 0;
 			tuId = 0;
 
@@ -283,7 +284,7 @@ public class ODFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					if ( units.peek().extract ) {
+					if ( context.peek().extract ) {
 						tf.append(reader.getText());
 					}
 					else { // UTF-8 element content: no escape of quote nor extended chars
@@ -313,7 +314,7 @@ public class ODFFilter implements IFilter {
 					break;
 				
 				case XMLStreamConstants.COMMENT:
-					if ( units.peek().extract ) {
+					if ( context.peek().extract ) {
 						tf.append(TagType.PLACEHOLDER, null, "<!--" + reader.getText() + "-->");
 					}
 					else {
@@ -322,7 +323,7 @@ public class ODFFilter implements IFilter {
 					break;
 
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					if ( units.peek().extract ) {
+					if ( context.peek().extract ) {
 						tf.append(TagType.PLACEHOLDER, null,
 							"<?" + reader.getPITarget() + " " + reader.getPIData() + "?>");
 					}
@@ -391,11 +392,11 @@ public class ODFFilter implements IFilter {
 	private void processStartElement () throws XMLStreamException {
 		String name = makePrintName();
 		if ( toExtract.containsKey(name) ) {
-			if (( units.size() > 1 ) || ( subFlow.contains(name) )) { // Use nested mode
+			if (( context.size() > 1 ) || ( subFlow.contains(name) )) { // Use nested mode
 				// Create the new id for the new sub-flow
 				String id = String.valueOf(++tuId);
 				// Add the reference to the current context
-				if ( units.peek().extract ) {
+				if ( context.peek().extract ) {
 					Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
 					code.setHasReference(true);
 				}
@@ -412,8 +413,8 @@ public class ODFFilter implements IFilter {
 				tf = new TextFragment();
 				skel = new GenericSkeleton(buildStartTag(name));
 				// Set the new variables are the new context
-				units.push(new Context(name, true));
-				units.peek().setVariables(tf, skel, tu);
+				context.push(new Context(name, true));
+				context.peek().setVariables(tf, skel, tu);
 			}
 			else { // Not nested
 				// Send document-part if there is a non-whitespace skeleton
@@ -428,15 +429,15 @@ public class ODFFilter implements IFilter {
 				//TODO: need a way to set the TextUnit's name/id/restype/etc.
 				tu = new TextUnit(null); // ID set only if needed
 				setTUInfo(name);
-				units.push(new Context(name, true));
-				units.peek().setVariables(tf, skel, tu);
+				context.push(new Context(name, true));
+				context.peek().setVariables(tf, skel, tu);
 			}
 		}
 		else if ( subFlow.contains(name) ) { // Is it a sub-flow (not extractable)
 			// Create the new id for the new sub-flow
 			String id = String.valueOf(++tuId);
 			// Add the reference to the current context
-			if ( units.peek().extract ) {
+			if ( context.peek().extract ) {
 				Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
 				code.setHasReference(true);
 			}
@@ -454,10 +455,10 @@ public class ODFFilter implements IFilter {
 			skel = new GenericSkeleton(buildStartTag(name));
 			// Add the start-tag to the new context 
 			// Set the new variables are the new context
-			units.push(new Context(name, true));
-			units.peek().setVariables(tf, skel, tu);
+			context.push(new Context(name, true));
+			context.peek().setVariables(tf, skel, tu);
 		}
-		else if ( units.peek().extract && name.equals("text:s") ) {
+		else if ( context.peek().extract && name.equals("text:s") ) {
 			String tmp = reader.getAttributeValue(NSURI_TEXT, "c");
 			if ( tmp != null ) {
 				int count = Integer.valueOf(tmp);
@@ -468,16 +469,16 @@ public class ODFFilter implements IFilter {
 			else tf.append(" "); // Default=1
 			reader.nextTag(); // Eat the end-element event
 		}
-		else if ( units.peek().extract && name.equals("text:tab") ) {
+		else if ( context.peek().extract && name.equals("text:tab") ) {
 			tf.append("\t");
 			reader.nextTag(); // Eat the end-element event
 		}
-		else if ( units.peek().extract && name.equals("text:line-break") ) {
+		else if ( context.peek().extract && name.equals("text:line-break") ) {
 			tf.append(new Code(TagType.PLACEHOLDER, "lb", "<text:line-break/>"));
 			reader.nextTag(); // Eat the end-element event
 		}
 		else {
-			if ( units.peek().extract ) {
+			if ( context.peek().extract ) {
 				if ( name.equals("text:a") ) processStartALink(name);
 				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
 				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
@@ -534,7 +535,7 @@ public class ODFFilter implements IFilter {
 		// Send a document part if there is no content
 		// But if it's in nested context, the parent is already refering to tu, and
 		// changing that reference to dp is hard, so we just send an empty tu
-		if ( tf.isEmpty() && ( units.size() < 3 )) {
+		if ( tf.isEmpty() && ( context.size() < 3 )) {
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 			skel.append(buildEndTag(name)+"\n");
 			dp.setSkeleton(skel);
@@ -557,27 +558,27 @@ public class ODFFilter implements IFilter {
 	// Return true when it's ready to send an event
 	private boolean processEndElement () {
 		String name = makePrintName();
-		if ( units.peek().extract && name.equals(units.peek().name) ) {
-			if ( units.size() > 2 ) { // Is it a nested TU
+		if ( context.peek().extract && name.equals(context.peek().name) ) {
+			if ( context.size() > 2 ) { // Is it a nested TU
 				// Add it to the queue
 				addTU(name);
-				units.pop();
+				context.pop();
 				// Reset the current variable to the correct context
-				tf = units.peek().tf;
-				tu = units.peek().tu;
-				skel = units.peek().skel;
+				tf = context.peek().tf;
+				tu = context.peek().tu;
+				skel = context.peek().skel;
 				// No trigger of the events yet
 				return false;
 			}
 			else { // Not embedded, pop first
-				units.pop();
+				context.pop();
 				addTU(name);
 				// Trigger the events to be sent
 				return true;
 			}
 		}
 		else {
-			if ( units.peek().extract ) {
+			if ( context.peek().extract ) {
 				tf.append(new Code(TagType.CLOSING, name, buildEndTag(name)));
 			}
 			else {
@@ -608,5 +609,16 @@ public class ODFFilter implements IFilter {
 				toProtect.add(TEXT_BOOKMARK_REF);
 			}
 		}
+		if ( toProtect.contains(OFFICE_ANNOTATION) ) {
+			if ( params.extractReferences ) {
+				toProtect.remove(OFFICE_ANNOTATION);
+			}
+		}
+		else { // Not protected 
+			if ( !params.extractReferences ) {
+				toProtect.add(OFFICE_ANNOTATION);
+			}
+		}
+		
 	}
 }

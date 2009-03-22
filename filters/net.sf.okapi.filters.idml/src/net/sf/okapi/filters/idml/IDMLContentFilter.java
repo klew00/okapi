@@ -38,7 +38,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -229,9 +228,9 @@ public class IDMLContentFilter implements IFilter {
 		// The XML declaration is not reported by the parser, so we need to
 		// create it as a document part when starting
 		skel = new GenericSkeleton();
-		startDoc.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
+		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 		skel.append("<?xml version=\"1.0\" encoding=\"");
-		skel.addValuePlaceholder(startDoc, IEncoder.PROP_ENCODING, "");
+		skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
 		skel.append("\"?>");
 		startDoc.setSkeleton(skel);
 	}

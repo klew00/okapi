@@ -35,9 +35,9 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
@@ -471,7 +471,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// <meta http-equiv="Content-Type"
 		// content="text/html; charset=ISO-2022-JP">
 		if (isMetaCharset(attrName, attrValue, tag)) {
-			normalizedName = IEncoder.PROP_ENCODING;
+			normalizedName = Property.ENCODING;
 			return normalizedName;
 		}
 
@@ -480,7 +480,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null) {
 				if (st.getAttributeValue("http-equiv").equals("Content-Language")) {
-					normalizedName = IEncoder.PROP_LANGUAGE;
+					normalizedName = Property.LANGUAGE;
 					return normalizedName;
 				}
 			}
@@ -488,7 +488,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 		// <x lang="en"> or <x xml:lang="en">
 		if (attrName.equals("lang") || attrName.equals("xml:lang")) {
-			normalizedName = IEncoder.PROP_LANGUAGE;
+			normalizedName = Property.LANGUAGE;
 		}
 
 		return normalizedName;

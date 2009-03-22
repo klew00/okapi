@@ -36,7 +36,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -269,9 +268,9 @@ public class XMLFilter implements IFilter {
 		skel = new GenericSkeleton();
 		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
 		skel.add(" encoding=\"");
-		skel.addValuePlaceholder(startDoc, IEncoder.PROP_ENCODING, "");
+		skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
 		skel.add("\"");
-		startDoc.setProperty(new Property(IEncoder.PROP_ENCODING, encoding, false));
+		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
 		skel.add("?>\n");
 

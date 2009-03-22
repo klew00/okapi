@@ -36,7 +36,6 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
-import net.sf.okapi.common.encoder.IEncoder;
 //import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -44,6 +43,7 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class OpenXMLFilter extends BaseMarkupFilter {
@@ -665,7 +665,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("w:val") != null)
 			{
-				normalizedName = IEncoder.PROP_LANGUAGE;
+				normalizedName = Property.LANGUAGE;
 				return normalizedName;
 			}
 		}
@@ -674,7 +674,7 @@ public class OpenXMLFilter extends BaseMarkupFilter {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("lang") != null)
 			{
-				normalizedName = IEncoder.PROP_LANGUAGE;
+				normalizedName = Property.LANGUAGE;
 				return normalizedName;
 			}
 		}

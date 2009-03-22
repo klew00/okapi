@@ -21,9 +21,9 @@
 package net.sf.okapi.common.encoder.tests;
 
 import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.encoder.PropertiesEncoder;
 import net.sf.okapi.common.encoder.XMLEncoder;
+import net.sf.okapi.common.resource.Property;
 import junit.framework.*;
 
 public class EncodersTest extends TestCase {
@@ -31,8 +31,8 @@ public class EncodersTest extends TestCase {
 	public void testXMLEncoder () {
 		XMLEncoder enc = new XMLEncoder();
 		
-		assertEquals("en", enc.toNative(IEncoder.PROP_LANGUAGE, "en"));
-		assertEquals("windows-1252", enc.toNative(IEncoder.PROP_ENCODING, "windows-1252"));
+		assertEquals("en", enc.toNative(Property.LANGUAGE, "en"));
+		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
 		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
@@ -68,8 +68,8 @@ public class EncodersTest extends TestCase {
 	public void testHTMLEncoder () {
 		HtmlEncoder enc = new HtmlEncoder();
 		
-		assertEquals("en", enc.toNative(IEncoder.PROP_LANGUAGE, "en"));
-		assertEquals("windows-1252", enc.toNative(IEncoder.PROP_ENCODING, "windows-1252"));
+		assertEquals("en", enc.toNative(Property.LANGUAGE, "en"));
+		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
 		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
@@ -89,8 +89,8 @@ public class EncodersTest extends TestCase {
 	public void testpropertiesEncoder () {
 		PropertiesEncoder enc = new PropertiesEncoder();
 		
-		assertEquals("en", enc.toNative(IEncoder.PROP_LANGUAGE, "en"));
-		assertEquals("windows-1252", enc.toNative(IEncoder.PROP_ENCODING, "windows-1252"));
+		assertEquals("en", enc.toNative(Property.LANGUAGE, "en"));
+		assertEquals("windows-1252", enc.toNative(Property.ENCODING, "windows-1252"));
 		
 		enc.setOptions(null, "us-ascii", "\n");
 		assertEquals("\\ud840\\udc00", enc.encode("\uD840\uDC00", 0));

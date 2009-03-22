@@ -169,6 +169,14 @@ public class Writer extends BaseWriter {
 		return event;
 	}
 
+	public IParameters getOptions () {
+		return null;
+	}
+
+	public void setOptions (IParameters options) {
+		// Nothing to do
+	}
+
 	private void processStartDocument (StartDocument resource) {
 		try {
 			Util.createDirectories(outputPath);

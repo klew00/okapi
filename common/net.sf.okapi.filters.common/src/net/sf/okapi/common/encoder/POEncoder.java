@@ -21,6 +21,7 @@
 package net.sf.okapi.common.encoder;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.Property;
 
 /**
  * Implements IEncoder for PO file format.
@@ -64,7 +65,7 @@ public class POEncoder implements IEncoder {
 		// PROP_ENCODING: No change
 		
 		// No changes for the other values
-		if ( propertyName.equals("approved") ) {
+		if ( propertyName.equals(Property.APPROVED) ) {
 			if (( value != null ) && ( value.equals("no") )) {
 				return "fuzzy";
 			}

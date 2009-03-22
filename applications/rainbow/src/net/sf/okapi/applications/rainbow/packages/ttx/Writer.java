@@ -324,4 +324,12 @@ public class Writer extends BaseWriter {
 		return relation.toString() + DTD_SETTINGS_FILE;
 	}
 
+	public IParameters getOptions () {
+		return null;
+	}
+
+	public void setOptions (IParameters options) {
+		// Nothing to do
+	}
+
 }

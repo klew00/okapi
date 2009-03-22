@@ -28,6 +28,7 @@ import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.AltTransAnnotation;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 
 public abstract class BaseWriter implements IWriter {
@@ -258,8 +259,8 @@ public abstract class BaseWriter implements IWriter {
 		// Write the items in the TM if needed
 		if ( tu.hasTarget(trgLang) ) {
 			boolean done = false;
-			if ( tu.hasTargetProperty(trgLang, "approved") ) {
-				if ( tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ) {
+			if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
+				if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {
 					tmxWriterApproved.writeItem(tu, null);
 					done = true;
 				}
