@@ -27,6 +27,8 @@ import java.io.OutputStream;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.AltTransAnnotation;
+import net.sf.okapi.common.resource.TextUnit;
 
 public abstract class BaseWriter implements IWriter {
 
@@ -39,8 +41,12 @@ public abstract class BaseWriter implements IWriter {
 	protected String sourceEncoding;
 	protected String targetEncoding;
 	protected String filterID;
-	protected TMXWriter tmxWriter;
-	protected String tmxPath;
+	protected TMXWriter tmxWriterApproved;
+	protected String tmxPathApproved;
+	protected TMXWriter tmxWriterUnApproved;
+	protected String tmxPathUnApproved;
+	protected TMXWriter tmxWriterAlternate;
+	protected String tmxPathAlternate;
 	protected String trgLang;
 	protected String encoding;
 	protected String outputPath;
@@ -49,7 +55,9 @@ public abstract class BaseWriter implements IWriter {
 	public BaseWriter () {
 		manifest = new Manifest();
 		manifest.setReaderClass(getReaderClass());
-		tmxWriter = new TMXWriter();
+		tmxWriterApproved = new TMXWriter();
+		tmxWriterUnApproved = new TMXWriter();
+		tmxWriterAlternate = new TMXWriter();
 	}
 	
 	public void cancel () {
@@ -95,12 +103,28 @@ public abstract class BaseWriter implements IWriter {
 		// No need to create the folder structure for the 'done' folder
 		// It will be done when merging
 		
-		// Create the reference TMX (pre-translations found in the source files)
-		if ( tmxPath == null ) {
-			tmxPath = manifest.getRoot() + File.separator + "fromOriginal.tmx";
+		// Create the reference TMX (approved pre-translations found in the source files)
+		if ( tmxPathApproved == null ) {
+			tmxPathApproved = manifest.getRoot() + File.separator + "approved.tmx";
 		}
-		tmxWriter.create(tmxPath);
-		tmxWriter.writeStartDocument(manifest.getSourceLanguage(),
+		tmxWriterApproved.create(tmxPathApproved);
+		tmxWriterApproved.writeStartDocument(manifest.getSourceLanguage(),
+			manifest.getTargetLanguage(), null, null, null, null, null);
+
+		// Create the reference TMX (un-approved pre-translations found in the source files)
+		if ( tmxPathUnApproved == null ) {
+			tmxPathUnApproved = manifest.getRoot() + File.separator + "unapproved.tmx";
+		}
+		tmxWriterUnApproved.create(tmxPathUnApproved);
+		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLanguage(),
+			manifest.getTargetLanguage(), null, null, null, null, null);
+
+		// Create the reference TMX (alternate found in the source files)
+		if ( tmxPathAlternate == null ) {
+			tmxPathAlternate = manifest.getRoot() + File.separator + "alternate.tmx";
+		}
+		tmxWriterAlternate.create(tmxPathAlternate);
+		tmxWriterAlternate.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 	}
 
@@ -115,10 +139,24 @@ public abstract class BaseWriter implements IWriter {
 				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
 			}
 	
-			tmxWriter.writeEndDocument();
-			tmxWriter.close();
-			if ( tmxWriter.getItemCount() == 0 ) {
-				File file = new File(tmxPath);
+			tmxWriterApproved.writeEndDocument();
+			tmxWriterApproved.close();
+			if ( tmxWriterApproved.getItemCount() == 0 ) {
+				File file = new File(tmxPathApproved);
+				file.delete();
+			}
+
+			tmxWriterUnApproved.writeEndDocument();
+			tmxWriterUnApproved.close();
+			if ( tmxWriterUnApproved.getItemCount() == 0 ) {
+				File file = new File(tmxPathUnApproved);
+				file.delete();
+			}
+
+			tmxWriterAlternate.writeEndDocument();
+			tmxWriterAlternate.close();
+			if ( tmxWriterAlternate.getItemCount() == 0 ) {
+				File file = new File(tmxPathAlternate);
 				file.delete();
 			}
 		}
@@ -210,6 +248,36 @@ public abstract class BaseWriter implements IWriter {
 
 	public void setOutput (OutputStream output) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Helper method to output the TMX entries.
+	 * @param tu the text unit to look at for possible output.
+	 */
+	public void writeTMXEntries (TextUnit tu) {
+		// Write the items in the TM if needed
+		if ( tu.hasTarget(trgLang) ) {
+			boolean done = false;
+			if ( tu.hasTargetProperty(trgLang, "approved") ) {
+				if ( tu.getTargetProperty(trgLang, "approved").getValue().equals("yes") ) {
+					tmxWriterApproved.writeItem(tu, null);
+					done = true;
+				}
+			}
+			if ( !done ) {
+				tmxWriterUnApproved.writeItem(tu, null);
+			}
+		}
+
+		// Check for alternates
+		AltTransAnnotation alt = tu.getAnnotation(AltTransAnnotation.class);
+		if ( alt != null ) {
+			alt.startIteration();
+			while ( alt.moveToNext() ) {
+				TextUnit altTu = alt.getEntry();
+				tmxWriterAlternate.writeItem(altTu, null);
+			}
+		}
 	}
 
 }

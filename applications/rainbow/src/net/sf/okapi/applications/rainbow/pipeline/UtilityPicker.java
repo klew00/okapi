@@ -1,0 +1,115 @@
+/*===========================================================================
+  Copyright (C) 2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
+package net.sf.okapi.applications.rainbow.pipeline;
+
+import java.util.Iterator;
+
+import net.sf.okapi.applications.rainbow.plugins.PluginItem;
+import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
+
+class UtilityPicker {
+
+	private Shell shell;
+	private List lbUtilities;
+	private String result;
+	private OKCancelPanel pnlActions;
+	
+	public UtilityPicker (Shell parent,
+		PluginsAccess pa,
+		IHelp helpParam) 
+	{
+		result = null;
+		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		shell.setText("Add Step");
+		UIUtil.inheritIcon(shell, parent);
+		shell.setLayout(new GridLayout());
+		
+		Label label = new Label(shell, SWT.None);
+		label.setText("Utilities available:");
+		
+		lbUtilities = new List(shell, SWT.BORDER | SWT.V_SCROLL);
+		lbUtilities.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		Iterator<String> iter = pa.getIterator();
+		PluginItem item;
+		while ( iter.hasNext() ) {
+			item = pa.getItem(iter.next());
+			if ( item.type != PluginsAccess.TYPE_UTILITY ) continue;
+			lbUtilities.add(item.toString());
+		}
+		
+		// Dialog-level buttons
+		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				result = null;
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
+					//if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					return;
+				}
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
+					if ( !saveData() ) return;
+				}
+				shell.close();
+			};
+		};
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		//gdTmp.horizontalSpan = 2;
+		pnlActions.setLayoutData(gdTmp);
+		shell.setDefaultButton(pnlActions.btOK);
+
+		shell.pack();
+		Rectangle Rect = shell.getBounds();
+		shell.setMinimumSize(Rect.width, Rect.height);
+		Dialogs.centerWindow(shell, parent);
+	}
+
+	public String showDialog () {
+		shell.open();
+		while ( !shell.isDisposed() ) {
+			if ( !shell.getDisplay().readAndDispatch() )
+				shell.getDisplay().sleep();
+		}
+		return result;
+	}
+
+	private boolean saveData () {
+		int n = lbUtilities.getSelectionIndex();
+		if ( n == -1 ) return false;
+		result = lbUtilities.getItem(n);
+		return true;
+	}
+
+}

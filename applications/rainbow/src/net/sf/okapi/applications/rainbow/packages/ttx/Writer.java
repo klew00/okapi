@@ -231,7 +231,7 @@ public class Writer extends BaseWriter {
 			writer.writeEndElement(); //Tu
 
 			// Write the item in the TM if needed
-			tmxWriter.writeItem(item, null);
+			tmxWriterApproved.writeItem(item, null);
 		}
 		else {
 			writeContent(item.getSourceContent());

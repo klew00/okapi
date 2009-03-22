@@ -44,9 +44,13 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		// Set any non-default folders before calling the base class method.
 		manifest.setSourceLocation("source");
 		manifest.setTargetLocation("target");
-		tmxPath = manifest.getRoot() + File.separator + "tm" + File.separator
-			+ "fromOriginal.tmx";
-		// call the base class method
+		tmxPathApproved = manifest.getRoot() + File.separator + "omegat" + File.separator
+			+ "project_save.tmx";
+		tmxPathUnApproved = manifest.getRoot() + File.separator + "tm" + File.separator
+			+ "unapproved.tmx";
+		tmxPathAlternate = manifest.getRoot() + File.separator + "tm" + File.separator
+			+ "alternate.tmx";
+		// Call the base class method
 		super.writeStartPackage();
 		
 		// Create the OmegaT-specific directories

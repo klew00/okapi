@@ -40,6 +40,8 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IParameters;
@@ -118,6 +120,7 @@ public class MainForm implements IParametersProvider {
 	private String sharedFolder;
 	private BaseHelp help;
 	private Project prj;
+	private PipelineWrapper wrapper; 
 	private StatusBar statusBar;
 	private TabFolder tabFolder;
 	private Label stInputRoot;
@@ -488,6 +491,27 @@ public class MainForm implements IParametersProvider {
 		miUtilities = new MenuItem(menuBar, SWT.CASCADE);
 		miUtilities.setText(rm.getCommandLabel("utilities")); //$NON-NLS-1$
 		buildUtilitiesMenu();
+
+		// Pipeline menu
+		MenuItem miPipeline = new MenuItem(menuBar, SWT.CASCADE);
+		miPipeline.setText(rm.getCommandLabel("pipeline")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		miPipeline.setMenu(dropMenu);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "pipeline.edit"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editPipeline();
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "pipeline.execute"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline();
+			}
+		});
 
 		// Tools menu
 		miTools = new MenuItem(menuBar, SWT.CASCADE);
@@ -1111,10 +1135,41 @@ public class MainForm implements IParametersProvider {
 			edParamsFolder.setFocus();
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
+	private void editPipeline () {
+		try {
+			PipelineEditor dlg = new PipelineEditor();
+			dlg.edit(shell, plugins, wrapper, null, null, false);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void executePipeline () {
+		try {
+			// Save any pending data
+			saveSurfaceData();
+
+			PipelineEditor dlg = new PipelineEditor();
+			if ( !dlg.edit(shell, plugins, wrapper, null, null, true) ) return;
+
+			// Create the utility driver if needed
+			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
+
+			wrapper.execute();
+		}
+		catch ( Exception E ) {
+			Dialogs.showError(shell, E.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
+		}
+	}
+	
 	private void updateTabInfo () {
 		if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
 			currentInput = tabFolder.getSelectionIndex();
@@ -1609,6 +1664,7 @@ public class MainForm implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
+		wrapper = new PipelineWrapper();
 		currentInput = 0;
 		resetDisplay(-1);
 	}

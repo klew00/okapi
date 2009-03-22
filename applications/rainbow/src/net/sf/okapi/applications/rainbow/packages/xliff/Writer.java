@@ -28,6 +28,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -297,13 +298,15 @@ public class Writer extends BaseWriter {
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
 		if ( tu.hasTarget(trgLang) ) {
-			// We do, by the way: write the item in the TM if needed
-			tmxWriter.writeItem(tu, null);
 			// Do we want to use that translation content?
 			if ( !useSourceForTranslated ) {
 				tc = tu.getTarget(trgLang);
 			}
 		}
+		
+		// Write out TMX entries
+		super.writeTMXEntries(tu);
+		
 		// Now tc hold the content to write. Write it with or without marks
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented()));
 		writer.writeEndElementLineBreak(); // target

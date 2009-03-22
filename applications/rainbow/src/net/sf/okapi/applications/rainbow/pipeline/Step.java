@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,22 +16,20 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.plugins;
+package net.sf.okapi.applications.rainbow.pipeline;
 
-public class PluginItem {
-	
-	public String id;
-	public int type;
-	public String pluginClass;
-	public String editorClass;
-	public String name;
-	public String description;
-	public String provider;
+public class Step {
 
-	public String toString () {
-		return name + "  [" + id + "]";
+	public String className;
+	public String utilId;
+
+	public Step (String utilId,
+		String className)
+	{
+		this.utilId = utilId;
+		this.className = className;
 	}
 
 }

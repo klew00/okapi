@@ -38,9 +38,9 @@ public class PluginsAccess {
 
 	private static final String PLUGIN_FILENAME  = "plugin.xml";
 
-	public static final String TYPE_UTILITY      = "utility";
-	public static final String TYPE_FILTER       = "filter";
-	public static final String TYPE_PARAMEDITOR  = "editor";
+	public static final int TYPE_UTILITY         = 0;
+	public static final int TYPE_FILTER          = 1;
+	public static final int TYPE_PARAMEDITOR     = 2;
 	
 	private LinkedHashMap<String, PluginItem> items;
 	
@@ -105,6 +105,15 @@ public class PluginsAccess {
 					item.id = String.format("__%d", ++sep);
 					items.put(item.id, item);
 					continue;
+				}
+				else if ( type.equals("utility") ) {
+					item.type = TYPE_UTILITY;
+				}
+				else if ( type.equals("filter") ) {
+					item.type = TYPE_FILTER;
+				}
+				else if ( type.equals("editor") ) {
+					item.type = TYPE_PARAMEDITOR;
 				}
 				
 				item.id = elem.getAttribute("id");

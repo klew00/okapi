@@ -41,6 +41,7 @@ import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -78,6 +79,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean canceled;
 	private GenericSkeleton skel;
 	private TextUnit tu;
+	private boolean approved;
 	private Parameters params;
 	private boolean sourceDone;
 	private boolean targetDone;
@@ -344,14 +346,14 @@ public class XLIFFFilter implements IFilter {
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'source-language'.");
-		if ( tmp.compareTo(srcLang) != 0 ) { // Warn about source language
+		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
 			logger.warn(String.format("The source language declared in <file> is '%s'.", tmp));
 		}
 		
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
-			if ( tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
+			if ( !tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
 				logger.warn(String.format("The target language declared in <file> is '%s'.", tmp));
 			}
 		}
@@ -443,6 +445,12 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) tu.setName(tmp);
 			else if ( params.fallbackToID ) {
 				tu.setName(tu.getId());
+			}
+
+			approved = false;
+			tmp = reader.getAttributeValue("", "approved");
+			if (( tmp != null ) && tmp.equals("yes") ) {
+				approved = true;
 			}
 
 			// Set restype (can be null)
@@ -609,13 +617,19 @@ public class XLIFFFilter implements IFilter {
 				tu.setTargetProperty(trgLang, new Property("coord", tmp, true));
 			}
 
+			if ( approved ) {
+				//TODO: Need a way to store and make modifiable property
+				// Note that this property is set to the target at the resource-level
+				tu.setTargetProperty(trgLang, new Property("approved", "yes", true));
+			}
+			
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				//resource.needTargetElement = false;
 				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
-				tu.setTarget(trgLang, tc);
+				tu.setTargetContent(trgLang, tc);
 			}
 			targetDone = true;
 		}

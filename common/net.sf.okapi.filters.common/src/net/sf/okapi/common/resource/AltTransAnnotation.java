@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xliff;
+package net.sf.okapi.common.resource;
 
 import java.util.LinkedList;
 
@@ -26,10 +26,10 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
-//TODO: This class probably needs to be more generic and not in the XLIFF filter package
 /**
- * Implements an annotation for XLIFF alt-trans. This annotation is meant to
- * contains all the alt-trans elements of a give trans-unit.
+ * Implements an annotation for alternate translations. For example, to represent
+ * the alt-trans elements of XLIFF. This annotation is meant to
+ * contains all the alternate translation entries of a give text unit.
  */
 public class AltTransAnnotation implements IAnnotation {
 	
@@ -60,7 +60,7 @@ public class AltTransAnnotation implements IAnnotation {
 	}
 	
 	/**
-	 * Adds a new alt-trans entry to this annotation. This method also set the current entry
+	 * Adds a new entry to this annotation. This method also set the current entry
 	 * of the iteration to the entry that was just added.
 	 * @param sourceLanguage Code of the source language, or null.
 	 * @param sourceText Text of the source element, or null.
@@ -77,8 +77,8 @@ public class AltTransAnnotation implements IAnnotation {
 	}
 
 	/**
-	 * Sets the target text for the last alt-trans entry added to this
-	 * annotation. If no alt-trans entry exists yet, or if one exists but has its target
+	 * Sets the target text for the last entry added to this
+	 * annotation. If no entry exists yet, or if one exists but has its target
 	 * already set, a new entry with empty source is created automatically.
 	 * @param targetLanguage Code of the target language.
 	 * @param targetText text of the target.
@@ -100,7 +100,8 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Resets the iteration mode for this annotation. 
-	 * @return True if there is at least one entry, false if this annotation has no entry.
+	 * @return True if there is at least one entry, false if this annotation has 
+	 * no entry.
 	 */
 	public boolean startIteration () {
 		current = -1;
@@ -117,8 +118,8 @@ public class AltTransAnnotation implements IAnnotation {
 	}
 
 	/**
-	 * Indicates if the current alt-trans entry of this annotation has a source.
-	 * @return True if the current alt-trans entry has a source, false if it does not.
+	 * Indicates if the current entry of this annotation has a source.
+	 * @return True if the current entry has a source, false if it does not.
 	 */
 	public boolean hasSource () {
 		if (( current == -1 ) && ( current < list.size() )) return false;
@@ -126,10 +127,11 @@ public class AltTransAnnotation implements IAnnotation {
 	}
 	
 	/**
-	 * Gets the current alt-trans entry for this annotation. For ease of use the entry is returned
-	 * as a TextUnit. Be aware that there are slight difference between a trans-unit element and a 
-	 * alt-trans element. 
-	 * @return The TextUnit object for the current alt-trans entry, or null if the current entry is not set.
+	 * Gets the current entry for this annotation. For ease of use the entry is returned
+	 * as a TextUnit. Be aware that there are slight difference between a normal
+	 * text unit and one that represents an alternate translation. 
+	 * @return The TextUnit object for the current entry, or null if the current 
+	 * entry is not set.
 	 */
 	public TextUnit getEntry () {
 		if (( current == -1 ) && ( current < list.size() )) return null;
@@ -138,7 +140,8 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Indicates if there is at least one entry in this annotation.
-	 * @return True if there is at least one entry in this annotation, false if there is none.
+	 * @return True if there is at least one entry in this annotation,
+	 * false if there is none.
 	 */
 	public boolean isEmpty () {
 		return (list.size() == 0);
@@ -146,8 +149,9 @@ public class AltTransAnnotation implements IAnnotation {
 	
 	/**
 	 * Gets the source language for the current entry of this annotation.
-	 * @return The code for the source language for the current entry, or null if the current entry
-	 * is not set, or if there is no source for this entry.
+	 * @return The code for the source language for the current entry,
+	 * or null if the current entry is not set, or if there is no source
+	 * for this entry.
 	 */
 	public String getSourceLanguage () {
 		if (( current == -1 ) && ( current < list.size() )) return null;
@@ -156,8 +160,9 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Gets the target language for the current entry of this annotation.
-	 * @return The code for the target language for the current entry, or null if the current entry
-	 * is not set, or if there is no target for this entry.
+	 * @return The code for the target language for the current entry,
+	 * or null if the current entry is not set, or if there is no target
+	 * for this entry.
 	 */
 	public String getTargetLanguage () {
 		if (( current == -1 ) && ( current < list.size() )) return null;

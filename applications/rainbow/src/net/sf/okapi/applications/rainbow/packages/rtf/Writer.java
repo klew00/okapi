@@ -239,13 +239,11 @@ public class Writer extends BaseWriter {
 		writer.write(skelWriter.processEndGroup(resource));
 	}
 
-	private void processTextUnit (TextUnit resource) {
-		// Write the items in the TM if needed
-		if (( tmxWriter != null ) && resource.hasTarget(trgLang) ) {
-			tmxWriter.writeItem(resource, null);
-		}
+	private void processTextUnit (TextUnit tu) {
+		// Write out TMX entries
+		super.writeTMXEntries(tu);
 		// Write skeleton and its content
-		writer.write(skelWriter.processTextUnit(resource));
+		writer.write(skelWriter.processTextUnit(tu));
 	}
 
 	private void processDocumentPart (DocumentPart resource) throws IOException {

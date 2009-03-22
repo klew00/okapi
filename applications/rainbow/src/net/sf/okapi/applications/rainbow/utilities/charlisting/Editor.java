@@ -89,8 +89,7 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell parent)
-	{
+	private void create (Shell parent) {
 		shell.setText("Used Characters Listing");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
