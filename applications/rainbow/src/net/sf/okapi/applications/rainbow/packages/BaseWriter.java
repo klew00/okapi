@@ -30,6 +30,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 public abstract class BaseWriter implements IWriter {
@@ -276,7 +277,8 @@ public abstract class BaseWriter implements IWriter {
 	 */
 	public void writeTMXEntries (TextUnit tu) {
 		// Write the items in the TM if needed
-		if ( tu.hasTarget(trgLang) ) {
+		TextContainer tc = tu.getTarget(trgLang);
+		if (( tc != null ) && ( !tc.isEmpty() )) {
 			boolean done = false;
 			if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
 				if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {

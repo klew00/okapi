@@ -305,11 +305,9 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
-		if ( tu.hasTarget(trgLang) ) {
-			// Do we want to use that translation content?
-			if ( !useSourceForTranslated ) {
-				tc = tu.getTarget(trgLang);
-			}
+		tc = tu.getTarget(trgLang);
+		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )) {
+			tc = tu.getSource(); // Go back to the source
 		}
 		
 		// Write out TMX entries
