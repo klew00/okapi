@@ -50,6 +50,8 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			+ "unapproved.tmx";
 		tmxPathAlternate = manifest.getRoot() + File.separator + "tm" + File.separator
 			+ "alternate.tmx";
+		tmxPathTM = manifest.getRoot() + File.separator + "tm" + File.separator
+			+ "leverage.tmx";
 		// Call the base class method
 		super.writeStartPackage();
 

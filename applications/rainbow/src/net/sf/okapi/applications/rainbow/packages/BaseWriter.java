@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
@@ -48,6 +49,8 @@ public abstract class BaseWriter implements IWriter {
 	protected String tmxPathUnApproved;
 	protected TMXWriter tmxWriterAlternate;
 	protected String tmxPathAlternate;
+	protected TMXWriter tmxWriterTM;
+	protected String tmxPathTM;
 	protected String trgLang;
 	protected String encoding;
 	protected String outputPath;
@@ -59,6 +62,7 @@ public abstract class BaseWriter implements IWriter {
 		tmxWriterApproved = new TMXWriter();
 		tmxWriterUnApproved = new TMXWriter();
 		tmxWriterAlternate = new TMXWriter();
+		tmxWriterTM = new TMXWriter();
 	}
 	
 	public void cancel () {
@@ -127,6 +131,14 @@ public abstract class BaseWriter implements IWriter {
 		tmxWriterAlternate.create(tmxPathAlternate);
 		tmxWriterAlternate.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
+
+		// Create the reference TMX (pre-translation TM)
+		if ( tmxPathTM == null ) {
+			tmxPathTM = manifest.getRoot() + File.separator + "leverage.tmx";
+		}
+		tmxWriterTM.create(tmxPathTM);
+		tmxWriterTM.writeStartDocument(manifest.getSourceLanguage(),
+			manifest.getTargetLanguage(), null, null, null, null, null);
 	}
 
 	public void writeEndPackage (boolean createZip) {
@@ -158,6 +170,13 @@ public abstract class BaseWriter implements IWriter {
 			tmxWriterAlternate.close();
 			if ( tmxWriterAlternate.getItemCount() == 0 ) {
 				File file = new File(tmxPathAlternate);
+				file.delete();
+			}
+
+			tmxWriterTM.writeEndDocument();
+			tmxWriterTM.close();
+			if ( tmxWriterTM.getItemCount() == 0 ) {
+				File file = new File(tmxPathTM);
 				file.delete();
 			}
 		}
@@ -266,7 +285,13 @@ public abstract class BaseWriter implements IWriter {
 				}
 			}
 			if ( !done ) {
-				tmxWriterUnApproved.writeItem(tu, null);
+				ScoresAnnotation scores = tu.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
+				if ( scores != null ) {
+					tmxWriterTM.writeItem(tu, null);
+				}
+				else {
+					tmxWriterUnApproved.writeItem(tu, null);
+				}
 			}
 		}
 

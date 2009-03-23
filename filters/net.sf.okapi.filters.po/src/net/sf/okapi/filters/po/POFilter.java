@@ -96,6 +96,8 @@ public class POFilter implements IFilter {
 	private String references;
 	private String msgIDPlural;
 	private String domain;
+	private InputStream startingInput;
+	private URI inputURI;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -147,6 +149,7 @@ public class POFilter implements IFilter {
 
 	public void open (InputStream input) {
 		try {
+			startingInput = input;
 			// Open the input reader from the provided stream
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
 			// Correct the encoding if we have detected a different one
@@ -163,6 +166,7 @@ public class POFilter implements IFilter {
 	public void open (URI inputURI) {
 		try {
 			docName = inputURI.getPath();
+			this.inputURI = inputURI;
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
@@ -213,6 +217,21 @@ public class POFilter implements IFilter {
 
 		// Open the input reader from the provided reader
 		reader = new BufferedReader(inputReader);
+		// Try to read the header info
+		if ( detectInformation() ) {
+			// Need to re-open the file with modified encoding
+			try {
+				reader.close();
+				if ( docName != null ) { // Was open from URI
+					startingInput.close();
+					startingInput = inputURI.toURL().openStream();
+				}
+				// Else: was open from startingInput 
+				reader = new BufferedReader(new InputStreamReader(startingInput, encoding));
+			}
+			catch ( IOException e ) {
+			}
+		}
 		
 		// Initializes the variables
 		nbPlurals = 0;
@@ -229,8 +248,6 @@ public class POFilter implements IFilter {
 		if ( params.useCodeFinder ) {
 			params.codeFinder.compile();
 		}
-		// Try to read the header info
-		detectInformation();
 	}
 	
 	private Event start () {
@@ -363,6 +380,7 @@ public class POFilter implements IFilter {
 					}
 				}
 				if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
+					//TODO: Fix the issue: this get added to the skel of doc-part of initial empty entry
 					skel.append(textLine+", ");
 					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
@@ -673,7 +691,12 @@ public class POFilter implements IFilter {
 	}
 
 
- 	private void detectInformation () {
+	/**
+	 * Detects declared encoding and plural form.
+	 * @return True if the reader needs to be re-opened with a new encoding,
+	 * false if not.
+	 */
+ 	private boolean detectInformation () {
  		char[] buffer;
  		try {
  			// Read the a chunk of the beginning of the file
@@ -711,15 +734,21 @@ public class POFilter implements IFilter {
 						// Auto-detected wins
 						//TODO: Warning that the internal encoding may be wrong!
 					}
-					// Else: same as auto-detected, keep that one
+					// Else: Same as auto-detected, keep that one
 				}
 				else { // No auto-detection before
-					// Internal wins over default
-					encoding = m.group(6);
+					// Compare with the default
+					if ( !encoding.equalsIgnoreCase(m.group(6)) ) {
+						// Internal wins over default
+						encoding = m.group(6);
+						// And we need to re-open the reader with the new encoding
+						return true;
+					}
+					// Else: default and declared encoding are the same
 				}
 			}
-			// Else: use the encoding already set
-			
+			// Else: Use the encoding already set
+			return false;
 		}
  		catch ( IOException e ) {
  			throw new RuntimeException(e);

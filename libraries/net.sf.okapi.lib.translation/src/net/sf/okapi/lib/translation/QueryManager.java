@@ -315,9 +315,9 @@ public class QueryManager {
 		
 		TextContainer tc = tu.setTarget(trgLang, tu.getSource().clone());
 		ScoresAnnotation scores = new ScoresAnnotation();
-		tc.setAnnotation(scores);
 		QueryResult qr;
 		int count;
+		int leveraged = 0;
 		
 		if ( tc.isSegmented() ) {
 			List<TextFragment> segList = tc.getSegments();
@@ -332,6 +332,7 @@ public class QueryManager {
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score);
+					leveraged++;
 					continue;
 				}
 				// Else: one or more matches, first is 100%
@@ -339,38 +340,49 @@ public class QueryManager {
 				if ( !exactsHaveSameTranslation() ) {
 					// If we do: Use the first one and lower the score to 99%
 					scores.add(99);
+					leveraged++;
 					continue;
 				}
 				// Else: Only one 100% or several that have the same translations 
-				scores.add(qr.score); // That's 1005 then
+				scores.add(qr.score); // That's 100% then
+				leveraged++;
 			}
 		}
 		else { // Case of un-segmented entries
 			count = query(tc);
 			if ( count == 0 ) {
 				scores.add(0);
-				return;
 			}
-			qr = next();
-			tc.setCodedText(qr.target.getCodedText(), false);
-			// Un-segmented entries that we have leveraged should be like
-			// a text unit with a single segment
-			makeSingleSegment(tu);
+			else {
+				qr = next();
+				tc.setCodedText(qr.target.getCodedText(), false);
+				// Un-segmented entries that we have leveraged should be like
+				// a text unit with a single segment
+				makeSingleSegment(tu);
 
-			// First is not 100%: use it and move on
-			if ( qr.score < 100 ) {
-				scores.add(qr.score);
-				return;
+				// First is not 100%: use it and move on
+				if ( qr.score < 100 ) {
+					scores.add(qr.score);
+					leveraged++;
+				}
+				// Else: one or more matches, first is 100%
+				// Check if they are several and if they have the same translation
+				else if ( !exactsHaveSameTranslation() ) {
+					// If we do: Use the first one and lower the score to 99%
+					scores.add(99);
+					leveraged++;
+				}
+				// Else: Only one 100% or several that have the same translations
+				else {
+					scores.add(qr.score); // That's 100% then
+					leveraged++;
+				}
 			}
-			// Else: one or more matches, first is 100%
-			// Check if they are several and if they have the same translation
-			if ( !exactsHaveSameTranslation() ) {
-				// If we do: Use the first one and lower the score to 99%
-				scores.add(99);
-				return;
-			}
-			// Else: Only one 100% or several that have the same translations 
-			scores.add(qr.score); // That's 1005 then
+		}
+
+		// Set the scores only if there is something to report
+		if ( leveraged > 0 ) {
+			tc.setAnnotation(scores);
 		}
 	}
 	
