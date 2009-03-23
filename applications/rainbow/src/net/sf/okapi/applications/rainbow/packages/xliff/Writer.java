@@ -319,9 +319,9 @@ public class Writer extends BaseWriter {
 		writer.writeEndElementLineBreak(); // target
 		
 		// Note
-		if ( tu.hasProperty("note") ) {
+		if ( tu.hasProperty(Property.NOTE) ) {
 			writer.writeStartElement("note");
-			writer.writeString(tu.getProperty("note").getValue());
+			writer.writeString(tu.getProperty(Property.NOTE).getValue());
 			writer.writeEndElementLineBreak(); // note
 		}
 

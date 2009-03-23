@@ -34,6 +34,7 @@ public class Property {
 	public static final String ENCODING = "encoding";
 	public static final String LANGUAGE = "language";
 	public static final String APPROVED = "approved"; 
+	public static final String NOTE = "note"; 
 	
 	private final String name;
 	private String value;

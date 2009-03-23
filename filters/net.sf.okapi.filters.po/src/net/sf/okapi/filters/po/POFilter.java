@@ -98,6 +98,7 @@ public class POFilter implements IFilter {
 	private String domain;
 	private InputStream startingInput;
 	private URI inputURI;
+	private boolean hasFuzzyFlag;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -215,6 +216,22 @@ public class POFilter implements IFilter {
 		parseState = 1;
 		canceled = false;
 
+		// Initializes the variables
+		nbPlurals = 0;
+		tuId = 0;
+		otherId = 0;
+		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
+		pluralMode = 0;
+		pluralCount = 0;
+		readLine = true;
+		msgIDPlural = "";
+		level = 0;
+		domain = DOMAIN_NONE; // Default domain prefix
+		// Compile code finder rules
+		if ( params.useCodeFinder ) {
+			params.codeFinder.compile();
+		}
+
 		// Open the input reader from the provided reader
 		reader = new BufferedReader(inputReader);
 		// Try to read the header info
@@ -231,22 +248,6 @@ public class POFilter implements IFilter {
 			}
 			catch ( IOException e ) {
 			}
-		}
-		
-		// Initializes the variables
-		nbPlurals = 0;
-		tuId = 0;
-		otherId = 0;
-		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
-		pluralMode = 0;
-		pluralCount = 0;
-		readLine = true;
-		msgIDPlural = "";
-		level = 0;
-		domain = DOMAIN_NONE; // Default domain prefix
-		// Compile code finder rules
-		if ( params.useCodeFinder ) {
-			params.codeFinder.compile();
 		}
 	}
 	
@@ -268,7 +269,7 @@ public class POFilter implements IFilter {
 		//boolean skip = false;
 		skel = new GenericSkeleton();
 		tu = null;
-		boolean hasFuzzyFlag = false;
+		hasFuzzyFlag = false;
 
 		if ( pluralMode == 0 ) {
 			msgID = "";
@@ -379,13 +380,13 @@ public class POFilter implements IFilter {
 						}
 					}
 				}
-				if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
-					//TODO: Fix the issue: this get added to the skel of doc-part of initial empty entry
-					skel.append(textLine+", ");
-					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
-					hasFuzzyFlag = true;
-				}
+				//if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
+				//	//TODO: Fix the issue: this get added to the skel of doc-part of initial empty entry
+				//	skel.append(textLine+", ");
+				//	skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+				//	tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
+				//	hasFuzzyFlag = true;
+				//}
 				skel.append(lineBreak);
 				continue;
 			}
@@ -425,18 +426,18 @@ public class POFilter implements IFilter {
 			
 			// Check for the message ID
 			if ( textLine.startsWith("msgid") ) {
-				if ( params.bilingualMode && !hasFuzzyFlag ) {
-					// Add the place for a fuzzy flag
-					// So the value can be created at output if needed
-					if ( tu == null ) {
-						tu = new TextUnit(null); // No id yet, it will be set later
-					}
-					skel.append("#, ");
-					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-					skel.append(lineBreak);
-					hasFuzzyFlag = true;
-					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
-				}
+				//if ( params.bilingualMode && !hasFuzzyFlag ) {
+				//	// Add the place for a fuzzy flag
+				//	// So the value can be created at output if needed
+				//	if ( tu == null ) {
+				//		tu = new TextUnit(null); // No id yet, it will be set later
+				//	}
+				//	skel.append("#, ");
+				//	skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+				//	skel.append(lineBreak);
+				//	hasFuzzyFlag = true;
+				//	tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
+				//}
 				msgID = getQuotedString(true);
 				continue;
 			}
@@ -532,7 +533,7 @@ public class POFilter implements IFilter {
 		tu.setMimeType("text/x-po");
 		
 		if ( locNote.length() > 0 ) {
-			tu.setProperty(new Property("locnote", locNote));
+			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		if ( transNote.length() > 0 ) {
 			tu.setProperty(new Property("transnote", transNote));
@@ -567,13 +568,16 @@ public class POFilter implements IFilter {
 					TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
 					tc.setContent(toAbstract(new TextFragment(tmp)));
 				}
+				if ( !hasFuzzyFlag ) {
+					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
+				}
 				//TODO: If the text is the same: what do we do?
 				// for now, treat it as non-translated
 				// also: take fuzzy flag in account
 			}
-			else { // Correct the approved property
-				tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
-			}
+			//else { // Correct the approved property
+			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
+			//}
 		}
 		else { // Parameters.MODE_MONOLINGUAL
 			if ( pluralMode == 0 ) {

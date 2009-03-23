@@ -863,8 +863,8 @@ public class XLIFFFilter implements IFilter {
 	private void processNote () {
 		try {
 			StringBuilder tmp = new StringBuilder();
-			if ( tu.hasProperty("note") ) {
-				tmp.append(tu.getProperty("note"));
+			if ( tu.hasProperty(Property.NOTE) ) {
+				tmp.append(tu.getProperty(Property.NOTE));
 				tmp.append("\n---\n");
 			}
 			int eventType;
@@ -881,7 +881,7 @@ public class XLIFFFilter implements IFilter {
 					String name = reader.getLocalName();
 					if ( name.equals("note") ) {
 						//TODO: Handle 'annotates', etc.
-						tu.setProperty(new Property("note", tmp.toString(), true));
+						tu.setProperty(new Property(Property.NOTE, tmp.toString(), true));
 						return;
 					}
 					// Else: This should be an error as note are text only.

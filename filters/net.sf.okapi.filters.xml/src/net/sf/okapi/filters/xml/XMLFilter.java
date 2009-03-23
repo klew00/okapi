@@ -600,7 +600,7 @@ public class XMLFilter implements IFilter {
 		String locNote = context.peek().locNote;
 		if ( locNote != null ) {
 			//TODO: implement real notes
-			tu.setProperty(new Property("locnote", locNote));
+			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		
 		if ( context.peek().preserveWS ) {
