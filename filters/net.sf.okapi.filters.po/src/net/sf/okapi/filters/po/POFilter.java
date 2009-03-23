@@ -220,7 +220,7 @@ public class POFilter implements IFilter {
 		nbPlurals = 0;
 		tuId = 0;
 		otherId = 0;
-		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
+		lineBreak = System.getProperty("line.separator");
 		pluralMode = 0;
 		pluralCount = 0;
 		readLine = true;

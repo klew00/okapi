@@ -20,8 +20,12 @@
 
 package net.sf.okapi.filters.po.tests;
 
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -31,8 +35,11 @@ import org.junit.Test;
 
 public class POFilterTest {
 	
+	private POFilter filter;
+	
 	@Before
 	public void setUp() {
+		filter = new POFilter();
 	}
 
 	@Test
@@ -40,8 +47,8 @@ public class POFilterTest {
 		POFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
-			testDriver.setShowSkeleton(true);
-			testDriver.setDisplayLevel(3);
+			//testDriver.setShowSkeleton(true);
+			//testDriver.setDisplayLevel(3);
 			filter = new POFilter();
 			filter.setOptions("en", "fr", "UTF-8", true);
 			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
@@ -57,5 +64,39 @@ public class POFilterTest {
 			if ( filter != null ) filter.close();
 		}
 	}
+	
+	@Test
+	public void simpleTest () {
+		String snippet = "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		String expect = "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr"));
+	}
+	
+	@Test
+	public void noTransTest () {
+		String snippet = "msgid \"Text 1\"\n"
+			+ "msgstr \"\"\n";
+		String expect = "msgid \"Text 1\"\n"
+			+ "msgstr \"Text 1\"\n";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr"));
+	}
+	
+	private ArrayList<Event> getEvents(String snippet,
+		String srcLang,
+		String trgLang)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.setOptions(srcLang, trgLang, "UTF-16", true);
+		filter.open(snippet);
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
+
 	
 }

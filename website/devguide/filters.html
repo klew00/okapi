@@ -17,10 +17,9 @@
 	<tr>
 		<td class="smalltoc"><p>
 			- <a href="#filterEvents">Filter Events</a><br>
-			- <a href="#Languages">Languages</a><br/>
-			- <a href="#Encodings">Encodings</a><br/>
-			- <a href="#LineBreaks">Line-Breaks</a><br/>
-			- <a href="#InlineCodes">Inline Codes</a><br>
+			- <a href="#languages">Languages</a><br/>
+			- <a href="#encodings">Encodings</a><br/>
+			- <a href="#lineBreaks">Line-Breaks</a><br/>
 			- <a href="#filterParameters">Filter Parameters</a></p></td>
 		<td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
@@ -78,7 +77,8 @@ information:</p>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">
 	isMultilingual()</a></code> indicates if the document is multilingual (See 
-	more on Monolingual and Multilingual).</li>
+	more on <a href="#monolingual">monolingual</a> and <a href="#multilingual">
+	multilingual</a> in <a href="#languages">the Languages section</a>).</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLineBreak(java.lang.String)">
 	getLineBreak()</a></code> gives the type of line-break used in the document.</li>
@@ -147,7 +147,8 @@ extracted text:</p>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">
 	getName()</a></code> gives the original identified the resource, for example 
-	the key of entry in a Java properties file.</li>
+	the key of entry in a Java properties file. If the text unit has no such 
+	identifier, this method should return <code>null</code>.</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">
 	getId()</a></code> gives the unique extraction-ID for this text unit. This 
@@ -170,26 +171,29 @@ extracted text:</p>
 	HTML <code>&lt;pre&gt;</code> element).</li>
 </ul>
 
-<h2><a name="Languages"></a>Languages</h2>
+<h2><a name="languages"></a>Languages</h2>
 <p>The documents a filter processes can be monolingual or multilingual. The 
 filter is responsible for knowing if it processes a monolingual or a 
 multilingual document.</p>
-<h3>Monolingual Documents</h3>
+<h3><a name="monolingual"></a>Monolingual Documents</h3>
 <p>Monolingual documents have their content in a single main language. In such 
 document any target data replaces the source data. Examples of monolingual 
 documents are Java properties file and OpenDocument files. Note that such 
-documents may contain text in different languages (like a citation), but their 
+documents may contain text in different languages (like citations), but their 
 structure is designed to have a single main language.</p>
-<h4>Input</h4>
-<p>Before sending the <code>START</code> event:</p>
+<p>Before starting to send events:</p>
 <ul>
-	<li>The filter must set the source language with the <code>
-	IFilter.setOptions()</code> method.</li>
+	<li>The caller of the filter must set the source language with the <code>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> method.</li>
 </ul>
 <p>When sending the <code>START_DOCUMENT</code> event:</p>
 <ul>
-	<li>The filter must indicate the source language in the <code>StartDocument</code> 
-	resource using <code>StartResource.StartDocument.setLanguage()</code>.</li>
+	<li>The filter must indicate the source language of the document in the <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource, using <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLanguage(java.lang.String)">StartDocument.setLanguage()</a></code>. The caller of the 
+	filter can retrieve the source language by calling <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">StartDocument.getLanguage()</a></code>.</li>
 </ul>
 <p>At any time when sending an event:</p>
 <ul>
@@ -199,29 +203,32 @@ structure is designed to have a single main language.</p>
 	language. The filter should create read-only properties for language 
 	information that are not source language.</li>
 </ul>
-<h4>Output</h4>
-<p>TODO</p>
-<h3>Multilingual Documents</h3>
-<h4>Input</h4>
+<h3><a name="multilingual"></a>Multilingual Documents</h3>
 <p>Multilingual documents have their content in several languages. They have a 
 structure that is designed to hold the same content in different languages. The 
 actual input document may contain only the source language content, but any 
-target data will be placed along with the source data. In such documents the 
-source data is not overwritten by the target data (except if the target language 
-is the same as the source one). Examples of multilingual documents are PO files 
+target data will be placed along with the source data rather than over it. In such documents the 
+source data is not overwritten by the target data. Examples of multilingual documents are PO files 
 and XLIFF files.</p>
-<p>Before sending the <code>START</code> event:</p>
+<p dir="ltr">Before starting to send events:</p>
 <ul>
-	<li>The filter must set the source and the target languages with the <code>
-	IFilter.setOptions()</code> method. Note that the target language can be the 
-	same as the source if the intent is to work on the source.</li>
+	<li>The caller of the filter must set the source and the target languages with the <code>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> method.</li>
 </ul>
 <p>When the filter sends the <code>START_DOCUMENT</code> event:</p>
 <ul>
 	<li>The filter must indicate that the document is multilingual in the <code>
-	StartDocument</code> resource using <code>StartDocument.setIsMultilingual()</code>.</li>
-	<li>The filter must indicate the source language in the <code>StartDocument</code> 
-	resource using <code>StartResource.StartDocument.setLanguage()</code>.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource using <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setIsMultilingual(boolean)">StartDocument.setIsMultilingual()</a></code>. 
+	The caller of the filter can retrieve that information using the <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">StartDocument.isMultilingual()</a></code>.</li>
+	<li>The filter must indicate the source language in the <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource using <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLanguage(java.lang.String)">StartDocument.setLanguage()</a></code>.&nbsp; 
+	The caller of the filter can retrieve the source language by calling <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">StartDocument.getLanguage()</a></code>.</li>
 </ul>
 <p>At any time when sending an event:</p>
 <ul>
@@ -231,18 +238,16 @@ and XLIFF files.</p>
 	language. The filter should create read-only properties for language 
 	information that are not source language.</li>
 </ul>
-<h4>Output</h4>
-<p>TODO</p>
-<h2><a name="Encodings"></a>Encodings</h2>
+<h2><a name="encodings"></a>Encodings</h2>
 <h3>Input</h3>
 <p>The filter is responsible for detecting the encoding of the input document 
 when possible. If the encoding cannot be detected, the filter should use the 
-default encoding provided by the caller through the <code>
+default encoding the caller has provided through one of the two <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> 
-method.</p>
+methods.</p>
 <p>If the input of the filter is a <code>CharSequence</code> (<code>as in
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#open(java.lang.CharSequence)">
-IFilter.open()</a></code>), the input encoding must be UTF-16.</p>
+IFilter.open()</a></code>), the input encoding should be UTF-16.</p>
 <p dir="ltr">If the input encoding is UTF-8. The filter must handle the possible 
 presence of a Byte-Order-Mark, and if it exists, not include it in the content 
 of the document.</p>
@@ -250,7 +255,9 @@ of the document.</p>
 <ul dir="ltr">
 	<li dir="ltr">
 	<p dir="ltr">The filter must 
-set the encoding used for the input in the <code>StartDocument</code> resource. 
+set the encoding used for the input in the <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource. 
 If the encoding is UTF-8, the filter must also indicate whether the original 
 document has a BOM or not. If the encoding is not UTF-8 that indicator must be 
 set to false (including for other UTF encodings). Both parameters are set using the
@@ -262,17 +269,19 @@ set to false (including for other UTF encodings). Both parameters are set using 
 <p>The encoding of an output generate by a writer (<code><a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html">IFilterWriter</a></code> object) is 
 not necessarily the same as the input encoding. The encoding to use is set by 
 the caller through the <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOption()</a></code> method. If the output encoding specified by that method is null, the 
+<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOption()</a></code> method. If the output encoding specified by that method is 
+<code>null</code>, the 
 filter should use the same encoding as the input document.</p>
-<p>The writer should create the output document when 
-receiving the <code>START_DOCUMENT</code> event. The <code>StartDocument</code> 
-resource contains information such as:</p>
+<p>The writer should create the output document only when 
+or after receiving the <code>START_DOCUMENT</code> event. The <code>
+<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource contains information such as:</p>
 <ul>
 	<li>The encoding of the input document.</li>
 	<li>A flag set to true if the input encoding was UTF-8 and was using a 
 	Byte-Order-Mark, set to false in all other cases.</li>
 </ul>
-<h2><a name="LineBreaks"></a>Line-Breaks</h2>
+<h2><a name="lineBreaks"></a>Line-Breaks</h2>
 <h3>Input</h3>
 <p>The filter is responsible for detecting the type of line-break of the input 
 document when possible. If the type of line-break cannot be detected (for 
@@ -280,103 +289,41 @@ example the input document has no line-breaks), the filter should assume the
 type of line-break to use is the one of the current platform.</p>
 <ul>
 	<li>All line-breaks passed in resources objects, for example the content of 
-	a <code>TextUnit</code> object, must be standardized to a single line-feed 
-	character (&quot;\n&quot;).</li>
+	a <code><a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html">TextUnit</a></code> object, must be standardized to a single line-feed 
+	character (&quot;<code>\n</code>&quot;).</li>
 	<li>All line-breaks inside skeleton objects must be in the same type as the 
 	input (i.e. remain unchanged).</li>
 </ul>
 <h3>Output</h3>
 <p>The writer must not change the type of line-break of a document. The original 
-type of line-break is available in the <code>StartDocument</code> resource (<code>StartDocument.getLineBreak()</code>).</p>
+type of line-break is available in the <code>
+<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
+	resource (<code><a href=",,/javadoc/net/sf/okapi/common/resource/StartDocument.html#getLineBreak()">StartDocument.getLineBreak()</a></code>).</p>
 <p>The reason for always using the original line-breaks in the output when using 
 the filters is that the writer cannot change the line-breaks in the skeleton 
 parts, so if different types of line-breaks are used in the skeleton and in the 
 extracted content the output would end up with a mix of line-break types.</p>
-<h2><a name="InlineCodes"></a>Inline Codes</h2>
-<p>Inline codes are sections of the extracted text content that are not text, 
-but codes. For example in the HTML content &quot;<code>Text in &lt;b&gt;bold&lt;/b&gt;.</code>&quot; 
-the two tags &quot;<code>&lt;b&gt;</code>&quot; and &quot;<code>&lt;/b&gt;</code>&quot; are inline codes.</p>
-<p>Imagine a string from a Java properties file:</p>
-<pre>&lt;b&gt;New file: {0}&lt;/b&gt;&lt;br/&gt;size={1}</pre>
-<p>This string is composed of three types of data:</p>
-<pre><span style="background-color: #00FFFF">&lt;b&gt;</span><span style="background-color: #00FF00">New file: </span><span style="background-color: #FFFF00">{0}</span><span style="background-color: #00FFFF">&lt;/b&gt;&lt;/br/&gt;</span><span style="background-color: #00FF00">size=</span><span style="background-color: #FFFF00">{1}</span></pre>
-<ul>
-	<li>&quot;<code><span style="background-color: #00FFFF">&lt;b&gt;</span></code>&quot;, &quot;<span style="background-color: #00FFFF"><code>&lt;/b&gt;</code></span>&quot;, 
-	and &quot;<code><span style="background-color: #00FFFF">&lt;br/&gt;</span></code>&quot; are 
-	codes of the original format (HTML in properties)</li>
-	<li>&quot;<code><span style="background-color: #FFFF00">{0}</span></code>&quot; and &quot;<code><span style="background-color: #FFFF00">{1}</span></code>&quot; 
-	are variable place-holders, as such they are part of the text, but have one 
-	aspect attached to them different from the other normal text: they should 
-	not be deleted during translation or the string will loose its integrity.</li>
-	<li>&quot;<code><span style="background-color: #00FF00">New file: </span></code>&quot; 
-	and &quot;<code><span style="background-color: #00FF00">size=</span></code>&quot; are 
-	simple spans of text.</li>
-</ul>
-<p>When extracted into a TextFragment each type of data needs to be preserved. 
-The two first will be marked up with inline codes, while the simple text will be 
-stored as simple text.</p>
-<pre>{xE101}{xE110}New file: {0}{xE102}{xE111}{xE103}{xE112}, size={1}</pre>
-<p>Codes are stored as a pair of special Unicode characters (each character is 
-represented as <code>{xHHHH}</code> in these examples). The first character of 
-the pair is always a Unicode character U+E101, U+E102, or U+E103. They 
-respectively indicate an opening code, a closing code, and a standalone code.</p>
-<p>Note: The character U+E104 is also used in some special strings to denote a 
-segment placeholder, but for the most part all the segmentation mechanism is 
-internal and you should not have to deal with segment placeholders.</p>
-<p>The second special character of the pair is the index that points to the 
-location of the code's data in the codes array that goes along with the coded 
-string. To avoid collision between index values (that should be 0 and above) and 
-real characters, the index character is the real index value + 0xE110. This make 
-the resulting character fall into the Private Use Area of Unicode, safe away for 
-normal characters.</p>
-<p>Along with the string, the <code>TextFragment</code> holds a list of Code objects. each 
-entry of that list corresponds to one of the code. The correspondence between 
-the index of the code in the list and the code marker in the string is computed 
-using the second character of the code marker: character value - 0xE110 gives 
-the index value in the list.</p>
-<pre><span style="background-color: #00FFFF">{xE101}{xE110}</span>New file: {0}<span style="background-color: #00FFFF">{xE102}{xE111}{xE103}{xE112}</span>, size={1}
- |      |                   |      |      |      |
- |      |                   |      |      |      |
- |      |                   |      |      |      +-- 0xE112-0xE110 = 2
- |      |                   |      |      +-- 0xE103 = PLACEHOLDER
- |      |                   |      |
- |      |                   |      +-- 0xE111-0xE110 = 1
- |      |                   +-- 0xE102 = CLOSING
- |      |
- |      +-- 0xE110-0xE110 = 0
- +-- 0xE101 = OPENING</pre>
-<p>codes[0]={tagType=OPENING, id=0, type=&quot;bold&quot; data=&quot;&lt;b&gt;&quot;, 
-flag=CLONEABLE|DELETABLE}<br>
-codes[1]={tagType=CLOSING, id=0, type=&quot;bold&quot; data=&quot;&lt;/b&gt;&quot;, 
-flag=CLONEABLE|DELETABLE}<br>
-codes[2]={tagType=PLACEHOLDER, id=1, type=&quot;lb&quot; data=&quot;&lt;br/&gt;&quot;, 
-flag=CLONEABLE|DELETABLE}</p>
-<p>The TextFragment class offers methods to manipulate the text and codes.</p>
-<p>&nbsp;</p>
-<p>There are often parts of the content that need to have specific properties 
-assigned to them. In our example, &quot;<code>{0}</code>&quot; and &quot;<code>{1}</code>&quot; 
-should not be modified and should not be removed.</p>
-<p>You can do this using the inline annotation mechanism.</p>
-<p>An inline annotation is composed of a type and the annotation itself. You can 
-use the append() method to append a code with an annotation when constructing a 
-coded text. Or you can use the annotate() method to apply an annotation to a 
-selection of a coded text.</p>
-<p>&nbsp;</p>
-<p>Original codes - Codes that hold a chunk of data of the original format that 
-is not part of the text and denote some kind or formatting or function. Such 
-codes can work as a pair )(when they mark a start and its corresponding end), or 
-they can be standalone. For example, the tags <code>&lt;b&gt;</code> and <code>&lt;/b&gt;</code> 
-that indicate the start and the end of a span of bolded text in HTML, and the 
-element <code>&lt;img src='abc.png'/&gt;</code> is an example of standalone code.</p>
-<p>Annotations - Codes that simply mark the start and end of a span of text that 
-has specific properties associated to it, which are not directly part of the 
-original format. Such codes have no chunk of original data associated. For 
-example, in a C++ string <code>&quot;File name: %s&quot;</code>, the text <code>&quot;%s&quot;</code> 
-should never be deleted.</p>
-<p>In a TextFragment object both are represented using inline codes.</p>
+<p>he <code><a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html">TextFragment</a></code> class offers methods to manipulate the text and codes.</p>
 <h2><a name="filterParameters"></a>Filter Parameters</h2>
-<p>TODO</p>
-<p>&nbsp;</p>
+<p>A filter may have specific parameters associated to it. These parameters are 
+specific to each filter and indicate various specialized processing options.</p>
+<p>A filter that has parameters must always generate a default set of parameters 
+upon creation. The <code>
+<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">IFilter.getParameters()</a></code> method may be called at 
+any time after the object has been created.</p>
+<p dir="ltr">The filter parameters must be accessible as object that implements 
+the interface <code><a href="../javadoc/net/sf/okapi/common/IParameters.html">IParameters</a></code>. The methods <code>
+<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">IFilter.getParameters()</a></code>  
+and <code>
+<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setParameters(net.sf.okapi.common.IParameters)">IFilter.setParameters()</a></code> methods allow you to set and get the 
+parameters of each filter.</p>
+<p dir="ltr">Some filter may have a way to edit the parameters in a dialog box, 
+through the <code>
+<a href="../javadoc/net/sf/okapi/common/IParametersEditor.html">IParametersEditor</a></code> interface. If such editor does not 
+exists for a given filter, the file where the parameters are stored must be 
+accessible through a simply text file editor. That is why the format for storing 
+filter parameters must be some kind of text-based format (e.g. properties file).</p>
+<p dir="ltr">The code below shows how to use the filter parameters:</p>
 <pre>// Create the filter we will use
 IFilter filter = new PropertiesFilter();
 // Get the default parameters
@@ -389,7 +336,6 @@ if ( params != null ) {
       params.save(&quot;editedParameters.txt&quot;);
    }
 }</pre>
-<p>&nbsp;</p>
 <p>&nbsp;</p>
 
 </body>

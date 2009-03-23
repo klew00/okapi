@@ -70,6 +70,7 @@ what event to send and receive.</p>
 on the type of event. Extracted text, properties, as well as grouping 
 information are carried in those resources. The following table show all the 
 kinds of event that can go through a pipeline.</p>
+<p><a name="eventsAndResources"></a>Events and Corresponding Resources:</p>
 <table border="1" id="table1" cellspacing="0" cellpadding="4">
 	<tr>
 		<th>Events</th>
@@ -685,16 +686,18 @@ are alone in a fragment, or otherwise separated from their corresponding closing
 or opening counterpart, the marker is not set to <code>MARKER_OPENING</code> or
 <code>MARKER_CLOSING</code>, but to <code>MARKER_ISOLATED</code>.</p>
 <pre>Normal: &quot;First <span style="background-color: #FFFF00">&lt;b&gt;</span>bold. Second one<span style="background-color: #00FF00">&lt;/b&gt;</span>.&quot;
- Coded: &quot;First <span style="background-color: #FFFF00">\uE101\uE110</span>bold. Second one<span style="background-color: #00FF00">\uE102\uE111</span>.&quot;
+ Coded: &quot;First <span style="background-color: #FFFF00"><b>\uE101</b>\uE110</span>bold. Second one<span style="background-color: #00FF00"><b>\uE102</b>\uE111</span>.&quot;
  Codes:  <span style="background-color: #FFFF00">0</span>={&quot;&lt;b&gt;&quot;=TagType.OPENING},
          <span style="background-color: #00FF00">1</span>={&quot;&lt;/b&gt;&quot;=TagType.OPENING}</pre>
+<div dir="ltr">
 <pre>Normal f1: &quot;First <span style="background-color: #FFFF00">&lt;b&gt;</span>bold. &quot;
- Coded f1: &quot;First <span style="background-color: #FFFF00">\uE103\uE110</span>&quot;
+ Coded f1: &quot;First <span style="background-color: #FFFF00"><b>\uE103</b>\uE110</span>&quot; (\uE101 becomes \uE103)
  Codes f1: <span style="background-color: #FFFF00">0</span>={&quot;&lt;b&gt;&quot;=TagType.OPENING}
 
 Normal f2: &quot;Second one<span style="background-color: #00FF00">&lt;/b&gt;</span>.&quot;
- Coded f2: &quot;Second one<span style="background-color: #00FF00">\uE103\uE110</span>.&quot;
+ Coded f2: &quot;Second one<span style="background-color: #00FF00"><b>\uE103</b>\uE110</span>.&quot; (\uE102 becomes \uE103)
  Codes f2: <span style="background-color: #00FF00">0</span>={&quot;&lt;/b&gt;&quot;=TagType.CLOSING}</pre>
+</div>
 <p>&nbsp;</p>
 
 </body>

@@ -303,7 +303,7 @@ public class XMLFilter implements IFilter {
 		skel = new GenericSkeleton();
 		
 		if ( context.size() > 0 ) {
-			// If we are within an element, reset the frag to append to it
+			// If we are within an element, reset the fragment to append to it
 			if ( trav.translate() ) { // The stack is up-to-date already
 				frag = new TextFragment();
 			}

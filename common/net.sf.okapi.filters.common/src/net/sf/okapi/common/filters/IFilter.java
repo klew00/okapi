@@ -142,8 +142,8 @@ public interface IFilter {
 	public ISkeletonWriter createSkeletonWriter ();
 	
 	/**
-	 * Creates a new IFilterWriter object that is the preferred implementation to
-	 * use to create an output in the same format. 
+	 * Creates a new IFilterWriter object from the most appropriate class to
+	 * use with this filter.
 	 * @return A new instance of IFilterWriter for the preferred implementation
 	 * for this filter.
 	 */
