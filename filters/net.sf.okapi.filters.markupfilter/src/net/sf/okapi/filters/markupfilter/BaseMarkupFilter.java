@@ -53,7 +53,9 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
@@ -119,12 +121,19 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		this.parameters = (Parameters) params;
 	}
 
+	/**
+	 * Close the filter and all used resources.
+	 */
 	public void close() {
 		this.parameters = null;
 		this.document = null; // help Java GC
 	}
 
-	public Source getParsedHeader(final InputStream inputStream) {
+	/*
+	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information in 
+	 * XML or HTML files
+	 */
+	private Source getParsedHeader(final InputStream inputStream) {
 		try {
 			inputStream.mark(0);
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
@@ -192,6 +201,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 	}
 
+	/**
+	 * Initialize parameters, rule state and parser.
+	 */
 	@Override
 	protected void initialize() {
 		super.initialize();
@@ -207,22 +219,41 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		nodeIterator = new NoCacheNodeIterator(document);
 	}
 
+	/**
+	 * Set the default config file as URL.
+	 * @param classPathToConfig
+	 */
 	protected void setDefaultConfig(URL classPathToConfig) {
 		this.defaultConfig = classPathToConfig;
 	}
 
+	/**
+	 * Initialize filter parameters from a URL.
+	 * @param config
+	 */
 	public void setParametersFromURL(URL config) {
 		parameters = new Parameters(config);
 	}
 
+	/**
+	 * Initialize filter parameters from a Java File.
+	 * @param config
+	 */
 	public void setParametersFromFile(File config) {
 		parameters = new Parameters(config);
 	}
 
+	/**
+	 * Initialize filter parameters from a String.
+	 * @param config
+	 */
 	public void setParametersFromString(String config) {
 		parameters = new Parameters(config);
 	}
 
+	/**
+	 * Queue up Jericho tokens until we can buld an Okapi {@link Event} and return it. 
+	 */
 	@Override
 	public Event next() {
 		// reset state flags and buffers
@@ -317,36 +348,96 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * 
 	 * @param segment
 	 */
-	protected void preProcess(Segment segment) {
-	};
+	protected void preProcess(Segment segment) {};
 
+	/**
+	 * Handle any recognized escaped server tags.
+	 * @param tag
+	 */
 	protected abstract void handleServerCommonEscaped(Tag tag);
 
+	/**
+	 * Handle any recognized server tags (i.e., PHP, Mason etc.)
+	 * @param tag
+	 */
 	protected abstract void handleServerCommon(Tag tag);
 
+	/**
+	 * Handle an XML markup declaration.
+	 * @param tag
+	 */
 	protected abstract void handleMarkupDeclaration(Tag tag);
 
+	/**
+	 * Handle an XML declaration.
+	 * @param tag
+	 */
 	protected abstract void handleXmlDeclaration(Tag tag);
 
+	/**
+	 * Handle the XML doc type declaration (DTD).
+	 * @param tag
+	 */
 	protected abstract void handleDocTypeDeclaration(Tag tag);
 
+	/**
+	 * Handle processing instructions.
+	 * @param tag
+	 */
 	protected abstract void handleProcessingInstruction(Tag tag);
 
+	/**
+	 * Handle comments.
+	 * @param tag
+	 */
 	protected abstract void handleComment(Tag tag);
 
+	/**
+	 * Handle CDATA sections.
+	 * @param tag
+	 */
 	protected abstract void handleCdataSection(Tag tag);
 
+	/**
+	 * Handle all text (PCDATA).
+	 * @param text
+	 */
 	protected abstract void handleText(Segment text);
 
+	/**
+	 * Handle start tags.
+	 * @param startTag
+	 */
 	protected abstract void handleStartTag(StartTag startTag);
 
+	/**
+	 * Handle end tags, including empty tags.
+	 * @param endTag
+	 */
 	protected abstract void handleEndTag(EndTag endTag);
 
-	protected abstract void handleDocumentPart(Tag endTag);
+	/**
+	 * Handle anything else not classified by Jericho.
+	 * @param tag
+	 */
+	protected abstract void handleDocumentPart(Tag tag);
 
+	/**
+	 * Some attributes names are converted to Okapi standards such as 
+	 * HTML charset to "encoding" and lang to "language" 
+	 * @param attrName
+	 * @param attrValue
+	 * @param tag
+	 * @return
+	 */
 	abstract protected String normalizeAttributeName(String attrName,
 			String attrValue, Tag tag);
 
+	/**
+	 * Add an {@link Code} to the current {@link TextUnit}. Throws an 
+	 * exception if there is no current {@link TextUnit}. 
+	 * @param tag
+	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
@@ -389,6 +480,14 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 	}
 
+	/**
+	 * For the given Jericho {@link StartTag} parse out all the actionable attributes and
+	 * and store them as {@link PropertyTextUnitPlaceholder}. {@link PlaceholderType} are 
+	 * set based on the filter configuration for each attribute.
+	 * for the attribute name and value. 
+	 * @param startTag
+	 * @return
+	 */
 	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(
 			StartTag startTag) {
 		// list to hold the properties or TextUnits
@@ -428,6 +527,16 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		return propertyOrTextUnitPlaceholders;
 	}
 
+	/**
+	 * Create a {@link PropertyTextUnitPlaceholder} given the supplied type, 
+	 * name and Jericho {@link Tag} and {@link Attribute}. 
+	 * @param type
+	 * @param name
+	 * @param value
+	 * @param tag
+	 * @param attribute
+	 * @return
+	 */
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
 			PlaceholderType type, String name, String value, Tag tag,
 			Attribute attribute) {
@@ -445,14 +554,25 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				valueStartPos, valueEndPos);
 	}
 
+	/**
+	 * Return true if the document is in utf8 encoding.
+	 */
 	protected boolean hasUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
 
+	/**
+	 * Return true if the document has a utf-8 byte order mark.
+	 */
 	protected boolean hasUtf8Bom() {
 		return hasUtf8Bom;
 	}
 
+	/**
+	 * Return true if the current filter configuration tells us to 
+	 * preserve whitespace as-is.
+	 * @return
+	 */
 	protected boolean keepOriginalFormatting() {
 		if (getRuleState().isPreserveWhitespaceState()
 				&& !getConfig().collapseWhitespace()) {
