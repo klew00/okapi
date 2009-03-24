@@ -7,12 +7,10 @@
 <body>
 <h1 class="util1">Utility – Used Characters Listing</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to get a list of all characters used in the 
+<p>This utility generates a list of all characters used in the 
 translatable text of a give set of files.</p>
-<p>This is useful for example when you need to create a font for bitmap Japanese 
-characters for a game interface. You need to include in the font only the 
-characters actually used in the text, so you can reduce the size of the bitmap 
-font.</p>
+<p>This is useful for example when you need to create a font for Japanese bitmap
+characters for a game interface. By including only the characters actually used in the text you can reduce the size of the bitmap font.</p>
 <p>The result file is a tab-delimited text file with three columns.</p>
 <ol>
 	<li>The Unicode code point</li>
@@ -27,6 +25,7 @@ U+007A &#39;z&#39; 10
 U+0079 &#39;y&#39; 320
 ...</pre>
 <p>The output list is not any specific order.</p>
+<p>This utility uses filters.</p>
 <h2>Input Parameters</h2>
 <ul>
 	<li>The list of the documents to process (Input list 1).</li>
