@@ -54,6 +54,9 @@ public class FormatManager {
 		else if ( sExt.equals(".rtf") ) aRes[1] = "okf_rtf";
 		else if ( sExt.equals(".idml") ) aRes[1] = "okf_idml";
 		else if ( sExt.equals(".po") ) aRes[1] = "okf_po";
+		else if ( sExt.equals(".docx") ) aRes[1] = "okf_msoffice";
+		else if ( sExt.equals(".xslx") ) aRes[1] = "okf_msoffice";
+		else if ( sExt.equals(".pptx") ) aRes[1] = "okf_msoffice";
 		return aRes;
 	}
 }

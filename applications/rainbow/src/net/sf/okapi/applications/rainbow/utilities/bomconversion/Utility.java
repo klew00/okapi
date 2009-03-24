@@ -123,17 +123,22 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 					}
 				}
 				else { // No BOM present
-					if ( !params.removeBOM ) { // If we add, do it 
-						switch ( guessByteOrder(buffer, len) ) {
-						case 1: // UTF-16BE
-							output.write(BOM_UTF16BE);
-							break;
-						case 2: // UTF-16LE
+					if ( !params.removeBOM ) { // If we add, do it
+						String enc = getInputEncoding(0).toLowerCase();
+						if ( enc.equals("utf-16") || enc.equals("utf-16le") ) {
 							output.write(BOM_UTF16LE);
-							break;
-						default: // Assume the file is UTF-8 
+							logger.info("Added UTF-16LE BOM");
+						}
+						else if ( enc.equals("utf-16be") ) {
+							output.write(BOM_UTF16BE);
+							logger.info("Added UTF-16BE BOM");
+						}
+						else if ( enc.equals("utf-8") ) {
 							output.write(BOM_UTF8);
-							break;
+							logger.info("Added UTF-8 BOM");
+						}
+						else { // Cannot add to un-supported encodings
+							logger.warn("Cannot add a BOM to a document in "+enc);
 						}
 					}
 					// Then write the buffer we checked
@@ -240,15 +245,15 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			&& ( buffer[1] == (byte)0x00 )
 			&& ( buffer[2] != (byte)0x00 )
 			&& ( buffer[3] == (byte)0x00 )) {
-			// Probably UTF-16BE 
-			return 1;
+			// Probably UTF-16LE 
+			return 2;
 		}
 		if (( buffer[0] == (byte)0x00 )
 			&& ( buffer[1] != (byte)0x00 )
 			&& ( buffer[2] == (byte)0x00 )
 			&& ( buffer[3] != (byte)0x00 )) {
-			// Probably UTF-16LE
-			return 2;
+			// Probably UTF-16B
+			return 1;
 		}
 		return 0;
 	}

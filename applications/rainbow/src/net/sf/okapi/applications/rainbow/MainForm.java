@@ -1703,15 +1703,8 @@ public class MainForm implements IParametersProvider {
 		for ( InputTableModel model : inputTableMods ) {
 			model.updateTable(null, 0);
 		}
-		
-		//TODO: select the list to build output 
-		String sampleInput = prj.getInputRoot(0) + File.separator
-			+ Res.getString("MainForm.37") + File.separator + Res.getString("MainForm.38"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		//TODO: select the list to build output 
-		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
-			prj.getOutputRoot(), "en", "fr"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		updatePathBuilderSampleData();
 		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());
 		edOutputRoot.setText(prj.getOutputRoot());
 
@@ -1736,6 +1729,24 @@ public class MainForm implements IParametersProvider {
 		stInputRoot.setText(String.format(Res.getString("MainForm.inputRootLabel"), currentInput+1)); //$NON-NLS-1$
 		edInputRoot.setText(prj.getInputRootDisplay(currentInput));
 		updateOutputRoot();
+	}
+
+	/*
+	 * Updates the data used to show the sample path in the path builder panel.
+	 */
+	private void updatePathBuilderSampleData () {
+		String sampleInput;
+		if ( inputTables.get(0).getItemCount() > 0 ) {
+			// Use the first file of the first list as example
+			sampleInput = prj.getInputRoot(0) + File.separator + inputTables.get(0).getItem(0).getText();
+		}
+		else {
+			sampleInput = prj.getInputRoot(0) + File.separator
+				+ Res.getString("MainForm.37") + File.separator //$NON-NLS-1$
+				+ Res.getString("MainForm.38"); //$NON-NLS-1$
+		}
+		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
+			prj.getOutputRoot(), prj.getSourceLanguage(), prj.getSourceEncoding());
 	}
 	
 	/**
@@ -1779,6 +1790,7 @@ public class MainForm implements IParametersProvider {
 		}
 		finally {
 			inputTableMods.get(currentInput).updateTable(null, 0);
+			updatePathBuilderSampleData();
 			updateCommands();
 			stopWaiting();
 		}
@@ -1794,9 +1806,9 @@ public class MainForm implements IParametersProvider {
 			if ( dir != null ) {
 				path = dir + File.separator + path;
 			}
-			File F = new File(path);
-			if ( F.isDirectory() ) {
-				n += doAddDocuments(F.list(), path);
+			File f = new File(path);
+			if ( f.isDirectory() ) {
+				n += doAddDocuments(f.list(), path);
 			}
 			else {
 				String[] res = fm.guessFormat(path);

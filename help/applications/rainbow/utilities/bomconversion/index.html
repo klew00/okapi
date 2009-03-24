@@ -7,9 +7,9 @@
 <body>
 <h1 class="util1">Utility – Byte-Order-Mark Conversion</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to add a Byte-Order-Mark (BOM) to UTF-8 and UTF-16 files and remove the Byte-Order-Mark (BOM) from 
-UTF-8, UTF-16, and UTF-32 files.</p>
-<p>The Byte-Order-Mark (or BOM) is a special Unicode mark that is used 
+<p>This utility allows you to add or remove the Byte-Order-Mark (BOM) to or from 
+UTF-8 and UTF-16 files.</p>
+<p>The Byte-Order-Mark is a special Unicode mark that is used 
 to indicate if a file is in little-endian (U+FEFF) or big-endian (U+FFFE) mode. For more 
 information on the BOM see <a href="http://www.unicode.org/faq/utf_bom.html">
 http://www.unicode.org/faq/utf_bom.html</a>.</p>
@@ -17,6 +17,7 @@ http://www.unicode.org/faq/utf_bom.html</a>.</p>
 <h2>Input Parameters</h2>
 <ul>
 	<li>The list of the input documents to modify (Input list 1).</li>
+	<li>The default input encoding (when Adding BOM).</li>
 	<li>The names and locations of the output documents.</li>
 </ul>
 <h2>Configuration</h2>
@@ -25,14 +26,14 @@ http://www.unicode.org/faq/utf_bom.html</a>.</p>
 <p><cite>Remove the Byte-Order-Mark if it is present</cite> -- Select this 
 option to remove the BOM from the input files if one is detected. By default 
 only the BOM of UTF-8 files are removed.</p>
-<p><cite>Remove also UTF-16 and UTF-32 BOMs</cite> -- Select this option to also 
-remove the BOM from UTF-16 and UTF-32 files if one is detected. This is not 
-something that is recommended: UTF-16 and UTF-32 files must have a BOM.</p>
+<p><cite>Remove also UTF-16 BOMs</cite> -- Select this option to also 
+remove the BOM from UTF-16 files if one is detected. This is not 
+something that is recommended: UTF-16 files must have a BOM.</p>
 <p><cite>Add the Byte-Order-Mark if it is not already present</cite> -- Select 
 this option to add a BOM in the input files if one is not detected. Note that 
-the input files must be in UTF-8 or UTF-16. When adding a BOM this utility tries to determine if the encoding of the file is UTF-16. If it can't determine this it will assume the file is encoded as UTF-8. Because auto detection of UTF-16 file is not guaranteed to be 100% accurate, using UTF-8 files would be preferable. See the <a href="../encodingconversion/index.html">
-Encoding Conversion Utility</a> for converting between encodings.
-</p>
+the input files must already be in UTF-8 or UTF-16.</p>
+<p>When using this feature, you also must specify the encoding of each file, so 
+the utility can add the proper type of BOM.</p>
 <p>&nbsp;</p>
 </body>
 </html>

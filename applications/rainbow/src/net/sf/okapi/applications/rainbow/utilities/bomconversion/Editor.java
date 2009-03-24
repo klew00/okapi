@@ -117,7 +117,7 @@ public class Editor implements IParametersEditor {
 		stRemove.setLayoutData(gdTmp);
 		
 		chkAlsoNonUTF8 = new Button(group, SWT.CHECK);
-		chkAlsoNonUTF8.setText("Remove also UTF-16 and UTF-32 BOMs (Not recommended)");
+		chkAlsoNonUTF8.setText("Remove also UTF-16 BOMs (Not recommended)");
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		chkAlsoNonUTF8.setLayoutData(gdTmp);
