@@ -1,0 +1,30 @@
+<?xml version="1.0"?> 
+<project name="javadoc" default="all" basedir="."> 
+
+	<property name="dist" value="dist"/>
+ 
+	<target name="all"> 
+	
+		<delete dir="${dist}" failonerror="false"/>
+		<mkdir dir="${dist}"/>
+		
+		<copy todir="${dist}">
+			<fileset dir="../../website" />
+		</copy>
+		
+		<copy todir="${dist}/help">
+			<fileset dir="../../help" />
+		</copy>
+		
+		<mkdir dir="${dist}/javadoc"/>
+		<javadoc destdir="${dist}/javadoc">
+			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
+			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
+			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
+<!--			<packageset dir="..\libraries\net.sf.okapi.lib.segmentation\src" defaultexcludes="yes"/>-->
+<!--			<packageset dir="..\libraries\net.sf.okapi.lib.translation\src" defaultexcludes="yes"/>-->
+		</javadoc>
+
+	</target>
+
+</project>
