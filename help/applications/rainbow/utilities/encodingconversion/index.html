@@ -23,19 +23,22 @@ document, and in some cases, to update its encoding declaration.</p>
 types of numeric character references (NCRs) when reading the input document. 
 For example: <code>&amp;#255;</code>, <code>&amp;#xE1;</code> and <code>&amp;#e1;</code> 
 will be un-escaped to &#39;<code>á</code>&#39;. If this option is not set, any NCR in 
-the input document will remain in the exact same form in the output document.</p>
+the input document will remain in the exact same form in the output document. For more on NCR see <a href="http://en.wikipedia.org/wiki/Numeric_character_reference">
+http://en.wikipedia.org/wiki/Numeric_character_reference</a>.</p>
 <p><cite>Character entity references</cite> -- Set this option to un-escape the 
 standard HTML character entity references (CERs) when reading the input 
 document. For example: <code>&amp;aacute;</code> will be un-escaped to &#39;<code>á</code>&#39;. 
 If this option is not set, any CER in the input document will remain in the 
-exact same form in the output document.</p>
+exact same form in the output document. For more on CER see <a href="http://en.wikipedia.org/wiki/Character_entity_reference">
+http://en.wikipedia.org/wiki/Character_entity_reference</a>.
+</p>
 <p><cite>Java-style escape notation</cite> -- Set this option to un-escape the 
 Java-style escaped characters when reading the input document. For example:
 <code>\u00e1</code> and <code>\u00E1</code> will be un-escaped to &#39;<code>á</code>&#39;. 
 If this option is not set all Java-style escaped characters in the input 
 document will remain in the exact same form in the output document.</p>
 <h3>Output Tab</h3>
-<h3>Escape notation to use</h3>
+<h4>Escape notation to use</h4>
 <p><cite>Uppercase hexadecimal numeric character reference</cite> -- Select this 
 option to use an uppercase hexadecimal NCR when escaping a character. For 
 example &#39;<code>á</code>&#39; will become <code>&amp;#xE1;</code>.</p>
@@ -67,6 +70,14 @@ applied to the user-defined expression to be the byte value of the output
 encoding rather than the Unicode code points. For example, the expression <code>
 \&#39;%x</code> for <code>日本語</code> will give <code>\&#39;93\&#39;fa\&#39;96\&#39;7b\&#39;8c\&#39;ea</code> 
 if this option is set and the output encoding is Shift-JIS.</p>
+<h4>What characters should be escaped</h4>
+<p><cite>Only the characters un-supported by the output encoding</cite> -- Select this option to escape only characters not supported by the output encoding.</p>
+<p><cite>All extended characters</cite> -- Select this option to escape all extended characters.</p>
+<h4>Miscellaneous</h4>
+<p><cite>Use Byte-Order-Mark for UTF-8 output</cite> -- Set this option to add a Byte-Order-Mark (BOM) for UTF-8 output. For more 
+information on the BOM see <a href="http://www.unicode.org/faq/utf_bom.html">
+http://www.unicode.org/faq/utf_bom.html</a>.</p>
+<p><cite>List characters not supported by the output encoding</cite> -- Set this option to list in the Log all characters not supported by the output encoding.</p>
 <h2>Updating Encoding Declarations</h2>
 <p>This utility can update automatically the encoding declarations of XML and 
 HTML documents, given a few conditions.</p>
@@ -92,7 +103,11 @@ distinction between normal XML/HTML code and XML/HTML comments.</p>
 </ul>
 <h3>Detection of the HTML Documents</h3>
 <ul>
-	<li>If an HTML charset declaration is detected:</li>
+	<li>If an HTML charset declaration is detected:
+	<ul>
+	<li>The charset value is updated.</li>
+	</ul>
+	</li>
 	<li>Otherwise, if the name of the file ends with an extension that starts 
 	with <code>.htm</code>:<ul>
 	<li>If a <code>&lt;head&gt;</code> element is found:<ul>
