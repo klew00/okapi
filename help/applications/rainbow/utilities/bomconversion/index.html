@@ -7,10 +7,10 @@
 <body>
 <h1 class="util1">Utility – Byte-Order-Mark Conversion</h1>
 <h2 class="util2">Overview</h2>
-<p>This utility allows you to add or remove the Byte-Order-Mark (BOM) of a 
-UTF-8, UTF-16, or UTF-32 files.</p>
-<p>The Byte-Order-Mark (or BOM) is a special Unicode mark (U+FEFF) that is used 
-to indicate if a file is in little-endian or big-endian mode. For more 
+<p>This utility allows you to add a Byte-Order-Mark (BOM) to UTF-8 and UTF-16 files and remove the Byte-Order-Mark (BOM) from 
+UTF-8, UTF-16, and UTF-32 files.</p>
+<p>The Byte-Order-Mark (or BOM) is a special Unicode mark that is used 
+to indicate if a file is in little-endian (U+FEFF) or big-endian (U+FFFE) mode. For more 
 information on the BOM see <a href="http://www.unicode.org/faq/utf_bom.html">
 http://www.unicode.org/faq/utf_bom.html</a>.</p>
 <p>This utility does not use filters.</p>
@@ -30,7 +30,9 @@ remove the BOM from UTF-16 and UTF-32 files if one is detected. This is not
 something that is recommended: UTF-16 and UTF-32 files must have a BOM.</p>
 <p><cite>Add the Byte-Order-Mark if it is not already present</cite> -- Select 
 this option to add a BOM in the input files if one is not detected. Note that 
-the input files must be in UTF-8 or UTF-16.</p>
+the input files must be in UTF-8 or UTF-16. When adding a BOM this utility tries to determine if the encoding of the file is UTF-16. If it can't determine this it will assume the file is encoded as UTF-8. Because auto detection of UTF-16 file is not guaranteed to be 100% accurate, using UTF-8 files would be preferable. See the <a href="../encodingconversion/index.html">
+Encoding Conversion Utility</a> for converting between encodings.
+</p>
 <p>&nbsp;</p>
 </body>
 </html>
