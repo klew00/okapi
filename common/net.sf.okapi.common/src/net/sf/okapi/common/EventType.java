@@ -76,7 +76,7 @@ public enum EventType {
 	DOCUMENT_PART,
 		
 	/**
-	 * Indicates that the user has canceled the processing.
+	 * Indicates that the user has canceled the process.
 	 * No resource are associated with this event.  
 	 */
 	CANCELED,

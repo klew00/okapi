@@ -16,6 +16,12 @@
 		<copy todir="${tmp}">
 			<fileset dir="${src_ui.common}" excludes="**/*.java"/>
 		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/common">
+			<fileset dir="../../help/common" />
+		</copy>
+		
 	</target>
 
 </project>

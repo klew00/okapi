@@ -54,7 +54,14 @@ and in the case of filter events, with <a href="#skeleton">skeleton</a>.</p>
 	<code>END_GROUP</code>, <code>END_SUBDOCUMENT</code>, and <code>END_DOCUMENT</code>) 
 	are used to pass along a document broken down into translatable 
 	and non-translatable parts.</li>
+	<li>The <code>CANCELED</code> event is used when the the processed has been 
+	canceled.</li>
+	<li>The <code>FINISHED</code> event is used in some implementations of the 
+	pipeline to stop multi-threading tasks.</li>
 </ul>
+
+<p dir="ltr">As a general rule, when a component gets an event it does not 
+understand, it should just pass it down the pipeline, without modifying it.</p>
 
 <h3><a name="filter"></a>Filter</h3>
 <p>A filter class is an implementation of the <code>

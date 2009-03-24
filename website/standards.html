@@ -27,11 +27,12 @@
 		<img border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
 	</tr>
 </table>
+<h2>Overview</h2>
 <p>The localization industry uses several standards to exchange data 
-between tools. It is important for tools to support such standards. They allow 
+between tools. It is <b>very important for tools to support such standards</b>. They allow 
 data to not be locked into proprietary formats, and also to approach the 
 translation process with a broader choice of options and more flexibility. The 
-applications and components of the Okapi Framework support these formats when 
+applications and components of the Okapi Framework support standards when 
 possible.</p>
 <ul>
 	<li><a href="#xliff">XLIFF - XML Localisation Interchange File Format</a></li>
@@ -47,8 +48,10 @@ markup language for extracted localizable text.</p>
 	XLIFF 1.2 specification</a></li>
 	<li><a href="http://www.oasis-open.org/committees/xliff/">The OASIS XLIFF 
 	Technical Committee home page</a></li>
-	<li>Example of XLIFF document</li>
+	<li>Example of XLIFF 1.2 document</li>
 </ul>
+<p>Many components of the framework use XLIFF. The framework also includes an
+<a href="help/filters/ui/xliff/index.html">XLIFF filter</a>.</p>
 <h2><a name="tmx"></a>TMX - Translation Memory eXchange</h2>
 <p>Maintained by the OSCAR Committee at LISA, TMX covers the exchange of 
 translation memory data.</p>
@@ -59,6 +62,7 @@ translation memory data.</p>
 	page at LISA</a></li>
 	<li>Example of TMX document</li>
 </ul>
+<p>Many components of the framework use TMX.</p>
 <h2><a name="its"></a>ITS - Internationalization Tag Set</h2>
 <p>ITS is a W3C namespace to provide internationalization information and 
 support in XML documents.</p>
@@ -68,7 +72,11 @@ support in XML documents.</p>
 	Group home page</a></li>
 	<li>Example of ITS document</li>
 </ul>
-<p>See also the XML Internationalization Best Practices document.</p>
+<p>The <a href="help/filters/ui/xml/index.html">XML Filter</a> that is part of 
+the framework supports ITS.</p>
+<p>Related to ITS, the <a href="http://www.w3.org/TR/xml-i18n-bp/">Best 
+Practices for XML Internationalization</a> W3C Note can help you designing and 
+authoring XML documents in a way they are easier to localize.</p>
 <h2><a name="srx"></a>SRX - Segmentation Rules eXchange</h2>
 <p>Maintained by the OSCAR Committee at LISA, SRX addresses the exchange of 
 segmentation rules among tools. The version 1.0 of SRX has been implemented 
@@ -80,7 +88,7 @@ version 2.0 of SRX has been implemented with better consistency.</p>
 	page at LISA</a></li>
 	<li>Example of SRX document</li>
 </ul>
-<p>The segmentation engine used in the Okapi Framework implements SRX&nbsp;2.0. See the
+<p>The segmentation engine provided in the framework implements SRX&nbsp;2.0. See the
 <a href="../javadoc/net/sf/okapi/lib/segmentation/SRXDocument.html"><code>
 SRXDocument</code> class</a> and the
 <a href="../javadoc/net/sf/okapi/lib/segmentation/Segmenter.html"><code>

@@ -196,16 +196,16 @@
  <encoding iana="windows-1254" cp="1254">
   <name>Turkish (Windows)</name>
  </encoding>
- <encoding iana="utf-7" cp="65000">
-  <name>Unicode (UTF-7)</name>
- </encoding>
- <encoding iana="utf-8" cp="65001">
+ <encoding iana="UTF-8" cp="65001">
   <name>Unicode (UTF-8)</name>
  </encoding>
- <encoding iana="utf-16" cp="1200">
+ <encoding iana="UTF-16" cp="1201">
   <name>Unicode (UTF-16)</name>
  </encoding>
- <encoding iana="utf-16be" cp="1201">
+ <encoding iana="UTF-16LE" cp="1200">
+  <name>Unicode (UTF-16 Little-Endian)</name>
+ </encoding>
+ <encoding iana="UTF-16BE" cp="1201">
   <name>Unicode (UTF-16 Big-Endian)</name>
  </encoding>
  <encoding iana="windows-1258" cp="1258">

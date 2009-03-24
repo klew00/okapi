@@ -558,14 +558,16 @@ public class Util {
 				return;
 			}
 			
-			/* It seems writers add the BOM for UTF other than UTF-8 as they should.
-			if ( tmp.equals("utf-16be")
-				|| tmp.equals("utf-16le")
-				|| tmp.equals("utf-16") )
-			{
+			/* It seems writers do the following:
+			 * For "UTF-16" they output UTF-16BE with a BOM
+			 * For "UTF-16LE" they output UTF-16LE without BOM
+			 * For "UTF-16BE" they output UTF-16BE without BOM
+			 * So we force a BOM for UTF-16LE and UTF-16BE */
+			if ( tmp.equals("utf-16be") || tmp.equals("utf-16le") ) {
 				writer.write("\ufeff");
 				return;
-			}*/
+			}
+			//TODO: Is this an issue? Does *reading* UTF-16LE/BE does not check for BOM?
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
