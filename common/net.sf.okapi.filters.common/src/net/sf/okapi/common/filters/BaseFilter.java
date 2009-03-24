@@ -45,15 +45,13 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-// TODO: Auto-generated Javadoc
 /**
- * BaseFilter provides basic services for filter writers and hides the powerful,
+ * BaseFilter provides a simplified API for filter writers and hides the powerful,
  * but complex resource and skeleton API's (
  * {@link net.sf.okapi.common.resource} and {@link net.sf.okapi.common.skeleton}
  * ).
  * 
- * To create a new filter extend BaseFilter (or for tag based formats
- * {@link net.sf.okapi.common.filters.markupfilter}) and call
+ * To create a new filter extend BaseFilter and call
  * {@link net.sf.okapi.common.filters#initialize()} and
  * {@link net.sf.okapi.common.filters#finalize()} methods at the beginning and
  * end of each filter run.
@@ -158,6 +156,9 @@ public abstract class BaseFilter implements IFilter {
 		return new GenericSkeletonWriter();
 	}
 
+	/**
+	 * Return the {@link IFilterWriter} that should be used in conjunction with this filter ({@link IFilter}).
+	 */
 	public IFilterWriter createFilterWriter () {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
@@ -184,10 +185,16 @@ public abstract class BaseFilter implements IFilter {
 		setSrcLang(sourceLanguage);
 	}
 
+	/*
+	 * Create a formatted ID for named resource.
+	 */
 	private String createId(String name, int number) {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
 	}
 
+	/*
+	 * Return the current buffered Event without removing it. 
+	 */
 	private Event peekTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
@@ -195,6 +202,9 @@ public abstract class BaseFilter implements IFilter {
 		return tempFilterEventStack.peek();
 	}
 
+	/*
+	 * Return the current buffered Event and remove it from the buffer.
+	 */
 	private Event popTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
@@ -203,7 +213,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Gets the encoding.
+	 * Gets the input document encoding.
 	 * 
 	 * @return the encoding
 	 */
@@ -212,7 +222,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Sets the encoding.
+	 * Sets the input document encoding.
 	 * 
 	 * @param encoding
 	 *            the new encoding
@@ -222,7 +232,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Gets the src lang.
+	 * Gets the input document source language.
 	 * 
 	 * @return the src lang
 	 */
@@ -231,7 +241,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Sets the src lang.
+	 * Sets the input document source language.
 	 * 
 	 * @param srcLang
 	 *            the new src lang
@@ -241,7 +251,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Gets the mime type.
+	 * Gets the input document mime type.
 	 * 
 	 * @return the mime type
 	 */
@@ -250,7 +260,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Sets the mime type.
+	 * Sets the input document mime type.
 	 * 
 	 * @param mimeType
 	 *            the new mime type
@@ -260,7 +270,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Initialize.
+	 * Initialize the filter and send the {@link StartDocument} {@link Event}
 	 */
 	protected void initialize() {
 		reset();
@@ -293,9 +303,9 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks if is current text unit.
+	 * Check if the current buffered {@link Event} is a {@link TextUnit}.
 	 * 
-	 * @return true, if is current text unit
+	 * @return true if TextUnit, false ootherwise. 
 	 */
 	protected boolean isCurrentTextUnit() {
 		Event e = peekTempEvent();
@@ -306,9 +316,12 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks if is current complex text unit.
+	 * Check if the current buffered {@link Event} is a complex {@link TextUnit}. 
+	 * A complex TextUnit is one which carries along with it it's surrounding 
+	 * context such &lt;p> text &lt;/p> or &lt;title> text &lt;/title> 
+	 *  
 	 * 
-	 * @return true, if is current complex text unit
+	 * @return true, if complex text unit, false otherwise.
 	 */
 	protected boolean isCurrentComplexTextUnit() {
 		Event e = peekTempEvent();
