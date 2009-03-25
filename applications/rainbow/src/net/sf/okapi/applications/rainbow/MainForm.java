@@ -623,6 +623,21 @@ public class MainForm implements IParametersProvider {
 		});
 
 		
+		// Drop target for opening project
+		DropTarget dropTarget = new DropTarget(shell, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
+		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public void drop (DropTargetEvent e) {
+				FileTransfer FT = FileTransfer.getInstance();
+				if ( FT.isSupportedType(e.currentDataType) ) {
+					String[] paths = (String[])e.data;
+					if ( paths != null ) {
+						openProject(paths[0]);
+					}
+				}
+			}
+		});
+		
 		// Root panel
 		stInputRoot = new Label(shell, SWT.NONE);
 		// Text an approximative text for correct sizing
