@@ -27,11 +27,11 @@ class Consumer(BasePipelineStep):
         print "%s<===>%s\nSKEL:%s\n=========" % (event.getEventType(), event.getResource(), event.getResource().getSkeleton())
 
 pipeline = Pipeline()
-filter = HtmlFilter()
-pipeline.addStep(FilterPipelineStepAdaptor(filter))
+pipeline.addStep(FilterPipelineStepAdaptor(HtmlFilter()))
 pipeline.addStep(Consumer())
 
-pipeline.process(u'This is a <img src="here">simple pipeline</img> test')
+
+pipeline.process(FileResource(u'This is a <img src="here">simple pipeline</img> test', "en"))
 pipeline.destroy()
 
 
