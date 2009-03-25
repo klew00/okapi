@@ -20,7 +20,7 @@
 
 from net.sf.okapi.common.pipeline import Pipeline, BasePipelineStep, FilterPipelineStepAdaptor
 from net.sf.okapi.common import EventType, Event
-from net.sf.okapi.filters.html import HtmlFilter    
+from net.sf.okapi.filters.html import HtmlFilter
     
 class Consumer(BasePipelineStep):
     def handleEvent(self, event): 
