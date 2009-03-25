@@ -20,6 +20,7 @@
 
 from java.io import File
 
+from net.sf.okapi.common.resource import FileResource
 from net.sf.okapi.common.pipeline import Pipeline
 from net.sf.okapi.common.pipeline import FilterPipelineStepAdaptor
 from net.sf.okapi.common.pipeline import FilterWriterPipelineStepAdaptor
@@ -64,7 +65,7 @@ def pipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, out
     writer.setOutput(outputPath)
     
     # Launch the execution
-    pipeline.process(input)
+    pipeline.process(FileResource(input, 'UTF-8', 'en'))
     
     # destroy the pipeline and finalize all steps
     pipeline.destroy();
