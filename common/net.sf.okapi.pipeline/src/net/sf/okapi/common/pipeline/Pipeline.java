@@ -20,23 +20,24 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.FileResource;
 
 public class Pipeline implements IPipeline {
 	List<IPipelineStep> steps;
-	IPipelineStep initialStep;
+	List<IPipelineStep> finishedSteps;
 	volatile boolean cancel = false;
-	boolean firstStep = true;
 	private boolean done = false;
 	private boolean destroyed = false;
+	private Event event;
 
 	public Pipeline() {
-		steps = new ArrayList<IPipelineStep>();
+		steps = new LinkedList<IPipelineStep>();
+		finishedSteps = new LinkedList<IPipelineStep>();
 		initialize();
 	}
 
@@ -48,42 +49,43 @@ public class Pipeline implements IPipeline {
 
 	public void addStep(IPipelineStep step) {
 		if (destroyed) {
-			throw new RuntimeException("Pipeline has been destroyed and must be reinitialized");
+			throw new RuntimeException(
+					"Pipeline has been destroyed and must be reinitialized");
 		}
-		
-		if (firstStep) {
-			if (!(step instanceof IInitialStep)) {
-				throw new RuntimeException("Initial step must implement IInitialStep");
-			}
-
-			initialStep = step;
-			firstStep = false;
-		} else {
-			steps.add(step);
-		}
+		steps.add(step);
 	}
 
 	public void cancel() {
 		cancel = true;
 	}
 
-	private void execute() {
+	private void execute(FileResource input) {
 		initialize();
 
+		// first event is always the FileResource event we use it to prime the
+		// pipeline
+		event = new Event(EventType.FILE_RESOURCE, input);
+
 		// loop through the events until we run out
-		while (((IInitialStep) initialStep).hasNext() && !cancel) {
-			Event event = initialStep.handleEvent(null);
-			for (IPipelineStep step : steps) {
-				step.handleEvent(event);
+		while (!steps.isEmpty() && !cancel) {
+			while (steps.get(0).hasNext() && !cancel) {				
+				for (IPipelineStep step : steps) {
+					event = step.handleEvent(event);
+				}
 			}
+			// as each step exhausts its events remove it from the list and move
+			// on to the next
+			finishedSteps.add(steps.remove(0));
 		}
+
 		if (cancel) {
-			initialStep.cancel();
+			for (IPipelineStep step : finishedSteps) {
+				step.cancel();
+			}
 			for (IPipelineStep step : steps) {
 				step.cancel();
 			}
 		}
-		done = true;
 	}
 
 	public PipelineReturnValue getState() {
@@ -91,68 +93,24 @@ public class Pipeline implements IPipeline {
 			return PipelineReturnValue.DESTROYED;
 		else if (cancel)
 			return PipelineReturnValue.CANCELLED;
-		else if (done)		
+		else if (done)
 			return PipelineReturnValue.SUCCEDED;
 		else
 			return PipelineReturnValue.RUNNING;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IPipeline#process()
-	 */
-	public void process() {
-		preprocess();
-		execute();
-		postprocess();
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
 	 */
-	public void process(URI input) {
-		((IInitialStep) initialStep).setInput(input);
+	public FileResource process(FileResource input) {
 		preprocess();
-		execute();
+		execute(input);
 		postprocess();
-	}
+		done = true;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.io.InputStream)
-	 */
-	public void process(InputStream input) {
-		preprocess();
-		((IInitialStep) initialStep).setInput(input);
-		execute();
-		postprocess();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seenet.sf.okapi.common.pipeline.IPipeline#process(CharSequence)
-	 */
-	public void process(CharSequence input) {
-		((IInitialStep) initialStep).setInput(input);
-		preprocess();
-		execute();
-		postprocess();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#close()
-	 */
-	public void destroy() {		
-		initialStep.destroy();
-		for (IPipelineStep step : steps) {
-			step.destroy();
-		}
-		destroyed = true;
+		return null; // TODO: How to get pipeline to always return a FileResource?
 	}
 
 	/*
@@ -161,7 +119,9 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
 	 */
 	private void postprocess() {
-		initialStep.postprocess();
+		for (IPipelineStep step : finishedSteps) {
+			step.postprocess();
+		}
 		for (IPipelineStep step : steps) {
 			step.postprocess();
 		}
@@ -173,9 +133,25 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
 	 */
 	private void preprocess() {
-		initialStep.preprocess();
+		for (IPipelineStep step : finishedSteps) {
+			step.preprocess();
+		}
 		for (IPipelineStep step : steps) {
 			step.preprocess();
 		}
+	}
+
+	/*
+	 * Destroy this pipeline and call destroy on each pipeline step. Cleanup
+	 * code should go here.
+	 */
+	public void destroy() {
+		for (IPipelineStep step : finishedSteps) {
+			step.destroy();
+		}
+		for (IPipelineStep step : steps) {
+			step.destroy();
+		}
+		destroyed = true;
 	}
 }

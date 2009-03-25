@@ -20,18 +20,42 @@
 
 package net.sf.okapi.common.pipeline;
 
+import sun.nio.ch.SocketOpts.IP;
+
 public enum PipelineReturnValue {
-	SUCCEDED,  
-	
-	FAILED, 
-	
-	INTERRUPTED, 
-	
-	RUNNING, 
-	
-	PAUSED, 
-	
-	CANCELLED, 
-	
+	/**
+	 * {@link IPipeline} completed successfully.
+	 */
+	SUCCEDED,
+
+	/**
+	 * One of the {@link IPipeline} steps has failed.
+	 */
+	FAILED,
+
+	/**
+	 * {@link IPipeline} was interrupted.
+	 */
+	INTERRUPTED,
+
+	/**
+	 * {@link IPipeline} is currently running.
+	 */
+	RUNNING,
+
+	/**
+	 * {@link IPipeline} has been paused.
+	 */
+	PAUSED,
+
+	/**
+	 * {@link IPipeline} was canceled.
+	 */
+	CANCELLED,
+
+	/**
+	 * {@link IPipeline} has been stopped and all steps have finalized. The
+	 * {@link IPipeline} must be reinitialized after being destroyed.
+	 */
 	DESTROYED
 }

@@ -20,18 +20,15 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.io.InputStream;
-import java.net.URI;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.FileResource;
 
-public class FileResourceInitialPipelineStepAdaptor extends BasePipelineStep implements IInitialStep {
+public class FileResourcePipelineStepAdaptor extends BasePipelineStep {	
 	private FileResource fileResource;
-	private boolean eventSent = false;
+	private boolean eventSent;
 
-	public FileResourceInitialPipelineStepAdaptor(FileResource fileResource) {
+	public FileResourcePipelineStepAdaptor(FileResource fileResource) {
 		this.fileResource = fileResource;
 		eventSent = false;
 	}
@@ -50,34 +47,6 @@ public class FileResourceInitialPipelineStepAdaptor extends BasePipelineStep imp
 		return new Event(EventType.FILE_RESOURCE, fileResource);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
-	 */
-	public void setInput(URI input) {
-		fileResource.setInputURI(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
-	 */
-	public void setInput(InputStream input) {
-		fileResource.setInputStream(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(CharSequence)
-	 */
-	public void setInput(CharSequence input) {
-		fileResource.setInputCharSequence(input);
-	}
-
 	@Override
 	public void destroy() {
 		fileResource.close();
@@ -87,11 +56,6 @@ public class FileResourceInitialPipelineStepAdaptor extends BasePipelineStep imp
 		destroy();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#hasNext()
-	 */
 	public boolean hasNext() {
 		return !eventSent;
 	}

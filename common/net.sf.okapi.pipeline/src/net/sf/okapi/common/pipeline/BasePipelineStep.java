@@ -21,10 +21,21 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.FileResource;
 
 public abstract class BasePipelineStep implements IPipelineStep {
+	private FileResource input;
+	
+	protected FileResource getInput() {
+		return input;
+	}
+	
+	public boolean hasNext() {
+		return false;
+	}
 
 	public Event handleEvent(Event event) {
+		// short circuit switch for null case
 		if (event == null) {
 			return null;
 		}
@@ -77,35 +88,50 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	// override these if there is a need for specialized pre or post processing.
 	// These methods are called once for every pipeline execution.
-	public void preprocess() {}
+	public void preprocess() {
+	}
 
-	public void postprocess() {}
-	
-	public void cancel() {}
+	public void postprocess() {
+	}
 
-	// used to cleanup any resources, close files etc.. Only called at the end
-	// of the Pipeline life cycle.
-	public void destroy() {}
+	public void cancel() {
+	}
+
+	/**
+	 * used to cleanup any resources, close files etc.. Only called at the end
+	 * of the Pipeline life cycle.
+	 */
+	public void destroy() {
+	}
 
 	// By default we simply pass the event on to the next step. Override these
 	// methods if we need to process
 	// the event
 
-	protected void handleDocumentPart(Event event) {}
+	protected void handleDocumentPart(Event event) {
+	}
 
-	protected void handleStartDocument(Event event) {}
+	protected void handleStartDocument(Event event) {
+	}
 
-	protected void handleEndDocument(Event event) {}
+	protected void handleEndDocument(Event event) {
+	}
 
-	protected void handleStartSubDocument(Event event) {}
+	protected void handleStartSubDocument(Event event) {
+	}
 
-	protected void handleEndSubDocument(Event event) {}
+	protected void handleEndSubDocument(Event event) {
+	}
 
-	protected void handleStartGroup(Event event) {}
+	protected void handleStartGroup(Event event) {
+	}
 
-	protected void handleEndGroup(Event event) {}
+	protected void handleEndGroup(Event event) {
+	}
 
-	protected void handleTextUnit(Event event) {}
+	protected void handleTextUnit(Event event) {
+	}
 
-	protected void handleFileResource(Event event) {}
+	protected void handleFileResource(Event event) {
+	}
 }

@@ -28,40 +28,9 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.FileResource;
 
-public class FilterPipelineStepAdaptor extends BasePipelineStep implements
-		IInitialStep {
+public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	private IFilter filter;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
-	 */
-	public void setInput(URI input) {
-		filter.open(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
-	 */
-	public void setInput(InputStream input) {
-		filter.open(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence
-	 * )
-	 */
-	public void setInput(CharSequence input) {
-		filter.open(input);
-	}
-
+	
 	public FilterPipelineStepAdaptor(IFilter filter) {
 		this.filter = filter;
 	}
@@ -73,12 +42,12 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements
 	public String getName() {
 		return filter.getName();
 	}
-
+	
 	@Override
 	public Event handleEvent(Event event) {		
 		if (event != null && event.getEventType() == EventType.FILE_RESOURCE) {
 			FileResource fileResource = (FileResource)event.getResource();
-			filter.setOptions(fileResource.getLocale(), fileResource.getEncoding(), true);			
+			filter.setOptions(fileResource.getLanguage(), fileResource.getEncoding(), true);			
 			if (fileResource.getInputCharSequence() != null) {
 				setInput(fileResource.getInputCharSequence());
 			} else if (fileResource.getInputURI() != null) {				
@@ -100,5 +69,17 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep implements
 
 	public void cancel() {
 		filter.cancel();
+	}
+	
+	private void setInput(URI input) {
+		filter.open(input);
+	}
+
+	private void setInput(InputStream input) {
+		filter.open(input);
+	}
+
+	private void setInput(CharSequence input) {
+		filter.open(input);
 	}
 }

@@ -21,9 +21,11 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.FileResource;
 
 public interface IPipelineStep {
-
+	
 	/**
 	 * Get the UI displayable name of this step.
 	 */
@@ -45,7 +47,15 @@ public interface IPipelineStep {
 	 * Process each event sent though the pipeline.
 	 */
 	Event handleEvent(Event event);
-
+	
+	/**
+	 * Steps that can generate {@link Event}s such as {@link IFilter}s return true until no more events can be created. 
+	 * Steps which do not create {@link Event} always return false.
+	 * 
+	 * @return true if can generate more events, false otherwise.
+	 */
+	boolean hasNext();
+	
 	/**
 	 * Cancel current pipeline processing.
 	 */

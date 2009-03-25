@@ -46,5 +46,9 @@ public class FilterWriterPipelineStepAdaptor extends BasePipelineStep {
 	@Override
 	public void destroy() {
 		filterWriter.close();
+	}
+
+	public boolean hasNext() {		
+		return false;
 	}	
 }
