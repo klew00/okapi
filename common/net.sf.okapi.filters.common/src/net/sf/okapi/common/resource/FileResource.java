@@ -33,6 +33,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.OkapiNotImplementedException;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
@@ -45,41 +46,51 @@ public class FileResource implements IResource {
 	private Annotations annotations;
 	private String id;
 	private String encoding;
-	private String locale;
+	private String language;
 	private BOMNewlineEncodingDetector.NewlineType originalNewlineType;
 	private InputStream inputStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
-	private String mimeType;
 	private Reader reader;
+	
+	/* TODO: 
+	 * 
+	 * Some possible fields for FileResource
+	 
+	- its path/uri
+    - what filter-options file to use (if any)
+    - its default encoding (in case it cannot be detected)
+    - the source language
+    - possibly the main target language to work with (for multi-lingual documents)
+    - possibly the name of the output file to generate at the end of the pipeline
+    - possibly the encoding to use for the output
+    */
 
-	public FileResource(URI inputURI, String encoding, String mimeType, String locale) {
+	public FileResource(URI inputURI, String encoding, String language) {
 		this.annotations = new Annotations();
-		reset(inputURI, encoding, mimeType, locale);
+		reset(inputURI, encoding, language);
 	}
 
-	public FileResource(InputStream inputStream, String encoding, String mimeType, String locale) {
+	public FileResource(InputStream inputStream, String encoding, String language) {
 		this.annotations = new Annotations();
-		reset(inputStream, encoding, mimeType, locale);
+		reset(inputStream, encoding, language);
 	}
 
-	public FileResource(CharSequence inputCharSequence, String mimeType, String locale) {
+	public FileResource(CharSequence inputCharSequence, String language) {
 		this.annotations = new Annotations();
-		reset(inputCharSequence, mimeType, locale);
+		reset(inputCharSequence, language);
 	}
 	
-	public void reset(CharSequence inputCharSequence, String mimeType, String locale) {
+	public void reset(CharSequence inputCharSequence, String language) {
 		setInputCharSequence(inputCharSequence);
 		setEncoding("UTF-16BE");
-		setMimeType(mimeType);
-		setLocale(locale);
+		setLanguage(language);
 		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewlineType(getInputCharSequence()));		
 	}
 	
-	public void reset(URI inputURI, String encoding, String mimeType, String locale) {
+	public void reset(URI inputURI, String encoding, String language) {
 		setInputURI(inputURI);
-		setMimeType(mimeType);
-		setLocale(locale);
+		setLanguage(language);
 		try {
 			InputStream inputStream = inputURI.toURL().openStream();
 			setInputStream(inputStream);
@@ -91,10 +102,9 @@ public class FileResource implements IResource {
 		}				
 	}
 	
-	public void reset(InputStream inputStream, String encoding, String mimeType, String locale) {
+	public void reset(InputStream inputStream, String encoding, String language) {
 		setEncoding(encoding);		
-		setMimeType(mimeType);
-		setLocale(locale);
+		setLanguage(language);
 		setInputStream(inputStream);
 		try {
 			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewlineType());
@@ -132,7 +142,7 @@ public class FileResource implements IResource {
 	 * @see net.sf.okapi.common.resource.IResource#getSkeleton()
 	 */
 	public ISkeleton getSkeleton() {
-		return null;
+		throw new OkapiNotImplementedException();
 	}
 
 	/*
@@ -208,26 +218,12 @@ public class FileResource implements IResource {
 		this.encoding = encoding;
 	}
 	
-	public String getLocale() {
-		return locale;
+	public String getLanguage() {
+		return language;
 	}
 
-	public void setLocale(String locale) {
-		this.locale = locale;
-	}
-
-	/**
-	 * @param mimeType the mimeType to set
-	 */
-	public void setMimeType(String mimeType) {
-		this.mimeType = mimeType;
-	}
-
-	/**
-	 * @return the mimeType
-	 */
-	public String getMimeType() {
-		return mimeType;
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	/**
