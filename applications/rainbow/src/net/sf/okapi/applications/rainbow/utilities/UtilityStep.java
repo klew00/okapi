@@ -58,4 +58,9 @@ public class UtilityStep implements IPipelineStep {
 	public void destroy () {
 		utility.destroy(); 
 	}
+
+	public boolean hasNext () {
+		return false;
+	}
+
 }

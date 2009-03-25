@@ -171,4 +171,8 @@ public abstract class BaseUtility implements IUtility {
 		// Do nothing by default
 	}
 
+	public boolean hasNext () {
+		return false;
+	}
+
 }

@@ -347,4 +347,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		logger.info("Not aligned: "+tu.getName());
 	}
 	
+	public boolean hasNext () {
+		return false;
+	}
+
 }

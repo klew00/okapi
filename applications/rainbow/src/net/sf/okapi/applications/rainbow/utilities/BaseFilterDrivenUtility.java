@@ -42,7 +42,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// If there is no associated filter: send the file as a FILE_RESOURCE
 			if (( getInputFilterSettings(0) == null ) || ( getInputFilterSettings(0).length() == 0 ) ) {
 				FileResource fr = new FileResource(new File(getInputPath(0)).toURI(),
-					getInputEncoding(0), null, srcLang);
+					getInputEncoding(0), srcLang);
 				handleEvent(new Event(EventType.FILE_RESOURCE, fr));
 				return;
 			}

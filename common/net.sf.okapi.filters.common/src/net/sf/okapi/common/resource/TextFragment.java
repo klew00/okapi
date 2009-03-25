@@ -561,8 +561,6 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Trims white-spaces from the beginning and the end of this fragment.
-	 * @return The trimmed fragment.
-	 * @see String
 	 */
 	public void trim () {
 		text = new StringBuilder(text.toString().trim());
