@@ -8,8 +8,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { HtmlEventTest.class, HtmlSnippetsTest.class, HtmlFullFileTest.class, HtmlConfigurationTest.class,
-		HtmlFilterRoundtripTest.class, HtmlDetectBomTest.class })
+@SuiteClasses( { HtmlEventTest.class, HtmlSnippetsTest.class, HtmlFullFileTest.class, HtmlConfigurationTest.class, HtmlDetectBomTest.class })
 public class AllHtmlTests {
 
 	public static Test suite() {
