@@ -92,7 +92,7 @@ public class StartDocument extends BaseNameable {
 	 * @param value True to set this document as multilingual, false to set it
 	 * as monolingual.
 	 */
-	public void setIsMultilingual (boolean value) {
+	public void setMultilingual (boolean value) {
 		isMultilingual = value;
 	}
 	

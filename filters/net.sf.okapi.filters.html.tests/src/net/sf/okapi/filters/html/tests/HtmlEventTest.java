@@ -473,7 +473,7 @@ public class HtmlEventTest {
 		
 		TextFragment tf = tu3.getSourceContent();
 		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
-		c.setHasReference(true);
+		c.setReferenceFlag(true);
 		tf.append(c);
 		
 		tf.append("and text after the list.");

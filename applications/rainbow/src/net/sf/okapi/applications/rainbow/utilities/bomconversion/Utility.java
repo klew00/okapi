@@ -236,7 +236,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	 * @param buffer The buffer to check.
 	 * @param length The number of usable bytes in the buffer.
 	 * @return 0=no detection, 1=UTF-16BE, 2=UTF-16LE
-	 */
+	 *
 	private int guessByteOrder (byte[] buffer,
 		int length)
 	{
@@ -257,5 +257,5 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		}
 		return 0;
 	}
-	
+	*/
 }

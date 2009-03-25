@@ -664,7 +664,7 @@ public abstract class BaseFilter implements IFilter {
 			} else {
 				// all text - the parent TU hold the references instead of a DocumentPart
 				currentCode.append(currentSkeleton.toString());
-				currentCode.setHasReference(true);
+				currentCode.setReferenceFlag(true);
 			}
 		}
 
@@ -957,7 +957,7 @@ public abstract class BaseFilter implements IFilter {
 			// add this group as a code of the complex TextUnit
 			g.setIsReferent(true);
 			Code c = new Code(TagType.PLACEHOLDER, startMarker.toString(), TextFragment.makeRefMarker(gid));
-			c.setHasReference(true);
+			c.setReferenceFlag(true);
 			startCode(c);
 			endCode();
 			referencableFilterEvents.add(fe);

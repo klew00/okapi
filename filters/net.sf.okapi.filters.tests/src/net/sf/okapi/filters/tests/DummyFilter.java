@@ -125,7 +125,7 @@ public class DummyFilter implements IFilter {
 
 		StartDocument sd = new StartDocument("sd1");
 		sd.setLanguage(srcLang);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setMimeType("text/xml");
 		GenericSkeleton skel = new GenericSkeleton("<doc>\n");
 		sd.setSkeleton(skel);

@@ -398,7 +398,7 @@ public class ODFFilter implements IFilter {
 				// Add the reference to the current context
 				if ( context.peek().extract ) {
 					Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
-					code.setHasReference(true);
+					code.setReferenceFlag(true);
 				}
 				else { // Or in the skeleton
 					skel.addReference(tu);
@@ -439,7 +439,7 @@ public class ODFFilter implements IFilter {
 			// Add the reference to the current context
 			if ( context.peek().extract ) {
 				Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
-				code.setHasReference(true);
+				code.setReferenceFlag(true);
 			}
 			else { // Or in the skeleton
 				skel.addReference(tu);

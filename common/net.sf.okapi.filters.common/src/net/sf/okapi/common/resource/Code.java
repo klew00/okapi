@@ -39,7 +39,7 @@ public class Code {
 	public static final String TYPE_LINK = "link";
 	public static final String TYPE_IMAGE = "image";
 	public static final String TYPE_COMMENT = "comment";
-	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing instruction";
+	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing-instruction";
 	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
@@ -205,7 +205,7 @@ public class Code {
 	 */
 	public void appendReference (String id) {
 		this.data += TextFragment.makeRefMarker(id);
-		setHasReference(true);
+		setReferenceFlag(true);
 	}
 	
 	/**
@@ -217,7 +217,7 @@ public class Code {
 		String propertyName)
 	{
 		this.data += TextFragment.makeRefMarker(id, propertyName);
-		setHasReference(true);
+		setReferenceFlag(true);
 	}
 	
 	/**
@@ -353,17 +353,17 @@ public class Code {
 	 * unit contained within the code. For example: the text of the ALT attribute in the
 	 * HTML IMG element: If the IMG tag is a code, the value of ALT is one of its
 	 * sub-flows.
-	 * @return True if the code has one sub-flow.
+	 * @return True if the code has at least one sub-flow.
 	 */
 	public boolean hasReference () {
 		return ((flag & HASREF) == HASREF);
 	}
 	
 	/**
-	 * Sets the sub-flow indicator. 
+	 * Sets the flag that indicates if this code has a reference (sub-flow) or not. 
 	 * @param value The new value to apply.
 	 */
-	public void setHasReference (boolean value) {
+	public void setReferenceFlag (boolean value) {
 		if ( value ) flag |= HASREF;
 		else flag &= ~HASREF;
 	}
@@ -402,7 +402,7 @@ public class Code {
 	 * Sets the flag of this in-line code to indicate if it can be duplicated or not.
 	 * @param value True to allow duplication, false to forbid it.
 	 */
-	public void setIsCloneable (boolean value) {
+	public void setCloneable (boolean value) {
 		if ( value ) flag |= CLONEABLE;
 		else flag &= ~CLONEABLE;
 	}
@@ -420,7 +420,7 @@ public class Code {
 	 * Sets the flag of this in-line code to indicate if it can be removed or not.
 	 * @param value True to allow deletion, false to forbid it.
 	 */
-	public void setIsDeleteable (boolean value) {
+	public void setDeleteable (boolean value) {
 		if ( value ) flag |= DELETEABLE;
 		else flag &= ~DELETEABLE;
 	}

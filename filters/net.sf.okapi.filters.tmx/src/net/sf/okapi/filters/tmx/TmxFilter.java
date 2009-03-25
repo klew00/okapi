@@ -245,7 +245,7 @@ public class TmxFilter implements IFilter {
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/x-tmx");
 			startDoc.setMimeType("text/x-tmx");
-			startDoc.setIsMultilingual(true);
+			startDoc.setMultilingual(true);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));			
 			
 			// The XML declaration is not reported by the parser, so we need to

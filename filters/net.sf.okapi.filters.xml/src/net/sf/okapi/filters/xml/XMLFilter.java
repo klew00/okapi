@@ -462,7 +462,7 @@ public class XMLFilter implements IFilter {
 		tmp.append(">");
 		// Set the inline code
 		Code code = frag.append(TagType.OPENING, node.getLocalName(), tmp.toString());
-		code.setHasReference(id!=null); // Set reference flag if we created TU(s)
+		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
 	}
 
 	private String addAttributeTextUnit (Attr attr,

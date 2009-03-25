@@ -346,7 +346,7 @@ public class RTFFilter implements IFilter {
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
-			startDoc.setIsMultilingual(true);
+			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(Util.LINEBREAK_DOS);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}

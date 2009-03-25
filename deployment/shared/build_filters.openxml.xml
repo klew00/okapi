@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<project name="filters.openxml" default="filters.openxml"> 
+
+	<property name="proj_filters.openxml" value="../../filters/net.sf.okapi.filters.openxml"/> 
+	<property name="src_filters.openxml" value="${proj_filters.openxml}/src"/> 
+	<property name="lib_filters.openxml" value="${proj_filters.openxml}/lib"/> 
+ 
+	<path id="mainClassPath_filters.openxml">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/dom4j-1.6.1.jar"/>
+		<pathelement location="${distlib}/log4j-1.2.15.jar"/>
+		<pathelement location="${distlib}/openxml4j-bin-beta.jar"/>
+	</path>
+
+	<target name="filters.openxml"> 
+		<copy todir="${distlib}">
+			<fileset dir="${lib_filters.openxml}"/>
+		</copy>
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.openxml}" destdir="${tmp}" classpathref="mainClassPath_filters.openxml"/>
+ 		
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.openxml}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/openxml">
+			<fileset dir="../../help/filters/ui/openxml" />
+		</copy>
+	</target>
+
+</project>

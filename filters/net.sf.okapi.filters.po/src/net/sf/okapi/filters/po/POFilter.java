@@ -261,7 +261,7 @@ public class POFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType("text/x-po");
 		startDoc.setMimeType("text/x-po");
-		startDoc.setIsMultilingual(params.bilingualMode);
+		startDoc.setMultilingual(params.bilingualMode);
 		return new Event(EventType.START_DOCUMENT, startDoc);
 	}
 	

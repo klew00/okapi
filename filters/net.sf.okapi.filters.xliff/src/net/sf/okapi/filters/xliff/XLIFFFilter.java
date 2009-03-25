@@ -194,7 +194,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/x-xliff");
 			startDoc.setMimeType("text/x-xliff");
-			startDoc.setIsMultilingual(true);
+			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(lineBreak);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 

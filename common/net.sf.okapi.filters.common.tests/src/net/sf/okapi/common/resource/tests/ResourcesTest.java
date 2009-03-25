@@ -44,7 +44,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("en");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
@@ -78,7 +78,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("en");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
@@ -114,7 +114,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("en");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
@@ -156,7 +156,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("en");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
@@ -198,7 +198,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("en");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
@@ -224,7 +224,7 @@ public class ResourcesTest extends TestCase {
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
-		sd.setIsMultilingual(true);
+		sd.setMultilingual(true);
 		sd.setLanguage("EN");
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));

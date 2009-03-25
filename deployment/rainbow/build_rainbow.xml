@@ -68,6 +68,7 @@
 		<ant antfile="../shared/build_filters.xliff.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.idml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.openoffice.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.openxml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.rtf.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>

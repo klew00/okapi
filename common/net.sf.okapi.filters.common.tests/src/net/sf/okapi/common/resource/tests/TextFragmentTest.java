@@ -154,7 +154,7 @@ public class TextFragmentTest extends TestCase {
 		//TODO: assertEquals(display.setContent(tf1).toString(false), "<1/>A<2/>B</1>C");
 		
 		Code code1 = new Code(TagType.PLACEHOLDER, "type", "data");
-		code1.setHasReference(true);
+		code1.setReferenceFlag(true);
 		code1.setId(100);
 		code1.setOuterData("outer");
 		assertEquals(code1.getType(), "type");
@@ -192,30 +192,30 @@ public class TextFragmentTest extends TestCase {
 		assertFalse(code2.isCloneable());
 		assertFalse(code2.isDeleteable());
 		
-		code1.setHasReference(true);
-		code1.setIsCloneable(true);
-		code1.setIsDeleteable(true);
+		code1.setReferenceFlag(true);
+		code1.setCloneable(true);
+		code1.setDeleteable(true);
 		assertTrue(code1.hasReference());
 		assertTrue(code1.isCloneable());
 		assertTrue(code1.isDeleteable());
 		
-		code1.setHasReference(false);
+		code1.setReferenceFlag(false);
 		assertFalse(code1.hasReference());
 		assertTrue(code1.isCloneable());
 		assertTrue(code1.isDeleteable());
 		
-		code1.setIsCloneable(false);
+		code1.setCloneable(false);
 		assertFalse(code1.hasReference());
 		assertFalse(code1.isCloneable());
 		assertTrue(code1.isDeleteable());
 
-		code1.setIsDeleteable(false);
+		code1.setDeleteable(false);
 		assertFalse(code1.hasReference());
 		assertFalse(code1.isCloneable());
 		assertFalse(code1.isDeleteable());
 
-		code1.setHasReference(true);
-		code1.setIsDeleteable(true);
+		code1.setReferenceFlag(true);
+		code1.setDeleteable(true);
 		assertTrue(code1.hasReference());
 		assertFalse(code1.isCloneable());
 		assertTrue(code1.isDeleteable());
