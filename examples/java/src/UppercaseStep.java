@@ -20,44 +20,28 @@
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class UppercaseStep implements IPipelineStep {
+public class UppercaseStep extends BasePipelineStep {
 
 	private String trgLang;
-	
-	public UppercaseStep (String targetLang) {
+
+	public UppercaseStep(String targetLang) {
 		trgLang = targetLang;
 	}
-	
-	public void cancel() {
-	}
 
-	public void destroy () {
-	}
-
-	public String getName () {
+	public String getName() {
 		return "UppercaseStep";
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case TEXT_UNIT:
-			TextUnit tu = (TextUnit)event.getResource();
-			if ( tu.isTranslatable() ) {
-				TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
-				tf.setCodedText(tf.getCodedText().toUpperCase());
-			}
+	public void handleTextUnit(Event event) {
+		TextUnit tu = (TextUnit) event.getResource();
+		if (tu.isTranslatable()) {
+			TextFragment tf = tu.createTarget(trgLang, false,
+					IResource.COPY_CONTENT);
+			tf.setCodedText(tf.getCodedText().toUpperCase());
 		}
-		return event;
 	}
-
-	public void postprocess () {
-	}
-
-	public void preprocess () {
-	}
-
 }
