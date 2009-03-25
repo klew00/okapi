@@ -9,7 +9,7 @@ import junit.framework.Test;
 
 @RunWith(Suite.class)
 @SuiteClasses( { HtmlEventTest.class, HtmlSnippetsTest.class, HtmlFullFileTest.class, HtmlConfigurationTest.class,
-		HtmlFilterRoundtripTest.class, HtmlFilterThreadedRoundtripTest.class, HtmlDetectBomTest.class })
+		HtmlFilterRoundtripTest.class, HtmlDetectBomTest.class })
 public class AllHtmlTests {
 
 	public static Test suite() {

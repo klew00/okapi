@@ -25,6 +25,7 @@ import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.resource.FileResource;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -38,45 +39,49 @@ public class HtmlFilterRoundtripTest {
 	public void setUp() {
 
 	}
-	
+
 	@Test
 	public void runPipelineFromString() {
 		IPipeline pipeline = new Pipeline();
-		
+
 		HtmlFilter htmlFilter = new HtmlFilter();
 		htmlFilter.setOptions("en", "UTF-8", true);
-		
+
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
+		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
+				genericSkeletonWriter);
 		genericFilterWriter.setOptions("es", "UTF-16LE");
 		genericFilterWriter.setOutput("genericOutput.txt");
 
-		
 		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-					
-		pipeline.process("<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>");		
-		pipeline.destroy();
+		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
+				genericFilterWriter));
+
+		FileResource fr = new FileResource(
+				"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
+				"en");
+		pipeline.process(fr);
 	}
-	
+
 	@Test
 	public void runPipelineFromStream() {
 		IPipeline pipeline = new Pipeline();
-		
+
 		HtmlFilter htmlFilter = new HtmlFilter();
 		htmlFilter.setOptions("en", "UTF-8", true);
-		
+
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
+		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
+				genericSkeletonWriter);
 		genericFilterWriter.setOptions("es", "UTF-8");
 		genericFilterWriter.setOutput("genericOutput.txt");
 
-		
 		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
-		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")			
-		pipeline.process("\r\nX\rY\n");		
-		pipeline.destroy();
+		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
+				genericFilterWriter));
+		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")
+		FileResource fr = new FileResource("\r\nX\rY\n", "en");
+		pipeline.process(fr);
 	}
 
 	@After
