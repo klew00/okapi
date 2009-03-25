@@ -22,7 +22,6 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.FileResource;
 
 public interface IPipelineStep {
 	
