@@ -8,7 +8,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { FilebasedPipelineTest.class, SimplePipelineTest.class, SimplePipelineWithCancelTest.class, XsltPipelineTest.class})
+@SuiteClasses( { FilterRoundtripTest.class, FilebasedPipelineTest.class, SimplePipelineTest.class, SimplePipelineWithCancelTest.class, XsltPipelineTest.class})
 public class AllPipelineTests {
 
 	public static Test suite() {
