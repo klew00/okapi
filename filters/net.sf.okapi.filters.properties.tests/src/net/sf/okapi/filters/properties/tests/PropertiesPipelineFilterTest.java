@@ -7,6 +7,7 @@ import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.resource.FileResource;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 
@@ -35,7 +36,8 @@ public class PropertiesPipelineFilterTest {
 		pipeline.addStep(new FilterPipelineStepAdaptor(propertiesFilter));
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter));
 		
-		pipeline.process(new URI(basePath+"/data/Test02.properties"));
+		FileResource fr = new FileResource(new URI(basePath+"/data/Test02.properties"), "windows-1252", "en");
+		pipeline.process(fr);
 		pipeline.destroy();
 		
 		//--Second--
@@ -52,7 +54,7 @@ public class PropertiesPipelineFilterTest {
 		pipeline2.addStep(new FilterPipelineStepAdaptor(propertiesFilter2));
 		pipeline2.addStep(new FilterWriterPipelineStepAdaptor(genericFilterWriter2));
 		
-		pipeline2.process(new URI(basePath+"/data/Test01_first_trip.properties"));
-		pipeline2.destroy();
+		fr = new FileResource(new URI(basePath+"/data/Test01.properties"), "windows-1252", "en");
+		pipeline.process(fr);
 	}
 }
