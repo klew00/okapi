@@ -34,7 +34,7 @@ from UppercaseStep import UppercaseStep
 from PseudoTranslateStep import PseudoTranslateStep
 
 
-def pipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, outputPath):
+def runPipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, outputPath):
     # Create the pipeline
     pipeline = Pipeline()
         
@@ -45,8 +45,8 @@ def pipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, out
     pipeline.addStep(inputStep)
     
     # add processing steps
-    pipeline.addStep(PseudoTranslateStep(trgLang))
-    #pipeline.addStep(UppercaseStep(trgLang))
+    #pipeline.addStep(PseudoTranslateStep(trgLang))
+    pipeline.addStep(UppercaseStep(trgLang))
     
     # Create the writer we will use
     writer = filter.createFilterWriter()
@@ -63,28 +63,31 @@ def pipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, out
     # Sets the writer options and output
     writer.setOptions(trgLang, outputEncoding)
     writer.setOutput(outputPath)
-    
+       
     # Launch the execution
     pipeline.process(FileResource(input, 'UTF-8', 'en'))
     
     # destroy the pipeline and finalize all steps
     pipeline.destroy();
 
-if __name__ == '__main__':        
-   
+if __name__ == '__main__':          
+    # example using Java properties filter
+    input = File("../myFile.properties").toURI()
+    print input
+    runPipeline(input, PropertiesFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.properties')
+    
     # example using HTML filter
     input = File("../myFile.html").toURI()
-    pipeline(input, HtmlFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.html')
+    print input
+    runPipeline(input, HtmlFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.html')
     
     # example using XML filter
     input = File("../myFile.xml").toURI()
-    pipeline(input, XMLFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.xml')
+    print input
+    runPipeline(input, XMLFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.xml')
            
     # example using OpenOffice filter
     input = File("../myFile.odt").toURI()
-    pipeline(input, OpenOfficeFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.odt')
-    
-    # example using Java properties filter
-    input = File("../myFile.properties").toURI()
-    pipeline(input, PropertiesFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.properties')
+    print input
+    runPipeline(input, OpenOfficeFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.odt')
     
