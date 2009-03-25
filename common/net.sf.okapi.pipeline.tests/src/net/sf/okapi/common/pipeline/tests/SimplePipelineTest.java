@@ -22,12 +22,12 @@ package net.sf.okapi.common.pipeline.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
+import net.sf.okapi.common.resource.FileResource;
 
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class SimplePipelineTest {
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());
 
-		pipeline.process(new URI("DUMMY"));		
+		pipeline.process(new FileResource("DUMMY", "en"));		
 		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());
 		pipeline.destroy();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());

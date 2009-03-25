@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.pipeline.tests;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +27,7 @@ import java.util.concurrent.Executors;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
+import net.sf.okapi.common.resource.FileResource;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -43,18 +43,14 @@ public class SimplePipelineWithCancelTest {
 				pipeline.addStep(new Producer());
 				pipeline.addStep(new ConsumerProducer());
 				pipeline.addStep(new Consumer());				
-				try {
-					pipeline.process(new URI("DUMMY"));
-				} catch (URISyntaxException e) {
-					throw new RuntimeException(e);
-				}				
-				pipeline.destroy();
+				
+				pipeline.process(new FileResource("DUMMY", "en"));
 			}
 		};
 
 		ExecutorService e = Executors.newSingleThreadExecutor();
 		e.execute(runnable);
-		Thread.sleep(2000);
+		Thread.sleep(500);
 		pipeline.cancel();
 		assertEquals(PipelineReturnValue.CANCELLED, pipeline.getState());
 		pipeline.destroy();

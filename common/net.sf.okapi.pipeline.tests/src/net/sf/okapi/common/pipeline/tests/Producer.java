@@ -19,15 +19,11 @@
 /*===========================================================================*/
 package net.sf.okapi.common.pipeline.tests;
 
-import java.io.InputStream;
-import java.net.URI;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipeline.IInitialStep;
 
-public class Producer extends BasePipelineStep implements IInitialStep {	
+public class Producer extends BasePipelineStep {	
 	private int eventCount = -1;
 
 	public String getName() {
@@ -45,9 +41,7 @@ public class Producer extends BasePipelineStep implements IInitialStep {
 	}
 
 	@Override
-	public Event handleEvent(Event event) {	
-		super.handleEvent(event);
-				
+	public Event handleEvent(Event event) {			
 		event = new Event(EventType.TEXT_UNIT, null);		
 		return event;
 	}
@@ -58,23 +52,5 @@ public class Producer extends BasePipelineStep implements IInitialStep {
 			return false;
 		}
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.net.URI)
-	 */
-	public void setInput(URI input) {		
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.io.InputStream)
-	 */
-	public void setInput(InputStream input) {		
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.pipeline.IInitialStep#setInput(java.lang.CharSequence)
-	 */
-	public void setInput(CharSequence input) {		
 	}
 }

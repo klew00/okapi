@@ -42,9 +42,10 @@ public class ConsumerProducer extends BasePipelineStep {
 	protected void handleTextUnit(Event event) {
 		try {
 			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (InterruptedException e) {}
+	}
+
+	public boolean hasNext() {
+		return false;
 	}
 }

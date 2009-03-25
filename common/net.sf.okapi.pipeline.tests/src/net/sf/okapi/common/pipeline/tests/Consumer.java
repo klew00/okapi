@@ -47,20 +47,9 @@ public class Consumer extends BasePipelineStep {
 	@Override
 	protected void handleFileResource(Event event) {
 		System.out.println("EventType: " + event.getEventType().name());
-	/*	Reader r = ((FileResource)event.getResource()).getReader();	
-		StringWriter out = new StringWriter();
-		try {
-			while(true) {
-				char c = (char)r.read();
-				if (c == -1) {
-					break;
-				}
-				out.append(c);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		
-		System.out.println("Resource is: " + out.toString());		*/
+	}
+
+	public boolean hasNext() {
+		return false;
 	}
 }

@@ -14,14 +14,15 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.FileResource;
 
 public class XsltTransformStep extends BasePipelineStep {
 	private InputStream xstlInputstream;
+	private boolean done;
 	
 	public XsltTransformStep(InputStream xstlInputstream) {
+		done = false;
 		this.xstlInputstream = xstlInputstream;
 	}
 
@@ -57,6 +58,13 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayInputStream transformedInput = new ByteArrayInputStream(tempStream.toByteArray());
 			
 		// overwrite our event to the new transformed content	
-		event.setResource(new FileResource(transformedInput, "UTF-8", "text/xml", "en"));
+		event.setResource(new FileResource(transformedInput, "UTF-8", "en"));
+		
+		// this step is done generating events
+		done = true;
+	}
+
+	public boolean hasNext() {
+		return !done;
 	}
 }

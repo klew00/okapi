@@ -8,13 +8,13 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.FileResourceInitialPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.xml.XMLFilter;
 
 import static org.junit.Assert.*;
@@ -33,30 +33,25 @@ public class XsltPipelineTest {
 	}
 
 	@Test
-	public void runXsltPipeline() throws URISyntaxException, UnsupportedEncodingException {
+	public void runXsltPipeline() throws URISyntaxException,
+			UnsupportedEncodingException {
 		IPipeline pipeline = new Pipeline();
 
 		// input resource
 		URL inputXml = XsltPipelineTest.class.getResource("test.xml");
-		pipeline.addStep(new FileResourceInitialPipelineStepAdaptor(
-				new FileResource(inputXml.toURI(), "UTF-8", "text/xml", "en")));
 
-		// make perfect copy of input
-		InputStream identityXslt = XsltPipelineTest.class
-				.getResourceAsStream("identity.xsl");
-		pipeline.addStep(new XsltTransformStep(identityXslt));
+		// make copy of input
+		InputStream in = XsltPipelineTest.class.getResourceAsStream("identity.xsl");
+		pipeline.addStep(new XsltTransformStep(in));
 
 		// remove b tags from input
-		InputStream replaceXslt = XsltPipelineTest.class
-				.getResourceAsStream("remove_b_tags.xsl");
-		pipeline.addStep(new XsltTransformStep(replaceXslt));
+		in = XsltPipelineTest.class.getResourceAsStream("remove_b_tags.xsl");
+		pipeline.addStep(new XsltTransformStep(in));
 
 		// filtering step - converts resource to events
 		IFilter filter = new XMLFilter();
 		filter.setOptions("en", "UTF-8", true);
-
 		IPipelineStep filterStep = new FilterPipelineStepAdaptor(filter);
-
 		pipeline.addStep(filterStep);
 
 		// writer step - converts events to a resource
@@ -67,12 +62,12 @@ public class XsltPipelineTest {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		writer.setOutput(outStream);
 
-		pipeline.process();
-
-		pipeline.destroy();
+		pipeline.process(new FileResource(inputXml.toURI(), "UTF-8", "en"));
 
 		assertEquals(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with bolded text.</para></start>",
-				new String(outStream.toByteArray(), "UTF-16LE"));
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>",
+				new String(outStream.toByteArray(), "UTF-8"));
+
+		pipeline.destroy();
 	}
 }
