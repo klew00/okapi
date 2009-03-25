@@ -21,15 +21,14 @@
 package net.sf.okapi.common.pipeline;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.FileResource;
 
 public class Pipeline implements IPipeline {
-	List<IPipelineStep> steps;
-	List<IPipelineStep> finishedSteps;
+	LinkedList<IPipelineStep> steps;
+	LinkedList<IPipelineStep> finishedSteps;
 	volatile boolean cancel = false;
 	private boolean done = false;
 	private boolean destroyed = false;
@@ -37,11 +36,16 @@ public class Pipeline implements IPipeline {
 
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
-		finishedSteps = new LinkedList<IPipelineStep>();
-		initialize();
+		finishedSteps = new LinkedList<IPipelineStep>();		
 	}
 
 	private void initialize() {
+		// copy all the finished steps from previous run
+		for (IPipelineStep step : finishedSteps) {
+			steps.add(step);
+		}
+		finishedSteps.clear();
+
 		cancel = false;
 		done = false;
 		destroyed = false;
@@ -59,30 +63,32 @@ public class Pipeline implements IPipeline {
 		cancel = true;
 	}
 
-	private void execute(FileResource input) {
-		initialize();
-
+	private void execute(FileResource input) {		
 		// first event is always the FileResource event we use it to prime the
 		// pipeline
 		event = new Event(EventType.FILE_RESOURCE, input);
 
 		// loop through the events until we run out
 		while (!steps.isEmpty() && !cancel) {
-			while (steps.get(0).hasNext() && !cancel) {				
+			while (steps.getFirst().hasNext() && !cancel) {
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
 				}
 			}
 			// as each step exhausts its events remove it from the list and move
 			// on to the next
-			finishedSteps.add(steps.remove(0));
+			finishedSteps.add(steps.remove());
 		}
+
+		// copy any remaining steps into finishedSteps - makes initialization
+		// process easier down the road if we reuse the pipeline
+		for (IPipelineStep step : steps) {
+			finishedSteps.add(step);
+		}
+		steps.clear();
 
 		if (cancel) {
 			for (IPipelineStep step : finishedSteps) {
-				step.cancel();
-			}
-			for (IPipelineStep step : steps) {
 				step.cancel();
 			}
 		}
@@ -105,12 +111,14 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
 	 */
 	public FileResource process(FileResource input) {
+		initialize();
 		preprocess();
 		execute(input);
 		postprocess();
 		done = true;
 
-		return null; // TODO: How to get pipeline to always return a FileResource?
+		return null; // TODO: How to get pipeline to always return a
+		// FileResource?
 	}
 
 	/*
@@ -122,9 +130,6 @@ public class Pipeline implements IPipeline {
 		for (IPipelineStep step : finishedSteps) {
 			step.postprocess();
 		}
-		for (IPipelineStep step : steps) {
-			step.postprocess();
-		}
 	}
 
 	/*
@@ -133,9 +138,8 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#preprocess()
 	 */
 	private void preprocess() {
-		for (IPipelineStep step : finishedSteps) {
-			step.preprocess();
-		}
+		// finishedSteps is empty - we preprocess on the steps waiting to be
+		// processed.
 		for (IPipelineStep step : steps) {
 			step.preprocess();
 		}
@@ -147,9 +151,6 @@ public class Pipeline implements IPipeline {
 	 */
 	public void destroy() {
 		for (IPipelineStep step : finishedSteps) {
-			step.destroy();
-		}
-		for (IPipelineStep step : steps) {
 			step.destroy();
 		}
 		destroyed = true;

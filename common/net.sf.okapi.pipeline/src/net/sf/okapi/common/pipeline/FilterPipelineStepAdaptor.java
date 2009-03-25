@@ -44,6 +44,12 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	}
 	
 	@Override
+	public void preprocess() {
+		// reset filter for next run
+		// TODO: we really need a reset method for IFilter 
+	}
+	
+	@Override
 	public Event handleEvent(Event event) {		
 		if (event != null && event.getEventType() == EventType.FILE_RESOURCE) {
 			FileResource fileResource = (FileResource)event.getResource();
