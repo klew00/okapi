@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.xsltransform;
 
@@ -119,17 +119,17 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		trans.clearParameters();
 		String value;
 		for ( String key : paramList.keySet() ) {
-			value = paramList.get(key).replace("<$SrcLang>", srcLang); //$NON-NLS-1$
-			value = value.replace("<$TrgLang>", trgLang); //$NON-NLS-1$
-			value = value.replace("<$Input1>", Util.makeURIFromPath(getInputPath(0))); //$NON-NLS-1$
-			value = value.replace("<$Output1>", Util.makeURIFromPath(getOutputPath(0))); //$NON-NLS-1$
+			value = paramList.get(key).replace("${SrcLang}", srcLang); //$NON-NLS-1$
+			value = value.replace("${TrgLang}", trgLang); //$NON-NLS-1$
+			value = value.replace("${Input1}", Util.makeURIFromPath(getInputPath(0))); //$NON-NLS-1$
+			value = value.replace("${Output1}", Util.makeURIFromPath(getOutputPath(0))); //$NON-NLS-1$
 			if ( getInputPath(1) != null ) {
-				value = value.replace("<$Input2>", Util.makeURIFromPath(getInputPath(1))); //$NON-NLS-1$
-				value = value.replace("<$Output2>", Util.makeURIFromPath(getOutputPath(1))); //$NON-NLS-1$
+				value = value.replace("${Input2}", Util.makeURIFromPath(getInputPath(1))); //$NON-NLS-1$
+				value = value.replace("${Output2}", Util.makeURIFromPath(getOutputPath(1))); //$NON-NLS-1$
 			}
 			if ( getInputPath(2) != null ) {
-				value = value.replace("<$Input3>", Util.makeURIFromPath(getInputPath(2))); //$NON-NLS-1$
-				value = value.replace("<$Output3>", Util.makeURIFromPath(getOutputPath(2))); //$NON-NLS-1$
+				value = value.replace("${Input3}", Util.makeURIFromPath(getInputPath(2))); //$NON-NLS-1$
+				value = value.replace("${Output3}", Util.makeURIFromPath(getOutputPath(2))); //$NON-NLS-1$
 			}
 			trans.setParameter(key, value);
 		}

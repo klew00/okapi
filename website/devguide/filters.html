@@ -51,40 +51,31 @@ document. Each <code>
 StartDocument</a></code> resource is expected to have at least the following 
 information:</p>
 <ul>
-	<li>
-	<p dir="ltr"><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/BaseNameable.html#getName()">
-	getName()</a></code> gives name of the full path or URI of the document when 
-	possible.</p></li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getEncoding()">
-	getEncoding()</a></code> gives the encoding that is being used to read the 
+	<a href="../javadoc/net/sf/okapi/common/resource/BaseNameable.html#getName()">
+	getName()</a></code> gives name of the full path or URI of the document, if possible.</li>
+	<li><code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getEncoding()">getEncoding()</a></code> gives the encoding that is being used to read the 
 	document. It may be different from the default encoding provided in the
 	<code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">
-	IFilter.setOptions()</a></code> method, for example when the filter can 
-	detect automatically the real encoding of the document.</li>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> 
+	method, for example when the filter can detect automatically the real 
+	encoding of the document.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#hasUTF8BOM()">
-	hasUTF8BOM()</a></code> indicates if the input document is encoded in UTF-8 
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#hasUTF8BOM()">hasUTF8BOM()</a></code> indicates if the input document is encoded in UTF-8 
 	and has a Byte-Order-Mark.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">
-	getLanguage()</a></code> gives the code of the source language of the 
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">getLanguage()</a></code> gives the code of the source language of the 
 	document (the same as the one specified with <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">
-	IFilter.setOptions()</a></code>).</li>
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code>).</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">
-	isMultilingual()</a></code> indicates if the document is multilingual (See 
-	more on <a href="#monolingual">monolingual</a> and <a href="#multilingual">
-	multilingual</a> in <a href="#languages">the Languages section</a>).</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">isMultilingual()</a></code> indicates if the document is multilingual (See 
+	more on <a href="#monolingual">monolingual</a> and <a href="#multilingual">multilingual</a> in 
+	<a href="#languages">the Languages section</a>).</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLineBreak(java.lang.String)">
-	getLineBreak()</a></code> gives the type of line-break used in the document.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLineBreak(java.lang.String)">getLineBreak()</a></code> gives the type of line-break used in the document.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getFilterParameters()">
-	getFilterParameters()</a></code> gives the parameters used for processing 
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getFilterParameters()">getFilterParameters()</a></code> gives the parameters used for processing 
 	this document, it may return <code>null</code> if the filter does not use 
 	parameters.</li>
 </ul>
@@ -109,7 +100,7 @@ START_SUBDOCUMENT</code> event. It is associated with a <code>
 <a href="../javadoc/net/sf/okapi/common/resource/Ending.html">Ending</a></code> 
 resource.</p>
 <h3>START_GROUP</h3>
-<p dir="ltr">The <code>START_GROUP</code> event may be sent by a filter to 
+<p>The <code>START_GROUP</code> event may be sent by a filter to 
 indicate the start of some logical grouping of events, for example to indicate 
 the start of a <code>&lt;table&gt;</code>, a <code>&lt;script&gt;</code>, or a <code>&lt;style&gt;</code> 
 element in an HTML document, or a dialog box in a Windows RC file.</p>
@@ -145,30 +136,26 @@ TextUnit</code></a> resource provides various information related to the
 extracted text:</p>
 <ul>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">
-	getName()</a></code> gives the original identified the resource, for example 
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">getName()</a></code> gives the original identified the resource, for example 
 	the key of entry in a Java properties file. If the text unit has no such 
 	identifier, this method should return <code>null</code>.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">
-	getId()</a></code> gives the unique extraction-ID for this text unit. This 
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">getId()</a></code> gives the unique extraction-ID for this text unit. This 
 	value is filter specific and is only meaningful for the filter. It can be 
-	sequential or not, continue or not, numbers or names, basically anything. Some filters may return the same values for <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">
-	getId()</a></code> and <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">
-	getName()</a></code>, but both object represent different things.</li>
+	sequential or not, continue or not, numbers or names, basically anything. Some filters may return the same values for 
+	<code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getId()">getId()</a></code> and 
+	<code>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getName()">getName()</a></code>, but both object represent different things.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#isTranslatable()">
-	isTranslatable()</a></code> indicates if this text unit is translatable.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#isTranslatable()">isTranslatable()</a></code> indicates if this text unit is translatable.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getMimeType()">
-	getMimeType()</a></code> gives the type of content the text unit contains.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#getMimeType()">getMimeType()</a></code> gives the type of content the text unit contains.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#preserveWhitespaces()">
-	preserveWhitespaces()</a></code> indicates if the white spaces inside the 
+	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#preserveWhitespaces()">preserveWhitespaces()</a></code> indicates if the white spaces inside the 
 	content of the text unit must be preserved (for example, as the content of a 
 	HTML <code>&lt;pre&gt;</code> element).</li>
+	<li>TESTvvvvvvvv</li>
 </ul>
 
 <h2><a name="languages"></a>Languages</h2>
@@ -210,7 +197,7 @@ actual input document may contain only the source language content, but any
 target data will be placed along with the source data rather than over it. In such documents the 
 source data is not overwritten by the target data. Examples of multilingual documents are PO files 
 and XLIFF files.</p>
-<p dir="ltr">Before starting to send events:</p>
+<p>Before starting to send events:</p>
 <ul>
 	<li>The caller of the filter must set the source and the target languages with the <code>
 	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> method.</li>
@@ -248,13 +235,13 @@ methods.</p>
 <p>If the input of the filter is a <code>CharSequence</code> (<code>as in
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#open(java.lang.CharSequence)">
 IFilter.open()</a></code>), the input encoding should be UTF-16.</p>
-<p dir="ltr">If the input encoding is UTF-8. The filter must handle the possible 
+<p>If the input encoding is UTF-8. The filter must handle the possible 
 presence of a Byte-Order-Mark, and if it exists, not include it in the content 
 of the document.</p>
-<p dir="ltr">When sending the <code>START_DOCUMENT</code> event:</p>
-<ul dir="ltr">
-	<li dir="ltr">
-	<p dir="ltr">The filter must 
+<p>When sending the <code>START_DOCUMENT</code> event:</p>
+<ul>
+	<li>
+	<p>The filter must 
 set the encoding used for the input in the <code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
 	resource. 
@@ -311,19 +298,19 @@ specific to each filter and indicate various specialized processing options.</p>
 upon creation. The <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">IFilter.getParameters()</a></code> method may be called at 
 any time after the object has been created.</p>
-<p dir="ltr">The filter parameters must be accessible as object that implements 
+<p>The filter parameters must be accessible as object that implements 
 the interface <code><a href="../javadoc/net/sf/okapi/common/IParameters.html">IParameters</a></code>. The methods <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">IFilter.getParameters()</a></code>  
 and <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setParameters(net.sf.okapi.common.IParameters)">IFilter.setParameters()</a></code> methods allow you to set and get the 
 parameters of each filter.</p>
-<p dir="ltr">Some filter may have a way to edit the parameters in a dialog box, 
+<p>Some filter may have a way to edit the parameters in a dialog box, 
 through the <code>
 <a href="../javadoc/net/sf/okapi/common/IParametersEditor.html">IParametersEditor</a></code> interface. If such editor does not 
 exists for a given filter, the file where the parameters are stored must be 
 accessible through a simply text file editor. That is why the format for storing 
 filter parameters must be some kind of text-based format (e.g. properties file).</p>
-<p dir="ltr">The code below shows how to use the filter parameters:</p>
+<p>The code below shows how to use the filter parameters:</p>
 <pre>// Create the filter we will use
 IFilter filter = new PropertiesFilter();
 // Get the default parameters

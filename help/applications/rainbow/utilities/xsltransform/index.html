@@ -40,6 +40,23 @@ template. the format must be name=value with one parameter per line. For
 example:</p>
 <pre>Lang=en
 tmFile=myTM.tmx</pre>
+<p>You can use the following variables in the parameters values:</p>
+<ul>
+	<li><code>${SrcLang}</code> = The code of the current source language.</li>
+	<li><code>${TrgLang}</code> = The code of the current target language.</li>
+	<li><code>${Input1}</code> = The full path of the input document of the 
+	Input list 1.</li>
+	<li><code>${Output1}</code> = The full path of the output document 
+	corresponding to the input document of the Input list 1.</li>
+	<li><code>${Input2}</code> = The full path of the input document of the 
+	Input list 2.</li>
+	<li><code>${Output2}</code> = The full path of the output document 
+	corresponding to the input document of the Input list 2.</li>
+	<li><code>${Input3}</code> = The full path of the input document of the 
+	Input list 3.</li>
+	<li><code>${Output3}</code> = The full path of the output document 
+	corresponding to the input document of the Input list 3.</li>
+</ul>
 <p><cite>Default Parameters</cite> -- Click this button to copy into the 
 parameters list all the default parameters declared in the template.</p>
 <p><cite>Open Template</cite> -- Click this button to open the template file.</p>

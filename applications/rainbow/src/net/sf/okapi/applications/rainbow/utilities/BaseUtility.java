@@ -144,22 +144,27 @@ public abstract class BaseUtility implements IUtility {
 	}
 
 	public String getInputPath (int index) {
+		if ( index > inputs.size()-1 ) return null;
 		return inputs.get(index).path;
 	}
 	
 	public String getInputEncoding (int index) {
+		if ( index > inputs.size()-1 ) return null;
 		return inputs.get(index).encoding;
 	}
 
 	public String getInputFilterSettings (int index) {
+		if ( index > inputs.size()-1 ) return null;
 		return inputs.get(index).filterSettings;
 	}
 
 	public String getOutputPath (int index) {
+		if ( index > inputs.size()-1 ) return null;
 		return outputs.get(index).path;
 	}
 	
 	public String getOutputEncoding (int index) {
+		if ( index > inputs.size()-1 ) return null;
 		return outputs.get(index).encoding;
 	}
 

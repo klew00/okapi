@@ -200,7 +200,8 @@ public class UtilityDriver implements CancelListener {
 							prj.buildTargetPath(j, addItem.relativePath),
 							prj.buildTargetEncoding(addItem));
 					}
-					else throw new RuntimeException("No more input files available.");
+					// Else: don't add anything
+					// The lists will return null and that is up to the utility to check.
 				}
 				
 				// Executes the utility

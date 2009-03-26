@@ -70,8 +70,43 @@ documents processed by the filters.</p>
 	<li><a href="help/applications/rainbow/utilities/index.html">See all the 
 	utilities available...</a></li>
 </ul>
-<h2>Example</h2>
-<p>TO COME SOON</p>
+<h2>Examples</h2>
+<p>Here are a few examples of how you can use the framework's components in your 
+own code:</p>
+<p>The Java code below opens a properties file or an OpenOffice.org document and 
+display all the translatable text inside.</p>
+<pre>import java.io.File;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
+import net.sf.okapi.filters.properties.PropertiesFilter; 
+
+public class Main {
+   public static void main (String[] args) {
+      try {
+         IFilter filter = null;
+         if ( args[0].endsWith(&quot;.properties&quot;) ) {
+            filter = new PropertiesFilter();
+         }
+         else if ( args[0].endsWith(&quot;.odt&quot;) ) {
+            filter = new OpenOfficeFilter();
+         }
+         filter.setOptions(&quot;en&quot;, &quot;UTF-8&quot;, false);
+         filter.open((new File(args[0])).toURI());
+         while ( filter.hasNext() ) {
+            Event event = filter.next();
+            if ( event.getEventType() == EventType.TEXT_UNIT ) {
+               System.out.println(event.getResource().toString());
+            }
+         }
+      }
+      catch ( Throwable e ) {
+         e.printStackTrace();
+      }
+   }
+}</pre>
+<p>TODO: MORE EXAMPLES</p>
 <p>&nbsp;</p>
 
 </body>
