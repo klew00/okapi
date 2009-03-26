@@ -59,12 +59,12 @@
 
 <filter id="okf_msoffice"
   name="(ALPHA-TEST-ONLY) MS-Office 2007"
-  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLZipFilter"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
  <filter id="okf_openxml"
   name="(ALPHA-TEST-ONLY) OpenXML-Content Filter"
-  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
+  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLContentFilter"
  >Filter for OpenXML-Content documents.</filter>
   
  <filter id="okf_tmx"
