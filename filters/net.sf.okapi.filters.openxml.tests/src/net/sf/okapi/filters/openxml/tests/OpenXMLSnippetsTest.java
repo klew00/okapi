@@ -4,15 +4,16 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
-import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
+//import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.filters.openxml.OpenXMLFilter;
+import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,7 +22,7 @@ import org.junit.Test;
 
 //TODO: Test for properties
 public class OpenXMLSnippetsTest {
-	private OpenXMLFilter openXMLFilter;
+	private OpenXMLContentFilter openXMLContentFilter;
 	private static final int MSWORD=1;
 	private static final int MSEXCEL=2;
 	private static final int MSPOWERPOINT=3;
@@ -29,7 +30,7 @@ public class OpenXMLSnippetsTest {
 	
 	@Before
 	public void setUp()  {
-		openXMLFilter = new OpenXMLFilter();	
+		openXMLContentFilter = new OpenXMLContentFilter();	
 	}
 
 	@After
@@ -107,46 +108,47 @@ public class OpenXMLSnippetsTest {
 */	
 	private ArrayList<Event> getEvents(String snippet, int filetype) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		openXMLFilter.setUpConfig(filetype);
-		openXMLFilter.open(snippet);
-		while (openXMLFilter.hasNext()) {
-			Event event = openXMLFilter.next();
-			openXMLFilter.displayOneEvent(event);
+		openXMLContentFilter.setUpConfig(filetype);
+		openXMLContentFilter.open(snippet);
+		while (openXMLContentFilter.hasNext()) {
+			Event event = openXMLContentFilter.next();
+			openXMLContentFilter.displayOneEvent(event);
 			list.add(event);
 		}
-		openXMLFilter.close();
+		openXMLContentFilter.close();
 		return list;
 	}
 
 	private String generateOutput(ArrayList<Event> list, String original) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
-		GenericSkeleton skl = null;
 		StringBuilder tmp = new StringBuilder();
-		writer.processStart("en-US", "utf-8", null, new EncoderManager()); // DWH 2-18-09 changed en to en-US
 		for (Event event : list) {
 			switch (event.getEventType()) {
+			case START_DOCUMENT:
+				writer.processStartDocument("en-US", "utf-8", null, new EncoderManager(),
+					(StartDocument)event.getResource());
+				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
-				skl = (GenericSkeleton) tu.getSkeleton();				
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:
 				DocumentPart dp = (DocumentPart) event.getResource();
-				skl = (GenericSkeleton) dp.getSkeleton();			
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
 				StartGroup startGroup = (StartGroup) event.getResource();
-				skl = (GenericSkeleton) startGroup.getSkeleton();				
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
 				Ending ending = (Ending) event.getResource();
-				skl = (GenericSkeleton) ending.getSkeleton();
 				tmp.append(writer.processEndGroup(ending));
 				break;
 			}
 		}		
+		System.out.println("\nOriginal: "+original);
+		System.out.println("Output:   "+tmp.toString()+"\n");
+		writer.close();
 		return tmp.toString();
 	}
 }
