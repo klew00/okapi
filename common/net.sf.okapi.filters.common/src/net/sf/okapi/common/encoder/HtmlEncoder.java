@@ -113,7 +113,7 @@ public class HtmlEncoder implements IEncoder {
 					}
 					else { // Should be able to fold to char, supplementary case will be treated
 						if (( chsEnc != null ) && !chsEnc.canEncode(ch) ) {
-							sbTmp.append(String.format("&#x%04x;", ch));
+							sbTmp.append(String.format("&#x%04x;", (int)ch));
 						}
 						else { // No encoder or char is supported
 							sbTmp.append(String.valueOf(ch));
