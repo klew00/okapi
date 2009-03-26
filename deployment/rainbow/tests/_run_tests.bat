@@ -14,6 +14,7 @@ cls
 pause
 @echo ON
 
+java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\XSLT_Test.rnb -x oku_xsltransform -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\BOM_Add.rnb -x oku_bomconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\LineBreak_ToDos.rnb -x oku_linebreakconversion -np
 java -jar ..\dist_win32-x86\lib\rainbow.jar -p miscellaneous\EncConv_Test1.rnb -x oku_encodingconversion -np
