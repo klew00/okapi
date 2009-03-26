@@ -1,0 +1,1 @@
+This file helps locate the data directory by giving an anchor to a .class.getResource() request.

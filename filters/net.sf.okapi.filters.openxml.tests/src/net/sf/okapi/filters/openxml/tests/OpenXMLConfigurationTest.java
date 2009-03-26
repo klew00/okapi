@@ -45,7 +45,8 @@ public class OpenXMLConfigurationTest {
 		
 		Map<String, String> attributes = new HashMap<String, String>();
 		assertTrue(rules.isTranslatableAttribute("wp:docpr", "name", attributes));
-		assertFalse(rules.isTranslatableAttribute("pic:cnvpr", "name", attributes));
+		assertTrue(rules.isTranslatableAttribute("pic:cnvpr", "name", attributes));
+		assertFalse(rules.isTranslatableAttribute("w:p", "name", attributes));
 		
 		attributes.clear();
 		attributes.put("w:val", "content-language");
@@ -63,10 +64,15 @@ public class OpenXMLConfigurationTest {
 		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
 		rules = new TaggedFilterConfiguration(url);	
 		assertEquals(rules.getMainRuleType("t"), TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
-		assertEquals(rules.getMainRuleType("a:br"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
+		assertEquals(rules.getMainRuleType("sheet"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
+		attributes = new HashMap<String, String>();
+		assertTrue(rules.isTranslatableAttribute("table", "name", attributes));
 
-		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
+		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/powerpointConfiguration.yml");
 		rules = new TaggedFilterConfiguration(url);	
-		assertEquals(rules.getMainRuleType("a:t"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
+		assertEquals(rules.getMainRuleType("a:p"), TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
+		attributes = new HashMap<String, String>();
+		attributes.put("w:val", "content-language");
+		assertTrue(rules.isWritableLocalizableAttribute("a:rpr", "lang", attributes));
 	}
 }
