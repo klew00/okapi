@@ -122,18 +122,18 @@ public class XMLFilterTest {
 	@Test
 	public void whitespacesTest () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-			+ "<doc><p>part 1\r\npart 2</p>"
-			+ "<p xml:space=\"preserve\">part 1\r\npart 2</p></doc>";
+			+ "<doc><p>part 1\npart 2</p>"
+			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
 		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<doc><p>part 1 part 2</p>"
-			+ "<p xml:space=\"preserve\">part 1\r\npart 2</p></doc>";
+			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
 	}
 	
 	@Test
 	public void whitespaces2Test () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-			+ "<p>part 1\r\npart 2<x> part3</x> part4</p>";
+			+ "<p>part 1\npart 2<x> part3</x> part4</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<p>part 1 part 2<x> part3</x> part4</p>";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));

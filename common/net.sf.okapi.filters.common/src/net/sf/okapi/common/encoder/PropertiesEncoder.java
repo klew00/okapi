@@ -79,7 +79,7 @@ public class PropertiesEncoder implements IEncoder {
 				else { // Should be able to fold to char, supplementary case will be treated
 					if ( escapeExtendedChars
 						|| (( chsEnc != null ) && !chsEnc.canEncode(ch) )) {
-						escaped.append(String.format("&#x%04x;", (int)ch));
+						escaped.append(String.format("\\u%04x", (int)ch));
 					}
 					else { // No encoder or char is supported
 						escaped.append(String.valueOf(ch));
@@ -143,7 +143,7 @@ public class PropertiesEncoder implements IEncoder {
 			else { // Extended not supplemental
 				if ( escapeExtendedChars 
 					|| (( chsEnc != null ) && !chsEnc.canEncode((char)value) )) {
-						return String.format("&#x%x;", value);
+						return String.format("\\u%04x", value);
 				}
 				else {
 					return String.valueOf((char)value);

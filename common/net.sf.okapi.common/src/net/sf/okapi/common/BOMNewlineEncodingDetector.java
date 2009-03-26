@@ -130,7 +130,7 @@ public final class BOMNewlineEncodingDetector {
 					if (c2 == -1)
 						return NewlineType.CR;
 					else
-						return (reader.read() == '\n') ? NewlineType.CRLF : NewlineType.CR;
+						return (c2 == '\n') ? NewlineType.CRLF : NewlineType.CR;
 				}
 			}
 		} catch (IOException e) {
@@ -143,7 +143,13 @@ public final class BOMNewlineEncodingDetector {
 			}
 		}
 
-		return NewlineType.LF;
+		if ( System.getProperty("line.separator").equals("\r\n") ) {
+			return NewlineType.CRLF;
+		}
+		if ( System.getProperty("line.separator").equals("\n") ) {
+			return NewlineType.LF;
+		}
+		return NewlineType.CR;
 	}
 	
 	public InputStream getInputStream() {

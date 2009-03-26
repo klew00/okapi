@@ -31,6 +31,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -78,6 +79,7 @@ public class XMLFilter implements IFilter {
 	private Stack<ContextItem> context;
 	private boolean canceled;
 	private Parameters params;
+	private boolean hasUTF8BOM;
 
 	public XMLFilter () {
 		params = new Parameters();
@@ -146,6 +148,8 @@ public class XMLFilter implements IFilter {
 
 	public void open (CharSequence inputText) {
 		encoding = "UTF-16";
+		hasUTF8BOM = false;
+		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
 		InputSource is = new InputSource(new StringReader(inputText.toString()));
 		commonOpen(2, is);
 	}
@@ -189,7 +193,6 @@ public class XMLFilter implements IFilter {
 		tuId = 0;
 		otherId = 0;
 		parseState = 0;
-		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -207,17 +210,26 @@ public class XMLFilter implements IFilter {
 		}
 		
 		//TODO: Do this only as an option
+		// Avoid DTD declaration
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
 		
 		URI uri = null;
+		BOMNewlineEncodingDetector detector = null;
 		// Load the document
 		try {
+			
 			switch ( type ) {
 			case 0: // InputStream
+				detector = new BOMNewlineEncodingDetector((InputStream)obj);
+				hasUTF8BOM = detector.hasUtf8Bom();
+				lineBreak = detector.getNewlineType().toString();
 				doc = docBuilder.parse((InputStream)obj);
 				break;
 			case 1: // URI
 				uri = (URI)obj;
+				detector = new BOMNewlineEncodingDetector(uri.toURL().openStream());
+				hasUTF8BOM = detector.hasUtf8Bom();
+				lineBreak = detector.getNewlineType().toString();
 				doc = docBuilder.parse(uri.toString());
 				break;
 			case 2: // InputSource
@@ -230,6 +242,11 @@ public class XMLFilter implements IFilter {
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
+		}
+		finally {
+			if ( detector != null ) {
+				detector = null; // Release it
+			}
 		}
 		
 		// Create the ITS engine
@@ -257,7 +274,7 @@ public class XMLFilter implements IFilter {
 		startDoc.setName(docName);
 		String realEnc = doc.getInputEncoding();
 		if ( realEnc != null ) encoding = realEnc;
-		startDoc.setEncoding(encoding, false); //TODO: UTF-8 BOM detection
+		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
@@ -272,20 +289,20 @@ public class XMLFilter implements IFilter {
 		skel.add("\"");
 		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
-		skel.add("?>\n");
+		skel.add("?>"+lineBreak);
 
 		// Add the DTD if needed
 		DocumentType dt = doc.getDoctype();
 		if ( dt != null ) {
 			String tmp;
 			if ( dt.getPublicId() != null ) {
-				tmp = String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">\n",
+				tmp = String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">"+lineBreak,
 						dt.getName(),
 						dt.getPublicId(),
 						dt.getSystemId());
 			}
 			else {
-				tmp = String.format("<!DOCTYPE %s SYSTEM \"%s\">\n",
+				tmp = String.format("<!DOCTYPE %s SYSTEM \"%s\">"+lineBreak,
 						dt.getName(),
 						dt.getSystemId());
 			}
@@ -339,14 +356,16 @@ public class XMLFilter implements IFilter {
 
 			case Node.TEXT_NODE:
 				if ( frag == null ) {//TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(node.getNodeValue(), 0, false, null));
+					skel.append(Util.escapeToXML(
+						node.getNodeValue().replace("\n", lineBreak), 0, false, null));
 				}
 				else {
 					if ( trav.translate() ) {
 						frag.append(node.getNodeValue());
 					}
 					else {//TODO: escape unsupported chars
-						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(node.getNodeValue(), 0, false, null));
+						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(
+							node.getNodeValue().replace("\n", lineBreak), 0, false, null));
 					}
 				}
 				break;
@@ -493,12 +512,12 @@ public class XMLFilter implements IFilter {
 	
 	private String buildCDATA (Node node) {
 		// Do not escape CDATA content
-		return "<![CDATA[" + node.getNodeValue() + "]]>";
+		return "<![CDATA[" + node.getNodeValue().replace("\n", lineBreak) + "]]>";
 	}
 	
 	private String buildComment (Node node) {
 		// Do not escape comments
-		return "<!--" + node.getNodeValue() + "-->";
+		return "<!--" + node.getNodeValue().replace("\n", lineBreak) + "-->";
 	}
 
 	/**
@@ -583,7 +602,7 @@ public class XMLFilter implements IFilter {
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
-				skel.add(frag.toString()); // Pass them as skeleton
+				skel.add(frag.toString().replace("\n", lineBreak)); // Pass them as skeleton
 			}
 			frag = null;
 			if ( popStack ) {
