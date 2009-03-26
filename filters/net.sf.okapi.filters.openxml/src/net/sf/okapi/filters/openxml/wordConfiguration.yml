@@ -53,4 +53,7 @@
 #'w:rstyle':           DWH 3-9-09 this dies because r:style is a standalone tag
 #  elementType: {link: ['w:val', EQUALS, 'Hyperlink']}
 
+# This one doesn't work unless INLINE is there with PRESERVE_WHITESPACE
+#'w:t':
+# ruleTypes: [INLINE, PRESERVE_WHITESPACE]
 

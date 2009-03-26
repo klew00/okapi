@@ -34,17 +34,19 @@
 
 # text marker
 
-'a:p': 
-  ruleTypes: [TEXTUNIT]
-
 'a:endpararpr':
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [lang]
+
+'a:p': 
+  ruleTypes: [TEXTUNIT]
 
 'a:rpr':
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [lang]
 
+#'a:t'
+#  ruleTypes: [INLINE,PRESERVE_WHITESPACE]
 
 
 

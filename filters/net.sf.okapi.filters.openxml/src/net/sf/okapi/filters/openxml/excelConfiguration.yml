@@ -38,7 +38,7 @@ author:
   ruleTypes: [EXCLUDE]
 
 t:
-  ruleTypes: [TEXTUNIT]
+  ruleTypes: [TEXTUNIT,PRESERVE_WHITESPACE]
 
 # used in comments file
 text:
