@@ -74,6 +74,9 @@ public class Pipeline implements IPipeline {
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
 				}
+				// TODO: do we need to reinitialize or null out the event from the last step???
+				// test cases still pass with or without this change
+				event = null;
 			}
 			// as each step exhausts its events remove it from the list and move
 			// on to the next
