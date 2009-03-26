@@ -23,20 +23,20 @@
 </table>
 
 <p>This utility allows you to compare two sets of translated text.</p>
-<p>The input is two document, the first one with the base translation, the 
-second one with the translation to compare to the base translation. The two 
+<p>The input is two documents, the first one containing the base translations, the 
+second one containing the translations to compare to the base translations. The two 
 documents <b>must have the same number of entries</b> and the <b>entries must be in the same 
 order</b>.</p>
-<p>For each entry the utility compare the two translated text and calculate a 
-score that indicates how similar the text of the second document is from the 
-text of the first translation. the score is a number between 0 and 100. The 
+<p>For each entry the utility compares the two translated texts and calculates a 
+score that measures how similar the text of the second document is to the 
+text of the baseline translation. The score is a number between 0 and 100. The 
 score is based on the <i>Levenstein distance</i> and additional processing. You 
 can find more information on that metric at
 <a href="http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a> 
 and <a href="http://en.wikipedia.org/wiki/Levenshtein_distance">
 http://en.wikipedia.org/wiki/Levenshtein_distance</a>.</p>
-<p>The utility outputs an HTML document for each pair of input document. That 
-file lists the pairs of text and the resulting score. You can also generate a 
+<p>The utility outputs an HTML document for each pair of input documents. The HTML
+document lists the pairs of text and the resulting score. You can also generate a 
 TMX document with the pairs and their scores.</p>
 <h2>Input Parameters</h2>
 <ul>
@@ -54,7 +54,7 @@ TMX document with the pairs and their scores.</p>
 <p><cite>Generate output tables in HTML</cite> -- Set this option to create one 
 HTML file for each pair of input document, where the results of the comparisons 
 are listed. The name of the HTML result file is the name of the document to 
-compare with the base document, plus a <code>.html</code> extension.</p>
+compare with the base document, plus an <code>.html</code> extension.</p>
 <p><cite>Open the first HTML output after completion</cite> -- Set this option 
 to open the first HTML result file created when the process is completed.</p>
 <h4>TMX Output</h4>
@@ -64,11 +64,17 @@ scores, for all input documents.</p>
 <p>Enter the full path of the TMX document to generate. You can use the variable
 <code>${ProjDir}</code> to specify the directory of the project.</p>
 <p><cite>Suffix for the second target language code</cite> -- Enter the suffix 
-to append to the target language code for the second target entries. For 
+to append to the target language code for the second set of target entries. For 
 example, enter -mt to indicate that the second target language is a 
 machine-translation generated text. If you do not enter a suffix, the language 
 code for both target entries will be the same and the TMX document will include 
 only the last one.</p>
+
+<h3>Options Tab</h3>
+<h4>Comparison Options</h4>
+<p><cite>Ignore case differences</cite> -- Set this option to ignore case differences when calculating the scores.</p>
+<p><cite>Ignore white-space differences</cite> -- Set this option to ignore white-space differences when calculating the scores.</p>
+<p><cite>Ignore punctuation differences</cite> -- Set this option to ignore punctuation differences when calculating the scores.</p>
 <p>&nbsp;</p>
 </body>
 </html>
