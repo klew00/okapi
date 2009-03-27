@@ -27,7 +27,8 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses({OpenXMLZipFullFileTest.class})
+@SuiteClasses({OpenXMLSnippetsTest.class, OpenXMLZipFullFileTest.class, 
+    OpenXMLConfigurationTest.class, OpenXMLRoundTripTest.class})
 public class AllOpenXMLTests {
 
   public static Test suite() {

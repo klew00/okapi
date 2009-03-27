@@ -24,6 +24,7 @@ package net.sf.okapi.filters.openxml.tests;
 //import org.apache.log4j.Logger;
 
 import java.io.*;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.ITranslator;
 
 public class PigLatinTranslator implements ITranslator {
@@ -42,7 +43,8 @@ public class PigLatinTranslator implements ITranslator {
 	public String translate(String s)
 	{
 		String rslt=s,ss="",slow;
-		int i,j,k,len;
+		int i,j,k,len,val;
+		char carrot;
 		len = s.length();
 		if (len>1)
 		{
@@ -90,7 +92,16 @@ public class PigLatinTranslator implements ITranslator {
 							i += k-1;
 						}
 						else
-							ss += s.charAt(i);
+						{
+							carrot = s.charAt(i);
+							if (TextFragment.isMarker(carrot))
+							{
+								ss += s.substring(i,i+2);
+								i++;
+							}
+							else
+								ss += carrot;
+						}
 					}
 				}			
 			}

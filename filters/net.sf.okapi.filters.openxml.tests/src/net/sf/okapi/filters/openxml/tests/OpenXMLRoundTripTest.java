@@ -44,18 +44,18 @@ public class OpenXMLRoundTripTest {
 		String sUserDir;
 		OpenXMLFilter filter = null;		
 		try {
-//			filter = new OpenXMLZipFilter(new PigLatinTranslator(),"pl"); // $$$
-			filter = new OpenXMLFilter();
+			filter = new OpenXMLFilter(new PigLatinTranslator(),"pl"); // $$$
+//			filter = new OpenXMLFilter();
 			filter.setOptions("en-US", "UTF-8", true);
 			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
 			sInputPath = sUserDir + "/data/";
 			sOutputPath = sUserDir + "/output/";
-//			uri = new URI(sInputPath+"sample."+glug);
-			uri = new URI(sInputPath+"TranslationServicesOff.docx");
+			uri = new URI(sInputPath+"sample."+glug);
+//			uri = new URI(sInputPath+"TranslationServicesOff.docx");
 //			uri = new URI(sInputPath+"gtsftopic.docx");
 			try
 			{
-				filter.open(uri,true,3);
+//				filter.open(uri,true,3);
 				filter.open(uri,false,3); // DWH 3-27-09
 			}
 			catch(Exception e)
@@ -65,11 +65,11 @@ public class OpenXMLRoundTripTest {
 			
 			ZipFilterWriter writer = new ZipFilterWriter();
 
-//			writer.setOptions("pl", "UTF-8"); // $$$
-			writer.setOptions("en-US", "UTF-8");
+			writer.setOptions("pl", "UTF-8"); // $$$
+//			writer.setOptions("en-US", "UTF-8");
 
-//			writer.setOutput(sOutputPath+"OutputSample."+glug);
-			writer.setOutput(sOutputPath+"OutputTranslationServicesOff.docx");
+			writer.setOutput(sOutputPath+"OutputSample."+glug);
+//			writer.setOutput(sOutputPath+"OutputTranslationServicesOff.docx");
 //			writer.setOutput(sOutputPath+"OutputGtsftopic.docx");
 			
 			while ( filter.hasNext() ) {

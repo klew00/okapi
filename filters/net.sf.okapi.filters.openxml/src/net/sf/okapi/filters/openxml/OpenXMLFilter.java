@@ -80,8 +80,6 @@ public class OpenXMLFilter implements IFilter {
 	private String sOutputLanguage="en-US";
 
 	public OpenXMLFilter () {
-//		openXMLContentFilter = new OpenXMLContentFilter();
-//		params = (Parameters)openXMLFilter.getParameters(); these would be for whole zip, but need each file
 	}
 	
 	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
@@ -386,11 +384,15 @@ public class OpenXMLFilter implements IFilter {
 					if (translator!=null)
 					{
 						TextUnit tu = (TextUnit)event.getResource();
-						TextFragment tf = tu.getSourceContent();
-						String sauce = tf.getCodedText();
+						TextFragment tfSource = tu.getSourceContent();
+						String sauce = tfSource.getCodedText();
 						String torg = translator.translate(sauce);
-						TextContainer tc = new TextContainer(torg);
+						TextFragment tfTarget = tfSource.clone();
+						tfTarget.setCodedText(torg);
+						TextContainer tc = new TextContainer();
+						tc.setContent(tfTarget);
 						tu.setTarget(sOutputLanguage, tc);
+						tfSource = null;
 					}
 					if (dbg>2)
 						openXMLContentFilter.displayOneEvent(event);
