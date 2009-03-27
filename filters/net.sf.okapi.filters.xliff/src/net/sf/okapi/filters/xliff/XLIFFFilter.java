@@ -111,7 +111,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "XLIFFFilter";
+		return "okf_xliff";
 	}
 
 	public String getMimeType () {
@@ -346,14 +346,14 @@ public class XLIFFFilter implements IFilter {
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'source-language'.");
 		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
-			logger.warn(String.format("The source language declared in <file> is '%s'.", tmp));
+			logger.warn(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
 			if ( !tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
-				logger.warn(String.format("The target language declared in <file> is '%s'.", tmp));
+				logger.warn(String.format("The target language declared in <file> is '%s' not '%s'.", tmp, trgLang));
 			}
 		}
 		
@@ -575,8 +575,7 @@ public class XLIFFFilter implements IFilter {
 			// Get the coord attribute if available
 			String tmp = reader.getAttributeValue("", "coord");
 			if ( tmp != null ) {
-				//TODO: Need a way to store and make modifiable property
-				tu.setSourceProperty(new Property("coord", tmp, true));
+				tu.setSourceProperty(new Property("coord", tmp, false));
 			}
 
 			skel.addContentPlaceholder(tu);
@@ -603,23 +602,21 @@ public class XLIFFFilter implements IFilter {
 		}
 		else {
 			// Get the state attribute if available
+			//TODO: Need to standardize target-state properties
 			String tmp = reader.getAttributeValue("", "state");
 			if ( tmp != null ) {
-				//TODO: Need a way to store and make modifiable property
-				tu.setTargetProperty(trgLang, new Property("state", tmp, true));
+				tu.setTargetProperty(trgLang, new Property("state", tmp, false));
 			}
 		
 			// Get the coord attribute if available
-			tmp = reader.getAttributeValue("", "coord");
+			tmp = reader.getAttributeValue("", Property.COORDINATES);
 			if ( tmp != null ) {
-				//TODO: Need a way to store and make modifiable property
-				tu.setTargetProperty(trgLang, new Property("coord", tmp, true));
+				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, tmp, false));
 			}
 
 			if ( approved ) {
-				//TODO: Need a way to store and make modifiable property
 				// Note that this property is set to the target at the resource-level
-				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
+				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
 			}
 			
 			skel.addContentPlaceholder(tu, trgLang);

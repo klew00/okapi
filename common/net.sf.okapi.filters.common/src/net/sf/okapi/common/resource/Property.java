@@ -35,6 +35,7 @@ public class Property {
 	public static final String LANGUAGE = "language";
 	public static final String APPROVED = "approved"; 
 	public static final String NOTE = "note"; 
+	public static final String COORDINATES = "coordinates"; 
 	
 	private final String name;
 	private String value;
@@ -97,6 +98,17 @@ public class Property {
 	public String getValue () {
 		return value;
 	}
+
+	/**
+	 * Gets the boolean value of this property. Use this helper method to get a boolean from the 
+	 * value of this property. The values "true" and "yes" (in any case) returns true, any other 
+	 * value returns false. No verification is done to see if the value is really boolean or not.
+	 * @return True is the property value is "true", "yes" (case-insensitive), false otherwise.
+	 */
+	public boolean getBoolean () {
+		if ( value == null ) return false;
+		return (value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("true"));
+	}
 	
 	/**
 	 * Sets a new value for this property.
@@ -113,7 +125,6 @@ public class Property {
 	public boolean isReadOnly () {
 		return isReadOnly;
 	}
-	
 	
 	/**
 	 * Gets the annotation of a given type for this property.
