@@ -34,22 +34,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Config;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
+import net.htmlparser.jericho.LoggerProvider;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
+
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
@@ -59,9 +58,11 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class BaseMarkupFilter extends BaseFilter {
-	private static final Logger logger = LoggerFactory
-			.getLogger(BaseMarkupFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
@@ -77,7 +78,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	static {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
-		// TODO: will this fix logging problems??? Config.LoggerProvider = ;
+		Config.LoggerProvider = LoggerProvider.SLF4J;
 	}
 
 	public BaseMarkupFilter() {
@@ -205,7 +206,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * Initialize parameters, rule state and parser.
 	 */
 	@Override
-	protected void initialize() {
+	protected void initialize() {		
 		super.initialize();
 
 		if (parameters == null) {
@@ -214,8 +215,15 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-		//document.fullSequentialParse(); // optimizes jericho parsing
+		
+		// set the logger
+		document.setLogger(new OkapiJerichoLogger(logger));
+		
+		// This code optimizes jericho parsing
+		//document.fullSequentialParse();
 		//nodeIterator = document.getNodeIterator();
+		
+		// This optimizes memory at the expense of performance 
 		nodeIterator = new NoCacheNodeIterator(document);
 	}
 
