@@ -196,7 +196,7 @@ public class FileResource implements IResource {
 	}
 
 	/**
-	 * @param inputMemMappedCharSequence
+	 * @param inputCharSequence
 	 *            the inputMemMappedCharSequence to set
 	 */
 	public void setInputCharSequence(CharSequence inputCharSequence) {
