@@ -61,7 +61,7 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testMultilangUpdate() {
 		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
-		assertEquals("<p lang='FR'>Text</p><p lang='jp'>JA text</p>",
+		assertEquals("<p lang='FR'>Text</p><p lang='ja'>JA text</p>",
 			generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 
@@ -171,9 +171,10 @@ public class HtmlSnippetsTest {
 		assertEquals("<p>[\uD840,\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
-	private ArrayList<Event> getEvents(String snippet) {
+	private ArrayList<Event> getEvents (String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
+		htmlFilter.setOptions("en", "UTF-16", true);
 		htmlFilter.open(snippet);
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();

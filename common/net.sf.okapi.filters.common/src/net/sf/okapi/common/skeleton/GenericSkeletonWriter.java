@@ -49,6 +49,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, Referent> referents;
+	private String inputLang;
 	private String outputLang;
 	private String outputEncoding;
 	private boolean isMultilingual;
@@ -86,6 +87,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		referents = new LinkedHashMap<String, Referent>();
 		storageStack = new Stack<StorageList>();
 
+		this.inputLang = resource.getLanguage();
 		this.outputLang = outputLanguage;
 		this.encoderManager = encoderManager;
 		this.outputEncoding = outputEncoding;
@@ -690,7 +692,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Else: We got the property value
 		// Check if it needs to be auto-modified
 		if ( Property.LANGUAGE.equals(name) ) {
-			value = outputLang;
+			// If it is the input language, we change it with the output language
+			//TODO: Do we need an option to be region-insensitive? (en==en-gb)
+			if ( value.equalsIgnoreCase(inputLang) ) {
+				value = outputLang;
+			}
 		}
 		else if ( Property.ENCODING.equals(name) ) {
 			value = outputEncoding;
