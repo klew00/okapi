@@ -18,6 +18,16 @@
 	<condition property="is_gtk2-linux-x86">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
+	<condition property="is_gtk2-linux-x86_64">
+		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+	</condition>
+
+	<condition property="is_linux">
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
+	</condition>
 
 	<path id="mainClassPath_ratel">
 		<pathelement location="${tmp}"/>
@@ -79,14 +89,12 @@
 		<launch4j configFile="./l4j_win_config.xml" />
 	</target>
 	
-	<target name="zipAll" unless="is_gtk2-linux-x86">
+	<target name="zipAll" unless="is_linux">
 		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="gzipAll" if="is_gtk2-linux-x86">
-		<tar destfile="${dist}/${jarname}_${platform}.tar" basedir="${dist}"/>
-		<gzip destfile="${dist}/${jarname}_${platform}.tar.gz" src="${dist}/${jarname}_${platform}.tar"/>
-		<delete file="${dist}/${jarname}_${platform}.tar"/>
+	<target name="gzipAll" if="is_linux">
+		<tar destfile="${dist}/${jarname}_${platform}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 	
 	<target name="all" depends="compile, winExe, linuxExePerm, zipAll, gzipAll"/>

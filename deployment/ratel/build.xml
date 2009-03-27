@@ -14,6 +14,9 @@
 			<property name="platform" value="gtk2-linux-x86"/>
 		</ant>
 		<ant antfile="build_ratel.xml">
+			<property name="platform" value="gtk2-linux-x86_64"/>
+		</ant>
+		<ant antfile="build_ratel.xml">
 			<property name="platform" value="carbon-macosx"/>
 		</ant>
 	</target>

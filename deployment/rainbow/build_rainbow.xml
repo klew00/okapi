@@ -14,7 +14,10 @@
 		<os family="mac"/>
 	</condition>
 	<condition property="platform" value="gtk2-linux-x86">
-		<os name="Linux"/>
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
 	</condition>
 	<condition property="isLinux">
 		<os name="Linux"/>
