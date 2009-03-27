@@ -25,11 +25,11 @@ import net.sf.okapi.common.resource.FileResource;
 
 public abstract class BasePipelineStep implements IPipelineStep {
 	private FileResource input;
-	
+
 	protected FileResource getInput() {
 		return input;
 	}
-	
+
 	public boolean hasNext() {
 		return false;
 	}
@@ -76,6 +76,10 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 		case FILE_RESOURCE:
 			handleFileResource(event);
+			break;
+
+		case FINISHED:
+			handleFinished(event);
 			break;
 
 		default:
@@ -133,5 +137,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	protected void handleFileResource(Event event) {
+	}
+
+	protected void handleFinished(Event event) {
 	}
 }
