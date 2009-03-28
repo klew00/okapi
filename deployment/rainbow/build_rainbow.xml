@@ -19,8 +19,12 @@
 	<condition property="platform" value="gtk2-linux-x86_64">
 		<os name="Linux" arch="x86_64"/>
 	</condition>
+
 	<condition property="isLinux">
-		<os name="Linux"/>
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
 	</condition>
 
 	<property name="proj_rainbow" value="../../applications/rainbow"/> 
