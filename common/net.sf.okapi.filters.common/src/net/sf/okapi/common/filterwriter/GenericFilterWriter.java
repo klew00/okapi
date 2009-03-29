@@ -272,7 +272,7 @@ public class GenericFilterWriter implements IFilterWriter {
 			// Create the output
 			writer = new OutputStreamWriter(output, encoding);
 			// Set default UTF-8 BOM usage
-			boolean useUTF8BOM = false; //TODO: use platform default
+			boolean useUTF8BOM = false; // On all platforms
 			// Check if the output encoding is UTF-8
 			if ( "utf-8".equalsIgnoreCase(encoding) ) {
 				// If the original was UTF-8 too

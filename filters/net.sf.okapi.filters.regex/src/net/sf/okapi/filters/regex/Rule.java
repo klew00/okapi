@@ -52,14 +52,14 @@ public class Rule {
 
 	public Rule () {
 		ruleName = "";
-		expr = "^(.*?)=\\[(.*?)]\\Z";
-		sourceGroup = 2;
+		expr = "";
+		sourceGroup = -1;
 		targetGroup = -1;
-		nameGroup = 1;
+		nameGroup = -1;
 		noteGroup = -1;
 		codeFinder = new InlineCodeFinder();
 		preserveWS = true;
-		sample = "ID001=[Source text]\n";
+		sample = "";
 	}
 	
 	public Rule (Rule obj) {

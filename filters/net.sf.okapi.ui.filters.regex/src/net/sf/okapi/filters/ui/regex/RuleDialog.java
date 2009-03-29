@@ -49,9 +49,13 @@ public class RuleDialog {
 	private Text edSample;
 	private Text edResult;
 	private Text edSource;
+	private boolean useSource;
 	private Text edTarget;
+	private boolean useTarget;
 	private Text edName;
+	private boolean useName;
 	private Text edNote;
+	private boolean useNote;
 	private Combo cbRuleType;
 	private boolean result = false;
 	private Pattern fullPattern;
@@ -235,37 +239,42 @@ public class RuleDialog {
 		int type = cbRuleType.getSelectionIndex();
 		switch ( type ) {
 		case Rule.RULETYPE_STRING:
-			edSource.setEnabled(true);
-			edTarget.setEnabled(false);
-			edName.setEnabled(true);
-			edNote.setEnabled(true);
+			useSource = true;
+			useTarget = false;
+			useName = true;
+			useNote = true;
 			break;
 		case Rule.RULETYPE_CONTENT:
-			edSource.setEnabled(true);
-			edTarget.setEnabled(true);
-			edName.setEnabled(true);
-			edNote.setEnabled(true);
+			useSource = true;
+			useTarget = true;
+			useName = true;
+			useNote = true;
 			break;
 		case Rule.RULETYPE_COMMENT:
-			edSource.setEnabled(true);
-			edTarget.setEnabled(false);
-			edName.setEnabled(false);
-			edNote.setEnabled(false);
+			useSource = true;
+			useTarget = false;
+			useName = false;
+			useNote = false;
 			break;
 		case Rule.RULETYPE_NOTRANS:
 		case Rule.RULETYPE_CLOSEGROUP:
-			edSource.setEnabled(false);
-			edTarget.setEnabled(false);
-			edName.setEnabled(false);
-			edNote.setEnabled(false);
+			useSource = false;
+			useTarget = false;
+			useName = false;
+			useNote = false;
 			break;
 		case Rule.RULETYPE_OPENGROUP:
-			edSource.setEnabled(false);
-			edTarget.setEnabled(false);
-			edName.setEnabled(true);
-			edNote.setEnabled(true);
+			useSource = false;
+			useTarget = false;
+			useName = true;
+			useNote = true;
 			break;
 		}
+		edSource.setEnabled(useSource);
+		edTarget.setEnabled(useTarget);
+		edName.setEnabled(useName);
+		edNote.setEnabled(useNote);
+		updateResults();
 	}
 	
 	private boolean updateResults () {
@@ -285,19 +294,19 @@ public class RuleDialog {
 				if ( m1.start() == m1.end() ) break;
 				boolean hasGroup = false;
 				if ( tmp.length() > 0 ) tmp.append("-----\n");
-				if ( source != -1 ) {
+				if ( useSource && ( source != -1 )) {
 					tmp.append("Source=[" + m1.group(source) + "]\n");
 					hasGroup = true;
 				}
-				if ( target != -1 ) {
+				if ( useTarget && ( target != -1 )) {
 					tmp.append("Target=[" + m1.group(target) + "]\n");
 					hasGroup = true;
 				}
-				if ( name != -1 ) {
+				if ( useName && ( name != -1 )) {
 					tmp.append("Identifier=[" + m1.group(name) + "]\n");
 					hasGroup = true;
 				}
-				if ( note != -1 ) {
+				if ( useNote && ( note != -1 )) {
 					tmp.append("Note=[" + m1.group(note) + "]\n");
 					hasGroup = true;
 				}

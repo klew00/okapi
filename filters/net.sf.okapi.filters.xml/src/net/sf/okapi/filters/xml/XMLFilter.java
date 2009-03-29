@@ -321,7 +321,7 @@ public class XMLFilter implements IFilter {
 		
 		if ( context.size() > 0 ) {
 			// If we are within an element, reset the fragment to append to it
-			if ( trav.translate() ) { // The stack is up-to-date already
+			if ( context.peek().translate ) { // The stack is up-to-date already
 				frag = new TextFragment();
 			}
 		}
