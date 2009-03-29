@@ -83,12 +83,12 @@ public class Utility extends BaseFilterDrivenUtility {
 			String trg = params.targetSRX.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
-			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			sourceSeg = doc.applyLanguageRules(srcLang, null);
 			//TODO: This is not working cross-platform!
 			if ( !src.equalsIgnoreCase(trg) ) {
 				doc.loadRules(trg);
-				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			}
 			targetSeg = doc.applyLanguageRules(trgLang, null);
 		}
@@ -234,7 +234,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			catch ( Throwable e ) {
-				logger.error(String.format("Error segmenting text unit id=%s: "
+				logger.severe(String.format("Error segmenting text unit id=%s: "
 					+e.getMessage(), tu.getId()));
 			}
 		}

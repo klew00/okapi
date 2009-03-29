@@ -21,9 +21,8 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.ILog;
@@ -46,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class UtilityDriver implements CancelListener {
 
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 	private ILog log;
 	private Project prj;
 	private FilterAccess fa;
@@ -222,11 +221,11 @@ public class UtilityDriver implements CancelListener {
 		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
 			if ( utility != null ) utility.postprocess();
-			logger.error("Error with utility.", e);
+			logger.log(Level.SEVERE, "Error with utility.", e);
 		}
 		finally {
 			if ( stopProcess ) {
-				logger.warn("Process interrupted by user.");
+				logger.warning("Process interrupted by user.");
 			}
 			if ( utility != null ) {
 				outputFolder = utility.getFolderAfterProcess();

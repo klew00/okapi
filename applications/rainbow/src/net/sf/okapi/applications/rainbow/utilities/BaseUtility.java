@@ -21,12 +21,11 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.event.EventListenerList;
 
 import org.eclipse.swt.widgets.Shell;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.common.IHelp;
@@ -36,7 +35,7 @@ public abstract class BaseUtility implements IUtility {
 
 	public static final String VAR_PROJDIR = "${ProjDir}";
 	
-	protected final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	protected final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterAccess fa;
 	protected String paramsFolder;

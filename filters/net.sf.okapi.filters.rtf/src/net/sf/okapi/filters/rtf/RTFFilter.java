@@ -34,6 +34,7 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -49,9 +50,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RTFFilter implements IFilter {
 
@@ -114,7 +112,7 @@ public class RTFFilter implements IFilter {
 	public static final int CW_PC                = 50;
 	public static final int CW_PCA               = 51;
 
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 	
 	private BufferedReader reader;
 	private boolean canceled;
@@ -833,7 +831,7 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warn(e.getLocalizedMessage());
+							logger.warning(e.getLocalizedMessage());
 							chCurrent = '?';
 						}
 					}
@@ -855,7 +853,7 @@ public class RTFFilter implements IFilter {
 									chCurrent = charBuf.get(0);
 								}
 								catch (CharacterCodingException e) {
-									logger.warn(e.getLocalizedMessage());
+									logger.warning(e.getLocalizedMessage());
 									chCurrent = '?';
 								}
 							}
@@ -882,7 +880,7 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warn(e.getLocalizedMessage());
+							logger.warning(e.getLocalizedMessage());
 							chCurrent = '?';
 						}
 					}
@@ -896,11 +894,11 @@ public class RTFFilter implements IFilter {
 			case TOKEN_ENDINPUT:
 				if ( group > 0 ) {
 					// Missing '{'
-					logger.warn(String.format("Missing '{' = %d.", group));
+					logger.warning(String.format("Missing '{' = %d.", group));
 				}
 				else if ( group < 0 ) {
 					// Extra '}'
-					logger.warn(String.format("Extra '}' = %d.", group));
+					logger.warning(String.format("Extra '}' = %d.", group));
 				}
 				return nRes;
 
@@ -1137,7 +1135,7 @@ public class RTFFilter implements IFilter {
 				}
 				else {
 					// Font undefined: Switch to the default encoding
-					logger.warn(String.format("The font '%d' is undefined. The encoding '%s' is used by default instead.", 
+					logger.warning(String.format("The font '%d' is undefined. The encoding '%s' is used by default instead.", 
 						value, defaultEncoding));
 					loadEncoding(defaultEncoding);
 				}
@@ -1212,7 +1210,7 @@ public class RTFFilter implements IFilter {
 		case CW_ANSICPG:
 			String name = winCodepages.get(value);
 			if ( name == null ) {
-				logger.warn(String.format("The codepage '%d' is undefined. The encoding '%s' is used by default instead.",
+				logger.warning(String.format("The codepage '%d' is undefined. The encoding '%s' is used by default instead.",
 					value, defaultEncoding));
 				ctxStack.peek().encoding = defaultEncoding;
 			}
@@ -1301,7 +1299,7 @@ public class RTFFilter implements IFilter {
 			|| ( "arabic-user".compareTo(encodingName) == 0 )
 			|| ( "hebrew-user".compareTo(encodingName) == 0 ))
 		{
-			logger.warn(String.format("The encoding '%s' is unsupported. The encoding '%s' is used by default instead.", 
+			logger.warning(String.format("The encoding '%s' is unsupported. The encoding '%s' is used by default instead.", 
 				encodingName, defaultEncoding));
 			encodingName = defaultEncoding;
 		}

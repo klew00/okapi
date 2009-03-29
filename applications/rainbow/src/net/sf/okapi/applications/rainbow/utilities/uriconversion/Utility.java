@@ -22,6 +22,8 @@ package net.sf.okapi.applications.rainbow.utilities.uriconversion;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.logging.Level;
+
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -178,7 +180,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Exception e ) {
-			logger.warn("Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
 		}
 	}
 

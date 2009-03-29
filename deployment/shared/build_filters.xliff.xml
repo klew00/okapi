@@ -6,7 +6,6 @@
  
 	<path id="mainClassPath_filters.xliff">
 		<pathelement location="${tmp}"/>
-		<pathelement location="${distlib}/slf4j-api-1.5.0.jar"/>
 		<pathelement location="${distlib}/stax-api-1.0.1.jar"/>
 		<pathelement location="${distlib}/wstx-lgpl-3.2.8.jar"/>
 	</path>

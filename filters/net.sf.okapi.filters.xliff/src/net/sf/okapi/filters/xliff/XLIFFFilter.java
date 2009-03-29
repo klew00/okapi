@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -58,15 +59,13 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import org.codehaus.stax2.XMLInputFactory2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 public class XLIFFFilter implements IFilter {
 
 	public static final String    XML_NS_URI   = "http://www.w3.org/XML/1998/namespace";
 	
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -378,14 +377,14 @@ public class XLIFFFilter implements IFilter {
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new RuntimeException("Missing attribute 'source-language'.");
 		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
-			logger.warn(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
+			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
 			if ( !tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
-				logger.warn(String.format("The target language declared in <file> is '%s' not '%s'.", tmp, trgLang));
+				logger.warning(String.format("The target language declared in <file> is '%s' not '%s'.", tmp, trgLang));
 			}
 		}
 		

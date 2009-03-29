@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.Utils;
@@ -35,9 +37,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.TextUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Merger {
 
 	private Manifest manifest;
@@ -45,7 +44,7 @@ public class Merger {
 	private FilterAccess fa;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 	private boolean skipNoTranslate;
 	private String trgLang;
 
@@ -127,7 +126,7 @@ public class Merger {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			logger.error("Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+			logger.log(Level.SEVERE, "Merging error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
 		}
 		finally {
 			if ( reader != null ) {
@@ -152,7 +151,7 @@ public class Merger {
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
-			logger.warn("There is no more package item to merge (for id=\"{}\")",
+			logger.log(Level.WARNING, "There is no more package item to merge (for id=\"%s\")",
 				tu.getId());
 			// Keep the source
 			return;
@@ -164,8 +163,8 @@ public class Merger {
 			
 			if ( !tu.getId().equals(srcPkgItem.getId()) ) {
 				// Problem: different IDs
-				logger.warn("ID mismatch: original item id=\"{}\" package item id=\"{}\"",
-					tu.getId(), srcPkgItem.getId());
+				logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\"",
+					tu.getId(), srcPkgItem.getId()));
 				// Keep the source
 				return;
 			}
@@ -181,14 +180,14 @@ public class Merger {
 						tu.getSourceContent().getCodes(), false);
 				}
 				catch ( RuntimeException e ) {
-					logger.error("Error with item id=\"{}\".", tu.getId());
+					logger.log(Level.SEVERE, "Error with item id=\"%s\".", tu.getId());
 					// Use the source instead, continue the merge
 					tu.setTarget(trgLang, tu.getSource());
 				}
 			}
 			else { // No translation in package
 				if ( !tu.isEmpty() ) {
-					logger.warn("Item id=\"{}\": No translation provided.", tu.getId());
+					logger.log(Level.WARNING, "Item id=\"%s\": No translation provided.", tu.getId());
 					tu.setTarget(trgLang, tu.getSource());
 				}
 			}

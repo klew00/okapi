@@ -237,7 +237,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 				for ( int i=0; i<n; i++ ) {
 					if ( !(canEncode = outputEncoder.canEncode(buffer.get(i))) ) {
 						if ( params.reportUnsupported ) {
-							logger.warn(String.format("Un-supported character: U+%04X ('%c')",
+							logger.warning(String.format("Un-supported character: U+%04X ('%c')",
 								(int)buffer.get(i), buffer.get(i)));
 						}
 					}

@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
@@ -47,9 +48,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Implements the IFilter interface for properties files.
  */
@@ -59,7 +57,7 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
-	private final Logger logger = LoggerFactory.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
 
 	private Parameters params;
 	private BufferedReader reader;
@@ -518,15 +516,7 @@ public class PropertiesFilter implements IFilter {
 	private void logMessage (Level level,
 		String text)
 	{
-		if ( level == Level.WARNING ) {
-			logger.warn(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
-		}
-		else if ( level == Level.SEVERE ) {
-			logger.error(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
-		}
-		else {
-			logger.info(String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
-		}
+		logger.log(level, String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
 	}
 
 }

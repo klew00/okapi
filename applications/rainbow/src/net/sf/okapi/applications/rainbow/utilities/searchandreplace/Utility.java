@@ -32,6 +32,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
@@ -198,7 +199,7 @@ public class Utility extends BaseFilterDrivenUtility implements ISimpleUtility {
 			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {
-			logger.warn("Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
 		}
 	}
 

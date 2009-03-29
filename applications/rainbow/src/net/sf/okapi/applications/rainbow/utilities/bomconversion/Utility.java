@@ -138,7 +138,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 							logger.info("Added UTF-8 BOM");
 						}
 						else { // Cannot add to un-supported encodings
-							logger.warn("Cannot add a BOM to a document in "+enc);
+							logger.warning("Cannot add a BOM to a document in "+enc);
 						}
 					}
 					// Then write the buffer we checked

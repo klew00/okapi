@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
+import java.util.logging.Level;
+
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -63,11 +65,11 @@ public class Utility extends BaseFilterDrivenUtility {
 			String trg = params.targetSrxPath.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
-			if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			srcSeg = doc.applyLanguageRules(srcLang, null);
 			if ( !src.equals(trg) ) {
 				doc.loadRules(trg);
-				if ( doc.hasWarning() ) logger.warn(doc.getWarning());
+				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			}
 			trgSeg = doc.applyLanguageRules(trgLang, null);
 		}
@@ -291,7 +293,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error while translating: ", e);
+			logger.log(Level.WARNING, "Error while translating: ", e);
 		}
 	}
 	
@@ -309,7 +311,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
 		}
 	}
 	
@@ -337,7 +339,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(tmp.toString(), tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error when updating content: '"+tmp.toString()+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tmp.toString()+"'", e);
 		}
 	}
 	
@@ -369,7 +371,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
 		}
 		catch ( Throwable e ) {
-			logger.warn("Error when adding text to '"+tmp+"'", e);
+			logger.log(Level.WARNING, "Error when adding text to '"+tmp+"'", e);
 		}
 	}
 

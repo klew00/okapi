@@ -80,10 +80,10 @@ public class Utility extends BaseFilterDrivenUtility  {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			logger.error(e.getMessage());
+			logger.severe(e.getMessage());
 		}
 		catch ( UnsupportedEncodingException e ) {
-			logger.error(e.getMessage());
+			logger.severe(e.getMessage());
 		}
 		finally {
 			if ( writer != null ) {
