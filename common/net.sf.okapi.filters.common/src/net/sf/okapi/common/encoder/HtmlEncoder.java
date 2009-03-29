@@ -144,7 +144,17 @@ public class HtmlEncoder implements IEncoder {
 		case '\n':
 			return lineBreak;
 		default:
-			return String.valueOf(value);
+			if ( value > 127 ) { // Extended chars
+				if (( chsEnc != null ) && ( !chsEnc.canEncode(value) )) {
+					return String.format("&#x%04x;", (int)value);
+				}
+				else { // No encoder or char is supported
+					return String.valueOf(value);
+				}
+			}
+			else { // ASCII chars
+				return String.valueOf(value);
+			}
 		}
 	}
 
