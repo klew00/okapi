@@ -20,10 +20,10 @@
 
 package net.sf.okapi.filters.xliff;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Stack;
@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -59,6 +60,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import org.codehaus.stax2.XMLInputFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 public class XLIFFFilter implements IFilter {
 
@@ -88,6 +90,7 @@ public class XLIFFFilter implements IFilter {
 	private AltTransAnnotation altTrans;
 	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
+	private boolean hasUTF8BOM;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -156,6 +159,31 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public void open (InputStream input) {
+		commonOpen(0, input);
+	}
+	
+	public void open (CharSequence inputText) {
+		docName = null;
+		encoding = "UTF-16";
+		hasUTF8BOM = false;
+		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
+		InputSource is = new InputSource(new StringReader(inputText.toString()));
+		commonOpen(1, is);
+	}
+
+	public void open (URI inputURI) {
+		try {
+			docName = inputURI.getPath();
+			commonOpen(0, inputURI.toURL().openStream());
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void commonOpen (int type,
+		Object obj)
+	{
 		try {
 			if ( srcLang == null ) throw new RuntimeException("Source language not set.");
 			if ( trgLang == null ) throw new RuntimeException("Target language not set.");
@@ -170,12 +198,29 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 			
-			reader = fact.createXMLStreamReader(input);
+			BOMNewlineEncodingDetector detector = null;
+			try {
+				switch ( type ) {
+				case 0: // From InputStream
+					detector = new BOMNewlineEncodingDetector((InputStream)obj);
+					hasUTF8BOM = detector.hasUtf8Bom();
+					lineBreak = detector.getNewlineType().toString();
+					reader = fact.createXMLStreamReader((InputStream)obj);
+					break;
+				case 1: // From Reader
+					reader = fact.createXMLStreamReader((Reader)obj);
+					break;
+				}
+			}
+			catch ( IOException e ) {
+				throw new RuntimeException(e);
+			}
+			finally {
+				if ( detector != null ) {
+					detector = null; // Release it
+				}
+			}
 
-			//TODO: Need to auto-detect the encoding and update 'encoding' variable
-			// use reader.getCharacterEncodingScheme() ??? but start doc not reported
-			
-			lineBreak = System.getProperty("line.separator"); //TODO: get real line break
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			parentIds = new Stack<Integer>();
@@ -189,7 +234,9 @@ public class XLIFFFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
-			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
+			String realEnc = reader.getCharacterEncodingScheme();
+			if ( realEnc != null ) encoding = realEnc;
+			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setType("text/x-xliff");
@@ -211,27 +258,7 @@ public class XLIFFFilter implements IFilter {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public void open (CharSequence inputText) {
-		//TODO: Check for better solution, going from char to byte to read char is just not good
-		try {
-			open(new ByteArrayInputStream(inputText.toString().getBytes("UTF-8")));
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		} 
-	}
-
-	public void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
+	
 	public void setOptions(String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
@@ -239,7 +266,10 @@ public class XLIFFFilter implements IFilter {
 	{
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
-		encoding = defaultEncoding;
+		
+		// Default encoding should be UTF-8, other must be declared
+		// And that will be auto-detected and encoding will be updated
+		encoding = "UTF-8";
 	}
 
 	public void setOptions(String sourceLanguage,
@@ -294,12 +324,14 @@ public class XLIFFFilter implements IFilter {
 				
 			case XMLStreamConstants.SPACE:
 			case XMLStreamConstants.CDATA:
+				skel.append(reader.getText().replace("\n", lineBreak));
+				break;
 			case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
 				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:
-				skel.append("<!--"+ reader.getText() + "-->");
+				skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
 				break;
 				
 			case XMLStreamConstants.PROCESSING_INSTRUCTION:
@@ -395,7 +427,7 @@ public class XLIFFFilter implements IFilter {
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
 			skel.append(String.format(" %s=\"%s\"", attrName,
-				reader.getAttributeValue(i)));
+				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
 			if ( attrName.equals("xml:space") ) {
 				ps = reader.getAttributeValue(i).equals("preserve");
 			}
@@ -524,12 +556,12 @@ public class XLIFFFilter implements IFilter {
 						}
 					}
 					//TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));
 					break;
 					
 				case XMLStreamConstants.COMMENT:
 					addTargetIfNeeded();
-					skel.append("<!--"+ reader.getText() + "-->");
+					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
 					break;
 				
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
