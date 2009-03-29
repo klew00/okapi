@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.regex;
 
@@ -37,6 +37,7 @@ public class Parameters extends BaseParameters {
 	public String expression;
 	public LocalizationDirectives locDir;
 	public String mimeType;
+	public boolean oneLevelGroups;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -53,6 +54,7 @@ public class Parameters extends BaseParameters {
 		useBSlashEscape = true;
 		locDir.reset();
 		mimeType = "text/plain";
+		oneLevelGroups = false;
 	}
 
 	public void fromString (String data) {
@@ -65,6 +67,7 @@ public class Parameters extends BaseParameters {
 		endString = buffer.getString("endString", endString);
 		extractOuterStrings = buffer.getBoolean("extractOuterStrings", extractOuterStrings);
 		useBSlashEscape = buffer.getBoolean("useBSlashEscape", useBSlashEscape);
+		oneLevelGroups = buffer.getBoolean("oneLevelGroups", oneLevelGroups);
 		regexOptions = buffer.getInteger("regexOptions", regexOptions);
 		mimeType = buffer.getString("mimeType", mimeType);
 		Rule rule;
@@ -85,6 +88,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString("endString", endString);
 		buffer.setBoolean("extractOuterStrings", extractOuterStrings);
 		buffer.setBoolean("useBSlashEscape", useBSlashEscape);
+		buffer.setBoolean("oneLevelGroups", oneLevelGroups);
 		buffer.setInteger("regexOptions", regexOptions);
 		buffer.setString("mimeType", mimeType);
 		buffer.setInteger("ruleCount", rules.size());
@@ -97,9 +101,7 @@ public class Parameters extends BaseParameters {
 	public void compileRules () {
 		for ( Rule rule : rules ) {
 			// Compile the full pattern
-			rule.pattern = Pattern.compile(
-				"("+rule.start+")(.*?)("+rule.end+")",
-				regexOptions);
+			rule.pattern = Pattern.compile(rule.expr, regexOptions);
 			// Compile any used in-line code rules for this rule
 			if ( rule.useCodeFinder ) {
 				rule.codeFinder.compile();

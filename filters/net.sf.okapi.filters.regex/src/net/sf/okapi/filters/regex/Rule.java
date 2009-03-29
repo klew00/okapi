@@ -35,11 +35,7 @@ public class Rule {
 	public static final int       RULETYPE_CLOSEGROUP = 5;
 	
 	protected String ruleName;
-	protected String start;
-	protected String end;
-	protected String nameStart;
-	protected String nameEnd;
-	protected String nameFormat;
+	protected String expr;
 	protected int ruleType;
 	protected boolean preserveWS;
 	protected boolean useCodeFinder;
@@ -47,27 +43,32 @@ public class Rule {
 	protected String propertyName;
 	protected String propertyValue;
 	protected String sample;
+	protected int sourceGroup;
+	protected int targetGroup;
+	protected int nameGroup;
+	protected int noteGroup;
 	// Runtime-only variable (don't serialize)
 	protected Pattern pattern;
 
 	public Rule () {
-		start = "";
-		end = "";
-		nameStart = "";
-		nameEnd = "";
-		nameFormat = "";
+		ruleName = "";
+		expr = "^(.*?)=\\[(.*?)]\\Z";
+		sourceGroup = 2;
+		targetGroup = -1;
+		nameGroup = 1;
+		noteGroup = -1;
 		codeFinder = new InlineCodeFinder();
 		preserveWS = true;
-		sample = "";
+		sample = "ID001=[Source text]\n";
 	}
 	
 	public Rule (Rule obj) {
 		ruleName = obj.ruleName;
-		start = obj.start;
-		end = obj.end;
-		nameStart = obj.nameStart;
-		nameEnd = obj.nameEnd;
-		nameFormat = obj.nameFormat;
+		expr = obj.expr;
+		sourceGroup = obj.sourceGroup;
+		targetGroup = obj.targetGroup;
+		nameGroup = obj.nameGroup;
+		noteGroup = obj.noteGroup;
 		ruleType = obj.ruleType;
 		preserveWS = obj.preserveWS;
 		useCodeFinder = obj.useCodeFinder;
@@ -86,22 +87,13 @@ public class Rule {
 		ruleName = value;
 	}
 	
-	public String getStart () {
-		return start;
+	public String getExpression () {
+		return expr;
 	}
 	
-	public void setStart (String value) {
+	public void setExpression (String value) {
 		if ( value == null ) throw new NullPointerException();
-		start = value;
-	}
-
-	public String getEnd () {
-		return end;
-	}
-	
-	public void setEnd (String value) {
-		if ( value == null ) throw new NullPointerException();
-		end = value;
+		expr = value;
 	}
 
 	public String getSample () {
@@ -113,39 +105,44 @@ public class Rule {
 		else sample = value;
 	}
 
-	public String getNameStart () {
-		return nameStart;
-	}
-	
-	public void setNameStart (String value) {
-		if ( value == null ) throw new NullPointerException();
-		nameStart = value;
-	}
-
-	public String getNameEnd () {
-		return nameEnd;
-	}
-	
-	public void setNameEnd (String value) {
-		if ( value == null ) throw new NullPointerException();
-		nameEnd = value;
-	}
-
-	public String getNameFormat () {
-		return nameFormat;
-	}
-	
-	public void setNameFormat (String value) {
-		if ( value == null ) throw new NullPointerException();
-		nameFormat = value;
-	}
-
 	public int getRuleType () {
 		return ruleType;
 	}
 	
 	public void setRuleType (int value) {
 		ruleType = value;
+	}
+	
+	public int getSourceGroup () {
+		return sourceGroup;
+	}
+	
+	public void setSourceGroup (int index) {
+		sourceGroup = index;
+	}
+	
+	public int getTargetGroup () {
+		return targetGroup;
+	}
+	
+	public void setTargetGroup (int index) {
+		targetGroup = index;
+	}
+	
+	public int getNameGroup () {
+		return nameGroup;
+	}
+	
+	public void setNameGroup (int index) {
+		nameGroup = index;
+	}
+	
+	public int getNoteGroup () {
+		return noteGroup;
+	}
+	
+	public void setNoteGroup (int index) {
+		noteGroup = index;
 	}
 	
 	public boolean preserveWS () {
@@ -193,11 +190,11 @@ public class Rule {
 		ParametersString tmp = new ParametersString();
 		tmp.setString("ruleName", ruleName);
 		tmp.setInteger("ruleType", ruleType);
-		tmp.setString("start", start);
-		tmp.setString("end", end);
-		tmp.setString("nameStart", nameStart);
-		tmp.setString("nameEnd", nameEnd);
-		tmp.setString("nameFormat", nameFormat);
+		tmp.setString("expr", expr);
+		tmp.setInteger("groupSource", sourceGroup);
+		tmp.setInteger("groupTarget", targetGroup);
+		tmp.setInteger("groupName", nameGroup);
+		tmp.setInteger("groupNote", noteGroup);
 		tmp.setBoolean("preserveWS", preserveWS);
 		tmp.setBoolean("useCodeFinder", useCodeFinder);
 		tmp.setString("propertyName", propertyName);
@@ -211,11 +208,11 @@ public class Rule {
 		ParametersString tmp = new ParametersString(data);
 		ruleName = tmp.getString("ruleName", ruleName);
 		ruleType = tmp.getInteger("ruleType", ruleType);
-		start = tmp.getString("start", start);
-		end = tmp.getString("end", end);
-		nameStart = tmp.getString("nameStart", nameStart);
-		nameEnd = tmp.getString("nameEnd", nameEnd);
-		nameFormat = tmp.getString("nameFormat", nameFormat);
+		expr = tmp.getString("expr", expr);
+		sourceGroup = tmp.getInteger("groupSource", sourceGroup);
+		targetGroup = tmp.getInteger("groupTarget", targetGroup);
+		nameGroup = tmp.getInteger("groupName", nameGroup);
+		noteGroup = tmp.getInteger("groupNote", noteGroup);
 		preserveWS = tmp.getBoolean("preserveWS", preserveWS);
 		propertyName = tmp.getString("propertyName", propertyName);
 		propertyValue = tmp.getString("propertyValue", propertyValue);

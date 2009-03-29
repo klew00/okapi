@@ -106,6 +106,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param data The data to add.
 	 */
 	public void add (String data) {
+		if ( data.length() == 0 ) return;
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
 		createNew = false;
@@ -140,6 +141,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param data The string data to append.
 	 */
 	public void append (String data) {
+		if ( data.length() == 0 ) return;
 		if (( createNew ) || ( list.size() == 0 )) {
 			add(data);
 		}

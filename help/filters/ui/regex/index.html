@@ -33,6 +33,7 @@ net.sf.okapi.filters.regex.RegexFilter</code> of the Okapi library.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
 <p>TODO</p>
+<p>&nbsp;</p>
 
 <h2><a name="parameters"></a>Parameters</h2>
 <h3>Rules Tab</h3>
@@ -50,20 +51,6 @@ up in the list. Rules are evaluated in the order of the list.</p>
 <p><cite>Move Down</cite> -- Click this button to move the rule currently 
 selected down in the list. Rules are evaluated in the order of the list.</p>
 <h4>Rule properties</h4>
-<p><cite>Action</cite> -- Select the type of action to perform for the rule 
-currently selected. There are four choices:</p>
-<ul>
-	<li><cite>Extract the strings inside the content</cite>: Extracts each 
-	strings within the content into a separate text unit. The beginning and 
-	ending of the strings are defined <a href="#OptionsStrings">in the <cite>
-	Options</cite> tab</a>.</li>
-	<li><cite>Extract the content itself</cite>: Extracts the whole text of the 
-	content into a single text unit.</li>
-	<li><cite>Treat the content as a comment</cite>: Does not extract anything, 
-	but process the content as a comment and search for localization directives 
-	if that option is set.</li>
-	<li><cite>Do not extract the content</cite>: Leaves the content alone.</li>
-</ul>
 <p><cite>Preserve white spaces</cite> -- Set this option to preserve all white 
 spaces of the extracted text. If this option is not set the extracted content is 
 unwrapped: That is any sequence of consecutive white spaces is replaced by a 
@@ -73,8 +60,12 @@ returns, and line-feeds.</p>
 <p><cite>Has inline codes</cite> -- Set this option to enable the conversion of 
 some part of the extracted text into inline codes.</p>
 <p><cite>Edit Inline Codes Patterns</cite> -- Click this button to open the 
-Inline Codes Patterns dialog box where you can define rules for converting parts 
+<cite>Inline Codes Patterns</cite> dialog box where you can define rules for converting parts 
 of text into inline codes.</p>
+<p><cite>Auto-close previous group when a new one starts</cite> -- Set this 
+option to automatically close any opened group when a new one is starting. This 
+option allows you to define only start of groups. If this option is not set, 
+each start of group must correspond to an end of group.</p>
 <h4>Regular expressions options</h4>
 <p>This set of options are used for all rules defined in the list. If you need 
 to overwrite an option for a given rule, use the <code>(?idmsux-idmsux)</code> 

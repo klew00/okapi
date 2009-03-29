@@ -30,9 +30,9 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -41,6 +41,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
@@ -65,6 +66,7 @@ public class RegexFilter implements IFilter {
 	private int startSkl;
 	private int parseState = 0;
 	private String srcLang;
+	private String trgLang;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	
@@ -97,7 +99,8 @@ public class RegexFilter implements IFilter {
 		return (parseState > 0);
 	}
 
-	public Event next () {
+	// Rev = 1241
+/*	public Event nextOriginal () {
 		// Cancel if requested
 		if ( canceled ) {
 			parseState = 0;
@@ -177,7 +180,89 @@ public class RegexFilter implements IFilter {
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
 		return nextEvent();
 	}
+*/
+	public Event next () {
+		// Cancel if requested
+		if ( canceled ) {
+			parseState = 0;
+			queue.clear();
+			queue.add(new Event(EventType.CANCELED));
+		}
+		
+		// Process queue if it's not empty yet
+		if ( queue.size() > 0 ) {
+			return nextEvent();
+		}
 
+		// Get the first best match among the rules
+		// trying to match expression
+		Rule bestRule = null;
+		int bestPosition = inputText.length()+99;
+		MatchResult result = null;
+		int i = 0;
+		
+		while ( true ) {
+			for ( Rule rule : params.rules ) {
+				Matcher m = rule.pattern.matcher(inputText);
+				if ( m.find(startSearch) ) {
+					if ( m.start() < bestPosition ) {
+						bestPosition = m.start();
+						bestRule = rule;
+					}
+				}
+				i++;
+			}
+			
+			if ( bestRule != null ) {
+				// Get the matching result
+				Matcher m = bestRule.pattern.matcher(inputText);
+				if ( m.find(bestPosition) ) {
+					result = m.toMatchResult();
+				}
+				// Check for empty content
+				if ( result.start() == result.end() ) {
+					if ( startSearch+1 < inputText.length() ) {
+						startSearch++;
+						continue;
+					}
+					else break; // Done
+				}
+				// Check for boundary to avoid infinite loop
+				else if ( result.start() != inputText.length() ) {
+					// Process the match we just found
+					return processMatch(bestRule, result);
+				}
+				else break; // Done
+			}
+			else break; // Done
+		}
+		
+		// Else: Send end of the skeleton if needed
+		if ( startSearch <= inputText.length() ) {
+			// Treat strings outside rules
+//TODO: implement extract string out of rules
+			// Send the skeleton
+			addSkeletonToQueue(inputText.substring(startSkl, inputText.length()), true);
+		}
+
+		// Any group to close automatically?
+		closeGroups();
+		
+		// End finally set the end
+		// Set the ending call
+		Ending ending = new Ending(String.format("%d", ++otherId));
+		queue.add(new Event(EventType.END_DOCUMENT, ending));
+		return nextEvent();
+	}
+	
+	private void closeGroups () {
+		if ( groupStack.size() > 0 ) {
+			Ending ending = new Ending(String.format("%d", ++otherId));
+			queue.add(new Event(EventType.END_GROUP, ending));
+			groupStack.pop();
+		}
+	}
+	
 	public void open (InputStream input) {
 		BufferedReader reader = null;
 		try {
@@ -187,8 +272,6 @@ public class RegexFilter implements IFilter {
 			hasUTF8BOM = bis.hasUTF8BOM();
 			reader = new BufferedReader(new InputStreamReader(bis, encoding));
 
-			// Read the whole file into one string
-			lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 			//TODO: Optimize this with a better 'readToEnd()'
 			//TODO: Fix issue that this code cannot read a lone \n at the end.
 			StringBuilder tmp = new StringBuilder();
@@ -199,8 +282,10 @@ public class RegexFilter implements IFilter {
 			}
 			reader.readLine();
 			
-			// Common open
-			commonOpen(tmp.toString());
+			// Detect line break type
+			lineBreak = BOMNewlineEncodingDetector.getNewlineType(tmp).toString();
+			// Common open (and normalize line-breaks
+			commonOpen(tmp.toString().replace(lineBreak, "\n"));
 		}
 		catch ( UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
@@ -243,6 +328,7 @@ public class RegexFilter implements IFilter {
 	{
 		encoding = defaultEncoding;
 		srcLang = sourceLanguage;
+		trgLang = targetLanguage;
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -291,9 +377,11 @@ public class RegexFilter implements IFilter {
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setType(params.mimeType);
 		startDoc.setMimeType(params.mimeType);
+		startDoc.setMultilingual(hasRulesWithTarget());
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 	
+	/*
 	private Event processMatch (Rule rule,
 		MatchResult startResult,
 		MatchResult endResult)
@@ -387,7 +475,112 @@ public class RegexFilter implements IFilter {
 		}
 		return nextEvent();
 	}
+*/
+	
+	private Event processMatch (Rule rule,
+		MatchResult result)
+	{
+		GenericSkeleton skel;
+		switch ( rule.ruleType ) {
+		case Rule.RULETYPE_NOTRANS:
+		case Rule.RULETYPE_COMMENT:
+			// Skeleton data is the whole expression's match
+			//TODO: line-breaks conversion!!
+			skel = new GenericSkeleton(
+				inputText.substring(startSkl, result.end()).replace("\n", lineBreak));
+			// Update starts for next read
+			startSearch = result.end();
+			startSkl = result.end();
+			// If comment: process the source content for directives
+			if ( rule.ruleType == Rule.RULETYPE_COMMENT ) {
+				params.locDir.process(result.group(rule.sourceGroup));
+			}
+			// Then just return one skeleton event
+			return new Event(EventType.DOCUMENT_PART,
+				new DocumentPart(String.format("%d", ++otherId), false, skel));
+			
+		case Rule.RULETYPE_OPENGROUP:
+		case Rule.RULETYPE_CLOSEGROUP:
+			// Skeleton data include the content
+			skel = new GenericSkeleton(
+				inputText.substring(startSkl, result.end()).replace("\n", lineBreak));
+			// Update starts for next read
+			startSearch = result.end();
+			startSkl = result.end();
+			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
+				// See if we need to auto-close the groups
+				if ( params.oneLevelGroups && (groupStack.size() > 0 )) {
+					closeGroups();
+				}
+				// Start the new one
+				StartGroup startGroup = new StartGroup(null);
+				startGroup.setId(String.valueOf(++otherId));
+				startGroup.setSkeleton(skel);
+				if ( rule.nameGroup != -1 ) {
+					String name = result.group(rule.nameGroup);
+					if ( name.length() > 0 ) {
+						startGroup.setName(name);
+					}
+				}
+				groupStack.push(startGroup);
+				queue.add(new Event(EventType.START_GROUP, startGroup));
+				return queue.poll();
+			}
+			else { // Close group
+				if ( groupStack.size() == 0 ) {
+					throw new RuntimeException("Rule for closing a group detected, but no group is open.");
+				}
+				groupStack.pop();
+				Ending ending = new Ending(String.valueOf(++otherId));  
+				ending.setSkeleton(skel);
+				return new Event(EventType.END_GROUP, ending);
+				
+			}
+		}
+		
+		//--- Otherwise: process the content
 
+		// Set skeleton data if needed
+		if ( result.start() > startSkl ) {
+			addSkeletonToQueue(inputText.substring(startSkl, result.start()), false);
+		}
+		startSkl = result.start();
+		
+		startSearch = result.end(); // For the next read
+		
+		// Check localization directives
+		if ( !params.locDir.isLocalizable(true) ) {
+			// If not to be localized: make it a skeleton unit
+			addSkeletonToQueue(inputText.substring(startSkl, result.end()), false);
+			startSkl = result.end(); // For the next read
+			// And return
+			return nextEvent();
+		}
+
+		//--- Else: We extract
+
+
+		// Process the data, this will create a queue of events if needed
+		if ( rule.ruleType == Rule.RULETYPE_CONTENT ) {
+			processContent(rule, result);
+		}
+		else if ( rule.ruleType == Rule.RULETYPE_STRING ) {
+			// Skeleton before
+			if ( result.start(rule.sourceGroup) > result.start() ) {
+				addSkeletonToQueue(inputText.substring(startSkl, result.start(rule.sourceGroup)), false);
+			}
+			// Extract the string(s)
+			processStrings(rule, result);
+			// Skeleton after
+			if ( result.end(rule.sourceGroup) < result.end() ) {
+				addSkeletonToQueue(inputText.substring(result.end(rule.sourceGroup), result.end()), false);
+			}
+			startSkl = result.end(); // For the next read
+		}
+		return nextEvent();
+	}
+
+	/*
 	private String getMatch (String text,
 		String start,
 		String end)
@@ -406,7 +599,8 @@ public class RegexFilter implements IFilter {
 		}
 		return null;
 	}
-	
+	*/
+	/*
 	private void processContent (Rule rule,
 		String name,
 		String data)
@@ -436,7 +630,107 @@ public class RegexFilter implements IFilter {
 
 		queue.add(new Event(EventType.TEXT_UNIT, tuRes));
 	}
+	*/
+
+	private void processContent (Rule rule,
+		MatchResult result)
+	{
+		// Create the new text unit and its skeleton
+		//TODO: handle un-escaping and mime-type
+		tuRes = new TextUnit(String.valueOf(++tuId), result.group(rule.sourceGroup));
+		GenericSkeleton skel = new GenericSkeleton();
+		tuRes.setSkeleton(skel);
+		boolean hasTarget = (rule.targetGroup != -1);
+		
+		if ( hasTarget ) {
+			// Add the target data
+			tuRes.setTargetContent(trgLang, new TextFragment(result.group(rule.targetGroup)));
+			// Case of source before target
+			if ( result.start(rule.targetGroup) > result.start(rule.sourceGroup) ) {
+				// Before the source
+				if ( result.start(rule.sourceGroup) > startSkl ) {
+					skel.append(inputText.substring(
+						startSkl, result.start(rule.sourceGroup)).replace("\n", lineBreak));
+				}
+				// The source
+				skel.addContentPlaceholder(tuRes);
+				// Between the source and the target
+				skel.append(inputText.substring(
+					result.end(rule.sourceGroup), result.start(rule.targetGroup)).replace("\n", lineBreak));
+				// The target
+				skel.addContentPlaceholder(tuRes, trgLang);
+				// After the target
+				if ( result.end(rule.targetGroup) < result.end() ) {
+					skel.append(inputText.substring(
+						result.end(rule.targetGroup), result.end()).replace("\n", lineBreak));
+				}
+			}
+			else { // Case of target before the source
+				// Before the target
+				if ( result.start(rule.targetGroup) > startSkl ) {
+					skel.append(inputText.substring(
+						startSkl, result.start(rule.targetGroup)).replace("\n", lineBreak));
+				}
+				// The target
+				skel.addContentPlaceholder(tuRes, trgLang);
+				// Between the target and the source
+				skel.append(inputText.substring(
+					result.end(rule.targetGroup), result.start(rule.sourceGroup)).replace("\n", lineBreak));
+				// The source
+				skel.addContentPlaceholder(tuRes);
+				// After the source
+				if ( result.end(rule.sourceGroup) < result.end() ) {
+					skel.append(inputText.substring(
+						result.end(rule.sourceGroup), result.end()).replace("\n", lineBreak));
+				}
+			}
+		}
+		else { // No target
+			if ( result.start(rule.sourceGroup) > startSkl ) {
+				skel.append(inputText.substring(
+					startSkl, result.start(rule.sourceGroup)).replace("\n", lineBreak));
+			}
+			skel.addContentPlaceholder(tuRes);
+			if ( result.end(rule.sourceGroup) < result.end() ) {
+				skel.append(inputText.substring(
+					result.end(rule.sourceGroup), result.end()).replace("\n", lineBreak));
+			}
+		}
+
+		// Move the skeleton start for next read
+		startSkl = result.end();
+		
+		if ( rule.preserveWS ) {
+			tuRes.setPreserveWhitespaces(true);
+		}
+		else { // Unwrap the content
+			TextFragment.unwrap(tuRes.getSourceContent());
+			if ( hasTarget ) TextFragment.unwrap(tuRes.getTargetContent(trgLang));
+		}
+
+		if ( rule.useCodeFinder ) {
+			rule.codeFinder.process(tuRes.getSourceContent());
+			if ( hasTarget ) rule.codeFinder.process(tuRes.getTargetContent(trgLang));
+		}
+
+		if ( rule.nameGroup != -1 ) {
+			String name = result.group(rule.nameGroup);
+			if ( name.length() > 0 ) {
+				tuRes.setName(name);
+			}
+		}
+		
+		if ( rule.noteGroup != -1 ) {
+			String note = result.group(rule.noteGroup);
+			if ( note.length() > 0 ) {
+				tuRes.setProperty(new Property(Property.NOTE, note, true));
+			}
+		}
+
+		queue.add(new Event(EventType.TEXT_UNIT, tuRes));
+	}
 	
+	/*
 	private void processStrings (Rule rule,
 		String name,
 		String data)
@@ -581,6 +875,165 @@ public class RegexFilter implements IFilter {
 			addSkeletonToQueue(data.substring(startSearch), false);
 		}
 	}
+	*/
+	
+	private void processStrings (Rule rule,
+		MatchResult result)
+	{
+		int i = -1;
+		int startSearch = 0;
+		int count = 0;
+		String mark = params.startString;
+		String data = result.group(rule.sourceGroup);
+		
+		while ( true  ) {
+			int j = 0;
+			int start = startSearch;
+			int end = -1;
+			int state = 0;
+
+			// Search string one by one
+			while ( end == -1 ) {
+				if ( ++i >= data.length() ) break;
+				
+				// Deal with \\, \" and \' escapes
+				if ( state > 0 ) {
+					if ( params.useBSlashEscape ) {
+						while ( data.codePointAt(i) == '\\' ) {
+							if ( i+2 < data.length() ) i += 2; // Now point to next
+							else throw new RuntimeException("Escape syntax error in ["+data+"]");
+						}
+					}
+				}
+			
+				// Check characters
+				switch ( state ) {
+				case 0:
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// Start of string match found, set search info for end
+							start = i+1; // Start of the string content
+							state = 2;
+							mark = params.endString;
+							j = 0;
+						}
+						else state = 1;
+					}
+					break;
+				case 1: // Look if we can finish a start match
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// Start of string match found, set search info for end
+							start = i+1; // Start of the string content
+							state = 2;
+							mark = params.endString;
+							j = 0;
+						}
+						// Else: keep moving
+					}
+					else { // Was not a match
+						state = 0;
+						i -= (j-1); // Go back just after the trigger
+						j = 0; // And reset the mark index
+					}
+					break;
+				case 2: // Look for an end mark
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// End of string match found
+							// Set the end of the string position (will stop the loop too)
+							end = i-j+1;
+							// Check for empty strings
+							if ( end == start ) {
+								end = -1;
+								state = 0;
+								j = 0;
+							}
+						}
+						else state = 3;
+					}
+					break;
+				case 3: // Look if we can finish an end match
+					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
+						if ( ++j == mark.length() ) {
+							// End of string match found
+							// Set the end of the string position (will stop the loop too)
+							end = i-j+1;
+							// Check for empty strings
+							if ( end == start ) {
+								end = -1;
+								state = 0;
+								j = 0;
+							}
+						}
+						// Else: Keep moving
+					}
+					else { // Was not a match
+						state = 2;
+						i -= (j-1); // Go back just after the trigger
+						j = 0; // And reset the mark index
+					}
+					break;
+				}
+			} // End of while end == -1
+			
+			// If we have found a string: process it
+			if ( end != -1 ) {
+				count++;
+				// Skeleton part before
+				if ( start > startSearch ) {
+					addSkeletonToQueue(data.substring(startSearch, start), false);
+				}
+
+				// Item to extract
+				tuRes = new TextUnit(String.valueOf(++tuId),
+					data.substring(start, end));
+				tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+				if ( rule.preserveWS ) {
+					tuRes.setPreserveWhitespaces(true);
+				}
+				else { // Unwrap the string
+					TextFragment.unwrap(tuRes.getSourceContent());
+				}
+				
+				if ( rule.useCodeFinder ) {
+					rule.codeFinder.process(tuRes.getSourceContent());
+				}
+
+				if ( rule.nameGroup != -1 ) {
+					String name = result.group(rule.nameGroup);
+					if ( name.length() > 0 ) {
+						if ( count > 1 ) { // Add a number after the first string
+							tuRes.setName(String.format("%s%d", name, count));
+						}
+						else {
+							tuRes.setName(name);
+						}
+					}
+				}
+				
+				if ( rule.noteGroup != -1 ) {
+					String note = result.group(rule.noteGroup);
+					if ( note.length() > 0 ) {
+						tuRes.setProperty(new Property(Property.NOTE, note, true));
+					}
+				}
+
+				queue.add(new Event(EventType.TEXT_UNIT, tuRes));
+				// Reset the pointers: next skeleton will start from startSearch, end reset to -1
+				startSearch = end;
+			}
+
+			// Make sure we get out of the loop if needed
+			if ( i >= data.length() ) break;
+			
+		} // End of while true
+
+		// Skeleton part after the last string
+		if ( startSearch < data.length() ) {
+			addSkeletonToQueue(data.substring(startSearch), false);
+		}
+	}
 	
 	private void addSkeletonToQueue (String data,
 		boolean forceNewEntry)
@@ -590,12 +1043,12 @@ public class RegexFilter implements IFilter {
 			if ( queue.getLast().getResource() instanceof DocumentPart ) {
 				// Append to the last queue entry if possible
 				skel = (GenericSkeleton)queue.getLast().getResource().getSkeleton();
-				skel.append(data);
+				skel.append(data.replace("\n", lineBreak));
 				return;
 			}
 		}
 		// Else: create a new skeleton entry
-		skel = new GenericSkeleton(data);
+		skel = new GenericSkeleton(data.replace("\n", lineBreak));
 		queue.add(new Event(EventType.DOCUMENT_PART,
 			new DocumentPart(String.valueOf(++otherId), false, skel)));
 	}
@@ -606,6 +1059,14 @@ public class RegexFilter implements IFilter {
 			parseState = 0; // No more event after
 		}
 		return queue.poll();
+	}
+
+	// Tells if at least one rule has a target
+	private boolean hasRulesWithTarget () {
+		for ( Rule rule : params.rules ) {
+			if ( rule.targetGroup != -1 ) return true;
+		}
+		return false;
 	}
 
 }

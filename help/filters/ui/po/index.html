@@ -26,7 +26,7 @@
 </table>
 
 <h2><a name="overview"></a>Overview</h2>
-<p>The PO Filter is an Okapi component that implements the IFilter interface for 
+<p>The PO Filter is an Okapi component that implements the <code>IFilter</code> interface for 
 Gettext PO (Portable Object) resource files.</p>
 <p>The implementation is based on the PO specifications found in the
 <a target="_blank" href="http://www.gnu.org/software/gettext/manual/html_node/gettext_9.html">GNU gettext manual</a>. 
@@ -144,18 +144,18 @@ looking like this:</p>
 <h3>References</h3>
 <p>PO files may have reference comments generated from the source code. they are 
 denoted by a leading &quot;<code>#:</code>&quot; marker.</p>
-<p>The filter provides read-only access to them through the &quot;<code>references</code>&quot; 
+<p>The filter provides read-only access to them through the <i>references</i> 
 resource-level property.</p>
 <h3>Extracted Comments</h3>
 <p>PO files may have comments generated from the source code. They correspond to 
 localization notes from the developers. They are denoted by a leading &quot;<code>#.</code>&quot; 
 marker</p>
-<p>The filter provides read-only access to them through the &quot;<code>locnote</code>&quot; 
+<p dir="ltr">The filter provides read-only access to them through the <i>note</i> 
 resource-level property </p>
 <h3>Translators Comments</h3>
 <p>PO files may have translators comments, denoted by a leading &quot;<code># </code>
 &quot; marker.</p>
-<p>The filter provides read-only access to them through the &quot;<code>transnote</code>&quot; 
+<p>The filter provides read-only access to them through the <i>transnote</i> 
 resource-level property.</p>
 <h3>Context Comments</h3>
 <p>PO files may have context comments, denoted by a leading &quot;<code>#|</code>&quot; 
@@ -170,13 +170,15 @@ rarely used.</p>
 <p>PO files may may a &quot;fuzzy flag&quot; indicated as &quot;<code>#, fuzzy</code>&quot;. This 
 indicates that the text in the <code>msgstr</code> entry is only a proposed 
 translation, and may or may not be correct for the source.</p>
-<p>When on bilingual mode, the filter provides access to this flag through the <i>approved</i> target 
-property.</p>
-<p>If the flag is set the <i>approved</i> property is set to &quot;<code>no</code>&quot;. 
-If the flag does not exists, the <i>approved</i> property is not defined.</p>
-<p>If the <i>approved</i> property was defined by the filter, and is deleted, or 
+<p>When on bilingual mode, the filter provides access to this flag through the <i>approved</i> 
+target property:</p>
+<ul>
+	<li>If the flag is set the <i>approved</i> property is set to &quot;<code>no</code>&quot;. 
+If the flag does not exists, the <i>approved</i> property is not defined.</li>
+	<li>If the <i>approved</i> property was defined by the filter, and is deleted, or 
 set to a different value than &quot;<code>no</code>&quot;, the flag is removed from the 
-output document.</p>
+output document.</li>
+</ul>
 <h3>No-Wrap Flag</h3>
 <p>TODO</p>
 <h3>X-Format Flag</h3>

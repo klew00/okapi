@@ -8,35 +8,127 @@
 <h1 class="dlgsec1">Regex Filter Parameters</h1>
 <h2 class="dlgsec2">Edit Rule</h2>
 <p>This dialog box allows you to edit a rule.</p>
-<h4>Boundaries of the content</h4>
-<p dir="ltr"><cite>Start</cite> -- Enter the regular expression matching just 
-before the content.</p>
-<p><cite>End</cite> -- Enter the regular expression matching just after the 
-content.</p>
-<p>You can enter a example of text to process in the edit field. The result of 
+<h4>Regular expression</h4>
+<p dir="ltr">Enter the regular expression for this rule. The expression must be 
+a valid Java regular expression. The capturing groups you define inside this 
+expression are used to specify what parts is what in the generated events.</p>
+<p><cite>Example</cite> -- Enter a example of text to process. The result of 
 the rule applied to the example is shown below the example, as you modify the parameters. 
 All matches for the given rule are provided.</p>
 <p>Example of expressions:</p>
-<pre>Start: \[.*?\]=\{
-  End: \}
+<pre>Expression: ^<span style="background-color: #FFFF00">(.*?)</span>=\[<span style="background-color: #00FF00">(.*?)</span>]\Z
 
-Sample: <span style="background-color: #00FF00">[ID100]={</span>Text to translate<span style="background-color: #00FF00">}</span></pre>
-<h4>Resource name</h4>
-<p>For each rule, you can capture a resource name. This name can be used as the 
-identifier of the text extracted in this rule. For example, the value may be 
-used as the value for the <code>resname</code> attribute in XLIFF.</p>
-<p><cite>Before the name</cite> -- Enter the regular expression matching just 
-before the name of the resource. This expression is applied on the text matched 
-by the <cite>Start</cite> expression.</p>
-<p><cite>After the name</cite> -- Enter the regular expression matching just 
-after the name of the resource. This expression is applied on the text matched 
-by the <cite>Start</cite> expression.</p>
-<p><cite>Format</cite> -- Reserved for later usage.</p>
-<p>Example of expression:</p>
-<pre>Before the name: \[
- After the name: \]
-
-Sample: <span style="background-color: #00FF00">[</span>ID100<span style="background-color: #00FF00">]</span>={  &lt;-- Matching text for the start of content.</pre>
+    Sample: <span style="background-color: #FFFF00">ID001</span>=[<span style="background-color: #00FF00">Source text</span>]</pre>
+<h3>Action and Groups</h3>
+<p><cite>Action</cite> -- Select the action to perform when this rule is used. </p>
+<p><cite>Action</cite> -- Select the action to perform for this rule. Which 
+fields can be used depends on the action selected. There are the following choices:</p>
+<ul>
+	<li><cite>Extract the strings in the source</cite>: Extracts each 
+	strings within the source capturing group defined for thsi rule. The content into a separate text unit. The beginning and 
+	ending of the strings are defined <a href="#OptionsStrings">in the <cite>
+	Options</cite> tab</a>.</li>
+	<li><cite>Extract the content</cite>: Extracts the content into a single 
+	text unit, according the different capturing groups defined for the rule.</li>
+	<li><cite>Treat the source as a comment</cite>: Does not extract anything, 
+	but process the content as a comment and search for localization directives 
+	if that option is set.</li>
+	<li><cite>Do not extract</cite>: Leaves the content alone.</li>
+	<li><cite>Start a group</cite>: Sends a <code>START_GROUP</code> event.</li>
+	<li><cite>End a group</cite>: Sends an <code>END_GROUP</code> event.</li>
+</ul>
+<p><cite>Source group number</cite> -- Enter the number of the capturing corresponding to 
+the source content for this rule. If this field is enabled, you must provide a 
+value.</p>
+<p><cite>Target group number</cite> -- Enter the number of the capturing corresponding to 
+the target content for this rule. Use -1 to leave this group undefined.</p>
+<p><cite>Identifier group number</cite> -- Enter the number of the capturing corresponding 
+to the identifier content for this rule. Use -1 to leave this group undefined.</p>
+<p><cite>Note group number</cite> -- Enter the number of the capturing corresponding to the 
+note content for this rule. Use -1 to leave this group undefined.</p>
+<p>The capturing groups are numbered by counting their opening parentheses from 
+left to right. For example, in the expression <code>((A)(B(C)))</code> there are 
+four groups:</p>
+<ol>
+	<li><code>((A)(B(C)))</code></li>
+	<li><code>(A)</code></li>
+	<li><code>(B(C))</code></li>
+	<li><code>(C)</code></li>
+</ol>
+<p><a name="actionsAndGroups"></a>What capturing group is used for in each available 
+action is defined as follow:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table1">
+	<tr>
+		<th align="left" valign="top" colspan="2">&nbsp;</th>
+		<th align="left" valign="top">Source</th>
+		<th align="left" valign="top">Target</th>
+		<th align="left" valign="top">Identifier</th>
+		<th align="left" valign="top">Note</th>
+	</tr>
+	<tr>
+		<th align="left" valign="top">Extract the strings in the source</th>
+		<td align="left" valign="top">Creates zero or more text units, 
+		depending on the strings found in the source capturing group.</td>
+		<td align="left" valign="top">Must be defined. It is where the string or 
+		strings to extract are taken from.</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">If defined: It is name for the first text 
+		unit. If there is more than one string to extract, a sequential number 
+		(starting at 2) is appended at the end of each subsequent name.</td>
+		<td align="left" valign="top">If defined: It is the <i>note</i> property 
+		associated to each text unit corresponding to each extracted string.</td>
+	</tr>
+	<tr>
+		<th align="left" valign="top">Extract the content</th>
+		<td align="left" valign="top">Creates one text unit based on the 
+		different capturing groups.</td>
+		<td align="left" valign="top">Must be defined. It is the source text of 
+		the text unit.</td>
+		<td align="left" valign="top">If defined:&nbsp; It is the target text of 
+		the text unit.</td>
+		<td align="left" valign="top">If defined: It is the name of the text 
+		unit.</td>
+		<td align="left" valign="top">If defined: It is the <i>note</i> property 
+		associated to the text unit.</td>
+	</tr>
+	<tr>
+		<th align="left" valign="top">Treat the source as a comment</th>
+		<td align="left" valign="top">
+		<p dir="ltr">Process the source capturing group for localization 
+		directives (if requested) and leaves the content of the whole expression untouched.</td>
+		<td align="left" valign="top">Must be defined. It is treated as a 
+		comment (for localization directives).</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+	</tr>
+	<tr>
+		<th align="left" valign="top">Do not extract</th>
+		<td align="left" valign="top">Leaves the content of the whole expression untouched.</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+	</tr>
+	<tr>
+		<th align="left" valign="top">Start a group</th>
+		<td align="left" valign="top">Sends a <code>START_GROUP</code> event.</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">If defined: It is the name of the group 
+		being opened.</td>
+		<td align="left" valign="top">If defined: It is the note property 
+		associated to the group being opened.</td>
+	</tr>
+	<tr>
+		<th align="left" valign="top">End a group</th>
+		<td align="left" valign="top">Sends an <code>END_GROUP</code> event.</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used</td>
+		<td align="left" valign="top">Not used.</td>
+	</tr>
+</table>
 <p>&nbsp;</p>
 </body>
 </html>

@@ -35,6 +35,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -43,17 +45,16 @@ import org.eclipse.swt.widgets.Text;
 public class RuleDialog {
 	
 	private Shell shell;
-	private Text edStart;
-	private Text edEnd;
+	private Text edExpression;
 	private Text edSample;
 	private Text edResult;
-	private Text edNameStart;
-	private Text edNameEnd;
-	private Text edNameFormat;
+	private Text edSource;
+	private Text edTarget;
+	private Text edName;
+	private Text edNote;
+	private Combo cbRuleType;
 	private boolean result = false;
 	private Pattern fullPattern;
-	private Pattern startPattern;
-	private Pattern endPattern;
 	private Rule rule = null;
 	private int regexOptions;
 	private IHelp help;
@@ -72,38 +73,25 @@ public class RuleDialog {
 		shell.setLayout(new GridLayout());
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText(Res.getString("RuleDialog.boundaries")); //$NON-NLS-1$
+		grpTmp.setText("Regular expression"); //$NON-NLS-1$
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		GridLayout layTmp = new GridLayout(2, false);
+		GridLayout layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
 
-		Label label = new Label(grpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.start")); //$NON-NLS-1$
-		
-		edStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
+		edExpression = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edStart.setLayoutData(gdTmp);
-		edStart.addModifyListener(new ModifyListener () {
+		edExpression.setLayoutData(gdTmp);
+		edExpression.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
 				updateResults();
 			}
 		});
 		
-		label = new Label(grpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.end")); //$NON-NLS-1$
-		
-		edEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edEnd.setLayoutData(gdTmp);
-		edEnd.addModifyListener(new ModifyListener () {
-			public void modifyText(ModifyEvent e) {
-				updateResults();
-			}
-		});
+		Label label = new Label(grpTmp, SWT.NONE);
+		label.setText("Sample:");
 		
 		edSample = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 64;
 		edSample.setLayoutData(gdTmp);
 		edSample.addModifyListener(new ModifyListener () {
@@ -114,37 +102,100 @@ public class RuleDialog {
 
 		edResult = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 88;
 		edResult.setLayoutData(gdTmp);
 		edResult.setEditable(false);
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText(Res.getString("RuleDialog.resourceName")); //$NON-NLS-1$
+		grpTmp.setText("Action and groups");
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		layTmp = new GridLayout(2, false);
+		layTmp = new GridLayout(4, false);
 		grpTmp.setLayout(layTmp);
+		
+		Composite cmpTmp = new Composite(grpTmp, SWT.None);
+		layTmp = new GridLayout(2, false);
+		layTmp.marginWidth = 0;
+		cmpTmp.setLayout(layTmp);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		cmpTmp.setLayoutData(gdTmp);
+		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText(Res.getString("Editor.action")); //$NON-NLS-1$
+		
+		cbRuleType = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbRuleType.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateGroups();
+			}
+		});
+		cbRuleType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		cbRuleType.add(Res.getString("Editor.extractStringsInside")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.extractContent")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.treatAsComment")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.doNotExtract")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.startGroup")); //$NON-NLS-1$
+		cbRuleType.add(Res.getString("Editor.endGroup")); //$NON-NLS-1$
 
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.beforeName")); //$NON-NLS-1$
+		label.setText("&Source group number:");
 		
-		edNameStart = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edNameStart.setLayoutData(gdTmp);
+		int fieldWidth = 50;
+		edSource = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
+		gdTmp = new GridData();
+		gdTmp.widthHint = fieldWidth;
+		edSource.setLayoutData(gdTmp);
+		edSource.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
+		
+		int indent = 10;
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("&Target group number:");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		label.setLayoutData(gdTmp);
+		
+		edTarget = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
+		gdTmp = new GridData();
+		gdTmp.widthHint = fieldWidth;
+		edTarget.setLayoutData(gdTmp);
+		edTarget.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.afterName")); //$NON-NLS-1$
+		label.setText("&Identifier group number:");
 		
-		edNameEnd = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edNameEnd.setLayoutData(gdTmp);
+		edName = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
+		gdTmp = new GridData();
+		gdTmp.widthHint = fieldWidth;
+		edName.setLayoutData(gdTmp);
+		edName.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
 		
 		label = new Label(grpTmp, SWT.NONE);
-		label.setText(Res.getString("RuleDialog.format")); //$NON-NLS-1$
+		label.setText("&Note group number:");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		label.setLayoutData(gdTmp);
 		
-		edNameFormat = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edNameFormat.setLayoutData(gdTmp);
+		edNote = new Text(grpTmp, SWT.BORDER | SWT.SINGLE);
+		gdTmp = new GridData();
+		gdTmp.widthHint = fieldWidth;
+		edNote.setLayoutData(gdTmp);
+		edNote.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateResults();
+			}
+		});
 		
 		//--- Dialog-level buttons
 
@@ -180,27 +231,78 @@ public class RuleDialog {
 		return result;
 	}
 
-	private void updateResults () {
+	public void updateGroups () {
+		int type = cbRuleType.getSelectionIndex();
+		switch ( type ) {
+		case Rule.RULETYPE_STRING:
+			edSource.setEnabled(true);
+			edTarget.setEnabled(false);
+			edName.setEnabled(true);
+			edNote.setEnabled(true);
+			break;
+		case Rule.RULETYPE_CONTENT:
+			edSource.setEnabled(true);
+			edTarget.setEnabled(true);
+			edName.setEnabled(true);
+			edNote.setEnabled(true);
+			break;
+		case Rule.RULETYPE_COMMENT:
+			edSource.setEnabled(true);
+			edTarget.setEnabled(false);
+			edName.setEnabled(false);
+			edNote.setEnabled(false);
+			break;
+		case Rule.RULETYPE_NOTRANS:
+		case Rule.RULETYPE_CLOSEGROUP:
+			edSource.setEnabled(false);
+			edTarget.setEnabled(false);
+			edName.setEnabled(false);
+			edNote.setEnabled(false);
+			break;
+		case Rule.RULETYPE_OPENGROUP:
+			edSource.setEnabled(false);
+			edTarget.setEnabled(false);
+			edName.setEnabled(true);
+			edNote.setEnabled(true);
+			break;
+		}
+	}
+	
+	private boolean updateResults () {
+		boolean result = true;
 		try {
-			fullPattern = Pattern.compile("("+edStart.getText()+")(.*?)("+edEnd.getText()+")", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				regexOptions);
+			// Get the values
+			fullPattern = Pattern.compile(edExpression.getText(), regexOptions);
+			int source = Integer.valueOf(edSource.getText());
+			int target = Integer.valueOf(edTarget.getText());
+			int name = Integer.valueOf(edName.getText());
+			int note = Integer.valueOf(edNote.getText());
+			
 			Matcher m1 = fullPattern.matcher(getSampleText());
 			StringBuilder tmp = new StringBuilder();
 			int startSearch = 0;
 			while ( m1.find(startSearch) ) {
-				startPattern = Pattern.compile(edStart.getText(), regexOptions);
-				Matcher m2 = startPattern.matcher(m1.group());
-				if ( m2.find() ) {
-					endPattern = Pattern.compile(edEnd.getText(), regexOptions);
-					Matcher m3 = endPattern.matcher(m1.group());
-					if ( m3.find(m2.end()) ) {
-						tmp.append(Res.getString("RuleDialog.resultStart") + m2.group() + Res.getString("RuleDialog.resultContent") //$NON-NLS-1$ //$NON-NLS-2$
-							+ m1.group().substring(m2.end(), m3.start())
-							+ Res.getString("RuleDialog.resultEnd") + m3.group() + "]\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
+				if ( m1.start() == m1.end() ) break;
+				boolean hasGroup = false;
+				if ( tmp.length() > 0 ) tmp.append("-----\n");
+				if ( source != -1 ) {
+					tmp.append("Source=[" + m1.group(source) + "]\n");
+					hasGroup = true;
 				}
-				if ( startSearch == m1.end(0) ) break;
-				else startSearch = m1.end(0);
+				if ( target != -1 ) {
+					tmp.append("Target=[" + m1.group(target) + "]\n");
+					hasGroup = true;
+				}
+				if ( name != -1 ) {
+					tmp.append("Identifier=[" + m1.group(name) + "]\n");
+					hasGroup = true;
+				}
+				if ( note != -1 ) {
+					tmp.append("Note=[" + m1.group(note) + "]\n");
+					hasGroup = true;
+				}
+				if ( !hasGroup ) tmp.append("Expression=[" + m1.group() + "]\n");
+				startSearch = m1.end();
 			}
 			// If there is no match: tell it
 			if ( tmp.length() == 0 ) {
@@ -211,7 +313,9 @@ public class RuleDialog {
 		}
 		catch ( Throwable e ) {
 			edResult.setText(Res.getString("RuleDialog.error")+e.getMessage()); //$NON-NLS-1$
+			result = false;
 		}
+		return result;
 	}
 
 	private String getSampleText() {
@@ -224,22 +328,25 @@ public class RuleDialog {
 
 	private boolean saveData () {
 		try {
-			if (( edStart.getText().length() == 0 )
-				&& ( edEnd.getText().length() == 0 )) {
-				edStart.selectAll();
-				edStart.setFocus();
+			if ( edExpression.getText().length() == 0 ) {
+				edExpression.selectAll();
+				edExpression.setFocus();
 				return false;
 			}
-			Pattern.compile(edStart.getText());
-			Pattern.compile(edEnd.getText());
-			Pattern.compile(edNameStart.getText());
-			Pattern.compile(edNameEnd.getText());
-			rule.setStart(edStart.getText());
-			rule.setEnd(edEnd.getText());
-			rule.setNameStart(edNameStart.getText());
-			rule.setNameEnd(edNameEnd.getText());
-			rule.setNameFormat(edNameFormat.getText());
+			// Check if values are valid before setting the rule
+			Integer.valueOf(edSource.getText());
+			Integer.valueOf(edTarget.getText());
+			Integer.valueOf(edName.getText());
+			Integer.valueOf(edNote.getText());
+			if ( !updateResults() ) throw new RuntimeException("Error in expression or in group numbers.");
+					
+			rule.setExpression(edExpression.getText());
+			rule.setSourceGroup(Integer.valueOf(edSource.getText()));
+			rule.setTargetGroup(Integer.valueOf(edTarget.getText()));
+			rule.setNameGroup(Integer.valueOf(edName.getText()));
+			rule.setNoteGroup(Integer.valueOf(edNote.getText()));
 			rule.setSample(getSampleText());
+			rule.setRuleType(cbRuleType.getSelectionIndex());
 			result = true;
 			return result;
 		}
@@ -250,11 +357,12 @@ public class RuleDialog {
 	}
 
 	public void setData () {
-		edStart.setText(rule.getStart());
-		edEnd.setText(rule.getEnd());
-		edNameFormat.setText(rule.getNameFormat());
-		edNameEnd.setText(rule.getNameEnd());
-		edNameStart.setText(rule.getNameStart());
+		edSource.setText(String.valueOf(rule.getSourceGroup()));
+		edTarget.setText(String.valueOf(rule.getTargetGroup()));
+		edName.setText(String.valueOf(rule.getNameGroup()));
+		edNote.setText(String.valueOf(rule.getNoteGroup()));
+		cbRuleType.select(rule.getRuleType());
+		edExpression.setText(rule.getExpression());
 		edSample.setText(rule.getSample());
 	}
 

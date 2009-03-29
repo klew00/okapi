@@ -43,7 +43,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -72,7 +71,7 @@ public class Editor implements IParametersEditor {
 	private Parameters params;
 	private ArrayList<Rule> rules;
 	private int ruleIndex = -1;
-	private Combo cbRuleType;
+	private Text edRuleType;
 	private Button chkPreserveWS;
 	private Button chkUseCodeFinder;
 	private Button btEditFinderRules;
@@ -81,6 +80,7 @@ public class Editor implements IParametersEditor {
 	private Button chkMultiline;
 	private Text edMimeType;
 	private IHelp help;
+	private Button chkOneLevelGroups;
 	
 	/**
 	 * Invokes the editor for the Properties filter parameters.
@@ -164,40 +164,31 @@ public class Editor implements IParametersEditor {
 		//--- Rule properties
 		
 		Group propGroup = new Group(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(2, false);
+		layTmp = new GridLayout();
 		propGroup.setLayout(layTmp);
 		propGroup.setText(Res.getString("Editor.ruleProperties")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 3;
 		propGroup.setLayoutData(gdTmp);
 		
-		edExpression = new Text(propGroup, SWT.BORDER | SWT.V_SCROLL);
+		edExpression = new Text(propGroup, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edExpression.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
 		gdTmp.heightHint = 50;
 		edExpression.setLayoutData(gdTmp);
 		
-		Label label = new Label(propGroup, SWT.NONE);
-		label.setText(Res.getString("Editor.action")); //$NON-NLS-1$
-		
-		cbRuleType = new Combo(propGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
-		cbRuleType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		cbRuleType.add(Res.getString("Editor.extractStringsInside")); //$NON-NLS-1$
-		cbRuleType.add(Res.getString("Editor.extractContent")); //$NON-NLS-1$
-		cbRuleType.add(Res.getString("Editor.treatAsComment")); //$NON-NLS-1$
-		cbRuleType.add(Res.getString("Editor.doNotExtract")); //$NON-NLS-1$
+		edRuleType = new Text(propGroup, SWT.BORDER);
+		edRuleType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edRuleType.setEditable(false);
 		
 		chkPreserveWS = new Button(propGroup, SWT.CHECK);
 		chkPreserveWS.setText(Res.getString("Editor.preserveWS")); //$NON-NLS-1$
 		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
 		chkPreserveWS.setLayoutData(gdTmp);
 		
 		chkUseCodeFinder = new Button(propGroup, SWT.CHECK);
 		chkUseCodeFinder.setText(Res.getString("Editor.hasInlines")); //$NON-NLS-1$
 		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
 		chkUseCodeFinder.setLayoutData(gdTmp);
 		chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -209,7 +200,6 @@ public class Editor implements IParametersEditor {
 		btEditFinderRules.setText(Res.getString("Editor.editInlines")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
-		gdTmp.horizontalSpan = 2;
 		btEditFinderRules.setLayoutData(gdTmp);
 		btEditFinderRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -223,7 +213,9 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout(2, false);
 		layTmp.marginWidth = 0;
 		cmpButtons.setLayout(layTmp);
-		cmpButtons.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.verticalSpan = 2;
+		cmpButtons.setLayoutData(gdTmp);
 		
 		int buttonWidth = 90;
 		
@@ -297,12 +289,14 @@ public class Editor implements IParametersEditor {
 
 		//--- Options
 		
+		chkOneLevelGroups = new Button(cmpTmp, SWT.CHECK);
+		chkOneLevelGroups.setText("Auto-close previous group when a new one starts");
+		
 		Group optionsGroup = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);
 		optionsGroup.setLayout(layTmp);
 		optionsGroup.setText(Res.getString("Editor.regexOptions")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
-		gdTmp.verticalSpan = 1;
 		optionsGroup.setLayoutData(gdTmp);
 		
 		chkDotAll = new Button(optionsGroup, SWT.CHECK);
@@ -315,7 +309,7 @@ public class Editor implements IParametersEditor {
 		chkIgnoreCase.setText(Res.getString("Editor.ignoreCases")); //$NON-NLS-1$
 		
 		//--- end Options
-		
+
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("Editor.rules")); //$NON-NLS-1$
 		tiTmp.setControl(cmpTmp);
@@ -352,7 +346,7 @@ public class Editor implements IParametersEditor {
 //TODO: implement chkExtractOuterStrings		
 chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET		
 
-		label = new Label(grpTmp, SWT.NONE);
+		Label label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("Editor.startOfString")); //$NON-NLS-1$
 		edStartString = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -420,22 +414,44 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		
 		int newRuleIndex = lbRules.getSelectionIndex();
 		boolean enabled = (newRuleIndex > -1 );
-		cbRuleType.setEnabled(enabled);
+		edRuleType.setEnabled(enabled);
 		chkPreserveWS.setEnabled(enabled);
 		chkUseCodeFinder.setEnabled(enabled);
 
 		ruleIndex = newRuleIndex;
 		if ( ruleIndex < 0 ) {
 			edExpression.setText(""); //$NON-NLS-1$
-			cbRuleType.select(0);
+			edRuleType.setText(""); //$NON-NLS-1$
 			chkPreserveWS.setSelection(false);
 			chkUseCodeFinder.setSelection(false);
 			btEditFinderRules.setEnabled(false);
 			return;
 		}
 		Rule rule = rules.get(ruleIndex);
-		edExpression.setText("(("+rule.getStart()+")(.*?)("+rule.getEnd()+"))"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		cbRuleType.select(rule.getRuleType());
+		edExpression.setText(rule.getExpression());
+		switch ( rule.getRuleType() ) {
+		case Rule.RULETYPE_STRING:
+			edRuleType.setText(Res.getString("Editor.extractStringsInside")); //$NON-NLS-1$
+			break;
+		case Rule.RULETYPE_CONTENT:
+			edRuleType.setText(Res.getString("Editor.extractContent")); //$NON-NLS-1$
+			break;
+		case Rule.RULETYPE_COMMENT:
+			edRuleType.setText(Res.getString("Editor.treatAsComment")); //$NON-NLS-1$
+			break;
+		case Rule.RULETYPE_NOTRANS:
+			edRuleType.setText(Res.getString("Editor.doNotExtract")); //$NON-NLS-1$
+			break;
+		case Rule.RULETYPE_OPENGROUP:
+			edRuleType.setText(Res.getString("Editor.startGroup")); //$NON-NLS-1$
+			break;
+		case Rule.RULETYPE_CLOSEGROUP:
+			edRuleType.setText(Res.getString("Editor.endGroup")); //$NON-NLS-1$
+			break;
+		default:
+			edRuleType.setText(""); //$NON-NLS-1$
+		}
+		
 		chkPreserveWS.setSelection(rule.preserveWS());
 		chkUseCodeFinder.setSelection(rule.useCodeFinder());
 		updateEditFinderRulesButton();
@@ -463,7 +479,6 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 	private void saveRuleData (int index) {
 		if ( index < 0 ) return;
 		Rule rule = rules.get(index);
-		rule.setRuleType(cbRuleType.getSelectionIndex());
 		rule.setPreserveWS(chkPreserveWS.getSelection());
 		rule.setUseCodeFinder(chkUseCodeFinder.getSelection());
 	}
@@ -592,6 +607,8 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
+		chkOneLevelGroups.setSelection(params.oneLevelGroups);
+
 		int tmp = params.regexOptions;
 		chkDotAll.setSelection((tmp & Pattern.DOTALL)==Pattern.DOTALL);
 		chkIgnoreCase.setSelection((tmp & Pattern.CASE_INSENSITIVE)==Pattern.CASE_INSENSITIVE);
@@ -616,6 +633,7 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		for ( Rule rule : rules ) {
 			paramRules.add(rule);
 		}
+		params.oneLevelGroups = chkOneLevelGroups.getSelection();
 		params.regexOptions = getRegexOptions();
 		result = true;
 	}
