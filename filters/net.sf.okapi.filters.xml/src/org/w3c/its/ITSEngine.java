@@ -352,7 +352,13 @@ public class ITSEngine implements IProcessor, ITraversal
 			throw new ITSException("locNoteType attribute missing.");
 		}
 		
-		String value1 = elem.getAttribute("locNote");
+		// Try to get the locNote element
+		String value1 = "";
+		NodeList list = elem.getElementsByTagNameNS(ITS_NS_URI, "locNote");
+		if ( list.getLength() > 0 ) {
+			value1 = getTextContent(list.item(0));
+		}
+		// Get the attributes
 		String value2 = elem.getAttribute("locNotePointer");
 		String value3 = elem.getAttribute("locNoteRef");
 		String value4 = elem.getAttribute("locNoteRefPointer");
@@ -374,7 +380,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			}
 			else {
 				if ( value3.length() > 0 ) {
-					rule.infoType = TERMINFOTYPE_REF;
+					rule.infoType = LOCNOTETYPE_REF;
 					rule.info = value3;
 					if ( value4.length() > 0 ) {
 						throw new ITSException("Too many locNoteXXX attributes specified");
@@ -382,7 +388,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				}
 				else {
 					if ( value4.length() > 0 ) {
-						rule.infoType = TERMINFOTYPE_REFPOINTER;
+						rule.infoType = LOCNOTETYPE_REFPOINTER;
 						rule.info = value4;
 					}
 				}
