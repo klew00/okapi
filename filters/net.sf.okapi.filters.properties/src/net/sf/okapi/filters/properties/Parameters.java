@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.filters.properties;
 
@@ -33,6 +33,7 @@ public class Parameters extends BaseParameters {
 	public boolean extractOnlyMatchingKey;
 	public String keyCondition;
 	public boolean extraComments;
+	public boolean commentsAreNotes;
 	public LocalizationDirectives locDir;
 
 	public Parameters () {
@@ -61,6 +62,7 @@ public class Parameters extends BaseParameters {
 		keyCondition = ".*text.*";
 
 		extraComments = false;
+		commentsAreNotes = true;
 	}
 
 	@Override
@@ -72,6 +74,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		buffer.setString("keyCondition", keyCondition);
 		buffer.setBoolean("extraComments", extraComments);
+		buffer.setBoolean("commentsAreNotes", commentsAreNotes);
 		buffer.setBoolean("escapeExtendedChars", escapeExtendedChars);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setGroup("codeFinderRules", codeFinder.toString());
@@ -88,8 +91,10 @@ public class Parameters extends BaseParameters {
 		extractOnlyMatchingKey = buffer.getBoolean("extractOnlyMatchingKey", extractOnlyMatchingKey);
 		keyCondition = buffer.getString("keyCondition", keyCondition);
 		extraComments = buffer.getBoolean("extraComments",extraComments);
+		commentsAreNotes = buffer.getBoolean("commentsAreNotes", commentsAreNotes);
 		escapeExtendedChars = buffer.getBoolean("escapeExtendedChars", escapeExtendedChars);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
 		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
 	}
+
 }

@@ -26,22 +26,57 @@
 </table>
 
 <h2><a name="overview"></a>Overview</h2>
-<p>This filter allows you to process Properties files.</p>
+<p>The Properties Filter is an Okapi component that implements the <code>IFilter</code> interface for 
+properties files. The filter is implement in the class <code>
+net.sf.okapi.filters.properties.PropertiesFilter</code> of the Okapi library.</p>
+<p>The implementation is based on the specification found in the Java
+<a target="_blank" href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/Properties.html#load(java.io.InputStream)">
+<code>java.util.Properties</code> class documentation</a>. Support for a few 
+additional features is also provided for compatibility with other type of 
+properties files.</p>
 <p>The following is an example of a very simple properties file. The translatable text 
 is marked in <b>bold</b>.</p>
 <pre># This is a comment
 
 Key1 : <b>This the text for Key1</b>
 Key2 = <b>This is the text for Key2</b></pre>
+<p>Note that Java properties can also be represented in XML. To process such 
+document, use the <a href="../xml/index.html">XML Filter</a>.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
-<p>TODO</p>
+<h3>Input Encoding</h3>
+<p>The filter decides which encoding to use for the input file using the 
+following logic:</p>
+<ul>
+	<li>If the file has a Unicode Byte-Order-Mark:<ul>
+		<li>Then, the corresponding encoding (e.g. UTF-8, UTF-16, etc.) is used.</li>
+	</ul>
+	</li>
+	<li>Otherwise, the input encoding used is the default encoding that was specified when 
+	setting the filter options.</li>
+</ul>
+<h3>Output Encoding</h3>
+<p>If the output encoding is UTF-8:</p>
+<ul>
+	<li>If the input encoding was also UTF-8, a Byte-Order-Mark is used for the 
+	output document only if one was detected in the input document.</li>
+	<li>If the input encoding was not UTF-8, no Byte-Order-Mark is used in the 
+	output document.</li>
+</ul>
+<h3>Extended Character in Output</h3>
+<p>By default, all extended characters are escaped in the output.</p>
+<p>You can change this behavior by modifying the <cite>Escape all extended characters</cite> 
+option.</p>
+<h3>Line-Breaks</h3>
+<p>The type of line-breaks of the output is the same as the one of the original 
+input.</p>
 
 <h2><a name="parameters"></a>Parameters</h2>
 <h3>Options Tab</h3>
 <h4>Localization directives</h4>
-<p>Localization directives are special comments you can use to override the default behavior of the filter regarding the parts to extract. The syntax and behavior of the directives are the same across all Okapi filters. See the <cite><a href="locdirectives.html">Localization Directives</a></cite> pages for detail information about what you can do with the mechanism.
-Note that the directives override key conditions.</p>
+<p>Localization directives are special comments you can use to override the 
+default behavior of the filter regarding the parts to extract. The syntax and 
+behavior of the directives are the same across all Okapi filters.Note that the directives override key conditions.</p>
 <p><cite>Use localization directives when they are present</cite> -- Set this option to enable the filter to recognize localization directives. If this option is not set, any localization directive in the input file will be ignored.</p>
 <p><cite>Extract items outside the scope of localization directives</cite> -- Set this option to extract any translatable item that is not within the scope of a localization directive. Selecting to extract or not outside localization directives allows you to mark up fewer parts of the source document. This option is enabled only when the <cite>Use localization directives when they are present</cite> option is set.</p>
 <h4>Key filtering</h4>
@@ -56,10 +91,15 @@ Extract only the items with a key matching the specified pattern = set
 Pattern = .*text.*</pre>
 <p>The extracted text is highlighted:</p>
 <pre>key1 = <b>Text for key1</b>
-
 text.err1 = <span style="font-weight: 700; background-color: #FFFF00">Text for text.err1</span>
 menu_text_file = <span style="font-weight: 700; background-color: #FFFF00">Text for menu_text_file</span></pre>
-<p><cite>Support additional comments</cite> -- Set this option to take into account other comment styles in addition to the strict Java comments (single-line starting with '#' or '!'). When this option is set, the filter also recognizes comments single-lines starting with ';', as well as single-line where '//' is the first no-whitespace sequence. (Note that // after a = are considered part of the value of the entry, not a comment).</p>
+<p><cite>Recognize additional comment markers</cite> -- Set this option to take into account other comment styles in addition to the strict Java comments (single-line starting with '<code>#</code>' or '<code>!</code>'). When this option is set, the filter also recognizes comments single-lines starting with '<code>;</code>', as well as single-line where 
+&quot;<code>//</code>&quot; is the first no-whitespace sequence. Note that <code>//</code> after a 
+<code>=</code> are considered part of the value of the entry, not a comment.</p>
+<p><cite>Extract comments to note properties</cite> -- Set this option to 
+include the comments before each entry as a <i>note</i> property on the text 
+unit of the corresponding entry. All comments lines are grouped into a single 
+note.</p>
 
 <h3>Inline Codes Tab</h3>
 <p><cite>Has inline codes as defined below:</cite> -- Set this option to use the specified regular expression to be use against the text of the extracted items. Any match will be converted to an inline code. By default the expression is:</p>
@@ -86,7 +126,7 @@ Modify</cite> when you are not in edit mode.</p>
 <p><cite>Discard</cite> -- Click this button to leave the edit mode and 
 revert the current rule to the expression it had before you started the edit 
 mode.</p>
-<p><cite>Patterns</cite> -- Click this button to display a list of "guidline" regular 
+<p><cite>Patterns</cite> -- Click this button to display a list of "guideline" regular 
 expression patterns then select a pattern to insert it the edit box. The inserted text replaces whatever text is 
 currently selected.</p>
 <p><cite>Test using all rules</cite> -- Set this option to test all the rules at the same 

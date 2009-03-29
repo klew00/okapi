@@ -7,7 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/third-party.logger-slf4j"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.pipeline"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

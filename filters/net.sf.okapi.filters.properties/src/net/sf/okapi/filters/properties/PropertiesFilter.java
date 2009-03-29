@@ -268,6 +268,7 @@ public class PropertiesFilter implements IFilter {
 			StringBuilder textBuffer = new StringBuilder();
 			String value = "";
 			String key = "";
+			String note = "";
 			boolean isMultiline = false;
 			int startText = 0;
 			long lS = -1;
@@ -294,15 +295,25 @@ public class PropertiesFilter implements IFilter {
 
 					// Comments
 					boolean isComment = (( tmp.charAt(0) == '#' ) || ( tmp.charAt(0) == '!' ));
+					if ( isComment ) tmp = tmp.substring(1);
 					if ( params.extraComments && !isComment ) {
-						if ( tmp.charAt(0) == ';' ) isComment = true; // .NET-style
-						else if ( tmp.startsWith("//") ) isComment = true; // C++/Java-style,
+						if ( tmp.charAt(0) == ';' ) {
+							isComment = true; // .NET-style
+							tmp = tmp.substring(1);
+						}
+						else if ( tmp.startsWith("//") ) {
+							isComment = true; // C++/Java-style,
+							tmp = tmp.substring(2);
+						}
 					}
 
 					if ( isComment ) {
 						params.locDir.process(tmp);
 						skel.append(textLine);
 						skel.append(lineBreak);
+						if ( params.commentsAreNotes ) {
+							note += (tmp+"\n");
+						}
 						continue;
 					}
 
@@ -407,6 +418,9 @@ public class PropertiesFilter implements IFilter {
 					tuRes.setName(key);
 					tuRes.setMimeType("text/x-properties");
 					tuRes.setPreserveWhitespaces(true);
+					if ( note.length() > 0 ) {
+						tuRes.setProperty(new Property(Property.NOTE, note, true));
+					}
 				}
 
 				if ( extract ) {

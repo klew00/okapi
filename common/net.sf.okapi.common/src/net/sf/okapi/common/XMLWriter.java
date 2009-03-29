@@ -42,6 +42,8 @@ public class XMLWriter {
 	private boolean inStartTag;
 	private Stack<String> elements;
 
+	private final String lineBreak = System.getProperty("line.separator");
+
 	/**
 	 * Creates the new XML document.
 	 * @param path The full path of the document to create. If any directory in the
@@ -154,7 +156,7 @@ public class XMLWriter {
 	 */
 	public void writeString (String text) {
 		closeStartTag();
-		writer.write(Util.escapeToXML(text, 0, false, null));
+		writer.write(Util.escapeToXML(text, 0, false, null).replace("\n", lineBreak));
 	}
 	
 	/**
