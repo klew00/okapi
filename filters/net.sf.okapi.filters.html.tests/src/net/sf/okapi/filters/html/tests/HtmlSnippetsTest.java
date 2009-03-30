@@ -168,7 +168,7 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testSupplementalSupport() {
 		String snippet = "<p>[&#x20000;]=U+D840,U+DC00</p>";
-		assertEquals("<p>[\uD840,\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<p>[\uD840\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	private ArrayList<Event> getEvents (String snippet) {
