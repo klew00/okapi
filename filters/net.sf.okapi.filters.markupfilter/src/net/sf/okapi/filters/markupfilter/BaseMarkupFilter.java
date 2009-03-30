@@ -60,7 +60,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public abstract class BaseMarkupFilter extends BaseFilter {
-	private static final Logger logger = Logger.getLogger(BaseMarkupFilter.class.toString());
+	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.markupfilter");
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
@@ -213,10 +213,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-		
-		// set the logger
-		document.setLogger(new OkapiJerichoLogger(logger));
-		
+				
 		// This code optimizes jericho parsing
 		//document.fullSequentialParse();
 		//nodeIterator = document.getNodeIterator();
