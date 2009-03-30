@@ -43,7 +43,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends BaseMarkupFilter {
 
-	private static final Logger logger = Logger.getLogger(HtmlFilter.class.toString());
+	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.html");
 	
 	private StringBuilder bufferedWhitespace;
 
