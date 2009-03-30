@@ -26,12 +26,13 @@
 </table>
 
 <h2><a name="overview"></a>Overview</h2>
-<p>This filter allows you to process HTML and XHTML documents.</p>
-<p>For this initial version the content of <code>&lt;style&gt;</code> and <code>
-&lt;script&gt;</code> elements is left un-translatable, and server-side scripts such 
-as PHP, ASPX, JSP, etc. is not actively supported.</p>
-<p>This filter is implement in the class <code>
+<p>The HTML Filter is an Okapi component that implements the <code>IFilter</code> interface for 
+HTML and XHTML documents. The filter is implement in the class <code>
 net.sf.okapi.filters.html.HtmlFilter</code> of the Okapi library.</p>
+<p>In the current version of the filter the content of <code>&lt;style&gt;</code> and <code>
+&lt;script&gt;</code> elements is not extracted, and tags from server-side scripts such 
+as PHP, ASPX, JSP, etc. are not formally supported (i.e. some may be fine 
+through, some may not).</p>
 <h2><a name="processing"></a>Processing Details</h2>
 <p>TODO</p>
 <h2><a name="parameters"></a>Parameters</h2>

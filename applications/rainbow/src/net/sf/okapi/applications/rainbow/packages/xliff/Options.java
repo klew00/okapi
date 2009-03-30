@@ -32,7 +32,7 @@ public class Options extends BaseParameters {
 	}
 	
 	public void reset() {
-		gMode = true;
+		gMode = false;
 		message = "";
 	}
 

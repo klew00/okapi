@@ -29,7 +29,7 @@
 	<target name="runtests">
 
 		<delete file="_tests_results.txt"/>
-		<delete file="miscellaneous\TransComp_MT.txt.html"/>
+		<delete file="miscellaneous/TransComp_MT.txt.html"/>
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="extraction/test1_out"/>
 			<fileset dir="extraction/test2_out"/>
@@ -37,82 +37,82 @@
 		</delete>
 
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\XSLT_Test.rnb -x oku_xsltransform -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/XSLT_Test.rnb -x oku_xsltransform -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\BOM_Add.rnb -x oku_bomconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/BOM_Add.rnb -x oku_bomconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\LineBreak_ToDos.rnb -x oku_linebreakconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/LineBreak_ToDos.rnb -x oku_linebreakconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\EncConv_Test1.rnb -x oku_encodingconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/EncConv_Test1.rnb -x oku_encodingconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\EncConv_Test2.rnb -x oku_encodingconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/EncConv_Test2.rnb -x oku_encodingconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\EncConv_Test3.rnb -x oku_encodingconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/EncConv_Test3.rnb -x oku_encodingconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\TransComp_Test1.rnb -x oku_transcomparison -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/TransComp_Test1.rnb -x oku_transcomparison -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\URI_decoded.rnb -x oku_uriconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/URI_decoded.rnb -x oku_uriconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\URI_encoded_default.rnb -x oku_uriconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/URI_encoded_default.rnb -x oku_uriconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\URI_encoded_default_all_extended.rnb -x oku_uriconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/URI_encoded_default_all_extended.rnb -x oku_uriconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\URI_encoded_all_but_uri_marks.rnb -x oku_uriconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/URI_encoded_all_but_uri_marks.rnb -x oku_uriconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\URI_encoded_all_but_uri_marks_and_res.rnb -x oku_uriconversion -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/URI_encoded_all_but_uri_marks_and_res.rnb -x oku_uriconversion -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\SearchReplaceFilter_Test.rnb -x oku_searchandreplace -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/SearchReplaceFilter_Test.rnb -x oku_searchandreplace -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\SearchReplaceNoFilter_Test.rnb -x oku_searchandreplace -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/SearchReplaceNoFilter_Test.rnb -x oku_searchandreplace -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p miscellaneous\SearchReplaceNoFilterRegEx_Test.rnb -x oku_searchandreplace -np"/>
-		</exec>
-		
-		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test1_Extraction.rnb -x oku_extraction -np"/>
-		</exec>
-		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test1_Translation.rnb -x oku_textrewriting -np"/>
-		</exec>
-		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test1_Merging.rnb -x oku_merging -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p miscellaneous/SearchReplaceNoFilterRegEx_Test.rnb -x oku_searchandreplace -np"/>
 		</exec>
 		
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test2_Extraction.rnb -x oku_extraction -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test1_Extraction.rnb -x oku_extraction -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test2_Translation.rnb -x oku_textrewriting -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test1_Translation.rnb -x oku_textrewriting -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ..\dist_${platform}\lib\rainbow.jar -p extraction\Test2_Merging.rnb -x oku_merging -np"/>
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test1_Merging.rnb -x oku_merging -np"/>
+		</exec>
+		
+		<exec executable="java">
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test2_Extraction.rnb -x oku_extraction -np"/>
+		</exec>
+		<exec executable="java">
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test2_Translation.rnb -x oku_textrewriting -np"/>
+		</exec>
+		<exec executable="java">
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test2_Merging.rnb -x oku_merging -np"/>
 		</exec>
 
 	</target>
 	
 	<target name="winCompare" if="isWindows">
 		<exec executable="comp" output="_tests_results.txt">
-		 <arg line="miscellaneous\*.out miscellaneous\*.gold"/>
+		 <arg line="miscellaneous/*.out miscellaneous/*.gold"/>
 		</exec>
 		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.* extraction\test1_gold\*.*"/>
+		 <arg line="extraction/test1_out/done/*.* extraction/test1_gold/*.*"/>
 		</exec>
 		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.* extraction\test2_gold\*.*"/>
+		 <arg line="extraction/test2_out/done/*.* extraction/test2_gold/*.*"/>
 		</exec>
 	</target>
 	

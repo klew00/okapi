@@ -25,7 +25,7 @@ td.hmenu { text-align: right; vertical-align: top; marging: 0px; padding: 2px 0p
 div.hmenu table { margin: 0px; padding: 0px; border: 0px; }
 div.hmenu table tr { margin: 0px; padding: 0px; border: 0px; }
 div.hmenu table tr td { margin: 0px; padding: 0px; border: 0px; text-align: center; }
-div.hmenu a { width: 140px; display: block; font-size: 0.75em; border-bottom: 1px solid; border-right: 1px solid; padding: 4; }
+div.hmenu a { width: 140px; display: block; font-size: 0.8em; border-bottom: 1px solid; border-right: 1px solid; padding: 4; }
 div.hmenu a:link { background: #CFCFCF; text-decoration: none; color: black; }
 div.hmenu a:visited { background: #CFCFCF; text-decoration: none; color: black; }
 div.hmenu a:hover { background: navy; color: white; font-weight: bold; }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rainbowProject version="4"><fileSet id="1"><root useCustom="0">C:\Documents and Settings\Yves</root><fi fs="okf_xliff" fo="" se="" te="">TransComp_HT.xlf</fi></fileSet><fileSet id="2"><root useCustom="0">C:\Documents and Settings\Yves</root><fi fs="okf_regex@PlainTextLineIsPara" fo="" se="" te="">TransComp_MT.txt</fi></fileSet><fileSet id="3"><root useCustom="0">C:\Documents and Settings\Yves</root></fileSet><output><root use="0"></root><subFolder use="0"></subFolder><extension use="1" style="0">.out</extension><replace use="0" oldText="" newText=""></replace><prefix use="0"></prefix><suffix use="0"></suffix></output><options sourceLanguage="EN-US" sourceEncoding="utf-8" targetLanguage="FR-FR" targetEncoding="utf-8"></options><parametersFolder useCustom="0"></parametersFolder><utilities xml:spaces="preserve"><params id="oku_transcomparison">
+<rainbowProject version="4"><fileSet id="1"><root useCustom="0">C:/Documents and Settings/Yves</root><fi fs="okf_xliff" fo="" se="" te="">TransComp_HT.xlf</fi></fileSet><fileSet id="2"><root useCustom="0">C:/Documents and Settings/Yves</root><fi fs="okf_regex@PlainTextLineIsPara" fo="" se="" te="">TransComp_MT.txt</fi></fileSet><fileSet id="3"><root useCustom="0">C:/Documents and Settings/Yves</root></fileSet><output><root use="0"></root><subFolder use="0"></subFolder><extension use="1" style="0">.out</extension><replace use="0" oldText="" newText=""></replace><prefix use="0"></prefix><suffix use="0"></suffix></output><options sourceLanguage="EN-US" sourceEncoding="utf-8" targetLanguage="FR-FR" targetEncoding="utf-8"></options><parametersFolder useCustom="0"></parametersFolder><utilities xml:spaces="preserve"><params id="oku_transcomparison">
 generateTMX.b=true
-tmxPath=${ProjDir}\TransComp_Test1Output.tmx.out
+tmxPath=${ProjDir}/TransComp_Test1Output.tmx.out
 generateHTML.b=true
 autoOpen.b=false
 ignoreCase.b=true

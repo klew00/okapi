@@ -178,7 +178,7 @@ public class Project {
 				writer.writeAttributeString("id", String.format("%d", i+1));
 				writer.writeStartElement("root");
 				writer.writeAttributeString("useCustom", useCustomInputRoots.get(i) ? "1" : "0");
-				writer.writeString(inputRoots.get(i));
+				writer.writeString(inputRoots.get(i).replace('\\', '/'));
 				writer.writeEndElement(); // root
 				for ( Input item : inputList ) {
 					writer.writeStartElement("fi");
@@ -186,7 +186,7 @@ public class Project {
 					writer.writeAttributeString("fo", item.format);
 					writer.writeAttributeString("se", item.sourceEncoding);
 					writer.writeAttributeString("te", item.targetEncoding);
-					writer.writeString(item.relativePath);
+					writer.writeString(item.relativePath.replace('\\', '/'));
 					writer.writeEndElement(); // fi
 				}
 				writer.writeEndElement(); // fileSet
@@ -196,11 +196,11 @@ public class Project {
 			writer.writeStartElement("output");
 			writer.writeStartElement("root");
 			writer.writeAttributeString("use", (useOutputRoot ? "1" : "0"));
-			writer.writeString(outputRoot);
+			writer.writeString(outputRoot.replace('\\', '/'));
 			writer.writeEndElement(); // root
 			writer.writeStartElement("subFolder");
 			writer.writeAttributeString("use", (pathBuilder.useSubfolder() ? "1" : "0"));
-			writer.writeString(pathBuilder.getSubfolder());
+			writer.writeString(pathBuilder.getSubfolder().replace('\\', '/'));
 			writer.writeEndElement(); // subFolder
 			writer.writeStartElement("extension");
 			writer.writeAttributeString("use", (pathBuilder.useExtension() ? "1" : "0"));
@@ -231,7 +231,7 @@ public class Project {
 			
 			writer.writeStartElement("parametersFolder");
 			writer.writeAttributeString("useCustom", useCustomParamsFolder ? "1" : "0");
-			writer.writeString(customParamsFolder);
+			writer.writeString(customParamsFolder.replace('\\', '/'));
 			writer.writeEndElement(); // parametersFolder
 			
 			writer.writeStartElement("utilities");

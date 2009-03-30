@@ -236,10 +236,10 @@ public class Manifest {
 			writer.writeAttributeString("targetLang", targetLang);
 			writer.writeAttributeString("packageType", packageType);
 			writer.writeAttributeString("readerClass", readerClass);
-			writer.writeAttributeString("originalDir", originalDir);
-			writer.writeAttributeString("sourceDir", sourceDir);
-			writer.writeAttributeString("targetDir", targetDir);
-			writer.writeAttributeString("doneDir", doneDir);
+			writer.writeAttributeString("originalDir", originalDir.replace('\\', '/'));
+			writer.writeAttributeString("sourceDir", sourceDir.replace('\\', '/'));
+			writer.writeAttributeString("targetDir", targetDir.replace('\\', '/'));
+			writer.writeAttributeString("doneDir", doneDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 
@@ -251,9 +251,9 @@ public class Manifest {
 				writer.writeStartElement("doc");
 				writer.writeAttributeString("id", String.valueOf(id));
 				writer.writeAttributeString("filter", item.getFilterID());
-				writer.writeAttributeString("work", item.getRelativeWorkPath());
-				writer.writeAttributeString("input", item.getRelativeInputPath());
-				writer.writeAttributeString("output", item.getRelativeOutputPath());
+				writer.writeAttributeString("work", item.getRelativeWorkPath().replace('\\', '/'));
+				writer.writeAttributeString("input", item.getRelativeInputPath().replace('\\', '/'));
+				writer.writeAttributeString("output", item.getRelativeOutputPath().replace('\\', '/'));
 				writer.writeAttributeString("inputEncoding", item.getInputEncoding());
 				writer.writeAttributeString("outputEncoding", item.getOutputEncoding());
 				writer.writeEndElementLineBreak();
