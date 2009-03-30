@@ -53,9 +53,8 @@ public abstract class CharacterReference extends Segment {
 
 	/**
 	 * The maximum codepoint allowed by unicode, 0x10FFFF (decimal 1114111).
-	 * This can be replaced by Character.MAX_CODE_POINT in java 1.5
 	 */
-	static final int MAX_CODE_POINT=0x10FFFF;
+	static final int MAX_CODE_POINT=Character.MAX_CODE_POINT; // 0x10FFFF (decimal 1114111)
 
 	static int MAX_ENTITY_REFERENCE_LENGTH; // set in CharacterEntityReference static class initialisation
 
@@ -699,11 +698,31 @@ public abstract class CharacterReference extends Segment {
 			final CharacterReference characterReference=getNext(source,pos,unterminatedCharacterReferenceSettings);
 			if (characterReference==null) break;
 			if (lastEnd!=characterReference.getBegin()) appendable.append(encodedText,lastEnd,characterReference.getBegin());
-			final char ch=characterReference.getChar();
-			appendable.append((ch==CharacterEntityReference._nbsp && convertNonBreakingSpaces) ? ' ' : ch);
+			if (characterReference.getChar()==CharacterEntityReference._nbsp && convertNonBreakingSpaces) {
+				appendable.append(' ');
+			} else {
+				characterReference.appendTo(appendable);
+			}
 			pos=lastEnd=characterReference.getEnd();
 		}
 		if (lastEnd!=encodedText.length()) appendable.append(encodedText,lastEnd,encodedText.length());
 		return appendable;
+	}
+
+	private void appendTo(Appendable appendable) throws IOException {
+		if (Character.isSupplementaryCodePoint(codePoint)) {
+			appendable.append(getHighSurrogate(codePoint));
+			appendable.append(getLowSurrogate(codePoint));
+		} else {
+			appendable.append(getChar());
+		}
+	}
+	
+	// pinched from http://svn.apache.org/repos/asf/abdera/java/trunk/dependencies/i18n/src/main/java/org/apache/abdera/i18n/text/CharUtils.java
+	private static char getHighSurrogate(int codePoint) {
+		return (char)((0xD800 - (0x10000 >> 10)) + (codePoint >> 10));
+	}
+	private static char getLowSurrogate(int codePoint) {
+		return (char)(0xDC00 + (codePoint & 0x3FF));
 	}
 }
