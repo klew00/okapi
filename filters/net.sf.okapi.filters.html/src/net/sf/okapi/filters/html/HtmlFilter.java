@@ -21,10 +21,8 @@
 package net.sf.okapi.filters.html;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterReference;
@@ -45,7 +43,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends BaseMarkupFilter {
 
-	private static final Logger logger = LoggerFactory.getLogger(HtmlFilter.class);
+	private static final Logger logger = Logger.getLogger(HtmlFilter.class.toString());
 	
 	private StringBuilder bufferedWhitespace;
 
