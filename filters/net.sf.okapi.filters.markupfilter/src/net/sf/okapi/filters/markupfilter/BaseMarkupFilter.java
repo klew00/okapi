@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.Config;
@@ -58,11 +59,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class BaseMarkupFilter extends BaseFilter {
-	private static final Logger logger = LoggerFactory.getLogger(BaseMarkupFilter.class);
+	private static final Logger logger = Logger.getLogger(BaseMarkupFilter.class.toString());
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
@@ -78,7 +76,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	static {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
-		Config.LoggerProvider = LoggerProvider.SLF4J;
+		Config.LoggerProvider = LoggerProvider.JAVA;
 	}
 
 	public BaseMarkupFilter() {

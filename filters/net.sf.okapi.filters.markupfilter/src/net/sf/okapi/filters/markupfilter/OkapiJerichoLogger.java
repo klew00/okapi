@@ -1,43 +1,45 @@
 package net.sf.okapi.filters.markupfilter;
 
+import java.util.logging.Level;
+
 import net.htmlparser.jericho.Logger;
 
 public class OkapiJerichoLogger implements Logger {
-	private org.slf4j.Logger logger;
+	private java.util.logging.Logger logger;
 	
-	public OkapiJerichoLogger(org.slf4j.Logger logger) {
+	public OkapiJerichoLogger(java.util.logging.Logger logger) {
 		this.logger = logger;		
 	}
 
 	public void debug(String message) {
-		logger.debug(message);
+		logger.log(Level.ALL, message);
 	}
 
 	public void error(String message) {
-		logger.error(message);
+		logger.log(Level.SEVERE, message);
 	}
 
 	public void info(String message) {
-		logger.info(message);		
+		logger.log(Level.INFO, message);		
 	}
 
 	public boolean isDebugEnabled() {
-		return logger.isDebugEnabled();
+		return logger.isLoggable(Level.ALL);
 	}
 
 	public boolean isErrorEnabled() {
-		return logger.isErrorEnabled();
+		return logger.isLoggable(Level.SEVERE);
 	}
 
 	public boolean isInfoEnabled() {
-		return logger.isInfoEnabled();
+		return logger.isLoggable(Level.INFO);
 	}
 
 	public boolean isWarnEnabled() {
-		return logger.isWarnEnabled();
+		return logger.isLoggable(Level.WARNING);
 	}
 
 	public void warn(String message) {
-		logger.warn(message);		
+		logger.log(Level.WARNING, message);		
 	}
 }
