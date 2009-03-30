@@ -9,7 +9,7 @@
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
 		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Filters</h1>
-		<h2 class="head2">IDML Filter</h2></td>
+		<h2 class="head2">IDML Filter (ALPHA)</h2></td>
 	</tr>
 	<tr>
 		<td class="smalltoc"><p>
@@ -26,12 +26,33 @@
 </table>
 
 <h2><a name="overview"></a>Overview</h2>
-<p>This filter allows you to process Adobe In-Design IDML documents.</p>
-<p>This filter is implement in the class <code>
+<p>The IDML Filter is an Okapi component that implements the <code>IFilter</code> interface for 
+Adobe InDesign IDML documents. The filter is implement in the class <code>
 net.sf.okapi.filters.idml.IDMLFilter</code> of the Okapi library.</p>
+<p>This first filter is actually a wrapper that internally calls a second 
+filter: The IDMLContentFilter is an Okapi component that implements the <code>
+IFilter</code> interface for raw IDML XML files. That filter is implement in the 
+class <code>
+net.sf.okapi.filters.idml.IDMLContentFilter</code> of the Okapi library.</p>
+<p>This way you can process normal IDML documents, or directly the raw Story XML 
+documents if needed.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
-<p>TODO</p>
+<h3>Encodings</h3>
+<p>The input encoding is automatically detected.</p>
+<p>Any user-specified encoding is ignored by these filters. they always use 
+UTF-8.</p>
+<h3>Line-Breaks</h3>
+<p>The type of line-breaks of the output is always set to a simple linefeed 
+(LF).</p>
+<h3>Sub-Documents</h3>
+<p>An IDML documents is a ZIP package called UCF (Universal Container Format) 
+and is made of many different documents inside. For example each story of the 
+document is stored in a separate story file in the <code>Stories</code> 
+sub-folder of the package.</p>
+<p>All the different embedded files are treated as sub-documents by the filter. 
+This means that, for example, when represented in XLIFF, a single IDML extracted 
+to a single XLIFF document can be made up of many <code>&lt;file&gt;</code> elements.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p>TODO</p>
 <p>&nbsp;</p>

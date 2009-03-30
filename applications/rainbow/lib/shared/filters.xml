@@ -48,32 +48,32 @@
  >Filter for XML documents. This filter supports the Internationalization Tag Set (ITS).</filter>
   
  <filter id="okf_idml"
-  name="(ALPHA-TEST-ONLY) IDML Filter"
+  name="(ALPHA) IDML Filter"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
  >Filter for Adobe In-Design Markup Language (IDML) documents.</filter>
   
  <filter id="okf_idmlcontent"
-  name="(ALPHA-TEST-ONLY) IDML-Content Filter"
+  name="(ALPHA) IDML-Content Filter"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
  >Filter for IDML-Content documents.</filter>
 
 <filter id="okf_msoffice"
-  name="(ALPHA-TEST-ONLY) MS-Office 2007"
+  name="(ALPHA) MS-Office 2007"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
  <filter id="okf_openxml"
-  name="(ALPHA-TEST-ONLY) OpenXML-Content Filter"
+  name="(ALPHA) OpenXML-Content Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLContentFilter"
  >Filter for OpenXML-Content documents.</filter>
   
  <filter id="okf_tmx"
-  name="(ALPHA-TEST-ONLY) TMX Filter"
+  name="(ALPHA) TMX Filter"
   inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
  >Filter for Translation Memory eXchange (TMX) documents</filter>
   
  <filter id="okf_mif"
-  name="(ALPHA-DON'T-EVEN-TRY) FrameMaker MIF"
+  name="(PRE-ALPHA-DON'T-EVEN-TRY) FrameMaker MIF"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
  >Filter for Adobe FrameMaker MIF files.</filter>
   

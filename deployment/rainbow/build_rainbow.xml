@@ -77,6 +77,7 @@
 		<ant antfile="../shared/build_filters.openoffice.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.openxml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.rtf.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.tmx.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>

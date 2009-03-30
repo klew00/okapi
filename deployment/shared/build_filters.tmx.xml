@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="filters.tmx" default="filters.tmx"> 
+
+	<property name="proj_filters.tmx" value="../../filters/net.sf.okapi.filters.tmx"/> 
+	<property name="src_filters.tmx" value="${proj_filters.tmx}/src"/> 
+ 
+	<path id="mainClassPath_filters.tmx">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/stax-api-1.0.1.jar"/>
+		<pathelement location="${distlib}/wstx-lgpl-3.2.8.jar"/>
+	</path>
+	
+	<target name="filters.tmx"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.tmx}" destdir="${tmp}" classpathref="mainClassPath_filters.tmx"/>
+ 		
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.tmx}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/tmx">
+			<fileset dir="../../help/filters/ui/tmx" />
+		</copy>
+	</target>
+
+</project>

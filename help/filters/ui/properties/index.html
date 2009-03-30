@@ -63,13 +63,31 @@ following logic:</p>
 	<li>If the input encoding was not UTF-8, no Byte-Order-Mark is used in the 
 	output document.</li>
 </ul>
-<h3>Extended Character in Output</h3>
-<p>By default, all extended characters are escaped in the output.</p>
-<p>You can change this behavior by modifying the <cite>Escape all extended characters</cite> 
-option.</p>
 <h3>Line-Breaks</h3>
 <p>The type of line-breaks of the output is the same as the one of the original 
 input.</p>
+<h3>Mapping</h3>
+<p>Each entry of the property file is mapped to a text unit resource as follow:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table1">
+	<tr>
+		<th>Properties File</th>
+		<th>Resource</th>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The key of the entry</td>
+		<td align="left" valign="top">The name of the text unit</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The text of the entry</td>
+		<td align="left" valign="top">The source content of the text unit</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">Comments (before the entry)</td>
+		<td align="left" valign="top">The <i>note</i> property of the text unit 
+		(if the option <cite>Extract comments to note properties</cite> is set)
+		</td>
+	</tr>
+</table>
 
 <h2><a name="parameters"></a>Parameters</h2>
 <h3>Options Tab</h3>

@@ -179,6 +179,7 @@ public class IDMLFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setLineBreak("\n");
+			startDoc.setFilterParameters(params);
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
@@ -225,7 +226,7 @@ public class IDMLFilter implements IFilter {
 		
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT
 		StartSubDocument sd = new StartSubDocument(docId, String.valueOf(++subDocId));
-		sd.setName(entry.getName());
+		sd.setName(docURI.getPath() + "/" + entry.getName()); // Use '/'
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
 			(GenericSkeleton)event.getResource().getSkeleton(), entry);

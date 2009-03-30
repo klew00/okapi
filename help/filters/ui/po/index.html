@@ -9,7 +9,7 @@
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
 		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Filters</h1>
-		<h2 class="head2">PO Filter</h2></td>
+		<h2 class="head2">PO Filter (BETA)</h2></td>
 	</tr>
 	<tr>
 		<td class="smalltoc"><p>
@@ -27,7 +27,8 @@
 
 <h2><a name="overview"></a>Overview</h2>
 <p>The PO Filter is an Okapi component that implements the <code>IFilter</code> interface for 
-Gettext PO (Portable Object) resource files.</p>
+Gettext PO (Portable Object) resource files. The filter is implement in the class <code>
+net.sf.okapi.filters.po.POFilter</code> of the Okapi library.</p>
 <p>The implementation is based on the PO specifications found in the
 <a target="_blank" href="http://www.gnu.org/software/gettext/manual/html_node/gettext_9.html">GNU gettext manual</a>. 
 There is also a useful
@@ -65,12 +66,12 @@ msgstr[1] &quot;&quot;</pre>
 following logic:</p>
 <ul>
 	<li>If the file has a Unicode Byte-Order-Mark:<ul>
-		<li>The corresponding encoding (e.g. UTF-8, UTF-16, etc.) is used.</li>
+		<li>Then, the corresponding encoding (e.g. UTF-8, UTF-16, etc.) is used.</li>
 	</ul>
 	</li>
 	<li>Else, if a header entry with a <code>charset</code> declaration 
 	exists in the first 1000 characters of the file:<ul>
-		<li>The declared encoding is used. Note that if the encoding has been detected from a Byte-Order-Mark 
+		<li>Then, the declared encoding is used. Note that if the encoding has been detected from a Byte-Order-Mark 
 		and the encoding declared in the header entry does not match, a warning is 
 		generated and the encoding of the Byte-Order-Mark is used.</li>
 	</ul>
@@ -95,7 +96,7 @@ needs to be updated manually in the header entry of the generated PO file. Note
 that PO files are generally bilingual files with their language-related 
 information already set.</p>
 <h3>Line-Breaks</h3>
-<p>The line-breaks type of the output is the same as the one of the original 
+<p>The type of line-breaks of the output is the same as the one of the original 
 input.</p>
 <h3>Plural Forms</h3>
 <p>The filter supports

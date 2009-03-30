@@ -155,6 +155,7 @@ public class MIFFilter implements IFilter {
 			queue = new LinkedList<Event>();
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
+			startDoc.setLineBreak("\n");
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
