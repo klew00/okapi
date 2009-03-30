@@ -1,0 +1,38 @@
+<?xml version="1.0"?> 
+<project name="rainbow_winexe" default="all" basedir="."> 
+
+	<condition property="platform" value="win32-x86">
+		<os family="windows"/>
+	</condition>
+	<condition property="isWindows">
+		<os family="windows"/>
+	</condition>
+	<condition property="platform" value="carbon-macosx">
+		<os family="mac"/>
+	</condition>
+	<condition property="isMac">
+		<os family="mac"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
+	</condition>
+	<condition property="isLinux">
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
+	</condition>
+
+	<target name="all" if="isWindows">
+		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
+		<taskdef name="launch4j"
+			classname="net.sf.launch4j.ant.Launch4jTask"
+			classpath="${launch4j.dir}/launch4j.jar
+				:${launch4j.dir}/lib/xstream.jar" />
+		<launch4j configFile="./l4j_win_config.xml" />
+	</target>
+	
+</project>

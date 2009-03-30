@@ -2,7 +2,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>lib\rainbow.jar</jar>
-  <outfile>dist_win32-x86\rainbow.exe</outfile>
+  <outfile>data\win32-x86_nocopy\rainbow.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
