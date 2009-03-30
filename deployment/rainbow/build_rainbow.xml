@@ -19,12 +19,14 @@
 	<condition property="platform" value="gtk2-linux-x86_64">
 		<os name="Linux" arch="x86_64"/>
 	</condition>
-
 	<condition property="isLinux">
 		<or>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 		</or>
+	</condition>
+	<condition property="buildingForWindows">
+		<equals arg1="${platform}" arg2="win32-x86"/>
 	</condition>
 
 	<property name="proj_rainbow" value="../../applications/rainbow"/> 
@@ -128,7 +130,7 @@ stax-api-1.0.1.jar wstx-lgpl-3.2.8.jar jyaml-1.3.jar"/>
 		
 	</target>
 
-	<target name="winExe" if="isWindows">
+	<target name="winExe" if="buildingForWindows">
 		<copy file="data/${platform}_nocopy/rainbow.exe" todir="${dist}"/>
 	</target>
 	

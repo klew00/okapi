@@ -26,6 +26,13 @@
 		</or>
 	</condition>
 
+	<!--
+	This file build rainbow.exe only. It should be run only when something changes in the .exe configuration or
+	for some reasons the .exe needs to be updated.
+	The built .exe is placed in data/win32-x86_nocopy and is under version control
+	This means the main rainbow build can be done a) without installing launch4j and b) on non-Windows platforms.
+	-->
+
 	<target name="all" if="isWindows">
 		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
 		<taskdef name="launch4j"
