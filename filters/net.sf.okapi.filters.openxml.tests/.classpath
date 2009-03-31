@@ -7,6 +7,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/third-party.logger-slf4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
