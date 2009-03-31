@@ -36,7 +36,7 @@ public class Pipeline implements IPipeline {
 
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
-		finishedSteps = new LinkedList<IPipelineStep>();		
+		finishedSteps = new LinkedList<IPipelineStep>();
 	}
 
 	private void initialize() {
@@ -53,8 +53,7 @@ public class Pipeline implements IPipeline {
 
 	public void addStep(IPipelineStep step) {
 		if (destroyed) {
-			throw new RuntimeException(
-					"Pipeline has been destroyed and must be reinitialized");
+			throw new RuntimeException("Pipeline has been destroyed and must be reinitialized");
 		}
 		steps.add(step);
 	}
@@ -63,20 +62,15 @@ public class Pipeline implements IPipeline {
 		cancel = true;
 	}
 
-	private void execute(FileResource input) {		
-		// first event is always the FileResource event we use it to prime the
-		// pipeline
-		event = new Event(EventType.FILE_RESOURCE, input);
-
+	private Event execute(Event input) {
+		event = input;
+		
 		// loop through the events until we run out
 		while (!steps.isEmpty() && !cancel) {
 			while (steps.getFirst().hasNext() && !cancel) {
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
 				}
-				// TODO: do we need to reinitialize or null out the event from the last step???
-				// test cases still pass with or without this change
-				event = null;
 			}
 			// as each step exhausts its events remove it from the list and move
 			// on to the next
@@ -95,6 +89,8 @@ public class Pipeline implements IPipeline {
 				step.cancel();
 			}
 		}
+
+		return event;
 	}
 
 	public PipelineReturnValue getState() {
@@ -111,17 +107,31 @@ public class Pipeline implements IPipeline {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#process(java.net.URI)
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(FileResource)
 	 */
 	public FileResource process(FileResource input) {
 		initialize();
 		preprocess();
-		execute(input);
+		Event e = execute(new Event(EventType.FILE_RESOURCE, input));
 		postprocess();
 		done = true;
 
-		return null; // TODO: How to get pipeline to always return a
-		// FileResource?
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.pipeline.IPipeline#process(Event)
+	 */
+	public Event process(Event input) {
+		initialize();
+		preprocess();
+		Event e = execute(input);
+		postprocess();
+		done = true;
+
+		return e;
 	}
 
 	/*

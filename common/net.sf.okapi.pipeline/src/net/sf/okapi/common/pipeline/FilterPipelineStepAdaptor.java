@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.FileResource;
 
 public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	private IFilter filter;
+	private boolean hasEvents;
 	
 	public FilterPipelineStepAdaptor(IFilter filter) {
 		this.filter = filter;
@@ -45,12 +46,11 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	
 	@Override
 	public void preprocess() {
-		// reset filter for next run
-		// TODO: we really need a reset method for IFilter 
+		hasEvents = true; 
 	}
 	
 	@Override
-	public Event handleEvent(Event event) {		
+	public Event handleEvent(Event event) {
 		if (event != null && event.getEventType() == EventType.FILE_RESOURCE) {
 			FileResource fileResource = (FileResource)event.getResource();
 			filter.setOptions(fileResource.getLanguage(), fileResource.getEncoding(), true);			
@@ -62,11 +62,18 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 				setInput(fileResource.getInputStream());
 			}				
 		}
-		return filter.next();		
+		
+		Event e = filter.next();
+		
+		if (e != null && e.getEventType() == EventType.END_DOCUMENT) {
+			hasEvents = false;
+		}
+		
+		return e;		
 	}
 
 	public boolean hasNext() {
-		return filter.hasNext();
+		return hasEvents;
 	}
 
 	public void destroy() {

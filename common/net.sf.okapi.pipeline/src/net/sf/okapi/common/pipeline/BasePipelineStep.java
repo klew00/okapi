@@ -21,6 +21,7 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.FileResource;
 
 public abstract class BasePipelineStep implements IPipelineStep {
@@ -35,9 +36,9 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	public Event handleEvent(Event event) {
-		// short circuit switch for null case
-		if (event == null) {
-			return null;
+		// short circuit switch for null or noop cases
+		if (event == null || event.getEventType() == EventType.NO_OP) {
+			return event;
 		}
 
 		switch (event.getEventType()) {
@@ -80,6 +81,10 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 		case FINISHED:
 			handleFinished(event);
+			break;
+			
+		case CUSTOM:
+			handleCustom(event);
 			break;
 
 		default:
@@ -140,5 +145,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	protected void handleFinished(Event event) {
+	}
+	
+	protected void handleCustom(Event event) {
 	}
 }
