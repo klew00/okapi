@@ -56,11 +56,6 @@ public interface IPipelineStep {
 	boolean hasNext();
 	
 	/**
-	 * Cancel current pipeline processing.
-	 */
-	void cancel();
-
-	/**
 	 * Cleanup code should go here. Called once at the end of the pipeline lifecycle.
 	 */
 	void destroy();
