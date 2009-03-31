@@ -1,6 +1,39 @@
 <?xml version="1.0"?> 
 <project name="ratel" default="all" basedir="."> 
 
+	<!-- Guess the platform if this build file is not called with the platform already set -->
+	<condition property="platform" value="win32-x86">
+		<os family="windows"/>
+	</condition>
+	<condition property="platform" value="carbon-macosx">
+		<os family="mac"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
+	</condition>
+
+	<!-- Set flags for what dstribution is being built -->
+	<condition property="building-windows">
+		<equals arg1="${platform}" arg2="win32-x86"/>
+	</condition>
+	<condition property="building-mac">
+		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	</condition>
+	<condition property="building-linux">
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
+	</condition>
+
+	<echo message=" ------------------------------------------------------------${line.separator}
+Distribution being built: ${platform}${line.separator}
+Running on: ${os.name} ${os.arch}${line.separator}
+------------------------------------------------------------"/>
+
 	<property name="jarname" value="srxeditor-ratel"/>
 	<property name="platform" value="win32-x86"/>
 	<property name="proj_ratel" value="../../applications/ratel"/> 
@@ -8,26 +41,6 @@
  	<property name="tmp" value="tmp"/>
 	<property name="dist" value="dist_${platform}"/>
 	<property name="distlib" value="${dist}/lib"/>
- 
-	<condition property="is_win32-x86">
-		<equals arg1="${platform}" arg2="win32-x86"/>
-	</condition>
-	<condition property="is_carbon-macosx">
-		<equals arg1="${platform}" arg2="carbon-macosx"/>
-	</condition>
-	<condition property="is_gtk2-linux-x86">
-		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
-	</condition>
-	<condition property="is_gtk2-linux-x86_64">
-		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
-	</condition>
-
-	<condition property="is_linux">
-		<or>
-			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
-			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
-		</or>
-	</condition>
 
 	<path id="mainClassPath_ratel">
 		<pathelement location="${tmp}"/>
@@ -76,24 +89,19 @@
 		
 	</target>
 	
-	<target name="linuxExePerm" if="is_gtk2-linux-x86">
+	<target name="linuxExePerm" if="building-linux">
 		<chmod file="${dist-bin}/${platform}/${jarname}" perm="ugo+rx"/>
 	</target>
 
-	<target name="winExe" if="is_win32-x86">
-		<property name="launch4j.dir" location="C:/Program Files/Launch4j" />
-		<taskdef name="launch4j"
-			classname="net.sf.launch4j.ant.Launch4jTask"
-			classpath="${launch4j.dir}/launch4j.jar
-				:${launch4j.dir}/lib/xstream.jar" />
-		<launch4j configFile="./l4j_win_config.xml" />
+	<target name="winExe" if="building-win32-x86">
+		<copy file="data/${platform}_nocopy/ratel.exe" todir="${dist}"/>
 	</target>
 	
-	<target name="zipAll" unless="is_linux">
+	<target name="zipAll" unless="building-linux">
 		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="gzipAll" if="is_linux">
+	<target name="gzipAll" if="building-linux">
 		<tar destfile="${dist}/${jarname}_${platform}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 	

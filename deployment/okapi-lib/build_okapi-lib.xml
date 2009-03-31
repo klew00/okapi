@@ -1,39 +1,45 @@
 <?xml version="1.0"?> 
 <project name="okapi-lib" default="all" basedir="."> 
 
-	<property name="jarname" value="okapi-lib"/>
-	<property name="platform" value="win32-x86"/>
- 	<property name="tmp" value="tmp"/>
-	<property name="dist" value="dist_${platform}"/>
-	<property name="distlib" value="${dist}/lib"/>
- 
-	<condition property="is_win32-x86">
-		<equals arg1="${platform}" arg2="win32-x86"/>
+	<!-- Guess the platform if this build file is not called with the platform already set -->
+	<condition property="platform" value="win32-x86">
+		<os family="windows"/>
 	</condition>
-	<condition property="is_carbon-macosx">
-		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	<condition property="platform" value="carbon-macosx">
+		<os family="mac"/>
 	</condition>
-	<condition property="is_gtk2-linux-x86">
-		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+	<condition property="platform" value="gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
 	</condition>
-	<condition property="is_gtk2-linux-x86_64">
-		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
 	</condition>
 
-	<condition property="is_windows_or_mac">
-		<or>
-			<equals arg1="${platform}" arg2="win32-x86"/>
-			<equals arg1="${platform}" arg2="carbon-macosx"/>
-		</or>
+	<!-- Set flags for what dstribution is being built -->
+	<condition property="building-windows">
+		<equals arg1="${platform}" arg2="win32-x86"/>
 	</condition>
-	
-	<condition property="is_linux">
+	<condition property="building-mac">
+		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	</condition>
+	<condition property="building-linux">
 		<or>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 		</or>
 	</condition>
 
+	<echo message=" ------------------------------------------------------------${line.separator}
+Distribution being built: ${platform}${line.separator}
+Running on: ${os.name} ${os.arch}${line.separator}
+------------------------------------------------------------"/>
+
+	<property name="jarname" value="okapi-lib"/>
+	<property name="platform" value="win32-x86"/>
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="distlib" value="${dist}/lib"/>
+ 
 	<target name="init">
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
@@ -95,11 +101,11 @@
 		
 	</target>
 
-	<target name="zipAll" if="is_windows_or_mac">
+	<target name="zipAll" unless="building-linux">
 		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="gzipAll" if="is_linux">
+	<target name="gzipAll" if="building-linux">
 		<tar destfile="${dist}/${jarname}_${platform}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 	

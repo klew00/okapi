@@ -1,11 +1,11 @@
 <?xml version="1.0"?> 
-<project name="rainbow_winexe" default="all" basedir="."> 
+<project name="ratel_winexe" default="all" basedir="."> 
 
 	<!--
-	This file build rainbow.exe only. It should be run only when something changes in the .exe configuration or
+	This file build ratel.exe only. It should be run only when something changes in the .exe configuration or
 	for some reasons the .exe needs to be updated.
 	The built .exe is placed in data/win32-x86_nocopy and is under version control
-	This means the main rainbow build can be done a) without installing launch4j and b) on non-Windows platforms.
+	This means the main ratel build can be done a) without installing launch4j and b) on non-Windows platforms.
 	-->
 
 	<target name="all">

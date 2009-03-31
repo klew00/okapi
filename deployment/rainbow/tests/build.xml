@@ -106,13 +106,13 @@
 	
 	<target name="winCompare" if="isWindows">
 		<exec executable="comp" output="_tests_results.txt">
-		 <arg line="miscellaneous/*.out miscellaneous/*.gold"/>
+		 <arg line="miscellaneous\*.out miscellaneous\*.gold"/>
 		</exec>
 		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction/test1_out/done/*.* extraction/test1_gold/*.*"/>
+		 <arg line="extraction\test1_out\done\*.* extraction\test1_gold\*.*"/>
 		</exec>
 		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction/test2_out/done/*.* extraction/test2_gold/*.*"/>
+		 <arg line="extraction\test2_out\done\*.* extraction\test2_gold\*.*"/>
 		</exec>
 	</target>
 	

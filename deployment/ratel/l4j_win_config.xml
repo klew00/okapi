@@ -2,7 +2,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>lib\ratel.jar</jar>
-  <outfile>dist_win32-x86\ratel.exe</outfile>
+  <outfile>data\win32-x86_nocopy\ratel.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
