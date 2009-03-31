@@ -83,7 +83,6 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		super();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
-		setNewlineType(System.getProperty("line.separator"));
 	}
 
 	/*
@@ -210,6 +209,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		if (parameters == null) {
 			parameters = new Parameters(defaultConfig);
 		}
+		
+		// this is the default that is usually overridden by the files own newline type
+		setNewlineType(System.getProperty("line.separator"));
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
