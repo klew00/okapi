@@ -92,6 +92,11 @@ public class FilterTestDriver {
 			case TEXT_UNIT:
 				TextUnit mtu = (TextUnit) mr;
 				TextUnit gtu = (TextUnit) gr;
+				
+				if (mtu.preserveWhitespaces() != gtu.preserveWhitespaces()) {
+					return false;
+				}
+								
 				if (!(mtu.toString().equals(gtu.toString()))) {
 					return false;
 				}
