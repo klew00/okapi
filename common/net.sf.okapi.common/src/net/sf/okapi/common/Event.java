@@ -25,6 +25,9 @@ package net.sf.okapi.common;
  */
 public class Event {
 
+	public final static Event FINISHED_EVENT = new Event(EventType.FINISHED);
+	public final static Event NOOP_EVENT = new Event(EventType.NO_OP);
+	
 	private EventType filterEventType;
 	private IResource resource;
 

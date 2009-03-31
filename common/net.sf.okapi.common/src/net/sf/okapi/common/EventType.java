@@ -21,74 +21,86 @@
 package net.sf.okapi.common;
 
 /**
- * The type of events used when working with the pipeline and its
- * associated interfaces like IFilter, IFilterWriter, etc.
+ * The type of events used when working with the pipeline and its associated
+ * interfaces like IFilter, IFilterWriter, etc.
  */
 public enum EventType {
 
 	/**
-	 * Indicates the start of an input document.
-	 * A StartDocument resource should be associated with this event.  
+	 * Indicates the start of an input document. A StartDocument resource should
+	 * be associated with this event.
 	 */
 	START_DOCUMENT,
-	
+
 	/**
-	 * Indicates the end of an input document.
-	 * An Ending resource should be associated with this event.  
+	 * Indicates the end of an input document. An Ending resource should be
+	 * associated with this event.
 	 */
 	END_DOCUMENT,
-	
+
 	/**
-	 * Indicates the start of a sub-document.
-	 * A StartSubDocument resource should be associated with this event. 
+	 * Indicates the start of a sub-document. A StartSubDocument resource should
+	 * be associated with this event.
 	 */
 	START_SUBDOCUMENT,
-	
+
 	/**
-	 * Indicates the end of a sub-document.
-	 * An Ending resource should be associated with this event.  
+	 * Indicates the end of a sub-document. An Ending resource should be
+	 * associated with this event.
 	 */
 	END_SUBDOCUMENT,
-	
+
 	/**
-	 * Indicates the start of a group. For example, the start tag of the &lt;table> element in HTML.
-	 * A StartGroup resource should be associated with this event. 
+	 * Indicates the start of a group. For example, the start tag of the
+	 * &lt;table> element in HTML. A StartGroup resource should be associated
+	 * with this event.
 	 */
 	START_GROUP,
-	
+
 	/**
-	 * Indicates the end of a group.
-	 * An Ending resource should be associated with this event.  
+	 * Indicates the end of a group. An Ending resource should be associated
+	 * with this event.
 	 */
 	END_GROUP,
-	
+
 	/**
-	 * Indicates a text unit. For example, a paragraph in an HTML document.
-	 * A TextUnit resource should be associated with this event. 
+	 * Indicates a text unit. For example, a paragraph in an HTML document. A
+	 * TextUnit resource should be associated with this event.
 	 */
 	TEXT_UNIT,
-	
+
 	/**
-	 * Indicates a document part. Document parts are used to carry chunks of the input document that
-	 * have no translatable data, but may have properties.
-	 * A DocumentPart resource should be associated with this event. 
+	 * Indicates a document part. Document parts are used to carry chunks of the
+	 * input document that have no translatable data, but may have properties. A
+	 * DocumentPart resource should be associated with this event.
 	 */
 	DOCUMENT_PART,
-		
+
 	/**
-	 * Indicates that the user has canceled the process.
-	 * No resource are associated with this event.  
+	 * Indicates that the user has canceled the process. No resource are
+	 * associated with this event.
 	 */
 	CANCELED,
-	
+
 	/**
-	 * Use by some pipelines to notify steps that events have been exhausted.
-	 * No resource are associated with this event.  
+	 * Used to notify pipeline steps that the pipeline is being shutdown.
 	 */
 	FINISHED,
-	
+
 	/**
 	 * File level event. A File resource should be associated with this event.
 	 */
-	FILE_RESOURCE
+	FILE_RESOURCE,
+
+	/**
+	 * A custom event type used when steps need to exchange non-resource based
+	 * information.
+	 */
+	CUSTOM,
+
+	/**
+	 * No operation event that is ignored by all steps. Used as a placeholder
+	 * event when steps need to stay alive without triggering ang actions.
+	 */
+	NO_OP
 }
