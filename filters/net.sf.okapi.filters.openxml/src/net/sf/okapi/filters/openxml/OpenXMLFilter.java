@@ -29,6 +29,7 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -52,6 +53,8 @@ import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 
 public class OpenXMLFilter implements IFilter {
+	
+	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.openxml");
 
 	private enum NextAction {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE

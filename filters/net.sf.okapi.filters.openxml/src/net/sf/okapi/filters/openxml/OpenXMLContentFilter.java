@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap; // DWH 10-10-08
+import java.util.logging.Logger;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.Segment;
@@ -48,6 +49,9 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class OpenXMLContentFilter extends BaseMarkupFilter {
+	
+	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.openxml");
+	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
