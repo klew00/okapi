@@ -27,6 +27,7 @@ public class Event {
 
 	public final static Event FINISHED_EVENT = new Event(EventType.FINISHED);
 	public final static Event NOOP_EVENT = new Event(EventType.NO_OP);
+	public final static Event FILE_RESOURCE_EVENT = new Event(EventType.FILE_RESOURCE);
 	
 	private EventType filterEventType;
 	private IResource resource;
