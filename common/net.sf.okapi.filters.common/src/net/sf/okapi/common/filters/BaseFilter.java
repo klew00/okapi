@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -57,6 +58,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * end of each filter run.
  */
 public abstract class BaseFilter implements IFilter {
+	private static final Logger logger = Logger.getLogger("net.sf.okapi.common.filters.BaseFilter");
+	
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
 	private static final String END_GROUP = "eg"; //$NON-NLS-1$
 	private static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
