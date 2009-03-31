@@ -50,9 +50,59 @@ public class HtmlEventTest {
 		htmlFilter = new HtmlFilter();
 		parameters = HtmlEventTest.class.getResource("testConfiguration1.yml");
 	}
-
+	
 	@Test
-	public void testMETATag1() {
+	public void testWithDefaultConfig() {
+		URL originalParameters = parameters;
+		parameters = HtmlFilter.class.getResource("defaultConfiguration.yml");
+		
+		testMetaTagContent();
+		testLang();
+		testXmlLang();
+		testMETATagWithLanguage();
+		testMETATagWithEncoding();
+		
+		parameters = originalParameters;
+	}
+	
+	@Test
+	public void testHtmlKeywordsNotExtracted() {
+		URL originalParameters = parameters;
+		parameters = HtmlFilter.class.getResource("defaultConfiguration.yml");
+		
+		String snippet = "<meta http-equiv=\"keywords\" content=\"keyword text\"/>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu = new TextUnit("tu1", "keyword text");
+		skel.add("content=\"");
+		skel.addContentPlaceholder(tu);
+		skel.add("\"");
+		tu.setIsReferent(true);
+		tu.setName("content");
+		tu.setSkeleton(skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu));
+
+		skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);
+		skel.add("<meta http-equiv=\"keywords\" ");
+		skel.addReference(tu);
+		skel.add("/>");
+		dp.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		
+		parameters = originalParameters;
+	}
+	
+	@Test
+	public void testMetaTagContent() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();
 
