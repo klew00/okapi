@@ -537,6 +537,35 @@ public class HtmlEventTest {
 
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
+	
+	@Test
+	public void testPreserveWhitespace() {
+		String snippet = "<pre>\twhitespace is preserved</pre>"; 
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+		
+		GenericSkeleton skel = new GenericSkeleton();		
+		DocumentPart dp = new DocumentPart("dp1", false);
+		
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+		skel.add("<pre>");
+		dp.setSkeleton(skel);
+		
+		TextUnit tu = new TextUnit("tu1", "\twhitespace is preserved");
+		tu.setPreserveWhitespaces(true);
+		events.add(new Event(EventType.TEXT_UNIT, tu));
+		
+		skel = new GenericSkeleton();
+		dp = new DocumentPart("dp2", false);
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+		skel.add("</pre>");
+		dp.setSkeleton(skel);
+		
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
