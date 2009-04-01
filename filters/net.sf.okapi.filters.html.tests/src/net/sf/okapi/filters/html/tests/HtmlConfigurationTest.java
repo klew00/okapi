@@ -54,7 +54,10 @@ public class HtmlConfigurationTest {
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
 		
 		Map<String, String> attributes = new HashMap<String, String>();
-		attributes.put("http-equiv", "keywords");		
+		attributes.put("name", "keywords");		
+		assertTrue(rules.isTranslatableAttribute("meta", "content", attributes));
+		assertFalse(rules.isTranslatableAttribute("dummy", "content", attributes));
+		attributes.put("name", "description");		
 		assertTrue(rules.isTranslatableAttribute("meta", "content", attributes));
 		assertFalse(rules.isTranslatableAttribute("dummy", "content", attributes));
 		
