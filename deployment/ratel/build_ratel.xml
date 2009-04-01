@@ -93,7 +93,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<chmod file="${dist-bin}/${platform}/${jarname}" perm="ugo+rx"/>
 	</target>
 
-	<target name="winExe" if="building-win32-x86">
+	<target name="winExe" if="building-windows">
 		<copy file="data/${platform}_nocopy/ratel.exe" todir="${dist}"/>
 	</target>
 	
