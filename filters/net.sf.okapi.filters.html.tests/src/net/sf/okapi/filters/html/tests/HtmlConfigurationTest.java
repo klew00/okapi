@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void defaultConfiguration() {		
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
 		assertEquals(rules.getMainRuleType("title"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS);
 		assertEquals(rules.getMainRuleType("abbr"), TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
@@ -50,7 +51,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void metaTag() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);	
 		
 		Map<String, String> attributes = new HashMap<String, String>();
@@ -76,7 +77,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void preserveWhileSpace() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		
 		assertEquals(rules.getMainRuleType("pre"), TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
@@ -88,7 +89,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void langAndXmlLang() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		
 		Map<String, String> attributes = new HashMap<String, String>();
@@ -109,7 +110,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void genericCodeTypes() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		
 		assertEquals(rules.getElementType("b"), "bold");
@@ -123,7 +124,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void collapseWhitespace() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.collapseWhitespace());
 				
@@ -134,7 +135,7 @@ public class HtmlConfigurationTest {
 	
 	@Test
 	public void inputAttributes() {
-		URL url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/testConfiguration1.yml");
+		URL url = HtmlFilter.class.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		
 		Map<String, String> attributes = new HashMap<String, String>();
