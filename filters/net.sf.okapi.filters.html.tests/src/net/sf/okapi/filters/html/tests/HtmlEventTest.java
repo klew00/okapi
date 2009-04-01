@@ -292,7 +292,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithComment() {
 		URL originalParameters = parameters;
-		parameters = HtmlSnippetsTest.class.getResource("minimalistConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("minimalistConfiguration.yml");
 		
 		String snippet = "<p>Before <!--comment--> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
@@ -317,7 +317,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithProcessingInstruction() {
 		URL originalParameters = parameters;
-		parameters = HtmlSnippetsTest.class.getResource("minimalistConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("minimalistConfiguration.yml");
 
 		String snippet = "<p>Before <?PI?> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
