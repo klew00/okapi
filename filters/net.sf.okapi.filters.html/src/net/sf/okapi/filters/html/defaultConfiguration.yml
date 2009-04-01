@@ -53,7 +53,7 @@ lang:
 # with embedded skeleton 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: {content: [http-equiv, EQUALS, keywords]}
+  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, keywords], [name, EQUALS, description]]}
   writableLocalizableAttributes: {content: [[http-equiv, EQUALS, content-language],[http-equiv, EQUALS, content-type]] }
   readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
   
