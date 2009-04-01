@@ -115,8 +115,6 @@ public class HtmlFilter extends BaseMarkupFilter {
 
 		String decodedText = text.toString();	
 		decodedText = CharacterReference.decode(text.toString(), false);
-		//decodedText = CharacterEntityReference.decode(text.toString(), false);
-		//decodedText = NumericCharacterReference.decode(decodedText, false);
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
@@ -231,6 +229,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case TEXT_UNIT_ELEMENT:
 			getRuleState().pushTextUnitRule(startTag.getName());
+			
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startTextUnit(new GenericSkeleton(startTag.toString()), propertyTextUnitPlaceholders);
@@ -240,6 +239,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+			
+			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
 			
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
@@ -307,6 +308,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().popPreserverWhitespaceRule();
+			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			
 			addToDocumentPart(endTag.toString());
 			break;
 		default:
@@ -438,12 +441,7 @@ public class HtmlFilter extends BaseMarkupFilter {
 					mainEndPos, valueStartPos, valueEndPos);
 		}
 
-		// otherwise treat normally
-		// convert all entities to Unicode
-		
-		//String decodedValue = CharacterEntityReference.decode(value, true);
-		//decodedValue = NumericCharacterReference.decode(value, true);
-		
+		// convert all entities to Unicode		
 		String decodedValue = CharacterReference.decode(value, true);
 		
 		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
