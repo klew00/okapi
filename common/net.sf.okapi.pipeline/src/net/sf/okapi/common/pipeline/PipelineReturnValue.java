@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.pipeline;
 
-import sun.nio.ch.SocketOpts.IP;
-
 public enum PipelineReturnValue {
 	/**
 	 * {@link IPipeline} completed successfully.
