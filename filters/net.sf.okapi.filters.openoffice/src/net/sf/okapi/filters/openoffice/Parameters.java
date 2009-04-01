@@ -26,6 +26,7 @@ public class Parameters extends BaseParameters {
 	
 	public boolean extractNotes;
 	public boolean extractReferences;
+	public boolean convertSpacesTabs;
 	
 	public Parameters () {
 		reset();
@@ -35,6 +36,7 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		extractNotes = false;
 		extractReferences = false;
+		convertSpacesTabs = false;
 	}
 
 	public void fromString (String data) {
@@ -42,6 +44,7 @@ public class Parameters extends BaseParameters {
 		buffer.fromString(data);
 		extractNotes = buffer.getBoolean("extractNotes", extractNotes);
 		extractReferences = buffer.getBoolean("extractReferences", extractReferences);
+		convertSpacesTabs = buffer.getBoolean("convertSpacesTabs", convertSpacesTabs);
 	}
 
 	@Override
@@ -49,6 +52,7 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setBoolean("extractNotes", extractNotes);
 		buffer.setBoolean("extractReferences", extractReferences);
+		buffer.setBoolean("convertSpacesTabs", convertSpacesTabs);
 		return buffer.toString();
 	}
 }

@@ -14,8 +14,7 @@
 	<tr>
 		<td class="smalltoc"><p>
 			- <a href="#overview">Overview</a><br>
-			- <a href="#processing">Processing Details</a><br>
-			- <a href="#parameters">Parameters</a><td class="hmenu">
+			- <a href="#processing">Processing Details</a><td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
 				<td><a href="../index.html">Filters</a></td>
 				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer's Guide</a></td>
@@ -36,9 +35,71 @@ chain of translation and localization tools. The XLIFF specification are at
 http://docs.oasis-open.org/xliff/xliff-core/xliff-core.html</a>.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
-<p>TODO</p>
-<h2><a name="parameters"></a>Parameters</h2>
-<p>TODO</p>
+<h3>Input Encoding</h3>
+<p>The filter decides which encoding to use for the input document using the 
+following logic:</p>
+<ul>
+	<li>If the document has an encoding declaration it is used.</li>
+	<li>Otherwise, UTF-8 is used as the default encoding (regardless the actual 
+	default encoding that was specified when setting the filter options).</li>
+</ul>
+<h3>Output Encoding</h3>
+<p>If the output encoding is UTF-8:</p>
+<ul>
+	<li>If the input encoding was also UTF-8, a Byte-Order-Mark is used for the 
+	output document only if one was detected in the input document.</li>
+	<li>If the input encoding was not UTF-8, no Byte-Order-Mark is used in the 
+	output document.</li>
+</ul>
+<h3>Line-Breaks</h3>
+<p>The type of line-breaks of the output is the same as the one of the original 
+input.</p>
+<h3>Mapping</h3>
+<p>The entries of the document are mapped as follow:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table1">
+	<tr>
+		<th>XLIFF Document</th>
+		<th>Resource</th>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>approved</code> attribute in
+		<code>&lt;trans-unit&gt;</code>.</td>
+		<td align="left" valign="top">The <i>approved</i> property of the target 
+		in the text unit.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>&lt;note&gt;</code> elements.</td>
+		<td align="left" valign="top">The <i>note</i> property of the text unit.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>&lt;alt-trans&gt;</code> element.</td>
+		<td align="left" valign="top">The <code>AltTransAnnotation</code> 
+		annotation.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>&lt;source&gt;</code> element.</td>
+		<td align="left" valign="top">The source text of the text unit.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>&lt;target&gt;</code> element.</td>
+		<td align="left" valign="top">The target text of the text unit.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>resname</code> attribute.</td>
+		<td align="left" valign="top">The name of the text unit,</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>restype</code> attribute</td>
+		<td align="left" valign="top">The type of the text unit.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>coord</code> attribute.</td>
+		<td align="left" valign="top">The <i>coordinates</i> property of the 
+		text unit.</td>
+	</tr>
+</table>
+
+<p>MORE DOCUMENTATION UPCOMING</p>
 <p>&nbsp;</p>
 
 </body>

@@ -248,7 +248,7 @@ public class MainForm implements IParametersProvider {
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
 		logHandler = new LogHandler(log);
-	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler); //$NON-NLS-1$
+		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
 		fa = new FilterAccess();
 		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
@@ -269,7 +269,7 @@ public class MainForm implements IParametersProvider {
 		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
-		
+
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {

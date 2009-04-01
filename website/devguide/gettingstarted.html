@@ -199,10 +199,12 @@ There are different methods to do this:</p>
 	<li>Provide a <code>CharSequence</code> object that contains the document itself. 
 	(<code>String</code> is a type of <code>CharSequence</code>).</li>
 </ul>
-<p>The examples below call <code>open()</code> with respectively a stream and a 
-URI:</p>
+<p>The examples below call <code>open()</code> using different methods:</p>
 <pre>// Open the input from an InputStream
 // filter.open(new FileInputStream(&quot;myFile.properties&quot;))
+
+// Open the input from a URI obtained from a path
+// filter.open(new File(&quot;myFile.properties&quot;).toURI());
 
 // Open the input from a URI
 // filter.open(new URI(&quot;file:///C:/myFile.properties&quot;));</pre>

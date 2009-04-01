@@ -112,7 +112,7 @@ public class RTFFilter implements IFilter {
 	public static final int CW_PC                = 50;
 	public static final int CW_PCA               = 51;
 
-	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private BufferedReader reader;
 	private boolean canceled;

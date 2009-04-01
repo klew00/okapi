@@ -35,7 +35,7 @@ public abstract class BaseUtility implements IUtility {
 
 	public static final String VAR_PROJDIR = "${ProjDir}";
 	
-	protected final Logger logger = Logger.getLogger("net.sf.okapi.logging");
+	protected final Logger logger = Logger.getLogger(getClass().getName());
 	protected EventListenerList listenerList = new EventListenerList();
 	protected FilterAccess fa;
 	protected String paramsFolder;

@@ -10,15 +10,22 @@
 			<fileset dir="tmp"/>
 		</delete>
 		<mkdir dir="tmp"/>
-
- 		<javac srcdir="src" destdir="tmp" classpathref="mainClassPath"/> 
-
-		<delete file="Main.jar"/>
+ 		<javac srcdir="src/example01" destdir="tmp" classpathref="mainClassPath"/> 
 		<manifest file="MANIFEST.MF">
-			<attribute name="Main-Class" value="Main"/>
+			<attribute name="Main-Class" value="example01.Main"/>
   		</manifest>
-
-		<jar jarfile="Main.jar" basedir="tmp" manifest="MANIFEST.MF"/>
+		<jar jarfile="example01.jar" basedir="tmp" manifest="MANIFEST.MF"/>
+  		
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="tmp"/>
+		</delete>
+		<mkdir dir="tmp"/>
+ 		<javac srcdir="src/example02" destdir="tmp" classpathref="mainClassPath"/> 
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="example02.Main"/>
+  		</manifest>
+		<jar jarfile="example02.jar" basedir="tmp" manifest="MANIFEST.MF"/>
+  		
   		
 		<delete file="MANIFEST.MF"/>
 		<delete includeEmptyDirs="true" failonerror="false">

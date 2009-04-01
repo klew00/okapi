@@ -65,7 +65,7 @@ public class XLIFFFilter implements IFilter {
 
 	public static final String    XML_NS_URI   = "http://www.w3.org/XML/1998/namespace";
 	
-	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -606,7 +606,7 @@ public class XLIFFFilter implements IFilter {
 			// Get the coord attribute if available
 			String tmp = reader.getAttributeValue("", "coord");
 			if ( tmp != null ) {
-				tu.setSourceProperty(new Property("coord", tmp, false));
+				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, false));
 			}
 
 			skel.addContentPlaceholder(tu);

@@ -531,6 +531,28 @@ public class ODFFilter implements IFilter {
 		}		
 	}
 
+	//TODO
+/*	private int optimizeFront (TextFragment frag) {
+		int trace = 0;
+		String text = frag.getCodedText();
+		char ch;
+		for ( int i=0; i<text.length(); i++ ) {
+			ch = text.charAt(i);
+			if ( TextFragment.isMarker(ch) ) {
+				
+				i++;
+			}
+			else if ( !Character.isWhitespace(ch) ) {
+				if ( trace == 0 ) {
+					if ( i > 0 ) return i;
+					else return -1; // Can't optimize
+				}
+				else return -1;
+			}
+		}
+		return text.length()+1; // No text, only codes and/or whitespace
+	}
+*/	
 	private void addTU (String name) {
 		// Send a document part if there is no content
 		// But if it's in nested context, the parent is already refering to tu, and
@@ -542,6 +564,9 @@ public class ODFFilter implements IFilter {
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		else { // Else: Send a text unit
+			// Optimize the content to remove extra code that could be outside the text
+			//TODO
+			
 			skel.addContentPlaceholder(tu);
 			if ( tu.getId() == null ) tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);

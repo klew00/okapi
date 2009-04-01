@@ -57,7 +57,7 @@ public class PropertiesFilter implements IFilter {
 	private static final int RESULT_ITEM    = 1;
 	private static final int RESULT_DATA    = 2;
 
-	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
 	private BufferedReader reader;

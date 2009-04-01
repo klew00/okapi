@@ -201,7 +201,7 @@ public class CommandLine {
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);
-	    Logger.getLogger("net.sf.okapi.logging").addHandler(logHandler); //$NON-NLS-1$
+		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 		
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$

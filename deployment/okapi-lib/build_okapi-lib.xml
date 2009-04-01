@@ -49,8 +49,10 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<mkdir dir="${distlib}"/>
  	</target>
 
-	<target name="compile" depends="init"> 
-		<ant antfile="../shared/build_third-party.logger-slf4j.xml" inheritAll="true"/>
+	<target name="compile" depends="init">
+		<copy todir="${tmp}/META-INF">
+			<fileset dir="data"/>
+		</copy>
 		<ant antfile="../shared/build_third-party.stax-wstx.xml" inheritAll="true"/>
 		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 		
@@ -83,10 +85,9 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
-			<attribute name="Class-Path" value="swt.jar slf4j-api-1.5.0.jar stax-api-1.0.1.jar 
+			<attribute name="Class-Path" value="swt.jar log4j-api-1.2.15.jar stax-api-1.0.1.jar
           wstx-lgpl-3.2.8.jar jyaml-1.3.jar             
-                      commons-logging-api-1.1.1.jar log4j-api-1.2.15.jar 
-                 slf4j-jdk14-1.5.0.jar"/>
+                      commons-logging-api-1.1.1.jar"/>
   		</manifest>
 
 		<jar jarfile="${distlib}/${jarname}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
@@ -94,7 +95,16 @@ Running on: ${os.name} ${os.arch}${line.separator}
   		/>
 
 		<copy todir="${dist}/examples/java">
-			<fileset dir="../../examples/java" />
+			<fileset dir="../../examples/java">
+				<exclude name="**/.*"/>
+				<exclude name="**/bin/**"/>
+			</fileset>
+		</copy>
+		<copy  todir="${dist}/examples/python">
+			<fileset dir="../../examples/python">
+				<exclude name="**/.*"/>
+				<exclude name="**/bin/**"/>
+			</fileset>
 		</copy>
 
 		<delete includeEmptyDirs="true" failonerror="false">

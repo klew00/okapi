@@ -110,9 +110,9 @@ public class Util {
 	 * string if p_sPath is a filename.
 	 */
 	static public String getDirectoryName (String path) {
-		int n = path.lastIndexOf(File.separator);
-		if ( n == -1 ) { // Try generic URL separator
-			n = path.lastIndexOf('/');
+		int n = path.lastIndexOf('/'); // Try generic first
+		if ( n == -1 ) { // Then try platform-specific separator
+			n = path.lastIndexOf(File.separator);
 		}
 		if ( n > 0 ) return path.substring(0, n);
 		else return "";
@@ -125,9 +125,9 @@ public class Util {
 	 * The path can bea URL path (e.g. "/C:/test/file.ext").
 	 */
 	static public void createDirectories (String path) {
-		int n = path.lastIndexOf(File.separatorChar);
-		if ( n == -1 ) { // Try generic URL separator
-			n = path.lastIndexOf('/');
+		int n = path.lastIndexOf('/'); // Try generic first
+		if ( n == -1 ) { // Then try platform-specific separator
+			n = path.lastIndexOf(File.separator);
 		}
 		if ( n == -1 ) return; // Nothing to do
 		// Else, use the directory part and create the tree	
@@ -419,9 +419,9 @@ public class Util {
 	static public String getFilename (String path,
 		boolean keepExtension) {
 		// Get the filename
-		int n = path.lastIndexOf(File.separator);
-		if ( n == -1 ) { // Try generic URL separator
-			n = path.lastIndexOf('/');
+		int n = path.lastIndexOf('/'); // Try generic first
+		if ( n == -1 ) { // Then try platform-specific separator
+			n = path.lastIndexOf(File.separator);
 		}
 		if ( n > -1 ) path = path.substring(n+1);
 		// Stop here if we keep the extension
@@ -583,7 +583,7 @@ public class Util {
 	public static String getTempDirectory () {
 		String tmp = System.getProperty("java.io.tmpdir");
 		// Normalize for all platforms: no trailing separator
-		if ( tmp.endsWith(File.separator) )
+		if ( tmp.endsWith(File.separator) ) // This separator is always platform-specific
 			tmp = tmp.substring(0, tmp.length()-1);
 		return tmp;
 	}
