@@ -66,6 +66,12 @@ public interface IPipeline {
 	 * @param step
 	 */
 	public void addStep(IPipelineStep step);
+	
+	/**
+	 * Finish a batch of inputs and return the final {@link Event}
+	 * @return
+	 */
+	public Event finishBatch();
 
 	/**
 	 * Close down {@link IPipeline} and recover resources from all steps.

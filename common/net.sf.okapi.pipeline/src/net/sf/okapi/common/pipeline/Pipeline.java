@@ -78,7 +78,7 @@ public class Pipeline implements IPipeline {
 
 		event = input;
 
-		// loop through the events until we run out or cancel
+		// loop through the events until we run out of steps or hit cancel
 		while (!steps.isEmpty() && !cancel) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
@@ -187,5 +187,9 @@ public class Pipeline implements IPipeline {
 			step.destroy();
 		}
 		destroyed = true;
+	}
+
+	public Event finishBatch() {		
+		return process(Event.FINISHED_EVENT);
 	}
 }
