@@ -64,6 +64,15 @@ public class HtmlFilter extends BaseMarkupFilter {
 		setMimeType("text/html");
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
+	
+	/**
+	 * Initialize parameters, rule state and parser. Called before processing of each input.
+	 */
+	@Override
+	protected void initialize() {		
+		super.initialize();
+		setPreserveWhitespace(false);
+	}
 
 	@Override
 	protected void handleCdataSection(Tag tag) {
