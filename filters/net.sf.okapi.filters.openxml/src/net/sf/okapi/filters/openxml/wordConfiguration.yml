@@ -31,6 +31,10 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
+'c:lang':
+  ruleTypes: [ATTRIBUTES_ONLY]
+  writableLocalizableAttributes: [val]
+
 'w:p':
   ruleTypes: [TEXTUNIT]
 
@@ -56,4 +60,9 @@
 # This one doesn't work unless INLINE is there with PRESERVE_WHITESPACE
 #'w:t':
 # ruleTypes: [INLINE, PRESERVE_WHITESPACE]
+
+'w:themefontlang':
+  ruleTypes: [ATTRIBUTES_ONLY]
+  writableLocalizableAttributes: [w:val]
+
 

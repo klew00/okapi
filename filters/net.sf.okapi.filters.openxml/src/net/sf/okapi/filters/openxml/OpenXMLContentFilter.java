@@ -670,10 +670,19 @@ public class OpenXMLContentFilter extends BaseMarkupFilter {
 */
 		// <w:lang w:val="en-US" ...>
 		tagName = tag.getName();
-		if (tagName.equals("w:lang"))
+		if (tagName.equals("w:lang") || tagName.equals("w:themefontlang")) // DWH 4-3-09 themeFontLang
 		{
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("w:val") != null)
+			{
+				normalizedName = Property.LANGUAGE;
+				return normalizedName;
+			}
+		}
+		else if (tagName.equals("c:lang")) // DWH 4-3-09
+		{
+			StartTag st = (StartTag) tag;
+			if (st.getAttributeValue("val") != null)
 			{
 				normalizedName = Property.LANGUAGE;
 				return normalizedName;

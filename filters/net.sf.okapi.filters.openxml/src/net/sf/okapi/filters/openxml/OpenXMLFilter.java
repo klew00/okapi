@@ -294,6 +294,8 @@ public class OpenXMLFilter implements IFilter {
 		                    sDocType.equals("header+xml") ||
 		                    sDocType.equals("footer+xml") ||
 		                    sDocType.equals("comments+xml") ||
+		                    sDocType.equals("chart+xml") ||
+		                    sDocType.equals("settings+xml") ||
 		                    sDocType.equals("glossary+xml"))) ||
 		             (nZipType==MSEXCEL &&
 		            	   (sDocType.equals("main+xml") ||
