@@ -50,9 +50,12 @@ public class OpenXMLRoundTripTest {
 			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
 			sInputPath = sUserDir + "/data/";
 			sOutputPath = sUserDir + "/output/";
-			uri = new URI(sInputPath+"sample."+glug);
+//			uri = new URI(sInputPath+"sample."+glug);
 //			uri = new URI(sInputPath+"TranslationServicesOff.docx");
 //			uri = new URI(sInputPath+"gtsftopic.docx");
+			uri = new URI(sInputPath+"OpenXML_text_reference_document.docx");
+//			uri = new URI(sInputPath+"OpenXML_text_reference_v1_1.docx");
+//			uri = new URI(sInputPath+"OpenXML_text_reference_v1_2.docx");
 			try
 			{
 //				filter.open(uri,true,3);
@@ -68,9 +71,12 @@ public class OpenXMLRoundTripTest {
 			writer.setOptions("pl", "UTF-8"); // $$$
 //			writer.setOptions("en-US", "UTF-8");
 
-			writer.setOutput(sOutputPath+"OutputSample."+glug);
+//			writer.setOutput(sOutputPath+"OutputSample."+glug);
 //			writer.setOutput(sOutputPath+"OutputTranslationServicesOff.docx");
 //			writer.setOutput(sOutputPath+"OutputGtsftopic.docx");
+			writer.setOutput(sOutputPath+"OpenXML_text_reference_document.docx");
+//			writer.setOutput(sOutputPath+"OpenXML_text_reference_v1_1.docx");
+//			writer.setOutput(sOutputPath+"OpenXML_text_reference_v1_2.docx");
 			
 			while ( filter.hasNext() ) {
 				event = filter.next();
