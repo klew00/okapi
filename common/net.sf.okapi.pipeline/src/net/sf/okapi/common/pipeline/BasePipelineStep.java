@@ -22,6 +22,7 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.FileResource;
 
 public abstract class BasePipelineStep implements IPipelineStep {
@@ -30,6 +31,11 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	protected FileResource getInput() {
 		return input;
 	}
+	
+	// dummy implementation of set and get parameters
+	public IParameters getParameters () { return null; }
+
+	public void setParameters (IParameters params) {}
 
 	public boolean hasNext() {
 		return false;

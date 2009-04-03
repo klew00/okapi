@@ -21,10 +21,23 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IFilter;
 
 public interface IPipelineStep {
 	
+	/**
+	 * Gets the current parameters for this filter.
+	 * @return The current parameters for this filter.
+	 */
+	public IParameters getParameters ();
+
+	/**
+	 * Sets new parameters for this filter.
+	 * @param params The new parameters to use.
+	 */
+	public void setParameters (IParameters params);
+
 	/**
 	 * Get the UI displayable name of this step.
 	 */
