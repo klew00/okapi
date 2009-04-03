@@ -458,7 +458,7 @@ public abstract class BaseFilter implements IFilter {
 
 		canceled = false;
 		done = false;
-		preserveWhitespace = false;
+		preserveWhitespace = true;
 		
 		newlineType = "\n";
 
