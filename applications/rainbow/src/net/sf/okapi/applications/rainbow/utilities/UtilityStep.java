@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
 public class UtilityStep implements IPipelineStep {
@@ -63,4 +64,12 @@ public class UtilityStep implements IPipelineStep {
 		return false;
 	}
 
+	public IParameters getParameters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setParameters(IParameters params) {
+		// TODO Auto-generated method stub		
+	}
 }
