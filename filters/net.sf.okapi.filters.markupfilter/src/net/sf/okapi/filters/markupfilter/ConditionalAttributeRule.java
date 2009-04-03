@@ -27,12 +27,12 @@ import java.util.regex.PatternSyntaxException;
 import net.htmlparser.jericho.Attribute;
 import net.sf.okapi.filters.yaml.IllegalConditionalAttributeException;
 
-
 /**
- * A conditional attribute is used to test extraction of elements or attributes.
- * Conditional rules may also hold meta data to be based on to extraction items.
- * Rules are evaluated in context which means the values passed in may will be
- * interpreteted as elements or attributes based on the context of evaluation.
+ * Defines a single conditional rule of the type
+ * "If attribute is X and the attribute value is Y extract Y"
+ * 
+ * Exact match and regex comparisons are supported. Comparisons are case
+ * insensitive.
  */
 public class ConditionalAttributeRule {
 
@@ -55,8 +55,8 @@ public class ConditionalAttributeRule {
 	 * Create a conditional rule with the following values.
 	 * 
 	 */
-	public ConditionalAttributeRule(String ruleAttributeName,
-			CONDITIONAL_ATTRIBUTE_TYPE matchType, String ruleAttributeValue) {		
+	public ConditionalAttributeRule(String ruleAttributeName, CONDITIONAL_ATTRIBUTE_TYPE matchType,
+			String ruleAttributeValue) {
 		this.ruleAttributeName = ruleAttributeName;
 		this.ruleAttributeValue = ruleAttributeValue;
 		this.matchType = matchType;
@@ -89,7 +89,7 @@ public class ConditionalAttributeRule {
 		case NOT_EQUALS:
 			return !(currentAttributeValue.equalsIgnoreCase(ruleAttributeValue));
 		case MATCH:
-			boolean result = false;			
+			boolean result = false;
 			try {
 				Matcher m = matchPattern.matcher(currentAttributeValue);
 				result = m.matches();
@@ -98,8 +98,7 @@ public class ConditionalAttributeRule {
 			}
 			return result;
 		default:
-			throw new IllegalConditionalAttributeException(
-					"Unkown match type: " + matchType.toString());
+			throw new IllegalConditionalAttributeException("Unkown match type: " + matchType.toString());
 		}
 	}
 }

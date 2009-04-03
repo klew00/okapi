@@ -50,7 +50,9 @@ import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
@@ -59,6 +61,21 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
+/**
+ * Abstract base class useful for creating an {@link IFilter} around the Jericho
+ * parser. Jericho can parse non-wellformed HTML, XHTML, XML and various server
+ * side scripting languages such as PHP (all configurable from Jericho).
+ * BaseMarkupFilter takes care of the parser initialization and provides default
+ * handlers for each token type returned by the parser.
+ * <p>
+ * BaseMarkupFilter along with BaseFilter automate the building of Okapi
+ * {@link Event}s and {@link IResource}s.
+ * <p>
+ * Handling of translatable text, inline tags, translatable and read-only
+ * attributes are configurable through a user defined YAML file. See the Okapi
+ * HtmlFilter and OpenXml (defaultConfiguration.yml) filters for examples.
+ * 
+ */
 public abstract class BaseMarkupFilter extends BaseFilter {
 	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.markupfilter");
 
@@ -128,8 +145,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	/*
-	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information in 
-	 * XML or HTML files
+	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information
+	 * in XML or HTML files
 	 */
 	private Source getParsedHeader(final InputStream inputStream) {
 		try {
@@ -142,8 +159,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 					break;
 				bytes[i] = (byte) nextByte;
 			}
-			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0,
-					i));
+			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0, i));
 			inputStream.reset();
 			return parsedInput;
 		} catch (IOException e) {
@@ -152,8 +168,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	public void open(CharSequence input) {
-		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input)
-				.toString());
+		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
 		document = new Source(input);
 		initialize();
 	}
@@ -162,13 +177,11 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		try {
 			bomEncodingDetector = new BOMNewlineEncodingDetector(input);
 			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
-			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(
-					BOMNewlineEncodingDetector.UTF_8) ? true : false;
+			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
 			setNewlineType(bomEncodingDetector.getNewlineType().toString());
 
 			Source parsedHeader = getParsedHeader(input);
-			String detectedEncoding = parsedHeader
-					.getDocumentSpecifiedEncoding();
+			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
 			if (detectedEncoding == null && getEncoding() != null) {
 				detectedEncoding = getEncoding();
@@ -178,11 +191,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				// TODO: do we warn that the detected encoding is different?
 			}
 
-			BOMAwareInputStream bomis = new BOMAwareInputStream(input,
-					detectedEncoding);
+			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
 			bomis.detectEncoding(); // TODO: why do we need to call this?
-			document = new Source(
-					new InputStreamReader(bomis, detectedEncoding));
+			document = new Source(new InputStreamReader(bomis, detectedEncoding));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -203,7 +214,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * Initialize parameters, rule state and parser.
 	 */
 	@Override
-	protected void initialize() {		
+	protected void initialize() {
 		super.initialize();
 
 		if (parameters == null) {
@@ -212,17 +223,18 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-				
+
 		// This code optimizes jericho parsing
-		//document.fullSequentialParse();
-		//nodeIterator = document.getNodeIterator();
-		
-		// This optimizes memory at the expense of performance 
+		// document.fullSequentialParse();
+		// nodeIterator = document.getNodeIterator();
+
+		// This optimizes memory at the expense of performance
 		nodeIterator = new NoCacheNodeIterator(document);
 	}
 
 	/**
 	 * Set the default config file as URL.
+	 * 
 	 * @param classPathToConfig
 	 */
 	protected void setDefaultConfig(URL classPathToConfig) {
@@ -231,6 +243,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	/**
 	 * Initialize filter parameters from a URL.
+	 * 
 	 * @param config
 	 */
 	public void setParametersFromURL(URL config) {
@@ -239,6 +252,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	/**
 	 * Initialize filter parameters from a Java File.
+	 * 
 	 * @param config
 	 */
 	public void setParametersFromFile(File config) {
@@ -247,6 +261,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 
 	/**
 	 * Initialize filter parameters from a String.
+	 * 
 	 * @param config
 	 */
 	public void setParametersFromString(String config) {
@@ -254,7 +269,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	/**
-	 * Queue up Jericho tokens until we can buld an Okapi {@link Event} and return it. 
+	 * Queue up Jericho tokens until we can buld an Okapi {@link Event} and
+	 * return it.
 	 */
 	@Override
 	public Event next() {
@@ -282,20 +298,16 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 				boolean inlineTag = false;
 				if (isInsideTextRun()
 						&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-						|| tag.getTagType() == StartTagType.COMMENT
-						|| tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
+								|| tag.getTagType() == StartTagType.COMMENT || tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
 					inlineTag = true;
 
-				if (isCurrentTextUnit() && !isCurrentComplexTextUnit()
-						&& !inlineTag) {
+				if (isCurrentTextUnit() && !isCurrentComplexTextUnit() && !inlineTag) {
 					endTextUnit();
 				}
 
-				if (tag.getTagType() == StartTagType.NORMAL
-						|| tag.getTagType() == StartTagType.UNREGISTERED) {
+				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 					handleStartTag((StartTag) tag);
-				} else if (tag.getTagType() == EndTagType.NORMAL
-						|| tag.getTagType() == EndTagType.UNREGISTERED) {
+				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 					handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
 					handleDocTypeDeclaration(tag);
@@ -348,94 +360,108 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * 
 	 * @param segment
 	 */
-	protected void preProcess(Segment segment) {};
+	protected void preProcess(Segment segment) {
+	};
 
 	/**
 	 * Handle any recognized escaped server tags.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleServerCommonEscaped(Tag tag);
 
 	/**
 	 * Handle any recognized server tags (i.e., PHP, Mason etc.)
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleServerCommon(Tag tag);
 
 	/**
 	 * Handle an XML markup declaration.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleMarkupDeclaration(Tag tag);
 
 	/**
 	 * Handle an XML declaration.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleXmlDeclaration(Tag tag);
 
 	/**
 	 * Handle the XML doc type declaration (DTD).
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleDocTypeDeclaration(Tag tag);
 
 	/**
 	 * Handle processing instructions.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleProcessingInstruction(Tag tag);
 
 	/**
 	 * Handle comments.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleComment(Tag tag);
 
 	/**
 	 * Handle CDATA sections.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleCdataSection(Tag tag);
 
 	/**
 	 * Handle all text (PCDATA).
+	 * 
 	 * @param text
 	 */
 	protected abstract void handleText(Segment text);
 
 	/**
 	 * Handle start tags.
+	 * 
 	 * @param startTag
 	 */
 	protected abstract void handleStartTag(StartTag startTag);
 
 	/**
 	 * Handle end tags, including empty tags.
+	 * 
 	 * @param endTag
 	 */
 	protected abstract void handleEndTag(EndTag endTag);
 
 	/**
 	 * Handle anything else not classified by Jericho.
+	 * 
 	 * @param tag
 	 */
 	protected abstract void handleDocumentPart(Tag tag);
 
 	/**
-	 * Some attributes names are converted to Okapi standards such as 
-	 * HTML charset to "encoding" and lang to "language" 
+	 * Some attributes names are converted to Okapi standards such as HTML
+	 * charset to "encoding" and lang to "language"
+	 * 
 	 * @param attrName
 	 * @param attrValue
 	 * @param tag
 	 * @return
 	 */
-	abstract protected String normalizeAttributeName(String attrName,
-			String attrValue, Tag tag);
+	abstract protected String normalizeAttributeName(String attrName, String attrValue, Tag tag);
 
 	/**
-	 * Add an {@link Code} to the current {@link TextUnit}. Throws an 
-	 * exception if there is no current {@link TextUnit}. 
+	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception
+	 * if there is no current {@link TextUnit}.
+	 * 
 	 * @param tag
 	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
@@ -444,8 +470,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		TextFragment.TagType codeType;
 
 		// start tag or empty tag
-		if (tag.getTagType() == StartTagType.NORMAL
-				|| tag.getTagType() == StartTagType.UNREGISTERED) {
+		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
 
 			// is this an empty tag?
@@ -460,18 +485,15 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			propertyTextUnitPlaceholders = null;
 
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-			if (propertyTextUnitPlaceholders != null
-					&& !propertyTextUnitPlaceholders.isEmpty()) {
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(codeType, literalTag, startTag.getName(),
-						propertyTextUnitPlaceholders);
+				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
 				addToTextUnit(codeType, literalTag, startTag.getName());
 			}
 		} else { // end or unknown tag
-			if (tag.getTagType() == EndTagType.NORMAL
-					|| tag.getTagType() == EndTagType.UNREGISTERED) {
+			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 				codeType = TextFragment.TagType.CLOSING;
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
@@ -481,45 +503,34 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	/**
-	 * For the given Jericho {@link StartTag} parse out all the actionable attributes and
-	 * and store them as {@link PropertyTextUnitPlaceholder}. {@link PlaceholderType} are 
-	 * set based on the filter configuration for each attribute.
-	 * for the attribute name and value. 
+	 * For the given Jericho {@link StartTag} parse out all the actionable
+	 * attributes and and store them as {@link PropertyTextUnitPlaceholder}.
+	 * {@link PlaceholderType} are set based on the filter configuration for
+	 * each attribute. for the attribute name and value.
+	 * 
 	 * @param startTag
 	 * @return
 	 */
-	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(
-			StartTag startTag) {
+	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(StartTag startTag) {
 		// list to hold the properties or TextUnits
 		List<PropertyTextUnitPlaceholder> propertyOrTextUnitPlaceholders = new LinkedList<PropertyTextUnitPlaceholder>();
 
 		// convert Jericho attributes to HashMap
-		Map<String, String> attrs = startTag.getAttributes().populateMap(
-				new HashMap<String, String>(), true);
+		Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
 		for (Attribute attribute : startTag.parseAttributes()) {
-			if (getConfig().isTranslatableAttribute(startTag.getName(),
-					attribute.getName(), attrs)) {
-				propertyOrTextUnitPlaceholders
-						.add(createPropertyTextUnitPlaceholder(
-								PlaceholderType.TRANSLATABLE, attribute
-										.getName(), attribute.getValue(),
-								startTag, attribute));
+			if (getConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderType.TRANSLATABLE,
+						attribute.getName(), attribute.getValue(), startTag, attribute));
 			} else {
 
-				if (getConfig().isReadOnlyLocalizableAttribute(
-						startTag.getName(), attribute.getName(), attrs)) {
-					propertyOrTextUnitPlaceholders
-							.add(createPropertyTextUnitPlaceholder(
-									PlaceholderType.READ_ONLY_PROPERTY,
-									attribute.getName(), attribute.getValue(),
-									startTag, attribute));
-				} else if (getConfig().isWritableLocalizableAttribute(
-						startTag.getName(), attribute.getName(), attrs)) {
-					propertyOrTextUnitPlaceholders
-							.add(createPropertyTextUnitPlaceholder(
-									PlaceholderType.WRITABLE_PROPERTY,
-									attribute.getName(), attribute.getValue(),
-									startTag, attribute));
+				if (getConfig().isReadOnlyLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
+				} else if (getConfig().isWritableLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
 				}
 			}
 		}
@@ -528,8 +539,9 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	/**
-	 * Create a {@link PropertyTextUnitPlaceholder} given the supplied type, 
-	 * name and Jericho {@link Tag} and {@link Attribute}. 
+	 * Create a {@link PropertyTextUnitPlaceholder} given the supplied type,
+	 * name and Jericho {@link Tag} and {@link Attribute}.
+	 * 
 	 * @param type
 	 * @param name
 	 * @param value
@@ -537,21 +549,18 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * @param attribute
 	 * @return
 	 */
-	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
-			PlaceholderType type, String name, String value, Tag tag,
-			Attribute attribute) {
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
+			String value, Tag tag, Attribute attribute) {
 		// offset of attribute
 		int mainStartPos = attribute.getBegin() - tag.getBegin();
 		int mainEndPos = attribute.getEnd() - tag.getBegin();
 
 		// offset of value of the attribute
-		int valueStartPos = attribute.getValueSegment().getBegin()
-				- tag.getBegin();
+		int valueStartPos = attribute.getValueSegment().getBegin() - tag.getBegin();
 		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
 
-		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(
-				name, value, tag), value, mainStartPos, mainEndPos,
-				valueStartPos, valueEndPos);
+		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos,
+				mainEndPos, valueStartPos, valueEndPos);
 	}
 
 	/**
@@ -569,13 +578,13 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	}
 
 	/**
-	 * Return true if the current filter configuration tells us to 
-	 * preserve whitespace as-is.
+	 * Return true if the current filter configuration tells us to preserve
+	 * whitespace as-is.
+	 * 
 	 * @return
 	 */
 	protected boolean keepOriginalFormatting() {
-		if (getRuleState().isPreserveWhitespaceState()
-				&& !getConfig().collapseWhitespace()) {
+		if (getRuleState().isPreserveWhitespaceState() && !getConfig().collapseWhitespace()) {
 			return true;
 		}
 		return false;

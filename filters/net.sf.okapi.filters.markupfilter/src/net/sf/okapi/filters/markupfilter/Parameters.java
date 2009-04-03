@@ -26,25 +26,28 @@ import java.net.URL;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
+/**
+ * {@link IParameters} based facade around the YAML configuration format.
+ * 
+ */
 public class Parameters extends BaseParameters {
 	private TaggedFilterConfiguration taggedConfig;
 
-	public Parameters(URL configPath) {		
-		reset();		
+	public Parameters(URL configPath) {
+		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configPath));
 	}
 
-	public Parameters(File configFile) {		
-		reset();		
+	public Parameters(File configFile) {
+		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configFile));
 	}
 
-	public Parameters(String configAsString) {		
-		reset();		
+	public Parameters(String configAsString) {
+		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configAsString));
 	}
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 

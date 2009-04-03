@@ -25,7 +25,8 @@ import java.util.Stack;
 import net.sf.okapi.filters.markupfilter.ExtractionRule.EXTRACTION_RULE_TYPE;
 
 /**
- * Holds the current HTML parser's rule state.
+ * Holds the current parser's rule state. State is maintained on separate
+ * stacks.
  */
 public class ExtractionRuleState {
 
@@ -43,21 +44,21 @@ public class ExtractionRuleState {
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
 	private Stack<RuleType> groupRuleStack;
-	private Stack<RuleType> textUnitRuleStack;	
+	private Stack<RuleType> textUnitRuleStack;
 
 	/**
 	 * 
 	 */
 	public ExtractionRuleState() {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
-		excludedIncludedRuleStack = new Stack<RuleType>();		
+		excludedIncludedRuleStack = new Stack<RuleType>();
 		groupRuleStack = new Stack<RuleType>();
 		textUnitRuleStack = new Stack<RuleType>();
 	}
-	
-	public void reset() {				
+
+	public void reset() {
 	}
-	
+
 	public boolean isGroupState() {
 		if (groupRuleStack.isEmpty())
 			return false;
@@ -91,7 +92,7 @@ public class ExtractionRuleState {
 		if (preserveWhiteSpaceRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE)
 			return true;
 
-		return false;		
+		return false;
 	}
 
 	public void pushPreserverWhitespaceRule(String ruleName) {
@@ -109,7 +110,7 @@ public class ExtractionRuleState {
 	public void pushIncludedRule(String ruleName) {
 		excludedIncludedRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT));
 	}
-	
+
 	public void pushGroupRule(String ruleName) {
 		groupRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.GROUP_ELEMENT));
 	}
@@ -117,16 +118,16 @@ public class ExtractionRuleState {
 	public void pushTextUnitRule(String ruleName) {
 		textUnitRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT));
 	}
-	
+
 	public void popExcludedIncludedRule() {
 		excludedIncludedRuleStack.pop();
 	}
-	
+
 	public void popGroupRule() {
 		groupRuleStack.pop();
 	}
 
 	public void popTextUnitRule() {
 		textUnitRuleStack.pop();
-	}		
+	}
 }

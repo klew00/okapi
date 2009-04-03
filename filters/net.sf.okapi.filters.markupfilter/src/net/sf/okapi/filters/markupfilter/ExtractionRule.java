@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * General HTML extraction rule can handle the following cases:<br/><br/>
- * 
+ * Defines extraction rules useful for markup languages such as HTML and XML.
+ * <p>
+ * Extraction rules can handle the following cases:
+ * <p>
  * NON EXTRACTABLE - Default rule - don't extract it.<br/> INLINE - Elements
  * that are included with text.<br/> EXCLUDED -Element and children that should
  * be excluded from extraction.<br/> INCLUDED - Elements and children within

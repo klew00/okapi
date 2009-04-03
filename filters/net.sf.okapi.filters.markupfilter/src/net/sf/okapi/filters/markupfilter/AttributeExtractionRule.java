@@ -25,22 +25,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Container for attribute extraction rules. 
+ */
 public class AttributeExtractionRule {
 	private String attributeName;
 	private List<ConditionalAttributeRule> extractionConditions;
 	private Map<String, String> properties;
-	
+
 	public AttributeExtractionRule(String attributeName) {
 		this.attributeName = attributeName;
 		this.extractionConditions = new LinkedList<ConditionalAttributeRule>();
 		this.properties = new HashMap<String, String>();
 	}
-		
+
+	/**
+	 * Add a conditional rule for this attribute.
+	 * 
+	 * @param conditionalAttribute
+	 */
 	public void addConditionalAttributeRule(ConditionalAttributeRule conditionalAttribute) {
 		this.extractionConditions.add(conditionalAttribute);
 		this.properties = new HashMap<String, String>();
 	}
-	
+
 	public void addProperty(String key, String value) {
 		properties.put(key, value);
 	}
