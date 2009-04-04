@@ -69,8 +69,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 	 * Initialize parameters, rule state and parser. Called before processing of each input.
 	 */
 	@Override
-	protected void initialize() {		
-		super.initialize();
+	protected void startFilter() {		
+		super.startFilter();
 		setPreserveWhitespace(false);
 	}
 
