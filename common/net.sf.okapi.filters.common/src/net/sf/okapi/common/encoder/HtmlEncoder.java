@@ -86,7 +86,7 @@ public class HtmlEncoder implements IEncoder {
 			case '\'':
 				switch ( quoteMode ) {
 				case 1:
-					sbTmp.append("&apos;");
+					sbTmp.append("&#039;");
 					break;
 				case 2:
 					sbTmp.append("&#39;");
@@ -138,7 +138,7 @@ public class HtmlEncoder implements IEncoder {
 		case '\"':
 			return "&quot;";
 		case '\'':
-			return "&apos;";
+			return "&#039;";
 		case '&':
 			return "&amp;";
 		case '\n':
@@ -167,7 +167,7 @@ public class HtmlEncoder implements IEncoder {
 		case '\"':
 			return "&quot;";
 		case '\'':
-			return "&apos;";
+			return "&#039;";
 		case '&':
 			return "&amp;";
 		case '\n':
