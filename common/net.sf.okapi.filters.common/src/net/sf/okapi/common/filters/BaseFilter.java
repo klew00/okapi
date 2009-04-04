@@ -47,19 +47,25 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
- * BaseFilter provides a simplified API for filter writers and hides the powerful,
- * but complex resource and skeleton API's (
- * {@link net.sf.okapi.common.resource} and {@link net.sf.okapi.common.skeleton}
- * ).
- * 
- * To create a new filter extend BaseFilter and call
- * {@link net.sf.okapi.common.filters#initialize()} and
- * {@link net.sf.okapi.common.filters#finalize()} methods at the beginning and
- * end of each filter run.
+ * BaseFilter provides a simplified API for filter writers and hides the low
+ * level resource and skeleton API's ({@link net.sf.okapi.common.resource} and
+ * {@link net.sf.okapi.common.skeleton}).
+ * <p>
+ * The BaseFilter allows filter writers to think in terms of simple start and
+ * end calls. For example, to produce a non-translatable {@link Event} you would
+ * use startDocumentPart() endDocumentPart(). For a text-based {@link Event} you
+ * would use startTextUNit() and endTextUnit().
+ * <p>
+ * More complex cases such as tags with embedded translatable text can also be
+ * handled. See the BaseMarkupFilter, HtmlFilter} and OpenXmlFilter for examples
+ * of using the {@link BaseFilter}.
+ * <p>
+ * To create a new filter extend BaseFilter and call startFilter() and endFilter()
+ * methods at the beginning and end of each filter run.
  */
 public abstract class BaseFilter implements IFilter {
 	private static final Logger logger = Logger.getLogger("net.sf.okapi.common.filters.BaseFilter");
-	
+
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
 	private static final String END_GROUP = "eg"; //$NON-NLS-1$
 	private static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
@@ -73,7 +79,7 @@ public abstract class BaseFilter implements IFilter {
 	private String srcLang;
 	private String mimeType;
 	private String newlineType;
-	
+
 	private String currentTagType;
 
 	private int startGroupId = 0;
@@ -160,9 +166,10 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Return the {@link IFilterWriter} that should be used in conjunction with this filter ({@link IFilter}).
+	 * Return the {@link IFilterWriter} that should be used in conjunction with
+	 * this filter ({@link IFilter}).
 	 */
-	public IFilterWriter createFilterWriter () {
+	public IFilterWriter createFilterWriter() {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
@@ -196,7 +203,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/*
-	 * Return the current buffered Event without removing it. 
+	 * Return the current buffered Event without removing it.
 	 */
 	private Event peekTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
@@ -275,7 +282,7 @@ public abstract class BaseFilter implements IFilter {
 	/**
 	 * Initialize the filter and send the {@link StartDocument} {@link Event}
 	 */
-	protected void initialize() {
+	protected void startFilter() {
 		reset();
 		startDocument();
 	}
@@ -285,8 +292,7 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @see java.lang.Object#finalize()
 	 */
-	@Override
-	protected void finalize() {
+	protected void endFilter() {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		} else if (!tempFilterEventStack.isEmpty()) {
@@ -294,10 +300,10 @@ public abstract class BaseFilter implements IFilter {
 			while (!tempFilterEventStack.isEmpty()) {
 				Event fe = tempFilterEventStack.peek();
 				if (fe.getEventType() == EventType.START_GROUP) {
-					StartGroup sg = (StartGroup)fe.getResource();
-					endGroup((GenericSkeleton)sg.getSkeleton());
+					StartGroup sg = (StartGroup) fe.getResource();
+					endGroup((GenericSkeleton) sg.getSkeleton());
 				} else if (fe.getEventType() == EventType.TEXT_UNIT) {
-					endTextUnit();					
+					endTextUnit();
 				}
 			}
 		}
@@ -308,7 +314,7 @@ public abstract class BaseFilter implements IFilter {
 	/**
 	 * Check if the current buffered {@link Event} is a {@link TextUnit}.
 	 * 
-	 * @return true if TextUnit, false ootherwise. 
+	 * @return true if TextUnit, false ootherwise.
 	 */
 	protected boolean isCurrentTextUnit() {
 		Event e = peekTempEvent();
@@ -319,10 +325,10 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * Check if the current buffered {@link Event} is a complex {@link TextUnit}. 
-	 * A complex TextUnit is one which carries along with it it's surrounding 
-	 * context such &lt;p> text &lt;/p> or &lt;title> text &lt;/title> 
-	 *  
+	 * Check if the current buffered {@link Event} is a complex {@link TextUnit}
+	 * . A complex TextUnit is one which carries along with it it's surrounding
+	 * context such &lt;p> text &lt;/p> or &lt;title> text &lt;/title>
+	 * 
 	 * 
 	 * @return true, if complex text unit, false otherwise.
 	 */
@@ -459,7 +465,7 @@ public abstract class BaseFilter implements IFilter {
 		canceled = false;
 		done = false;
 		preserveWhitespace = true;
-		
+
 		newlineType = "\n";
 
 		referencableFilterEvents = new LinkedList<Event>();
@@ -538,7 +544,7 @@ public abstract class BaseFilter implements IFilter {
 	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
 		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
 		tu.setPreserveWhitespaces(isPreserveWhitespace());
-		
+
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
 
@@ -563,8 +569,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
-				.getValue(), true));
+		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
 	}
 
@@ -641,7 +646,7 @@ public abstract class BaseFilter implements IFilter {
 
 			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
-				currentSkeleton.addReference(tu);	
+				currentSkeleton.addReference(tu);
 				referencableFilterEvents.add(new Event(EventType.TEXT_UNIT, tu));
 			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
 				embeddedWritableProp(resource, propOrText, tag, language);
@@ -657,7 +662,7 @@ public abstract class BaseFilter implements IFilter {
 		currentSkeleton.add(tag.substring(pt.getMainEndPos()));
 
 		// setup references based on type
-		if (inlineCode) {			
+		if (inlineCode) {
 			if (!textPlaceholdersOnly) {
 				currentCode.appendReference(resource.getId());
 				resource.setSkeleton(currentSkeleton);
@@ -665,7 +670,8 @@ public abstract class BaseFilter implements IFilter {
 				// writable/localizables
 				referencableFilterEvents.add(new Event(EventType.DOCUMENT_PART, resource));
 			} else {
-				// all text - the parent TU hold the references instead of a DocumentPart
+				// all text - the parent TU hold the references instead of a
+				// DocumentPart
 				currentCode.append(currentSkeleton.toString());
 				currentCode.setReferenceFlag(true);
 			}
@@ -904,7 +910,7 @@ public abstract class BaseFilter implements IFilter {
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
 		startCode(new Code(codeType, codeName));
 		processAllEmbedded(literalCode, language, propertyTextUnitPlaceholders, true, tu);
-		endCode();		
+		endCode();
 
 		currentSkeleton = null;
 	}
@@ -1130,7 +1136,8 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * @param preserveWhitespace the preserveWhitespace to set
+	 * @param preserveWhitespace
+	 *            the preserveWhitespace to set
 	 */
 	protected void setPreserveWhitespace(boolean preserveWhitespace) {
 		this.preserveWhitespace = preserveWhitespace;
@@ -1144,21 +1151,22 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * @param currentElementType the currentElementType to set
+	 * @param currentElementType
+	 *            the currentElementType to set
 	 */
 	public void setTagType(String tagType) {
 		this.currentTagType = tagType;
 	}
-	
+
 	abstract protected boolean hasUtf8Encoding();
-	
+
 	abstract protected boolean hasUtf8Bom();
-	
+
 	protected String getNewlineType() {
 		return newlineType;
 	}
 
 	protected void setNewlineType(String newlineType) {
 		this.newlineType = newlineType;
-	}	
+	}
 }
