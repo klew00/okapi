@@ -170,7 +170,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public void open(CharSequence input) {
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
 		document = new Source(input);
-		initialize();
+		startFilter();
 	}
 
 	public void open(InputStream input) {
@@ -197,7 +197,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		initialize();
+		startFilter();
 	}
 
 	public void open(URI inputURI) {
@@ -214,8 +214,8 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	 * Initialize parameters, rule state and parser.
 	 */
 	@Override
-	protected void initialize() {
-		super.initialize();
+	protected void startFilter() {
+		super.startFilter();
 
 		if (parameters == null) {
 			parameters = new Parameters(defaultConfig);
@@ -348,7 +348,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 
 		if (!nodeIterator.hasNext()) {
-			super.finalize(); // we are done
+			super.endFilter(); // we are done
 		}
 
 		// return one of the waiting events
