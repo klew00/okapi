@@ -60,19 +60,19 @@ public class DummyBaseFilter extends BaseFilter {
 
 	private void createCase1 () {
 		setMimeType("text/xml");
-		initialize();
+		startFilter();
 		this.startTextUnit("Text.");
 		this.endTextUnit();
 		this.startDocumentPart("<docPart/>");
 		this.addToDocumentPart("<secondPart/>");
 		this.endDocumentPart();
-		this.finalize();
+		this.endFilter();
 	}
 
 	private void createCase2 () {
 		setMimeType("text/xml");
 		setNewlineType("\n");
-		initialize();
+		startFilter();
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();
 		list.add(new PropertyTextUnitPlaceholder(PlaceholderType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
 		//TODO: Skeleton should be GenericSkeleton since BaseFilter uses only that one
@@ -80,7 +80,7 @@ public class DummyBaseFilter extends BaseFilter {
 		this.addToTextUnit(TagType.OPENING, "<b>", "bold");
 		this.addToTextUnit("Text");
 		this.addToTextUnit(TagType.CLOSING, "</b>", "bold");
-		this.finalize();
+		this.endFilter();
 	}
 
 	/* (non-Javadoc)
