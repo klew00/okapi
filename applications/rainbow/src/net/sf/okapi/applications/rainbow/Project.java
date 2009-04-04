@@ -298,7 +298,7 @@ public class Project {
 				if ( elem2 == null ) throw new Exception("Element <root> missing.");
 				// Use !=='0' for backward compatibility: empty value will == custom
 				useCustomInputRoots.set(i, !elem2.getAttribute("useCustom").equals("0"));
-				inputRoots.set(i, Util.getTextContent(elem2));
+				inputRoots.set(i, Util.getTextContent(elem2).replace('/', File.separatorChar));
 
 				NodeList n2 = elem1.getElementsByTagName("fi");
 				Input item;
@@ -309,7 +309,7 @@ public class Project {
 					item.format = elem2.getAttribute("fo");
 					item.sourceEncoding = elem2.getAttribute("se");
 					item.targetEncoding = elem2.getAttribute("te");
-					item.relativePath = Util.getTextContent(elem2);
+					item.relativePath = Util.getTextContent(elem2).replace('/', File.separatorChar);
 					inputLists.get(i).add(item);
 				}
 			}
@@ -320,13 +320,13 @@ public class Project {
 			elem2 = getFirstElement(elem1, "root");
 			if ( elem2 != null ) {
 				useOutputRoot = elem2.getAttribute("use").equals("1");
-				outputRoot = Util.getTextContent(elem2);
+				outputRoot = Util.getTextContent(elem2).replace('/', File.separatorChar);
 			}
 			
 			elem2 = getFirstElement(elem1, "subFolder");
 			if ( elem2 != null ) {
 				pathBuilder.setUseSubfolder(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setSubfolder(Util.getTextContent(elem2));
+				pathBuilder.setSubfolder(Util.getTextContent(elem2).replace('/', File.separatorChar));
 			}
 			
 			elem2 = getFirstElement(elem1, "extension");
@@ -367,7 +367,7 @@ public class Project {
 			elem1 = getFirstElement(rootElem, "parametersFolder");
 			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
 			useCustomParamsFolder = elem1.getAttribute("useCustom").equals("1");
-			customParamsFolder = Util.getTextContent(elem2);
+			customParamsFolder = Util.getTextContent(elem1).replace('/', File.separatorChar);
 			
 			// Parameters for the utilities
 			elem1 = getFirstElement(rootElem, "utilities");

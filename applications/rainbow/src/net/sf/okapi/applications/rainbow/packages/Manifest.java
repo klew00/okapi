@@ -308,16 +308,16 @@ public class Manifest {
 		    else setTargetLanguage(tmp);
 
 		    tmp = elem.getAttribute("originalDir");
-		    setOriginalLocation(tmp);
+		    setOriginalLocation(tmp.replace('/', File.separatorChar));
 
 		    tmp = elem.getAttribute("sourceDir");
-		    setSourceLocation(tmp);
+		    setSourceLocation(tmp.replace('/', File.separatorChar));
 
 		    tmp = elem.getAttribute("targetDir");
-		    setTargetLocation(tmp);
+		    setTargetLocation(tmp.replace('/', File.separatorChar));
 
 		    tmp = elem.getAttribute("doneDir");
-		    setDoneLocation(tmp);
+		    setDoneLocation(tmp.replace('/', File.separatorChar));
 		    
 		    tmp = elem.getAttribute("date");
 		    setDate(tmp);
@@ -356,7 +356,10 @@ public class Manifest {
 			    if (( filterID == null ) || ( filterID.length() == 0 ))
 			    	throw new RuntimeException("Missing filter attribute.");
 			    
-		    	docs.put(id, new ManifestItem(tmp, inPath, outPath, inEnc, outEnc, filterID, true));
+		    	docs.put(id, new ManifestItem(tmp.replace('/', File.separatorChar),
+		    		inPath.replace('/', File.separatorChar),
+		    		outPath.replace('/', File.separatorChar),
+		    		inEnc, outEnc, filterID, true));
 		    }
 
 		    rootFolder = Util.getDirectoryName(path);
