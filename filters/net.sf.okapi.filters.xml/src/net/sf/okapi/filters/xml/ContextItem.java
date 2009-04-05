@@ -27,16 +27,19 @@ class ContextItem {
 	
 	Node node;
 	boolean translate;
+	String trgPointer;
 	String locNote;
 	boolean preserveWS;
 
 	public ContextItem (Node node,
 			boolean translate,
+			String trgPointer,
 			String locNote,
 			boolean preserveWS)
 		{
 			this.node = node;
 			this.translate = translate;
+			this.trgPointer = trgPointer;
 			this.locNote = locNote;
 			this.preserveWS = preserveWS;
 		}
@@ -47,10 +50,9 @@ class ContextItem {
 		this.node = node;
 		// Context is always an element node
 		this.translate = trav.translate();
+		this.trgPointer = trav.getTargetPointer();
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
 	}
-		
-	
 
 }

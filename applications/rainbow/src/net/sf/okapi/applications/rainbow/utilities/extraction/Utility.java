@@ -215,12 +215,11 @@ public class Utility extends BaseFilterDrivenUtility {
     }
 	
     private void processTextUnit (TextUnit tu) {
-		if ( params.includeTargets ) {
-			//TODO: Find a solution to not output item with
-			// existing target
-		}
-	
-		TextContainer cont = null;
+    	// Do not process non-translatable text units
+    	//TODO: Do we need to still make sure we have a target copy?
+    	if ( !tu.isTranslatable() ) return;
+
+    	TextContainer cont = null;
 		// Segment if requested
 		if (( params.preSegment ) && !"no".equals(tu.getProperty("canSegment")) ) {
 			try {

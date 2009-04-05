@@ -209,8 +209,8 @@ public class Project {
 			writer.writeEndElement(); // extension
 			writer.writeStartElement("replace");
 			writer.writeAttributeString("use", (pathBuilder.useReplace() ? "1" : "0"));
-			writer.writeAttributeString("oldText", pathBuilder.getSearch());
-			writer.writeAttributeString("newText", pathBuilder.getReplace());
+			writer.writeAttributeString("oldText", pathBuilder.getSearch().replace('\\', '/'));
+			writer.writeAttributeString("newText", pathBuilder.getReplace().replace('\\', '/'));
 			writer.writeEndElement(); // replace
 			writer.writeStartElement("prefix");
 			writer.writeAttributeString("use", (pathBuilder.usePrefix() ? "1" : "0"));
@@ -341,8 +341,8 @@ public class Project {
 			elem2 = getFirstElement(elem1, "replace");
 			if ( elem2 != null ) {
 				pathBuilder.setUseReplace(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setSearch(elem2.getAttribute("oldText"));
-				pathBuilder.setReplace(elem2.getAttribute("newText"));
+				pathBuilder.setSearch(elem2.getAttribute("oldText").replace('/', File.separatorChar));
+				pathBuilder.setReplace(elem2.getAttribute("newText").replace('/', File.separatorChar));
 			}
 
 			elem2 = getFirstElement(elem1, "prefix");

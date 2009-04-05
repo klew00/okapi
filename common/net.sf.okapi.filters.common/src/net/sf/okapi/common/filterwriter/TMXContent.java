@@ -1,24 +1,24 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 By the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-package net.sf.okapi.tm.simpletm;
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
+package net.sf.okapi.common.filterwriter;
 
 import java.util.List;
 
@@ -27,14 +27,13 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
- * Handles the conversion between a abstract content (IContainer)
- * and TMX notation.
+ * Handles the conversion between a coded text object and TMX.
  */
 public class TMXContent {
 
-	private String      codedText;
-	private List<Code>  codes;
-	private boolean     withTradosWorkarounds = false;
+	private String codedText;
+	private List<Code> codes;
+	private boolean withTradosWorkarounds = false;
 	
 	public TMXContent () {
 		codedText = "";
@@ -64,7 +63,7 @@ public class TMXContent {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt.
-	 * @return The TMX string.
+	 * @return
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT)
@@ -78,17 +77,27 @@ public class TMXContent {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<bpt i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
-				tmp.append("</bpt>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					tmp.append("</bpt>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("<hi type=\"protected\">");
+				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				id = codes.get(index).getId();
-				tmp.append(String.format("<ept i=\"%d\">", id));
-				tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
-				tmp.append("</ept>");
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					tmp.append(String.format("<ept i=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					tmp.append("</ept>");
+				}
+				if ( code.hasAnnotation("protected") ) {
+					tmp.append("</hi>");
+				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
@@ -98,7 +107,11 @@ public class TMXContent {
 				// Use <ph> or <it> depending on underlying tagType
 				switch ( code.getTagType() ) {
 				case PLACEHOLDER:
-					if ( withTradosWorkarounds && code.getData().startsWith("\\") ) {
+					if ( withTradosWorkarounds
+						&& ((code.getData().indexOf('{') != -1 )
+							|| (code.getData().indexOf('}') != -1 )
+							|| (code.getData().indexOf('\\') != -1 )))
+					{
 						tmp.append("<ut>{\\cs6\\f1\\cf6\\lang1024 </ut>");
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 						tmp.append("<ut>}</ut>");

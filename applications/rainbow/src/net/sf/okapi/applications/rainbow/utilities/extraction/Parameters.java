@@ -30,7 +30,6 @@ public class Parameters extends BaseParameters {
 	public boolean createZip;
 	public String pkgName;
 	public String outputFolder;
-	public boolean includeTargets;
 	public boolean preSegment;
 	public String sourceSRX;
 	public String targetSRX;
@@ -38,6 +37,7 @@ public class Parameters extends BaseParameters {
 	public String tmPath;
 	public boolean useFileName;
 	public boolean useGroupName;
+	public boolean protectAccepted;
 
 	public Parameters () {
 		reset();
@@ -48,7 +48,6 @@ public class Parameters extends BaseParameters {
 		createZip = false;
 		pkgName = "pack1";
 		outputFolder = "${ProjDir}";
-		includeTargets = true;
 		preSegment = false;
 		sourceSRX = "";
 		targetSRX = "";
@@ -56,6 +55,7 @@ public class Parameters extends BaseParameters {
 		tmPath = "";
 		useFileName = true;
 		useGroupName = true;
+		protectAccepted = true;
 	}
 
 	public void fromString(String data) {
@@ -65,7 +65,6 @@ public class Parameters extends BaseParameters {
 		createZip = buffer.getBoolean("createZip", createZip);
 		pkgName = buffer.getString("pkgName", pkgName);
 		outputFolder = buffer.getString("outputFolder", outputFolder);
-		includeTargets = buffer.getBoolean("includeTargets", includeTargets);
 		preSegment = buffer.getBoolean("preSegment", preSegment);
 		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
 		targetSRX = buffer.getString("targetSRX", targetSRX);
@@ -73,6 +72,7 @@ public class Parameters extends BaseParameters {
 		tmPath = buffer.getString("tmPath", tmPath);
 		useFileName = buffer.getBoolean("useFileName", useFileName);
 		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
+		protectAccepted = buffer.getBoolean("protectAccepted", protectAccepted);
 	}
 
 	public String toString() {
@@ -81,7 +81,6 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("createZip", createZip);
 		buffer.setString("pkgName", pkgName);
 		buffer.setString("outputFolder", outputFolder);
-		buffer.setBoolean("includeTargets", includeTargets);
 		buffer.setBoolean("preSegment", preSegment);
 		buffer.setString("sourceSRX", sourceSRX);
 		buffer.setString("targetSRX", targetSRX);
@@ -89,6 +88,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString("tmPath", tmPath);
 		buffer.setBoolean("useFileName", useFileName);
 		buffer.setBoolean("useGroupName", useGroupName);
+		buffer.setBoolean("protectAccepted", protectAccepted);
 		return buffer.toString();
 	}
 	

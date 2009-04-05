@@ -22,13 +22,13 @@ package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
 import java.io.File;
 
-import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;

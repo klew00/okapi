@@ -33,7 +33,8 @@ public class ITSEngine implements IProcessor, ITraversal
 	
 	private static final String   FLAGNAME            = "\u00ff";
 	private static final String   FLAGSEP             = "\u001c";
-	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	// Must have +FLAGSEP as many time as there are FP_XXX_DATA entries +1
+	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
@@ -42,10 +43,11 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_LOCNOTE          = 4;
 	private static final int      FP_PRESERVEWS       = 5;
 	private static final int      FP_LANGINFO         = 6;
-
+	
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
 	private static final int      FP_LANGINFO_DATA         = 2;
+	private static final int      FP_TRANSLATE_DATA        = 3;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -55,6 +57,8 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      LOCNOTETYPE_POINTER      = 2;
 	private static final int      LOCNOTETYPE_REF          = 3;
 	private static final int      LOCNOTETYPE_REFPOINTER   = 4;
+
+	private static final int      TRANSLATE_TRGPOINTER     = 1;
 
 	private DocumentBuilderFactory fact; 
 	private Document doc;
@@ -260,6 +264,11 @@ public class ITSEngine implements IProcessor, ITraversal
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
 		
+		value = elem.getAttributeNS(ITSX_NS_URI, "target");
+		if ( value.length() > 0 ) {
+			rule.info = value;
+			rule.infoType = TRANSLATE_TRGPOINTER; 
+		}
 		rules.add(rule);
 	}
 
@@ -588,6 +597,9 @@ public class ITSEngine implements IProcessor, ITraversal
 					switch ( rule.ruleType ) {
 					case IProcessor.DC_TRANSLATE:
 						setFlag(NL.item(i), FP_TRANSLATE, (rule.flag ? 'y' : 'n'), true);
+						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
+							setFlag(NL.item(i), FP_TRANSLATE_DATA, rule.info, true);							
+						}
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
@@ -885,6 +897,10 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( (tmp = (String)attribute.getUserData(FLAGNAME)) == null ) return false;
 		// '?' and 'n' will return (correctly) false
 		return (tmp.charAt(FP_TRANSLATE) == 'y');
+	}
+
+	public String getTargetPointer () {
+		return trace.peek().targetPointer;
 	}
 	
 	public int getDirectionality () {

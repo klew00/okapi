@@ -64,6 +64,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * methods at the beginning and end of each filter run.
  */
 public abstract class BaseFilter implements IFilter {
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger("net.sf.okapi.common.filters.BaseFilter");
 
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$

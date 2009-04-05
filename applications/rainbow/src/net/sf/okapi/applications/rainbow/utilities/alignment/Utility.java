@@ -24,13 +24,13 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;

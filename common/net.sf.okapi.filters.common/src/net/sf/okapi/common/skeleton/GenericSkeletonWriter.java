@@ -326,7 +326,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Otherwise trgCont is either the available target or the source (fall-back case)
 
 //TODO: Case of unsegmented with target!!!		
-		
+
+		if ( !tu.isTranslatable() ) {
+			context = 0; // Keep skeleton context
+		}
 		// Check for segmentation
 		if ( srcCont.isSegmented() ) {
 			// Special case of segmented entry: source + target

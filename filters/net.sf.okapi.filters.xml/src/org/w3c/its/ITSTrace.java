@@ -11,6 +11,7 @@ class ITSTrace {
 	String locNote;
 	boolean preserveWS;
 	String language;
+	String targetPointer;
 
 	ITSTrace () {
 	}
@@ -27,6 +28,8 @@ class ITSTrace {
 		// withinText: No inheritance
 		
 		// term : No inheritance
+		
+		// target: No inheritance
 		
 		// locnote: Inheritance for child elements but not attributes
 		locNote = initialTrace.locNote;

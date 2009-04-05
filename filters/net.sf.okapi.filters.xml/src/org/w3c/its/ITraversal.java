@@ -47,6 +47,14 @@ public interface ITraversal {
 	 * @return True if the attribute is translatable, false otherwise.
 	 */
 	public boolean translate (Attr attribute);
+
+	/**
+	 * Gets the target pointer for the current element of the traversal. This method
+	 * is used for an extension to ITS 1.0.
+	 * @return The XPath relative to the current element to the node where the
+	 * translation should be placed.
+	 */
+	public String getTargetPointer ();
 	
 	/**
 	 * Gets the directionality for the text of the current node of the

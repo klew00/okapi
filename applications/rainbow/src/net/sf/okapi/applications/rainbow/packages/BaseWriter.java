@@ -24,10 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.okapi.applications.rainbow.lib.TMXWriter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
