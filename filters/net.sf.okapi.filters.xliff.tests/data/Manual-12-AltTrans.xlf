@@ -15,7 +15,7 @@
    </trans-unit>
    <trans-unit id="3" approved="yes">
       <source xml:lang="en">Text number 3</source>
-      <target xml:lang="fr">Texte nméro 3</target>
+      <target xml:lang="fr">Texte numéro 3</target>
    </trans-unit>
    <trans-unit id="4">
       <source xml:lang="en">Text number four</source>
