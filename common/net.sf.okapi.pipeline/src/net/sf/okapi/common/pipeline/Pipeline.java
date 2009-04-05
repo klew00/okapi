@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 
 public class Pipeline implements IPipeline {
 	LinkedList<IPipelineStep> steps;
@@ -117,7 +117,7 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(FileResource)
 	 */
-	public Event process(FileResource input) {
+	public Event process(InputResource input) {
 		return process(new Event(EventType.FILE_RESOURCE, input));
 	}
 	

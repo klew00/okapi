@@ -26,7 +26,7 @@ import java.net.URI;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 
 public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	private IFilter filter;
@@ -52,7 +52,7 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	@Override
 	public Event handleEvent(Event event) {
 		if (event != null && event.getEventType() == EventType.FILE_RESOURCE) {
-			FileResource fileResource = (FileResource)event.getResource();
+			InputResource fileResource = (InputResource)event.getResource();
 			filter.setOptions(fileResource.getLanguage(), fileResource.getEncoding(), true);			
 			if (fileResource.getInputCharSequence() != null) {
 				setInput(fileResource.getInputCharSequence());

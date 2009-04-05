@@ -22,18 +22,18 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 
 public class FileResourcePipelineStepAdaptor extends BasePipelineStep {	
-	private FileResource fileResource;
+	private InputResource fileResource;
 	private boolean eventSent;
 
-	public FileResourcePipelineStepAdaptor(FileResource fileResource) {
+	public FileResourcePipelineStepAdaptor(InputResource fileResource) {
 		this.fileResource = fileResource;
 		eventSent = false;
 	}
 
-	public FileResource getFileResource() {
+	public InputResource getFileResource() {
 		return fileResource;
 	}
 
