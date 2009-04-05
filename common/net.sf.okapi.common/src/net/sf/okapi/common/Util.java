@@ -56,7 +56,7 @@ public class Util {
 	public static final String   RTF_MIDMARKER2  = "\\{>}";
 	public static final String   RTF_ENDMARKER   = "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
 	
-	private static final String NEWLINES_REGEX = "\r[\n]?";
+	private static final String NEWLINES_REGEX = "\r(\n)?";
 	private static final Pattern NEWLINES_REGEX_PATTERN = Pattern.compile(NEWLINES_REGEX);
 
 	/**
