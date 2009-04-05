@@ -26,7 +26,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility
 	implements IFilterDrivenUtility {
@@ -41,7 +41,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 
 			// If there is no associated filter: send the file as a FILE_RESOURCE
 			if (( getInputFilterSettings(0) == null ) || ( getInputFilterSettings(0).length() == 0 ) ) {
-				FileResource fr = new FileResource(new File(getInputPath(0)).toURI(),
+				InputResource fr = new InputResource(new File(getInputPath(0)).toURI(),
 					getInputEncoding(0), srcLang);
 				handleEvent(new Event(EventType.FILE_RESOURCE, fr));
 				return;

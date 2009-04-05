@@ -29,7 +29,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -185,7 +185,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			processTextUnit((TextUnit)event.getResource());
 			break;
 		case FILE_RESOURCE:
-			processFileResource((FileResource)event.getResource());
+			processFileResource((InputResource)event.getResource());
 			break;
 		}
 		// All events then go to the actual writer
@@ -196,7 +196,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	 * Handles files without any associated filter settings (.png, etc.)
 	 * @param fr The file resource to process.
 	 */
-	private void processFileResource (FileResource fr) {
+	private void processFileResource (InputResource fr) {
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		writer.createCopies(++id, relativeInput);
 	}
