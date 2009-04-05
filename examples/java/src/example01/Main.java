@@ -30,7 +30,7 @@ import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.xml.XMLFilter;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
@@ -152,7 +152,7 @@ public class Main {
 		writer.setOutput(outputPath);
 		
 		// Launch the execution
-		FileResource fr = new FileResource((new File(inputPath)).toURI(), inputEncoding, srcLang);
+		InputResource fr = new InputResource((new File(inputPath)).toURI(), inputEncoding, srcLang);
 		pipeline.process(fr);
 		pipeline.destroy();
 	}
