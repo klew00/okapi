@@ -151,18 +151,18 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
-	public void testNormalizeNewlines() {
+	public void testNewlineDetection() {
 		String snippet = "\r\nX\rY\n";
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("collapseWhitespaceOff.yml");
-		assertEquals("\nX\nY\n", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("\r\nX\r\nY\r\n", generateOutput(getEvents(snippet), snippet, "en"));
 		parameters = originalParameters; 
 	}
 
 	@Test
 	public void testNormalizeNewlinesInPre() {
 		String snippet = "<pre>\r\nX\rY\n</pre>";
-		assertEquals("<pre>\nX\nY\n</pre>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<pre>\r\nX\r\nY\r\n</pre>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
