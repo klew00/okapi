@@ -129,9 +129,8 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// whitespace is false
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedText = collapseWhitespace(decodedText);
-		} else {
-			decodedText = Util.normalizeNewlines(decodedText);
-		}
+		}		
+		decodedText = Util.normalizeNewlines(decodedText);
 
 		if (canStartNewTextUnit()) {
 			startTextUnit(decodedText);
@@ -453,11 +452,11 @@ public class HtmlFilter extends BaseMarkupFilter {
 		// convert all entities to Unicode		
 		String decodedValue = CharacterReference.decode(value, true);
 		
-		if (getConfig().collapseWhitespace() && !getRuleState().isPreserveWhitespaceState()) {
+		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedValue = collapseWhitespace(decodedValue);
-		} else {
-			decodedValue = Util.normalizeNewlines(decodedValue);
 		}
+		decodedValue = Util.normalizeNewlines(decodedValue);
+		
 		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
 	}
 
