@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
-import net.sf.okapi.common.resource.FileResource;
+import net.sf.okapi.common.resource.InputResource;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -44,7 +44,7 @@ public class SimplePipelineWithCancelTest {
 				pipeline.addStep(new ConsumerProducer());
 				pipeline.addStep(new Consumer());				
 				
-				pipeline.process(new FileResource("DUMMY", "en"));
+				pipeline.process(new InputResource("DUMMY", "en"));
 			}
 		};
 
