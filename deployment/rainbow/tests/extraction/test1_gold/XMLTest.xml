@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<myDoc its:version="1.0" xmlns:its="http://www.w3.org/2005/11/its">
+ <head>
+  <test>No trans: ø=o-slash; &#x0104;=A-ogonek, &#xff21;&#xff22;&#xff23;=ABC-fullwidth</test>
+  <author>Norbert Griphook</author>
+  <comments>This is the instructions for the ordering process.</comments>
+  <its:rules version="1.0">
+   <its:translateRule selector="/myDoc/head" translate="no"/>
+   <its:translateRule selector="//*/@alt" translate="yes"/> 
+   <its:translateRule selector="//del" translate="no"/>
+   <its:translateRule selector="//@*[ancestor::del]" translate="no"/>
+   <its:withinTextRule selector="//ui|//ins|//del|//imgRef" withinText="yes"/>
+  </its:rules>
+ </head>
+ <test>[Tråñs: ø=õ-slåsh; &#x0104;=Â-õgõñèk, &#xff21;&#xff22;&#xff23;=ÂBÇ-füllwìðth]</test>
+ <par>[Tõ stårt çlìçk <ins>thè <ui>Bègìñ</ui> büttõñ</ins><del> the icon <imgRef alt="Start" file="btnStart.png"/></del> åñð fìll thè fõrm låbèlèð wìth thè fõllõwìñg ìçõñ: <imgRef alt="[Vålüè Âððèð Tåx Fõrm]" file="vat.png"/>]</par>
+ <par>[Pårt 1]<notinline>[Tèxt ìñsìðè]</notinline>[Pårt 2]</par>
+ <par>[Pårt 1]<notinline its:translate="no">no trans inside</notinline>[Pårt 2]</par>
+</myDoc>

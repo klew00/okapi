@@ -105,15 +105,42 @@
 	</target>
 	
 	<target name="winCompare" if="isWindows">
-		<exec executable="comp" output="_tests_results.txt">
+		<exec executable="fc" output="_tests_results.txt">
 		 <arg line="miscellaneous\*.out miscellaneous\*.gold"/>
 		</exec>
-		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.* extraction\test1_gold\*.*"/>
+		
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test1_out\done\*.html extraction\test1_gold\*.html"/>
 		</exec>
-		<exec executable="comp" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.* extraction\test2_gold\*.*"/>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test1_out\done\*.xml extraction\test1_gold\*.xml"/>
 		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test1_out\done\*.properties extraction\test1_gold\*.properties"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test1_out\done\*.xlf extraction\test1_gold\*.xlf"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test1_out\done\*.info extraction\test1_gold\*.info"/>
+		</exec>
+		
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test2_out\done\*.html extraction\test2_gold\*.html"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test2_out\done\*.xml extraction\test2_gold\*.xml"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test2_out\done\*.properties extraction\test2_gold\*.properties"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test2_out\done\*.xlf extraction\test2_gold\*.xlf"/>
+		</exec>
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test2_out\done\*.info extraction\test2_gold\*.info"/>
+		</exec>
+		
 	</target>
 	
 	<target name="all" depends="runtests, winCompare"/>

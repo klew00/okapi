@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+<file datatype="x-test" original="test1" source-language="en" target-language="fr">
+<body>
+   <trans-unit id="0" translate="no">
+      <source xml:lang="en">Do not translate this.</source>
+   <target xml:lang="fr">Do not translate this.</target>
+</trans-unit>
+   <trans-unit id="1">
+      <source xml:lang="en">Text number 1</source>
+   <target xml:lang="fr">[Tèxt ñümbèr 1]</target>
+</trans-unit>
+   <trans-unit id="2">
+      <source xml:lang="en">Text number 2</source>
+      <target xml:lang="fr">[Tèxt ñümbèr 2]</target>
+   </trans-unit>
+   <trans-unit id="3" approved="yes">
+      <source xml:lang="en">Text number 3</source>
+      <target xml:lang="fr">[Tèxt ñümbèr 3]</target>
+   </trans-unit>
+   <trans-unit id="4">
+      <source xml:lang="en">Text number four</source>
+      <target xml:lang="fr">[Tèxt ñümbèr fõür]</target>
+<alt-trans>
+         <source xml:lang="en">The text number four.</source>
+         <target xml:lang="fr">Le texte numéro quatre.</target>
+      </alt-trans>
+   </trans-unit>
+</body>
+</file>
+</xliff>
