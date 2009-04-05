@@ -107,8 +107,8 @@ public abstract class BaseFilter implements IFilter {
 	 * Instantiates a new base filter.
 	 */
 	public BaseFilter() {
-		// reset is called in initialize method - no need to call it in the
-		// constructor
+		// a few vars should only be initialized once rather than on each reset call.
+		newlineType = "\n";
 	}
 
 	/*
@@ -466,8 +466,6 @@ public abstract class BaseFilter implements IFilter {
 		canceled = false;
 		done = false;
 		preserveWhitespace = true;
-
-		newlineType = "\n";
 
 		referencableFilterEvents = new LinkedList<Event>();
 		filterEvents = new LinkedList<Event>();
