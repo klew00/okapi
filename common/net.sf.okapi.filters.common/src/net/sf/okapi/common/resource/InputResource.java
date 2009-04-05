@@ -90,6 +90,7 @@ public class InputResource implements IResource {
 	
 	public void reset(URI inputURI, String encoding, String language) {
 		setInputURI(inputURI);
+		setEncoding(encoding);
 		setLanguage(language);
 		try {
 			InputStream inputStream = inputURI.toURL().openStream();
