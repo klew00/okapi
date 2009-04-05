@@ -37,7 +37,7 @@ public class MemMappedCharSequenceTest {
 
 	@Test
 	public void testLarge() throws FileNotFoundException {
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test.txt");
+		InputStream in = new FileInputStream("/OKAPI/common/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE");
 		assertEquals(7257720, charSequence.length());
 		assertEquals('<', charSequence.charAt(1));
@@ -48,7 +48,7 @@ public class MemMappedCharSequenceTest {
 	
 	@Test
 	public void testLowercase() throws FileNotFoundException {
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test.txt");
+		InputStream in = new FileInputStream("/OKAPI/common/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
 		charSequence.close();
