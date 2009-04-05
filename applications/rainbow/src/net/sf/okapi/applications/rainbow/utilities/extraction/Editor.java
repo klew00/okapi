@@ -24,6 +24,7 @@ import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.packages.xliff.OptionsEditor;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -59,6 +60,7 @@ public class Editor implements IParametersEditor {
 	private OKCancelPanel pnlActions;
 	private Parameters params;
 	private List lbTypes;
+	private Button btOptions;
 	private Text edDescription;
 	private Text edName;
 	private Text edOutputFolder;
@@ -73,6 +75,7 @@ public class Editor implements IParametersEditor {
 	private boolean inInit = true;
 	private IHelp help;
 	private String projectDir;
+	private IParameters xliffOptions;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -124,13 +127,16 @@ public class Editor implements IParametersEditor {
 		//--- Format tab
 
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayout(new GridLayout(2, false));
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Package Format");
 		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Type of package to create:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
 
 		lbTypes = new List(cmpTmp, SWT.BORDER);
 		lbTypes.add("Generic XLIFF");
@@ -138,11 +144,28 @@ public class Editor implements IParametersEditor {
 		lbTypes.add("Original + RTF layer");
 		// Access the list through key rather than index
 		lbTypes.setData("xliff\tomegat\trtf");
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
+		gdTmp.horizontalSpan = 2;
 		lbTypes.setLayoutData(gdTmp);
+		lbTypes.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updatePackageType();
+			}
+		});
 		
-		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI);
+		btOptions = new Button(cmpTmp, SWT.PUSH);
+		btOptions.setText("&Options...");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = 80;
+		btOptions.setLayoutData(gdTmp);
+		btOptions.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editOptions();
+			}
+		});
+		
+		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		edDescription.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 60;
@@ -307,6 +330,29 @@ public class Editor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void updatePackageType () {
+		int n = lbTypes.getSelectionIndex();
+		if ( n == -1 ) {
+			btOptions.setEnabled(false);
+			edDescription.setText("");
+			return;
+		}
+		switch ( n ) {
+		case 0: // XLIFF
+			btOptions.setEnabled(true);
+			edDescription.setText("Simple package where all files to translate are extracted to XLIFF. You can translate this package with any XLIFF editor.");
+			break;
+		case 1: // OmegaT
+			btOptions.setEnabled(false);
+			edDescription.setText("OmegaT project with all its files and directory structure in place. You can translate this package with OmegaT.");
+			break;
+		case 2: // Original + RTF
+			btOptions.setEnabled(false);
+			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles. You can translate this package with Trados Translator's Workbench or any compatible tool.");
+			break;
+		}
+	}
+	
 	private void updatePretranslate () {
 		edTmPath.setEnabled(chkPreTranslate.getSelection());
 		btGetTmPath.setEnabled(chkPreTranslate.getSelection());
@@ -342,6 +388,9 @@ public class Editor implements IParametersEditor {
 		edTmPath.setText(params.tmPath);
 		chkUseFileName.setSelection(params.useFileName);
 		chkUseGroupName.setSelection(params.useGroupName);
+		// TODO: This needs to be a clone, not the object itself, or it will get saved on cancel
+		xliffOptions = params.xliffOptions;
+		updatePackageType();
 		updatePretranslate();
 		updateSample();
 	}
@@ -361,6 +410,7 @@ public class Editor implements IParametersEditor {
 		params.tmPath = edTmPath.getText();
 		params.useFileName = chkUseFileName.getSelection();
 		params.useGroupName = chkUseGroupName.getSelection();
+		params.xliffOptions = xliffOptions;
 		result = true;
 		return true;
 	}
@@ -370,4 +420,16 @@ public class Editor implements IParametersEditor {
 		String out = edOutputFolder.getText() + File.separator + edName.getText();
 		edSample.setText(out.replace(BaseUtility.VAR_PROJDIR, projectDir));
 	}
+	
+	private void editOptions () {
+		int n = lbTypes.getSelectionIndex();
+		if ( n == -1 ) return;
+		switch ( n ) {
+		case 0: // XLIFF
+			OptionsEditor dlg = new OptionsEditor();
+			dlg.edit(xliffOptions, shell, help, projectDir);
+			break;
+		}
+	}
+
 }

@@ -65,8 +65,10 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
 	public void preprocess () {
-		if ( params.pkgType.equals("xliff") )
+		if ( params.pkgType.equals("xliff") ) {
 			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
+			writer.setParameters(params.xliffOptions);
+		}
 		else if ( params.pkgType.equals("omegat") )
 			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
 		else if ( params.pkgType.equals("ttx") )

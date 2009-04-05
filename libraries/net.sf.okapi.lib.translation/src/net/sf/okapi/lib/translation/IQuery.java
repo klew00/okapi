@@ -38,6 +38,12 @@ public interface IQuery {
 	public static final int SUPPORT_EXPORT       = 0x0080;
 
 	/**
+	 * Gets the name of the connector.
+	 * @return the name of the connector.
+	 */
+	public String getName ();
+
+	/**
 	 * Indicates if this query engine implements a given option.
 	 * @param option The option to lookup.
 	 * @return True if the given option is supported, false if it is not.

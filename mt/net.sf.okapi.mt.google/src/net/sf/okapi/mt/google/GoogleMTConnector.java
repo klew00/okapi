@@ -1,22 +1,22 @@
-/*===========================================================================*/
-/* Copyright (C) 2008 By the Okapi Framework contributors                    */
-/*---------------------------------------------------------------------------*/
-/* This library is free software; you can redistribute it and/or modify it   */
-/* under the terms of the GNU Lesser General Public License as published by  */
-/* the Free Software Foundation; either version 2.1 of the License, or (at   */
-/* your option) any later version.                                           */
-/*                                                                           */
-/* This library is distributed in the hope that it will be useful, but       */
-/* WITHOUT ANY WARRANTY; without even the implied warranty of                */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser   */
-/* General Public License for more details.                                  */
-/*                                                                           */
-/* You should have received a copy of the GNU Lesser General Public License  */
-/* along with this library; if not, write to the Free Software Foundation,   */
-/* Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA               */
-/*                                                                           */
-/* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
-/*===========================================================================*/
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
 
 package net.sf.okapi.mt.google;
 
@@ -51,6 +51,10 @@ public class GoogleMTConnector implements IQuery {
 		// Nothing to do
 	}
 
+	public String getName () {
+		return "Google-MT";
+	}
+
 	public boolean hasNext () {
 		return (current>-1);
 	}
@@ -77,21 +81,23 @@ public class GoogleMTConnector implements IQuery {
 		current = -1;
 		try {
 			String qtext = text.getCodedText();
+			StringBuilder tmpCodes = new StringBuilder();
 			if ( text.hasCode() ) {
-				StringBuilder tmp = new StringBuilder();
+				StringBuilder tmpText = new StringBuilder();
 				for ( int i=0; i<qtext.length(); i++ ) {
 					switch ( qtext.charAt(i) ) {
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
 					case TextFragment.MARKER_SEGMENT:
-						i++; // Skip second part of the code
+						tmpCodes.append(qtext.charAt(i));
+						tmpCodes.append(qtext.charAt(++i));
 						break;
 					default:
-						tmp.append(qtext.charAt(i));
+						tmpText.append(qtext.charAt(i));
 					}
 				}
-				qtext = tmp.toString();
+				qtext = tmpText.toString();
 			}
 
 			URL url = new URL(address + String.format(baseQuery,
@@ -114,7 +120,13 @@ public class GoogleMTConnector implements IQuery {
 	        if ( m.find() ) {
 				result = new QueryResult();
 				result.source = text;
-		        result.target = new TextFragment(unescape(m.group(1)));
+				if ( text.hasCode() ) {
+					result.target = new TextFragment(unescape(m.group(1))+tmpCodes.toString(),
+						text.getCodes());
+				}
+				else {
+					result.target = new TextFragment(unescape(m.group(1)));
+				}
 				result.score = (text.hasCode() ? 98 : 99);
 				current = 0;
 	        }

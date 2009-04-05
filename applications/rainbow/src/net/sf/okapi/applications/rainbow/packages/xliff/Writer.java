@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,7 +47,6 @@ public class Writer extends BaseWriter {
 
 	private XMLWriter writer = null;
 	private XLIFFContent xliffCont;
-	private boolean excludeNoTranslate = false;
 	private boolean useSourceForTranslated = false;
 	private boolean inFile;
 	private String srcLang;
@@ -109,7 +108,7 @@ public class Writer extends BaseWriter {
 				Util.getFilename(relativeSourcePath, true));
 			
 			// Do not export items with translate='no'
-			excludeNoTranslate = true;
+			options.includeNoTranslate = false;
 			
 			// If translated found: replace the target text by the source.
 			// Trusting the target will be gotten from the TMX from original
@@ -141,10 +140,11 @@ public class Writer extends BaseWriter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return options;
 	}
 
 	public void setParameters (IParameters params) {
+		options = (Options)params;
 	}
 
 	public Event handleEvent (Event event) {
@@ -251,7 +251,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	private void processTextUnit (TextUnit tu) {
-		if ( excludeNoTranslate && !tu.isTranslatable() ) {
+		if ( !options.includeNoTranslate && !tu.isTranslatable() ) {
 			return;
 		}
 		if ( !inFile ) writeStartFile(relativeSourcePath, docMimeType);
@@ -326,14 +326,6 @@ public class Writer extends BaseWriter {
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
-	}
-
-	public IParameters getOptions () {
-		return options;
-	}
-
-	public void setOptions (IParameters options) {
-		this.options = (Options)options;
 	}
 
 }

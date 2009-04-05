@@ -22,7 +22,9 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 
 import java.util.UUID;
 
+import net.sf.okapi.applications.rainbow.packages.xliff.Options;
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.IParameters;
 
 public class Parameters extends BaseParameters {
 	
@@ -38,6 +40,7 @@ public class Parameters extends BaseParameters {
 	public boolean useFileName;
 	public boolean useGroupName;
 	public boolean protectAccepted;
+	public IParameters xliffOptions;
 
 	public Parameters () {
 		reset();
@@ -56,6 +59,7 @@ public class Parameters extends BaseParameters {
 		useFileName = true;
 		useGroupName = true;
 		protectAccepted = true;
+		xliffOptions = new Options();
 	}
 
 	public void fromString(String data) {
@@ -73,6 +77,7 @@ public class Parameters extends BaseParameters {
 		useFileName = buffer.getBoolean("useFileName", useFileName);
 		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
 		protectAccepted = buffer.getBoolean("protectAccepted", protectAccepted);
+		xliffOptions.fromString(buffer.getGroup("xliffOptions"));
 	}
 
 	public String toString() {
@@ -89,6 +94,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useFileName", useFileName);
 		buffer.setBoolean("useGroupName", useGroupName);
 		buffer.setBoolean("protectAccepted", protectAccepted);
+		buffer.setGroup("xliffOptions", xliffOptions.toString());
 		return buffer.toString();
 	}
 	

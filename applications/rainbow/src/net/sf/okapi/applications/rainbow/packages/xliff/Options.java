@@ -25,6 +25,7 @@ import net.sf.okapi.common.BaseParameters;
 public class Options extends BaseParameters {
 
 	public boolean gMode;
+	public boolean includeNoTranslate;
 	public String message;
 	
 	public Options () {
@@ -33,6 +34,7 @@ public class Options extends BaseParameters {
 	
 	public void reset() {
 		gMode = false;
+		includeNoTranslate = true;
 		message = "";
 	}
 
@@ -40,12 +42,14 @@ public class Options extends BaseParameters {
 		reset();
 		buffer.fromString(data);
 		gMode = buffer.getBoolean("gMode", gMode);
+		includeNoTranslate = buffer.getBoolean("includeNoTranslate", includeNoTranslate);
 		message = buffer.getString("message", message);
 	}
 
 	public String toString () {
 		buffer.reset();
 		buffer.setParameter("gMode", gMode);
+		buffer.setBoolean("includeNoTranslate", includeNoTranslate);
 		buffer.setParameter("message", message);
 		return buffer.toString();
 	}

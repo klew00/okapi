@@ -30,6 +30,9 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
+/**
+ * Writer for TMX documents.
+ */
 public class TMXWriter {
 	
 	private XMLWriter writer;
@@ -40,6 +43,9 @@ public class TMXWriter {
 	private boolean withTradosWorkarounds;
 	private Pattern exclusionPattern = null;
 
+	/**
+	 * Closes the current output document if one is opened.
+	 */
 	public void close () {
 		if ( writer != null ) {
 			writer.close();
@@ -47,10 +53,19 @@ public class TMXWriter {
 		}
 	}
 	
+	/**
+	 * Gets the number of TU elements that have been written in the current output document.
+	 * @return The number of TU elements written in the current output document.
+	 */
 	public int getItemCount () {
 		return itemCount;
 	}
 
+	/**
+	 * Creates a new TMX document.
+	 * @param path The full path of the TMX document to create.
+	 * If another document exists already it will be overwritten.
+	 */
 	public void create (String path) {
 		if ( path == null ) throw new NullPointerException();
 		itemCount = 0;
@@ -60,6 +75,11 @@ public class TMXWriter {
 		writer.create(path);
 	}
 	
+	/**
+	 * Sets the flag indicating whether the writer should output 
+	 * workaround codes specific for Trados.
+	 * @param value True to output Trados-specific workarounds. False otherwise.
+	 */
 	public void setTradosWorkarounds (boolean value) {
 		withTradosWorkarounds = value;
 		if ( tmxCont != null ) {
@@ -67,6 +87,11 @@ public class TMXWriter {
 		}
 	}
 	
+	/**
+	 * Sets a pattern oc content to not output. The given pattern is matched against 
+	 * the source content of each item, if it matches, the item is not written.
+	 * @param pattern The regular expression pattern of the contents to not output.
+	 */
 	public void setExclusionOption (String pattern) {
 		if (( pattern == null ) || ( pattern.length() == 0 )) {
 			exclusionPattern = null;
@@ -76,6 +101,16 @@ public class TMXWriter {
 		}
 	}
 	
+	/**
+	 * Writes the start of the TMC document.
+	 * @param sourceLanguage The source language (must be set).
+	 * @param targetLanguage The target language (must be set).
+	 * @param creationTool The identifier of the creation tool (can be null).
+	 * @param creationToolVersion The version of the creation tool (can be null).
+	 * @param segType The type of segments in the output.
+	 * @param originalTMFormat The identifier for the original TM engine (can be null).
+	 * @param dataType The type of data to output.
+	 */
 	public void writeStartDocument (String sourceLanguage,
 		String targetLanguage,
 		String creationTool,
@@ -112,12 +147,20 @@ public class TMXWriter {
 		writer.writeLineBreak();
 	}
 	
+	/**
+	 * Writes the end of the TMX document.
+	 */
 	public void writeEndDocument () {
 		writer.writeEndElementLineBreak(); // body
 		writer.writeEndElementLineBreak(); // tmx
 		writer.writeEndDocument();
 	}
 	
+	/**
+	 * Writes a given text unit.
+	 * @param item The text unit to output.
+	 * @param attributes The optional set of attribute to put along with the entry. 
+	 */
 	public void writeItem (TextUnit item,
 		Map<String, String> attributes)
 	{
@@ -242,7 +285,7 @@ public class TMXWriter {
 	}
 
 	/**
-	 * Writes an TUV element.
+	 * Writes a TUV element.
 	 * @param frag The TextFragment for the content of this TUV. This can be
 	 * a segment of a TextContainer.
 	 * @param language The language for this TUV.

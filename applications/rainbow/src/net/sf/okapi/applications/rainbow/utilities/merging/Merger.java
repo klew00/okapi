@@ -44,8 +44,7 @@ public class Merger {
 	private FilterAccess fa;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
-	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
-	private boolean skipNoTranslate;
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	private String trgLang;
 
 	public Merger () {
@@ -72,7 +71,6 @@ public class Merger {
 		}
 		// Set the manifest and the options
 		this.manifest = manifest;
-		skipNoTranslate = "omegat".equals(manifest.getPackageType());
 		trgLang = manifest.getTargetLanguage();
 	}
 	
@@ -145,14 +143,14 @@ public class Merger {
 	}
 
 	private void processTextUnit (TextUnit tu) {
-		// Skip the non-translatable if they are not included in the package
-		if ( skipNoTranslate && !tu.isTranslatable() ) return;
+		// Skip the non-translatable
+		if ( !tu.isTranslatable() ) return;
 			
 		// Get item from the package document
 		if ( !reader.readItem() ) {
 			// Problem: 
-			logger.log(Level.WARNING, "There is no more package item to merge (for id=\"%s\")",
-				tu.getId());
+			logger.log(Level.WARNING,
+				String.format("There is no more package item to merge (for id=\"%s\")", tu.getId()));
 			// Keep the source
 			return;
 		}

@@ -44,6 +44,10 @@ public class OpenTranTMConnector implements ITMQuery {
 	private int current = -1;
 	private int maxHits = 25;
 	
+	public String getName () {
+		return "OpenTran-Repository";
+	}
+
 	public void close () {
 		if ( client != null ) {
 			client = null; // Free to garbage collect

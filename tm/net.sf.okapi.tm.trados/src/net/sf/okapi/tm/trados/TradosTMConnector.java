@@ -46,6 +46,10 @@ public class TradosTMConnector implements ITMQuery {
 		tmInstance.invoke("Open",new Variant(connectionString),new Variant("BATCH_ANALYZER"));
 	}
 		
+	public String getName () {
+		return "Trados-TW4Win";
+	}
+
 	public void close () {
 		tradosInstance.invoke("quit", new Variant[] {});
 	}

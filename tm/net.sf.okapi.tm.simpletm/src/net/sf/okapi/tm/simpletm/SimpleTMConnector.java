@@ -43,6 +43,10 @@ public class SimpleTMConnector implements ITMQuery {
 		attributes = new LinkedHashMap<String, String>();
 	}
 	
+	public String getName () {
+		return "SimpleTM";
+	}
+
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;
