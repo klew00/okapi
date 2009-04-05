@@ -42,7 +42,7 @@ import net.sf.okapi.common.annotation.IAnnotation;
  * referencing a file to be processed in the pipeline. File's can be decomposed
  * into events in the pipeline.
  */
-public class FileResource implements IResource {
+public class InputResource implements IResource {
 	private Annotations annotations;
 	private String id;
 	private String encoding;
@@ -66,17 +66,17 @@ public class FileResource implements IResource {
     - possibly the encoding to use for the output
     */
 
-	public FileResource(URI inputURI, String encoding, String language) {
+	public InputResource(URI inputURI, String encoding, String language) {
 		this.annotations = new Annotations();
 		reset(inputURI, encoding, language);
 	}
 
-	public FileResource(InputStream inputStream, String encoding, String language) {
+	public InputResource(InputStream inputStream, String encoding, String language) {
 		this.annotations = new Annotations();
 		reset(inputStream, encoding, language);
 	}
 
-	public FileResource(CharSequence inputCharSequence, String language) {
+	public InputResource(CharSequence inputCharSequence, String language) {
 		this.annotations = new Annotations();
 		reset(inputCharSequence, language);
 	}
