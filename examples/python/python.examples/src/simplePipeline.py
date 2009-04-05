@@ -20,7 +20,7 @@
 
 from net.sf.okapi.common.pipeline import Pipeline, BasePipelineStep, FilterPipelineStepAdaptor
 from net.sf.okapi.common import EventType, Event
-from net.sf.okapi.common.resource import FileResource
+from net.sf.okapi.common.resource import InputResource
 from net.sf.okapi.filters.html import HtmlFilter
     
 class Consumer(BasePipelineStep):
@@ -32,7 +32,7 @@ pipeline.addStep(FilterPipelineStepAdaptor(HtmlFilter()))
 pipeline.addStep(Consumer())
 
 
-pipeline.process(FileResource(u'This is a <img src="here">simple pipeline</img> test', "en"))
+pipeline.process(InputResource(u'This is a <img src="here">simple pipeline</img> test', "en"))
 pipeline.destroy()
 
 
