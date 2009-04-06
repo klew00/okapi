@@ -252,10 +252,8 @@ public class MainForm implements IParametersProvider {
 
 		fa = new FilterAccess();
 		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
-		//TODO: Define default editor in user preferences!
-		String tmp = config.getProperty("defaultEditor"); //$NON-NLS-1$
-		//TODO: get default text editor from system if possible
-		fa.setDefaultEditor(tmp==null ? "notepad" : tmp); //$NON-NLS-1$
+		// Define default editor, if none, the fall back for .txt will be used.
+		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
 
 		// Toolbar
 		createToolbar();

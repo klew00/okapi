@@ -35,6 +35,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.UIUtil;
 
+import org.eclipse.swt.program.Program;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -309,12 +310,18 @@ public class FilterAccess {
 	{
 		IParametersEditor paramsEditor = loadEditor(filterID);
 		boolean result = false;
+		paramObject.save(paramsPath); // Creates the file if it does not exists yet
 		if ( paramsEditor == null ) {
 			if ( defaultEditor != null ) {
-				paramObject.save(paramsPath);
 				// Call the default editor
 				UIUtil.execute(defaultEditor, paramsPath);
 				result = true;
+			}
+			else { // Fall back to default text editor if possible.
+				Program prg = Program.findProgram(".txt");
+				if ( prg != null ) {
+					result = prg.execute(paramsPath);
+				}
 			}
 		}
 		else result = paramsEditor.edit(paramObject, uiContext, helpParam, projectDir);
