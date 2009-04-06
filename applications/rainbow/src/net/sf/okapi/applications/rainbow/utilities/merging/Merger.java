@@ -144,50 +144,56 @@ public class Merger {
 
 	private void processTextUnit (TextUnit tu) {
 		// Skip the non-translatable
+		// This means the translate attributes must be the same
+		// in the original and the merging files
 		if ( !tu.isTranslatable() ) return;
-			
+
 		// Get item from the package document
-		if ( !reader.readItem() ) {
-			// Problem: 
-			logger.log(Level.WARNING,
-				String.format("There is no more package item to merge (for id=\"%s\")", tu.getId()));
+		// Skip also the read-only ones
+		TextUnit srcPkgItem;
+		while ( true ) {
+			if ( !reader.readItem() ) {
+				// Problem: 
+				logger.log(Level.WARNING,
+					String.format("There is no more package item to merge (for id=\"%s\")", tu.getId()));
+				// Keep the source
+				return;
+			}
+			srcPkgItem = reader.getItem();
+			if ( !srcPkgItem.isTranslatable() ) continue;
+			else break; // Found next translatable (and likely translated) item
+		}
+			
+		if ( !tu.getId().equals(srcPkgItem.getId()) ) {
+			// Problem: different IDs
+			logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\"",
+				tu.getId(), srcPkgItem.getId()));
 			// Keep the source
 			return;
 		}
 
-		// Update the item if needed
-		if ( tu.isTranslatable() ) {
-			TextUnit srcPkgItem = reader.getItem();
-			
-			if ( !tu.getId().equals(srcPkgItem.getId()) ) {
-				// Problem: different IDs
-				logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\"",
-					tu.getId(), srcPkgItem.getId()));
-				// Keep the source
-				return;
+		if ( srcPkgItem.hasTarget(trgLang) ) {
+			// Create the target entry for the output if it does not exist yet
+			tu.createTarget(trgLang, false, IResource.COPY_ALL);
+			// Set the codedText part of the content only. Do not modify the codes.
+			//TODO: in-line could be clones: the code should come from the translation not the original then.
+			try {
+				tu.getTarget(trgLang).setCodedText(
+					srcPkgItem.getTargetContent(trgLang).getCodedText(),
+					tu.getSourceContent().getCodes(), false);
 			}
-
-			if ( srcPkgItem.hasTarget(trgLang) ) {
-				// Create the target entry for the output if it does not exist yet
-				tu.createTarget(trgLang, false, IResource.COPY_ALL);
-				// Set the codedText part of the content only. Do not modify the codes.
-				//TODO: in-line could be clones: the code should come from the translation not the original then.
-				try {
-					tu.getTarget(trgLang).setCodedText(
-						srcPkgItem.getTargetContent(trgLang).getCodedText(),
-						tu.getSourceContent().getCodes(), false);
-				}
-				catch ( RuntimeException e ) {
-					logger.log(Level.SEVERE, "Error with item id=\"%s\".", tu.getId());
-					// Use the source instead, continue the merge
-					tu.setTarget(trgLang, tu.getSource());
-				}
+			catch ( RuntimeException e ) {
+				logger.log(Level.SEVERE,
+					String.format("Error with item id=\"%s\".", tu.getId()));
+				// Use the source instead, continue the merge
+				tu.setTarget(trgLang, tu.getSource());
 			}
-			else { // No translation in package
-				if ( !tu.isEmpty() ) {
-					logger.log(Level.WARNING, "Item id=\"%s\": No translation provided.", tu.getId());
-					tu.setTarget(trgLang, tu.getSource());
-				}
+		}
+		else { // No translation in package
+			if ( !tu.isEmpty() ) {
+				logger.log(Level.WARNING,
+					String.format("Item id=\"%s\": No translation provided.", tu.getId()));
+				tu.setTarget(trgLang, tu.getSource());
 			}
 		}
 	}
