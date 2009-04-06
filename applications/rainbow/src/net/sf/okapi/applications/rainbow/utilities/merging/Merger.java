@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,8 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Merger {
@@ -174,19 +177,30 @@ public class Merger {
 
 		if ( srcPkgItem.hasTarget(trgLang) ) {
 			// Create the target entry for the output if it does not exist yet
-			tu.createTarget(trgLang, false, IResource.COPY_ALL);
-			// Set the codedText part of the content only. Do not modify the codes.
-			//TODO: in-line could be clones: the code should come from the translation not the original then.
+			TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+			// Get the target codes, we may need them if the source ones fail
+			// (case of approved translation with different codes)
+			List<Code> trgOriCodes = trgCont.getCodes();
+			// Set the coded text with the new translated content
 			try {
-				tu.getTarget(trgLang).setCodedText(
-					srcPkgItem.getTargetContent(trgLang).getCodedText(),
+				trgCont.setCodedText(srcPkgItem.getTargetContent(trgLang).getCodedText(),
 					tu.getSourceContent().getCodes(), false);
 			}
 			catch ( RuntimeException e ) {
-				logger.log(Level.SEVERE,
-					String.format("Error with item id=\"%s\".", tu.getId()));
-				// Use the source instead, continue the merge
-				tu.setTarget(trgLang, tu.getSource());
+				// If there is an error, try with the target
+				try {
+					trgCont.setCodedText(srcPkgItem.getTargetContent(trgLang).getCodedText(),
+						trgOriCodes, false);
+					logger.log(Level.WARNING,
+						String.format("Item id=\"%s\" was merged with target codes.\nS='%s'\nT='%s'",
+							tu.getId(), tu.getSourceContent().toString(), trgCont.toString()));
+				}
+				catch ( RuntimeException e2 ) {
+					logger.log(Level.SEVERE,
+						String.format("Error with item id=\"%s\".", tu.getId()));
+					// Use the source instead, continue the merge
+					tu.setTarget(trgLang, tu.getSource());
+				}
 			}
 		}
 		else { // No translation in package

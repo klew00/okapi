@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
@@ -308,7 +308,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
 			TextContainer cnt = tu.getTarget(trgLang); 
-			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
+			cnt.setCodedText(tmp, tu.getTargetContent(trgLang).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
@@ -336,7 +336,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			TextContainer cnt = tu.getTarget(trgLang); 
-			cnt.setCodedText(tmp.toString(), tu.getSourceContent().getCodes(), false);
+			cnt.setCodedText(tmp.toString(), tu.getTargetContent(trgLang).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING, "Error when updating content: '"+tmp.toString()+"'", e);
@@ -368,7 +368,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmp += params.suffix;
 			}
 			TextContainer cnt = tu.getTarget(trgLang); 
-			cnt.setCodedText(tmp, tu.getSourceContent().getCodes(), false);
+			cnt.setCodedText(tmp, tu.getTargetContent(trgLang).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING, "Error when adding text to '"+tmp+"'", e);
