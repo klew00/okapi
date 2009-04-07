@@ -27,5 +27,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openxml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.po"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.po"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.tmx"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project name="filters.mif" default="filters.mif"> 
+
+	<property name="proj_filters.mif" value="../../filters/net.sf.okapi.filters.mif"/> 
+	<property name="src_filters.mif" value="${proj_filters.mif}/src"/> 
+ 
+	<path id="mainClassPath_filters.mif">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="filters.mif"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.mif}" destdir="${tmp}" classpathref="mainClassPath_filters.mif"/>
+ 		
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.mif}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/mif">
+			<fileset dir="../../help/filters/ui/mif" />
+		</copy>
+
+	</target>
+
+</project>
