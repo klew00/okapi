@@ -31,7 +31,7 @@ public class XsltTransformStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleFileResource(Event event) {
+	protected void handleInputResource(Event event) {
 		
 		ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
 

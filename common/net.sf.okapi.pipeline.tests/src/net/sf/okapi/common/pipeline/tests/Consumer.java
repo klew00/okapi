@@ -45,7 +45,7 @@ public class Consumer extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleFileResource(Event event) {
+	protected void handleInputResource(Event event) {
 		System.out.println("EventType: " + event.getEventType().name());
 	}
 
