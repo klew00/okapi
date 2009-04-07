@@ -82,7 +82,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 			break;
 
 		case FILE_RESOURCE:
-			handleFileResource(event);
+			handleInputResource(event);
 			break;
 
 		case FINISHED:
@@ -95,7 +95,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 		default:
 			// TODO: specific exception
-			throw new RuntimeException("Unkown event");
+			throw new RuntimeException("Unkown Okapi Event: " + event.toString());
 		}
 
 		return event;
@@ -147,7 +147,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	protected void handleTextUnit(Event event) {
 	}
 
-	protected void handleFileResource(Event event) {
+	protected void handleInputResource(Event event) {
 	}
 
 	protected void handleFinished(Event event) {
