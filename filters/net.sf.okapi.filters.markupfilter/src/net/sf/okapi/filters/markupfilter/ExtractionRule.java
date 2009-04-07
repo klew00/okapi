@@ -81,22 +81,6 @@ public class ExtractionRule {
 	}
 
 	/**
-	 * Convenience rule factory for inline elements with a single extractable
-	 * attribute. No conditions apply to the attribute.
-	 * 
-	 * @param elementName
-	 *            lowercase element name.
-	 * @param attributeName
-	 *            lowercase attribute name.
-	 * @return {@link ExtractionRule}
-	 */
-	public static ExtractionRule createInlineWithAttributeRule(String elementName, String attributeName) {
-		ExtractionRule rule = new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INLINE_ELEMENT);
-		rule.addExtractableAttribute(new AttributeExtractionRule(attributeName));
-		return rule;
-	}
-
-	/**
 	 * Convenience rule factory for excluded elements. Conditions can be applied
 	 * after rule creation.
 	 * 
@@ -118,22 +102,6 @@ public class ExtractionRule {
 	 */
 	public static ExtractionRule createIncludedRule(String elementName) {
 		return new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT);
-	}
-
-	/**
-	 * Convenience rule factory for non-extractable elements with extractable
-	 * attributes.. No conditions apply to the attribute.
-	 * 
-	 * @param elementName
-	 *            lowercase element name.
-	 * @param attributeName
-	 *            lowercase attribute name.
-	 * @return {@link ExtractionRule}
-	 */
-	public static ExtractionRule createExtractableAttributeRule(String elementName, String attributeName) {
-		ExtractionRule rule = new ExtractionRule(elementName, EXTRACTION_RULE_TYPE.EXTRACTABLE_ATTRIBUTES);
-		rule.addExtractableAttribute(new AttributeExtractionRule(attributeName));
-		return rule;
 	}
 
 	/**
