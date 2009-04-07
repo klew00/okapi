@@ -23,15 +23,8 @@ package net.sf.okapi.common.pipeline;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.InputResource;
 
 public abstract class BasePipelineStep implements IPipelineStep {
-	private InputResource input;
-
-	protected InputResource getInput() {
-		return input;
-	}
-	
 	// dummy implementation of set and get parameters
 	public IParameters getParameters () { return null; }
 
