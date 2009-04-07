@@ -126,11 +126,11 @@ public final class BOMNewlineEncodingDetector {
 				if (c == '\n')
 					return NewlineType.LF;
 				if (c == '\r') {
-					char c2 = (char) reader.read();
+					int c2 = reader.read();
 					if (c2 == -1)
 						return NewlineType.CR;
 					else
-						return (c2 == '\n') ? NewlineType.CRLF : NewlineType.CR;
+						return ((char)c2 == '\n') ? NewlineType.CRLF : NewlineType.CR;
 				}
 			}
 		} catch (IOException e) {
