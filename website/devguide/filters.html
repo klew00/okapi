@@ -56,18 +56,15 @@ information:</p>
 	getName()</a></code> gives name of the full path or URI of the document, if possible.</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getEncoding()">getEncoding()</a></code> gives the encoding that is being used to read the 
-	document. It may be different from the default encoding provided in the
-	<code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> 
-	method, for example when the filter can detect automatically the real 
+	document. It may be different from the default encoding provided when the 
+	document is opened, for example when the filter can detect automatically the real 
 	encoding of the document.</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#hasUTF8BOM()">hasUTF8BOM()</a></code> indicates if the input document is encoded in UTF-8 
 	and has a Byte-Order-Mark.</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">getLanguage()</a></code> gives the code of the source language of the 
-	document (the same as the one specified with <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code>).</li>
+	document (the same as the one specified when opening the document).</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">isMultilingual()</a></code> indicates if the document is multilingual (See 
 	more on <a href="#monolingual">monolingual</a> and <a href="#multilingual">multilingual</a> in 
@@ -170,8 +167,8 @@ documents may contain text in different languages (like citations), but their
 structure is designed to have a single main language.</p>
 <p>Before starting to send events:</p>
 <ul>
-	<li>The caller of the filter must set the source language with the <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> method.</li>
+	<li>The caller of the filter must set the source language when opening the 
+	document.</li>
 </ul>
 <p>When sending the <code>START_DOCUMENT</code> event:</p>
 <ul>
@@ -199,8 +196,8 @@ source data is not overwritten by the target data. Examples of multilingual docu
 and XLIFF files.</p>
 <p>Before starting to send events:</p>
 <ul>
-	<li>The caller of the filter must set the source and the target languages with the <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> method.</li>
+	<li>The caller of the filter must set the source and the target languages when 
+	opening the document.</li>
 </ul>
 <p>When the filter sends the <code>START_DOCUMENT</code> event:</p>
 <ul>
@@ -229,12 +226,7 @@ and XLIFF files.</p>
 <h3>Input</h3>
 <p>The filter is responsible for detecting the encoding of the input document 
 when possible. If the encoding cannot be detected, the filter should use the 
-default encoding the caller has provided through one of the two <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setOptions(java.lang.String, java.lang.String, boolean)">IFilter.setOptions()</a></code> 
-methods.</p>
-<p>If the input of the filter is a <code>CharSequence</code> (<code>as in
-<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#open(java.lang.CharSequence)">
-IFilter.open()</a></code>), the input encoding should be UTF-16.</p>
+default encoding the caller has provided when opening the document.</p>
 <p>If the input encoding is UTF-8. The filter must handle the possible 
 presence of a Byte-Order-Mark, and if it exists, not include it in the content 
 of the document.</p>

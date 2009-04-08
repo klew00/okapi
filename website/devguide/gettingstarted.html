@@ -78,10 +78,11 @@ kinds of event that can go through a pipeline.</p>
 		<th>Filter-Specific Event?</th>
 	</tr>
 	<tr>
-		<td><code>FILE_RESOURCE</code></td>
+		<td><code>INPUT_RESOURCE</code></td>
 		<td><code>
-		<a href="../javadoc/net/sf/okapi/common/resource/FileResource.html">FileResource</a></code></td>
-		<td>no (corresponds to a file by itself).</td>
+		<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
+		InputResource</a></code></td>
+		<td>no (corresponds to a document by itself).</td>
 	</tr>
 	<tr>
 		<td><code>START_DOCUMENT</code></td>
@@ -137,7 +138,17 @@ kinds of event that can go through a pipeline.</p>
 	<tr>
 		<td><code>FINISHED</code></td>
 		<td>none</td>
-		<td>no (used by the multi-threaded pipeline)</td>
+		<td>no (used at the end of a set of documents)</td>
+	</tr>
+	<tr>
+		<td><code>NO_OP</code></td>
+		<td>none</td>
+		<td>no (used for no-operation)</td>
+	</tr>
+	<tr>
+		<td><code>CUSTOM</code></td>
+		<td>custom resource</td>
+		<td>no (used for custom events)</td>
 	</tr>
 	</table>
 <p>A filter always generates at least the <code>START_DOCUMENT</code> 
@@ -156,31 +167,18 @@ the <code>
 interface for Java Properties files.</p>
 <pre>// Create a filter object
 IFilter filter = new PropertiesFilter();</pre>
-<h3><a name="configuringFilter"></a>Configuring the Filter</h3>
-<p>The next step is to configure the filter. There are options you always need to set:</p>
-<ul>
-	<li>The language of the text to extract.</li>
-	<li>The default encoding of the document to process.</li>
-	<li>Whether or not you want the filter to generate the 
-	<a href="glossary.html#skeleton">skeleton</a> for 
-	the document (we'll see more about the skeleton later).</li>
-</ul>
-<p>In the code below we set the source language to English, using the same standard 
-language tag identifiers you would use with HTML and XML (BCP-47). We set the default encoding to UTF-16 because 
-our input will be a Unicode string. Note that some filters will be able to detect 
-automatically the correct encoding of the input and ignore this value. And 
-lastly, we ask the filter to generate the skeleton. It will be useful later.</p>
-<pre>// Set the filter general options
-filter.setOptions(&quot;en&quot;, &quot;UTF-16&quot;, true);</pre>
-<p>Some filters have also a second set of options that are specific to them. The <code>PropertiesFilter</code> has such options, but the defaults are 
-just fine for the example so we won't use any additional parameters. If you have to set these 
-filter-specific parameters, the method <code>
+<h3><a name="settingParameters"></a>Setting the Filter Parameters</h3>
+<p>Some filters have options that are specific to the format they parse. You can 
+set these filter-specific parameters with the method
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#setParameters(net.sf.okapi.common.IParameters)">
-IFilter.setParameters()</a></code> would be the one to call at this point. The 
+<code>
+IFilter.setParameters()</code></a>. The 
 method <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#getParameters()">
 IFilter.getParameters()</a></code> allows you to retrieve the current 
 parameters.</p>
+<p>The <code>PropertiesFilter</code> has such options, but the defaults are just 
+fine for the example so we won't use any additional parameters.</p>
 <p class="question"><b>Question</b>: Is there an easy way to edit the 
 filter-specific parameters?</p>
 <p class="answer">It depends. The parameters are accessible through the <code>
@@ -191,32 +189,59 @@ provide UI for modifying their parameters. See the
 <a href="filters.html#filterParameters">Filter Parameters</a> section of the 
 guide for more details.</p>
 <h3><a name="openInputDoc"></a>Opening the Input Document</h3>
-<p>Once all the options are set, the next step is to open the input document. 
-There are different methods to do this:</p>
+<p>The next step is to open the document. This is done with the help of an <code>
+<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
+InputResource</a></code> object, which carries all the information the filter 
+needs to open the input document:</p>
 <ul>
-	<li>Provide an <code>InputStream</code> object.</li>
-	<li>Provide a <code>URI</code> object pointing to the physical document.</li>
-	<li>Provide a <code>CharSequence</code> object that contains the document itself. 
+	<li>The object representing the document to process. This can be one (and 
+	only one) of the following:<ul>
+	<li>a <code>CharSequence</code> object that contains the document itself. 
 	(<code>String</code> is a type of <code>CharSequence</code>).</li>
+	<li>a <code>URI</code> object pointing to the physical document.</li>
+	<li>an <code>InputStream</code> object.</li>
+</ul></li>
+	<li>The default encoding of the document to process.</li>
+	<li>The language of the text to extract.</li>
+	<li>And, optionally, the target language to work with (for multilingual 
+	formats).</li>
 </ul>
-<p>The examples below call <code>open()</code> using different methods:</p>
-<pre>// Open the input from an InputStream
-// filter.open(new FileInputStream(&quot;myFile.properties&quot;))
-
-// Open the input from a URI obtained from a path
-// filter.open(new File(&quot;myFile.properties&quot;).toURI());
-
-// Open the input from a URI
-// filter.open(new URI(&quot;file:///C:/myFile.properties&quot;));</pre>
-<p>Note that while the filters should do their best to implement all the 
-different types of <code>open()</code>, this may not be possible in some cases 
+<p dir="ltr">In the code below we set the source language to English, using the 
+same standard language tag identifiers you would use with HTML and XML (BCP-47). 
+We set the default encoding to UTF-8. Note that some filters will be able to 
+detect automatically the correct encoding of the input and ignore this value.</p>
+<pre>// Creates the InputResource object
+InputResource res = new InputResource(myInputStream, &quot;UTF-8&quot;, &quot;en&quot;);
+// Opens the document
+filter.open(res);</pre>
+<p>By default a filter generates the 
+	<a href="glossary.html#skeleton">skeleton</a> for 
+	the document (we'll see more about the skeleton later). If, for some reason, 
+you do not want to generate the skeleton you can specify an additional parameter 
+and use:</p>
+<pre>// Opens the document, without generating skeleton
+filter.open(res, false);</pre>
+<p class="question"><b>Question</b>: Why using an intermediate object for 
+opening the document. It would be simpler to just pass the parameters to <code>
+open()</code>.</p>
+<p class="answer">The <code>
+<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
+InputResource</a></code> object is used because in many cases filters are used 
+in the broader environment of pipelines, where having all information about the 
+input document in one object makes things much easier. The object is also the 
+resource associated to the <code>INPUT_RESOURCE</code> event that allows to mix 
+in the same pipeline steps using filter events or steps working on the input 
+document directly.</p>
+<p dir="ltr">Note that while the filters should do their best to implement all the 
+different input objects, this may not be possible in some cases 
 because of the format the filter deal with. For example, a&nbsp; filter for 
-Adobe Photoshop PSD files would not be able to implement the <code>open()</code> 
-method with a string as PSD are binary formats.</p>
-<p>In this example we are going to use the third method and provide the content 
-of our document as a string:</p>
-<pre>// Open the input from a CharSequence
-filter.open(&quot;key1=Text1\nkey2=Text2&quot;);</pre>
+Adobe Photoshop PSD files is not supporting <code>CharSequence</code> input 
+objects. as PSD are binary formats.</p>
+<p>In our example we want to open a <code>String</code>-based document:</p>
+<pre>// Creates the InputResource object
+InputResource res = new InputResource(&quot;key1=Text1\nkey2=Text2&quot;, &quot;en&quot;);
+// Opens the document
+filter.open(res);</pre>
 <p>This is equivalent to opening a physical properties file on the disk that has the 
 following content:</p>
 <pre>key1=Text1
@@ -298,12 +323,10 @@ provides the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 interface to do all this transparently.</p>
 <h3><a name="creatingFilterAndWriter"></a>Creating the Filter and the Writer</h3>
-<p>First you must prepare the filter, just like before, except that we will use 
+<p>First, you must create the filter, just like before, except that we will use 
 the HTML filter this time:</p>
 <pre>// Create a filter object
-IFilter filter = new HtmlFilter();
-// Set the filter general options
-filter.setOptions(&quot;en&quot;, &quot;UTF-16&quot;, true);</pre>
+IFilter filter = new HtmlFilter();</pre>
 <p>Then, you need to create an <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 object. You do this by calling a method of the filter itself (<code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#createFilterWriter()">IFilter.createFilterWriter()</a></code>) 
@@ -316,8 +339,7 @@ IFilterWriter writer = filter.createFilterWriter();</pre>
 <p>Once the writer object created you need to set its options. This is done with 
 the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOptions()</a></code> method.</p>
-<p>We need to set the output language, here French (but it could be also the 
-same language as the input if needed). And we need to indicate in what encoding the 
+<p>We need to set the output language, here French. And we need to indicate in what encoding the 
 output should be written, in our example we will choose Latin-1.</p>
 <pre>// Set the writer's options
 writer.setOptions(&quot;fr&quot;, &quot;iso-8859-1&quot;);</pre>
@@ -335,7 +357,8 @@ physical file.</p>
 writer.setOutput(&quot;myFile_fr.html&quot;);</pre>
 <p>Note that the output document is not created when you set the output, but 
 only when the filter will start sending events.</p>
-<p class="question"><b>Question:</b> Can the output document be the same as the input one?</p>
+<p class="question"><b>Question:</b> Can the output file be the same as the input 
+file?</p>
 <p class="answer">Yes, you should be able to overwrite the input document. 
 However, to ensure it will 
 work, you should <b>always close the input document before closing the output 
@@ -344,11 +367,11 @@ document</b>.</p>
 <p>The next step is to open the input document with the filter. This time we 
 will use an HTML string:</p>
 <pre>// Open the input from a CharSequence
-filter.open(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
+filter.open(new InputResource(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
    + &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
    + &quot;&lt;body&gt;\n&quot;
    + &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
-   + &quot;&lt;/body&gt;&lt;/html&gt;&quot;);</pre>
+   + &quot;&lt;/body&gt;&lt;/html&gt;&quot;, &quot;en&quot;));</pre>
 <h3><a name="processDocWithoutDhanges"></a>Processing the Document Without Making Changes</h3>
 <p>Now that all is set, we can process the document.</p>
 <p>Re-writing the input document is achieved simply: You call the <code>

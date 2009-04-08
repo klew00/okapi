@@ -33,10 +33,10 @@
 <p><span style="background-color: #FFFF00">SECTION UNDER CONSTRUCTION</span></p>
 <h2><a name="overview"></a>Overview</h2>
 <p>Pipelines are a powerful mechanism to apply a sequence of actions to an input 
-document. They allow you to construct processes customized to specific projects 
-very easily, re-using the same components. For example, most of the tasks you 
-are running can be broken down into these main parts:</p>
-<p>Extract the text &gt;&gt; Apply some change to the text &gt;&gt; Merge back the text into 
+document (or a set of them). They allow you to construct processes customized to specific projects 
+very easily, re-using the same components. For example, many tasks can be broken down into these main parts:</p>
+<p>Extract the text &gt;&gt; Apply some changes to the text &gt;&gt; Merge back the 
+modified text into 
 its original format.</p>
 <p>With the framework this type of sequence is implemented using the following 
 interfaces:</p>
@@ -85,26 +85,22 @@ pipeline.addStep(writerStep);</pre>
 <p>Now we have a pipeline with two steps. It can reads and re-writes a given HTML 
 document. To use it, you have to set the input and output options just like when 
 you are not using the pipeline:</p>
-<pre>// Sets the filter options
-filter.setOptions(&quot;en&quot;, &quot;UTF-16&quot;, true);
-
-// Sets the writer options and output
+<pre>// Sets the writer options and output
 writer.setOptions(&quot;fr&quot;, &quot;UTF-8&quot;);
-writer.setOutput(&quot;myPipelineOutput.html&quot;);
-
-String input = &quot;&lt;html&gt;&lt;head&gt;\n&quot;
-+ &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
-+ &quot;&lt;body&gt;\n&quot;
-+ &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
-+ &quot;&lt;/body&gt;&lt;/html&gt;&quot;;</pre>
+writer.setOutput(&quot;myPipelineOutput.html&quot;);</pre>
 <p>Once all options are set you can one of the <code>process()</code> methods provided by 
 the pipeline to execute the process. The method initiates the first call to the filter and triggers 
 the flow of events that go through all the steps. Once the pipeline is not needed 
 anymore, you should call <code>
 <a href="../javadoc/net/sf/okapi/common/pipeline/IPipeline.html#destroy()">
 IPipeline.destroy()</a></code> to clean up any resource used by the steps:</p>
-<pre>// Launch the execution
-pipeline.process(input);
+<pre>String input = &quot;&lt;html&gt;&lt;head&gt;\n&quot;
++ &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
++ &quot;&lt;body&gt;\n&quot;
++ &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
++ &quot;&lt;/body&gt;&lt;/html&gt;&quot;;
+// Launch the execution
+pipeline.process(new InputResource(input, &quot;en&quot;));
 
 // Clean up all the pipeline resources
 pipeline.destroy();</pre>

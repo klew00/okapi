@@ -56,9 +56,8 @@ mechanism.</p>
 pipeline</a>. Events can be associated with <a href="#resource">resources</a>, 
 and in the case of filter events, with <a href="#skeleton">skeleton</a>.</p>
 <ul>
-	<li>The <code>FILE_RESOURCE</code> event is used to pass along the 
-	references of a complete 
-	document.</li>
+	<li>The <code>INPUT_RESOURCE</code> event is used to pass along the 
+	information of an input document.</li>
 	<li>The filter events (<code>START_DOCUMENT</code>, <code>START_SUBDOCUMENT</code>,
 	<code>START_GROUP</code>, <code>DOCUMENT_PART</code>, <code>TEXT_UNIT</code>,
 	<code>END_GROUP</code>, <code>END_SUBDOCUMENT</code>, and <code>END_DOCUMENT</code>) 
@@ -66,8 +65,12 @@ and in the case of filter events, with <a href="#skeleton">skeleton</a>.</p>
 	and non-translatable parts.</li>
 	<li>The <code>CANCELED</code> event is used when the the processed has been 
 	canceled.</li>
-	<li>The <code>FINISHED</code> event is used in some implementations of the 
-	pipeline to stop multi-threading tasks.</li>
+	<li>The <code>FINISHED</code> event is used mark the end of a set of input 
+	documents.</li>
+	<li>The <code>NO_OP</code> event is used in some cases to send events that 
+	do nothing.</li>
+	<li>The <code>CUSTOM</code> event is used for carrying custom
+	<a href="#resource">resources</a> through the <a href="#pipeline">pipeline</a>.</li>
 </ul>
 
 <p dir="ltr">As a general rule, when a component gets an event it does not 
