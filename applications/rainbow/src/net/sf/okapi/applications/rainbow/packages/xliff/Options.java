@@ -26,6 +26,7 @@ public class Options extends BaseParameters {
 
 	public boolean gMode;
 	public boolean includeNoTranslate;
+	public boolean setApprovedAsNoTranslate;
 	public String message;
 	
 	public Options () {
@@ -35,6 +36,7 @@ public class Options extends BaseParameters {
 	public void reset() {
 		gMode = false;
 		includeNoTranslate = true;
+		setApprovedAsNoTranslate = false;
 		message = "";
 	}
 
@@ -43,13 +45,20 @@ public class Options extends BaseParameters {
 		buffer.fromString(data);
 		gMode = buffer.getBoolean("gMode", gMode);
 		includeNoTranslate = buffer.getBoolean("includeNoTranslate", includeNoTranslate);
+		setApprovedAsNoTranslate = buffer.getBoolean("setApprovedAsNoTranslate", setApprovedAsNoTranslate);
 		message = buffer.getString("message", message);
+		
+		// Make sure the we can merge later
+		if ( !includeNoTranslate ) {
+			setApprovedAsNoTranslate = false;
+		}
 	}
 
 	public String toString () {
 		buffer.reset();
 		buffer.setParameter("gMode", gMode);
 		buffer.setBoolean("includeNoTranslate", includeNoTranslate);
+		buffer.setBoolean("setApprovedAsNoTranslate", setApprovedAsNoTranslate);
 		buffer.setParameter("message", message);
 		return buffer.toString();
 	}

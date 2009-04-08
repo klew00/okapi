@@ -12,6 +12,15 @@ include the text unit that are flagged as non-translatable in the generated
 XLIFF document. Depending on the input document and the filter you are using, 
 such text unit may have text useful for context. In some other cases, they may 
 be just codes.</p>
+<p><cite>Set approved entries as non-translatable</cite> -- Set this option to 
+have the XLIFF <code>translate</code> attribute set to &quot;<code>no</code>&quot; for the 
+text units that have approved translation (that is that have an <i>approved</i> 
+target property set to &quot;<code>yes</code>&quot;). This may be useful when you are 
+working with an XLIFF editor that does not recognize the XLIFF <code>approved</code> 
+attribute.</p>
+<p>Note that this option is available only when you include the non-translatable 
+entries in the XLIFF output (because otherwise merging back the data could not 
+work).</p>
 <p><cite>Use the &lt;g&gt;&lt;/g&gt; and &lt;x/&gt; notation</cite> -- Set this option to use the 
 XLIFF notation with empty content markup elements (<code>&lt;g&gt;&lt;/g&gt;</code>, <code>
 &lt;x/&gt;</code>, etc.). If this option is not set, the notation with code content is 

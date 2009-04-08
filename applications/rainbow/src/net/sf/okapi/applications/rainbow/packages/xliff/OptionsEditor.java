@@ -45,6 +45,7 @@ public class OptionsEditor implements IParametersEditor {
 	private boolean result = false;
 	private Button chkGMode;
 	private Button chkIncludeNoTranslate;
+	private Button chkSetApprovedAsNoTranslate;
 	private Options params;
 	private IHelp help;
 
@@ -91,6 +92,22 @@ public class OptionsEditor implements IParametersEditor {
 		
 		chkIncludeNoTranslate = new Button(cmpTmp, SWT.CHECK);
 		chkIncludeNoTranslate.setText("Include non-translatable text units");
+		chkIncludeNoTranslate.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateNoTranslateCases();
+			};
+		});
+		
+		chkSetApprovedAsNoTranslate = new Button(cmpTmp, SWT.CHECK);
+		chkSetApprovedAsNoTranslate.setText("Set approved entries as non-translatable");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalIndent = 16;
+		chkSetApprovedAsNoTranslate.setLayoutData(gdTmp);
+		chkSetApprovedAsNoTranslate.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateNoTranslateCases();
+			};
+		});
 		
 		chkGMode = new Button(cmpTmp, SWT.CHECK);
 		chkGMode.setText("Use <g></g> and <x/> notation");
@@ -112,7 +129,7 @@ public class OptionsEditor implements IParametersEditor {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
 
@@ -139,12 +156,21 @@ public class OptionsEditor implements IParametersEditor {
 	private void setData () {
 		chkGMode.setSelection(params.gMode);
 		chkIncludeNoTranslate.setSelection(params.includeNoTranslate);
+		chkSetApprovedAsNoTranslate.setSelection(params.setApprovedAsNoTranslate);
+		updateNoTranslateCases();
 	}
 	
 	private boolean saveData () {
 		params.gMode = chkGMode.getSelection();
 		params.includeNoTranslate = chkIncludeNoTranslate.getSelection();
+		params.setApprovedAsNoTranslate = chkSetApprovedAsNoTranslate.getSelection();
 		return true;
 	}
 	
+	private void updateNoTranslateCases () {
+		if ( !chkIncludeNoTranslate.getSelection() ) {
+			chkSetApprovedAsNoTranslate.setSelection(false);
+		}
+		chkSetApprovedAsNoTranslate.setEnabled(chkIncludeNoTranslate.getSelection());
+	}
 }

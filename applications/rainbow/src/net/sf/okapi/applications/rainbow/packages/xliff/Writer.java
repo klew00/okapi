@@ -116,7 +116,7 @@ public class Writer extends BaseWriter {
 			// that use directly the <target> element.
 			useSourceForTranslated = true;
 		}
-		
+
 		relativeWorkPath += EXTENSION;
 		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filtersettings, filterParams);
@@ -251,9 +251,18 @@ public class Writer extends BaseWriter {
 	}
 	
 	private void processTextUnit (TextUnit tu) {
+		// Check if we need to set the entry as non-translatable
+		if ( options.setApprovedAsNoTranslate ) {
+			Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
+			if (( prop != null ) && prop.getValue().equals("yes") ) {
+				tu.setIsTranslatable(false);
+			}
+		}
+		// Check if we need to skip non-translatable entries
 		if ( !options.includeNoTranslate && !tu.isTranslatable() ) {
 			return;
 		}
+
 		if ( !inFile ) writeStartFile(relativeSourcePath, docMimeType);
 
 		writer.writeStartElement("trans-unit");
