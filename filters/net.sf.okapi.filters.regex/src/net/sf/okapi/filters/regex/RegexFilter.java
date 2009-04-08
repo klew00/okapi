@@ -635,6 +635,7 @@ public class RegexFilter implements IFilter {
 		// Move the skeleton start for next read
 		startSkl = result.end();
 		
+		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
 		if ( rule.preserveWS ) {
 			tuRes.setPreserveWhitespaces(true);
 		}

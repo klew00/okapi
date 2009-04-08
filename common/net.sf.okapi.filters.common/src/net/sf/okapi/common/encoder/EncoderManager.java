@@ -93,14 +93,13 @@ public class EncoderManager implements IEncoder {
 			// If not: lookup what encoder to use
 			mimeType = newMimeType;
 			String name = mimeMap.get(mimeType);
-			if ( name == null ) { // Not in the map, nullify the encoder
-				encoder = null;
-				return;
+			if ( name == null ) { // Not in the map: Use the default one.
+				encoder = new DefaultEncoder();
 			}
-			// Else: Instantiate the encoder based on the class name
-			encoder = (IEncoder)Class.forName(name).newInstance();
+			else { // Else: Instantiate the encoder based on the class name
+				encoder = (IEncoder)Class.forName(name).newInstance();
+			}
 			// And set the options
-			//TODO: Handle parameters at some point
 			encoder.setOptions(defParams, defEncoding, defLineBreak);
 		}
 		catch ( InstantiationException e ) {
