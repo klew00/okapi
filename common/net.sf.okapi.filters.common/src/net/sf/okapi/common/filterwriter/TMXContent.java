@@ -34,25 +34,48 @@ public class TMXContent {
 	private String codedText;
 	private List<Code> codes;
 	private boolean withTradosWorkarounds = false;
-	
+
+	/**
+	 * Creates a new TMXContent object without any content.
+	 */
 	public TMXContent () {
 		codedText = "";
 	}
 	
+	/**
+	 * Creates a new TMXContent object and set its content to the given fragment.
+	 * @param content The TextFragment object to format.
+	 */
 	public TMXContent (TextFragment content) {
 		setContent(content);
 	}
-	
+
+	/**
+	 * Sets the flag that indicates if the TMX generated should use workarounds so the
+	 * output can be read in some versions of Trados Translators' Workbench that have
+	 * bugs leading to the lose of data.
+	 * @param value True to use workarounds, false to not use workarounds.
+	 */
 	public void setTradosWorkarounds (boolean value) {
 		withTradosWorkarounds = value;
 	}
 	
+	/**
+	 * Sets the fragment to format.
+	 * @param content The TextFragment object to format.
+	 * @return Itself
+	 */
 	public TMXContent setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;
 	}
 	
+	/**
+	 * Generates a TMX string from the content.
+	 * This is the same as calling this.toString(1, true).
+	 * @return The string formatted in TMX.
+	 */
 	@Override
 	public String toString () {
 		return toString(1, true);
@@ -63,7 +86,7 @@ public class TMXContent {
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt.
-	 * @return
+	 * @return The string formatted in TMX.
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT)

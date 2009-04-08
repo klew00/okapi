@@ -36,20 +36,37 @@ public class XLIFFContent {
 	private List<Code> codes;
 	private XLIFFContent innerContent;
 	
+	/**
+	 * Creates a new XLIFFContent object without any content.
+	 */
 	public XLIFFContent () {
 		codedText = "";
 	}
 	
+	/**
+	 * Creates a new XLIFFContent object and set its content to the given fragment.
+	 * @param content The TextFragment object to format.
+	 */
 	public XLIFFContent (TextFragment content) {
 		setContent(content);
 	}
-	
+
+	/**
+	 * Sets the fragment to format.
+	 * @param content The TextFragment object to format.
+	 * @return Itself
+	 */
 	public XLIFFContent setContent (TextFragment content) {
 		codedText = content.getCodedText();
 		codes = content.getCodes();
 		return this;
 	}
 	
+	/**
+	 * Generates an XLIFF string from the content.
+	 * This is the same as calling this.toString(1, true, false, false).
+	 * @return The string formatted in XLIFF.
+	 */
 	@Override
 	public String toString () {
 		return toString(1, true, false, false);
@@ -63,7 +80,7 @@ public class XLIFFContent {
 	 * @param codeOnlyMode True when the in-line codes are to be set as raw-values.
 	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
 	 * This option is to be used when the in-line code is an XLIFF-in-line code itself.
-	 * @return The coded string.
+	 * @return The string formatted in XLIFF.
 	 */
 	public String toString (int quoteMode,
 		boolean escapeGT,

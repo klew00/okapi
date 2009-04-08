@@ -270,19 +270,19 @@ public class InputResource implements IResource {
 	 * either {@link #getInputURI()} or {@link #getInputStream()} are not null.
 	 * @return The CharSequence object for this resource (may be null).
 	 */
-	public void setInputCharSequence(CharSequence inputCharSequence) {
-		this.inputCharSequence = inputCharSequence;
-		// Only one of the three inputs can be set at the same time
-		inputURI = null;
-		inputStream = null;
+	public CharSequence getInputCharSequence () {
+		return inputCharSequence;
 	}
 
 	/**
 	 * Sets the CharSequence object associated with this resource.
 	 * @param inputCharSequence The CharSequence object for this resource.
 	 */
-	public CharSequence getInputCharSequence () {
-		return inputCharSequence;
+	public void setInputCharSequence(CharSequence inputCharSequence) {
+		this.inputCharSequence = inputCharSequence;
+		// Only one of the three inputs can be set at the same time
+		inputURI = null;
+		inputStream = null;
 	}
 
 	/**
@@ -311,7 +311,7 @@ public class InputResource implements IResource {
 
 	/**
 	 * Sets the source language associated with this resource.
-	 * @param sourceLanguage The source language associated with this resource.
+	 * @param language The source language associated with this resource.
 	 */
 	public void setSourceLanguage (String language) {
 		srcLang = language;
@@ -327,7 +327,7 @@ public class InputResource implements IResource {
 
 	/**
 	 * Sets the target language associated with this resource.
-	 * @param targetLanguage The atregt language associated with this resource.
+	 * @param language The target language associated with this resource.
 	 */
 	public void setTargetLanguage (String language) {
 		trgLang = language;
