@@ -20,8 +20,13 @@
 
 package net.sf.okapi.filters.properties.tests;
 
-import java.io.InputStream;
+import static org.junit.Assert.assertEquals;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -32,30 +37,55 @@ import org.junit.Test;
 
 public class PropertiesFilterTest {
 	
+	private PropertiesFilter filter;
+
 	@Before
 	public void setUp() {
+		filter = new PropertiesFilter();
 	}
 
 	@Test
-	public void runTest () {
-		PropertiesFilter filter = null;		
+	public void externalFileTest () {
+		FilterTestDriver testDriver = new FilterTestDriver();
+		testDriver.setDisplayLevel(-1);
+		testDriver.setShowSkeleton(true);
 		try {
-			FilterTestDriver testDriver = new FilterTestDriver();
-			testDriver.setShowSkeleton(false);
-			testDriver.setDisplayLevel(0);
-			filter = new PropertiesFilter();
-			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");
-			filter.open(new InputResource(input, "UTF-8", "en"));
+			URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
+			filter.open(new InputResource(new URI(url.toString()), "windows-1252", "en", "es"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
-			Assert.fail("Exception occured");
+			Assert.fail();
 		}
 		finally {
 			if ( filter != null ) filter.close();
 		}
 	}
+
+	@Test
+	public void lineBreaksTest () {
+		String snippet = "Key1=Text1\rKey2=Text2\r";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		assertEquals(snippet, result);
+		snippet = "Key1=Text1\r\nKey2=Text2\r\n";
+		result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		assertEquals(snippet, result);
+		snippet = "Key1=Text1\n\n\nKey2=Text2\n";
+		result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		assertEquals(snippet, result);
+	}
 	
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new InputResource(snippet, "en"));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
+
 }

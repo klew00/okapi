@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMAwareInputStream;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -165,11 +166,11 @@ public class PropertiesFilter implements IFilter {
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
+		if ( input.getInputURI() != null ) {
 			open(input.getInputURI());
+		}
+		else if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
 		}
 		else if ( input.getInputStream() != null ) {
 			open(input.getInputStream());
@@ -182,15 +183,11 @@ public class PropertiesFilter implements IFilter {
 	private void open (InputStream input) {
 		try {
 			close();
-			parseState = 1;
-			canceled = false;
-
-			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-			// Correct the encoding if we have detected a different one
-			encoding = bis.detectEncoding();
-			hasUTF8BOM = bis.hasUTF8BOM();
-			commonOpen(new InputStreamReader(bis, encoding));
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input);
+			if ( detector.isDifinitive() ) encoding = detector.getEncoding();
+			hasUTF8BOM = detector.hasUtf8Bom();
+			lineBreak = detector.getNewlineType().toString();
+			commonOpen(new InputStreamReader(input, encoding));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
@@ -208,8 +205,10 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	private void open (CharSequence inputText) {
+		close();
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
+		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
 		commonOpen(new StringReader(inputText.toString()));
 	}
 	
@@ -236,7 +235,6 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	private void commonOpen (Reader inputReader) {
-		close();
 		parseState = 1;
 		canceled = false;
 
@@ -246,7 +244,6 @@ public class PropertiesFilter implements IFilter {
 		// Initializes the variables
 		tuId = 0;
 		otherId = 0;
-		lineBreak = System.getProperty("line.separator"); //TODO: Auto-detection of line-break type
 		lineNumber = 0;
 		lineSince = 0;
 		position = 0;
