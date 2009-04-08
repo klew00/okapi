@@ -6,6 +6,7 @@ import java.io.InputStream;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -37,14 +38,13 @@ public class HtmlDetectBomTest {
 		assertFalse(bomDetector.hasUtf7Bom());
 		
 		
-		htmlFilter.setOptions("en", "utf-8", true);
-		htmlFilter.open(htmlStream);
+		htmlFilter.open(new InputResource(htmlStream, "UTF-8", "en"));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			if (event.getEventType() == EventType.START_DOCUMENT) {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertTrue(sd.hasUTF8BOM());
-				assertEquals("utf-8", sd.getEncoding());
+				assertEquals("UTF-8", sd.getEncoding());
 				assertEquals("en", sd.getLanguage());
 				assertEquals("\r\n", sd.getLineBreak());
 			}

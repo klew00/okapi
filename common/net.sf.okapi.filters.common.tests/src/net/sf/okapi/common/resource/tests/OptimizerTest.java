@@ -39,18 +39,19 @@ public class OptimizerTest extends TestCase {
 		tf.append("Hello ");
 		tf.append(TagType.OPENING, "b1", "<b1>");
 		tf.append(TagType.OPENING, "b2", "<b2>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
 		tf.append("bold");
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append(TagType.CLOSING, "b1", "</b1>");
 		tf.append("world");
-		assertEquals(tf.getCodes().size(), 4); 
-		OptimizerTest.optimizes(tf);
-		assertEquals(tf.getCodes().size(), 2); 
+		assertEquals(tf.getCodes().size(), 5); 
+		OptimizerTest.optimizeCodes(tf);
+		assertEquals(tf.getCodes().size(), 3); 
 		fmt.setContent(tf);
 		System.out.println(fmt.toString());
 	}
 	
-	static private void optimizes (TextFragment frag) {
+	static private void optimizeCodes (TextFragment frag) {
 		Stack<Code> stack = new Stack<Code>();
 		String text = frag.getCodedText();;
 		char ch;

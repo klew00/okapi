@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -50,9 +51,8 @@ public class POFilterTest {
 			//testDriver.setShowSkeleton(true);
 			//testDriver.setDisplayLevel(3);
 			filter = new POFilter();
-			filter.setOptions("en", "fr", "UTF-8", true);
 			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
-			filter.open(input);
+			filter.open(new InputResource(input, "UTF-8", "en", "fr"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
@@ -88,8 +88,7 @@ public class POFilterTest {
 		String trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.setOptions(srcLang, trgLang, "UTF-16", true);
-		filter.open(snippet);
+		filter.open(new InputResource(snippet, srcLang, trgLang));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

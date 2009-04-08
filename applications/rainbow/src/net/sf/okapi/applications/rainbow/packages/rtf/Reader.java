@@ -21,11 +21,13 @@
 package net.sf.okapi.applications.rainbow.packages.rtf;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Reader implements IReader {
 
+	private InputResource res;
 	private RTFFilter filter;
 	
 	public void closeDocument () {
@@ -45,7 +47,8 @@ public class Reader implements IReader {
 	{
 		closeDocument();
 		filter = new RTFFilter();
-		filter.setOptions(sourceLanguage, targetLanguage, "windows-1252", false);
+		res = new InputResource("windows-1252", sourceLanguage);
+		res.setTargetLanguage(targetLanguage);
 //		URL url = new URL(path);
 //		filter.open(url.openStream());
 	}

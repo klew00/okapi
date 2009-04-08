@@ -26,7 +26,6 @@ public class PropertiesPipelineFilterTest {
 		IPipeline pipeline = new Pipeline();
 		
 		PropertiesFilter propertiesFilter = new PropertiesFilter();
-		propertiesFilter.setOptions("en", "windows-1252", true);
 		
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(genericSkeletonWriter);
@@ -44,7 +43,6 @@ public class PropertiesPipelineFilterTest {
 		IPipeline pipeline2 = new Pipeline();
 
 		PropertiesFilter propertiesFilter2 = new PropertiesFilter();
-		propertiesFilter2.setOptions("en", "windows-1252", true);
 		
 		GenericSkeletonWriter genericSkeletonWriter2 = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter2 = new GenericFilterWriter(genericSkeletonWriter2);

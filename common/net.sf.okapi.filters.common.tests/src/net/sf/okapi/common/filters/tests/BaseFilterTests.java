@@ -23,6 +23,7 @@ package net.sf.okapi.common.filters.tests;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.tests.DummyBaseFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -37,12 +38,11 @@ public class BaseFilterTests {
 			testDriver.setShowSkeleton(true);
 			filter = new DummyBaseFilter();
 
-			filter.setOptions("en", "is", "UTF-8", true);
-			filter.open("1");
+			filter.open(new InputResource("1", "en", "is"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
-			filter.open("2");
+			filter.open(new InputResource("2", "en", "is"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

@@ -29,6 +29,7 @@ import java.net.URL;
 //import net.sf.okapi.common.ISkeleton;
 //import net.sf.okapi.common.resource.INameable;
 //import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 //import net.sf.okapi.filters.xliff.AltTransAnnotation;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
@@ -44,9 +45,8 @@ public class XLIFFFilterTest {
 		XLIFFFilter filter = null;		
 		try {
 			filter = new XLIFFFilter();
-			filter.setOptions("en", "es", "UTF-8", true);
 			URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-			filter.open(new URI(url.toString()));
+			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en", "es"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

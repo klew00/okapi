@@ -43,6 +43,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -141,7 +142,30 @@ public class IDMLContentFilter implements IFilter {
 		return event;
 	}
 
-	public void open (InputStream input) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
 		try {
 			close();
 			// Open the input reader from the provided stream
@@ -155,12 +179,12 @@ public class IDMLContentFilter implements IFilter {
 		}
 	}
 
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		encoding = "UTF-16";
 		commonOpen(new StringReader(inputText.toString()));
 	}
 
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		try {
 			docName = inputURI.getPath();
 			open(inputURI.toURL().openStream());
@@ -170,14 +194,7 @@ public class IDMLContentFilter implements IFilter {
 		}
 	}
 
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
-	}
-
-	public void setOptions (String sourceLanguage,
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)

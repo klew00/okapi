@@ -50,7 +50,6 @@ public class FilterRoundtripTest {
 		IPipeline pipeline = new Pipeline();
 
 		HtmlFilter htmlFilter = new HtmlFilter();
-		htmlFilter.setOptions("en", "UTF-8", true);
 
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
@@ -73,7 +72,6 @@ public class FilterRoundtripTest {
 		IPipeline pipeline = new Pipeline();
 
 		HtmlFilter htmlFilter = new HtmlFilter();
-		htmlFilter.setOptions("en", "UTF-8", true);
 
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
@@ -95,7 +93,6 @@ public class FilterRoundtripTest {
 		IPipeline pipeline = new Pipeline();
 
 		HtmlFilter htmlFilter = new HtmlFilter();
-		htmlFilter.setOptions("en", "UTF-8", true);
 
 		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
 		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(

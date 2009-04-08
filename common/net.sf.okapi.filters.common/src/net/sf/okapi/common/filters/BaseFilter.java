@@ -174,24 +174,11 @@ public abstract class BaseFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
-	 * java.lang.String, boolean)
-	 */
-	public void setOptions(String language, String defaultEncoding, boolean generateSkeleton) {
-		setOptions(language, null, defaultEncoding, generateSkeleton);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#setOptions(java.lang.String,
-	 * java.lang.String, java.lang.String, boolean)
-	 */
-	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
-			boolean generateSkeleton) {
+	protected void setOptions(String sourceLanguage,
+		String targetLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		setEncoding(defaultEncoding);
 		setSrcLang(sourceLanguage);
 	}

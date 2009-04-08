@@ -31,6 +31,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -80,26 +81,42 @@ public class DummyFilter implements IFilter {
 		return queue.poll();
 	}
 
-	public void open (InputStream input) {
-		reset();
+	public void open (InputResource input) {
+		open(input, true);
 	}
-
-	public void open (CharSequence inputText) {
-		reset();
-	}
-
-	public void open (URI inputURI) {
-		reset();
-	}
-
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
+	
+	public void open (InputResource input,
 		boolean generateSkeleton)
 	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
+		reset();
 	}
 
-	public void setOptions (String sourceLanguage,
+	private void open (CharSequence inputText) {
+		reset();
+	}
+
+	private void open (URI inputURI) {
+		reset();
+	}
+
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)

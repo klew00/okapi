@@ -51,8 +51,13 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			// Load the filter if needed
 			filter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 				getInputFilterSettings(0), filter);
-			filter.setOptions(srcLang, trgLang, getInputEncoding(0), true);
 	
+			// Setup the filter
+			File f = new File(getInputPath(0));
+			InputResource res = new InputResource(f.toURI(), getInputEncoding(0), srcLang);
+			res.setTargetLanguage(trgLang);
+			filter.open(res);
+
 			// Create the filter writer if required
 			if ( needsSelfOutput ) {
 				filterWriter = filter.createFilterWriter();
@@ -60,12 +65,8 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 				filterWriter.setOutput(getOutputPath(0));
 			}
 
-			// Setup the filter
-			File f = new File(getInputPath(0)); 
-			filter.open(f.toURI());
-			Event event;
-			
 			// Process the document
+			Event event;
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				handleEvent(event);

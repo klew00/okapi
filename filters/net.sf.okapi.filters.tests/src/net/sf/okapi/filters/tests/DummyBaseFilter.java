@@ -20,14 +20,13 @@
 
 package net.sf.okapi.filters.tests;
 
-import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.BaseFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -44,15 +43,19 @@ public class DummyBaseFilter extends BaseFilter {
 		return null;
 	}
 
-	public void open (InputStream input) {
+	public void open (InputResource input) {
+		open(input, true);
 	}
-
-	public void open(CharSequence inputText) {
-		if ( "2".equals(inputText) ) createCase2();
-		else createCase1();
-	}
-
-	public void open (URI inputURI) {
+	
+	public void open(InputResource input,
+		boolean generateSkeleton)
+	{
+		if ( input.getInputCharSequence().equals("2") ) {
+			createCase2();
+		}
+		else {
+			createCase1();
+		}
 	}
 
 	public void setParameters (IParameters params) {

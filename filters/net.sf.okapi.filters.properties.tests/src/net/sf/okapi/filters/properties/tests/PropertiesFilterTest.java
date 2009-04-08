@@ -22,6 +22,7 @@ package net.sf.okapi.filters.properties.tests;
 
 import java.io.InputStream;
 
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -43,9 +44,8 @@ public class PropertiesFilterTest {
 			testDriver.setShowSkeleton(false);
 			testDriver.setDisplayLevel(0);
 			filter = new PropertiesFilter();
-			filter.setOptions("en", "UTF-8", true);
 			InputStream input = PropertiesFilterTest.class.getResourceAsStream("/Test01.properties");
-			filter.open(input);
+			filter.open(new InputResource(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

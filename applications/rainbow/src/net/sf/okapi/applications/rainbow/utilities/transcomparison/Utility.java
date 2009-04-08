@@ -29,6 +29,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -140,9 +141,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Initialize the filter to read the translation to compare
 		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 			getInputFilterSettings(1), inputToCompare);
-		inputToCompare.setOptions(srcLang, trgLang, getInputEncoding(1), false);
 		File f = new File(getInputPath(1));
-		inputToCompare.open(f.toURI());
+		inputToCompare.open(new InputResource(f.toURI(), getInputEncoding(1), srcLang, trgLang));
 			
 		// Start HTML output
 		if ( writer != null ) writer.close();

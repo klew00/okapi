@@ -46,6 +46,7 @@ import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -157,11 +158,34 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 
-	public void open (InputStream input) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
 		commonOpen(0, input);
 	}
 	
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		docName = null;
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
@@ -170,7 +194,7 @@ public class XLIFFFilter implements IFilter {
 		commonOpen(1, is);
 	}
 
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		try {
 			docName = inputURI.getPath();
 			commonOpen(0, inputURI.toURL().openStream());
@@ -258,7 +282,7 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 	
-	public void setOptions(String sourceLanguage,
+	private void setOptions(String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
@@ -269,13 +293,6 @@ public class XLIFFFilter implements IFilter {
 		// Default encoding should be UTF-8, other must be declared
 		// And that will be auto-detected and encoding will be updated
 		encoding = "UTF-8";
-	}
-
-	public void setOptions(String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
 	}
 
 	public void setParameters (IParameters params) {

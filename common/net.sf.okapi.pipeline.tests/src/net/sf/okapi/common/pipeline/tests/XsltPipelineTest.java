@@ -14,7 +14,6 @@ import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.InputResource;
-import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.xml.XMLFilter;
 
 import static org.junit.Assert.*;
@@ -50,7 +49,6 @@ public class XsltPipelineTest {
 
 		// filtering step - converts resource to events
 		IFilter filter = new XMLFilter();
-		filter.setOptions("en", "UTF-8", true);
 		IPipelineStep filterStep = new FilterPipelineStepAdaptor(filter);
 		pipeline.addStep(filterStep);
 

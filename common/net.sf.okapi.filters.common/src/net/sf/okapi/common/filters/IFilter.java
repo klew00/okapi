@@ -20,12 +20,10 @@
 
 package net.sf.okapi.common.filters;
 
-import java.io.InputStream;
-import java.net.URI;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -56,9 +54,9 @@ public interface IFilter {
 	 * @param defaultEncoding Name of the default encoding of the input document.
 	 * @param generateSkeleton Indicates if this filter should generate skeleton data or not.
 	 */
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton);
+//	public void setOptions (String sourceLanguage,
+//		String defaultEncoding,
+//		boolean generateSkeleton);
 
 	/**
 	 * Sets the options for this (multilingual) filter.
@@ -67,9 +65,24 @@ public interface IFilter {
 	 * @param defaultEncoding Name of the default encoding of the input document.
 	 * @param generateSkeleton Indicates if this filter should generate skeleton data or not.
 	 */
-	public void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
+//	public void setOptions (String sourceLanguage,
+//		String targetLanguage,
+//		String defaultEncoding,
+//		boolean generateSkeleton);
+
+	/**
+	 * Opens the input document described in a give InputResource object.
+	 * Skeleton information is always created when you use this method.
+	 * @param input The InputResource object to use to open the document.
+	 */
+	public void open (InputResource input);
+
+	/**
+	 * Opens the input document described in a give InputResource object, and
+	 * optionally creates skeleton information.
+	 * @param input The InputResource object to use to open the document.
+	 */
+	public void open (InputResource input,
 		boolean generateSkeleton);
 
 	/**
@@ -78,7 +91,7 @@ public interface IFilter {
 	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
 	 * @param input The input stream of the input document.
 	 */
-	public void open (InputStream input);
+//	public void open (InputStream input);
 
 	/**
 	 * Opens the input document that is as a character sequence.
@@ -86,7 +99,7 @@ public interface IFilter {
 	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
 	 * @param inputText The text that is the input document.
 	 */
-	public void open (CharSequence inputText);
+//	public void open (CharSequence inputText);
 
 	/**
 	 * Opens the input document through its URI.
@@ -94,7 +107,7 @@ public interface IFilter {
 	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
 	 * @param inputURI The URI of the input document.
 	 */
-	public void open (URI inputURI);
+//	public void open (URI inputURI);
 
 	/**
 	 * Closes the input document. Developers should call this method from within their code

@@ -42,6 +42,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -142,11 +143,34 @@ public class XMLFilter implements IFilter {
 		return null;
 	}
 
-	public void open (InputStream input) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
 		commonOpen(0, input);
 	}
 
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
 		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
@@ -154,19 +178,12 @@ public class XMLFilter implements IFilter {
 		commonOpen(2, is);
 	}
 
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		docName = inputURI.getPath();
 		commonOpen(1, inputURI);
 	}
 
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
-	}
-
-	public void setOptions (String sourceLanguage,
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)

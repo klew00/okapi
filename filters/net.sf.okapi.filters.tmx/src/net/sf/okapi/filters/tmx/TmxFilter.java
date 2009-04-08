@@ -42,6 +42,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -195,7 +196,30 @@ public class TmxFilter implements IFilter {
 		return false;
 	}
 	
-	public void open(URI inputURI) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open(URI inputURI) {
 		try { 
 			docName = inputURI.getPath();
 			open(inputURI.toURL().openStream());
@@ -205,12 +229,12 @@ public class TmxFilter implements IFilter {
 		}
 	}
 
-	public void open(CharSequence inputText) {
+	private void open(CharSequence inputText) {
 		//TODO: Check for better solution, going from char to byte to read char is just not good
 		open(new ByteArrayInputStream(inputText.toString().getBytes())); 		
 	}
 	
-	public void open (InputStream input) {
+	private void open (InputStream input) {
 		try {
 			if ( srcLang == null ) throw new RuntimeException("Source language not set.");
 			if ( trgLang == null ) throw new RuntimeException("Target language not set.");
@@ -266,15 +290,11 @@ public class TmxFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
-	public void setOptions(String language, String defaultEncoding,
-			boolean generateSkeleton) {
-
-		setOptions(language, null, defaultEncoding, generateSkeleton);
-	}
-
-	public void setOptions(String sourceLanguage, String targetLanguage,
-			String defaultEncoding, boolean generateSkeleton) {
-
+	private void setOptions(String sourceLanguage,
+		String targetLanguage,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
 		encoding = defaultEncoding;

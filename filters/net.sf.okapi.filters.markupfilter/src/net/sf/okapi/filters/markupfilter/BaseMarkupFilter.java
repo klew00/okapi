@@ -56,6 +56,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -167,13 +168,36 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		}
 	}
 
-	public void open(CharSequence input) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open(CharSequence input) {
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
 		document = new Source(input);
 		startFilter();
 	}
 
-	public void open(InputStream input) {
+	private void open(InputStream input) {
 		try {
 			bomEncodingDetector = new BOMNewlineEncodingDetector(input);
 			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
@@ -200,7 +224,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		startFilter();
 	}
 
-	public void open(URI inputURI) {
+	private void open(URI inputURI) {
 		try {
 			open(inputURI.toURL().openStream());
 		} catch (MalformedURLException e) {

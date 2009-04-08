@@ -38,6 +38,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -135,19 +136,42 @@ public class OpenOfficeFilter implements IFilter {
 		}
 	}
 
-	public void open (InputStream input) {
+	public void open (InputResource input) {
+		open(input, true);
+	}
+	
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
 		// Not supported for this filter
 		throw new UnsupportedOperationException(
 			"Method is not supported for this filter.");
 	}
 
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		// Not supported for this filter
 		throw new UnsupportedOperationException(
 			"Method is not supported for this filter.");
 	}
 
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		close();
 		docURI = inputURI;
 		nextAction = NextAction.OPENZIP;
@@ -156,14 +180,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter.setParameters(params);
 	}
 
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
-	}
-
-	public void setOptions (String sourceLanguage,
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
@@ -225,10 +242,9 @@ public class OpenOfficeFilter implements IFilter {
 	
 	private Event openSubDocument () {
 		filter.close();
-		filter.setOptions(srcLang, "UTF-8", true);
 		Event event;
 		try {
-			filter.open(zipFile.getInputStream(entry));
+			filter.open(new InputResource(zipFile.getInputStream(entry), "UTF-8", srcLang));
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {

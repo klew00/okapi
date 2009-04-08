@@ -25,6 +25,7 @@ import java.io.File;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
@@ -54,9 +55,10 @@ public class Reader implements IReader {
 			closeDocument();
 			reader = new XLIFFFilter();
 			// Encoding is not really used so we can hard-code
-			reader.setOptions(sourceLanguage, targetLanguage, "UTF-8", false);
 			File f = new File(path);
-			reader.open(f.toURI());
+			InputResource res = new InputResource(f.toURI(), "UTF-8", sourceLanguage);
+			res.setTargetLanguage(targetLanguage);
+			reader.open(res, false);
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException(e);

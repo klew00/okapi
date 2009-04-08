@@ -41,6 +41,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -99,88 +100,6 @@ public class RegexFilter implements IFilter {
 		return (parseState > 0);
 	}
 
-	// Rev = 1241
-/*	public Event nextOriginal () {
-		// Cancel if requested
-		if ( canceled ) {
-			parseState = 0;
-			queue.clear();
-			queue.add(new Event(EventType.CANCELED));
-		}
-		
-		// Process queue if it's not empty yet
-		if ( queue.size() > 0 ) {
-			return nextEvent();
-		}
-
-		// Get the first best match among the rules
-		// trying to match ((start)(.*?)(end))
-		Rule bestRule = null;
-		int bestPosition = inputText.length()+99;
-		MatchResult startResult = null;
-		MatchResult endResult = null;
-		int i = 0;
-		
-		while ( true ) {
-			for ( Rule rule : params.rules ) {
-				Matcher m = rule.pattern.matcher(inputText);
-				if ( m.find(startSearch) ) {
-					if ( m.start() < bestPosition ) {
-						bestPosition = m.start();
-						bestRule = rule;
-					}
-				}
-				i++;
-			}
-			
-			if ( bestRule != null ) {
-				// Find the start pattern
-				Pattern p = Pattern.compile(bestRule.start, params.regexOptions);
-				Matcher m = p.matcher(inputText);
-				if ( m.find(bestPosition) ) {
-					startResult = m.toMatchResult();
-				}
-				else throw new RuntimeException("Inconsistant rule finding.");
-				// Find the end pattern
-				p = Pattern.compile(bestRule.end, params.regexOptions);
-				m = p.matcher(inputText);
-				if ( m.find(startResult.end()) ) {
-					endResult = m.toMatchResult();
-				}
-				else throw new RuntimeException("Inconsistant rule finding.");
-				// Check for empty content
-				if ( startResult.start() == endResult.start() ) {
-					if ( startSearch+1 < inputText.length() ) {
-						startSearch++;
-						continue;
-					}
-					else break; // Done
-				}
-				// Check for boundary to avoid infinite loop
-				else if ( startResult.start() != inputText.length() ) {
-					// Process the match we just found
-					return processMatch(bestRule, startResult, endResult);
-				}
-				else break; // Done
-			}
-			else break; // Done
-		}
-		
-		// Else: Send end of the skeleton if needed
-		if ( startSearch <= inputText.length() ) {
-			// Treat strings outside rules
-//TODO: implement extract string out of rules
-			// Send the skeleton
-			addSkeletonToQueue(inputText.substring(startSkl, inputText.length()), true);
-		}
-
-		// End finally set the end
-		// Set the ending call
-		Ending ending = new Ending(String.format("%d", ++otherId));
-		queue.add(new Event(EventType.END_DOCUMENT, ending));
-		return nextEvent();
-	}
-*/
 	public Event next () {
 		// Cancel if requested
 		if ( canceled ) {
@@ -262,8 +181,31 @@ public class RegexFilter implements IFilter {
 			groupStack.pop();
 		}
 	}
+
+	public void open (InputResource input) {
+		open(input, true);
+	}
 	
-	public void open (InputStream input) {
+	public void open (InputResource input,
+		boolean generateSkeleton)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+	
+	private void open (InputStream input) {
 		BufferedReader reader = null;
 		try {
 			// Open the input reader from the provided stream
@@ -305,7 +247,7 @@ public class RegexFilter implements IFilter {
 		}
 	}
 	
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		try {
 			docName = inputURI.getPath();
 			open(inputURI.toURL().openStream());
@@ -315,13 +257,13 @@ public class RegexFilter implements IFilter {
 		}
 	}
 
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
 		commonOpen(inputText.toString());
 	}
 
-	public void setOptions (String sourceLanguage,
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
@@ -329,13 +271,6 @@ public class RegexFilter implements IFilter {
 		encoding = defaultEncoding;
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
-	}
-
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
 	}
 
 	public void setParameters (IParameters params) {

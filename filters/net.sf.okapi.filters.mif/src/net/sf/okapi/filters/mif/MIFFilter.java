@@ -32,11 +32,13 @@ import java.util.LinkedList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.OkapiNotImplementedException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -119,15 +121,31 @@ public class MIFFilter implements IFilter {
 	public boolean hasNext () {
 		return hasNext;
 	}
+
+	public void open (InputResource input) {
+		open(input, true);
+	}
 	
-	public void setOptions (String sourceLanguage,
-		String defaultEncoding,
+	public void open (InputResource input,
 		boolean generateSkeleton)
 	{
-		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
 	}
-
-	public void setOptions (String sourceLanguage,
+	
+	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
@@ -135,7 +153,7 @@ public class MIFFilter implements IFilter {
 		srcLang = sourceLanguage;
 	}
 
-	public void open (InputStream input) {
+	private void open (InputStream input) {
 		try {
 			close();
 			// Detect encoding
@@ -168,7 +186,7 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	public void open (URI inputURI) {
+	private void open (URI inputURI) {
 		try {
 			docName = inputURI.getPath();
 			open(inputURI.toURL().openStream());
@@ -178,9 +196,9 @@ public class MIFFilter implements IFilter {
 		}
 	}
 
-	public void open (CharSequence inputText) {
+	private void open (CharSequence inputText) {
 		// Not supported with MIF filter
-		throw new UnsupportedOperationException();
+		throw new OkapiNotImplementedException();
 	}
 
 	public void setParameters (IParameters params) {

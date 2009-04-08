@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -51,18 +52,16 @@ public class RegexFilterTest {
 			URL paramsUrl = RegexFilterTest.class.getResource("/okf_regex@StringInfo.fprm");
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
-			filter.setOptions("en", "UTF-8", true);
 			InputStream input = RegexFilterTest.class.getResourceAsStream("/Test01_stringinfo_en.info");
-			filter.open(input);
+			filter.open(new InputResource(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			
 			paramsUrl = RegexFilterTest.class.getResource("/okf_regex@SRT.fprm");
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
-			filter.setOptions("en", "UTF-8", true);
 			input = RegexFilterTest.class.getResourceAsStream("/Test01_srt_en.srt");
-			filter.open(input);
+			filter.open(new InputResource(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			

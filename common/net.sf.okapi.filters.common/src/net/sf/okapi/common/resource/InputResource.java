@@ -20,20 +20,11 @@
 
 package net.sf.okapi.common.resource;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URI;
 
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.OkapiNotImplementedException;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
@@ -46,73 +37,87 @@ public class InputResource implements IResource {
 	private Annotations annotations;
 	private String id;
 	private String encoding;
-	private String language;
-	private BOMNewlineEncodingDetector.NewlineType originalNewlineType;
+	private String srcLang;
+	private String trgLang;
 	private InputStream inputStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
-	private Reader reader;
 	
-	/* TODO: 
-	 * 
-	 * Some possible fields for FileResource
-	 
-	- its path/uri
-    - what filter-options file to use (if any)
-    - its default encoding (in case it cannot be detected)
-    - the source language
-    - possibly the main target language to work with (for multi-lingual documents)
-    - possibly the name of the output file to generate at the end of the pipeline
-    - possibly the encoding to use for the output
-    */
-
-	public InputResource(URI inputURI, String encoding, String language) {
-		this.annotations = new Annotations();
-		reset(inputURI, encoding, language);
+	public InputResource (CharSequence inputCharSequence,
+		String sourceLanguage)
+	{
+		create(inputCharSequence, sourceLanguage, null);
+	}
+			
+	public InputResource (CharSequence inputCharSequence,
+		String sourceLanguage,
+		String targetLanguage)
+	{
+		create(inputCharSequence, sourceLanguage, targetLanguage);
 	}
 
-	public InputResource(InputStream inputStream, String encoding, String language) {
-		this.annotations = new Annotations();
-		reset(inputStream, encoding, language);
+	public InputResource (URI inputURI,
+		String defaultEncoding,
+		String sourceLanguage)
+	{
+		create(inputURI, defaultEncoding, sourceLanguage, null);
 	}
 
-	public InputResource(CharSequence inputCharSequence, String language) {
-		this.annotations = new Annotations();
-		reset(inputCharSequence, language);
+	public InputResource (URI inputURI,
+		String defaultEncoding,
+		String sourceLanguage,
+		String targetLanguage)
+	{
+		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
 	}
-	
-	public void reset(CharSequence inputCharSequence, String language) {
+
+	public InputResource (InputStream inputStream,
+		String defaultEncoding,
+		String sourceLanguage)
+	{
+		create(inputStream, defaultEncoding, sourceLanguage, null);
+	}
+		
+	public InputResource (InputStream inputStream,
+		String defaultEncoding,
+		String sourceLanguage,
+		String targetLanguage)
+	{
+		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage);
+	}
+		
+	private void create (CharSequence inputCharSequence,
+		String sourceLanguage,
+		String targetLanguage)
+	{
 		setInputCharSequence(inputCharSequence);
 		setEncoding("UTF-16BE");
-		setLanguage(language);
-		setOriginalNewlineType(BOMNewlineEncodingDetector.getNewlineType(getInputCharSequence()));		
+		setSourceLanguage(sourceLanguage);
+		setTargetLanguage(targetLanguage);
 	}
-	
-	public void reset(URI inputURI, String encoding, String language) {
+				
+	private void create (URI inputURI,
+		String defaultEncoding,
+		String sourceLanguage,
+		String targetLanguage)
+	{
 		setInputURI(inputURI);
-		setEncoding(encoding);
-		setLanguage(language);
-		try {
-			InputStream inputStream = inputURI.toURL().openStream();
-			setInputStream(inputStream);
-			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewlineType());
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}				
+		setEncoding(defaultEncoding);
+		setSourceLanguage(sourceLanguage);
+		setTargetLanguage(targetLanguage);
 	}
-	
-	public void reset(InputStream inputStream, String encoding, String language) {
-		setEncoding(encoding);		
-		setLanguage(language);
+
+	private void create (InputStream inputStream,
+		String defaultEncoding,
+		String sourceLanguage,
+		String targetLanguage)
+	{
 		setInputStream(inputStream);
-		try {
-			setOriginalNewlineType(new BOMNewlineEncodingDetector(inputStream).getNewlineType());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		setEncoding(defaultEncoding);
+		setSourceLanguage(sourceLanguage);
+		setTargetLanguage(targetLanguage);
 	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -142,8 +147,8 @@ public class InputResource implements IResource {
 	 * 
 	 * @see net.sf.okapi.common.resource.IResource#getSkeleton()
 	 */
-	public ISkeleton getSkeleton() {
-		throw new OkapiNotImplementedException();
+	public ISkeleton getSkeleton () {
+		return null;
 	}
 
 	/*
@@ -153,7 +158,7 @@ public class InputResource implements IResource {
 	 * net.sf.okapi.common.resource.IResource#setAnnotation(net.sf.okapi.common
 	 * .annotation.IAnnotation)
 	 */
-	public void setAnnotation(IAnnotation annotation) {
+	public void setAnnotation (IAnnotation annotation) {
 		if (annotations == null) {
 			annotations = new Annotations();
 		}
@@ -165,7 +170,7 @@ public class InputResource implements IResource {
 	 * 
 	 * @see net.sf.okapi.common.resource.IResource#setId(java.lang.String)
 	 */
-	public void setId(String id) {
+	public void setId (String id) {
 		this.id = id;
 	}
 
@@ -176,108 +181,70 @@ public class InputResource implements IResource {
 	 * net.sf.okapi.common.resource.IResource#setSkeleton(net.sf.okapi.common
 	 * .filters.ISkeleton)
 	 */
-	public void setSkeleton(ISkeleton skeleton) {
+	public void setSkeleton (ISkeleton skeleton) {
 		// Not Implemented
 	}
 
-	public InputStream getInputStream() {
+	/**
+	 * Gets the InputStream object associated with this resource. It may be null if 
+	 * either {@link #getInputCharSequence()} or {@link #getInputURI()} are not null.
+	 * @return The InputStream object for this resource (may be null).
+	 */
+	public InputStream getInputStream () {
 		return inputStream;
 	}
 
-	public void setInputStream(InputStream inputStream) {
+	public void setInputStream (InputStream inputStream) {
 		this.inputStream = inputStream;
+		// Only one of the three inputs can be set at the same time
+		inputURI = null;
+		inputCharSequence = null;
 	}
 
-	public URI getInputURI() {
+	public URI getInputURI () {
 		return inputURI;
 	}
 
 	public void setInputURI(URI inputURI) {
 		this.inputURI = inputURI;
+		// Only one of the three inputs can be set at the same time
+		inputStream = null;
+		inputCharSequence = null;
 	}
 
-	/**
-	 * @param inputCharSequence
-	 *            the inputMemMappedCharSequence to set
-	 */
 	public void setInputCharSequence(CharSequence inputCharSequence) {
 		this.inputCharSequence = inputCharSequence;
+		// Only one of the three inputs can be set at the same time
+		inputURI = null;
+		inputStream = null;
 	}
 
-	/**
-	 * @return the inputMemMappedCharSequence
-	 */
-	public CharSequence getInputCharSequence() {
+	public CharSequence getInputCharSequence () {
 		return inputCharSequence;
 	}
 
-	public String getEncoding() {
+	public String getEncoding () {
 		return encoding;
 	}
 
-	public void setEncoding(String encoding) {
+	public void setEncoding (String encoding) {
 		this.encoding = encoding;
 	}
 	
-	public String getLanguage() {
-		return language;
+	public String getSourceLanguage () {
+		return srcLang;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setSourceLanguage (String language) {
+		srcLang = language;
 	}
 
-	/**
-	 * @param originalNewlineType the originalNewlineType to set
-	 */
-	public void setOriginalNewlineType(BOMNewlineEncodingDetector.NewlineType originalNewlineType) {
-		this.originalNewlineType = originalNewlineType;
+	public String getTargetLanguage () {
+		return trgLang;
 	}
 
-	/**
-	 * @return the originalNewlineType
-	 */
-	public BOMNewlineEncodingDetector.NewlineType getOriginalNewlineType() {
-		return originalNewlineType;
+	public void setTargetLanguage (String language) {
+		trgLang = language;
 	}
 
-	public Reader getReader() {
-		if (reader != null) {
-			return reader;
-		}
-		
-		if (getInputStream() != null)
-			try {
-				reader = new InputStreamReader(getInputStream(), getEncoding());
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
-		if (getInputCharSequence() != null)
-			reader = new StringReader(getInputCharSequence().toString()); 
-		
-		return reader;
-	}
-	
-	public void close() {
-		if (reader != null) {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		
-		if (getInputStream() != null)
-			try {
-				getInputStream().close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		if (getInputCharSequence() != null) {
-			CharSequence cs = getInputCharSequence(); 
-			// if this is a MemMappedCharSequence we need to close it
-			if (cs instanceof MemMappedCharSequence)
-				((MemMappedCharSequence)cs).close();
-		}					
-	}
 }

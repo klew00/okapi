@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert; 
 
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.mif.MIFFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -45,9 +46,8 @@ public class MIFFilterTest {
 			testDriver.setShowSkeleton(false);
 			testDriver.setDisplayLevel(0);
 			filter = new MIFFilter();
-			filter.setOptions("en", "UTF-8", true);
 			URL url = MIFFilterTest.class.getResource("/Test01.mif");
-			filter.open(new URI(url.toString()));
+			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 		}
 		catch ( Throwable e ) {

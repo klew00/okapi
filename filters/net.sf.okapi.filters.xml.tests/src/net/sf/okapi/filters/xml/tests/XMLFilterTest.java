@@ -22,10 +22,12 @@ package net.sf.okapi.filters.xml.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.xml.XMLFilter;
 
@@ -50,10 +52,8 @@ public class XMLFilterTest {
 		XMLFilter filter = null;		
 		try {
 			filter = new XMLFilter();
-			filter.setOptions("en", "es", "UTF-16", true);
-			
 			URL url = XMLFilterTest.class.getResource("/Translate1.xml");
-			filter.open(url.toURI());
+			filter.open(new InputResource(new URI(url.toString()), "UTF-16", "en", "es"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
@@ -141,7 +141,7 @@ public class XMLFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		xmlFilter.open(snippet);
+		xmlFilter.open(new InputResource(snippet, "en"));
 		while (xmlFilter.hasNext()) {
 			Event event = xmlFilter.next();
 			list.add(event);

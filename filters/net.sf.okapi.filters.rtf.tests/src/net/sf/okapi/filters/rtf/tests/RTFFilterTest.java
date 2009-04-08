@@ -22,6 +22,7 @@ package net.sf.okapi.filters.rtf.tests;
 
 import java.io.InputStream;
 
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -42,19 +43,18 @@ public class RTFFilterTest {
 		RTFFilter filter = null;		
 		try {
 			filter = new RTFFilter();
-			filter.setOptions("en", "fr", "windows-1252", true);
 			InputStream input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(input);
+			filter.open(new InputResource(input, "windows-1252", "en", "fr"));
 			process1(filter);
 			filter.close();
 			
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(input);
+			filter.open(new InputResource(input, "windows-1252", "en", "fr"));
 			process2(filter);
 			filter.close();
 
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(input);
+			filter.open(new InputResource(input, "windows-1252", "en", "fr"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
