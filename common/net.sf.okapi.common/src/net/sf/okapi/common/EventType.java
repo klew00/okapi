@@ -90,7 +90,7 @@ public enum EventType {
 	/**
 	 * File level event. A File resource should be associated with this event.
 	 */
-	FILE_RESOURCE,
+	INPUT_RESOURCE,
 
 	/**
 	 * A custom event type used when steps need to exchange non-resource based

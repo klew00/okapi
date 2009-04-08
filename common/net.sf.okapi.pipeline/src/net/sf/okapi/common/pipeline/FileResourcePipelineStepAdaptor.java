@@ -44,7 +44,7 @@ public class FileResourcePipelineStepAdaptor extends BasePipelineStep {
 	@Override
 	public Event handleEvent(Event event) {
 		eventSent = true;
-		return new Event(EventType.FILE_RESOURCE, fileResource);
+		return new Event(EventType.INPUT_RESOURCE, fileResource);
 	}
 
 	public void cancel() {
