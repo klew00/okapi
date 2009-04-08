@@ -48,6 +48,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	String pathToOpen;
 	int options;
 	Property scoreProp;
+	long scoreTotal;
+	int itemCount;
 	
 	public Utility () {
 		params = new Parameters();
@@ -176,12 +178,19 @@ public class Utility extends BaseFilterDrivenUtility {
 		Event event = synchronize(EventType.START_DOCUMENT);
 		StartDocument res = (StartDocument)event.getResource();
 		isToCompareMultilingual = res.isMultilingual();
+		scoreTotal = 0;
+		itemCount = 0;
 	}
 	
 	private void processEndDocument () {
     	if ( inputToCompare != null ) inputToCompare.close();
     	if ( params.generateHTML ) {
 			writer.writeEndElement(); // table
+    		writer.writeElementString("p", String.format("", itemCount));
+    		if ( itemCount > 0 ) {
+    			writer.writeElementString("p", String.format("Number of items = %d. Average score = %.2f",
+    				itemCount, (float)((float)scoreTotal / itemCount)));
+    		}
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html
     		writer.close();
@@ -239,6 +248,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Compute the distance
 		int score = matcher.compare(trgFrag1, trgFrag2, options);
+		// Store the scores for the average
+		scoreTotal += score;
+		itemCount++;
 
 		// Output in HTML
 		if ( params.generateHTML ) {

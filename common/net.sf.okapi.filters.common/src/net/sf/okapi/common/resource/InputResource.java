@@ -29,11 +29,14 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * File resource which holds a URI, InputStream or MemMappedCharSequence
- * referencing a file to be processed in the pipeline. File's can be decomposed
- * into events in the pipeline.
+ * Resource that carries all the information needed for a filter to open a given document.
+ * Documents are passed through the pipeline either as InputResource, or a filter events. Specialized
+ * steps allows to convert one to the other and conversely.
+ * The InputResource object has one (and only one) of three input objects:
+ * a CharSequence, a URI, or an InputStream.
  */
 public class InputResource implements IResource {
+	
 	private Annotations annotations;
 	private String id;
 	private String encoding;
@@ -43,12 +46,23 @@ public class InputResource implements IResource {
 	private URI inputURI;
 	private CharSequence inputCharSequence;
 	
+	/**
+	 * Creates a new InputResource object with a given CharSequence and a source language. 
+	 * @param inputCharSequence The CharSequence for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 */
 	public InputResource (CharSequence inputCharSequence,
 		String sourceLanguage)
 	{
 		create(inputCharSequence, sourceLanguage, null);
 	}
-			
+	
+	/**
+	 * Creates a new InputResource object with a given CharSequence, a source language and a target language.
+	 * @param inputCharSequence The CharSequence for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 * @param targetLanguage The target language for this InputResource.
+	 */
 	public InputResource (CharSequence inputCharSequence,
 		String sourceLanguage,
 		String targetLanguage)
@@ -56,6 +70,12 @@ public class InputResource implements IResource {
 		create(inputCharSequence, sourceLanguage, targetLanguage);
 	}
 
+	/**
+	 * Creates a new InputResource object with a given URI, a default encoding and a source language. 
+	 * @param inputURI The URI for this InputResource.
+	 * @param defaultEncoding The default encoding for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 */
 	public InputResource (URI inputURI,
 		String defaultEncoding,
 		String sourceLanguage)
@@ -63,6 +83,14 @@ public class InputResource implements IResource {
 		create(inputURI, defaultEncoding, sourceLanguage, null);
 	}
 
+	/**
+	 * Creates a new InputResource object with a given URI, a default encoding, a source language
+	 * and a target language. 
+	 * @param inputURI The URI for this InputResource.
+	 * @param defaultEncoding The default encoding for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 * @param targetLanguage The target language for this InputResource.
+	 */
 	public InputResource (URI inputURI,
 		String defaultEncoding,
 		String sourceLanguage,
@@ -71,6 +99,12 @@ public class InputResource implements IResource {
 		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
 	}
 
+	/**
+	 * Creates a new InputResource object with a given InputStream, a default encoding and a source language. 
+	 * @param inputStream The InputStream for this InputResource.
+	 * @param defaultEncoding The default encoding for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 */
 	public InputResource (InputStream inputStream,
 		String defaultEncoding,
 		String sourceLanguage)
@@ -78,6 +112,13 @@ public class InputResource implements IResource {
 		create(inputStream, defaultEncoding, sourceLanguage, null);
 	}
 		
+	/**
+	 * Creates a new InputResource object with a given InputStream, a default encoding and a source language. 
+	 * @param inputStream The InputStream for this InputResource.
+	 * @param defaultEncoding The default encoding for this InputResource.
+	 * @param sourceLanguage The source language for this InputResource.
+	 * @param targetLanguage The target language for this InputResource.
+	 */
 	public InputResource (InputStream inputStream,
 		String defaultEncoding,
 		String sourceLanguage,
@@ -117,7 +158,6 @@ public class InputResource implements IResource {
 		setSourceLanguage(sourceLanguage);
 		setTargetLanguage(targetLanguage);
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -182,7 +222,7 @@ public class InputResource implements IResource {
 	 * .filters.ISkeleton)
 	 */
 	public void setSkeleton (ISkeleton skeleton) {
-		// Not Implemented
+		// This resource has no skeleton
 	}
 
 	/**
@@ -194,6 +234,10 @@ public class InputResource implements IResource {
 		return inputStream;
 	}
 
+	/**
+	 * Sets the InputStream object associated with this resource.
+	 * @param inputStream The InputStream object for this resource.
+	 */
 	public void setInputStream (InputStream inputStream) {
 		this.inputStream = inputStream;
 		// Only one of the three inputs can be set at the same time
@@ -201,10 +245,19 @@ public class InputResource implements IResource {
 		inputCharSequence = null;
 	}
 
+	/**
+	 * Gets the URI object associated with this resource. It may be null if 
+	 * either {@link #getInputCharSequence()} or {@link #getInputStream()} are not null.
+	 * @return The URI object for this resource (may be null).
+	 */
 	public URI getInputURI () {
 		return inputURI;
 	}
 
+	/**
+	 * Sets the URI object associated with this resource.
+	 * @param inputURI The URI object for this resource.
+	 */
 	public void setInputURI(URI inputURI) {
 		this.inputURI = inputURI;
 		// Only one of the three inputs can be set at the same time
@@ -212,6 +265,11 @@ public class InputResource implements IResource {
 		inputCharSequence = null;
 	}
 
+	/**
+	 * Gets the CharSequence object associated with this resource. It may be null if 
+	 * either {@link #getInputURI()} or {@link #getInputStream()} are not null.
+	 * @return The CharSequence object for this resource (may be null).
+	 */
 	public void setInputCharSequence(CharSequence inputCharSequence) {
 		this.inputCharSequence = inputCharSequence;
 		// Only one of the three inputs can be set at the same time
@@ -219,30 +277,58 @@ public class InputResource implements IResource {
 		inputStream = null;
 	}
 
+	/**
+	 * Sets the CharSequence object associated with this resource.
+	 * @param inputCharSequence The CharSequence object for this resource.
+	 */
 	public CharSequence getInputCharSequence () {
 		return inputCharSequence;
 	}
 
+	/**
+	 * Gets the default encoding associated to this resource.
+	 * @return The default encoding associated to this resource.
+	 */
 	public String getEncoding () {
 		return encoding;
 	}
 
+	/**
+	 * Sets the default encoding associated with this resource.
+	 * @param encoding The default encoding associated with this resource.
+	 */
 	public void setEncoding (String encoding) {
 		this.encoding = encoding;
 	}
 	
+	/**
+	 * Gets the source language associated to this resource.
+	 * @return The source language associated to this resource.
+	 */
 	public String getSourceLanguage () {
 		return srcLang;
 	}
 
+	/**
+	 * Sets the source language associated with this resource.
+	 * @param sourceLanguage The source language associated with this resource.
+	 */
 	public void setSourceLanguage (String language) {
 		srcLang = language;
 	}
 
+	/**
+	 * Gets the target language associated to this resource.
+	 * @return The target language associated to this resource.
+	 */
 	public String getTargetLanguage () {
 		return trgLang;
 	}
 
+	/**
+	 * Sets the target language associated with this resource.
+	 * @param targetLanguage The atregt language associated with this resource.
+	 */
 	public void setTargetLanguage (String language) {
 		trgLang = language;
 	}
