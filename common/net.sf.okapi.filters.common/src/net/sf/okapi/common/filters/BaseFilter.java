@@ -1137,7 +1137,7 @@ public abstract class BaseFilter implements IFilter {
 	}
 
 	/**
-	 * @param currentElementType
+	 * @param tagType
 	 *            the currentElementType to set
 	 */
 	public void setTagType(String tagType) {

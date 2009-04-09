@@ -34,8 +34,7 @@ public class PropertiesEncoder implements IEncoder {
 	private boolean escapeExtendedChars;
 	
 	/**
-	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding, and
-	 * escaping all extended characters.
+	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding.
 	 */
 	public PropertiesEncoder () {
 		escapeExtendedChars = false;

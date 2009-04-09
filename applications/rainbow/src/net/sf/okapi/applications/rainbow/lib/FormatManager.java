@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,14 +16,52 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.lib;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 public class FormatManager {
 
+	Map<String, String> pairs;
+	
 	public void load (String p_sPath) {
 		//TODO: Load format manager data from external file
+		
+		pairs = new Hashtable<String, String>();
+		pairs.put(".xlf", "okf_xliff");
+		pairs.put(".xml", "okf_xml");
+		pairs.put(".html", "okf_html");
+		pairs.put(".htm", "okf_html");
+		pairs.put(".properties", "okf_properties");
+		pairs.put(".tmx", "okf_tmx");
+		pairs.put(".mif", "okf_mif");
+		pairs.put(".rtf", "okf_rtf");
+		pairs.put(".idml", "okf_idml");
+		pairs.put(".po", "okf_po");
+		pairs.put(".docx", "okf_msoffice");
+		pairs.put(".docm", "okf_msoffice");
+		pairs.put(".dotm", "okf_msoffice");
+		pairs.put(".xlsx", "okf_msoffice");
+		pairs.put(".pptx", "okf_msoffice");
+		pairs.put(".odt", "okf_openoffice");
+		pairs.put(".ott", "okf_openoffice");
+		pairs.put(".sxw", "okf_openoffice");
+		pairs.put(".stw", "okf_openoffice");
+		pairs.put(".odp", "okf_openoffice");
+		pairs.put(".otp", "okf_openoffice");
+		pairs.put(".sxi", "okf_openoffice");
+		pairs.put(".sti", "okf_openoffice");
+		pairs.put(".ods", "okf_openoffice");
+		pairs.put(".ots", "okf_openoffice");
+		pairs.put(".sxc", "okf_openoffice");
+		pairs.put(".stc", "okf_openoffice");
+		pairs.put(".odg", "okf_openoffice");
+		pairs.put(".otg", "okf_openoffice");
+		pairs.put(".sxd", "okf_openoffice");
+		pairs.put(".std", "okf_openoffice");
 	}
 	
 	/**
@@ -35,28 +73,9 @@ public class FormatManager {
 	public String[] guessFormat (String p_sPath) {
 		String[] aRes = new String[2];
 		aRes[0] = Utils.detectEncoding(p_sPath);
-		aRes[1] = null; 
 		String sExt = Utils.getExtension(p_sPath).toLowerCase();
-		if ( sExt.equals(".properties") ) aRes[1] = "okf_properties";
-		else if ( sExt.equals(".xlf") ) aRes[1] = "okf_xliff";
-		else if ( sExt.equals(".xml") ) aRes[1] = "okf_xml";
-		else if ( sExt.equals(".html") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".asp") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".php") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".htm") ) aRes[1] = "okf_html";
-		else if ( sExt.equals(".odt") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ods") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odp") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".odg") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".ott") ) aRes[1] = "okf_openoffice";
-		else if ( sExt.equals(".tmx") ) aRes[1] = "okf_tmx";
-		else if ( sExt.equals(".mif") ) aRes[1] = "okf_mif";
-		else if ( sExt.equals(".rtf") ) aRes[1] = "okf_rtf";
-		else if ( sExt.equals(".idml") ) aRes[1] = "okf_idml";
-		else if ( sExt.equals(".po") ) aRes[1] = "okf_po";
-		else if ( sExt.equals(".docx") ) aRes[1] = "okf_msoffice";
-		else if ( sExt.equals(".xlsx") ) aRes[1] = "okf_msoffice";
-		else if ( sExt.equals(".pptx") ) aRes[1] = "okf_msoffice";
+		aRes[1] = pairs.get(sExt);
 		return aRes;
 	}
+
 }

@@ -1479,6 +1479,7 @@ public class MainForm implements IParametersProvider {
 		rm.loadCommands("commands.xml"); //$NON-NLS-1$
 
 		fm = new FormatManager();
+		fm.load(null); // TODO: implement real external file, for now it's hard-coded
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		em = new EncodingManager();
