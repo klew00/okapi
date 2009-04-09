@@ -69,7 +69,7 @@ public class POFilter implements IFilter {
 	private static final Pattern charsetPattern = Pattern.compile(
 		"(content-type)(\\s*?):(.*?)charset(\\s*?)=(\\s*?)(.*?)([\\\\|;|\\n])",
 		Pattern.CASE_INSENSITIVE);
-	
+		
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
@@ -376,34 +376,20 @@ public class POFilter implements IFilter {
 			
 			// Check for flags
 			if ( textLine.startsWith("#,") ) {
-				String value = textLine.substring(2).trim();
-				String[] flags = value.split("[\\s,]");
 				if ( tu == null ) {
 					tu = new TextUnit(null); // No id yet, it will be set later
 				}
-				int start = 0;
-				int pos = 0;
-				for ( String flag : flags ) {
-					if ( flag.equals("fuzzy") ) {
-						if ( params.bilingualMode ) {
-							pos = textLine.indexOf(flag);
-							skel.append(textLine.substring(start, pos));
-							start = pos+5; // After "fuzzy"
-							skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-							tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
-							hasFuzzyFlag = true;
-							skel.append(textLine.substring(start));
-							break;
-						}
-					}
+				int pos = textLine.indexOf("fuzzy");
+				if ( params.bilingualMode && ( pos > -1 )) { // No fuzzy flag or monolingual mode
+					skel.append(textLine.substring(0, pos));
+					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
+					hasFuzzyFlag = true;
+					skel.append(textLine.substring(pos+5));
 				}
-				//if ( !hasFuzzyFlag ) { // No fuzzy flag, but we have a flag line.
-				//	//TODO: Fix the issue: this get added to the skel of doc-part of initial empty entry
-				//	skel.append(textLine+", ");
-				//	skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-				//	tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
-				//	hasFuzzyFlag = true;
-				//}
+				else {
+					skel.append(textLine);
+				}
 				skel.append(lineBreak);
 				continue;
 			}

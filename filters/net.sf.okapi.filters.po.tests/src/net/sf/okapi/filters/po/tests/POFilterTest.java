@@ -44,25 +44,30 @@ public class POFilterTest {
 	}
 
 	@Test
-	public void runTest () {
-		POFilter filter = null;		
-		try {
-			FilterTestDriver testDriver = new FilterTestDriver();
-			//testDriver.setShowSkeleton(true);
-			//testDriver.setDisplayLevel(3);
-			filter = new POFilter();
-			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
-			filter.open(new InputResource(input, "UTF-8", "en", "fr"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail("Exception occured");
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void optionLineTest () {
+		String snippet = "#, c-format\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		assertEquals(result, snippet);
+		
+		snippet = "#, c-format, fuzz\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		assertEquals(result, snippet);
+		
+		snippet = "#, fuzzy, c-format\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		assertEquals(result, snippet);
+
+		snippet = "#, x-stuff, fuzzy, c-format\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n";
+		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		assertEquals(result, snippet);
 	}
 	
 	@Test
@@ -81,6 +86,28 @@ public class POFilterTest {
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Text 1\"\n";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr"));
+	}
+	
+	@Test
+	public void externalFileTest () {
+		POFilter filter = null;		
+		try {
+			FilterTestDriver testDriver = new FilterTestDriver();
+			//testDriver.setShowSkeleton(true);
+			//testDriver.setDisplayLevel(3);
+			filter = new POFilter();
+			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
+			filter.open(new InputResource(input, "UTF-8", "en", "fr"));
+			if ( !testDriver.process(filter) ) Assert.fail();
+			filter.close();
+		}
+		catch ( Throwable e ) {
+			e.printStackTrace();
+			Assert.fail("Exception occured");
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
 	}
 	
 	private ArrayList<Event> getEvents(String snippet,
