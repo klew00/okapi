@@ -581,16 +581,11 @@ public class POFilter implements IFilter {
 			}
 			// Set the translation if one exists
 			if ( tmp.length() > 0 ) {
-				if ( !tmp.equals(sID) ) {
-					TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
-					tc.setContent(toAbstract(new TextFragment(tmp)));
-				}
+				TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+				tc.setContent(toAbstract(new TextFragment(tmp)));
 				if ( !hasFuzzyFlag ) {
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
 				}
-				//TODO: If the text is the same: what do we do?
-				// for now, treat it as non-translated
-				// also: take fuzzy flag in account
 			}
 			//else { // Correct the approved property
 			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");

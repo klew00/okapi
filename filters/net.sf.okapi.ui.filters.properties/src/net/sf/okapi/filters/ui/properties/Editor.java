@@ -57,7 +57,7 @@ public class Editor implements IParametersEditor {
 	private LDPanel pnlLD;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
-	//private Button chkEscapeExtendedChars;
+	private Button chkEscapeExtendedChars;
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
@@ -193,7 +193,7 @@ public class Editor implements IParametersEditor {
 
 		//--- Output tab
 		
-/*		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
@@ -210,7 +210,7 @@ public class Editor implements IParametersEditor {
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("tabOutput"));
 		tiTmp.setControl(cmpTmp);
-*/		
+		
 		
 		//--- Dialog-level buttons
 
@@ -257,7 +257,7 @@ public class Editor implements IParametersEditor {
 		chkUseKeyFilter.setSelection(params.useKeyCondition);
 		chkExtraComments.setSelection(params.extraComments);
 		chkCommentsAreNotes.setSelection(params.commentsAreNotes);
-		//chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
+		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
 		chkUseCodeFinder.setSelection(params.useCodeFinder);
 		pnlCodeFinder.setData(params.codeFinder.toString());
 		
@@ -281,7 +281,7 @@ public class Editor implements IParametersEditor {
 		params.extractOnlyMatchingKey = rdExtractOnlyMatchingKey.getSelection();
 		params.extraComments = chkExtraComments.getSelection();
 		params.commentsAreNotes = chkCommentsAreNotes.getSelection();
-		//params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
+		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
 		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		return true;
 	}

@@ -168,7 +168,6 @@ public class Editor implements IParametersEditor {
 		tiTmp.setText(Res.getString("tabOptions"));
 		tiTmp.setControl(cmpTmp);
 		
-		
 		//--- Inline tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
@@ -193,7 +192,7 @@ public class Editor implements IParametersEditor {
 
 		//--- Output tab
 		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		/*cmpTmp = new Composite(tfTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
@@ -202,7 +201,7 @@ public class Editor implements IParametersEditor {
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("tabOutput"));
 		tiTmp.setControl(cmpTmp);
-		
+		*/
 		
 		//--- Dialog-level buttons
 
