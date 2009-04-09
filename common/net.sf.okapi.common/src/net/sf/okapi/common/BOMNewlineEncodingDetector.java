@@ -96,11 +96,20 @@ public final class BOMNewlineEncodingDetector {
 	public static final String UTF_32BE="UTF-32BE";
 	public static final String UTF_32LE="UTF-32LE";
 	
+	private String defaultEncoding = ISO_8859_1;
+	
 	private boolean hasUtf8Bom;
 	private boolean hasUtf7Bom;
 	private boolean hasBom;
 	
 	public BOMNewlineEncodingDetector(final InputStream inputStream) throws IOException {
+		this.inputStream=inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
+		inputStream.mark(0);
+		init();
+	}
+	
+	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding) throws IOException {
+		this.defaultEncoding = defaultEncoding;
 		this.inputStream=inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		inputStream.mark(0);
 		init();
@@ -263,7 +272,7 @@ public final class BOMNewlineEncodingDetector {
 			if (b1==0) return setEncoding(UTF_16BE,"default 16-bit BE encoding (byte stream starts with 00, stream 2 bytes long)");
 			if (b2==0) return setEncoding(UTF_16LE,"default 16-bit LE encoding (byte stream pattern XX 00, stream 2 bytes long)");
 			// No 00 bytes present, assume 8-bit encoding:
-			return setEncoding(ISO_8859_1,"default 8-bit ASCII-compatible encoding (no 00 bytes present, stream 2 bytes long)");
+			return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
 		}
 		// Stream contains at least 4 bytes.
 		// The patterns used for documentation are made up of:
@@ -319,9 +328,17 @@ public final class BOMNewlineEncodingDetector {
 		// UTF-8 is however not a good choice as it is not strictly an 8-bit encoding.
 		// UTF-8 bytes with a value >= 0x80 indicate the presence of a multi-byte character, and there are many byte values that are illegal.
 		// Therefore, choose the only true 8-bit encoding that accepts all byte values and is guaranteed to be available on all java implementations.
-		return setEncoding(ISO_8859_1,"default 8-bit ASCII-compatible encoding (no 00 bytes present in first four bytes of stream)");
+		return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
 	}
 	
+	public String getDefaultEncoding() {
+		return defaultEncoding;
+	}
+
+	public void setDefaultEncoding(String defaultEncoding) {
+		this.defaultEncoding = defaultEncoding;
+	}
+
 	public boolean hasBom() {
 		return hasBom;	
 	}
