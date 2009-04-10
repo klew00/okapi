@@ -8,6 +8,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
@@ -109,7 +110,7 @@ public class OpenXMLSnippetsTest {
 	private ArrayList<Event> getEvents(String snippet, int filetype) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		openXMLContentFilter.setUpConfig(filetype);
-		openXMLContentFilter.open(snippet);
+		openXMLContentFilter.open(new InputResource(snippet, "en"));
 		while (openXMLContentFilter.hasNext()) {
 			Event event = openXMLContentFilter.next();
 			openXMLContentFilter.displayOneEvent(event);
