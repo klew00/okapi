@@ -13,6 +13,40 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.resource.Code;
 
+/**
+ * Defines extraction rules useful for markup languages such as HTML and XML.
+ * <p>
+ * Extraction rules can handle the following cases:
+ * <p>
+ * NON EXTRACTABLE - Default rule - don't extract it.
+ * <p>
+ * INLINE - Elements that are included with text.
+ * <p>
+ * EXCLUDED -Element and children that should be excluded from extraction.
+ * <p>
+ * INCLUDED - Elements and children within EXLCUDED ranges that should be
+ * extracted.
+ * <p>
+ * GROUP - Elements that are grouped together structurally such as lists, tables
+ * etc..
+ * <p>
+ * ATTRIBUTES - Attributes on specific elements which should be extracted. May
+ * be translatable or localizable.
+ * <p>
+ * ATTRIBUTES ANY ELEMENT - Convenience rule for attributes which can occur on
+ * any element. May be translatable or localizable.
+ * <p>
+ * TEXT UNIT - Elements whose start and end tags become part of a
+ * {@link TextUnit} rather than {@link SkeletonUnit}.
+ * <p>
+ * TEXT RUN - Elements which group together a common run of inline elements. For
+ * example, a style marker in OpenXML.
+ * <p>
+ * Any of the above rules may have conditional rules based on attribute names
+ * and/or values. Conditional rules ({@link ConditionalAttributeRule}) may be
+ * attached to both elements and attributes. More than one conditional rules are
+ * evaluated as OR expressions. For example, "type=button" OR "type=default".
+ */
 public class TaggedFilterConfiguration {
 	private static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
 	private static final String INLINE = "INLINE";
@@ -128,25 +162,25 @@ public class TaggedFilterConfiguration {
 		if (element.getTagType() == StartTagType.COMMENT) {
 			return Code.TYPE_COMMENT;
 		}
-		
+
 		if (element.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION) {
 			return Code.TYPE_XML_PROCESSING_INSTRUCTION;
 		}
-		
+
 		Map<String, Object> rule = configReader.getRule(element.getName());
 		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
 			return (String) rule.get(ELEMENT_TYPE);
-		}		
+		}
 
 		return element.getName();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public String getElementType(String elementName) {
 		Map<String, Object> rule = configReader.getRule(elementName);
 		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
 			return (String) rule.get(ELEMENT_TYPE);
-		}		
+		}
 
 		return elementName;
 	}
@@ -161,53 +195,6 @@ public class TaggedFilterConfiguration {
 		}
 		return false;
 	}
-
-	/*
-	TODO:
-	These methods do not detect attributes that occur on many elements. Since no client 
-	is using these anyway comment them out for now and set TODO for later refactor or delete.
-	 
-	public boolean hasActionableAttributes(String ruleName) {
-		return hasTranslatableAttributes(ruleName) || hasLocalizableAttributes(ruleName);
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean hasTranslatableAttributes(String ruleName) {
-		Map rule = configReader.getRule(ruleName);
-		if (rule != null && rule.containsKey("translatableAttributes")) {
-			return true;
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean hasLocalizableAttributes(String ruleName) {
-		Map<String, Object> rule = configReader.getRule(ruleName);
-		if (rule != null
-				&& (rule.containsKey("writableLocalizableAttributes") || rule
-						.containsKey("readOnlyLocalizableAttributes"))) {
-			return true;
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean hasReadOnlyLocalizableAttributes(String ruleName) {
-		Map<String, Object> rule = configReader.getRule(ruleName);
-		if (rule != null && rule.containsKey("readOnlyLocalizableAttributes")) {
-			return true;
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean hasWritableLocalizableAttributes(String ruleName) {
-		Map<String, Object> rule = configReader.getRule(ruleName);
-		if (rule != null && rule.containsKey("writableLocalizableAttributes")) {
-			return true;
-		}
-		return false;
-	}*/
 
 	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
 		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
@@ -275,7 +262,7 @@ public class TaggedFilterConfiguration {
 			}
 
 		}
-		
+
 		// catch attributes that may appear on any element
 		if (isActionableAttributeRule(elementName, attribute, type)) {
 			return true;
@@ -363,7 +350,7 @@ public class TaggedFilterConfiguration {
 				}
 				return true;
 			} else { // multiple condition values of type EQUAL or MATCH are
-						// OR'ed together
+				// OR'ed together
 				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
 					String value = i.next();
 					if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {

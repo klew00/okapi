@@ -78,7 +78,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  * 
  */
 public abstract class BaseMarkupFilter extends BaseFilter {
-	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.markupfilter");
+	private static final Logger logger = Logger.getLogger(BaseMarkupFilter.class.getName());
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 

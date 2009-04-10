@@ -22,7 +22,7 @@ package net.sf.okapi.filters.markupfilter;
 
 import java.util.Stack;
 
-import net.sf.okapi.filters.markupfilter.ExtractionRule.EXTRACTION_RULE_TYPE;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
  * Holds the current parser's rule state. State is maintained on separate
@@ -32,13 +32,13 @@ public class ExtractionRuleState {
 
 	private static final class RuleType {
 
-		public RuleType(String ruleName, EXTRACTION_RULE_TYPE ruleType) {
+		public RuleType(String ruleName, RULE_TYPE ruleType) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
 		}
 
 		public String ruleName;
-		public EXTRACTION_RULE_TYPE ruleType;
+		public RULE_TYPE ruleType;
 	}
 
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
@@ -62,7 +62,7 @@ public class ExtractionRuleState {
 	public boolean isGroupState() {
 		if (groupRuleStack.isEmpty())
 			return false;
-		if (groupRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.GROUP_ELEMENT)
+		if (groupRuleStack.peek().ruleType == RULE_TYPE.GROUP_ELEMENT)
 			return true;
 
 		return false;
@@ -71,7 +71,7 @@ public class ExtractionRuleState {
 	public boolean isTextUnitState() {
 		if (textUnitRuleStack.isEmpty())
 			return false;
-		if (textUnitRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT)
+		if (textUnitRuleStack.peek().ruleType == RULE_TYPE.TEXT_UNIT_ELEMENT)
 			return true;
 
 		return false;
@@ -80,7 +80,7 @@ public class ExtractionRuleState {
 	public boolean isExludedState() {
 		if (excludedIncludedRuleStack.isEmpty())
 			return false;
-		if (excludedIncludedRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.EXCLUDED_ELEMENT)
+		if (excludedIncludedRuleStack.peek().ruleType == RULE_TYPE.EXCLUDED_ELEMENT)
 			return true;
 
 		return false;
@@ -89,14 +89,14 @@ public class ExtractionRuleState {
 	public boolean isPreserveWhitespaceState() {
 		if (preserveWhiteSpaceRuleStack.isEmpty())
 			return false;
-		if (preserveWhiteSpaceRuleStack.peek().ruleType == EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE)
+		if (preserveWhiteSpaceRuleStack.peek().ruleType == RULE_TYPE.PRESERVE_WHITESPACE)
 			return true;
 
 		return false;
 	}
 
 	public void pushPreserverWhitespaceRule(String ruleName) {
-		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.PRESERVE_WHITESPACE));
+		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE));
 	}
 
 	public void popPreserverWhitespaceRule() {
@@ -104,19 +104,19 @@ public class ExtractionRuleState {
 	}
 
 	public void pushExcludedRule(String ruleName) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.EXCLUDED_ELEMENT));
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT));
 	}
 
 	public void pushIncludedRule(String ruleName) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.INCLUDED_ELEMENT));
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT));
 	}
 
 	public void pushGroupRule(String ruleName) {
-		groupRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.GROUP_ELEMENT));
+		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT));
 	}
 
 	public void pushTextUnitRule(String ruleName) {
-		textUnitRuleStack.push(new RuleType(ruleName, EXTRACTION_RULE_TYPE.TEXT_UNIT_ELEMENT));
+		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT));
 	}
 
 	public void popExcludedIncludedRule() {
