@@ -24,10 +24,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -58,14 +60,13 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * <p>
  * More complex cases such as tags with embedded translatable text can also be
  * handled. See the BaseMarkupFilter, HtmlFilter} and OpenXmlFilter for examples
- * of using the {@link BaseFilter}.
+ * of using the {@link AbstractBaseFilter}.
  * <p>
  * To create a new filter extend BaseFilter and call startFilter() and endFilter()
  * methods at the beginning and end of each filter run.
  */
-public abstract class BaseFilter implements IFilter {
-	@SuppressWarnings("unused")
-	private static final Logger logger = Logger.getLogger("net.sf.okapi.common.filters.BaseFilter");
+public abstract class AbstractBaseFilter implements IFilter {	
+	private static final Logger LOGGER = Logger.getLogger(AbstractBaseFilter.class.getName());
 
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
 	private static final String END_GROUP = "eg"; //$NON-NLS-1$
@@ -106,8 +107,8 @@ public abstract class BaseFilter implements IFilter {
 	/**
 	 * Instantiates a new base filter.
 	 */
-	public BaseFilter() {
-		// a few vars should only be initialized once rather than on each reset call.
+	public AbstractBaseFilter() {
+		// newlineType should only be initialized once rather than on each reset call.
 		newlineType = "\n";
 	}
 
@@ -489,6 +490,7 @@ public abstract class BaseFilter implements IFilter {
 		startDocument.setFilterParameters(getParameters());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
+		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId());
 	}
 
 	/**
@@ -498,6 +500,7 @@ public abstract class BaseFilter implements IFilter {
 		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
 		Event event = new Event(EventType.END_DOCUMENT, endDocument);
 		filterEvents.add(event);
+		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId());
 	}
 
 	/**
@@ -511,6 +514,7 @@ public abstract class BaseFilter implements IFilter {
 		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
 		Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
+		LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
 	}
 
 	/**
@@ -520,6 +524,7 @@ public abstract class BaseFilter implements IFilter {
 		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
 		Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
+		LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -546,7 +551,7 @@ public abstract class BaseFilter implements IFilter {
 
 	private void embeddedWritableProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		resource = setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
+		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
 				.getValue(), false));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(), language);
@@ -639,7 +644,7 @@ public abstract class BaseFilter implements IFilter {
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, language);
 			} else {
-				throw new BaseFilterException("Unkown Property or TextUnit type");
+				throw new IllegalFilterOperationException("Unkown Property or TextUnit type");
 			}
 		}
 
@@ -792,13 +797,17 @@ public abstract class BaseFilter implements IFilter {
 	 *            the property text unit placeholders
 	 * @param language
 	 *            the language
+	 *            
+	 * @throws IllegalFilterOperationException
 	 */
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		Event tempTextUnit;
 
 		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot end TextUnit");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end the TextUnit. TextUnit not found.");
+			LOGGER.log(Level.SEVERE, "Trying to end a TextUnit that does not exist.", e);
+			throw e;
 		}
 
 		// The ability to add internal placeholders to end tags is not currently
@@ -823,10 +832,14 @@ public abstract class BaseFilter implements IFilter {
 	 * 
 	 * @param text
 	 *            the text
+	 *            
+	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add text");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add to the TextUnit. TextUnit not found.");
+			LOGGER.log(Level.SEVERE, "Trying to add text to a TextUnit that does not exist.", e);
+			throw e;
 		}
 
 		Event tempTextUnit = peekTempEvent();
@@ -843,10 +856,14 @@ public abstract class BaseFilter implements IFilter {
 	 *            the literal code
 	 * @param codeName
 	 *            the code name
+	 *            
+	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
 		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add code");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add a Code to the TextUnit. TextUnit not found.");
+			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
+			throw e;
 		}
 
 		Code code = new Code(codeType, codeName, literalCode);
@@ -884,12 +901,16 @@ public abstract class BaseFilter implements IFilter {
 	 *            the language
 	 * @param propertyTextUnitPlaceholders
 	 *            the property text unit placeholders
+	 *            
+	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add codes");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add Codes to the TextUnit. TextUnit not found.");
+			LOGGER.log(Level.SEVERE, "Trying to add Codes to a TextUnit that does not exist.", e);
+			throw e;
 		}
 
 		currentSkeleton = new GenericSkeleton();
@@ -982,13 +1003,18 @@ public abstract class BaseFilter implements IFilter {
 	 *            the property text unit placeholders
 	 * @param language
 	 *            the language
+	 *            
+	 * @throws IllegalFilterOperationException
 	 */
 	protected void endGroup(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
-			throw new BaseFilterException("Start group not found. Cannot end group");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end current Group. StartGroup not found.");
+			LOGGER.log(Level.SEVERE, "Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.", e);
+			throw e;
 		}
+		
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
 
 		if (endMarker != null && propertyTextUnitPlaceholders != null) {
@@ -1008,7 +1034,9 @@ public abstract class BaseFilter implements IFilter {
 
 	private void startCode(Code code) {
 		if (!isCurrentTextUnit()) {
-			throw new BaseFilterException("TextUnit not found. Cannot add a Code to a non-exisitant TextUnit.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add a Code to the TextUnit. TextUnit not found.");
+			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
+			throw e;			
 		}
 		currentCode = code;
 		currentCode.setType(currentTagType);
@@ -1016,7 +1044,9 @@ public abstract class BaseFilter implements IFilter {
 
 	private void endCode() {
 		if (currentCode == null) {
-			throw new BaseFilterException("Code not found. Cannot end a non-exisitant code.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end the current Code. Code not found.");
+			LOGGER.log(Level.SEVERE, "Trying to end a Code that does not exist. Did you call startCode?", e);
+			throw e;
 		}
 
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
