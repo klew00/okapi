@@ -38,10 +38,10 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
+import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-public class HtmlFilter extends BaseMarkupFilter {
+public class HtmlFilter extends AbstractBaseMarkupFilter {
 
 	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.html");
 	
