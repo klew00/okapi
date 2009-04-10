@@ -23,14 +23,14 @@ package net.sf.okapi.filters.tests;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.filters.AbstractBaseFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class DummyBaseFilter extends BaseFilter {
+public class DummyBaseFilter extends AbstractBaseFilter {
 
 	public void close() {
 	}
