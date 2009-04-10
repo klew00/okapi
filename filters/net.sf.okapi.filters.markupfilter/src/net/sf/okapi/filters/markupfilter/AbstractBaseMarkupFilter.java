@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Attribute;
@@ -51,7 +52,10 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.filters.BaseFilter;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.AbstractBaseFilter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
@@ -77,8 +81,8 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  * HtmlFilter and OpenXml (defaultConfiguration.yml) filters for examples.
  * 
  */
-public abstract class BaseMarkupFilter extends BaseFilter {
-	private static final Logger logger = Logger.getLogger(BaseMarkupFilter.class.getName());
+public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
+	private static final Logger LOGGER = Logger.getLogger(AbstractBaseMarkupFilter.class.getName());
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
@@ -97,7 +101,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		Config.LoggerProvider = LoggerProvider.JAVA;
 	}
 
-	public BaseMarkupFilter() {
+	public AbstractBaseMarkupFilter() {
 		super();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
@@ -143,6 +147,7 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 	public void close() {
 		this.parameters = null;
 		this.document = null; // help Java GC
+		LOGGER.log(Level.FINE, getName() + " has been closed");
 	}
 
 	/*
@@ -164,33 +169,36 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			inputStream.reset();
 			return parsedInput;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Could not reset the input stream to it's start position", re);
+			throw re;
 		}
 	}
 
-	public void open (InputResource input) {
+	public void open(InputResource input) {
 		open(input, true);
+		LOGGER.log(Level.FINE, getName() + " has opened an input document");
 	}
-	
-	public void open (InputResource input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
+
+	/**
+	 * @throws BadFilterInputException
+	 * @throws OkapiIOException 
+	 */
+	public void open(InputResource input, boolean generateSkeleton) {
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
+		if (input.getInputCharSequence() != null) {
 			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
+		} else if (input.getInputURI() != null) {
 			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
+		} else if (input.getInputStream() != null) {
 			open(input.getInputStream());
-		}
-		else {
-			throw new RuntimeException("InputResource has no input defined.");
+		} else {
+			BadFilterInputException e = new BadFilterInputException("Input data not found when starting filter");
+			LOGGER.log(Level.SEVERE, e.toString());
+			throw e;
 		}
 	}
-	
+
 	private void open(CharSequence input) {
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
 		document = new Source(input);
@@ -208,18 +216,20 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
 			if (detectedEncoding == null && getEncoding() != null) {
-				detectedEncoding = getEncoding();
-				// TODO: do we warn that the detected encoding is different?
+				detectedEncoding = getEncoding();				
+				LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
 			} else if (getEncoding() == null) {
 				detectedEncoding = parsedHeader.getEncoding(); // get best guess
-				// TODO: do we warn that the detected encoding is different?
+				LOGGER.log(Level.WARNING, String.format("Default encoding not found. Using detected encoding (%2)", detectedEncoding));
 			}
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
 			bomis.detectEncoding(); // TODO: why do we need to call this?
 			document = new Source(new InputStreamReader(bomis, detectedEncoding));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
+			throw re;
 		}
 		startFilter();
 	}
@@ -228,9 +238,13 @@ public abstract class BaseMarkupFilter extends BaseFilter {
 		try {
 			open(inputURI.toURL().openStream());
 		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
+			BadFilterInputException re = new BadFilterInputException(e);
+			LOGGER.log(Level.SEVERE, "Filter could not open URI", re);
+			throw re;
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Filter could not open URI", re);
+			throw re;
 		}
 	}
 
