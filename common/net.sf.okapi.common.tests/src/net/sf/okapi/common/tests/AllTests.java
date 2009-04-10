@@ -18,30 +18,22 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.filterwriter;
+package net.sf.okapi.common.tests;
 
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
-import junit.framework.*;
+import net.sf.okapi.common.MemMappedCharSequence;
 
-public class GenericContentTest extends TestCase {
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-	public void testSimple () {
-		TextUnit tu = new TextUnit("tu1");
-		TextFragment tf = tu.getSourceContent();
-		GenericContent fmt = new GenericContent();
-		tf.append("t1");
-		tf.append(TagType.OPENING, "b1", "<b1>");
-		tf.append(TagType.OPENING, "b2", "<b2>");
-		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
-		tf.append("t2");
-		tf.append(TagType.CLOSING, "b2", "</b2>");
-		tf.append(TagType.CLOSING, "b1", "</b1>");
-		tf.append("t3");
-		assertEquals(tf.getCodes().size(), 5);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf).toString());
-		assertEquals("t1<b1><b2><x1/>t2</b2></b1>t3", fmt.toString(true));
-	}
-	
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.Test;
+
+@RunWith(Suite.class)
+@SuiteClasses({UtilTest.class, MemMappedCharSequence.class})
+public class AllTests {
+  public static Test suite() {
+    return new JUnit4TestAdapter(AllTests.class);
+  }
+
 }

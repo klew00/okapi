@@ -107,7 +107,7 @@ public class Util {
 	 * @param path Full path from where to extract the directory name. The path
 	 * can be a URL path (e.g. "/C:/test/file.ext").
 	 * @return The directory name (without the final separator), or an empty
-	 * string if p_sPath is a filename.
+	 * string if path is a filename.
 	 */
 	static public String getDirectoryName (String path) {
 		int n = path.lastIndexOf('/'); // Try generic first
@@ -435,8 +435,9 @@ public class Util {
 	/**
 	 * Gets the extension of a given path or filename.
 	 * @param path The original path or filename.
-	 * @return The last extension of the filename (including the period), or an empty string if the filename
-	 * ends with a period, or null if there is no period in the filename.
+	 * @return The last extension of the filename (including the period),
+	 * or null if there is no period in the filename. If the filename ends with
+	 * a period, the return is a period.
 	 */
 	static public String getExtension (String path) {
 		// Get the extension
@@ -632,7 +633,7 @@ public class Util {
 	public static int getPercentage (int part,
 		int total)
 	{
-		return Math.round((float)part/(float)((total==0)?1:total)*100);
+		return (total==0 ? 1 : Math.round((float)part / (float)total*100));
 	}
 
 	/**
