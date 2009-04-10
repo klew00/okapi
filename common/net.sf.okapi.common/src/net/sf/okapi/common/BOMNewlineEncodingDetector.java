@@ -266,7 +266,7 @@ public final class BOMNewlineEncodingDetector {
 		// No Unicode Byte Order Mark found.  Have to start guessing.
 		definitive=false;
 		
-		LOGGER.log(Level.WARNING, "BOM not found trying to guess document encoding.");
+		LOGGER.log(Level.WARNING, "BOM not found. Now trying to guess document encoding.");
 		
 		// The best we can do is to provide an encoding that reflects the correct number and ordering of bytes for characters in the ASCII range.
 		// The result will be one of ISO_8859_1, EBCDIC, UTF_16BE, UTF_16LE, UTF_32BE or UTF_32LE.
