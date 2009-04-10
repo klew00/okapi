@@ -19,11 +19,17 @@
 /*===========================================================================*/
 package net.sf.okapi.common.pipeline.tests;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Producer extends BasePipelineStep {	
+	
+	private static final Logger LOGGER = Logger.getLogger(Producer.class.getName());
+	
 	private int eventCount = -1;
 
 	public String getName() {
@@ -32,12 +38,12 @@ public class Producer extends BasePipelineStep {
 
 	@Override
 	public void postprocess() {	
-		System.out.println(getName() + " postprocess");
+		LOGGER.log(Level.FINEST, getName() + " postprocess");
 	}
 
 	@Override
 	public void preprocess() {
-		System.out.println(getName() + " preprocess");		
+		LOGGER.log(Level.FINEST, getName() + " preprocess");		
 	}
 
 	@Override

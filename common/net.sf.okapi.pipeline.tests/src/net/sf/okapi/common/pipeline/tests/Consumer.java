@@ -21,32 +21,38 @@
 package net.sf.okapi.common.pipeline.tests;
 
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class Consumer extends BasePipelineStep {
+	
+	private static final Logger LOGGER = Logger.getLogger(Consumer.class.getName());
+	
 	public String getName() {
 		return "Consumer";
 	}
 
 	@Override
-	public void postprocess() {
-		System.out.println(getName() + " postprocess");
+	public void postprocess() {		
+		LOGGER.log(Level.FINEST, getName() + " postprocess");
 	}
 
 	@Override
 	public void preprocess() {
-		System.out.println(getName() + " preprocess");
+		LOGGER.log(Level.FINEST, getName() + " preprocess");
 	}
 	
 	@Override
 	protected void handleTextUnit(Event event) {
-		System.out.println("EventType: " + event.getEventType().name());
+		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
 	}
 	
 	@Override
-	protected void handleInputResource(Event event) {
-		System.out.println("EventType: " + event.getEventType().name());
+	protected void handleInputResource(Event event) {		
+		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
 	}
 
 	public boolean hasNext() {
