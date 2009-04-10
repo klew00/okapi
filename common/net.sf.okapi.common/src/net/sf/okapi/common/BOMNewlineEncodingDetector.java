@@ -42,6 +42,10 @@ package net.sf.okapi.common;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
 /**
  * Helper class to detect byte-order-mark and some type of encodings, as well as
@@ -51,6 +55,8 @@ import java.nio.charset.*;
  * http://www.w3.org/TR/html401/charset.html#h-5.2
  */
 public final class BOMNewlineEncodingDetector {
+	
+	private static final Logger LOGGER = Logger.getLogger(BOMNewlineEncodingDetector.class.getName());
 	
 	public enum NewlineType {
 		CR {
@@ -143,12 +149,16 @@ public final class BOMNewlineEncodingDetector {
 				}
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "I/O Error getting newline type", re);
+			throw re;
 		} finally {
 			try {
 				inputStream.reset();
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE, "Could not reset the input stream to it's start position", re);
+				throw re;
 			}
 		}
 
@@ -255,6 +265,9 @@ public final class BOMNewlineEncodingDetector {
 		}
 		// No Unicode Byte Order Mark found.  Have to start guessing.
 		definitive=false;
+		
+		LOGGER.log(Level.WARNING, "BOM not found trying to guess document encoding.");
+		
 		// The best we can do is to provide an encoding that reflects the correct number and ordering of bytes for characters in the ASCII range.
 		// The result will be one of ISO_8859_1, EBCDIC, UTF_16BE, UTF_16LE, UTF_32BE or UTF_32LE.
 		// Assumes 00 bytes indicate multi-byte encodings rather than the presence of NUL characters or characters with a code that is a multiple of 0x100.

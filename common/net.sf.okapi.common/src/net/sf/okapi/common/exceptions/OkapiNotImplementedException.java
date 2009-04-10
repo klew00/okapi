@@ -1,4 +1,4 @@
-package net.sf.okapi.common;
+package net.sf.okapi.common.exceptions;
 
 public class OkapiNotImplementedException extends RuntimeException {
 

@@ -47,6 +47,12 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
 import java.security.AccessController;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
  * Represents the text from the {@linkplain Source source} document that is to
@@ -72,6 +78,9 @@ import java.security.AccessController;
  * {@link Source#getParseText()} method.
  */
 public final class MemMappedCharSequence implements CharSequence {
+	
+	private static final Logger LOGGER = Logger.getLogger(CharSequence.class.getName());
+	
 	private CharBuffer text;
 	private MappedByteBuffer byteBuffer;
 	private File tempUTF16BEfile;
@@ -126,7 +135,10 @@ public final class MemMappedCharSequence implements CharSequence {
 			createMemMappedCharBuffer(Channels.newChannel(new ReaderInputStream(inputSource, "UTF-16BE")), "UTF-16BE",
 					lowercase);
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			// UTF-16BE encoding should be supported on all Java VM's
+			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
+			LOGGER.log(Level.SEVERE, "UTF-16BE encoding not supported", re);
+			throw re;
 		}
 	}
 
@@ -174,7 +186,9 @@ public final class MemMappedCharSequence implements CharSequence {
 		try {
 			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding, lowercase);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Cannot open URL stream: " + inputSource.toString(), re);
+			throw re;
 		}
 	}
 
@@ -212,10 +226,14 @@ public final class MemMappedCharSequence implements CharSequence {
 				toLowercase();
 			}
 
-		} catch (FileNotFoundException fnfx) {
-			throw new RuntimeException(fnfx);
-		} catch (IOException iox) {
-			throw new RuntimeException(iox);
+		} catch (FileNotFoundException e) {
+			OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
+			LOGGER.log(Level.SEVERE, "Cannot create memory mapped file", re);
+			throw re;
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Cannot create memory mapped file", re);
+			throw re;
 		} finally {
 			if (tempUTF16BEfile != null)
 				tempUTF16BEfile.deleteOnExit();
@@ -717,7 +735,9 @@ public final class MemMappedCharSequence implements CharSequence {
 			// decode input bytes to output chars, pass EOF flag
 			result = decoder.decode(bb, cb, eof);
 			if (result.isError()) {
-				throw new RuntimeException(result.toString());
+				RuntimeException e = new RuntimeException(result.toString());
+				LOGGER.log(Level.SEVERE, "Cannot map byte to char using charset: " + charset.displayName(), e);
+				throw e;
 			}
 
 			// if output buffer is full, drain output
@@ -780,7 +800,9 @@ public final class MemMappedCharSequence implements CharSequence {
 					byteBuffer = null;
 					System.gc();
 				} catch (Exception e) {
-					throw new RuntimeException(e);
+					OkapiIOException re = new OkapiIOException(e);
+					LOGGER.log(Level.SEVERE, "Cannot close memory mapped file", re);
+					throw re;
 				}
 				return null;
 			}
