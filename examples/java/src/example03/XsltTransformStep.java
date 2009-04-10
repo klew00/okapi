@@ -3,6 +3,7 @@ package example03;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.Reader;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -39,7 +40,7 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
 
 		// get the input xml and xslt streams
-		InputStream XmlInput = ((InputResource)event.getResource()).getInputStream(); 
+		Reader XmlInput = ((InputResource)event.getResource()).getReader(); 
 				
 		Source xmlSource = new StreamSource(XmlInput);
 		Source xsltSource = new StreamSource(xstlInputstream);
