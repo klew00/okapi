@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.OkapiNotImplementedException;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
