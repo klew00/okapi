@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -336,4 +337,45 @@ public class FilterTestDriver {
 		writer.close();
 		return tmp.toString();
 	}
+
+	/**
+	 * Gets the Nth text unit found in the given list of events.
+	 * @param list The list of events
+	 * @param tuNumber The number of the unit to return: 1 for the first one, 2 for the second, etc.
+	 * @return The text unit found, or null.
+	 */
+	public static TextUnit getTextUnit (ArrayList<Event> list,
+		int tuNumber)
+	{
+		int n = 0;
+		for (Event event : list) {
+			if ( event.getEventType() == EventType.TEXT_UNIT ) {
+				if ( ++n == tuNumber ) {
+					return (TextUnit)event.getResource();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the Nth group found in the given list of events.
+	 * @param list The list of events
+	 * @param tuNumber The number of the group to return: 1 for the first one, 2 for the second, etc.
+	 * @return The group found, or null.
+	 */
+	public static StartGroup getGroup (ArrayList<Event> list,
+		int tuNumber)
+	{
+		int n = 0;
+		for (Event event : list) {
+			if ( event.getEventType() == EventType.START_GROUP ) {
+				if ( ++n == tuNumber ) {
+					return (StartGroup)event.getResource();
+				}
+			}
+		}
+		return null;
+	}
+
 }

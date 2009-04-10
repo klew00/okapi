@@ -27,12 +27,16 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class POFilterTest {
 	
@@ -44,34 +48,43 @@ public class POFilterTest {
 	}
 
 	@Test
-	public void optionLineTest () {
+	public void testOuputOptionLine_JustFormat () {
 		String snippet = "#, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
 		assertEquals(result, snippet);
+	}
 		
-		snippet = "#, c-format, fuzz\n"
+	@Test
+	public void testOuputOptionLine_FormatFuzzy () {
+		String snippet = "#, c-format, fuzzy\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
 		assertEquals(result, snippet);
+	}
 		
-		snippet = "#, fuzzy, c-format\n"
+	@Test
+	public void testOuputOptionLine_FuzyFormat () {
+		String snippet = "#, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
 		assertEquals(result, snippet);
+	}
 
-		snippet = "#, x-stuff, fuzzy, c-format\n"
+	@Test
+	public void testOuputOptionLine_StuffFuzyFormat () {
+		String snippet = "#, x-stuff, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
 		assertEquals(result, snippet);
 	}
 	
 	@Test
-	public void simpleTest () {
+	public void testOuputSimpleEntry () {
 		String snippet = "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
 		String expect = "msgid \"Text 1\"\n"
@@ -80,7 +93,7 @@ public class POFilterTest {
 	}
 	
 	@Test
-	public void noTransTest () {
+	public void testOuputAddTranslation () {
 		String snippet = "msgid \"Text 1\"\n"
 			+ "msgstr \"\"\n";
 		String expect = "msgid \"Text 1\"\n"
@@ -89,7 +102,84 @@ public class POFilterTest {
 	}
 	
 	@Test
-	public void externalFileTest () {
+	public void testTUEmptyIDEntry () {
+		String snippet = "msgid \"\"\n"
+			+ "msgstr \"Some stuff\"\n";
+		assertEquals(null, FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1));
+	}
+	
+	@Test
+	public void testTUCompleteEntry () {
+		String snippet = "#, fuzzy\n"
+			+ "#. Comment\n"
+			+ "#: Reference\n"
+			+ "# Translator note\n"
+			+ "#| Context\n"
+			+ "msgid \"Source\"\n"
+			+ "msgstr \"Target\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+
+		assertNotNull(tu);
+		assertEquals("Source", tu.getSource().toString());
+		assertEquals("Target", tu.getTarget("fr").toString());
+
+		assertTrue(tu.hasTargetProperty("fr", Property.APPROVED));
+		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertEquals("no", prop.getValue());
+		assertFalse(prop.isReadOnly());
+		
+		assertTrue(tu.hasProperty(Property.NOTE));
+		prop = tu.getProperty(Property.NOTE);
+		assertEquals("Comment", prop.getValue());
+		assertTrue(prop.isReadOnly());
+		
+		assertTrue(tu.hasProperty("references"));
+		prop = tu.getProperty("references");
+		assertEquals("Reference", prop.getValue());
+		assertTrue(prop.isReadOnly());
+
+		assertTrue(tu.hasProperty("transnote"));
+		prop = tu.getProperty("transnote");
+		assertEquals("Translator note", prop.getValue());
+		assertTrue(prop.isReadOnly());
+	}
+	
+	@Test
+	public void testTUPluralEntry_DefaultGroup () {
+		StartGroup sg = FilterTestDriver.getGroup(getEvents(makePluralEntry(), "en", "fr"), 1);
+		assertNotNull(sg);
+		assertEquals("x-gettext-plurals", sg.getType());
+	}
+
+	@Test
+	public void testTUPluralEntry_DefaultSingular () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), "en", "fr"), 1);
+		assertNotNull(tu);
+		assertEquals("untranslated-singular", tu.getSource().toString());
+		assertFalse(tu.hasTarget("fr"));
+	}
+
+	@Test
+	public void testTUPluralEntry_DefaultPlural () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), "en", "fr"), 2);
+		assertNotNull(tu);
+		assertEquals("untranslated-plural", tu.getSource().toString());
+		assertFalse(tu.hasTarget("fr"));
+	}
+	
+	@Test
+	public void testOuputPluralEntry () {
+		String snippet = makePluralEntry();
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String expected = "msgid \"untranslated-singular\"\n"
+			+ "msgid_plural \"untranslated-plural\"\n"
+			+ "msgstr[0] \"untranslated-singular\"\n"
+			+ "msgstr[1] \"untranslated-plural\"\n";
+		assertEquals(expected, result);
+	}
+		
+	@Test
+	public void testOuputExternalFile () {
 		POFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
@@ -124,5 +214,11 @@ public class POFilterTest {
 		return list;
 	}
 
-	
+	private String makePluralEntry () {
+		return "msgid \"untranslated-singular\"\n"
+			+ "msgid_plural \"untranslated-plural\"\n"
+			+ "msgstr[0] \"\"\n"
+			+ "msgstr[1] \"\"\n";
+	}
+
 }
