@@ -42,13 +42,13 @@ import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.filters.markupfilter.BaseMarkupFilter;
+import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class OpenXMLContentFilter extends BaseMarkupFilter {
+public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	
 	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.openxml");
 	
