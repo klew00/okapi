@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Stack;
@@ -41,11 +42,12 @@ public class XMLWriter {
 	private PrintWriter writer = null;
 	private boolean inStartTag;
 	private Stack<String> elements;
+	private StringWriter strWriter = null;
 
 	private final String lineBreak = System.getProperty("line.separator");
 
 	/**
-	 * Creates the new XML document.
+	 * Creates a new XML document on disk.
 	 * @param path The full path of the document to create. If any directory in the
 	 * path does not exists yet it will be created automatically. The document is 
 	 * always written in UTF-8.
@@ -64,7 +66,27 @@ public class XMLWriter {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * Creates a new XML document in a string.
+	 * Use the method {@link #getStringOutput()} to get the resulting string.
+	 */
+	public void create () {
+		strWriter = new StringWriter();
+		writer = new PrintWriter(strWriter);
+		inStartTag = false;
+		elements = new Stack<String>();
+	}
 
+	/**
+	 * Gets the string buffer of the XML document created with {@link #create()}.
+	 * @return The string buffer of the XML document created with {@link #create()}.
+	 */
+	public String getStringOutput () {
+		close();
+		return strWriter.toString();
+	}
+	
 	/**
 	 * Closes the writer and release any associated resources.
 	 */

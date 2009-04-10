@@ -9,6 +9,7 @@
  <command name="file.loadFromClipboard">&amp;Load From Clipboard</command>
  <command name="file.save" ctrl="1" key="S">&amp;Save&#x9;Ctrl+S</command>
  <command name="file.saveas">Save &amp;As...</command>
+ <command name="file.copyToClipboard">&amp;Copy To Clipboard</command>
  <command name="file.exit" alt="1" key="F4">E&amp;xit&#x9;Alt+F4</command>
 
  <!-- Tools menu -->

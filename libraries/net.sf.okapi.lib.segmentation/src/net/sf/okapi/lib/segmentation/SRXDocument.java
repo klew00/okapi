@@ -724,23 +724,50 @@ public class SRXDocument {
 		if (( list == null ) || ( list.getLength() < 1 )) return null;
 		return (Element)list.item(0);
 	}
-	
+
+	/**
+	 * Saves the current rules to an SRX string.
+	 * @param saveExtensions True to save Okapi SRX extensions, false to not save them.
+	 * @param saveNonValidInfo True to save non-SRX-valid attributes, false to not save them
+	 * @return The string containing the saved SRX rules.
+	 */
+	public String saveRulesToString (boolean saveExtensions,
+		boolean saveNonValidInfo)
+	{
+		XMLWriter writer = new XMLWriter();
+		writer.create();
+		boolean current = modified;
+		saveRules(writer, saveExtensions, saveNonValidInfo);
+		modified = current; // Keep the same state for modified
+		return writer.getStringOutput();
+	}
+
 	/**
 	 * Saves the current rules to an SRX rules file.
 	 * @param rulesPath The full path of the file where to save the rules.
+	 * @param saveExtensions True to save Okapi SRX extensions, false to not save them.
+	 * @param saveNonValidInfo True to save non-SRX-valid attributes, false to not save them
 	 */
 	public void saveRules (String rulesPath,
-		boolean saveRulesExtraInfo)
+		boolean saveExtensions,
+		boolean saveNonValidInfo)
 	{
-		XMLWriter writer = null;
+		XMLWriter writer = new XMLWriter();
+		writer.create(rulesPath);
+		saveRules(writer, saveExtensions, saveNonValidInfo);
+	}
+	
+	private void saveRules (XMLWriter writer,
+		boolean saveExtensions,
+		boolean saveNonValidInfo)
+	{
 		try {
-			writer = new XMLWriter();
-			writer.create(rulesPath);
 			writer.writeStartDocument();
-
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
-			writer.writeAttributeString("xmlns:"+NSPREFIX_OKPSRX, NSURI_OKPSRX);
+			if ( saveExtensions ) {
+				writer.writeAttributeString("xmlns:"+NSPREFIX_OKPSRX, NSURI_OKPSRX);
+			}
 			writer.writeAttributeString("version", "2.0");
 			version = "2.0";
 			writer.writeLineBreak();
@@ -765,24 +792,26 @@ public class SRXDocument {
 			writer.writeAttributeString("include", (includeIsolatedCodes ? "yes" : "no"));
 			writer.writeEndElementLineBreak(); // formathandle
 			
-			writer.writeStartElement(NSPREFIX_OKPSRX+":options");
-			writer.writeAttributeString("oneSegmentIncludesAll",
-				(oneSegmentIncludesAll ? "yes" : "no"));
-			writer.writeAttributeString("trimLeadingWhitespaces",
-				(trimLeadingWS ? "yes" : "no"));
-			writer.writeAttributeString("trimTrailingWhitespaces",
-				(trimTrailingWS ? "yes" : "no"));
-			writer.writeEndElementLineBreak(); // okpsrx:options
+			if ( saveExtensions ) {
+				writer.writeStartElement(NSPREFIX_OKPSRX+":options");
+				writer.writeAttributeString("oneSegmentIncludesAll",
+					(oneSegmentIncludesAll ? "yes" : "no"));
+				writer.writeAttributeString("trimLeadingWhitespaces",
+					(trimLeadingWS ? "yes" : "no"));
+				writer.writeAttributeString("trimTrailingWhitespaces",
+					(trimTrailingWS ? "yes" : "no"));
+				writer.writeEndElementLineBreak(); // okpsrx:options
 
-			writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
-			writer.writeAttributeString("language", getSampleLanguage());
-			writer.writeAttributeString("useMappedRules", (testOnSelectedGroup() ? "no" : "yes"));
-			writer.writeString(getSampleText());
-			writer.writeEndElementLineBreak(); // okpsrx:sample
+				writer.writeStartElement(NSPREFIX_OKPSRX+":sample");
+				writer.writeAttributeString("language", getSampleLanguage());
+				writer.writeAttributeString("useMappedRules", (testOnSelectedGroup() ? "no" : "yes"));
+				writer.writeString(getSampleText());
+				writer.writeEndElementLineBreak(); // okpsrx:sample
 			
-			writer.writeStartElement(NSPREFIX_OKPSRX+":rangeRule");
-			writer.writeString(getMaskRule());
-			writer.writeEndElementLineBreak(); // okpsrx:rangeRule
+				writer.writeStartElement(NSPREFIX_OKPSRX+":rangeRule");
+				writer.writeString(getMaskRule());
+				writer.writeEndElementLineBreak(); // okpsrx:rangeRule
+			}
 
 			writer.writeEndElementLineBreak(); // header
 
@@ -800,7 +829,7 @@ public class SRXDocument {
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
 					// Start of non-standard SRX 2.0 (non-SRX attributes not allowed)
-					if ( saveRulesExtraInfo ) {
+					if ( saveExtensions && saveNonValidInfo ) {
 						writer.writeAttributeString(NSPREFIX_OKPSRX+":active", (rule.isActive ? "yes" : "no"));
 					}
 					// End of non-Standard SRX

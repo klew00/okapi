@@ -43,6 +43,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -487,6 +488,14 @@ public class SRXEditor {
             }
 		});
 
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.copyToClipboard"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				copySRXDocumentToClipboard();
+            }
+		});
+		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -852,6 +861,27 @@ public class SRXEditor {
 		}
 	}
 	
+	private void copySRXDocumentToClipboard () {
+		if ( !srxDoc.getVersion().equals("2.0") ) { //$NON-NLS-1$
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setText(shell.getText());
+			dlg.setMessage(Res.getString("edit.saveDocVersionWarning")); //$NON-NLS-1$
+			if ( dlg.open() != SWT.YES ) return;
+		}
+		getSurfaceData();
+		Clipboard clipboard = null;
+		try {
+			clipboard = new Clipboard(shell.getDisplay());
+			TextTransfer textTransfer = TextTransfer.getInstance();
+			// Save, but not the rules extra info: active/non-active (not standard) 
+			clipboard.setContents(new String[]{srxDoc.saveRulesToString(false, false)},
+				new Transfer[]{textTransfer});
+		}
+		finally {
+			if ( clipboard != null ) clipboard.dispose();
+		}
+	}
+	
 	private boolean saveSRXDocument (String path) {
 		try {
 			if ( !srxDoc.getVersion().equals("2.0") ) { //$NON-NLS-1$
@@ -868,7 +898,7 @@ public class SRXEditor {
 			}
 			getSurfaceData();
 			// Save, but not the rules extra info: active/non-active (not standard) 
-			srxDoc.saveRules(path, false);
+			srxDoc.saveRules(path, true, false);
 			srxPath = path;
 			updateCaption();
 		}
