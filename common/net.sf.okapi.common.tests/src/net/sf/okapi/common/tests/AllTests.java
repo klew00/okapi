@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.tests;
 
-import net.sf.okapi.common.MemMappedCharSequence;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -30,7 +28,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses({UtilTest.class, MemMappedCharSequence.class})
+@SuiteClasses({UtilTest.class, MemMappedCharSequenceTest.class})
 public class AllTests {
   public static Test suite() {
     return new JUnit4TestAdapter(AllTests.class);

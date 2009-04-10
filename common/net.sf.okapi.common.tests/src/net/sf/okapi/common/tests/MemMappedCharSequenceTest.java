@@ -6,22 +6,15 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.MemMappedCharSequence;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MemMappedCharSequenceTest {
 	private MemMappedCharSequence charSequence;
 	
-	@Before
-	public void setUp() throws Exception {
+	public MemMappedCharSequenceTest() {	
 	}
-
-	@After
-	public void tearDown() {
-	}
-
+	
 	@Test
 	public void testString() {
 		String testString = "This is a test of the in memory string handling";
@@ -51,20 +44,6 @@ public class MemMappedCharSequenceTest {
 		InputStream in = new FileInputStream("/OKAPI/common/net.sf.okapi.common.tests/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
-		charSequence.close();
-	}
-	
-	//@Test
-	public void testStressTest() throws FileNotFoundException {
-		long before = System.currentTimeMillis(); // Start timing
-
-		InputStream in = new FileInputStream("D:/OKAPI/net.sf.okapi.common.tests/src/testfiles/test_large.txt");
-		charSequence = new MemMappedCharSequence(in, "UTF-16LE");				
-		
-		long  after = System.currentTimeMillis(); // End timing
-		long fastTime = after - before;
-		System.out.println("Speed " + fastTime + " ms.");
-		
 		charSequence.close();
 	}
 }
