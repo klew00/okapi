@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.html;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -43,17 +44,14 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends AbstractBaseMarkupFilter {
 
-	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.html");
-	
+	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
+
 	private StringBuilder bufferedWhitespace;
 
-	/* HTML whitespace
-	 * space (U+0020) 
-	 * tab (U+0009) 
-	 * form feed (U+000C) 
-	 * line feed (U+000A)
-	 * carriage return (U+000D) 
-	 * zero-width space (U+200B) (IE6 does not recognize these, they are treated as unprintable characters)
+	/*
+	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
+	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
+	 * recognize these, they are treated as unprintable characters)
 	 */
 	private static final String HTML_WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
 	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
@@ -64,28 +62,33 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		setMimeType("text/html");
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
-	
+
 	/**
-	 * Initialize parameters, rule state and parser. Called before processing of each input.
+	 * Initialize parameters, rule state and parser. Called before processing of
+	 * each input.
 	 */
 	@Override
-	protected void startFilter() {		
+	protected void startFilter() {
 		super.startFilter();
 		setPreserveWhitespace(false);
+		if (getConfig().collapseWhitespace()) {
+			LOGGER.log(Level.WARNING,
+					"By default the HTML filter will collapse whitespace unless overridden in the configuration");
+		}
 	}
 
 	@Override
 	protected void handleCdataSection(Tag tag) {
-		addToDocumentPart(tag.toString());		
+		addToDocumentPart(tag.toString());
 	}
 
 	@Override
 	protected void preProcess(Segment segment) {
 		boolean isInsideTextRun = false;
 		if (segment instanceof Tag) {
-			isInsideTextRun = getConfig().getMainRuleType(((Tag)segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+			isInsideTextRun = getConfig().getMainRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
 		}
-		
+
 		// add buffered whitespace to the current translatable text
 		if (bufferedWhitespace.length() > 0 && isInsideTextRun) {
 			if (canStartNewTextUnit()) {
@@ -95,13 +98,13 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			}
 		} else if (bufferedWhitespace.length() > 0) {
 			// otherwise add it as non-translatable
-			addToDocumentPart(bufferedWhitespace.toString());			
+			addToDocumentPart(bufferedWhitespace.toString());
 		}
 		// reset buffer for next pass
 		bufferedWhitespace.setLength(0);
-		bufferedWhitespace.trimToSize();		
+		bufferedWhitespace.trimToSize();
 	}
-	
+
 	@Override
 	protected void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
@@ -116,20 +119,21 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
 			if (bufferedWhitespace.length() <= 0) {
-				// buffer the whitespace until we know that we are not inside translatable text.
-				bufferedWhitespace.append(text.toString());				
-			} 
+				// buffer the whitespace until we know that we are not inside
+				// translatable text.
+				bufferedWhitespace.append(text.toString());
+			}
 			return;
 		}
 
-		String decodedText = text.toString();	
+		String decodedText = text.toString();
 		decodedText = CharacterReference.decode(text.toString(), false);
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedText = collapseWhitespace(decodedText);
-		}		
+		}
 		decodedText = Util.normalizeNewlines(decodedText);
 
 		if (canStartNewTextUnit()) {
@@ -138,16 +142,16 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			addToTextUnit(decodedText);
 		}
 	}
-	
+
 	@Override
-	protected void endTextUnit() {		
-		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {			
+	protected void endTextUnit() {
+		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			Event e = peekMostRecentTextUnit();
-			TextUnit tu = (TextUnit)e.getResource();
-			tu.getSourceContent().trim();	
-		}			
-		
-		super.endTextUnit();		
+			TextUnit tu = (TextUnit) e.getResource();
+			tu.getSourceContent().trim();
+		}
+
+		super.endTextUnit();
 	}
 
 	private String collapseWhitespace(String text) {
@@ -202,8 +206,9 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().pushGroupRule(startTag.getName());
-			
-			// catch tags which are not listed in the config but have attributes that require processing
+
+			// catch tags which are not listed in the config but have attributes
+			// that require processing
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startGroup(new GenericSkeleton(startTag.toString()), startTag.getName(), propertyTextUnitPlaceholders);
 			} else {
@@ -213,8 +218,9 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().pushExcludedRule(startTag.getName());
-			
-			// catch tags which are not listed in the config but have attributes that require processing
+
+			// catch tags which are not listed in the config but have attributes
+			// that require processing
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
@@ -225,7 +231,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			break;
 		case INCLUDED_ELEMENT:
 			getRuleState().pushIncludedRule(startTag.getName());
-			
+
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
@@ -237,7 +243,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			break;
 		case TEXT_UNIT_ELEMENT:
 			getRuleState().pushTextUnitRule(startTag.getName());
-			
+
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startTextUnit(new GenericSkeleton(startTag.toString()), propertyTextUnitPlaceholders);
@@ -247,9 +253,9 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-			
+
 			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-			
+
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
@@ -259,7 +265,8 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			}
 			break;
 		default:
-			// catch tags which are not listed in the config but have attributes that require processing
+			// catch tags which are not listed in the config but have attributes
+			// that require processing
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
@@ -317,7 +324,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		case PRESERVE_WHITESPACE:
 			getRuleState().popPreserverWhitespaceRule();
 			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-			
+
 			addToDocumentPart(endTag.toString());
 			break;
 		default:
@@ -449,14 +456,14 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 					mainEndPos, valueStartPos, valueEndPos);
 		}
 
-		// convert all entities to Unicode		
+		// convert all entities to Unicode
 		String decodedValue = CharacterReference.decode(value, true);
-		
+
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedValue = collapseWhitespace(decodedValue);
 		}
 		decodedValue = Util.normalizeNewlines(decodedValue);
-		
+
 		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
 	}
 
