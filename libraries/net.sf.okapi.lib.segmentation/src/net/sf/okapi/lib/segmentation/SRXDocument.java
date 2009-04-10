@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.segmentation;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
@@ -516,19 +518,45 @@ public class SRXDocument {
 	
 	/**
 	 * Loads an SRX rules file.
+	 * @param data The character sequence to load.
+	 * The rules can be embedded inside another vocabulary.
+	 */
+	public void loadRules (CharSequence data) {
+		loadRules(data, 1);
+		modified = true;
+	}
+	
+	/**
+	 * Loads an SRX rules file.
 	 * @param pathOrURL The full path or URL of the rules file to load.
 	 * The rules can be embedded inside another vocabulary.
 	 */
 	public void loadRules (String pathOrURL) {
+		loadRules(pathOrURL, 0);
+	}			
+			
+	public void loadRules (Object input,
+		int inputType )
+	{
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Fact.setNamespaceAware(true);
-			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
+			DocumentBuilder docBuilder;
+			docBuilder = Fact.newDocumentBuilder();
 			docBuilder.setEntityResolver(new DefaultEntityResolver());
-			Document doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
+
+			Document doc;
+			if ( inputType == 0 ) {
+				String pathOrURL = (String)input;
+				doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
+			}
+			else {
+				CharSequence data = (CharSequence)input;
+				doc = docBuilder.parse(new InputSource(new StringReader(data.toString())));
+			}
+
 			resetAll();
-			
 			XPathFactory xpathFac = XPathFactory.newInstance();
 			XPath xpath = xpathFac.newXPath();
 			NSContextManager nsContext = new NSContextManager();

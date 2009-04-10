@@ -48,12 +48,9 @@ public class Utility extends BaseFilterDrivenUtility {
 	private Segmenter targetSeg;
 	private QueryManager qm;
 	private String resolvedOutputDir;
-	private int segDocCount;
-	private int segTotalCount;
-	private int exactDocCount;
-	private int fuzzyDocCount;
-	private int exactTotalCount;
-	private int fuzzyTotalCount;
+	private HTMLReporter htmlRpt;
+	
+	private static final String HTML_REPORT_NAME = "report.html";
 	
 	public Utility () {
 		params = new Parameters();
@@ -78,7 +75,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				new GenericSkeletonWriter());
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
-	
+		
 		// Load SRX file(s) and create segmenters if required
 		if ( params.preSegment ) {
 			String src = params.sourceSRX.replace(VAR_PROJDIR, projectDir);
@@ -107,11 +104,13 @@ public class Utility extends BaseFilterDrivenUtility {
 		Util.deleteDirectory(resolvedOutputDir, false);
 		
 		id = 0;
+		String pkgId = params.makePackageID();
 		writer.setInformation(srcLang, trgLang,
-			"TODO:projectID", resolvedOutputDir, params.makePackageID(), inputRoot);
+			"TODO:projectID", resolvedOutputDir, pkgId, inputRoot);
 		writer.writeStartPackage();
-		
-		segTotalCount = exactTotalCount = fuzzyTotalCount = 0;
+
+		htmlRpt = new HTMLReporter();
+		htmlRpt.create(resolvedOutputDir+File.separator+HTML_REPORT_NAME);
 	}
 
 	public void postprocess () {
@@ -123,17 +122,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.close();
 			qm = null;
 		}
-		
-		// Statistics
-		logger.info(String.format("\nTotal exact matches = %d (%3d%%)", exactTotalCount,
-			Util.getPercentage(exactTotalCount, segTotalCount)));
-		logger.info(String.format("Total Fuzzy matches = %d (%3d%%)", fuzzyTotalCount,
-			Util.getPercentage(fuzzyTotalCount, segTotalCount)));
-		int n = segTotalCount-(exactTotalCount+fuzzyTotalCount);
-		logger.info(String.format("Total No matches = %d (%3d%%)", n,
-			Util.getPercentage(n, segTotalCount)));
-		logger.info(String.format("Total segments = %d", segTotalCount));
-		
+		if ( htmlRpt != null ) {
+			htmlRpt.close();
+			htmlRpt = null;
+		}
 	}
 	
 	public IParameters getParameters () {
@@ -171,17 +163,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			processStartDocument((StartDocument)event.getResource());
 			break;
 		case END_DOCUMENT:
-			segTotalCount += segDocCount;
-			exactTotalCount += exactDocCount;
-			fuzzyTotalCount += fuzzyDocCount;
-			logger.info(String.format("Exact matches = %d (%3d%%)", exactDocCount,
-				Util.getPercentage(exactDocCount, segDocCount)));
-			logger.info(String.format("Fuzzy matches = %d (%3d%%)", fuzzyDocCount,
-				Util.getPercentage(fuzzyDocCount, segDocCount)));
-			int n = segDocCount-(exactDocCount+fuzzyDocCount);
-			logger.info(String.format("No matches = %d (%3d%%)", n,
-				Util.getPercentage(n, segDocCount)));					
-			logger.info(String.format("Segments = %d", segDocCount));
+			htmlRpt.endDocument();
 			break;
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
@@ -204,7 +186,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
     private void processStartDocument (StartDocument resource) {
-    	segDocCount = exactDocCount = fuzzyDocCount = 0;
+		htmlRpt.startDocument(getInputPath(0));
 		if (( qm != null ) && params.useFileName ) {
 			qm.setAttribute("FileName", Util.getFilename(getInputPath(0), true));
 		}
@@ -241,7 +223,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		// Compute the statistics
-		segDocCount += tu.getSource().getSegmentCount();
+		int n = tu.getSource().getSegmentCount();
+		htmlRpt.addSegmentCount(n==0 ? 1 : n);
 
 		// Leverage if requested
 		if ( qm != null ) {
@@ -256,8 +239,8 @@ public class Utility extends BaseFilterDrivenUtility {
 				ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
 				if ( scores != null ) {
 					for ( int score : scores.getList() ) {
-						if ( score > 99 ) exactDocCount++;
-						else if ( score != 0 ) fuzzyDocCount++;
+						if ( score > 99 ) htmlRpt.addExactMatch(1);
+						else if ( score != 0 ) htmlRpt.addFuzzyMatch(1);
 					}
 				}
 			}

@@ -65,15 +65,23 @@ public class PropertiesFilterTest {
 	}
 
 	@Test
-	public void lineBreaksTest () {
+	public void crLineBreaksTest () {
 		String snippet = "Key1=Text1\rKey2=Text2\r";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
-		snippet = "Key1=Text1\r\nKey2=Text2\r\n";
-		result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+	}
+
+	@Test
+	public void crAndLfLineBreaksTest () {
+		String snippet = "Key1=Text1\r\nKey2=Text2\r\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
-		snippet = "Key1=Text1\n\n\nKey2=Text2\n";
-		result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+	}
+	
+	@Test
+	public void lfLineBreaksTest () {
+		String snippet = "Key1=Text1\n\n\nKey2=Text2\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
 	}
 	

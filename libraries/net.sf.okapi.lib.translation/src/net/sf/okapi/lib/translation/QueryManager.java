@@ -178,7 +178,7 @@ public class QueryManager {
 	}
 	
 	/**
-	 * Reset the current result to the first one if there is one.
+	 * Resets the current result to the first one if there is one.
 	 */
 	public void rewind () {
 		if ( results.size() > 0 ) current = 0;

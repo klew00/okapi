@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,41 +18,22 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.rainbow.packages.rtf;
+package net.sf.okapi.applications.rainbow.lib;
 
-import net.sf.okapi.applications.rainbow.packages.IReader;
-import net.sf.okapi.common.resource.InputResource;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.rtf.RTFFilter;
+public interface IAnalysisReporter {
 
-public class Reader implements IReader {
-
-	private InputResource res;
-	private RTFFilter filter;
+	public void create (String path);
 	
-	public void closeDocument () {
-		if ( filter != null ) {
-			filter.close();
-			filter = null;
-		}
-	}
+	public void close ();
 
-	public TextUnit getItem () {
-		return null;
-	}
-
-	public void openDocument (String path,
-		String sourceLanguage,
-		String targetLanguage)
-	{
-		closeDocument();
-		filter = new RTFFilter();
-		res = new InputResource("windows-1252", sourceLanguage);
-		res.setTargetLanguage(targetLanguage);
-	}
-
-	public boolean readItem () {
-		return false;
-	}
-
+	public void startDocument (String path);
+	
+	public void endDocument ();
+	
+	public void addExactMatch (int value);
+	
+	public void addFuzzyMatch (int value);
+	
+	public void addSegmentCount (int value);
+	
 }

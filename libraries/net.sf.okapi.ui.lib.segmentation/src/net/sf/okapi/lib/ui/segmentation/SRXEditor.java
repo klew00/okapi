@@ -41,6 +41,9 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
@@ -448,11 +451,21 @@ public class SRXEditor {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				loadSRXDocument(null);
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.loadFromClipboard"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				loadSRXDocumentfromClipboard();
             }
 		});
 
@@ -769,9 +782,49 @@ public class SRXEditor {
 		return true;
 	}
 	
+	private void loadSRXDocumentfromClipboard () {
+		try {
+			if ( !checkIfRulesNeedSaving() ) return;
+			getSurfaceData(); // To get back the original data in case of escape: 
+
+			// Get the data types available in the Clipboard
+			Clipboard clipboard = new Clipboard(shell.getDisplay());
+	        TransferData[] transferDatas = clipboard.getAvailableTypes();
+	        boolean found = false;
+	        for(int i=0; i<transferDatas.length; i++) {
+	        	if ( TextTransfer.getInstance().isSupportedType(transferDatas[i]) ) {
+	        		found = true;
+	        		break;
+	        	}
+	        }
+	        // Do nothing if there is no simple text available
+	        if ( !found ) return;
+
+	        // Load the file from the text in the Clipboard
+			srxDoc.loadRules((CharSequence)clipboard.getContents(TextTransfer.getInstance()));
+			
+			if ( srxDoc.hasWarning() ) {
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING | SWT.YES | SWT.CANCEL);
+				dlg.setText(shell.getText());
+				dlg.setMessage(srxDoc.getWarning());
+				dlg.open();
+			}
+			srxPath = null; // No path
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+		finally {
+			updateCaption();
+			updateAll();
+		}
+	}
+	
 	private void loadSRXDocument (String path) {
 		try {
+			if ( !checkIfRulesNeedSaving() ) return;
 			getSurfaceData(); // To get back the original data in case of escape: 
+			
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell,
 					Res.getString("edit.loadDocCaption"), //$NON-NLS-1$

@@ -152,7 +152,6 @@ extracted text:</p>
 	<a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html#preserveWhitespaces()">preserveWhitespaces()</a></code> indicates if the white spaces inside the 
 	content of the text unit must be preserved (for example, as the content of a 
 	HTML <code>&lt;pre&gt;</code> element).</li>
-	<li>TESTvvvvvvvv</li>
 </ul>
 
 <h2><a name="languages"></a>Languages</h2>
@@ -248,7 +247,7 @@ set to false (including for other UTF encodings). Both parameters are set using 
 <p>The encoding of an output generate by a writer (<code><a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html">IFilterWriter</a></code> object) is 
 not necessarily the same as the input encoding. The encoding to use is set by 
 the caller through the <code>
-<a href="../javadoc/net/sf/okapi/common/filters/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOption()</a></code> method. If the output encoding specified by that method is 
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOption()</a></code> method. If the output encoding specified by that method is 
 <code>null</code>, the 
 filter should use the same encoding as the input document.</p>
 <p>The writer should create the output document only when 
@@ -277,7 +276,7 @@ type of line-break to use is the one of the current platform.</p>
 <p>The writer must not change the type of line-break of a document. The original 
 type of line-break is available in the <code>
 <a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
-	resource (<code><a href=",,/javadoc/net/sf/okapi/common/resource/StartDocument.html#getLineBreak()">StartDocument.getLineBreak()</a></code>).</p>
+	resource (<code><a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLineBreak()">StartDocument.getLineBreak()</a></code>).</p>
 <p>The reason for always using the original line-breaks in the output when using 
 the filters is that the writer cannot change the line-breaks in the skeleton 
 parts, so if different types of line-breaks are used in the skeleton and in the 
