@@ -20,6 +20,7 @@ public class TaggedFilterConfiguration {
 	private static final String EXCLUDE = "EXCLUDE";
 	private static final String INCLUDE = "INCLUDE";
 	private static final String TEXTUNIT = "TEXTUNIT";
+	private static final String TEXTRUN = "TEXTRUN";
 	private static final String PRESERVE_WHITESPACE = "PRESERVE_WHITESPACE";
 	private static final String SCRIPT = "SCRIPT";
 	private static final String SERVER = "SERVER";
@@ -35,7 +36,7 @@ public class TaggedFilterConfiguration {
 	private static final String ELEMENT_TYPE = "elementType";
 
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
+		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
 	};
 
 	private YamlConfigurationReader configReader;
@@ -72,6 +73,8 @@ public class TaggedFilterConfiguration {
 			return RULE_TYPE.INCLUDED_ELEMENT;
 		} else if (ruleType.equals(TEXTUNIT)) {
 			return RULE_TYPE.TEXT_UNIT_ELEMENT;
+		} else if (ruleType.equals(TEXTRUN)) {
+			return RULE_TYPE.TEXT_RUN_ELEMENT;
 		} else if (ruleType.equals(PRESERVE_WHITESPACE)) {
 			return RULE_TYPE.PRESERVE_WHITESPACE;
 		} else if (ruleType.equals(SCRIPT)) {
