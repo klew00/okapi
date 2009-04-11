@@ -37,6 +37,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -98,7 +100,7 @@ public class PropertiesFilter implements IFilter {
 			parseState = 0;
 		}
 		catch ( IOException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -175,7 +177,7 @@ public class PropertiesFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -189,7 +191,7 @@ public class PropertiesFilter implements IFilter {
 			commonOpen(new InputStreamReader(input, encoding));
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -199,7 +201,7 @@ public class PropertiesFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -465,7 +467,7 @@ public class PropertiesFilter implements IFilter {
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 

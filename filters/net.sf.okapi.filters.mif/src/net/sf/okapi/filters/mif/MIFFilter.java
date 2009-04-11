@@ -32,7 +32,11 @@ import java.util.LinkedList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -102,7 +106,7 @@ public class MIFFilter implements IFilter {
 			hasNext = false;
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -141,7 +145,7 @@ public class MIFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -182,7 +186,7 @@ public class MIFFilter implements IFilter {
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiUnsupportedEncodingException(e);
 		}
 	}
 	
@@ -192,7 +196,7 @@ public class MIFFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -296,7 +300,7 @@ public class MIFFilter implements IFilter {
 			queue.add(new Event(EventType.END_DOCUMENT, ending));
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 
 		// Else: we are done
@@ -354,7 +358,7 @@ public class MIFFilter implements IFilter {
 				skel.append((char)c);
 				return tagBuffer.toString();
 			case -1:
-				throw new RuntimeException("Unexpected end of input.");
+				throw new IllegalFilterOperationException("Unexpected end of input.");
 			default:
 				tagBuffer.append((char)c);
 				break;
@@ -376,7 +380,7 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// Else: Missing end of string error
-		throw new RuntimeException("End of string is missing.");
+		throw new IllegalFilterOperationException("End of string is missing.");
 	}
 	
 	String processString () throws IOException {
@@ -420,7 +424,7 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// Else: Missing end of string error
-		throw new RuntimeException("End of string is missing.");
+		throw new IllegalFilterOperationException("End of string is missing.");
 	}
 
 	private String guessEncoding (InputStream input) {

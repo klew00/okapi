@@ -37,6 +37,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -91,7 +93,7 @@ public class TmxFilter implements IFilter {
 			hasNext = false;
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -136,7 +138,7 @@ public class TmxFilter implements IFilter {
 			return queue.poll();		
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -149,10 +151,10 @@ public class TmxFilter implements IFilter {
 			case XMLStreamConstants.START_ELEMENT:
 				if( isStartGroupTag(reader.getLocalName())){
 					return processStartGroup();
-				}else if (isDocumentPartTag(reader.getLocalName())){
+				} else if (isDocumentPartTag(reader.getLocalName())){
 					boolean success = processDocumentPart();
 					if(!success){
-						throw new RuntimeException("Invalid Xml.");
+						throw new OkapiIOException("Invalid Xml.");
 					}else{
 						return true;
 					}
@@ -215,7 +217,7 @@ public class TmxFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -225,7 +227,7 @@ public class TmxFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -236,8 +238,8 @@ public class TmxFilter implements IFilter {
 	
 	private void open (InputStream input) {
 		try {
-			if ( srcLang == null ) throw new RuntimeException("Source language not set.");
-			if ( trgLang == null ) throw new RuntimeException("Target language not set.");
+			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
+			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
 			close();
 			canceled = false;			
 			
@@ -282,7 +284,7 @@ public class TmxFilter implements IFilter {
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -426,11 +428,11 @@ public class TmxFilter implements IFilter {
 					break;
 				default: 
 					//Todo--handle remaining cases
-				break;
+					break;
 				}
 			}
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		return false;
 	}
@@ -464,7 +466,7 @@ public class TmxFilter implements IFilter {
 			}
 			return false;
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}	
 	
@@ -517,7 +519,7 @@ public class TmxFilter implements IFilter {
 			}
 			return false;
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	
@@ -594,7 +596,7 @@ public class TmxFilter implements IFilter {
 				}
 			}
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		return false;		
 	}
@@ -638,7 +640,7 @@ public class TmxFilter implements IFilter {
 			}
 			return false;
 		} catch (XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 

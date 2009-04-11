@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
 import java.net.URLDecoder;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Shell;
@@ -201,6 +202,7 @@ public class CommandLine {
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);
+		logHandler.setLevel(Level.INFO);
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 		
 		lm = new LanguageManager();

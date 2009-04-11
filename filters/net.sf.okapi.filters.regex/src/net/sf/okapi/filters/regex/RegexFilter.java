@@ -36,6 +36,10 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -201,7 +205,7 @@ public class RegexFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -230,10 +234,10 @@ public class RegexFilter implements IFilter {
 			commonOpen(tmp.toString().replace(lineBreak, "\n"));
 		}
 		catch ( UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			throw new OkapiUnsupportedEncodingException(e);
 		}
 		catch ( IOException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		finally {
 			if ( reader != null ) {
@@ -241,7 +245,7 @@ public class RegexFilter implements IFilter {
 					reader.close();
 				}
 				catch ( IOException e ) {
-					throw new RuntimeException(e);
+					throw new OkapiIOException(e);
 				}
 			}
 		}
@@ -253,7 +257,7 @@ public class RegexFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -463,7 +467,7 @@ public class RegexFilter implements IFilter {
 			}
 			else { // Close group
 				if ( groupStack.size() == 0 ) {
-					throw new RuntimeException("Rule for closing a group detected, but no group is open.");
+					throw new IllegalFilterOperationException("Rule for closing a group detected, but no group is open.");
 				}
 				groupStack.pop();
 				Ending ending = new Ending(String.valueOf(++otherId));  
@@ -666,153 +670,6 @@ public class RegexFilter implements IFilter {
 		queue.add(new Event(EventType.TEXT_UNIT, tuRes));
 	}
 	
-	/*
-	private void processStrings (Rule rule,
-		String name,
-		String data)
-	{
-		int i = -1;
-		int startSearch = 0;
-		String mark = params.startString;
-		
-		while ( true  ) {
-			int j = 0;
-			int start = startSearch;
-			int end = -1;
-			int state = 0;
-
-			// Search string one by one
-			while ( end == -1 ) {
-				if ( ++i >= data.length() ) break;
-				
-				// Deal with \\, \" and \' escapes
-				if ( state > 0 ) {
-					if ( params.useBSlashEscape ) {
-						while ( data.codePointAt(i) == '\\' ) {
-							if ( i+2 < data.length() ) i += 2; // Now point to next
-							else throw new RuntimeException("Escape syntax error in ["+data+"]");
-						}
-					}
-				}
-			
-				// Check characters
-				switch ( state ) {
-				case 0:
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// Start of string match found, set search info for end
-							start = i+1; // Start of the string content
-							state = 2;
-							mark = params.endString;
-							j = 0;
-						}
-						else state = 1;
-					}
-					break;
-				case 1: // Look if we can finish a start match
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// Start of string match found, set search info for end
-							start = i+1; // Start of the string content
-							state = 2;
-							mark = params.endString;
-							j = 0;
-						}
-						// Else: keep moving
-					}
-					else { // Was not a match
-						state = 0;
-						i -= (j-1); // Go back just after the trigger
-						j = 0; // And reset the mark index
-					}
-					break;
-				case 2: // Look for an end mark
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// End of string match found
-							// Set the end of the string position (will stop the loop too)
-							end = i-j+1;
-							// Check for empty strings
-							if ( end == start ) {
-								end = -1;
-								state = 0;
-								j = 0;
-							}
-						}
-						else state = 3;
-					}
-					break;
-				case 3: // Look if we can finish an end match
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// End of string match found
-							// Set the end of the string position (will stop the loop too)
-							end = i-j+1;
-							// Check for empty strings
-							if ( end == start ) {
-								end = -1;
-								state = 0;
-								j = 0;
-							}
-						}
-						// Else: Keep moving
-					}
-					else { // Was not a match
-						state = 2;
-						i -= (j-1); // Go back just after the trigger
-						j = 0; // And reset the mark index
-					}
-					break;
-				}
-			} // End of while end == -1
-			
-			// If we have found a string: process it
-			if ( end != -1 ) {
-				// Skeleton part before
-				if ( start > startSearch ) {
-					addSkeletonToQueue(data.substring(startSearch, start), false);
-				}
-
-				// Item to extract
-				tuRes = new TextUnit(String.valueOf(++tuId),
-					data.substring(start, end));
-				tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
-				if ( rule.preserveWS ) {
-					tuRes.setPreserveWhitespaces(true);
-				}
-				else { // Unwrap the string
-					TextFragment.unwrap(tuRes.getSourceContent());
-				}
-				
-				if ( rule.useCodeFinder ) {
-					rule.codeFinder.process(tuRes.getSourceContent());
-				}
-
-				if ( name != null ) {
-					if ( rule.nameFormat.length() > 0 ) {
-						String tmp = rule.nameFormat.replace("<parentName>",
-							(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-						tuRes.setName(tmp.replace("<self>", name));
-					}
-					else tuRes.setName(name);
-				}
-				queue.add(new Event(EventType.TEXT_UNIT, tuRes));
-				// Reset the pointers: next skeleton will start from startSearch, end reset to -1
-				startSearch = end;
-			}
-
-			// Make sure we get out of the loop if needed
-			if ( i >= data.length() ) break;
-			
-		} // End of while true
-
-		// Skeleton part after the last string
-		if ( startSearch < data.length() ) {
-			addSkeletonToQueue(data.substring(startSearch), false);
-		}
-	}
-	*/
-	
 	private void processStrings (Rule rule,
 		MatchResult result)
 	{
@@ -837,7 +694,7 @@ public class RegexFilter implements IFilter {
 					if ( params.useBSlashEscape ) {
 						while ( data.codePointAt(i) == '\\' ) {
 							if ( i+2 < data.length() ) i += 2; // Now point to next
-							else throw new RuntimeException("Escape syntax error in ["+data+"]");
+							else throw new IllegalFilterOperationException("Escape syntax error in ["+data+"]");
 						}
 					}
 				}

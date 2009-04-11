@@ -39,6 +39,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -152,7 +156,7 @@ public class ODFFilter implements IFilter {
 			hasNext = false;
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -183,7 +187,7 @@ public class ODFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -217,7 +221,7 @@ public class ODFFilter implements IFilter {
 			hasNext = true;
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -227,7 +231,7 @@ public class ODFFilter implements IFilter {
 			open(new ByteArrayInputStream(input.toString().getBytes("UTF-8")));
 		}
 		catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			throw new OkapiUnsupportedEncodingException(e);
 		} 
 	}
 
@@ -237,7 +241,7 @@ public class ODFFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -353,7 +357,7 @@ public class ODFFilter implements IFilter {
 
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -543,7 +547,7 @@ public class ODFFilter implements IFilter {
 			case XMLStreamConstants.START_DOCUMENT:
 			case XMLStreamConstants.END_DOCUMENT:
 				// Should not occur
-				throw new RuntimeException("Invalid start or end document detected while processing inline element.");
+				throw new IllegalFilterOperationException("Invalid start or end document detected while processing inline element.");
 			}
 		}		
 	}

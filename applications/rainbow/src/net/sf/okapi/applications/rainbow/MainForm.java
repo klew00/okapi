@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
@@ -248,6 +249,7 @@ public class MainForm implements IParametersProvider {
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
 		logHandler = new LogHandler(log);
+		logHandler.setLevel(Level.INFO);
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
 		fa = new FilterAccess();

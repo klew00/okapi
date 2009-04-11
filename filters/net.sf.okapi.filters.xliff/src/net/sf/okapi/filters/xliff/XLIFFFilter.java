@@ -39,6 +39,9 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -109,7 +112,7 @@ public class XLIFFFilter implements IFilter {
 			hasNext = false;
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -154,7 +157,7 @@ public class XLIFFFilter implements IFilter {
 			return queue.poll();
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -177,7 +180,7 @@ public class XLIFFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -200,7 +203,7 @@ public class XLIFFFilter implements IFilter {
 			commonOpen(0, inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -208,8 +211,8 @@ public class XLIFFFilter implements IFilter {
 		Object obj)
 	{
 		try {
-			if ( srcLang == null ) throw new RuntimeException("Source language not set.");
-			if ( trgLang == null ) throw new RuntimeException("Target language not set.");
+			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
+			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
 			close();
 			canceled = false;
 
@@ -236,7 +239,7 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 			catch ( IOException e ) {
-				throw new RuntimeException(e);
+				throw new OkapiIOException(e);
 			}
 			finally {
 				if ( detector != null ) {
@@ -278,7 +281,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	
@@ -387,12 +390,12 @@ public class XLIFFFilter implements IFilter {
 		storeStartElement();
 		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		String tmp = reader.getAttributeValue("", "original");
-		if ( tmp == null ) throw new RuntimeException("Missing attribute 'original'.");
+		if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'original'.");
 		else startSubDoc.setName(tmp);
 		
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
-		if ( tmp == null ) throw new RuntimeException("Missing attribute 'source-language'.");
+		if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'source-language'.");
 		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
 			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
@@ -485,7 +488,7 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) tu.setIsTranslatable(tmp.equals("yes"));
 
 			tmp = reader.getAttributeValue("", "id");
-			if ( tmp == null ) throw new RuntimeException("Missing attribute 'id'.");
+			if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'id'.");
 			tu.setId(tmp);
 			
 			tmp = reader.getAttributeValue("", "resname");
@@ -588,7 +591,7 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		return false;
 	}
@@ -808,7 +811,7 @@ public class XLIFFFilter implements IFilter {
 			return content;
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -901,7 +904,7 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	
@@ -935,7 +938,7 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 

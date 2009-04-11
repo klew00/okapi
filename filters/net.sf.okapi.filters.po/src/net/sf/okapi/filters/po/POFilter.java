@@ -36,6 +36,9 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -119,7 +122,7 @@ public class POFilter implements IFilter {
 			parseState = 0;
 		}
 		catch ( IOException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -168,7 +171,7 @@ public class POFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -184,7 +187,7 @@ public class POFilter implements IFilter {
 			commonOpen(new InputStreamReader(bis, encoding));
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -195,7 +198,7 @@ public class POFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -311,7 +314,7 @@ public class POFilter implements IFilter {
 				try {
 					textLine = reader.readLine();
 				} catch ( IOException e ) {
-					throw new RuntimeException(e);
+					throw new OkapiIOException(e);
 				}
 				if ( textLine == null ) {
 					// No more lines
@@ -464,7 +467,7 @@ public class POFilter implements IFilter {
 		if ( textLine.indexOf("msgstr[") == 0 ) {
 			// Check if we are indeed in plural mode
 			if ( pluralMode == 0 ) {
-				throw new RuntimeException(Res.getString("extraPluralMsgStr"));
+				throw new IllegalFilterOperationException(Res.getString("extraPluralMsgStr"));
 			}
 			// Check if we reached the last plural form
 			// Note that PO files have at least 2 plural entries even if nplural=1
@@ -481,7 +484,7 @@ public class POFilter implements IFilter {
 			// Then proceed as a normal entry
 		}
 		else if ( pluralMode != 0 ) {
-			throw new RuntimeException(Res.getString("missingPluralMsgStr"));
+			throw new IllegalFilterOperationException(Res.getString("missingPluralMsgStr"));
 		}
 
 		// Get the message string
@@ -608,12 +611,12 @@ public class POFilter implements IFilter {
 			// Get opening quote
 			int nPos1 = textLine.indexOf('"');
 			if ( nPos1 == -1 ) {
-				throw new RuntimeException(Res.getString("missingStartQuote"));
+				throw new IllegalFilterOperationException(Res.getString("missingStartQuote"));
 			}
 			// Get closing quote
 			int nPos2 = textLine.lastIndexOf('"');
 			if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
-				throw new RuntimeException(Res.getString("missingEndQuote"));
+				throw new IllegalFilterOperationException(Res.getString("missingEndQuote"));
 			}
 			if ( forMsgID ) {
 				skel.append(textLine+lineBreak);
@@ -664,7 +667,7 @@ public class POFilter implements IFilter {
 		}
 		catch ( Throwable e ) {
 			//LogMessage(LogType.ERROR, E.Message + "\n" + E.StackTrace);
-			throw new RuntimeException(Res.getString("problemWithQuotes"));
+			throw new IllegalFilterOperationException(Res.getString("problemWithQuotes"));
 		}
 	}
 
@@ -753,7 +756,7 @@ public class POFilter implements IFilter {
 			return false;
 		}
  		catch ( IOException e ) {
- 			throw new RuntimeException(e);
+ 			throw new OkapiIOException(e);
 		}
  		finally {
  			buffer = null;

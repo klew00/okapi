@@ -40,6 +40,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -280,7 +284,7 @@ public class RTFFilter implements IFilter {
 			hasNext = false;
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -351,7 +355,7 @@ public class RTFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -373,7 +377,7 @@ public class RTFFilter implements IFilter {
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiUnsupportedEncodingException(e);
 		}
 	}
 
@@ -389,7 +393,7 @@ public class RTFFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -553,7 +557,7 @@ public class RTFFilter implements IFilter {
 						nState = 7;
 					}
 					else {
-						throw new RuntimeException("Expecting: '>' while parsing Trados markup.");
+						throw new IllegalFilterOperationException("Expecting: '>' while parsing Trados markup.");
 					}
 					break;
 
@@ -782,7 +786,7 @@ public class RTFFilter implements IFilter {
 			return TOKEN_CHAR;
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -994,7 +998,7 @@ public class RTFFilter implements IFilter {
 			}
 			else {
 				// Unexpected end of input
-				throw new RuntimeException("Unexcpected end of input.");
+				throw new IllegalFilterOperationException("Unexcpected end of input.");
 			}
 		}
 	}
@@ -1062,7 +1066,7 @@ public class RTFFilter implements IFilter {
 			}
 			else {
 				// Unexpected end of input
-				throw new RuntimeException("Unexcpected end of input.");
+				throw new IllegalFilterOperationException("Unexcpected end of input.");
 			}
 		}
 	}
@@ -1346,7 +1350,7 @@ public class RTFFilter implements IFilter {
 		case '_':
 			return TOKEN_CTRLWORD;
 		default: // Should not get here
-			throw new RuntimeException(String.format("Unknown control symbol '%c'", chCurrent));
+			throw new IllegalFilterOperationException(String.format("Unknown control symbol '%c'", chCurrent));
 		}
 	}
 

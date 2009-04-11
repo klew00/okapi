@@ -45,6 +45,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class SRXDocument {
@@ -594,7 +595,7 @@ public class SRXDocument {
 				version = tmp;
 				warning = null;
 			}
-			else throw new RuntimeException("Invalid version.");
+			else throw new OkapiIOException("Invalid version value.");
 			
 			Element elem1 = getFirstElementByTagNameNS(ns, "header", srxElem);
 			tmp = elem1.getAttribute("segmentsubflows");
@@ -695,16 +696,16 @@ public class SRXDocument {
 			modified = false;
 		}
 		catch ( SAXException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( XPathExpressionException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	

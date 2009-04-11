@@ -38,6 +38,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -93,7 +95,7 @@ public class IDMLContentFilter implements IFilter {
 			queue = null;
 		}
 		catch ( XMLStreamException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -161,7 +163,7 @@ public class IDMLContentFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -175,7 +177,7 @@ public class IDMLContentFilter implements IFilter {
 			commonOpen(new InputStreamReader(bis, encoding));
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -190,7 +192,7 @@ public class IDMLContentFilter implements IFilter {
 			open(inputURI.toURL().openStream());
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -218,7 +220,7 @@ public class IDMLContentFilter implements IFilter {
 			reader = fact.createXMLStreamReader(inputReader);
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 
 		//TODO: Need to auto-detect the encoding and update 'encoding' variable
@@ -355,10 +357,7 @@ public class IDMLContentFilter implements IFilter {
 			}
 		}
 		catch ( XMLStreamException e ) {
-			throw new RuntimeException(e);
-		}
-		catch ( Throwable e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		
 		// No more XML events

@@ -33,6 +33,9 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -87,7 +90,7 @@ public class OpenOfficeFilter implements IFilter {
 			}
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -132,7 +135,7 @@ public class OpenOfficeFilter implements IFilter {
 		case NEXTINSUBDOC:
 			return nextInSubDocument();
 		default:
-			throw new RuntimeException("Invalid next() call.");
+			throw new IllegalFilterOperationException("Invalid next() call.");
 		}
 	}
 
@@ -155,7 +158,7 @@ public class OpenOfficeFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -211,10 +214,10 @@ public class OpenOfficeFilter implements IFilter {
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
 		catch ( ZipException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	
@@ -248,7 +251,7 @@ public class OpenOfficeFilter implements IFilter {
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT

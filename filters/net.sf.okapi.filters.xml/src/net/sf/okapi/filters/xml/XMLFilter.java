@@ -37,6 +37,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -162,7 +164,7 @@ public class XMLFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new BadFilterInputException("InputResource has no input defined.");
 		}
 	}
 	
@@ -222,8 +224,9 @@ public class XMLFilter implements IFilter {
 		DocumentBuilder docBuilder;
 		try {
 			docBuilder = fact.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
+		}
+		catch (ParserConfigurationException e) {
+			throw new OkapiIOException(e);
 		}
 		
 		//TODO: Do this only as an option
@@ -255,10 +258,10 @@ public class XMLFilter implements IFilter {
 			}
 		}
 		catch ( SAXException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		finally {
 			if ( detector != null ) {

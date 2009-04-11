@@ -45,7 +45,8 @@ import org.eclipse.swt.widgets.Shell;
 
 public class UtilityDriver implements CancelListener {
 
-	private final Logger logger = Logger.getLogger("net.sf.okapi.logging");
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private ILog log;
 	private Project prj;
 	private FilterAccess fa;
