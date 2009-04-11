@@ -378,4 +378,18 @@ public class FilterTestDriver {
 		return null;
 	}
 
+	/**
+	 * Gets the start document in the given list of events.
+	 * @param list The list of events
+	 * @return The start document found, or null.
+	 */
+	public static StartDocument getStartDocument (ArrayList<Event> list) {
+		for (Event event : list) {
+			if ( event.getEventType() == EventType.START_DOCUMENT ) {
+				return (StartDocument)event.getResource();
+			}
+		}
+		return null;
+	}
+
 }

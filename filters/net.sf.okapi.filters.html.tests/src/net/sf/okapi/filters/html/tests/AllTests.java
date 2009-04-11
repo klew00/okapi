@@ -9,10 +9,10 @@ import junit.framework.Test;
 
 @RunWith(Suite.class)
 @SuiteClasses( { HtmlEventTest.class, HtmlSnippetsTest.class, HtmlFullFileTest.class, HtmlConfigurationTest.class, HtmlDetectBomTest.class })
-public class AllHtmlTests {
+public class AllTests {
 
 	public static Test suite() {
-		return new JUnit4TestAdapter(AllHtmlTests.class);
+		return new JUnit4TestAdapter(AllTests.class);
 	}
 
 }

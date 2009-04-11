@@ -28,12 +28,15 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class PropertiesFilterTest {
 	
@@ -65,24 +68,83 @@ public class PropertiesFilterTest {
 	}
 
 	@Test
-	public void crLineBreaksTest () {
+	public void testLineBreaks_CR () {
 		String snippet = "Key1=Text1\rKey2=Text2\r";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
 	}
 
 	@Test
-	public void crAndLfLineBreaksTest () {
+	public void testineBreaks_CRLF () {
 		String snippet = "Key1=Text1\r\nKey2=Text2\r\n";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
 	}
 	
 	@Test
-	public void lfLineBreaksTest () {
+	public void testLineBreaks_LF () {
 		String snippet = "Key1=Text1\n\n\nKey2=Text2\n";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
 		assertEquals(snippet, result);
+	}
+	
+	@Test
+	public void testEntry () {
+		String snippet = "Key1=Text1\n# Comment\nKey2=Text2\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("Text2", tu.getSource().toString());
+		assertEquals("Key2", tu.getName());
+		assertTrue(tu.hasProperty(Property.NOTE));
+		Property prop = tu.getProperty(Property.NOTE);
+		assertEquals(" Comment", prop.getValue());
+		assertTrue(prop.isReadOnly());
+	}
+	
+	@Test
+	public void testSplicedEntry () {
+		String snippet = "Key1=Text1\nKey2=Text2 \\\nSecond line";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("Text2 Second line", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testEscapes () {
+		String snippet = "Key1=Text with \\u00E3";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text with \u00E3", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testKeySpecial () {
+		String snippet = "\\:\\= : Text1";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text1", tu.getSource().toString());
+		assertEquals("\\:\\=", tu.getName());
+	}
+	
+	@Test
+	public void testLocDirectives_Skip () {
+		String snippet = "#_skip\nKey1:Text1\nKey2:Text2";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		// Text1 not extracted because of the directive
+		assertEquals("Text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testLocDirectives_Group () {
+		String snippet = "#_bskip\nKey1:Text1\n#_text\nKey2:Text2\nKey2:Text3";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		// Text1 not extracted because of the directive
+		assertEquals("Text2", tu.getSource().toString());
+		// No next TU because of _bskip
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNull(tu);
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {

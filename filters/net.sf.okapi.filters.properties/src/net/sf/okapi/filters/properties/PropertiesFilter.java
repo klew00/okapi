@@ -325,7 +325,8 @@ public class PropertiesFilter implements IFilter {
 						skel.append(textLine);
 						skel.append(lineBreak);
 						if ( params.commentsAreNotes ) {
-							note += (tmp+"\n");
+							if ( note.length() > 0 ) note += "\n";
+							note += tmp;
 						}
 						continue;
 					}
