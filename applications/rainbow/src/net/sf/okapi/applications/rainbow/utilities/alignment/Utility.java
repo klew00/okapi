@@ -129,8 +129,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Prepare the db store
 		dbStoreBuilder = new DbStoreBuilder();
-		// We use the source part only, and it contains the target language of the alignment task
-		dbStoreBuilder.setSegmenters(trgSeg, null);
+		dbStoreBuilder.setSegmenter(trgSeg);
+		dbStoreBuilder.setOptions(trgLang, null);
 		
 		if ( aligner == null ) {
 			aligner = new Aligner(shell, help, updateCommand);
@@ -239,9 +239,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			trgFilter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
 				getInputFilterSettings(1), trgFilter);
 			
-			// Open the file
-			// Note we use the target language as the source, because we are
-			// processing the 'target' from the utility viewpoint
+			// Open the file with the translations
 			File f = new File(getInputPath(1));
 			InputResource res = new InputResource(f.toURI(), getInputEncoding(1), srcLang);
 			res.setTargetLanguage(trgLang);

@@ -33,7 +33,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class DbStore {
 
@@ -194,13 +193,15 @@ public class DbStore {
 		}
 	}
 	
-	public int addSourceTextUnit (TextUnit tu,
-		int gKey)
+	public int addSourceEntry (TextContainer tc,
+		int gKey,
+		String tuId,
+		String tuName,
+		String tuType)
 	{
 		int count = 0;
 		PreparedStatement pstm = null;
 		try {
-			TextContainer tc = tu.getSource();
 			//TODO: make this pstm class-level
 			pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?,?);",
 				TBLNAME_SOURCE, SOURCE_NTMP, SOURCE_NGKEY, SOURCE_NXKEY, SOURCE_NSEGKEY, SOURCE_NNAME,
@@ -209,10 +210,10 @@ public class DbStore {
 			// Store the main content
 			pstm.setInt(1, 0);
 			pstm.setInt(2, gKey);
-			pstm.setString(3, tu.getId());
+			pstm.setString(3, tuId);
 			pstm.setInt(4, 0); // SegKey is 0 for the main entry
-			pstm.setString(5, tu.getName());
-			pstm.setString(6, tu.getType());
+			pstm.setString(5, tuName);
+			pstm.setString(6, tuType);
 			pstm.setString(7, tc.getCodedText());
 			pstm.setString(8, Code.codesToString(tc.getCodes()));
 			pstm.execute();
@@ -224,10 +225,10 @@ public class DbStore {
 				for ( TextFragment tf : tc.getSegments() ) {
 					pstm.setInt(1, 0);
 					pstm.setInt(2, gKey);
-					pstm.setString(3, tu.getId());
+					pstm.setString(3, tuId);
 					pstm.setInt(4, i); // SegKey is >0 for the segments
-					pstm.setString(5, tu.getName());
-					pstm.setString(6, tu.getType());
+					pstm.setString(5, tuName);
+					pstm.setString(6, tuType);
 					pstm.setString(7, tf.getCodedText());
 					pstm.setString(8, Code.codesToString(tf.getCodes()));
 					pstm.execute();

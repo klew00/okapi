@@ -29,6 +29,10 @@ msgstr "Texte avec une traducion approuvée %s"
 msgid "Text with non-approved translation %s"
 msgstr "Text avec une traduction non-approuvée %s"
 
+#, c-format
+msgid "First sentence. Second sentence with %s."
+msgstr "Deuxième phrase d'abord avec %s. Puis la première."
+
 #, c-format, fuzzy
 msgid "Text 2 with non-approved translation %s"
 msgstr "Text 2 avec une traduction non-approuvée %s et d'autre codes %d."

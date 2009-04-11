@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.utilities.extraction;
 
-import java.text.SimpleDateFormat;
-
 import net.sf.okapi.applications.rainbow.lib.IAnalysisReporter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -50,8 +48,6 @@ class HTMLReporter implements IAnalysisReporter {
 		writer.writeRawXML("<table cellspacing=\"0\" cellpadding=\"4\" border=\"1\">");
 
 		writer.writeElementString("h2", "Translation Package Report");
-		//SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-		//writer.writeElementString("p", "Creation: " +DF.format(new java.util.Date()));
 
 		writer.writeStartElement("tr");
 		writer.writeRawXML(String.format("<td class=\"h\">%s</td>", "Exact"));

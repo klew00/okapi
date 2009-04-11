@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,7 +16,7 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
@@ -28,6 +28,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
@@ -36,9 +38,9 @@ class DbStoreBuilder implements IFilterWriter {
 	private Stack<Integer> groupStack;
 	private int lastGroupKey;
 	private DbStore dbs;
-	private Segmenter srcSeg;
-	private Segmenter trgSeg;
+	private Segmenter segmenter;
 	private String language;
+	private boolean useSource;
 
 	public DbStoreBuilder () {
 		dbs = new DbStore();
@@ -48,11 +50,8 @@ class DbStoreBuilder implements IFilterWriter {
 		return dbs;
 	}
 	
-	public void setSegmenters (Segmenter srcSeg,
-		Segmenter trgSeg)
-	{
-		this.srcSeg = srcSeg;
-		this.trgSeg = trgSeg;
+	public void setSegmenter (Segmenter segmenter) {
+		this.segmenter = segmenter;
 	}
 	
 	public void cancel () {
@@ -64,8 +63,7 @@ class DbStoreBuilder implements IFilterWriter {
 	}
 
 	public String getName () {
-		// No name
-		return null;
+		return getClass().getName();
 	}
 
 	public IParameters getParameters () {
@@ -75,7 +73,7 @@ class DbStoreBuilder implements IFilterWriter {
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			processStartDocument();
+			processStartDocument((StartDocument)event.getResource());
 			break;
 		case START_GROUP:
 			processStartGroup();
@@ -113,29 +111,35 @@ class DbStoreBuilder implements IFilterWriter {
 	}
 
 	private void processTextUnit (TextUnit tu) {
-		// Segment if requested
-		if ( srcSeg != null ) {
-			srcSeg.computeSegments(tu.getSource());
-			tu.getSource().createSegments(srcSeg.getSegmentRanges());
+		TextContainer tc;
+		if ( useSource ) tc = tu.getSource();
+		else { // Use the target
+			tc = tu.getTarget(language);
+			if ( tc == null ) return; // No target to set
 		}
-		if ( trgSeg != null ) {
-			if ( tu.hasTarget(language) ) {
-				trgSeg.computeSegments(tu.getTarget(language));
-				tu.getTarget(language).createSegments(trgSeg.getSegmentRanges());
-			}
+		// Segment if requested
+		if ( segmenter != null ) {
+			segmenter.computeSegments(tc);
+			tc.createSegments(segmenter.getSegmentRanges());
 		}
 		// Add the tu to the db store
-		dbs.addSourceTextUnit(tu, groupStack.peek());
+		dbs.addSourceEntry(tc, groupStack.peek(), tu.getId(), tu.getName(), tu.getType());
 	}
 
 	private void processStartGroup () {
 		groupStack.push(++lastGroupKey);
 	}
 
-	private void processStartDocument () {
+	private void processStartDocument (StartDocument resource) {
 		groupStack = new Stack<Integer>();
 		lastGroupKey = 0;
 		groupStack.push(0);
+
+		// Fill with the source or the target of this document
+		// If monolingual, use the source
+		// If multilingual we assume to use the target
+		useSource = !resource.isMultilingual();
+		
 		//TODO: Better temp filename (rely on createTmpFile() or something like this)
 		String path = Util.getTempDirectory() + File.separatorChar + "tmpDB";
 		dbs.create(path, "tmpDB", true);
