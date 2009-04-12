@@ -23,7 +23,7 @@ package net.sf.okapi.common;
 /**
  * Common way to call in an editor to modify the parameters of 
  * a component. The parameters are implemented
- * through the IParameters interface. 
+ * through the {@link net.sf.okapi.common.IParameters} interface. 
  */
 public interface IParametersEditor {
 
@@ -31,19 +31,19 @@ public interface IParametersEditor {
 	 * Edits the values for the given parameters. If the edit succeeds
 	 * (returns true), the parameters have been updated in p_Parameters to
 	 * reflect the changes. 
-	 * @param paramsObject The parameters to edit.
-	 * @param uiContext An implementation-specific object. For example, the
+	 * @param paramsObject the parameters to edit.
+	 * @param uiContext an implementation-specific object. For example, the
 	 * parent window from where the editor is called. The type and value of
 	 * uiContext depend on each implementation. See the documentation of the 
 	 * implementation for details. Because not all callers may be able to
 	 * provide the proper context passing a null value is allowed.
-	 * @param helpParam The IHelp object responsible for displaying the help.
+	 * @param helpParam the IHelp object responsible for displaying the help.
 	 * Because not all callers may be able to provide the proper object 
 	 * passing a null value is allowed.
-	 * @param projectDir Project directory (without separator). This is used 
+	 * @param projectDir project directory (without separator). This is used 
 	 * for the ${ProjDir} variable. Because not all callers may be able to
 	 * provide the proper project directory passing a null value is allowed.
-	 * @return True if the edit was successful, false if the user canceled or if 
+	 * @return true if the edit was successful, false if the user canceled or if 
 	 * an error occurred. 
 	 */
 	public boolean edit (IParameters paramsObject,
@@ -55,7 +55,7 @@ public interface IParametersEditor {
 	 * Creates an instance of the parameters object the editor can edit (with
 	 * the default values). This allows the user to create new parameters object 
 	 * from the interface, without knowing what exact type of object is created. 
-	 * @return An instance of the parameters object for the editor.
+	 * @return an instance of the parameters object for the editor.
 	 */
 	public IParameters createParameters ();
 }

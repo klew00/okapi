@@ -45,16 +45,16 @@ public class BaseReferenceable extends BaseNameable implements IReferenceable {
 	}
 	
 	/**
-	 * Gets the ID of the parent resource of this resource.
-	 * @return The ID of this resource's parent, or null if there is none.
+	 * Gets the identifier of the parent resource of this resource.
+	 * @return the identifier of this resource's parent, or null if there is none.
 	 */
 	public String getParentId () {
 		return parentId;
 	}
 	
 	/**
-	 * Sets the ID of the parent resource of this resource.
-	 * @param id The ID to set.
+	 * Sets the identifier of the parent resource of this resource.
+	 * @param id the identifier to set.
 	 */
 	public void setParentId (String id) {
 		parentId = id;

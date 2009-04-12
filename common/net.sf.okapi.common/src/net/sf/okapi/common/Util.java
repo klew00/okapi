@@ -36,6 +36,9 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+
 import org.w3c.dom.Node;
 
 /**
@@ -347,6 +350,13 @@ public class Util {
 		}
 	}
 	
+	/**
+	 * Copies a file from one location to another.
+	 * @param fromPath The path of the file to copy.
+	 * @param toPath The path of the copy to make.
+	 * @param move True to move the file, false to copy it.
+	 * @throws OkapiIOException.
+	 */
 	public static void copyFile (String fromPath,
 		String toPath,
 		boolean move)
@@ -365,14 +375,16 @@ public class Util {
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		finally {
 			try {
 				if ( ic != null ) ic.close();
 				if ( oc != null ) oc.close();
 			}
-			catch ( IOException e ) {};
+			catch ( IOException e ) {
+				throw new OkapiIOException(e);
+			};
 		}
 	}
 
@@ -452,6 +464,7 @@ public class Util {
 	 * will both return "file:///C:/test" encoded as URI.
 	 * @param pathOrUri The path to change to URI string.
 	 * @return The URI string.
+	 * @throws OkapiUnsupportedEncodingException.
 	 */
 	static public String makeURIFromPath (String pathOrUri) {
 		// This should catch most of the URI forms
@@ -464,7 +477,7 @@ public class Util {
 			return "file:///"+tmp.replace("+", "%20");
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e); // UTF-8 should be always supported anyway
+			throw new OkapiUnsupportedEncodingException(e); // UTF-8 should be always supported anyway
 		}
 	}
 
@@ -545,6 +558,7 @@ public class Util {
 	 * @param writer Writer where to output the BOM.
 	 * @param bomOnUTF8 Indicates if we should use a BOM on UTF-8 files.
 	 * @param encoding Encoding of the output.
+	 * @throws OkapiIOException.
 	 */
 	static public void writeBOMIfNeeded (Writer writer,
 		boolean bomOnUTF8,
@@ -571,7 +585,7 @@ public class Util {
 			//TODO: Is this an issue? Does *reading* UTF-16LE/BE does not check for BOM?
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 	

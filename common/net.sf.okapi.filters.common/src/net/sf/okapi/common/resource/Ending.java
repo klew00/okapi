@@ -26,7 +26,7 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Represents the resource associated with the filter events END_DOCUMENT,
+ * Resource associated with the filter events END_DOCUMENT,
  * END_SUBDOCUMENT, and END_GROUP.
  */
 public class Ending implements IResource {

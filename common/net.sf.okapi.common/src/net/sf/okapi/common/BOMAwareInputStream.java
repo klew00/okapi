@@ -41,6 +41,12 @@ public class BOMAwareInputStream extends InputStream {
 	private boolean hasUTF8BOM;
 	private boolean autoDetected;
 
+	/**
+	 * Creates a new BOMAwareInputStream object for a given InputStream and a given
+	 * default encoding.
+	 * @param input The input stream to use.
+	 * @param defaultEncoding The default encoding to use if none can be auto-detected.
+	 */
 	public BOMAwareInputStream (InputStream input,
 		String defaultEncoding)
 	{
@@ -154,6 +160,11 @@ public class BOMAwareInputStream extends InputStream {
 	}
 	
 	@Override
+	/**
+	 * Reads the next byte of data from this input stream.
+	 * @return The next byte of data, or -1 if the end of the stream has been reached.
+	 * @throws IOException.
+	 */
 	public int read()
 		throws IOException
 	{

@@ -27,9 +27,9 @@ public interface IParametersProvider {
 
 	/**
 	 * Loads a parameters object from a given location. 
-	 * @param location The string that encodes the source location. The value depends
+	 * @param location the string that encodes the source location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
-	 * @return The loaded parameters object or null if an error occurred.
+	 * @return the loaded parameters object or null if an error occurred.
 	 * @throws Exception
 	 */
 	public IParameters load (String location)
@@ -37,9 +37,9 @@ public interface IParametersProvider {
 	
 	/**
 	 * Gets the default parameters for a given provider.
-	 * @param location The string that encodes the source location. The value depends
+	 * @param location the string that encodes the source location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
-	 * @return The defaults parameters object or null if an error occurred.
+	 * @return the defaults parameters object or null if an error occurred.
 	 * @throws Exception
 	 */
 	public IParameters createParameters (String location)
@@ -47,9 +47,9 @@ public interface IParametersProvider {
 
 	/**
 	 * Saves a parameters object to a given location.
-	 * @param location The string that encodes the target location. The value depends
+	 * @param location the string that encodes the target location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
-	 * @param paramsObject The parameters object to save.
+	 * @param paramsObject the parameters object to save.
 	 * @throws Exception
 	 */
 	public void save (String location,
@@ -58,17 +58,17 @@ public interface IParametersProvider {
 	
 	/**
 	 * Deletes a parameters object at a given location. 
-	 * @param location The string that encodes the target location. The value depends
+	 * @param location the string that encodes the target location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
-	 * @return True if the parameters object was delete, false if it was not.
+	 * @return true if the parameters object was delete, false if it was not.
 	 */
 	public boolean deleteParameters (String location);
 	
 	/**
 	 * Split a given location into its components.
-	 * @param location The string that encodes the location. The value depends
+	 * @param location the string that encodes the location. The value depends
 	 * on each implementation. It can be a path, a filter setting string, etc.
-	 * @return An array of string corresponding to each component of the location.
+	 * @return an array of string corresponding to each component of the location.
 	 * The values depend on each implementation.
 	 */
 	public String[] splitLocation (String location);
@@ -76,7 +76,7 @@ public interface IParametersProvider {
 	/**
 	 * Gets the list of available sets of parameters (for example, the list
 	 * of all filter settings). 
-	 * @return An array of string, each string being the string you
+	 * @return an array of string, each string being the string you
 	 * would pass to load the give set of parameters. 
 	 */
 	public String[] getParametersList ();

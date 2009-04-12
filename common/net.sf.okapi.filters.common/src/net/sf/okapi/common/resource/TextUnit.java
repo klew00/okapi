@@ -30,8 +30,9 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Basic unit of extraction from a filter. The TextUnit object holds the extracted source text, all its
- * properties and annotations, and any target corresponding data.
+ * Basic unit of extraction from a filter and also the resource associated with the filter event TEXT_UNIT.
+ * The TextUnit object holds the extracted source text, all its properties and 
+ * annotations, and any target corresponding data.
  */
 public class TextUnit implements INameable, IReferenceable {
 
@@ -51,17 +52,17 @@ public class TextUnit implements INameable, IReferenceable {
 	private ConcurrentHashMap<String, TextContainer> targets;
 
 	/**
-	 * Creates a new TextUnit object with its ID.
-	 * @param id The ID of this resource.
+	 * Creates a new TextUnit object with its identifier.
+	 * @param id the identifier of this resource.
 	 */
 	public TextUnit (String id) {
 		create(id, null, false, null);
 	}
 
 	/**
-	 * Creates a new TextUnit object with its ID and a text.
-	 * @param id The ID of this resource.
-	 * @param sourceText The initial text of the source.
+	 * Creates a new TextUnit object with its identifier and a text.
+	 * @param id the identifier of this resource.
+	 * @param sourceText the initial text of the source.
 	 */
 	public TextUnit (String id,
 		String sourceText)
@@ -71,9 +72,9 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Creates a new TextUnit object with its ID, a text, and a flag indicating if it is a referent or not.
-	 * @param id The ID of this resource.
-	 * @param sourceText The initial text of the source.
-	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * @param id the identifier of this resource.
+	 * @param sourceText the initial text of the source.
+	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
 	 * by another resource) or not.
 	 */
 	public TextUnit (String id,
@@ -84,13 +85,13 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Creates a new TextUnit object with its ID, a text, a flag indicating if it is a referent or not, and
-	 * a given MIME type.
-	 * @param id The ID of this resource.
-	 * @param sourceText The initial text of the source.
-	 * @param isReferent Indicates if this resource is a referent (i.e. is referred to
+	 * Creates a new TextUnit object with its identifier, a text, a flag indicating 
+	 * if it is a referent or not, and a given MIME type.
+	 * @param id the identifier of this resource.
+	 * @param sourceText the initial text of the source.
+	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
 	 * by another resource) or not.
-	 * @param mimeType The MIME type identifier for the content of this TextUnit.
+	 * @param mimeType the MIME type identifier for the content of this TextUnit.
 	 */
 	public TextUnit (String id,
 		String sourceText,
@@ -117,7 +118,7 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Gets the string representation of the source text of this TextUnit.
-	 * @return The source text of this TextUnit.
+	 * @return the source text of this TextUnit.
 	 */
 	@Override
 	public String toString () {
@@ -317,7 +318,7 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Gets the source object for this TextUnit.
-	 * @return The source object for this TextUnit.
+	 * @return the source object for this TextUnit.
 	 */
 	public TextContainer getSource () {
 		return source;
@@ -325,8 +326,8 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	/**
 	 * Sets the source object for this TextUnit. Any existing source object is overwritten.
-	 * @param textContainer The source object to set.
-	 * @return The source object that has been set.
+	 * @param textContainer the source object to set.
+	 * @return the source object that has been set.
 	 */
 	public TextContainer setSource (TextContainer textContainer) {
 		source = textContainer;
@@ -335,8 +336,8 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	/**
 	 * Gets the target object for this TextUnit for a given language.
-	 * @param language The language to query.
-	 * @return The target object for this TextUnit for the given language, or null if
+	 * @param language the language to query.
+	 * @return the target object for this TextUnit for the given language, or null if
 	 * it does not exist.
 	 */
 	public TextContainer getTarget (String language) {
@@ -348,9 +349,9 @@ public class TextUnit implements INameable, IReferenceable {
 	 * Any existing target object for the given language is overwritten.
 	 * To set a target object based on the source, use the 
 	 * {@link #createTarget(String, boolean, int)} method.
-	 * @param language The target language. 
-	 * @param text The target object to set.
-	 * @return The target object that has been set.
+	 * @param language the target language. 
+	 * @param text the target object to set.
+	 * @return the target object that has been set.
 	 */
 	public TextContainer setTarget (String language,
 		TextContainer text)
@@ -371,8 +372,8 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	/**
 	 * Indicates if there is a target object for a given language for this TextUnit. 
-	 * @param language The language to query.
-	 * @return True if a target object exists for the given language, false otherwise.
+	 * @param language the language to query.
+	 * @return true if a target object exists for the given language, false otherwise.
 	 */
 	public boolean hasTarget (String language) {
 		return (targets.get(language) != null);
@@ -380,15 +381,15 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	/**
 	 * Creates or get the target for this TextUnit.
-	 * @param language The target language.
-	 * @param overwriteExisting True to overwrite any existing target for the given language.
+	 * @param language the target language.
+	 * @param overwriteExisting true to overwrite any existing target for the given language.
 	 * False to not create a new target object if one already exists for the given language. 
-	 * @param creationOptions Creation options:
+	 * @param creationOptions creation options:
 	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
 	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
 	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
 	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
-	 * @return The target object that was created, or retrieved. 
+	 * @return the target object that was created, or retrieved. 
 	 */
 	public TextContainer createTarget (String language,
 		boolean overwriteExisting,
@@ -408,12 +409,17 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Gets the content of the source for this TextUnit.
-	 * @return The content of the source for this TextUnit.
+	 * @return the content of the source for this TextUnit.
 	 */
 	public TextFragment getSourceContent () {
 		return source;
 	}
 	
+	/**
+	 * Sets the content of the source for thsi TextUnit.
+	 * @param content the new content to set.
+	 * @return the new content of the source for this TextUnit. 
+	 */
 	public TextFragment setSourceContent (TextFragment content) {
 		source.setContent(content);
 		return source;
@@ -421,8 +427,8 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Gets the content of the target for a given language for this TextUnit.
-	 * @param language The language to query.
-	 * @return The content of the target for the given language for this TextUnit.
+	 * @param language the language to query.
+	 * @return the content of the target for the given language for this TextUnit.
 	 */
 	public TextFragment getTargetContent (String language) {
 		TextContainer tc = getTarget(language);
@@ -430,6 +436,12 @@ public class TextUnit implements INameable, IReferenceable {
 		return tc.getContent();
 	}
 	
+	/**
+	 * Sets the content of the target for a given language for this TextUnit.
+	 * @param language the language to set.
+	 * @param content the new content to set.
+	 * @return the new content for the given target language for this text unit. 
+	 */
 	public TextFragment setTargetContent (String language,
 		TextFragment content)
 	{
@@ -448,7 +460,7 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Indicates if the source text of this TextUnit is empty.
-	 * @return True if the source text of this TextUnit is empty, false otherwise.
+	 * @return true if the source text of this TextUnit is empty, false otherwise.
 	 */
 	public boolean isEmpty () {
 		return (( source.text == null ) || ( source.text.length() == 0 ));

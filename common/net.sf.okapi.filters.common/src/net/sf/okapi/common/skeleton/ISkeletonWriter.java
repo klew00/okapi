@@ -34,16 +34,19 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public interface ISkeletonWriter {
 
+	/**
+	 * Closes this skeleton writer.
+	 */
 	public void close ();
 	
 	/**
 	 * Processes the START_DOCUMENT event.
-	 * @param outputLanguage Code of the output language. 
-	 * @param outputEncoding Name of the output charset encoding.
-	 * @param layer Layer provider to use.
-	 * @param encoderManager Encoder manager to use.
-	 * @param resource The StartDocument resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param outputLanguage the code of the output language. 
+	 * @param outputEncoding the name of the output charset encoding.
+	 * @param layer the layer provider to use.
+	 * @param encoderManager the encoder manager to use.
+	 * @param resource the StartDocument resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processStartDocument (String outputLanguage,
 		String outputEncoding,
@@ -53,51 +56,51 @@ public interface ISkeletonWriter {
 	
 	/**
 	 * Processes the END_DOCUMENT event.
-	 * @param resource The Ending resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the Ending resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processEndDocument (Ending resource);
 	
 	/**
 	 * Processes a START_SUBDOCUMENT event.
-	 * @param resource The StartSubDocument resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the StartSubDocument resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processStartSubDocument (StartSubDocument resource);
 	
 	/**
 	 * Processes the END_SUBDOCUMENT event.
-	 * @param resource The Ending resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the Ending resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processEndSubDocument (Ending resource);
 	
 	/**
 	 * Processes the START_GROUP event.
-	 * @param resource The StartGroup resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the StartGroup resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processStartGroup (StartGroup resource);
 	
 	/**
 	 * Processes the END_GROUP event.
-	 * @param resource The Ending resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the Ending resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processEndGroup (Ending resource);
 	
 	/**
 	 * Processes the TEXT_UNIT event.
-	 * @param resource The TextUnit resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the TextUnit resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processTextUnit (TextUnit resource);
 	
 	/**
 	 * Processes the DOCUMENT_PART event.
-	 * @param resource The DocumentPart resource associated with the event.
-	 * @return The string output corresponding to this event.
+	 * @param resource the DocumentPart resource associated with the event.
+	 * @return the string output corresponding to this event.
 	 */
 	public String processDocumentPart (DocumentPart resource);
-	
+
 }

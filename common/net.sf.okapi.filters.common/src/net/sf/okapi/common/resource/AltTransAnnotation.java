@@ -62,8 +62,8 @@ public class AltTransAnnotation implements IAnnotation {
 	/**
 	 * Adds a new entry to this annotation. This method also set the current entry
 	 * of the iteration to the entry that was just added.
-	 * @param sourceLanguage Code of the source language, or null.
-	 * @param sourceText Text of the source element, or null.
+	 * @param sourceLanguage code of the source language, or null.
+	 * @param sourceText text of the source element, or null.
 	 */
 	public void addNew (String sourceLanguage,
 		TextContainer sourceText)
@@ -80,7 +80,7 @@ public class AltTransAnnotation implements IAnnotation {
 	 * Sets the target text for the last entry added to this
 	 * annotation. If no entry exists yet, or if one exists but has its target
 	 * already set, a new entry with empty source is created automatically.
-	 * @param targetLanguage Code of the target language.
+	 * @param targetLanguage code of the target language.
 	 * @param targetText text of the target.
 	 */
 	public void setTarget (String targetLanguage,
@@ -100,7 +100,7 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Resets the iteration mode for this annotation. 
-	 * @return True if there is at least one entry, false if this annotation has 
+	 * @return true if there is at least one entry, false if this annotation has 
 	 * no entry.
 	 */
 	public boolean startIteration () {
@@ -110,7 +110,7 @@ public class AltTransAnnotation implements IAnnotation {
 	
 	/**
 	 * Moves to the next alt-trans entry in this annotation.
-	 * @return True if there was one available, false if there is no more entry.
+	 * @return true if there was one available, false if there is no more entry.
 	 */
 	public boolean moveToNext () {
 		if ( ++current < list.size() ) return true;
@@ -119,7 +119,7 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Indicates if the current entry of this annotation has a source.
-	 * @return True if the current entry has a source, false if it does not.
+	 * @return true if the current entry has a source, false if it does not.
 	 */
 	public boolean hasSource () {
 		if (( current == -1 ) && ( current < list.size() )) return false;
@@ -130,7 +130,7 @@ public class AltTransAnnotation implements IAnnotation {
 	 * Gets the current entry for this annotation. For ease of use the entry is returned
 	 * as a TextUnit. Be aware that there are slight difference between a normal
 	 * text unit and one that represents an alternate translation. 
-	 * @return The TextUnit object for the current entry, or null if the current 
+	 * @return the TextUnit object for the current entry, or null if the current 
 	 * entry is not set.
 	 */
 	public TextUnit getEntry () {
@@ -140,7 +140,7 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Indicates if there is at least one entry in this annotation.
-	 * @return True if there is at least one entry in this annotation,
+	 * @return true if there is at least one entry in this annotation,
 	 * false if there is none.
 	 */
 	public boolean isEmpty () {
@@ -149,7 +149,7 @@ public class AltTransAnnotation implements IAnnotation {
 	
 	/**
 	 * Gets the source language for the current entry of this annotation.
-	 * @return The code for the source language for the current entry,
+	 * @return the code for the source language for the current entry,
 	 * or null if the current entry is not set, or if there is no source
 	 * for this entry.
 	 */
@@ -160,7 +160,7 @@ public class AltTransAnnotation implements IAnnotation {
 
 	/**
 	 * Gets the target language for the current entry of this annotation.
-	 * @return The code for the target language for the current entry,
+	 * @return the code for the target language for the current entry,
 	 * or null if the current entry is not set, or if there is no target
 	 * for this entry.
 	 */

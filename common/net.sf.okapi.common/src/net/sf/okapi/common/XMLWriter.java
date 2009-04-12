@@ -48,7 +48,7 @@ public class XMLWriter {
 
 	/**
 	 * Creates a new XML document on disk.
-	 * @param path The full path of the document to create. If any directory in the
+	 * @param path the full path of the document to create. If any directory in the
 	 * path does not exists yet it will be created automatically. The document is 
 	 * always written in UTF-8.
 	 */
@@ -80,7 +80,7 @@ public class XMLWriter {
 
 	/**
 	 * Gets the string buffer of the XML document created with {@link #create()}.
-	 * @return The string buffer of the XML document created with {@link #create()}.
+	 * @return the string buffer of the XML document created with {@link #create()}.
 	 */
 	public String getStringOutput () {
 		close();
@@ -119,7 +119,7 @@ public class XMLWriter {
 	
 	/**
 	 * Writes the start of an element.
-	 * @param name The name of the element to start.
+	 * @param name the name of the element to start.
 	 */
 	public void writeStartElement (String name) {
 		closeStartTag();
@@ -148,8 +148,8 @@ public class XMLWriter {
 	
 	/**
 	 * Writes an element and its content. 
-	 * @param name The name of the element to write.
-	 * @param content The content to enclose inside this element.
+	 * @param name the name of the element to write.
+	 * @param content the content to enclose inside this element.
 	 */
 	public void writeElementString (String name,
 		String content)
@@ -163,8 +163,8 @@ public class XMLWriter {
 	/**
 	 * Writes an attribute and its associated value. You must use
 	 * {@link #writeStartElement(String)} just before.
-	 * @param name The name of the attribute.
-	 * @param value The value of the attribute.
+	 * @param name the name of the attribute.
+	 * @param value the value of the attribute.
 	 */
 	public void writeAttributeString (String name,
 		String value)
@@ -174,7 +174,7 @@ public class XMLWriter {
 	
 	/**
 	 * Writes a string. The text is automatically escaped.
-	 * @param text The text to output.
+	 * @param text the text to output.
 	 */
 	public void writeString (String text) {
 		closeStartTag();
@@ -183,7 +183,7 @@ public class XMLWriter {
 	
 	/**
 	 * Writes a chunk of raw XML.
-	 * @param xmlData The data to output. No escaping is performed.
+	 * @param xmlData the data to output. No escaping is performed.
 	 */
 	public void writeRawXML (String xmlData) {
 		closeStartTag();
@@ -192,7 +192,7 @@ public class XMLWriter {
 	
 	/**
 	 * Writes a comment.
-	 * @param text The text of the comment.
+	 * @param text the text of the comment.
 	 */
 	public void writeComment (String text) {
 		closeStartTag();

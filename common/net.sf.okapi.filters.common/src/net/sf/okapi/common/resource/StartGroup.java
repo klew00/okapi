@@ -21,19 +21,25 @@
 package net.sf.okapi.common.resource;
 
 /**
- * Represents the resource associated with the filter event START_GROUP.
+ * Resource associated with the filter event START_GROUP.
  */
 public class StartGroup extends BaseReferenceable {
 
 	/**
 	 * Creates a new StartGroup object.
-	 * @param parentId The ID of the parent resource for this resource.
+	 * @param parentId The identifier of the parent resource for this group.
 	 */
 	public StartGroup (String parentId) {
 		super();
 		this.parentId = parentId;
 	}
 
+	/**
+	 * Creates a new startGroup object with the identifier of the group's parent
+	 * and the group's identifier.
+	 * @param parentId the identifier of the parent resource for this group.
+	 * @param id the identifier of this group.
+	 */
 	public StartGroup (String parentId,
 		String id)
 	{
@@ -42,6 +48,13 @@ public class StartGroup extends BaseReferenceable {
 		this.id = id;
 	}
 
+	/**
+	 * Creates a new startGroup object with the identifier of the group's parent,
+	 * the group's identifier, and an indicator of wether this group is a referent or not.
+	 * @param parentId the identifier of the parent resource for this group.
+	 * @param id the identifier of this group.
+	 * @param isReference true if this group is referred by another resource.
+	 */
 	public StartGroup (String parentId,
 		String id,
 		boolean isReference)

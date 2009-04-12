@@ -23,7 +23,7 @@ package net.sf.okapi.common.resource;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Represents the resource associated with the filter event START_DOCUMENT.
+ * Resource associated with the filter event START_DOCUMENT.
  */
 public class StartDocument extends BaseNameable {
 

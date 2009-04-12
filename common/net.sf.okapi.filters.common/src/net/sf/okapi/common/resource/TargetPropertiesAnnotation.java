@@ -29,7 +29,7 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.annotation.IterableEnumeration;
 
 /**
- * Represents the target properties associated to a set of source properties
+ * The target properties associated to a set of source properties
  * in a resource.
  */
 public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String> {

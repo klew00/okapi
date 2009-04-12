@@ -88,7 +88,7 @@ public enum EventType {
 	FINISHED,
 
 	/**
-	 * File level event. A File resource should be associated with this event.
+	 * Document-level event. An InputResource resource should be associated with this event.
 	 */
 	INPUT_RESOURCE,
 
@@ -100,7 +100,7 @@ public enum EventType {
 
 	/**
 	 * No operation event that is ignored by all steps. Used as a placeholder
-	 * event when steps need to stay alive without triggering ang actions.
+	 * event when steps need to stay alive without triggering any actions.
 	 */
 	NO_OP
 }

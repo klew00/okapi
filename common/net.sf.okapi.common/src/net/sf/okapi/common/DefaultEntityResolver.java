@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 public class DefaultEntityResolver implements EntityResolver {
 
 	/**
-	 * Resolves a given entity.
+	 * Resolves a given entity to the input source for an empty XML document.
 	 * @param publicID The public ID of the entity.
 	 * @param systemID The system ID of the entity.
 	 * @return The input source for the resolved entity. This default implementation always returns

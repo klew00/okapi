@@ -28,11 +28,11 @@ public interface IHelp {
 
 	/**
 	 * Shows the help for a given topic.
-	 * @param object The object for which the help is to be displayed. The package
+	 * @param object the object for which the help is to be displayed. The package
 	 * name of this parameter is used to compute the location of the help file. 
-	 * @param filename The filename of the topic to call. The location is computed
+	 * @param filename the filename of the topic to call. The location is computed
 	 * for the package path of the object parameter.
-	 * @param query An option query string, or null.
+	 * @param query an option query string, or null.
 	 */
 	public void showTopic (Object object,
 		String filename,
@@ -40,9 +40,9 @@ public interface IHelp {
 
 	/**
 	 * Shows the help for a given topic.
-	 * @param object The object for which the help is to be displayed. The package
+	 * @param object the object for which the help is to be displayed. The package
 	 * name of this parameter is used to compute the location of the help file. 
-	 * @param filename The filename of the topic to call. The location is computed
+	 * @param filename the filename of the topic to call. The location is computed
 	 * for the package path of the object parameter.
 	 */
 	public void showTopic (Object object,

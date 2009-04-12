@@ -85,8 +85,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Helper method to convert a marker index to its character value in the
 	 * coded text string.
-	 * @param index The index value to encode.
-	 * @return The corresponding character value.
+	 * @param index the index value to encode.
+	 * @return the corresponding character value.
 	 */
 	public static char toChar (int index) {
 		return (char)(index+CHARBASE);
@@ -95,27 +95,28 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Helper method to convert the index-coded-as-character part of a marker into 
 	 * its index value.
-	 * @param index The character to decode.
-	 * @return The corresponding index value.
+	 * @param index the character to decode.
+	 * @return the corresponding index value.
 	 */
 	public static int toIndex (char index) {
 		return ((int)index)-CHARBASE;
 	}
 	
 	/**
-	 * Helper method to build a reference marker string from a given ID.
-	 * @param id The ID to use.
-	 * @return The reference marker constructed from the ID.
+	 * Helper method to build a reference marker string from a given identifier.
+	 * @param id the identifier to use.
+	 * @return the reference marker constructed from the ID.
 	 */
 	public static String makeRefMarker (String id) {
 		return REFMARKER_START+id+REFMARKER_END;
 	}
 	
 	/**
-	 * Helper method to build a reference marker string from a given ID and a property name.
-	 * @param id The ID to use.
-	 * @param propertyName The name of the property to use.
-	 * @return The reference marker constructed from the ID and the property name.
+	 * Helper method to build a reference marker string from a given identifier
+	 * and a property name.
+	 * @param id The identifier to use.
+	 * @param propertyName the name of the property to use.
+	 * @return the reference marker constructed from the identifier and the property name.
 	 */
 	public static String makeRefMarker (String id,
 		String propertyName)
@@ -125,10 +126,10 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Helper method to retrieve a reference marker from a string.  
-	 * @param text The text to search for a reference marker. 
-	 * @return Null if no reference marker has been found. An array of four objects if 
-	 * a reference marker has been found:
-	 * <ul><li>Object 0: The ID of the reference.
+	 * @param text the text to search for a reference marker. 
+	 * @return null if no reference marker has been found. An array of four 
+	 * objects if a reference marker has been found:
+	 * <ul><li>Object 0: The identifier of the reference.
 	 * <li>Object 1: The start position of the reference marker in the string.
 	 * <li>Object 2: The end position of the reference marker in the string.
 	 * <li>Object 3: The name of the property if there is one, null otherwise. 
@@ -158,16 +159,16 @@ public class TextFragment implements Comparable<Object> {
 	 * Helper method to find, from the back, the first non-whitespace character
 	 * of a coded text, starting at a given position and no farther than another
 	 * given position.
-	 * @param codedText The coded text to process.
-	 * @param fromIndex The first position to check (must be greater or equal to
+	 * @param codedText the coded text to process.
+	 * @param fromIndex the first position to check (must be greater or equal to
 	 * untilIndex). Use -1 to point to the last position of the text.
 	 * @param untilIndex The last position to check (must be lesser or equal to
 	 * fromIndex).
-	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
-	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
-	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
-	 * @param whitespaceIsWS Indicates if whitespace characters count as whitespace.
-	 * @return The first non-whitespace character position from the back, given the parameters.
+	 * @param openingMarkerIsWS indicates if opening markers count as whitespace.
+	 * @param closingMarkerIsWS indicates if closing markers count as whitespace.
+	 * @param isolatedMarkerIsWS indicates if isolated markers count as whitespace.
+	 * @param whitespaceIsWS indicates if whitespace characters count as whitespace.
+	 * @return the first non-whitespace character position from the back, given the parameters.
 	 */
 	public static int getLastNonWhitespacePosition (String codedText,
 		int fromIndex,
@@ -234,16 +235,16 @@ public class TextFragment implements Comparable<Object> {
 	 * Helper method to find the first non-whitespace character
 	 * of a coded text, starting at a given position and no farther than another
 	 * given position.
-	 * @param codedText The coded text to process.
-	 * @param fromIndex The first position to check (must be lesser or equal to
+	 * @param codedText the coded text to process.
+	 * @param fromIndex the first position to check (must be lesser or equal to
 	 * untilIndex).
-	 * @param untilIndex The last position to check (must be greater or equal to
+	 * @param untilIndex the last position to check (must be greater or equal to
 	 * fromIndex). Use -1 to point to the last position of the text.
-	 * @param openingMarkerIsWS Indicates if opening markers count as whitespace.
-	 * @param closingMarkerIsWS Indicates if closing markers count as whitespace.
-	 * @param isolatedMarkerIsWS Indicates if isolated markers count as whitespace.
-	 * @param whitespaceIsWS Indicates if whitespace characters count as whitespace.
-	 * @return The first non-whitespace character position, given the parameters.
+	 * @param openingMarkerIsWS indicates if opening markers count as whitespace.
+	 * @param closingMarkerIsWS indicates if closing markers count as whitespace.
+	 * @param isolatedMarkerIsWS indicates if isolated markers count as whitespace.
+	 * @param whitespaceIsWS indicates if whitespace characters count as whitespace.
+	 * @return the first non-whitespace character position, given the parameters.
 	 */
 	public static int getFirstNonWhitespacePosition (String codedText,
 		int fromIndex,
@@ -294,7 +295,7 @@ public class TextFragment implements Comparable<Object> {
 	 * Unwraps the content of a TextFragment. All sequences of consecutive white spaces
 	 * are replaced by a single space characters, and any white spaces at the head or
 	 * the end of the text is trimmed out. White spaces here are: space, tab, CR and LF. 
-	 * @param frag The text fragment to unwrap.
+	 * @param frag the text fragment to unwrap.
 	 */
 	public static void unwrap (TextFragment frag) {
 		String text = frag.getCodedText();
@@ -330,8 +331,8 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Helper method that check if a given character is an inline code marker.
-	 * @param ch The character to check.
-	 * @return True if the character is a code marker, false if it is not.
+	 * @param ch the character to check.
+	 * @return true if the character is a code marker, false if it is not.
 	 */
 	public static boolean isMarker (char ch) {
 		return (( ch == MARKER_OPENING )
@@ -350,7 +351,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Creates a TextFragment with a given text.
-	 * @param text The text to use.
+	 * @param text the text to use.
 	 */
 	public TextFragment (String text) {
 		this.text = new StringBuilder((text==null) ? "" : text);
@@ -358,7 +359,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Creates a TextFragment with the content of a given TextFragment.
-	 * @param fragment The content to use.
+	 * @param fragment the content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
 		//this.parent = parent;
@@ -369,8 +370,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Creates a TextFragment with the content made of a given coded text
 	 * and a list of codes.
-	 * @param newCodedText The new coded text.
-	 * @param newCodes The list of codes.
+	 * @param newCodedText the new coded text.
+	 * @param newCodes the list of codes.
 	 */
 	public TextFragment (String newCodedText,
 		List<Code> newCodes)
@@ -381,7 +382,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Clones this TextFragment.
-	 * @return A new TextFragment that is a copy of this one.
+	 * @return a new TextFragment that is a copy of this one.
 	 */
 	@Override
 	public TextFragment clone () {
@@ -393,7 +394,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if this TextFragment contains any in-line code with a reference.
-	 * @return True if there is one or more in-line codes with a reference,
+	 * @return true if there is one or more in-line codes with a reference,
 	 * false if there is no reference.
 	 */
 	public boolean hasReference () {
@@ -406,7 +407,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Appends a character to the fragment.
-	 * @param value The character to append.
+	 * @param value the character to append.
 	 */
 	public void append (char value) {
 		text.append(value);
@@ -414,7 +415,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Appends a string to the fragment. If the string is null, it is ignored.
-	 * @param text The string to append.
+	 * @param text the string to append.
 	 */
 	public void append (String text) {
 		if ( text == null ) return;
@@ -424,7 +425,7 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Appends a TextFragment object to this fragment. If the fragment is null,
 	 * it is ignored.
-	 * @param fragment The TextFragment to append.
+	 * @param fragment the TextFragment to append.
 	 */
 	public void append (TextFragment fragment) {
 		insert(-1, fragment);
@@ -432,7 +433,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Appends an existing code to this fragment.
-	 * @param code The existing code to append.
+	 * @param code the existing code to append.
 	 */
 	public Code append (Code code) {
 		if ( codes == null ) codes = new ArrayList<Code>();
@@ -461,10 +462,10 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Appends an annotation-type code to this text.
-	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
-	 * @param type The type of the annotation (e.g. "protected").
-	 * @param annotation The annotation to add (can be null).
-	 * @return The new code that was added to this text.
+	 * @param tagType the tag type of the code (e.g. TagType.OPENING).
+	 * @param type the type of the annotation (e.g. "protected").
+	 * @param annotation the annotation to add (can be null).
+	 * @return the new code that was added to this text.
 	 */
 	public Code append (TagType tagType,
 		String type,
@@ -477,10 +478,10 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Appends a new code to the text.
-	 * @param tagType The tag type of the code (e.g. TagType.OPENING).
-	 * @param type The type of the code (e.g. "bold").
-	 * @param data The raw code itself. (e.g. "&lt;b>").
-	 * @return The new code that was added to the text.
+	 * @param tagType the tag type of the code (e.g. TagType.OPENING).
+	 * @param type the type of the code (e.g. "bold").
+	 * @param data the raw code itself. (e.g. "&lt;b>").
+	 * @return the new code that was added to the text.
 	 */
 	public Code append (TagType tagType,
 		String type,
@@ -513,10 +514,10 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Inserts a TextFragment object to this fragment.
-	 * @param offset Position in the coded text where to insert the new fragment.
+	 * @param offset position in the coded text where to insert the new fragment.
 	 * You can use -1 to append at the end of the current content.
-	 * @param fragment The TextFragment to insert.
-	 * @throws InvalidPositionException When offset points inside a marker.
+	 * @param fragment the TextFragment to insert.
+	 * @throws InvalidPositionException when offset points inside a marker.
 	 */
 	public void insert (int offset,
 		TextFragment fragment)
@@ -568,7 +569,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Gets the coded text representation of the fragment.
-	 * @return The coded text for the fragment.
+	 * @return the coded text for the fragment.
 	 */
 	public String getCodedText () {
 		if ( !isBalanced ) balanceMarkers();
@@ -577,14 +578,14 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Gets the portion of coded text for a given section of the coded text.
-	 * @param start The position of the first character or marker of the section
+	 * @param start the position of the first character or marker of the section
 	 * (in the coded text representation).
 	 * @param end The position just after the last character or marker of the section
 	 * (in the coded text representation).
 	 * You can use -1 for ending the section at the end of the fragment.
-	 * @return The portion of coded text for the given range. It can be 
+	 * @return the portion of coded text for the given range. It can be 
 	 * empty but never null.
-	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @throws InvalidPositionException when start or end points inside a marker.
 	 */
 	public String getCodedText (int start,
 		int end)
@@ -599,8 +600,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Gets the code for a given index formatted as character (the second
 	 * special character in a marker in a coded text string).
-	 * @param indexAsChar The index value coded as character.
-	 * @return The corresponding code.
+	 * @param indexAsChar the index value coded as character.
+	 * @return the corresponding code.
 	 */
 	public Code getCode (char indexAsChar) {
 		return codes.get(toIndex(indexAsChar)); 
@@ -609,7 +610,7 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Gets the code for a given index.
 	 * @param index the index of the code.
-	 * @return The code for the given index.
+	 * @return the code for the given index.
 	 */
 	public Code getCode (int index) {
 		return codes.get(index);
@@ -617,7 +618,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Gets the list of all codes for the fragment.
-	 * @return The list of all codes for the fragment. If there is no code, an empty
+	 * @return the list of all codes for the fragment. If there is no code, an empty
 	 * list is returned.
 	 */
 	public List<Code> getCodes () {
@@ -629,12 +630,12 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Gets a copy of the list of the codes that are within a given section of
 	 * coded text.
-	 * @param start The position of the first character or marker of the section
+	 * @param start the position of the first character or marker of the section
 	 * (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
+	 * @param end the position just after the last character or marker of the section
 	 * (in the coded text representation).
-	 * @return A new list of all codes within the given range.
-	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @return a new list of all codes within the given range.
+	 * @throws InvalidPositionException when start or end points inside a marker.
 	 */
 	public List<Code> getCodes (int start,
 		int end)
@@ -662,9 +663,9 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Gets the index value for the first in-line code (in the codes list)
-	 * with a given ID.
-	 * @param id The ID to look for.
-	 * @return The index of the found code, or -1 if none is found. 
+	 * with a given identifier.
+	 * @param id the identifier to look for.
+	 * @return the index of the found code, or -1 if none is found. 
 	 */
 	public int getIndex (int id) {
 		if ( codes == null ) return -1;
@@ -678,7 +679,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Indicates if the fragment is empty (no text and no codes).
-	 * @return True if the fragment is empty.
+	 * @return true if the fragment is empty.
 	 */
 	public boolean isEmpty () {
 		return (text.length()==0);
@@ -687,9 +688,9 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Indicates if the fragment contains at least one character
 	 * (inline code and annotation markers do not count as characters).
-	 * @param whiteSpacesAreText Indicates if white-spaces should be considered 
+	 * @param whiteSpacesAreText indicates if white-spaces should be considered 
 	 * characters or not for the purpose of checking if this fragment is empty.
-	 * @return True if the fragment contains at least one character (that character could
+	 * @return true if the fragment contains at least one character (that character could
 	 * be a white-space if whiteSpacesAreText is set to true).
 	 */
 	public boolean hasText (boolean whiteSpacesAreText) {
@@ -713,7 +714,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if the fragment contains at least one code.
-	 * @return True if the fragment contains at least one code.
+	 * @return true if the fragment contains at least one code.
 	 */
 	public boolean hasCode () {
 		if ( codes == null ) return false;
@@ -722,11 +723,11 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Removes a section of the fragment (including its codes).
-	 * @param start The position of the first character or marker of the section
+	 * @param start the position of the first character or marker of the section
 	 * (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
+	 * @param end the position just after the last character or marker of the section
 	 * (in the coded text representation).
-	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @throws InvalidPositionException when start or end points inside a marker.
 	 */
 	public void remove (int start,
 		int end)
@@ -760,12 +761,12 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Gets a copy of a sub-sequence of this object.
-	 * @param start The position of the first character or marker of the section
+	 * @param start the position of the first character or marker of the section
 	 * (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
+	 * @param end the position just after the last character or marker of the section
 	 * (in the coded text representation).
 	 * You can use -1 for ending the section at the end of the fragment.
-	 * @return A new TextContainer object with a copy of the given sub-sequence.
+	 * @return a new TextContainer object with a copy of the given sub-sequence.
 	 */
 	public TextFragment subSequence (int start,
 		int end)
@@ -798,8 +799,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Sets the coded text of the fragment, using its the existing codes. The coded
 	 * text must be valid for the existing codes.
-	 * @param newCodedText The coded text to apply.
-	 * @throws InvalidContentException When the coded text is not valid, or does
+	 * @param newCodedText the coded text to apply.
+	 * @throws InvalidContentException when the coded text is not valid, or does
 	 * not correspond to the existing codes.
 	 */
 	public void setCodedText (String newCodedText)
@@ -824,9 +825,9 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Sets the coded text of the fragment and its corresponding codes.
-	 * @param newCodedText The coded text to apply.
-	 * @param newCodes The list of the corresponding codes.
-	 * @throws InvalidContentException When the coded text is not valid or does 
+	 * @param newCodedText the coded text to apply.
+	 * @param newCodes the list of the corresponding codes.
+	 * @throws InvalidContentException when the coded text is not valid or does 
 	 * not correspond to the new codes.
 	 */
 	public void setCodedText (String newCodedText,
@@ -837,11 +838,11 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Sets the coded text of the fragment and its corresponding codes.
-	 * @param newCodedText The coded text to apply.
-	 * @param newCodes The list of the corresponding codes.
+	 * @param newCodedText the coded text to apply.
+	 * @param newCodes the list of the corresponding codes.
 	 * @param allowCodeDeletion True when missing in-line codes in the coded text
 	 * means the corresponding codes should be deleted from the fragment.
-	 * @throws InvalidContentException When the coded text is not valid or does 
+	 * @throws InvalidContentException when the coded text is not valid or does 
 	 * not correspond to the new codes.
 	 */
 	public void setCodedText (String newCodedText,
@@ -934,7 +935,7 @@ public class TextFragment implements Comparable<Object> {
 	 * the method returns the comparison between the coded text strings of both text fragments.
 	 * If the object is not a TextFragment, the method returns the comparison between the two
 	 * toString() results of the two objects.
-	 * @return A value 0 if the objects are equals.
+	 * @return a value 0 if the objects are equals.
 	 */
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;
@@ -956,14 +957,14 @@ public class TextFragment implements Comparable<Object> {
 	 * existing that is within the range will become part of the new code.
 	 * @param start The position of the first character or marker of the section
 	 * (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
+	 * @param end the position just after the last character or marker of the section
 	 * (in the coded text representation).
-	 * @param tagType Tag type of the new code.
-	 * @param type Type of the new code.
-	 * @return The difference between the coded text length before and after 
+	 * @param tagType the tag type of the new code.
+	 * @param type the type of the new code.
+	 * @return the difference between the coded text length before and after 
 	 * the operation. This value can be used to adjust further start and end positions
 	 * that have been calculated on the coded text before the changes are applied.
-	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @throws InvalidPositionException when start or end points inside a marker.
 	 */
 	public int changeToCode (int start,
 		int end,
@@ -1010,9 +1011,9 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Finds the position in this coded text of the closing code for a give
 	 * opening code.
-	 * @param id ID of the opening code.
-	 * @param indexOfOpening Index of the opening code.
-	 * @return The position in this text of the closing code for the given
+	 * @param id identifier of the opening code.
+	 * @param indexOfOpening index of the opening code.
+	 * @return the position in this text of the closing code for the given
 	 * opening code, or -1 if it could not be found. 
 	 */
 	private int findClosingCodePosition(int id, int indexOfOpening) {
@@ -1036,16 +1037,16 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Annotates a section of this text.
-	 * @param start The position of the first character or marker of the section 
+	 * @param start the position of the first character or marker of the section 
 	 * to annotate (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
+	 * @param end the position just after the last character or marker of the section
 	 * to annotate (in the coded text representation).
-	 * @param type Type of annotation to set.
-	 * @param annotation Annotation to set (can be null).
-	 * @return The difference between the coded text length before and after 
+	 * @param type the type of annotation to set.
+	 * @param annotation the annotation to set (can be null).
+	 * @return the difference between the coded text length before and after 
 	 * the operation. This value can be used to adjust further start and end positions
 	 * that have been calculated on the coded text before the changes are applied.
-	 * @throws InvalidPositionException When start or end points inside a marker.
+	 * @throws InvalidPositionException when start or end points inside a marker.
 	 */
 	public int annotate (int start,
 		int end,
@@ -1141,7 +1142,7 @@ public class TextFragment implements Comparable<Object> {
 	 * Removes all annotations of a given type in this text. This also removes any
 	 * code that is there only for holding an annotation of the given type, or
 	 * any code that has no annotation and no data either. 
-	 * @param type The type of annotation to remove.
+	 * @param type the type of annotation to remove.
 	 */
 	public void removeAnnotations (String type) {
 		if ( !hasCode() ) return;
@@ -1155,7 +1156,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if this text has at least one annotation.
-	 * @return True if there is at least one annotation, false otherwise.
+	 * @return true if there is at least one annotation, false otherwise.
 	 */
 	public boolean hasAnnotation () {
 		if ( !hasCode() ) return false;
@@ -1167,8 +1168,8 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if this text has at least one annotation of a given type.
-	 * @param type The type of annotation to look for.
-	 * @return True if there is at least one annotation of the given type, false otherwise.
+	 * @param type the type of annotation to look for.
+	 * @return true if there is at least one annotation of the given type, false otherwise.
 	 */
 	public boolean hasAnnotation (String type) {
 		if ( !hasCode() ) return false;
@@ -1230,8 +1231,8 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Gets the list of all spans of text annotated with a given type of annotation.
-	 * @param type The type of annotation to look for.
-	 * @return A list of annotated spans for the given type.
+	 * @param type the type of annotation to look for.
+	 * @return a list of annotated spans for the given type.
 	 */
 	public List<AnnotatedSpan> getAnnotatedSpans (String type) {
 		// Always return a list, never null.
@@ -1264,8 +1265,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Verifies if a given position in the coded text is on the second special
 	 * character of a marker sequence.
-	 * @param position The position to text.
-	 * @throws InvalidPositionException When position points inside a marker.
+	 * @param position the position to text.
+	 * @throws InvalidPositionException when position points inside a marker.
 	 */
 	private void checkPositionForMarker (int position) {
 		if ( position > 0 ) {

@@ -29,9 +29,12 @@ import javax.xml.namespace.NamespaceContext;
 
 /**
  * Helper class to manage XML namespaces.
- * The reserved 'xml' and 'xmlns' prefixes are hard-coded.
+ * The reserved <code>xml</code> and <code>xmlns</code> prefixes are hard-coded.
  * <p>The following namespaces are pre-defined:
- * <ul><li>xsl : http://www.w3.org/1999/XSL/Transform
+ * <ul><li>xml : http://www.w3.org/XML/1998/namespace</li>
+ * <li>xmlns : http://www.w3.org/2000/xmlns/</li>
+ * <li>xsl : http://www.w3.org/1999/XSL/Transform</li>
+ * </ul>
  */
 public class NSContextManager implements NamespaceContext {
 

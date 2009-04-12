@@ -71,8 +71,8 @@ public class Code {
 
 	/**
 	 * Helper method to convert a list of codes into a string.
-	 * @param list List of the codes to flatten into a string.
-	 * @return The string with all the codes.
+	 * @param list the list of the codes to flatten into a string.
+	 * @return the string with all the codes.
 	 * @see #stringToCodes(String)
 	 */
 	public static String codesToString (List<Code> list) {
@@ -87,8 +87,8 @@ public class Code {
 	
 	/**
 	 * Gets a string storage representation of the annotations of a Code.
-	 * @param map The list of annotations.
-	 * @return The storage string.
+	 * @param map the list of annotations.
+	 * @return the storage string.
 	 */
 	private static String annotationsToString (LinkedHashMap<String, InlineAnnotation> map) {
 		if (( map == null ) || map.isEmpty() ) return "";
@@ -104,9 +104,9 @@ public class Code {
 	}
 	
 	/**
-	 * helper method to convert a storage string into a list of codes.
+	 * Helper method to convert a storage string into a list of codes.
 	 * @param data the storage string to convert.
-	 * @return A list of the codes in the storage string.
+	 * @return a list of the codes in the storage string.
 	 * @see #codesToString(List)
 	 */
 	public static List<Code> stringToCodes (String data) {
@@ -151,8 +151,8 @@ public class Code {
 	
 	/**
 	 * Creates a new code. By default codes can be both deleted and cloned.
-	 * @param tagType The tag type.
-	 * @param type The type of code (e.g. the name of the tag). The type must be
+	 * @param tagType the tag type.
+	 * @param type the type of code (e.g. the name of the tag). The type must be
 	 * exactly the same between the opening and closing codes.
 	 * @param data the content of the code.
 	 */
@@ -173,8 +173,8 @@ public class Code {
 
 	/**
 	 * Creates a new code with empty data.
-	 * @param tagType The tag type.
-	 * @param type The type of code (e.g. the name of the tag).
+	 * @param tagType the tag type.
+	 * @param type the type of code (e.g. the name of the tag).
 	 */
 	public Code (TagType tagType,
 		String type)
@@ -184,7 +184,7 @@ public class Code {
 	
 	/**
 	 * Creates a new code with a null type, and empty data. You must set the type later on.	 
-	 * @param type The type of code (e.g. the name of the tag).
+	 * @param type the type of code (e.g. the name of the tag).
 	 */
 	public Code (String type) {
 		this(null, type, "");
@@ -201,7 +201,7 @@ public class Code {
 	
 	/**
 	 * Appends a reference marker to the current code data.
-	 * @param id The ID of the referent resource.
+	 * @param id the identifier of the referent resource.
 	 */
 	public void appendReference (String id) {
 		this.data += TextFragment.makeRefMarker(id);
@@ -210,8 +210,8 @@ public class Code {
 	
 	/**
 	 * Appends a reference marker for a given property to the current code data.
-	 * @param id The ID of the referent resource where the property is located.
-	 * @param propertyName The name of the property.
+	 * @param id the identifier of the referent resource where the property is located.
+	 * @param propertyName the name of the property.
 	 */
 	public void appendReference (String id,
 		String propertyName)
@@ -222,7 +222,7 @@ public class Code {
 	
 	/**
 	 * Gets the string representation of this code: its data.
-	 * @return The raw data of this code.
+	 * @return the raw data of this code.
 	 */
 	@Override
 	public String toString () {
@@ -231,7 +231,7 @@ public class Code {
 
 	/**
 	 * Indicates if this code has any type of annotation.
-	 * @return True when this code has any type of annotation.
+	 * @return true when this code has any type of annotation.
 	 */
 	public boolean hasAnnotation () {
 		return (( annotations != null ) && ( annotations.size() > 0 ));
@@ -239,7 +239,7 @@ public class Code {
 
 	/**
 	 * Indicates if this code has a given type of annotation.
-	 * @return The type of annotation for this code or and empty string.
+	 * @return the type of annotation for this code or and empty string.
 	 */
 	public boolean hasAnnotation (String type) {
 		if ( annotations == null ) return false;
@@ -248,7 +248,7 @@ public class Code {
 	
 	/**
 	 * Indicates if this code has data.
-	 * @return True if this code has data. 
+	 * @return true if this code has data. 
 	 */
 	public boolean hasData () {
 		return (data.length()>0);
@@ -257,7 +257,7 @@ public class Code {
 	/**
 	 * Clone the code. Note that this method does not check if this code can be
 	 * duplicated or not. Use {@link #isCloneable()} to check.
-	 * @return A copy of the object.
+	 * @return a copy of the object.
 	 */
 	@Override
 	public Code clone () {
@@ -280,7 +280,7 @@ public class Code {
 	
 	/**
 	 * Gets the tag type of the code.
-	 * @return The tag type of the code.
+	 * @return the tag type of the code.
 	 */
 	public TagType getTagType () {
 		return tagType;
@@ -288,7 +288,7 @@ public class Code {
 	
 	/**
 	 * Sets the tag type for the code.
-	 * @param value The new tag type to apply. The value must be one of the
+	 * @param value the new tag type to apply. The value must be one of the
 	 * values of {@link TagType}.
 	 */
 	public void setTagType (TagType value) {
@@ -297,7 +297,7 @@ public class Code {
 	
 	/**
 	 * Gets the abstract type for the code. For example: "bold".
-	 * @return The abstract type of the code.
+	 * @return the abstract type of the code.
 	 */
 	public String getType () {
 		return type;
@@ -306,7 +306,7 @@ public class Code {
 	/**
 	 * Sets the abstract type of the code. This member is used to match up
 	 * together opening and closing codes.
-	 * @param value The new abstract type of the code.
+	 * @param value the new abstract type of the code.
 	 */
 	public void setType (String value) {
 		if ( value == null ) type = "null";
@@ -316,7 +316,7 @@ public class Code {
 	/**
 	 * Gets the raw data for the code. This does not build a string
 	 * with sub-flows content.
-	 * @return The raw data of the code.
+	 * @return the raw data of the code.
 	 */
 	public String getData () {
 		return data;
@@ -324,25 +324,25 @@ public class Code {
 	
 	/**
 	 * Sets the raw data for the code.
-	 * @param value The new raw data of the code.
+	 * @param value the new raw data of the code.
 	 */
 	public void setData (String value) {
 		data = value;
 	}
 	
 	/**
-	 * Gets the ID of the code.
-	 * @return The ID of the code.
+	 * Gets the identifier of the code.
+	 * @return The identifier of the code.
 	 */
 	public int getId () {
 		return id;
 	}
 
 	/**
-	 * Sets the ID of the code. Be aware that IDs for in-line codes are
+	 * Sets the identifier of the code. Be aware that identifiers for in-line codes are
 	 * generated automatically when used in {@link TextFragment} and overriding the
 	 * values may result in codes with duplicate IDs.
-	 * @param value The new ID value to be applied.
+	 * @param value the new identifier value to be applied.
 	 */
 	public void setId (int value) {
 		id = value;
@@ -353,7 +353,7 @@ public class Code {
 	 * unit contained within the code. For example: the text of the ALT attribute in the
 	 * HTML IMG element: If the IMG tag is a code, the value of ALT is one of its
 	 * sub-flows.
-	 * @return True if the code has at least one sub-flow.
+	 * @return true if the code has at least one sub-flow.
 	 */
 	public boolean hasReference () {
 		return ((flag & HASREF) == HASREF);
@@ -361,7 +361,7 @@ public class Code {
 	
 	/**
 	 * Sets the flag that indicates if this code has a reference (sub-flow) or not. 
-	 * @param value The new value to apply.
+	 * @param value the new value to apply.
 	 */
 	public void setReferenceFlag (boolean value) {
 		if ( value ) flag |= HASREF;
@@ -373,7 +373,7 @@ public class Code {
 	 * Outer data is used for format that implements in-line codes like TMX or XLIFF.
 	 * For example "&lt;ph id='1'>code&lt;/ph>" is the outer data, and "code" in the
 	 * inner data.
-	 * @param value The data to set.
+	 * @param value the data to set.
 	 */
 	public void setOuterData (String value) {
 		outerData = value;
@@ -392,7 +392,7 @@ public class Code {
 	/**
 	 * Indicates if this in-line code can be duplicated in the text.
 	 * For example a HTML bold element could be duplicated, while a <code>%s</code> should not.
-	 * @return True if this in-line code can be duplicated.
+	 * @return true if this in-line code can be duplicated.
 	 */
 	public boolean isCloneable () {
 		return ((flag & CLONEABLE) == CLONEABLE);
@@ -400,7 +400,7 @@ public class Code {
 
 	/**
 	 * Sets the flag of this in-line code to indicate if it can be duplicated or not.
-	 * @param value True to allow duplication, false to forbid it.
+	 * @param value true to allow duplication, false to forbid it.
 	 */
 	public void setCloneable (boolean value) {
 		if ( value ) flag |= CLONEABLE;
@@ -410,7 +410,7 @@ public class Code {
 	/**
 	 * Indicates if this in-line code can be removed from the text.
 	 * For example a HTML bold element could be removed, while a <code>%s</code> should not.
-	 * @return True if this in-line code can be removed.
+	 * @return true if this in-line code can be removed.
 	 */
 	public boolean isDeleteable () {
 		return ((flag & DELETEABLE) == DELETEABLE);
@@ -418,7 +418,7 @@ public class Code {
 	
 	/**
 	 * Sets the flag of this in-line code to indicate if it can be removed or not.
-	 * @param value True to allow deletion, false to forbid it.
+	 * @param value true to allow deletion, false to forbid it.
 	 */
 	public void setDeleteable (boolean value) {
 		if ( value ) flag |= DELETEABLE;
@@ -427,7 +427,7 @@ public class Code {
 
 	/**
 	 * Sets the annotation for this code.
-	 * @param type Type of the annotation to set.
+	 * @param type type of the annotation to set.
 	 * @param annotation the annotation to set. This parameter can be null for example
 	 * when the annotation is used like a boolean flag.
 	 */
@@ -443,8 +443,8 @@ public class Code {
 	
 	/**
 	 * Gets the annotation of a given type.
-	 * @param type The type of annotation to retrieve.
-	 * @return The annotation of the given type, or null if there is no such
+	 * @param type the type of annotation to retrieve.
+	 * @return the annotation of the given type, or null if there is no such
 	 * annotation for this code.
 	 */
 	public InlineAnnotation getAnnotation (String type) {
@@ -465,7 +465,7 @@ public class Code {
 
 	/**
 	 * Removes the annotation of a given type in this code.
-	 * @param type The type of annotation to remove.
+	 * @param type the type of annotation to remove.
 	 */
 	public void removeAnnotation (String type) {
 		if ( annotations != null ) {

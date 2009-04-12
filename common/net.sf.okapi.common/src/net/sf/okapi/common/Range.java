@@ -25,7 +25,14 @@ package net.sf.okapi.common;
  */
 public class Range {
 
+	/**
+	 * Starting position of this range.
+	 */
 	public int start;
+	
+	/**
+	 * Ending position of this range.
+	 */
 	public int end;
 
 	/**

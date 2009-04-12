@@ -31,10 +31,10 @@ public interface IEncoder {
 
 	/**
 	 * Sets the options for this encoder.
-	 * @param params The parameters object with all the configuration information 
+	 * @param params the parameters object with all the configuration information 
 	 * specific to this encoder.
-	 * @param encoding The name of the charset encoding to use.
-	 * @param lineBreak The type of line break to use.
+	 * @param encoding the name of the charset encoding to use.
+	 * @param lineBreak the type of line break to use.
 	 */
 	public void setOptions (IParameters params,
 		String encoding,
@@ -42,9 +42,9 @@ public interface IEncoder {
 	
 	/**
 	 * Encodes a given text with this encoder.
-	 * @param text The text to encode.
-	 * @param context The context of the text: 0=text, 1=skeleton, 2=inline.
-	 * @return The encoded text.
+	 * @param text the text to encode.
+	 * @param context the context of the text: 0=text, 1=skeleton, 2=inline.
+	 * @return the encoded text.
 	 */
 	public String encode (String text, int context);
 	
@@ -53,18 +53,18 @@ public interface IEncoder {
 	 * a loop it is assumed that the code point is tested by the caller to know 
 	 * if it is a supplemental one or not and and any index update to skip the
 	 * low surrogate part of the pair is done on the caller side.
-	 * @param codePoint The code-point to encode.
-	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
-	 * @return The encoded character 9as a string since it can be now made up of
+	 * @param codePoint the code-point to encode.
+	 * @param context the context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return the encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
 	public String encode (int codePoint, int context);
 	
 	/**
 	 * Encodes a given character with this encoding.
-	 * @param value The character to encode.
-	 * @param context The context of the character: 0=text, 1=skeleton, 2=inline.
-	 * @return The encoded character 9as a string since it can be now made up of
+	 * @param value the character to encode.
+	 * @param context the context of the character: 0=text, 1=skeleton, 2=inline.
+	 * @return the encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
 	public String encode (char value, int context);
@@ -72,9 +72,9 @@ public interface IEncoder {
 	/**
 	 * Converts any property values from its standard representation to
 	 * the native representation for this encoder.
-	 * @param propertyName Name of the property.
-	 * @param value Standard value to convert.
-	 * @return Native representation of the given value.
+	 * @param propertyName the name of the property.
+	 * @param value the standard value to convert.
+	 * @return the native representation of the given value.
 	 */
 	public String toNative (String propertyName,
 		String value);

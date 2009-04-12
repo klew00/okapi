@@ -34,7 +34,7 @@ public class Event {
 	/**
 	 * Creates a new event without any associated resource.
 	 * Used for filter events that have no resources such as START and FINISH.
-	 * @param filterEventType The type of event to create.
+	 * @param filterEventType the type of event to create.
 	 */
 	public Event (EventType filterEventType) {
 		this.filterEventType = filterEventType;		
@@ -43,7 +43,7 @@ public class Event {
 	/**
 	 * Creates a new event with an associated resource.
 	 * @param filterEventType The type of event to create.
-	 * @param resource The resource to associate to the event.
+	 * @param resource the resource to associate to the event.
 	 */
 	public Event(EventType filterEventType, IResource resource) {
 		this.filterEventType = filterEventType;
@@ -53,8 +53,8 @@ public class Event {
 	/**
 	 * Creates a new event with an associated resource and a skeleton object.
 	 * @param filterEventType The type of event to create.
-	 * @param resource The resource to associate to the event.
-	 * @param skeleton The skeleton to associate to the event.
+	 * @param resource the resource to associate to the event.
+	 * @param skeleton the skeleton to associate to the event.
 	 */
 	public Event(EventType filterEventType, IResource resource, ISkeleton skeleton) {
 		this.filterEventType = filterEventType;

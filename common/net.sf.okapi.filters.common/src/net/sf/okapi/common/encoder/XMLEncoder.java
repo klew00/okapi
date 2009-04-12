@@ -35,6 +35,17 @@ public class XMLEncoder implements IEncoder {
 	private boolean escapeGt;
 	private boolean escapeNbsp;
 	
+	/**
+	 * Sets the options for this encoder. This encoder supports the following
+	 * parameters:
+	 * <ul><li>escapeGt=true to converts '>' characters to to <code>&amp;gt;</code>.</li>
+	 * <li>escapeNbsp=true to converts non-breaking space to <code>&amp;nbsp;</code>.</li>
+	 * </ul>
+	 * @param params the parameters object with all the configuration information 
+	 * specific to this encoder.
+	 * @param encoding the name of the charset encoding to use.
+	 * @param lineBreak the type of line break to use.
+	 */
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)

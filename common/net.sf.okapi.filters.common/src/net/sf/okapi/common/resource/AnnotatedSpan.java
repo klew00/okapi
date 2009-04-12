@@ -51,12 +51,12 @@ public class AnnotatedSpan {
 	/**
 	 * Creates a new AnnotatedSpan object with a give type of annotation,
 	 * its annotation and its fragment of text. 
-	 * @param type The type of the annotation for this span of text.
-	 * @param annotation The annotation associated with this span of text.
+	 * @param type the type of the annotation for this span of text.
+	 * @param annotation the annotation associated with this span of text.
 	 * @param span the span of text.
-	 * @param start The start position of the span of text in the original
+	 * @param start the start position of the span of text in the original
 	 * coded text.
-	 * @param end The end position of the span of text in the original
+	 * @param end the end position of the span of text in the original
 	 * coded text.
 	 */
 	public AnnotatedSpan (String type,

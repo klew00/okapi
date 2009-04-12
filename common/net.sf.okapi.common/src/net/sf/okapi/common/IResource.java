@@ -39,39 +39,39 @@ public interface IResource {
 	 * or not, and it can be not a number.
 	 * It has no correspondence in the source document ("IDs" coming from the source document
 	 * are "names" and not available for all resources).
-	 * @return The id of this resource.
+	 * @return the identifier of this resource.
 	 */
 	public String getId ();
 	
 	/**
-	 * Sets the ID of this resource.
-	 * @param id The new ID value.
+	 * Sets the identifier of this resource.
+	 * @param id the new identifier value.
 	 * @see #getId()
 	 */
 	public void setId (String id);
 	
 	/**
 	 * Gets the skeleton object for this resource.
-	 * @return The skeleton object for this resource or null if there is none.
+	 * @return the skeleton object for this resource or null if there is none.
 	 */
 	public ISkeleton getSkeleton ();
 	
 	/**
 	 * Sets the skeleton object for this resource.
-	 * @param skeleton The skeleton object to set.
+	 * @param skeleton the skeleton object to set.
 	 */
 	public void setSkeleton (ISkeleton skeleton);
 
 	/**
 	 * Gets the annotation object for a given class for this resource.
-	 * @param type The class of the annotation object to retrieve.
-	 * @return The annotation for the given class for this resource. 
+	 * @param type the class of the annotation object to retrieve.
+	 * @return the annotation for the given class for this resource. 
 	 */
 	public <A> A getAnnotation (Class<? extends IAnnotation> type);
 
 	/**
 	 * Sets an annotation object or this resource.
-	 * @param annotation The annotation object to set.
+	 * @param annotation the annotation object to set.
 	 */
 	public void setAnnotation (IAnnotation annotation);
 	

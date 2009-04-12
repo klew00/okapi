@@ -36,7 +36,8 @@ import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
  * Resource that carries all the information needed for a filter to open a given
- * document. Documents are passed through the pipeline either as InputResource,
+ * document, and also the resource associated with the event INPUT_RESOURCE.
+ * Documents are passed through the pipeline either as InputResource,
  * or a filter events. Specialized steps allows to convert one to the other and
  * conversely. The InputResource object has one (and only one) of three input
  * objects: a CharSequence, a URI, or an InputStream.

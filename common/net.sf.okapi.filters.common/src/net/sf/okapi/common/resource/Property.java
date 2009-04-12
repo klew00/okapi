@@ -44,9 +44,9 @@ public class Property {
 
 	/**
 	 * Creates a new property object with a name, a vale and its read-only flag.
-	 * @param name Name of the property (case-sensitive).
-	 * @param value Value of the property.
-	 * @param isReadOnly True if the property is protected, false if it is not protected
+	 * @param name the name of the property (case-sensitive).
+	 * @param value the value of the property.
+	 * @param isReadOnly true if the property is protected, false if it is not protected
 	 * and can be modified.
 	 */
 	public Property (String name, String value, boolean isReadOnly) {
@@ -57,8 +57,8 @@ public class Property {
 	
 	/**
 	 * Creates a new read-only property object with a name and a value.
-	 * @param name The name of the property (case-sensitive)
-	 * @param value The value of the property.
+	 * @param name the name of the property (case-sensitive)
+	 * @param value the value of the property.
 	 */
 	public Property (String name, String value) {
 		this(name, value, true);
@@ -66,7 +66,7 @@ public class Property {
 	
 	/**
 	 * Gets the string representation of this property. This is the same as its value.
-	 * @return The value of the property.
+	 * @return the value of the property.
 	 */
 	@Override
 	public String toString () {
@@ -75,7 +75,7 @@ public class Property {
 	
 	/**
 	 * Clones this property.
-	 * @return A new property object that is a copy of this one.
+	 * @return a new property object that is a copy of this one.
 	 */
 	public Property clone () {
 		Property prop = new Property(name, value, isReadOnly);
@@ -85,7 +85,7 @@ public class Property {
 
 	/**
 	 * Gets the name of this property.
-	 * @return The name of this property.
+	 * @return the name of this property.
 	 */
 	public String getName () {
 		return name;
@@ -93,7 +93,7 @@ public class Property {
 	
 	/**
 	 * Gets the value of this property.
-	 * @return The value of this property.
+	 * @return the value of this property.
 	 */
 	public String getValue () {
 		return value;
@@ -103,7 +103,7 @@ public class Property {
 	 * Gets the boolean value of this property. Use this helper method to get a boolean from the 
 	 * value of this property. The values "true" and "yes" (in any case) returns true, any other 
 	 * value returns false. No verification is done to see if the value is really boolean or not.
-	 * @return True is the property value is "true", "yes" (case-insensitive), false otherwise.
+	 * @return true is the property value is "true", "yes" (case-insensitive), false otherwise.
 	 */
 	public boolean getBoolean () {
 		if ( value == null ) return false;
@@ -112,7 +112,7 @@ public class Property {
 	
 	/**
 	 * Sets a new value for this property.
-	 * @param value The new value to set.
+	 * @param value the new value to set.
 	 */
 	public void setValue (String value) {
 		this.value = value;
@@ -120,7 +120,7 @@ public class Property {
 	
 	/**
 	 * Indicates if this property is read-only.
-	 * @return True if the property is not modifiable, false if it can be modified.
+	 * @return true if the property is not modifiable, false if it can be modified.
 	 */
 	public boolean isReadOnly () {
 		return isReadOnly;
@@ -128,8 +128,8 @@ public class Property {
 	
 	/**
 	 * Gets the annotation of a given type for this property.
-	 * @param type The type of annotation to retrieve.
-	 * @return The annotation, or null if this property has no annotation of the requested type.
+	 * @param type the type of annotation to retrieve.
+	 * @return the annotation, or null if this property has no annotation of the requested type.
 	 */
 	@SuppressWarnings("unchecked")
 	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
@@ -139,7 +139,7 @@ public class Property {
 
 	/**
 	 * Sets an annotation for this property. 
-	 * @param annotation The annotation object to set.
+	 * @param annotation the annotation object to set.
 	 */
 	public void setAnnotation (IAnnotation annotation) {
 		if ( annotations == null ) annotations = new Annotations();

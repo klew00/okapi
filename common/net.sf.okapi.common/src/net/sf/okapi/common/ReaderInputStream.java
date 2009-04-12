@@ -1,4 +1,3 @@
-package net.sf.okapi.common;
 /*
  * Java Network Programming, Second Edition
  * Merlin Hughes, Michael Shoffner, Derek Hamner
@@ -35,11 +34,12 @@ package net.sf.okapi.common;
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+package net.sf.okapi.common;
 
 import java.io.*;
 
 /**
- * An InputStream backed by a Reader
+ * An InputStream backed by a Reader.
  */
 public class ReaderInputStream extends InputStream {
   protected Reader reader;
