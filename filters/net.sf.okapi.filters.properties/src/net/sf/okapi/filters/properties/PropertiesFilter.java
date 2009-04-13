@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -188,7 +189,10 @@ public class PropertiesFilter implements IFilter {
 			encoding = detector.getEncoding();
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
-			commonOpen(new InputStreamReader(input, encoding));
+			detector = null; // Free/close
+			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
+			bis.detectEncoding(); // Needed to skip over the BOM
+			commonOpen(new InputStreamReader(bis, encoding));
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
