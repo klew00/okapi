@@ -14,4 +14,5 @@ useGroupName.b=true
 protectAccepted.b=true
 xliffOptions.gMode.b=false
 xliffOptions.includeNoTranslate.b=true
+xliffOptions.setApprovedAsNoTranslate.b=false
 xliffOptions.message=</params></utilities></rainbowProject>

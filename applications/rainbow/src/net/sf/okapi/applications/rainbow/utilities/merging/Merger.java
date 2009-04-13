@@ -86,21 +86,24 @@ public class Merger {
 	}
 	
 	public void execute (int docId) {
-		if ( manifest.getPackageType().equals("rtf") ) {
-			convertFromRTF(docId);
+		ManifestItem item = manifest.getItem(docId);
+		// Skip items not selected for merge
+		if ( !item.selected() ) return;
+
+		// Merge or convert depending on the post-processing selected
+		if ( item.getPostProcessingType().equals(ManifestItem.POSPROCESSING_TYPE_RTF) ) {
+			convertFromRTF(docId, item);
 		}
-		else {
-			merge(docId);
+		else { // Default: use the reader-driven process
+			merge(docId, item);
 		}
 	}
 	
-	private void convertFromRTF (int docId) {
+	private void convertFromRTF (int docId,
+		ManifestItem item)
+	{
 		OutputStreamWriter writer = null;
 		try {
-			ManifestItem item = manifest.getItem(docId);
-			// Skip items not selected for merge
-			if ( !item.selected() ) return;
-			
 			// File to convert
 			String fileToConvert = manifest.getFileToMergePath(docId);
 
@@ -156,12 +159,10 @@ public class Merger {
 		}
 	}
 	
-	private void merge (int docId) {
+	private void merge (int docId,
+		ManifestItem item)
+	{
 		try {
-			ManifestItem item = manifest.getItem(docId);
-			// Skip items not selected for merge
-			if ( !item.selected() ) return;
-			
 			// File to merge
 			String fileToMerge = manifest.getFileToMergePath(docId);
 			// Instantiate a package reader of the proper type

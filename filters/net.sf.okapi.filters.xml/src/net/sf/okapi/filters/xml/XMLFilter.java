@@ -274,7 +274,7 @@ public class XMLFilter implements IFilter {
 		itsEng = new ITSEngine(doc, uri);
 		// Load the parameters file if there is one
 		if ( params != null ) {
-			if ( params.getDocument()!= null ) {
+			if ( params.getDocument() != null ) {
 				itsEng.addExternalRules(params.getDocument(), params.getURI());
 			}
 		}

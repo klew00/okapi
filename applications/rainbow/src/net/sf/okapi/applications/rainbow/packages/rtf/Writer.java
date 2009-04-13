@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -60,8 +61,7 @@ public class Writer extends BaseWriter {
 	}
 	
 	public String getReaderClass () {
-		//TODO: Use dynamic name
-		return "net.sf.okapi.applications.rainbow.packages.rtf.Reader";
+		return "none"; // RTF use a non-reader-driven post-processing mode
 	}
 	
 	@Override
@@ -227,7 +227,8 @@ public class Writer extends BaseWriter {
 		writer.close();
 		if ( manifest != null ) {
 			manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-				relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+				relativeTargetPath, sourceEncoding, targetEncoding, filterID,
+				ManifestItem.POSPROCESSING_TYPE_RTF);
 		}
 	}
 

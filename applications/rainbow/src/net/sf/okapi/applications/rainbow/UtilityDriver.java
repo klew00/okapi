@@ -21,6 +21,9 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -223,6 +226,9 @@ public class UtilityDriver implements CancelListener {
 			if ( filter != null ) filter.close();
 			if ( utility != null ) utility.postprocess();
 			logger.log(Level.SEVERE, "Error with utility.", e);
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			logger.info(sw.toString());
 		}
 		finally {
 			if ( stopProcess ) {

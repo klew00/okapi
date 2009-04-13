@@ -545,9 +545,9 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("http://okapi.opentag.com/updates?"
+				UIUtil.start("http://okapi.opentag.com/updates?" //$NON-NLS-1$
 					+ getClass().getPackage().getImplementationTitle()
-					+ "="
+					+ "=" //$NON-NLS-1$
 					+ getClass().getPackage().getImplementationVersion());
 			}
 		});

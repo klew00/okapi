@@ -189,11 +189,12 @@ public class Manifest {
 		String relativeOutputPath,
 		String inputEncoding,
 		String outputEncoding,
-		String filterID)
+		String filterID,
+		String postProcessingType)
 	{
 		docs.put(docID, new ManifestItem(relativeWorkPath,
 			relativeInputPath, relativeOutputPath,
-			inputEncoding, outputEncoding, filterID, true));
+			inputEncoding, outputEncoding, filterID, postProcessingType, true));
 	}
 
 	public String getFileToMergePath (int docID) {
@@ -256,6 +257,7 @@ public class Manifest {
 				writer.writeAttributeString("output", item.getRelativeOutputPath().replace('\\', '/'));
 				writer.writeAttributeString("inputEncoding", item.getInputEncoding());
 				writer.writeAttributeString("outputEncoding", item.getOutputEncoding());
+				writer.writeAttributeString("postProcessing", item.getPostProcessingType());
 				writer.writeEndElementLineBreak();
 			}
 
@@ -322,7 +324,7 @@ public class Manifest {
 		    tmp = elem.getAttribute("date");
 		    setDate(tmp);
 
-		    String inPath, outPath, inEnc, outEnc, filterID;
+		    String inPath, outPath, inEnc, outEnc, filterID, postProcessingType;
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
@@ -356,10 +358,15 @@ public class Manifest {
 			    if (( filterID == null ) || ( filterID.length() == 0 ))
 			    	throw new RuntimeException("Missing filter attribute.");
 			    
+			    postProcessingType = elem.getAttribute("postProcessing");
+			    if (( filterID == null ) || ( filterID.length() == 0 )) {
+			    	postProcessingType = "default";	
+			    }
+			    
 		    	docs.put(id, new ManifestItem(tmp.replace('/', File.separatorChar),
 		    		inPath.replace('/', File.separatorChar),
 		    		outPath.replace('/', File.separatorChar),
-		    		inEnc, outEnc, filterID, true));
+		    		inEnc, outEnc, filterID, postProcessingType, true));
 		    }
 
 		    rootFolder = Util.getDirectoryName(path);

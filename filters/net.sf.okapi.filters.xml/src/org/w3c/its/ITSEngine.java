@@ -81,7 +81,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		rules = new ArrayList<ITSRule>();
 		nsContext = new NSContextManager();
 		nsContext.addNamespace(ITS_NS_PREFIX, ITS_NS_URI);
+
+		// Macintosh work-around
+		// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
+		// That is not the case on 10.4 or with Windows or Linux flavors
+		// This allows XPathFactory.newInstance() to have a non-null context
+		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+		// end work-around
 		xpFact = XPathFactory.newInstance();
+
 		xpath = xpFact.newXPath();
 		xpath.setNamespaceContext(nsContext);
 	}

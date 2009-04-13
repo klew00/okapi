@@ -237,7 +237,14 @@ public class Editor implements IParametersEditor {
 		    DocumentBuilder builder = domFactory.newDocumentBuilder();
 		    Document doc = builder.parse(path);
 
+			// Macintosh work-around
+			// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
+			// That is not the case on 10.4 or with Windows or Linux flavors
+			// This allows XPathFactory.newInstance() to have a non-null context
+			Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+			// end work-around
 		    XPathFactory factory = XPathFactory.newInstance();
+
 		    XPath xpath = factory.newXPath();
 		    xpath.setNamespaceContext(new NSContextManager());
 		    XPathExpression expr = xpath.compile("//xsl:param"); //$NON-NLS-1$

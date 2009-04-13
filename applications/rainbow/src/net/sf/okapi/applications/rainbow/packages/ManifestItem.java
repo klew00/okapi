@@ -22,6 +22,9 @@ package net.sf.okapi.applications.rainbow.packages;
 
 public class ManifestItem {
 
+	public static final String POSPROCESSING_TYPE_DEFAULT = "default";
+	public static final String POSPROCESSING_TYPE_RTF = "rtf";
+	
 	private String relativeWorkPath;
 	private String relativeInputPath;
 	private String relativeOutputPath;
@@ -29,6 +32,7 @@ public class ManifestItem {
 	private String outputEncoding;
 	private String filterID;
 	private boolean selected;
+	private String postProcessingType;
 	private boolean exists;
 
 	public ManifestItem (String relativeWorkPath,
@@ -37,6 +41,7 @@ public class ManifestItem {
 		String inputEncoding,
 		String outputEncoding,
 		String filterID,
+		String postProcessingType,
 		boolean selected)
 	{
 		if ( relativeWorkPath == null ) throw new NullPointerException();
@@ -45,6 +50,7 @@ public class ManifestItem {
 		if ( inputEncoding == null ) throw new NullPointerException();
 		if ( outputEncoding == null ) throw new NullPointerException();
 		if ( filterID == null ) throw new NullPointerException();
+		if ( postProcessingType == null ) throw new NullPointerException();
 		
 		this.relativeWorkPath = relativeWorkPath;
 		this.relativeInputPath = relativeInputPath;
@@ -53,6 +59,7 @@ public class ManifestItem {
 		this.outputEncoding = outputEncoding;
 		this.filterID = filterID;
 		this.selected = selected;
+		this.postProcessingType = postProcessingType;
 		exists = true;
 	}
 
@@ -95,4 +102,9 @@ public class ManifestItem {
 	public void setExists (boolean value) {
 		exists = value;
 	}
+	
+	public String getPostProcessingType () {
+		return postProcessingType;
+	}
+	
 }

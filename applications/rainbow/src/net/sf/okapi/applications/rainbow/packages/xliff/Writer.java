@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.packages.xliff;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
+import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -194,7 +195,8 @@ public class Writer extends BaseWriter {
 		close();
 
 		manifest.addDocument(docID, relativeWorkPath, relativeSourcePath,
-			relativeTargetPath, sourceEncoding, targetEncoding, filterID);
+			relativeTargetPath, sourceEncoding, targetEncoding, filterID,
+			ManifestItem.POSPROCESSING_TYPE_DEFAULT);
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {

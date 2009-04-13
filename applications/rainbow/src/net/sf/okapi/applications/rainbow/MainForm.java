@@ -41,8 +41,8 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
-import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
-import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+//import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
+//import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IParameters;
@@ -121,7 +121,7 @@ public class MainForm implements IParametersProvider {
 	private String sharedFolder;
 	private BaseHelp help;
 	private Project prj;
-	private PipelineWrapper wrapper; 
+	//private PipelineWrapper wrapper; 
 	private StatusBar statusBar;
 	private TabFolder tabFolder;
 	private Label stInputRoot;
@@ -493,7 +493,7 @@ public class MainForm implements IParametersProvider {
 		buildUtilitiesMenu();
 
 		// Pipeline menu
-		MenuItem miPipeline = new MenuItem(menuBar, SWT.CASCADE);
+/*		MenuItem miPipeline = new MenuItem(menuBar, SWT.CASCADE);
 		miPipeline.setText(rm.getCommandLabel("pipeline")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		miPipeline.setMenu(dropMenu);
@@ -512,7 +512,7 @@ public class MainForm implements IParametersProvider {
 				executePipeline();
 			}
 		});
-
+*/
 		// Tools menu
 		miTools = new MenuItem(menuBar, SWT.CASCADE);
 		miTools.setText(rm.getCommandLabel("tools")); //$NON-NLS-1$
@@ -1156,7 +1156,7 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	private void editPipeline () {
+/*	private void editPipeline () {
 		try {
 			PipelineEditor dlg = new PipelineEditor();
 			dlg.edit(shell, plugins, wrapper, null, null, false);
@@ -1186,7 +1186,7 @@ public class MainForm implements IParametersProvider {
 			stopWaiting();
 		}
 	}
-	
+*/	
 	private void updateTabInfo () {
 		if ( tabFolder.getSelectionIndex() < inputTables.size() ) {
 			currentInput = tabFolder.getSelectionIndex();
@@ -1682,7 +1682,7 @@ public class MainForm implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
-		wrapper = new PipelineWrapper();
+		//wrapper = new PipelineWrapper();
 		currentInput = 0;
 		resetDisplay(-1);
 	}

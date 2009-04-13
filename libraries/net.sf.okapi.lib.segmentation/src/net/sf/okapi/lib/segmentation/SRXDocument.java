@@ -558,7 +558,14 @@ public class SRXDocument {
 			}
 
 			resetAll();
+			// Macintosh work-around
+			// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
+			// That is not the case on 10.4 or with Windows or Linux flavors
+			// This allows XPathFactory.newInstance() to have a non-null context
+			Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+			// end work-around
 			XPathFactory xpathFac = XPathFactory.newInstance();
+
 			XPath xpath = xpathFac.newXPath();
 			NSContextManager nsContext = new NSContextManager();
 			nsContext.add("srx", NSURI_SRX20);
