@@ -20,7 +20,11 @@
 
 package net.sf.okapi.applications.rainbow.utilities.merging;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,15 +44,18 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Merger {
+
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Manifest manifest;
 	private IReader reader;
 	private FilterAccess fa;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private RTFFilter rtfFilter;
 	private String trgLang;
 
 	public Merger () {
@@ -78,14 +85,85 @@ public class Merger {
 		trgLang = manifest.getTargetLanguage();
 	}
 	
-	public void merge (int docID) {
+	public void execute (int docId) {
+		if ( manifest.getPackageType().equals("rtf") ) {
+			convertFromRTF(docId);
+		}
+		else {
+			merge(docId);
+		}
+	}
+	
+	private void convertFromRTF (int docId) {
+		OutputStreamWriter writer = null;
 		try {
-			ManifestItem item = manifest.getItem(docID);
+			ManifestItem item = manifest.getItem(docId);
+			// Skip items not selected for merge
+			if ( !item.selected() ) return;
+			
+			// File to convert
+			String fileToConvert = manifest.getFileToMergePath(docId);
+
+			// Instantiate the reader if needed
+			if ( rtfFilter == null ) {
+				rtfFilter = new RTFFilter();
+			}
+
+			logger.info("\nConverting: " + fileToConvert);
+			
+			//TODO: get LB info from original
+			String lineBreak = Util.LINEBREAK_DOS;
+			
+			// Open the RTF input
+			File f = new File(fileToConvert);
+			//TODO: gusse encoding based on language
+			rtfFilter.open(new InputResource(f.toURI(), "windows-1252", manifest.getTargetLanguage()));
+				
+			// Open the output document
+			// Initializes the output
+			String outputFile = manifest.getFileToGeneratePath(docId);
+			Util.createDirectories(outputFile);
+			writer = new OutputStreamWriter(new BufferedOutputStream(
+				new FileOutputStream(outputFile)), item.getOutputEncoding());
+			//TODO: check BOM option from original
+			Util.writeBOMIfNeeded(writer, false, item.getOutputEncoding());
+				
+			// Process
+			StringBuilder buf = new StringBuilder();
+			while ( rtfFilter.getTextUntil(buf, -1, 0) == 0 ) {
+				writer.write(buf.toString());
+				writer.write(lineBreak);
+			}
+			
+		}		
+		catch ( Exception e ) {
+			// Log and move on to the next file
+			Throwable e2 = e.getCause();
+			logger.log(Level.SEVERE, "Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()), e);
+		}
+		finally {
+			if ( rtfFilter != null ) {
+				rtfFilter.close();
+			}
+			if ( writer != null ) {
+				try {
+					writer.close();
+				}
+				catch ( IOException e ) {
+					logger.log(Level.SEVERE, "Conversion error when closing file. " + e.getMessage(), e);
+				}
+			}
+		}
+	}
+	
+	private void merge (int docId) {
+		try {
+			ManifestItem item = manifest.getItem(docId);
 			// Skip items not selected for merge
 			if ( !item.selected() ) return;
 			
 			// File to merge
-			String fileToMerge = manifest.getFileToMergePath(docID);
+			String fileToMerge = manifest.getFileToMergePath(docId);
 			// Instantiate a package reader of the proper type
 			if ( reader == null ) {
 				reader = (IReader)Class.forName(manifest.getReaderClass()).newInstance();
@@ -94,9 +172,9 @@ public class Merger {
 
 			// Original and parameters files
 			String originalFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
-				+ File.separator + String.format("%d.ori", docID);
+				+ File.separator + String.format("%d.ori", docId);
 			String paramsFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
-				+ File.separator + String.format("%d.fprm", docID);
+				+ File.separator + String.format("%d.fprm", docId);
 			// Load the relevant filter
 			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
 			
@@ -108,13 +186,13 @@ public class Merger {
 				manifest.getSourceLanguage(), trgLang));
 			
 			// Initializes the output
-			String outputFile = manifest.getFileToGeneratePath(docID);
+			String outputFile = manifest.getFileToGeneratePath(docId);
 			Util.createDirectories(outputFile);
 			outFilter = inpFilter.createFilterWriter();
 			outFilter.setOptions(trgLang, item.getOutputEncoding());
 			outFilter.setOutput(outputFile);
 			
-			// process the document
+			// Process the document
 			Event event;
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();

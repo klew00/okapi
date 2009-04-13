@@ -727,10 +727,15 @@ public class RTFFilter implements IFilter {
 		frag.append(tagType, type, data);
 	}
 	
-	// Return: 0=ok, 1=err, 2=stop
+	/**
+	 * Gets the text content until a specified condition is reached.
+	 * @param cwCode the control word to stop on. Use -1 for either CW_PAR or CW_LINE.
+	 * @param errorCwCode the control word to stop on and return an error. Use 0 for none.
+	 * @return 0: OK, 1: error, 2: stop was due to no more text 
+	 */
 	public int getTextUntil (StringBuilder text,
-		int p_nCWCode,
-		int p_nErrorCWCode)
+		int cwCode,
+		int errorCwCode)
 	{
 		text.setLength(0);
 		//boolean bParOrLine = false;
@@ -754,19 +759,19 @@ public class RTFFilter implements IFilter {
 				break;
 
 			case TOKEN_CTRLWORD:
-				if ( p_nCWCode == -1 ) {
+				if ( cwCode == -1 ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
 						//bParOrLine = true;
 						return 0;
 					}
 				}
-				else if ( code == p_nCWCode ) {
+				else if ( code == cwCode ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
 						//bParOrLine = true;
 					}
 					return 0;
 				}
-				if ( code == p_nErrorCWCode ) {
+				if ( code == errorCwCode ) {
 					return 1;
 				}
 				break;

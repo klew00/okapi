@@ -93,6 +93,13 @@
 		</exec>
 		
 		<exec executable="java">
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test3_Extraction.rnb -x oku_extraction -np"/>
+		</exec>
+		<exec executable="java">
+		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test3_PostProcessing.rnb -x oku_merging -np"/>
+		</exec>
+		
+		<exec executable="java">
 		 <arg line="-jar ../dist_${platform}/lib/rainbow.jar -p extraction/Test2_Extraction.rnb -x oku_extraction -np"/>
 		</exec>
 		<exec executable="java">
@@ -141,6 +148,9 @@
 		 <arg line="extraction\test2_out\done\*.info extraction\test2_gold\*.info"/>
 		</exec>
 		
+		<exec executable="fc" output="_tests_results.txt" append="true">
+		 <arg line="extraction\test3_out\done\*.info extraction\test3_gold\*.info"/>
+		</exec>
 	</target>
 	
 	<target name="all" depends="runtests, winCompare"/>

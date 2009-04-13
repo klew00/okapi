@@ -93,7 +93,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		// Process each selected document in the manifest
 		Iterator<Integer> iter = manifest.getItems().keySet().iterator();
 		while ( iter.hasNext() ) {
-			merger.merge(iter.next());
+			merger.execute(iter.next());
 		}
 	}
 
