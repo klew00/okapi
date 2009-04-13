@@ -1,6 +1,10 @@
 <?xml version="1.0"?> 
 <project name="okapi-lib" default="all" basedir="."> 
 
+	<!-- Get the version information to use from file -->
+	<property file="../shared/release.properties" />
+	<property name="okapilibStamp" value="${okapilibVersion}_r${releaseNumber}" />
+	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
 		<os family="windows"/>
@@ -29,13 +33,14 @@
 		</or>
 	</condition>
 
+	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_v${okapilibVersion}" />
+
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}
+Version info: ${okapilibStamp}${line.separator}
 Running on: ${os.name} ${os.arch}${line.separator}
 ------------------------------------------------------------"/>
 
-	<property name="jarname" value="okapi-lib"/>
-	<property name="platform" value="win32-x86"/>
  	<property name="tmp" value="tmp"/>
 	<property name="dist" value="dist_${platform}"/>
 	<property name="distlib" value="${dist}/lib"/>
@@ -87,12 +92,14 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="${ant.project.name}"/>
+			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
 			<attribute name="Class-Path" value="swt.jar log4j-api-1.2.15.jar stax-api-1.0.1.jar
           wstx-lgpl-3.2.8.jar jyaml-1.3.jar             
                       commons-logging-api-1.1.1.jar"/>
   		</manifest>
 
-		<jar jarfile="${distlib}/${jarname}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
 			excludes="MANIFEST.MF"
   		/>
 
@@ -116,11 +123,11 @@ Running on: ${os.name} ${os.arch}${line.separator}
 	</target>
 
 	<target name="zipAll" unless="building-linux">
-		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
+		<zip destfile="${dist}/${distName}.zip" basedir="${dist}"/>
 	</target>
 
 	<target name="gzipAll" if="building-linux">
-		<tar destfile="${dist}/${jarname}_${platform}.tar.gz" basedir="${dist}" compression="gzip"/>
+		<tar destfile="${dist}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 	
 	<target name="all" depends="compile, zipAll, gzipAll"/>

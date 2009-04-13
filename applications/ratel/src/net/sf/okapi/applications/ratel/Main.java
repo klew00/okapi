@@ -48,7 +48,7 @@ public class Main {
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
-			SRXEditor editor = new SRXEditor(shlMain, false, help, null);
+			SRXEditor editor = new SRXEditor(shlMain, false, help);
 			editor.showDialog(null);
 		}
 		catch ( Throwable e ) {

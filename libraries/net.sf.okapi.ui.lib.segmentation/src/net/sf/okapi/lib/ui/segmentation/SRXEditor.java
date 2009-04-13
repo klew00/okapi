@@ -78,7 +78,6 @@ public class SRXEditor {
 	private static final String APPNAME = "Ratel"; //$NON-NLS-1$
 	
 	private Shell shell;
-	private String updateCommand;
 	private Text edSampleText;
 	private Text edResults;
 	private Table tblRules;
@@ -113,15 +112,13 @@ public class SRXEditor {
 
 	/**
 	 * Creates a new SRXEditor dialog.
-	 * @param parent The parent shell.
-	 * @param asDialog True if used from another program.
-	 * @param helpParam The help engine to use.
-	 * @param updateCommand The update command to use (or null for Ratel).
+	 * @param parent the parent shell.
+	 * @param asDialog true if used from another program.
+	 * @param helpParam the help engine to use.
 	 */
 	public SRXEditor (Shell parent,
 		boolean asDialog,
-		IHelp helpParam,
-		String updateCommand)
+		IHelp helpParam)
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
@@ -138,11 +135,9 @@ public class SRXEditor {
 
 		if ( asDialog ) {
 			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
-			this.updateCommand = updateCommand;
 		}
 		else {
 			shell = parent;
-			this.updateCommand = "ratel="+Res.getString("SRXEditor.version"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
@@ -550,7 +545,10 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.update"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("http://okapi.opentag.com/updates?"+updateCommand); //$NON-NLS-1$
+				UIUtil.start("http://okapi.opentag.com/updates?"
+					+ getClass().getPackage().getImplementationTitle()
+					+ "="
+					+ getClass().getPackage().getImplementationVersion());
 			}
 		});
 
@@ -604,7 +602,7 @@ public class SRXEditor {
 				AboutDialog dlg = new AboutDialog(shell,
 					Res.getString("SRXEditor.aboutCaption"), //$NON-NLS-1$
 					Res.getString("SRXEditor.aboutDescription"), //$NON-NLS-1$
-					Res.getString("SRXEditor.version")); //$NON-NLS-1$
+					getClass().getPackage().getImplementationVersion());
 				dlg.showDialog();
             }
 		});
@@ -1008,7 +1006,7 @@ public class SRXEditor {
 		config.setProperty("testInputPath", testInputPath); //$NON-NLS-1$
 		config.setProperty("testOutputPath", testOutputPath); //$NON-NLS-1$
 		config.setProperty("htmlOutput", htmlOutput); //$NON-NLS-1$
-		config.save(APPNAME, "Beta"); //$NON-NLS-1$
+		config.save(APPNAME, "N/A"); //$NON-NLS-1$
 		
 		getSurfaceData();
 		if ( srxDoc.isModified() ) {

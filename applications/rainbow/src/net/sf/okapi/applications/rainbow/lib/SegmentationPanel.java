@@ -139,8 +139,7 @@ public class SegmentationPanel extends Composite {
 	
 	private void editSRXFile (Text edTextField) {
 		try {
-			SRXEditor editor = new SRXEditor(getShell(), true, help,
-				"rainbow="+Res.getString("VERSION"));
+			SRXEditor editor = new SRXEditor(getShell(), true, help);
 			String oriPath = edTextField.getText().replace("${ProjDir}", projectDir);
 			if ( oriPath.length() == 0 ) oriPath = null;
 			editor.showDialog(oriPath);

@@ -571,8 +571,10 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
-				UIUtil.start("http://okapi.opentag.com/updates?rainbow=" //$NON-NLS-1$
-					+Res.getString("VERSION")); //$NON-NLS-1$
+				UIUtil.start("http://okapi.opentag.com/updates?" 
+					+ getClass().getPackage().getImplementationTitle()
+					+ "="
+					+ getClass().getPackage().getImplementationVersion());
 			}
 		});
 
@@ -617,7 +619,7 @@ public class MainForm implements IParametersProvider {
 				AboutDialog dlg = new AboutDialog(shell,
 					Res.getString("MainForm.aboutCaption"), //$NON-NLS-1$
 					Res.getString("MainForm.aboutAppName"), //$NON-NLS-1$
-					Res.getString("VERSION")); //$NON-NLS-1$);
+					getClass().getPackage().getImplementationVersion());
 				dlg.showDialog();
 			}
 		});
@@ -1549,7 +1551,7 @@ public class MainForm implements IParametersProvider {
 		// Set the MRU list
 		mruList.copyToProperties(config);
 		// Save to the user home directory as ".appname" file
-		config.save(APPNAME, Res.getString("VERSION")); //$NON-NLS-1$
+		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
 
 	private boolean canContinue () {
@@ -1989,8 +1991,7 @@ public class MainForm implements IParametersProvider {
 	private void editSegmentationRules (String path) {
 		SRXEditor dlg = null;
 		try {
-			dlg = new SRXEditor(shell, true, help,
-				"rainbow="+Res.getString("VERSION")); //$NON-NLS-1$ //$NON-NLS-2$
+			dlg = new SRXEditor(shell, true, help);
 			dlg.showDialog(path);
 		}
 		catch ( Throwable e ) {

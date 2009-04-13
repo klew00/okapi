@@ -133,7 +133,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		dbStoreBuilder.setOptions(trgLang, null);
 		
 		if ( aligner == null ) {
-			aligner = new Aligner(shell, help, updateCommand);
+			aligner = new Aligner(shell, help);
 			aligner.setInfo(trgSrxPath, params.checkSingleSegUnit,
 				params.useAutoCorrection, srcLang, trgLang);
 		}

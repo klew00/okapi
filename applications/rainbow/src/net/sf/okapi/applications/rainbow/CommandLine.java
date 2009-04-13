@@ -185,7 +185,7 @@ public class CommandLine {
 	private void printBanner () {
 		System.out.println("------------------------------------------------------------");
 		System.out.println("Rainbow - Command-Line Mode");
-		System.out.println("Version: "+Res.getString("VERSION"));
+		System.out.println("Version: "+getClass().getPackage().getImplementationVendor());
 		System.out.println("------------------------------------------------------------");
 	}
 	

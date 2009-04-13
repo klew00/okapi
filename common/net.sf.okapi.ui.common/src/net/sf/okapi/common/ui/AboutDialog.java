@@ -84,13 +84,14 @@ public class AboutDialog {
 		}
 
 		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText(description);
+		label.setText(description==null ? "TBD" : description); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL
 			| GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
 		label.setLayoutData(gdTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText(String.format(Res.getString("AboutDialog.versionLabel"), version)); //$NON-NLS-1$
+		label.setText(String.format(Res.getString("AboutDialog.versionLabel"),
+			version==null ? "TBD" : version)); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.GRAB_HORIZONTAL
 			| GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
 		label.setLayoutData(gdTmp);

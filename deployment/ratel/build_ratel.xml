@@ -1,6 +1,10 @@
 <?xml version="1.0"?> 
 <project name="ratel" default="all" basedir="."> 
 
+	<!-- Get the version information to use from file -->
+	<property file="../shared/release.properties" />
+	<property name="ratelStamp" value="${ratelVersion}_r${releaseNumber}" />
+	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
 		<os family="windows"/>
@@ -29,13 +33,14 @@
 		</or>
 	</condition>
 
+	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_v${ratelVersion}" />
+
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}
+Version info: ${ratelStamp}${line.separator}
 Running on: ${os.name} ${os.arch}${line.separator}
 ------------------------------------------------------------"/>
 
-	<property name="jarname" value="srxeditor-ratel"/>
-	<property name="platform" value="win32-x86"/>
 	<property name="proj_ratel" value="../../applications/ratel"/> 
 	<property name="src_ratel" value="${proj_ratel}/src"/> 
  	<property name="tmp" value="tmp"/>
@@ -76,10 +81,12 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Main-Class" value="net.sf.okapi.applications.ratel.Main"/>
+			<attribute name="Implementation-Title" value="${ant.project.name}"/>
+			<attribute name="Implementation-Version" value="${ratelStamp}"/>
 			<attribute name="Class-Path" value="swt.jar"/>
   		</manifest>
 
-		<jar jarfile="${distlib}/ratel.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
 			excludes="MANIFEST.MF"
   		/>
 
@@ -90,7 +97,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 	</target>
 	
 	<target name="linuxExePerm" if="building-linux">
-		<chmod file="${dist-bin}/${platform}/${jarname}" perm="ugo+rx"/>
+		<chmod file="${dist-bin}/${platform}/${ant.project.name}.jar" perm="ugo+rx"/>
 	</target>
 
 	<target name="winExe" if="building-windows">
@@ -98,11 +105,11 @@ Running on: ${os.name} ${os.arch}${line.separator}
 	</target>
 	
 	<target name="zipAll" unless="building-linux">
-		<zip destfile="${dist}/${jarname}_${platform}.zip" basedir="${dist}"/>
+		<zip destfile="${dist}/${distName}.zip" basedir="${dist}"/>
 	</target>
 
 	<target name="gzipAll" if="building-linux">
-		<tar destfile="${dist}/${jarname}_${platform}.tar.gz" basedir="${dist}" compression="gzip"/>
+		<tar destfile="${dist}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 	
 	<target name="all" depends="compile, winExe, linuxExePerm, zipAll, gzipAll"/>
