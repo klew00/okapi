@@ -10,6 +10,7 @@
    <its:translateRule selector="//del" translate="no" />
    <its:translateRule selector="//@*[ancestor::del]" translate="no"/>
    <its:withinTextRule selector="//ui|//ins|//del|//imgRef" withinText="yes"/>
+   <its:withinTextRule selector="//fnote" withinText="nested"/>
   </its:rules>
  </head>
  <test>Trans: ø=o-slash; Ą=A-ogonek, ＡＢＣ=ABC-fullwidth</test>
@@ -24,4 +25,5 @@
  <par>Part 1
   <notinline its:translate="no">no trans inside</notinline>
   Part 2</par>
+ <par>text with footnote<fnote>Text of the footnote</fnote> after footnote.</par>
 </myDoc>

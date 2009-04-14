@@ -148,8 +148,8 @@ public class ManifestDialog {
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, (help!=null));
-		pnlActions.btOK.setText("Execute");
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions,
+			(help!=null), "Execute");
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 

@@ -36,8 +36,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -143,18 +141,18 @@ public class Editor implements IParametersEditor {
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-		cmpTmp0.setLayout(new GridLayout(4, false));
+		cmpTmp0.setLayout(new GridLayout());
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Options");
 		tiTmp.setControl(cmpTmp0);		
 		
-		// search and replace grid items
+		// Search and replace grid items
 		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);
 		table.setLinesVisible (true);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+		table.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		//--click updates button states--
+		// Click updates button states
 		table.addListener (SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
 				if ( event.detail!=SWT.CHECK ) {
@@ -163,7 +161,7 @@ public class Editor implements IParametersEditor {
 			}
 		});		
 
-		//--double-click opens editor--
+		// Double-click opens editor
 		table.addListener (SWT.MouseDoubleClick, new Listener () {
 			public void handleEvent (Event event) {
 				if(table.getSelectionIndex()!=-1){
@@ -174,10 +172,9 @@ public class Editor implements IParametersEditor {
 			}
 		});		
 		
-		//--resizing the columns--
+		// Resizing the columns
 		table.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-
 				int tableWidth = table.getBounds().width;
 				int remaining = tableWidth - table.getColumn(0).getWidth();
 				table.getColumn(1).setWidth(remaining/2-2);
@@ -185,7 +182,7 @@ public class Editor implements IParametersEditor {
 			}
 		});
 		
-		// table headers
+		// Table headers
 		String[] titles = {"Use", "Search For", "Replace By"};
 		for (int i=0; i<titles.length; i++) {
 			TableColumn column = new TableColumn (table, SWT.LEFT);
@@ -193,40 +190,30 @@ public class Editor implements IParametersEditor {
 			column.pack();
 		}
 
-		// up and down buttons
-		Composite cmpTmp = new Composite(cmpTmp0, SWT.NONE);
-		RowLayout rl = new RowLayout();
-		rl.type = SWT.VERTICAL;
-		rl.pack = false;
-		cmpTmp.setLayout(rl);
-		
+		// Buttons
 		int standardWidth = 80;
-
-		RowData rdTmp = new RowData();
-		rdTmp.width = standardWidth;
-
-		// Add, edit, delete buttons
-		Composite cmpTmp2 = new Composite(cmpTmp0, SWT.NONE);
-		RowLayout rl2 = new RowLayout();
-		rl2.pack = false;
-		cmpTmp2.setLayout(rl2);
-		cmpTmp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+		// Add, edit, delete, move-up, move-down
+		Composite cmpTmp = new Composite(cmpTmp0, SWT.NONE);
+		layTmp = new GridLayout(5, true);
+		layTmp.marginHeight = layTmp.marginWidth = 0;
+		cmpTmp.setLayout(layTmp);
 		
-		Button btAdd = new Button(cmpTmp2, SWT.PUSH);
+		Button btAdd = new Button(cmpTmp, SWT.PUSH);
 		btAdd.setText("Add...");
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btAdd.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btAdd, standardWidth);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateType = ADD_ITEM;
 				showAddItemsDialog();
 			}
 		});		
-		rdTmp = new RowData();
-		rdTmp.width = standardWidth;
-		btAdd.setLayoutData(rdTmp);
-
 		
-		Button btEdit = new Button(cmpTmp2, SWT.PUSH);
+		Button btEdit = new Button(cmpTmp, SWT.PUSH);
 		btEdit.setText("Edit...");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btEdit.setLayoutData(gdTmp);
 		btEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(table.getSelectionIndex()!=-1){
@@ -235,10 +222,11 @@ public class Editor implements IParametersEditor {
 				}				
 			}
 		});		
-		btEdit.setLayoutData(rdTmp);
 		
-		Button btRemove = new Button(cmpTmp2, SWT.PUSH);
+		Button btRemove = new Button(cmpTmp, SWT.PUSH);
 		btRemove.setText("Remove");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if(table.getSelectionIndex()!=-1){
@@ -252,12 +240,13 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});	
-		btRemove.setLayoutData(rdTmp);
 		
 
-		btMoveUp = new Button(cmpTmp2, SWT.PUSH);
+		btMoveUp = new Button(cmpTmp, SWT.PUSH);
 		btMoveUp.setText("Move Up");
 		btMoveUp.setEnabled(false);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btMoveUp.setLayoutData(gdTmp);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( table.getSelectionIndex()!=-1 ) {
@@ -280,11 +269,12 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});	
-		btMoveUp.setLayoutData(rdTmp);
 		
-		btMoveDown = new Button(cmpTmp2, SWT.PUSH);
+		btMoveDown = new Button(cmpTmp, SWT.PUSH);
 		btMoveDown.setText("Move Down");
 		btMoveDown.setEnabled(false);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
@@ -308,7 +298,6 @@ public class Editor implements IParametersEditor {
 				}
 			}
 		});			
-		btMoveDown.setLayoutData(rdTmp);
 		
 		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
 		chkPlainText.setText("Process the files as plain text (not using filters)");
@@ -328,7 +317,7 @@ public class Editor implements IParametersEditor {
 		Group group = new Group(cmpTmp0, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
 		group.setText("Regular expression options");
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		chkDotAll = new Button(group, SWT.CHECK);
 		chkDotAll.setText("Dot also matches line-feed");

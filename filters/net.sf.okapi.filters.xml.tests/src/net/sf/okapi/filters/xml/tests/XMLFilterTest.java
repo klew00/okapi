@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.xml.XMLFilter;
 
@@ -160,6 +161,34 @@ public class XMLFilterTest {
 		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 			+ "<p>part 1 part 2 part3 part4</p>";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+	}
+	
+	@Test
+	public void testSeveralUnits () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><p>text 1</p><p>text 2</p><p>text 3</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text 1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("text 2", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertNotNull(tu);
+		assertEquals("text 3", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testTranslatableAttributes () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p text=\"value 1\">text 1</p><p>text 2</p><p>text 3</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("value 1", tu.getSource().toString());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {

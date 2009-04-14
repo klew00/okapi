@@ -106,7 +106,7 @@ public class Editor implements IParametersEditor {
 		tiTmp.setControl(cmpTmp0);		
 	
 		chkUnescape = new Button (cmpTmp0, SWT.RADIO);
-		chkUnescape.setText ("Un-escape the URI escape sequence");
+		chkUnescape.setText("Un-escape the URI escape sequence");
 		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkUnescape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -120,7 +120,7 @@ public class Editor implements IParametersEditor {
 		});		
 	
 		chkEscape = new Button (cmpTmp0, SWT.RADIO);
-		chkEscape.setText ("Escape content to URI escape sequence");
+		chkEscape.setText("Escape content to URI escape sequence");
 		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkEscape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -165,8 +165,8 @@ public class Editor implements IParametersEditor {
 		btnFirstOption.setText("All But URI-Marks");
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
-		gdTmp.widthHint = buttonWidth;
 		btnFirstOption.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btnFirstOption, buttonWidth);
 		btnFirstOption.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String selectList = " `@#$^&+={}|[]\\:\";<>,?/";
@@ -184,8 +184,8 @@ public class Editor implements IParametersEditor {
 		btnSecondOption = new Button(cmpTmp0, SWT.PUSH);
 		btnSecondOption.setText("All But Marks And Reserved");
 		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
 		btnSecondOption.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btnSecondOption, buttonWidth);
 		btnSecondOption.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String selectList = " `#^{}|[]\\\"<>";

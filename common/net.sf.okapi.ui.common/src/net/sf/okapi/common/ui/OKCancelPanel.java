@@ -22,6 +22,7 @@ package net.sf.okapi.common.ui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -30,13 +31,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Default panel for Help/OK/cancel buttons
+ * Default panel for Help/OK/Cancel buttons
  */
 public class OKCancelPanel extends Composite {
 
-	public Button       btOK;
-	public Button       btCancel;
-	public Button       btHelp;
+	public Button btOK;
+	public Button btCancel;
+	public Button btHelp;
 
 	/**
 	 * Creates a new panel for Help/OK/Cancel buttons.
@@ -53,12 +54,32 @@ public class OKCancelPanel extends Composite {
 		boolean showHelp)
 	{
 		super(parent, SWT.NONE);
-		createContent(action, showHelp, null);
+		createContent(action, showHelp, Res.getString("OKCancelPanel.btOK"));
+	}
+	
+	/**
+	 * Creates a new panel for Help/OK/Cancel buttons.
+	 * @param parent the parent control.
+	 * @param flags the style flags.
+	 * @param action the action to execute when any of the buttons is clicked.
+	 * The receiving event, the widget's data is marked: 'c' for the Cancel
+	 * button, 'o' for OK, and 'h' for help.
+	 * @param showHelp true to display the Help button.
+	 * @param okLabel the label for the 'o' button.
+	 */
+	public OKCancelPanel (Composite parent,
+		int flags,
+		SelectionAdapter action,
+		boolean showHelp,
+		String okLabel)
+	{
+		super(parent, SWT.NONE);
+		createContent(action, showHelp, okLabel);
 	}
 	
 	private void createContent (SelectionAdapter action,
 		boolean showHelp,
-		String fourthButtonText)
+		String okLabel)
 	{
 		GridLayout layTmp = new GridLayout(2, true);
 		layTmp.marginHeight = 0;
@@ -71,8 +92,8 @@ public class OKCancelPanel extends Composite {
 		btHelp.setData("h");
 		btHelp.addSelectionListener(action);
 		GridData gdTmp = new GridData();
-		gdTmp.widthHint = nWidth;
 		btHelp.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btHelp, nWidth);
 		btHelp.setVisible(showHelp);
 		
 		Composite cmpTmp = new Composite(this, SWT.NONE);
@@ -89,24 +110,32 @@ public class OKCancelPanel extends Composite {
 			btOK = new Button(cmpTmp, SWT.PUSH);
 			btCancel = new Button(cmpTmp, SWT.PUSH);
 		}
-		else {
+		else { // UIUtil.PFTYPE_UNIX, UIUtil.PFTYPE_MAC
 			btCancel = new Button(cmpTmp, SWT.PUSH);
 			btOK = new Button(cmpTmp, SWT.PUSH);
 		}
 
-		btOK.setText(Res.getString("OKCancelPanel.btOK"));
+		btOK.setText(okLabel);
 		btOK.setData("o");
 		btOK.addSelectionListener(action);
 		RowData rdTmp = new RowData();
-		rdTmp.width = nWidth;
 		btOK.setLayoutData(rdTmp);
+		btOK.pack();
+		Rectangle rect1 = btOK.getBounds();
 		
 		btCancel.setText(Res.getString("OKCancelPanel.btCancel"));
 		btCancel.setData("c");
 		btCancel.addSelectionListener(action);
 		rdTmp = new RowData();
-		rdTmp.width = nWidth;
 		btCancel.setLayoutData(rdTmp);
+		btCancel.pack();
+		Rectangle rect2 = btCancel.getBounds();
+		
+		int max = rect1.width;
+		if ( max < rect2.width ) max = rect2.width;
+		if ( max < nWidth ) max = nWidth;
+		((RowData)btOK.getLayoutData()).width = max;
+		((RowData)btCancel.getLayoutData()).width = max;
 	}
 	
 	public void setOKText (String text) {

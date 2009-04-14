@@ -76,7 +76,6 @@ public class XMLFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private int tuId;
 	private int otherId;
-	private int parseState;
 	private TextFragment frag;
 	private GenericSkeleton skel;
 	private Stack<ContextItem> context;
@@ -127,22 +126,20 @@ public class XMLFilter implements IFilter {
 		if ( queue == null ) return null;
 
 		// Process queue if it's not empty yet
-		if ( queue.size() > 0 ) {
-			return queue.poll();
-		}
-
-		// Process the next item, filling the queue
-		process();
-		// Send next event after processing, if there is one
-		if ( queue.size() > 0 ) {
-			if ( parseState == 1 ) {
+		while ( true ) {
+			if ( queue.size() > 0 ) {
 				Event event = queue.poll();
-				queue = null;
+				if ( event.getEventType() == EventType.END_DOCUMENT ) {
+					queue = null;
+				}
 				return event;
 			}
-			return queue.poll();
+
+			// Process the next item, filling the queue
+			process();
+			// Ensure no infinite loop
+			if ( queue.size() == 0 ) return null;
 		}
-		return null;
 	}
 
 	public void open (InputResource input) {
@@ -211,7 +208,6 @@ public class XMLFilter implements IFilter {
 		canceled = false;
 		tuId = 0;
 		otherId = 0;
-		parseState = 0;
 
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -354,7 +350,6 @@ public class XMLFilter implements IFilter {
 					ending.setSkeleton(skel);
 				}
 				queue.add(new Event(EventType.END_DOCUMENT, ending));
-				parseState = 1;
 				return;
 			}
 			

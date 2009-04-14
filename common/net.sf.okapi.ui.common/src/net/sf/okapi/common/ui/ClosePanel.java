@@ -24,13 +24,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Default panel for Help/OK/cancel buttons
+ * Default panel for Help/Close buttons
  */
 public class ClosePanel extends Composite {
 
@@ -68,32 +66,25 @@ public class ClosePanel extends Composite {
 		btHelp.setText(Res.getString("ClosePanel.btHelp")); //$NON-NLS-1$
 		btHelp.setData("h"); //$NON-NLS-1$
 		btHelp.addSelectionListener(action);
-		GridData gdTmp = new GridData();
-		gdTmp.widthHint = nWidth;
-		btHelp.setLayoutData(gdTmp);
+		btHelp.setLayoutData(new GridData());
+		UIUtil.ensureWidth(btHelp, nWidth);
 		btHelp.setVisible(showHelp);
 		
 		Composite cmpTmp = new Composite(this, SWT.NONE);
-		RowLayout layRow = new RowLayout(SWT.HORIZONTAL);
-		layRow.marginWidth = 0;
-		layRow.marginHeight = 0;
-		cmpTmp.setLayout(layRow);
-		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		layTmp = new GridLayout();
+		layTmp.marginWidth = 0;
+		layTmp.marginHeight = 0;
+		cmpTmp.setLayout(layTmp);
+		GridData gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gdTmp.grabExcessHorizontalSpace = true;
 		cmpTmp.setLayoutData(gdTmp);
 
-		// Create the buttons in a platform-specific order
 		btClose = new Button(cmpTmp, SWT.PUSH);
-
 		btClose.setText(Res.getString("ClosePanel.btClose")); //$NON-NLS-1$
 		btClose.setData("c"); //$NON-NLS-1$
 		btClose.addSelectionListener(action);
-		RowData rdTmp = new RowData();
-		rdTmp.width = nWidth;
-		btClose.setLayoutData(rdTmp);
+		btClose.setLayoutData(new GridData());
+		UIUtil.ensureWidth(btClose, nWidth);
 	}
 	
-	public void setCloseText (String text) {
-		btClose.setText(text);
-	}
 }

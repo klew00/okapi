@@ -190,9 +190,13 @@ public class PipelineEditor {
 				shell.close();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		
+		
 		if ( executeMode ) {
-			pnlActions.btOK.setText("Execute");
+			pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true, "Execute");
+		}
+		else {
+			pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		}
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
