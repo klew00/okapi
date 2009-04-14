@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
@@ -127,7 +128,7 @@ public class GroupsAndOptionsDialog {
 		int listWidthHint = 150;
 		lbLangRules = new List(grpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 3;
+		gdTmp.verticalSpan = 1;
 		gdTmp.widthHint = listWidthHint;
 		lbLangRules.setLayoutData(gdTmp);
 		lbLangRules.addSelectionListener(new SelectionAdapter() {
@@ -136,22 +137,30 @@ public class GroupsAndOptionsDialog {
 			};
 		});
 		
-		int buttonWidth = 80;
-		btAddRules = new Button(grpTmp, SWT.PUSH);
-		btAddRules.setText(Res.getString("options.addRules")); //$NON-NLS-1$
+		Composite cmpTmp = new Composite(grpTmp, SWT.NONE);
+		layTmp = new GridLayout(1, true);
+		layTmp.marginWidth = 0;
+		layTmp.marginHeight = 0;
+		cmpTmp.setLayout(layTmp);
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		cmpTmp.setLayoutData(gdTmp);
+		
+		int buttonWidth = 80;
+		btAddRules = new Button(cmpTmp, SWT.PUSH);
+		btAddRules.setText(Res.getString("options.addRules")); //$NON-NLS-1$
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btAddRules.setLayoutData(gdTmp);
+		// Make sure one button is at least buttonWidth wide
+		UIUtil.ensureWidth(btAddRules, buttonWidth);
 		btAddRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRules(true);
 			}
 		});
 		
-		btRenameRules = new Button(grpTmp, SWT.PUSH);
+		btRenameRules = new Button(cmpTmp, SWT.PUSH);
 		btRenameRules.setText(Res.getString("options.renameRules")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btRenameRules.setLayoutData(gdTmp);
 		btRenameRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -159,10 +168,9 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 		
-		btRemoveRules = new Button(grpTmp, SWT.PUSH);
+		btRemoveRules = new Button(cmpTmp, SWT.PUSH);
 		btRemoveRules.setText(Res.getString("options.removeRules")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btRemoveRules.setLayoutData(gdTmp);
 		btRemoveRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -181,7 +189,7 @@ public class GroupsAndOptionsDialog {
 		
 		lbLangMaps = new List(grpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 5;
+		gdTmp.verticalSpan = 1;
 		gdTmp.widthHint = listWidthHint;		
 		lbLangMaps.setLayoutData(gdTmp);
 		lbLangMaps.addSelectionListener(new SelectionAdapter() {
@@ -190,21 +198,29 @@ public class GroupsAndOptionsDialog {
 			};
 		});
 
-		btAddMap = new Button(grpTmp, SWT.PUSH);
-		btAddMap.setText(Res.getString("options.addMap")); //$NON-NLS-1$
+		cmpTmp = new Composite(grpTmp, SWT.NONE);
+		layTmp = new GridLayout(1, true);
+		layTmp.marginWidth = 0;
+		layTmp.marginHeight = 0;
+		cmpTmp.setLayout(layTmp);
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		cmpTmp.setLayoutData(gdTmp);
+		
+		btAddMap = new Button(cmpTmp, SWT.PUSH);
+		btAddMap.setText(Res.getString("options.addMap")); //$NON-NLS-1$
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btAddMap.setLayoutData(gdTmp);
+		// Make sure one button is at least buttonWidth wide
+		UIUtil.ensureWidth(btAddMap, buttonWidth);
 		btAddMap.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editMap(true);
 			}
 		});
 
-		btEditMap = new Button(grpTmp, SWT.PUSH);
+		btEditMap = new Button(cmpTmp, SWT.PUSH);
 		btEditMap.setText(Res.getString("options.editMap")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btEditMap.setLayoutData(gdTmp);
 		btEditMap.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -212,10 +228,9 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 		
-		btRemoveMap = new Button(grpTmp, SWT.PUSH);
+		btRemoveMap = new Button(cmpTmp, SWT.PUSH);
 		btRemoveMap.setText(Res.getString("options.removeMap")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btRemoveMap.setLayoutData(gdTmp);
 		btRemoveMap.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -223,10 +238,9 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 		
-		btMoveUpMap = new Button(grpTmp, SWT.PUSH);
+		btMoveUpMap = new Button(cmpTmp, SWT.PUSH);
 		btMoveUpMap.setText(Res.getString("options.moveUpMap")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btMoveUpMap.setLayoutData(gdTmp);
 		btMoveUpMap.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -234,10 +248,9 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 		
-		btMoveDownMap = new Button(grpTmp, SWT.PUSH);
+		btMoveDownMap = new Button(cmpTmp, SWT.PUSH);
 		btMoveDownMap.setText(Res.getString("options.moveDownMap")); //$NON-NLS-1$
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		btMoveDownMap.setLayoutData(gdTmp);
 		btMoveDownMap.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

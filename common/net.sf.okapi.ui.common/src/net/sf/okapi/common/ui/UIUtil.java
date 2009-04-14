@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 public class UIUtil {
@@ -146,6 +147,21 @@ public class UIUtil {
 		}
 		catch ( Throwable e ) {
 			return null;
+		}
+	}
+
+	/**
+	 * Ensures that a control using GridData layout has a given minimum with.
+	 * @param control the control to adjust.
+	 * @param minimumWidth the minimum width to use.
+	 */
+	public static void ensureWidth (Control control,
+		int minimumWidth)
+	{
+		control.pack();
+		Rectangle rect = control.getBounds();
+		if ( rect.width < minimumWidth ) {
+			((GridData)control.getLayoutData()).widthHint = minimumWidth;
 		}
 	}
 

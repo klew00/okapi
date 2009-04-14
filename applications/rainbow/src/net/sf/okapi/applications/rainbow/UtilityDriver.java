@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Level;

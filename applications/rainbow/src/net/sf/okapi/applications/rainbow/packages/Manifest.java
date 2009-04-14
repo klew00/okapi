@@ -278,6 +278,7 @@ public class Manifest {
 		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
 		    if ( NL == null ) throw new RuntimeException("Invalid manifest file.");
 		    Element elem = (Element)NL.item(0);
+		    if ( elem == null ) throw new RuntimeException("Invalid manifest file.");
 		    
 		    String tmp = elem.getAttribute("projectID");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))

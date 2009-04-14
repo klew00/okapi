@@ -157,8 +157,8 @@ public class Editor implements IParametersEditor {
 		btOptions = new Button(cmpTmp, SWT.PUSH);
 		btOptions.setText("&Options...");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = 80;
 		btOptions.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btOptions, 80);
 		btOptions.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editOptions();

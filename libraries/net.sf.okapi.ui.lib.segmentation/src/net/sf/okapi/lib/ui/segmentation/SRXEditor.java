@@ -182,8 +182,8 @@ public class SRXEditor {
 		Button btTmp = new Button(cmpTmp, SWT.PUSH);
 		btTmp.setText(Res.getString("edit.groupAndOptions")); //$NON-NLS-1$
 		gdTmp = new GridData();
-		gdTmp.widthHint = topButtonsWidth;
 		btTmp.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btTmp, topButtonsWidth);
 		btTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editGroupsAndOptions();
@@ -241,13 +241,9 @@ public class SRXEditor {
 		gdTmp.horizontalSpan = 6;
 		cmpGroup.setLayoutData(gdTmp);
 
-		//int ruleButtonsWidth = 95;
 		btAddRule = new Button(cmpGroup, SWT.PUSH);
 		btAddRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btAddRule.setText(Res.getString("edit.btAddRule")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btAddRule.setLayoutData(gdTmp);
 		btAddRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRule(true);
@@ -257,9 +253,6 @@ public class SRXEditor {
 		btEditRule = new Button(cmpGroup, SWT.PUSH);
 		btEditRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btEditRule.setText(Res.getString("edit.btEditRule")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btEditRule.setLayoutData(gdTmp);
 		btEditRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRule(false);
@@ -269,9 +262,6 @@ public class SRXEditor {
 		btRemoveRule = new Button(cmpGroup, SWT.PUSH);
 		btRemoveRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btRemoveRule.setText(Res.getString("edit.btRemoveRule")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btRemoveRule.setLayoutData(gdTmp);
 		btRemoveRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				removeRule();
@@ -281,9 +271,6 @@ public class SRXEditor {
 		btMoveUpRule = new Button(cmpGroup, SWT.PUSH);
 		btMoveUpRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btMoveUpRule.setText(Res.getString("edit.moveUp")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btMoveUpRule.setLayoutData(gdTmp);
 		btMoveUpRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveUpRule();
@@ -293,9 +280,6 @@ public class SRXEditor {
 		btMoveDownRule = new Button(cmpGroup, SWT.PUSH);
 		btMoveDownRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btMoveDownRule.setText(Res.getString("edit.moveDown")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btMoveDownRule.setLayoutData(gdTmp);
 		btMoveDownRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDownRule();
@@ -305,9 +289,6 @@ public class SRXEditor {
 		Button btMaskRule = new Button(cmpGroup, SWT.PUSH);
 		btMaskRule.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btMaskRule.setText(Res.getString("edit.maskRule")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btMaskRule.setLayoutData(gdTmp);
 		btMaskRule.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editMaskRule();
@@ -317,9 +298,6 @@ public class SRXEditor {
 		Button btCharInfo = new Button(cmpGroup, SWT.PUSH);
 		btCharInfo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btCharInfo.setText(Res.getString("edit.charInfo")); //$NON-NLS-1$
-		//gdTmp = new GridData();
-		//gdTmp.widthHint = ruleButtonsWidth;
-		//btCharInfo.setLayoutData(gdTmp);
 		btCharInfo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				showCharInfo();

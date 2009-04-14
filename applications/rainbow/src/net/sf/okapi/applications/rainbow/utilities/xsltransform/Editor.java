@@ -149,8 +149,8 @@ public class Editor implements IParametersEditor {
 		Button btGetDefaults = new Button(cmpTmp, SWT.PUSH);
 		btGetDefaults.setText(Res.getString("editor.btGetDefaults")); //$NON-NLS-1$
 		gdTmp = new GridData();
-		gdTmp.widthHint = wideButtonWidth;
 		btGetDefaults.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btGetDefaults, wideButtonWidth);
 		btGetDefaults.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getParametersFromTemplate();
@@ -161,8 +161,8 @@ public class Editor implements IParametersEditor {
 		btOpenFile.setText(Res.getString("editor.btOpenTemplate")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
-		gdTmp.widthHint = wideButtonWidth;
 		btOpenFile.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btOpenFile, wideButtonWidth);
 		btOpenFile.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Program.launch(edXsltPath.getText()); 
