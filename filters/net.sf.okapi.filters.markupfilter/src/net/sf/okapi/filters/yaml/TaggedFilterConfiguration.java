@@ -42,6 +42,8 @@ import net.sf.okapi.common.resource.Code;
  * TEXT RUN - Elements which group together a common run of inline elements. For
  * example, a style marker in OpenXML.
  * <p>
+ * TEXT MARKER - Elements which immediately surround text.
+ * <p>
  * Any of the above rules may have conditional rules based on attribute names
  * and/or values. Conditional rules ({@link ConditionalAttributeRule}) may be
  * attached to both elements and attributes. More than one conditional rules are
@@ -55,6 +57,7 @@ public class TaggedFilterConfiguration {
 	private static final String INCLUDE = "INCLUDE";
 	private static final String TEXTUNIT = "TEXTUNIT";
 	private static final String TEXTRUN = "TEXTRUN";
+	private static final String TEXTMARKER = "TEXTMARKER";
 	private static final String PRESERVE_WHITESPACE = "PRESERVE_WHITESPACE";
 	private static final String SCRIPT = "SCRIPT";
 	private static final String SERVER = "SERVER";
@@ -70,7 +73,7 @@ public class TaggedFilterConfiguration {
 	private static final String ELEMENT_TYPE = "elementType";
 
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
+		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, UNKOWN
 	};
 
 	private YamlConfigurationReader configReader;
@@ -109,6 +112,8 @@ public class TaggedFilterConfiguration {
 			return RULE_TYPE.TEXT_UNIT_ELEMENT;
 		} else if (ruleType.equals(TEXTRUN)) {
 			return RULE_TYPE.TEXT_RUN_ELEMENT;
+		} else if (ruleType.equals(TEXTMARKER)) {
+			return RULE_TYPE.TEXT_MARKER_ELEMENT;
 		} else if (ruleType.equals(PRESERVE_WHITESPACE)) {
 			return RULE_TYPE.PRESERVE_WHITESPACE;
 		} else if (ruleType.equals(SCRIPT)) {
