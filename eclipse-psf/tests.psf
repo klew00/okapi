@@ -22,6 +22,5 @@
 <project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.segmentation.tests,net.sf.okapi.lib.segmentation.tests,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
 <project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline.tests,net.sf.okapi.pipeline.tests,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
 <project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/examples/python/python.examples,python.pipeline,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/tests/scripts,test-okapi-scripts,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
 </provider>
 </psf>
