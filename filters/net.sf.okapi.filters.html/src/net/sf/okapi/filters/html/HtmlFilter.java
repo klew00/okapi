@@ -72,7 +72,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		super.startFilter();
 		setPreserveWhitespace(false);
 		if (getConfig().collapseWhitespace()) {
-			LOGGER.log(Level.WARNING,
+			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration");
 		}
 	}
