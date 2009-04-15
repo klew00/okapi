@@ -108,6 +108,7 @@ public class MainForm implements IParametersProvider {
 	public static final String OPT_ALLOWDUPINPUT = "allowDupInput"; //$NON-NLS-1$
 	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
 	public static final String OPT_BOUNDS        = "bounds"; //$NON-NLS-1$
+	public static final String OPT_LOGLEVEL      = "logLevel"; //$NON-NLS-1$
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -249,7 +250,7 @@ public class MainForm implements IParametersProvider {
 		log = new LogForm(shell);
 		log.setTitle(Res.getString("LOG_CAPTION")); //$NON-NLS-1$
 		logHandler = new LogHandler(log);
-		logHandler.setLevel(Level.INFO);
+		setLogLevel();
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
 		fa = new FilterAccess();
@@ -1037,6 +1038,24 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
+	private void setLogLevel () {
+		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
+		switch ( n ) {
+		case 1:
+			logHandler.setLevel(Level.FINE);
+			break;
+		case 2:
+			logHandler.setLevel(Level.FINER);
+			break;
+		case 3:
+			logHandler.setLevel(Level.FINEST);
+			break;
+		default:
+			logHandler.setLevel(Level.INFO);
+			break;
+		}
+	}
+	
 	private void createToolbar () {
 		ToolBar toolbar = new ToolBar(shell, SWT.FLAT | SWT.WRAP);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -1500,6 +1519,7 @@ public class MainForm implements IParametersProvider {
 			PreferencesForm dlg = new PreferencesForm(shell, help);
 			dlg.setData(config);
 			dlg.showDialog();
+			setLogLevel();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

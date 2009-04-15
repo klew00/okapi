@@ -33,7 +33,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 class PreferencesForm {
@@ -44,6 +46,7 @@ class PreferencesForm {
 	private Button rdStartPrjAsk;
 	private Button rdStartPrjLoad;
 	private Button chkAllowDuplicateInputs;
+	private Combo cbLogLevel;
 	private UserConfiguration config;
 
 	PreferencesForm (Shell p_Parent,
@@ -72,10 +75,22 @@ class PreferencesForm {
 		grpTmp = new Group(shell, SWT.NONE);
 		grpTmp.setText("Miscellaneous");
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		grpTmp.setLayout(new GridLayout());
+		grpTmp.setLayout(new GridLayout(2, false));
 		
 		chkAllowDuplicateInputs = new Button(grpTmp, SWT.CHECK);
 		chkAllowDuplicateInputs.setText("Allow duplicate documents in the input lists");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAllowDuplicateInputs.setLayoutData(gdTmp);
+		
+		Label label = new Label(grpTmp, SWT.NONE);
+		label.setText("Logging level:");
+		
+		cbLogLevel = new Combo(grpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbLogLevel.add("Normal");
+		cbLogLevel.add("Fine");
+		cbLogLevel.add("Finer");
+		cbLogLevel.add("Finest");
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -90,7 +105,7 @@ class PreferencesForm {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
@@ -116,6 +131,9 @@ class PreferencesForm {
 		if ( n == 1 ) rdStartPrjAsk.setSelection(true);
 		else if ( n == 2 ) rdStartPrjLoad.setSelection(true);
 		else rdStartPrjDoNotLoad.setSelection(true);
+		n = config.getInteger(MainForm.OPT_LOGLEVEL);
+		if (( n < 0 ) || ( n > 3)) n = 0;
+		cbLogLevel.select(n);
 	}
 
 	private boolean saveData () {
@@ -124,6 +142,7 @@ class PreferencesForm {
 			if ( rdStartPrjAsk.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 1);
 			else if ( rdStartPrjLoad.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 2);
 			else config.setProperty(MainForm.OPT_LOADMRU, 0);
+			config.setProperty(MainForm.OPT_LOGLEVEL, cbLogLevel.getSelectionIndex());
 		}
 		catch ( Exception E ) {
 			return false;
