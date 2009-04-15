@@ -29,6 +29,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderDialog;
 import net.sf.okapi.common.ui.filters.LDPanel;
 import net.sf.okapi.filters.regex.Parameters;
@@ -210,7 +211,7 @@ public class Editor implements IParametersEditor {
 		//--- Buttons
 		
 		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(2, false);
+		layTmp = new GridLayout(2, true);
 		layTmp.marginWidth = 0;
 		cmpButtons.setLayout(layTmp);
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -221,9 +222,9 @@ public class Editor implements IParametersEditor {
 		
 		btAdd = new Button(cmpButtons, SWT.PUSH);
 		btAdd.setText(Res.getString("Editor.add")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btAdd.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btAdd, buttonWidth);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editRule(true);
@@ -232,8 +233,7 @@ public class Editor implements IParametersEditor {
 		
 		btEdit = new Button(cmpButtons, SWT.PUSH);
 		btEdit.setText(Res.getString("Editor.edit")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btEdit.setLayoutData(gdTmp);
 		btEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -243,8 +243,7 @@ public class Editor implements IParametersEditor {
 		
 		btRename = new Button(cmpButtons, SWT.PUSH);
 		btRename.setText(Res.getString("Editor.rename")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btRename.setLayoutData(gdTmp);
 		btRename.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -254,8 +253,7 @@ public class Editor implements IParametersEditor {
 		
 		btMoveUp = new Button(cmpButtons, SWT.PUSH);
 		btMoveUp.setText(Res.getString("Editor.moveUp")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btMoveUp.setLayoutData(gdTmp);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -265,8 +263,7 @@ public class Editor implements IParametersEditor {
 		
 		btRemove = new Button(cmpButtons, SWT.PUSH);
 		btRemove.setText(Res.getString("Editor.remove")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.widthHint = buttonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
 		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
@@ -277,9 +274,8 @@ public class Editor implements IParametersEditor {
 		
 		btMoveDown = new Button(cmpButtons, SWT.PUSH);
 		btMoveDown.setText(Res.getString("Editor.moveDown")); //$NON-NLS-1$
-		gdTmp = new GridData();
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
-		gdTmp.widthHint = buttonWidth;
 		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

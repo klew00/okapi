@@ -164,5 +164,5 @@ public class UIUtil {
 			((GridData)control.getLayoutData()).widthHint = minimumWidth;
 		}
 	}
-
+	
 }

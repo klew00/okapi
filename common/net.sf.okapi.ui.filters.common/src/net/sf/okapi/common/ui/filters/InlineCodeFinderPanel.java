@@ -24,12 +24,14 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -43,6 +45,8 @@ import org.eclipse.swt.widgets.Text;
  */
 public class InlineCodeFinderPanel extends Composite {
 
+	private static final String ACCEPT_LABEL = "Accept";
+	
 	private InlineCodeFinder codeFinder;
 	private List lbRules;
 	private Text edExpression;
@@ -90,7 +94,6 @@ public class InlineCodeFinderPanel extends Composite {
 		lbRules = new List(cmpRules, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
-		//gdTmp.verticalSpan = 4;
 		gdTmp.grabExcessVerticalSpace = true;
 		lbRules.setLayoutData(gdTmp);
 		lbRules.addSelectionListener(new SelectionAdapter() {
@@ -99,26 +102,30 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
-		int normalButtonWidth = 80;
-		int largeButtonWidth = 80;
+		int buttonSet1Width = 90;
+		int buttonSet2Width = 90;
 
-		// Buttons for the rules list
+		//--- Buttons for the rules list
 
-		btAdd = new Button(cmpRules, SWT.PUSH);
+		Composite cmpTmp = new Composite(cmpRules, SWT.NONE);
+		layTmp = new GridLayout(2, true);
+		layTmp.marginHeight = layTmp.marginWidth = 0;
+		cmpTmp.setLayout(layTmp);
+		
+		btAdd = new Button(cmpTmp, SWT.PUSH);
 		btAdd.setText("Add");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btAdd.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btAdd, buttonSet1Width);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				startEditMode(true);
 			};
 		});
 	
-		btMoveUp = new Button(cmpRules, SWT.PUSH);
+		btMoveUp = new Button(cmpTmp, SWT.PUSH);
 		btMoveUp.setText("Move Up");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btMoveUp.setLayoutData(gdTmp);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -126,10 +133,9 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 		
-		btRemove = new Button(cmpRules, SWT.PUSH);
+		btRemove = new Button(cmpTmp, SWT.PUSH);
 		btRemove.setText("Remove");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -137,10 +143,9 @@ public class InlineCodeFinderPanel extends Composite {
 			};
 		});
 
-		btMoveDown = new Button(cmpRules, SWT.PUSH);
+		btMoveDown = new Button(cmpTmp, SWT.PUSH);
 		btMoveDown.setText("Move Down");
-		gdTmp = new GridData();
-		gdTmp.widthHint = normalButtonWidth;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -163,10 +168,16 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 
 		btModify = new Button(this, SWT.PUSH);
-		btModify.setText("Modify");
 		gdTmp = new GridData();
-		gdTmp.widthHint = largeButtonWidth;
 		btModify.setLayoutData(gdTmp);
+		// This button has two labels: use the maximum width
+		int max = buttonSet2Width;
+		btModify.setText(ACCEPT_LABEL);
+		btModify.pack();
+		Rectangle rect = btModify.getBounds();
+		if ( rect.width > max ) max = rect.width;
+		btModify.setText("Modify");
+		UIUtil.ensureWidth(btModify, max);
 		btModify.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( editMode ) endEditMode(true);
@@ -177,8 +188,8 @@ public class InlineCodeFinderPanel extends Composite {
 		btDiscard = new Button(this, SWT.PUSH);
 		btDiscard.setText("Discard");
 		gdTmp = new GridData();
-		gdTmp.widthHint = largeButtonWidth;
 		btDiscard.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btDiscard, buttonSet2Width);
 		btDiscard.setEnabled(false);
 		btDiscard.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -189,8 +200,8 @@ public class InlineCodeFinderPanel extends Composite {
 		btInsertPattern = new Button(this, SWT.PUSH);
 		btInsertPattern.setText("Patterns...");
 		gdTmp = new GridData();
-		gdTmp.widthHint = largeButtonWidth;
 		btInsertPattern.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btInsertPattern, buttonSet2Width);
 		btInsertPattern.setEnabled(false);
 		btInsertPattern.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -299,7 +310,7 @@ public class InlineCodeFinderPanel extends Composite {
 			btMoveUp.setEnabled(false);
 			btMoveDown.setEnabled(false);
 			btModify.setEnabled(true);
-			btModify.setText("Accept");
+			btModify.setText(ACCEPT_LABEL);
 			edExpression.setFocus();
 		}
 		else {

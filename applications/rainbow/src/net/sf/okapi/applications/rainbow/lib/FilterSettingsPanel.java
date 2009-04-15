@@ -97,7 +97,7 @@ public class FilterSettingsPanel extends Composite {
 		edDescription = new Text(this, SWT.BORDER | SWT.MULTI | SWT.WRAP);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 3;
-		gdTmp.heightHint = 40;
+		gdTmp.heightHint = 60;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
 		

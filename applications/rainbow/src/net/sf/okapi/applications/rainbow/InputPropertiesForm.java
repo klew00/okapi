@@ -67,11 +67,11 @@ class InputPropertiesForm {
 		grpTmp.setText(Res.getString("INPROP_GRPPARAMS")); //$NON-NLS-1$
 
 		pnlFilterSettings = new FilterSettingsPanel(grpTmp, help, SWT.NONE, paramsProv, projectDir);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlFilterSettings.setLayoutData(gdTmp);
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		grpTmp.setLayout(new GridLayout(2, false));
 		grpTmp.setText(Res.getString("INPROP_GRPENCODINGS")); //$NON-NLS-1$
 		
