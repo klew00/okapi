@@ -99,7 +99,10 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					if ( code.hasData() ) {
+					if ( code.hasAnnotation("protected") ) {
+						tmp.append("<mrk mtype=\"protected\">");
+					}
+					//if ( code.hasData() ) {
 						if ( gMode ) {
 							tmp.append(String.format("<g id=\"%d\">", code.getId()));
 						}
@@ -108,10 +111,7 @@ public class XLIFFContent {
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 							tmp.append("</bpt>");
 						}
-					}
-					if ( code.hasAnnotation("protected") ) {
-						tmp.append("<mrk mtype=\"protected\">");
-					}
+					//}
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
@@ -121,7 +121,7 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					if ( code.hasData() ) {
+					//if ( code.hasData() ) {
 						if ( gMode ) {
 							tmp.append("</g>");
 						}
@@ -130,7 +130,7 @@ public class XLIFFContent {
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 							tmp.append("</ept>");
 						}
-					}
+					//}
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("</mrk>");
 					}
@@ -144,7 +144,7 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					if ( code.hasData() ) {
+					//if ( code.hasData() ) {
 						if ( gMode ) {
 							tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
 						}
@@ -153,7 +153,7 @@ public class XLIFFContent {
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 							tmp.append("</ph>");
 						}
-					}
+					//}
 				}
 				break;
 			case '>':

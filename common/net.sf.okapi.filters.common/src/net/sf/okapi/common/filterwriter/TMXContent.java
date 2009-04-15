@@ -101,23 +101,23 @@ public class TMXContent {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
-					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
-					tmp.append("</bpt>");
-				}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("<hi type=\"protected\">");
 				}
+				//if ( code.hasData() ) {
+					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					tmp.append("</bpt>");
+				//}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
+				//if ( code.hasData() ) {
 					tmp.append(String.format("<ept i=\"%d\">", code.getId()));
 					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
 					tmp.append("</ept>");
-				}
+				//}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("</hi>");
 				}

@@ -111,7 +111,7 @@ public class SRXDocument {
 		trimLeadingWS = false; // Extension
 		trimTrailingWS = false; // Extension
 
-		sampleText = "Mr. Holmes is from the <I>U.K.</I> <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
+		sampleText = "Mr. Holmes is from the U.K. not the U.S. <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
 	}
 	

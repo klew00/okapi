@@ -31,6 +31,7 @@ import net.sf.okapi.lib.segmentation.Rule;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -70,7 +71,6 @@ public class RuleDialog {
 		edBefore = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edBefore.setLayoutData(gdTmp);
-		edBefore.setText(rule.getBefore());
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText(Res.getString("ruleDlg.afterLabel")); //$NON-NLS-1$
@@ -78,7 +78,6 @@ public class RuleDialog {
 		edAfter = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edAfter.setLayoutData(gdTmp);
-		edAfter.setText(rule.getAfter());
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText(Res.getString("ruleDlg.actionLabel")); //$NON-NLS-1$
@@ -120,7 +119,14 @@ public class RuleDialog {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 600 ) startSize.x = 600; 
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
+
+		// Set the text after the resize
+		edAfter.setText(rule.getAfter());
+		edBefore.setText(rule.getBefore());
 	}
 	
 	public Rule showDialog () {

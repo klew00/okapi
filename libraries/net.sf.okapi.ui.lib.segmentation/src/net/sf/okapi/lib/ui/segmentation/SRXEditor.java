@@ -42,6 +42,11 @@ import net.sf.okapi.lib.segmentation.Segmenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
@@ -380,6 +385,21 @@ public class SRXEditor {
 			public void shellDeactivated(ShellEvent event) {}
 			public void shellDeiconified(ShellEvent event) {}
 			public void shellIconified(ShellEvent event) {}
+		});
+		
+		// Drop target for opening project
+		DropTarget dropTarget = new DropTarget(shell, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
+		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public void drop (DropTargetEvent e) {
+				FileTransfer FT = FileTransfer.getInstance();
+				if ( FT.isSupportedType(e.currentDataType) ) {
+					String[] paths = (String[])e.data;
+					if ( paths != null ) {
+						loadSRXDocument(paths[0]);
+					}
+				}
+			}
 		});
 
 		// Size
@@ -730,7 +750,7 @@ public class SRXEditor {
 	}
 
 	private void getSurfaceData () {
-		srxDoc.setSampleText(edSampleText.getText());
+		srxDoc.setSampleText(edSampleText.getText().replace("\r", ""));
 		srxDoc.setSampleLanguage(edSampleLanguage.getText());
 		srxDoc.setTestOnSelectedGroup(rdTestOnSelectedGroup.getSelection());
 	}
