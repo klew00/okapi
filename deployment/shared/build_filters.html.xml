@@ -6,10 +6,8 @@
  
 	<path id="mainClassPath_filters.html">
 		<pathelement location="${tmp}"/>
-		<pathelement location="${distlib}/slf4j-api-1.5.0.jar"/>
-		<pathelement location="${distlib}/commons-logging-api-1.1.1.jar"/>
 		<pathelement location="${distlib}/jyaml-1.3.jar"/>
-		<pathelement location="${distlib}/log4j-api-1.2.15.jar"/>
+		<pathelement location="${distlib}/jericho-html-3.0.jar"/>
 	</path>
 	
 	<target name="filters.html">

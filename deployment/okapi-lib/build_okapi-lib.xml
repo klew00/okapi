@@ -94,9 +94,8 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="${ant.project.name}"/>
 			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
-			<attribute name="Class-Path" value="swt.jar log4j-api-1.2.15.jar stax-api-1.0.1.jar
-          wstx-lgpl-3.2.8.jar jyaml-1.3.jar             
-                      commons-logging-api-1.1.1.jar"/>
+			<attribute name="Class-Path" value="swt.jar stax-api-1.0.1.jar wstx-lgpl-3.2.8.jar            
+jyaml-1.3.jar jericho-html-3.0.jar"/>
   		</manifest>
 
 		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
