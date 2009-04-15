@@ -105,8 +105,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		id = 0;
 		String pkgId = params.makePackageID();
-		writer.setInformation(srcLang, trgLang,
-			"TODO:projectID", resolvedOutputDir, pkgId, inputRoot);
+		// Use the hashcode of the input root for project ID, just to have one
+		writer.setInformation(srcLang, trgLang, Util.makeID(inputRoot),
+			resolvedOutputDir, pkgId, inputRoot);
 		writer.writeStartPackage();
 
 		htmlRpt = new HTMLReporter();

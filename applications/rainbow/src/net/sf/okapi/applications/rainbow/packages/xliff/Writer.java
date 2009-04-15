@@ -293,6 +293,7 @@ public class Writer extends BaseWriter {
 
 		// Get the source container
 		TextContainer tc = tu.getSource();
+		boolean srcHasText = tc.hasText(false);
 
 		//--- Write the source
 		
@@ -314,10 +315,12 @@ public class Writer extends BaseWriter {
 		
 		writer.writeStartElement("target");
 		writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
+		
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
 		tc = tu.getTarget(trgLang);
-		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )) {
+		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
+			|| ( srcHasText && !tc.hasText(false) )) {
 			tc = tu.getSource(); // Go back to the source
 		}
 		

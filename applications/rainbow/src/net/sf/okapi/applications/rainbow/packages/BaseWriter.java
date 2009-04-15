@@ -279,6 +279,9 @@ public abstract class BaseWriter implements IWriter {
 		// Write the items in the TM if needed
 		TextContainer tc = tu.getTarget(trgLang);
 		if (( tc != null ) && ( !tc.isEmpty() )) {
+			if ( tu.getSourceContent().hasText(false) && !tc.hasText(false) ) {
+				return; // Target ahs code and/or spaces only
+			}
 			boolean done = false;
 			if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
 				if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {

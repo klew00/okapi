@@ -43,13 +43,17 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters implements IParameters {
 	
 	private final static String DEFAULTS = "<?xml version='1.0' encoding='UTF-8'?>\n"
-		+ "<its:rules xmlns:its='http://www.w3.org/2005/11/its' version='1.0'\n"
-		+ ">\n"
+		+ "<its:rules version='1.0'\n"
+		+ " xmlns:its='http://www.w3.org/2005/11/its'\n"
+		+ " xmlns:xlink='http://www.w3.org/1999/xlink'\n"
+		+ " xmlns:itsx='http://www.w3.org/2008/12/its-extensions'\n"
+		+ ">"
 		+ "<!-- See ITS specification at: http://www.w3.org/TR/its/ -->\n"
 		+ "</its:rules>\n";
 	
@@ -74,7 +78,7 @@ public class Parameters implements IParameters {
 			docBuilder = fact.newDocumentBuilder();
 		}
 		catch ( ParserConfigurationException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
@@ -94,10 +98,10 @@ public class Parameters implements IParameters {
 			trans.transform(new DOMSource(doc), result);
 		}
 		catch ( TransformerConfigurationException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
         }
 		catch ( TransformerException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		return sw.toString();
 	}
@@ -109,10 +113,10 @@ public class Parameters implements IParameters {
 			doc = docBuilder.parse(new InputSource(new StringReader(data)));
 		}
 		catch ( SAXException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 
@@ -128,10 +132,10 @@ public class Parameters implements IParameters {
 			doc = docBuilder.parse(f);
 		}
 		catch ( SAXException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		} 
 		path = filePath;
 		docURI = f.toURI();
@@ -163,10 +167,10 @@ public class Parameters implements IParameters {
 				trans.transform(new DOMSource(doc), result);
 			}
 			catch ( TransformerConfigurationException e ) {
-				throw new RuntimeException(e);
+				throw new OkapiIOException(e);
 	        }
 			catch ( TransformerException e ) {
-				throw new RuntimeException(e);
+				throw new OkapiIOException(e);
 			}
 			// Update path and URI
 			path = filePath;

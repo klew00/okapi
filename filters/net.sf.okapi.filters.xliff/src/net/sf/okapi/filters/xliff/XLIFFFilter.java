@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -67,8 +68,6 @@ import org.xml.sax.InputSource;
 
 public class XLIFFFilter implements IFilter {
 
-	public static final String    XML_NS_URI   = "http://www.w3.org/XML/1998/namespace";
-	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private boolean hasNext;
@@ -600,7 +599,7 @@ public class XLIFFFilter implements IFilter {
 		TextContainer tc;
 		if ( sourceDone ) { // Case of an alt-trans entry
 			// Get the language
-			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
 			if ( lang == null ) lang = srcLang; // Use default
 			// Get the text content
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
@@ -642,7 +641,7 @@ public class XLIFFFilter implements IFilter {
 		TextContainer tc;
 		if ( targetDone ) { // Case of an alt-trans entry
 			// Get the language
-			String lang = reader.getAttributeValue(XML_NS_URI, "lang");
+			String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
 			if ( lang == null ) lang = trgLang; // Use default
 			// Get the text content
 			tc = processContent("target", true);
@@ -743,7 +742,7 @@ public class XLIFFFilter implements IFilter {
 					}
 					else if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						if ( store ) storeEndElement();
-						code = content.append(TagType.CLOSING, name, name); 
+						code = content.append(TagType.CLOSING, name, ""); 
 						idStack.pop();
 						String tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
@@ -760,7 +759,7 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						idStack.push(++id);
-						code = content.append(TagType.OPENING, name, name);
+						code = content.append(TagType.OPENING, name, "");
 						// Get the outer code
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
