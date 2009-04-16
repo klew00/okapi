@@ -28,21 +28,28 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
  * Resource that carries all the information needed for a filter to open a given
  * document, and also the resource associated with the event INPUT_RESOURCE.
- * Documents are passed through the pipeline either as InputResource,
- * or a filter events. Specialized steps allows to convert one to the other and
+ * Documents are passed through the pipeline either as InputResource, or a
+ * filter events. Specialized steps allows to convert one to the other and
  * conversely. The InputResource object has one (and only one) of three input
  * objects: a CharSequence, a URI, or an InputStream.
  */
 public class InputResource implements IResource {
+
+	private static final Logger LOGGER = Logger.getLogger(InputResource.class.getName());
 
 	private Annotations annotations;
 	private String id;
@@ -151,8 +158,12 @@ public class InputResource implements IResource {
 	 * an inputURL is set then an inputStream is set automatically.
 	 * 
 	 * @return the Reader
+	 * 
+	 * @throws OkapiIOException
 	 */
 	public Reader getReader() {
+		URL url = null;
+
 		if (inputReader != null) {
 			return inputReader;
 		}
@@ -163,11 +174,25 @@ public class InputResource implements IResource {
 			inputReader = new StringReader(getInputCharSequence().toString());
 		else if (getInputURI() != null) {
 			try {
+				url = getInputURI().toURL();
 				readerFromInputStream(getInputURI().toURL().openStream());
+			} catch (IllegalArgumentException e) {
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI must be absolute: "
+						+ ((url == null) ? "URL is null" : url.toString()), re);
+				throw re;
+
 			} catch (MalformedURLException e) {
-				throw new RuntimeException(e);
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI may be malformed: "
+						+ ((url == null) ? "URL is null" : url.toString()), re);
+				throw re;
+
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE,
+						"Could not open the URL. The URL is OK but the input stream could not be opened", re);
+				throw re;
 			}
 		}
 
@@ -178,7 +203,10 @@ public class InputResource implements IResource {
 		try {
 			inputReader = new InputStreamReader(inStream, getEncoding());
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
+			LOGGER.log(Level.SEVERE, "The encoding " + getEncoding()
+					+ "is not a standard Java encoding. Please check the spelling.", re);
+			throw re;
 		}
 	}
 
