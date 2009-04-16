@@ -53,7 +53,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractBaseFilter;
 import net.sf.okapi.common.filters.IFilter;
@@ -101,6 +100,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		Config.LoggerProvider = LoggerProvider.JAVA;
 	}
 
+	/**
+	 * Default constructor for {@link AbstractBaseMarkupFilter}
+	 */
 	public AbstractBaseMarkupFilter() {
 		super();
 		hasUtf8Bom = false;
@@ -118,14 +120,32 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		return parameters;
 	}
 
+	/**
+	 * Get the current {@link ExtractionRuleState} object.
+	 * 
+	 * @return a {@link ExtractionRuleState}
+	 */
 	public ExtractionRuleState getRuleState() {
 		return ruleState;
 	}
 
+	/**
+	 * Sets the current {@link ExtractionRuleState}
+	 * 
+	 * @param ruleState
+	 *            a {@link ExtractionRuleState}
+	 */
 	public void setRuleState(ExtractionRuleState ruleState) {
 		this.ruleState = ruleState;
 	}
 
+	/**
+	 * Get the current {@link TaggedFilterConfiguration}. A
+	 * TaggedFilterConfiguration is the result of reading in a YAML
+	 * configuration file and converting it into Java Objects.
+	 * 
+	 * @return a {@link TaggedFilterConfiguration}
+	 */
 	public TaggedFilterConfiguration getConfig() {
 		return parameters.getTaggedConfig();
 	}
@@ -175,14 +195,30 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		}
 	}
 
+	/**
+	 * Start a new {@link IFilter} using the supplied {@link InputResource}.
+	 * 
+	 * @param input
+	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
+	 *            {@link URI} or {@link InputStream})
+	 */
 	public void open(InputResource input) {
 		open(input, true);
 		LOGGER.log(Level.FINE, getName() + " has opened an input document");
 	}
 
 	/**
+	 * Start a new {@link IFilter} using the supplied {@link InputResource}.
+	 * 
+	 * @param input
+	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
+	 *            {@link URI} or {@link InputStream})
+	 * @param generateSkeleton
+	 *            - true if the {@link IFilter} should store non-translatble
+	 *            blocks (aka skeleton), false otherwise.
+	 * 
 	 * @throws BadFilterInputException
-	 * @throws OkapiIOException 
+	 * @throws OkapiIOException
 	 */
 	public void open(InputResource input, boolean generateSkeleton) {
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
@@ -216,11 +252,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
 			if (detectedEncoding == null && getEncoding() != null) {
-				detectedEncoding = getEncoding();				
-				LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
+				detectedEncoding = getEncoding();
+				LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
+						getEncoding()));
 			} else if (getEncoding() == null) {
 				detectedEncoding = parsedHeader.getEncoding(); // get best guess
-				LOGGER.log(Level.WARNING, String.format("Default encoding not found. Using detected encoding (%2)", detectedEncoding));
+				LOGGER.log(Level.WARNING, String.format("Default encoding not found. Using detected encoding (%2)",
+						detectedEncoding));
 			}
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
@@ -249,7 +287,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	/**
-	 * Initialize parameters, rule state and parser.
+	 * Initialize parameters, rule state and Jericho parser.
 	 */
 	@Override
 	protected void startFilter() {
@@ -490,9 +528,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * charset to "encoding" and lang to "language"
 	 * 
 	 * @param attrName
+	 *            - the attribute name
 	 * @param attrValue
+	 *            - the attribute value
 	 * @param tag
-	 * @return
+	 *            - the Jericho {@link Tag} that contains the attribute
+	 * @return the attribute name after it as passe through the normalization
+	 *         rules
 	 */
 	abstract protected String normalizeAttributeName(String attrName, String attrValue, Tag tag);
 
@@ -501,6 +543,8 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * if there is no current {@link TextUnit}.
 	 * 
 	 * @param tag
+	 *            - the Jericho {@link Tag} that is converted to a Okpai
+	 *            {@link Code}
 	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
@@ -547,7 +591,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * each attribute. for the attribute name and value.
 	 * 
 	 * @param startTag
-	 * @return
+	 *            - Jericho {@link StartTag}
+	 * @return all actionable (translatable, writable or read-only) attributes
+	 *         found in the {@link StartTag}
 	 */
 	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(StartTag startTag) {
 		// list to hold the properties or TextUnits
@@ -581,11 +627,17 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * name and Jericho {@link Tag} and {@link Attribute}.
 	 * 
 	 * @param type
+	 *            - {@link PlaceholderType} is one of TRANSLATABLE,
+	 *            READ_ONLY_PROPERTY, WRITABLE_PROPERTY
 	 * @param name
+	 *            - attribute name
 	 * @param value
+	 *            - attribute value
 	 * @param tag
+	 *            - Jericho {@link Tag} which contains the attribute
 	 * @param attribute
-	 * @return
+	 *            - attribute as a Jericho {@link Attribute}
+	 * @return a {@link PropertyTextUnitPlaceholder} representing the attribute
 	 */
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
 			String value, Tag tag, Attribute attribute) {
@@ -602,24 +654,28 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	/**
-	 * Return true if the document is in utf8 encoding.
+	 * Is the input encoded as UTF-8?
+	 * 
+	 * @return true if the document is in utf8 encoding.
 	 */
 	protected boolean hasUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
 
 	/**
-	 * Return true if the document has a utf-8 byte order mark.
+	 * Does the input have a UTF-8 Byte Order Mark?
+	 * 
+	 * @return true if the document has a utf-8 byte order mark.
 	 */
 	protected boolean hasUtf8Bom() {
 		return hasUtf8Bom;
 	}
 
 	/**
-	 * Return true if the current filter configuration tells us to preserve
-	 * whitespace as-is.
+	 * Do we preserve the original formatting of the input?
 	 * 
-	 * @return
+	 * @return true if the current filter configuration tells us to preserve
+	 *         whitespace as-is.
 	 */
 	protected boolean keepOriginalFormatting() {
 		if (getRuleState().isPreserveWhitespaceState() && !getConfig().collapseWhitespace()) {
