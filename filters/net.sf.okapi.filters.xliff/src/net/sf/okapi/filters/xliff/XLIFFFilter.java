@@ -50,7 +50,7 @@ import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -160,11 +160,11 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 
-	public void open (InputResource input) {
+	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
-	public void open (InputResource input,
+	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -179,7 +179,7 @@ public class XLIFFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("InputResource has no input defined.");
+			throw new BadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
