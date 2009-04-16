@@ -9,7 +9,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
@@ -181,7 +181,7 @@ public class HtmlSnippetsTest {
 	private ArrayList<Event> getEvents (String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
-		htmlFilter.open(new InputResource(snippet, "en"));
+		htmlFilter.open(new RawDocument(snippet, "en"));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			list.add(event);

@@ -9,7 +9,7 @@ import java.net.URL;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -47,7 +47,7 @@ public class HtmlFullFileTest {
 	public void testAll() throws URISyntaxException {
 		for (String f : testFileList) {
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
-			htmlFilter.open(new InputResource(htmlStream, "UTF-8", "en"));
+			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
 			try {
 				while (htmlFilter.hasNext()) {
 					@SuppressWarnings("unused")
@@ -64,7 +64,7 @@ public class HtmlFullFileTest {
 	public void testNonwellformed() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/nonwellformed.specialtest");
 		MemMappedCharSequence charSequence = new MemMappedCharSequence(htmlStream, "UTF-8");
-		htmlFilter.open(new InputResource(charSequence, "en"));
+		htmlFilter.open(new RawDocument(charSequence, "en"));
 		while (htmlFilter.hasNext()) {
 			@SuppressWarnings("unused")
 			Event event = htmlFilter.next();
@@ -74,7 +74,7 @@ public class HtmlFullFileTest {
 	@Test
 	public void testOkapiIntro() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");		
-		htmlFilter.open(new InputResource(htmlStream, "windows-1252", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "windows-1252", "en"));
 		boolean foundText = false;
 		boolean first = true;
 		String lastText = "";
@@ -99,7 +99,7 @@ public class HtmlFullFileTest {
 	@Test
 	public void testSkippedScriptandStyleElements() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");			
-		htmlFilter.open(new InputResource(htmlStream, "UTF-8", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
 		boolean foundText = false;
 		boolean first = true;
 		String firstText = "";
