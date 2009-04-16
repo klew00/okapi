@@ -24,7 +24,7 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.idml.IDMLFilter;
 
 import org.junit.Assert;
@@ -40,7 +40,7 @@ public class IDMLFilterTest {
 			//URL url = IDMLFilterTest.class.getResource("/helloworld-1.idml");
 			//URL url = IDMLFilterTest.class.getResource("/private/100_101_CentreofGalaxy.idml");
 			URL url = IDMLFilterTest.class.getResource("/private/iPhone_2_A_MASTER.idml");
-			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			
 			IFilterWriter writer = filter.createFilterWriter();
 			writer.setOptions("en", "UTF-8");

@@ -25,7 +25,7 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.idml.IDMLContentFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -43,12 +43,12 @@ public class IDMLContentFilterTest {
 			testDriver.setDisplayLevel(0);
 			filter = new IDMLContentFilter();
 			URL url = IDMLContentFilterTest.class.getResource("/Story_story1.xml");
-			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
 			// Test a simple re-write
-			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			rewrite(filter);
 			filter.close();
 		}
