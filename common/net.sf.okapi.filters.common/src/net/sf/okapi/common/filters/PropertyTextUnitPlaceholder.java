@@ -1,6 +1,7 @@
 package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.HashCodeUtil;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -11,14 +12,6 @@ import net.sf.okapi.common.resource.TextUnit;
  * stores offset information for the name and value that can be used by the
  * {@link AbstractBaseFilter} to automatically generate proper attribute-based
  * {@link IResource}s
- */
-/**
- * @author HargraveJE
- *
- */
-/**
- * @author HargraveJE
- * 
  */
 public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitPlaceholder> {
 	public enum PlaceholderType {
