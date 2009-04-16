@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class FilebasedPipelineTest {
 		pipeline.addStep(new Consumer());
 
 		assertEquals(PipelineReturnValue.RUNNING, pipeline.getState());
-		pipeline.process(new InputResource("<b>Test this resource</b>", "en"));	
+		pipeline.process(new RawDocument("<b>Test this resource</b>", "en"));	
 		pipeline.destroy();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}

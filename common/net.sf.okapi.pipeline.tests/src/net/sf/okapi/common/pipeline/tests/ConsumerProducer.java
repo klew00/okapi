@@ -47,7 +47,7 @@ public class ConsumerProducer extends BasePipelineStep {
 	@Override
 	protected void handleTextUnit(Event event) {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {}
 	}
 

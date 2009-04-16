@@ -13,7 +13,7 @@ import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.xml.XMLFilter;
 
 import static org.junit.Assert.*;
@@ -60,7 +60,7 @@ public class XsltPipelineTest {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		writer.setOutput(outStream);
 
-		pipeline.process(new InputResource(inputXml.toURI(), "UTF-8", "en"));
+		pipeline.process(new RawDocument(inputXml.toURI(), "UTF-8", "en"));
 
 		assertEquals(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>",

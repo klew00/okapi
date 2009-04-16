@@ -30,7 +30,7 @@ import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -61,7 +61,7 @@ public class FilterRoundtripTest {
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
 				genericFilterWriter));
 
-		InputResource fr = new InputResource(
+		RawDocument fr = new RawDocument(
 				"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
 				"en");
 		pipeline.process(fr);
@@ -83,7 +83,7 @@ public class FilterRoundtripTest {
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
 				genericFilterWriter));
 		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")
-		InputResource fr = new InputResource("\r\nX\rY\n", "en");
+		RawDocument fr = new RawDocument("\r\nX\rY\n", "en");
 		pipeline.process(fr);
 		pipeline.destroy();
 	}
@@ -106,7 +106,7 @@ public class FilterRoundtripTest {
 		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
 				genericFilterWriter));
 
-		InputResource fr = new InputResource("<b>TEST ME</b>", "en");
+		RawDocument fr = new RawDocument("<b>TEST ME</b>", "en");
 		
 		// first pass
 		pipeline.process(fr);
