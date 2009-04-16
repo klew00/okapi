@@ -42,14 +42,14 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 /**
  * Resource that carries all the information needed for a filter to open a given
  * document, and also the resource associated with the event INPUT_RESOURCE.
- * Documents are passed through the pipeline either as InputResource, or a
+ * Documents are passed through the pipeline either as RawDocument, or a
  * filter events. Specialized steps allows to convert one to the other and
- * conversely. The InputResource object has one (and only one) of three input
+ * conversely. The RawDocument object has one (and only one) of three input
  * objects: a CharSequence, a URI, or an InputStream.
  */
-public class InputResource implements IResource {
+public class RawDocument implements IResource {
 
-	private static final Logger LOGGER = Logger.getLogger(InputResource.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RawDocument.class.getName());
 
 	private Annotations annotations;
 	private String id;
@@ -62,94 +62,94 @@ public class InputResource implements IResource {
 	private Reader inputReader;
 
 	/**
-	 * Creates a new InputResource object with a given CharSequence and a source
+	 * Creates a new RawDocument object with a given CharSequence and a source
 	 * language.
 	 * 
 	 * @param inputCharSequence
-	 *            The CharSequence for this InputResource.
+	 *            The CharSequence for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 */
-	public InputResource(CharSequence inputCharSequence, String sourceLanguage) {
+	public RawDocument(CharSequence inputCharSequence, String sourceLanguage) {
 		create(inputCharSequence, sourceLanguage, null);
 	}
 
 	/**
-	 * Creates a new InputResource object with a given CharSequence, a source
+	 * Creates a new RawDocument object with a given CharSequence, a source
 	 * language and a target language.
 	 * 
 	 * @param inputCharSequence
-	 *            The CharSequence for this InputResource.
+	 *            The CharSequence for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this InputResource.
+	 *            The target language for this RawDocument.
 	 */
-	public InputResource(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
+	public RawDocument(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
 		create(inputCharSequence, sourceLanguage, targetLanguage);
 	}
 
 	/**
-	 * Creates a new InputResource object with a given URI, a default encoding
+	 * Creates a new RawDocument object with a given URI, a default encoding
 	 * and a source language.
 	 * 
 	 * @param inputURI
-	 *            The URI for this InputResource.
+	 *            The URI for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this InputResource.
+	 *            The default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 */
-	public InputResource(URI inputURI, String defaultEncoding, String sourceLanguage) {
+	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage) {
 		create(inputURI, defaultEncoding, sourceLanguage, null);
 	}
 
 	/**
-	 * Creates a new InputResource object with a given URI, a default encoding,
+	 * Creates a new RawDocument object with a given URI, a default encoding,
 	 * a source language and a target language.
 	 * 
 	 * @param inputURI
-	 *            The URI for this InputResource.
+	 *            The URI for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this InputResource.
+	 *            The default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this InputResource.
+	 *            The target language for this RawDocument.
 	 */
-	public InputResource(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
+	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
 		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
 	}
 
 	/**
-	 * Creates a new InputResource object with a given InputStream, a default
+	 * Creates a new RawDocument object with a given InputStream, a default
 	 * encoding and a source language.
 	 * 
 	 * @param inputStream
-	 *            The InputStream for this InputResource.
+	 *            The InputStream for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this InputResource.
+	 *            The default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 */
-	public InputResource(InputStream inputStream, String defaultEncoding, String sourceLanguage) {
+	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage) {
 		create(inputStream, defaultEncoding, sourceLanguage, null);
 	}
 
 	/**
-	 * Creates a new InputResource object with a given InputStream, a default
+	 * Creates a new RawDocument object with a given InputStream, a default
 	 * encoding and a source language.
 	 * 
 	 * @param inputStream
-	 *            The InputStream for this InputResource.
+	 *            The InputStream for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this InputResource.
+	 *            The default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this InputResource.
+	 *            The source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this InputResource.
+	 *            The target language for this RawDocument.
 	 */
-	public InputResource(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
+	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
 		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage);
 	}
 

@@ -23,7 +23,7 @@ package net.sf.okapi.common.filters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -71,18 +71,18 @@ public interface IFilter {
 //		boolean generateSkeleton);
 
 	/**
-	 * Opens the input document described in a give InputResource object.
+	 * Opens the input document described in a give RawDocument object.
 	 * Skeleton information is always created when you use this method.
-	 * @param input The InputResource object to use to open the document.
+	 * @param input The RawDocument object to use to open the document.
 	 */
-	public void open (InputResource input);
+	public void open (RawDocument input);
 
 	/**
-	 * Opens the input document described in a give InputResource object, and
+	 * Opens the input document described in a give RawDocument object, and
 	 * optionally creates skeleton information.
-	 * @param input The InputResource object to use to open the document.
+	 * @param input The RawDocument object to use to open the document.
 	 */
-	public void open (InputResource input,
+	public void open (RawDocument input,
 		boolean generateSkeleton);
 
 	/**
