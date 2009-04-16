@@ -34,10 +34,19 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import junit.framework.*;
 
-public class ResourcesTest extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
+public class ResourcesTest {
+
+	@Before
+	public void setUp () throws Exception {
+	}
+	
+	
+	@Test
 	public void testMETATag1 () {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		ArrayList<Event> list = new ArrayList<Event>();
@@ -72,6 +81,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
+	@Test
 	public void testPWithAttributes () {
 		String test = "<p title='my title'>Text of p</p>";
 		ArrayList<Event> list = new ArrayList<Event>();
@@ -108,6 +118,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
+	@Test
 	public void testComplexEmptyElement () {
 		String test = "<elem wr-prop1='wr-value1' ro-prop1='ro-value1' wr-prop2='wr-value2' text='text'/>";
 		ArrayList<Event> list = new ArrayList<Event>();
@@ -150,6 +161,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test, "en"), test);
 	}
 
+	@Test
 	public void testPWithInlines () {
 		String test = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
 		ArrayList<Event> list = new ArrayList<Event>();
@@ -192,6 +204,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test, "en"), test);
 	}
 
+	@Test
 	public void testMETATag2 () {
 		String test = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
 		ArrayList<Event> list = new ArrayList<Event>();
@@ -216,6 +229,7 @@ public class ResourcesTest extends TestCase {
 		assertEquals(generateOutput(list, test, "en"), test);
 	}
 	
+	@Test
 	public void testTMXTU () {
 		String test = "<tu><tuv xml:lang='EN'><seg>T1-en<sub>Sub-en</sub>T2-en</seg></tuv>"
 			+"<tuv xml:lang='SV'><seg>T1-sv<sub>Sub-sv</sub>T2-sv</seg></tuv></tu>";

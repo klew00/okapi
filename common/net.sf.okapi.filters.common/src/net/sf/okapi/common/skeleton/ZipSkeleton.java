@@ -26,7 +26,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
- * Extension of the GenericSkeleton skeleton implementation that allow
+ * Extension of the {@link GenericSkeleton} skeleton implementation that allow
  * ZipFile and ZipEntry objects to be passed along with skeleton parts. 
  */
 public class ZipSkeleton extends GenericSkeleton {

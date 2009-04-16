@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import junit.framework.*;
 
-public class TextContainerTest extends TestCase {
+public class TextContainerTest {
 
 	@Test
 	public void testGetSetContent () {
@@ -78,27 +78,29 @@ public class TextContainerTest extends TestCase {
 		assertEquals(1, tc.getSegmentCount());
 		assertEquals("text1", tc.getSegments().get(0).toString());
 	}
-	
-	@Test
-	public TextContainer testAppendSeveralSegments () {
+
+	private TextContainer createMultiSegmentContent () {
 		TextContainer tc = new TextContainer();
 		TextFragment tf = new TextFragment("text1");
-		assertEquals(0, tc.getSegmentCount());
 		tc.appendSegment(tf);
-		assertEquals(1, tc.getSegmentCount());
 		tc.append(' ');
 		tf = new TextFragment("text2");
 		tc.appendSegment(tf);
-		assertEquals(2, tc.getSegmentCount());
-		assertEquals("text1", tc.getSegments().get(0).toString());
-		assertEquals("text2", tc.getSegments().get(1).toString());
-		assertEquals("0 1", tc.toString());
 		return tc;
 	}
 	
 	@Test
-	public void testMergeingSegments () {
-		TextContainer tc = testAppendSeveralSegments();
+	public void testAppendSeveralSegments () {
+		TextContainer tc = createMultiSegmentContent();
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals("text1", tc.getSegments().get(0).toString());
+		assertEquals("text2", tc.getSegments().get(1).toString());
+		assertEquals("0 1", tc.toString());
+	}
+	
+	@Test
+	public void testMergingSegments () {
+		TextContainer tc = createMultiSegmentContent();
 		tc.mergeAllSegments();
 		assertEquals(0, tc.getSegmentCount());
 		assertNull(tc.getSegments());
@@ -135,7 +137,8 @@ public class TextContainerTest extends TestCase {
 		assertFalse(tc1.isSegmented());
 		assertEquals(tc1.toString(), originalText);
 	}
-	
+
+	@Test
 	public void testSegmentsFromArray () {
 		String originalText = "[seg1][seg2] [seg3]";
 		TextContainer tc1 = new TextContainer(originalText);

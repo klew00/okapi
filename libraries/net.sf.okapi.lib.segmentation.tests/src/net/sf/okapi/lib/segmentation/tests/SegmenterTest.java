@@ -20,8 +20,14 @@
 
 package net.sf.okapi.lib.segmentation.tests;
 
+import java.util.ArrayList;
+
 import org.junit.Before;
 
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.lib.segmentation.LanguageMap;
+import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.junit.Test;
@@ -59,6 +65,32 @@ public class SegmenterTest {
 		assertTrue(seg.oneSegmentIncludesAll());
 		assertTrue(seg.trimLeadingWhitespaces());
 		assertTrue(seg.trimTrailingWhitespaces());
+	}
+	
+	@Test
+	public void testSimpleSegmentation () {
+		Segmenter seg = createSegmenterWithRules("en");
+		TextContainer tc = new TextContainer("Part 1. Part 2.");
+		int n = seg.computeSegments(tc);
+		assertEquals(2, n);
+		tc.createSegments(seg.getSegmentRanges());
+		assertNotNull(tc.getSegments());
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals("Part 1.", tc.getSegments().get(0).toString());
+		assertEquals(" Part 2.", tc.getSegments().get(1).toString());
+	}
+	
+	private Segmenter createSegmenterWithRules (String lang) {
+		SRXDocument doc = new SRXDocument();
+		LanguageMap langMap = new LanguageMap(".*", "default");
+		doc.addLanguageMap(langMap);
+		// Add the rules
+		ArrayList<Rule> langRules = new ArrayList<Rule>();
+		langRules.add(new Rule("\\.", "\\s", true));
+		// Add the ruls to the document
+		doc.addLanguageRule("default", langRules);
+		// Create the segmenter
+		return doc.applyLanguageRules(lang, null);
 	}
 	
 }

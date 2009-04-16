@@ -43,7 +43,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 
 /**
- * Implements the IFilterWriter interface for filters that handle formats made of
+ * Implements the {@link IFilterWriter} interface for filters that handle formats made of
  * a ZIP package with embedded extractable documents, such as IDML or
  * OpenOffice.org files (ODT, ODS, ODP, etc.)
  */

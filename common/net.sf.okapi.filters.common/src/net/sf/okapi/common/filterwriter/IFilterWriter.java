@@ -40,7 +40,7 @@ public interface IFilterWriter {
 	/**
 	 * Sets the options for this writer.
 	 * @param language Code of the output language.
-	 * @param defaultEncoding Name of the charset encoding for the output.
+	 * @param defaultEncoding Name of the character set encoding for the output.
 	 */
 	public void setOptions (String language,
 		String defaultEncoding);

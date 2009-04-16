@@ -22,8 +22,9 @@ package net.sf.okapi.common;
 
 /**
  * Represents a skeleton object. It is an object that is associated to a resource and carries data
- * about the non extractable part of the resource. Skeleton objects are used by the SkeletonWriter
- * object to reconstruct the original file format.
+ * about the non extractable part of the resource. Skeleton objects are used by the 
+ * {@link net.sf.okapi.common.filterwriter.IFilterWriter} implementations to reconstruct the 
+ * original file format.
  */
 public interface ISkeleton {
 

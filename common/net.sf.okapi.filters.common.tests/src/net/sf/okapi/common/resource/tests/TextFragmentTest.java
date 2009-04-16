@@ -22,25 +22,29 @@ package net.sf.okapi.common.resource.tests;
 
 import java.util.List;
 
-import junit.framework.TestCase;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.AnnotatedSpan;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InlineAnnotation;
+import net.sf.okapi.common.resource.InvalidPositionException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
-public class TextFragmentTest extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TextFragmentTest {
 
 	private GenericContent fmt;
 	
-	@Override
+	@Before
 	public void setUp () throws Exception {
-		super.setUp();
 		fmt = new GenericContent();
 	}
 	
+	@Test
 	public void testConstructors () {
 		TextFragment tf1 = new TextFragment();
 		assertTrue(tf1.isEmpty());
@@ -53,6 +57,7 @@ public class TextFragmentTest extends TestCase {
 		assertNotSame(tf1, tf2);
 	}
 	
+	@Test
 	public void testAppend () {
 		TextFragment tf1 = new TextFragment();
 		tf1.append('c');
@@ -85,6 +90,7 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(tf1.toString(), "<br/>"); 
 	}
 	
+	@Test
 	public void testInsert () {
 		TextFragment tf1 = new TextFragment();
 		tf1.insert(0, new TextFragment("[ins1]"));
@@ -118,6 +124,7 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(tf1.toString(), "a<br/>b<b>c</b><x/>");
 	}
 
+	@Test
 	public void testRemove () {
 		TextFragment tf1 = makeFragment();
 		assertEquals(fmt.setContent(tf1).toString(true), "<b>A<br/>B</b>C");
@@ -137,6 +144,7 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(tf1.toString(), "ABC");
 	}
 	
+	@Test
 	public void testInlines () {
 		TextFragment tf1 = makeFragment();
 		assertTrue(tf1.hasCode());
@@ -235,6 +243,7 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(textStorage1, textStorage2);
 	}
 	
+	@Test
 	public void testCodedText () {
 		TextFragment tf1 = makeFragment();
 		assertEquals(tf1.getCodedText().length(), (2*3)+3); // 2 per code + 3 chars
@@ -256,6 +265,7 @@ public class TextFragmentTest extends TestCase {
 		assertEquals(codes.get(1).getData(), "<br/>");
 	}
 
+	@Test
 	public void testHasText () {
 		TextFragment tf1 = new TextFragment();
 		assertFalse(tf1.hasText(true));
@@ -273,6 +283,7 @@ public class TextFragmentTest extends TestCase {
 		assertTrue(tf1.hasText(false));
 	}
 	
+	@Test
 	public void testHasCode () {
 		TextFragment tf1 = new TextFragment();
 		assertFalse(tf1.hasCode());
@@ -284,6 +295,7 @@ public class TextFragmentTest extends TestCase {
 		assertTrue(tf1.hasCode());
 	}
 
+	@Test
 	public void testTextCodesChanges () {
 		TextFragment tf1 = new TextFragment("<b>New file:</b> %s");
 
@@ -454,6 +466,12 @@ public class TextFragmentTest extends TestCase {
 		//assertEquals(fmt.setContent(tf1).toString(false), "<3>w1 </3><1><4>w2</4> w3</1> w4 <2>w5 w6</2> w7");
 
 	}
+	
+	@Test(expected = InvalidPositionException.class)
+    public void testGetCodedTextWithBadRange () {
+		TextFragment tf = makeFragment();
+		tf.getCodedText(1, 3); // 1 is middle of first code
+    }
 	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>

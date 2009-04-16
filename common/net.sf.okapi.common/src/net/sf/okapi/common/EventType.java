@@ -27,52 +27,54 @@ package net.sf.okapi.common;
 public enum EventType {
 
 	/**
-	 * Indicates the start of an input document. A StartDocument resource should
-	 * be associated with this event.
+	 * Indicates the start of an input document. A {@link net.sf.okapi.common.resource.StartDocument}
+	 * resource should be associated with this event.
 	 */
 	START_DOCUMENT,
 
 	/**
-	 * Indicates the end of an input document. An Ending resource should be
-	 * associated with this event.
+	 * Indicates the end of an input document. An {@link net.sf.okapi.common.resource.Ending}
+	 * resource should be associated with this event.
 	 */
 	END_DOCUMENT,
 
 	/**
-	 * Indicates the start of a sub-document. A StartSubDocument resource should
-	 * be associated with this event.
+	 * Indicates the start of a sub-document. A {@link net.sf.okapi.common.resource.StartSubDocument}
+	 * resource should be associated with this event.
 	 */
 	START_SUBDOCUMENT,
 
 	/**
-	 * Indicates the end of a sub-document. An Ending resource should be
-	 * associated with this event.
+	 * Indicates the end of a sub-document. An {@link net.sf.okapi.common.resource.Ending}
+	 * resource should be associated with this event.
 	 */
 	END_SUBDOCUMENT,
 
 	/**
 	 * Indicates the start of a group. For example, the start tag of the
-	 * &lt;table> element in HTML. A StartGroup resource should be associated
-	 * with this event.
+	 * &lt;table> element in HTML. A {@link net.sf.okapi.common.resource.StartGroup} resource
+	 * should be associated with this event.
 	 */
 	START_GROUP,
 
 	/**
-	 * Indicates the end of a group. An Ending resource should be associated
-	 * with this event.
+	 * Indicates the end of a group. An {@link net.sf.okapi.common.resource.Ending} resource
+	 * should be associated with this event.
 	 */
 	END_GROUP,
 
 	/**
 	 * Indicates a text unit. For example, a paragraph in an HTML document. A
-	 * TextUnit resource should be associated with this event.
+	 * {@link net.sf.okapi.common.resource.TextUnit} resource should be associated 
+	 * with this event.
 	 */
 	TEXT_UNIT,
 
 	/**
 	 * Indicates a document part. Document parts are used to carry chunks of the
 	 * input document that have no translatable data, but may have properties. A
-	 * DocumentPart resource should be associated with this event.
+	 * {@link net.sf.okapi.common.resource.DocumentPart} resource should be associated 
+	 * with this event.
 	 */
 	DOCUMENT_PART,
 
@@ -88,7 +90,8 @@ public enum EventType {
 	FINISHED,
 
 	/**
-	 * Document-level event. An InputResource resource should be associated with this event.
+	 * Document-level event. An {@link net.sf.okapi.common.resource.InputResource} resource
+	 * should be associated with this event.
 	 */
 	INPUT_RESOURCE,
 
@@ -103,4 +106,5 @@ public enum EventType {
 	 * event when steps need to stay alive without triggering any actions.
 	 */
 	NO_OP
+
 }
