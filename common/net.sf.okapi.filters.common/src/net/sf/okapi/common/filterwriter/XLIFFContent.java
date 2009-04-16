@@ -225,7 +225,9 @@ public class XLIFFContent {
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				if ( code.getType().equals(TextContainer.CODETYPE_SEGMENT) ) {
-					if ( withMarkers ) tmp.append("<mrk mtype=\"seg\">"); //TODO: mid attribute
+					if ( withMarkers ) {
+						tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", code.getData()));
+					}
 					if ( innerContent == null ) {
 						innerContent = new XLIFFContent();
 					}

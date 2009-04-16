@@ -273,7 +273,7 @@ public class TextContainer extends TextFragment {
 		// Check if the segment is empty
 		if ( start == end ) return null;
 
-		// Create lists if needed
+		// Create lists and codes if needed
 		if ( segments == null ) {
 			segments = new ArrayList<TextFragment>();
 		}
@@ -329,6 +329,20 @@ public class TextContainer extends TextFragment {
 		if ( inserted ) renumberSegmentMarkers(start+2, segIndex+1);
 		// Return the created segment
 		return segments.get(segIndex);
+	}
+
+	public void appendSegment (TextFragment fragment) {
+		// Create lists and codes if needed
+		if ( segments == null ) {
+			segments = new ArrayList<TextFragment>();
+		}
+		// Add the segment to the list of segments
+		segments.add(fragment);
+		// Gets its index
+		int segIndex = segments.size()-1;
+		// Append the segment maker
+		Code code = new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, String.valueOf(segIndex));
+		append(code);
 	}
 	
 	/**

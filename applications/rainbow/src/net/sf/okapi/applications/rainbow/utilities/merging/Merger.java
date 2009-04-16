@@ -232,60 +232,68 @@ public class Merger {
 
 		// Get item from the package document
 		// Skip also the read-only ones
-		TextUnit srcPkgItem;
+		TextUnit tuFromTrans;
 		while ( true ) {
 			if ( !reader.readItem() ) {
 				// Problem: 
 				logger.log(Level.WARNING,
-					String.format("There is no more package item to merge (for id=\"%s\")", tu.getId()));
+					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
 				// Keep the source
 				return;
 			}
-			srcPkgItem = reader.getItem();
-			if ( !srcPkgItem.isTranslatable() ) continue;
+			tuFromTrans = reader.getItem();
+			if ( !tuFromTrans.isTranslatable() ) continue;
 			else break; // Found next translatable (and likely translated) item
 		}
 			
-		if ( !tu.getId().equals(srcPkgItem.getId()) ) {
+		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
 			// Problem: different IDs
-			logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\"",
-				tu.getId(), srcPkgItem.getId()));
+			logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\".",
+				tu.getId(), tuFromTrans.getId()));
 			// Keep the source
 			return;
 		}
 
-		if ( srcPkgItem.hasTarget(trgLang) ) {
-			// Create the target entry for the output if it does not exist yet
-			TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
-			// Get the target codes, we may need them if the source ones fail
-			// (case of approved translation with different codes)
-			List<Code> trgOriCodes = trgCont.getCodes();
-			// Set the coded text with the new translated content
-			try {
-				trgCont.setCodedText(srcPkgItem.getTargetContent(trgLang).getCodedText(),
-					tu.getSourceContent().getCodes(), false);
-			}
-			catch ( RuntimeException e ) {
-				// If there is an error, try with the target
-				try {
-					trgCont.setCodedText(srcPkgItem.getTargetContent(trgLang).getCodedText(),
-						trgOriCodes, false);
-					logger.log(Level.WARNING,
-						String.format("Item id=\"%s\" was merged with target codes.\nS='%s'\nT='%s'",
-							tu.getId(), tu.getSourceContent().toString(), trgCont.toString()));
-				}
-				catch ( RuntimeException e2 ) {
-					logger.log(Level.SEVERE,
-						String.format("Error with item id=\"%s\".", tu.getId()));
-					// Use the source instead, continue the merge
-					tu.setTarget(trgLang, tu.getSource());
-				}
-			}
-		}
-		else { // No translation in package
+		if ( !tuFromTrans.hasTarget(trgLang) ) {
+			// No translation in package
 			if ( !tu.isEmpty() ) {
 				logger.log(Level.WARNING,
 					String.format("Item id=\"%s\": No translation provided.", tu.getId()));
+				tu.setTarget(trgLang, tu.getSource());
+			}
+		}
+		
+		// Else: try to merge the given target
+		
+		// Un-segment first if needed
+		TextContainer trgCont = tuFromTrans.getTarget(trgLang);
+		if ( trgCont.isSegmented() ) {
+			trgCont.mergeAllSegments();
+		}
+		
+		// Create the target entry for the output if it does not exist yet
+		trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		// Get the target codes, we may need them if the source ones fail
+		// (case of approved translation with different codes)
+		List<Code> trgOriCodes = trgCont.getCodes();
+		// Set the coded text with the new translated content
+		try {
+			trgCont.setCodedText(tuFromTrans.getTargetContent(trgLang).getCodedText(),
+				tu.getSourceContent().getCodes(), false);
+		}
+		catch ( RuntimeException e ) {
+			// If there is an error, try with the target
+			try {
+				trgCont.setCodedText(tuFromTrans.getTargetContent(trgLang).getCodedText(),
+					trgOriCodes, false);
+				logger.log(Level.WARNING,
+					String.format("Item id=\"%s\" was merged with target codes.\nS='%s'\nT='%s'",
+						tu.getId(), tu.getSourceContent().toString(), trgCont.toString()));
+			}
+			catch ( RuntimeException e2 ) {
+				logger.log(Level.SEVERE,
+					String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
+				// Use the source instead, continue the merge
 				tu.setTarget(trgLang, tu.getSource());
 			}
 		}

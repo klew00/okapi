@@ -211,9 +211,15 @@ public class Writer extends BaseWriter {
 			(original!=null) ? original : "unknown");
 		writer.writeAttributeString("source-language", srcLang);
 		writer.writeAttributeString("target-language", trgLang);
-		writer.writeAttributeString("datatype",
-			(contentType!=null) ? contentType : "x-undefined");
+		
+		if ( contentType == null ) contentType = "x-undefined";
+		else if ( contentType.equals("text/html") ) contentType = "html";
+		else if ( contentType.equals("text/xml") ) contentType = "xml";
+		// TODO: other standard XLIFF content types
+		else contentType = "x-"+contentType;
+		writer.writeAttributeString("datatype",contentType);
 		writer.writeLineBreak();
+		
 		inFile = true;
 
 //		writer.writeStartElement("header");

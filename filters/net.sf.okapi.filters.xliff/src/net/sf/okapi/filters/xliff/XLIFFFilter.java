@@ -675,7 +675,7 @@ public class XLIFFFilter implements IFilter {
 				//resource.needTargetElement = false;
 				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
-				tu.setTargetContent(trgLang, tc);
+				tu.setTarget(trgLang, tc);
 			}
 			targetDone = true;
 		}
@@ -722,6 +722,12 @@ public class XLIFFFilter implements IFilter {
 			int eventType;
 			String name;
 			Code code;
+			TextFragment segment = null;
+			int segIdStack = -1;
+			// The current variable points either to content or segment depending on where
+			// we are currently storing the parsed data, the segments are part of the content
+			// at the end, so all can use the same code/skeleton
+			TextFragment current = content;
 			
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -729,7 +735,7 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
-					content.append(reader.getText());
+					current.append(reader.getText());
 					if ( store ) { //TODO: escape unsupported chars
 						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					}
@@ -740,9 +746,19 @@ public class XLIFFFilter implements IFilter {
 					if ( name.equals(tagName) ) {
 						return content;
 					}
-					else if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
+					if ( name.equals("mrk") ) { // check of end of segment
+						if ( idStack.pop() == segIdStack ) {
+							current = content; // Point back to content
+							segIdStack = -1; // Reset to not trigger segment ending again
+							// Add the segment to the content
+							content.appendSegment(segment); //TODO: mid should be the segid
+							continue;
+						}
+					}
+					// Other cases
+					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						if ( store ) storeEndElement();
-						code = content.append(TagType.CLOSING, name, ""); 
+						code = current.append(TagType.CLOSING, name, ""); 
 						idStack.pop();
 						String tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
@@ -757,9 +773,20 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
 					name = reader.getLocalName();
+					if ( name.equals("mrk") ) { // Check for start of segment
+						String type = reader.getAttributeValue(null, "mtype");
+						if (( type != null ) && ( type.equals("seg") )) {
+							idStack.push(++id);
+							segIdStack = id;
+							segment = new TextFragment();
+							current = segment; // Segment is now being built
+							continue;
+						}
+					}
+					// Other cases
 					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
 						idStack.push(++id);
-						code = content.append(TagType.OPENING, name, "");
+						code = current.append(TagType.OPENING, name, "");
 						// Get the outer code
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
@@ -789,24 +816,26 @@ public class XLIFFFilter implements IFilter {
 						code.setOuterData(tmpg.toString());
 					}
 					else if ( name.equals("x") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
 					}
 					else if ( name.equals("bpt") ) {
 						idStack.push(++id);
-						appendCode(TagType.OPENING, id, name, store, content);
+						appendCode(TagType.OPENING, id, name, store, current);
 					}
 					else if ( name.equals("ept") ) {
-						appendCode(TagType.CLOSING, idStack.pop(), name, store, content);
+						appendCode(TagType.CLOSING, idStack.pop(), name, store, current);
 					}
 					else if ( name.equals("ph") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
 					}
 					else if ( name.equals("it") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, content);
+						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
 					}
 					break;
 				}
 			}
+			
+			// current should be content at the end
 			return content;
 		}
 		catch ( XMLStreamException e) {
@@ -828,7 +857,7 @@ public class XLIFFFilter implements IFilter {
 		int id,
 		String tagName,
 		boolean store,
-		TextContainer content)
+		TextFragment content)
 	{
 		try {
 			StringBuilder innerCode = new StringBuilder();

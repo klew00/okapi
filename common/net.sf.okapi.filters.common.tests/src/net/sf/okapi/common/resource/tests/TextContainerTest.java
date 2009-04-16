@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,12 +16,15 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
 package net.sf.okapi.common.resource.tests;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.junit.Test;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Property;
@@ -31,6 +34,7 @@ import junit.framework.*;
 
 public class TextContainerTest extends TestCase {
 
+	@Test
 	public void testGetSetContent () {
 		TextContainer tc1 = new TextContainer();
 		assertNotNull(tc1.getContent());
@@ -43,6 +47,7 @@ public class TextContainerTest extends TestCase {
 		assertEquals(tc1.toString(), tc2.toString());
 	}
 
+	@Test
 	public void testGetSetProperties () {
 		TextContainer tc1 = new TextContainer();
 		Set<String> list = tc1.getPropertyNames();
@@ -63,7 +68,44 @@ public class TextContainerTest extends TestCase {
 			assertSame(p1, p2);
 		}
 	}
+
+	@Test
+	public void testAppendSimpleSegment () {
+		TextContainer tc = new TextContainer();
+		TextFragment tf = new TextFragment("text1");
+		assertEquals(0, tc.getSegmentCount());
+		tc.appendSegment(tf);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("text1", tc.getSegments().get(0).toString());
+	}
 	
+	@Test
+	public TextContainer testAppendSeveralSegments () {
+		TextContainer tc = new TextContainer();
+		TextFragment tf = new TextFragment("text1");
+		assertEquals(0, tc.getSegmentCount());
+		tc.appendSegment(tf);
+		assertEquals(1, tc.getSegmentCount());
+		tc.append(' ');
+		tf = new TextFragment("text2");
+		tc.appendSegment(tf);
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals("text1", tc.getSegments().get(0).toString());
+		assertEquals("text2", tc.getSegments().get(1).toString());
+		assertEquals("0 1", tc.toString());
+		return tc;
+	}
+	
+	@Test
+	public void testMergeingSegments () {
+		TextContainer tc = testAppendSeveralSegments();
+		tc.mergeAllSegments();
+		assertEquals(0, tc.getSegmentCount());
+		assertNull(tc.getSegments());
+		assertEquals("text1 text2", tc.toString());
+	}
+	
+	@Test
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
 		TextContainer tc1 = new TextContainer(originalText);
@@ -92,16 +134,22 @@ public class TextContainerTest extends TestCase {
 		tc1.mergeAllSegments();
 		assertFalse(tc1.isSegmented());
 		assertEquals(tc1.toString(), originalText);
-		
+	}
+	
+	public void testSegmentsFromArray () {
+		String originalText = "[seg1][seg2] [seg3]";
+		TextContainer tc1 = new TextContainer(originalText);
+
 		// Test segmenting from an array
 		List<Range> ranges = new ArrayList<Range>();
 		ranges.add(new Range(0, 6));
 		ranges.add(new Range(6, 12));
 		ranges.add(new Range(13, 19));
+		
 		tc1.createSegments(ranges);
 		assertTrue(tc1.isSegmented());
 		assertEquals(tc1.getCodedText().length(), 2+2+1+2);
-		list = tc1.getSegments();
+		List<TextFragment> list = tc1.getSegments();
 		assertNotNull(list);
 		assertEquals(list.size(), 3);
 		assertEquals(list.get(0).toString(), "[seg1]");
