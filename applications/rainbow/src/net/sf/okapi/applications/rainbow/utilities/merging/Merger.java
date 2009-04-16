@@ -41,7 +41,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
@@ -120,7 +120,7 @@ public class Merger {
 			// Open the RTF input
 			File f = new File(fileToConvert);
 			//TODO: gusse encoding based on language
-			rtfFilter.open(new InputResource(f.toURI(), "windows-1252", manifest.getTargetLanguage()));
+			rtfFilter.open(new RawDocument(f.toURI(), "windows-1252", manifest.getTargetLanguage()));
 				
 			// Open the output document
 			// Initializes the output
@@ -183,7 +183,7 @@ public class Merger {
 			
 			// Initializes the input
 			File f = new File(originalFile);
-			inpFilter.open(new InputResource(f.toURI(), item.getInputEncoding(),
+			inpFilter.open(new RawDocument(f.toURI(), item.getInputEncoding(),
 				manifest.getSourceLanguage(), trgLang));
 			
 			// Initializes the output

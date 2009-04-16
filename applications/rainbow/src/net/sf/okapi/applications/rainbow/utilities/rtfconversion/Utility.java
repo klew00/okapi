@@ -32,7 +32,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
@@ -50,7 +50,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		try {
 			// Open the RTF input
 			File f = new File(getInputPath(0));
-			filter.open(new InputResource(f.toURI(), getInputEncoding(0), srcLang, trgLang));
+			filter.open(new RawDocument(f.toURI(), getInputEncoding(0), srcLang, trgLang));
 			
 			// Open the output document
 			Util.createDirectories(getOutputPath(0));
