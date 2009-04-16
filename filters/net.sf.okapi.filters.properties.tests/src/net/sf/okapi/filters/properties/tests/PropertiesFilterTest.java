@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
@@ -54,7 +54,7 @@ public class PropertiesFilterTest {
 		testDriver.setShowSkeleton(true);
 		try {
 			URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
-			filter.open(new InputResource(new URI(url.toString()), "windows-1252", "en", "es"));
+			filter.open(new RawDocument(new URI(url.toString()), "windows-1252", "en", "es"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
@@ -149,7 +149,7 @@ public class PropertiesFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new InputResource(snippet, "en"));
+		filter.open(new RawDocument(snippet, "en"));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);
