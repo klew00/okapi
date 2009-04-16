@@ -20,15 +20,18 @@
 
 package net.sf.okapi.common.filters;
 
+import java.security.acl.Group;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -55,17 +58,17 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * <p>
  * The BaseFilter allows filter writers to think in terms of simple start and
  * end calls. For example, to produce a non-translatable {@link Event} you would
- * use startDocumentPart() endDocumentPart(). For a text-based {@link Event} you
- * would use startTextUNit() and endTextUnit().
+ * use startDocumentPart() and endDocumentPart(). For a text-based {@link Event}
+ * you would use startTextUnit() and endTextUnit().
  * <p>
  * More complex cases such as tags with embedded translatable text can also be
- * handled. See the BaseMarkupFilter, HtmlFilter} and OpenXmlFilter for examples
- * of using the {@link AbstractBaseFilter}.
+ * handled. See the BaseMarkupFilter, HtmlFilter and OpenXmlFilter for examples
+ * of using the AbstractBaseFilter.
  * <p>
- * To create a new filter extend BaseFilter and call startFilter() and endFilter()
- * methods at the beginning and end of each filter run.
+ * To create a new filter extend BaseFilter and call startFilter() and
+ * endFilter() methods at the beginning and end of each filter run.
  */
-public abstract class AbstractBaseFilter implements IFilter {	
+public abstract class AbstractBaseFilter implements IFilter {
 	private static final Logger LOGGER = Logger.getLogger(AbstractBaseFilter.class.getName());
 
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
@@ -108,7 +111,8 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * Instantiates a new base filter.
 	 */
 	public AbstractBaseFilter() {
-		// newlineType should only be initialized once rather than on each reset call.
+		// newlineType should only be initialized once rather than on each reset
+		// call.
 		newlineType = "\n";
 	}
 
@@ -175,17 +179,30 @@ public abstract class AbstractBaseFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	protected void setOptions(String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
+	/**
+	 * Each {@link IFilter} has a small set of options beyond normal
+	 * configuration that gives the {@link IFilter} the needed information to
+	 * properly parse the content.
+	 * 
+	 * @param sourceLanguage
+	 *            - source language of the input document
+	 * @param targetLanguage
+	 *            - target language if the input document is multilingual.
+	 * @param defaultEncoding
+	 *            - assumed encoding of the input document. May be overriden if
+	 *            a different encoding is detected.
+	 * @param generateSkeleton
+	 *            - store skeleton (non-translatable parts of the document)
+	 *            along with the extracted text.
+	 */
+	protected void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
+			boolean generateSkeleton) {
 		setEncoding(defaultEncoding);
 		setSrcLang(sourceLanguage);
 	}
 
 	/*
-	 * Create a formatted ID for named resource.
+	 * Create a formatted ID for named resources.
 	 */
 	private String createId(String name, int number) {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
@@ -202,7 +219,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/*
-	 * Return the current buffered Event and remove it from the buffer.
+	 * Return the current buffered Event and removes it from the buffer.
 	 */
 	private Event popTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
@@ -269,17 +286,17 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Initialize the filter and send the {@link StartDocument} {@link Event}
+	 * Initialize the filter for every input and send the {@link StartDocument}
+	 * {@link Event}
 	 */
 	protected void startFilter() {
 		reset();
 		startDocument();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#finalize()
+	/**
+	 * End the current filter processing and send the {@link Ending}
+	 * {@link Event}
 	 */
 	protected void endFilter() {
 		if (hasUnfinishedSkeleton()) {
@@ -303,7 +320,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	/**
 	 * Check if the current buffered {@link Event} is a {@link TextUnit}.
 	 * 
-	 * @return true if TextUnit, false ootherwise.
+	 * @return true if TextUnit, false otherwise.
 	 */
 	protected boolean isCurrentTextUnit() {
 		Event e = peekTempEvent();
@@ -315,7 +332,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 
 	/**
 	 * Check if the current buffered {@link Event} is a complex {@link TextUnit}
-	 * . A complex TextUnit is one which carries along with it it's surrounding
+	 * A complex TextUnit is one which carries along with it it's surrounding
 	 * context such &lt;p> text &lt;/p> or &lt;title> text &lt;/title>
 	 * 
 	 * 
@@ -330,7 +347,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks if is current group.
+	 * Check if the current buffered {@link Event} is a {@link Group}
 	 * 
 	 * @return true, if is current group
 	 */
@@ -343,7 +360,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks if is inside text run.
+	 * Checks if the filter is inside text run.
 	 * 
 	 * @return true, if is inside text run
 	 */
@@ -352,7 +369,9 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Can start new text unit.
+	 * Can we start new {@link TextUnit}? A new {@link TextUnit} can only be
+	 * started if the current one has been ended with endTextUnit. Or no
+	 * {@link TextUnit} has been created yet.
 	 * 
 	 * @return true, if successful
 	 */
@@ -364,7 +383,8 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks for queued events.
+	 * Checks for queued events. We queue events in the correct order as
+	 * expected by the Okapi Writers (IWriter).
 	 * 
 	 * @return true, if successful
 	 */
@@ -376,7 +396,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Peek most recent group.
+	 * Peek at the most recently created {@link Group}.
 	 * 
 	 * @return the filter event
 	 */
@@ -393,7 +413,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Peek most recent text unit.
+	 * Peek At the most recently created {@link TextUnit}.
 	 * 
 	 * @return the filter event
 	 */
@@ -410,7 +430,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks for unfinished skeleton.
+	 * Checks for unfinished skeleton aka {@link DocumentPart}
 	 * 
 	 * @return true, if successful
 	 */
@@ -422,7 +442,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks for parent text unit.
+	 * Checks if the current {@link TextUnit} has a parent.
 	 * 
 	 * @return true, if successful
 	 */
@@ -441,10 +461,10 @@ public abstract class AbstractBaseFilter implements IFilter {
 		return false;
 	}
 
-	/**
-	 * Reset parser for new input.
+	/*
+	 * Reset {@link IFilter} for new input.
 	 */
-	protected void reset() {
+	private void reset() {
 		startGroupId = 0;
 		endGroupId = 0;
 		textUnitId = 0;
@@ -466,7 +486,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Checks if is canceled.
+	 * Checks if the {@link IFilter} has been canceled.
 	 * 
 	 * @return true, if is canceled
 	 */
@@ -479,7 +499,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start document.
+	 * Send the {@link EventType} START_DOCUMENT {@link Event}
 	 */
 	protected void startDocument() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
@@ -494,7 +514,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End document.
+	 * Send the {@link EventType} END_DOCUMENT {@link Event}
 	 */
 	protected void endDocument() {
 		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
@@ -504,7 +524,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start sub document.
+	 * Send the {@link EventType} START_SUBDOCUMENT {@link Event}
 	 */
 	protected void startSubDocument() {
 		if (hasUnfinishedSkeleton()) {
@@ -518,7 +538,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End sub document.
+	 * Send the {@link EventType} END_SUBDOCUMENT {@link Event}
 	 */
 	protected void endSubDocument() {
 		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
@@ -551,8 +571,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 
 	private void embeddedWritableProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			String language) {
-		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText
-				.getValue(), false));
+		setPropertyBasedOnLanguage(resource, language, new Property(propOrText.getName(), propOrText.getValue(), false));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(), language);
 		currentSkeleton.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
@@ -676,10 +695,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start text unit.
+	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and queue
+	 * it.
 	 * 
 	 * @param text
-	 *            the text
+	 *            the text used to prime the {@link TextUnit}
 	 */
 	protected void startTextUnit(String text) {
 		startTextUnit(text, null, null, null);
@@ -693,22 +713,26 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start text unit.
+	 * Start a complex {@link TextUnit}. Also create a TextUnit {@link Event}
+	 * and queue it.
 	 * 
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag that begins the complex {@link TextUnit}
 	 */
 	protected void startTextUnit(GenericSkeleton startMarker) {
 		startTextUnit(null, startMarker, null, null);
 	}
 
 	/**
-	 * Start text unit.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
+	 * it.
 	 * 
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag that begins the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 */
 	protected void startTextUnit(GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -716,14 +740,17 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start text unit.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
+	 * it.
 	 * 
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag that begins the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 * @param text
-	 *            the text
+	 *            the text used to prime the {@link TextUnit}
 	 */
 	protected void startTextUnit(String text, GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -731,16 +758,19 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start text unit.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
+	 * it.
 	 * 
-	 * @param text
-	 *            the text
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag that begins the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
+	 * @param text
+	 *            the text used to prime the {@link TextUnit}
 	 * @param language
-	 *            the language
+	 *            the language of the text
 	 */
 	protected void startTextUnit(String text, GenericSkeleton startMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -772,32 +802,36 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End text unit.
+	 * End the current {@link TextUnit} and place the {@link Event} on the
+	 * finished queue.
 	 */
 	protected void endTextUnit() {
 		endTextUnit(null, null, null);
 	}
 
 	/**
-	 * End text unit.
+	 * End the current {@link TextUnit} and place the {@link Event} on the
+	 * finished queue.
 	 * 
 	 * @param endMarker
-	 *            the end marker
+	 *            the tag that ends the complex {@link TextUnit}
 	 */
 	protected void endTextUnit(GenericSkeleton endMarker) {
 		endTextUnit(endMarker, null, null);
 	}
 
 	/**
-	 * End text unit.
+	 * End the current {@link TextUnit} and place the {@link Event} on the
+	 * finished queue.
 	 * 
 	 * @param endMarker
-	 *            the end marker
+	 *            the tag that ends the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 * @param language
-	 *            the language
-	 *            
+	 *            the language of the text
+	 * 
 	 * @throws IllegalFilterOperationException
 	 */
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
@@ -805,7 +839,8 @@ public abstract class AbstractBaseFilter implements IFilter {
 		Event tempTextUnit;
 
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end the TextUnit. TextUnit not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot end the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to end a TextUnit that does not exist.", e);
 			throw e;
 		}
@@ -828,16 +863,17 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Adds the to text unit.
+	 * Adds text to the current {@link TextUnit}
 	 * 
 	 * @param text
 	 *            the text
-	 *            
+	 * 
 	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add to the TextUnit. TextUnit not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot add to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add text to a TextUnit that does not exist.", e);
 			throw e;
 		}
@@ -848,20 +884,22 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Nothing is actionable within the tag (i.e., no properties or text)
+	 * Add a {@link Code} to the current {@link TextUnit}. Nothing is actionable
+	 * within the tag (i.e., no properties or text)
 	 * 
 	 * @param codeType
 	 *            the code type
 	 * @param literalCode
-	 *            the literal code
+	 *            the literal code as it appears in the input.
 	 * @param codeName
 	 *            the code name
-	 *            
+	 * 
 	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add a Code to the TextUnit. TextUnit not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot add a Code to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
 			throw e;
 		}
@@ -872,16 +910,18 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Adds the to text unit.
+	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
+	 * actionable attributes.
 	 * 
 	 * @param codeType
 	 *            the code type
 	 * @param literalCode
-	 *            the literal code
+	 *            the literal code as it appears in the input.
 	 * @param codeName
 	 *            the code name
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -889,26 +929,28 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Adds the to text unit.
+	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
+	 * actionable attributes.
 	 * 
 	 * @param codeType
 	 *            the code type
 	 * @param literalCode
-	 *            the literal code
+	 *            the literal code as it appears in the input.
 	 * @param codeName
 	 *            the code name
-	 * @param language
-	 *            the language
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
-	 *            
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
+	 * @param language
+	 *            the language of the text
 	 * @throws IllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add Codes to the TextUnit. TextUnit not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot add Codes to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add Codes to a TextUnit that does not exist.", e);
 			throw e;
 		}
@@ -927,24 +969,25 @@ public abstract class AbstractBaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start group.
+	 * Create and send a {@link StartGroup} {@link Event}
 	 * 
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag which starts the {@link Group}
 	 */
 	protected void startGroup(GenericSkeleton startMarker) {
 		startGroup(startMarker, null, null);
 	}
 
 	/**
-	 * Start group.
+	 * Create and send a {@link StartGroup} {@link Event}
 	 * 
 	 * @param startMarker
-	 *            the start marker
+	 *            the tag which starts the {@link Group}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 * @param language
-	 *            the language
+	 *            the language of any actionable items
 	 */
 	protected void startGroup(GenericSkeleton startMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -985,36 +1028,39 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End group.
+	 * Send an {@link Ending} {@link Event} of type END_GROUP
 	 * 
 	 * @param endMarker
-	 *            the end marker
+	 *            the tags that ends the {@link Group}
 	 */
 	protected void endGroup(GenericSkeleton endMarker) {
 		endGroup(endMarker, null, null);
 	}
 
 	/**
-	 * End group.
+	 * Send an {@link Ending} {@link Event} of type END_GROUP
 	 * 
 	 * @param endMarker
-	 *            the end marker
+	 *            the tags that ends the {@link Group}
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 * @param language
-	 *            the language
-	 *            
+	 *            the language of any actionable items
+	 * 
 	 * @throws IllegalFilterOperationException
 	 */
 	protected void endGroup(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end current Group. StartGroup not found.");
-			LOGGER.log(Level.SEVERE, "Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.", e);
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot end current Group. StartGroup not found.");
+			LOGGER.log(Level.SEVERE, "Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.",
+					e);
 			throw e;
 		}
-		
+
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
 
 		if (endMarker != null && propertyTextUnitPlaceholders != null) {
@@ -1032,19 +1078,27 @@ public abstract class AbstractBaseFilter implements IFilter {
 	// Code Methods
 	// ////////////////////////////////////////////////////////////////////////
 
+	/*
+	 * Create a Code and store it for later processing.
+	 */
 	private void startCode(Code code) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot add a Code to the TextUnit. TextUnit not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot add a Code to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
-			throw e;			
+			throw e;
 		}
 		currentCode = code;
 		currentCode.setType(currentTagType);
 	}
 
+	/*
+	 * End the COde and add it to the TextUnit.
+	 */
 	private void endCode() {
 		if (currentCode == null) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException("Cannot end the current Code. Code not found.");
+			IllegalFilterOperationException e = new IllegalFilterOperationException(
+					"Cannot end the current Code. Code not found.");
 			LOGGER.log(Level.SEVERE, "Trying to end a Code that does not exist. Did you call startCode?", e);
 			throw e;
 		}
@@ -1059,10 +1113,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start document part.
+	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
+	 * {@link Event} for later processing.
 	 * 
 	 * @param part
-	 *            the part
+	 *            the {@link DocumentPart} (aka skeleton)
 	 */
 	protected void startDocumentPart(String part) {
 
@@ -1075,14 +1130,16 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start document part.
+	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
+	 * {@link Event} for later processing.
 	 * 
 	 * @param part
-	 *            the part
+	 *            the {@link DocumentPart} (aka skeleton)
 	 * @param name
 	 *            the name
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
 	 */
 	protected void startDocumentPart(String part, String name,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -1090,16 +1147,18 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Start document part.
+	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
+	 * {@link Event} for later processing.
 	 * 
 	 * @param part
-	 *            the part
+	 *            the {@link DocumentPart} (aka skeleton)
 	 * @param name
 	 *            the name
-	 * @param language
-	 *            the language
 	 * @param propertyTextUnitPlaceholders
-	 *            the property text unit placeholders
+	 *            the list of actionable {@link TextUnit} or {@link Properties}
+	 *            with offset information into the tag.
+	 * @param language
+	 *            the language of any actionable items
 	 */
 	protected void startDocumentPart(String part, String name, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -1116,10 +1175,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End document part.
+	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the
+	 * {@link Event} on the finished queue.
 	 * 
 	 * @param part
-	 *            the part
+	 *            the {@link DocumentPart} (aka skeleton)
 	 */
 	protected void endDocumentPart(String part) {
 		if (part != null) {
@@ -1131,17 +1191,18 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * End document part.
+	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the
+	 * {@link Event} on the finished queue.
 	 */
 	protected void endDocumentPart() {
 		endDocumentPart(null);
 	}
 
 	/**
-	 * Adds the to document part.
+	 * Add to the current {@link DocumentPart}.
 	 * 
 	 * @param part
-	 *            the part
+	 *            the {@link DocumentPart} as a String.
 	 */
 	protected void addToDocumentPart(String part) {
 		if (currentSkeleton == null) {
@@ -1152,36 +1213,61 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
+	 * Tell the {@link IFilter} what to do with whitespace.
+	 * 
 	 * @param preserveWhitespace
-	 *            the preserveWhitespace to set
+	 *            the preserveWhitespace as boolean.
 	 */
 	protected void setPreserveWhitespace(boolean preserveWhitespace) {
 		this.preserveWhitespace = preserveWhitespace;
 	}
 
 	/**
-	 * @return the preserveWhitespace
+	 * 
+	 * @return the preserveWhitespace boolean.
 	 */
 	protected boolean isPreserveWhitespace() {
 		return preserveWhitespace;
 	}
 
 	/**
+	 * Set the tag type of the current tag (BOLD, UNDERLINED etc..).
+	 * 
 	 * @param tagType
-	 *            the currentElementType to set
+	 *            the tagType of the current tag.
 	 */
 	public void setTagType(String tagType) {
 		this.currentTagType = tagType;
 	}
 
+	/**
+	 * Is the input encoded as UTF-8?
+	 * 
+	 * @return true if input is UTF-8, false otherwise.
+	 */
 	abstract protected boolean hasUtf8Encoding();
 
+	/**
+	 * Does the input have a UTF-8 Byte Order Mark?
+	 * 
+	 * @return true if thre is a UTF-8 BOM, false otherwise.
+	 */
 	abstract protected boolean hasUtf8Bom();
 
+	/**
+	 * Get the newline type used in the input.
+	 * 
+	 * @return the {@link NewlineType} one of '\n', '\r' or '\r\n'
+	 */
 	protected String getNewlineType() {
 		return newlineType;
 	}
 
+	/**
+	 * Set the newline type.
+	 * 
+	 * @param newlineType one of '\n', '\r' or '\r\n'.
+	 */
 	protected void setNewlineType(String newlineType) {
 		this.newlineType = newlineType;
 	}
