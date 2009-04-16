@@ -59,7 +59,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -196,19 +196,19 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	/**
-	 * Start a new {@link IFilter} using the supplied {@link InputResource}.
+	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 
 	 * @param input
 	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
 	 *            {@link URI} or {@link InputStream})
 	 */
-	public void open(InputResource input) {
+	public void open(RawDocument input) {
 		open(input, true);
 		LOGGER.log(Level.FINE, getName() + " has opened an input document");
 	}
 
 	/**
-	 * Start a new {@link IFilter} using the supplied {@link InputResource}.
+	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 
 	 * @param input
 	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
@@ -220,7 +220,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * @throws BadFilterInputException
 	 * @throws OkapiIOException
 	 */
-	public void open(InputResource input, boolean generateSkeleton) {
+	public void open(RawDocument input, boolean generateSkeleton) {
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
 		if (input.getInputCharSequence() != null) {
 			open(input.getInputCharSequence());
