@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -53,7 +53,7 @@ public class RegexFilterTest {
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
 			InputStream input = RegexFilterTest.class.getResourceAsStream("/Test01_stringinfo_en.info");
-			filter.open(new InputResource(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			
@@ -61,7 +61,7 @@ public class RegexFilterTest {
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
 			input = RegexFilterTest.class.getResourceAsStream("/Test01_srt_en.srt");
-			filter.open(new InputResource(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 			
