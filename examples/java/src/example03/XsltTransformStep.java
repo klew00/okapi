@@ -16,7 +16,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 
 public class XsltTransformStep extends BasePipelineStep {
 	private InputStream xstlInputstream;
@@ -40,7 +40,7 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
 
 		// get the input xml and xslt streams
-		Reader XmlInput = ((InputResource)event.getResource()).getReader(); 
+		Reader XmlInput = ((RawDocument)event.getResource()).getReader(); 
 				
 		Source xmlSource = new StreamSource(XmlInput);
 		Source xsltSource = new StreamSource(xstlInputstream);
@@ -62,7 +62,7 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayInputStream transformedInput = new ByteArrayInputStream(tempStream.toByteArray());
 			
 		// overwrite our event to the new transformed content	
-		event.setResource(new InputResource(transformedInput, "UTF-8", "en"));
+		event.setResource(new RawDocument(transformedInput, "UTF-8", "en"));
 		
 		// this step is done generating events
 		done = true;

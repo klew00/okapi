@@ -25,7 +25,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
@@ -42,7 +42,7 @@ public class Main {
 				filter = new OpenOfficeFilter();
 			}
 			// Open the document to process
-			filter.open(new InputResource(new File(args[0]).toURI(), "UTF-8", "en"));
+			filter.open(new RawDocument(new File(args[0]).toURI(), "UTF-8", "en"));
 			
 			// Create a formatter to display text unit more prettily.
 			GenericContent fmt = new GenericContent();
