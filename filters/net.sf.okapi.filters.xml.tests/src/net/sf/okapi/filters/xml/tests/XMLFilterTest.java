@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -56,7 +56,7 @@ public class XMLFilterTest {
 		try {
 			filter = new XMLFilter();
 			URL url = XMLFilterTest.class.getResource("/Translate1.xml");
-			filter.open(new InputResource(new URI(url.toString()), "UTF-16", "en", "es"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-16", "en", "es"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
@@ -193,7 +193,7 @@ public class XMLFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		xmlFilter.open(new InputResource(snippet, "en"));
+		xmlFilter.open(new RawDocument(snippet, "en"));
 		while (xmlFilter.hasNext()) {
 			Event event = xmlFilter.next();
 			list.add(event);
