@@ -41,7 +41,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -156,11 +156,11 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
-	public void open (InputResource input) {
+	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
-	public void open (InputResource input,
+	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -175,7 +175,7 @@ public class OpenXMLFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("InputResource has no input defined.");
+			throw new RuntimeException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -381,7 +381,7 @@ public class OpenXMLFilter implements IFilter {
 				bis = new BufferedInputStream(isInputStream); // DWH 3-5-09 allows mark and reset
 			}
 
-			openXMLContentFilter.open(new InputResource(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
+			openXMLContentFilter.open(new RawDocument(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
 			//			openXMLContentFilter.next(); // START
 			event = openXMLContentFilter.next(); // START_DOCUMENT
 			if (dbg>2)
