@@ -26,7 +26,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.AbstractBaseFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -43,11 +43,11 @@ public class DummyBaseFilter extends AbstractBaseFilter {
 		return null;
 	}
 
-	public void open (InputResource input) {
+	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
-	public void open(InputResource input,
+	public void open(RawDocument input,
 		boolean generateSkeleton)
 	{
 		if ( input.getInputCharSequence().equals("2") ) {
