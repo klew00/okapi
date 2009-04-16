@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.tests;
+package net.sf.okapi.common.filters.tests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -28,23 +28,10 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses({net.sf.okapi.common.resource.tests.ResourcesTest.class,
-	net.sf.okapi.common.resource.tests.TextContainerTest.class,
-	net.sf.okapi.common.resource.tests.TextFragmentTest.class,
-	net.sf.okapi.common.resource.tests.TextUnitTest.class,
-	net.sf.okapi.common.encoder.tests.EncodersTest.class,
-	net.sf.okapi.common.filters.tests.AbstractBaseFilterTests.class,
-	net.sf.okapi.common.filters.tests.FilterEventTest.class,
-	net.sf.okapi.common.filterwriter.tests.GenericContentTest.class,
-	net.sf.okapi.common.resource.tests.ResourcesTest.class,
-	net.sf.okapi.common.resource.tests.TextContainerTest.class,
-	net.sf.okapi.common.resource.tests.TextFragmentTest.class,
-	net.sf.okapi.common.resource.tests.TextUnitTest.class
-	})
-	
-public class AllCommonFiltersTests {
-  public static Test suite() {
-    return new JUnit4TestAdapter(AllCommonFiltersTests.class);
-  }
+@SuiteClasses( { AbstractBaseFilterTests.class, FilterEventTest.class, PropertyTextUnitPlaceholderTest.class })
+public class AllTests {
+	public static Test suite() {
+		return new JUnit4TestAdapter(AllTests.class);
+	}
 
 }

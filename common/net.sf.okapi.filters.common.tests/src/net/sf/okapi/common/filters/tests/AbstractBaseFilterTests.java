@@ -27,7 +27,7 @@ import net.sf.okapi.common.resource.InputResource;
 import net.sf.okapi.filters.tests.DummyBaseFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
-public class BaseFilterTests {
+public class AbstractBaseFilterTests {
 
 	@Test
 	public void testMultilingual () {
@@ -54,5 +54,4 @@ public class BaseFilterTests {
 			if ( filter != null ) filter.close();
 		}
 	}
-
 }
