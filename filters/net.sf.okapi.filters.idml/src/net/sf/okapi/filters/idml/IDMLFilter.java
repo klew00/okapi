@@ -41,7 +41,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -132,11 +132,11 @@ public class IDMLFilter implements IFilter {
 		}
 	}
 
-	public void open (InputResource input) {
+	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
-	public void open (InputResource input,
+	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -151,7 +151,7 @@ public class IDMLFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("InputResource has no input defined.");
+			throw new BadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -236,7 +236,7 @@ public class IDMLFilter implements IFilter {
 		filter.setParameters(params);
 		Event event;
 		try {
-			filter.open(new InputResource(zipFile.getInputStream(entry), "UTF-8", srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {
