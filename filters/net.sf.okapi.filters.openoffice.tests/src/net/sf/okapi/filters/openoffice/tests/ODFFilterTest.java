@@ -25,7 +25,7 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.resource.InputResource;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openoffice.ODFFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
@@ -43,12 +43,12 @@ public class ODFFilterTest {
 			testDriver.setDisplayLevel(3);
 			filter = new ODFFilter();
 			URL url = ODFFilterTest.class.getResource("/ODFTest_footnote.xml");
-			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
 			// Test a simple re-write
-			filter.open(new InputResource(new URI(url.toString()), "UTF-8", "en"));
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			rewrite(filter);
 			filter.close();
 		}
