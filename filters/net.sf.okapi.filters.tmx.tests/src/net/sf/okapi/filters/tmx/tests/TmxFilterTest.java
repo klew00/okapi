@@ -1,38 +1,28 @@
 package net.sf.okapi.filters.tmx.tests;
 
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
 
 public class TmxFilterTest {
 
-	@Before
-	public void setUp() {
-		System.out.println("SetUp");
-	}	
-	
 	@Test
 	public void runTest () {
+		FilterTestDriver testDriver = new FilterTestDriver();
 		TmxFilter filter = null;		
 		try {
 			filter = new TmxFilter();
-			filter.setOptions("EN-US","FR-CA", "UTF-8",true);
-			InputStream input = TmxFilterTest.class.getResourceAsStream("/ImportTest2A.tmx");
-			filter.open(input);
-			process(filter);
+			URL url = TmxFilterTest.class.getResource("/ImportTest2A.tmx");
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "EN-US", "FR-CA"));			
+			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
+			//process(filter);
+			//filter.close();
 			
 		}
 		catch ( Throwable e ) {
@@ -44,7 +34,7 @@ public class TmxFilterTest {
 		}
 	}	
 	
-	private void process (IFilter filter) {
+/*	private void process (IFilter filter) {
 		
 		System.out.println("==================================================");
 		Event event;
@@ -100,5 +90,5 @@ public class TmxFilterTest {
 			System.out.println(skel.toString());
 			System.out.println("---");
 		}
-	}
+	}*/
 }
