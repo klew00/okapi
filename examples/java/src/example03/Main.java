@@ -19,7 +19,7 @@ import net.sf.okapi.filters.xml.XMLFilter;
 /**
  * Example showing an Okapi pipeline running XSLT transformations on a file. The
  * transformed file is then run through the XML filter (broken down into Okapi
- * Events) and then written using the filter Events writer.
+ * Events) and then re-written using the generic Event writer.
  */
 public class Main {
 
@@ -29,11 +29,11 @@ public class Main {
 		// input resource as URL
 		URL inputXml = Main.class.getResource("test.xml");
 
-		// make copy of input using identity XSLT step
+		// make copy of input using identity XSLT
 		InputStream in = Main.class.getResourceAsStream("identity.xsl");
 		pipeline.addStep(new XsltTransformStep(in));
 
-		// remove b tags from input using remove_b_tags XSLT step
+		// remove b tags from input using remove_b_tags XSLT
 		in = Main.class.getResourceAsStream("remove_b_tags.xsl");
 		pipeline.addStep(new XsltTransformStep(in));
 
