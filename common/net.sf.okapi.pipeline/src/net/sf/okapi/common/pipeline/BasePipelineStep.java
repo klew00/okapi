@@ -75,7 +75,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 			break;
 
 		case RAW_DOCUMENT:
-			handleInputResource(event);
+			handleRawDocument(event);
 			break;
 
 		case FINISHED:
@@ -140,7 +140,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	protected void handleTextUnit(Event event) {
 	}
 
-	protected void handleInputResource(Event event) {
+	protected void handleRawDocument(Event event) {
 	}
 
 	protected void handleFinished(Event event) {
