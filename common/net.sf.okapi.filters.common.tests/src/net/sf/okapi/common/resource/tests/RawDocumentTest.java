@@ -11,11 +11,11 @@ import static org.junit.Assert.*;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class InputResourceTest {
+public class RawDocumentTest {
 
 	@Test
 	public void getReaderWithURI() throws URISyntaxException, IOException {
-		RawDocument ir = new RawDocument(InputResourceTest.class.getResource("/test.html").toURI(), "UTF-8", "en");
+		RawDocument ir = new RawDocument(RawDocumentTest.class.getResource("/test.html").toURI(), "UTF-8", "en");
 		Reader r = ir.getReader();
 		assertTrue(r.ready());
 	}
@@ -31,4 +31,5 @@ public class InputResourceTest {
 		RawDocument ir = new RawDocument(new URI("/bad/bad"), "UTF-8", "en");
 		ir.getReader();
 	}
+
 }

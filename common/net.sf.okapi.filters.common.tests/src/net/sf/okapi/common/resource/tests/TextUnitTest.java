@@ -27,10 +27,14 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import junit.framework.*;
 
-public class TextUnitTest extends TestCase {
+import org.junit.Test;
+import static org.junit.Assert.*;
 
+
+public class TextUnitTest {
+
+	@Test
 	public void testGetSetSource () {
 		TextUnit tu1 = new TextUnit("tu1");
 		assertEquals(tu1.isEmpty(), true);
@@ -44,6 +48,7 @@ public class TextUnitTest extends TestCase {
 		assertSame(tu1.getSource(), tc1);
 	}
 	
+	@Test
 	public void testGetSetTarget () {
 		TextUnit tu1 = new TextUnit("tu1");
 		assertNull(tu1.getTarget("fr"));
@@ -55,6 +60,7 @@ public class TextUnitTest extends TestCase {
 		assertEquals(tu1.getTarget("fr").toString(), "fr text+");
 	}
 	
+	@Test
 	public void testHasTarget () {
 		TextUnit tu1 = new TextUnit("tu1");
 		assertEquals(tu1.hasTarget("fr"), false);
@@ -66,6 +72,7 @@ public class TextUnitTest extends TestCase {
 		assertEquals(tu1.hasTarget("fr"), false);
 	}
 
+	@Test
 	public void testCreateTarget () {
 		// Create from source
 		TextUnit tu1 = new TextUnit("tu1");
@@ -91,6 +98,7 @@ public class TextUnitTest extends TestCase {
 		assertEquals(tu1.getTarget("fr").toString(), "source text");
 	}
 
+	@Test
 	public void testGetSetId () {
 		TextUnit tu1 = new TextUnit("tu1");
 		assertEquals(tu1.getId(), "tu1");
@@ -100,6 +108,7 @@ public class TextUnitTest extends TestCase {
 		assertNull(tu1.getId());
 	}
 	
+	@Test
 	public void testGetSetMimeType () {
 		TextUnit tu1 = new TextUnit("tu1");
 		assertNull(tu1.getMimeType());
@@ -109,6 +118,7 @@ public class TextUnitTest extends TestCase {
 		assertNull(tu1.getMimeType());
 	}
 	
+	@Test
 	public void testGetSetProperties () {
 		TextUnit tu1 = new TextUnit("tu1");
 		Set<String> list = tu1.getPropertyNames();
@@ -127,6 +137,7 @@ public class TextUnitTest extends TestCase {
 		assertSame(tu1.getProperty("name"), p1);
 	}
 
+	@Test
 	public void testGetSetSourceProperties () {
 		TextUnit tu1 = new TextUnit("tu1");
 		Set<String> list = tu1.getSourcePropertyNames();
@@ -151,6 +162,7 @@ public class TextUnitTest extends TestCase {
 		assertNotSame(p3, p2);
 	}
 
+	@Test
 	public void testGetSetTargetProperties () {
 		TextUnit tu1 = new TextUnit("tu1");
 		Set<String> list = tu1.getTargetPropertyNames("fr");
@@ -179,6 +191,7 @@ public class TextUnitTest extends TestCase {
 		assertNotSame(p3, p2);
 	}
 	
+	@Test
 	public void testGetSetSourceContent () {
 		TextUnit tu1 = new TextUnit("tu1");
 		TextFragment tf1 = new TextFragment("source text");
@@ -200,6 +213,7 @@ public class TextUnitTest extends TestCase {
 		assertEquals(tu1.getSource().toString(), "source text+$");
 	}
 
+	@Test
 	public void testGetSetTargetContent () {
 		TextUnit tu1 = new TextUnit("tu1");
 		TextFragment tf1 = new TextFragment("fr text");

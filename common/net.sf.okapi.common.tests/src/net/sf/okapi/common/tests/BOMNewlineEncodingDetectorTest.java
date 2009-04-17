@@ -4,7 +4,6 @@ package net.sf.okapi.common.tests;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 

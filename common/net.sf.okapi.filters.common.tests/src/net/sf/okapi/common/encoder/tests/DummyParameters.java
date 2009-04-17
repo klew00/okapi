@@ -74,5 +74,10 @@ public class DummyParameters implements IParameters {
 	public void save (String filePath) {
 		// Not needed for tests
 	}
+
+	public int getInteger(String name) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 }

@@ -107,4 +107,9 @@ public abstract class BaseParameters implements IParameters {
 		else return buffer.getString(name);
 	}
 	
+	public int getInteger (String name) {
+		if ( buffer == null ) return 0;
+		else return Integer.parseInt(buffer.getString(name));
+	}
+
 }

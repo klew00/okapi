@@ -47,5 +47,5 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("breakAtContent", breakAtContent);
 		return buffer.toString();
 	}
-	
+
 }

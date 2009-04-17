@@ -200,8 +200,11 @@ public class Parameters implements IParameters {
 	}
 
 	public String getString (String name) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public int getInteger (String name) {
+		return 0;
 	}
 
 }

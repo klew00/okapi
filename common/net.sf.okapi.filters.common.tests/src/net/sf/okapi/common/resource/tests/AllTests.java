@@ -28,7 +28,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { InputResourceTest.class, OptimizerTest.class, ResourcesTest.class, TextContainerTest.class,
+@SuiteClasses( { RawDocumentTest.class, OptimizerTest.class, ResourcesTest.class, TextContainerTest.class,
 		TextFragmentTest.class, TextUnitTest.class })
 public class AllTests {
 	public static Test suite() {

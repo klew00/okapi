@@ -84,5 +84,12 @@ public interface IParameters {
 	 * @return the value of the given parameter, or null if it is not defined.
 	 */
 	public String getString (String name);
+
+	/**
+	 * Gets the integer value for a given parameter name.
+	 * @param name the name of the integer parameter to retrieve.
+	 * @return the value of the given parameter, or 0 if it is not defined.
+	 */
+	public int getInteger (String name);
 	
 }

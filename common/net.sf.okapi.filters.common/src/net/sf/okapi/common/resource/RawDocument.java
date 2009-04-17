@@ -66,9 +66,9 @@ public class RawDocument implements IResource {
 	 * language.
 	 * 
 	 * @param inputCharSequence
-	 *            The CharSequence for this RawDocument.
+	 *            the CharSequence for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 */
 	public RawDocument(CharSequence inputCharSequence, String sourceLanguage) {
 		create(inputCharSequence, sourceLanguage, null);
@@ -79,11 +79,11 @@ public class RawDocument implements IResource {
 	 * language and a target language.
 	 * 
 	 * @param inputCharSequence
-	 *            The CharSequence for this RawDocument.
+	 *            the CharSequence for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this RawDocument.
+	 *            the target language for this RawDocument.
 	 */
 	public RawDocument(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
 		create(inputCharSequence, sourceLanguage, targetLanguage);
@@ -94,11 +94,11 @@ public class RawDocument implements IResource {
 	 * and a source language.
 	 * 
 	 * @param inputURI
-	 *            The URI for this RawDocument.
+	 *            the URI for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this RawDocument.
+	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 */
 	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage) {
 		create(inputURI, defaultEncoding, sourceLanguage, null);
@@ -109,13 +109,13 @@ public class RawDocument implements IResource {
 	 * a source language and a target language.
 	 * 
 	 * @param inputURI
-	 *            The URI for this RawDocument.
+	 *            the URI for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this RawDocument.
+	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this RawDocument.
+	 *            the target language for this RawDocument.
 	 */
 	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
 		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
@@ -126,11 +126,11 @@ public class RawDocument implements IResource {
 	 * encoding and a source language.
 	 * 
 	 * @param inputStream
-	 *            The InputStream for this RawDocument.
+	 *            the InputStream for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this RawDocument.
+	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 */
 	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage) {
 		create(inputStream, defaultEncoding, sourceLanguage, null);
@@ -141,21 +141,22 @@ public class RawDocument implements IResource {
 	 * encoding and a source language.
 	 * 
 	 * @param inputStream
-	 *            The InputStream for this RawDocument.
+	 *            the InputStream for this RawDocument.
 	 * @param defaultEncoding
-	 *            The default encoding for this RawDocument.
+	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
-	 *            The source language for this RawDocument.
+	 *            the source language for this RawDocument.
 	 * @param targetLanguage
-	 *            The target language for this RawDocument.
+	 *            the target language for this RawDocument.
 	 */
 	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
 		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage);
 	}
 
 	/**
-	 * Create a {@link Reader} from either inputStream or inputCharSequence. If
-	 * an inputURL is set then an inputStream is set automatically.
+	 * Create a {@link Reader} from the input for this RawDocument.
+	 * The reader is created from inputStream or inputCharSequence.
+	 * If an inputURL is set then a temporary InputStream is created automatically.
 	 * 
 	 * @return the Reader
 	 * 
@@ -254,10 +255,9 @@ public class RawDocument implements IResource {
 		return id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.resource.IResource#getSkeleton()
+	/**
+	 * Returns always null as there is never a skeleton associated to a RawDocument.
+	 * @return always null.
 	 */
 	public ISkeleton getSkeleton() {
 		return null;
@@ -286,12 +286,8 @@ public class RawDocument implements IResource {
 		this.id = id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.resource.IResource#setSkeleton(net.sf.okapi.common
-	 * .filters.ISkeleton)
+	/**
+	 * This method has no effect as there is never a skeleton for a RawDocument.
 	 */
 	public void setSkeleton(ISkeleton skeleton) {
 		// This resource has no skeleton
@@ -302,7 +298,7 @@ public class RawDocument implements IResource {
 	 * if either {@link #getInputCharSequence()} or {@link #getInputURI()} are
 	 * not null.
 	 * 
-	 * @return The InputStream object for this resource (may be null).
+	 * @return the InputStream object for this resource (may be null).
 	 */
 	public InputStream getInputStream() {
 		return inputStream;
@@ -312,7 +308,7 @@ public class RawDocument implements IResource {
 	 * Sets the InputStream object associated with this resource.
 	 * 
 	 * @param inputStream
-	 *            The InputStream object for this resource.
+	 *            the InputStream object for this resource.
 	 */
 	public void setInputStream(InputStream inputStream) {
 		this.inputStream = inputStream;
@@ -326,7 +322,7 @@ public class RawDocument implements IResource {
 	 * either {@link #getInputCharSequence()} or {@link #getInputStream()} are
 	 * not null.
 	 * 
-	 * @return The URI object for this resource (may be null).
+	 * @return the URI object for this resource (may be null).
 	 */
 	public URI getInputURI() {
 		return inputURI;
@@ -336,7 +332,7 @@ public class RawDocument implements IResource {
 	 * Sets the URI object associated with this resource.
 	 * 
 	 * @param inputURI
-	 *            The URI object for this resource.
+	 *         the URI object for this resource.
 	 */
 	public void setInputURI(URI inputURI) {
 		this.inputURI = inputURI;
@@ -350,7 +346,7 @@ public class RawDocument implements IResource {
 	 * null if either {@link #getInputURI()} or {@link #getInputStream()} are
 	 * not null.
 	 * 
-	 * @return The CharSequence object for this resource (may be null).
+	 * @return the CharSequence object for this resource (may be null).
 	 */
 	public CharSequence getInputCharSequence() {
 		return inputCharSequence;
@@ -360,7 +356,7 @@ public class RawDocument implements IResource {
 	 * Sets the CharSequence object associated with this resource.
 	 * 
 	 * @param inputCharSequence
-	 *            The CharSequence object for this resource.
+	 *            the CharSequence object for this resource.
 	 */
 	public void setInputCharSequence(CharSequence inputCharSequence) {
 		this.inputCharSequence = inputCharSequence;
@@ -382,7 +378,7 @@ public class RawDocument implements IResource {
 	 * Sets the default encoding associated with this resource.
 	 * 
 	 * @param encoding
-	 *            The default encoding associated with this resource.
+	 *            the default encoding associated with this resource.
 	 */
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
@@ -391,7 +387,7 @@ public class RawDocument implements IResource {
 	/**
 	 * Gets the source language associated to this resource.
 	 * 
-	 * @return The source language associated to this resource.
+	 * @return the source language associated to this resource.
 	 */
 	public String getSourceLanguage() {
 		return srcLang;
@@ -401,7 +397,7 @@ public class RawDocument implements IResource {
 	 * Sets the source language associated with this resource.
 	 * 
 	 * @param language
-	 *            The source language associated with this resource.
+	 *            the source language associated with this resource.
 	 */
 	public void setSourceLanguage(String language) {
 		srcLang = language;
@@ -410,7 +406,7 @@ public class RawDocument implements IResource {
 	/**
 	 * Gets the target language associated to this resource.
 	 * 
-	 * @return The target language associated to this resource.
+	 * @return the target language associated to this resource.
 	 */
 	public String getTargetLanguage() {
 		return trgLang;
@@ -420,7 +416,7 @@ public class RawDocument implements IResource {
 	 * Sets the target language associated with this resource.
 	 * 
 	 * @param language
-	 *            The target language associated with this resource.
+	 *           the target language associated with this resource.
 	 */
 	public void setTargetLanguage(String language) {
 		trgLang = language;

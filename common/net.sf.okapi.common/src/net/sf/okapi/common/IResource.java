@@ -33,7 +33,7 @@ public interface IResource {
 	public static final int COPY_ALL = (COPY_CONTENT | COPY_PROPERTIES);
 
 	/**
-	 * Gets the ID of the resource. This ID is unique per extracted document and by type of resource.
+	 * Gets the identifier of the resource. This identifier is unique per extracted document and by type of resource.
 	 * This value is filter-specific. It and may be different from one extraction 
 	 * of the same document to the next. It can a sequential number or not, incremental 
 	 * or not, and it can be not a number.

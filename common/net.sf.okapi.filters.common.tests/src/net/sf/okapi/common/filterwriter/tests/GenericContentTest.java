@@ -22,16 +22,39 @@ package net.sf.okapi.common.filterwriter.tests;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import junit.framework.*;
 
-public class GenericContentTest extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-	public void testSimple () {
-		TextUnit tu = new TextUnit("tu1");
-		TextFragment tf = tu.getSourceContent();
-		GenericContent fmt = new GenericContent();
+public class GenericContentTest {
+
+	private GenericContent fmt;
+	
+	@Before
+	public void setUp() throws Exception {
+		fmt = new GenericContent();
+	}
+	
+	@Test
+	public void testSimple_Default () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf).toString());
+	}
+	
+	@Test
+	public void testSimple_WithOption () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		fmt.setContent(tf);
+		assertEquals("t1<b1><b2><x1/>t2</b2></b1>t3", fmt.toString(true));
+		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.toString(false));
+	}
+	
+	private TextFragment createTextUnit () {
+		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
 		tf.append(TagType.OPENING, "b2", "<b2>");
@@ -40,9 +63,7 @@ public class GenericContentTest extends TestCase {
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append(TagType.CLOSING, "b1", "</b1>");
 		tf.append("t3");
-		assertEquals(tf.getCodes().size(), 5);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf).toString());
-		assertEquals("t1<b1><b2><x1/>t2</b2></b1>t3", fmt.toString(true));
+		return tf;
 	}
 	
 }

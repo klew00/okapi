@@ -25,10 +25,13 @@ import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.encoder.PropertiesEncoder;
 import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.resource.Property;
-import junit.framework.*;
 
-public class EncodersTest extends TestCase {
+import org.junit.Test;
+import static org.junit.Assert.*;
 
+public class EncodersTest {
+
+	@Test
 	public void testXMLEncoder () {
 		XMLEncoder enc = new XMLEncoder();
 		
@@ -66,6 +69,7 @@ public class EncodersTest extends TestCase {
 		assertEquals("&gt;", enc.encode('>', 0));
 	}
 
+	@Test
 	public void testHTMLEncoder () {
 		HtmlEncoder enc = new HtmlEncoder();
 		
@@ -87,6 +91,7 @@ public class EncodersTest extends TestCase {
 		assertEquals("a", enc.encode((int)'a', 0));
 	}
 
+	@Test
 	public void testPropertiesEncoder () {
 		PropertiesEncoder enc = new PropertiesEncoder();
 		
@@ -108,6 +113,7 @@ public class EncodersTest extends TestCase {
 		assertEquals("a", enc.encode((int)'a', 0));
 	}
 
+	@Test
 	public void testDefaultEncoder () {
 		DefaultEncoder enc = new DefaultEncoder();
 		
