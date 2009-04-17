@@ -1,40 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
-<provider id="org.eclipse.team.svn.core.svnnature">
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.common,net.sf.okapi.common,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.filters.common,net.sf.okapi.filters.common,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.html,net.sf.okapi.filters.html,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.idml,net.sf.okapi.filters.idml,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.markupfilter,net.sf.okapi.filters.markupfilter,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.mif,net.sf.okapi.filters.mif,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openoffice,net.sf.okapi.filters.openoffice,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openxml,net.sf.okapi.filters.openxml,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.po,net.sf.okapi.filters.po,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.properties,net.sf.okapi.filters.properties,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.regex,net.sf.okapi.filters.regex,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.rtf,net.sf.okapi.filters.rtf,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tmx,net.sf.okapi.filters.tmx,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff,net.sf.okapi.filters.xliff,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml,net.sf.okapi.filters.xml,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.jython,net.sf.okapi.lib.jython,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.segmentation,net.sf.okapi.lib.segmentation,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.translation,net.sf.okapi.lib.translation,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/mt/net.sf.okapi.mt.google,net.sf.okapi.mt.google,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline,net.sf.okapi.pipeline,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.open-tran,net.sf.okapi.tm.opentran,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.simpletm,net.sf.okapi.tm.simpletm,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.trados,net.sf.okapi.tm.trados,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.ui.common,net.sf.okapi.ui.common,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.ui.filters.common,net.sf.okapi.ui.filters.common,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.openoffice,net.sf.okapi.ui.filters.openoffice,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.po,net.sf.okapi.ui.filters.po,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.properties,net.sf.okapi.ui.filters.properties,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.regex,net.sf.okapi.ui.filters.regex,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.ui.lib.segmentation,net.sf.okapi.ui.lib.segmentation,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/applications/rainbow,rainbow,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/applications/ratel,ratel,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/applications/serval,serval,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/third-party/shared/stax-wstx,stax-wstx,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/third-party/win32-x86,win32-x86,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
+<provider id="org.tigris.subversion.subclipse.core.svnnature">
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.common,net.sf.okapi.common"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.filters.common,net.sf.okapi.filters.common"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.html,net.sf.okapi.filters.html"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.idml,net.sf.okapi.filters.idml"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.markupfilter,net.sf.okapi.filters.markupfilter"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.mif,net.sf.okapi.filters.mif"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openoffice,net.sf.okapi.filters.openoffice"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openxml,net.sf.okapi.filters.openxml"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.po,net.sf.okapi.filters.po"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.properties,net.sf.okapi.filters.properties"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.regex,net.sf.okapi.filters.regex"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.rtf,net.sf.okapi.filters.rtf"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tmx,net.sf.okapi.filters.tmx"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff,net.sf.okapi.filters.xliff"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml,net.sf.okapi.filters.xml"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml.tests,net.sf.okapi.filters.xml.tests"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.jython,net.sf.okapi.lib.jython"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.jython.tests,net.sf.okapi.lib.jython.tests"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.segmentation,net.sf.okapi.lib.segmentation"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.segmentation.tests,net.sf.okapi.lib.segmentation.tests"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.translation,net.sf.okapi.lib.translation"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/mt/net.sf.okapi.mt.google,net.sf.okapi.mt.google"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline,net.sf.okapi.pipeline"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline.tests,net.sf.okapi.pipeline.tests"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.open-tran,net.sf.okapi.tm.opentran"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.simpletm,net.sf.okapi.tm.simpletm"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.trados,net.sf.okapi.tm.trados"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.ui.common,net.sf.okapi.ui.common"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.ui.filters.common,net.sf.okapi.ui.filters.common"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.openoffice,net.sf.okapi.ui.filters.openoffice"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.po,net.sf.okapi.ui.filters.po"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.properties,net.sf.okapi.ui.filters.properties"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.regex,net.sf.okapi.ui.filters.regex"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.ui.lib.segmentation,net.sf.okapi.ui.lib.segmentation"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/applications/rainbow,rainbow"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/applications/ratel,ratel"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/applications/serval,serval"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/third-party/shared/stax-wstx,stax-wstx"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/third-party/win32-x86,win32-x86"/>
 </provider>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-UI" name="Okapi-UI">
+<item elementID="=net.sf.okapi.ui.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.filters.openoffice" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.filters.po" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.ui.lib.segmentation" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Lib" name="Okapi-Lib">
+<item elementID="=net.sf.okapi.tm.trados" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/win32-x86" type="4"/>
+<item elementID="=net.sf.okapi.pipeline.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.lib.jython.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.lib.translation" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.mt.google" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.lib.jython" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.tm.simpletm" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.tm.opentran" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=stax-wstx" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.lib.segmentation.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.lib.segmentation" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Filters" name="Okapi-Filters">
+<item elementID="=net.sf.okapi.filters.idml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.mif" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.openxml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.po" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.tmx" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.xml.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.markupfilter" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.xliff" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.openoffice" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.rtf" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.xml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.pipeline" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Apps" name="Okapi-Apps">
+<item elementID="=rainbow" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=ratel" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=serval" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSets>
 </psf>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <psf version="2.0">
-<provider id="org.eclipse.team.svn.core.svnnature">
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/help,help,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
-<project reference="1.0.1,https://okapi.googlecode.com/svn/trunk/website,Website,0026f1e61813001e1a17c3c4ed5df2e4;https://okapi.googlecode.com/svn;https://okapi.googlecode.com/svn;branches;tags;trunk;true;0cd2bb99-014b-0410-b875-5d0485b745ed;https://okapi.googlecode.com/svn;;false;;;22"/>
+<provider id="org.tigris.subversion.subclipse.core.svnnature">
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/deployment,Deployment"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/help,help"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/examples/python,python"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/website,Website"/>
 </provider>
 </psf>
