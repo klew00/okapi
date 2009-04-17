@@ -51,7 +51,7 @@ public class Consumer extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleInputResource(Event event) {		
+	protected void handleRawDocument(Event event) {		
 		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
 	}
 
