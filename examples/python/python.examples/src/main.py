@@ -57,9 +57,6 @@ def runPipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, 
     # Add this step to the pipeline
     pipeline.addStep(outputStep)
 
-    # Sets the filter options
-    filter.setOptions(srcLang, inputEncoding, True)
-
     # Sets the writer options and output
     writer.setOptions(trgLang, outputEncoding)
     writer.setOutput(outputPath)
