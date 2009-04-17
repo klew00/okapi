@@ -9,6 +9,7 @@ import java.net.URL;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
@@ -19,7 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HtmlFullFileTest {
-	private HtmlFilter htmlFilter;
+	private IFilter htmlFilter;
 	private String[] testFileList;
 
 	@Before
