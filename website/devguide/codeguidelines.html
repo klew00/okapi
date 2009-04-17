@@ -1,0 +1,94 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Okapi Framework Developer's Guide - Coding Guidelines</title>
+<link rel="stylesheet" type="text/css" href="../okapi.css">
+</head>
+
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Developer's Guide</h1>
+		<h2 class="head2">Coding Guidelines</h2></td>
+	</tr>
+	<tr>
+		<td class="smalltoc"></td>
+		<td class="hmenu">
+			<div class="hmenu"><table align="right"><tr>
+				<td><a href="glossary.html">Glossary</a></td>
+				<td><a href="index.html">Guide Content</a></td>
+				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
+			</tr></table></div>
+		</td>
+	</tr>
+</table>
+
+<p>When coding a component of the framework, try to respect the following 
+guidelines:</p>
+<h2>Coding Style</h2>
+<p>Generally use the Java classic conventions described at:
+<a href="http://java.sun.com/docs/codeconv/">http://java.sun.com/docs/codeconv/</a></p>
+<h2>Exceptions</h2>
+<p>Checked exceptions are often not well suited for a component-based system 
+like the Okapi Framework. Avoid them when possible.</p>
+<p>When throwing exceptions, if possible use the appropriate common exception 
+defined in the <code>
+<a href="../javadoc/net/sf/okapi/common/exceptions/package-summary.html">
+net.sf.common.exceptions</a></code> package.</p>
+<p>If you have a need for a new type of exception and use it in different 
+packages, add it to the set of common exceptions. If that exception is specific 
+to a package, declare it within that package.</p>
+<h2>Logging</h2>
+<p>Generally the Java built-in <code>Logger</code> class is enough for the need 
+of the Okapi components.</p>
+<pre>logger = Logger.getLogger(getClass().getName());</pre>
+<p>What level to use when logging:</p>
+<div align="left">
+	<table border="1" cellspacing="0" cellpadding="4" id="table1">
+		<tr>
+			<th>Level</th>
+			<th>Usage</th>
+		</tr>
+		<tr>
+			<td><code>SEVER</code></td>
+			<td>Errors the end user should see.</td>
+		</tr>
+		<tr>
+			<td><code>WARNING</code></td>
+			<td>Important alert messages the end user should see.</td>
+		</tr>
+		<tr>
+			<td><code>INFO</code></td>
+			<td>Additional log information, progress, etc. These messages are 
+			also shown to the user.</td>
+		</tr>
+		<tr>
+			<td><code>FINE</code></td>
+			<td>Extra, less important information. The end user may choose to 
+			see them.</td>
+		</tr>
+		<tr>
+			<td><code>FINER</code></td>
+			<td>Debug information. For developers.</td>
+		</tr>
+		<tr>
+			<td><code>FINEST</code></td>
+			<td>Debug information. For developers.</td>
+		</tr>
+	</table>
+</div>
+<h2>Unit Tests</h2>
+<p>Most classes of the framework should have a corresponding JUnit test class 
+that exercise most of its methods.</p>
+<p>Test methods should be short and specific.</p>
+<p>If a package has more than one test class, a <code>AllTests</code> class that 
+calls all the test classes for that package should be created.</p>
+<p>The tests should be be fast to run.</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
