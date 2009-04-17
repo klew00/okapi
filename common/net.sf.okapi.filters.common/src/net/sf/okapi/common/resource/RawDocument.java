@@ -41,7 +41,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
  * Resource that carries all the information needed for a filter to open a given
- * document, and also the resource associated with the event INPUT_RESOURCE.
+ * document, and also the resource associated with the event RAW_DOCUMENT.
  * Documents are passed through the pipeline either as RawDocument, or a
  * filter events. Specialized steps allows to convert one to the other and
  * conversely. The RawDocument object has one (and only one) of three input

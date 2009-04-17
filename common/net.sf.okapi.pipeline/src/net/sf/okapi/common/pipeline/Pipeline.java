@@ -118,7 +118,7 @@ public class Pipeline implements IPipeline {
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(FileResource)
 	 */
 	public Event process(RawDocument input) {
-		return process(new Event(EventType.INPUT_RESOURCE, input));
+		return process(new Event(EventType.RAW_DOCUMENT, input));
 	}
 	
 	/*

@@ -100,7 +100,7 @@ IPipeline.destroy()</a></code> to clean up any resource used by the steps:</p>
 + &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
 + &quot;&lt;/body&gt;&lt;/html&gt;&quot;;
 // Launch the execution
-pipeline.process(new InputResource(input, &quot;en&quot;));
+pipeline.process(new RawDocument(input, &quot;en&quot;));
 
 // Clean up all the pipeline resources
 pipeline.destroy();</pre>

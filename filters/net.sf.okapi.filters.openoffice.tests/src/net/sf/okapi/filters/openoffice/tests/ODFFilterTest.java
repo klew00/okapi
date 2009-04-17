@@ -40,7 +40,7 @@ public class ODFFilterTest {
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(true);
-			testDriver.setDisplayLevel(3);
+			testDriver.setDisplayLevel(0);
 			filter = new ODFFilter();
 			URL url = ODFFilterTest.class.getResource("/ODFTest_footnote.xml");
 			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));

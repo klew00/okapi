@@ -48,7 +48,7 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent(Event event) {
-		if (event != null && event.getEventType() == EventType.INPUT_RESOURCE) {
+		if (event != null && event.getEventType() == EventType.RAW_DOCUMENT) {
 			filter.open((RawDocument)event.getResource());
 		}
 		Event e = filter.next();

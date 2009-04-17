@@ -78,10 +78,10 @@ kinds of event that can go through a pipeline.</p>
 		<th>Filter-Specific Event?</th>
 	</tr>
 	<tr>
-		<td><code>INPUT_RESOURCE</code></td>
+		<td><code>RAW_DOCUMENT</code></td>
 		<td><code>
-		<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
-		InputResource</a></code></td>
+		<a href="../javadoc/net/sf/okapi/common/resource/RawDocument.html">
+		RawDocument</a></code></td>
 		<td>no (corresponds to a document by itself).</td>
 	</tr>
 	<tr>
@@ -190,8 +190,8 @@ provide UI for modifying their parameters. See the
 guide for more details.</p>
 <h3><a name="openInputDoc"></a>Opening the Input Document</h3>
 <p>The next step is to open the document. This is done with the help of an <code>
-<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
-InputResource</a></code> object, which carries all the information the filter 
+<a href="../javadoc/net/sf/okapi/common/resource/RawDocument.html">
+RawDocument</a></code> object, which carries all the information the filter 
 needs to open the input document:</p>
 <ul>
 	<li>The object representing the document to process. This can be one (and 
@@ -210,8 +210,8 @@ needs to open the input document:</p>
 same standard language tag identifiers you would use with HTML and XML (BCP-47). 
 We set the default encoding to UTF-8. Note that some filters will be able to 
 detect automatically the correct encoding of the input and ignore this value.</p>
-<pre>// Creates the InputResource object
-InputResource res = new InputResource(myInputStream, &quot;UTF-8&quot;, &quot;en&quot;);
+<pre>// Creates the RawDocument object
+RawDocument res = new RawDocument(myInputStream, &quot;UTF-8&quot;, &quot;en&quot;);
 // Opens the document
 filter.open(res);</pre>
 <p>By default a filter generates the 
@@ -225,11 +225,11 @@ filter.open(res, false);</pre>
 opening the document. It would be simpler to just pass the parameters to <code>
 open()</code>.</p>
 <p class="answer">The <code>
-<a href="../javadoc/net/sf/okapi/common/resource/InputResource.html">
-InputResource</a></code> object is used because in many cases filters are used 
+<a href="../javadoc/net/sf/okapi/common/resource/RawDocument.html">
+RawDocument</a></code> object is used because in many cases filters are used 
 in the broader environment of pipelines, where having all information about the 
 input document in one object makes things much easier. The object is also the 
-resource associated to the <code>INPUT_RESOURCE</code> event that allows to mix 
+resource associated to the <code>RAW_DOCUMENT</code> event that allows to mix 
 in the same pipeline steps using filter events or steps working on the input 
 document directly.</p>
 <p dir="ltr">Note that while the filters should do their best to implement all the 
@@ -238,8 +238,8 @@ because of the format the filter deal with. For example, a&nbsp; filter for
 Adobe Photoshop PSD files is not supporting <code>CharSequence</code> input 
 objects. as PSD are binary formats.</p>
 <p>In our example we want to open a <code>String</code>-based document:</p>
-<pre>// Creates the InputResource object
-InputResource res = new InputResource(&quot;key1=Text1\nkey2=Text2&quot;, &quot;en&quot;);
+<pre>// Creates the RawDocument object
+RawDocument res = new RawDocument(&quot;key1=Text1\nkey2=Text2&quot;, &quot;en&quot;);
 // Opens the document
 filter.open(res);</pre>
 <p>This is equivalent to opening a physical properties file on the disk that has the 
@@ -322,7 +322,7 @@ extracted resources and the skeleton parts passed through the events. The framew
 provides the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 interface to do all this transparently.</p>
-<h3><a name="creatingFilterAndWriter"></a>Creating the Filter and the Writer</h3>
+<h3><a name="creatingFilterAndWriter"></a>Creating the Filter and the FilterWriter</h3>
 <p>First, you must create the filter, just like before, except that we will use 
 the HTML filter this time:</p>
 <pre>// Create a filter object
@@ -333,15 +333,17 @@ object. You do this by calling a method of the filter itself (<code><a href="../
 that provides you with the proper implementation of <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 for the given format it supports.</p>
-<pre>// Create the writer
+<pre>// Create the filter writer
 IFilterWriter writer = filter.createFilterWriter();</pre>
-<h3><a name="configuringWriter"></a>Configuring the Writer</h3>
-<p>Once the writer object created you need to set its options. This is done with 
+<h3><a name="configuringWriter"></a>Configuring the FilterWriter</h3>
+<p>Once the <code>
+<a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
+object created you need to set its options. This is done with 
 the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOptions()</a></code> method.</p>
 <p>We need to set the output language, here French. And we need to indicate in what encoding the 
 output should be written, in our example we will choose Latin-1.</p>
-<pre>// Set the writer's options
+<pre>// Set the filter writer's options
 writer.setOptions(&quot;fr&quot;, &quot;iso-8859-1&quot;);</pre>
 <p>We also need to set where the output will be generated. The type of object 
 used for output can be different from the one used for the input. For example, 
@@ -367,7 +369,7 @@ document</b>.</p>
 <p>The next step is to open the input document with the filter. This time we 
 will use an HTML string:</p>
 <pre>// Open the input from a CharSequence
-filter.open(new InputResource(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
+filter.open(new RawDocument(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
    + &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
    + &quot;&lt;body&gt;\n&quot;
    + &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
@@ -383,7 +385,7 @@ output document, in case you are writing on the same file).</p>
 while ( filter.hasNext() ) {
    writer.handleEvent(filter.next());
 }
-// Closing the filter and the writer
+// Closing the filter and the filter writer
 filter.close();
 writer.close();</pre>
 <p>The code above should create a new file called <code>myFile.fr.properties</code> 
@@ -392,12 +394,12 @@ in your current directory and its content should be like this:</p>
 &lt;meta http-equiv='Content-Language' content='fr'&gt;&lt;/head&gt;
 &lt;body&gt;
 &lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</pre>
-<p>As you can notice, the writer make some modifications automatically: the HTML 
+<p>As you can notice, the filter writer make some modifications automatically: the HTML 
 language declaration has been updated to reflect the target language you 
 specified: &quot;<code>fr</code>&quot;. The remaining of the content is the same as the 
 input.</p>
 <h3><a name="processDocWithChanges"></a>Processing the Document and Making Changes</h3>
-<p>Obviously the real interest of the writer is to save changes made to the 
+<p>Obviously the real interest of the filter writer is to save changes made to the 
 extracted text into its original format.</p>
 <p>To perform changes in the extracted text you need to handle the <code>
 TEXT_UNIT</code> event, which comes with a <code>

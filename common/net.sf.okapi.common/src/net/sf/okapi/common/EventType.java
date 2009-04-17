@@ -90,10 +90,10 @@ public enum EventType {
 	FINISHED,
 
 	/**
-	 * Document-level event. An {@link net.sf.okapi.common.resource.InputResource} resource
+	 * Document-level event. An {@link net.sf.okapi.common.resource.RawResource} resource
 	 * should be associated with this event.
 	 */
-	INPUT_RESOURCE,
+	RAW_DOCUMENT,
 
 	/**
 	 * A custom event type used when steps need to exchange non-resource based

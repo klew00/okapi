@@ -169,7 +169,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
 			break;
-		case INPUT_RESOURCE:
+		case RAW_DOCUMENT:
 			processFileResource((RawDocument)event.getResource());
 			break;
 		}

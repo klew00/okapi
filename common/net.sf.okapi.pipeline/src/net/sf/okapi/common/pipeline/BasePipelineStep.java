@@ -74,7 +74,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 			handleDocumentPart(event);
 			break;
 
-		case INPUT_RESOURCE:
+		case RAW_DOCUMENT:
 			handleInputResource(event);
 			break;
 

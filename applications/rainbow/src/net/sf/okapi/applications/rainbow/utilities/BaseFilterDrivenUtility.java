@@ -43,7 +43,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			if (( getInputFilterSettings(0) == null ) || ( getInputFilterSettings(0).length() == 0 ) ) {
 				RawDocument fr = new RawDocument(new File(getInputPath(0)).toURI(),
 					getInputEncoding(0), srcLang);
-				handleEvent(new Event(EventType.INPUT_RESOURCE, fr));
+				handleEvent(new Event(EventType.RAW_DOCUMENT, fr));
 				return;
 			}
 			
