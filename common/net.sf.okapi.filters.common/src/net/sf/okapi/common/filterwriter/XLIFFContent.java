@@ -232,7 +232,7 @@ public class XLIFFContent {
 						innerContent = new XLIFFContent();
 					}
 					index = Integer.valueOf(code.getData());
-					innerContent.setContent(container.getSegments().get(index));
+					innerContent.setContent(container.getSegments().get(index).text);
 					tmp.append(innerContent.toString(quoteMode, escapeGT, false, gMode));
 					if ( withMarkers ) tmp.append("</mrk>");
 				}

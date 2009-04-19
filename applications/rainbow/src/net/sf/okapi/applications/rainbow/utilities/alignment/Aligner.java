@@ -30,6 +30,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -666,10 +667,10 @@ public class Aligner {
 				if ( n < 1 ) return;
 			}
 			// Swap current segment with the previous/next one
-			java.util.List<TextFragment> segs = target.getSegments();
-			TextFragment tf = segs.get(n+direction);
+			java.util.List<Segment> segs = target.getSegments();
+			Segment tmpSeg = segs.get(n+direction);
 			segs.set(n+direction, segs.get(n));
-			segs.set(n, tf);
+			segs.set(n, tmpSeg);
 			// Update
 			updateTargetDisplay();
 			fillTargetList(n+direction);
@@ -708,7 +709,7 @@ public class Aligner {
 		// No split if location is not a range and is not inside text
 		if (( start == end ) && ( start == 0 )) return;
 		// Get the length of the segment to re-split
-		int len = target.getSegments().get(segIndex).getCodedText().length();
+		int len = target.getSegments().get(segIndex).text.getCodedText().length();
 		//TODO: case for if (( start == 0 ) && ( end == len ))
 
 		// Merge the segment to re-split into the main content
@@ -819,9 +820,9 @@ public class Aligner {
 	private void fillTargetList (int selection) {
 		trgList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( TextFragment tf : target.getSegments() ) {
-			if ( useGeneric ) trgList.add(genericCont.setContent(tf).toString());
-			else trgList.add(tf.toString());
+		for ( Segment seg : target.getSegments() ) {
+			if ( useGeneric ) trgList.add(genericCont.setContent(seg.text).toString());
+			else trgList.add(seg.text.toString());
 		}
 		if (( trgList.getItemCount() > 0 ) && ( selection < trgList.getItemCount() )) 
 			trgList.setSelection(selection);
@@ -834,9 +835,9 @@ public class Aligner {
 	private void fillSourceList (int selection) {
 		srcList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( TextFragment tf : source.getSegments() ) {
-			if ( useGeneric ) srcList.add(genericCont.setContent(tf).toString());
-			else srcList.add(tf.toString());
+		for ( Segment seg : source.getSegments() ) {
+			if ( useGeneric ) srcList.add(genericCont.setContent(seg.text).toString());
+			else srcList.add(seg.toString());
 		}
 		if (( srcList.getItemCount() > 0 ) && ( selection < srcList.getItemCount() )) 
 			srcList.setSelection(selection);
@@ -923,7 +924,7 @@ public class Aligner {
 				try {
 					// genericCont is already set with the proper text
 					genericCont.updateFragment(edTrgSeg.getText(),
-						target.getSegments().get(indexActiveSegment), true);
+						target.getSegments().get(indexActiveSegment).text, true);
 				}
 				catch ( InvalidContentException e ) {
 					Dialogs.showError(shell, e.getMessage(), null);
@@ -955,7 +956,7 @@ public class Aligner {
 
 	private void toggleFields (boolean specialMode) {
 		if ( specialMode ) {
-			genericCont.setContent(target.getSegments().get(indexActiveSegment));
+			genericCont.setContent(target.getSegments().get(indexActiveSegment).text);
 			edTrgSeg.setText(genericCont.toString());
 			edTrgSeg.setFocus();
 			btAccept.setEnabled(true);
@@ -1025,13 +1026,13 @@ public class Aligner {
 			}
 			
 			// Sanity check using common anchors
-			java.util.List<TextFragment> srcList = source.getSegments();
-			java.util.List<TextFragment> trgList = target.getSegments();
+			java.util.List<Segment> srcList = source.getSegments();
+			java.util.List<Segment> trgList = target.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
-				if ( srcList.get(i).getCodes().size() != trgList.get(i).getCodes().size() ) {
+				if ( srcList.get(i).text.getCodes().size() != trgList.get(i).text.getCodes().size() ) {
 					addIssue(1, String.format("%d: Warning- Different number of inline codes in source and target.", i+1));
 				}
-				checkAnchors(srcList.get(i), trgList.get(i), i);
+				checkAnchors(srcList.get(i).text, trgList.get(i).text, i);
 			}
 			if ( forceIssueDisplay ) addIssue(0, null);
 			return updateIssueStatus(gotoIssue);
@@ -1112,8 +1113,8 @@ public class Aligner {
 		int n = trgList.getSelectionIndex();
 		if ( n == -1 ) n = 0;
 		try {
-			java.util.List<TextFragment> srcCol = source.getSegments();
-			java.util.List<TextFragment> trgCol = target.getSegments();
+			java.util.List<Segment> srcCol = source.getSegments();
+			java.util.List<Segment> trgCol = target.getSegments();
 			
 			int lastMatch = -1;
 			int trgStart = 0;
@@ -1273,18 +1274,18 @@ public class Aligner {
 			if ( targetToSource ) {
 				if ( (n = trgList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(trgLang, srcLang);
-				oriFrag = target.getSegments().get(n);
+				oriFrag = target.getSegments().get(n).text;
 			}
 			else {
 				if ( (n = srcList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(srcLang, trgLang);
-				oriFrag = source.getSegments().get(n);
+				oriFrag = source.getSegments().get(n).text;
 			}
 			
 			mtQuery.query(oriFrag);
 			String text;
 			if ( mtQuery.hasNext() ) {
-				text = "original segment:\n" + oriFrag.toString()
+				text = "Original segment:\n" + oriFrag.toString()
 					+ "\n\nPossible translation:\n" + mtQuery.next().target.toString();
 			}
 			else {

@@ -34,8 +34,8 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
@@ -44,8 +44,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	private Parameters params;
 	private IWriter writer;
 	private int id;
-	private Segmenter sourceSeg;
-	private Segmenter targetSeg;
+	private ISegmenter sourceSeg;
+	private ISegmenter targetSeg;
 	private QueryManager qm;
 	private String resolvedOutputDir;
 	private HTMLReporter htmlRpt;
@@ -210,11 +210,11 @@ public class Utility extends BaseFilterDrivenUtility {
 			try {
 				cont = tu.getSource();
 				sourceSeg.computeSegments(cont);
-				cont.createSegments(sourceSeg.getSegmentRanges());
+				cont.createSegments(sourceSeg.getRanges());
 				if ( tu.hasTarget(trgLang) ) {
 					cont = tu.getTarget(trgLang);
 					targetSeg.computeSegments(cont);
-					cont.createSegments(targetSeg.getSegmentRanges());
+					cont.createSegments(targetSeg.getRanges());
 				}
 			}
 			catch ( Throwable e ) {

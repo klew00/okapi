@@ -402,7 +402,7 @@ public class GroupsAndOptionsDialog {
 		else {
 			srxDoc.getAllLanguagesMaps().set(n, langMap);
 		}
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateLanguageMaps(n);
 	}
 	
@@ -410,7 +410,7 @@ public class GroupsAndOptionsDialog {
 		int n = lbLangMaps.getSelectionIndex();
 		if ( n == -1 ) return;
 		srxDoc.getAllLanguagesMaps().remove(n);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateLanguageMaps(n);
 	}
 	
@@ -421,7 +421,7 @@ public class GroupsAndOptionsDialog {
 		srxDoc.getAllLanguagesMaps().set(n-1,
 			srxDoc.getAllLanguagesMaps().get(n));
 		srxDoc.getAllLanguagesMaps().set(n, tmp);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateLanguageMaps(--n);
 	}
 	
@@ -432,7 +432,7 @@ public class GroupsAndOptionsDialog {
 		srxDoc.getAllLanguagesMaps().set(n+1,
 			srxDoc.getAllLanguagesMaps().get(n));
 		srxDoc.getAllLanguagesMaps().set(n, tmp);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateLanguageMaps(++n);
 	}
 	
@@ -495,7 +495,7 @@ public class GroupsAndOptionsDialog {
 		}
 		// Remove
 		srxDoc.getAllLanguageRules().remove(ruleName);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateLanguageRules(null);
 	}
 	

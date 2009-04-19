@@ -20,22 +20,45 @@
 
 package net.sf.okapi.common.exceptions;
 
+/**
+ * Signals that a filter had an error when trying to open its input. This is likely
+ * a problem in the type of input used to open the document.  
+ */
 public class BadFilterInputException extends RuntimeException {
 
 	private static final long serialVersionUID = 1122090108070908960L;
 
-	public BadFilterInputException() {
+	/**
+	 * Creates an empty new BadFilterInputException object.
+	 */
+	public BadFilterInputException () {
 	}
 
-	public BadFilterInputException(String message) {
+	/**
+	 * Creates a new BadFilterInputException object with a given message.
+	 * @param message text of the message.
+	 */
+	public BadFilterInputException (String message) {
 		super(message);		
 	}
 
-	public BadFilterInputException(Throwable cause) {
+	/**
+	 * Creates a new BadFilterInputException object with a given parent 
+	 * exception cause.
+	 * @param cause the parent exception cause.
+	 */
+	public BadFilterInputException (Throwable cause) {
 		super(cause);
 	}
 
-	public BadFilterInputException(String message, Throwable cause) {
+	/**
+	 * Creates a new BadFilterInputException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public BadFilterInputException (String message, Throwable cause) {
 		super(message, cause);
 	}
+
 }

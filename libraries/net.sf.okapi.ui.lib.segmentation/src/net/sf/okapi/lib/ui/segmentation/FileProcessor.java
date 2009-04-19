@@ -34,10 +34,10 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 
 public class FileProcessor {
 
@@ -102,7 +102,7 @@ public class FileProcessor {
 	public void process (String inputPath,
 		String outputPath,
 		boolean htmlOutput,
-		Segmenter segmenter)
+		ISegmenter segmenter)
 		throws IOException
 	{
 		BufferedReader reader = null;
@@ -132,12 +132,12 @@ public class FileProcessor {
 			populateTextContainer(tmp.toString(), textCont);
 			// Segment
 			segmenter.computeSegments(textCont);
-			textCont.createSegments(segmenter.getSegmentRanges());
+			textCont.createSegments(segmenter.getRanges());
 			if ( htmlOutput ) {
-				List<TextFragment> list = textCont.getSegments();
-				for ( TextFragment frag : list ) {
+				List<Segment> list = textCont.getSegments();
+				for ( Segment seg : list ) {
 					writer.write("<p>"); //$NON-NLS-1$
-					writer.write(Util.escapeToXML(sampleOutput.setContent(frag).toString(true), 0, false, null));
+					writer.write(Util.escapeToXML(sampleOutput.setContent(seg.text).toString(true), 0, false, null));
 					writer.write("</p>"); //$NON-NLS-1$
 				}
 			}

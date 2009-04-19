@@ -29,7 +29,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.segmentation.SRXSegmenter;
 import junit.framework.*;
 
 public class SRXDocumentTest extends TestCase {
@@ -79,9 +79,9 @@ public class SRXDocumentTest extends TestCase {
 		assertEquals(rule.getAfter(), tmp);
 		rule.setBefore(tmp);
 		assertEquals(rule.getBefore(), tmp);
-		rule.setIsBreak(false);
+		rule.setBreak(false);
 		assertFalse(rule.isBreak());
-		rule.setIsActive(false);
+		rule.setActive(false);
 		assertFalse(rule.isActive());
 		
 		// Check LanguageMap
@@ -109,15 +109,15 @@ public class SRXDocumentTest extends TestCase {
 		doc.addLanguageMap(new LanguageMap("en.*", "english"));
 		doc.addLanguageMap(new LanguageMap(".*", "default"));
 
-		Segmenter seg = doc.applyLanguageRules("en", null);
+		SRXSegmenter seg = (SRXSegmenter)doc.applyLanguageRules("en", null);
 		assertNotNull(seg);
 		assertEquals(seg.getLanguage(), "en");
-		assertNull(seg.getSegmentRanges()); // Null set yet
+		assertNull(seg.getRanges()); // Null set yet
 		seg.computeSegments("Mr. Holmes. The detective.");
-		assertNotNull(seg.getSegmentRanges());
-		assertEquals(seg.getSegmentRanges().size(), 2);
+		assertNotNull(seg.getRanges());
+		assertEquals(seg.getRanges().size(), 2);
 		seg.computeSegments("MR. Holmes. The detective.");
-		assertEquals(seg.getSegmentRanges().size(), 3);
+		assertEquals(seg.getRanges().size(), 3);
 		
 		TextContainer tc = new TextContainer();
 		tc.append("One.");
@@ -127,7 +127,7 @@ public class SRXDocumentTest extends TestCase {
 		seg.setOptions(true, true, true, false, false, false, false);
 		seg.computeSegments(tc);
 		// "One.XX Two.YY" --> "[One.XX][ Two.YY]"
-		List<Range> ranges = seg.getSegmentRanges();
+		List<Range> ranges = seg.getRanges();
 		assertNotNull(ranges);
 		assertEquals(ranges.size(), 2);
 		assertEquals(ranges.get(0).end, 6);
@@ -135,7 +135,7 @@ public class SRXDocumentTest extends TestCase {
 		seg.setOptions(true, false, true, false, false, false, false);
 		seg.computeSegments(tc);
 		// "One.XX Two.YY" --> "[One.][XX Two.YY]"
-		ranges = seg.getSegmentRanges();
+		ranges = seg.getRanges();
 		assertNotNull(ranges);
 		assertEquals(ranges.size(), 2);
 		assertEquals(ranges.get(0).end, 4);

@@ -31,14 +31,14 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 
 class DbStoreBuilder implements IFilterWriter {
 	
 	private Stack<Integer> groupStack;
 	private int lastGroupKey;
 	private DbStore dbs;
-	private Segmenter segmenter;
+	private ISegmenter segmenter;
 	private String language;
 	private boolean useSource;
 
@@ -50,7 +50,7 @@ class DbStoreBuilder implements IFilterWriter {
 		return dbs;
 	}
 	
-	public void setSegmenter (Segmenter segmenter) {
+	public void setSegmenter (ISegmenter segmenter) {
 		this.segmenter = segmenter;
 	}
 	
@@ -120,7 +120,7 @@ class DbStoreBuilder implements IFilterWriter {
 		// Segment if requested
 		if ( segmenter != null ) {
 			segmenter.computeSegments(tc);
-			tc.createSegments(segmenter.getSegmentRanges());
+			tc.createSegments(segmenter.getRanges());
 		}
 		// Add the tu to the db store
 		dbs.addSourceEntry(tc, groupStack.peek(), tu.getId(), tu.getName(), tu.getType());

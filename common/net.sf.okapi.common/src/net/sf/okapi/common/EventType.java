@@ -22,7 +22,8 @@ package net.sf.okapi.common;
 
 /**
  * The type of events used when working with the pipeline and its associated
- * interfaces like IFilter, IFilterWriter, etc.
+ * interfaces such as {@link net.sf.okapi.common.filters.IFilter} or 
+ * {@link net.sf.okapi.common.filterwriter.IFilterWriter}.
  */
 public enum EventType {
 

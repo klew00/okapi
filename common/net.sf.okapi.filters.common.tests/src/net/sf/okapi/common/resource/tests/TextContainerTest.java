@@ -29,6 +29,7 @@ import static org.junit.Assert.*;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -126,7 +127,7 @@ public class TextContainerTest {
 		tc1.createSegment(5, 11);
 		assertEquals(tc1.toString().length(), 4);
 		assertEquals(tc1.getCodedText().length(), 2+2+1+2);
-		List<TextFragment> list = tc1.getSegments();
+		List<Segment> list = tc1.getSegments();
 		assertNotNull(list);
 		assertEquals(list.size(), 3);
 		assertEquals(list.get(0).toString(), "[seg1]");
@@ -152,7 +153,7 @@ public class TextContainerTest {
 		tc1.createSegments(ranges);
 		assertTrue(tc1.isSegmented());
 		assertEquals(tc1.getCodedText().length(), 2+2+1+2);
-		List<TextFragment> list = tc1.getSegments();
+		List<Segment> list = tc1.getSegments();
 		assertNotNull(list);
 		assertEquals(list.size(), 3);
 		assertEquals(list.get(0).toString(), "[seg1]");

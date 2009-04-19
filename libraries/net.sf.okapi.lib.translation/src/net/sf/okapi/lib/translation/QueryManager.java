@@ -28,6 +28,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -320,15 +321,15 @@ public class QueryManager {
 		int leveraged = 0;
 		
 		if ( tc.isSegmented() ) {
-			List<TextFragment> segList = tc.getSegments();
+			List<Segment> segList = tc.getSegments();
 			for ( int i=0; i<segList.size(); i++ ) {
-				count = query(segList.get(i));
+				count = query(segList.get(i).text);
 				if ( count == 0 ) {
 					scores.add(0);
 					continue;
 				}
 				qr = next();
-				segList.set(i, qr.target);
+				segList.get(i).text = qr.target;
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score);

@@ -48,6 +48,10 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 
+/**
+ * Provides facilities to load, save, and manage segmentation rules in SRX format.
+ * This class also implements several extensions to the standard SRX behavior.
+ */
 public class SRXDocument {
 	
 	private static final String   NSURI_SRX20 = "http://www.lisa.org/srx20";
@@ -78,23 +82,41 @@ public class SRXDocument {
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
 	private String maskRule;
 
+	/**
+	 * Creates an empty SRX document.
+	 */
 	public SRXDocument () {
 		resetAll();
 	}
 
+	/**
+	 * Gets the version of this SRX document.
+	 * @return the version of this SRX document.
+	 */
 	public String getVersion () {
 		return version;
 	}
 	
+	/**
+	 * Indicates if a warning was issued last time a document was read.
+	 * @return true if a warning was issued, false otherwise.
+	 */
 	public boolean hasWarning () {
 		return (( warning != null ) && ( warning.length() > 0 ));
 	}
 
+	/**
+	 * Gets the last warning that was issued while loading a document.
+	 * @return the text of the last warning issued, or an empty string.
+	 */
 	public String getWarning () {
 		if ( warning == null ) return "";
 		else return warning;
 	}
 	
+	/**
+	 * Resets the document to its default empty initial state.
+	 */
 	public void resetAll () {
 		langMaps = new ArrayList<LanguageMap>();
 		langRules = new LinkedHashMap<String, ArrayList<Rule>>();
@@ -115,30 +137,61 @@ public class SRXDocument {
 		sampleLanguage = "en";
 	}
 	
+	/**
+	 * Gets a map of all the language rules in this document.
+	 * @return a map of all the language rules.
+	 */
 	public LinkedHashMap<String, ArrayList<Rule>> getAllLanguageRules () {
 		return langRules;
 	}
 	
+	/**
+	 * Gets the list of rules for a given &lt;languagerule> element.
+	 * @param ruleName the name of the &lt;languagerule> element to query.
+	 * @return the list of rules for a given &lt;languagerule> element.
+	 */
 	public ArrayList<Rule> getLanguageRules (String ruleName) {
 		return langRules.get(ruleName);
 	}
 	
+	/**
+	 * Gets the list of all the language maps in this document. 
+	 * @return the list of all the language maps.
+	 */
 	public ArrayList<LanguageMap> getAllLanguagesMaps () {
 		return langMaps;
 	}
 	
+	/**
+	 * Indicates if sub-flows must be segmented.
+	 * @return true if sub-flows must be segmented, false otherwise.
+	 */
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
 	
+	/**
+	 * Sets the flag indicating if sub-flows must be segmented.
+	 * @param value true if sub-flows must be segmented, false otherwise.
+	 */
 	public void setSegmentSubFlows (boolean value) {
 		segmentSubFlows = value;
 	}
 	
+	/**
+	 * Indicates if cascading must be applied when selecting the rules for 
+	 * a given language pattern.
+	 * @return true if cascading must be applied, false otherwise.
+	 */
 	public boolean cascade () {
 		return cascade;
 	}
 	
+	/**
+	 * Sets the flag indicating if cascading must be applied when selecting 
+	 * the rules for a given language pattern.
+	 * @param value true if cascading must be applied, false otherwise.
+	 */
 	public void setCascade (boolean value) {
 		if ( value != cascade ) {
 			cascade = value;
@@ -147,9 +200,9 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Indicates if when there is a single segment in a text it should include
+	 * Indicates if, when there is a single segment in a text, it should include
 	 * the whole text (no spaces or codes trim left/right)
-	 * @return True if a text with a single segment should include the whole
+	 * @return true if a text with a single segment should include the whole
 	 * text.
 	 */
 	public boolean oneSegmentIncludesAll () {
@@ -160,7 +213,8 @@ public class SRXDocument {
 	 * Sets the indicator that tells if when there is a single segment in a 
 	 * text it should include the whole text (no spaces or codes trim left/right)
 	 * text.
-	 * @param value The new value to set.
+	 * @param value true if a text with a single segment should include the whole
+	 * text.
 	 */
 	public void setOneSegmentIncludesAll (boolean value) {
 		if ( value != oneSegmentIncludesAll ) {
@@ -171,7 +225,7 @@ public class SRXDocument {
 
 	/**
 	 * Indicates if leading white-spaces should be left outside the segments.
-	 * @return True if the leading white-spaces should be trimmed.
+	 * @return true if the leading white-spaces should be trimmed.
 	 */
 	public boolean trimLeadingWhitespaces () {
 		return trimLeadingWS;
@@ -180,7 +234,7 @@ public class SRXDocument {
 	/**
 	 * Sets the indicator that tells if leading white-spaces should be left outside 
 	 * the segments.
-	 * @param value The new value to set.
+	 * @param value true if the leading white-spaces should be trimmed.
 	 */
 	public void setTrimLeadingWhitespaces (boolean value) {
 		if ( value != trimLeadingWS ) {
@@ -191,7 +245,7 @@ public class SRXDocument {
 	
 	/**
 	 * Indicates if trailing white-spaces should be left outside the segments.
-	 * @return True if the trailing white-spaces should be trimmed.
+	 * @return true if the trailing white-spaces should be trimmed.
 	 */
 	public boolean trimTrailingWhitespaces () {
 		return trimTrailingWS;
@@ -200,7 +254,7 @@ public class SRXDocument {
 	/**
 	 * Sets the indicator that tells if trailing white-spaces should be left outside 
 	 * the segments.
-	 * @param value The new value to set.
+	 * @param value true if the trailing white-spaces should be trimmed.
 	 */
 	public void setTrimTrailingWhitespaces (boolean value) {
 		if ( value != trimTrailingWS ) {
@@ -211,7 +265,7 @@ public class SRXDocument {
 	
 	/**
 	 * Indicates if start codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if start codes should be included, false otherwise.
 	 */
 	public boolean includeStartCodes () {
 		return includeStartCodes;
@@ -220,7 +274,7 @@ public class SRXDocument {
 	/**
 	 * Sets the indicator that tells if start codes should be included or not.
 	 * (See SRX implementation notes).
-	 * @param value The new value to use.
+	 * @param value true if start codes should be included, false otherwise.
 	 */
 	public void setIncludeStartCodes (boolean value) {
 		if ( value != includeStartCodes ) {
@@ -231,7 +285,7 @@ public class SRXDocument {
 	
 	/**
 	 * Indicates if end codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if end codes should be included, false otherwise.
 	 */
 	public boolean includeEndCodes () {
 		return includeEndCodes;
@@ -240,7 +294,7 @@ public class SRXDocument {
 	/**
 	 * Sets the indicator that tells if end codes should be included or not.
 	 * (See SRX implementation notes).
-	 * @param value The new value to use.
+	 * @param value true if end codes should be included, false otherwise.
 	 */
 	public void setIncludeEndCodes (boolean value) {
 		if ( value != includeEndCodes ) {
@@ -251,7 +305,7 @@ public class SRXDocument {
 	
 	/**
 	 * Indicates if isolated codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if isolated codes should be included, false otherwise.
 	 */
 	public boolean includeIsolatedCodes () {
 		return includeIsolatedCodes;
@@ -260,7 +314,7 @@ public class SRXDocument {
 	/**
 	 * Sets the indicator that tells if isolated codes should be included or not.
 	 * (See SRX implementation notes).
-	 * @param value The new value to use.
+	 * @param value true if isolated codes should be included, false otherwise.
 	 */
 	public void setIncludeIsolatedCodes (boolean value) {
 		if ( value != includeIsolatedCodes ) {
@@ -271,7 +325,7 @@ public class SRXDocument {
 
 	/**
 	 * Gets the current pattern of the mask rule.
-	 * @return The current pattern of the mask rule.
+	 * @return the current pattern of the mask rule.
 	 */
 	public String getMaskRule () {
 		return maskRule;
@@ -279,7 +333,7 @@ public class SRXDocument {
 	
 	/**
 	 * Sets the pattern for the mask rule.
-	 * @param pattern The pattern to use for the mask rule.
+	 * @param pattern the new pattern to use for the mask rule.
 	 */
 	public void setMaskRule (String pattern) {
 		if ( pattern != null ) {
@@ -297,7 +351,7 @@ public class SRXDocument {
 	 * Gets the current sample text. This text is an example string that can be used
 	 * to test the various rules. It can be handy to be able to save it along with
 	 * the SRX document.
-	 * @return The sample text, or an empty string.
+	 * @return the sample text, or an empty string.
 	 */
 	public String getSampleText () {
 		if ( sampleText == null ) return "";
@@ -306,7 +360,7 @@ public class SRXDocument {
 	
 	/**
 	 * Sets the sample text.
-	 * @param value Sample text.
+	 * @param value the new sample text.
 	 */
 	public void setSampleText (String value) {
 		if ( value != null ) {
@@ -322,7 +376,7 @@ public class SRXDocument {
 	
 	/**
 	 * Gets the current sample language code.
-	 * @return The sample language code.
+	 * @return the current sample language code.
 	 */
 	public String getSampleLanguage () {
 		return sampleLanguage;
@@ -330,8 +384,8 @@ public class SRXDocument {
 	
 	/**
 	 * Sets the sample language code. Null or empty strings are changed
-	 * to the default value.
-	 * @param value The new sample language code.
+	 * to the default language.
+	 * @param value the new sample language code.
 	 */
 	public void setSampleLanguage (String value) {
 		if (( value == null ) || ( value.length() == 0 )) {
@@ -349,7 +403,7 @@ public class SRXDocument {
 	/**
 	 * Indicates that, when sampling the rules, the sample should be
 	 * computed using only a selected group of rules.
-	 * @return True to test using only a selected group of rules.
+	 * @return true to test using only a selected group of rules.
 	 * False to test using all the rules matching a given language.
 	 */
 	public boolean testOnSelectedGroup () {
@@ -358,7 +412,7 @@ public class SRXDocument {
 	
 	/**
 	 * Sets the indicator on how to apply rules for samples.
-	 * @param value True to test using only a selected group of rules.
+	 * @param value true to test using only a selected group of rules.
 	 * False to test using all the rules matching a given language.
 	 */
 	public void setTestOnSelectedGroup (boolean value) {
@@ -369,21 +423,20 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Indicates if the segmenter data have been modified since the
-	 * last load or save.
-	 * @return True if they have been modified, false if there is no changes.
+	 * Indicates if the document has been modified since the last load or save.
+	 * @return true if the document have been modified, false otherwise.
 	 */
 	public boolean isModified () {
 		return modified;
 	}
 	
 	/**
-	 * Sets the flag indicating if the segmenter data have been
-	 * modified since the last load or save. If you make change to the rules or
-	 * language maps directly to the lists, make sure to set this flag to true.
-	 * @param value The new value.
+	 * Sets the flag indicating if the document has been modified since the last
+	 * load or save. If you make change to the rules or language maps directly to 
+	 * the lists, make sure to set this flag to true.
+	 * @param value true if the document has been changed, false otherwise.
 	 */
-	public void setIsModified (boolean value) {
+	public void setModified (boolean value) {
 		modified = value;
 	}
 	
@@ -391,8 +444,8 @@ public class SRXDocument {
 	 * Adds a language rule to this SRX document. If another language rule
 	 * with the same name exists already it will be replaced by the
 	 * new one, without warning.
-	 * @param name Name of the language rule to add.
-	 * @param langRule Language rule object to add.
+	 * @param name name of the language rule to add.
+	 * @param langRule language rule object to add.
 	 */
 	public void addLanguageRule (String name,
 		ArrayList<Rule> langRule)
@@ -402,9 +455,9 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Adds a language map to this SRX document. The new map is added
+	 * Adds a language map to this document. The new map is added
 	 * at the end of the one already there.
-	 * @param langMap The language map object to add.
+	 * @param langMap the language map object to add.
 	 */
 	public void addLanguageMap (LanguageMap langMap) {
 		langMaps.add(langMap);
@@ -414,19 +467,23 @@ public class SRXDocument {
 	/**
 	 * Sets the rules for the segmentation. This method
 	 * applies the language code you specify to the language mappings
-	 * currently available in the segmenter and compile the rules
+	 * currently available in the document and compile the rules
 	 * when one or more language map is found. The matching is done in
 	 * the order of the list of language maps and more than one can be 
 	 * selected if {@link #cascade()} is true.
-	 * @param languageCode The language code. the value should be a 
+	 * @param languageCode the language code. the value should be a 
 	 * BCP-47 value (e.g. "de", "fr-ca", etc.)
-	 * @param existingSegmenter Optional existing segmenter object to re-use.
+	 * @param existingSegmenter optional existing SRXSegmenter object to re-use.
 	 * Use null for not re-using anything.
 	 */
-	public Segmenter applyLanguageRules (String languageCode,
-		Segmenter existingSegmenter)
+	public ISegmenter applyLanguageRules (String languageCode,
+		ISegmenter existingSegmenter)
 	{
-		Segmenter segmenter = existingSegmenter;
+		SRXSegmenter segmenter = null;
+		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXDocument )) {
+			segmenter = (SRXSegmenter)existingSegmenter;
+		}
+
 		if ( segmenter != null ) {
 			// Check if we really need to re-compile
 			if ( languageCode != null ) {
@@ -437,7 +494,7 @@ public class SRXDocument {
 			segmenter.reset();
 		}
 		else {
-			segmenter = new Segmenter();
+			segmenter = new SRXSegmenter();
 		}
 		
 		segmenter.setCascade(cascade);
@@ -458,12 +515,18 @@ public class SRXDocument {
 	
 	/**
 	 * Applies a single language rule group to do the segmentation.
-	 * @param ruleName The name of the rule group to apply.
+	 * @param ruleName the name of the rule group to apply.
+	 * @param existingSegmenter optional existing SRXSegmenter object to re-use.
+	 * Use null for not re-using anything.
 	 */
-	public Segmenter applySingleLanguageRule (String ruleName,
-		Segmenter existingSegmenter)
+	public ISegmenter applySingleLanguageRule (String ruleName,
+		ISegmenter existingSegmenter)
 	{
-		Segmenter segmenter = existingSegmenter;
+		SRXSegmenter segmenter = null;
+		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXDocument )) {
+			segmenter = (SRXSegmenter)existingSegmenter;
+		}
+		
 		if ( segmenter != null ) {
 			// Check if we really need to re-compile
 			if ( ruleName != null ) {
@@ -473,7 +536,7 @@ public class SRXDocument {
 			segmenter.reset();
 		}
 		else {
-			segmenter = new Segmenter();
+			segmenter = new SRXSegmenter();
 		}
 
 		segmenter.setOptions(segmentSubFlows, includeStartCodes,
@@ -486,9 +549,9 @@ public class SRXDocument {
 
 	/**
 	 * Compiles a language rule into the current set of active rules.
-	 * @param ruleName The name of the language rule to compile.
+	 * @param ruleName the name of the language rule to compile.
 	 */
-	private void compileRules (Segmenter segmenter,
+	private void compileRules (SRXSegmenter segmenter,
 		String ruleName)
 	{
 		if ( !langRules.containsKey(ruleName) ) {
@@ -518,9 +581,9 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Loads an SRX rules file.
-	 * @param data The character sequence to load.
+	 * Loads an SRX document from a CharSequence object.
 	 * The rules can be embedded inside another vocabulary.
+	 * @param data the character sequence to load.
 	 */
 	public void loadRules (CharSequence data) {
 		loadRules(data, 1);
@@ -528,15 +591,15 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Loads an SRX rules file.
-	 * @param pathOrURL The full path or URL of the rules file to load.
+	 * Loads an SRX document from a file.
 	 * The rules can be embedded inside another vocabulary.
+	 * @param pathOrURL The full path or URL of the document to load.
 	 */
 	public void loadRules (String pathOrURL) {
 		loadRules(pathOrURL, 0);
 	}			
-			
-	public void loadRules (Object input,
+
+	private void loadRules (Object input,
 		int inputType )
 	{
 		try {
@@ -719,10 +782,10 @@ public class SRXDocument {
 	/**
 	 * Gets the first occurrence of a given element in a given namespace
 	 * from a given element.
-	 * @param ns The namespace URI to look for.
-	 * @param tagName Name of the element to look for.
-	 * @param elem Element where to look for.
-	 * @return The first found element, or null.
+	 * @param ns the namespace URI to look for.
+	 * @param tagName the name of the element to look for.
+	 * @param elem the element where to look for.
+	 * @return the first found element, or null.
 	 */
 	private Element getFirstElementByTagNameNS (String ns,
 		String tagName,
@@ -735,9 +798,9 @@ public class SRXDocument {
 
 	/**
 	 * Saves the current rules to an SRX string.
-	 * @param saveExtensions True to save Okapi SRX extensions, false to not save them.
-	 * @param saveNonValidInfo True to save non-SRX-valid attributes, false to not save them
-	 * @return The string containing the saved SRX rules.
+	 * @param saveExtensions true to save Okapi SRX extensions, false otherwise.
+	 * @param saveNonValidInfo true to save non-SRX-valid attributes, false otherwise.
+	 * @return the string containing the saved SRX rules.
 	 */
 	public String saveRulesToString (boolean saveExtensions,
 		boolean saveNonValidInfo)
@@ -751,10 +814,10 @@ public class SRXDocument {
 	}
 
 	/**
-	 * Saves the current rules to an SRX rules file.
-	 * @param rulesPath The full path of the file where to save the rules.
-	 * @param saveExtensions True to save Okapi SRX extensions, false to not save them.
-	 * @param saveNonValidInfo True to save non-SRX-valid attributes, false to not save them
+	 * Saves the current rules to an SRX rules document.
+	 * @param rulesPath the full path of the file where to save the rules.
+	 * @param saveExtensions true to save Okapi SRX extensions, false otherwise.
+	 * @param saveNonValidInfo true to save non-SRX-valid attributes, false otherwise.
 	 */
 	public void saveRules (String rulesPath,
 		boolean saveExtensions,
@@ -872,4 +935,5 @@ public class SRXDocument {
 			if ( writer != null ) writer.close();
 		}
 	}
+
 }

@@ -21,8 +21,7 @@
 			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
-<!--			<packageset dir="../../common/net.sf.okapi.ui.common/src" defaultexcludes="yes"/>
-			<packageset dir="../../libraries/net.sf.okapi.ui.lib.segmentation/src" defaultexcludes="yes"/>-->
+			<packageset dir="../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

@@ -20,14 +20,32 @@
 
 package net.sf.okapi.lib.segmentation;
 
+/**
+ * Stores the data for an SRX &lt;languagemap> map element
+ */
 public class LanguageMap {
 
+	/**
+	 * The pattern of this language map.
+	 */
 	protected String pattern;
-	protected String ruleName;
 	
+	/**
+	 * The name of this language map.
+	 */
+	protected String ruleName;
+
+	/**
+	 * Creates an empty LanguageMap object. 
+	 */
 	public LanguageMap () {
 	}
 	
+	/**
+	 * Creates a LanguageMap object with a given pattern and a given name.
+	 * @param pattern the pattern for the new language map.
+	 * @param ruleName the name of the new language map.
+	 */
 	public LanguageMap (String pattern,
 		String ruleName)
 	{
@@ -35,11 +53,20 @@ public class LanguageMap {
 		this.ruleName = ruleName;
 	}
 	
+	/**
+	 * Gets the pattern associated to this language map.
+	 * @return the pattern associated to this language map.
+	 */
 	public String getPattern () {
 		return pattern;
 	}
 	
+	/**
+	 * Gets the name of this language map.
+	 * @return the name of this languag emap.
+	 */
 	public String getRuleName () {
 		return ruleName;
 	}
+
 }

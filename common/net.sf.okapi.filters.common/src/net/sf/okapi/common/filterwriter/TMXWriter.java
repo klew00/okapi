@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -180,11 +181,11 @@ public class TMXWriter {
 		}
 		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
 			// Write the segments
-			List<TextFragment> srcList = srcTC.getSegments();
-			List<TextFragment> trgList = trgTC.getSegments();
+			List<Segment> srcList = srcTC.getSegments();
+			List<Segment> trgList = trgTC.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
-				writeTU(srcList.get(i),
-					(i>trgList.size()-1) ? null : trgList.get(i),
+				writeTU(srcList.get(i).text,
+					(i>trgList.size()-1) ? null : trgList.get(i).text,
 					String.format("%s_s%02d", tuid, i+1),
 					attributes);
 			}

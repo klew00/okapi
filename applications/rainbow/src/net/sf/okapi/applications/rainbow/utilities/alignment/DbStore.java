@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -222,15 +223,15 @@ public class DbStore {
 			// Store the segments if needed
 			if ( tc.isSegmented() ) {
 				int i = 1;
-				for ( TextFragment tf : tc.getSegments() ) {
+				for ( Segment seg : tc.getSegments() ) {
 					pstm.setInt(1, 0);
 					pstm.setInt(2, gKey);
 					pstm.setString(3, tuId);
 					pstm.setInt(4, i); // SegKey is >0 for the segments
 					pstm.setString(5, tuName);
 					pstm.setString(6, tuType);
-					pstm.setString(7, tf.getCodedText());
-					pstm.setString(8, Code.codesToString(tf.getCodes()));
+					pstm.setString(7, seg.text.getCodedText());
+					pstm.setString(8, Code.codesToString(seg.text.getCodes()));
 					pstm.execute();
 					count++;
 					i++;
@@ -274,16 +275,17 @@ public class DbStore {
 			// Build the segments
 			if ( !tc.hasCode() || !result.next() ) return tc; // No segments
 			// Create the new list
-			ArrayList<TextFragment> list = new ArrayList<TextFragment>();
+			ArrayList<Segment> list = new ArrayList<Segment>();
 			tc.setSegments(list);
 
 			// Add the first segment to it
-			list.add(new TextFragment(result.getString(1),
-				Code.stringToCodes(result.getString(2))));
+			int segIndex = 0;
+			list.add(new Segment(String.valueOf(segIndex),
+				new TextFragment(result.getString(1), Code.stringToCodes(result.getString(2)))));
 			// Add the other segments
 			while ( result.next() ) {
-				list.add(new TextFragment(result.getString(1),
-					Code.stringToCodes(result.getString(2))));
+				list.add(new Segment(String.valueOf(++segIndex),
+					new TextFragment(result.getString(1), Code.stringToCodes(result.getString(2)))));
 			}
 			return tc;
 		}

@@ -109,7 +109,7 @@ public class GenericContent {
 				code = container.getCode(text.charAt(++i));
 				int index = Integer.parseInt(code.getData());
 				if ( showSegments ) tmp.append("[");
-				tmp.append(setContent(container.getSegments().get(index)).toString(normalText));
+				tmp.append(setContent(container.getSegments().get(index).text).toString(normalText));
 				if ( showSegments ) tmp.append("]");
 				break;
 			default:

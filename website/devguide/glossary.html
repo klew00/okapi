@@ -181,6 +181,14 @@ Some resources also implement the <code>
 <a href="../javadoc/net/sf/okapi/common/resource/INameable.html">INameable</a></code> 
 or <code><a href="../javadoc/net/sf/okapi/common/resource/IReferenceable.html">
 IReferenceable</a></code> interfaces.</p>
+<h3 dir="ltr"><a name="segment"></a>Segment</h3>
+<p dir="ltr">A segment, in the context of the framework, is the result of a 
+segmentation processed applied to a extracted content, generally a
+<a href="#textUnit">text unit</a>. For example, it can be a single sentence, in 
+a text unit that is the content of an HTML <code>&lt;p&gt;</code> element. 
+Segmentation services are provided through the <code>
+<a href="../javadoc/net/sf/okapi/lib/segmentation/ISegmenter.html">ISegmenter</a></code> 
+interface.</p>
 <h3><a name="skeleton"></a>Skeleton</h3>
 <p>The skeleton is the non-textual part of a document. A <a href="#filter">
 filter</a> has for function to separate text content from skeleton parts. The 
@@ -223,6 +231,9 @@ The text unit is at the center of the text extraction mechanism. Usually it
 corresponds to something like a paragraph. For example: the content of a <code>
 &lt;p&gt;</code> element in HTML, or the text of the value of a key/value pair in a 
 properties file.</p>
+<p dir="ltr">Often, the content of a text unit needs to be broken down into 
+smaller parts, for example sentences. This is the segmentation process, and each 
+resulting part is a <a href="#segment">segment</a>.</p>
 <p dir="ltr">See the section <a href="gettingstarted.html#TextUnits">Working 
 with Text Units</a> for more details on text units.</p>
 <p>&nbsp;</p>

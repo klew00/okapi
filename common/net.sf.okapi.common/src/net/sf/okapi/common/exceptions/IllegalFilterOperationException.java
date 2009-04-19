@@ -20,15 +20,35 @@
 
 package net.sf.okapi.common.exceptions;
 
+/**
+ * Signals a general error related to a filter operation.
+ */
 public class IllegalFilterOperationException extends RuntimeException {
+
 	private static final long serialVersionUID = 5617083235059687346L;
+
+	/**
+	 * Creates an empty new IllegalFilterOperationException object.
+	 */
+	public IllegalFilterOperationException () {
+	}
 	
-	public IllegalFilterOperationException(String message) {
+	/**
+	 * Creates a new IllegalFilterOperationException object with a given message.
+	 * @param message text of the message.
+	 */
+	public IllegalFilterOperationException (String message) {
 		super(message);
 	}
 	
-	public IllegalFilterOperationException(Exception e) {
-		super(e);
+	/**
+	 * Creates a new IllegalFilterOperationException object with a given parent 
+	 * exception cause.
+	 * @param cause the parent exception cause.
+	 */
+	public IllegalFilterOperationException (Throwable cause) {
+		super(cause);
 	}
+
 }
 

@@ -18,37 +18,59 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.exceptions;
+package net.sf.okapi.common.resource;
 
 /**
- * Signals a general IO error. This is generally the result of some kind of
- * IO-related exception occurring inside an Okapi component.
+ * Convenience class to group together the text fragment of a segment
+ * and its identifier.
  */
-public class OkapiIOException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1128014152792942325L;
+public class Segment {
 	
 	/**
-	 * Creates an empty new OkapiIOException object.
+	 * Identifier of this segment.
 	 */
-	public OkapiIOException () {
+	public String id;
+	/**
+	 * Text fragment of this segment.
+	 */
+	public TextFragment text;
+	
+	/**
+	 * Creates an empty segment object.
+	 */
+	public Segment () {
+	}
+	
+	/**
+	 * Creates a segment object with a given identifier and a given
+	 * text fragment.
+	 * @param id identifier for the new segment.
+	 * @param text text fragment for the new segment.
+	 */
+	public Segment (String id,
+		TextFragment text)
+	{
+		this.id = id;
+		this.text = text;
 	}
 
 	/**
-	 * Creates a new OkapiIOException object with a given message.
-	 * @param message text of the message.
+	 * Clones this segment.
+	 * @return a copy of this segment. 
 	 */
-	public OkapiIOException (String message) {
-		super(message);
+	@Override
+	public Segment clone () {
+		return new Segment(id, text);
 	}
 	
 	/**
-	 * Creates a new OkapiIOException object with a given parent 
-	 * exception cause.
-	 * @param cause the parent exception cause.
+	 * Gets the text representation of the text fragment of this segment.
+	 * @return the text representation of this segment.
 	 */
-	public OkapiIOException (Throwable cause) {
-		super(cause);
+	@Override
+	public String toString () {
+		if ( text == null ) return null;
+		return text.toString();
 	}
-
+	
 }

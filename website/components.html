@@ -28,7 +28,7 @@
 	</tr>
 </table>
 <p>The Okapi Framework comes with a collection of various components and 
-libraries that are used in the okapi applications, but can also be utilzed by 
+libraries that are used in the okapi applications, but can also be utilized by 
 any developer to quickly put together powerful and specialized processes.</p>
 <h2><a name="filters"></a>Filters</h2>
 <p>One of of the most important types of component in the framework are the 
@@ -44,13 +44,13 @@ using the same API regardless of the file format.</p>
 	filter for XML documents.</li>
 	<li><b><a href="help/filters/ui/xliff/index.html">XLIFF Filter</a></b> - A 
 	filter for XLIFF documents.</li>
-	<li>See all the filters available...</li>
+	<li><a href="help/filters/ui/index.html">See all the filters available...</a></li>
 </ul>
 <h2><a name="utilities"></a>Utilities</h2>
 <p>Another important type of components are the utilities. Each utilities is a 
 self-contained module that perform a specific task that can be applied to the 
 documents processed by the filters.</p>
-<p>The following list shows some of the utilities that come with rainbow:</p>
+<p>The following list shows some of the utilities that come with Rainbow:</p>
 <ul>
 	<li><cite>
 	<a href="help/applications/rainbow/utilities/extraction/index.html">
@@ -70,8 +70,8 @@ documents processed by the filters.</p>
 	<li><a href="help/applications/rainbow/utilities/index.html">See all the 
 	utilities available...</a></li>
 </ul>
-<h2>Examples</h2>
-<p>Here are a few examples of how you can use the framework's components in your 
+<h2>Example</h2>
+<p>Here is a simple example of how you can use the framework's components in your 
 own code:</p>
 <p>The Java code below opens a properties file or an OpenOffice.org document and 
 display all the translatable text inside.</p>
@@ -79,6 +79,7 @@ display all the translatable text inside.</p>
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter; 
 
@@ -92,12 +93,19 @@ public class Main {
          else if ( args[0].endsWith(&quot;.odt&quot;) ) {
             filter = new OpenOfficeFilter();
          }
-         filter.setOptions(&quot;en&quot;, &quot;UTF-8&quot;, false);
-         filter.open((new File(args[0])).toURI());
+         // Open the document to process
+         filter.open(new RawDocument(new File(args[0]).toURI(),
+            &quot;UTF-8&quot;, &quot;en&quot;));
+         // Create a formatter to display text unit more prettily.
+         GenericContent fmt = new GenericContent();
+         // Process the input document
          while ( filter.hasNext() ) {
             Event event = filter.next();
             if ( event.getEventType() == EventType.TEXT_UNIT ) {
-               System.out.println(event.getResource().toString());
+               // Format and print out each text unit
+               fmt.setContent(((TextUnit)event.getResource()
+                  ).getSourceContent());
+               System.out.println(fmt.toString());
             }
          }
       }
@@ -106,7 +114,6 @@ public class Main {
       }
    }
 }</pre>
-<p>TODO: MORE EXAMPLES</p>
 <p>&nbsp;</p>
 
 </body>

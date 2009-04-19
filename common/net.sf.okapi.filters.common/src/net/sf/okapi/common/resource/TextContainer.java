@@ -37,7 +37,7 @@ public class TextContainer extends TextFragment {
 
 	protected Hashtable<String, Property> properties;
 	protected Annotations annotations;
-	protected ArrayList<TextFragment> segments;
+	protected ArrayList<Segment> segments;
 
 	/**
 	 * Creates a new empty TextContainer object.
@@ -88,9 +88,9 @@ public class TextContainer extends TextFragment {
 		}
 		// Clone the segments
 		if ( segments != null ) {
-			newCont.segments = new ArrayList<TextFragment>();
-			for ( TextFragment frag : segments ) {
-				newCont.segments.add(frag.clone());
+			newCont.segments = new ArrayList<Segment>();
+			for ( Segment seg : segments ) {
+				newCont.segments.add(seg.clone());
 			}
 		}
 		
@@ -186,7 +186,7 @@ public class TextContainer extends TextFragment {
 	 * Gets the list of all current segments, or null if this object is not segmented.
 	 * @return The list of all current segments, or null. 
 	 */
-	public List<TextFragment> getSegments () {
+	public List<Segment> getSegments () {
 		return segments;
 	}
 	
@@ -211,10 +211,11 @@ public class TextContainer extends TextFragment {
 	 * @return The number of segments.
 	 */
 	public int createSegments (List<Range> ranges) {
-		//TODO: Find a way to offer re-segmentation on top of existing one
+		// Do nothing if null
 		if( ranges == null ) return 0;
+
 		// Extract the segments using the ranges
-		segments = new ArrayList<TextFragment>();
+		segments = new ArrayList<Segment>();
 		if (( codes == null ) && (ranges.size() > 0 )) {
 			codes = new ArrayList<Code>();
 		}
@@ -222,7 +223,8 @@ public class TextContainer extends TextFragment {
 		int diff = 0;
 		for ( int i=0; i<ranges.size(); i++ ) {
 			// Add the new segment in the list
-			segments.add(subSequence(ranges.get(i).start+diff, ranges.get(i).end+diff));
+			segments.add(new Segment(String.valueOf(i),
+				subSequence(ranges.get(i).start+diff, ranges.get(i).end+diff)));
 			// Remove it from the main content
 			int width = ranges.get(i).end-ranges.get(i).start;
 			// For chunks < 2 there is no codes so we can just add the needed room for the segment marker
@@ -262,8 +264,8 @@ public class TextContainer extends TextFragment {
 	 * @param end The position just after the last character or marker of the section
 	 * (in the coded text representation). You can use -1 to indicate the end of the
 	 * text.
-	 * @return The segment just created, or null if no segment was created (for
-	 * example when the width provided was 0).
+	 * @return The TextFragment of the segment just created, or null if no segment 
+	 * was created (for example when the width provided was 0).
 	 */
 	public TextFragment createSegment (int start,
 		int end)
@@ -275,7 +277,7 @@ public class TextContainer extends TextFragment {
 
 		// Create lists and codes if needed
 		if ( segments == null ) {
-			segments = new ArrayList<TextFragment>();
+			segments = new ArrayList<Segment>();
 		}
 		if ( codes == null ) {
 			codes = new ArrayList<Code>();
@@ -284,6 +286,7 @@ public class TextContainer extends TextFragment {
 		// Get the segment index value for the first segment to create
 		// (where it goes in the list of existing segments)
 		int segIndex = 0;
+		String segId;
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
@@ -300,15 +303,18 @@ public class TextContainer extends TextFragment {
 		}
 
 		// Add the new segment in the list
+		Segment seg = new Segment(null, subSequence(start, end));
 		boolean inserted = true;
 		if ( segIndex > segments.size()-1 ) {
-			segments.add(subSequence(start, end));
+			segments.add(seg);
 			segIndex = segments.size()-1;
 			inserted = false; // new segment was added
 		}
 		else {
-			segments.add(segIndex, subSequence(start, end));
+			segments.add(segIndex, seg);
 		}
+		segId = String.valueOf(segIndex);
+		seg.id = segId;
 		
 		// Remove it from the main content
 		int width = end-start;
@@ -320,28 +326,26 @@ public class TextContainer extends TextFragment {
 		// Set the segment marker and its corresponding code
 		text.setCharAt(start, (char)MARKER_SEGMENT);
 		// Add the segment marker
-		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT,
-			String.valueOf(segIndex)));
+		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, segId));
 		// Index of the marker is independent of its location
 		text.setCharAt(start+1, toChar(codes.size()-1));
 
 		// If required: update the indices of the segment markers after the new one
 		if ( inserted ) renumberSegmentMarkers(start+2, segIndex+1);
 		// Return the created segment
-		return segments.get(segIndex);
+		return segments.get(segIndex).text;
 	}
 
 	public void appendSegment (TextFragment fragment) {
 		// Create lists and codes if needed
 		if ( segments == null ) {
-			segments = new ArrayList<TextFragment>();
+			segments = new ArrayList<Segment>();
 		}
+		String segId = String.valueOf(segments.size());
 		// Add the segment to the list of segments
-		segments.add(fragment);
-		// Gets its index
-		int segIndex = segments.size()-1;
-		// Append the segment maker
-		Code code = new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, String.valueOf(segIndex));
+		segments.add(new Segment(segId, fragment));
+		// Append the segment maker. Note segment Id and index are the same here
+		Code code = new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, segId);
 		append(code);
 	}
 	
@@ -353,7 +357,6 @@ public class TextContainer extends TextFragment {
 	 * and will be lost.
 	 */
 	public void mergeAllSegments () {
-		//TODO: Decide how to do the merge: re-use original or remerged?
 		if ( !isSegmented() ) return;
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
@@ -366,11 +369,11 @@ public class TextContainer extends TextFragment {
 			case MARKER_SEGMENT:
 				code = getCode(text.charAt(++i));
 				int index = Integer.parseInt(code.data);
-				int add = segments.get(index).getCodedText().length();
+				int add = segments.get(index).text.getCodedText().length();
 				// Remove the segment marker
 				remove(i-1, i+1);
 				// Insert the segment
-				insert(i-1, segments.get(index));
+				insert(i-1, segments.get(index).text);
 				// Adjust the value of i so it is at the end of the new segment
 				i += (add-2); // -2 = size of code marker
 				break;
@@ -405,7 +408,7 @@ public class TextContainer extends TextFragment {
 					// Remove the segment marker
 					remove(pos, i+1);
 					// Insert the segment
-					insert(pos, segments.get(segmentIndex));
+					insert(pos, segments.get(segmentIndex).text);
 					// Remove the segment from the segment list
 					segments.remove(segmentIndex);
 					// Renumber the remaining segment
@@ -425,8 +428,8 @@ public class TextContainer extends TextFragment {
 	/**
 	 * Renumbers, from a given value, the segment indices associated to the 
 	 * segment markers located after a given position. 
-	 * @param start Start position (in coded text) where the renumbering should start.
-	 * @param indexValue Value to use as first index value of the renumbering.
+	 * @param start start position (in coded text) where the renumbering should start.
+	 * @param indexValue value to use as first index value of the renumbering.
 	 */
 	private void renumberSegmentMarkers (int start,
 		int indexValue)
@@ -448,8 +451,10 @@ public class TextContainer extends TextFragment {
 	}
 
 	/**
-	 * Joins a given segment with the closest to it on the right side.
-	 * @param segmentIndex Index of the first segment to join.
+	 * Joins a given segment with the closest to it on the right side. The content
+	 * between the given segment and the next, as well as the content of the next
+	 * segment are moved to the end of the content of the given segment.
+	 * @param segmentIndex index of the first segment to join.
 	 */
 	public void joinSegmentWithNext (int segmentIndex) {
 		Code code;
@@ -483,13 +488,13 @@ public class TextContainer extends TextFragment {
 		
 		// Assumes pos1 and pos2 are > -1 now
 		// Get the inter-segment part and add it to first segment
-		segments.get(segmentIndex).append(subSequence(pos1+2, pos2));
+		segments.get(segmentIndex).text.append(subSequence(pos1+2, pos2));
 		// Remove inter-segment part and marker for second segment
 		remove(pos1+2, pos2+2);
 		// Update the indices of the remaining segments
 		renumberSegmentMarkers(pos1+2, segmentIndex+1);
 		// Add second segment to first one
-		segments.get(segmentIndex).append(segments.get(seg2Index));
+		segments.get(segmentIndex).text.append(segments.get(seg2Index).text);
 		// Remove second segment
 		segments.remove(seg2Index);
 	}
@@ -499,7 +504,7 @@ public class TextContainer extends TextFragment {
 	 * place-holder itself, so it must already match the given list.
 	 * @param segments The new list of segments.
 	 */
-	public void setSegments (ArrayList<TextFragment> segments) {
+	public void setSegments (ArrayList<Segment> segments) {
 		this.segments = segments;
 	}
 

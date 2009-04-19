@@ -35,6 +35,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -367,8 +368,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
-		List<TextFragment> srcSegs = srcCont.getSegments();
-		List<TextFragment> trgSegs = null;
+		List<Segment> srcSegs = srcCont.getSegments();
+		List<Segment> trgSegs = null;
 		ScoresAnnotation scores = null;
 		if ( trgCont != null ) {
 			trgSegs = trgCont.getSegments();
@@ -392,14 +393,14 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				TextFragment trgFrag = null;
 				int lev = 0;
 				if (( trgSegs != null ) && ( n < trgSegs.size() )) {
-					trgFrag = trgSegs.get(n);
+					trgFrag = trgSegs.get(n).text;
 					if ( scores != null ) lev = scores.getScore(n);
 				}
 				//TODO: Else, source/target segments do not match
 				// Write it
 				if ( layer == null ) {
 					if ( trgFrag == null ) {
-						tmp.append(getContent(srcSegs.get(n), null, context));
+						tmp.append(getContent(srcSegs.get(n).text, null, context));
 					}
 					else { // No target available: use the source
 						tmp.append(getContent(trgFrag, langToUse, context));
@@ -410,7 +411,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					case 1:
 						tmp.append(layer.endCode()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n), null, 0)
+							+ getContent(srcSegs.get(n).text, null, 0)
 							+ layer.midSegment(lev)
 							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
 							+ layer.endSegment()
@@ -419,7 +420,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					case 2:
 						tmp.append(layer.endInline()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n), null, 0)
+							+ getContent(srcSegs.get(n).text, null, 0)
 							+ layer.midSegment(lev)
 							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
 							+ layer.endSegment()
@@ -427,7 +428,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						break;
 					default:
 						tmp.append(layer.startSegment()
-							+ getContent(srcSegs.get(n), null, context)
+							+ getContent(srcSegs.get(n).text, null, context)
 							+ layer.midSegment(lev)
 							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, context))
 							+ layer.endSegment());

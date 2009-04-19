@@ -27,12 +27,13 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
@@ -46,8 +47,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 	
 	private Parameters params;
-	private Segmenter srcSeg;
-	private Segmenter trgSeg;
+	private ISegmenter srcSeg;
+	private ISegmenter trgSeg;
 	private SimpleTMConnector tmQ;
 	
 	public Utility () {
@@ -140,13 +141,13 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( tu.hasTarget(trgLang) ) {
 				if ( params.segment ) {
 					trgSeg.computeSegments(tu.getTarget(trgLang));
-					tu.getTarget(trgLang).createSegments(trgSeg.getSegmentRanges());
+					tu.getTarget(trgLang).createSegments(trgSeg.getRanges());
 				}
 			}
 			else {
 				if ( params.segment ) {
 					srcSeg.computeSegments(tu.getSource());
-					tu.getSource().createSegments(srcSeg.getSegmentRanges());
+					tu.getSource().createSegments(srcSeg.getRanges());
 				}
 			}
 		}
@@ -273,13 +274,13 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmQ.setAttribute("GroupName", tu.getName());
 			TextContainer tc = tu.getTarget(trgLang);
 			if ( tc.isSegmented() ) {
-				int seg = 0;
-				for ( TextFragment tf : tc.getSegments() ) {
-					if ( tmQ.query(tf) == 1 ) {
+				int segIndex = 0;
+				for ( Segment seg : tc.getSegments() ) {
+					if ( tmQ.query(seg.text) == 1 ) {
 						qr = tmQ.next();
-						tc.getSegments().set(seg, qr.target);
+						tc.getSegments().get(segIndex).text = qr.target;
 					}
-					seg++;
+					segIndex++;
 				}
 			}
 			else {

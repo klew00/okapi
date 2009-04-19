@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -225,16 +226,16 @@ public class Database {
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
 				TextFragment trgFrag;
-				int seg = 0;
-				for ( TextFragment srcFrag : srcCont.getSegments() ) {
-					pstm.setString(2, srcFrag.getCodedText());
-					pstm.setString(3, Code.codesToString(srcFrag.getCodes()));
-					trgFrag = trgCont.getSegments().get(seg);
+				int segIndex = 0;
+				for ( Segment srcSeg : srcCont.getSegments() ) {
+					pstm.setString(2, srcSeg.text.getCodedText());
+					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
+					trgFrag = trgCont.getSegments().get(segIndex).text;
 					pstm.setString(4, trgFrag.getCodedText());
 					pstm.setString(5, Code.codesToString(trgFrag.getCodes()));
 					pstm.execute();
 					count++;
-					seg++;
+					segIndex++;
 				}
 			}
 			else {

@@ -34,10 +34,10 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -89,7 +89,7 @@ public class SRXEditor {
 	private RulesTableModel rulesTableMod;
 	private Combo cbGroup;
 	private SRXDocument srxDoc;
-	private Segmenter segmenter;
+	private ISegmenter segmenter;
 	private String srxPath;
 	private TextContainer sampleText;
 	private Button btAddRule;
@@ -226,8 +226,8 @@ public class SRXEditor {
 					int n = tblRules.getSelectionIndex();
 					if ( n < 0 ) return;
 					String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
-					srxDoc.getLanguageRules(ruleName).get(n).setIsActive(((TableItem)e.item).getChecked());
-					srxDoc.setIsModified(true);
+					srxDoc.getLanguageRules(ruleName).get(n).setActive(((TableItem)e.item).getChecked());
+					srxDoc.setModified(true);
 					updateResults(true);
 				}
 				updateRulesButtons();
@@ -684,7 +684,7 @@ public class SRXEditor {
 					edSampleText.getText().replace("\r", ""), sampleText);  //$NON-NLS-1$  //$NON-NLS-2$
 				// Segment
 				segmenter.computeSegments(sampleText);
-				sampleText.createSegments(segmenter.getSegmentRanges());
+				sampleText.createSegments(segmenter.getRanges());
 				// Create the output in generic format
 				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true, true));
 			}
@@ -928,7 +928,7 @@ public class SRXEditor {
 		else {
 			srxDoc.getLanguageRules(ruleName).set(n, rule);
 		}
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		updateRules(n, true);
 	}
 	
@@ -937,7 +937,7 @@ public class SRXEditor {
 		if ( n == -1 ) return;
 		String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
 		srxDoc.getLanguageRules(ruleName).remove(n);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		tblRules.remove(n);
 		if ( n > tblRules.getItemCount()-1 )
 			n = tblRules.getItemCount()-1;
@@ -956,7 +956,7 @@ public class SRXEditor {
 		srxDoc.getLanguageRules(ruleName).set(n-1,
 			srxDoc.getLanguageRules(ruleName).get(n));
 		srxDoc.getLanguageRules(ruleName).set(n, tmp);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		// Update
 		updateRules(n-1, true);
 	}
@@ -970,7 +970,7 @@ public class SRXEditor {
 		srxDoc.getLanguageRules(ruleName).set(n+1,
 			srxDoc.getLanguageRules(ruleName).get(n));
 		srxDoc.getLanguageRules(ruleName).set(n, tmp);
-		srxDoc.setIsModified(true);
+		srxDoc.setModified(true);
 		// Update
 		updateRules(n+1, true);
 	}

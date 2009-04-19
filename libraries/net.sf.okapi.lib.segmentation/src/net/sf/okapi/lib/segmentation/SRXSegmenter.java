@@ -20,10 +20,9 @@
 
 package net.sf.okapi.lib.segmentation;
 
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.TreeMap;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +30,10 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
-public class Segmenter {
+/**
+ * Implements the {@link ISegmenter} interface for SRX rules.
+ */
+public class SRXSegmenter implements ISegmenter {
 	
 	private boolean segmentSubFlows;
 	private boolean cascade;
@@ -51,14 +53,14 @@ public class Segmenter {
 	private ArrayList<Integer> ends;
 
 	/**
-	 * Creates a new segmenter object.
+	 * Creates a new SRXSegmenter object.
 	 */
-	public Segmenter () {
+	public SRXSegmenter () {
 		reset();
 	}
 
 	/**
-	 * Reset the options to their defaults, and the compiled rules
+	 * Resets the options to their defaults, and the compiled rules
 	 * to nothing.
 	 */
 	public void reset () {
@@ -79,16 +81,16 @@ public class Segmenter {
 
 	/**
 	 * Sets the options for this segmenter.
-	 * @param segmentSubFlows True to segment sub-flows, false to no segment them.
-	 * @param includeStartCodes True to include start codes just before a break in the 'left' segment,
+	 * @param segmentSubFlows true to segment sub-flows, false to no segment them.
+	 * @param includeStartCodes true to include start codes just before a break in the 'left' segment,
 	 * false to put them in the next segment. 
-	 * @param includeEndCodes  True to include end codes just before a break in the 'left' segment,
+	 * @param includeEndCodes  true to include end codes just before a break in the 'left' segment,
 	 * false to put them in the next segment.
-	 * @param includeIsolatedCodes True to include isolated codes just before a break in the 'left' segment,
+	 * @param includeIsolatedCodes true to include isolated codes just before a break in the 'left' segment,
 	 * false to put them in the next segment.
-	 * @param oneSegmentIncludesAll True to include everything in segments that are alone.
-	 * @param trimLeadingWS True to trim leading white-spaces from the segments, false to keep them.
-	 * @param trimTrailingWS True to trim trailing white-spaces from the segments, false to keep them.
+	 * @param oneSegmentIncludesAll true to include everything in segments that are alone.
+	 * @param trimLeadingWS true to trim leading white-spaces from the segments, false to keep them.
+	 * @param trimTrailingWS true to trim trailing white-spaces from the segments, false to keep them.
 	 */
 	public void setOptions (boolean segmentSubFlows,
 		boolean includeStartCodes,
@@ -107,29 +109,52 @@ public class Segmenter {
 		this.trimTrailingWS = trimTrailingWS;
 	}
 	
+	/**
+	 * Indicates if, when there is a single segment in a text, it should include
+	 * the whole text (no spaces or codes trim left/right)
+	 * @return true if a text with a single segment should include the whole
+	 * text.
+	 */
 	public boolean oneSegmentIncludesAll () {
 		return oneSegmentIncludesAll;
 	}
 
+	/**
+	 * Indicates if sub-flows must be segmented.
+	 * @return true if sub-flows must be segmented, false otherwise.
+	 */
 	public boolean segmentSubFlows () {
 		return segmentSubFlows;
 	}
 	
+	/**
+	 * Indicates if cascading must be applied when selecting the rules for 
+	 * a given language pattern.
+	 * @return true if cascading must be applied, false otherwise.
+	 */
 	public boolean cascade () {
 		return cascade;
 	}
 	
+	/**
+	 * Indicates if leading white-spaces should be left outside the segments.
+	 * @return true if the leading white-spaces should be trimmed.
+	 */
 	public boolean trimLeadingWhitespaces () {
 		return trimLeadingWS;
 	}
 	
+	/**
+	 * Indicates if trailing white-spaces should be left outside the segments.
+	 * @return true if the trailing white-spaces should be trimmed.
+	 */
 	public boolean trimTrailingWhitespaces () {
 		return trimTrailingWS;
 	}
 	
 	/**
 	 * Indicates if start codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if they should be included, false otherwise.
 	 */
 	public boolean includeStartCodes () {
 		return includeStartCodes;
@@ -137,7 +162,7 @@ public class Segmenter {
 	
 	/**
 	 * Indicates if end codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if they should be included, false otherwise.
 	 */
 	public boolean includeEndCodes () {
 		return includeEndCodes;
@@ -145,36 +170,25 @@ public class Segmenter {
 	
 	/**
 	 * Indicates if isolated codes should be included (See SRX implementation notes).
-	 * @return True if they should be included, false otherwise.
+	 * @return true if they should be included, false otherwise.
 	 */
 	public boolean includeIsolatedCodes () {
 		return includeIsolatedCodes;
 	}
 	
-	/**
-	 * Calculate the segmentation of a given plain text string.
-	 * @param text Plain text to segment.
-	 * @return The number of segment found.
-	 */
 	public int computeSegments (String text) {
 		TextContainer tmp = new TextContainer(text);
 		return computeSegments(tmp);
 	}
 	
-	/**
-	 * Calculates the segmentation of a given IContainer object. The assumption is that the container
-	 * is not segmented yet.
-	 * @param container The object to segment.
-	 * @return The number of segment found.
-	 */
 	public int computeSegments (TextContainer container) {
 		if ( currentLanguageCode == null ) {
 			// Need to call selectLanguageRule()
-			throw new RuntimeException("No language defined for the segmeter.");
+			throw new SegmentationRuleException("No language defined for the segmenter.");
 		}
 		if ( container.isSegmented() ) {
 			// Assumes the text is not already segmented
-			throw new RuntimeException("Text already segmented.");
+			throw new SegmentationRuleException("Text already segmented.");
 		}
 		
 		// Set the flag for trimming or not the in-line codes
@@ -339,15 +353,7 @@ public class Segmenter {
 		return starts.size();
 	}
 	
-	/**
-	 * Compute the range of the next segment for a given TextContainer content.
-	 * The next segment is searched from the first character after the last
-	 * segment marker found in the container.
-	 * @param container The text container where to look for the next segment. 
-	 * @return A range corresponding to the start and end position of the found
-	 * segment, or null if no more segments are found.
-	 */
-	public Point getNextSegmentRange (TextContainer container) {
+	public Range getNextSegmentRange (TextContainer container) {
 		String text = container.getCodedText();
 		int start = 0;
 		if ( container.isSegmented() ) {
@@ -406,19 +412,9 @@ public class Segmenter {
 
 		// Return the range
 		if ( start == end ) return null;
-		return new Point(start, end);
+		return new Range(start, end);
 	}
 
-	/**
-	 * Gets the list of all the split positions in the text
-	 * that was last segmented. You must call {@link #computeSegments(TextContainer)}
-	 * or {@link #computeSegments(String)} before calling this method.
-	 * A split position is the first character position of a new segment.
-	 * <p><b>IMPORTANT: The position returned here are the position WITHOUT taking in account the options
-	 * for trimming or not leading and trailing white-spaces.</b>
-	 * @return An array of integers where each value is a split position
-	 * in the coded text that was segmented.
-	 */
 	public List<Integer> getSplitPositions () {
 		
 		if ( finalSplits == null ) {
@@ -427,15 +423,7 @@ public class Segmenter {
 		return finalSplits;
 	}
 
-	/**
-	 * Gets the list off all segments ranges calculated when
-	 * calling {@link #computeSegments(String)}, or
-	 * {@link #computeSegments(TextContainer)}.
-	 * @return The list of all segments ranges. each range is stored in
-	 * a {@link Range} object where start is the start and end the end of the range.
-	 * Return null if no ranges have been defined yet.
-	 */
-	public List<Range> getSegmentRanges () {
+	public List<Range> getRanges () {
 		ArrayList<Range> list = new ArrayList<Range>();
 		if ( starts == null ) return null;
 		for ( int i=0; i<starts.size(); i++ ) {
@@ -444,11 +432,6 @@ public class Segmenter {
 		return list;
 	}
 	
-	/**
-	 * Gets the language used to apply the rules.
-	 * @return The language code used to apply the rules, or null, if none is 
-	 * specified yet.
-	 */
 	public String getLanguage () {
 		return currentLanguageCode;
 	}
@@ -461,14 +444,27 @@ public class Segmenter {
 		currentLanguageCode = languageCode;
 	}
 	
+	/**
+	 * Sets the flag indicating if cascading must be applied when selecting the 
+	 * rules for a given language pattern.
+	 * @param value true if cascading must be applied, false otherwise.
+	 */
 	protected void setCascade (boolean value) {
 		cascade = value;
 	}
-	
+
+	/**
+	 * Adds a compiled rule to this segmenter.
+	 * @param compiledRule the compiled rule to add.
+	 */
 	protected void addRule (CompiledRule compiledRule) {
 		rules.add(compiledRule);
 	}
 	
+	/**
+	 * Sets the pattern for the mask rule.
+	 * @param pattern the new pattern to use for the mask rule.
+	 */
 	protected void setMaskRule (String pattern) {
 		if (( pattern != null ) && ( pattern.length() > 0 ))
 			maskRule = Pattern.compile(pattern);

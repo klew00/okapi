@@ -25,15 +25,16 @@ import java.util.ArrayList;
 import org.junit.Before;
 
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
+import net.sf.okapi.lib.segmentation.SRXSegmenter;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class SegmenterTest {
+public class SRXSegmenterTest {
 
 	@Before
 	public void setUp() {
@@ -41,7 +42,7 @@ public class SegmenterTest {
 
 	@Test
 	public void testDefaultOptions () {
-		Segmenter seg = new Segmenter();
+		SRXSegmenter seg = new SRXSegmenter();
 		// Check default options
 		assertFalse(seg.cascade());
 		assertTrue(seg.segmentSubFlows());
@@ -55,7 +56,7 @@ public class SegmenterTest {
 	
 	@Test
 	public void testChangedOptions () {
-		Segmenter seg = new Segmenter();
+		SRXSegmenter seg = new SRXSegmenter();
 		// Check changing options
 		seg.setOptions(false, true, false, true, true, true, true);
 		assertFalse(seg.segmentSubFlows());
@@ -69,18 +70,18 @@ public class SegmenterTest {
 	
 	@Test
 	public void testSimpleSegmentation () {
-		Segmenter seg = createSegmenterWithRules("en");
+		ISegmenter seg = createSegmenterWithRules("en");
 		TextContainer tc = new TextContainer("Part 1. Part 2.");
 		int n = seg.computeSegments(tc);
 		assertEquals(2, n);
-		tc.createSegments(seg.getSegmentRanges());
+		tc.createSegments(seg.getRanges());
 		assertNotNull(tc.getSegments());
 		assertEquals(2, tc.getSegmentCount());
 		assertEquals("Part 1.", tc.getSegments().get(0).toString());
 		assertEquals(" Part 2.", tc.getSegments().get(1).toString());
 	}
 	
-	private Segmenter createSegmenterWithRules (String lang) {
+	private ISegmenter createSegmenterWithRules (String lang) {
 		SRXDocument doc = new SRXDocument();
 		LanguageMap langMap = new LanguageMap(".*", "default");
 		doc.addLanguageMap(langMap);

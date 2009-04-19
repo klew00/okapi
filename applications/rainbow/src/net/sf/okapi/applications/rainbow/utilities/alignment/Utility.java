@@ -35,8 +35,8 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.segmentation.Segmenter;
 import net.sf.okapi.tm.simpletm.Database;
 
 public class Utility extends BaseFilterDrivenUtility {
@@ -48,8 +48,8 @@ public class Utility extends BaseFilterDrivenUtility {
 	private TMXWriter tmxWriter = null;
 	private Database simpleTm = null;
 	private IFilter trgFilter;
-	private Segmenter srcSeg;
-	private Segmenter trgSeg;
+	private ISegmenter srcSeg;
+	private ISegmenter trgSeg;
 	private int aligned;
 	private int alignedTotal;
 	private int noText;
@@ -277,7 +277,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Segment the source if needed
 		if ( params.segment ) {
 			srcSeg.computeSegments(tu.getSource());
-			tu.getSource().createSegments(srcSeg.getSegmentRanges());
+			tu.getSource().createSegments(srcSeg.getRanges());
 			if ( !tu.getSource().isSegmented() ) {
 				if ( !tu.getSource().hasText(false) ) {
 					noText++;
