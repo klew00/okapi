@@ -501,7 +501,7 @@ public class Aligner {
 		
 		// Query engine
 		mtQuery = new GoogleMTConnector();
-		mtQuery.open(null);
+		mtQuery.open();
 
 		// Size and position of dialog
 		shell.pack();

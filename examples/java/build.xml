@@ -6,6 +6,7 @@
 	</path>
 
 	<target name="all">
+		<!-- Example 01 -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="tmp"/>
 		</delete>
@@ -16,6 +17,7 @@
   		</manifest>
 		<jar jarfile="example01.jar" basedir="tmp" manifest="MANIFEST.MF"/>
   		
+  		<!-- Example 02 -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="tmp"/>
 		</delete>
@@ -26,7 +28,28 @@
   		</manifest>
 		<jar jarfile="example02.jar" basedir="tmp" manifest="MANIFEST.MF"/>
   		
-  		
+  		<!-- Example 03 -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="tmp"/>
+		</delete>
+		<mkdir dir="tmp"/>
+ 		<javac srcdir="src/example03" destdir="tmp" classpathref="mainClassPath"/> 
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="example03.Main"/>
+  		</manifest>
+		<jar jarfile="example03.jar" basedir="tmp" manifest="MANIFEST.MF"/>
+
+		<!-- Example 04 -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="tmp"/>
+		</delete>
+		<mkdir dir="tmp"/>
+ 		<javac srcdir="src/example04" destdir="tmp" classpathref="mainClassPath"/> 
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="example04.Main"/>
+  		</manifest>
+		<jar jarfile="example04.jar" basedir="tmp" manifest="MANIFEST.MF"/>
+
 		<delete file="MANIFEST.MF"/>
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="tmp"/>

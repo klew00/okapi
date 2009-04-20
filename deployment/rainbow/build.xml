@@ -8,10 +8,10 @@
 		</delete>
 
 		<ant antfile="build_rainbow.xml">
-			<property name="platform" value="win32-x86"/>
+			<property name="platform" value="gtk2-linux-x86"/>
 		</ant>
 		<ant antfile="build_rainbow.xml">
-			<property name="platform" value="gtk2-linux-x86"/>
+			<property name="platform" value="win32-x86"/>
 		</ant>
 		<ant antfile="build_rainbow.xml">
 			<property name="platform" value="gtk2-linux-x86_64"/>

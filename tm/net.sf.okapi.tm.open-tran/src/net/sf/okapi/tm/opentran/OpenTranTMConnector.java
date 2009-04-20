@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -74,15 +75,6 @@ public class OpenTranTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
-	public boolean hasOption (int option) {
-		switch ( option ) {
-		case HAS_SERVER:
-			return false; // TODO: allow choice of server
-		default:
-			return false;
-		}
-	}
-
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -93,7 +85,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		return null;
 	}
 
-	public void open (String connectionString) {
+	public void open () {
 		try {
 			//TODO: use the connection string
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
@@ -161,11 +153,13 @@ public class OpenTranTMConnector implements ITMQuery {
 	}
 
 	public void removeAttribute (String name) {
+		// Not used with this connector
 	}
 
 	public void setAttribute (String name,
 		String value)
 	{
+		// Not used with this connector
 	}
 
 	public void setLanguages (String sourceLang,
@@ -173,6 +167,23 @@ public class OpenTranTMConnector implements ITMQuery {
 	{
 		srcLang = toInternalCode(sourceLang);
 		trgLang = toInternalCode(targetLang);
+	}
+
+	public void setMaximumHits (int max) {
+		maxHits = max;
+	}
+
+	public void setThreshold (int threshold) {
+		// Not used with this connector
+	}
+
+	public int getMaximunHits () {
+		return maxHits;
+	}
+
+	public int getThreshold () {
+		// Not used with this connector
+		return 0;
 	}
 
 	private String toInternalCode (String standardCode) {
@@ -183,21 +194,13 @@ public class OpenTranTMConnector implements ITMQuery {
 		return code;
 	}
 
-	public void setMaximumHits (int max) {
-		maxHits = max;
+	public IParameters getParameters () {
+		// Not used with this connector
+		return null;
 	}
 
-	public void setThreshold (int threshold) {
-		// Not supported currently
-	}
-
-	public int getMaximunHits () {
-		return maxHits;
-	}
-
-	public int getThreshold () {
-		// Not supported currently
-		return 0;
+	public void setParameters (IParameters params) {
+		// Not used with this connector
 	}
 
 }

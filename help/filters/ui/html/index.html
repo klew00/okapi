@@ -108,7 +108,7 @@ input.</p>
 
 <h2><a name="parameters"></a>Parameters</h2>
 
-<h5>Built in Configuration Files</h5>
+<h3>Built in Configuration Files</h3>
 <p>The HTML filter does not currently have a user interface to modify
 its configuration files. By default the HTML filter uses a minimalist
 configuration file that does not create structural groupings. For
@@ -117,119 +117,66 @@ pre-defined maximalist configuration file that can be used if
 structural groupings are needed. The caveat is that any structural tags
 that map to groups must be well formed, that is, they must have a start
 and end tag. Otherwise the filter return an error.</p>
-<h5>HTML Configuration Syntax</h5>
+<h3>HTML Configuration Syntax</h3>
 For the truly brave you can cerate your own HTML configuration files. See the <a href="defaultConfiguration.yml" target="_blank">defaultConfiguration.yml</a> and <a href="maximalistConfiguration.yml" target="_blank">maximalistConfiguration.yml</a> for examples.
-<p>HTML tags are associated with rules. These rules are used by the filter to&nbsp;</p>
-<table style="width: 1603px; height: 231px;" id="table1" border="1" cellpadding="4" cellspacing="0">
-  <caption></caption>
-  <tbody>
+<p>HTML tags are associated with rules. These rules are used by the filter to 
+process the input document.</p>
 
-    <tr>
+	<table border="1" cellspacing="0" cellpadding="4" id="table2">
+		<tr>
+			<th valign="top" colspan="2">HTML Rule Types</th>
+		</tr>
+		<tr>
+			<td valign="top"><code>INLINE</code></td>
+			<td>A&nbsp;tag which may occur inside a text run. For example <code>&lt;b&gt;</code>, 
+			<code>&lt;i&gt;</code>, and <code>&lt;u&gt;</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>GROUP</code></td>
+			<td>Defines a&nbsp;group of elements that are structurally bound. For example
+			<code>&lt;table&gt;</code>, <code>&lt;div&gt;</code> and <code>&lt;menu&gt;</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>EXCLUDE</code></td>
+			<td>Prevents extraction of any text until an end element of the same tag is
+found. For example, if the content between a <code>&lt;script&gt;</code> tag should not be
+extracted then define <code>&lt;script&gt;</code> as <code>EXCLUDE</code></td>
+		</tr>
+		<tr>
+			<td valign="top"><code>INCLUDE</code></td>
+			<td>Overrides any current exclusions. This allows exceptions for children of 
+			<code>EXCLUDE</code>d tags.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>TEXTUNIT</code></td>
+			<td>A tag that starts a complex text
+unit. Examples include <code>&lt;p&gt;</code>, <code>&lt;title&gt;</code>, <code>&lt;h1&gt;</code>. Complex
+text units carry their surrounding tags along with any extracted text.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>PRESERVE_WHITESPACE</code></td>
+			<td>A tag that must preserve its whitespace and newlines as-is. For example
+			<code>&lt;pre&gt;</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>ATTRIBUTES_ONLY</code></td>
+			<td>A tag that has localizable or translatable attributes and does 
+			not.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>ATTRIBUTE_TRANS</code></td>
+			<td>A translatable attribute.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>ATTRIBUTE_WRITABLE</code></td>
+			<td>A writable or modifiable attribute, but not translatable.</td>
+		</tr>
+		<tr>
+			<td valign="top"><code>ATTRIBUTE_READONLY</code></td>
+			<td>A read-only attribute, extracted by may not be modified.</td>
+		</tr>
+	</table>
 
-      <th colspan="2" style="vertical-align: top; text-align: center;">&nbsp;HTML Rule Types</th>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th align="left" valign="top">INLINE</th>
-
-      <td align="left" valign="top">A&nbsp;tag which may occur inside a text run. For example &lt;b&gt;, &lt;i&gt;, and &lt;u&gt;</td>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th align="left" valign="top">GROUP</th>
-
-      <td align="left" valign="top">Defines a&nbsp;group of elements that are structurally bound. For example, &lt;table&gt;, &lt;div&gt; and &lt;menu&gt;</td>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th align="left" valign="top">EXCLUDE</th>
-
-      <td align="left" valign="top">
-Prevents extraction of any text until an end element of the same tag is
-found. For example, if the content between a script tag should not be
-extracted then define &lt;script&gt; as EXCLUDE</td>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th align="left" valign="top">INCLUDE</th>
-
-      <td align="left" valign="top">Overrides any current exclusions. This allows exceptions for children of EXCLUDEd tags.</td>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th align="left" valign="top">TEXTUNIT</th>
-
-      <td align="left" valign="top">A tag that starts a complex text
-unit. Examples include &lt;p&gt;, &lt;title&gt;, &lt;h1&gt;. Complex
-text units carry their surrounding tags along with any extracted text.<br>
-      </td>
-
-
-
-
-    </tr>
-
-    <tr>
-
-      <th style="vertical-align: top; text-align: left;">PRESERVE_WHITESPACE</th>
-
-      <td style="vertical-align: top; text-align: left;">A tag that must preserve its whitespace and newlines as-is. For example, &lt;pre&gt;</td>
-
-
-
-
-    </tr>
-    <tr>
-      <td style="font-weight: bold;">
-      <h4><big>ATTRIBUTES_ONLY</big></h4>
-      </td>
-      <td>A tag that has localizaible or translatable attributes and does not&nbsp;</td>
-    </tr>
-    <tr>
-      <td>
-      <h4><big><span style="font-weight: bold;">ATTRIBUTE_TRANS</span></big></h4>
-      </td>
-      <td>A translatable attribute.</td>
-    </tr>
-    <tr>
-      <td>
-      <h4><big>ATTRIBUTE_WRITABLE</big></h4>
-      </td>
-      <td>A writable or modifiable attribute, but not translatable.</td>
-    </tr>
-    <tr>
-      <td>
-      <h4><big>ATTRIBUTE_READONLY</big></h4>
-      </td>
-      <td>A read-only attribute, extracted by may not be modified.</td>
-    </tr>
-  </tbody>
-</table>
-<br>
+<p>&nbsp;</p>
 </body>
 </html>

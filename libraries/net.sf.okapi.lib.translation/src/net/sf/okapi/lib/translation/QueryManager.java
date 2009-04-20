@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
@@ -79,27 +80,26 @@ public class QueryManager {
 	 * attributes that is set.
 	 * @param connector The translation resource connector to add.
 	 * @param resourceName Name of the translation resource to add.
-	 * @param connectionString the string connection to open this translation resource.
-	 * @return The ID for the added translation resource. This ID can be
-	 * used later to access specifically the added translation resource.
+	 * @param params the parameters for this connector.
+	 * @return The identifier for the added translation resource. This identifier
+	 * can be used later to access specifically the added translation resource.
 	 */
 	public int addAndInitializeResource (IQuery connector,
 		String resourceName,
-		String connectionString)
+		IParameters params)
 	{
 		// Add the resource
 		int id = addResource(connector, resourceName);
-		// open it and set the current options
-		connector.open(connectionString);
+		// Set the parameters and open 
+		connector.setParameters(params);
+		connector.open();
 		if (( srcLang != null ) && ( trgLang != null )) {
 			connector.setLanguages(srcLang, trgLang);
 		}
 		for ( String name : attributes.keySet() ) {
 			connector.setAttribute(name, attributes.get(name));
 		}
-		// Set the connection string
-		ResourceItem ri = resList.get(id);
-		ri.connectionString = connectionString;
+
 		return id;
 	}
 	
@@ -428,7 +428,7 @@ public class QueryManager {
 				writer.writeStartElement("resource");
 				writer.writeAttributeString("id", String.valueOf(id));
 				writer.writeAttributeString("name", ri.name);
-				writer.writeAttributeString("connection", ri.connectionString);
+//				writer.writeAttributeString("params", ri.query.getParameters().toString());
 				//TODO: save options, etc
 				writer.writeEndElement(); // resource
 			}

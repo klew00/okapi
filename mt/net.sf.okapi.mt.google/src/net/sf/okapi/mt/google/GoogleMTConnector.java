@@ -31,6 +31,7 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -67,7 +68,7 @@ public class GoogleMTConnector implements IQuery {
 		return null;
 	}
 
-	public void open (String connectionString) {
+	public void open () {
 		// Nothing to do
 	}
 
@@ -143,15 +144,6 @@ public class GoogleMTConnector implements IQuery {
 		return ((lastError==null) ? 1 : 0);
 	}
 	
-	private String unescape (String text) {
-		if ( text == null ) return "";
-		String tmp = text.replace("&#39;", "'");
-		tmp = tmp.replace("&lt;", "<");
-		tmp = tmp.replace("&gt;", ">");
-		tmp = tmp.replace("&quot;", "\"");
-		return tmp.replace("&amp;", "&");
-	}
-
 	public void setAttribute (String name,
 		String value)
 	{
@@ -177,6 +169,15 @@ public class GoogleMTConnector implements IQuery {
 		return trgLang;
 	}
 
+	private String unescape (String text) {
+		if ( text == null ) return "";
+		String tmp = text.replace("&#39;", "'");
+		tmp = tmp.replace("&lt;", "<");
+		tmp = tmp.replace("&gt;", ">");
+		tmp = tmp.replace("&quot;", "\"");
+		return tmp.replace("&amp;", "&");
+	}
+
 	private String convertLangCode (String standardCode) {
 		String code = standardCode.toLowerCase();
 		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
@@ -185,12 +186,13 @@ public class GoogleMTConnector implements IQuery {
 		return code;
 	}
 
-	public boolean hasOption (int option) {
-		return false;
+	public IParameters getParameters () {
+		// No parameters are used with this connector
+		return null;
 	}
-	
-	public void export (String outputPath) {
-		throw new UnsupportedOperationException();
+
+	public void setParameters (IParameters params) {
+		// No parameters are used with this connector
 	}
 
 }

@@ -95,8 +95,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preTranslate ) {
 			qm = new QueryManager();
 			qm.setLanguages(srcLang, trgLang);
-			String path = params.tmPath.replace(VAR_PROJDIR, projectDir);
-			qm.addAndInitializeResource(new SimpleTMConnector(), path, path);
+			net.sf.okapi.tm.simpletm.Parameters tmParams = new net.sf.okapi.tm.simpletm.Parameters();
+			tmParams.dbPath = params.tmPath.replace(VAR_PROJDIR, projectDir);
+			qm.addAndInitializeResource(new SimpleTMConnector(), tmParams.dbPath, tmParams);
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;

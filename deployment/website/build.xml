@@ -9,11 +9,17 @@
 		<mkdir dir="${dist}"/>
 		
 		<copy todir="${dist}">
-			<fileset dir="../../website" />
+			<fileset dir="../../website">
+				<exclude name="**/_*"/>
+				<exclude name="**/.*"/>
+			</fileset>
 		</copy>
 		
 		<copy todir="${dist}/help">
-			<fileset dir="../../help" />
+			<fileset dir="../../help">
+				<exclude name="**/_*"/>
+				<exclude name="**/.*"/>
+			</fileset>
 		</copy>
 		
 		<mkdir dir="${dist}/javadoc"/>
@@ -21,7 +27,7 @@
 			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
-			<packageset dir="../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
+			<packageset dir="../../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

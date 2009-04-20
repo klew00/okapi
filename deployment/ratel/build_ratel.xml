@@ -33,7 +33,7 @@
 		</or>
 	</condition>
 
-	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_v${ratelVersion}" />
+	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_${ratelVersion}" />
 
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}
@@ -110,6 +110,11 @@ Running on: ${os.name} ${os.arch}${line.separator}
 
 	<target name="gzipAll" if="building-linux">
 		<tar destfile="${dist}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
+		<tar destfile="${dist}/${distName}.tar.gz" compression="gzip">
+			<tarfileset filemode="755" dir="${dist}">
+				<include name="**/*.sh"/>
+  			</tarfileset>
+  		</tar>
 	</target>
 	
 	<target name="all" depends="compile, winExe, linuxExePerm, zipAll, gzipAll"/>

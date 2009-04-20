@@ -45,7 +45,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private static final char ENDSEG = ']';
 	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
 	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
-	
+
 	private Parameters params;
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
@@ -77,7 +77,11 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
 			tmQ = new SimpleTMConnector();
-			tmQ.open(params.tmPath.replace(VAR_PROJDIR, projectDir));
+			net.sf.okapi.tm.simpletm.Parameters tmParams = new net.sf.okapi.tm.simpletm.Parameters();
+			tmParams.dbPath = params.tmPath;
+			tmParams.dbPath.replace(VAR_PROJDIR, projectDir);
+			tmQ.setParameters(tmParams);
+			tmQ.open();
 		}
 	}
 	

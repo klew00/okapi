@@ -23,6 +23,7 @@ package net.sf.okapi.tm.simpletm;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -37,8 +38,10 @@ public class SimpleTMConnector implements ITMQuery {
 	private String srcLang;
 	private String trgLang;
 	private LinkedHashMap<String, String> attributes;
+	private Parameters params;
 
 	public SimpleTMConnector () {
+		params = new Parameters();
 		db = new Database();
 		attributes = new LinkedHashMap<String, String>();
 	}
@@ -78,13 +81,8 @@ public class SimpleTMConnector implements ITMQuery {
 		return null;
 	}
 
-	/**
-	 * opens a TM.
-	 * @param connectionString The full path of the database name to open.
-	 * The path can have the extension ".data.db" or not extension.
-	 */
-	public void open (String connectionString) {
-		db.open(connectionString);
+	public void open () {
+		db.open(params.dbPath);
 	}
 
 	public int query (String plainText) {
@@ -134,16 +132,6 @@ public class SimpleTMConnector implements ITMQuery {
 		return trgLang;
 	}
 
-	public boolean hasOption (int option) {
-		switch ( option ) {
-		case HAS_FILEPATH:
-		case SUPPORT_EXPORT:
-			return true;
-		default:
-			return false;
-		}
-	}
-
 	public void export (String outputPath) {
 		db.exportToTMX(outputPath, srcLang, trgLang);
 	}
@@ -154,6 +142,14 @@ public class SimpleTMConnector implements ITMQuery {
 
 	public int getThreshold () {
 		return threshold;
+	}
+
+	public IParameters getParameters() {
+		return params;
+	}
+
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
 	}
 
 }

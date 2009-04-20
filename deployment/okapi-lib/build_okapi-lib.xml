@@ -33,7 +33,7 @@
 		</or>
 	</condition>
 
-	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_v${okapilibVersion}" />
+	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_${okapilibVersion}" />
 
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}

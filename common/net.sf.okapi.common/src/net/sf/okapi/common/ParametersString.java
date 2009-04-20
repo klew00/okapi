@@ -84,7 +84,7 @@ public class ParametersString {
 	}
 	
 	private String buildString (String prefix) {
-		StringBuilder tmp = new StringBuilder();
+		StringBuilder tmp = new StringBuilder("#v1");
 		Object value;
 		if ( prefix != null ) prefix += ".";
 		for ( String key : list.keySet() ) {
