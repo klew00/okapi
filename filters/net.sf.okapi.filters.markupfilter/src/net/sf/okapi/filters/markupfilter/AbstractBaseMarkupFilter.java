@@ -277,7 +277,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
 			bomis.detectEncoding(); // TODO: why do we need to call this?
-			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding)).setNonTagTextWriter(nonTagTextWriter);;
+			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding)).setPlainTextWriter(nonTagTextWriter);
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);

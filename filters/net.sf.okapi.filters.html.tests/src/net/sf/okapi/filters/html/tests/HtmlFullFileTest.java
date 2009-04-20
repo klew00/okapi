@@ -10,7 +10,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MemMappedCharSequence;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
@@ -44,7 +47,7 @@ public class HtmlFullFileTest {
 		htmlFilter.close();
 	}
 
-	// @Test
+	@Test
 	public void testAllExternalFiles() throws URISyntaxException {
 		@SuppressWarnings("unused")
 		Event event = null;
@@ -56,25 +59,6 @@ public class HtmlFullFileTest {
 				event = htmlFilter.next();
 			}
 		}
-	}
-
-	@Test
-	public void testMsg0058() throws URISyntaxException {
-		@SuppressWarnings("unused")
-		Event event = null;
-		Event previousEvent = null;
-
-		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/msg00058.html");
-		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
-		while (htmlFilter.hasNext()) {
-			try {
-				event = htmlFilter.next();
-				previousEvent = event;
-			} catch (Exception e) {
-				int x = 1;
-			}
-		}
-
 	}
 
 	@Test
@@ -132,5 +116,39 @@ public class HtmlFullFileTest {
 		}
 		assertTrue(foundText);
 		assertEquals("First Text", firstText);
+	}
+	
+	@Test
+	public void printEvents() {
+		htmlFilter = new HtmlFilter();
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/msg00058.html");
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));	
+		try {
+		while (htmlFilter.hasNext()) {
+			Event event = htmlFilter.next();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+				assertTrue(event.getResource() instanceof TextUnit);
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
+				assertTrue(event.getResource() instanceof DocumentPart);
+			} else if (event.getEventType() == EventType.START_GROUP
+					|| event.getEventType() == EventType.END_GROUP) {
+				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			}
+			System.out.print(event.getEventType().toString() + ": ");
+			if (event.getResource() != null) {
+				if (event.getResource() instanceof DocumentPart) {
+					System.out.println(((DocumentPart) event.getResource()).getSourcePropertyNames());
+				} else {
+					System.out.println(event.getResource().toString());
+				}
+				if (event.getResource().getSkeleton() != null) {
+					System.out.println("\tSkeketon: " + event.getResource().getSkeleton().toString());
+				}
+			}
+		}
+		htmlFilter.close();
+		} catch(Exception e) {
+			int x = 1;
+		}
 	}
 }
