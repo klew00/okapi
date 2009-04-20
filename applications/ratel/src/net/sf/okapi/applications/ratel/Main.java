@@ -49,7 +49,8 @@ public class Main {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
 			SRXEditor editor = new SRXEditor(shlMain, false, help);
-			editor.showDialog(null);
+			if ( args.length > 0 ) editor.showDialog(args[0]);
+			else editor.showDialog(null);
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
