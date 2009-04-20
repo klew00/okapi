@@ -20,19 +20,34 @@
 
 package net.sf.okapi.tm.globalsight;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.globalsight.webservices.WebServiceException;
 import com.globalsight.www.webservices.Ambassador;
 import com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -49,9 +64,18 @@ public class GlobalSightTMConnector implements ITMQuery {
 	private String gsToken;
 	private String gsTmProfile;
 	private Parameters params;
+	private DocumentBuilder docBuilder;
 
 	public GlobalSightTMConnector () {
 		params = new Parameters();
+		DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+		Fact.setValidating(false);
+		try {
+			docBuilder = Fact.newDocumentBuilder();
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException("Error creating document builder.", e);
+		}
 	}
 
 	public String getName () {
@@ -100,6 +124,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 			int n = gsToken.lastIndexOf("+_+");
 			gsToken = gsToken.substring(0, n);
 			gsTmProfile = params.tmProfile;
+			results = new ArrayList<QueryResult>();
 		}
 		catch ( AxisFault e ) {
 			throw new RuntimeException("Error creating the GS Web services.", e);
@@ -114,8 +139,27 @@ public class GlobalSightTMConnector implements ITMQuery {
 
 	public int query (String plainText) {
 		try {
-			String res = gsWS.searchEntries(gsToken, gsTmProfile, plainText, srcLang);
-			res.indexOf("100%");
+			results.clear();
+			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, plainText, srcLang);
+			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
+			NodeList list1 = doc.getElementsByTagName("entry");
+			Element elem;
+			NodeList list2;
+			NodeList list3;
+			QueryResult res;
+			for ( int i=0; i<list1.getLength(); i++ ) {
+				elem = (Element)list1.item(i);
+				list2 = elem.getElementsByTagName("percentage");
+				res = new QueryResult();
+				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				list2 = elem.getElementsByTagName("source");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.source = new TextFragment(Util.getTextContent(list3.item(0)));
+				list2 = elem.getElementsByTagName("target");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.target = new TextFragment(Util.getTextContent(list3.item(0)));
+				results.add(res);
+			}
 		}
 		catch ( WebServiceException e ) {
 			throw new RuntimeException("Error querying TM.", e);
@@ -123,8 +167,14 @@ public class GlobalSightTMConnector implements ITMQuery {
 		catch ( RemoteException e ) {
 			throw new RuntimeException("Error querying TM.", e);
 		}
-		
-		return 0;
+		catch ( SAXException e ) {
+			throw new RuntimeException("Error with query resuls.", e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error with query resuls.", e);
+		}
+		if ( results.size() > 0 ) current = 0;
+		return results.size();
 	}
 
 	public int query (TextFragment text) {

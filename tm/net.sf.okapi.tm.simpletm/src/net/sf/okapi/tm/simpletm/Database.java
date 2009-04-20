@@ -313,16 +313,22 @@ public class Database {
 			qstm.setString(1, query.getCodedText());
 			ResultSet result = qstm.executeQuery();
 			if ( !result.first() ) return null;
-			ArrayList<QueryResult> list = new ArrayList<QueryResult>(); 
+			ArrayList<QueryResult> list = new ArrayList<QueryResult>();
+			String queryCodes = query.getCodes().toString();
 			do {
 				QueryResult qr = new QueryResult();
-				qr.score = 100;
 				qr.source = new TextFragment();
 				qr.source.setCodedText(result.getString(1),
 					Code.stringToCodes(result.getString(2)), false);
 				qr.target = new TextFragment();
 				qr.target.setCodedText(result.getString(3),
 					Code.stringToCodes(result.getString(4)), false);
+				
+				// Tune-down the score if the content or order of the codes are different
+				String trgCodes = qr.target.getCodes().toString();
+				if ( queryCodes.equals(trgCodes) ) qr.score = 100;
+				else qr.score = 99;
+				
 				list.add(qr);
 			} while ( result.next() && ( list.size() < maxCount ));
 			return list;
