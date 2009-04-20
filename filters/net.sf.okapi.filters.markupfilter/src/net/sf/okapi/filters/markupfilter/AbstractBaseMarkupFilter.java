@@ -240,18 +240,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	private void open(CharSequence input) {
-		ByteArrayInputStream bs = null;
-		
+		ByteArrayInputStream bs = null;		
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
-
-		try {
-			bs = new ByteArrayInputStream(((String)input).getBytes("UTF-8"));
-			document = new StreamedSource(bs).setPlainTextWriter(nonTagTextWriter);
-		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
-			throw re;
-		}
+		document = new StreamedSource(input).setPlainTextWriter(nonTagTextWriter);
 		startFilter();
 	}
 
@@ -313,11 +304,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-
-		// This code optimizes jericho parsing
-		// document.fullSequentialParse();
-		// nodeIterator = document.getNodeIterator();
-
+		
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
 	}
@@ -696,5 +683,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			return true;
 		}
 		return false;
+	}
+
+	public StringWriter getNonTagTextWriter() {
+		return nonTagTextWriter;
 	}
 }

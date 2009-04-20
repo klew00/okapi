@@ -118,7 +118,7 @@ public class HtmlFullFileTest {
 		assertEquals("First Text", firstText);
 	}
 	
-	@Test
+	//@Test
 	public void printEvents() {
 		htmlFilter = new HtmlFilter();
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/msg00058.html");

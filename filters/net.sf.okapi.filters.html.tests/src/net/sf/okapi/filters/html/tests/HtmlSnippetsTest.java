@@ -117,7 +117,7 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testCollapseWhitespaceWithPre() {
-		String snippet = "<pre>   \n   \r <x/>  \f    </pre>";
+		String snippet = "<pre>   \n   \n <x/>  \t    </pre>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
