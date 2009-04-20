@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -45,6 +46,7 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
+import net.htmlparser.jericho.StreamedSource;
 import net.htmlparser.jericho.Tag;
 
 import net.sf.okapi.common.BOMAwareInputStream;
@@ -85,7 +87,8 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
-	private Source document;
+	private StreamedSource document;
+	private StringWriter nonTagTextWriter;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
@@ -105,6 +108,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	public AbstractBaseMarkupFilter() {
 		super();
+		nonTagTextWriter = new StringWriter();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 	}
@@ -236,8 +240,18 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	private void open(CharSequence input) {
+		ByteArrayInputStream bs = null;
+		
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
-		document = new Source(input);
+
+		try {
+			bs = new ByteArrayInputStream(((String)input).getBytes("UTF-8"));
+			document = new StreamedSource(bs).setPlainTextWriter(nonTagTextWriter);
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
+			throw re;
+		}
 		startFilter();
 	}
 
@@ -263,7 +277,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
 			bomis.detectEncoding(); // TODO: why do we need to call this?
-			document = new Source(new InputStreamReader(bomis, detectedEncoding));
+			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding)).setNonTagTextWriter(nonTagTextWriter);;
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
@@ -305,7 +319,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		// nodeIterator = document.getNodeIterator();
 
 		// This optimizes memory at the expense of performance
-		nodeIterator = new NoCacheNodeIterator(document);
+		nodeIterator = document.iterator();
 	}
 
 	/**

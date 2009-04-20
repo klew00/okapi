@@ -26,7 +26,7 @@ public class HtmlFullFileTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		
+
 		// read all files in the test html directory
 		URL url = HtmlFullFileTest.class.getResource("/simpleTest.html");
 		File dir = new File(url.toURI()).getParentFile();
@@ -44,37 +44,52 @@ public class HtmlFullFileTest {
 		htmlFilter.close();
 	}
 
-	@Test
-	public void testAll() throws URISyntaxException {
+	// @Test
+	public void testAllExternalFiles() throws URISyntaxException {
+		@SuppressWarnings("unused")
+		Event event = null;
+
 		for (String f : testFileList) {
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
 			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
-			try {
-				while (htmlFilter.hasNext()) {
-					@SuppressWarnings("unused")
-					Event event = htmlFilter.next();
-				}				
-			} catch (Exception e) {
-				//System.err.println("Error for file: " + f + ": " + e.toString());
-				throw new RuntimeException("Error for file: " + f + ": " + e.toString());
+			while (htmlFilter.hasNext()) {
+				event = htmlFilter.next();
 			}
 		}
 	}
 
 	@Test
+	public void testMsg0058() throws URISyntaxException {
+		@SuppressWarnings("unused")
+		Event event = null;
+		Event previousEvent = null;
+
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/msg00058.html");
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		while (htmlFilter.hasNext()) {
+			try {
+				event = htmlFilter.next();
+				previousEvent = event;
+			} catch (Exception e) {
+				int x = 1;
+			}
+		}
+
+	}
+
+	@Test
 	public void testNonwellformed() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/nonwellformed.specialtest");
-		MemMappedCharSequence charSequence = new MemMappedCharSequence(htmlStream, "UTF-8");
-		htmlFilter.open(new RawDocument(charSequence, "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
 		while (htmlFilter.hasNext()) {
 			@SuppressWarnings("unused")
 			Event event = htmlFilter.next();
 		}
 	}
-	
+
 	@Test
 	public void testOkapiIntro() {
-		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");		
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");
 		htmlFilter.open(new RawDocument(htmlStream, "windows-1252", "en"));
 		boolean foundText = false;
 		boolean first = true;
@@ -83,7 +98,7 @@ public class HtmlFullFileTest {
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
-				TextUnit tu = (TextUnit)event.getResource();
+				TextUnit tu = (TextUnit) event.getResource();
 				if (first) {
 					first = false;
 					firstText = tu.getSource().toString();
@@ -94,12 +109,12 @@ public class HtmlFullFileTest {
 		}
 		assertTrue(foundText);
 		assertEquals("Okapi Framework", firstText);
-		assertEquals("\u00A0", lastText);		
+		assertEquals("\u00A0", lastText);
 	}
-	
+
 	@Test
 	public void testSkippedScriptandStyleElements() {
-		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");			
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");
 		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
 		boolean foundText = false;
 		boolean first = true;
@@ -107,15 +122,15 @@ public class HtmlFullFileTest {
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
-				TextUnit tu = (TextUnit)event.getResource();
+				TextUnit tu = (TextUnit) event.getResource();
 				if (first) {
 					first = false;
 					firstText = tu.getSource().toString();
 				}
-				foundText = true;				
+				foundText = true;
 			}
 		}
 		assertTrue(foundText);
-		assertEquals("First Text", firstText);		
+		assertEquals("First Text", firstText);
 	}
 }
