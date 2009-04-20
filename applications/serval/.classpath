@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.opentran"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.trados"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.simpletm"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.globalsight"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

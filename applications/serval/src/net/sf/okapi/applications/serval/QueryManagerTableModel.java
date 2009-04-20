@@ -41,7 +41,7 @@ public class QueryManagerTableModel {
 			item.setText(1, ((ri.name==null) ? "" : ri.name));
 			item.setText(2, String.format("%s --> %s",
 				ri.query.getSourceLanguage(), ri.query.getTargetLanguage()));
-			item.setText(3, ((ri.connectionString==null) ? "" : ri.connectionString));
+			item.setText(3, "TODO");
 			item.setText(4, ri.query.getClass().getCanonicalName());
 		}
 		if ( table.getItemCount() > 0 ) {
@@ -58,7 +58,7 @@ public class QueryManagerTableModel {
 		item.setText(1, ((ri.name==null) ? "" : ri.name));
 		item.setText(2, String.format("%s --> %s",
 			ri.query.getSourceLanguage(), ri.query.getTargetLanguage()));
-		item.setText(3, ((ri.connectionString==null) ? "" : ri.connectionString));
+		item.setText(3, "TODO");
 		item.setText(4, ri.query.getClass().getCanonicalName());
 	}
 }

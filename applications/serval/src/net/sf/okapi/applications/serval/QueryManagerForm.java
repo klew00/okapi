@@ -28,7 +28,6 @@ public class QueryManagerForm {
 
 	private Shell shell;
 	private Table table;
-	private Button btExport;
 	private Button btRemove;
 	private Button btMoveUp;
 	private Button btMoveDown;
@@ -108,13 +107,6 @@ public class QueryManagerForm {
 		
 		btMoveDown = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Move Down", stdWidth, 1);
 		
-		btExport = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Export...", stdWidth, 1);
-		btExport.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				export();
-			}
-		});
-
 		// Load and Save 
 
 		Composite cmpTmp = new Composite(shell, SWT.NONE);
@@ -168,7 +160,6 @@ public class QueryManagerForm {
 	
 	private void updateButtons () {
 		boolean enabled = (table.getItemCount() > 0);
-		btExport.setEnabled(enabled);
 		btRemove.setEnabled(enabled);
 		btMoveUp.setEnabled(enabled);
 		btMoveDown.setEnabled(enabled);
@@ -192,27 +183,6 @@ public class QueryManagerForm {
 			model.updateTable(qm);
 			updateButtons();
 		}		
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getLocalizedMessage(), null);
-		}
-	}
-	
-	private void export () {
-		try {
-			// Get the selected resource
-			int n = table.getSelectionIndex();
-			if ( n == -1 ) return;
-			ResourceItem ri = qm.getResource((Integer)table.getSelection()[0].getData());
-			// Check if it supports export
-			if ( !ri.query.hasOption(IQuery.SUPPORT_EXPORT) ) {
-				return;
-			}
-			// Get the output file path
-			String path = Dialogs.browseFilenamesForSave(shell, "File To Export", null, null, null);
-			if ( path == null ) return;
-			// Export
-			ri.query.export(path);
-		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
@@ -242,7 +212,7 @@ public class QueryManagerForm {
 			// Edit its options
 			ConnectorOptionsForm optionsDlg = new ConnectorOptionsForm(shell);
 			if ( optionsDlg.showDialog(ri) ) {
-				ri.query.open(ri.connectionString);
+				ri.query.open();
 				model.updateTable(qm);
 			}
 		}

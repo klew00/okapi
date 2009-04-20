@@ -5,6 +5,7 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.tm.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 import net.sf.okapi.tm.trados.TradosTMConnector;
@@ -43,6 +44,7 @@ public class SelectionForm {
 		lbResources.add("SimpleTM local translation memory file");
 		lbResources.add("Open-Tran translation search server (Internet)");
 		lbResources.add("Trados TM local translation memory");
+		lbResources.add("GlobalSight TM Web service");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -66,6 +68,9 @@ public class SelectionForm {
 						break;
 					case 3: // Trados TM
 						result = new TradosTMConnector();
+						break;
+					case 4: // GlobalSight TM
+						result = new GlobalSightTMConnector();
 						break;
 					}
 				}
