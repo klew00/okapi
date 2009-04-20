@@ -70,11 +70,11 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 /**
  * Abstract base class useful for creating an {@link IFilter} around the Jericho
  * parser. Jericho can parse non-wellformed HTML, XHTML, XML and various server
- * side scripting languages such as PHP (all configurable from Jericho).
+ * side scripting languages such as PHP, Mason, Perl (all configurable from Jericho).
  * BaseMarkupFilter takes care of the parser initialization and provides default
  * handlers for each token type returned by the parser.
  * <p>
- * BaseMarkupFilter along with BaseFilter automate the building of Okapi
+ * BaseMarkupFilter along with BaseFilter automates the building of Okapi
  * {@link Event}s and {@link IResource}s.
  * <p>
  * Handling of translatable text, inline tags, translatable and read-only

@@ -123,7 +123,7 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testCollapseWhitespaceWithoutPre() {
-		String snippet = " <b>   text1\t\n\r\ftext2    </b> ";
+		String snippet = " <b>   text1\t\r\n\ftext2    </b> ";
 		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
