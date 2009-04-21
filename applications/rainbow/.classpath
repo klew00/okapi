@@ -28,5 +28,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.po"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.po"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.tmx"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/stax-wstx"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
