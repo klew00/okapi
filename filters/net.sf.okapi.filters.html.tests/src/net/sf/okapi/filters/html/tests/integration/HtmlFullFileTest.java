@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html.tests.integration;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -35,7 +35,7 @@ public class HtmlFullFileTest {
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return name.endsWith(".html") || name.endsWith(".hml");
+				return name.endsWith(".html") || name.endsWith(".htm");
 			}
 		};
 		testFileList = dir.list(filter);
@@ -52,6 +52,7 @@ public class HtmlFullFileTest {
 		Event event = null;
 
 		for (String f : testFileList) {
+			System.out.println(f);
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
 			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
 			while (htmlFilter.hasNext()) {
