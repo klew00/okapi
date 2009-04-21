@@ -453,6 +453,10 @@ parameters:</p>
 <a href="../javadoc/net/sf/okapi/common/resource/TextContainer.html">
 TextContainer</a></code> object, that hold all the target-related data: text, as 
 well a properties, annotations, etc.</p>
+<p class="question"><b>Question:</b> Is the language code case-sensitive?</p>
+<p class="answer">Yes it is. Currently &quot;<code>fr</code>&quot; and &quot;<code>FR</code>&quot; 
+are seen as different languages. It is the responsibility of the developers to 
+normalize the codes how they see fit.</p>
 <p>To make any modification to the content you need to work with a string of 
 <a href="glossary.html#codedText">coded text</a>. It is a string with some special characters that markup 
 <a href="glossary.html#inlineCode">inline 

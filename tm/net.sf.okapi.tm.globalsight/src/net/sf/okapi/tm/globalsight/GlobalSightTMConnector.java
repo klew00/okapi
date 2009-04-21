@@ -20,7 +20,6 @@
 
 package net.sf.okapi.tm.globalsight;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -34,7 +33,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.axis.AxisFault;
-import org.apache.axis.client.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,6 +48,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
@@ -60,6 +59,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
+	private int threshold = 75;
 	private Ambassador gsWS;
 	private String gsToken;
 	private String gsTmProfile;
@@ -148,16 +148,18 @@ public class GlobalSightTMConnector implements ITMQuery {
 			NodeList list3;
 			QueryResult res;
 			for ( int i=0; i<list1.getLength(); i++ ) {
+				if ( i >= maxHits ) break;
 				elem = (Element)list1.item(i);
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
 				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				if ( res.score < threshold ) continue;
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.source = new TextFragment(Util.getTextContent(list3.item(0)));
+				res.source = readSegment((Element)list3.item(0));
 				list2 = elem.getElementsByTagName("target");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.target = new TextFragment(Util.getTextContent(list3.item(0)));
+				res.target = readSegment((Element)list3.item(0));
 				results.add(res);
 			}
 		}
@@ -175,6 +177,25 @@ public class GlobalSightTMConnector implements ITMQuery {
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();
+	}
+	
+	// This assumes a simple structure: basically <ph> elements
+	private TextFragment readSegment (Element elem) {
+		TextFragment tf = new TextFragment();
+		NodeList list = elem.getChildNodes();
+		Node node;
+		for ( int i=0; i<list.getLength(); i++ ) {
+			node = list.item(i);
+			switch ( node.getNodeType() ) {
+			case Node.TEXT_NODE:
+				tf.append(node.getNodeValue());
+				break;
+			case Node.ELEMENT_NODE:
+				tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+				break;
+			}
+		}
+		return tf;
 	}
 
 	public int query (TextFragment text) {
@@ -225,12 +246,22 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return code;
 	}
 
+	/**
+	 * Sets the maximum number of hits to return. Note that with this
+	 * connector this method can only reduce the maximum number of hits from
+	 * the one defined in the active TM profile.
+	 */
 	public void setMaximumHits (int max) {
 		maxHits = max;
 	}
 
+	/**
+	 * Sets the minimal percetage at which a match is kept. Note that
+	 * with this connector this method can only reduce the threshold from the
+	 * one defined in the active TM profile. 
+	 */
 	public void setThreshold (int threshold) {
-		// Not supported currently
+		this.threshold = threshold; 
 	}
 
 	public int getMaximunHits () {
@@ -238,11 +269,10 @@ public class GlobalSightTMConnector implements ITMQuery {
 	}
 
 	public int getThreshold () {
-		// Not supported currently
-		return 0;
+		return threshold;
 	}
 
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return params;
 	}
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <myDoc its:version="1.0" xmlns:its="http://www.w3.org/2005/11/its">
  <head>
-  <test>No trans: ø=o-slash; &#x0104;=A-ogonek, &#xff21;&#xff22;&#xff23;=ABC-fullwidth</test>
+  <test>No trans: ø=o-slash; ?=A-ogonek, ???=ABC-fullwidth</test>
   <author>Norbert Griphook</author>
   <comments>This is the instructions for the ordering process.</comments>
   <its:rules version="1.0">
