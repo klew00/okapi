@@ -121,12 +121,12 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			if (bufferedWhitespace.length() <= 0) {
 				// buffer the whitespace until we know that we are not inside
 				// translatable text.
-				bufferedWhitespace.append(text.toString());				
+				bufferedWhitespace.append(text.toString());
 			}
 			return;
 		}
 
-		String decodedText = text.toString();		
+		String decodedText = text.toString();
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
@@ -195,84 +195,66 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		case ATTRIBUTES_ONLY:
 			// we assume we have already ended any (non-complex) TextUnit in
 			// the main while loop in BaseMarkupFilter
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
-				endDocumentPart();
-			} else {
-				// no attributes that need processing - just treat as skeleton
-				addToDocumentPart(startTag.toString());
-			}
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().pushGroupRule(startTag.getName());
-
-			// catch tags which are not listed in the config but have attributes
-			// that require processing
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startGroup(new GenericSkeleton(startTag.toString()), startTag.getName(), propertyTextUnitPlaceholders);
-			} else {
-				// no attributes that need processing - just treat as skeleton
-				startGroup(new GenericSkeleton(startTag.toString()));
-			}
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().pushExcludedRule(startTag.getName());
-
-			// catch tags which are not listed in the config but have attributes
-			// that require processing
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
-				endDocumentPart();
-			} else {
-				// no attributes that need processing - just treat as skeleton
-				addToDocumentPart(startTag.toString());
-			}
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			break;
 		case INCLUDED_ELEMENT:
 			getRuleState().pushIncludedRule(startTag.getName());
-
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
-				endDocumentPart();
-			} else {
-				// no attributes that need processing - just treat as skeleton
-				addToDocumentPart(startTag.toString());
-			}
-
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			break;
 		case TEXT_UNIT_ELEMENT:
 			getRuleState().pushTextUnitRule(startTag.getName());
-
-			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startTextUnit(new GenericSkeleton(startTag.toString()), propertyTextUnitPlaceholders);
-			} else {
-				startTextUnit(new GenericSkeleton(startTag.toString()));
-			}
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-
 			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+			break;
+		default:
+			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+		}
+	}
 
+	/*
+	 * catch tags which are not listed in the config but have attributes that
+	 * require processing
+	 */
+	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
+			StartTag tag) {
+		switch (getConfig().getMainRuleType(tag.getName())) {
+		case TEXT_UNIT_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
-				endDocumentPart();
+				startTextUnit(new GenericSkeleton(tag.toString()), propertyTextUnitPlaceholders);
+			} else {
+				startTextUnit(new GenericSkeleton(tag.toString()));
+			}
+			break;
+		case GROUP_ELEMENT:
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startGroup(new GenericSkeleton(tag.toString()), tag.getName(), propertyTextUnitPlaceholders);
 			} else {
 				// no attributes that need processing - just treat as skeleton
-				addToDocumentPart(startTag.toString());
+				startGroup(new GenericSkeleton(tag.toString()));
 			}
 			break;
 		default:
-			// catch tags which are not listed in the config but have attributes
-			// that require processing
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startDocumentPart(startTag.toString(), startTag.getName(), propertyTextUnitPlaceholders);
+				startDocumentPart(tag.toString(), tag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
 			} else {
 				// no attributes that needs processing - just treat as skeleton
-				addToDocumentPart(startTag.toString());
+				addToDocumentPart(tag.toString());
 			}
+
+			break;
 		}
 	}
 
