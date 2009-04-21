@@ -172,7 +172,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	public void close() {
 		this.parameters = null;
 		try {
-			document.close();
+			if (document != null) {
+				document.close();
+			}
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
