@@ -38,10 +38,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.CharacterEntityReference;
+import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.Config;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.LoggerProvider;
+import net.htmlparser.jericho.NumericCharacterReference;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
@@ -70,9 +73,9 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 /**
  * Abstract base class useful for creating an {@link IFilter} around the Jericho
  * parser. Jericho can parse non-wellformed HTML, XHTML, XML and various server
- * side scripting languages such as PHP, Mason, Perl (all configurable from Jericho).
- * BaseMarkupFilter takes care of the parser initialization and provides default
- * handlers for each token type returned by the parser.
+ * side scripting languages such as PHP, Mason, Perl (all configurable from
+ * Jericho). BaseMarkupFilter takes care of the parser initialization and
+ * provides default handlers for each token type returned by the parser.
  * <p>
  * BaseMarkupFilter along with BaseFilter automates the building of Okapi
  * {@link Event}s and {@link IResource}s.
@@ -88,7 +91,6 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
 	private StreamedSource document;
-	private StringWriter nonTagTextWriter;
 	private ExtractionRuleState ruleState;
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
@@ -108,7 +110,6 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	public AbstractBaseMarkupFilter() {
 		super();
-		nonTagTextWriter = new StringWriter();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 	}
@@ -170,6 +171,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	public void close() {
 		this.parameters = null;
+		try {
+			document.close();
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
+			throw re;
+		}
 		this.document = null; // help Java GC
 		LOGGER.log(Level.FINE, getName() + " has been closed");
 	}
@@ -225,6 +233,16 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * @throws OkapiIOException
 	 */
 	public void open(RawDocument input, boolean generateSkeleton) {
+		// close StreamedSource from previous run
+		if (document != null) {
+			try {
+				document.close();
+			} catch (IOException e) {
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
+				throw re;
+			}
+		}
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
 		if (input.getInputCharSequence() != null) {
 			open(input.getInputCharSequence());
@@ -240,9 +258,8 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	private void open(CharSequence input) {
-		ByteArrayInputStream bs = null;		
 		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
-		document = new StreamedSource(input).setPlainTextWriter(nonTagTextWriter);
+		document = new StreamedSource(input);
 		startFilter();
 	}
 
@@ -262,13 +279,14 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 						getEncoding()));
 			} else if (getEncoding() == null) {
 				detectedEncoding = parsedHeader.getEncoding(); // get best guess
-				LOGGER.log(Level.WARNING, String.format("Default encoding not found. Using detected encoding (%2)",
+				LOGGER.log(Level.WARNING, String.format(
+						"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 						detectedEncoding));
 			}
 
 			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
-			bomis.detectEncoding(); // TODO: why do we need to call this?
-			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding)).setPlainTextWriter(nonTagTextWriter);
+			bomis.detectEncoding();
+			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding));
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
@@ -304,7 +322,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
-		
+
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
 	}
@@ -415,7 +433,12 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 				// unset current generic tag type (bold, underlined etc.)
 				setTagType(null);
 
+			} else if (segment instanceof CharacterEntityReference) {
+				handleCharacterEntity(segment);
+			} else if (segment instanceof NumericCharacterReference) {
+				handleNumericEntity(segment);
 			} else {
+				// last resort is pure text node
 				handleText(segment);
 			}
 
@@ -502,6 +525,36 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * @param text
 	 */
 	protected abstract void handleText(Segment text);
+
+	/**
+	 * Handle all Character entities. Default implementation converts entity to
+	 * Unicode character.
+	 * 
+	 * @param entity
+	 *            - the character entity
+	 */
+	protected void handleNumericEntity(Segment entity) {
+		String decodedText = CharacterReference.decode(entity.toString(), false);
+		if (!isCurrentTextUnit()) {
+			startTextUnit();
+		}
+		addToTextUnit(decodedText);
+	}
+
+	/**
+	 * Handle all numeric entities. Default implementation converts entity to
+	 * Unicode character.
+	 * 
+	 * @param entity
+	 *            - the numeric entity
+	 */
+	protected void handleCharacterEntity(Segment entity) {
+		String decodedText = CharacterReference.decode(entity.toString(), false);
+		if (!isCurrentTextUnit()) {
+			startTextUnit();
+		}
+		addToTextUnit(decodedText);
+	}
 
 	/**
 	 * Handle start tags.
@@ -683,9 +736,5 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			return true;
 		}
 		return false;
-	}
-
-	public StringWriter getNonTagTextWriter() {
-		return nonTagTextWriter;
 	}
 }

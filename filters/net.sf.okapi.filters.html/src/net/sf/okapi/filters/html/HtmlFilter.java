@@ -110,7 +110,6 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(text.toString());
-			// TODO addToDocumentPart(getNonTagTextWriter().toString());
 			return;
 		}
 
@@ -122,15 +121,12 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			if (bufferedWhitespace.length() <= 0) {
 				// buffer the whitespace until we know that we are not inside
 				// translatable text.
-				bufferedWhitespace.append(text.toString());
-				// TODO bufferedWhitespace.append(getNonTagTextWriter().toString());
+				bufferedWhitespace.append(text.toString());				
 			}
 			return;
 		}
 
-		String decodedText = text.toString();
-		// TODO String decodedText = getNonTagTextWriter().toString();
-		decodedText = CharacterReference.decode(decodedText, false);
+		String decodedText = text.toString();		
 
 		// collapse whitespace only if config says we can and preserve
 		// whitespace is false
