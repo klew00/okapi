@@ -4,7 +4,6 @@ import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.IParameters;
 import static net.sf.okapi.common.MimeTypeMapper.*;
 
 public final class FilterFactory {
@@ -47,7 +46,7 @@ public final class FilterFactory {
 	 * @param className
 	 *            The class name of the filter to use.
 	 */
-	public static void addMapping(String mimeType, String className, IParameters configuration) {
+	public static void addMapping(String mimeType, String className) {
 		mimeMap.put(mimeType, className);
 	}
 
