@@ -4,9 +4,8 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters{
 
-	protected String startGroupTags;
-	protected String documentPartTags;
-	
+	protected boolean processAllTargets;
+	protected boolean consolidateDpSkeleton;
 	protected boolean escapeGT;
 
 	public Parameters () {
@@ -14,24 +13,24 @@ public class Parameters extends BaseParameters{
 	}	
 
 	public void reset() {
-		startGroupTags = "<tmx><header><body><ude>";
-		documentPartTags = "<note><prop><map>";
 		escapeGT = false;
+		processAllTargets=true;
+		consolidateDpSkeleton=true;
 	}
 	
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
-		startGroupTags = buffer.getString("startGroupTags", startGroupTags);
-		documentPartTags = buffer.getString("documentPartTags", documentPartTags);
 		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
+		processAllTargets = buffer.getBoolean("processAllTargets", processAllTargets);
+		consolidateDpSkeleton = buffer.getBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 	}
 
 	public String toString () {
 		buffer.reset();
-		buffer.setString("stateValues", startGroupTags);
-		buffer.setString("documentPartTags", documentPartTags);		
 		buffer.setBoolean("escapeGT", escapeGT);		
+		buffer.setBoolean("processAllTargets", processAllTargets);
+		buffer.setBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 		return buffer.toString();
 	}
 }
