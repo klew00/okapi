@@ -59,9 +59,14 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		</delete>
 		<mkdir dir="${tmp}"/>
 		<mkdir dir="${distlib}"/>
+		<mkdir dir="${distlib}/examples"/>
  	</target>
 
 	<target name="compile" depends="init">
+		<copy todir="${tmp}/META-INF">
+			<fileset dir="data" includes="**/*.txt"/>
+		</copy>
+
 		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 		
 		<ant antfile="../shared/build_ui.lib.segmentation.xml" inheritAll="true"/>
@@ -71,12 +76,6 @@ Running on: ${os.name} ${os.arch}${line.separator}
 			<fileset dir="${src_ratel}" excludes="**/*.java"/>
 		</copy>
 		
-		<copy todir="${dist}">
-			<fileset dir="data/${platform}"/>
-			<fileset dir="data" includes="**/*.srx"/>
-			<fileset dir="data" includes="**/*.txt"/>
-		</copy>
-
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
@@ -89,6 +88,17 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
 			excludes="MANIFEST.MF"
   		/>
+
+		<copy todir="${dist}">
+			<fileset dir="data/${platform}"/>
+		</copy>
+		
+		<copy todir="${dist}/examples">
+			<fileset dir="data/examples" includes="**/*.srx"/>
+			<fileset dir="data/examples" includes="**/*.txt"/>
+		</copy>
+
+		<copy todir="${dist}" file="data/readme.html"/>
 
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>

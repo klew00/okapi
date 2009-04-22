@@ -1,0 +1,112 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Ratel ReadMe</title>
+</head>
+<body>
+<h1>Release Notes - Ratel 1.0.1-r0001, Apr-30-2009</h1>
+<ul>
+	<li><a href="#SetupWindows">Windows Platform</a></li>
+	<li><a href="#SetupLinux">Linux Platforms</a></li>
+	<li><a href="#SetupMac">Macintosh Platform</a></li>
+	<li><a href="#Support">Support</a></li>
+</ul>
+<hr>
+<h2><a name="SetupWindows"></a>Windows Platform</h2>
+<h3>Requirements</h3>
+<p>In order to run Ratel on Windows you must have a running installation of Java&nbsp;1.5 or 
+later.</p>
+<h3>Installation</h3>
+<p>To install Ratel on Windows:</p>
+<ol>
+	<li>Download the ZIP file of the Windows distribution.</li>
+	<li>Unzip the file on any location, we recommend <code>C:\Program Files\Ratel</code>.</li>
+</ol>
+<p>To run Ratel: simply double-click on the <code>ratel.exe</code> file in the main folder.</p>
+<p>You can also run the application with the following command line (assuming it 
+has been unzipped in the recommended folder):</p>
+<pre>C:\&gt;javaw -jar C:\Program Files\Ratel\lib\ratel.jar</pre>
+<h3>Uninstallation</h3>
+<p>To uninstall Ratel</p>
+<ol>
+	<li>Ratel runs independently of Windows, so to uninstall it you can simply delete the folder where you have installed it. 
+There is no registry dependencies to remove.</li>
+</ol>
+
+<hr>
+<h2><a name="SetupLinux"></a>Linux Platforms</h2>
+<h4>Requirements</h4>
+<p>In order to run Ratel on Linux you must have a running installation of Java&nbsp;1.5 or 
+later.</p>
+<h3>Installation</h3>
+<p>To install Ratel on Linux (32- and 64-bit):</p>
+<ol>
+	<li>Download the ZIP file of the Linux distribution you need (there is one 
+	for 32-bit and one for 64-bit).</li>
+	<li>Extract the GunZip file on any location.</li>
+	<li>Set the execution rights for the file called <code>ratel.sh</code> on the 
+	main directory.</li>
+</ol>
+<p>To run Ratel: simply double-click on the <code>ratel.sh</code> file in the 
+main directory.</p>
+<p>You can also run the application from the command line (assuming Ratel 
+installed in <code>\home\archie\ratel</code>):</p>
+<pre>archie@archie:~&gt;java -jar ratel/lib/ratel.jar</pre>
+<h3>Uninstallation</h3>
+<p>To uninstall Ratel:</p>
+<ol>
+	<li>Delete the directory where Ratel is installed.</li>
+</ol>
+
+<hr>
+<h2><a name="SetupMac"></a>Macintosh Platform</h2>
+<h3>Requirements</h3>
+<p>On both Mac OS X 10.5 (Leopard) or higher, and Mac OS X 10.4 (Tiger), Ratel 
+requires Java 1.4.2 or Java 1.5.x. Note that Java 1.6 (which is 64-bit) is not supported yet. 
+Currently Ratel uses Carbon, not Cocoa. Support for Cocoa will 
+come when the Cocoa implementation of SWT is stable.</p>
+<h3>Installation</h3>
+<p>To install Ratel on Macintosh:</p>
+<ol>
+	<li>Download the ZIP file of the Macintosh distribution.</li>
+	<li>Extract the file on any location. For example <code>
+	/Users/admin/Desktop/ratel.sh</code></li>
+</ol>
+<p>To run Ratel:</p>
+<ol>
+	<li>Try double-clicking on the <code>ratel.sh</code> shell script that is in 
+	the main directory of the distribution.</li>
+	<li>If this does not work:<ol>
+		<li>Open a terminal window.</li>
+		<li>Go to the main directory of the distribution, for example <code>
+		/Users/admin/Desktop/ratel</code></li>
+		<li>Execute the following command:</li>
+	</ol>
+	<pre>java -XstartOnFirstThread -jar lib/ratel.jar</pre>
+	</li>
+</ol>
+<p>You <b>MUST</b> specify the <code>-XstartOnFirstThread</code> option or Ratel may 
+not work properly.</p>
+<h3>Uninstallation</h3>
+<p>To uninstall Ratel:</p>
+<ol>
+	<li>Delete the directory where Ratel is installed.</li>
+</ol>
+
+<hr>
+<h2><a name="Support"></a>Support</h2>
+<p>If you have questions, suggestions or bug to report, you can do this 
+different ways:</p>
+<ul>
+	<li>Use the <cite>Send Feedback</cite> command in the <cite>Help</cite> menu 
+	of Ratel.</li>
+	<li>Read and post notes in the
+	<a target="_blank" href="http://tech.groups.yahoo.com/group/okapitools/">Okapi Tools users group</a> (you need to be registered member to post, but 
+	not to read).</li>
+	<li>Read an post issue report on the
+	<a href="http://code.google.com/p/okapi/issues/list">Google Code project 
+	site</a>.</li>
+</ul>
+<p>&nbsp;</p>
+</body>
+</html>
