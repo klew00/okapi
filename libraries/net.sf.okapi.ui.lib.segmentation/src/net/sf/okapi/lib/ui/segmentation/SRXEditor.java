@@ -662,7 +662,7 @@ public class SRXEditor {
 				// parameter passed is different from the current identifier
 				// or if forceReset is true.
 				if ( rdTestOnSelectedGroup.getSelection() ) {
-					segmenter = srxDoc.applySingleLanguageRule(cbGroup.getText(),
+					segmenter = srxDoc.compileSingleLanguageRule(cbGroup.getText(),
 						(forceReset ? null : segmenter));
 				}
 				else { // Applies all the matching rules
@@ -670,7 +670,7 @@ public class SRXEditor {
 					if ( edSampleLanguage.getText().length() == 0 ) {
 						edSampleLanguage.setText("en"); //$NON-NLS-1$
 					}
-					segmenter = srxDoc.applyLanguageRules(edSampleLanguage.getText(),
+					segmenter = srxDoc.compileLanguageRules(edSampleLanguage.getText(),
 						(forceReset ? null : segmenter));
 				}
 			}

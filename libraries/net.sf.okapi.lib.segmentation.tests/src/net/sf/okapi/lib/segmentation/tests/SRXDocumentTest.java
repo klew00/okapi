@@ -109,7 +109,7 @@ public class SRXDocumentTest extends TestCase {
 		doc.addLanguageMap(new LanguageMap("en.*", "english"));
 		doc.addLanguageMap(new LanguageMap(".*", "default"));
 
-		SRXSegmenter seg = (SRXSegmenter)doc.applyLanguageRules("en", null);
+		SRXSegmenter seg = (SRXSegmenter)doc.compileLanguageRules("en", null);
 		assertNotNull(seg);
 		assertEquals(seg.getLanguage(), "en");
 		assertNull(seg.getRanges()); // Null set yet

@@ -51,7 +51,7 @@ public class SegmentationTest {
 		// Add the ruls to the document
 		doc.addLanguageRule("default", langRules);
 		// Create the segmenter
-		segmenter = doc.applyLanguageRules("en", null);
+		segmenter = doc.compileLanguageRules("en", null);
 	}
 
 	@Test

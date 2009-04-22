@@ -33,20 +33,20 @@ public interface ISegmenter {
 	/**
 	 * Calculate the segmentation of a given plain text string.
 	 * @param text plain text to segment.
-	 * @return the number of segment found.
+	 * @return the number of segments calculated.
 	 */
 	public int computeSegments (String text);
 	
 	/**
-	 * Calculates the segmentation of a given IContainer object.
+	 * Calculates the segmentation of a given TextContainer object.
 	 * The assumption is that the container is not segmented yet.
 	 * @param container the object to segment.
-	 * @return the number of segment found.
+	 * @return the number of segments calculated.
 	 */
 	public int computeSegments (TextContainer container);
 
 	/**
-	 * Compute the range of the next segment for a given TextContainer content.
+	 * Compute the range of the next segment for a given TextContainer object.
 	 * The next segment is searched from the first character after the last
 	 * segment marker found in the container.
 	 * @param container the text container where to look for the next segment. 
@@ -71,7 +71,7 @@ public interface ISegmenter {
 	 * Gets the list off all segments ranges calculated when
 	 * calling {@link #computeSegments(String)}, or
 	 * {@link #computeSegments(TextContainer)}.
-	 * @return The list of all segments ranges. each range is stored in
+	 * @return the list of all segments ranges. each range is stored in
 	 * a {@link Range} object where start is the start and end the end of the range.
 	 * Returns null if no ranges have been defined yet.
 	 */

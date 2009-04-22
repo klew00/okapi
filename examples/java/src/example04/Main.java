@@ -40,7 +40,7 @@ public class Main {
 			doc.loadRules(f.getAbsolutePath());
 			
 			// Obtain a segmenter for English
-			ISegmenter segmenter = doc.applyLanguageRules("en", null);
+			ISegmenter segmenter = doc.compileLanguageRules("en", null);
 
 			// Plain text case
 			int count = segmenter.computeSegments("Part 1. Part 2.");

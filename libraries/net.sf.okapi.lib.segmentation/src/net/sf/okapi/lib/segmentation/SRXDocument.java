@@ -465,8 +465,9 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Sets the rules for the segmentation. This method
-	 * applies the language code you specify to the language mappings
+	 * Compiles the all language rules applicable for a given language code, and
+	 * assign them to a segmenter. This method applies the language code you 
+	 * specify to the language mappings
 	 * currently available in the document and compile the rules
 	 * when one or more language map is found. The matching is done in
 	 * the order of the list of language maps and more than one can be 
@@ -475,8 +476,9 @@ public class SRXDocument {
 	 * BCP-47 value (e.g. "de", "fr-ca", etc.)
 	 * @param existingSegmenter optional existing SRXSegmenter object to re-use.
 	 * Use null for not re-using anything.
+	 * @return the instance of the segmenter with the new compiled rules.
 	 */
-	public ISegmenter applyLanguageRules (String languageCode,
+	public ISegmenter compileLanguageRules (String languageCode,
 		ISegmenter existingSegmenter)
 	{
 		SRXSegmenter segmenter = null;
@@ -514,12 +516,13 @@ public class SRXDocument {
 	}
 	
 	/**
-	 * Applies a single language rule group to do the segmentation.
+	 * Compiles a single language rule group and assign it to a segmenter.
 	 * @param ruleName the name of the rule group to apply.
 	 * @param existingSegmenter optional existing SRXSegmenter object to re-use.
 	 * Use null for not re-using anything.
+	 * @return the instance of the segmenter with the new compiled rules.
 	 */
-	public ISegmenter applySingleLanguageRule (String ruleName,
+	public ISegmenter compileSingleLanguageRule (String ruleName,
 		ISegmenter existingSegmenter)
 	{
 		SRXSegmenter segmenter = null;

@@ -82,12 +82,12 @@ public class Utility extends BaseFilterDrivenUtility {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(srcSrxPath);
 			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
-			srcSeg = doc.applyLanguageRules(srcLang, null);
+			srcSeg = doc.compileLanguageRules(srcLang, null);
 			if ( !srcSrxPath.equals(trgSrxPath) ) {
 				doc.loadRules(trgSrxPath);
 				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			}
-			trgSeg = doc.applyLanguageRules(trgLang, null);
+			trgSeg = doc.compileLanguageRules(trgLang, null);
 		}
 		
 		// Prepare the TMX output if requested

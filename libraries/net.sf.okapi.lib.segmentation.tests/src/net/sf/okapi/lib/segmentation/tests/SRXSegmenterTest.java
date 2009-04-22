@@ -91,7 +91,7 @@ public class SRXSegmenterTest {
 		// Add the ruls to the document
 		doc.addLanguageRule("default", langRules);
 		// Create the segmenter
-		return doc.applyLanguageRules(lang, null);
+		return doc.compileLanguageRules(lang, null);
 	}
 	
 }
