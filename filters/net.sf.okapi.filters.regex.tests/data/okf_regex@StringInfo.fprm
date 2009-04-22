@@ -1,10 +1,11 @@
-
+#v1
 useLD.b=true
 localizeOutside.b=true
 startString="
 endString="
 extractOuterStrings.b=false
 useBSlashEscape.b=true
+oneLevelGroups.b=false
 regexOptions.i=8
 mimeType=text/plain
 ruleCount.i=1

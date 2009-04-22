@@ -20,13 +20,20 @@
 
 package net.sf.okapi.filters.regex.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
+import net.sf.okapi.filters.regex.Rule;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Assert;
@@ -35,20 +42,21 @@ import org.junit.Test;
 
 public class RegexFilterTest {
 	
+	private RegexFilter filter;
+	
 	@Before
 	public void setUp() {
+		filter = new RegexFilter();
 	}
 
 	@Test
 	public void runTest () {
-		RegexFilter filter = null;		
 		try {
 			FilterTestDriver testDriver = new FilterTestDriver();
 			testDriver.setDisplayLevel(0);
 			testDriver.setShowSkeleton(true);
-			filter = new RegexFilter();
+			
 			IParameters params = new Parameters();
-
 			URL paramsUrl = RegexFilterTest.class.getResource("/okf_regex@StringInfo.fprm");
 			params.load(paramsUrl.getPath(), false);
 			filter.setParameters(params);
@@ -75,4 +83,35 @@ public class RegexFilterTest {
 		}
 	}
 	
+	@Test
+	public void testSimpleRule () {
+		String snippet = "test1=\"text1\"\ntest2=\"text2\"\n";
+		Parameters params = new Parameters();
+		Rule rule = new Rule();
+		rule.setRuleType(Rule.RULETYPE_STRING);
+		rule.setExpression("=(.+)$");
+		rule.setSourceGroup(1);
+		params.rules.add(rule);
+		filter.setParameters(params);
+		// Process
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("text1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("text2", tu.getSource().toString());
+	}
+
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, "en"));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
+
 }

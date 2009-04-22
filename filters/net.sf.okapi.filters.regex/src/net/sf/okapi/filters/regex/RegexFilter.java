@@ -119,12 +119,12 @@ public class RegexFilter implements IFilter {
 
 		// Get the first best match among the rules
 		// trying to match expression
-		Rule bestRule = null;
+		Rule bestRule;
 		int bestPosition = inputText.length()+99;
 		MatchResult result = null;
-		int i = 0;
 		
 		while ( true ) {
+			bestRule = null;
 			for ( Rule rule : params.rules ) {
 				Matcher m = rule.pattern.matcher(inputText);
 				if ( m.find(startSearch) ) {
@@ -133,7 +133,6 @@ public class RegexFilter implements IFilter {
 						bestRule = rule;
 					}
 				}
-				i++;
 			}
 			
 			if ( bestRule != null ) {
@@ -264,6 +263,7 @@ public class RegexFilter implements IFilter {
 	private void open (CharSequence inputText) {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
+		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
 		commonOpen(inputText.toString());
 	}
 
@@ -319,102 +319,6 @@ public class RegexFilter implements IFilter {
 		startDoc.setMultilingual(hasRulesWithTarget());
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
-	
-	/*
-	private Event processMatch (Rule rule,
-		MatchResult startResult,
-		MatchResult endResult)
-	{
-		GenericSkeleton skel;
-		switch ( rule.ruleType ) {
-		case Rule.RULETYPE_NOTRANS:
-		case Rule.RULETYPE_COMMENT:
-			// Skeleton data include the content
-			skel = new GenericSkeleton(inputText.substring(startSkl, endResult.start()));
-			// Update starts for next read
-			startSearch = endResult.end();
-			startSkl = endResult.start();
-			// If comment: process the comment for directives
-			if ( rule.ruleType == Rule.RULETYPE_COMMENT ) {
-				params.locDir.process(skel.toString());
-			}
-			// Then just return one skeleton event
-			return new Event(EventType.DOCUMENT_PART,
-				new DocumentPart(String.format("%d", ++otherId), false, skel));
-			
-		case Rule.RULETYPE_OPENGROUP:
-		case Rule.RULETYPE_CLOSEGROUP:
-			// Skeleton data include the content
-			skel = new GenericSkeleton(inputText.substring(startSkl, endResult.start()));
-			// Update starts for next read
-			startSearch = endResult.end();
-			startSkl = endResult.start();
-			//TODO: return group event, and deal with skeleton
-			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
-				StartGroup startGroup = new StartGroup(null);
-				startGroup.setId(String.valueOf(++otherId));
-				startGroup.setSkeleton(skel);
-				if ( rule.nameStart.length() > 0 ) {
-					String name = getMatch(startResult.group(), rule.nameStart, rule.nameEnd);
-					if ( name != null ) { // Process the name format if needed
-						if ( rule.nameFormat.length() > 0 ) {
-							String tmp = rule.nameFormat.replace("<parentName>",
-								(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-							startGroup.setName(tmp.replace("<self>", name));
-						}
-						else startGroup.setName(name);
-					}
-				}
-				groupStack.push(startGroup);
-				return new Event(EventType.START_GROUP, startGroup);
-			}
-			else { // Close group
-				groupStack.pop();
-				Ending ending = new Ending(String.valueOf(++otherId));  
-				ending.setSkeleton(skel);
-				return new Event(EventType.END_GROUP, ending);
-				
-			}
-		}
-		
-		//--- Otherwise: process the content
-
-		// Set skeleton data if needed
-		if ( startResult.end() > startSkl ) {
-			addSkeletonToQueue(inputText.substring(startSkl, startResult.end()), false);
-		}
-		
-		// Set start positions for next read
-		startSearch = endResult.end();
-		startSkl = endResult.start();
-
-		// Check localization directives
-		if ( !params.locDir.isLocalizable(true) ) {
-			// If not to be localized: make it a skeleton unit
-			addSkeletonToQueue(inputText.substring(startResult.end(),
-				endResult.start()), false);
-			// And return
-			return nextEvent();
-		}
-
-		//--- Else: We extract
-
-		// Any resname we can use?
-		String name = getMatch(startResult.group(), rule.nameStart,
-			rule.nameEnd);
-
-		// Process the data, this will create a queue of events if needed
-		if ( rule.ruleType == Rule.RULETYPE_CONTENT ) {
-			processContent(rule, name, inputText.substring(
-				startResult.end(), endResult.start()));
-		}
-		else if ( rule.ruleType == Rule.RULETYPE_STRING ) {
-			processStrings(rule, name, inputText.substring(
-				startResult.end(), endResult.start()));
-		}
-		return nextEvent();
-	}
-*/
 	
 	private Event processMatch (Rule rule,
 		MatchResult result)
@@ -518,58 +422,6 @@ public class RegexFilter implements IFilter {
 		}
 		return nextEvent();
 	}
-
-	/*
-	private String getMatch (String text,
-		String start,
-		String end)
-	{
-		if (( start == null ) || ( start.length() == 0 )) return null;
-		if (( end == null ) || ( end.length() == 0 )) return null;
-		
-		Pattern p = Pattern.compile(start, params.regexOptions);
-		Matcher m1 = p.matcher(text);
-		if ( m1.find() ) {
-			p = Pattern.compile(end, params.regexOptions);
-			Matcher m2 = p.matcher(text);
-			if ( m2.find(m1.end()) ) {
-				return text.substring(m1.end(), m2.start());
-			}
-		}
-		return null;
-	}
-	*/
-	/*
-	private void processContent (Rule rule,
-		String name,
-		String data)
-	{
-		tuRes = new TextUnit(String.valueOf(++tuId), data);
-		//TODO: handle un-escaping and mime-type
-		
-		if ( rule.preserveWS ) {
-			tuRes.setPreserveWhitespaces(true);
-		}
-		else { // Unwrap the content
-			TextFragment.unwrap(tuRes.getSourceContent());
-		}
-
-		if ( rule.useCodeFinder ) {
-			rule.codeFinder.process(tuRes.getSourceContent());
-		}
-
-		if ( name != null ) {
-			if ( rule.nameFormat.length() > 0 ) {
-				String tmp = rule.nameFormat.replace("<parentName>",
-					(groupStack.size()>0 ? groupStack.peek().getName() : "" ));
-				tuRes.setName(tmp.replace("<self>", name));
-			}
-			else tuRes.setName(name);
-		}
-
-		queue.add(new Event(EventType.TEXT_UNIT, tuRes));
-	}
-	*/
 
 	private void processContent (Rule rule,
 		MatchResult result)
@@ -676,11 +528,11 @@ public class RegexFilter implements IFilter {
 		int i = -1;
 		int startSearch = 0;
 		int count = 0;
-		String mark = params.startString;
 		String data = result.group(rule.sourceGroup);
+		char endChar = 0;
+		int n;
 		
 		while ( true  ) {
-			int j = 0;
 			int start = startSearch;
 			int end = -1;
 			int state = 0;
@@ -702,69 +554,24 @@ public class RegexFilter implements IFilter {
 				// Check characters
 				switch ( state ) {
 				case 0:
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// Start of string match found, set search info for end
-							start = i+1; // Start of the string content
-							state = 2;
-							mark = params.endString;
-							j = 0;
-						}
-						else state = 1;
+					n = params.startString.indexOf(data.codePointAt(i));
+					if ( n > -1 ) {
+						// Start of string match found, set search info for end
+						start = i+1; // Start of the string content
+						state = 1;
+						endChar = params.endString.charAt(n);
 					}
 					break;
-				case 1: // Look if we can finish a start match
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// Start of string match found, set search info for end
-							start = i+1; // Start of the string content
-							state = 2;
-							mark = params.endString;
-							j = 0;
+				case 1: // Look for the end mark
+					if ( data.codePointAt(i) == endChar ) {
+						// End of string match found
+						// Set the end of the string position (will stop the loop too)
+						end = i;
+						// Check for empty strings
+						if ( end == start ) {
+							end = -1;
+							state = 0;
 						}
-						// Else: keep moving
-					}
-					else { // Was not a match
-						state = 0;
-						i -= (j-1); // Go back just after the trigger
-						j = 0; // And reset the mark index
-					}
-					break;
-				case 2: // Look for an end mark
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// End of string match found
-							// Set the end of the string position (will stop the loop too)
-							end = i-j+1;
-							// Check for empty strings
-							if ( end == start ) {
-								end = -1;
-								state = 0;
-								j = 0;
-							}
-						}
-						else state = 3;
-					}
-					break;
-				case 3: // Look if we can finish an end match
-					if ( data.codePointAt(i) == mark.codePointAt(j) ) {
-						if ( ++j == mark.length() ) {
-							// End of string match found
-							// Set the end of the string position (will stop the loop too)
-							end = i-j+1;
-							// Check for empty strings
-							if ( end == start ) {
-								end = -1;
-								state = 0;
-								j = 0;
-							}
-						}
-						// Else: Keep moving
-					}
-					else { // Was not a match
-						state = 2;
-						i -= (j-1); // Go back just after the trigger
-						j = 0; // And reset the mark index
 					}
 					break;
 				}
