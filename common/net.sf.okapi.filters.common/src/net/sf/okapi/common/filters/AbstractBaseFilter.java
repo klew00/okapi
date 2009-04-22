@@ -845,13 +845,12 @@ public abstract class AbstractBaseFilter implements IFilter {
 			throw e;
 		}
 
-		// The ability to add internal placeholders to end tags is not currently
-		// support
-		// if (endMarker != null && propertyTextUnitPlaceholders != null) {
-		// processAllEmbedded(endMarker.toString(), language,
-		// propertyTextUnitPlaceholders, false);
-		// }
-
+		/*
+		 * The ability to add internal placeholders to end tags is not currently
+		 * support if (endMarker != null && propertyTextUnitPlaceholders !=
+		 * null) { processAllEmbedded(endMarker.toString(), language,
+		 * propertyTextUnitPlaceholders, false); }
+		 */
 		tempTextUnit = popTempEvent();
 
 		if (endMarker != null) {
@@ -1266,7 +1265,8 @@ public abstract class AbstractBaseFilter implements IFilter {
 	/**
 	 * Set the newline type.
 	 * 
-	 * @param newlineType one of '\n', '\r' or '\r\n'.
+	 * @param newlineType
+	 *            one of '\n', '\r' or '\r\n'.
 	 */
 	protected void setNewlineType(String newlineType) {
 		this.newlineType = newlineType;

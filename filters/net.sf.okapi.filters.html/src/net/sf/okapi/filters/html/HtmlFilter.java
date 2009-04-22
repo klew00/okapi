@@ -32,6 +32,7 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -59,7 +60,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	public HtmlFilter() {
 		super();
 		bufferedWhitespace = new StringBuilder();
-		setMimeType("text/html");
+		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
 
