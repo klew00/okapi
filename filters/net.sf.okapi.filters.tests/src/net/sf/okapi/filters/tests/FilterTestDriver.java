@@ -48,6 +48,72 @@ public class FilterTestDriver {
 	private int displayLevel = 0;
 	private int warnings;
 	private boolean ok;
+	
+	static public boolean compareEvent(Event manual, Event generated) {
+		if (generated.getEventType() != manual.getEventType()) {
+			return false;
+		}
+		IResource mr = manual.getResource();
+		IResource gr = generated.getResource();
+		if (mr != null && gr != null && mr.getSkeleton() != null && gr.getSkeleton() != null) {
+			if (!(mr.getSkeleton().toString().equals(gr.getSkeleton().toString()))) {
+				return false;
+			}
+		}
+
+		switch (generated.getEventType()) {
+		case DOCUMENT_PART:
+			DocumentPart mdp = (DocumentPart) mr;
+			DocumentPart gdp = (DocumentPart) gr;
+			if (mdp.isReferent() != gdp.isReferent()) {
+				return false;
+			}
+			if (mdp.isTranslatable() != gdp.isTranslatable()) {
+				return false;
+			}
+			if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
+				return false;
+			}
+
+			for (String propName : gdp.getSourcePropertyNames()) {
+				Property gdpProp = gdp.getSourceProperty(propName);
+				Property mdpProp = mdp.getSourceProperty(propName);
+				if (gdpProp.isReadOnly() != mdpProp.isReadOnly()) {
+					return false;
+				}
+			}
+			break;
+		case TEXT_UNIT:
+			TextUnit mtu = (TextUnit) mr;
+			TextUnit gtu = (TextUnit) gr;
+
+			if (mtu.preserveWhitespaces() != gtu.preserveWhitespaces()) {
+				return false;
+			}
+
+			if (!(mtu.toString().equals(gtu.toString()))) {
+				return false;
+			}
+
+			if (mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size()) {
+				return false;
+			}
+
+			int i = -1;
+			for (Code c : mtu.getSource().getCodes()) {
+				i++;
+				if (c.getType() != null) {
+					if (!c.getType().equals(gtu.getSource().getCode(i).getType())) {
+						return false;
+					}
+				}
+			}
+
+			break;
+		}
+
+		return true;
+	}
 
 	static public boolean compareEvents(ArrayList<Event> manual, ArrayList<Event> generated) {
 		if (manual.size() != generated.size()) {
@@ -57,66 +123,8 @@ public class FilterTestDriver {
 		Iterator<Event> manualIt = manual.iterator();
 		for (Event ge : generated) {
 			Event me = manualIt.next();
-			if (ge.getEventType() != me.getEventType()) {
+			if (!compareEvent(me, ge)) {
 				return false;
-			}
-			IResource mr = me.getResource();
-			IResource gr = ge.getResource();
-			if (mr != null && gr != null && mr.getSkeleton() != null && gr.getSkeleton() != null) {
-				if (!(mr.getSkeleton().toString().equals(gr.getSkeleton().toString()))) {
-					return false;
-				}
-			}
-
-			switch (ge.getEventType()) {
-			case DOCUMENT_PART:
-				DocumentPart mdp = (DocumentPart) mr;
-				DocumentPart gdp = (DocumentPart) gr;
-				if (mdp.isReferent() != gdp.isReferent()) {
-					return false;
-				}
-				if (mdp.isTranslatable() != gdp.isTranslatable()) {
-					return false;
-				}
-				if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
-					return false;
-				}
-
-				for (String propName : gdp.getSourcePropertyNames()) {
-					Property gdpProp = gdp.getSourceProperty(propName);
-					Property mdpProp = mdp.getSourceProperty(propName);
-					if (gdpProp.isReadOnly() != mdpProp.isReadOnly()) {
-						return false;
-					}
-				}
-				break;
-			case TEXT_UNIT:
-				TextUnit mtu = (TextUnit) mr;
-				TextUnit gtu = (TextUnit) gr;
-				
-				if (mtu.preserveWhitespaces() != gtu.preserveWhitespaces()) {
-					return false;
-				}
-								
-				if (!(mtu.toString().equals(gtu.toString()))) {
-					return false;
-				}
-
-				if (mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size()) {
-					return false;
-				}
-
-				int i = -1;
-				for (Code c : mtu.getSource().getCodes()) {
-					i++;
-					if (c.getType() != null) {
-						if (!c.getType().equals(gtu.getSource().getCode(i).getType())) {
-							return false;
-						}
-					}
-				}
-
-				break;
 			}
 		}
 		return true;
@@ -139,7 +147,7 @@ public class FilterTestDriver {
 	 * @param value
 	 *            0=display nothing, 1=display TU only, >1=display all.
 	 */
-	public void setDisplayLevel (int value) {
+	public void setDisplayLevel(int value) {
 		displayLevel = value;
 
 	}
@@ -169,50 +177,59 @@ public class FilterTestDriver {
 			case START_DOCUMENT:
 				startDoc++;
 				checkStartDocument((StartDocument) event.getResource());
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---Start Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_DOCUMENT:
 				endDoc++;
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---End Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_SUBDOCUMENT:
 				startSubDoc++;
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---Start Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case END_SUBDOCUMENT:
 				endSubDoc++;
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---End Sub Document");
 				printSkeleton(event.getResource());
 				break;
 			case START_GROUP:
 				startGroup++;
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---Start Group");
 				printSkeleton(event.getResource());
 				break;
 			case END_GROUP:
 				endGroup++;
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---End Group");
 				printSkeleton(event.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit)event.getResource();
-				if ( displayLevel < 1 ) break;
+				TextUnit tu = (TextUnit) event.getResource();
+				if (displayLevel < 1)
+					break;
 				printTU(tu);
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				printResource(tu);
 				printSkeleton(tu);
 				break;
 			case DOCUMENT_PART:
-				if ( displayLevel < 2 ) break;
+				if (displayLevel < 2)
+					break;
 				System.out.println("---Document Part");
 				printResource((INameable) event.getResource());
 				printSkeleton(event.getResource());
@@ -220,27 +237,27 @@ public class FilterTestDriver {
 			}
 		}
 
-		if ( startDoc != 1 ) {
+		if (startDoc != 1) {
 			System.err.println(String.format("ERROR: START_DOCUMENT = %d", startDoc));
 			ok = false;
 		}
-		if ( endDoc != 1 ) {
+		if (endDoc != 1) {
 			System.err.println(String.format("ERROR: END_DOCUMENT = %d", endDoc));
 			ok = false;
 		}
-		if ( startSubDoc != endSubDoc ) {
-			System.err.println(String.format("ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc,
-				endSubDoc));
+		if (startSubDoc != endSubDoc) {
+			System.err
+					.println(String.format("ERROR: START_SUBDOCUMENT=%d, END_SUBDOCUMENT=%d", startSubDoc, endSubDoc));
 			ok = false;
 		}
-		if ( startGroup != endGroup ) {
+		if (startGroup != endGroup) {
 			System.out.println(String.format("ERROR: START_GROUP=%d, END_GROUP=%d", startGroup, endGroup));
 			ok = false;
 		}
 		return ok;
 	}
 
-	private void printTU (TextUnit tu) {
+	private void printTU(TextUnit tu) {
 		System.out.println("---Text Unit");
 		System.out.println("S=[" + tu.toString() + "]");
 		for (String lang : tu.getTargetLanguages()) {
@@ -260,7 +277,8 @@ public class FilterTestDriver {
 	}
 
 	private void printSkeleton(IResource res) {
-		if ( !showSkeleton ) return;
+		if (!showSkeleton)
+			return;
 		ISkeleton skel = res.getSkeleton();
 		if (skel != null) {
 			System.out.println("---");
@@ -274,48 +292,51 @@ public class FilterTestDriver {
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No encoding specified in StartDocument.");
 			warnings++;
-		} else if ( displayLevel > 1 )
+		} else if (displayLevel > 1)
 			System.out.println("StartDocument encoding = " + tmp);
 
 		tmp = startDoc.getLanguage();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No language specified in StartDocument.");
 			warnings++;
-		} else if ( displayLevel > 1 )
+		} else if (displayLevel > 1)
 			System.out.println("StartDocument language = " + tmp);
 
 		tmp = startDoc.getName();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No name specified in StartDocument.");
 			warnings++;
-		} else if ( displayLevel > 1 )
+		} else if (displayLevel > 1)
 			System.out.println("StartDocument name = " + tmp);
 
-		if ( displayLevel < 2 ) return;
+		if (displayLevel < 2)
+			return;
 		System.err.println("StartDocument MIME type = " + startDoc.getMimeType());
 		System.err.println("StartDocument Type = " + startDoc.getType());
 	}
 
 	/**
 	 * create a string output from a list of events.
-	 * @param list The list of events.
-	 * @param original The original string.
-	 * @param trgLang Code of the target (output) language.
+	 * 
+	 * @param list
+	 *            The list of events.
+	 * @param original
+	 *            The original string.
+	 * @param trgLang
+	 *            Code of the target (output) language.
 	 * @return The generated output string
 	 */
-	public static String generateOutput(ArrayList<Event> list,
-		String original,
-		String trgLang) {
+	public static String generateOutput(ArrayList<Event> list, String original, String trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
 				tmp.append(writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(),
-					(StartDocument) event.getResource()));
+						(StartDocument) event.getResource()));
 				break;
 			case END_DOCUMENT:
-				tmp.append(writer.processEndDocument((Ending)event.getResource()));
+				tmp.append(writer.processEndDocument((Ending) event.getResource()));
 				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
@@ -330,7 +351,7 @@ public class FilterTestDriver {
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:
-				tmp.append(writer.processEndGroup((Ending)event.getResource()));
+				tmp.append(writer.processEndGroup((Ending) event.getResource()));
 				break;
 			}
 		}
@@ -340,18 +361,20 @@ public class FilterTestDriver {
 
 	/**
 	 * Gets the Nth text unit found in the given list of events.
-	 * @param list The list of events
-	 * @param tuNumber The number of the unit to return: 1 for the first one, 2 for the second, etc.
+	 * 
+	 * @param list
+	 *            The list of events
+	 * @param tuNumber
+	 *            The number of the unit to return: 1 for the first one, 2 for
+	 *            the second, etc.
 	 * @return The text unit found, or null.
 	 */
-	public static TextUnit getTextUnit (ArrayList<Event> list,
-		int tuNumber)
-	{
+	public static TextUnit getTextUnit(ArrayList<Event> list, int tuNumber) {
 		int n = 0;
 		for (Event event : list) {
-			if ( event.getEventType() == EventType.TEXT_UNIT ) {
-				if ( ++n == tuNumber ) {
-					return (TextUnit)event.getResource();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+				if (++n == tuNumber) {
+					return (TextUnit) event.getResource();
 				}
 			}
 		}
@@ -360,18 +383,20 @@ public class FilterTestDriver {
 
 	/**
 	 * Gets the Nth group found in the given list of events.
-	 * @param list The list of events
-	 * @param tuNumber The number of the group to return: 1 for the first one, 2 for the second, etc.
+	 * 
+	 * @param list
+	 *            The list of events
+	 * @param tuNumber
+	 *            The number of the group to return: 1 for the first one, 2 for
+	 *            the second, etc.
 	 * @return The group found, or null.
 	 */
-	public static StartGroup getGroup (ArrayList<Event> list,
-		int tuNumber)
-	{
+	public static StartGroup getGroup(ArrayList<Event> list, int tuNumber) {
 		int n = 0;
 		for (Event event : list) {
-			if ( event.getEventType() == EventType.START_GROUP ) {
-				if ( ++n == tuNumber ) {
-					return (StartGroup)event.getResource();
+			if (event.getEventType() == EventType.START_GROUP) {
+				if (++n == tuNumber) {
+					return (StartGroup) event.getResource();
 				}
 			}
 		}
@@ -380,13 +405,15 @@ public class FilterTestDriver {
 
 	/**
 	 * Gets the start document in the given list of events.
-	 * @param list The list of events
+	 * 
+	 * @param list
+	 *            The list of events
 	 * @return The start document found, or null.
 	 */
-	public static StartDocument getStartDocument (ArrayList<Event> list) {
+	public static StartDocument getStartDocument(ArrayList<Event> list) {
 		for (Event event : list) {
-			if ( event.getEventType() == EventType.START_DOCUMENT ) {
-				return (StartDocument)event.getResource();
+			if (event.getEventType() == EventType.START_DOCUMENT) {
+				return (StartDocument) event.getResource();
 			}
 		}
 		return null;

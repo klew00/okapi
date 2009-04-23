@@ -1,12 +1,15 @@
 package net.sf.okapi.common.tests;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import net.sf.okapi.common.MemMappedCharSequence;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class MemMappedCharSequenceTest {
@@ -29,8 +32,9 @@ public class MemMappedCharSequenceTest {
 	}
 
 	@Test
-	public void testLarge() throws FileNotFoundException {
-		InputStream in = new FileInputStream("/OKAPI/common/net.sf.okapi.common.tests/src/testfiles/test.txt");
+	public void testLarge() throws IOException {
+		File dir1 = new File (".");	
+		InputStream in = new FileInputStream(dir1.getCanonicalPath() + "/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE");
 		assertEquals(7257720, charSequence.length());
 		assertEquals('<', charSequence.charAt(1));
@@ -40,8 +44,9 @@ public class MemMappedCharSequenceTest {
 	}
 	
 	@Test
-	public void testLowercase() throws FileNotFoundException {
-		InputStream in = new FileInputStream("/OKAPI/common/net.sf.okapi.common.tests/src/testfiles/test.txt");
+	public void testLowercase() throws IOException {
+		File dir1 = new File (".");	
+		InputStream in = new FileInputStream(dir1.getCanonicalPath() + "/src/testfiles/test.txt");
 		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
 		charSequence.close();

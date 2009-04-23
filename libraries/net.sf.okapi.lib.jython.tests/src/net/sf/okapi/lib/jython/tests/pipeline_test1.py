@@ -1,8 +1,9 @@
-from net.sf.okapi.common.pipeline import IPipeline, Pipeline, BasePipelineStep, IInitialStep
+from net.sf.okapi.common.pipeline import IPipeline, Pipeline, BasePipelineStep
 from net.sf.okapi.common import EventType, Event
 from net.sf.okapi.common.resource import TextUnit
+from net.sf.okapi.common.resource import RawDocument
 
-class Producer(BasePipelineStep, IInitialStep):
+class Producer(BasePipelineStep):
     def preprocess(self):
         self.eventCount = 0
         
@@ -23,7 +24,7 @@ class Consumer(BasePipelineStep):
 pipeline = Pipeline()
 pipeline.addStep(Producer())
 pipeline.addStep(Consumer())
-pipeline.process()
+pipeline.process(RawDocument("", "UTF-8", "en"))
 
 
 
