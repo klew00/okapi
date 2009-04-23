@@ -29,7 +29,7 @@ import java.util.Hashtable;
 public final class MimeTypeMapper {
 	private static final Hashtable<String, String> extensionToMimeMap = new Hashtable<String, String>();
 
-	public static final String UNKOWN_MIME_TYPE = "application/octet-stream";
+	public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	public static final String XML_MIME_TYPE = "text/xml";
 	public static final String ODF_MIME_TYPE = "text/x-odf";
 	public static final String HTML_MIME_TYPE = "text/html";
@@ -94,7 +94,7 @@ public final class MimeTypeMapper {
 	public static String getMimeType(String extension) {
 		String mimeType = extensionToMimeMap.get(extension);
 		if ( mimeType == null ) {
-			return UNKOWN_MIME_TYPE;
+			return DEFAULT_MIME_TYPE;
 		}
 		return mimeType;
 	}
