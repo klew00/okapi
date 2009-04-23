@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.BadFilterInputException;
 import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -52,7 +53,6 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class MIFFilter implements IFilter {
 	
-	private static final String MIMETYPE = "text/x-mif"; // TODO: check value
 	private static final Hashtable<String, Character> charTable = initCharTable();
 
 	private String docName;
@@ -115,7 +115,7 @@ public class MIFFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return MIMETYPE;
+		return MimeTypeMapper.MIF_MIME_TYPE;
 	}
 
 	public IParameters getParameters () {

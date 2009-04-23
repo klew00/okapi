@@ -35,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.BadFilterInputException;
 import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
@@ -131,7 +132,7 @@ public class POFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return "text/x-po";
+		return MimeTypeMapper.PO_MIME_TYPE;
 	}
 
 	public IParameters getParameters () {

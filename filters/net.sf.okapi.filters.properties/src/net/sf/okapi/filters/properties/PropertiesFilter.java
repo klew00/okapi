@@ -37,6 +37,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.BadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -110,7 +111,7 @@ public class PropertiesFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return "text/x-properties"; //TODO: check
+		return MimeTypeMapper.PROPERTIES_MIME_TYPE;
 	}
 
 	public IParameters getParameters () {

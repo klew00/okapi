@@ -24,6 +24,7 @@ import java.security.InvalidParameterException;
 import java.util.Hashtable;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 
 /**
  * Provides caching and lookup mechanism for the text encoders used when writing out text
@@ -46,10 +47,10 @@ public class EncoderManager implements IEncoder {
 		// Default mapping
 		mimeMap.put("text/xml", "net.sf.okapi.common.encoder.XMLEncoder");
 		mimeMap.put("text/x-odf", "net.sf.okapi.common.encoder.XMLEncoder");
-		mimeMap.put("text/x-properties", "net.sf.okapi.common.encoder.PropertiesEncoder");
-		mimeMap.put("text/x-mif", "net.sf.okapi.common.encoder.MIFEncoder");
-		mimeMap.put("text/html", "net.sf.okapi.common.encoder.HtmlEncoder");
-		mimeMap.put("text/x-po", "net.sf.okapi.common.encoder.POEncoder");
+		mimeMap.put(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
+		mimeMap.put(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");
+		mimeMap.put(MimeTypeMapper.HTML_MIME_TYPE, "net.sf.okapi.common.encoder.HtmlEncoder");
+		mimeMap.put(MimeTypeMapper.PO_MIME_TYPE, "net.sf.okapi.common.encoder.POEncoder");
 	}
 
 	/**
