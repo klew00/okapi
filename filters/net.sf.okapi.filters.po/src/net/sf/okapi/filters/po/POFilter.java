@@ -280,8 +280,8 @@ public class POFilter implements IFilter {
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
 		startDoc.setLineBreak(lineBreak);
-		startDoc.setType("text/x-po");
-		startDoc.setMimeType("text/x-po");
+		startDoc.setType(MimeTypeMapper.PO_MIME_TYPE);
+		startDoc.setMimeType(MimeTypeMapper.PO_MIME_TYPE);
 		startDoc.setMultilingual(params.bilingualMode);
 		return new Event(EventType.START_DOCUMENT, startDoc);
 	}
@@ -537,7 +537,8 @@ public class POFilter implements IFilter {
 		tu.setId(String.valueOf(++tuId));
 		tu.setPreserveWhitespaces(true);
 		tu.setSkeleton(skel);
-		tu.setMimeType("text/x-po");
+		//TODO: Need to adjust for each format
+		tu.setMimeType(MimeTypeMapper.PO_MIME_TYPE);
 		
 		if ( locNote.length() > 0 ) {
 			tu.setProperty(new Property(Property.NOTE, locNote));

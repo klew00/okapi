@@ -93,6 +93,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			reader = new BufferedReader(new InputStreamReader(bis, encoding));
 			
 			// Open the output
+			Util.createDirectories(getOutputPath(0)); // Make sure the folder exists
 			OutputStream output = new FileOutputStream(getOutputPath(0));
 			writer = new OutputStreamWriter(new BufferedOutputStream(output), encoding);
 			// Write BOM if there was one

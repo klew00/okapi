@@ -25,7 +25,15 @@
 			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 		</or>
 	</condition>
+	
 	<property name="rainbowHome" value="../dist_${platform}"/>
+	<property name="fs" value="${file.separator}"/>
+	<condition property="compare" value="fc" else="diff">
+		<os family="windows"/>
+	</condition>
+	<condition property="startDotStar" value="*.*" else="">
+		<os family="windows"/>
+	</condition>
 
 	<target name="runtests">
 
@@ -38,6 +46,9 @@
 			<fileset dir="miscellaneous/out"/>
 		</delete>
 
+		<exec executable="java">
+		 <arg line="-jar ${rainbowHome}/lib/rainbow.jar -p miscellaneous/XSLT_Test.rnb -x oku_xsltransform -np"/>
+		</exec>
 		<exec executable="java">
 		 <arg line="-jar ${rainbowHome}/lib/rainbow.jar -p miscellaneous/LineBreak_ToDos.rnb -x oku_linebreakconversion -np"/>
 		</exec>
@@ -78,9 +89,6 @@
 		 <arg line="-jar ${rainbowHome}/lib/rainbow.jar -p miscellaneous/SearchReplaceNoFilterRegEx_Test.rnb -x oku_searchandreplace -np"/>
 		</exec>
 		<exec executable="java">
-		 <arg line="-jar ${rainbowHome}/lib/rainbow.jar -p miscellaneous/XSLT_Test.rnb -x oku_xsltransform -np"/>
-		</exec>
-		<exec executable="java">
 		 <arg line="-jar ${rainbowHome}/lib/rainbow.jar -p miscellaneous/BOM_Add.rnb -x oku_bomconversion -np"/>
 		</exec>
 		
@@ -113,54 +121,54 @@
 
 	</target>
 	
-	<target name="winCompare" if="isWindows">
-		<exec executable="fc" output="_tests_results.txt">
-		 <arg line="miscellaneous\gold\*.* miscellaneous\out\*.*"/>
+	<target name="compare">
+		<exec executable="${compare}" output="_tests_results.txt">
+		 <arg line="miscellaneous${fs}gold${fs}${startDotStar} miscellaneous${fs}out${fs}${startDotStar}"/>
 		</exec>
 		
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.html extraction\test1_gold\*.html"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.html extraction${fs}test1_gold${fs}*.html"/>
 		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.xml extraction\test1_gold\*.xml"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.xml extraction${fs}test1_gold${fs}*.xml"/>
 		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.properties extraction\test1_gold\*.properties"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.properties extraction${fs}test1_gold${fs}*.properties"/>
 		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.xlf extraction\test1_gold\*.xlf"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.xlf extraction${fs}test1_gold${fs}*.xlf"/>
 		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.info extraction\test1_gold\*.info"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.info extraction${fs}test1_gold${fs}*.info"/>
 		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test1_out\done\*.po extraction\test1_gold\*.po"/>
-		</exec>
-		
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.html extraction\test2_gold\*.html"/>
-		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.xml extraction\test2_gold\*.xml"/>
-		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.properties extraction\test2_gold\*.properties"/>
-		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.xlf extraction\test2_gold\*.xlf"/>
-		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.info extraction\test2_gold\*.info"/>
-		</exec>
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test2_out\done\*.po extraction\test2_gold\*.po"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test1_out${fs}done${fs}*.po extraction${fs}test1_gold${fs}*.po"/>
 		</exec>
 		
-		<exec executable="fc" output="_tests_results.txt" append="true">
-		 <arg line="extraction\test3_out\done\*.info extraction\test3_gold\*.info"/>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.html extraction${fs}test2_gold${fs}*.html"/>
+		</exec>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.xml extraction${fs}test2_gold${fs}*.xml"/>
+		</exec>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.properties extraction${fs}test2_gold${fs}*.properties"/>
+		</exec>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.xlf extraction${fs}test2_gold${fs}*.xlf"/>
+		</exec>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.info extraction${fs}test2_gold${fs}*.info"/>
+		</exec>
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test2_out${fs}done${fs}*.po extraction${fs}test2_gold${fs}*.po"/>
+		</exec>
+		
+		<exec executable="${compare}" output="_tests_results.txt" append="true">
+		 <arg line="extraction${fs}test3_out${fs}done${fs}*.info extraction${fs}test3_gold${fs}*.info"/>
 		</exec>
 	</target>
 	
-	<target name="all" depends="runtests, winCompare"/>
+	<target name="all" depends="runtests, compare"/>
 
 </project>

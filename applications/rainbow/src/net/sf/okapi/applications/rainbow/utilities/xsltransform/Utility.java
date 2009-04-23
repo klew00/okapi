@@ -106,6 +106,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			Source xmlInput = new javax.xml.transform.stream.StreamSource(
 				new File(getInputPath(0)));
 			// Create the output
+			Util.createDirectories(getOutputPath(0)); // Make sure the folder exists
 			Result result = new javax.xml.transform.stream.StreamResult(
 				new File(getOutputPath(0)));
 			trans.transform(xmlInput, result);
