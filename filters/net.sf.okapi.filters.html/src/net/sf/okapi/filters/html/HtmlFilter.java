@@ -35,9 +35,11 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
@@ -115,9 +117,6 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		}
 
 		// check for ignorable whitespace and add it to the skeleton
-		// The Jericho html parser always pulls out the largest stretch of text
-		// so standalone whitespace should always be ignorable if we are not
-		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
 			if (bufferedWhitespace.length() <= 0) {
 				// buffer the whitespace until we know that we are not inside
@@ -127,31 +126,11 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			return;
 		}
 
-		String decodedText = text.toString();
-
-		// collapse whitespace only if config says we can and preserve
-		// whitespace is false
-		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
-			decodedText = collapseWhitespace(decodedText);
-		}
-		decodedText = Util.normalizeNewlines(decodedText);
-
 		if (canStartNewTextUnit()) {
-			startTextUnit(decodedText);
+			startTextUnit(text.toString());
 		} else {
-			addToTextUnit(decodedText);
+			addToTextUnit(text.toString());
 		}
-	}
-
-	@Override
-	protected void endTextUnit() {
-		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
-			Event e = peekMostRecentTextUnit();
-			TextUnit tu = (TextUnit) e.getResource();
-			tu.getSourceContent().trim();
-		}
-
-		super.endTextUnit();
 	}
 
 	private String collapseWhitespace(String text) {
@@ -438,15 +417,27 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 					mainEndPos, valueStartPos, valueEndPos);
 		}
 
-		// convert all entities to Unicode
-		String decodedValue = CharacterReference.decode(value, true);
+		return super.createPropertyTextUnitPlaceholder(type, name, normalizeHtmlText(value, true), tag, attribute);
+	}
 
+	@Override
+	protected Event postProcessText(Event textUnit) {
+		TextFragment text = ((TextUnit) textUnit.getResource()).getSourceContent();
+		text.setCodedText(normalizeHtmlText(text.getCodedText(), false));
+		return textUnit;
+	}
+
+	private String normalizeHtmlText(String text, boolean insideAttribute) {
+		// convert all entities to Unicode
+		String decodedValue = CharacterReference.decode(text, insideAttribute);
+		
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedValue = collapseWhitespace(decodedValue);
+			decodedValue = decodedValue.trim();
 		}
 		decodedValue = Util.normalizeNewlines(decodedValue);
 
-		return super.createPropertyTextUnitPlaceholder(type, name, decodedValue, tag, attribute);
+		return decodedValue;
 	}
 
 	/*

@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -30,6 +31,29 @@ class TestUtils {
 			}
 		};
 		return dir.list(filter);
+	}
+
+	public static void printEvents(ArrayList<Event> events) {
+		for (Event event : events) {
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+				assertTrue(event.getResource() instanceof TextUnit);
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
+				assertTrue(event.getResource() instanceof DocumentPart);
+			} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
+				assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
+			}
+			System.out.print(event.getEventType().toString() + ": ");
+			if (event.getResource() != null) {
+				if (event.getResource() instanceof DocumentPart) {
+					System.out.println(((DocumentPart) event.getResource()).getSourcePropertyNames());
+				} else {
+					System.out.println(event.getResource().toString());
+				}
+				if (event.getResource().getSkeleton() != null) {
+					System.out.println("\tSkeleton: " + event.getResource().getSkeleton().toString());
+				}
+			}
+		}
 	}
 
 	public static void printEvents(String file) {

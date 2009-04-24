@@ -853,12 +853,36 @@ public abstract class AbstractBaseFilter implements IFilter {
 		 */
 		tempTextUnit = popTempEvent();
 
+		// Test if we actually have text of some type, if not convert this Event
+		// into a DocumrntPart
+		TextUnit tu = (TextUnit) tempTextUnit.getResource();
+		if (!tu.getSource().hasText()) {
+			startDocumentPart(tu.getSource().toString());
+			if (endMarker != null) {
+				addToDocumentPart(endMarker.toString());
+			}
+			endDocumentPart();
+			return;
+		}
+
 		if (endMarker != null) {
 			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 			skel.add((GenericSkeleton) endMarker);
 		}
 
+		tempTextUnit = postProcessText(tempTextUnit);
+
 		filterEvents.add(tempTextUnit);
+	}
+
+	/**
+	 * Do any required post-processing on the TextUnit before the {@link Event}
+	 * leaves the {@link IFilter}. Default implementation leaves Event
+	 * unchanged. Override this method if you need to do format specific handing
+	 * such as collapsing whitespace.
+	 */
+	protected Event postProcessText(Event tempTextUnit) {
+		return tempTextUnit;
 	}
 
 	/**

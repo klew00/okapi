@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests.integration;
+package net.sf.okapi.filters.html.tests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -8,11 +8,11 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { HtmlFullFileTest.class })
-public class AllTests {
+@SuiteClasses( { HtmlEventTest.class, HtmlSnippetsTest.class, HtmlConfigurationTest.class, HtmlDetectBomTest.class })
+public class AllHtmlUnitTests {
 
 	public static Test suite() {
-		return new JUnit4TestAdapter(AllTests.class);
+		return new JUnit4TestAdapter(AllHtmlUnitTests.class);
 	}
 
 }

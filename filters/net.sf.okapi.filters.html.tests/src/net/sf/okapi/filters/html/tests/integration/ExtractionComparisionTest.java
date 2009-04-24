@@ -50,6 +50,10 @@ public class ExtractionComparisionTest {
 			roundTripEvents(f);
 			
 			assertTrue(FilterTestDriver.compareEvents(originalEvents, postExtractionEvents));
+			//assertTrue(originalEvents.size() == postExtractionEvents.size());
+			/*if (!FilterTestDriver.compareEvents(originalEvents, postExtractionEvents)) {
+				TestUtils.printEvents(postExtractionEvents);
+			}*/
 		}
 	}
 

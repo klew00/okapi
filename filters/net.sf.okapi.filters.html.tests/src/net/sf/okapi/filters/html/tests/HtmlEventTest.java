@@ -190,6 +190,25 @@ public class HtmlEventTest {
 	}
 	
 	@Test
+	public void testTextUnitWithoutText() {
+		String snippet = "<b>    <font>  </font> </b>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		// Build the input
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp1 = new DocumentPart("dp1", false);
+		skel.add(snippet);
+		dp1.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+	
+	@Test
 	public void testXmlLang() {
 		String snippet = "<yyy xml:lang=\"en\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();

@@ -688,6 +688,16 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Indicates if the fragment contains at least one character
 	 * (inline code and annotation markers do not count as characters).
+	 * 
+	 * @return true if the fragment contains at least one character, excluding whitespace.
+	 */
+	public boolean hasText () {
+		return hasText(false);
+	}
+	
+	/**
+	 * Indicates if the fragment contains at least one character
+	 * (inline code and annotation markers do not count as characters).
 	 * @param whiteSpacesAreText indicates if white-spaces should be considered 
 	 * characters or not for the purpose of checking if this fragment is empty.
 	 * @return true if the fragment contains at least one character (that character could
