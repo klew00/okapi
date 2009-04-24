@@ -22,6 +22,8 @@ package net.sf.okapi.lib.ui.segmentation;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
@@ -980,14 +982,27 @@ public class SRXEditor {
 	 */
 	private void editMaskRule () {
 		try {
-			InputDialog dlg = new InputDialog(shell, Res.getString("edit.maskRuleCaption"), //$NON-NLS-1$
-				Res.getString("edit.maskRuleDesc"), "", null, 0);  //$NON-NLS-1$  //$NON-NLS-2$
-			dlg.setInputValue(srxDoc.getMaskRule());
-			dlg.setAllowEmptyValue(true);
-			String result = dlg.showDialog();
-			if ( result == null ) return; // Canceled
+			String pattern = srxDoc.getMaskRule();
+			while ( true ) {
+				InputDialog dlg = new InputDialog(shell, Res.getString("edit.maskRuleCaption"), //$NON-NLS-1$
+					Res.getString("edit.maskRuleDesc"), "", null, 0);  //$NON-NLS-1$  //$NON-NLS-2$
+				dlg.setInputValue(pattern);
+				dlg.setAllowEmptyValue(true);
+				pattern = dlg.showDialog();
+				if ( pattern == null ) return; // Canceled
+				// Check the syntax
+				try {
+					Pattern.compile(pattern.replace(SRXDocument.ANYCODE,
+						SRXDocument.INLINECODE_PATTERN));
+				}
+				catch ( PatternSyntaxException e ) {
+					Dialogs.showError(shell, e.getLocalizedMessage(), null);
+					continue;
+				}
+				break;
+			}
 			// Else: Set the new expression
-			srxDoc.setMaskRule(result);
+			srxDoc.setMaskRule(pattern);
 			updateResults(true);
 		}
 		catch ( Throwable e ) {

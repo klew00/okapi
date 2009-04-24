@@ -59,11 +59,27 @@ public class SRXDocument {
 	private static final String   NSURI_OKPSRX = "http://okapi.sf.net/srx-extensions";
 	private static final String   NSPREFIX_OKPSRX = "okpsrx";
 
-	// Do not include segment markers because they should not be present on text to segment
-	private static final String   INLINECODES_PATTERN = String.format("(([\\u%X\\u%X\\u%X].)*)",
+	/**
+	 * Represents the pattern for an inline code (both special characters). 
+	 */
+	public static final String INLINECODE_PATTERN = String.format("([\\u%X\\u%X\\u%X].)",
 		TextFragment.MARKER_OPENING, TextFragment.MARKER_CLOSING, TextFragment.MARKER_ISOLATED);
-	private static final String   NOAUTO = "[noauto]";
-			
+	
+	/**
+	 * Marker for INLINECODE_PATTERN in the given pattern.
+	 * \Y+ = one or more codes, \Y* = zero, one or more codes, etc.
+	 */
+	public static final String ANYCODE = "\\Y";
+
+	/**
+	 * Placed at the end of the 'after' expression, this marker indicates the given pattern
+	 * should not have auto-insertion of AUTO_INLINECODES. 
+	 */
+	public static final String NOAUTO = "[noauto]";
+	
+	// Represents zero, one or more inline codes. this is used in auto-insertion cases
+	private static final String AUTO_INLINECODES = "("+INLINECODE_PATTERN+"*)";
+	
 	private boolean cascade;
 	private boolean segmentSubFlows;
 	private boolean includeStartCodes;
@@ -561,21 +577,23 @@ public class SRXDocument {
 			throw new SegmentationRuleException("language rule '"+ruleName+"' not found.");
 		}
 		ArrayList<Rule> langRule = langRules.get(ruleName);
+		String pattern = null;
 		for ( Rule rule : langRule ) {
 			if ( rule.isActive ) {
 				if ( rule.before.endsWith(NOAUTO)) {
-					segmenter.addRule(
-						// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
-						new CompiledRule("("+rule.before.substring(0, rule.before.length()-NOAUTO.length())
-							+")("+rule.after+")", rule.isBreak));
+					// If the rule.before ends with NOAUTO, then we do not put pattern for in-line codes
+					pattern = "("+rule.before.substring(0, rule.before.length()-NOAUTO.length())
+						+")("+rule.after+")";
 				}
 				else {
-					segmenter.addRule(
-						// The compiled rule is made of two groups: the pattern before and the pattern after
-						// the break. A special pattern for in-line codes is also added transparently.
-						new CompiledRule("("+rule.before+INLINECODES_PATTERN+")("+rule.after+")",
-							rule.isBreak));
+					// The compiled rule is made of two groups: the pattern before and the pattern after
+					// the break. A special pattern for in-line codes is also added transparently.
+					pattern = "("+rule.before+AUTO_INLINECODES+")("+rule.after+")";
 				}
+				// Replace special markers ANYCODES by inline code pattern
+				pattern = pattern.replace(ANYCODE, INLINECODE_PATTERN);
+				// Compile and add the rule
+				segmenter.addRule(new CompiledRule(pattern, rule.isBreak));
 			}
 		}
 		

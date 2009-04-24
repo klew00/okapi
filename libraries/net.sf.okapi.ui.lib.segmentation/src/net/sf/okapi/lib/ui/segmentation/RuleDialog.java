@@ -27,6 +27,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.segmentation.Rule;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -146,8 +147,11 @@ public class RuleDialog {
 				edBefore.setFocus();
 				return false;
 			}
-			Pattern.compile(edBefore.getText());
-			Pattern.compile(edAfter.getText());
+			// We are just testing the syntax here, so no need to do more that replace
+			// the ANYCODE by something valid
+			Pattern.compile(edBefore.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN));
+			Pattern.compile(edAfter.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN));
+			// The patterns pass: create the new rule
 			result = new Rule(edBefore.getText(), edAfter.getText(), rdBreak.getSelection());
 			return true;
 		}
