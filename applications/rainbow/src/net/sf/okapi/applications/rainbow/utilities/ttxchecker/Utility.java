@@ -71,7 +71,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 	}
 
 	public boolean hasParameters () {
-		return true;
+		return false; // Not for now
 	}
 
 	public boolean isFilterDriven () {

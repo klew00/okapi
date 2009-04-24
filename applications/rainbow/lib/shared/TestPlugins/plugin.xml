@@ -6,7 +6,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.extraction.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Translation Package Creation</name>
    <description>Creates a translation package.</description>
@@ -23,7 +23,7 @@
   id="oku_merging"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Translation Package Post-Processing</name>
    <description>Post-processes translation packages.</description>
@@ -38,7 +38,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Text Rewriting</name>
    <description>Re-writes documents with different changes, for
@@ -58,7 +58,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>ID-Based Alignment</name>
    <description>Aligns pairs of files to create a TMX output.</description>
@@ -71,7 +71,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Search And Replace</name>
    <description>Performs a search and replace on the input file.</description>
@@ -86,7 +86,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Encoding Conversion</name>
    <description>Converts a text input file from one encoding to another.</description>
@@ -99,7 +99,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Line-Break Conversion</name>
    <description>Converts the line-breaks of any text input file to a give type.</description>
@@ -112,7 +112,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Byte-Order-Mark Conversion</name>
    <description>Adds or removes the Unicode Byte-Order-Mark of any text input file to a give type.</description>
@@ -125,7 +125,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>URI Conversion</name>
    <description>Performs a URI conversion on the input file.</description>
@@ -137,7 +137,7 @@
    id="oku_rtfconversion"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.rtfconversion.Utility"
-   updateUri="http://okapi.sf.net/">
+   updateUri="http://okapi.opentag.com/updates.html">
    <info>
     <name>RTF Conversion</name>
     <description>Convers the input RTF to different formats.</description>
@@ -152,7 +152,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.xsltransform.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>XSL Transformation</name>
    <description>Processes an input XML document with a given XSLT template.</description>
@@ -165,7 +165,7 @@
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Utility"
   editorClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Editor"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Used Characters Listing</name>
    <description>Provides a list of all characters used in the translatable parts of the input file.</description>
@@ -178,7 +178,7 @@
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Utility"
    editorClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Editor"
-   updateUri="http://okapi.sf.net/">
+   updateUri="http://okapi.opentag.com/updates.html">
    <info>
     <name>Translation Comparison</name>
     <description>Compare two sets of translations.</description>
@@ -190,8 +190,7 @@
    id="oku_ttxchecker"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.ttxchecker.Utility"
-   editorClass="net.sf.okapi.applications.rainbow.utilities.ttxchecker.Editor"
-   updateUri="http://okapi.sf.net/">
+   updateUri="http://okapi.opentag.com/updates.html">
    <info>
     <name>TTX Checker</name>
     <description>Check ttx file(s) for errors.</description>
@@ -203,7 +202,7 @@
   id="oku_twbbatchanalysis"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.twbbatchanalysis.Utility"
-  updateUri="http://okapi.sf.net/">
+  updateUri="http://okapi.opentag.com/updates.html">
   <info>
    <name>Trados Batch Analysis</name>
    <description>Execute a batch TM analysis on the provided input files.</description>
