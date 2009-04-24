@@ -35,6 +35,10 @@ public class Consumer extends BasePipelineStep {
 		return "Consumer";
 	}
 
+	public String getDescription() {
+		return "Description";
+	}
+
 	@Override
 	public void postprocess() {		
 		LOGGER.log(Level.FINEST, getName() + " postprocess");

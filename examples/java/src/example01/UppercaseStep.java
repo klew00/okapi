@@ -44,9 +44,13 @@ public class UppercaseStep implements IPipelineStep {
 	}
 
 	public String getName () {
-		return "UppercaseStep";
+		return "Uppercase";
 	}
 
+	public String getDescription () {
+		return "Converts text to upper cases.";
+	}
+	
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:

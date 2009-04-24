@@ -41,6 +41,10 @@ public class FilterPipelineStepAdaptor extends BasePipelineStep {
 		return filter.getName();
 	}
 	
+	public String getDescription () {
+		return "Filters a RawDocument into filter events.";
+	}
+	
 	@Override
 	public void preprocess() {
 		hasEvents = true; 

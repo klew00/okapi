@@ -30,7 +30,11 @@ public class XsltTransformStep extends BasePipelineStep {
 	public String getName() {
 		return "XSLT Processing Step";
 	}
-
+	 
+	public String getDescription () {
+		return "Applies an XSLT template to the document.";
+	}
+	
 	/**
 	 * handler takes a 
 	 */

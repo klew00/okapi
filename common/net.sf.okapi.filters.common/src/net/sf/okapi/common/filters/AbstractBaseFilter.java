@@ -1242,8 +1242,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	/**
 	 * Set the tag type of the current tag (BOLD, UNDERLINED etc..).
 	 * 
-	 * @param tagType
-	 *            the tagType of the current tag.
+	 * @return the tagType of the current tag.
 	 */
 	public String getTagType() {
 		return currentTagType;

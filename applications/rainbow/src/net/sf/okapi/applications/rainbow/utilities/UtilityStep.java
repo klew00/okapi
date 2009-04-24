@@ -45,6 +45,11 @@ public class UtilityStep implements IPipelineStep {
 		return utility.getName();
 	}
 
+	public String getDescription () {
+		// TODO: Implement real descriptions
+		return utility.getName();
+	}
+	
 	public void pause () {
 	}
 

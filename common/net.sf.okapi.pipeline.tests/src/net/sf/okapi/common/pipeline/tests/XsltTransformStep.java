@@ -31,6 +31,10 @@ public class XsltTransformStep extends BasePipelineStep {
 		return "XSLT Processing Step";
 	}
 
+	public String getDescription () {
+		return "Applies an XSLT template to the document.";
+	}
+	
 	@Override
 	protected void handleRawDocument(Event event) {
 		

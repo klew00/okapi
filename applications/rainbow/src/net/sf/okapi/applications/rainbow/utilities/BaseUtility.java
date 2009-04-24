@@ -65,6 +65,11 @@ public abstract class BaseUtility implements IUtility {
 		listenerList.remove(CancelListener.class, listener);
 	}
 
+	public String getDescription() {
+		// TODO: Implement real description
+		return null;
+	}
+	
 	public void setContextUI (Object contextUI,
 		IHelp helpParam,
 		String updateCommand,

@@ -36,6 +36,10 @@ public class Producer extends BasePipelineStep {
 		return "Producer";
 	}
 
+	public String getDescription() {
+		return "Description";
+	}
+
 	@Override
 	public void postprocess() {	
 		LOGGER.log(Level.FINEST, getName() + " postprocess");

@@ -47,9 +47,13 @@ public class PseudoTranslateStep implements IPipelineStep {
 	}
 
 	public String getName () {
-		return "PseudoTranslateStep";
+		return "Pseudo-Translation";
 	}
 
+	public String getDescription () {
+		return "Pseudo-translates text.";
+	}
+	
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:

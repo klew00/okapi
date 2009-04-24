@@ -56,11 +56,6 @@ public class TextContainer extends TextFragment {
 		annotations = new Annotations();
 	}
 	
-//	@Override
-//	public String toString () {
-//		return text.toString();
-//	}
-	
 	/**
 	 * Clones this TextContainer.
 	 * @return A new TextContainer object that is a copy of this one. 

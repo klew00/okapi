@@ -317,7 +317,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Gets the source object for this TextUnit.
+	 * Gets the source object for this TextUnit (a {@link TextContainer} object).
 	 * @return the source object for this TextUnit.
 	 */
 	public TextContainer getSource () {
@@ -408,7 +408,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Gets the content of the source for this TextUnit.
+	 * Gets the content of the source for this TextUnit (a {@link TextFragment} object).
 	 * @return the content of the source for this TextUnit.
 	 */
 	public TextFragment getSourceContent () {
