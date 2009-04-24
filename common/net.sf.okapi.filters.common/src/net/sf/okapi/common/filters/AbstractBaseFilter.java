@@ -1240,6 +1240,16 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
+	 * Set the tag type of the current tag (BOLD, UNDERLINED etc..).
+	 * 
+	 * @param tagType
+	 *            the tagType of the current tag.
+	 */
+	public String getTagType() {
+		return currentTagType;
+	}
+
+	/**
 	 * Is the input encoded as UTF-8?
 	 * 
 	 * @return true if input is UTF-8, false otherwise.
