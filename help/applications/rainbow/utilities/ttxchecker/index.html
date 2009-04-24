@@ -1,0 +1,38 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>XSL Transformation</title>
+<link rel="stylesheet" type="text/css" href="../../../../help.css">
+</head>
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Utilities</h1>
+		<h2 class="head2">TTX Checker</h2></td>
+	</tr>
+	<tr>
+		<td class="smalltoc"></td>
+		<td class="hmenu">
+			<div class="hmenu"><table align="right"><tr>
+				<td><a href="../index.html">Utilities</a></td>
+				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
+			</tr></table></div>
+		</td>
+	</tr>
+</table>
+<p>During translation of Trados TTX files, target segmentation may in some cases prevent saving out the target after translation. The most common issue relates to inline codes. TagEditor has some requirements regarding the number and order of text segments and inline codes. This utility will identify potential problem areas.</p>
+<p>This utility does not use filters.</p>
+<h2>Input Parameters</h2>
+<ul>
+	<li>The list of the TTX documents to check (Input list 1).</li>
+</ul>
+<h2>Configuration</h2>
+<h3>Options Tab</h3>
+<h3>Check TTX</h3>
+<p>The only thing you need to do is add the documents to the input list.
+Target and Source language will be based on what's specified in each ttx file. Potential problem areas will be listed in the Rainbow Log (F9). Focus on the issues marked as "High" priority. In some cases you may need to address some "Low" priority issues as well. Open the ttx file TagEditor and address the issues in the Rainbow log.</p>
+<p>For each issue the logfile will display two types of information. The first one is the logical pieces where a text segment is represented as a tag. Comparing source and target will gives you an idea where the problem is located. The second section shows the tags and the actual text. Use the text to locate the area in the file in TagEditor. The current way we're fixing issues is to add "dummy" text to empty segments. That dummy text can then be deleted once the target has been saved out.</p>
+<p>&nbsp;</p>
+</body>
+</html>
