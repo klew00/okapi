@@ -103,6 +103,21 @@ jyaml-1.3.jar jericho-html-3.1-dev-4.jar"/>
 			excludes="MANIFEST.MF"
   		/>
 
+		<copy todir="${dist}/localweb/devguide">
+			<fileset dir="../../website/devguide">
+				<exclude name="**/_*"/>
+				<exclude name="**/.*"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
+
+		<javadoc destdir="${dist}/localweb/javadoc">
+			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
+			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
+			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
+			<packageset dir="../../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
+		</javadoc>
+
 		<copy todir="${dist}" file="data/readme.html"/>
 		
 		<copy todir="${dist}/examples/java">
