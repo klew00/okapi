@@ -180,7 +180,7 @@ public class TextFragmentTest {
 		assertEquals(code2.getType(), "type");
 		assertEquals(code2.getData(), "data");
 		assertEquals(code2.getOuterData(), "outer");
-		assertEquals(code2.getId(), 1); // ID automatically adjusted to 1
+		assertEquals(code2.getId(), 100);
 		assertEquals(code2.getTagType(), TagType.PLACEHOLDER);
 		
 		Code code4 = code2.clone();
@@ -188,7 +188,7 @@ public class TextFragmentTest {
 		assertEquals(code4.getType(), "type");
 		assertEquals(code4.getData(), "data");
 		assertEquals(code4.getOuterData(), "outer");
-		assertEquals(code4.getId(), 1); // ID automatically adjusted to 1
+		assertEquals(code4.getId(), 100);
 		assertEquals(code4.getTagType(), TagType.PLACEHOLDER);
 		
 		code1 = new Code(TagType.PLACEHOLDER, "t", "d");

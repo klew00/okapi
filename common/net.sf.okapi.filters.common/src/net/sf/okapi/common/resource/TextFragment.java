@@ -345,8 +345,8 @@ public class TextFragment implements Comparable<Object> {
 	 * Creates an empty TextFragment.
 	 */
 	public TextFragment () {
-		//this.parent = parent;
 		text = new StringBuilder();
+		isBalanced = true;
 	}
 
 	/**
@@ -355,6 +355,7 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public TextFragment (String text) {
 		this.text = new StringBuilder((text==null) ? "" : text);
+		isBalanced = true;
 	}
 
 	/**
@@ -362,8 +363,8 @@ public class TextFragment implements Comparable<Object> {
 	 * @param fragment the content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
-		//this.parent = parent;
 		text = new StringBuilder();
+		isBalanced = true;
 		insert(-1, fragment);
 	}
 	
@@ -376,7 +377,6 @@ public class TextFragment implements Comparable<Object> {
 	public TextFragment (String newCodedText,
 		List<Code> newCodes)
 	{
-		//this.parent = parent;
 		setCodedText(newCodedText, newCodes, false);
 	}
 	
@@ -452,11 +452,24 @@ public class TextFragment implements Comparable<Object> {
 			append(""+((char)MARKER_SEGMENT)+toChar(codes.size()));
 			break;
 		}
-		// Create the code
-		codes.add(code); //Code newCode = code.clone();
-		if ( code.tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
+		// Flag it as needing balancing, if needed
 		if (( code.tagType != TagType.PLACEHOLDER )
-			&& ( code.tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
+			&& ( code.tagType != TagType.SEGMENTHOLDER )) {
+			// Set as not balanced only if no id is defined
+			if ( code.id == -1) isBalanced = false;
+		}
+		// Add the code
+		codes.add(code);
+		if ( code.tagType != TagType.CLOSING ) {
+			if ( codes.get(codes.size()-1).id == -1 ) {
+				codes.get(codes.size()-1).id = ++lastCodeID;
+			}
+			else { // Make sure the last ID is up to date
+				if ( codes.get(codes.size()-1).id > lastCodeID ) {
+					lastCodeID = codes.get(codes.size()-1).id;
+				}
+			}
+		}
 		return code;
 	}
 
@@ -506,9 +519,68 @@ public class TextFragment implements Comparable<Object> {
 		}
 		// Create the code
 		codes.add(new Code(tagType, type, data));
-		if ( tagType != TagType.CLOSING ) codes.get(codes.size()-1).id = ++lastCodeID;
+		if ( tagType != TagType.CLOSING ) {
+			codes.get(codes.size()-1).id = ++lastCodeID;
+		}
 		if (( tagType != TagType.PLACEHOLDER )
 			&& ( tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
+		return codes.get(codes.size()-1);
+	}
+
+	/**
+	 * Appends a new code to the text, when the code has a defined identifier.
+	 * @param tagType the tag type of the code (e.g. TagType.OPENING).
+	 * @param type the type of the code (e.g. "bold").
+	 * @param data the raw code itself. (e.g. "&lt;b>").
+	 * @param id the identifier to use for this code.
+	 * @return the new code that was added to the text.
+	 */
+	public Code append (TagType tagType,
+		String type,
+		String data,
+		int id)
+	{
+		// Create the list of codes if needed
+		if ( codes == null ) codes = new ArrayList<Code>();
+		// Append the code marker
+		switch ( tagType ) {
+		case OPENING:
+			append(""+((char)MARKER_OPENING)+toChar(codes.size()));
+			break;
+		case CLOSING:
+			append(""+((char)MARKER_CLOSING)+toChar(codes.size()));
+			break;
+		case PLACEHOLDER:
+			append(""+((char)MARKER_ISOLATED)+toChar(codes.size()));
+			break;
+		case SEGMENTHOLDER:
+			append(""+((char)MARKER_SEGMENT)+toChar(codes.size()));
+			break;
+		}
+		
+		// Create the code
+		Code code = new Code(tagType, type, data);
+		code.id = id;
+		codes.add(code);
+		
+		// Flag it as needing balancing, if needed
+		if (( code.tagType != TagType.PLACEHOLDER )
+			&& ( code.tagType != TagType.SEGMENTHOLDER )) {
+			// Set as not balanced only if no id is defined
+			if ( id == -1) isBalanced = false;
+		}
+
+		if ( code.tagType != TagType.CLOSING ) {
+			if ( id == -1 ) {
+				code.id = ++lastCodeID;
+			}
+			else { // Make sure the last ID is up to date
+				if ( id > lastCodeID ) {
+					lastCodeID = id;
+				}
+			}
+		}
+
 		return codes.get(codes.size()-1);
 	}
 
@@ -686,22 +758,22 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Indicates if the fragment contains at least one character
+	 * Indicates if this fragment contains at least one character other than a whitespace.
 	 * (inline code and annotation markers do not count as characters).
 	 * 
-	 * @return true if the fragment contains at least one character, excluding whitespace.
+	 * @return true if this fragment contains at least one character, excluding whitespaces.
 	 */
 	public boolean hasText () {
 		return hasText(false);
 	}
 	
 	/**
-	 * Indicates if the fragment contains at least one character
+	 * Indicates if this fragment contains at least one character
 	 * (inline code and annotation markers do not count as characters).
-	 * @param whiteSpacesAreText indicates if white-spaces should be considered 
+	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
 	 * characters or not for the purpose of checking if this fragment is empty.
-	 * @return true if the fragment contains at least one character (that character could
-	 * be a white-space if whiteSpacesAreText is set to true).
+	 * @return true if this fragment contains at least one character (that character could
+	 * be a whitespace if whiteSpacesAreText is set to true).
 	 */
 	public boolean hasText (boolean whiteSpacesAreText) {
 		for ( int i=0; i<text.length(); i++ ) {

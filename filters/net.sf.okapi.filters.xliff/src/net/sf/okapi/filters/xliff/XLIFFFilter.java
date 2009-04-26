@@ -64,7 +64,6 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import org.codehaus.stax2.XMLInputFactory2;
-import org.xml.sax.InputSource;
 
 public class XLIFFFilter implements IFilter {
 
@@ -192,8 +191,7 @@ public class XLIFFFilter implements IFilter {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
 		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
-		InputSource is = new InputSource(new StringReader(inputText.toString()));
-		commonOpen(1, is);
+		commonOpen(1, new StringReader(inputText.toString()));
 	}
 
 	private void open (URI inputURI) {
@@ -721,6 +719,7 @@ public class XLIFFFilter implements IFilter {
 			idStack.push(id);
 			int eventType;
 			String name;
+			String tmp;
 			Code code;
 			TextFragment segment = null;
 			int segIdStack = -1;
@@ -746,7 +745,7 @@ public class XLIFFFilter implements IFilter {
 					if ( name.equals(tagName) ) {
 						return content;
 					}
-					if ( name.equals("mrk") ) { // check of end of segment
+					if ( name.equals("mrk") ) { // Check of end of segment
 						if ( idStack.pop() == segIdStack ) {
 							current = content; // Point back to content
 							segIdStack = -1; // Reset to not trigger segment ending again
@@ -756,11 +755,12 @@ public class XLIFFFilter implements IFilter {
 						}
 					}
 					// Other cases
-					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
+					if ( name.equals("g") || name.equals("mrk") ) {
 						if ( store ) storeEndElement();
-						code = current.append(TagType.CLOSING, name, ""); 
+						// Leave the id set to -1 for balancing
+						code = current.append(TagType.CLOSING, name, "");
 						idStack.pop();
-						String tmp = reader.getPrefix();
+						tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
 							code.setOuterData("</"+tmp+":"+name+">");
 						}
@@ -784,9 +784,10 @@ public class XLIFFFilter implements IFilter {
 						}
 					}
 					// Other cases
-					if ( name.equals("g") || name.equals("mrk") ) { //TODO: || name.equals("sub") ) {
-						idStack.push(++id);
-						code = current.append(TagType.OPENING, name, "");
+					if ( name.equals("g") || name.equals("mrk") ) {
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						idStack.push(id);
+						code = current.append(TagType.OPENING, name, "", id);
 						// Get the outer code
 						String prefix = reader.getPrefix();
 						StringBuilder tmpg = new StringBuilder();
@@ -816,20 +817,47 @@ public class XLIFFFilter implements IFilter {
 						code.setOuterData(tmpg.toString());
 					}
 					else if ( name.equals("x") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
+					}
+					else if ( name.equals("bx") ) {
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
+					}
+					else if ( name.equals("ex") ) {
+						// No support for overlapping codes yet
+						appendCode(TagType.CLOSING, -1, name, "Xpt", store, current);
 					}
 					else if ( name.equals("bpt") ) {
-						idStack.push(++id);
-						appendCode(TagType.OPENING, id, name, store, current);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ept") ) {
-						appendCode(TagType.CLOSING, idStack.pop(), name, store, current);
+						// We assume balanced codes for now, so we use the current one
+						//TODO: Change this to handle overlapping cases
+						appendCode(TagType.CLOSING, -1, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ph") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
 					}
 					else if ( name.equals("it") ) {
-						appendCode(TagType.PLACEHOLDER, ++id, name, store, current);
+						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						tmp = reader.getAttributeValue(null, "pos");
+						TagType tt = TagType.PLACEHOLDER;
+						if ( tmp == null ) {
+							logger.severe("Missing pos attribute for <it> element.");
+						}
+						else if ( tmp.equals("close") ) {
+							tt = TagType.CLOSING;
+						}
+						else if ( tmp.equals("open") ) {
+							tt = TagType.OPENING;
+						}
+						else {
+							logger.severe(String.format("Invalid value '%s' for pos attribute.", tmp));
+						}
+						appendCode(tt, id, name, name, store, current);
 					}
 					break;
 				}
@@ -843,19 +871,28 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 
+	private int retrieveId (int currentIdValue,
+		String id)
+	{
+		if ( id == null ) return ++currentIdValue;
+		return Integer.valueOf(id);
+	}
+	
 	/**
 	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
 	 * @param type The type of in-line code.
-	 * @param id The id of the code to add.
-	 * @param tagName The tag name of the in-line element to process.
-	 * @param store True if we need to store the data in the skeleton.
-	 * @param content The object where to put the code.
-	 * @param inlineCodes Array where to save the original in-line code.
+	 * @param id the id of the code to add.
+	 * @param tagName the tag name of the in-line element to process.
+	 * @param type the type of code (bpt and ept must use the same one so they can match!) 
+	 * @param store true if we need to store the data in the skeleton.
+	 * @param content the object where to put the code.
+	 * @param inlineCodes array where to save the original in-line code.
 	 * Do not save if this parameter is null.
 	 */
 	private void appendCode (TagType tagType,
 		int id,
 		String tagName,
+		String type,
 		boolean store,
 		TextFragment content)
 	{
@@ -913,7 +950,7 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
-						Code code = content.append(tagType, tagName, innerCode.toString());
+						Code code = content.append(tagType, type, innerCode.toString(), id);
 						outerCode.append("</"+tagName+">");
 						code.setOuterData(outerCode.toString());
 						return;	

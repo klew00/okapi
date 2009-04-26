@@ -97,29 +97,28 @@ public class TextContainer extends TextFragment {
 	/**
 	 * Gets the TextFragment for this TextContainer. Because TextContainer is an extension of
 	 * TextFragment this methods returns this object itself, but typed as a TextFragment.
-	 * @return This object itself, but typed as a TextFragment.
+	 * @return this object itself, but typed as a TextFragment.
 	 */
 	public TextFragment getContent () {
 		return this;
 	}
 	
 	/**
-	 * Sets the content of this TextContainer.
-	 * @param content The new content to set. 
+	 * Sets the content of this TextContainer. the new content must not have segment markers.
+	 * @param content the new content to set.
 	 */
 	public void setContent (TextFragment content) {
-		//TODO: Fix this, this is not right, maybe just call clone()?
 		text = new StringBuilder();
-		insert(-1, content);
-		this.lastCodeID = content.lastCodeID;
-		//TODO: what about the properties???
-		
-		// We don't change the current annotations
+		codes = null;
+		// We don't change the current annotations or properties
 		// But we reset the segments
 		if ( segments != null ) {
 			segments.clear();
 			segments = null;
 		}
+
+		insert(-1, content);
+		this.lastCodeID = content.lastCodeID;
 	}
 
 	/**

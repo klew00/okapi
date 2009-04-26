@@ -26,6 +26,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
  * Handles the conversion between a coded text object and XLIFF.
@@ -144,16 +145,34 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					//if ( code.hasData() ) {
-						if ( gMode ) {
+					if ( gMode ) {
+						if ( code.getTagType() == TagType.OPENING ) {
+							tmp.append(String.format("<bx id=\"%d\"/>", code.getId()));
+						}
+						else if ( code.getTagType() == TagType.CLOSING ) {
+							tmp.append(String.format("<ex id=\"%d\"/>", code.getId()));
+						}
+						else {
 							tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+						}
+					}
+					else {
+						if ( code.getTagType() == TagType.OPENING ) {
+							tmp.append(String.format("<it id=\"%d\" pos=\"open\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</it>");
+						}
+						else if ( code.getTagType() == TagType.CLOSING ) {
+							tmp.append(String.format("<it id=\"%d\" pos=\"close\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</it>");
 						}
 						else {
 							tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
 							tmp.append("</ph>");
 						}
-					//}
+					}
 				}
 				break;
 			case '>':
@@ -238,13 +257,32 @@ public class XLIFFContent {
 				}
 				else {
 					if ( gMode ) {
-						tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+						if ( code.getTagType() == TagType.OPENING ) {
+							tmp.append(String.format("<bx id=\"%d\"/>", code.getId()));
+						}
+						else if ( code.getTagType() == TagType.CLOSING ) {
+							tmp.append(String.format("<ex id=\"%d\"/>", code.getId()));
+						}
+						else {
+							tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+						}
 					}
 					else {
-						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(),
-							quoteMode, escapeGT, null)); //TODO: escape unsupported chars 
-						tmp.append("</ph>");
+						if ( code.getTagType() == TagType.OPENING ) {
+							tmp.append(String.format("<it id=\"%d\" pos=\"open\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</it>");
+						}
+						else if ( code.getTagType() == TagType.CLOSING ) {
+							tmp.append(String.format("<it id=\"%d\" pos=\"close\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</it>");
+						}
+						else {
+							tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append("</ph>");
+						}
 					}
 				}
 				break;

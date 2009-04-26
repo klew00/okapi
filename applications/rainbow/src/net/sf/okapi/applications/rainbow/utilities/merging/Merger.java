@@ -262,41 +262,104 @@ public class Merger {
 				tu.setTarget(trgLang, tu.getSource());
 			}
 		}
-		
-		// Else: try to merge the given target
-		
-		// Un-segment first if needed
-		TextContainer trgCont = tuFromTrans.getTarget(trgLang);
-		if ( trgCont.isSegmented() ) {
-			trgCont.mergeAllSegments();
+
+//		boolean approved = false;
+//		Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
+//		if (( prop != null ) && prop.getValue().equals("yes") ) {
+//			approved = true;
+//		}
+
+		// Get the translated target, and unsegment it if needed
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
+		if ( fromTrans.isSegmented() ) {
+			fromTrans.mergeAllSegments();
 		}
+
+		// We create a new target if needed
+		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+
+		// Adjust the codes to use the appropriate ones
+		List<Code> transCodes = fromTrans.getCodes();
+		// Use the ones in translated target, but if empty, take it from source
+		transCodes = transferCodes(transCodes, tu.getSourceContent().getCodes(), tu);
 		
-		// Create the target entry for the output if it does not exist yet
-		trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
-		// Get the target codes, we may need them if the source ones fail
-		// (case of approved translation with different codes)
-		List<Code> trgOriCodes = trgCont.getCodes();
-		// Set the coded text with the new translated content
+		// Now set the target coded text and the target codes
 		try {
-			trgCont.setCodedText(tuFromTrans.getTargetContent(trgLang).getCodedText(),
-				tu.getSourceContent().getCodes(), false);
+			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
 		}
 		catch ( RuntimeException e ) {
-			// If there is an error, try with the target
-			try {
-				trgCont.setCodedText(tuFromTrans.getTargetContent(trgLang).getCodedText(),
-					trgOriCodes, false);
-				logger.log(Level.WARNING,
-					String.format("Item id=\"%s\" was merged with target codes.\nS='%s'\nT='%s'",
-						tu.getId(), tu.getSourceContent().toString(), trgCont.toString()));
-			}
-			catch ( RuntimeException e2 ) {
-				logger.log(Level.SEVERE,
-					String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
-				// Use the source instead, continue the merge
-				tu.setTarget(trgLang, tu.getSource());
-			}
+			logger.log(Level.SEVERE,
+				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
+			// Use the source instead, continue the merge
+			tu.setTarget(trgLang, tu.getSource());
 		}
 	}
 
+	/*
+	 * Check the codes in the translated entry, use the original data if there is
+	 * none in the code coming from XLIFF, and generate non-stoping error if
+	 * non-deletable codes are missing.
+	 */
+	private List<Code> transferCodes (List<Code> transCodes,
+		List<Code> oriCodes,
+		TextUnit tu)
+	{
+		// Check if we have at least one code
+		if ( transCodes.size() == 0 ) return transCodes;
+		
+		int[] oriIndices = new int[oriCodes.size()];
+		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
+		int done = 0;
+		
+		Code transCode, oriCode;
+		for ( int i=0; i<transCodes.size(); i++ ) {
+			transCode = transCodes.get(i);
+			transCode.setOuterData(null); // Remove XLIFF outer codes
+
+			// Get the data from the original code (match on id)
+			oriCode = null;
+			for ( int j=0; j<oriIndices.length; j++ ) {
+				if ( oriIndices[j] == -1) continue; // Used already
+				if ( oriCodes.get(oriIndices[j]).getId() == transCode.getId() ) {
+					oriCode = oriCodes.get(oriIndices[j]);
+					oriIndices[j] = -1;
+					done++;
+					break;
+				}
+			}
+			if ( oriCode == null ) { // Not found in original (extra in target)
+				if (( transCode.getData() == null )
+					|| ( transCode.getData().length() == 0 )) {
+					// Leave it like that
+					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s')",
+						transCode.getId(), tu.getId()));
+				}
+			}
+			else { // Get the data from the original
+				if (( transCode.getData() == null )
+					|| ( transCode.getData().length() == 0 )) {
+					transCode.setData(oriCode.getData());
+				}
+				transCode.setReferenceFlag(oriCode.hasReference());
+			}
+		}
+		
+		// If needed, check for missing codes in translation
+		if ( oriCodes.size() > done ) {
+			// Any index > -1 in source means it was was deleted in target
+			for ( int i=0; i<oriIndices.length; i++ ) {
+				if ( oriIndices[i] != -1 ) {
+					Code code = oriCodes.get(oriIndices[i]);
+					if ( !code.isDeleteable() ) {
+						logger.severe(String.format("The non-deletable code id='%d' (%s) is missing in target (item id='%s')",
+							code.getId(), code.getData(), tu.getId()));
+						logger.info("Source='"+tu.getSource().toString()+"'");
+					}
+				}
+			}
+		}
+		
+		return transCodes;
+	}
+	
 }

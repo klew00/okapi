@@ -373,7 +373,7 @@ public class Code {
 	 * Outer data is used for format that implements in-line codes like TMX or XLIFF.
 	 * For example "&lt;ph id='1'>code&lt;/ph>" is the outer data, and "code" in the
 	 * inner data.
-	 * @param value the data to set.
+	 * @param value the data to set (can be null).
 	 */
 	public void setOuterData (String value) {
 		outerData = value;
