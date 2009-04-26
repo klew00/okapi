@@ -1368,9 +1368,12 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	private void balanceMarkers () {
 		if ( codes == null ) return;
+		lastCodeID = 0;
 		for ( Code item : codes ) {
 			// Void all IDs of closing codes
 			if ( item.tagType == TagType.CLOSING ) item.id = -1;
+			// And get the highest ID value used
+			if ( item.id > lastCodeID ) lastCodeID = item.id;
 		}
 		// Process the markers
 		for ( int i=0; i<text.length(); i++ ) {
@@ -1420,7 +1423,7 @@ public class TextFragment implements Comparable<Object> {
 					}
 					else text.setCharAt(i, (char)MARKER_CLOSING);
 				}
-				i++; // Skip index part of the index
+				i++; // Skip index part of the code marker
 				break;
 			}
 		}

@@ -305,7 +305,10 @@ public class Merger {
 		TextUnit tu)
 	{
 		// Check if we have at least one code
-		if ( transCodes.size() == 0 ) return transCodes;
+		if ( transCodes.size() == 0 ) {
+			if ( oriCodes.size() == 0 ) return transCodes;
+			// Else: fall thru and get missing codes errors
+		}
 		
 		int[] oriIndices = new int[oriCodes.size()];
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
