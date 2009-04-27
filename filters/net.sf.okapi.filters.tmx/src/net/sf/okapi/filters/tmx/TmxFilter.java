@@ -80,8 +80,8 @@ public class TmxFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	
-	private enum TuvXmlLang {SOURCE,TARGET,OTHER}
-	private TuvXmlLang tuvTrgType;
+	private enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
+	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 	private String currentLang;					//--current language processed in the TU
 	private ArrayList<TextUnit> subList;		//--keeps track of the subflows for a TU--
 	int subCounter = 0;
@@ -423,10 +423,12 @@ public class TmxFilter implements IFilter {
 				reader.getAttributeValue(i)));
 			
 			//--set the properties depending on the tuvTrgType--
-			if(tuvTrgType == TuvXmlLang.SOURCE){
+			if(tuvTrgType == TuvXmlLang.UNDEFINED){
+				tu.setProperty(new Property(reader.getAttributeLocalName(i),reader.getAttributeValue(i), true));				
+			}else if(tuvTrgType == TuvXmlLang.SOURCE){
 				tu.setSourceProperty(new Property(reader.getAttributeLocalName(i), reader.getAttributeValue(i), true));
 			}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-				tu.setTargetProperty(trgLang, new Property(reader.getAttributeLocalName(i),reader.getAttributeValue(i), true));
+				tu.setTargetProperty(currentLang, new Property(reader.getAttributeLocalName(i),reader.getAttributeValue(i), true));
 			}			
 		}
 		skel.append(">");
@@ -454,7 +456,9 @@ public class TmxFilter implements IFilter {
 					 //TODO: Check if it's ok to not check for unsupported chars
 					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					//--set the properties depending on the tuvTrgType--
-					if(tuvTrgType == TuvXmlLang.SOURCE){
+					if(tuvTrgType == TuvXmlLang.UNDEFINED){
+						tu.setProperty(new Property(startElement, reader.getText(), true));
+					}else if(tuvTrgType == TuvXmlLang.SOURCE){
 						tu.setSourceProperty(new Property(startElement, reader.getText(), true));	
 					}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 						tu.setTargetProperty(currentLang, new Property(startElement, reader.getText(), true));
@@ -641,6 +645,7 @@ public class TmxFilter implements IFilter {
 						tu.setSkeleton(skel);
 						tu.setMimeType("text/xml");
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
+						tuvTrgType = TuvXmlLang.UNDEFINED;
 						return true;
 					}else if(localName.equals("tuv")){
 						countTuvs++;
