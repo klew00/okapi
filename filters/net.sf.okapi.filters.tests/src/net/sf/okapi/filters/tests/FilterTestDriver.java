@@ -288,6 +288,7 @@ public class FilterTestDriver {
 	}
 
 	private void checkStartDocument(StartDocument startDoc) {
+		if ( displayLevel < 1 ) return; 
 		String tmp = startDoc.getEncoding();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No encoding specified in StartDocument.");

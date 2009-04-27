@@ -37,9 +37,7 @@ public class IDMLFilterTest {
 		IDMLFilter filter = null;		
 		try {
 			filter = new IDMLFilter();
-			//URL url = IDMLFilterTest.class.getResource("/helloworld-1.idml");
-			//URL url = IDMLFilterTest.class.getResource("/private/100_101_CentreofGalaxy.idml");
-			URL url = IDMLFilterTest.class.getResource("/private/iPhone_2_A_MASTER.idml");
+			URL url = IDMLFilterTest.class.getResource("/Test01.idml");
 			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			
 			IFilterWriter writer = filter.createFilterWriter();

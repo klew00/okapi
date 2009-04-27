@@ -30,27 +30,33 @@ public class UtilTest {
 	}
 
 	@Test
-	public void testGetDirectoryName () {
+	public void testGetDirectoryName_BSlash () {
 		String in = "C:\\test\\file";
 		assertEquals("C:\\test", Util.getDirectoryName(in));
 	}
 
 	@Test
-	public void testGetDirectoryName_Dir () {
+	public void testGetDirectoryName_Slash () {
+		String in = "/home/test/file";
+		assertEquals("/home/test", Util.getDirectoryName(in));
+	}
+
+	@Test
+	public void testGetDirectoryName_DirBSlash () {
 		String in = "C:\\test\\";
 		assertEquals("C:\\test", Util.getDirectoryName(in));
+	}
+
+	@Test
+	public void testGetDirectoryName_DirSlash () {
+		String in = "/home/test/";
+		assertEquals("/home/test", Util.getDirectoryName(in));
 	}
 
 	@Test
 	public void testGetDirectoryName_Filename () {
 		String in = "myFile.ext";
 		assertEquals("", Util.getDirectoryName(in));
-	}
-
-	@Test
-	public void testGetDirectoryName_Slash () {
-		String in = "C:/test/";
-		assertEquals("C:/test", Util.getDirectoryName(in));
 	}
 
 	@Test

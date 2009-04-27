@@ -1,0 +1,44 @@
+Deploying
+=========
+
+--- 1) Make sure all unit tests pass (manual for now)
+
+
+--- 2) Make sure the following files have the proper version and release numbers for this release:
+
+- trunk/deployment/shared/release.properties
+- trunk/website/updates.html
+- trunk/website/downloads.html
+
+
+--- 3) Make aslo sure the readme files are up-to-date:
+
+- trunk/deployment/okapi-lib/data/readme.html
+- trunk/deployment/rainbow/data/readme.html
+- trunk/deployment/ratel/data/readme.html
+
+
+--- 4) Run trunk/deployment/build.xml This will rebuild all distributions for all platforms.
+
+
+--- 5) Go to trunk/deployment/rainbow and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
+
+The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
+
+
+--- 6) Post each packge (.zip or .gz) of the distributions to the GoogleCode download area.
+
+
+--- 7) Update the Web site with any files that was modified in trunk/website. Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
+
+Host: ftp.opentag.com
+Username: same as for the shared documents
+Password: same as for the shared documents
+Start directory: okapi
+
+The structure in the okapi is the same as in trunk/website
+
+
+--- 8) Post a notification that a new release is available.
+
+-end-
