@@ -2129,6 +2129,7 @@ public class MainForm implements IParametersProvider {
 				indices[i] = indices[i]-1;
 			}
 			inputTableMods.get(currentInput).updateTable(indices, 0);
+			updatePathBuilderSampleData();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -2161,6 +2162,7 @@ public class MainForm implements IParametersProvider {
 				indices[i] = indices[i]+1;
 			}
 			inputTableMods.get(currentInput).updateTable(indices, 0);
+			updatePathBuilderSampleData();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
