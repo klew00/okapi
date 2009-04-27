@@ -618,7 +618,6 @@ public class TmxFilter implements IFilter {
 						storeTuStartElement();
 						
 					}else if(reader.getLocalName().equals("seg")){
-						System.out.println("ProcessSeg");
 						processSeg(tu, skel);
 					}
 					break;
