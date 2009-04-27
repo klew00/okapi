@@ -122,16 +122,14 @@ public class XLIFFContent {
 					tmp.append(code.toString());
 				}
 				else {
-					//if ( code.hasData() ) {
-						if ( gMode ) {
-							tmp.append("</g>");
-						}
-						else {
-							tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-							tmp.append("</ept>");
-						}
-					//}
+					if ( gMode ) {
+						tmp.append("</g>");
+					}
+					else {
+						tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</ept>");
+					}
 					if ( code.hasAnnotation("protected") ) {
 						tmp.append("</mrk>");
 					}
@@ -289,16 +287,14 @@ public class XLIFFContent {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
-					if ( gMode ) {
-						tmp.append(String.format("<g id=\"%d\">", code.getId()));
-					}
-					else {
-						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(),
-							quoteMode, escapeGT, null)); //TODO: escape unsupported chars
-						tmp.append("</bpt>");
-					}
+				if ( gMode ) {
+					tmp.append(String.format("<g id=\"%d\">", code.getId()));
+				}
+				else {
+					tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(code.toString(),
+						quoteMode, escapeGT, null)); //TODO: escape unsupported chars
+					tmp.append("</bpt>");
 				}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("<mrk mtype=\"protected\">");
@@ -307,16 +303,14 @@ public class XLIFFContent {
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
-					if ( gMode ) {
-						tmp.append("</g>");
-					}
-					else {
-						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(),
-							quoteMode, escapeGT, null)); //TODO: escape unsupported chars
-						tmp.append("</ept>");
-					}
+				if ( gMode ) {
+					tmp.append("</g>");
+				}
+				else {
+					tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+					tmp.append(Util.escapeToXML(code.toString(),
+						quoteMode, escapeGT, null)); //TODO: escape unsupported chars
+					tmp.append("</ept>");
 				}
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("</mrk>");

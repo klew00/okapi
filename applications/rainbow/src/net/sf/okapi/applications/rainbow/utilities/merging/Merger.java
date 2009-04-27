@@ -162,6 +162,7 @@ public class Merger {
 	private void merge (int docId,
 		ManifestItem item)
 	{
+		Event event;
 		try {
 			// File to merge
 			String fileToMerge = manifest.getFileToMergePath(docId);
@@ -194,7 +195,6 @@ public class Merger {
 			outFilter.setOutput(outputFile);
 			
 			// Process the document
-			Event event;
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
@@ -271,6 +271,15 @@ public class Merger {
 
 		// Get the translated target, and unsegment it if needed
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
+		if ( fromTrans == null ) {
+			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
+			// Else: Missing target in the XLIFF
+			logger.log(Level.WARNING,
+				String.format("Item id='%s': no target in XLIFF.", tu.getId()));
+			return;
+		}
+		
+//TODO: handle case of empty or non-existant target		
 		if ( fromTrans.isSegmented() ) {
 			fromTrans.mergeAllSegments();
 		}
