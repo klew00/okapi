@@ -28,14 +28,16 @@ import java.util.regex.Pattern;
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.EndTag;
+import net.htmlparser.jericho.EndTagType;
+import net.htmlparser.jericho.HTMLElements;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Property;
@@ -430,7 +432,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	private String normalizeHtmlText(String text, boolean insideAttribute) {
 		// convert all entities to Unicode
 		String decodedValue = CharacterReference.decode(text, insideAttribute);
-		
+
 		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
 			decodedValue = collapseWhitespace(decodedValue);
 			decodedValue = decodedValue.trim();
@@ -438,6 +440,48 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		decodedValue = Util.normalizeNewlines(decodedValue);
 
 		return decodedValue;
+	}
+
+	@Override
+	protected void addCodeToCurrentTextUnit(Tag tag) {
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+		String literalTag = tag.toString();
+		TextFragment.TagType codeType;
+
+		// start tag or empty tag
+		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
+			StartTag startTag = ((StartTag) tag);
+
+			// is this an empty tag?
+			if (startTag.isSyntacticalEmptyElementTag()) {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			} else if (startTag.isEndTagRequired()) {
+				codeType = TextFragment.TagType.OPENING;				
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+
+			// create a list of Property or Text placeholders for this tag
+			// If this list is empty we know that there are no attributes that
+			// need special processing
+			propertyTextUnitPlaceholders = null;
+
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				// add code and process actionable attributes
+				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
+			} else {
+				// no actionable attributes, just add the code as-is
+				addToTextUnit(codeType, literalTag, startTag.getName());
+			}
+		} else { // end or unknown tag
+			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+			addToTextUnit(codeType, literalTag, tag.getName());
+		}
 	}
 
 	/*

@@ -1,24 +1,28 @@
 package net.sf.okapi.filters.html.tests;
 
-import static org.junit.Assert.assertEquals;
+
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class HtmlSnippetsTest {
 	private HtmlFilter htmlFilter;
@@ -32,6 +36,17 @@ public class HtmlSnippetsTest {
 
 	@After
 	public void tearDown() {
+	}
+
+	@Test
+	public void testHtmlNonWellFormedEmptyTag() {
+		String snippet = "<br>text<br/>";
+		ArrayList<Event> events = getEvents(snippet);
+		TextUnit tu = (TextUnit)events.get(1).getResource();
+		List<Code> codes = tu.getSourceContent().getCodes();
+		for (Code code : codes) {			
+			assertEquals(TagType.PLACEHOLDER, code.getTagType());
+		}
 	}
 
 	@Test
@@ -55,15 +70,14 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testLangUpdate() {
 		String snippet = "<p lang='en'>Text <span lang='en'>text</span> text</p>";
-		assertEquals("<p lang='FR'>Text <span lang='FR'>text</span> text</p>",
-			generateOutput(getEvents(snippet), snippet, "FR"));
+		assertEquals("<p lang='FR'>Text <span lang='FR'>text</span> text</p>", generateOutput(getEvents(snippet),
+				snippet, "FR"));
 	}
 
 	@Test
 	public void testMultilangUpdate() {
 		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
-		assertEquals("<p lang='FR'>Text</p><p lang='ja'>JA text</p>",
-			generateOutput(getEvents(snippet), snippet, "FR"));
+		assertEquals("<p lang='FR'>Text</p><p lang='ja'>JA text</p>", generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 
 	@Test
@@ -142,7 +156,8 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
-		assertEquals("<p><b>Question</b>: When the &quot;<code>&lt;b></code>&quot; code was added</p>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<p><b>Question</b>: When the &quot;<code>&lt;b></code>&quot; code was added</p>", generateOutput(
+				getEvents(snippet), snippet, "en"));
 	}
 
 	@Test
@@ -157,7 +172,7 @@ public class HtmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("collapseWhitespaceOff.yml");
 		assertEquals("\r\nX\r\nY\r\n", generateOutput(getEvents(snippet), snippet, "en"));
-		parameters = originalParameters; 
+		parameters = originalParameters;
 	}
 
 	@Test
@@ -171,14 +186,14 @@ public class HtmlSnippetsTest {
 		String snippet = "<p>[&#x20000;]=U+D840,U+DC00</p>";
 		assertEquals("<p>[\uD840\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
 	}
-	
+
 	@Test
 	public void testSimpleSupplementalSupport() {
 		String snippet = "&#x20000;";
 		assertEquals("\uD840\uDC00", generateOutput(getEvents(snippet), snippet, "en"));
 	}
 
-	private ArrayList<Event> getEvents (String snippet) {
+	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
 		htmlFilter.open(new RawDocument(snippet, "en"));
