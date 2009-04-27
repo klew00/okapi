@@ -16,7 +16,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HtmlFullFileTest {
-	private IFilter htmlFilter;
+	private HtmlFilter htmlFilter;
 	private String[] testFileList;
 
 	@Before
@@ -52,6 +52,13 @@ public class HtmlFullFileTest {
 			@SuppressWarnings("unused")
 			Event event = htmlFilter.next();
 		}
+	}
+	
+	@Test
+	public void testEncodingShouldBeFound() {
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/withEncoding.html");
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		assertEquals(htmlFilter.getEncoding(), "windows-1252");
 	}
 
 	@Test

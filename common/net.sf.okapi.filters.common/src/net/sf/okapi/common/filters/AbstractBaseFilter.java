@@ -233,7 +233,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * 
 	 * @return the encoding
 	 */
-	protected String getEncoding() {
+	public String getEncoding() {
 		return encoding;
 	}
 
@@ -243,7 +243,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * @param encoding
 	 *            the new encoding
 	 */
-	protected void setEncoding(String encoding) {
+	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 

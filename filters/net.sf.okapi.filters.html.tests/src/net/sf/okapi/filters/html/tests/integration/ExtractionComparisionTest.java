@@ -45,15 +45,9 @@ public class ExtractionComparisionTest {
 	public void roundTripCompare() throws UnsupportedEncodingException {
 		for (String f : testFileList) {
 			originalEvents.clear();
-			postExtractionEvents.clear();
-
-			roundTripEvents(f);
-			
+			postExtractionEvents.clear();		
+			roundTripEvents(f);			
 			assertTrue(FilterTestDriver.compareEvents(originalEvents, postExtractionEvents));
-			//assertTrue(originalEvents.size() == postExtractionEvents.size());
-			/*if (!FilterTestDriver.compareEvents(originalEvents, postExtractionEvents)) {
-				TestUtils.printEvents(postExtractionEvents);
-			}*/
 		}
 	}
 
