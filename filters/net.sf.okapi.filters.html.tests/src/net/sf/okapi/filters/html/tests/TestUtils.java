@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests.integration;
+package net.sf.okapi.filters.html.tests;
 
 import static org.junit.Assert.assertTrue;
 
@@ -18,7 +18,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
-class TestUtils {
+public class TestUtils {
 
 	public static String[] getTestFiles() throws URISyntaxException {
 		// read all files in the test html directory

@@ -1,11 +1,10 @@
-package net.sf.okapi.filters.html.tests.integration;
+package net.sf.okapi.filters.html.tests;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;

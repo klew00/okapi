@@ -8,7 +8,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { HtmlFullFileTest.class, ExtractionComparisionTest.class })
+@SuiteClasses( { ExtractionComparisionTest.class })
 public class AllHtmlIntegrationTests {
 
 	public static Test suite() {

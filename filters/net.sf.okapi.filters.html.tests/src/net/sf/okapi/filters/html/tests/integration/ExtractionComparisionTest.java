@@ -9,6 +9,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.filters.html.tests.HtmlFullFileTest;
+import net.sf.okapi.filters.html.tests.TestUtils;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.After;
