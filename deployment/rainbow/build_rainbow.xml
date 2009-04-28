@@ -122,6 +122,10 @@ Running on: ${os.name} ${os.arch}${line.separator}
 			<fileset dir="data/${platform}"/>
 		</copy>
 
+		<copy todir="${dist}/config">
+			<fileset dir="../shared/config"/>
+		</copy>
+
 		<copy file="../../help/help.css" todir="${dist}/help"/>
 		<copy file="../../help/filters/ui/index.html" todir="${dist}/help/filters/ui"/>
 		<copy todir="${dist}/help/applications/rainbow">

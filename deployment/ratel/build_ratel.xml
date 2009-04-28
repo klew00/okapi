@@ -100,6 +100,10 @@ Running on: ${os.name} ${os.arch}${line.separator}
 
 		<copy todir="${dist}" file="data/readme.html"/>
 
+		<copy todir="${dist}/config">
+			<fileset dir="../shared/config" includes="**/*.srx"/>
+		</copy>
+
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
