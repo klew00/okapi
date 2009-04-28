@@ -485,10 +485,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 
-	private String getContent (TextFragment tf,
+	public String getContent (TextFragment tf,
 		String langToUse,
 		int context)
-	{
+	{ // this needs to be public for an override in OpenXML
 		// Output simple text
 		if ( !tf.hasCode() ) {
 			if ( encoderManager == null ) {
@@ -581,10 +581,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String expandCodeContent (Code code,
+	protected String expandCodeContent (Code code,
 		String langToUse,
 		int context)
-	{
+	{ // this needs to be protected, not private, for OpenXML
 		String codeTmp = code.getOuterData();
 		if ( layer != null ) {
 			codeTmp = layer.startInline() 
