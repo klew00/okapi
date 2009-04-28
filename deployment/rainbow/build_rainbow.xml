@@ -3,7 +3,7 @@
 
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
-	<property name="rainbowStamp" value="${rainbowVersion}_r${releaseNumber}" />
+	<property name="rainbowStamp" value="${rainbowVersion}${releaseInfo}" />
 	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
@@ -33,7 +33,7 @@
 		</or>
 	</condition>
 
-	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_${rainbowVersion}" />
+	<property name="distName" value="${ant.project.name}_${platform}_${rainbowStamp}" />
 
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}

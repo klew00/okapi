@@ -3,7 +3,7 @@
 
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
-	<property name="okapilibStamp" value="${okapilibVersion}_r${releaseNumber}" />
+	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
 	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
@@ -33,7 +33,7 @@
 		</or>
 	</condition>
 
-	<property name="distName" value="r${releaseNumber}_${platform}_${ant.project.name}_${okapilibVersion}" />
+	<property name="distName" value="${ant.project.name}_${platform}_${okapilibStamp}" />
 
 	<echo message=" ------------------------------------------------------------${line.separator}
 Distribution being built: ${platform}${line.separator}

@@ -34,6 +34,10 @@
 		</delete>
 		<mkdir dir="tmp"/>
  		<javac srcdir="src/example03" destdir="tmp" classpathref="mainClassPath"/> 
+ 		<copy todir="tmp/example03">
+ 			<fileset dir="src/example03" includes="**/*.xsl"/>
+ 			<fileset dir="src/example03" includes="**/*.xml"/>
+ 		</copy>
 		<manifest file="MANIFEST.MF">
 			<attribute name="Main-Class" value="example03.Main"/>
   		</manifest>
