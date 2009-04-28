@@ -120,7 +120,7 @@ public class OpenXMLFilter implements IFilter {
 	}
 	
 	public IFilterWriter createFilterWriter () {
-		return new ZipFilterWriter();
+		return new OpenXMLZipFilterWriter();
 	}
 
 	public String getName () {
