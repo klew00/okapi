@@ -29,6 +29,7 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -37,6 +38,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -55,7 +57,7 @@ import net.sf.okapi.filters.markupfilter.Parameters;
 
 public class OpenXMLFilter implements IFilter {
 	
-	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.openxml");
+	private Logger LOGGER = Logger.getLogger(OpenXMLFilter.class.getName());
 
 	private enum NextAction {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
@@ -64,6 +66,7 @@ public class OpenXMLFilter implements IFilter {
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
+	public final static int MSWORDCHART=4; // DWH 4-16-09
 	private final String MIMETYPE = "text/xml";
 	private final String docId = "sd";
 	
@@ -78,10 +81,12 @@ public class OpenXMLFilter implements IFilter {
 	private OpenXMLContentFilter openXMLContentFilter;
 	private Parameters params=null;
 	private int nZipType=MSWORD;
-	private int dbg=0;
+	private int nFileType=MSWORD; // DWH 4-16-09
+	private Level nLogLevel=Level.FINE;
 	private boolean bSquishable=true;
 	private ITranslator translator=null;
 	private String sOutputLanguage="en-US";
+	private boolean canceled = false;
 
 	public OpenXMLFilter () {
 	}
@@ -89,10 +94,6 @@ public class OpenXMLFilter implements IFilter {
 	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
-	}
-
-	public void cancel () {
-		// TODO Auto-generated method stub
 	}
 
 	public void close () {
@@ -104,13 +105,14 @@ public class OpenXMLFilter implements IFilter {
 			}
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			LOGGER.log(Level.SEVERE,"Error closing zipped output file.");
+			throw new OkapiIOException("Error closing zipped output file.");
 		}
 	}
 
-	public void setDbg(int dbg) // set debug level
+	public void setNLogLevel(Level nLogLevel) // set debug level
 	{
-		this.dbg = dbg;
+		this.nLogLevel = nLogLevel;
 	}
 	
 	public ISkeletonWriter createSkeletonWriter () {
@@ -170,15 +172,56 @@ public class OpenXMLFilter implements IFilter {
 		}
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI());
+			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
 		}
 		else if ( input.getInputStream() != null ) {
 			open(input.getInputStream());
 		}
 		else {
-			throw new RuntimeException("RawDocument has no input defined.");
+			throw new RuntimeException("InputResource has no input defined.");
 		}
 	}
 	
+	public void open (RawDocument input,
+			boolean generateSkeleton, boolean bSquishable)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI(),bSquishable);
+			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+
+	public void open (RawDocument input,
+			boolean generateSkeleton, boolean bSquishable, Level nLogLevel)
+	{
+		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+			input.getEncoding(), generateSkeleton);
+		if ( input.getInputCharSequence() != null ) {
+			open(input.getInputCharSequence());
+		}
+		else if ( input.getInputURI() != null ) {
+			open(input.getInputURI(),bSquishable,nLogLevel);
+			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
+		}
+		else if ( input.getInputStream() != null ) {
+			open(input.getInputStream());
+		}
+		else {
+			throw new RuntimeException("InputResource has no input defined.");
+		}
+	}
+
 	public void open (InputStream input) {
 		// Not supported for this filter
 		throw new UnsupportedOperationException(
@@ -192,22 +235,23 @@ public class OpenXMLFilter implements IFilter {
 	}
 
 	private void open (URI inputURI) {
-		open(inputURI,true,0); // DWH 2-26-09 just a default
+		open(inputURI,true,Level.FINE); // DWH 2-26-09 just a default
 	}
 	
 	public void open (URI inputURI, boolean bSquishable) {
-		open(inputURI, bSquishable, 0);
+		open(inputURI, bSquishable, Level.FINE);
 	}
 	
-	public void open (URI inputURI, boolean bSquishable, int dbg) {
+	public void open (URI inputURI, boolean bSquishable, Level nLogLevel) {
 		close();
 		docURI = inputURI;
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		openXMLContentFilter = new OpenXMLContentFilter();
-		this.dbg = dbg;
-		openXMLContentFilter.setDbg(dbg);
+		this.nLogLevel = nLogLevel;
+		openXMLContentFilter.setLogger(LOGGER);
 		this.bSquishable = bSquishable;
+		LOGGER.log(Level.FINE,"\nOpening "+inputURI.toString());
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -261,10 +305,13 @@ public class OpenXMLFilter implements IFilter {
 			    }
 			}
 			if (nZipType==-1)
-				throw (new IOException("This is not a Microsoft Office 2007 Word, Excel, or Powerpoint file.")); 
-			openXMLContentFilter.setUpConfig(nZipType);
+			{
+				LOGGER.log(Level.SEVERE,"MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
+				throw new BadFilterInputException("MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
+			}
+//			openXMLContentFilter.setUpConfig(nZipType);
 			  // DWH 3-4-09 sets Parameters inside OpenXMLContentFilter based on file type
-			params = (Parameters)openXMLContentFilter.getParameters();
+//			params = (Parameters)openXMLContentFilter.getParameters();
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
 			entries = zipFile.entries();
@@ -282,11 +329,13 @@ public class OpenXMLFilter implements IFilter {
 		}
 		catch ( ZipException e )
 		{
-			throw new RuntimeException(e);
+			LOGGER.log(Level.SEVERE,"Error opening zipped input file.");
+			throw new OkapiIOException("Error opening zipped input file.");
 		}
 		catch ( IOException e )
 		{
-			throw new RuntimeException(e);
+			LOGGER.log(Level.SEVERE,"Error reading zipped input file.");
+			throw new OkapiIOException("Error reading zipped input file.");
 		}
 	}
 	
@@ -294,6 +343,7 @@ public class OpenXMLFilter implements IFilter {
 		String sEntryName; // DWH 2-26-09
 		String sDocType; // DWH 2-26-09
 		int iCute; // DWH 2-26-09
+		boolean bInMainFile; // DWH 4-15-09
 		while( entries.hasMoreElements() ) { // note that [Content_Types].xml is always first
 			entry = entries.nextElement();
 			sEntryName = entry.getName();
@@ -301,11 +351,16 @@ public class OpenXMLFilter implements IFilter {
 		    iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
 		    if (iCute>0)
 			    sDocType = sDocType.substring(iCute+1);
-			if ( bSquishable && sEntryName.endsWith(".xml") &&
-				    ((nZipType==MSWORD && sDocType.equals("main+xml")) ||
-				   	 (nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")))) {
-				if (dbg>2)
-					System.out.println("\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+			bInMainFile = (sEntryName.endsWith(".xml") &&
+				    		((nZipType==MSWORD && sDocType.equals("main+xml")) ||
+				    		 (nZipType==MSPOWERPOINT && sDocType.equals("slide+xml"))));
+			openXMLContentFilter.setBInMainFile(bInMainFile); // DWH 4-15-09 only allow blank text in main files
+			if (bInMainFile && bSquishable)
+			{
+				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				nFileType = nZipType;
+				openXMLContentFilter.setUpConfig(nFileType);
+				params = (Parameters)openXMLContentFilter.getParameters();
 				return openSubDocument(true);
 			}
 			else if ( sEntryName.equals("[Content_Types].xml") ||
@@ -329,11 +384,19 @@ public class OpenXMLFilter implements IFilter {
 				   	 (nZipType==MSPOWERPOINT &&
 				   	       (sDocType.equals("slide+xml") ||
 				   	        sDocType.equals("notesSlide+xml")))))) {
-				if (dbg>2)
-					System.out.println("\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
+				if (nZipType==MSWORD && sDocType.equals("chart+xml")) // DWH 4-16-09
+					nFileType = MSWORDCHART;
+				else
+					nFileType = nZipType;
+				openXMLContentFilter.setUpConfig(nFileType);
+				params = (Parameters)openXMLContentFilter.getParameters();
+				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				return openSubDocument(false);
 			}
 			else {
+				nFileType = nZipType;
+				openXMLContentFilter.setUpConfig(nFileType);
+				params = (Parameters)openXMLContentFilter.getParameters();
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
 				return new Event(EventType.DOCUMENT_PART, dp, skel);
@@ -367,7 +430,8 @@ public class OpenXMLFilter implements IFilter {
 						pios.close();
 					} catch (IOException e) {
 						// e.printStackTrace();
-						throw new RuntimeException(e);
+						LOGGER.log(Level.SEVERE,"Error closing input stream.");
+						throw new OkapiIOException("Error closing input stream.");
 					}
 				}
 				pios = new PipedOutputStream(); // DWH 2-19-09 this may need to be final
@@ -384,14 +448,12 @@ public class OpenXMLFilter implements IFilter {
 			openXMLContentFilter.open(new RawDocument(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
 			//			openXMLContentFilter.next(); // START
 			event = openXMLContentFilter.next(); // START_DOCUMENT
-			if (dbg>2)
-			{
-				String glorp = openXMLContentFilter.getParameters().toString();
-				System.out.println(glorp); // This lists what YAML actually read out of the configuration file
-			}
+			LOGGER.log(Level.FINEST,openXMLContentFilter.getParameters().toString());
+			  // DWH 4-22-09 This lists what YAML actually read out of the configuration file
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			LOGGER.log(Level.SEVERE,"Error streaming input.");
+			throw new OkapiIOException("Error streaming input.");
 		}
 		
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT
@@ -413,18 +475,16 @@ public class OpenXMLFilter implements IFilter {
 					{
 						TextUnit tu = (TextUnit)event.getResource();
 						TextFragment tfSource = tu.getSourceContent();
-						String sauce = tfSource.getCodedText();
-						String torg = translator.translate(sauce);
+						String torg = translator.translate(tfSource);
 						TextFragment tfTarget = tfSource.clone();
 //						tfTarget.setCodedText(torg);
-						tfTarget.setCodedText("GLUNK "+torg); // DWH 4-8-09 testing 1 2 3 
+						tfTarget.setCodedText(/*"GLUNK "+*/torg); // DWH 4-8-09 testing 1 2 3 
 						TextContainer tc = new TextContainer();
 						tc.setContent(tfTarget);
 						tu.setTarget(sOutputLanguage, tc);
 						tfSource = null;
 					}
-					if (dbg>2)
-						openXMLContentFilter.displayOneEvent(event);
+					openXMLContentFilter.displayOneEvent(event);
 					return event;
 				case END_DOCUMENT:
 					// Read the FINISHED event
@@ -437,12 +497,38 @@ public class OpenXMLFilter implements IFilter {
 					return new Event(EventType.END_SUBDOCUMENT, ending, skel);
 				
 				default: // Else: just pass the event through
-					if (dbg>2)
-						openXMLContentFilter.displayOneEvent(event);
+					openXMLContentFilter.displayOneEvent(event);
 					return event;
 			}
 		}
 		return null; // Should not get here
 	}
-	
+	public int getNZipType() // DWH 4-13-09
+	{
+		return nZipType;
+	}
+	public OpenXMLContentFilter getOpenXMLContentFilter()
+	{
+		return openXMLContentFilter;
+	}
+
+	public void cancel() {
+		// TODO Auto-generated method stub
+		
+	}
+	public void setLogger(Logger lgr)
+	{
+		LOGGER = lgr;
+		if (openXMLContentFilter!=null)
+			openXMLContentFilter.setLogger(lgr);
+	}
+	public Logger getLogger()
+	{
+		return LOGGER;
+	}
+	public void setLogLevel(Level lvl)
+	{
+		nLogLevel = lvl;
+		LOGGER.setLevel(lvl);
+	}
 }
