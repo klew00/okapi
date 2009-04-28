@@ -26,19 +26,22 @@ package net.sf.okapi.filters.openxml;
 import java.io.*;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap; // DWH 10-10-08
+import java.util.Set;
+//import java.util.TreeMap; // DWH 10-10-08
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.htmlparser.jericho.EndTag;
+//import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
-//import net.htmlparser.jericho.Source;
+//import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
-import net.sf.okapi.common.encoder.IEncoder;
-//import net.sf.okapi.common.BOMAwareInputStream;
+//import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -46,79 +49,103 @@ import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	
-	private static final Logger logger = Logger.getLogger("net.sf.okapi.filters.openxml");
+	private Logger LOGGER=null;
 	
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
+	public final static int MSWORDCHART=4; // DWH 4-16-09
 
 	private int configurationType;
 	private Package p=null;
 //	private int filetype; // DWH 10-15-08
 	private String sConfigFileName; // DWH 10-15-08
 	private URL urlConfig; // DWH 3-9-09
-	private int dbg=0; // DWH 2-16-09
-	private Hashtable htXMLFileType=null;
-
-//	static Logger logr = Logger.getLogger("net.sf.okapi.filters.openxml");
-    // see http://logging.apache.org/log4j/1.2/manual.html
+	private Hashtable<String,String> htXMLFileType=null;
+	private boolean bInTextRun = false; // DWH 4-10-09
+	private boolean bInSubTextRun = false; // DWH 4-10-09
+	private boolean bBetweenTextMarkers=false; // DWH 4-14-09
+	private boolean bAfterText = false; // DWH 4-10-09
+	private TextRun trTextRun = null; // DWH 4-10-09
+	private boolean bIgnoredPreRun = false; // DWH 4-10-09
+	private boolean bHaveStuffBeforeTextRun = false; // DWH 4-15-09
+	private boolean bInMainFile = false; // DWH 4-15-09
 
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
 	}
 
-	public void displayOneEvent(Event event)
+	public void displayOneEvent(Event event) // DWH 4-22-09 LOGGER
 	{
-		String etyp=event.getEventType().toString();
-		if (event.getEventType() == EventType.TEXT_UNIT) {
-//			assertTrue(event.getResource() instanceof TextUnit);
-		} else if (event.getEventType() == EventType.DOCUMENT_PART) {
-//			assertTrue(event.getResource() instanceof DocumentPart);
-		} else if (event.getEventType() == EventType.START_GROUP
-				|| event.getEventType() == EventType.END_GROUP) {
-//			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
-		}
-		if (etyp.equals("START"))
-			System.out.println("\n");
-		System.out.println(etyp + ": ");
-		if (event.getResource() != null) {
-			System.out.println("(" + event.getResource().getId()+")");
-			if (event.getResource() instanceof DocumentPart) {
-				System.out.println(((DocumentPart) event.getResource()).getSourcePropertyNames());
-			} else {
-				System.out.println(event.getResource().toString());
+		Set<String> setter;
+		if (LOGGER.isLoggable(Level.FINEST))
+		{
+			String etyp=event.getEventType().toString();
+			if (event.getEventType() == EventType.TEXT_UNIT) {
+	//			assertTrue(event.getResource() instanceof TextUnit);
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
+	//			assertTrue(event.getResource() instanceof DocumentPart);
+			} else if (event.getEventType() == EventType.START_GROUP
+					|| event.getEventType() == EventType.END_GROUP) {
+	//			assertTrue(event.getResource() instanceof StartGroup || event.getResource() instanceof Ending);
 			}
-			if (event.getResource().getSkeleton() != null) {
-				System.out.println("*Skeleton: \n" + event.getResource().getSkeleton().toString());
+			if (etyp.equals("START"))
+				LOGGER.log(Level.FINEST,"\n");
+			LOGGER.log(Level.FINEST,etyp + ": ");
+			if (event.getResource() != null) {
+				LOGGER.log(Level.FINEST,"(" + event.getResource().getId()+")");
+				if (event.getResource() instanceof DocumentPart) {
+					setter = ((DocumentPart) event.getResource()).getSourcePropertyNames();
+					for(String seti : setter)
+						LOGGER.log(Level.FINEST,seti);
+				} else {
+					LOGGER.log(Level.FINEST,event.getResource().toString());
+				}
+				if (event.getResource().getSkeleton() != null) {
+					LOGGER.log(Level.FINEST,"*Skeleton: \n" + event.getResource().getSkeleton().toString());
+				}
 			}
-		}
-		
+		}		
 	}
 	public void setUpConfig(int filetype)
 	{
-		if (filetype==MSWORD)
+		switch(filetype)
 		{
-			sConfigFileName = "/net/sf/okapi/filters/openxml/wordConfiguration.yml"; // DWH 1-5-09 groovy -> yml
-			configurationType = MSWORD;
-		}			
-		else if (filetype==MSEXCEL)
-		{
-			sConfigFileName = "/net/sf/okapi/filters/openxml/excelConfiguration.yml"; // DWH 1-5-09 groovy -> yml
-			configurationType = MSEXCEL;
-		}
-		else if (filetype==MSPOWERPOINT)
-		{
-			sConfigFileName = "/net/sf/okapi/filters/openxml/powerpointConfiguration.yml"; // DWH 1-5-09 groovy -> yml
-			configurationType = MSPOWERPOINT;
+			case MSWORDCHART:
+				sConfigFileName = "/net/sf/okapi/filters/openxml/wordChartConfiguration.yml"; // DWH 1-5-09 groovy -> yml
+				configurationType = MSWORDCHART;
+				break;
+			case MSEXCEL:
+				sConfigFileName = "/net/sf/okapi/filters/openxml/excelConfiguration.yml"; // DWH 1-5-09 groovy -> yml
+				configurationType = MSEXCEL;
+				break;
+			case MSPOWERPOINT:
+				sConfigFileName = "/net/sf/okapi/filters/openxml/powerpointConfiguration.yml"; // DWH 1-5-09 groovy -> yml
+				configurationType = MSPOWERPOINT;
+				break;
+			case MSWORD:
+			default:
+				sConfigFileName = "/net/sf/okapi/filters/openxml/wordConfiguration.yml"; // DWH 1-5-09 groovy -> yml
+				configurationType = MSWORD;
+				break;
 		}
 		urlConfig = OpenXMLContentFilter.class.getResource(sConfigFileName); // DWH 3-9-09
 		setDefaultConfig(urlConfig); // DWH 3-9-09
-		setParameters(new Parameters(urlConfig)); // DWH 3-9-09 it doesn't update automatically from setDefaultConfig
+		try
+		{
+			setParameters(new Parameters(urlConfig)); // DWH 3-9-09 it doesn't update automatically from setDefaultConfig
+		}
+		catch(Exception e)
+		{
+			LOGGER.log(Level.SEVERE,"Can't read MS Office Filter Configuration File.");
+			throw new OkapiIOException("Can't read MS Office Filter Configuration File.");
+		}
 	}
 	
 	public InputStream combineRepeatedFormat(final InputStream in, final PipedOutputStream pios)
@@ -128,8 +155,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		try {
 			piis = new PipedInputStream(pios);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE,"Can't read piped input stream.");
+			throw new OkapiIOException("Can't read piped input stream.");
 		}		
 		final OutputStreamWriter osw = new OutputStreamWriter(pios);
 		final BufferedWriter bw = new BufferedWriter(osw);
@@ -157,7 +184,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	          if (curtext.length()>0)
 	        	  havtext(curtext);
 	        }
-	        catch(IOException e) {}
+	        catch(IOException e)
+	        {
+				LOGGER.log(Level.SEVERE,"Can't read input pipe.");
+				throw new OkapiIOException("Can't read input pipe.");	        	
+	        }
 		    try {
 		    	br.close();
 		    	isr.close();
@@ -166,8 +197,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 //				osw.flush();
 				osw.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE,"Can't read piped input.");
+				throw new OkapiIOException("Can't read piped input.");
 			}
 	      }
 	      private void handleOneChar(char c)
@@ -361,11 +392,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	    	try
 	    	{
 				bw.write(s);
-				if (dbg>3)
-					System.out.println(s); // for debugging only
+				LOGGER.log(Level.FINEST,s); //
 			} catch (IOException e) {
-				// do some logging here
-				// e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Problem writing piped stream.");
+//				throw new OkapiIOException("Can't read piped input.");
 				s = s + " ";
 			}
 	      }
@@ -374,23 +404,18 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		return piis;
 	}
 	
-	public void resetParse() // DWH $$$$
-	{
-		Iterator<Segment> nodeIterator = new TreeMap().keySet().iterator(); // empty
-//		setFinishedParsing(false); 1-5-09
-	}
-	
 	protected void handleCdataSection(Tag tag) { // 1-5-09
 		addToDocumentPart(tag.toString());
-		// TODO: special handling for CDATA sections (may call sub-filters or
-		// unescape content etc.)
 	}
 
 	@Override
 	protected void handleText(Segment text) {
+		if (text==null) // DWH 4-14-09
+			return;
+		String txt=text.toString();
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
-			addToDocumentPart(text.toString());
+			addToDocumentPart(txt);
 			return;
 		}
 
@@ -399,14 +424,37 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
-			addToDocumentPart(text.toString());
+			addToDocumentPart(txt);
 			return;
 		}
-
-		if (canStartNewTextUnit()) {
-			startTextUnit(text.toString());
-		} else {
-			addToTextUnit(text.toString());
+		if (canStartNewTextUnit())
+		{
+//			if (bBetweenTextMarkers)
+//				startTextUnit(txt);
+//			else
+				addToDocumentPart(txt);
+		}
+		else
+		{
+			if (bInTextRun) // DWH 4-20-09 whole if revised
+			{
+				if (bBetweenTextMarkers)
+				{
+					addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
+					bAfterText = true;
+					addToTextUnit(txt); // adds the text
+					trTextRun = new TextRun(); // then starts a new text run for a code after the text
+					bInTextRun = true;
+				}
+				else
+					addToTextRun(txt); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
+			}
+			else
+			{
+				trTextRun = new TextRun();
+				bInTextRun = true;
+				addToTextRun(txt); // not inside text markers, so this text will become part of a code
+			}
 		}
 	}
 
@@ -420,13 +468,17 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 
 	@Override
 	protected void handleStartTag(StartTag startTag) {
-		String sTagName = startTag.getName(); // DWH 2-26-09
+		String sTagName;
 		String sTagString; // DWH 2-26-09
 		String sPartName; // DWH 2-26-09 for PartName attribute in [Content_Types].xml
 		String sContentType; // DWH 2-26-09 for ContentType attribute in [Content_Types].xml
 		// if in excluded state everything is skeleton including text
+		if (startTag==null) // DWH 4-14-09
+			return;
+		sTagName = startTag.getName(); // DWH 2-26-09
+		sTagString = startTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
-			addToDocumentPart(startTag.toString());
+			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
 			  // DWH 1-23-09
@@ -442,14 +494,16 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			return;
 		}
-		sTagString = startTag.toString(); // DWH 2-26-09
 		switch (getConfig().getMainRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
-			addCodeToCurrentTextUnit(startTag);
+			if (bInTextRun) // DWH 4-9-09
+				addToTextRun(startTag);
+			else
+				addCodeToCurrentTextUnit(startTag);
 			break;
 
 		case ATTRIBUTES_ONLY:
@@ -457,9 +511,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			// the main while loop above
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 
-			if (!canStartNewTextUnit()) // DWH 2-14-09 document part just created is part of inline codes
-				addCodeToCurrentTextUnit(startTag);
-			else
+			if (canStartNewTextUnit()) // DWH 2-14-09 document part just created is part of inline codes
 			{
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
 				if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) { // 1-29-09
@@ -471,6 +523,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					addToDocumentPart(sTagString);
 				}
 			}
+			else if (bInTextRun) // DWH 4-10-09
+			{
+				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
+				addToTextRun(startTag,propertyTextUnitPlaceholders);
+			}
+			else
+				addCodeToCurrentTextUnit(startTag);
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().pushGroupRule(sTagName);
@@ -485,13 +544,47 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+//			if (startTag.isSyntacticalEmptyElementTag()) // means the tag ended with />
 			if (sTagString.endsWith("/>")) // DWH 3-18-09 in case text unit element is a standalone tag (weird, but Microsoft does it)
 				addToDocumentPart(sTagString); // 1-5-09
 			else
 			{
 				getRuleState().pushTextUnitRule(sTagName);
 				startTextUnit(new GenericSkeleton(sTagString)); // DWH 1-29-09
+				if (configurationType==MSEXCEL || configurationType==MSWORDCHART)
+				// DWH 4-16-09 Excel and Word Charts don't have text runs or text markers
+				{
+					bInTextRun = true;
+					bBetweenTextMarkers = true;
+				}
+				else
+				{
+					bInTextRun = false;
+					bBetweenTextMarkers = false;					
+				}
 			}
+			break;
+		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
+			if (bInTextRun)
+				bInSubTextRun = true;
+			else
+			{
+				bInTextRun = true;
+				bAfterText = false;
+				bIgnoredPreRun = false;
+				trTextRun = new TextRun();
+				bBetweenTextMarkers = false; // DWH 4-16-09
+			}
+			addToTextRun(startTag);
+			break;
+		case TEXT_MARKER_ELEMENT: // DWH 4-14-09 whole case
+			if (bInTextRun)
+			{
+				bBetweenTextMarkers = true;
+				addToTextRun(startTag);
+			}
+			else
+				addToDocumentPart(sTagString);
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(sTagName);
@@ -507,18 +600,29 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			if (canStartNewTextUnit()) // DWH 1-14-09 then not currently in text unit; added else
 				addToDocumentPart(sTagString); // 1-5-09
+			else if (bInTextRun) // DWH 4-10-09
+				addToTextRun(startTag);
 			else
-				addCodeToCurrentTextUnit(startTag);				
+			{
+				addCodeToCurrentTextUnit(startTag);
+				bHaveStuffBeforeTextRun = true;
+			}
 		}
 	}
 
 	@Override
 	protected void handleEndTag(EndTag endTag) {
 		// if in excluded state everything is skeleton including text
+		String sTagName; // DWH 2-26-09
+		String sTagString; // DWH 4-14-09
+		if (endTag==null) // DWH 4-14-09
+			return;
+		sTagName = endTag.getName(); // DWH 2-26-09
+		sTagString = endTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(endTag.toString());
 			// process these tag types to update parser state
-			switch (getConfig().getMainRuleType(endTag.getName())) {
+			switch (getConfig().getMainRuleType(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
 				getRuleState().popExcludedIncludedRule();
@@ -534,39 +638,72 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			return;
 		}
 
-		switch (getConfig().getMainRuleType(endTag.getName())) {
+		switch (getConfig().getMainRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
-			addCodeToCurrentTextUnit(endTag);
+			if (bInTextRun) // DWH 4-9-09
+				addToTextRun(endTag);
+			else
+				addCodeToCurrentTextUnit(endTag);
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().popGroupRule();
-			endGroup(new GenericSkeleton(endTag.toString()));
+			endGroup(new GenericSkeleton(sTagString));
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().popExcludedIncludedRule();
-			addToDocumentPart(endTag.toString());
+			addToDocumentPart(sTagString);
 			break;
 		case INCLUDED_ELEMENT:
 			getRuleState().popExcludedIncludedRule();
-			addToDocumentPart(endTag.toString());
+			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+			if (bInTextRun)
+			{
+				addTextRunToCurrentTextUnit(true);
+				bInTextRun = false;
+			} // otherwise this is an illegal element, so just ignore it
+			bBetweenTextMarkers = true; // DWH 4-16-09
 			getRuleState().popTextUnitRule();
-			endTextUnit(new GenericSkeleton(endTag.toString()));
+			endTextUnit(new GenericSkeleton(sTagString));
+			break;
+		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
+			addToTextRun(endTag);
+			if (bInSubTextRun)
+				bInSubTextRun = false;
+			else if (bInTextRun)
+			{
+				addTextRunToCurrentTextUnit(true);
+				bInTextRun = false;
+			} // otherwise this is an illegal element, so just ignore it
+			break;
+		case TEXT_MARKER_ELEMENT: // DWH 4-14-09 whole case
+			if (bInTextRun)
+			{
+				bBetweenTextMarkers = false;
+				addToTextRun(endTag);
+			}
+			else
+				addToDocumentPart(sTagString);
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().popPreserverWhitespaceRule();
-			addToDocumentPart(endTag.toString());
+			addToDocumentPart(sTagString);
 			break;
 		default:
 			if (canStartNewTextUnit()) // DWH 1-14-09 then not currently in text unit; added else
-				addToDocumentPart(endTag.toString()); // not in text unit, so add to skeleton
+				addToDocumentPart(sTagString); // not in text unit, so add to skeleton
+			else if (bInTextRun) // DWH 4-9-09
+				addToTextRun(endTag);
 			else
+			{
 				addCodeToCurrentTextUnit(endTag); // in text unit, so add to inline codes
+				bHaveStuffBeforeTextRun = true;
+			}
 			break;
 		}
 	}
@@ -714,8 +851,99 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		return(rslt);
 	}
-	public void setDbg(int dbg)
+	private void addToTextRun(String s)
 	{
-		this.dbg = dbg;
+		if (bInTextRun && trTextRun!=null)
+			trTextRun.append(s);		
+	}
+	private void addToTextRun(Tag tag) // DWH 4-10-09 adds tag text to string that will be part of larger code later
+	{
+		// add something here to check if it was bold, italics, etc. to set a property
+		if (bInTextRun && trTextRun!=null)
+			trTextRun.append(tag.toString());
+	}
+	private void addToTextRun(Tag tag, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
+	{
+		String txt;
+		int offset;
+		if (bInTextRun && trTextRun!=null)
+		{
+			txt=trTextRun.getText();
+			offset=txt.length();
+			trTextRun.appendWithPropertyTextUnitPlaceholders(tag.toString(),offset,propertyTextUnitPlaceholders);
+		}
+	}
+	private void addTextRunToCurrentTextUnit(boolean bEndRun) {
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+		TextFragment.TagType codeType;
+		String text,tempTagType;
+		int len;
+		if (bInTextRun && trTextRun!=null)
+		{
+			if (bAfterText)
+				codeType = TextFragment.TagType.CLOSING;
+			else if (bEndRun) // if no text was encountered and this is the </w:r> or </w:p>, this is a standalone code
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			else
+				codeType = TextFragment.TagType.OPENING;
+			text = trTextRun.getText();
+			if (codeType==TextFragment.TagType.OPENING &&
+				!bHaveStuffBeforeTextRun && // DWH 4-15-09 only do this if there wasn't stuff before <w:r>
+				bInMainFile && // DWH 4-15-08 only do this in MSWORD document and MSPOWERPOINT slides
+				((/*text.equals("<w:r><w:t>") || */text.equals("<w:r><w:t xml:space=\"preserve\">")) ||
+				 (/*text.equals("<a:r><a:t>") || */text.equals("<a:r><a:t xml:space=\"preserve\">"))))
+			{
+				bIgnoredPreRun = true; // don't put codes around text that has not attributes
+				trTextRun = null;
+				return;
+			}
+			else if (codeType==TextFragment.TagType.CLOSING && bIgnoredPreRun)
+			{
+				bIgnoredPreRun = false;
+				if (text.endsWith("</w:t></w:r>") || text.endsWith("</a:t></a:r>"))
+				{
+					len = text.length();
+					if (len>12) // take of the end codes and leave the rest as a placeholder code, if any
+					{
+						text = text.substring(0,len-12);
+						codeType = TextFragment.TagType.CLOSING;
+					}	
+					else
+					{
+						trTextRun = null;
+						return;						
+					}
+				}
+			}
+			propertyTextUnitPlaceholders = trTextRun.getPropertyTextUnitPlaceholders();
+			tempTagType = getTagType(); // DWH 4-24-09 saves what Abstract Base Filter thinks current tag type is
+			setTagType("x"); // DWH 4-24-09 type for current manufactured tag in text run, so tags will balance
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				// add code and process actionable attributes
+				addToTextUnit(codeType, text, "x", propertyTextUnitPlaceholders);
+			} else {
+				// no actionable attributes, just add the code as-is
+				addToTextUnit(codeType, text, "x");
+			}
+			setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
+			trTextRun = null;
+		}
+		bHaveStuffBeforeTextRun = false; // since the text run has now been added to the text unit
+	}
+	public int getConfigurationType()
+	{
+		return configurationType;
+	}
+	protected void setBInMainFile(boolean bInMainFile) // DWH 4-15-09
+	{
+		this.bInMainFile = bInMainFile;
+	}
+	protected boolean getBInMainFile() // DWH 4-15-09
+	{
+		return bInMainFile;
+	}
+	public void setLogger(Logger lgr)
+	{
+		LOGGER = lgr;
 	}
 }
