@@ -19,7 +19,9 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
+import net.sf.okapi.common.resource.TextFragment;
+
 public interface ITranslator
 {
-	public String translate(String s);
+	public String translate(TextFragment tf);
 }

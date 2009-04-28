@@ -19,10 +19,15 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml.tests;
 
+import java.util.List;
+
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.ITranslator;
 
-public class PigLatinTranslator implements ITranslator {
+public class CodePeekTranslator extends GenericSkeletonWriter implements ITranslator {
+	  // extends GenericSkeletonWriter because expandCodeContent is protected
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";
 	static final String PUNC=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?";
@@ -31,21 +36,59 @@ public class PigLatinTranslator implements ITranslator {
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
 
-	public PigLatinTranslator()
-	{
-	}
-
 	public String translate(TextFragment tf)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;
-		int i,j,k,len;
+		int i,j,k,len,codenum;
+		String linebreak="<w:br/>";
 		char carrot;
+		int nSurroundingCodes=0; // DWH 4-8-09
+		Code code;
+		char ch;
 		len = s.length();
+		List<Code> codes = tf.getCodes();
 		if (len>1)
 		{
 			for(i=0;i<len;i++)
 			{
+				ch = s.charAt(i);
+				code = null;
+				switch ( ch )
+				{
+					case TextFragment.MARKER_OPENING:
+						codenum = TextFragment.toIndex(s.charAt(++i));
+						code = codes.get(codenum);
+						ss += linebreak + "[MARKER_OPENING " + codenum + ":" + eggspand(code) + "]" + linebreak;
+						nSurroundingCodes++;
+						break;
+					case TextFragment.MARKER_CLOSING:
+						codenum = TextFragment.toIndex(s.charAt(++i));
+						code = codes.get(codenum);
+						ss += linebreak + "[MARKER_CLOSING " + codenum + ":" + eggspand(code) + "]" + linebreak;
+						nSurroundingCodes--;
+						break;
+					case TextFragment.MARKER_ISOLATED:
+						codenum = TextFragment.toIndex(s.charAt(++i));
+						code = codes.get(codenum);
+						if (code.getTagType()==TextFragment.TagType.OPENING)
+							nSurroundingCodes++;
+						else if (code.getTagType()==TextFragment.TagType.CLOSING)
+							nSurroundingCodes--;
+						ss += linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
+						break;
+					case TextFragment.MARKER_SEGMENT:
+						codenum = TextFragment.toIndex(s.charAt(++i));
+						code = codes.get(codenum);
+						if (code.getTagType()==TextFragment.TagType.OPENING)
+							nSurroundingCodes++;
+						else if (code.getTagType()==TextFragment.TagType.CLOSING)
+							nSurroundingCodes--;
+						ss += linebreak + "[MARKER_SEGMENT " + codenum + ":" + eggspand(code) + "]" + linebreak;
+						break;
+				}
+				if (code!=null)
+					continue;
 				if (i+2<len && s.substring(i,i+3).equals("---"))
 				{
 					ss += "---";
@@ -140,5 +183,22 @@ public class PigLatinTranslator implements ITranslator {
 				break;
 		}
 		return i;		
+	}
+	private String eggspand(Code code)
+	{
+		String s,ss="";
+		int len;
+		char carrot;
+		s = expandCodeContent(code, "en-US", 1);
+		len = s.length();
+		for(int i=0; i<len; i++)
+		{
+			carrot = s.charAt(i);
+			if (carrot=='<')
+				ss += "&lt;";
+			else
+				ss += carrot;
+		}
+		return ss;
 	}
 }

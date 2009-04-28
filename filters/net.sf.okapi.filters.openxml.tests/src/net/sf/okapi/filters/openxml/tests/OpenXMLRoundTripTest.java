@@ -21,79 +21,124 @@
 package net.sf.okapi.filters.openxml.tests;
 
 import java.io.File;
+//import java.io.File;
+//import java.io.FileInputStream;
+//import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
+import java.util.ArrayList;
+//import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+//import java.util.zip.ZipEntry;
+//import java.util.zip.ZipFile;
 
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.common.filterwriter.ZipFilterWriter;
+import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter; // DWH 4-8-09
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class OpenXMLRoundTripTest {
+	private ZipCompare zc=null;
+
+	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
 
 	@Test
 	public void runTest () {
-		String glug = "docx";
-//		String glug = "pptx";
-//		String glug = "xlsx";
-		String sPath,sInputPath,sOutputPath;
+		LOGGER.setLevel(Level.FINE);
+//		LOGGER.setLevel(Level.FINER);
+//		LOGGER.setLevel(Level.FINEST);
+		LOGGER.addHandler(new LogHandlerSystemOut());
+		ArrayList<String> themfiles = new ArrayList<String>();
+		zc = new ZipCompare();
+		themfiles.add("BoldWorld.docx");
+		themfiles.add("sample.docx");
+		themfiles.add("sample.pptx");
+		themfiles.add("sample.xlsx");
+		themfiles.add("TranslationServicesOff.docx");
+		themfiles.add("gtsftopic.docx");
+		themfiles.add("OpenXML_text_reference_document.docx");
+		themfiles.add("OpenXML_text_reference_v1_1.docx");
+		themfiles.add("OpenXML_text_reference_v1_2.docx");
+		themfiles.add("Mauris.docx");
+
+		for(String s : themfiles)
+		{
+			runOneTest(s,false,false); // English
+			runOneTest(s,true,false);  // PigLatin
+			runOneTest(s,false,true);  // Codes
+		}
+	}
+
+	public void runOneTest (String filename, boolean bTranslating, boolean bPeeking) {
+		String sInputPath=null,sOutputPath=null,sGoldPath=null;
 		Event event;
 		URI uri;
 		String sUserDir;
-		OpenXMLFilter filter = null;		
+		OpenXMLFilter filter = null;
+		boolean rtrued2;
 		try {
-			filter = new OpenXMLFilter(new PigLatinTranslator(),"pl"); // $$$
-//			filter = new OpenXMLFilter();
+			if (bPeeking)
+				filter = new OpenXMLFilter(new CodePeekTranslator(),"en-US");
+			else if (bTranslating)
+				filter = new OpenXMLFilter(new PigLatinTranslator(),"pl");
+			else
+				filter = new OpenXMLFilter();
 			filter.setOptions("en-US", "UTF-8", true);
+//			filter.setLogLevel(Level.FINEST);
+//			filter.setLogLevel(Level.FINE);
 			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
 			sInputPath = sUserDir + "/data/";
 			sOutputPath = sUserDir + "/output/";
-//			uri = new URI(sInputPath+"sample."+glug);
-//			uri = new URI(sInputPath+"TranslationServicesOff.docx");
-//			uri = new URI(sInputPath+"gtsftopic.docx");
-			uri = new URI(sInputPath+"OpenXML_text_reference_document.docx");
-//			uri = new URI(sInputPath+"OpenXML_text_reference_v1_1.docx");
-//			uri = new URI(sInputPath+"OpenXML_text_reference_v1_2.docx");
+			sGoldPath = sUserDir + "/gold/";
+			uri = new URI(sInputPath+filename);
 			try
 			{
-//				filter.open(uri,true,3);
-				filter.open(uri,false,3); // DWH 3-27-09
+				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 3-27-09
 			}
 			catch(Exception e)
 			{
 				throw new RuntimeException(e);				
 			}
+			filter.setLogger(LOGGER);
 			
-			ZipFilterWriter writer = new ZipFilterWriter();
+			OpenXMLZipFilterWriter writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
 
-			writer.setOptions("pl", "UTF-8"); // $$$
-//			writer.setOptions("en-US", "UTF-8");
+			if (bPeeking)
+				writer.setOptions("en-US", "UTF-8");
+			else if (bTranslating)
+				writer.setOptions("pl", "UTF-8");
+			else
+				writer.setOptions("en-US", "UTF-8");
 
-//			writer.setOutput(sOutputPath+"OutputSample."+glug);
-//			writer.setOutput(sOutputPath+"OutputTranslationServicesOff.docx");
-//			writer.setOutput(sOutputPath+"OutputGtsftopic.docx");
-			writer.setOutput(sOutputPath+"OpenXML_text_reference_document.docx");
-//			writer.setOutput(sOutputPath+"OpenXML_text_reference_v1_1.docx");
-//			writer.setOutput(sOutputPath+"OpenXML_text_reference_v1_2.docx");
+			writer.setOutput(sOutputPath+ (bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename);
 			
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				if (event!=null)
+				{
+					if (event.getEventType()==EventType.START_SUBDOCUMENT) // DWH 4-16-09 was START_DOCUMENT
+						writer.setParameters(filter.getParameters());
 					writer.handleEvent(event);
+				}
 				else
 					event = null; // just for debugging
 			}
 			writer.close();
+			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename,
+					   sGoldPath+(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename);
+			LOGGER.log(Level.INFO,(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename+" SUCCEEDED");
+			assert(rtrued2);
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
+			LOGGER.log(Level.SEVERE,e.getMessage());
+			assert(0==1);
 		}
 		finally {
 			if ( filter != null ) filter.close();
 		}
 	}
-
 }

@@ -25,8 +25,10 @@ import java.io.FilenameFilter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level; // DWH 4-22-09
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.RawDocument;
 //import net.sf.okapi.filters.markupfilter.Parameters;
 //import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
@@ -72,7 +74,7 @@ public class OpenXMLZipFullFileTest {
 			String fff = ff.replace(" ","%20");
 			try {
 				URI uriFf = new URI(fff);
-				openXMLFilter.open(uriFf,true,3);
+				openXMLFilter.open(new RawDocument(uriFf,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					event = openXMLFilter.next();
 				}
@@ -89,7 +91,7 @@ public class OpenXMLZipFullFileTest {
 		try
 		{
 			URI uriFf = new URI(filename);
-			openXMLFilter.open(uriFf,true,3);
+			openXMLFilter.open(uriFf,true,Level.FINEST); // DWH 4-22-09
 			while (openXMLFilter.hasNext())
 			{
 				Event event = openXMLFilter.next();

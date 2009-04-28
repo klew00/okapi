@@ -32,13 +32,20 @@
 # MATCH regex match. Must match the entire attribute value
 
 
-# text marker
+filetype:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  elementType: MSEXCEL
 
 author:
   ruleTypes: [EXCLUDE]
 
+v:
+  ruleTypes: [TEXTUNIT]
+
+# used in sharedString file
+
 t:
-  ruleTypes: [TEXTUNIT,PRESERVE_WHITESPACE]
+  ruleTypes: [TEXTUNIT]
 
 # used in comments file
 text:
@@ -57,5 +64,7 @@ table:
 tablecolumn:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [name]
+
+
 
 

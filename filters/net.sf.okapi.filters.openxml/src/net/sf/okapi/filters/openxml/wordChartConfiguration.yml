@@ -35,42 +35,9 @@
 
 filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSWORD
+  elementType: MSWORDCHART
 
-#'c:lang':
-#  ruleTypes: [ATTRIBUTES_ONLY]
-#  writableLocalizableAttributes: [val]
-
-'w:p':
-  ruleTypes: [TEXTUNIT]
-
-'w:r':
-  ruleTypes: [TEXTRUN]
-
-'pic:cnvpr':
+'c:lang':
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-  elementType: image
-
-'wp:docpr':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-
-#'w:ppr':
-#  ruleTypes: [EXCLUDE]
-
-'w:lang':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: [w:val]
-
-#'w:rstyle':           DWH 3-9-09 this dies because r:style is a standalone tag
-#  elementType: {link: ['w:val', EQUALS, 'Hyperlink']}
-
-'w:t':
-  ruleTypes: [TEXTMARKER]
-
-'w:themefontlang':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: [w:val]
-
+  writableLocalizableAttributes: [val]
 
