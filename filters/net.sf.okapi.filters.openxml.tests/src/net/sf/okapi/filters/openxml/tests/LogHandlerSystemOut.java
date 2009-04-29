@@ -42,8 +42,10 @@ class LogHandlerSystemOut extends Handler {
 	public void publish (LogRecord record) {
 		if ( record.getLevel() == Level.SEVERE ) {
 			System.out.println("LOGGER SEVERE: "+record.getMessage());
-			System.out.println(record.getThrown().getMessage());
-			System.out.println(" @ "+record.getThrown().toString());
+			if (record.getThrown() != null){
+				System.out.println(record.getThrown().getMessage());
+				System.out.println(" @ "+record.getThrown().toString());
+			}
 		}
 		else if ( record.getLevel() == Level.WARNING ) {
 			System.out.println("LOGGER SEVERE: "+record.getMessage());

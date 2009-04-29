@@ -20,25 +20,19 @@
 
 package net.sf.okapi.filters.openxml.tests;
 
-import java.io.File;
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.InputStream;
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 import java.util.ArrayList;
-//import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import java.util.zip.ZipEntry;
-//import java.util.zip.ZipFile;
 
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter; // DWH 4-8-09
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.openxml.OpenXMLFilter;
+import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class OpenXMLRoundTripTest {
@@ -135,7 +129,7 @@ public class OpenXMLRoundTripTest {
 		}
 		catch ( Throwable e ) {
 			LOGGER.log(Level.SEVERE,e.getMessage());
-			assert(0==1);
+			fail("An unexpected exception was thrown " + e);
 		}
 		finally {
 			if ( filter != null ) filter.close();

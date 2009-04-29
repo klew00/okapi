@@ -57,7 +57,7 @@ public class OpenXMLZipFullFileTest {
 		// read all files in the test html directory
 		URL url = OpenXMLZipFullFileTest.class.getResource("anchor.txt");
 		File dir = new File(url.toURI()).getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile();
-		File dir2 = new File(dir.getAbsolutePath()+"\\data");
+		File dir2 = new File(dir.getAbsolutePath()+"/data");
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir2, String name) {
