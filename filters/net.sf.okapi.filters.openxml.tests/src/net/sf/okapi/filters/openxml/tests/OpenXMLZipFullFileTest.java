@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level; // DWH 4-22-09
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.RawDocument;
@@ -38,13 +39,19 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class OpenXMLZipFullFileTest {
+	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private static final String deary="/data/";
 
 	@Before
 	public void setUp() throws Exception {
-		openXMLFilter = new OpenXMLFilter();
+		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+		openXMLFilter = new OpenXMLFilter();	
+		openXMLFilter.setLogger(LOGGER);
+		LOGGER.setLevel(Level.FINER);
+		if (LOGGER.getHandlers().length<1)
+			LOGGER.addHandler(new LogHandlerSystemOut());		
 		openXMLFilter.setOptions("en", "UTF-8", true);
 
 		// read all files in the test html directory

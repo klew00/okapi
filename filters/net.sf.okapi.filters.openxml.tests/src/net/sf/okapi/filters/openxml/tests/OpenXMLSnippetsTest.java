@@ -26,7 +26,7 @@ import org.junit.Test;
 
 
 public class OpenXMLSnippetsTest {
-	private static final Logger LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+	private static Logger LOGGER;
 	private OpenXMLContentFilter openXMLContentFilter;
 	private static final int MSWORD=1;
 	private static final int MSEXCEL=2;
@@ -36,16 +36,18 @@ public class OpenXMLSnippetsTest {
 	
 	@Before
 	public void setUp()  {
+		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLContentFilter = new OpenXMLContentFilter();	
 		openXMLContentFilter.setLogger(LOGGER);
 		LOGGER.setLevel(Level.FINER);
-		LOGGER.addHandler(new LogHandlerSystemOut());
+		if (LOGGER.getHandlers().length<1)
+			LOGGER.addHandler(new LogHandlerSystemOut());		
 	}
 
 	@After
 	public void tearDown() {
 	}
-/*
+
 	@Test
 	public void testInsertion() {
 		String snippet = "<w:p><w:ins><w:r><w:t xml:space=\"preserve\">zorcon</w:t></w:r></w:ins></w:p>";
@@ -73,7 +75,7 @@ public class OpenXMLSnippetsTest {
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}
-*/
+
 	@Test
 	public void testInlineLanguage() {
 		String snippet = "<w:p><w:r><w:lang w:val=\"en-US\"/></w:r></w:p>";
@@ -186,6 +188,7 @@ public class OpenXMLSnippetsTest {
 			}
 		}		
 
+		LOGGER.setUseParentHandlers(false);
 		LOGGER.log(Level.FINER,"nOriginal: "+original);
 		LOGGER.log(Level.FINER,"Output:    "+tmp.toString());
 		writer.close();
