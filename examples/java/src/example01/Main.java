@@ -25,8 +25,8 @@ import java.io.File;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
+import net.sf.okapi.common.pipeline.EventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -125,7 +125,7 @@ public class Main {
 		IPipeline pipeline = new Pipeline();
 		
 		// Create the filter step
-		IPipelineStep inputStep = new FilterPipelineStepAdaptor(filter);
+		IPipelineStep inputStep = new RawDocumentToEventsStep(filter);
 		// Add this step to the pipeline
 		pipeline.addStep(inputStep);
 
@@ -143,7 +143,7 @@ public class Main {
 		// Create the writer we will use
 		IFilterWriter writer = filter.createFilterWriter();
 		// Create the writer step (using the writer provider by our filter)
-		IPipelineStep outputStep = new FilterWriterPipelineStepAdaptor(writer);
+		IPipelineStep outputStep = new EventsWriterStep(writer);
 		// Add this step to the pipeline
 		pipeline.addStep(outputStep);
 

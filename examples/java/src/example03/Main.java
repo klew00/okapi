@@ -8,8 +8,8 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
+import net.sf.okapi.common.pipeline.EventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -39,13 +39,13 @@ public class Main {
 
 		// filtering step - converts raw resource to events
 		IFilter filter = new XMLFilter();
-		IPipelineStep filterStep = new FilterPipelineStepAdaptor(filter);
+		IPipelineStep filterStep = new RawDocumentToEventsStep(filter);
 		pipeline.addStep(filterStep);
 
 		// writer step - converts events to a raw resource
 		IFilterWriter writer = filter.createFilterWriter();
 		writer.setOptions("en", "UTF-8");
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(writer));
+		pipeline.addStep(new EventsWriterStep(writer));
 
 		// buffer for the writer step
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();

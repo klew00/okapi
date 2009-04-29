@@ -26,8 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.pipeline.FilterPipelineStepAdaptor;
-import net.sf.okapi.common.pipeline.FilterWriterPipelineStepAdaptor;
+import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
+import net.sf.okapi.common.pipeline.EventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
@@ -57,8 +57,8 @@ public class FilterRoundtripTest {
 		genericFilterWriter.setOptions("es", "UTF-16LE");
 		genericFilterWriter.setOutput("genericOutput.txt");
 
-		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
+		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
+		pipeline.addStep(new EventsWriterStep(
 				genericFilterWriter));
 
 		RawDocument fr = new RawDocument(
@@ -79,8 +79,8 @@ public class FilterRoundtripTest {
 		genericFilterWriter.setOptions("es", "UTF-8");
 		genericFilterWriter.setOutput("genericOutput.txt");
 
-		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
+		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
+		pipeline.addStep(new EventsWriterStep(
 				genericFilterWriter));
 		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")
 		RawDocument fr = new RawDocument("\r\nX\rY\n", "en");
@@ -102,8 +102,8 @@ public class FilterRoundtripTest {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		genericFilterWriter.setOutput(outStream);
 
-		pipeline.addStep(new FilterPipelineStepAdaptor(htmlFilter));
-		pipeline.addStep(new FilterWriterPipelineStepAdaptor(
+		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
+		pipeline.addStep(new EventsWriterStep(
 				genericFilterWriter));
 
 		RawDocument fr = new RawDocument("<b>TEST ME</b>", "en");

@@ -25,11 +25,11 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class FilterPipelineStepAdaptor extends BasePipelineStep {
+public class RawDocumentToEventsStep extends BasePipelineStep {
 	private IFilter filter;
 	private boolean hasEvents;
 	
-	public FilterPipelineStepAdaptor(IFilter filter) {
+	public RawDocumentToEventsStep(IFilter filter) {
 		this.filter = filter;
 	}
 
