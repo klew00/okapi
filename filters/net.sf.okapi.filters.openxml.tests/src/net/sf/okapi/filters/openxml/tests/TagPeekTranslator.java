@@ -26,6 +26,13 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.ITranslator;
 
+/**
+ * Implements ITranslator and modifies text to be translated to
+ * show the tags the translator will see while translating.  This
+ * is used in OpenXMLRoundTripTest, so the tags are shown in the
+ * orignal file format.
+ */
+
 public class TagPeekTranslator extends GenericSkeletonWriter implements ITranslator {
 	  // extends GenericSkeletonWriter because expandCodeContent is protected
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";

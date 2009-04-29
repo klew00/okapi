@@ -20,12 +20,18 @@
 
 package net.sf.okapi.filters.openxml.tests;
 
-//import java.io.File;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+
+/**
+ * This class does a simple byte-to-byte compare.  The
+ * filesExactlyTheSame method takes two files specified
+ * by URIs and returns a boolean indicating whether they
+ * are the same. 
+ */
 
 public class FileCompare {
 

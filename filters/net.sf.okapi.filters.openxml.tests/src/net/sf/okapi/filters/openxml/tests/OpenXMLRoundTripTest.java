@@ -36,6 +36,21 @@ import net.sf.okapi.common.EventType;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * This tests OpenXMLFilter (including OpenXMLContentFilter) and
+ * OpenXMLZipFilterWriter (including OpenXMLContentSkeleton writer)
+ * by filtering, automatically translating, and then writing the
+ * zip file corresponding to a Word, Excel or Powerpoint 2009 file, 
+ * then comparing it to a gold file to make sure nothing has changed.
+ * It does this with a specific list of files.
+ * 
+ * <p>This is done with no translator first, to make sure the same
+ * file is created that was filtered in the first place.  Then it
+ * is translated into Pig Latin by PigLatinTranslator, translated so
+ * codes are expanded by CodePeekTranslator, and then translated to
+ * see a view like the translator will see by TagPeekTranslator.
+ */
+
 public class OpenXMLRoundTripTest {
 	private ZipCompare zc=null;
 

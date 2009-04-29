@@ -29,6 +29,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 
+/**
+ * This class compares two zip files to see if they have
+ * the same contents.  The zipsExactlyTheSame method takes
+ * two files specified by their file paths and indicates
+ * by calling FileCompare whether all files in the zip
+ * are exactly the same as each other.  This can be used
+ * to compare zip file output with a gold standard zip file.  
+ */
+
 public class ZipCompare {
 
 	private FileCompare fc=null;

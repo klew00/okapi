@@ -26,6 +26,13 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.ITranslator;
 
+/**
+ * Implements ITranslator and modifies text to be translated by
+ * expanding codes, showing the code type and tags encoded.  This
+ * is useful for debugging to be able to see in the original file
+ * format what the encoded text looks like.
+ */
+
 public class CodePeekTranslator extends GenericSkeletonWriter implements ITranslator {
 	  // extends GenericSkeletonWriter because expandCodeContent is protected
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";

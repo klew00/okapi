@@ -29,6 +29,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * This tests the Office 2007 configuration files that drive the OpenXMLFilter.
+ */
+
 public class OpenXMLConfigurationTest {
 	
 	@Before

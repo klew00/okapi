@@ -26,6 +26,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
+/**
+ * Runs all unit tests for OpenXML.
+ */
+
 @RunWith(Suite.class)
 @SuiteClasses({OpenXMLSnippetsTest.class, OpenXMLZipFullFileTest.class, 
     OpenXMLConfigurationTest.class, OpenXMLRoundTripTest.class})

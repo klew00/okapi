@@ -22,6 +22,14 @@ package net.sf.okapi.filters.openxml.tests;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.ITranslator;
 
+/**
+ * Implements ITranslator and translates the text to be
+ * translated into one dialect of Pig Latin.  This is
+ * used in debugging by OpenXMLRoundTripTest, so that
+ * one can easily see that all text that should be 
+ * translated is available to the translator for translation.
+ */
+
 public class PigLatinTranslator implements ITranslator {
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";

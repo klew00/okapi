@@ -1,1 +1,2 @@
+This file is used by OpenXMLZipFullFileTest and should not be deleted.
 This file helps locate the data directory by giving an anchor to a .class.getResource() request.
