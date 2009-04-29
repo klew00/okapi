@@ -1813,6 +1813,7 @@ public class MainForm implements IParametersProvider {
 	private void addDocumentsFromList (String[] paths) {
 		try {
 			if ( currentInput == -1 ) return;
+			saveSurfaceData();
 			// Get a list of paths if needed
 			if ( paths == null ) {
 				paths = Dialogs.browseFilenames(shell, Res.getString("MainForm.addDocsBrowsecaption"), //$NON-NLS-1$
@@ -2107,6 +2108,7 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( currentInput == -1 ) return;
 			if ( getFocusedInputIndex() < 0 ) return;
+			saveSurfaceData();
 			// Get the selected documents
 			Table table = inputTables.get(currentInput);
 			int[] indices = table.getSelectionIndices();
@@ -2140,6 +2142,7 @@ public class MainForm implements IParametersProvider {
 		try {
 			if ( currentInput == -1 ) return;
 			if ( getFocusedInputIndex() < 0 ) return;
+			saveSurfaceData();
 			// Get the selected documents
 			Table table = inputTables.get(currentInput);
 			int[] indices = table.getSelectionIndices();
@@ -2169,15 +2172,4 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-/*	private void testRunnable () {
-		try {
-//			startWaiting("Test", true);
-//			RunnableTest test = new RunnableTest(shell.getDisplay(), log);
-//			Thread T = new Thread(test);
-//			T.start();
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}*/
 }

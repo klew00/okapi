@@ -223,24 +223,6 @@ public class PathBuilder {
 		return tmp.toString();
 	}
 
-	/* Not used currently
-	public void fromString (String data) {
-		reset();
-		ParametersString tmp = new ParametersString(data);
-		setUseSubfolder(tmp.getBoolean("useSubFolder", m_bUseSubfolder));
-		setSubfolder(tmp.getString("subFolder", m_sSubfolder));
-		setUseExtension(tmp.getBoolean("useExtension", m_bUseExt));
-		setExtensionType(tmp.getInteger("extensionType", m_nExtType));
-		setExtension(tmp.getString("extension", m_sExt));
-		setUsePrefix(tmp.getBoolean("usePrefix", m_bUsePrefix));
-		setPrefix(tmp.getString("prefix", m_sPrefix));
-		setUseSuffix(tmp.getBoolean("useSuffix", m_bUseSuffix));
-		setSuffix(tmp.getString("suffix", m_sSuffix));
-		setUseReplace(tmp.getBoolean("useReplace", m_bUseReplace));
-		setSearch(tmp.getString("search", m_sSearch));
-		setReplace(tmp.getString("replace", m_sReplace));
-	}*/
-
 	/**
 	 * Transforms a given full path to a new path.
 	 * @param p_sFullPath The path to transform.
@@ -282,17 +264,24 @@ public class PathBuilder {
 			sFile += getSuffix();
 		}
 
+		// Get the root
 		String sTmp = (((p_sNewRoot==null)||(p_sNewRoot.length()==0))
 			? p_sOriginalRoot : p_sNewRoot) + File.separatorChar;
-		String sSub = getSubfolder();
-		if ( !useSubfolder() ) {
-			sSub = Util.getDirectoryName(sPath);
-			if ( sSub.length() != 0 ) sSub = sSub.substring(1);
+			
+		// Get optional extra sub-folder
+		if ( useSubfolder() ) {
+			String sSub = getSubfolder();
+			if (( sSub != null ) && ( sSub.length() > 0 ))
+				sTmp += (sSub + File.separatorChar);
 		}
-		if (( sSub != null ) && ( sSub.length() > 0 ))
-			sTmp += (sSub + File.separatorChar);
-		sTmp += (sFile + sExt);
 
+		String relPath = Util.getDirectoryName(sPath);
+		if ( relPath.length() != 0 ) {
+			sTmp += (relPath.substring(1) + File.separatorChar);
+		}
+		
+		sTmp += (sFile + sExt);
+		
 		// Search/Replace text if needed
 		if ( useReplace() && ( getSearch().length() != 0 ))
 			sTmp = sTmp.replace(getSearch(), getReplace());
