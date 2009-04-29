@@ -854,11 +854,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 		 */
 		tempTextUnit = popTempEvent();
 
+		/*
 		// Test if we actually have text of some type, if not convert this Event
 		// into a DocumrntPart
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
 		sourceString = tu.getSource().toString(); // for testing of embedded text
-//		if (!tu.getSource().hasText()) {
 		if (!tu.getSource().hasText() && sourceString!=null && sourceString.indexOf("[#$")==-1) { // only do this if there isn't embedded text
 			String prefix = tu.getSkeleton().toString(); // include anything in skeleton of TU before self
 			int ego = prefix.indexOf("[#$$self$]"); // ego points to the self
@@ -872,17 +872,17 @@ public abstract class AbstractBaseFilter implements IFilter {
 			if (endMarker != null) {
 				endDocumentPart(); // end the document part corresponding to the internals of the text unit
 				startDocumentPart(endMarker.toString()); // create a document part consisting only of the end marker
-//				addToDocumentPart(endMarker.toString()); DWH
 			}
 			endDocumentPart();
 			return;
 		}
+	  */
 
 		if (endMarker != null) {
 			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 			skel.add((GenericSkeleton) endMarker);
 		}
-
+		
 		tempTextUnit = postProcessText(tempTextUnit);
 
 		filterEvents.add(tempTextUnit);
