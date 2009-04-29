@@ -19,6 +19,8 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml.tests;
 
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.ITranslator;
 
@@ -43,7 +45,7 @@ public class PigLatinTranslator implements ITranslator {
 	{
 	}
 
-	public String translate(TextFragment tf)
+	public String translate(TextFragment tf, Logger LOGGER)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;

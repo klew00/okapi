@@ -20,6 +20,7 @@
 package net.sf.okapi.filters.openxml.tests;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -43,7 +44,7 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
 
-	public String translate(TextFragment tf)
+	public String translate(TextFragment tf, Logger LOGGER)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;

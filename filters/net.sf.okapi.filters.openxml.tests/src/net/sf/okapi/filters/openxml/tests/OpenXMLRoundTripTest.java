@@ -22,6 +22,7 @@ package net.sf.okapi.filters.openxml.tests;
 
 import java.io.File;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -55,6 +56,7 @@ public class OpenXMLRoundTripTest {
 	private ZipCompare zc=null;
 
 	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
+	private boolean allGood=true;
 
 	@Test
 	public void runTest () {
@@ -82,6 +84,7 @@ public class OpenXMLRoundTripTest {
 			runOneTest(s,true,true);  // Codes
 			runOneTest(s,false,true);  // Tags
 		}
+		assertTrue("Some Roundtrip files failed.",allGood);
 	}
 
 	public void runOneTest (String filename, boolean bTranslating, boolean bPeeking) {
@@ -144,10 +147,12 @@ public class OpenXMLRoundTripTest {
 					event = null; // just for debugging
 			}
 			writer.close();
-			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename,
-					   sGoldPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
-			LOGGER.log(Level.INFO,(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+" SUCCEEDED");
-			assert(rtrued2);
+			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename,
+					   					      sGoldPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
+			LOGGER.log(Level.INFO,(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+
+					   (rtrued2 ? " SUCCEEDED" : " FAILED"));
+			if (!rtrued2)
+				allGood = false;
 		}
 		catch ( Throwable e ) {
 			LOGGER.log(Level.WARNING,e.getMessage());

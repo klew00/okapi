@@ -20,6 +20,8 @@
 package net.sf.okapi.filters.openxml.tests;
 
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -43,7 +45,7 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
 
-	public String translate(TextFragment tf)
+	public String translate(TextFragment tf, Logger LOGGER)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;
@@ -52,117 +54,124 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 		int nSurroundingCodes=0; // DWH 4-8-09
 		Code code;
 		char ch;
-		len = s.length();
-		List<Code> codes = tf.getCodes();
-		if (len>1)
+		try
 		{
-			for(i=0;i<len;i++)
+			len = s.length();
+			List<Code> codes = tf.getCodes();
+			if (len>1)
 			{
-				ch = s.charAt(i);
-				code = null;
-				switch ( ch )
+				for(i=0;i<len;i++)
 				{
-					case TextFragment.MARKER_OPENING:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						ss += "&lt;g" + codenum + ">";
-						nSurroundingCodes++;
-						break;
-					case TextFragment.MARKER_CLOSING:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						ss += "&lt;/g" + codenum + ">";
-						nSurroundingCodes--;
-						break;
-					case TextFragment.MARKER_ISOLATED:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						if (code.getTagType()==TextFragment.TagType.OPENING)
-							nSurroundingCodes++;
-						else if (code.getTagType()==TextFragment.TagType.CLOSING)
-							nSurroundingCodes--;
-						ss += "&lt;x" + codenum + ">";
-						break;
-					case TextFragment.MARKER_SEGMENT:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						if (code.getTagType()==TextFragment.TagType.OPENING)
-							nSurroundingCodes++;
-						else if (code.getTagType()==TextFragment.TagType.CLOSING)
-							nSurroundingCodes--;
-						ss += "&lt;y" + codenum + ">";
-						break;
-				}
-				if (code!=null)
-					continue;
-				if (i+2<len && s.substring(i,i+3).equals("---"))
-				{
-					ss += "---";
-					i += 2;
-				}
-				else if (i+1<len && s.substring(i,i+2).equals("--"))
-				{
-					ss += "--";
-					i += 1;				
-				}
-				else
-				{
-					j = hominyOf(s.substring(i),NUM);
-					if (j>0)
+					ch = s.charAt(i);
+					code = null;
+					switch ( ch )
 					{
-						ss += s.substring(i,i+j);
-						i += j-1;
-						continue;
+						case TextFragment.MARKER_OPENING:
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							ss += "&lt;g" + codenum + ">";
+							nSurroundingCodes++;
+							break;
+						case TextFragment.MARKER_CLOSING:
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							ss += "&lt;/g" + codenum + ">";
+							nSurroundingCodes--;
+							break;
+						case TextFragment.MARKER_ISOLATED:
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (code.getTagType()==TextFragment.TagType.OPENING)
+								nSurroundingCodes++;
+							else if (code.getTagType()==TextFragment.TagType.CLOSING)
+								nSurroundingCodes--;
+							ss += "&lt;x" + codenum + ">";
+							break;
+						case TextFragment.MARKER_SEGMENT:
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (code.getTagType()==TextFragment.TagType.OPENING)
+								nSurroundingCodes++;
+							else if (code.getTagType()==TextFragment.TagType.CLOSING)
+								nSurroundingCodes--;
+							ss += "&lt;y" + codenum + ">";
+							break;
 					}
-					j = hominyOf(s.substring(i),CONS);
-					if (j>0)
-					{
-						k = hominyLetters(s.substring(i+j));
-						slow = s.substring(i,i+j).toLowerCase();
-						if (k > -1)
-						{
-							ss += s.substring(i+j,i+j+k);
-							i += k;
-						}
-						ss += slow+"ay";
-						i += j-1;
+					if (code!=null)
 						continue;
+					if (i+2<len && s.substring(i,i+3).equals("---"))
+					{
+						ss += "---";
+						i += 2;
+					}
+					else if (i+1<len && s.substring(i,i+2).equals("--"))
+					{
+						ss += "--";
+						i += 1;				
 					}
 					else
 					{
-						k = hominyLetters(s.substring(i));
-						if (k>0)
+						j = hominyOf(s.substring(i),NUM);
+						if (j>0)
 						{
-							ss += s.substring(i,i+k)+"hay";
-							i += k-1;
+							ss += s.substring(i,i+j);
+							i += j-1;
+							continue;
+						}
+						j = hominyOf(s.substring(i),CONS);
+						if (j>0)
+						{
+							k = hominyLetters(s.substring(i+j));
+							slow = s.substring(i,i+j).toLowerCase();
+							if (k > -1)
+							{
+								ss += s.substring(i+j,i+j+k);
+								i += k;
+							}
+							ss += slow+"ay";
+							i += j-1;
+							continue;
 						}
 						else
 						{
-							carrot = s.charAt(i);
-							if (carrot=='&') // DWH 4-21-09 handle entities
+							k = hominyLetters(s.substring(i));
+							if (k>0)
 							{
-								k = s.indexOf(';', i);
-								if (k>=0 && (k-i<=5 || (k-i<=7 && s.charAt(i+1)=='#')))
-									// entity: leave it alone
+								ss += s.substring(i,i+k)+"hay";
+								i += k-1;
+							}
+							else
+							{
+								carrot = s.charAt(i);
+								if (carrot=='&') // DWH 4-21-09 handle entities
 								{
-									ss += s.substring(i,k+1);
-									i += k-i;
+									k = s.indexOf(';', i);
+									if (k>=0 && (k-i<=5 || (k-i<=7 && s.charAt(i+1)=='#')))
+										// entity: leave it alone
+									{
+										ss += s.substring(i,k+1);
+										i += k-i;
+									}
+									else
+										ss += carrot;
+								}
+								else if (TextFragment.isMarker(carrot))
+								{
+									ss += s.substring(i,i+2);
+									i++;
 								}
 								else
 									ss += carrot;
 							}
-							else if (TextFragment.isMarker(carrot))
-							{
-								ss += s.substring(i,i+2);
-								i++;
-							}
-							else
-								ss += carrot;
 						}
-					}
-				}			
+					}			
+				}
+				rslt = ss;
 			}
-			rslt = ss;
+		}
+		catch(Throwable e)
+		{
+			LOGGER.log(Level.WARNING,"Tag Translator failed on "+s);
 		}
 		return rslt;
 	}
