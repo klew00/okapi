@@ -55,14 +55,13 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
- * Represents the text from the {@linkplain Source source} document that is to
- * be parsed.
+ * Represents the text from the source document that is to be parsed.
  * <p>
  * This class is normally only of interest to users who wish to create <a
  * href="TagType.html#Custom">custom tag types</a>.
  * <p>
  * The parse text is defined as the entire text of the source document in lower
- * case, with all {@linkplain Segment#ignoreWhenParsing() ignored} segments
+ * case, with all <code>Segment.ignoreWhenParsing()</code> ignored} segments
  * replaced by space characters.
  * <p>
  * The text is stored in lower case to make case insensitive parsing as
@@ -75,7 +74,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
  * not possible using the normal <code>String</code> class.
  * <p>
  * <code>ParseText</code> instances are obtained using the
- * {@link Source#getParseText()} method.
+ * <code>Source.getParseText()</code> method.
  */
 public final class MemMappedCharSequence implements CharSequence {
 	
@@ -115,9 +114,8 @@ public final class MemMappedCharSequence implements CharSequence {
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
 	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
 	 * @param inputSource
-	 *            Reader.
+	 *      the reader to use for the input.
 	 */
 	public MemMappedCharSequence(final Reader inputSource) {
 		this(inputSource, false);
@@ -125,10 +123,10 @@ public final class MemMappedCharSequence implements CharSequence {
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
-	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
-	 * @param inputSource
-	 *            Reader.
+	 * file name, and optionally converts it into lowercase characters.
+	 * The file is assumed to be encoded as UTF-16BE.
+	 * @param inputSource the reader to use for the input.
+	 * @param lowercase true if the content should be converted to lowercases.
 	 */
 	public MemMappedCharSequence(final Reader inputSource, boolean lowercase) {		
 		try {
@@ -144,10 +142,9 @@ public final class MemMappedCharSequence implements CharSequence {
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
-	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
-	 * @param string
-	 *            the string upon which the parse text is based.
+	 * file name, for a given encoding.
+	 * @param inputSource the reader to use for the input.
+	 * @param encoding the encoding to use.
 	 */
 	public MemMappedCharSequence(final InputStream inputSource, String encoding) {
 		this(inputSource, encoding, false);
@@ -155,10 +152,10 @@ public final class MemMappedCharSequence implements CharSequence {
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
-	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
-	 * @param string
-	 *            the string upon which the parse text is based.
+	 * file name, for a given encoding, and optionally converts it into lowercase characters.
+	 * @param inputSource the reader to use for the input.
+	 * @param encoding the encoding to use.
+	 * @param lowercase true if the content should be converted to lowercases.
 	 */
 	public MemMappedCharSequence(final InputStream inputSource, String encoding, boolean lowercase) {		
 		createMemMappedCharBuffer(Channels.newChannel(inputSource), encoding, lowercase);
@@ -166,10 +163,9 @@ public final class MemMappedCharSequence implements CharSequence {
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
-	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
-	 * @param string
-	 *            the string upon which the parse text is based.
+	 * file name, in a given encoding.
+	 * @param inputSource the URL of the input upon which the parse text is based.
+	 * @param encoding the encoding to use.
 	 */
 	public MemMappedCharSequence(final URL inputSource, String encoding) {
 		this(inputSource, encoding, false);
@@ -177,10 +173,10 @@ public final class MemMappedCharSequence implements CharSequence {
 
 	/**
 	 * Constructs a new <code>ParseText</code> object based on the specified
-	 * file name. The file is assumed to be encoded as UTF-16BE.
-	 * 
-	 * @param string
-	 *            the string upon which the parse text is based.
+	 * file name, in a given encoding, and optionally converts it into lowercase characters.
+	 * @param inputSource the URL of the input upon which the parse text is based.
+	 * @param encoding the encoding to use.
+	 * @param lowercase true if the content should be converted to lowercases.
 	 */
 	public MemMappedCharSequence(final URL inputSource, String encoding, boolean lowercase) {
 		try {

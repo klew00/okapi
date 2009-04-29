@@ -91,7 +91,7 @@ public enum EventType {
 	FINISHED,
 
 	/**
-	 * Document-level event. An {@link net.sf.okapi.common.resource.RawResource} resource
+	 * Document-level event. A {@link net.sf.okapi.common.resource.RawDocument} resource
 	 * should be associated with this event.
 	 */
 	RAW_DOCUMENT,

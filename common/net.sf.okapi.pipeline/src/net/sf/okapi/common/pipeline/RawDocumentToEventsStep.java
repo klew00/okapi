@@ -25,6 +25,13 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 
+/**
+ * Converts a {@link RawDocument} into filter events. This class implements the {@link IPipelineStep}
+ * interface for a step that takes a {@link RawDocument} and uses a provided {@link IFilter} 
+ * implementation to generate its corresponding events.
+ * @see EventsToRawDocumentStep
+ * @see EventsWriterStep 
+ */
 public class RawDocumentToEventsStep extends BasePipelineStep {
 	private IFilter filter;
 	private boolean hasEvents;

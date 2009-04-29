@@ -55,30 +55,29 @@ the <code>
 class.</p>
 <pre>// Create the pipeline
 IPipeline pipeline = new Pipeline();</pre>
-<p>Use the classe
-<a href="../javadoc/net/sf/okapi/common/pipeline/FilterPipelineStepAdaptor.html">
-<code>
-FilterPipelineStepAdaptor</code></a> to plug any <code>
+<p>Use the classe <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/RawDocumentToEventsStep.html">
+RawDocumentToEventsStep</a></code> to plug any <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html">IFilter</a></code> 
 objects in the pipeline, 
 and the class
-<a href="../javadoc/net/sf/okapi/common/pipeline/FilterWriterPipelineStepAdaptor.html">
 <code>
-FilterWriterPipelineStepAdaptor</code></a> for any <code>
+<a href="../javadoc/net/sf/okapi/common/pipeline/EventsToRawDocumentStep.html">
+EventsToRawDocumentStep</a></code> for any <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">
 IFilterWriter</a></code> object.</p>
 <p>Creating the initial step with the filter is easy:</p>
 <pre>// Create the filter we will use
 IFilter filter = new HtmlFilter();
 // Create the filter step
-IPipelineStep filterStep = new FilterPipelineStepAdaptor(filter);
+IPipelineStep filterStep = new RawDocumentToEventsStep(filter);
 // Add this step to the pipeline
 pipeline.addStep(filterStep);</pre>
 <p>Creating the last step with the filter writer is also quite easy:</p>
 <pre>// Create the writer we will use
 IFilterWriter writer = filter.createFilterWriter();
 // Create the writer step (using the writer provider by our filter)
-IPipelineStep writerStep = new FilterWriterPipelineStepAdaptor(writer);
+IPipelineStep writerStep = new EventsToRawDocumentStep(writer);
 // Add this step to the pipeline
 pipeline.addStep(writerStep);</pre>
 <p>Now we have a pipeline with two steps. It can reads and re-writes a given HTML 

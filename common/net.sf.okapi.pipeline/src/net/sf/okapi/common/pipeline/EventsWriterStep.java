@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,14 @@ package net.sf.okapi.common.pipeline;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 
+/**
+ * Outputs filters events into a document.
+ * This class implements the {@link IPipelineStep} interface for a step that takes 
+ * filter events and creates an output document using a provided {@link IFilterWriter} 
+ * implementation. Each event and its resource are passed on to the next step.
+ * @see RawDocumentToEventsStep
+ * @see EventsToRawDocumentStep 
+ */
 public class EventsWriterStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;

@@ -17,6 +17,14 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
+/**
+ * Converts filters events into a {@link RawDocument}.
+ * This class implements the {@link IPipelineStep} interface for a step that takes 
+ * filter events and creates an output document using a provided {@link IFilterWriter} 
+ * implementation. When the document is completed, a {@link RawDocument} is generated.
+ * @see RawDocumentToEventsStep
+ * @see EventsWriterStep 
+ */
 public class EventsToRawDocumentStep extends BasePipelineStep {
 
 	private static final Logger LOGGER = Logger.getLogger(EventsToRawDocumentStep.class.getName());
