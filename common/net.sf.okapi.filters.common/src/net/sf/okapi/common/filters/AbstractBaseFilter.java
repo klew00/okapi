@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -663,7 +663,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, language);
 			} else {
-				throw new IllegalFilterOperationException("Unkown Property or TextUnit type");
+				throw new OkapiIllegalFilterOperationException("Unkown Property or TextUnit type");
 			}
 		}
 
@@ -832,7 +832,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * @param language
 	 *            the language of the text
 	 * 
-	 * @throws IllegalFilterOperationException
+	 * @throws OkapiIllegalFilterOperationException
 	 */
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -840,7 +840,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		String sourceString; // for testing to see if there is embedded text
 
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot end the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to end a TextUnit that does not exist.", e);
 			throw e;
@@ -904,11 +904,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * @param text
 	 *            the text
 	 * 
-	 * @throws IllegalFilterOperationException
+	 * @throws OkapiIllegalFilterOperationException
 	 */
 	protected void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot add to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add text to a TextUnit that does not exist.", e);
 			throw e;
@@ -930,11 +930,11 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * @param codeName
 	 *            the code name
 	 * 
-	 * @throws IllegalFilterOperationException
+	 * @throws OkapiIllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot add a Code to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
 			throw e;
@@ -979,13 +979,13 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 *            with offset information into the tag.
 	 * @param language
 	 *            the language of the text
-	 * @throws IllegalFilterOperationException
+	 * @throws OkapiIllegalFilterOperationException
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot add Codes to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add Codes to a TextUnit that does not exist.", e);
 			throw e;
@@ -1084,13 +1084,13 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 * @param language
 	 *            the language of any actionable items
 	 * 
-	 * @throws IllegalFilterOperationException
+	 * @throws OkapiIllegalFilterOperationException
 	 */
 	protected void endGroup(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot end current Group. StartGroup not found.");
 			LOGGER.log(Level.SEVERE, "Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.",
 					e);
@@ -1119,7 +1119,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	private void startCode(Code code) {
 		if (!isCurrentTextUnit()) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot add a Code to the TextUnit. TextUnit not found.");
 			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
 			throw e;
@@ -1133,7 +1133,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	private void endCode() {
 		if (currentCode == null) {
-			IllegalFilterOperationException e = new IllegalFilterOperationException(
+			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
 					"Cannot end the current Code. Code not found.");
 			LOGGER.log(Level.SEVERE, "Trying to end a Code that does not exist. Did you call startCode?", e);
 			throw e;

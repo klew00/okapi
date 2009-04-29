@@ -33,8 +33,8 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -128,7 +128,7 @@ public class IDMLFilter implements IFilter {
 		case NEXTINSUBDOC:
 			return nextInSubDocument();
 		default:
-			throw new IllegalFilterOperationException("Invalid next() call.");
+			throw new OkapiIllegalFilterOperationException("Invalid next() call.");
 		}
 	}
 
@@ -151,7 +151,7 @@ public class IDMLFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	

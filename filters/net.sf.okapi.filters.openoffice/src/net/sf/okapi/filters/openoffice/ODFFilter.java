@@ -39,8 +39,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
@@ -187,7 +187,7 @@ public class ODFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -547,7 +547,7 @@ public class ODFFilter implements IFilter {
 			case XMLStreamConstants.START_DOCUMENT:
 			case XMLStreamConstants.END_DOCUMENT:
 				// Should not occur
-				throw new IllegalFilterOperationException("Invalid start or end document detected while processing inline element.");
+				throw new OkapiIllegalFilterOperationException("Invalid start or end document detected while processing inline element.");
 			}
 		}		
 	}

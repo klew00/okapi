@@ -56,7 +56,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractBaseFilter;
 import net.sf.okapi.common.filters.IFilter;
@@ -230,7 +230,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 *            - true if the {@link IFilter} should store non-translatble
 	 *            blocks (aka skeleton), false otherwise.
 	 * 
-	 * @throws BadFilterInputException
+	 * @throws OkapiBadFilterInputException
 	 * @throws OkapiIOException
 	 */
 	public void open(RawDocument input, boolean generateSkeleton) {
@@ -252,7 +252,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		} else if (input.getInputStream() != null) {
 			open(input.getInputStream());
 		} else {
-			BadFilterInputException e = new BadFilterInputException("Input data not found when starting filter");
+			OkapiBadFilterInputException e = new OkapiBadFilterInputException("Input data not found when starting filter");
 			LOGGER.log(Level.SEVERE, e.toString());
 			throw e;
 		}
@@ -301,7 +301,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		try {
 			open(inputURI.toURL().openStream());
 		} catch (MalformedURLException e) {
-			BadFilterInputException re = new BadFilterInputException(e);
+			OkapiBadFilterInputException re = new OkapiBadFilterInputException(e);
 			LOGGER.log(Level.SEVERE, "Filter could not open URI", re);
 			throw re;
 		} catch (IOException e) {

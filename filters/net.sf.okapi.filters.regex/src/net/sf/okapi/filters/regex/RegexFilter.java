@@ -36,8 +36,8 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
@@ -204,7 +204,7 @@ public class RegexFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -371,7 +371,7 @@ public class RegexFilter implements IFilter {
 			}
 			else { // Close group
 				if ( groupStack.size() == 0 ) {
-					throw new IllegalFilterOperationException("Rule for closing a group detected, but no group is open.");
+					throw new OkapiIllegalFilterOperationException("Rule for closing a group detected, but no group is open.");
 				}
 				groupStack.pop();
 				Ending ending = new Ending(String.valueOf(++otherId));  
@@ -546,7 +546,7 @@ public class RegexFilter implements IFilter {
 					if ( params.useBSlashEscape ) {
 						while ( data.codePointAt(i) == '\\' ) {
 							if ( i+2 < data.length() ) i += 2; // Now point to next
-							else throw new IllegalFilterOperationException("Escape syntax error in ["+data+"]");
+							else throw new OkapiIllegalFilterOperationException("Escape syntax error in ["+data+"]");
 						}
 					}
 				}

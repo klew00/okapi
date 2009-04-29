@@ -39,7 +39,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -179,7 +179,7 @@ public class PropertiesFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	

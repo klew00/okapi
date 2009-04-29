@@ -39,7 +39,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -172,7 +172,7 @@ public class TmxFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -630,7 +630,7 @@ public class TmxFilter implements IFilter {
 						
 						//--TMX RULE: Make sure each <tu> contains at least one <tuv>--
 						if(countTuvs<1){
-							throw new BadFilterInputException("Each <tu> requires at least one <tuv>");							
+							throw new OkapiBadFilterInputException("Each <tu> requires at least one <tuv>");							
 						}
 						
 						//--add any sub TUs--
@@ -652,7 +652,7 @@ public class TmxFilter implements IFilter {
 						//TODO: Add finalizing the tuv
 					}else{
 						//--TMX RULE: Entering here would mean content other than <note>, <prop>, or <tuv> inside the <tu> which is invalid.
-						throw new BadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
+						throw new OkapiBadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
 					} 	
 					break;
 				}
@@ -842,7 +842,7 @@ public class TmxFilter implements IFilter {
 	/**
 	 * Gets the xml:lang attribute from the current <tuv> element
 	 * @return 	returns the language or throws exception if xml:lang is missing
-	 * @throws 	BadFilterInputException If xml:Lang is missing
+	 * @throws 	OkapiBadFilterInputException If xml:Lang is missing
 	 */		
 	private String getXmlLangFromCurTuv(){
 
@@ -856,7 +856,7 @@ public class TmxFilter implements IFilter {
 				}
 			}
 		}
-		throw new BadFilterInputException("The required xml:lang attribute is missing in <tuv>. The file is not valid TMX.");
+		throw new OkapiBadFilterInputException("The required xml:lang attribute is missing in <tuv>. The file is not valid TMX.");
 	}
 	
 }

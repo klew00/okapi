@@ -40,8 +40,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -178,7 +178,7 @@ public class XLIFFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -387,12 +387,12 @@ public class XLIFFFilter implements IFilter {
 		storeStartElement();
 		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		String tmp = reader.getAttributeValue("", "original");
-		if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'original'.");
+		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'original'.");
 		else startSubDoc.setName(tmp);
 		
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
-		if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'source-language'.");
+		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
 		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
 			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
@@ -485,7 +485,7 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) tu.setIsTranslatable(tmp.equals("yes"));
 
 			tmp = reader.getAttributeValue("", "id");
-			if ( tmp == null ) throw new IllegalFilterOperationException("Missing attribute 'id'.");
+			if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
 			tu.setId(tmp);
 			
 			tmp = reader.getAttributeValue("", "resname");

@@ -307,7 +307,7 @@ public class OpenXMLFilter implements IFilter {
 			if (nZipType==-1)
 			{
 				LOGGER.log(Level.SEVERE,"MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
-				throw new BadFilterInputException("MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
+				throw new OkapiBadFilterInputException("MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
 			}
 //			openXMLContentFilter.setUpConfig(nZipType);
 			  // DWH 3-4-09 sets Parameters inside OpenXMLContentFilter based on file type

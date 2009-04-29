@@ -40,8 +40,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
@@ -355,7 +355,7 @@ public class RTFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -557,7 +557,7 @@ public class RTFFilter implements IFilter {
 						nState = 7;
 					}
 					else {
-						throw new IllegalFilterOperationException("Expecting: '>' while parsing Trados markup.");
+						throw new OkapiIllegalFilterOperationException("Expecting: '>' while parsing Trados markup.");
 					}
 					break;
 
@@ -1003,7 +1003,7 @@ public class RTFFilter implements IFilter {
 			}
 			else {
 				// Unexpected end of input
-				throw new IllegalFilterOperationException("Unexcpected end of input.");
+				throw new OkapiIllegalFilterOperationException("Unexcpected end of input.");
 			}
 		}
 	}
@@ -1071,7 +1071,7 @@ public class RTFFilter implements IFilter {
 			}
 			else {
 				// Unexpected end of input
-				throw new IllegalFilterOperationException("Unexcpected end of input.");
+				throw new OkapiIllegalFilterOperationException("Unexcpected end of input.");
 			}
 		}
 	}
@@ -1355,7 +1355,7 @@ public class RTFFilter implements IFilter {
 		case '_':
 			return TOKEN_CTRLWORD;
 		default: // Should not get here
-			throw new IllegalFilterOperationException(String.format("Unknown control symbol '%c'", chCurrent));
+			throw new OkapiIllegalFilterOperationException(String.format("Unknown control symbol '%c'", chCurrent));
 		}
 	}
 

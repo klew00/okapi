@@ -33,8 +33,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.exceptions.BadFilterInputException;
-import net.sf.okapi.common.exceptions.IllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -145,7 +145,7 @@ public class MIFFilter implements IFilter {
 			open(input.getInputStream());
 		}
 		else {
-			throw new BadFilterInputException("RawDocument has no input defined.");
+			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
 	
@@ -358,7 +358,7 @@ public class MIFFilter implements IFilter {
 				skel.append((char)c);
 				return tagBuffer.toString();
 			case -1:
-				throw new IllegalFilterOperationException("Unexpected end of input.");
+				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
 			default:
 				tagBuffer.append((char)c);
 				break;
@@ -380,7 +380,7 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// Else: Missing end of string error
-		throw new IllegalFilterOperationException("End of string is missing.");
+		throw new OkapiIllegalFilterOperationException("End of string is missing.");
 	}
 	
 	String processString () throws IOException {
@@ -424,7 +424,7 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// Else: Missing end of string error
-		throw new IllegalFilterOperationException("End of string is missing.");
+		throw new OkapiIllegalFilterOperationException("End of string is missing.");
 	}
 
 	private String guessEncoding (InputStream input) {
