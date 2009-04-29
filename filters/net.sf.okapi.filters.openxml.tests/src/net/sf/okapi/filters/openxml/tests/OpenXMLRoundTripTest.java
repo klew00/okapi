@@ -20,19 +20,20 @@
 
 package net.sf.okapi.filters.openxml.tests;
 
+import java.io.File;
 import static org.junit.Assert.fail;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
+import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter; // DWH 4-8-09
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class OpenXMLRoundTripTest {
@@ -63,7 +64,8 @@ public class OpenXMLRoundTripTest {
 		{
 			runOneTest(s,false,false); // English
 			runOneTest(s,true,false);  // PigLatin
-			runOneTest(s,false,true);  // Codes
+			runOneTest(s,true,true);  // Codes
+			runOneTest(s,false,true);  // Tags
 		}
 	}
 
@@ -76,7 +78,12 @@ public class OpenXMLRoundTripTest {
 		boolean rtrued2;
 		try {
 			if (bPeeking)
-				filter = new OpenXMLFilter(new CodePeekTranslator(),"en-US");
+			{
+				if (bTranslating)
+					filter = new OpenXMLFilter(new CodePeekTranslator(),"en-US");
+				else
+					filter = new OpenXMLFilter(new TagPeekTranslator(),"en-US");
+			}
 			else if (bTranslating)
 				filter = new OpenXMLFilter(new PigLatinTranslator(),"pl");
 			else
@@ -108,7 +115,7 @@ public class OpenXMLRoundTripTest {
 			else
 				writer.setOptions("en-US", "UTF-8");
 
-			writer.setOutput(sOutputPath+ (bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename);
+			writer.setOutput(sOutputPath+ (bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
 			
 			while ( filter.hasNext() ) {
 				event = filter.next();
@@ -123,12 +130,12 @@ public class OpenXMLRoundTripTest {
 			}
 			writer.close();
 			rtrued2 = zc.zipsExactlyTheSame(sOutputPath+(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename,
-					   sGoldPath+(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename);
-			LOGGER.log(Level.INFO,(bPeeking ? "Peek" : (bTranslating ? "Tran" : "Out"))+filename+" SUCCEEDED");
+					   sGoldPath+(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
+			LOGGER.log(Level.INFO,(bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename+" SUCCEEDED");
 			assert(rtrued2);
 		}
 		catch ( Throwable e ) {
-			LOGGER.log(Level.SEVERE,e.getMessage());
+			LOGGER.log(Level.WARNING,e.getMessage());
 			fail("An unexpected exception was thrown " + e);
 		}
 		finally {
