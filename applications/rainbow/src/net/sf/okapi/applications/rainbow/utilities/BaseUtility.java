@@ -81,6 +81,7 @@ public abstract class BaseUtility implements IUtility {
 		this.updateCommand = updateCommand;
 		this.projectDir = projectDir;
 		this.canPrompt = canPrompt;
+		commonFolder = null;
 	}
 
 	public void setOptions (String sourceLanguage,
@@ -133,7 +134,6 @@ public abstract class BaseUtility implements IUtility {
 	public void resetLists () {
 		inputs.clear();
 		outputs.clear();
-		commonFolder = null;
 	}
 
 	public void setRoots (String inputRoot,
