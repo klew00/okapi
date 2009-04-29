@@ -31,8 +31,22 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 // For this to work, expandCodeContent has to be changed to protected in GenericSkeletonWriter
 
 /**
- * Implements ISkeletonWriter for the GenericSkeleton skeleton. 
+ * <p>Implements ISkeletonWriter for OpenXMLContentFilter, which
+ * filters Microsoft Office Word, Excel, and Powerpoint Documents.
+ * OpenXML is the format of these documents.
+ * 
+ * <p>Since OpenXML files are Zip files that contain XML documents,
+ * <b>OpenXMLZipFilter</b> handles opening and processing the zip file, and
+ * instantiates this skeleton writer to process the XML documents.
+ * 
+ * <p>This skeleton writer exhibits slightly different behavior depending 
+ * on whether the XML file is Word, Excel, Powerpoint, or a chart in Word.
+ * If there is was no character style information in the original XML file, 
+ * such as <w:r><w:t>text</w:t></w:r>, the tags were not made codes in
+ * OpenXMLContentFilter, so these tags need to be reintroduced by this
+ * skeleton writer.
  */
+
 public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 
 	public final static int MSWORD=1;
