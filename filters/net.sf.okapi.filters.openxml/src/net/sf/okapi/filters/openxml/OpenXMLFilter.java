@@ -645,7 +645,7 @@ public class OpenXMLFilter implements IFilter {
 					{
 						TextUnit tu = (TextUnit)event.getResource();
 						TextFragment tfSource = tu.getSourceContent();
-						String torg = translator.translate(tfSource);
+						String torg = translator.translate(tfSource,LOGGER);
 						TextFragment tfTarget = tfSource.clone();
 //						tfTarget.setCodedText(torg);
 						tfTarget.setCodedText(/*"GLUNK "+*/torg); // DWH 4-8-09 testing 1 2 3 

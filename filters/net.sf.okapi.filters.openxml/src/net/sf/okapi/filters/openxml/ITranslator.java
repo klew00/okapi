@@ -19,6 +19,8 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -27,5 +29,5 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public interface ITranslator
 {
-	public String translate(TextFragment tf);
+	public String translate(TextFragment tf, Logger lgr);
 }
