@@ -24,6 +24,12 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+/**
+ * This is just a LogHander that intercepts java.util.logging.Logger
+ * messages and displays them with System.out.println.  It allows testing
+ * of logging, and also shows log messages on the Console during debugging. 
+ */
+
 class LogHandlerSystemOut extends Handler {
 	
 	@Override
