@@ -11,7 +11,7 @@ Deploying
 - trunk/website/downloads.html
 
 
---- 3) Make aslo sure the readme files are up-to-date:
+--- 3) Make also sure the readme files are up-to-date:
 
 - trunk/deployment/okapi-lib/data/readme.html
 - trunk/deployment/rainbow/data/readme.html
