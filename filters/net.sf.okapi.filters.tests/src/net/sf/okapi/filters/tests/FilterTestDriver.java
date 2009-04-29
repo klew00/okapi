@@ -129,6 +129,21 @@ public class FilterTestDriver {
 		}
 		return true;
 	}
+	
+	static public boolean compareEventTypesOnly(ArrayList<Event> manual, ArrayList<Event> generated) {
+		if (manual.size() != generated.size()) {
+			return false;
+		}
+
+		Iterator<Event> manualIt = manual.iterator();
+		for (Event ge : generated) {
+			Event me = manualIt.next();
+			if (ge.getEventType() != me.getEventType()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Indicates to this driver to display the skeleton data.
