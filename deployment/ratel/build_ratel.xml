@@ -119,12 +119,25 @@ Running on: ${os.name} ${os.arch}${line.separator}
 	</target>
 
 	<target name="gzipAll" if="building-linux">
-		<tar destfile="${dist}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
+		<!--
+		TODO: Here we copy the dist dir to a new dir to match the name of the tar file
+		      we could build it directly into such a directory 
+		-->
+		<mkdir dir="${dist}/${distName}"/>
+		<copy todir="${dist}/${distName}">
+			<fileset dir="${dist}" excludes="${distName}"/>
+		</copy>
+
 		<tar destfile="${dist}/${distName}.tar.gz" compression="gzip">
 			<tarfileset filemode="755" dir="${dist}">
-				<include name="**/*.sh"/>
+				<include name="${distName}/**/*.sh"/>
+  			</tarfileset>
+			<tarfileset dir="${dist}">
+				<exclude name="${distName}/**/*.sh"/>
   			</tarfileset>
   		</tar>
+		
+		<delete dir="${dist}/${distName}"/>
 	</target>
 	
 	<target name="all" depends="compile, winExe, zipAll, gzipAll"/>
