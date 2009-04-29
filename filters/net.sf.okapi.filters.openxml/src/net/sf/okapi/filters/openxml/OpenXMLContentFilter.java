@@ -52,6 +52,50 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
+/**
+ * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
+ * OpenXML is the format of these documents.
+ * 
+ * <p>Since OpenXML files are Zip files that contain XML documents,
+ * <b>OpenXMLFilter</b> handles opening and processing the zip file, and
+ * instantiates this filter to process the XML documents.
+ * 
+ * <p>This filter extends AbstractBaseMarkupFilter, which extends
+ * AbstractBaseFilter.  It uses the Jericho parser to analyze the
+ * XML files.
+ * 
+ * <p>The filter exhibits slightly differnt behavior depending on whether
+ * the XML file is Word, Excel, Powerpoint, or a chart in Word.  The
+ * tags in these files are configured in yaml configuration files that
+ * specify the behavior of the tags.  These configuration files are 
+ * <p><li>wordConfiguration.yml
+ * <li>excelConfiguration.yml
+ * <li>powerpointConfiguration.yml
+ * <li>wordChartConfiguration.yml
+ * 
+ * In Word and Powerpoint, text is always surrounded by paragraph tags
+ * <w:p> or <a:p>, which signal the beginning and end of the text unit
+ * for this filter, and are marked as TEXT_UNIT_ELEMENTs in the configuration
+ * files.  Inside these are one or more text runs surrounded by <w:r> or <a:r>
+ * tags and marked as TEXT_RUN_ELEMENTS by the configuration files.  The text
+ * itself occurs between text marker tags <w:t> or <a:t> tags, which are 
+ * designated TEXT_MARKER_ELEMENTS by the configuration files.  Tags between 
+ * and including <w:r> and <w:t> (which usually include a <w:rPr> tag sequence 
+ * for character style) are consolidated into a single MARKER_OPENING code.  Tags
+ * between and including </w:t> and </w:r>, which sometimes include graphics
+ * tags, are consolidated into a single MARKER_CLOSING code.  If there is no
+ * text between <w:r> and </w:r>, a single MARKER_PLACEHOLDER code is created
+ * for the text run.  If there is no character style information, 
+ * <w:r><w:t>text</w:t></w:r> is not surrounded by MARKER_OPENING or 
+ * MARKER_CLOSING codes, to simplify things for translators; these are supplied
+ * by OpenXMLContentSkeletonWriter during output.  The same is true for text
+ * runs marked by <a:r> and <a:t> in Powerpoint files.
+ * 
+ * Excel files are simpler, and only mark text by <v>, <t>, and <text> tags
+ * in worksheet, sharedString, and comment files respectively.  These tags
+ * work like TEXT_UNIT, TEXT_RUN, and TEXT_MARKER elements combined.
+ */
+
 public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	
 	private Logger LOGGER=null;
