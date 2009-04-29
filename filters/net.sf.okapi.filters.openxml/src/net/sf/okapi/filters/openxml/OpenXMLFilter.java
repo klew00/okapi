@@ -106,11 +106,23 @@ public class OpenXMLFilter implements IFilter {
 	public OpenXMLFilter () {
 	}
 	
+	/**
+	 * Creating the class with these two parameters allows automatic
+	 * manipulation of text within TextUnits.  A copy of a source
+	 * TextFragment is the parameter to the translator, and it
+	 * can change the text.  The new text fragment is added to the
+	 * TextUnit in the specified output language.
+	 * @param translator the class that translates the text of a text fragment
+	 * @param sOutputLanguage the locale of the output language, in the form en-US
+	 */
 	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
 	}
 
+	/**
+	 * Closes the input zip file and completes the filter.
+	 */
 	public void close () {
 		try {
 			nextAction = NextAction.DONE;
@@ -125,35 +137,74 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * Sets the java.util.logging.Logger log level.
+	 * @param nLogLevel a java.util.logging.Level constant
+	 * Level.SEVERE Errors the end user should see. 
+	 * Level.WARNING Important alert messages the end user should see. 
+	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 
+	 * Level.FINE Extra, less important information. The end user may choose to see them. 
+	 * Level.FINER Debug information. For developers. 
+	 * Level.FINEST Debug information. For developers. 
+	 */
 	public void setNLogLevel(Level nLogLevel) // set debug level
 	{
 		this.nLogLevel = nLogLevel;
 	}
 	
+	/**
+	 * Creates the skeleton writer for use with this filter.
+	 * Null return means implies GenericSkeletonWriter. 
+	 * @return the skeleton writer
+	 */
 	public ISkeletonWriter createSkeletonWriter () {
 		return null; // There is no corresponding skeleton writer
 	}
 	
+	/**
+	 * Creates the filter writer for use with this filter.
+	 * @return the filter writer
+	 */
 	public IFilterWriter createFilterWriter () {
 		return new OpenXMLZipFilterWriter();
 	}
 
+	/**
+	 * Returns a name for this filter to be used in a user interface.
+	 * @return the filter name
+	 */
 	public String getName () {
 		return "okf_openxml";
 	}
 
+	/**
+	 * Returns the current mimetype
+	 * @return the current mimetype
+	 */
 	public String getMimeType () {
 		return MIMETYPE;
 	}
 
+	/**
+	 * Returns the current IParameters object.
+	 * @return the current IParameters object
+	 */
 	public IParameters getParameters () {
 		return params;
 	}
 
+	/**
+	 * Returns true if the filter has a next event.
+	 * @return whether or not the filter has a next event
+	 */
 	public boolean hasNext () {
 		return ((( queue != null ) && ( !queue.isEmpty() )) || ( nextAction != NextAction.DONE ));
 	}
 
+	/**
+	 * Returns the next zip filter event.
+	 * @return the next zip filter event
+	 */
 	public Event next () {
 		// Send remaining event from the queue first
 		if ( queue.size() > 0 ) {
@@ -173,10 +224,19 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * Opens a RawDocument for filtering, defaulting to generating the skeleton
+	 * @param input a Raw Document to open and filter
+	 */
 	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
+	/**
+	 * Opens a RawDocument for filtering
+	 * @param input a Raw Document to open and filter
+	 * @param generateSkeleton true if a skeleton should be generated
+	 */
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -197,6 +257,13 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 	
+	/**
+	 * Opens a RawDocument for filtering
+	 * @param input a Raw Document to open and filter
+	 * @param generateSkeleton true if a skeleton should be generated
+	 * @param bSquishable true if file should be optimized by combining compatible
+	 *        text runs
+	 */
 	public void open (RawDocument input,
 			boolean generateSkeleton, boolean bSquishable)
 	{
@@ -217,6 +284,20 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * Opens a RawDocument for filtering
+	 * @param input a Raw Document to open and filter
+	 * @param generateSkeleton true if a skeleton should be generated
+	 * @param bSquishable true if file should be optimized by combining compatible
+	 *        text runs
+	 * @param nLogLevel a java.util.logging.Level constant
+	 * Level.SEVERE Errors the end user should see. 
+	 * Level.WARNING Important alert messages the end user should see. 
+	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 
+	 * Level.FINE Extra, less important information. The end user may choose to see them. 
+	 * Level.FINER Debug information. For developers. 
+	 * Level.FINEST Debug information. For developers. 
+	 */
 	public void open (RawDocument input,
 			boolean generateSkeleton, boolean bSquishable, Level nLogLevel)
 	{
@@ -237,26 +318,57 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * Opens an input stream for filtering
+	 * @param input an input stream to open and filter
+	 */
 	public void open (InputStream input) {
 		// Not supported for this filter
 		throw new UnsupportedOperationException(
 			"Method is not supported for this filter.");
 	}
 
+	/**
+	 * Opens a character sequence for filtering
+	 * @param a character sequence to open and filter
+	 */
 	private void open (CharSequence inputText) {
 		// Not supported for this filter
 		throw new UnsupportedOperationException(
 			"Method is not supported for this filter.");
 	}
 
+	/**
+	 * Opens a URI for filtering
+	 * @param a cURI to open and filter
+	 */
 	private void open (URI inputURI) {
 		open(inputURI,true,Level.FINE); // DWH 2-26-09 just a default
 	}
 	
+	/**
+	 * Opens a URI for filtering
+	 * @param a cURI to open and filter
+	 * @param bSquishable true if file should be optimized by combining compatible
+	 *        text runs
+	 */
 	public void open (URI inputURI, boolean bSquishable) {
 		open(inputURI, bSquishable, Level.FINE);
 	}
 	
+	/**
+	 * Opens a URI for filtering
+	 * @param a cURI to open and filter
+	 * @param bSquishable true if file should be optimized by combining compatible
+	 *        text runs
+	 * @param nLogLevel a java.util.logging.Level constant
+	 * Level.SEVERE Errors the end user should see. 
+	 * Level.WARNING Important alert messages the end user should see. 
+	 * Level.INFO Additional log information, progress, etc. These messages are also shown to the user. 
+	 * Level.FINE Extra, less important information. The end user may choose to see them. 
+	 * Level.FINER Debug information. For developers. 
+	 * Level.FINEST Debug information. For developers. 
+	 */
 	public void open (URI inputURI, boolean bSquishable, Level nLogLevel) {
 		close();
 		docURI = inputURI;
@@ -269,6 +381,12 @@ public class OpenXMLFilter implements IFilter {
 		LOGGER.log(Level.FINE,"\nOpening "+inputURI.toString());
 	}
 
+	/**
+	 * Sets language, encoding, and generation options for the filter.
+	 * @param sourceLanguage source language in en-US format
+	 * @param defaultEncoding encoding, such as "UTF-8"
+	 * @param generateSkeleton true if skeleton should be generated
+	 */
 	public void setOptions (String sourceLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
@@ -276,6 +394,13 @@ public class OpenXMLFilter implements IFilter {
 		setOptions(sourceLanguage, null, defaultEncoding, generateSkeleton);
 	}
 
+	/**
+	 * Sets language, encoding, and generation options for the filter.
+	 * @param sourceLanguage source language in en-US format
+	 * @param targetLanguage target language in de-DE format
+	 * @param defaultEncoding encoding, such as "UTF-8"
+	 * @param generateSkeleton true if skeleton should be generated
+	 */
 	public void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,
@@ -284,10 +409,19 @@ public class OpenXMLFilter implements IFilter {
 		srcLang = sourceLanguage;
 	}
 
+	/**
+	 * Sets the parameters
+	 * @param params IParameters object
+	 */
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	/**
+	 * Opens the document at the URI specified in the call to open(..),
+	 * looks through the names of the XML files inside to determine
+	 * the type, and creates a StartDocument Event.
+	 */
 	private Event openZipFile () {
 		File fZip;
 		String sEntryName,sZipType;
@@ -354,6 +488,13 @@ public class OpenXMLFilter implements IFilter {
 		}
 	}
 	
+	/**
+	 * Opens the next file in the zip fle, determines its type based on its name,
+	 * reads the yaml configuration file and sets the parameters, then creates
+	 * a DocumentPart Event if this file is to pass through unaltered, or 
+	 * subdocument Events otherwise
+	 * @return an appropriate Event for this XML file in the zip file
+	 */
 	private Event nextInZipFile () {
 		String sEntryName; // DWH 2-26-09
 		String sDocType; // DWH 2-26-09
@@ -424,6 +565,13 @@ public class OpenXMLFilter implements IFilter {
 		return new Event(EventType.END_DOCUMENT, ending);
 	}
 	
+	/**
+	 * Opens an XML file in the zip file, sets its parameters, combines
+	 * compatible contiguous text runs if desired, and creates a 
+	 * START_SUBDOCUMENT event
+	 * @param bSquishing true to combine compatible contiguous text runs
+	 * @return a START_SUBDOCUMENT event
+	 */
 	private Event openSubDocument (boolean bSquishing) {
 		PipedInputStream squishedInputStream;
 		PipedOutputStream pios=null;
@@ -480,6 +628,13 @@ public class OpenXMLFilter implements IFilter {
 		return new Event(EventType.START_SUBDOCUMENT, sd, skel);
 	}
 	
+	/**
+	 * Returns the next subdocument event.  If it is a TEXT_UNIT event,
+	 * it invokes the translator to manipulate the text before sending
+	 * on the event.  If it is an END_DOCUMENT event, it sends on
+	 * an END_SUBDOCUMENT event instead.
+	 * @return a subdocument event
+	 */
 	private Event nextInSubDocument () {
 		Event event;
 		while ( openXMLContentFilter.hasNext() ) {
@@ -518,29 +673,49 @@ public class OpenXMLFilter implements IFilter {
 		}
 		return null; // Should not get here
 	}
+	/**
+	 * Returns the type of zip file.
+	 * @return the type of zip file
+	 */
 	public int getNZipType() // DWH 4-13-09
 	{
 		return nZipType;
 	}
+	/**
+	 * Returns the OpenXMLContentFilter.
+	 * @return the OpenXMLContentFilter
+	 */
 	public OpenXMLContentFilter getOpenXMLContentFilter()
 	{
 		return openXMLContentFilter;
 	}
-
+	/**
+	 * Cancels filter processing.  Not yet implemented.
+	 */
 	public void cancel() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
+	/**
+	 * Sets the java.util.logging.Logger.
+	 */
 	public void setLogger(Logger lgr)
 	{
 		LOGGER = lgr;
 		if (openXMLContentFilter!=null)
 			openXMLContentFilter.setLogger(lgr);
 	}
+	/**
+	 * Returns the java.util.logging.Logger.
+	 * @return the java.util.logging.Logger
+	 */
 	public Logger getLogger()
 	{
 		return LOGGER;
 	}
+	/**
+	 * Returns the current Log Level.
+	 * @return he current Log Level
+	 */
 	public void setLogLevel(Level lvl)
 	{
 		nLogLevel = lvl;

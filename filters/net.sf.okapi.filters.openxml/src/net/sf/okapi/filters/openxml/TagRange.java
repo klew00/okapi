@@ -1,5 +1,9 @@
 package net.sf.okapi.filters.openxml;
 
+/**
+ * Used in FixXML to get position of tags in a document.
+ * 
+ */
 public class TagRange
 {
 	private static final int STARTTAG=1;

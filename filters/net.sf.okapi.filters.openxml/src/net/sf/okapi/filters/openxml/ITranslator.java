@@ -21,6 +21,10 @@ package net.sf.okapi.filters.openxml;
 
 import net.sf.okapi.common.resource.TextFragment;
 
+/**
+ * This is used for testing, allowing automatic manipulation
+ * of text in a text unit that will be available for translation. 
+ */
 public interface ITranslator
 {
 	public String translate(TextFragment tf);

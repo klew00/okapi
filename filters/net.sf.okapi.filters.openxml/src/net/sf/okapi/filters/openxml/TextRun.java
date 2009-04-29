@@ -21,13 +21,15 @@
 package net.sf.okapi.filters.openxml;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 
 /**
- * Holds text and placeholder information for a list of tags.
+ * Holds text and placeholder information for a list of tags.  This
+ * is used in OpenXMLContentFilter as a temporary holding place
+ * for information that will be needed to create a single code
+ * for a sequence of tags such as <w:r>...<w:t> or </w:t>...</w:r>.
  * 
  */
 public class TextRun {
