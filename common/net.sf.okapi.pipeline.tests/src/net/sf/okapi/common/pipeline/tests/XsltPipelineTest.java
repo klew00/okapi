@@ -63,8 +63,8 @@ public class XsltPipelineTest {
 		pipeline.process(new RawDocument(inputXml.toURI(), "UTF-8", "en"));
 
 		assertEquals(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>",
-				new String(outStream.toByteArray(), "UTF-8"));
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>".replaceAll("\\r\\n", "\n"),
+				new String(outStream.toByteArray(), "UTF-8").replaceAll("\\r\\n", "\n"));
 
 		pipeline.destroy();
 	}
