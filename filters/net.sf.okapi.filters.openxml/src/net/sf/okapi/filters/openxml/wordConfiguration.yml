@@ -56,8 +56,8 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [name]
 
-#'w:ppr':
-#  ruleTypes: [EXCLUDE]
+'w:ppr':
+  ruleTypes: [EXCLUDE]
 
 'w:lang':
   ruleTypes: [ATTRIBUTES_ONLY]

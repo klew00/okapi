@@ -24,6 +24,19 @@ import java.io.*;
 import java.util.LinkedList;
 import net.sf.okapi.common.resource.InvalidContentException;
 
+/**
+ * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
+ * OpenXML is the format of these documents.
+ * 
+ * <p>Since OpenXML files are Zip files that contain XML documents,
+ * this filter handles opening and processing the zip file, and
+ * instantiates <b>OpenXMLContentFilter</b> to process the XML documents.
+ * 
+ * <p>A call to createFilterWriter returns OpenXMLZipFilterWriter, which is
+ * the associated writer for this filter.  OpenXMLZipFilterWriter instantiates
+ * OpenXMLContentSkeletonWriter. 
+ */
+
 public class FixXML
 {
 	

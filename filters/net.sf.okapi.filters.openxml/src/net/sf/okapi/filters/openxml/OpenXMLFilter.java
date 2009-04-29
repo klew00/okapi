@@ -29,6 +29,7 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -41,6 +42,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -49,11 +51,24 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.filters.markupfilter.Parameters;
+
+/**
+ * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
+ * OpenXML is the format of these documents.
+ * 
+ * <p>Since OpenXML files are Zip files that contain XML documents,
+ * this filter handles opening and processing the zip file, and
+ * instantiates <b>OpenXMLContentFilter</b> to process the XML documents.
+ * 
+ * <p>A call to createFilterWriter returns OpenXMLZipFilterWriter, which is
+ * the associated writer for this filter.  OpenXMLZipFilterWriter instantiates
+ * OpenXMLContentSkeletonWriter. 
+ */
 
 public class OpenXMLFilter implements IFilter {
 	

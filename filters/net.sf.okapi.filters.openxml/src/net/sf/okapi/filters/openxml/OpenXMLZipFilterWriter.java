@@ -49,10 +49,16 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.filters.markupfilter.Parameters;
 
 /**
- * Implements the IFilterWriter interface for filters that handle formats made of
- * a ZIP package with embedded extractable documents, such as IDML or
- * OpenOffice.org files (ODT, ODS, ODP, etc.)
+ * <p>Implements the IFilterWriter interface for the OpenXMLFilter, which
+ * filters Microsoft Office Word, Excel, and Powerpoint Documents. OpenXML 
+ * is the format of these documents.
+ * 
+ * <p>Since OpenXML files are Zip files that contain XML documents,
+ * this filter writer handles writing out the zip file, and
+ * uses OpenXMLContentSkeletonWriter to output the XML documents.
+ * 
  */
+
 public class OpenXMLZipFilterWriter implements IFilterWriter {
 
 	public final static int MSWORD=1;
