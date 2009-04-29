@@ -83,6 +83,7 @@ public class TmxFilter implements IFilter {
 	private enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
 	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 	private String currentLang;					//--current language processed in the TU
+	private boolean targetExists= false;
 	private ArrayList<TextUnit> subList;		//--keeps track of the subflows for a TU--
 	int subCounter = 0;
 	
@@ -611,8 +612,13 @@ public class TmxFilter implements IFilter {
 						//Todo: handle true/false
 						processTuDocumentPart();
 					}else if(reader.getLocalName().equals("tuv")){
-
+						
 						currentLang = getXmlLangFromCurTuv();
+
+						if(currentLang.toLowerCase().equals(trgLang.toLowerCase())){
+							targetExists=true;
+						}
+						
 						tuvTrgType = getTuvTrgType(currentLang);
 						//currentLang=reader.getAttributeValue(0).toLowerCase();
 						storeTuStartElement();
@@ -640,11 +646,29 @@ public class TmxFilter implements IFilter {
 							}
 						subList=null;
 						
+						//--add the resname based on tuid--
+						if(tu.getProperty("tuid")!=null){
+							tu.setName(tu.getProperty("tuid").getValue());
+						}
+
+						//--create new skeleton and close source if target does not exist--
+						if(!targetExists){
+							tu.setTarget(trgLang,tu.getSource().clone(false));
+							skel.append("<tuv xml:lang=\""+trgLang+"\"><seg>");
+							skel.addContentPlaceholder(tu, trgLang);
+							skel.append("</seg></tuv>");
+						}
+						
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType("text/xml");
+						
+						
+						
+						
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						tuvTrgType = TuvXmlLang.UNDEFINED;
+						targetExists=false;
 						return true;
 					}else if(localName.equals("tuv")){
 						countTuvs++;
