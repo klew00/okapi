@@ -38,6 +38,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * This is a test that filters all files in the data directory.
+ */
+
 public class OpenXMLZipFullFileTest {
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
