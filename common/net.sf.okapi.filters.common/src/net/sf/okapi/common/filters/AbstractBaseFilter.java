@@ -837,6 +837,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		Event tempTextUnit;
+		String sourceString; // for testing to see if there is embedded text
 
 		if (!isCurrentTextUnit()) {
 			IllegalFilterOperationException e = new IllegalFilterOperationException(
@@ -856,10 +857,22 @@ public abstract class AbstractBaseFilter implements IFilter {
 		// Test if we actually have text of some type, if not convert this Event
 		// into a DocumrntPart
 		TextUnit tu = (TextUnit) tempTextUnit.getResource();
-		if (!tu.getSource().hasText()) {
-			startDocumentPart(tu.getSource().toString());
+		sourceString = tu.getSource().toString(); // for testing of embedded text
+//		if (!tu.getSource().hasText()) {
+		if (!tu.getSource().hasText() && sourceString!=null && sourceString.indexOf("[#$")==-1) { // only do this if there isn't embedded text
+			String prefix = tu.getSkeleton().toString(); // include anything in skeleton of TU before self
+			int ego = prefix.indexOf("[#$$self$]"); // ego points to the self
+		    if (ego>0)
+		    {
+				prefix = prefix.substring(0,ego); // delete your "self", i.e. inside structure of text unit is no longer necessary
+				startDocumentPart(prefix); // create a document part with just what was in the TU before self
+		    }			
+
+			startDocumentPart(sourceString); // parameter was tu.getSource().toString()
 			if (endMarker != null) {
-				addToDocumentPart(endMarker.toString());
+				endDocumentPart(); // end the document part corresponding to the internals of the text unit
+				startDocumentPart(endMarker.toString()); // create a document part consisting only of the end marker
+//				addToDocumentPart(endMarker.toString()); DWH
 			}
 			endDocumentPart();
 			return;
