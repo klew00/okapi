@@ -599,7 +599,7 @@ public class TmxFilter implements IFilter {
 				switch ( eventType ) {
 
 				case XMLStreamConstants.COMMENT:
-					skel.append("<!--"+ reader.getText() + "-->");
+					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
 					break;
 					
 				case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
@@ -653,17 +653,14 @@ public class TmxFilter implements IFilter {
 
 						//--create new skeleton and close source if target does not exist--
 						if(!targetExists){
-							tu.setTarget(trgLang,tu.getSource().clone(false));
 							skel.append("<tuv xml:lang=\""+trgLang+"\"><seg>");
 							skel.addContentPlaceholder(tu, trgLang);
-							skel.append("</seg></tuv>");
+							skel.append("</seg></tuv>"+lineBreak);
 						}
 						
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType("text/xml");
-						
-						
 						
 						
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
