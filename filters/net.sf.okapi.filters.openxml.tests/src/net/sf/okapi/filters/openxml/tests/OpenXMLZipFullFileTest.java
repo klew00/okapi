@@ -79,7 +79,11 @@ public class OpenXMLZipFullFileTest {
 	@Test
 	public void testAll() throws URISyntaxException {
 		Event event;
-		String base=System.getProperty("user.dir").replace('\\','/').toLowerCase();
+		
+		//String base=System.getProperty("user.dir").replace('\\','/').toLowerCase();
+		String base = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
+		base = base.substring(6,base.length()-5);
+
 		for (String f : testFileList) {
 			String ff = base+deary+f;
 			String fff = ff.replace(" ","%20");

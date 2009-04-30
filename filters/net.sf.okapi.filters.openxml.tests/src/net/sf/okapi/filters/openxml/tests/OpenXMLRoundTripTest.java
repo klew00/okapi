@@ -107,7 +107,9 @@ public class OpenXMLRoundTripTest {
 			filter.setOptions("en-US", "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
-			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
+			sUserDir = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
+			sUserDir = sUserDir.substring(6,sUserDir.length()-5);
+			//sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
 			sInputPath = sUserDir + "/data/";
 			sOutputPath = sUserDir + "/output/";
 			sGoldPath = sUserDir + "/gold/";
