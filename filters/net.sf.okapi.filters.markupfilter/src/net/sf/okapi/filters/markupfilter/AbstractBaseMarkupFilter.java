@@ -246,10 +246,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		}
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
 		if (input.getInputCharSequence() != null) {
+			setDocumentName("");
 			open(input.getInputCharSequence());
 		} else if (input.getInputURI() != null) {
+			setDocumentName(input.getInputURI().toString());
 			open(input.getInputURI());
 		} else if (input.getInputStream() != null) {
+			setDocumentName("");
 			open(input.getInputStream());
 		} else {
 			OkapiBadFilterInputException e = new OkapiBadFilterInputException("Input data not found when starting filter");

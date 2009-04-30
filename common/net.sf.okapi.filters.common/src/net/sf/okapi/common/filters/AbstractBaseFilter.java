@@ -84,6 +84,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	private String srcLang;
 	private String mimeType;
 	private String newlineType;
+	private String documentName;
 
 	private String currentTagType;
 
@@ -469,7 +470,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		endGroupId = 0;
 		textUnitId = 0;
 		documentPartId = 0;
-		subDocumentId = 0;
+		subDocumentId = 0;		
 
 		canceled = false;
 		done = false;
@@ -508,6 +509,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		startDocument.setMimeType(getMimeType());
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
+		startDocument.setName(getDocumentName());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
 		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId());
@@ -837,7 +839,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	protected void endTextUnit(GenericSkeleton endMarker, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		Event tempTextUnit;
-		String sourceString; // for testing to see if there is embedded text
+		// String sourceString; // for testing to see if there is embedded text
 
 		if (!isCurrentTextUnit()) {
 			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
@@ -855,34 +857,31 @@ public abstract class AbstractBaseFilter implements IFilter {
 		tempTextUnit = popTempEvent();
 
 		/*
-		// Test if we actually have text of some type, if not convert this Event
-		// into a DocumrntPart
-		TextUnit tu = (TextUnit) tempTextUnit.getResource();
-		sourceString = tu.getSource().toString(); // for testing of embedded text
-		if (!tu.getSource().hasText() && sourceString!=null && sourceString.indexOf("[#$")==-1) { // only do this if there isn't embedded text
-			String prefix = tu.getSkeleton().toString(); // include anything in skeleton of TU before self
-			int ego = prefix.indexOf("[#$$self$]"); // ego points to the self
-		    if (ego>0)
-		    {
-				prefix = prefix.substring(0,ego); // delete your "self", i.e. inside structure of text unit is no longer necessary
-				startDocumentPart(prefix); // create a document part with just what was in the TU before self
-		    }			
-
-			startDocumentPart(sourceString); // parameter was tu.getSource().toString()
-			if (endMarker != null) {
-				endDocumentPart(); // end the document part corresponding to the internals of the text unit
-				startDocumentPart(endMarker.toString()); // create a document part consisting only of the end marker
-			}
-			endDocumentPart();
-			return;
-		}
-	  */
+		 * // Test if we actually have text of some type, if not convert this
+		 * Event // into a DocumrntPart TextUnit tu = (TextUnit)
+		 * tempTextUnit.getResource(); sourceString = tu.getSource().toString();
+		 * // for testing of embedded text if (!tu.getSource().hasText() &&
+		 * sourceString!=null && sourceString.indexOf("[#$")==-1) { // only do
+		 * this if there isn't embedded text String prefix =
+		 * tu.getSkeleton().toString(); // include anything in skeleton of TU
+		 * before self int ego = prefix.indexOf("[#$$self$]"); // ego points to
+		 * the self if (ego>0) { prefix = prefix.substring(0,ego); // delete
+		 * your "self", i.e. inside structure of text unit is no longer
+		 * necessary startDocumentPart(prefix); // create a document part with
+		 * just what was in the TU before self }
+		 * 
+		 * startDocumentPart(sourceString); // parameter was
+		 * tu.getSource().toString() if (endMarker != null) { endDocumentPart();
+		 * // end the document part corresponding to the internals of the text
+		 * unit startDocumentPart(endMarker.toString()); // create a document
+		 * part consisting only of the end marker } endDocumentPart(); return; }
+		 */
 
 		if (endMarker != null) {
 			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 			skel.add((GenericSkeleton) endMarker);
 		}
-		
+
 		tempTextUnit = postProcessText(tempTextUnit);
 
 		filterEvents.add(tempTextUnit);
@@ -1316,5 +1315,25 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	protected void setNewlineType(String newlineType) {
 		this.newlineType = newlineType;
+	}
+
+	/**
+	 * Allows implementers to set the START_DOCUMENT name for the current input.
+	 * 
+	 * @param name
+	 *            - set the input document name or path
+	 */
+	protected void setDocumentName(String documentName) {
+		this.documentName = documentName;
+	}
+
+	/**
+	 * Get the START_DOCUMENT name for the current input.
+	 * 
+	 * @param name
+	 *            - set the input document name or path
+	 */
+	protected String getDocumentName() {
+		return documentName;
 	}
 }
