@@ -63,6 +63,17 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		this.configurationType = configurationType; // DWH 4-10-09
 	}
 	
+	/**
+	 * Gets the content out of a coded text string.  If the text was "blank", i.e.
+               * only surrounded by <w:r><w:t> and </w:t></w:r> in the original
+               * input, these tags are restored around the translated text.  Codes are
+               * expanded by calling expandCodeContent in GenericSkeletonWriter.
+               * Text is not blank if it was surrounded by OPENING and CLOSING codes.
+	 * @param tf TextFragment containing the coded text to expand
+	 * @param langToUse output language to use, in en-US format
+	 * @param context same as context variable in GenericFilterWriter
+	 * @return text with all of the codes expanded and blank text surrounded
+	 */
 @Override
 	public String getContent (TextFragment tf,
 		String langToUse,
@@ -216,6 +227,12 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		}
 		return tmp.toString();
 	}
+	/**
+	 * Handles layers and encoding of a string to be expanded.
+	 * @param s string to be expanded
+	 * @return context same as context variable in getContent in GenericSkeletonWriter
+	 * @param s string to be expanded
+	 */
 	private String encody(String s, int context)
 	{
 		if ( encoderManager == null ) {

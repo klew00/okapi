@@ -77,10 +77,16 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private net.sf.okapi.filters.markupfilter.Parameters params; // DWH 4-13-09
 	private static final Logger LOGGER = Logger.getLogger(OpenXMLZipFilterWriter.class.getName());
 
+	/**
+	 * Cancels processing of a filter; yet to be implemented.
+	 */
 	public void cancel () {
 		//TODO: implement cancel()
 	}
 	
+	/**
+	 * Closes the zip file.
+	 */
 	public void close () {
 		if ( zipOut == null ) return;
 		IOException err = null;
@@ -138,10 +144,18 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		}
 	}
 
+	/**
+	 * Gets the name of the filter writer.
+	 */
 	public String getName () {
-		return "ZipFilterWriter";
+		return "OpenXMLZipFilterWriter"; 
 	}
 
+	/**
+	 * Handles an event.  Passes all but START_DOCUMENT, END_DOCUMENT,
+               * and DOCUMENT_PART to subdocument processing.
+	 * @param event the event to process
+	 */
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
@@ -186,6 +200,12 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			"Method is not supported for this class.");
 	}
 
+	/**
+	 * Processes the start document for the whole zip file by
+               * initializing a temporary output file, and and output stream.
+	 * @param res a resource for the start document
+	 */
+
 	private void processStartDocument (StartDocument res) {
 		try {
 			buffer = new byte[2048];
@@ -226,6 +246,11 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		close();
 	}
 	
+	/**
+	 * This passes a file that doesn't need processing from the input zip
+               * file to the output zip file.
+	 * @param event corresponding to the file to be passed through
+	 */
 	private void processDocumentPart (Event event) {
 		// Treat top-level ZipSkeleton events
 		DocumentPart res = (DocumentPart)event.getResource();
@@ -253,6 +278,17 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		}
 	}
 
+	/**
+	 * Starts processing a new file withing the zip file.  It looks for the 
+               * element type of "filetype" in the yaml parameters which need to
+               * be set before handleEvent is called, and need to be the same as
+               * the parameters on the START_SUBDOCUMENT event from the
+               * OpenXMLFilter (by calling setParameters).  Once the type of the
+               * file is discovered from the Parameters, a subdoc writer is 
+               * created from OpenXMLContentSkeletonWriter, and a temporary
+               * output file is created.
+	 * @param res resource of the StartSubDocument
+	 */
 	private void processStartSubDocument (StartSubDocument res) {
 		int nZipType = 0; // DWH 4-13-09
 		String sZipType; // DWH 4-13-09
@@ -299,6 +335,11 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		subDocWriter.handleEvent(new Event(EventType.START_DOCUMENT, sd));
 	}
 	
+	/**
+	 * Finishes writing the subdocument temporary file, then adds it as an
+               * entry in the temporary zip output file.
+	 * @param res resource of the end subdocument
+	 */
 	private void processEndSubDocument (Ending res) {
 		try {
 			// Finish writing the sub-document

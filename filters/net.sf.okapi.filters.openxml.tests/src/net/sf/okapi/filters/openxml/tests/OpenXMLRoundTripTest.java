@@ -71,7 +71,6 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");
 		themfiles.add("TranslationServicesOff.docx");
-		themfiles.add("gtsftopic.docx");
 		themfiles.add("OpenXML_text_reference_document.docx");
 		themfiles.add("OpenXML_text_reference_v1_1.docx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");

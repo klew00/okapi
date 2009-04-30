@@ -125,6 +125,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		setMimeType("text/xml");
 	}
 
+	/**
+	 * Logs information about the event fir the log level is FINEST. 
+	 * @param event event to log information about 
+	 */
 	public void displayOneEvent(Event event) // DWH 4-22-09 LOGGER
 	{
 		Set<String> setter;
@@ -157,6 +161,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 		}		
 	}
+	/**
+	 * Sets the name of the Yaml configuration file for the current file type, reads the file, and sets the parameters.
+	 * @param filetype type of XML in the current file
+	 */
 	public void setUpConfig(int filetype)
 	{
 		switch(filetype)
@@ -192,6 +200,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 	}
 	
+	/**
+	 * Combines contiguous compatible text runs, in order to simplify the inline tags presented 
+               * to a user.  Note that MSWord can have embedded <w:r> elements for ruby text.  Note
+               * that Piped streams are used which use a separate thread for this processing.
+	 * @param in input stream of the XML file
+	 * @param in piped output stream for the "squished" output
+	 * @return a PipedInputStream used for further processing of the file
+	 */
 	public InputStream combineRepeatedFormat(final InputStream in, final PipedOutputStream pios)
 	{
 		PipedInputStream piis=null;
@@ -448,10 +464,26 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		return piis;
 	}
 	
+	/**
+	 * Adds CDATA as a DocumentPart
+	 * @param a tag containing the CDATA
+	 */
 	protected void handleCdataSection(Tag tag) { // 1-5-09
 		addToDocumentPart(tag.toString());
 	}
 
+	/**
+	 * Handles text.  If in a text run, it ends the text run and 
+               * adds the tags that were in it as a single MARKER_OPENING code.
+               * This would correspond to <w:r>...<w:t> in MSWord.  It will
+               * then start a new text run anticipating </w:t>...</w:r>.  If
+               * text is found that was not in a text run, i.e. it was not between
+               * text markers, it is not text to be processed by a user, so it
+               * becomes part of a new text run which will become part of a
+               * code.  If the text is not in a text unit, then it is added to a
+               * document part.
+	 * @param text the text to be handled
+	 */
 	@Override
 	protected void handleText(Segment text) {
 		if (text==null) // DWH 4-14-09
@@ -502,6 +534,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 	}
 
+	/**
+	 * Handles a tag that is anticipated to be a DocumentPart.  Since everything
+               * between TEXTUNIT markers is treated as an inline code, if there is a
+               * current TextUnit, this is added as a code in the text unit.
+	 * @param tag a tag
+	 */
 	@Override
 	protected void handleDocumentPart(Tag tag) {
 		if (canStartNewTextUnit()) // DWH ifline and whole else: is an inline code if inside a text unit
@@ -510,6 +548,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addCodeToCurrentTextUnit(tag);				
 	}
 
+	/**
+	 * Handles a start tag.  TEXT_UNIT_ELEMENTs start a new TextUnit.  TEXT_RUN_ELEMENTs
+               * start a new text run.  TEXT_MARKER_ELEMENTS set a flag that any following
+               * text will be between text markers.  ATTRIBUTES_ONLY tags have translatable text
+               * in the attributes, so within a text unit, it is added within a text run; otherwise it
+               * becomes a DocumentPart.
+	 * @param startTagt the start tag to process
+	 */
 	@Override
 	protected void handleStartTag(StartTag startTag) {
 		String sTagName;
@@ -654,6 +700,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 	}
 
+	/**
+	 * Handles end tags.  These either add to current text runs
+               * or end text runs or text units as appropriate.
+	 * @param endTag the end tag to process
+	 */
 	@Override
 	protected void handleEndTag(EndTag endTag) {
 		// if in excluded state everything is skeleton including text
@@ -752,76 +803,85 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML comments as DocumentParts.
+	 * @param tag comment tag
 	 */
 	@Override
 	protected void handleComment(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML doc type declaratons as DocumentParts.
+	 * @param tag doc type declaration tag
 	 */
 	@Override
 	protected void handleDocTypeDeclaration(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML markup declaratons as DocumentParts.
+	 * @param tag markup declaration tag
 	 */
 	@Override
 	protected void handleMarkupDeclaration(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML processing instructions as DocumentParts.
+	 * @param tag processing instruction tag
 	 */
 	@Override
 	protected void handleProcessingInstruction(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML server common tags as DocumentParts.
+	 * @param tag server common tag
 	 */
 	@Override
 	protected void handleServerCommon(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats server common escaped tags as DocumentParts.
+	 * @param tag server common escaped tag
 	 */
 	@Override
 	protected void handleServerCommonEscaped(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration(net.htmlparser.jericho.Tag)
+	/**
+	 * Treats XML declaratons as DocumentParts.
+	 * @param tag XML declaration tag
 	 */
 	@Override
 	protected void handleXmlDeclaration(Tag tag) {
 		handleDocumentPart(tag);		
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#getName()
+	/**
+	 * Returns name of the filter.
+	 * @return name of the filter
 	 */
 	public String getName() {
 		return "OpenXMLContentFilter";
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java.
-	 * lang.String)
+	/**
+	 * Normalizes naming of attributes whose values are the
+               * encoding or a language name, so that they can be 
+               * automatically changed to the output encoding and output.
+               * Unfortunately, this hard codes the tags to look for.
+	 * @param attrName name of the attribute
+	 * @param attrValue, value of the attribute
+	 * @param tag tag that contains the attribute
+	 * @return a normalized name for the attribute
 	 */
 	@Override
 	protected String normalizeAttributeName(String attrName, String attrValue, Tag tag) {
@@ -880,11 +940,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		return normalizedName;
 	}
-	protected void initFileTypes() // DWH 2-26-09
+	protected void initFileTypes() // DWH $$$ needed?
 	{
 		htXMLFileType = new Hashtable();
 	}
-	protected String getContentType(String sPartName) // DWH 2-26-09
+	protected String getContentType(String sPartName) // DWH $$$ needed?
 	{
 		String rslt="",tmp;
 		if (sPartName!=null)
@@ -895,17 +955,30 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		return(rslt);
 	}
+	/**
+	 * Adds a text string to a text run that will become a single code.
+	 * @param s the text string to add
+	 */
 	private void addToTextRun(String s)
 	{
 		if (bInTextRun && trTextRun!=null)
 			trTextRun.append(s);		
 	}
+	/**
+	 * Adds a tag to a text run that will become a single code.
+	 * @param tag the tag to add
+	 */
 	private void addToTextRun(Tag tag) // DWH 4-10-09 adds tag text to string that will be part of larger code later
 	{
 		// add something here to check if it was bold, italics, etc. to set a property
 		if (bInTextRun && trTextRun!=null)
 			trTextRun.append(tag.toString());
 	}
+	/**
+	 * Adds a tag and codes to a text run that will become a single code.
+	 * @param tag the tag to add
+	 * @param propertyTextUnitPlaceholders a list of codes of embedded text
+     */
 	private void addToTextRun(Tag tag, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
 	{
 		String txt;
@@ -917,6 +990,17 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			trTextRun.appendWithPropertyTextUnitPlaceholders(tag.toString(),offset,propertyTextUnitPlaceholders);
 		}
 	}
+	/**
+	 * Adds the text and codes in a text run as a single code in a text unit.
+               * If it is after text, it is added as a MARKER_CLOSING.  If no text
+               * was encountered and this is being called by an ending TEXT_RUN_ELEMENT
+               * or ending TEXT_UNIT_ELEMENT, it is added as a MARKER_PLACEHOLDER.
+               * Otherwise, it is added as a MARKER_OPENING.
+	 * compatible contiguous text runs if desired, and creates a 
+	 * START_SUBDOCUMENT event
+	 * @param bEndRun true if called while processing an end TEXT_RUN_ELEMENT
+               * or end TEXT_UNIT_ELEMENT
+	 */
 	private void addTextRunToCurrentTextUnit(boolean bEndRun) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		TextFragment.TagType codeType;
