@@ -21,7 +21,7 @@ Deploying
 --- 4) Run trunk/deployment/build.xml This will rebuild all distributions for all platforms.
 
 
---- 5) Go to trunk/deployment/rainbow and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
+--- 5) Go to trunk/deployment/rainbow/tests and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
 
 The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
 
