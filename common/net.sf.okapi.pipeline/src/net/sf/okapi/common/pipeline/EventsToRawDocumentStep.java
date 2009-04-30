@@ -38,13 +38,32 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 	private File outputFile;
 	private URI userOutput;
 
+	/**
+	 * Create a EventsToRawDocumentStep that creates a temp file to write out
+	 * {@link Event}s. The temp file is closed after writing and passed down as
+	 * a {@link URI} to subsequent steps.
+	 */
 	public EventsToRawDocumentStep() {
 	}
 
+	/**
+	 * Create a EventsToRawDocumentStep that takes a user specified {@link URI}
+	 * and writes all processed {@link EventsToRawDocumentStep} to this file.
+	 * The URI is passed down the {@link IPipeline} for subsequent steps to use
+	 * as input.
+	 * 
+	 * @param userOutput
+	 *            - user specified URI
+	 */
 	public EventsToRawDocumentStep(URI userOutput) {
 		this.userOutput = userOutput;
 	}
 
+	/**
+	 * Catch all incoming {@link Event}s and write them out to the a temp or
+	 * user specified {@link URI}. This step generates NO_OP events until the
+	 * input events are exhausted, at which point a RawDocument event is sent.
+	 */
 	@Override
 	public Event handleEvent(Event event) {
 		RawDocument input = null;
@@ -76,7 +95,8 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 				}
 			} catch (IOException e) {
 				OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
-				LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep", userOutput.toString()), re);
+				LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep",
+						userOutput.toString()), re);
 				throw re;
 			}
 
@@ -95,7 +115,7 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 
 			input = new RawDocument(outputFile.toURI(), encoding, language);
 			hasNext = false;
-			
+
 			// return the RawDocument Event that is the end result of all
 			// previous Events
 			return new Event(EventType.RAW_DOCUMENT, input);
@@ -108,14 +128,24 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 		return Event.NOOP_EVENT;
 	}
 
+	/**
+	 * This step generates NO_OP Events until the final RAW_DOCUMENT event is
+	 * sent.
+	 */
 	public boolean hasNext() {
 		return hasNext;
 	}
 
+	/**
+	 * Step description.
+	 */
 	public String getDescription() {
 		return "Combine document events into a full document and pass it along as an event (RawDocument)";
 	}
 
+	/**
+	 * UI pipeline step displayable name.
+	 */
 	public String getName() {
 		return "Event to Document Converter Step";
 	}
