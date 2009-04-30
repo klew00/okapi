@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.common.filters.tests.AllTests.class,
 	net.sf.okapi.common.tests.AllCommonFiltersTests.class,
 	net.sf.okapi.filters.html.tests.AllHtmlUnitTests.class,
+	net.sf.okapi.filters.html.tests.integration.ExtractionComparisionTest.class,
 	net.sf.okapi.filters.idml.tests.IDMLContentFilterTest.class,
 	net.sf.okapi.filters.idml.tests.IDMLFilterTest.class,
 	net.sf.okapi.filters.mif.tests.MIFFilterTest.class,
@@ -19,13 +20,14 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.filters.properties.tests.AllTests.class,
 	net.sf.okapi.filters.regex.tests.RegexFilterTest.class,
 	net.sf.okapi.filters.rtf.tests.RTFFilterTest.class,
-	//net.sf.okapi.filters.tests, ??
+	
 	net.sf.okapi.filters.tmx.tests.TmxFilterTest.class,
 	net.sf.okapi.filters.xliff.tests.XLIFFFilterTest.class,
 	net.sf.okapi.filters.xml.tests.XMLFilterTest.class,
 	net.sf.okapi.lib.jython.tests.JythonBasedPipelineTest.class,
 	net.sf.okapi.lib.segmentation.tests.AllTests.class,
-	net.sf.okapi.common.pipeline.tests.AllPipelineTests.class
+	net.sf.okapi.common.pipeline.tests.AllPipelineTests.class,
+	net.sf.okapi.common.pipeline.tests.integration.AllPipelineIntegrationTests.class
 })
 public class TestSuite {
 }

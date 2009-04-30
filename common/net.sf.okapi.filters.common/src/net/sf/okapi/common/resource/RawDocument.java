@@ -213,7 +213,7 @@ public class RawDocument implements IResource {
 
 	private void create(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
 		setInputCharSequence(inputCharSequence);
-		setEncoding("UTF-16BE");
+		setEncoding("UTF-16");
 		setSourceLanguage(sourceLanguage);
 		setTargetLanguage(targetLanguage);
 	}

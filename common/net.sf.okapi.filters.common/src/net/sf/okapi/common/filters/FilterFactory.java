@@ -36,22 +36,22 @@ public final class FilterFactory {
 	 */
 	static {
 		mimeMap = new Hashtable<String, String>();
-		mimeMap.put(XML_MIME_TYPE, "net.sf.okapi.common.filters.xml.XMLFilter");
-		mimeMap.put(ODF_MIME_TYPE, "net.sf.okapi.common.filters.openoffice.ODFFilter");
-		mimeMap.put(HTML_MIME_TYPE, "net.sf.okapi.common.filters.html.HtmlFilter");
-		mimeMap.put(SERVER_SIDE_INCLUDE_MIME_TYPE, "net.sf.okapi.common.filters.html.HtmlFilter");
-		mimeMap.put(PO_MIME_TYPE, "net.sf.okapi.common.filters.po.POFilter");
-		mimeMap.put(RTF_MIME_TYPE, "net.sf.okapi.common.filters.rtf.RTFFilter");
-		mimeMap.put(JAVASCRIPT_MIME_TYPE, "net.sf.okapi.common.filters.javascript.JavascriptFilter");
-		mimeMap.put(CSV_MIME_TYPE, "net.sf.okapi.common.filters.csv.CsvFilter");
-		mimeMap.put(MIF_MIME_TYPE, "net.sf.okapi.common.filters.mif.MIFFilter");
-		mimeMap.put(PROPERTIES_MIME_TYPE, "net.sf.okapi.common.filters.properties.PropertiesFilter");
-		mimeMap.put(DOCX_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
-		mimeMap.put(DOCM_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
-		mimeMap.put(XLSX_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
-		mimeMap.put(XLSM_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
-		mimeMap.put(PPTX_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
-		mimeMap.put(PPTM_MIME_TYPE, "net.sf.okapi.common.filters.openxml.OpenXmlFilter");
+		mimeMap.put(XML_MIME_TYPE, "net.sf.okapi.filters.xml.XMLFilter");
+		mimeMap.put(ODF_MIME_TYPE, "net.sf.okapi.filters.openoffice.ODFFilter");
+		mimeMap.put(HTML_MIME_TYPE, "net.sf.okapi.filters.html.HtmlFilter");
+		mimeMap.put(SERVER_SIDE_INCLUDE_MIME_TYPE, "net.sf.okapi.filters.html.HtmlFilter");
+		mimeMap.put(PO_MIME_TYPE, "net.sf.okapi.filters.po.POFilter");
+		mimeMap.put(RTF_MIME_TYPE, "net.sf.okapi.filters.rtf.RTFFilter");
+		mimeMap.put(JAVASCRIPT_MIME_TYPE, "net.sf.okapi.filters.javascript.JavascriptFilter");
+		mimeMap.put(CSV_MIME_TYPE, "net.sf.okapi.filters.csv.CsvFilter");
+		mimeMap.put(MIF_MIME_TYPE, "net.sf.okapi.filters.mif.MIFFilter");
+		mimeMap.put(PROPERTIES_MIME_TYPE, "net.sf.okapi.filters.properties.PropertiesFilter");
+		mimeMap.put(DOCX_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
+		mimeMap.put(DOCM_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
+		mimeMap.put(XLSX_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
+		mimeMap.put(XLSM_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
+		mimeMap.put(PPTX_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
+		mimeMap.put(PPTM_MIME_TYPE, "net.sf.okapi.filters.openxml.OpenXmlFilter");
 	}
 
 	/**

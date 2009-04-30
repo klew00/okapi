@@ -1,4 +1,4 @@
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline.tests.integration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

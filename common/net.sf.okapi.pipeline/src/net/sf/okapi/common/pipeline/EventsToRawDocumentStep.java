@@ -1,14 +1,14 @@
 package net.sf.okapi.common.pipeline;
 
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.filters.FilterFactory;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -18,12 +18,14 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
- * Converts filters events into a {@link RawDocument}.
- * This class implements the {@link IPipelineStep} interface for a step that takes 
- * filter events and creates an output document using a provided {@link IFilterWriter} 
- * implementation. When the document is completed, a {@link RawDocument} is generated.
+ * Converts filters events into a {@link RawDocument}. This class implements the
+ * {@link IPipelineStep} interface for a step that takes filter events and
+ * creates an output document using a provided {@link IFilterWriter}
+ * implementation. When the document is completed, a {@link RawDocument} is
+ * generated.
+ * 
  * @see RawDocumentToEventsStep
- * @see EventsWriterStep 
+ * @see EventsWriterStep
  */
 public class EventsToRawDocumentStep extends BasePipelineStep {
 
@@ -33,24 +35,24 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 	private boolean hasNext;
 	private String language;
 	private String encoding;
-	private URI path;
-	private ByteArrayOutputStream byteBuffer;
+	private File outputFile;
+	private URI userOutput;
 
 	public EventsToRawDocumentStep() {
-		hasNext = true;
-		byteBuffer = new ByteArrayOutputStream(1024);
 	}
 
-	public EventsToRawDocumentStep(URI path) {
-		hasNext = true;
-		this.path = path;
+	public EventsToRawDocumentStep(URI userOutput) {
+		this.userOutput = userOutput;
 	}
 
 	@Override
 	public Event handleEvent(Event event) {
 		RawDocument input = null;
 		IFilter filter = null;
-		
+
+		// hasNext Event is true by default until we hit the END_DOCUMENT event
+		hasNext = true;
+
 		if (event.getEventType() == EventType.START_DOCUMENT) {
 			language = ((StartDocument) event.getResource()).getLanguage();
 			encoding = ((StartDocument) event.getResource()).getEncoding();
@@ -63,32 +65,37 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 				filter = FilterFactory.getDefaultFilter(mimeType);
 				filterWriter = filter.createFilterWriter();
 			}
-			
+
 			filterWriter.setOptions(language, encoding);
-			if (path != null) {
-				filterWriter.setOutput(path.getPath());
-			} else {
-				filterWriter.setOutput(byteBuffer);
+			try {
+				if (userOutput != null) {
+					outputFile = new File(userOutput);
+				} else {
+					outputFile = File.createTempFile("EventsToRawDocumentStep", ".tmp");
+					userOutput = outputFile.toURI();
+				}
+			} catch (IOException e) {
+				OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
+				LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep", userOutput.toString()), re);
+				throw re;
 			}
 
+			filterWriter.setOutput(outputFile.getAbsolutePath());
 			filterWriter.handleEvent(event);
 			hasNext = true;
 		} else if (event.getEventType() == EventType.END_DOCUMENT) {
+			// handle the END_DOCUMENT event and close the writer
 			filterWriter.handleEvent(event);
 			filterWriter.close();
 
-			if (path != null) {
-				input = new RawDocument(path, encoding, language);
-			} else {
-				try {
-					input = new RawDocument(new String(byteBuffer.toByteArray(), encoding), language);
-				} catch (UnsupportedEncodingException e) {
-					OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-					LOGGER.log(Level.SEVERE, "Error creating RawDocument. Unsupported encoding: " + encoding, re);
-					throw re;
-				}
+			// it should be safe to close the output file on jvm exit
+			if (outputFile.exists()) {
+				outputFile.deleteOnExit();
 			}
+
+			input = new RawDocument(outputFile.toURI(), encoding, language);
 			hasNext = false;
+			
 			// return the RawDocument Event that is the end result of all
 			// previous Events
 			return new Event(EventType.RAW_DOCUMENT, input);
@@ -99,11 +106,6 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 
 		// return the NOOP event until we hit an END_DOCUMENT
 		return Event.NOOP_EVENT;
-	}
-
-	@Override
-	public void destroy() {
-		filterWriter.close();
 	}
 
 	public boolean hasNext() {

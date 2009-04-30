@@ -1,4 +1,4 @@
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline.tests.integration;
 
 import net.sf.okapi.common.pipeline.tests.integration.XsltPipelineTest;
 
@@ -10,11 +10,11 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { EventsToRawDocumentStepTest.class, FilterRoundtripTest.class, FilebasedPipelineTest.class, SimplePipelineTest.class, SimplePipelineWithCancelTest.class, XsltPipelineTest.class})
-public class AllPipelineTests {
+@SuiteClasses( { XsltPipelineTest.class })
+public class AllPipelineIntegrationTests {
 
 	public static Test suite() {
-		return new JUnit4TestAdapter(AllPipelineTests.class);
+		return new JUnit4TestAdapter(AllPipelineIntegrationTests.class);
 	}
 
 }
