@@ -20,21 +20,20 @@
 
 package net.sf.okapi.filters.openxml.tests;
 
-import java.io.File;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter; // DWH 4-8-09
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.openxml.OpenXMLFilter;
+import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
