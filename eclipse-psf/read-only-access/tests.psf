@@ -10,6 +10,7 @@
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.mif.tests,net.sf.okapi.filters.mif.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openoffice.tests,net.sf.okapi.filters.openoffice.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openxml.tests,net.sf.okapi.filters.openxml.tests"/>
+<project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.plaintext.tests,net.sf.okapi.filters.plaintext.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.po.tests,net.sf.okapi.filters.po.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.properties.tests,net.sf.okapi.filters.properties.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.regex.tests,net.sf.okapi.filters.regex.tests"/>
@@ -22,6 +23,7 @@
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.segmentation.tests,net.sf.okapi.lib.segmentation.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline.tests,net.sf.okapi.pipeline.tests"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/examples/python,python"/>
+<project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/tests/TestSuite,TestSuite"/>
 </provider>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Tests" name="Okapi-Tests">
 <item elementID="=net.sf.okapi.filters.markupfilter.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -29,6 +31,7 @@
 <item elementID="=net.sf.okapi.filters.mif.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xliff.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.idml.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=TestSuite" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.lib.jython.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.pipeline.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openoffice.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -36,14 +39,15 @@
 <item elementID="=net.sf.okapi.filters.html.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openxml.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.tmx.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.xml.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.rtf.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.xml.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.properties.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/python" type="4"/>
 <item elementID="=net.sf.okapi.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/python" type="4"/>
 <item elementID="=net.sf.okapi.filters.po.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.lib.segmentation.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.regex.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.plaintext.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 </psf>
