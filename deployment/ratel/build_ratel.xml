@@ -133,6 +133,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 				<include name="${distName}/**/*.sh"/>
   			</tarfileset>
 			<tarfileset dir="${dist}">
+				<include name="${distName}/**/*"/>
 				<exclude name="${distName}/**/*.sh"/>
   			</tarfileset>
   		</tar>
