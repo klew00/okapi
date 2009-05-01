@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Html Filter
+Bundle-SymbolicName: net.sf.okapi.filters.html
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.filters.html
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.markupfilter;bundle-version="1.0.0"

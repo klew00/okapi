@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Okapi Common
+Bundle-SymbolicName: net.sf.okapi.common
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.common,
+ net.sf.okapi.common.annotation,
+ net.sf.okapi.common.exceptions

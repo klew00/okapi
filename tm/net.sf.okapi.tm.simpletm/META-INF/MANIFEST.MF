@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Simple TM
+Bundle-SymbolicName: net.sf.okapi.tm.simpletm
+Bundle-Version: 1.0.0
+Bundle-ClassPath: lib/h2.jar
+Export-Package: net.sf.okapi.tm.simpletm
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.lib.translation;bundle-version="1.0.0"

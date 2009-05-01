@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Filters Common
+Bundle-SymbolicName: net.sf.okapi.filters.common
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.common.encoder,
+ net.sf.okapi.common.filters,
+ net.sf.okapi.common.filterwriter,
+ net.sf.okapi.common.resource,
+ net.sf.okapi.common.skeleton
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"

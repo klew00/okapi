@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Google Machine Translation Connector
+Bundle-SymbolicName: net.sf.okapi.mt.google
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.mt.google
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.lib.translation;bundle-version="1.0.0"

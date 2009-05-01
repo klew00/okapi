@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Java Properties Filter UI
+Bundle-SymbolicName: net.sf.okapi.ui.filters.properties
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.filters.ui.properties
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.filters.common;bundle-version="1.0.0"

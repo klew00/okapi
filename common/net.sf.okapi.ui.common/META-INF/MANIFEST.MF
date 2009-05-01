@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Common UI Library
+Bundle-SymbolicName: net.sf.okapi.ui.common
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.common.ui
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"

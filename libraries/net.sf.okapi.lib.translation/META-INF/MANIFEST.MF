@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Translation Library
+Bundle-SymbolicName: net.sf.okapi.lib.translation
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.lib.translation
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0"

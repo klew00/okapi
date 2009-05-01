@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: OpenXml Filter
+Bundle-SymbolicName: net.sf.okapi.filters.openxml
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.filters.openxml
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.markupfilter;bundle-version="1.0.0"
