@@ -165,4 +165,28 @@ public class UtilTest {
 		assertEquals(1, Util.getPercentage(10, 0));
 	}
 
+	@Test
+	public void testIsSameLanguage_DoNotIgnoreRegion () {
+		assertTrue(Util.isSameLanguage("en", "en", false));
+		assertTrue(Util.isSameLanguage("en", "EN", false));
+		assertTrue(Util.isSameLanguage("En", "eN", false));
+		assertFalse(Util.isSameLanguage("en", "fr", false));
+		assertFalse(Util.isSameLanguage("en", "en-us", false));
+		assertFalse(Util.isSameLanguage("en-us", "en", false));
+		assertFalse(Util.isSameLanguage("abc-xyz", "abc-QWE", false));
+		assertFalse(Util.isSameLanguage("abc-xyz", "iop-QWE", false));
+	}
+
+	@Test
+	public void testIsSameLanguage_IgnoreRegion () {
+		assertTrue(Util.isSameLanguage("en", "en", true));
+		assertTrue(Util.isSameLanguage("en", "EN", true));
+		assertTrue(Util.isSameLanguage("En", "eN", true));
+		assertFalse(Util.isSameLanguage("en", "fr", true));
+		assertTrue(Util.isSameLanguage("en", "en-us", true));
+		assertTrue(Util.isSameLanguage("en-us", "en", true));
+		assertTrue(Util.isSameLanguage("abc-xyz", "abc-QWE", true));
+		assertFalse(Util.isSameLanguage("abc-xyz", "iop-QWE", true));
+	}
+	
 }

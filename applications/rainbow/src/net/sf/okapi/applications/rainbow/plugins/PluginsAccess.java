@@ -130,8 +130,8 @@ public class PluginsAccess {
 					Element elemInfo = (Element)infoList.item(j);
 					String lang = elemInfo.getAttribute("xml:lang");
 					int n = 0;
-					if ( Utils.areSameLanguages(lang, prefLang, true) ) n = 3;
-					else if ( Utils.areSameLanguages(lang, prefLang, false) ) n = 2;
+					if ( Util.isSameLanguage(lang, prefLang, true) ) n = 3;
+					else if ( Util.isSameLanguage(lang, prefLang, false) ) n = 2;
 					else if ( lang.length() == 0 ) n = 1;
 					if ( n > nDone ) {
 						Element elem2 = getFirstElement(elemInfo, "name");

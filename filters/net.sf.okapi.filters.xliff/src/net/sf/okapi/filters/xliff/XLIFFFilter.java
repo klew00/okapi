@@ -393,14 +393,14 @@ public class XLIFFFilter implements IFilter {
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
-		if ( !tmp.equalsIgnoreCase(srcLang) ) { // Warn about source language
+		if ( !Util.isSameLanguage(tmp, srcLang, true) ) { // Warn about source language
 			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
 		tmp = reader.getAttributeValue("", "target-language");
 		if ( tmp != null ) {
-			if ( !tmp.equalsIgnoreCase(trgLang) ) { // Warn about target language
+			if ( !Util.isSameLanguage(tmp, trgLang, true) ) { // Warn about target language
 				logger.warning(String.format("The target language declared in <file> is '%s' not '%s'.", tmp, trgLang));
 			}
 		}
@@ -690,7 +690,7 @@ public class XLIFFFilter implements IFilter {
 	private void addTargetIfNeeded () {
 		if ( targetDone ) return; // Nothing to add
 		// If the target language is the same as the source, we should not create new <target>
-		if ( srcLang.equalsIgnoreCase(trgLang) ) return;
+		if ( Util.isSameLanguage(srcLang, trgLang, true) ) return; 
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));

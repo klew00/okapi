@@ -660,4 +660,32 @@ public class Util {
 		return String.format("%s%X", ((n>0)?'P':'N'), n);
 	}
 
+	/**
+	 * Indicates if two language codes are 'the same'. The comparison ignores case differences, and if the
+	 * parameter ignoreRegion is true, any part after the first '-' is also ignored. Note that the character
+	 * '_' is treated like a character '-'.
+	 * @param lang1 first language code to compare.
+	 * @param lang2 second language code to compare.
+	 * @param ignoreRegion True to ignore any part after the first separator, false to take it into account.
+	 * @return true if, according the given options, the two language codes are the same. False otherwise.
+	 */
+	static public boolean isSameLanguage (String lang1,
+		String lang2,
+		boolean ignoreRegion)
+	{
+		lang1 = lang1.replace('_', '-');
+		lang2 = lang2.replace('_', '-');
+		if ( ignoreRegion ) { // Do not take the region part into account
+			int n = lang1.indexOf('-');
+			if ( n > -1 ) {
+				lang1 = lang1.substring(0, n);
+			}
+			n = lang2.indexOf('-');
+			if ( n > -1 ) {
+				lang2 = lang2.substring(0, n);
+			}
+		}
+		return lang1.equalsIgnoreCase(lang2);
+	}
+
 }

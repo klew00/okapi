@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
+import net.sf.okapi.common.Util;
 
 import org.eclipse.swt.widgets.Text;
 
@@ -186,7 +187,7 @@ public class Utils {
 			sCode = sCode + "-" + Loc.getCountry();
 		}
 		// If it's the same as the source, use an arbitrary value.
-		if ( areSameLanguages(sCode, getDefaultSourceLanguage(), true) ) return "fr-FR";
+		if ( Util.isSameLanguage(sCode, getDefaultSourceLanguage(), true) ) return "fr-FR";
 		else return sCode;
 	}
 
@@ -196,39 +197,6 @@ public class Utils {
 		return (tmp1 + (tmp2.length()==0 ? "" : ("-"+tmp2))); 
 	}
 	
-	static public boolean areSameLanguages (String p_sLanguage1,
-		String p_sLanguage2,
-		boolean p_bIgnoreSubLanguage)
-	{
-		String sL1;
-		String sL2;
-		if ( p_sLanguage1.length() == 0 ) return false;
-		if ( p_sLanguage2.length() == 0 ) return false;
-
-		p_sLanguage1 = p_sLanguage1.replace('_', '-');
-		p_sLanguage2 = p_sLanguage2.replace('_', '-');
-
-		if ( !p_bIgnoreSubLanguage ) {
-			sL1 = p_sLanguage1;
-			sL2 = p_sLanguage2;
-		}
-		else { // Do not take the sub-language is account
-			if ( p_sLanguage1.length() > 2 ) {
-				sL1 = p_sLanguage1.substring(0, 3);
-				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 2);
-			}
-			else sL1 = p_sLanguage1.substring(0, 2);
-
-			if ( p_sLanguage2.length() > 2 ) {
-				sL2 = p_sLanguage2.substring(0, 3);
-				if ( sL2.charAt(2) == '-' ) sL2 = sL2.substring(0, 2);
-			}
-			else sL2 = p_sLanguage2.substring(0, 2);
-		}
-
-		return sL1.equalsIgnoreCase(sL2);
-	}
-
 	static public String getOkapiSharedFolder (String rootFolder) {
 		return rootFolder + File.separatorChar + "lib" + File.separator + "shared";
 	}
