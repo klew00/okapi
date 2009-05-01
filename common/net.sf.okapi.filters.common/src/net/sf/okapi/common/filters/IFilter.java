@@ -32,8 +32,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * <pre>
  * MyUtlity myUtility = new MyUtility(); // Some object that do things with filter events
  * IFilter filter = new MyFilter(); // A filter implementation
- * filter.setOptions("en", "UTF-8", true);
- * filter.open(new URI("myFile.ext"));
+ * filter.open(new RawDocument(URI("myFile.ext"), "UTF-8", "en");
  * while ( filter.hasNext() ) {
  *    myUtility.handleEvent(filter.next());
  * }
