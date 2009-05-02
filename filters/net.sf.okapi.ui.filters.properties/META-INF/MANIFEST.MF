@@ -9,4 +9,6 @@ Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.properties;bundle-version="1.0.0",
  net.sf.okapi.ui.common;bundle-version="1.0.0",
  net.sf.okapi.ui.filters.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
+ org.eclipse.swt;bundle-version="3.4.2",
+ net.sf.okapi.filters.properties;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0"
