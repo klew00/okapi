@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.xliff"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.tests"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
