@@ -46,6 +46,11 @@ public class Rule {
 	protected boolean isActive;
 
 	/**
+	 * Optional comment placed just before the rule.
+	 */
+	protected String comment;
+	
+	/**
 	 * Creates an empty breaking and active Rule object. 
 	 */
 	public Rule () {
@@ -53,6 +58,7 @@ public class Rule {
 		after = "";
 		isBreak = true;
 		isActive = true;
+		comment = null;
 	}
 	
 	/**
@@ -136,11 +142,30 @@ public class Rule {
 	}
 	
 	/**
-	 * sets the flag indicating if this rule is active.
+	 * Sets the flag indicating if this rule is active.
 	 * @param value true if this rule is active, false otherwise.
 	 */
 	public void setActive (boolean value) {
 		isActive = value;
+	}
+
+	/**
+	 * Gets the optional comment for this rule.
+	 * @return the comment for this rule, or null if there is none.
+	 */
+	public String getComment () {
+		return comment;
+	}
+	
+	/**
+	 * Sets the comment for this rule.
+	 * @param text the new comment. Use null or empty string to remove the comment.
+	 */
+	public void setComment (String text) {
+		comment = text;
+		if (( comment != null ) && ( comment.length() == 0 )) {
+			comment = null;
+		}
 	}
 
 }

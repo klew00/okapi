@@ -197,7 +197,7 @@ public class XMLWriter {
 	public void writeComment (String text) {
 		closeStartTag();
 		writer.write("<!--");
-		writer.write(text);
+		writer.write(text.replace("\n", lineBreak));
 		writer.write("-->");
 	}
 	

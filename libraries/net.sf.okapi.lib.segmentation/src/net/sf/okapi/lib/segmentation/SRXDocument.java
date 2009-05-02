@@ -37,6 +37,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -97,6 +98,8 @@ public class SRXDocument {
 	private ArrayList<LanguageMap> langMaps;
 	private LinkedHashMap<String, ArrayList<Rule>> langRules;
 	private String maskRule;
+	private String docComment;
+	private String headerComment;
 
 	/**
 	 * Creates an empty SRX document.
@@ -129,6 +132,46 @@ public class SRXDocument {
 		if ( warning == null ) return "";
 		else return warning;
 	}
+
+	/**
+	 * Gets the comments associated with the header of this document.
+	 * @return the comments for the header of this document, or null if there are none.
+	 */
+	public String getHeaderComments () {
+		return headerComment;
+	}
+	
+	/**
+	 * Sets the comments for the header of this document.
+	 * @param text the new comments, use null or empty string for removing
+	 * the comments.
+	 */
+	public void setHeaderComments (String text) {
+		headerComment = text;
+		if (( headerComment != null ) && ( headerComment.length() == 0 )) {
+			headerComment = null;
+		}
+	}
+	
+	/**
+	 * Gets the comments associated with this document.
+	 * @return the comments for this document, or null if there are none.
+	 */
+	public String getComments () {
+		return docComment;
+	}
+	
+	/**
+	 * Sets the comments for this document.
+	 * @param text the new comments, use null or empty string for removing
+	 * the comments.
+	 */
+	public void setComments (String text) {
+		docComment = text;
+		if (( docComment != null ) && ( docComment.length() == 0 )) {
+			docComment = null;
+		}
+	}
 	
 	/**
 	 * Resets the document to its default empty initial state.
@@ -151,6 +194,8 @@ public class SRXDocument {
 
 		sampleText = "Mr. Holmes is from the U.K. not the U.S. <B>Is Dr. Watson from there too?</B> Yes: both are.<BR/>";
 		sampleLanguage = "en";
+		headerComment = null;
+		docComment = null;
 	}
 	
 	/**
@@ -677,6 +722,7 @@ public class SRXDocument {
 			
 			// Treat the first occurrence (we assume there is never more in one file)
 			Element srxElem = (Element)srxList.item(0);
+			docComment = getPreviousComments(srxElem, null);
 			String tmp = srxElem.getAttribute("version");
 			if ( tmp.equals("1.0") ) {
 				version = tmp;
@@ -689,6 +735,8 @@ public class SRXDocument {
 			else throw new OkapiIOException("Invalid version value.");
 			
 			Element elem1 = getFirstElementByTagNameNS(ns, "header", srxElem);
+			headerComment = getPreviousComments(elem1, null);
+			
 			tmp = elem1.getAttribute("segmentsubflows");
 			if ( tmp.length() > 0 ) segmentSubFlows = "yes".equals(tmp);
 			tmp = elem1.getAttribute("cascade");
@@ -747,6 +795,9 @@ public class SRXDocument {
 			
 			// languagerules
 			elem2 = getFirstElementByTagNameNS(ns, "languagerules", elem1);
+			if ( elem2 == null ) {
+				throw new RuntimeException("the languagerules element is missing.");
+			}
 			// For each languageRule
 			list2 = elem2.getElementsByTagNameNS(ns, "languagerule");
 			for ( int i=0; i<list2.getLength(); i++ ) {
@@ -758,6 +809,7 @@ public class SRXDocument {
 				for ( int j=0; j<list3.getLength(); j++ ) {
 					Element elem4 = (Element)list3.item(j);
 					Rule newRule = new Rule();
+					newRule.comment = getPreviousComments(elem4, "rule"); 
 					tmp = elem4.getAttribute("break");
 					if ( tmp.length() > 0 ) newRule.isBreak = "yes".equals(tmp);
 					tmp = elem4.getAttributeNS(NSURI_OKPSRX, "active");
@@ -798,6 +850,33 @@ public class SRXDocument {
 		catch ( XPathExpressionException e) {
 			throw new OkapiIOException(e);
 		}
+	}
+	
+	/**
+	 * Gathers comments before a given element.
+	 * @param startNode the node where to start. Use null to allow the gathering to go at
+	 * the parent level.
+	 * @param stopElement the name of the node where to stop, or null for no limitation.
+	 * @return the string with all the comments found in the given scope, or null if
+	 * no comments were found.
+	 */
+	private String getPreviousComments (Node startNode,
+		String stopElement)
+	{
+		Node node = startNode.getPreviousSibling();
+		while ( node != null ) {
+			switch ( node.getNodeType() ) {
+			case Node.COMMENT_NODE:
+				return node.getNodeValue();
+			case Node.ELEMENT_NODE:
+				if (( stopElement != null ) && ( node.getNodeName().equals(stopElement) )) {
+					return null;
+				}
+				break;
+			}
+			node = node.getPreviousSibling(); 
+		}
+		return null;
 	}
 	
 	/**
@@ -855,6 +934,10 @@ public class SRXDocument {
 	{
 		try {
 			writer.writeStartDocument();
+			if ( docComment != null ) {
+				writer.writeComment(docComment);
+				writer.writeLineBreak();
+			}
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
 			if ( saveExtensions ) {
@@ -864,6 +947,10 @@ public class SRXDocument {
 			version = "2.0";
 			writer.writeLineBreak();
 			
+			if ( headerComment != null ) {
+				writer.writeComment(headerComment);
+				writer.writeLineBreak();
+			}
 			writer.writeStartElement("header");
 			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
 			writer.writeAttributeString("cascade", (cascade ? "yes": "no"));
@@ -918,6 +1005,10 @@ public class SRXDocument {
 				writer.writeLineBreak();
 				ArrayList<Rule> langRule = langRules.get(ruleName);
 				for ( Rule rule : langRule ) {
+					if ( rule.comment != null ) {
+						writer.writeComment(rule.comment);
+						writer.writeLineBreak();
+					}
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));
 					// Start of non-standard SRX 2.0 (non-SRX attributes not allowed)

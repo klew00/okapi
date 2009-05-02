@@ -50,6 +50,7 @@ public class RuleDialog {
 	private Button rdNoBreak;
 	private Rule result = null;
 	private IHelp help;
+	private Text edComments;
 
 	public RuleDialog (Shell parent,
 		Rule rule,
@@ -99,6 +100,15 @@ public class RuleDialog {
 		rdBreak.setSelection(rule.isBreak());
 		rdNoBreak.setSelection(!rule.isBreak());
 		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Comments:");
+
+		edComments = new Text(cmpTmp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 60;
+		edComments.setLayoutData(gdTmp);
+		edComments.setText(rule.getComment()==null ? "" : rule.getComment());
+
 		//--- Dialog-level buttons
 
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
@@ -153,6 +163,7 @@ public class RuleDialog {
 			Pattern.compile(edAfter.getText().replace(SRXDocument.ANYCODE, SRXDocument.INLINECODE_PATTERN));
 			// The patterns pass: create the new rule
 			result = new Rule(edBefore.getText(), edAfter.getText(), rdBreak.getSelection());
+			result.setComment(edComments.getText());
 			return true;
 		}
 		catch ( Exception e) {

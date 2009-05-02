@@ -22,6 +22,11 @@ package net.sf.okapi.lib.segmentation.tests;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
@@ -30,10 +35,14 @@ import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.segmentation.SRXSegmenter;
-import junit.framework.*;
 
-public class SRXDocumentTest extends TestCase {
+public class SRXDocumentTest {
 
+	@Before
+	public void setUp() {
+	}
+
+	@Test
 	public void testGetSet () {
 		SRXDocument doc = new SRXDocument();
 		
@@ -67,6 +76,7 @@ public class SRXDocumentTest extends TestCase {
 		
 	}
 
+	@Test
 	public void testObjects () {
 		// Check rule
 		Rule rule = new Rule();
@@ -92,6 +102,7 @@ public class SRXDocumentTest extends TestCase {
 		assertEquals(lm.getRuleName(), ruleName);
 	}
 	
+	@Test
 	public void testRules () {
 		SRXDocument doc = new SRXDocument();
 		doc.setCascade(true);
@@ -142,4 +153,60 @@ public class SRXDocumentTest extends TestCase {
 		assertEquals(ranges.get(1).start, 4);
 	}
 
+	@Test
+	public void testComments () {
+		SRXDocument doc = createDocument();
+		assertNotNull(doc.getComments());
+		assertEquals("Main comment", doc.getComments());
+		assertNotNull(doc.getHeaderComments());
+		assertEquals("Header comment", doc.getHeaderComments());
+		Map<String, ArrayList<Rule>> list = doc.getAllLanguageRules();
+		assertNotNull(list);
+		ArrayList<Rule> rules = list.get("default");
+		assertNotNull(rules);
+		assertEquals(1, rules.size());
+		assertNotNull(rules.get(0).getComment());
+		assertEquals("Rule comment", rules.get(0).getComment());
+	}
+	
+	@Test
+	public void testSimpleRule () {
+		SRXDocument doc = createDocument();
+		Map<String, ArrayList<Rule>> list = doc.getAllLanguageRules();
+		assertNotNull(list);
+		ArrayList<Rule> rules = list.get("default");
+		assertNotNull(rules);
+		assertEquals(1, rules.size());
+		assertEquals("([A-Z]\\.){2,}", rules.get(0).getBefore());
+		assertEquals("\\s", rules.get(0).getAfter());
+		assertFalse(rules.get(0).isBreak());
+	}
+	
+	private SRXDocument createDocument () {
+		SRXDocument doc = new SRXDocument();
+		String srx = "<!--Main comment-->"
+			+ "<srx xmlns='http://www.lisa.org/srx20' version='2.0'>"
+			+ "<!--Header comment-->"
+			+ "<header segmentsubflows='yes' cascade='no'>"
+			+ "<formathandle type='start' include='no'/>"
+			+ "<formathandle type='end' include='yes'/>"
+			+ "<formathandle type='isolated' include='no'/>"
+			+ "</header>"
+			+ "<body>"
+			+ "<languagerules>"
+			+ "<languagerule languagerulename='default'>"
+			+ "<!--Rule comment-->"
+			+ "<rule break='no'>"
+			+ "<beforebreak>([A-Z]\\.){2,}</beforebreak>"
+			+ "<afterbreak>\\s</afterbreak>"
+			+ "</rule>"
+			+ "</languagerule>"
+			+ "</languagerules>"
+			+ "<maprules>"
+			+ "<languagemap languagepattern='.*' languagerulename='default'/>"
+			+ "</maprules>"
+			+ "</body></srx>";
+		doc.loadRules((CharSequence)srx);
+		return doc;
+	}
 }

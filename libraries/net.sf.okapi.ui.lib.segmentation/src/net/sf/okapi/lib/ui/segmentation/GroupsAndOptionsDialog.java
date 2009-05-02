@@ -43,9 +43,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 public class GroupsAndOptionsDialog {
 
@@ -71,6 +73,8 @@ public class GroupsAndOptionsDialog {
 	private Button chkTrimTrailingWS;
 	private ClosePanel pnlActions;
 	private IHelp help;
+	private Text edHeaderComments;
+	private Text edDocComments;
 
 	public GroupsAndOptionsDialog (Shell parent,
 		SRXDocument srxDoc,
@@ -115,6 +119,18 @@ public class GroupsAndOptionsDialog {
 		
 		chkOneSegmentIncludesAll = new Button(grpTmp, SWT.CHECK);
 		chkOneSegmentIncludesAll.setText(Res.getString("options.includeAllInOne")); //$NON-NLS-1$
+
+		Label label = new Label(grpTmp, SWT.NONE);
+		label.setText("Header comments:");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		label.setLayoutData(gdTmp);
+		
+		edHeaderComments = new Text(grpTmp, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 40;
+		edHeaderComments.setLayoutData(gdTmp);
 		
 		//=== Language Rules
 		
@@ -258,6 +274,20 @@ public class GroupsAndOptionsDialog {
 			}
 		});
 
+		// === Document comment
+		
+		grpTmp = new Group(shell, SWT.NONE);
+		grpTmp.setText("Document comments");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		grpTmp.setLayoutData(gdTmp);
+		grpTmp.setLayout(new GridLayout());
+
+		edDocComments = new Text(grpTmp, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 60;
+		edDocComments.setLayoutData(gdTmp);
+		
 		// Handling of the closing event
 		shell.addShellListener(new ShellListener() {
 			public void shellActivated(ShellEvent event) {}
@@ -318,6 +348,10 @@ public class GroupsAndOptionsDialog {
 		chkOneSegmentIncludesAll.setSelection(srxDoc.oneSegmentIncludesAll());
 		chkTrimLeadingWS.setSelection(srxDoc.trimLeadingWhitespaces());
 		chkTrimTrailingWS.setSelection(srxDoc.trimTrailingWhitespaces());
+		String tmp = srxDoc.getHeaderComments();
+		edHeaderComments.setText(tmp==null ? "" : tmp);
+		tmp = srxDoc.getComments();
+		edDocComments.setText(tmp==null ? "" : tmp);
 	}
 	
 	private void getOptions () {
@@ -329,6 +363,10 @@ public class GroupsAndOptionsDialog {
 		srxDoc.setOneSegmentIncludesAll(chkOneSegmentIncludesAll.getSelection());
 		srxDoc.setTrimLeadingWhitespaces(chkTrimLeadingWS.getSelection());
 		srxDoc.setTrimTrailingWhitespaces(chkTrimTrailingWS.getSelection());
+		String tmp = edHeaderComments.getText();
+		srxDoc.setHeaderComments(tmp.replace("\r\n", "\n"));
+		tmp = edDocComments.getText();
+		srxDoc.setComments(tmp.replace("\r\n", "\n"));
 	}
 	
 	private void updateRulesButtons () {
