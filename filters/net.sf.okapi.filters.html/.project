@@ -3,9 +3,6 @@
 	<name>net.sf.okapi.filters.html</name>
 	<comment></comment>
 	<projects>
-		<project>net.sf.okapi.common</project>
-		<project>net.sf.okapi.filters.common</project>
-		<project>net.sf.okapi.filters.markupfilter</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

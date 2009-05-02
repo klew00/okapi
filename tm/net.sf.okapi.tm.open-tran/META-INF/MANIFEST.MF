@@ -8,4 +8,5 @@ Bundle-ClassPath: lib/xmlrpc-client-3.1.jar,
  lib/ws-commons-util-1.0.2.jar
 Export-Package: net.sf.okapi.tm.opentran
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
+ net.sf.okapi.lib.translation;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0"

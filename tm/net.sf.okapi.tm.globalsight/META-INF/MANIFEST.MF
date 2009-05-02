@@ -22,4 +22,5 @@ Export-Package: com.globalsight.webservices;
    javax.xml.rpc",
  net.sf.okapi.tm.globalsight;uses:="net.sf.okapi.common,net.sf.okapi.lib.translation,net.sf.okapi.common.resource"
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
+ net.sf.okapi.lib.translation;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0"

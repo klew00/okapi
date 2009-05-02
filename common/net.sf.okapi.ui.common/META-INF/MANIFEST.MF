@@ -4,4 +4,6 @@ Bundle-Name: Common UI Library
 Bundle-SymbolicName: net.sf.okapi.ui.common
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.common.ui
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ org.eclipse.swt;bundle-version="3.4.2"

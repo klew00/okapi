@@ -4,4 +4,5 @@ Bundle-Name: Segmentation Library
 Bundle-SymbolicName: net.sf.okapi.lib.segmentation
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.lib.segmentation
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0"
