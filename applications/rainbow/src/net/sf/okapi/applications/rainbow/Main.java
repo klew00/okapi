@@ -32,7 +32,7 @@ public class Main {
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);
 
-			if (( args.length < 1 ) || !args[0].startsWith("-") ) {
+			if (( args.length < 1 ) || !args[0].startsWith("-") ) { //$NON-NLS-1$
 				// Normal mode
 				String projectFile = null;
 				if ( args.length == 1 ) {

@@ -572,9 +572,9 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				//TODO Help check for updates
-				UIUtil.start("http://okapi.opentag.com/updates?" 
+				UIUtil.start("http://okapi.opentag.com/updates?"  //$NON-NLS-1$
 					+ getClass().getPackage().getImplementationTitle()
-					+ "="
+					+ "=" //$NON-NLS-1$
 					+ getClass().getPackage().getImplementationVersion());
 			}
 		});
@@ -1567,7 +1567,7 @@ public class MainForm implements IParametersProvider {
 		// Set the window placement
 		config.setProperty("maximized", shell.getMaximized()); //$NON-NLS-1$
 		Rectangle r = shell.getBounds();
-		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height));
+		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
 		// Set the MRU list
 		mruList.copyToProperties(config);
 		// Save to the user home directory as ".appname" file

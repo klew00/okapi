@@ -54,43 +54,43 @@ class PreferencesForm {
 	{
 		help = helpParam;
 		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("User Preferences");
+		shell.setText(Res.getString("PreferencesForm.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, p_Parent);
 		shell.setLayout(new GridLayout());
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Initial Project");
+		grpTmp.setText(Res.getString("PreferencesForm.initialProjectGroup")); //$NON-NLS-1$
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		grpTmp.setLayout(new GridLayout());
 
 		rdStartPrjDoNotLoad = new Button(grpTmp, SWT.RADIO);
-		rdStartPrjDoNotLoad.setText("Never load a project");
+		rdStartPrjDoNotLoad.setText(Res.getString("PreferencesForm.neverLoad")); //$NON-NLS-1$
 		
 		rdStartPrjAsk = new Button(grpTmp, SWT.RADIO);
-		rdStartPrjAsk.setText("Ask the user");
+		rdStartPrjAsk.setText(Res.getString("PreferencesForm.askUser")); //$NON-NLS-1$
 		
 		rdStartPrjLoad = new Button(grpTmp, SWT.RADIO);
-		rdStartPrjLoad.setText("Load automatically");
+		rdStartPrjLoad.setText(Res.getString("PreferencesForm.autoLoad")); //$NON-NLS-1$
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Miscellaneous");
+		grpTmp.setText(Res.getString("PreferencesForm.miscGroup")); //$NON-NLS-1$
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		grpTmp.setLayout(new GridLayout(2, false));
 		
 		chkAllowDuplicateInputs = new Button(grpTmp, SWT.CHECK);
-		chkAllowDuplicateInputs.setText("Allow duplicate documents in the input lists");
+		chkAllowDuplicateInputs.setText(Res.getString("PreferencesForm.allowDuplicated")); //$NON-NLS-1$
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkAllowDuplicateInputs.setLayoutData(gdTmp);
 		
 		Label label = new Label(grpTmp, SWT.NONE);
-		label.setText("Logging level:");
+		label.setText(Res.getString("PreferencesForm.logLevel")); //$NON-NLS-1$
 		
 		cbLogLevel = new Combo(grpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		cbLogLevel.add("Normal");
-		cbLogLevel.add("Fine");
-		cbLogLevel.add("Finer");
-		cbLogLevel.add("Finest");
+		cbLogLevel.add(Res.getString("PreferencesForm.logNormal")); //$NON-NLS-1$
+		cbLogLevel.add(Res.getString("PreferencesForm.logFine")); //$NON-NLS-1$
+		cbLogLevel.add(Res.getString("PreferencesForm.logFiner")); //$NON-NLS-1$
+		cbLogLevel.add(Res.getString("PreferencesForm.logFinest")); //$NON-NLS-1$
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

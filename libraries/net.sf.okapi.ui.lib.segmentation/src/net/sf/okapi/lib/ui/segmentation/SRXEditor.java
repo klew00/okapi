@@ -752,7 +752,7 @@ public class SRXEditor {
 	}
 
 	private void getSurfaceData () {
-		srxDoc.setSampleText(edSampleText.getText().replace("\r", ""));
+		srxDoc.setSampleText(edSampleText.getText().replace("\r", "")); //$NON-NLS-1$ //$NON-NLS-2$
 		srxDoc.setSampleLanguage(edSampleLanguage.getText());
 		srxDoc.setTestOnSelectedGroup(rdTestOnSelectedGroup.getSelection());
 	}

@@ -54,7 +54,7 @@ class LogHandler extends Handler {
 			Throwable e = record.getThrown();
 			if ( e != null ) {
 				log.message(e.getMessage());
-				log.message(" @ "+e.toString());
+				log.message(" @ "+e.toString()); //$NON-NLS-1$
 			}
 		}
 		else if ( record.getLevel() == Level.WARNING ) {

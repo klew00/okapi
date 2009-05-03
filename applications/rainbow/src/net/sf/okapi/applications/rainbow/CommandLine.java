@@ -93,51 +93,51 @@ public class CommandLine {
 		
 		for ( int i=0; i<args.length; i++ ) {
 			arg = args[i];
-			if ( "-p".equals(arg) ) { // Load a project
+			if ( "-p".equals(arg) ) { // Load a project //$NON-NLS-1$
 				prj.load(nextArg(args, ++i));
 			}
-			else if ( "-x".equals(arg) ) { // Execute utility
+			else if ( "-x".equals(arg) ) { // Execute utility //$NON-NLS-1$
 				utilityId = nextArg(args, ++i);
 				continueAfter = true;
 			}
-			else if ( "-np".equals(arg) ) { // No prompt for options
+			else if ( "-np".equals(arg) ) { // No prompt for options //$NON-NLS-1$
 				promptForOptions = false;
 			}
-			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help
-				help.showTopic(this, "index", "commandLine.html");
+			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help //$NON-NLS-1$ //$NON-NLS-2$
+				help.showTopic(this, "index", "commandLine.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			else if ( "-se".equals(arg) ) { // Source encoding
+			else if ( "-se".equals(arg) ) { // Source encoding //$NON-NLS-1$
 				prj.setSourceEncoding(nextArg(args, ++i));
 			}
-			else if ( "-te".equals(arg) ) { // Target encoding
+			else if ( "-te".equals(arg) ) { // Target encoding //$NON-NLS-1$
 				prj.setTargetEncoding(nextArg(args, ++i));
 			}
-			else if ( "-sl".equals(arg) ) { // Source language
+			else if ( "-sl".equals(arg) ) { // Source language //$NON-NLS-1$
 				prj.setSourceLanguage(nextArg(args, ++i));
 			}
-			else if ( "-tl".equals(arg) ) { // Target language
+			else if ( "-tl".equals(arg) ) { // Target language //$NON-NLS-1$
 				prj.setTargetLanguage(nextArg(args, ++i));
 			}
-			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0
+			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0 //$NON-NLS-1$ //$NON-NLS-2$
 				prj.setInputRoot(0, nextArg(args, ++i), true);
 			}
-			else if ( "-pd".equals(arg) ) {
+			else if ( "-pd".equals(arg) ) { //$NON-NLS-1$
 				prj.setCustomParametersFolder(nextArg(args, ++i));
 				prj.setUseCustomParametersFolder(true);
 			}
-			else if ( "-opt".equals(arg) ) {
+			else if ( "-opt".equals(arg) ) { //$NON-NLS-1$
 				optionsFile = nextArg(args, ++i);
 			}
-			else if ( "-fs".equals(arg) ) {
+			else if ( "-fs".equals(arg) ) { //$NON-NLS-1$
 				Input inp = prj.getLastItem(0);
 				if ( inp == null ) { 
-					throw new RuntimeException("-fs parameter defined before input path.");
+					throw new RuntimeException(Res.getString("CommandLine.fsBeforeInputError")); //$NON-NLS-1$
 				}
 				else {
 					inp.filterSettings = nextArg(args, ++i);
 				}
 			}
-			else if ( "-o".equals(arg) ) { // Output file
+			else if ( "-o".equals(arg) ) { // Output file //$NON-NLS-1$
 				File f = new File(nextArg(args, ++i));
 				prj.setOutputRoot(Util.getDirectoryName(f.getAbsolutePath()));
 				prj.setUseOutputRoot(true);
@@ -146,9 +146,9 @@ public class CommandLine {
 				prj.pathBuilder.setReplace(Util.getFilename(f.getAbsolutePath(), true));
 				setOutSearch = true;
 			}
-			else if ( !arg.startsWith("-") ) { // Input file
+			else if ( !arg.startsWith("-") ) { // Input file //$NON-NLS-1$
 				if ( ++inpList > 2 ) {
-					throw new RuntimeException("Too many input files.");
+					throw new RuntimeException(Res.getString("CommandLine.tooManyInput")); //$NON-NLS-1$
 				}
 				File f = new File(arg);
 				String[] res = fm.guessFormat(f.getAbsolutePath());
@@ -157,7 +157,7 @@ public class CommandLine {
 				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1], false);
 			}
 			else {
-				log.error("Invalid command line argument: "+args[i]);
+				log.error(Res.getString("CommandLine.invalidCommand")+args[i]); //$NON-NLS-1$
 				continueAfter = false;
 			}
 			
@@ -165,7 +165,7 @@ public class CommandLine {
 			if ( setOutSearch ) {
 				Input inp = prj.getLastItem(0);
 				if ( inp == null ) { 
-					throw new RuntimeException("No input file specified.");
+					throw new RuntimeException(Res.getString("CommandLine.noInput")); //$NON-NLS-1$
 				}
 				else {
 					prj.pathBuilder.setSearch(inp.relativePath);
@@ -177,16 +177,16 @@ public class CommandLine {
 	
 	private String nextArg (String[] args, int index) {
 		if ( index >= args.length ) {
-			throw new RuntimeException("Missing parameter in the command line.");
+			throw new RuntimeException(Res.getString("CommandLine.missingParameter")); //$NON-NLS-1$
 		}
 		return args[index];
 	}
 	
 	private void printBanner () {
-		System.out.println("------------------------------------------------------------");
-		System.out.println("Rainbow - Command-Line Mode");
-		System.out.println("Version: "+getClass().getPackage().getImplementationVersion());
-		System.out.println("------------------------------------------------------------");
+		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
+		System.out.println(Res.getString("CommandLine.bannerApplication")); //$NON-NLS-1$
+		System.out.println(Res.getString("CommandLine.bannerVersion")+getClass().getPackage().getImplementationVersion()); //$NON-NLS-1$
+		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
 	private void initialize () throws Exception {
@@ -198,7 +198,7 @@ public class CommandLine {
     	// Remove the application folder in all cases
     	rootFolder = Util.getDirectoryName(rootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
-		help = new BaseHelp(rootFolder+File.separator+"help");
+		help = new BaseHelp(rootFolder+File.separator+"help"); //$NON-NLS-1$
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);

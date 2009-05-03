@@ -59,10 +59,10 @@ public class Project {
 
 	public Project (LanguageManager lm) {
 		useCustomParamsFolder = false;
-		customParamsFolder = System.getProperty("user.home");
+		customParamsFolder = System.getProperty("user.home"); //$NON-NLS-1$
 		
 		useOutputRoot = false;
-		outputRoot = "";
+		outputRoot = ""; //$NON-NLS-1$
 		
 		// Three lists
 		inputLists = new ArrayList<ArrayList<Input>>();
@@ -70,21 +70,21 @@ public class Project {
 		inputRoots = new ArrayList<String>();
 		
 		inputLists.add(new ArrayList<Input>());
-		inputRoots.add(System.getProperty("user.home"));
+		inputRoots.add(System.getProperty("user.home")); //$NON-NLS-1$
 		useCustomInputRoots.add(false);
 		
 		inputLists.add(new ArrayList<Input>());
-		inputRoots.add(System.getProperty("user.home"));
+		inputRoots.add(System.getProperty("user.home")); //$NON-NLS-1$
 		useCustomInputRoots.add(false);
 		
 		inputLists.add(new ArrayList<Input>());
-		inputRoots.add(System.getProperty("user.home"));
+		inputRoots.add(System.getProperty("user.home")); //$NON-NLS-1$
 		useCustomInputRoots.add(false);
 		
 		utilityParams = new Hashtable<String, String>();
 		
 		pathBuilder = new PathBuilder();
-		pathBuilder.setExtension(".out");
+		pathBuilder.setExtension(".out"); //$NON-NLS-1$
 		sourceLanguage = Utils.getDefaultSourceLanguage().toUpperCase();
 		targetLanguage = Utils.getDefaultTargetLanguage().toUpperCase();
 		sourceEncoding = lm.getDefaultEncodingFromCode(sourceLanguage, UIUtil.getPlatformType());
@@ -127,9 +127,9 @@ public class Project {
 		
 		// Create the new entry and add it to the list
 		Input inp = new Input();
-		inp.sourceEncoding = ((sourceEncoding == null) ? "" : sourceEncoding);
-		inp.targetEncoding = ((targetEncoding == null) ? "" : targetEncoding);
-		inp.filterSettings = ((filterSettings == null) ? "" : filterSettings);
+		inp.sourceEncoding = ((sourceEncoding == null) ? "" : sourceEncoding); //$NON-NLS-1$
+		inp.targetEncoding = ((targetEncoding == null) ? "" : targetEncoding); //$NON-NLS-1$
+		inp.filterSettings = ((filterSettings == null) ? "" : filterSettings); //$NON-NLS-1$
 		inp.relativePath = newPath;
 		inputLists.get(listIndex).add(inp);
 		isModified = true;
@@ -169,23 +169,23 @@ public class Project {
 			writer = new XMLWriter();
 			writer.create(newPath);
 			writer.writeStartDocument();
-			writer.writeStartElement("rainbowProject");
-			writer.writeAttributeString("version", "4");
+			writer.writeStartElement("rainbowProject"); //$NON-NLS-1$
+			writer.writeAttributeString("version", "4"); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			int i=0;
 			for ( ArrayList<Input> inputList : inputLists ) {
-				writer.writeStartElement("fileSet");
-				writer.writeAttributeString("id", String.format("%d", i+1));
-				writer.writeStartElement("root");
-				writer.writeAttributeString("useCustom", useCustomInputRoots.get(i) ? "1" : "0");
+				writer.writeStartElement("fileSet"); //$NON-NLS-1$
+				writer.writeAttributeString("id", String.format("%d", i+1)); //$NON-NLS-1$ //$NON-NLS-2$
+				writer.writeStartElement("root"); //$NON-NLS-1$
+				writer.writeAttributeString("useCustom", useCustomInputRoots.get(i) ? "1" : "0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				writer.writeString(inputRoots.get(i).replace('\\', '/'));
 				writer.writeEndElement(); // root
 				for ( Input item : inputList ) {
-					writer.writeStartElement("fi");
-					writer.writeAttributeString("fs", item.filterSettings);
-					writer.writeAttributeString("fo", item.format);
-					writer.writeAttributeString("se", item.sourceEncoding);
-					writer.writeAttributeString("te", item.targetEncoding);
+					writer.writeStartElement("fi"); //$NON-NLS-1$
+					writer.writeAttributeString("fs", item.filterSettings); //$NON-NLS-1$
+					writer.writeAttributeString("fo", item.format); //$NON-NLS-1$
+					writer.writeAttributeString("se", item.sourceEncoding); //$NON-NLS-1$
+					writer.writeAttributeString("te", item.targetEncoding); //$NON-NLS-1$
 					writer.writeString(item.relativePath.replace('\\', '/'));
 					writer.writeEndElement(); // fi
 				}
@@ -193,52 +193,52 @@ public class Project {
 				i++;
 			}
 			
-			writer.writeStartElement("output");
-			writer.writeStartElement("root");
-			writer.writeAttributeString("use", (useOutputRoot ? "1" : "0"));
+			writer.writeStartElement("output"); //$NON-NLS-1$
+			writer.writeStartElement("root"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (useOutputRoot ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			writer.writeString(outputRoot.replace('\\', '/'));
 			writer.writeEndElement(); // root
-			writer.writeStartElement("subFolder");
-			writer.writeAttributeString("use", (pathBuilder.useSubfolder() ? "1" : "0"));
+			writer.writeStartElement("subFolder"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (pathBuilder.useSubfolder() ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			writer.writeString(pathBuilder.getSubfolder().replace('\\', '/'));
 			writer.writeEndElement(); // subFolder
-			writer.writeStartElement("extension");
-			writer.writeAttributeString("use", (pathBuilder.useExtension() ? "1" : "0"));
-			writer.writeAttributeString("style", String.format("%d", pathBuilder.getExtensionType()));
+			writer.writeStartElement("extension"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (pathBuilder.useExtension() ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			writer.writeAttributeString("style", String.format("%d", pathBuilder.getExtensionType())); //$NON-NLS-1$ //$NON-NLS-2$
 			writer.writeString(pathBuilder.getExtension()); 
 			writer.writeEndElement(); // extension
-			writer.writeStartElement("replace");
-			writer.writeAttributeString("use", (pathBuilder.useReplace() ? "1" : "0"));
-			writer.writeAttributeString("oldText", pathBuilder.getSearch().replace('\\', '/'));
-			writer.writeAttributeString("newText", pathBuilder.getReplace().replace('\\', '/'));
+			writer.writeStartElement("replace"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (pathBuilder.useReplace() ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			writer.writeAttributeString("oldText", pathBuilder.getSearch().replace('\\', '/')); //$NON-NLS-1$
+			writer.writeAttributeString("newText", pathBuilder.getReplace().replace('\\', '/')); //$NON-NLS-1$
 			writer.writeEndElement(); // replace
-			writer.writeStartElement("prefix");
-			writer.writeAttributeString("use", (pathBuilder.usePrefix() ? "1" : "0"));
+			writer.writeStartElement("prefix"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (pathBuilder.usePrefix() ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			writer.writeString(pathBuilder.getPrefix());
 			writer.writeEndElement(); // prefix
-			writer.writeStartElement("suffix");
-			writer.writeAttributeString("use", (pathBuilder.useSuffix() ? "1" : "0"));
+			writer.writeStartElement("suffix"); //$NON-NLS-1$
+			writer.writeAttributeString("use", (pathBuilder.useSuffix() ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			writer.writeString(pathBuilder.getSuffix());
 			writer.writeEndElement(); // suffix
 			writer.writeEndElement(); // output
 
-			writer.writeStartElement("options");
-			writer.writeAttributeString("sourceLanguage", sourceLanguage);
-			writer.writeAttributeString("sourceEncoding", sourceEncoding);
-			writer.writeAttributeString("targetLanguage", targetLanguage);
-			writer.writeAttributeString("targetEncoding", targetEncoding);
+			writer.writeStartElement("options"); //$NON-NLS-1$
+			writer.writeAttributeString("sourceLanguage", sourceLanguage); //$NON-NLS-1$
+			writer.writeAttributeString("sourceEncoding", sourceEncoding); //$NON-NLS-1$
+			writer.writeAttributeString("targetLanguage", targetLanguage); //$NON-NLS-1$
+			writer.writeAttributeString("targetEncoding", targetEncoding); //$NON-NLS-1$
 			writer.writeEndElement(); // options
 			
-			writer.writeStartElement("parametersFolder");
-			writer.writeAttributeString("useCustom", useCustomParamsFolder ? "1" : "0");
+			writer.writeStartElement("parametersFolder"); //$NON-NLS-1$
+			writer.writeAttributeString("useCustom", useCustomParamsFolder ? "1" : "0"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			writer.writeString(customParamsFolder.replace('\\', '/'));
 			writer.writeEndElement(); // parametersFolder
 			
-			writer.writeStartElement("utilities");
-			writer.writeAttributeString("xml:spaces", "preserve");
+			writer.writeStartElement("utilities"); //$NON-NLS-1$
+			writer.writeAttributeString("xml:spaces", "preserve"); //$NON-NLS-1$ //$NON-NLS-2$
 			for ( String utilityID : utilityParams.keySet() ) {
-				writer.writeStartElement("params");
-				writer.writeAttributeString("id", utilityID);
+				writer.writeStartElement("params"); //$NON-NLS-1$
+				writer.writeAttributeString("id", utilityID); //$NON-NLS-1$
 				writer.writeString(utilityParams.get(utilityID));
 				writer.writeEndElement(); // params
 			}
@@ -283,99 +283,99 @@ public class Project {
 			Document doc = Fact.newDocumentBuilder().parse(file);
 			
 			Element rootElem = doc.getDocumentElement();
-			String tmp = rootElem.getAttribute("version");
-			if ( !tmp.equals("4") ) {
-				throw new Exception("Unsupported version of the project file.");
+			String tmp = rootElem.getAttribute("version"); //$NON-NLS-1$
+			if ( !tmp.equals("4") ) { //$NON-NLS-1$
+				throw new Exception(Res.getString("Project.unsupportedVersion")); //$NON-NLS-1$
 			}
 
 			Element elem1;
 			Element elem2;
-			NodeList n1 = rootElem.getElementsByTagName("fileSet");
+			NodeList n1 = rootElem.getElementsByTagName("fileSet"); //$NON-NLS-1$
 			for ( int i=0; i<n1.getLength(); i++ ) {
 				elem1 = (Element)n1.item(i);
 
-				elem2 = getFirstElement(elem1, "root");
-				if ( elem2 == null ) throw new Exception("Element <root> missing.");
+				elem2 = getFirstElement(elem1, "root"); //$NON-NLS-1$
+				if ( elem2 == null ) throw new Exception(Res.getString("Project.rootMissing")); //$NON-NLS-1$
 				// Use !=='0' for backward compatibility: empty value will == custom
-				useCustomInputRoots.set(i, !elem2.getAttribute("useCustom").equals("0"));
+				useCustomInputRoots.set(i, !elem2.getAttribute("useCustom").equals("0")); //$NON-NLS-1$ //$NON-NLS-2$
 				inputRoots.set(i, Util.getTextContent(elem2).replace('/', File.separatorChar));
 
-				NodeList n2 = elem1.getElementsByTagName("fi");
+				NodeList n2 = elem1.getElementsByTagName("fi"); //$NON-NLS-1$
 				Input item;
 				for ( int j=0; j<n2.getLength(); j++ ) {
 					elem2 = (Element)n2.item(j);
 					item = new Input();
-					item.filterSettings = elem2.getAttribute("fs");
-					item.format = elem2.getAttribute("fo");
-					item.sourceEncoding = elem2.getAttribute("se");
-					item.targetEncoding = elem2.getAttribute("te");
+					item.filterSettings = elem2.getAttribute("fs"); //$NON-NLS-1$
+					item.format = elem2.getAttribute("fo"); //$NON-NLS-1$
+					item.sourceEncoding = elem2.getAttribute("se"); //$NON-NLS-1$
+					item.targetEncoding = elem2.getAttribute("te"); //$NON-NLS-1$
 					item.relativePath = Util.getTextContent(elem2).replace('/', File.separatorChar);
 					inputLists.get(i).add(item);
 				}
 			}
 
-			elem1 = getFirstElement(rootElem, "output");
-			if ( elem1 == null ) throw new Exception("Element <output> missing.");
+			elem1 = getFirstElement(rootElem, "output"); //$NON-NLS-1$
+			if ( elem1 == null ) throw new Exception(Res.getString("Project.outputMissing")); //$NON-NLS-1$
 			
-			elem2 = getFirstElement(elem1, "root");
+			elem2 = getFirstElement(elem1, "root"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				useOutputRoot = elem2.getAttribute("use").equals("1");
+				useOutputRoot = elem2.getAttribute("use").equals("1"); //$NON-NLS-1$ //$NON-NLS-2$
 				outputRoot = Util.getTextContent(elem2).replace('/', File.separatorChar);
 			}
 			
-			elem2 = getFirstElement(elem1, "subFolder");
+			elem2 = getFirstElement(elem1, "subFolder"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				pathBuilder.setUseSubfolder(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setUseSubfolder(elem2.getAttribute("use").equals("1")); //$NON-NLS-1$ //$NON-NLS-2$
 				pathBuilder.setSubfolder(Util.getTextContent(elem2).replace('/', File.separatorChar));
 			}
 			
-			elem2 = getFirstElement(elem1, "extension");
+			elem2 = getFirstElement(elem1, "extension"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				pathBuilder.setUseExtension(elem2.getAttribute("use").equals("1"));
-				int n = Integer.valueOf(elem2.getAttribute("style"));
+				pathBuilder.setUseExtension(elem2.getAttribute("use").equals("1")); //$NON-NLS-1$ //$NON-NLS-2$
+				int n = Integer.valueOf(elem2.getAttribute("style")); //$NON-NLS-1$
 				if (( n < 0 ) || ( n > 2 )) n = 2; // Sanity check
 				pathBuilder.setExtensionType(n);
 				pathBuilder.setExtension(Util.getTextContent(elem2));
 			}
 
-			elem2 = getFirstElement(elem1, "replace");
+			elem2 = getFirstElement(elem1, "replace"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				pathBuilder.setUseReplace(elem2.getAttribute("use").equals("1"));
-				pathBuilder.setSearch(elem2.getAttribute("oldText").replace('/', File.separatorChar));
-				pathBuilder.setReplace(elem2.getAttribute("newText").replace('/', File.separatorChar));
+				pathBuilder.setUseReplace(elem2.getAttribute("use").equals("1")); //$NON-NLS-1$ //$NON-NLS-2$
+				pathBuilder.setSearch(elem2.getAttribute("oldText").replace('/', File.separatorChar)); //$NON-NLS-1$
+				pathBuilder.setReplace(elem2.getAttribute("newText").replace('/', File.separatorChar)); //$NON-NLS-1$
 			}
 
-			elem2 = getFirstElement(elem1, "prefix");
+			elem2 = getFirstElement(elem1, "prefix"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				pathBuilder.setUsePrefix(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setUsePrefix(elem2.getAttribute("use").equals("1")); //$NON-NLS-1$ //$NON-NLS-2$
 				pathBuilder.setPrefix(Util.getTextContent(elem2));
 			}
 
-			elem2 = getFirstElement(elem1, "suffix");
+			elem2 = getFirstElement(elem1, "suffix"); //$NON-NLS-1$
 			if ( elem2 != null ) {
-				pathBuilder.setUseSuffix(elem2.getAttribute("use").equals("1"));
+				pathBuilder.setUseSuffix(elem2.getAttribute("use").equals("1")); //$NON-NLS-1$ //$NON-NLS-2$
 				pathBuilder.setSuffix(Util.getTextContent(elem2));
 			}
 
-			elem1 = getFirstElement(rootElem, "options");
-			if ( elem1 == null ) throw new Exception("Element <options> missing.");
-			sourceLanguage = elem1.getAttribute("sourceLanguage");
-			targetLanguage = elem1.getAttribute("targetLanguage");
-			sourceEncoding = elem1.getAttribute("sourceEncoding");
-			targetEncoding = elem1.getAttribute("targetEncoding");
+			elem1 = getFirstElement(rootElem, "options"); //$NON-NLS-1$
+			if ( elem1 == null ) throw new Exception(Res.getString("Project.optionsMissing")); //$NON-NLS-1$
+			sourceLanguage = elem1.getAttribute("sourceLanguage"); //$NON-NLS-1$
+			targetLanguage = elem1.getAttribute("targetLanguage"); //$NON-NLS-1$
+			sourceEncoding = elem1.getAttribute("sourceEncoding"); //$NON-NLS-1$
+			targetEncoding = elem1.getAttribute("targetEncoding"); //$NON-NLS-1$
 			
-			elem1 = getFirstElement(rootElem, "parametersFolder");
-			if ( elem1 == null ) throw new Exception("Element <parametersFolder> missing.");
-			useCustomParamsFolder = elem1.getAttribute("useCustom").equals("1");
+			elem1 = getFirstElement(rootElem, "parametersFolder"); //$NON-NLS-1$
+			if ( elem1 == null ) throw new Exception(Res.getString("Project.paramFolderMissing")); //$NON-NLS-1$
+			useCustomParamsFolder = elem1.getAttribute("useCustom").equals("1"); //$NON-NLS-1$ //$NON-NLS-2$
 			customParamsFolder = Util.getTextContent(elem1).replace('/', File.separatorChar);
 			
 			// Parameters for the utilities
-			elem1 = getFirstElement(rootElem, "utilities");
+			elem1 = getFirstElement(rootElem, "utilities"); //$NON-NLS-1$
 			if ( elem1 != null ) {
-				n1 = rootElem.getElementsByTagName("params");
+				n1 = rootElem.getElementsByTagName("params"); //$NON-NLS-1$
 				for ( int i=0; i<n1.getLength(); i++ ) {
 					elem2 = (Element)n1.item(i);
-					utilityParams.put(elem2.getAttribute("id"), Util.getTextContent(elem2));
+					utilityParams.put(elem2.getAttribute("id"), Util.getTextContent(elem2)); //$NON-NLS-1$
 				}
 			}
 
@@ -425,18 +425,18 @@ public class Project {
 		}
 		// Else: use the same folder as the project
 		if ( path == null ) {
-			return System.getProperty("user.home");
+			return System.getProperty("user.home"); //$NON-NLS-1$
 		}
 		return Util.getDirectoryName(path);
 	}
 	
 	public String getInputRootDisplay (int listIndex) {
 		if ( useCustomInputRoots.get(listIndex) ) {
-			return "<Custom>:  " + inputRoots.get(listIndex);
+			return Res.getString("Project.customPrefix") + inputRoots.get(listIndex); //$NON-NLS-1$
 		}
 		// Else: use the same folder as the project
-		return "<Auto>:  " + ((path == null)
-			? System.getProperty("user.home")
+		return Res.getString("Project.autoPrefix") + ((path == null) //$NON-NLS-1$
+			? System.getProperty("user.home") //$NON-NLS-1$
 			: Util.getDirectoryName(path));
 	}
 	
@@ -542,13 +542,13 @@ public class Project {
 		if ( useCustom ) return customParamsFolder;
 		// Else: use the same folder as the project
 		String prjFolder = path;
-		String folder = "";
+		String folder = ""; //$NON-NLS-1$
 		if ( prjFolder == null ) {
-			if ( displayMode ) folder = "<Auto>:  ";
-			folder += System.getProperty("user.home");
+			if ( displayMode ) folder = Res.getString("Project.autoPrefix"); //$NON-NLS-1$
+			folder += System.getProperty("user.home"); //$NON-NLS-1$
 		}
 		else {
-			if ( displayMode ) folder = "<Auto>:  ";			
+			if ( displayMode ) folder = Res.getString("Project.autoPrefix");			 //$NON-NLS-1$
 			folder += Util.getDirectoryName(prjFolder);
 		}
 		return folder;
@@ -613,7 +613,7 @@ public class Project {
 	}
 	
 	public String getUtilityParameters (String utilityID) {
-		if ( !utilityParams.containsKey(utilityID) ) return "";
+		if ( !utilityParams.containsKey(utilityID) ) return ""; //$NON-NLS-1$
 		else return utilityParams.get(utilityID);
 	}
 	
@@ -637,7 +637,7 @@ public class Project {
 	}
 	
 	public String getProjectFolder () {
-		if ( path == null ) return System.getProperty("user.home"); 
+		if ( path == null ) return System.getProperty("user.home");  //$NON-NLS-1$
 		else return Util.getDirectoryName(path);
 	}
 

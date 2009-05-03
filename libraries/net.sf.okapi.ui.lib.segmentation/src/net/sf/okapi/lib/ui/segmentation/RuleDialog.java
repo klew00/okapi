@@ -101,13 +101,13 @@ public class RuleDialog {
 		rdNoBreak.setSelection(!rule.isBreak());
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Comments:");
+		label.setText(Res.getString("RuleDialog.comments")); //$NON-NLS-1$
 
 		edComments = new Text(cmpTmp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 60;
 		edComments.setLayoutData(gdTmp);
-		edComments.setText(rule.getComment()==null ? "" : rule.getComment());
+		edComments.setText(rule.getComment()==null ? "" : rule.getComment()); //$NON-NLS-1$
 
 		//--- Dialog-level buttons
 

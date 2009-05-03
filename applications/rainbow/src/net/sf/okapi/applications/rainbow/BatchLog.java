@@ -96,7 +96,7 @@ public class BatchLog implements ILog {
 	}
 
 	public boolean newLine () {
-		System.out.println("");
+		System.out.println(""); //$NON-NLS-1$
 		return false;
 	}
 
@@ -120,11 +120,11 @@ public class BatchLog implements ILog {
 	{
 		switch ( p_nType ) {
 		case LogType.ERROR:
-			System.out.println("ERROR: "+p_sValue);
+			System.out.println(Res.getString("BatchLog.error")+p_sValue); //$NON-NLS-1$
 			errCount++;
 			break;
 		case LogType.WARNING:
-			System.out.println("WARNING: "+p_sValue);
+			System.out.println(Res.getString("BatchLog.warning")+p_sValue); //$NON-NLS-1$
 			warnCount++;
 			break;
 		case LogType.MESSAGE:

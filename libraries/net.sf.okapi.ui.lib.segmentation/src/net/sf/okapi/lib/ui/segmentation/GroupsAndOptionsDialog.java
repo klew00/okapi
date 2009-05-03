@@ -121,7 +121,7 @@ public class GroupsAndOptionsDialog {
 		chkOneSegmentIncludesAll.setText(Res.getString("options.includeAllInOne")); //$NON-NLS-1$
 
 		Label label = new Label(grpTmp, SWT.NONE);
-		label.setText("Header comments:");
+		label.setText(Res.getString("GroupsAndOptionsDialog.headerComments")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
@@ -277,7 +277,7 @@ public class GroupsAndOptionsDialog {
 		// === Document comment
 		
 		grpTmp = new Group(shell, SWT.NONE);
-		grpTmp.setText("Document comments");
+		grpTmp.setText(Res.getString("GroupsAndOptionsDialog.docComments")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		grpTmp.setLayoutData(gdTmp);
@@ -349,9 +349,9 @@ public class GroupsAndOptionsDialog {
 		chkTrimLeadingWS.setSelection(srxDoc.trimLeadingWhitespaces());
 		chkTrimTrailingWS.setSelection(srxDoc.trimTrailingWhitespaces());
 		String tmp = srxDoc.getHeaderComments();
-		edHeaderComments.setText(tmp==null ? "" : tmp);
+		edHeaderComments.setText(tmp==null ? "" : tmp); //$NON-NLS-1$
 		tmp = srxDoc.getComments();
-		edDocComments.setText(tmp==null ? "" : tmp);
+		edDocComments.setText(tmp==null ? "" : tmp); //$NON-NLS-1$
 	}
 	
 	private void getOptions () {
@@ -364,9 +364,9 @@ public class GroupsAndOptionsDialog {
 		srxDoc.setTrimLeadingWhitespaces(chkTrimLeadingWS.getSelection());
 		srxDoc.setTrimTrailingWhitespaces(chkTrimTrailingWS.getSelection());
 		String tmp = edHeaderComments.getText();
-		srxDoc.setHeaderComments(tmp.replace("\r\n", "\n"));
+		srxDoc.setHeaderComments(tmp.replace("\r\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 		tmp = edDocComments.getText();
-		srxDoc.setComments(tmp.replace("\r\n", "\n"));
+		srxDoc.setComments(tmp.replace("\r\n", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	private void updateRulesButtons () {

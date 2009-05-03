@@ -89,7 +89,7 @@ public class UtilityDriver implements CancelListener {
 		try {
 			prj = project;
 			if ( !plugins.containsID(utilityName) )
-				throw new RuntimeException("Utility not found: "+utilityName);
+				throw new RuntimeException(Res.getString("UtilityDriver.utilityNotFound")+utilityName); //$NON-NLS-1$
 			pluginItem = plugins.getItem(utilityName);
 			utility = (IUtility)Class.forName(pluginItem.pluginClass).newInstance();
 			// Feedback event handling
@@ -135,7 +135,7 @@ public class UtilityDriver implements CancelListener {
 			}
 			else {
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-				dlg.setMessage(String.format("You are about to execute the utility: %s\nDo you want to proceed?",
+				dlg.setMessage(String.format(Res.getString("UtilityDriver.confirmExecution"), //$NON-NLS-1$
 					pluginItem.name));
 				dlg.setText(Util.getNameInCaption(shell.getText()));
 				if ( dlg.open() != SWT.YES ) return false;
@@ -155,7 +155,7 @@ public class UtilityDriver implements CancelListener {
 
 			// Set the run-time parameters
 			utility.setFilterAccess(fa, prj.getParametersFolder());
-			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"),
+			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"), //$NON-NLS-1$ //$NON-NLS-2$
 				prj.getProjectFolder(), canPrompt);
 			if ( utility.needsRoots() ) {
 				utility.setRoots(prj.getInputRoot(0), prj.buildOutputRoot(0));
@@ -167,14 +167,14 @@ public class UtilityDriver implements CancelListener {
 			
 			// Last check to warning for empty list
 			if ( prj.getList(0).size() == 0 ) {
-				log.warning("There is no input document.");
+				log.warning(Res.getString("UtilityDriver.noInput")); //$NON-NLS-1$
 			}
 
 			// Process each input file
 			int f = -1;
 			for ( Input item : prj.getList(0) ) {
 				f++;
-				log.message("\n-- Input: "+item.relativePath);
+				log.message(Res.getString("UtilityDriver.input")+item.relativePath); //$NON-NLS-1$
 
 				// Initialize the main input
 				utility.resetLists();
@@ -224,14 +224,14 @@ public class UtilityDriver implements CancelListener {
 		catch ( Throwable e ) {
 			if ( filter != null ) filter.close();
 			if ( utility != null ) utility.postprocess();
-			logger.log(Level.SEVERE, "Error with utility.", e);
+			logger.log(Level.SEVERE, Res.getString("UtilityDriver.utilityError"), e); //$NON-NLS-1$
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			logger.info(sw.toString());
 		}
 		finally {
 			if ( stopProcess ) {
-				logger.warning("Process interrupted by user.");
+				logger.warning(Res.getString("UtilityDriver.userCancel")); //$NON-NLS-1$
 			}
 			if ( utility != null ) {
 				outputFolder = utility.getFolderAfterProcess();
