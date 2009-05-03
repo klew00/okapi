@@ -55,6 +55,7 @@ public class FilterTestDriver {
 		}
 		IResource mr = manual.getResource();
 		IResource gr = generated.getResource();
+
 		if (mr != null && gr != null && mr.getSkeleton() != null && gr.getSkeleton() != null) {
 			if (!(mr.getSkeleton().toString().equals(gr.getSkeleton().toString()))) {
 				return false;
@@ -71,34 +72,105 @@ public class FilterTestDriver {
 			if (mdp.isTranslatable() != gdp.isTranslatable()) {
 				return false;
 			}
-			if (!(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames()))) {
+			if ( !(mdp.getPropertyNames().equals(gdp.getPropertyNames())) ) {
 				return false;
 			}
-
-			for (String propName : gdp.getSourcePropertyNames()) {
+			for ( String propName : gdp.getPropertyNames() ) {
+				Property gdpProp = gdp.getProperty(propName);
+				Property mdpProp = mdp.getProperty(propName);
+				if ( gdpProp.isReadOnly() != mdpProp.isReadOnly() ) {
+					return false;
+				}
+				if ( !gdpProp.getValue().equals(mdpProp.getValue()) ) {
+					return false;
+				}
+			}
+			
+			if ( !(mdp.getSourcePropertyNames().equals(gdp.getSourcePropertyNames())) ) {
+				return false;
+			}
+			for ( String propName : gdp.getSourcePropertyNames() ) {
 				Property gdpProp = gdp.getSourceProperty(propName);
 				Property mdpProp = mdp.getSourceProperty(propName);
-				if (gdpProp.isReadOnly() != mdpProp.isReadOnly()) {
+				if ( gdpProp.isReadOnly() != mdpProp.isReadOnly() ) {
+					return false;
+				}
+				if ( !gdpProp.getValue().equals(mdpProp.getValue()) ) {
 					return false;
 				}
 			}
 			break;
+			
 		case TEXT_UNIT:
 			TextUnit mtu = (TextUnit) mr;
 			TextUnit gtu = (TextUnit) gr;
 
-			if (mtu.preserveWhitespaces() != gtu.preserveWhitespaces()) {
+			// Resource-level properties
+			if ( !(mtu.getPropertyNames().equals(gtu.getPropertyNames())) ) {
 				return false;
 			}
-
-			if (!(mtu.toString().equals(gtu.toString()))) {
+			for ( String propName : gtu.getPropertyNames() ) {
+				Property gtuProp = gtu.getProperty(propName);
+				Property mtuProp = mtu.getProperty(propName);
+				if ( gtuProp.isReadOnly() != mtuProp.isReadOnly() ) {
+					return false;
+				}
+				if ( !gtuProp.getValue().equals(mtuProp.getValue()) ) {
+					return false;
+				}
+			}
+			
+			// Source properties
+			if ( !(mtu.getSourcePropertyNames().equals(gtu.getSourcePropertyNames())) ) {
 				return false;
 			}
-
-			if (mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size()) {
-				return false;
+			for ( String propName : gtu.getSourcePropertyNames() ) {
+				Property gtuProp = gtu.getSourceProperty(propName);
+				Property mtuProp = mtu.getSourceProperty(propName);
+				if ( gtuProp.isReadOnly() != mtuProp.isReadOnly() ) {
+					return false;
+				}
+				if ( !gtuProp.getValue().equals(mtuProp.getValue()) ) {
+					return false;
+				}
 			}
 
+			String tmp = mtu.getName();
+			if ( tmp == null ) {
+				if ( gtu.getName() != null ) {
+					return false;
+				}
+			}
+			else if ( tmp.equals(gtu.getName()) ) {
+				return false;
+			}
+			
+			tmp = mtu.getType();
+			if ( tmp == null ) {
+				if ( gtu.getType() != null ) {
+					return false;
+				}
+			}
+			else if ( tmp.equals(gtu.getType()) ) {
+				return false;
+			}
+			
+			if (mtu.isTranslatable() != gtu.isTranslatable()) {
+				return false;
+			}
+			if ( mtu.isReferent() != gtu.isReferent() ) {
+				return false;
+			}
+			if ( mtu.preserveWhitespaces() != gtu.preserveWhitespaces() ) {
+				return false;
+			}
+			if ( !(mtu.toString().equals(gtu.toString())) ) {
+				return false;
+			}
+			
+			if ( mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size() ) {
+				return false;
+			}
 			int i = -1;
 			for (Code c : mtu.getSource().getCodes()) {
 				i++;
@@ -108,7 +180,6 @@ public class FilterTestDriver {
 					}
 				}
 			}
-
 			break;
 		}
 

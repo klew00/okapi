@@ -36,6 +36,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -107,7 +108,7 @@ public class XMLFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return "text/xml";
+		return MimeTypeMapper.XML_MIME_TYPE;
 	}
 
 	public IParameters getParameters () {
@@ -294,8 +295,8 @@ public class XMLFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
-		startDoc.setType("text/xml");
-		startDoc.setMimeType("text/xml");
+		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
+		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 
 		// Add the XML declaration
 		skel = new GenericSkeleton();
@@ -503,7 +504,7 @@ public class XMLFilter implements IFilter {
 		boolean addToSkeleton)
 	{
 		String id = String.valueOf(++tuId);
-		TextUnit tu = new TextUnit(id, attr.getValue(), true, "text/xml");
+		TextUnit tu = new TextUnit(id, attr.getValue(), true, MimeTypeMapper.XML_MIME_TYPE);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
@@ -628,7 +629,7 @@ public class XMLFilter implements IFilter {
 		}
 		// Create the unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
-		tu.setMimeType("text/xml");
+		tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		tu.setSourceContent(frag);
 
 		String locNote = context.peek().locNote;

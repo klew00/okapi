@@ -45,7 +45,7 @@ public class EncoderManager implements IEncoder {
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
 		// Default mapping
-		mimeMap.put("text/xml", "net.sf.okapi.common.encoder.XMLEncoder");
+		mimeMap.put(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
 		mimeMap.put("text/x-odf", "net.sf.okapi.common.encoder.XMLEncoder");
 		mimeMap.put(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
 		mimeMap.put(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");

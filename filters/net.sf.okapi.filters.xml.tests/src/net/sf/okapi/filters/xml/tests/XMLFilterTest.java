@@ -22,51 +22,31 @@ package net.sf.okapi.filters.xml.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 import net.sf.okapi.filters.xml.XMLFilter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class XMLFilterTest {
 
-	private XMLFilter xmlFilter;
+	private XMLFilter filter;
 
 	@Before
 	public void setUp() {
-		xmlFilter = new XMLFilter();
-	}
-
-	@Test
-	public void testExternalFile () {
-		FilterTestDriver testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(0);
-		testDriver.setShowSkeleton(true);
-		XMLFilter filter = null;		
-		try {
-			filter = new XMLFilter();
-			URL url = XMLFilterTest.class.getResource("/Translate1.xml");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-16", "en", "es"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+		filter = new XMLFilter();
 	}
 
 	@Test
@@ -193,13 +173,42 @@ public class XMLFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		xmlFilter.open(new RawDocument(snippet, "en"));
-		while (xmlFilter.hasNext()) {
-			Event event = xmlFilter.next();
+		filter.open(new RawDocument(snippet, "en"));
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
 			list.add(event);
 		}
-		xmlFilter.close();
+		filter.close();
 		return list;
+	}
+
+	@Test
+	public void testDoubleExtraction () throws URISyntaxException {
+		// Read all files in the data directory
+		URL url = XMLFilterTest.class.getResource("/test01.xml");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"test01.xml", null));
+		list.add(new InputDocument(root+"test02.xml", null));
+		list.add(new InputDocument(root+"test03.xml", null));
+		list.add(new InputDocument(root+"test04.xml", null));
+		list.add(new InputDocument(root+"test05.xml", null));
+		list.add(new InputDocument(root+"test06.xml", null));
+		list.add(new InputDocument(root+"LocNote-1.xml", null));
+		list.add(new InputDocument(root+"LocNote-2.xml", null));
+		list.add(new InputDocument(root+"LocNote-3.xml", null));
+		list.add(new InputDocument(root+"LocNote-4.xml", null));
+		list.add(new InputDocument(root+"LocNote-5.xml", null));
+		list.add(new InputDocument(root+"LocNote-6.xml", null));
+		list.add(new InputDocument(root+"Androidtest1.xml", "okf_xml@AndroidStrings.fprm"));
+		list.add(new InputDocument(root+"Androidtest2.xml", "okf_xml@AndroidStrings.fprm"));
+		list.add(new InputDocument(root+"JavaProperties.xml", "okf_xml@JavaProperties.fprm"));
+		list.add(new InputDocument(root+"TestMultiLang.xml", null));
+
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
 	}
 
 }
