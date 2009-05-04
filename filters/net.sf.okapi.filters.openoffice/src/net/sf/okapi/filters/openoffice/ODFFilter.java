@@ -93,6 +93,7 @@ public class ODFFilter implements IFilter {
 	private boolean canceled;
 	private boolean hasNext;
 	private Stack<Context> context;
+	private String lineBreak = "\n";
 
 	public ODFFilter () {
 		toExtract = new Hashtable<String, ElementRule>();
@@ -216,7 +217,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setType(startDoc.getMimeType());
 			startDoc.setEncoding("UTF-8", false);
-			startDoc.setLineBreak("\n");
+			startDoc.setLineBreak(lineBreak);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 			hasNext = true;
 		}
@@ -576,11 +577,11 @@ public class ODFFilter implements IFilter {
 */	
 	private void addTU (String name) {
 		// Send a document part if there is no content
-		// But if it's in nested context, the parent is already refering to tu, and
+		// But if it's in nested context, the parent is already referring to tu, and
 		// changing that reference to dp is hard, so we just send an empty tu
 		if ( tf.isEmpty() && ( context.size() < 3 )) {
 			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-			skel.append(buildEndTag(name)+"\n");
+			skel.append(buildEndTag(name)+lineBreak);
 			dp.setSkeleton(skel);
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
@@ -596,7 +597,8 @@ public class ODFFilter implements IFilter {
 			// Add closing tag to the fragment or skeleton
 			// Add line break because ODF files don't have any
 			// They are needed for example in RTF output
-			skel.append(buildEndTag(name)+"\n");
+			if ( tu.isReferent() ) skel.append(buildEndTag(name));
+			else skel.append(buildEndTag(name)+lineBreak);
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}
 	}
@@ -636,7 +638,7 @@ public class ODFFilter implements IFilter {
 					|| ( name.equals("draw:frame"))
 					|| ( name.equals("text:list"))
 					|| ( name.equals("text:list-item")) ) {
-					skel.append("\n");
+					skel.append(lineBreak);
 				}
 			}
 		}
@@ -667,4 +669,5 @@ public class ODFFilter implements IFilter {
 		}
 		
 	}
+
 }

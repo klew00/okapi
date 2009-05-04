@@ -20,35 +20,42 @@
 
 package net.sf.okapi.filters.openoffice.tests;
 
-import java.net.URI;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
-import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class OpenOfficeFilterTest {
 
+	private OpenOfficeFilter filter;
+
+	@Before
+	public void setUp() {
+		filter = new OpenOfficeFilter();
+	}
+
 	@Test
-	public void runTest () {
-		FilterTestDriver testDriver = new FilterTestDriver();
-		OpenOfficeFilter filter = null;		
-		try {
-			filter = new OpenOfficeFilter();
-			URL url = OpenOfficeFilterTest.class.getResource("/TestDocument01.odt");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testDoubleExtraction () throws URISyntaxException {
+		// Read all files in the data directory
+		URL url = OpenOfficeFilterTest.class.getResource("/TestDocument01.odt");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"TestDocument01.odt", null));
+//		list.add(new InputDocument(root+"TestDocument02.odt", null));
+//TODO: Implement roundTrip to output dir
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
 	}
 
 }

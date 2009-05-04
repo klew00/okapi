@@ -571,9 +571,6 @@ public class FilterTestDriver {
 		if ( tu1.preserveWhitespaces() != tu2.preserveWhitespaces() ) {
 			return false;
 		}
-		if ( !(tu1.toString().equals(tu2.toString())) ) {
-			return false;
-		}
 		if ( !compareTextContainer(tu1.getSource(), tu2.getSource()) ) {
 			return false;
 		}
@@ -876,6 +873,10 @@ public class FilterTestDriver {
 		}
 		
 		// Coded text
-		return tf1.getCodedText().equals(tf2.getCodedText());
+		if ( !tf1.getCodedText().equals(tf2.getCodedText()) ) {
+			System.err.println("Coded text difference:\n1=\""+tf1.getCodedText()+"\"\n2=\""+tf2.getCodedText()+"\"");
+			return false;
+		}
+		return true;
 	}
 }

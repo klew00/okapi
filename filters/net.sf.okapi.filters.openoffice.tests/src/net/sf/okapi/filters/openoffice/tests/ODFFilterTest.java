@@ -20,61 +20,46 @@
 
 package net.sf.okapi.filters.openoffice.tests;
 
-import java.net.URI;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.openoffice.ODFFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ODFFilterTest {
 	
-	@Test
-	public void runTest () {
-		ODFFilter filter = null;		
-		try {
-			FilterTestDriver testDriver = new FilterTestDriver();
-			testDriver.setShowSkeleton(true);
-			testDriver.setDisplayLevel(0);
-			filter = new ODFFilter();
-			URL url = ODFFilterTest.class.getResource("/ODFTest_footnote.xml");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
+	private ODFFilter filter;
 
-			// Test a simple re-write
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
-			rewrite(filter);
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	@Before
+	public void setUp() {
+		filter = new ODFFilter();
 	}
-	
-	private void rewrite (IFilter filter) {
-		GenericFilterWriter writer = null;
-		try {
-			writer = new GenericFilterWriter(filter.createSkeletonWriter());
-			writer.setOptions("FR", "UTF-8");
-			writer.setOutput("ODFTest_footnote.out.xml");
-			while ( filter.hasNext() ) {
-				writer.handleEvent(filter.next());
-			}
-		}
-		finally {
-			if ( writer != null ) writer.close();
-		}
+
+	@Test
+	public void testDoubleExtraction () throws URISyntaxException {
+		// Read all files in the data directory
+		URL url = OpenOfficeFilterTest.class.getResource("/TestDocument01.odt_content.xml");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"TestDocument01.odt_content.xml", null));
+		list.add(new InputDocument(root+"TestDocument01.odt_meta.xml", null));
+		list.add(new InputDocument(root+"TestDocument01.odt_styles.xml", null));
+		list.add(new InputDocument(root+"TestDocument02.odt_content.xml", null));
+		list.add(new InputDocument(root+"ODFTest_footnote.xml", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
 	}
-	
+
+
 }
