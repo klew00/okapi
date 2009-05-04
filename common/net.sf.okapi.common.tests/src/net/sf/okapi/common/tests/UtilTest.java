@@ -1,21 +1,54 @@
+/*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.common.tests;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import static org.junit.Assert.*;
 
 public class UtilTest {
 	
 	private CharsetEncoder chsEnc;
+	private DocumentBuilderFactory docBuilderFact;
 	
 	@Before
 	public void setUp() throws Exception {
+		docBuilderFact = DocumentBuilderFactory.newInstance();
+		docBuilderFact.setValidating(false);
 		chsEnc = Charset.forName("iso-8859-1").newEncoder();
 	}
 
@@ -188,5 +221,45 @@ public class UtilTest {
 		assertTrue(Util.isSameLanguage("abc-xyz", "abc-QWE", true));
 		assertFalse(Util.isSameLanguage("abc-xyz", "iop-QWE", true));
 	}
+
+	@Test
+	public void testGetTextContent_Simple () {
+		Document doc = createXMLdocument("<d>\n\nText</d>");
+		Element elem = doc.getDocumentElement();
+		assertEquals("\n\nText", Util.getTextContent(elem));
+	}
 	
+	@Test
+	public void testGetTextContent_WithComment () {
+		Document doc = createXMLdocument("<d><!--comment-->Text</d>");
+		Element elem = doc.getDocumentElement();
+		assertEquals("Text", Util.getTextContent(elem));
+	}
+	
+	@Test
+	public void testGetTextContent_Empty () {
+		Document doc = createXMLdocument("<d/>");
+		Element elem = doc.getDocumentElement();
+		assertEquals("", Util.getTextContent(elem));
+	}
+	
+	private Document createXMLdocument (String data) {
+		InputSource input = new InputSource(new StringReader(data));
+		Document doc = null;
+		try {
+			doc = docBuilderFact.newDocumentBuilder().parse(input);
+		}
+		catch ( SAXException e ) {
+			e.printStackTrace();
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+		}
+		catch ( ParserConfigurationException e ) {
+			e.printStackTrace();
+		}
+		assertNotNull(doc);
+		return doc;
+	}
+
 }

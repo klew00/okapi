@@ -792,18 +792,23 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	/**
-	 * Gets the content of a simple element. This is to work around the implementation issue of 
-	 * node.gettextContent() in some VM of the Macintosh.
-	 * @param node The element node to process.
-	 * @return The content of the element.
+	 * Gets the text content of the first TEXT child of an element node.
+	 * This is to use instead of node.getTextContent() which does not work with some
+	 * Macintosh Java VMs. Note this work-around get <b>only the first TEXT node</b>.
+	 * @param node the container element.
+	 * @return the text of the first TEXT child node.
 	 */
-	private String getTextContent (Node node) {
-		//TODO: take in account non-text nodes before the first one (e.g. comments)
-		Node n = node.getFirstChild();
-		if ( n == null ) return "";
-		return n.getNodeValue();
+	public static String getTextContent (Node node) {
+		Node tmp = node.getFirstChild();
+		while ( true ) {
+			if ( tmp == null ) return "";
+			if ( tmp.getNodeType() == Node.TEXT_NODE ) {
+				return tmp.getNodeValue();
+			}
+			tmp = tmp.getNextSibling();
+		}
 	}
-	
+
 	private String resolvePointer (Node node,
 		String pointer)
 	{

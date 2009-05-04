@@ -625,17 +625,21 @@ public class Util {
 	}
 	
 	/**
-	 * Gets the text content of the first child of an element node.
+	 * Gets the text content of the first TEXT child of an element node.
 	 * This is to use instead of node.getTextContent() which does not work with some
-	 * MacIntosh Java VMs.
-	 * @param node The container element.
-	 * @return The text of the first child node.
+	 * Macintosh Java VMs. Note this work-around get <b>only the first TEXT node</b>.
+	 * @param node the container element.
+	 * @return the text of the first TEXT child node.
 	 */
 	public static String getTextContent (Node node) {
-		//TODO: take in account non-text nodes before the first one (e.g. comments)
-		Node n = node.getFirstChild();
-		if ( n == null ) return "";
-		return n.getNodeValue();
+		Node tmp = node.getFirstChild();
+		while ( true ) {
+			if ( tmp == null ) return "";
+			if ( tmp.getNodeType() == Node.TEXT_NODE ) {
+				return tmp.getNodeValue();
+			}
+			tmp = tmp.getNextSibling();
+		}
 	}
 
 	/**

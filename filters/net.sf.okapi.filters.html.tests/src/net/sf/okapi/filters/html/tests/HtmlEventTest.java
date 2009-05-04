@@ -156,7 +156,8 @@ public class HtmlEventTest {
 		skel.add("<p ");
 		skel.addReference(tu2);
 		skel.add(" dir='");
-		skel.addValuePlaceholder(tu1, "dir", null);		
+		skel.addValuePlaceholder(tu1, "dir", null);
+		tu1.setSourceProperty(new Property("dir", "rtl", false));
 		skel.add("'>");
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
