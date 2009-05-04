@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.jython"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.pipeline"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
