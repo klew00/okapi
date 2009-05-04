@@ -210,6 +210,7 @@ public class FilterTestDriver {
 		Event generated)
 	{
 		if (generated.getEventType() != manual.getEventType()) {
+			System.err.println("Event type difference");
 			return false;
 		}
 		
@@ -230,6 +231,7 @@ public class FilterTestDriver {
 			
 		case TEXT_UNIT:
 			if ( !compareTextUnit((TextUnit)manual.getResource(), (TextUnit)generated.getResource()) ) {
+				System.err.println("Text unit difference");
 				return false;
 			}
 			break;
@@ -238,18 +240,29 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean compareEvents(ArrayList<Event> manual, ArrayList<Event> generated) {
-		if (manual.size() != generated.size()) {
+	static public boolean compareEvents(ArrayList<Event> list1,
+		ArrayList<Event> list2)
+	{
+		int i = 0;
+		Event event1, event2;
+		while ( i<list1.size() ) {
+			event1 = list1.get(i);
+			if ( i >= list2.size() ) {
+				System.err.println("Less events in second list");
+				return false;
+			}
+			event2 = list2.get(i);
+			if ( !compareEvent(event1, event2) ) {
+				return false;
+			}
+			i++;
+		}
+		
+		if ( list1.size() != list2.size() ) {
+			System.err.println("Less events in first list");
 			return false;
 		}
 
-		Iterator<Event> manualIt = manual.iterator();
-		for (Event ge : generated) {
-			Event me = manualIt.next();
-			if (!compareEvent(me, ge)) {
-				return false;
-			}
-		}
 		return true;
 	}
 	
@@ -562,16 +575,20 @@ public class FilterTestDriver {
 		TextUnit tu2)
 	{
 		if ( !compareINameable(tu1, tu2) ) {
+			System.err.println("Difference in INameable");
 			return false;
 		}
 		if ( tu1.isReferent() != tu2.isReferent() ) {
+			System.err.println("isReferent difference");
 			return false;
 		}
 		// TextUnit tests
 		if ( tu1.preserveWhitespaces() != tu2.preserveWhitespaces() ) {
+			System.err.println("preserveWhitespaces difference");
 			return false;
 		}
 		if ( !compareTextContainer(tu1.getSource(), tu2.getSource()) ) {
+			System.err.println("TextContainer difference");
 			return false;
 		}
 		//TODO: target, but we have to take re-writing of source as target in account
@@ -629,6 +646,7 @@ public class FilterTestDriver {
 		Set<String> names1 = item1.getPropertyNames();
 		Set<String> names2 = item2.getPropertyNames();
 		if ( names1.size() != names2.size() ) {
+			System.err.println("Number of resource-level properties difference");
 			return false;
 		}
 		for ( String name : item1.getPropertyNames() ) {
@@ -643,6 +661,7 @@ public class FilterTestDriver {
 		names1 = item1.getSourcePropertyNames();
 		names2 = item2.getSourcePropertyNames();
 		if ( names1.size() != names2.size() ) {
+			System.err.println("Number of source properties difference");
 			return false;
 		}
 		for ( String name : item1.getSourcePropertyNames() ) {
@@ -660,37 +679,65 @@ public class FilterTestDriver {
 		String tmp1 = item1.getName();
 		String tmp2 = item2.getName();
 		if ( tmp1 == null ) {
-			if ( tmp2 != null ) return false;
+			if ( tmp2 != null ) {
+				System.err.println("Name null difference");
+				return false;
+			}
 		}
 		else {
-			if ( tmp2 == null ) return false;
-			if ( !tmp1.equals(tmp2) ) return false;
+			if ( tmp2 == null ) {
+				System.err.println("Name null difference");
+				return false;
+			}
+			if ( !tmp1.equals(tmp2) ) {
+				System.err.println("Name difference");
+				return false;
+			}
 		}
 		
 		// Type
 		tmp1 = item1.getType();
 		tmp2 = item2.getType();
 		if ( tmp1 == null ) {
-			if ( tmp2 != null ) return false;
+			if ( tmp2 != null ) {
+				System.err.println("Type null difference");
+				return false;
+			}
 		}
 		else {
-			if ( tmp2 == null ) return false;
-			if ( !tmp1.equals(tmp2) ) return false;
+			if ( tmp2 == null ) {
+				System.err.println("Type null difference");
+				return false;
+			}
+			if ( !tmp1.equals(tmp2) ) {
+				System.err.println("Type difference");
+				return false;
+			}
 		}
 		
 		// MIME type
 		tmp1 = item1.getMimeType();
 		tmp2 = item2.getMimeType();
 		if ( tmp1 == null ) {
-			if ( tmp2 != null ) return false;
+			if ( tmp2 != null ) {
+				System.err.println("Mime-type null difference");
+				return false;
+			}
 		}
 		else {
-			if ( tmp2 == null ) return false;
-			if ( !tmp1.equals(tmp2) ) return false;
+			if ( tmp2 == null ) {
+				System.err.println("Mime-type null difference");
+				return false;
+			}
+			if ( !tmp1.equals(tmp2) ) {
+				System.err.println("Mime-type difference");
+				return false;
+			}
 		}
 
 		// Is translatable
 		if ( item1.isTranslatable() != item2.isTranslatable() ) {
+			System.err.println("isTranslatable difference");
 			return false;
 		}
 		
@@ -700,20 +747,38 @@ public class FilterTestDriver {
 	public static boolean compareProperty (Property p1,
 		Property p2)
 	{
-		if ( p1 == null ) return (p2 == null);
-		if ( p2 == null ) return false;
+		if ( p1 == null ) {
+			if ( p2 != null ) {
+				System.err.println("Property name null difference");
+				return false;
+			}
+			return true;
+		}
+		if ( p2 == null ) {
+			System.err.println("Property name null difference");
+			return false;
+		}
+		
 		if ( !p1.getName().equals(p2.getName()) ) {
-			System.err.println("name difference");
+			System.err.println("Property name difference");
 			return false;
 		}
 		if ( p1.isReadOnly() != p2.isReadOnly() ) {
-			System.err.println("isReadOnly difference");
+			System.err.println("Property isReadOnly difference");
 			return false;
 		}
 		if ( p1.getValue() == null ) {
-			return (p2.getValue() == null);
+			if ( p2.getValue() != null ) {
+				System.err.println("Property value null difference");
+				return false;
+			}
+			return true;
 		}
-		return (p1.getValue().equals(p2.getValue()));
+		if ( !p1.getValue().equals(p2.getValue()) ) {
+			System.err.println("Property value difference");
+			return false;
+		}
+		return true;
 	}
 
 	public static boolean compareTextContainer (TextContainer t1,
@@ -755,12 +820,16 @@ public class FilterTestDriver {
 					if ( !seg1.id.equals(seg2.id) ) return false;
 				}
 				if ( !compareTextFragment(seg1.text, seg2.text) ) {
+					System.err.println("Text fragment difference");
 					return false;
 				}
 			}
 		}
 		else {
-			if ( t2.isSegmented() ) return false;
+			if ( t2.isSegmented() ) {
+				System.err.println("Segmentation difference");
+				return false;
+			}
 		}
 		
 		return true;

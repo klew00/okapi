@@ -96,6 +96,54 @@ public class RoundTripComparison {
 		return true;
 	}
 	
+	public boolean executeCompare (IFilter filter,
+		List<InputDocument> inputDocs,
+		String defaultEncoding,
+		String srcLang,
+		String trgLang,
+		String outputDir)
+	{
+		try {
+			this.filter = filter;
+			this.defaultEncoding = defaultEncoding;
+			this.srcLang = srcLang;
+			this.trgLang = trgLang;
+		
+			// Create the filter-writer for the provided filter
+			writer = filter.createFilterWriter();
+		
+			for ( InputDocument doc : inputDocs ) {
+				// Reset the event lists
+				extraction1Events.clear();
+				extraction2Events.clear();
+				// Load parameters if needed
+				if ( doc.paramFile == null ) {
+					IParameters params = filter.getParameters();
+					params.reset();
+				}
+				else {
+					String root = Util.getDirectoryName(doc.path);
+					IParameters params = filter.getParameters();
+					params.load(root+"/"+doc.paramFile, false);
+				}
+				// Execute the first extraction and the re-writing
+				String outPath = executeFirstExtractionToFile(doc, outputDir);
+				// Execute the second extraction from the output of the first
+				executeSecondExtractionFromFile(outPath);
+				// Compare the events
+				if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events) ) {
+					throw new RuntimeException("Events are different for "+doc.path);
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			System.err.println(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+		
+
 	private void executeFirstExtraction (InputDocument doc) throws URISyntaxException {
 		try {
 			// Open the input
@@ -136,6 +184,75 @@ public class RoundTripComparison {
 			// Set the input (from the output of first extraction)
 			String input = new String(writerBuffer.toByteArray(), "UTF-16");
 			filter.open(new RawDocument(input, srcLang, trgLang));
+			
+			// Process the document
+			Event event;
+			while ( filter.hasNext() ) {
+				event = filter.next();
+				switch ( event.getEventType() ) {
+				case START_DOCUMENT:
+				case END_DOCUMENT:
+				case START_SUBDOCUMENT:
+				case END_SUBDOCUMENT:
+				case START_GROUP:
+				case END_GROUP:
+					break;
+				case TEXT_UNIT:
+					extraction2Events.add(event);
+					break;
+				}
+			}
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
+	}
+
+	private String executeFirstExtractionToFile (InputDocument doc,
+		String outputDir) throws URISyntaxException
+	{
+		String outPath = null;
+		try {
+			// Open the input
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLang, trgLang));
+			
+			// Prepare the output
+			writer.setOptions(trgLang, "UTF-8");
+			outPath = Util.getDirectoryName(doc.path);
+			outPath += ("/" + outputDir + "/" + Util.getFilename(doc.path, true));
+			writer.setOutput(outPath);
+			
+			// Process the document
+			Event event;
+			while ( filter.hasNext() ) {
+				event = filter.next();
+				switch ( event.getEventType() ) {
+				case START_DOCUMENT:
+				case END_DOCUMENT:
+				case START_SUBDOCUMENT:
+				case END_SUBDOCUMENT:
+				case START_GROUP:
+				case END_GROUP:
+					break;
+				case TEXT_UNIT:
+					extraction1Events.add(event);
+					break;
+				}
+				writer.handleEvent(event);
+			}
+		}
+		finally {
+			if ( filter != null ) filter.close();
+			if ( writer != null ) writer.close();
+		}
+		return outPath;
+	}
+
+	private void executeSecondExtractionFromFile (String input) throws UnsupportedEncodingException {
+		try {
+			// Set the input (from the output of first extraction)
+			File file = new File(input);
+			filter.open(new RawDocument(file.toURI(), "UTF-8", srcLang, trgLang));
 			
 			// Process the document
 			Event event;

@@ -51,6 +51,7 @@ public class ODFFilterTest {
 		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"TestSpreadsheet01.ods_content.xml", null));
 		list.add(new InputDocument(root+"TestDocument01.odt_content.xml", null));
 		list.add(new InputDocument(root+"TestDocument01.odt_meta.xml", null));
 		list.add(new InputDocument(root+"TestDocument01.odt_styles.xml", null));

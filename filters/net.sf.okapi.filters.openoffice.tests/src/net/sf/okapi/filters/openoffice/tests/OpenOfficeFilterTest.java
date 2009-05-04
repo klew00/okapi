@@ -51,11 +51,15 @@ public class OpenOfficeFilterTest {
 		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"TestDocument01.odt", null));
-//		list.add(new InputDocument(root+"TestDocument02.odt", null));
-//TODO: Implement roundTrip to output dir
+//		list.add(new InputDocument(root+"TestSpreadsheet01.ods", null));
+		list.add(new InputDocument(root+"TestDocument01.odt", null));
+		list.add(new InputDocument(root+"TestDocument02.odt", null));
+		list.add(new InputDocument(root+"TestDocument03.odt", null));
+		list.add(new InputDocument(root+"TestDocument04.odt", null));
+		list.add(new InputDocument(root+"TestDrawing01.odg", null));
+		list.add(new InputDocument(root+"TestPresentation01.odp", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en", "output"));
 	}
 
 }
