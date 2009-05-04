@@ -51,7 +51,7 @@ public class OpenOfficeFilterTest {
 		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"TestSpreadsheet01.ods", null));
+		list.add(new InputDocument(root+"TestSpreadsheet01.ods", null));
 		list.add(new InputDocument(root+"TestDocument01.odt", null));
 		list.add(new InputDocument(root+"TestDocument02.odt", null));
 		list.add(new InputDocument(root+"TestDocument03.odt", null));

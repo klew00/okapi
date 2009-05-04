@@ -462,23 +462,42 @@ public class ODFFilter implements IFilter {
 			if ( context.peek().extract ) {
 				Code code = tf.append(TagType.PLACEHOLDER, name, TextFragment.makeRefMarker(id));
 				code.setReferenceFlag(true);
+				// Create the new text unit
+				tu = new TextUnit(id);
+				// Set it as a referent, and set the info
+				tu.setIsReferent(true);
+				setTUInfo(name);
+				// Create the new fragment and skeleton
+				tf = new TextFragment();
+				// Create the skeleton and add the start tag
+				skel = new GenericSkeleton(buildStartTag(name));
+				// Add the start-tag to the new context 
+				// Set the new variables are the new context
+				context.push(new Context(name, true));
+				context.peek().setVariables(tf, skel, tu);
 			}
 			else { // Or in the skeleton
-				skel.addReference(tu);
+				// Send the exeisting skeleton if needed
+				if ( !skel.isEmpty(true) ) {
+					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+					dp.setSkeleton(skel);
+					queue.add(new Event(EventType.DOCUMENT_PART, dp));
+					skel = new GenericSkeleton(); // Start new skeleton 
+				}
+				// Create the new text unit
+				tu = new TextUnit(id);
+				// Set it as a referent, and set the info
+				//tu.setIsReferent(true);
+				setTUInfo(name);
+				// Create the new fragment and skeleton
+				tf = new TextFragment();
+				// Create the skeleton and add the start tag
+				skel = new GenericSkeleton(buildStartTag(name));
+				// Add the start-tag to the new context 
+				// Set the new variables are the new context
+				context.push(new Context(name, true));
+				context.peek().setVariables(tf, skel, tu);
 			}
-			// Create the new text unit
-			tu = new TextUnit(id);
-			// Set it as a referent, and set the info
-			tu.setIsReferent(true);
-			setTUInfo(name);
-			// Create the new fragment and skeleton
-			tf = new TextFragment();
-			// Create the skeleton and add the start tag
-			skel = new GenericSkeleton(buildStartTag(name));
-			// Add the start-tag to the new context 
-			// Set the new variables are the new context
-			context.push(new Context(name, true));
-			context.peek().setVariables(tf, skel, tu);
 		}
 		else if ( context.peek().extract && name.equals("text:s") ) {
 			String tmp = reader.getAttributeValue(NSURI_TEXT, "c");
