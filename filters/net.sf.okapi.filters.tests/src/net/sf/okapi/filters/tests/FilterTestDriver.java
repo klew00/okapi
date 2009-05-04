@@ -22,6 +22,8 @@ package net.sf.okapi.filters.tests;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -34,8 +36,11 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -48,8 +53,8 @@ public class FilterTestDriver {
 	private int displayLevel = 0;
 	private int warnings;
 	private boolean ok;
-	
-	static public boolean compareEvent(Event manual, Event generated) {
+
+	static public boolean laxCompareEvent(Event manual, Event generated) {
 		if (generated.getEventType() != manual.getEventType()) {
 			return false;
 		}
@@ -179,6 +184,53 @@ public class FilterTestDriver {
 						return false;
 					}
 				}
+			}
+			break;
+		}
+
+		return true;
+	}
+
+	static public boolean laxCompareEvents(ArrayList<Event> manual, ArrayList<Event> generated) {
+		if (manual.size() != generated.size()) {
+			return false;
+		}
+
+		Iterator<Event> manualIt = manual.iterator();
+		for (Event ge : generated) {
+			Event me = manualIt.next();
+			if (!laxCompareEvent(me, ge)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	static public boolean compareEvent(Event manual,
+		Event generated)
+	{
+		if (generated.getEventType() != manual.getEventType()) {
+			return false;
+		}
+		
+		switch (generated.getEventType()) {
+		case DOCUMENT_PART:
+			DocumentPart mdp = (DocumentPart)manual.getResource();
+			DocumentPart gdp = (DocumentPart)generated.getResource();
+			if ( !compareIResource(mdp, gdp) ) {
+				return false;
+			}
+			if ( !compareINameable(mdp, gdp) ) {
+				return false;
+			}
+			if (mdp.isReferent() != gdp.isReferent()) {
+				return false;
+			}
+			break;
+			
+		case TEXT_UNIT:
+			if ( !compareTextUnit((TextUnit)manual.getResource(), (TextUnit)generated.getResource()) ) {
+				return false;
 			}
 			break;
 		}
@@ -506,4 +558,324 @@ public class FilterTestDriver {
 		return null;
 	}
 
+	public static boolean compareTextUnit (TextUnit tu1,
+		TextUnit tu2)
+	{
+		if ( !compareINameable(tu1, tu2) ) {
+			return false;
+		}
+		if ( tu1.isReferent() != tu2.isReferent() ) {
+			return false;
+		}
+		// TextUnit tests
+		if ( tu1.preserveWhitespaces() != tu2.preserveWhitespaces() ) {
+			return false;
+		}
+		if ( !(tu1.toString().equals(tu2.toString())) ) {
+			return false;
+		}
+		if ( !compareTextContainer(tu1.getSource(), tu2.getSource()) ) {
+			return false;
+		}
+		//TODO: target, but we have to take re-writing of source as target in account
+		return true;
+	}
+	
+	public static boolean compareIResource (IResource item1,
+		IResource item2)
+	{
+		if ( item1 == null ) {
+			return (item2 == null);
+		}
+		if ( item2 == null ) return false;
+		
+		// ID
+		String tmp1 = item1.getId();
+		String tmp2 = item2.getId();
+		if ( tmp1 == null ) {
+			if ( tmp2 != null ) return false;
+		}
+		else {
+			if ( tmp2 == null ) return false;
+			if ( !tmp1.equals(tmp2) ) return false;
+		}
+
+		// Skeleton
+		ISkeleton skl1 = item1.getSkeleton();
+		ISkeleton skl2 = item2.getSkeleton();
+		if ( skl1 == null ) {
+			if ( skl2 != null ) return false;
+		}
+		else {
+			if ( skl2 == null ) return false;
+			tmp1 = skl1.toString();
+			tmp2 = skl2.toString();
+			if ( tmp1 == null ) {
+				if ( tmp2 != null ) return false;
+			}
+			else {
+				if ( tmp2 == null ) return false;
+				if ( !tmp1.equals(tmp2) ) return false;
+			}
+		}
+
+		return true;
+	}
+	
+	public static boolean compareINameable (INameable item1,
+		INameable item2)
+	{
+		if ( item1 == null ) return (item2 == null);
+		if ( item2 == null ) return false;
+		
+		// Resource-level properties
+		Set<String> names1 = item1.getPropertyNames();
+		Set<String> names2 = item2.getPropertyNames();
+		if ( names1.size() != names2.size() ) {
+			return false;
+		}
+		for ( String name : item1.getPropertyNames() ) {
+			Property p1 = item1.getProperty(name);
+			Property p2 = item2.getProperty(name);
+			if ( !compareProperty(p1, p2) ) {
+				return false;
+			}
+		}
+		
+		// Source properties
+		names1 = item1.getSourcePropertyNames();
+		names2 = item2.getSourcePropertyNames();
+		if ( names1.size() != names2.size() ) {
+			return false;
+		}
+		for ( String name : item1.getSourcePropertyNames() ) {
+			Property p1 = item1.getSourceProperty(name);
+			Property p2 = item2.getSourceProperty(name);
+			if ( !compareProperty(p1, p2) ) {
+				return false;
+			}
+		}
+		
+		// Target properties
+		//TODO: Target properties
+		
+		// Name
+		String tmp1 = item1.getName();
+		String tmp2 = item2.getName();
+		if ( tmp1 == null ) {
+			if ( tmp2 != null ) return false;
+		}
+		else {
+			if ( tmp2 == null ) return false;
+			if ( !tmp1.equals(tmp2) ) return false;
+		}
+		
+		// Type
+		tmp1 = item1.getType();
+		tmp2 = item2.getType();
+		if ( tmp1 == null ) {
+			if ( tmp2 != null ) return false;
+		}
+		else {
+			if ( tmp2 == null ) return false;
+			if ( !tmp1.equals(tmp2) ) return false;
+		}
+		
+		// MIME type
+		tmp1 = item1.getMimeType();
+		tmp2 = item2.getMimeType();
+		if ( tmp1 == null ) {
+			if ( tmp2 != null ) return false;
+		}
+		else {
+			if ( tmp2 == null ) return false;
+			if ( !tmp1.equals(tmp2) ) return false;
+		}
+
+		// Is translatable
+		if ( item1.isTranslatable() != item2.isTranslatable() ) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean compareProperty (Property p1,
+		Property p2)
+	{
+		if ( p1 == null ) return (p2 == null);
+		if ( p2 == null ) return false;
+		if ( !p1.getName().equals(p2.getName()) ) {
+			System.err.println("name difference");
+			return false;
+		}
+		if ( p1.isReadOnly() != p2.isReadOnly() ) {
+			System.err.println("isReadOnly difference");
+			return false;
+		}
+		if ( p1.getValue() == null ) {
+			return (p2.getValue() == null);
+		}
+		return (p1.getValue().equals(p2.getValue()));
+	}
+
+	public static boolean compareTextContainer (TextContainer t1,
+		TextContainer t2)
+	{
+		if ( t1 == null ) {
+			System.err.println("Text container null difference");
+			return (t2 == null);
+		}
+		if ( t2 == null ) {
+			System.err.println("Text container null difference");
+			return false;
+		}
+		
+		if ( !compareTextFragment(t1.getContent(), t2.getContent()) ) {
+			System.err.println("Fragment difference");
+			return false;
+		}
+		
+		if ( t1.isSegmented() ) {
+			if ( !t2.isSegmented() ) {
+				System.err.println("isSegmented difference");
+				return false;
+			}
+			List<Segment> segs1 = t1.getSegments();
+			List<Segment> segs2 = t2.getSegments();
+			if ( segs1.size() != segs2.size() ) {
+				System.err.println("Number of segments difference");
+				return false;
+			}
+			for ( int i=0; i<segs1.size(); i++ ) {
+				Segment seg1 = segs1.get(i);
+				Segment seg2 = segs1.get(i);
+				if ( seg1.id == null ) {
+					if ( seg2.id != null ) return false;
+				}
+				else {
+					if ( seg2.id == null ) return false;
+					if ( !seg1.id.equals(seg2.id) ) return false;
+				}
+				if ( !compareTextFragment(seg1.text, seg2.text) ) {
+					return false;
+				}
+			}
+		}
+		else {
+			if ( t2.isSegmented() ) return false;
+		}
+		
+		return true;
+	}
+	
+	public static boolean compareTextFragment (TextFragment tf1,
+		TextFragment tf2)
+	{
+		if ( tf1 == null ) {
+			System.err.println("Fragment null difference");
+			return (tf2 == null);
+		}
+		if ( tf2 == null ) {
+			System.err.println("Fragment null difference");
+			return false;
+		}
+		
+		List<Code> codes1 = tf1.getCodes();
+		List<Code> codes2 = tf2.getCodes();
+		if ( codes1.size() != codes2.size() ) {
+			System.err.println("Number of codes difference");
+			return false;
+		}
+		for ( int i=0; i<codes1.size(); i++ ) {
+			Code code1 = codes1.get(i);
+			Code code2 = codes2.get(i);
+			if ( code1.getId() != code2.getId() ) {
+				System.err.println("ID difference");
+				return false;
+			}
+			// Data
+			String tmp1 = code1.getData();
+			String tmp2 = code2.getData();
+			if ( tmp1 == null ) {
+				if ( tmp2 != null ) {
+					System.err.println("Data null difference");
+					return false;
+				}
+			}
+			else {
+				if ( tmp2 == null ) {
+					System.err.println("Data null difference");
+					return false;
+				}
+				if ( !tmp1.equals(tmp2) ) {
+					System.err.println("Data difference");
+					return false;
+				}
+			}
+			// Outer data
+			tmp1 = code1.getOuterData();
+			tmp2 = code2.getOuterData();
+			if ( tmp1 == null ) {
+				if ( tmp2 != null ) {
+					System.err.println("Outer data null difference");
+					return false;
+				}
+			}
+			else {
+				if ( tmp2 == null ) {
+					System.err.println("Outer data null difference");
+					return false;
+				}
+				if ( !tmp1.equals(tmp2) ) {
+					System.err.println("Outer data difference");
+					return false;
+				}
+			}
+			// Type
+			tmp1 = code1.getType();
+			tmp2 = code2.getType();
+			if ( tmp1 == null ) {
+				if ( tmp2 != null ) {
+					System.err.println("Type null difference");
+					return false;
+				}
+			}
+			else {
+				if ( tmp2 == null ) {
+					System.err.println("Type null difference");
+					return false;
+				}
+				if ( !tmp1.equals(tmp2) ) {
+					System.err.println("Type difference");
+					return false;
+				}
+			}
+			// Tag type
+			if ( code1.getTagType() != code2.getTagType() ) {
+				System.err.println("Tag-type difference");
+				return false;
+			}
+			if ( code1.hasReference() != code2.hasReference() ) {
+				System.err.println("hasReference difference");
+				return false;
+			}
+			if ( code1.isCloneable() != code2.isCloneable() ) {
+				System.err.println("isCloenable difference");
+				return false;
+			}
+			if ( code1.isDeleteable() != code2.isDeleteable() ) {
+				System.err.println("isDeleteable difference");
+				return false;
+			}
+			if ( code1.hasAnnotation() != code2.hasAnnotation() ) {
+				System.err.println("annotation difference");
+				return false;
+			}
+			//TODO: compare annotations
+		}
+		
+		// Coded text
+		return tf1.getCodedText().equals(tf2.getCodedText());
+	}
 }

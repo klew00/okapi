@@ -97,7 +97,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 		
 		parameters = originalParameters;
 	}
@@ -130,7 +130,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -164,7 +164,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		addEndEvents(events);
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 	
 	@Test
@@ -262,7 +262,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -306,7 +306,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -330,7 +330,7 @@ public class HtmlEventTest {
 		
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 		parameters = originalParameters;
 	}
 
@@ -355,7 +355,7 @@ public class HtmlEventTest {
 		
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 		parameters = originalParameters;
 	}
 
@@ -456,7 +456,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -494,7 +494,7 @@ public class HtmlEventTest {
 
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	@Test
@@ -555,7 +555,7 @@ public class HtmlEventTest {
 		
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 	
 	@Test
@@ -584,7 +584,7 @@ public class HtmlEventTest {
 		
 		addEndEvents(events);
 
-		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
