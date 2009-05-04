@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Jython Jars
 Bundle-SymbolicName: net.sf.okapi.lib.jython
 Bundle-Version: 1.0.0
-Bundle-ClassPath: jython.jar,
- lib/jython.jar
+Bundle-ClassPath: lib/jython.jar
 Export-Package: com.sun.jna,
  com.sun.jna.darwin,
  com.sun.jna.ptr,
