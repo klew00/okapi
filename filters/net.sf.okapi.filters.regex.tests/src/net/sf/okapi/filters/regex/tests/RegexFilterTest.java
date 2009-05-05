@@ -20,16 +20,24 @@
 
 package net.sf.okapi.filters.regex.tests;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
@@ -40,6 +48,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @author ALSIOHE
+ *
+ */
 public class RegexFilterTest {
 	
 	private RegexFilter filter;
@@ -114,4 +126,156 @@ public class RegexFilterTest {
 		return list;
 	}
 
+	
+// SV =====================================================================================================	
+	
+	private String TEST_PARAMS1 = "/okf_regex@StringInfo.fprm";
+	private String TEST_DOC1 = "/Test01_stringinfo_en.info";
+	
+	private void initFilter() {
+		FilterTestDriver testDriver = new FilterTestDriver();
+		testDriver.setDisplayLevel(2);
+		testDriver.setShowSkeleton(true);
+		
+		IParameters params = new Parameters();
+		URL paramsUrl = RegexFilterTest.class.getResource(TEST_PARAMS1);
+		params.load(paramsUrl.getPath(), false);
+		filter.setParameters(params);		
+	}
+	
+	@Test
+	public void testDocName() {
+// Pass the 3 input types, docName is expected to be null if the input is stream /char sequence, not null if URI
+		
+		initFilter();
+
+		// stream, docName = null 		
+		InputStream input = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		try {
+			Event event = filter.next();
+			assertTrue(event.getResource() instanceof StartDocument);
+			StartDocument sd = (StartDocument)event.getResource();
+			assertNull(sd.getName());
+		}
+		finally {
+			filter.close();
+		}
+		
+		// char sequence, docName = null 		
+		filter.open(new RawDocument("a char sequence", "UTF-8", "en"));
+		try {
+			Event event2 = filter.next();
+			assertTrue(event2.getResource() instanceof StartDocument);
+			StartDocument sd2 = (StartDocument)event2.getResource();
+			assertNull(sd2.getName());
+		}
+		finally {
+			filter.close();
+		}
+		
+		// URI, docName <> null
+		URL url = RegexFilterTest.class.getResource(TEST_DOC1);
+		URI uri = null;
+		try {
+			uri = url.toURI();
+		}
+		catch (URISyntaxException e){
+		}
+		filter.open(new RawDocument(uri, "UTF-8", "en"));
+		try {
+			Event event3 = filter.next();
+			assertTrue(event3.getResource() instanceof StartDocument);
+			StartDocument sd3 = (StartDocument)event3.getResource();
+			String name = sd3.getName();
+			assertNotNull(name);
+		}
+		finally {
+			filter.close();
+		}
+	}
+	
+	@Test
+	public void testEmptyInput() {
+// Empty input, check exceptions
+				
+		initFilter();
+
+		// empty stream, OkapiBadFilterInputException expected, no other
+		boolean caught = false;
+		boolean caught2 = false;
+		
+		InputStream input = null;
+		try {
+			filter.open(new RawDocument(input, "UTF-8", "en"));
+		}	
+		catch (OkapiBadFilterInputException e) {
+			caught = true;
+		}
+		catch (Exception e) {
+			caught2 = true;
+		}
+		finally {
+			filter.close();
+		}
+		
+		assertTrue(caught);
+		assertFalse(caught2);
+		
+		
+		// empty raw doc, OkapiBadFilterInputException expected, no other
+		caught = false;
+		caught2 = false;
+		
+		try {
+			filter.open(null);
+		}	
+		catch (OkapiBadFilterInputException e) {
+			caught = true;
+		}
+		catch (Exception e) {
+			caught2 = true;
+		}
+		finally {
+			filter.close();
+		}
+	
+		assertTrue(caught);
+		assertFalse(caught2);
+		
+		
+		// empty filter parameters, OkapiBadFilterInputException (? a new exception class) expected, no other
+		caught = false;
+		caught2 = false;
+				
+		try {
+			filter.setParameters(null);
+			
+			InputStream input2 = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
+			filter.open(new RawDocument(input2, "UTF-8", "en"));
+		}	
+		catch (OkapiBadFilterInputException e) {
+			caught = true;
+		}
+		catch (Exception e) {
+			caught2 = true;
+		}
+		finally {
+			filter.close();
+		}
+	
+		assertTrue(caught);
+		assertFalse(caught2);
+		
+	}
+	
+	
+	@Test
+	public void testSkeleton() {
+// Write a skeleton into a file, compare with the input file
+// Test trailing /n
+// Check if open(, generateSkeleton = false) blocks skeleton generation 		
+	}
+	
 }
