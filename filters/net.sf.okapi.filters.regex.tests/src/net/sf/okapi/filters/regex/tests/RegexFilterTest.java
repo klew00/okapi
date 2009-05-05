@@ -21,10 +21,6 @@
 package net.sf.okapi.filters.regex.tests;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -35,7 +31,6 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -49,7 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author ALSIOHE
+ * @author SV
  *
  */
 public class RegexFilterTest {
@@ -157,6 +152,7 @@ public class RegexFilterTest {
 			Event event = filter.next();
 			assertTrue(event.getResource() instanceof StartDocument);
 			StartDocument sd = (StartDocument)event.getResource();
+			
 			assertNull(sd.getName());
 		}
 		finally {
@@ -169,6 +165,7 @@ public class RegexFilterTest {
 			Event event2 = filter.next();
 			assertTrue(event2.getResource() instanceof StartDocument);
 			StartDocument sd2 = (StartDocument)event2.getResource();
+			
 			assertNull(sd2.getName());
 		}
 		finally {
@@ -189,6 +186,7 @@ public class RegexFilterTest {
 			assertTrue(event3.getResource() instanceof StartDocument);
 			StartDocument sd3 = (StartDocument)event3.getResource();
 			String name = sd3.getName();
+			
 			assertNotNull(name);
 		}
 		finally {
