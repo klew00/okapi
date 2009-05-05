@@ -256,7 +256,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 	}
 
 	/**
-	 * Sets the minimal percetage at which a match is kept. Note that
+	 * Sets the minimal percentage at which a match is kept. Note that
 	 * with this connector this method can only reduce the threshold from the
 	 * one defined in the active TM profile. 
 	 */

@@ -218,6 +218,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setType(startDoc.getMimeType());
 			startDoc.setEncoding("UTF-8", false);
 			startDoc.setLineBreak(lineBreak);
+			startDoc.setFilterParameters(params);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 			hasNext = true;
 		}
