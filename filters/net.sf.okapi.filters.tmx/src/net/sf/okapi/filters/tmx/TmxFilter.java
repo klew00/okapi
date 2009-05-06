@@ -59,7 +59,6 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import org.codehaus.stax2.XMLInputFactory2;
-import org.xml.sax.InputSource;
 
 public class TmxFilter implements IFilter {
 
@@ -186,8 +185,7 @@ public class TmxFilter implements IFilter {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
 		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
-		InputSource is = new InputSource(new StringReader(inputText.toString()));
-		commonOpen(1, is);
+		commonOpen(1, new StringReader(inputText.toString()));
 	}
 
 	private void open (URI inputURI) {
@@ -204,8 +202,8 @@ public class TmxFilter implements IFilter {
 		Object obj)
 	{
 		try {
-			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
-			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
+			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
+			if ( trgLang == null || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
 			close();
 			canceled = false;			
 			
@@ -216,7 +214,7 @@ public class TmxFilter implements IFilter {
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);			
-			
+
 			BOMNewlineEncodingDetector detector = null;
 			try {
 				switch ( type ) {
@@ -239,7 +237,6 @@ public class TmxFilter implements IFilter {
 					detector = null; // Release it
 				}
 			}			
-			
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			tuId = 0;

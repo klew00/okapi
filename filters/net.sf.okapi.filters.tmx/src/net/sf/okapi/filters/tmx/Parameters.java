@@ -4,9 +4,10 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters{
 
-	protected boolean processAllTargets;
-	protected boolean consolidateDpSkeleton;
-	protected boolean escapeGT;
+	//--TODO change back to protected when the testing setup is completed-- 
+	public boolean processAllTargets;
+	public boolean consolidateDpSkeleton;
+	public boolean escapeGT;
 
 	public Parameters () {
 		reset();
