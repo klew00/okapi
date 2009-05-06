@@ -20,26 +20,20 @@
 
 package net.sf.okapi.filters.xliff.tests;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
-//import net.sf.okapi.common.Event;
-//import net.sf.okapi.common.filters.IFilter;
-//import net.sf.okapi.common.IResource;
-//import net.sf.okapi.common.ISkeleton;
-//import net.sf.okapi.common.resource.INameable;
-//import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
-//import net.sf.okapi.filters.xliff.AltTransAnnotation;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -56,25 +50,29 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
-	public void testExternalFile () {
-		FilterTestDriver testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(0);
-		testDriver.setShowSkeleton(true);
-		try {
-			URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en", "fr"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"JMP-11-Test01.xlf", null));
+		list.add(new InputDocument(root+"Manual-12-AltTrans.xlf", null));
+		list.add(new InputDocument(root+"PAS-10-Test01.xlf", null));
+		list.add(new InputDocument(root+"RB-11-Test01.xlf", null));
+		list.add(new InputDocument(root+"RB-12-Test02.xlf", null));
+		list.add(new InputDocument(root+"SF-12-Test03.xlf", null));
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+
+		list.clear();
+		list.add(new InputDocument(root+"SF-12-Test01.xlf", null));
+		list.add(new InputDocument(root+"SF-12-Test02.xlf", null));
+		rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "es"));
 	}
-	
+
 	@Test
 	public void testStartDocument () {
 		StartDocument sd = FilterTestDriver.getStartDocument(createSimpleXLIFF());
@@ -158,95 +156,4 @@ public class XLIFFFilterTest {
 		return list;
 	}
 	
-	
-/*	private void process (IFilter filter) {
-		System.out.println("================================================");
-		Event event;
-		while ( filter.hasNext() ) {
-			event = filter.next();
-			switch ( event.getEventType() ) {
-			case START_DOCUMENT:
-				System.out.println("---Start Document");
-				printSkeleton(event.getResource());
-				break;
-			case END_DOCUMENT:
-				System.out.println("---End Document");
-				printSkeleton(event.getResource());
-				break;
-			case START_SUBDOCUMENT:
-				System.out.println("---Start Sub Document");
-				printSkeleton(event.getResource());
-				break;
-			case END_SUBDOCUMENT:
-				System.out.println("---End Sub Document");
-				printSkeleton(event.getResource());
-				break;
-			case START_GROUP:
-				System.out.println("---Start Group");
-				printSkeleton(event.getResource());
-				break;
-			case END_GROUP:
-				System.out.println("---End Group");
-				printSkeleton(event.getResource());
-				break;
-			case TEXT_UNIT:
-				System.out.println("---Text Unit");
-				TextUnit tu = (TextUnit)event.getResource();
-				printResource(tu);
-				System.out.println("S=["+tu.toString()+"]");
-				for ( String lang : tu.getTargetLanguages() ) {
-					System.out.println("T=["+tu.getTarget(lang).toString()+"]");
-				}
-				printAltTrans(tu);
-				printSkeleton(tu);
-				break;
-			case DOCUMENT_PART:
-				System.out.println("---Document Part");
-				printResource((INameable)event.getResource());
-				printSkeleton(event.getResource());
-				break;
-			}
-		}
-	}
-	
-	private void printResource (INameable res) {
-		System.out.println("  id="+res.getId());
-		System.out.println("  name="+res.getName());
-		System.out.println("  type="+res.getType());
-		System.out.println("  mimeType="+res.getMimeType());
-	}
-
-	private void printSkeleton (IResource res) {
-		ISkeleton skel = res.getSkeleton();
-		if ( skel != null ) {
-			System.out.println("---");
-			System.out.println(skel.toString());
-			System.out.println("---");
-		}
-	}
-
-	private void printAltTrans (TextUnit res) {
-		System.out.println("---AltTransAnnotation---");
-		AltTransAnnotation ata = res.getAnnotation(AltTransAnnotation.class);
-		if ( ata == null ) {
-			System.out.println("No annotation");
-		}
-		else {
-			ata.startIteration();
-			while ( ata.moveToNext() ) {
-				TextUnit tu = ata.getEntry();
-				if ( ata.hasSource() ) {
-					System.out.println("S("+ata.getSourceLanguage()+")=["+tu.toString()+"]");
-				}
-				else {
-					System.out.println("No source defined.");
-					
-				}
-				System.out.println("T("+ata.getTargetLanguage()+")=["
-					+tu.getTarget(ata.getTargetLanguage()).toString()+"]");
-			}
-		}
-		System.out.println("---end of AltTransAnnotation---");
-	}
-*/
 }
