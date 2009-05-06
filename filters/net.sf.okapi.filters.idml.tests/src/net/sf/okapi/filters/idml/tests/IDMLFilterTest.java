@@ -20,42 +20,43 @@
 
 package net.sf.okapi.filters.idml.tests;
 
-import java.net.URI;
+import static org.junit.Assert.assertTrue;
+
 import java.net.URL;
+import java.util.ArrayList;
 
-import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.idml.IDMLFilter;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class IDMLFilterTest {
 
+	private IDMLFilter filter;
+
+	@Before
+	public void setUp() {
+		filter = new IDMLFilter();
+	}
+
 	@Test
-	public void runTest () {
-		IDMLFilter filter = null;		
-		try {
-			filter = new IDMLFilter();
-			URL url = IDMLFilterTest.class.getResource("/Test01.idml");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
-			
-			IFilterWriter writer = filter.createFilterWriter();
-			writer.setOptions("en", "UTF-8");
-			writer.setOutput("output.idml");
-			
-			while ( filter.hasNext() ) {
-				writer.handleEvent(filter.next());
-			}
-			writer.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		URL url = IDMLFilterTest.class.getResource("/Test01.idml");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.idml", null));
+		list.add(new InputDocument(root+"helloworld-1.idml", null));
+		list.add(new InputDocument(root+"helloworld-2.idml", null));
+		list.add(new InputDocument(root+"ConditionalText.idml", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en", "output"));
 	}
 
 }
