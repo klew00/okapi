@@ -343,8 +343,8 @@ public class Merger {
 				if (( transCode.getData() == null )
 					|| ( transCode.getData().length() == 0 )) {
 					// Leave it like that
-					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s')",
-						transCode.getId(), tu.getId()));
+					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 				}
 			}
 			else { // Get the data from the original
@@ -363,8 +363,8 @@ public class Merger {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( !code.isDeleteable() ) {
-						logger.severe(String.format("The non-deletable code id='%d' (%s) is missing in target (item id='%s')",
-							code.getId(), code.getData(), tu.getId()));
+						logger.severe(String.format("The non-deletable code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 						logger.info("Source='"+tu.getSource().toString()+"'");
 					}
 				}

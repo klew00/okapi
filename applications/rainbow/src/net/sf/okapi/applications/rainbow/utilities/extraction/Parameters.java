@@ -41,6 +41,7 @@ public class Parameters extends BaseParameters {
 	public boolean useGroupName;
 	public boolean protectAccepted;
 	public IParameters xliffOptions;
+	public boolean leverageOnlyExact;
 
 	public Parameters () {
 		reset();
@@ -60,6 +61,7 @@ public class Parameters extends BaseParameters {
 		useGroupName = true;
 		protectAccepted = true;
 		xliffOptions = new Options();
+		leverageOnlyExact = true;
 	}
 
 	public void fromString(String data) {
@@ -78,6 +80,7 @@ public class Parameters extends BaseParameters {
 		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
 		protectAccepted = buffer.getBoolean("protectAccepted", protectAccepted);
 		xliffOptions.fromString(buffer.getGroup("xliffOptions"));
+		leverageOnlyExact = buffer.getBoolean("leverageOnlyExact", leverageOnlyExact);
 	}
 
 	public String toString() {
@@ -95,6 +98,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useGroupName", useGroupName);
 		buffer.setBoolean("protectAccepted", protectAccepted);
 		buffer.setGroup("xliffOptions", xliffOptions.toString());
+		buffer.setBoolean("leverageOnlyExact", leverageOnlyExact);
 		return buffer.toString();
 	}
 	

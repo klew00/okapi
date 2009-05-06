@@ -1015,8 +1015,10 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Compares an object with this TextFragment. If the object is also a TextFragment,
 	 * the method returns the comparison between the coded text strings of both text fragments.
+	 * Note that inline codes are not compared with this method.
 	 * If the object is not a TextFragment, the method returns the comparison between the two
 	 * toString() results of the two objects.
+	 * @param object the object to compare with this TextFragment.
 	 * @return a value 0 if the objects are equals.
 	 */
 	public int compareTo (Object object) {
@@ -1026,6 +1028,33 @@ public class TextFragment implements Comparable<Object> {
 		}
 		// Else, compare string representation
 		return toString().compareTo(object.toString());
+	}
+
+	/**
+	 * Compares a TextFragment with this one. The method returns the comparison between
+	 * the coded text strings of both text fragments, and if specified, between their 
+	 * inline codes.
+	 * @param frag the TextFragment to compare with this one.
+	 * @param codeSensitive true if the codes need to be compared as well.
+	 * @return a value 0 if the objects are equals.
+	 */
+	public int compareTo (TextFragment frag,
+		boolean codeSensitive)
+	{
+		if ( frag == null ) return -1;
+		int n = getCodedText().compareTo((frag).getCodedText());
+		if ( n != 0 ) return n;
+		if ( codeSensitive ) {
+			if ( hasCode() ) {
+				if ( !frag.hasCode() ) return 1;
+				String otherCodes = frag.getCodes().toString();
+				return otherCodes.compareTo(codes.toString());
+			}
+			else {
+				if ( frag.hasCode() ) return -1;
+			}
+		}
+		return 0;
 	}
 
 	@Override

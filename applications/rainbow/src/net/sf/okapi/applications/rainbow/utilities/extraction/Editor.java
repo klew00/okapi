@@ -71,6 +71,7 @@ public class Editor implements IParametersEditor {
 	private Button btGetTmPath;
 	private Button chkUseFileName;
 	private Button chkUseGroupName;
+	private Button chkLeverageOnlyExact;
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
 	private IHelp help;
@@ -302,6 +303,12 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		chkUseGroupName.setLayoutData(gdTmp);
 
+		chkLeverageOnlyExact = new Button(cmpTmp, SWT.CHECK);
+		chkLeverageOnlyExact.setText("Leverage only exatct (100%) matches");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkLeverageOnlyExact.setLayoutData(gdTmp);
+		
 		
 		//--- Dialog-level buttons
 
@@ -358,6 +365,7 @@ public class Editor implements IParametersEditor {
 		btGetTmPath.setEnabled(chkPreTranslate.getSelection());
 		chkUseFileName.setEnabled(chkPreTranslate.getSelection());
 		chkUseGroupName.setEnabled(chkPreTranslate.getSelection());
+		chkLeverageOnlyExact.setEnabled(chkPreTranslate.getSelection());
 	}
 	
 	private boolean showDialog () {
@@ -388,6 +396,7 @@ public class Editor implements IParametersEditor {
 		edTmPath.setText(params.tmPath);
 		chkUseFileName.setSelection(params.useFileName);
 		chkUseGroupName.setSelection(params.useGroupName);
+		chkLeverageOnlyExact.setSelection(params.leverageOnlyExact);
 		// TODO: This needs to be a clone, not the object itself, or it will get saved on cancel
 		xliffOptions = params.xliffOptions;
 		updatePackageType();
@@ -410,6 +419,7 @@ public class Editor implements IParametersEditor {
 		params.tmPath = edTmPath.getText();
 		params.useFileName = chkUseFileName.getSelection();
 		params.useGroupName = chkUseGroupName.getSelection();
+		params.leverageOnlyExact = chkLeverageOnlyExact.getSelection();
 		params.xliffOptions = xliffOptions;
 		result = true;
 		return true;

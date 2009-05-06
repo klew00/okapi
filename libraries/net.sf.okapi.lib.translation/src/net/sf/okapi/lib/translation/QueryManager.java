@@ -392,11 +392,11 @@ public class QueryManager {
 		QueryResult qr = next();
 		if ( qr == null ) return false;
 		if ( qr.score < 100 ) return false;
-		TextFragment firsFrag = qr.target;
+		TextFragment firstFrag = qr.target;
 		while ( hasNext() ) {
 			qr = next();
 			if ( qr.score < 100 ) return true;
-			if ( qr.target.compareTo(firsFrag) != 0 ) return false;
+			if ( qr.target.compareTo(firstFrag, true) != 0 ) return false;
 		}
 		return true;
 	}

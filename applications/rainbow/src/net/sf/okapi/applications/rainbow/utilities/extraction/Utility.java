@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 
@@ -97,7 +98,10 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.setLanguages(srcLang, trgLang);
 			net.sf.okapi.tm.simpletm.Parameters tmParams = new net.sf.okapi.tm.simpletm.Parameters();
 			tmParams.dbPath = params.tmPath.replace(VAR_PROJDIR, projectDir);
-			qm.addAndInitializeResource(new SimpleTMConnector(), tmParams.dbPath, tmParams);
+			int resId = qm.addAndInitializeResource(new SimpleTMConnector(), tmParams.dbPath, tmParams);
+			if ( params.leverageOnlyExact ) {
+				((ITMQuery)qm.getResource(resId).query).setThreshold(100);
+			}
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;

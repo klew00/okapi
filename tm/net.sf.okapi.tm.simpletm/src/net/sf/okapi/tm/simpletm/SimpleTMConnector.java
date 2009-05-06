@@ -32,7 +32,7 @@ public class SimpleTMConnector implements ITMQuery {
 	
 	private Database db;
 	private int maxHits = 5;
-	private int threshold = 100;
+	private int threshold = 98;
 	private List<QueryResult> results;
 	private int current = -1;
 	private String srcLang;
@@ -92,7 +92,7 @@ public class SimpleTMConnector implements ITMQuery {
 	
 	public int query (TextFragment text) {
 		current = -1;
-		results = db.query(text, attributes, maxHits);
+		results = db.query(text, attributes, maxHits, threshold);
 		if ( results == null ) return 0;
 		current = 0;
 		return results.size();

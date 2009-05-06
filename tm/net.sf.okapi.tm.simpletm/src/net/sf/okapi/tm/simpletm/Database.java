@@ -294,7 +294,8 @@ public class Database {
 	
 	public List<QueryResult> query (TextFragment query,
 		LinkedHashMap<String, String> attributes,
-		int maxCount)
+		int maxCount,
+		int threshold)
 	{
 		try {
 			// prepare the query with or without context condition
@@ -329,7 +330,9 @@ public class Database {
 				if ( queryCodes.equals(trgCodes) ) qr.score = 100;
 				else qr.score = 99;
 				
-				list.add(qr);
+				if ( qr.score >= threshold ) {
+					list.add(qr);
+				}
 			} while ( result.next() && ( list.size() < maxCount ));
 			return list;
 		}
