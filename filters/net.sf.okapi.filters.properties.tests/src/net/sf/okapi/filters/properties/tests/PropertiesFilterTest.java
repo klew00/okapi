@@ -20,20 +20,19 @@
 
 package net.sf.okapi.filters.properties.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -48,23 +47,20 @@ public class PropertiesFilterTest {
 	}
 
 	@Test
-	public void externalFileTest () {
-		FilterTestDriver testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(-1);
-		testDriver.setShowSkeleton(true);
-		try {
-			URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
-			filter.open(new RawDocument(new URI(url.toString()), "windows-1252", "en", "es"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.properties", null));
+		list.add(new InputDocument(root+"Test02.properties", "okf_properties@Test02.fprm"));
+		list.add(new InputDocument(root+"Test03.properties", "okf_properties@Test03.fprm"));
+		list.add(new InputDocument(root+"Test04.properties", "okf_properties@Test04.fprm"));
+	
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
 
 	@Test

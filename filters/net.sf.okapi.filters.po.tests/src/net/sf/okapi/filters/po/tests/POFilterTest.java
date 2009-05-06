@@ -203,7 +203,6 @@ public class POFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
 
-	
 	private ArrayList<Event> getEvents(String snippet,
 		String srcLang,
 		String trgLang)

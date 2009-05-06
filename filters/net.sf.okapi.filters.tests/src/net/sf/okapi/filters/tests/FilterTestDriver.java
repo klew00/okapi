@@ -775,8 +775,10 @@ public class FilterTestDriver {
 			return true;
 		}
 		if ( !p1.getValue().equals(p2.getValue()) ) {
-			System.err.println("Property value difference");
-			return false;
+			if ( !p1.getName().equals("start") ) { // In double-extraction 'start' can be different
+				System.err.println("Property value difference");
+				return false;
+			}
 		}
 		return true;
 	}
@@ -839,8 +841,11 @@ public class FilterTestDriver {
 		TextFragment tf2)
 	{
 		if ( tf1 == null ) {
-			System.err.println("Fragment null difference");
-			return (tf2 == null);
+			if ( tf2 != null ) {
+				System.err.println("Fragment null difference");
+				return false;
+			}
+			return true;
 		}
 		if ( tf2 == null ) {
 			System.err.println("Fragment null difference");

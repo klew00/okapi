@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: PO Filter
+Bundle-Name: Characters Listing
 Bundle-SymbolicName: net.sf.okapi.steps.charlisting
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.steps.charlisting

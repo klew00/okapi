@@ -93,6 +93,10 @@ public class PropertiesEncoder implements IEncoder {
 				case '\t':
 					escaped.append("\\t");
 					break;
+				case ':':
+				case '=':
+					if ( i == 0 ) escaped.append('\\');
+					// Fall thru
 				default:
 					escaped.append(ch);
 					break;
