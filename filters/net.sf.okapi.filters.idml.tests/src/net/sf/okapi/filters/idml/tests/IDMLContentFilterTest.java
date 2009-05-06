@@ -57,5 +57,4 @@ public class IDMLContentFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
 	}
 
-
 }

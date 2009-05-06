@@ -21,19 +21,22 @@
 package net.sf.okapi.filters.po.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -179,26 +182,27 @@ public class POFilterTest {
 	}
 		
 	@Test
-	public void testOuputExternalFile () {
-		POFilter filter = null;		
-		try {
-			FilterTestDriver testDriver = new FilterTestDriver();
-			//testDriver.setShowSkeleton(true);
-			//testDriver.setDisplayLevel(3);
-			filter = new POFilter();
-			InputStream input = POFilterTest.class.getResourceAsStream("/Test01.po");
-			filter.open(new RawDocument(input, "UTF-8", "en", "fr"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail("Exception occured");
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		URL url = POFilterTest.class.getResource("/Test01.po");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.po", null));
+		list.add(new InputDocument(root+"Test02.po", null));
+		list.add(new InputDocument(root+"Test03.po", null));
+		list.add(new InputDocument(root+"Test04.po", null));
+		list.add(new InputDocument(root+"Test05.po", null));
+		list.add(new InputDocument(root+"TestMonoLingual_EN.po", "okf_po@Monolingual.fprm"));
+		list.add(new InputDocument(root+"TestMonoLingual_FR.po", "okf_po@Monolingual.fprm"));
+		list.add(new InputDocument(root+"AllCasesTest.po", null));
+		list.add(new InputDocument(root+"Test_nautilus.af.po", null));
+	
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
+
 	
 	private ArrayList<Event> getEvents(String snippet,
 		String srcLang,
