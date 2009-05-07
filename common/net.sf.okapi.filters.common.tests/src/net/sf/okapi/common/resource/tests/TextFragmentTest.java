@@ -127,13 +127,13 @@ public class TextFragmentTest {
 	@Test
 	public void testRemove () {
 		TextFragment tf1 = makeFragment();
-		assertEquals(fmt.setContent(tf1).toString(true), "<b>A<br/>B</b>C");
+		assertEquals(fmt.setContent(tf1).toString(true), "[b]A[br/]B[/b]C");
 		tf1.remove(2, 3); // xxAxxBxxC -> xxxxBxxC
 		tf1.remove(4, 5); // xxxxBxxC -> xxxxxxC
 		tf1.remove(6, 7); // xxxxxxC -> xxxxxx
 		assertFalse(tf1.hasText(true));
 		assertEquals(tf1.getCodedText().length(), 3*2);
-		assertEquals(tf1.toString(), "<b><br/></b>");
+		assertEquals(tf1.toString(), "[b][br/][/b]");
 
 		tf1 = makeFragment();
 		tf1.remove(0, 2); // xxAxxBxxC -> AxxBxxC
@@ -148,16 +148,16 @@ public class TextFragmentTest {
 	public void testInlines () {
 		TextFragment tf1 = makeFragment();
 		assertTrue(tf1.hasCode());
-		assertEquals(tf1.toString(), "<b>A<br/>B</b>C");
-		assertEquals(tf1.getCode(0).getData(), "<b>");
-		assertEquals(tf1.getCode(1).getData(), "<br/>");
-		assertEquals(tf1.getCode(2).getData(), "</b>");
+		assertEquals(tf1.toString(), "[b]A[br/]B[/b]C");
+		assertEquals(tf1.getCode(0).getData(), "[b]");
+		assertEquals(tf1.getCode(1).getData(), "[br/]");
+		assertEquals(tf1.getCode(2).getData(), "[/b]");
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>A<2/>B</1>C");
 		tf1.remove(0, 2);
 		//TODO: assertEquals(display.setContent(tf1).toString(false), "A<2/>B<1/>C");
-		assertEquals(tf1.toString(), "A<br/>B</b>C");
+		assertEquals(tf1.toString(), "A[br/]B[/b]C");
 		TextFragment tf2 = new TextFragment();
-		tf2.append(TagType.OPENING, "b", "<b>");
+		tf2.append(TagType.OPENING, "b", "[b]");
 		tf1.insert(0, tf2);
 		//TODO: assertEquals(display.setContent(tf1).toString(false), "<1/>A<2/>B</1>C");
 		
@@ -261,8 +261,8 @@ public class TextFragmentTest {
 		codes = tf1.getCodes(0, 5); // xxAxxBxxC
 		assertNotNull(codes);
 		assertEquals(codes.size(), 2);
-		assertEquals(codes.get(0).getData(), "<b>");
-		assertEquals(codes.get(1).getData(), "<br/>");
+		assertEquals(codes.get(0).getData(), "[b]");
+		assertEquals(codes.get(1).getData(), "[br/]");
 	}
 
 	@Test
@@ -473,17 +473,59 @@ public class TextFragmentTest {
 		tf.getCodedText(1, 3); // 1 is middle of first code
     }
 	
+	@Test
+    public void testCompareToSameString () {
+		TextFragment tf = new TextFragment("text of the fragment");
+		assertEquals(0, tf.compareTo("text of the fragment"));
+    }
+	
+	@Test
+    public void testCompareToDifferentString () {
+		TextFragment tf = new TextFragment("text of the fragment");
+		assertFalse(0==tf.compareTo("Text Of The Fragment"));
+    }
+	
+	@Test
+    public void testCompareToSameFragment () {
+		TextFragment tf1 = new TextFragment("text of the fragment");
+		TextFragment tf2 = new TextFragment("text of the fragment");
+		assertEquals(0, tf1.compareTo(tf2));
+    }
+	
+	@Test
+    public void testCompareToDifferentFragment () {
+		TextFragment tf1 = new TextFragment("text of the fragment");
+		TextFragment tf2 = new TextFragment("Text Of The Fragment");
+		assertFalse(0==tf1.compareTo(tf2));
+    }
+	
+	@Test
+    public void testCompareToSameFragmentWithSameCodes () {
+		TextFragment tf1 = makeFragment();
+		TextFragment tf2 = makeFragment();
+		assertEquals(0, tf1.compareTo(tf2, true));
+    }
+	
+	@Test
+    public void testCompareToSameFragmentWithDifferentCodes () {
+		TextFragment tf1 = makeFragment();
+		tf1.getCodes().get(0).setData("[zzz]");
+		TextFragment tf2 = makeFragment();
+		assertTrue(0==tf1.compareTo(tf2, false));
+		assertFalse(0==tf1.compareTo(tf2, true));
+    }
+	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
 	 * @return the new fragment.
 	 */
 	private TextFragment makeFragment () {
 		TextFragment tf = new TextFragment();
-		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "b", "[b]");
 		tf.append("A");
-		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tf.append(TagType.PLACEHOLDER, "br", "[br/]");
 		tf.append("B");
-		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "b", "[/b]");
 		tf.append("C");
 		return tf;
 	}
