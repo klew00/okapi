@@ -112,8 +112,10 @@ public class CharListingStep implements IPipelineStep {
 		try {
 			Util.createDirectories(params.outputPath);
 			writer = new PrintWriter(params.outputPath, "UTF-8");
-			//TODO: generate BOM based on user choice or at least platform
-			writer.write('\uFEFF'); // BOM
+			// Generate BOM if we are on windows
+			if ( !Util.isOSCaseSensitive() ) {
+				writer.write('\uFEFF');
+			}
 			// Process all characters
 			for ( char key : charList.keySet() ) {
 				switch ( key ) {
@@ -129,10 +131,12 @@ public class CharListingStep implements IPipelineStep {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			logger.log(Level.SEVERE, "Error with "+params.outputPath, e);
+			logger.log(Level.SEVERE,
+				String.format("Error with '%s'.", params.outputPath), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
-			logger.log(Level.SEVERE, "Error with "+params.outputPath, e);
+			logger.log(Level.SEVERE,
+				String.format("Error with '%s'.", params.outputPath), e);
 		}
 		finally {
 			firstDoc = true;

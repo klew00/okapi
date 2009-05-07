@@ -51,4 +51,14 @@ public class OkapiIOException extends RuntimeException {
 		super(cause);
 	}
 
+	/**
+	 * Creates a new OkapiIOException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public OkapiIOException (String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

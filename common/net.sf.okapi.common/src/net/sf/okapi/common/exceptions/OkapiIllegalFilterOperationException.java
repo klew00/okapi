@@ -50,5 +50,15 @@ public class OkapiIllegalFilterOperationException extends RuntimeException {
 		super(cause);
 	}
 
+	/**
+	 * Creates a new OkapiIllegalFilterOperationException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public OkapiIllegalFilterOperationException (String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }
 

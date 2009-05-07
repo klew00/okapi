@@ -154,47 +154,55 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Create a {@link Reader} from the input for this RawDocument.
+	 * Creates a {@link Reader} from the input for this RawDocument.
 	 * The reader is created from inputStream or inputCharSequence.
-	 * If an inputURL is set then a temporary InputStream is created automatically.
+	 * If an inputURI is set then a temporary InputStream is created automatically.
 	 * 
 	 * @return the Reader
 	 * 
 	 * @throws OkapiIOException
 	 */
 	public Reader getReader() {
-		URL url = null;
-
-		if (inputReader != null) {
+		// Re-use existing reader if there is one
+		//TODO: how dangerous is this? Should it be reset, etc? 
+		if ( inputReader != null ) {
 			return inputReader;
 		}
 
-		if (getInputStream() != null)
-			readerFromInputStream(getInputStream());
-		else if (getInputCharSequence() != null)
+		// Create a reader for the current input 
+		if ( getInputCharSequence() != null ) {
 			inputReader = new StringReader(getInputCharSequence().toString());
-		else if (getInputURI() != null) {
+		}
+		else if ( getInputURI() != null ) {
+			URL url = null;
 			try {
 				url = getInputURI().toURL();
 				readerFromInputStream(getInputURI().toURL().openStream());
-			} catch (IllegalArgumentException e) {
+			}
+			catch (IllegalArgumentException e) {
 				OkapiIOException re = new OkapiIOException(e);
 				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI must be absolute: "
-						+ ((url == null) ? "URL is null" : url.toString()), re);
-				throw re;
-
-			} catch (MalformedURLException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI may be malformed: "
-						+ ((url == null) ? "URL is null" : url.toString()), re);
-				throw re;
-
-			} catch (IOException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE,
-						"Could not open the URL. The URL is OK but the input stream could not be opened", re);
+					+ ((url == null) ? "URL is null" : url.toString()), re);
 				throw re;
 			}
+			catch (MalformedURLException e) {
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI may be malformed: "
+					+ ((url == null) ? "URL is null" : url.toString()), re);
+				throw re;
+			}
+			catch (IOException e) {
+				OkapiIOException re = new OkapiIOException(e);
+				LOGGER.log(Level.SEVERE,
+					"Could not open the URL. The URL is OK but the input stream could not be opened", re);
+				throw re;
+			}
+		}
+		else if ( getInputStream() != null ) {
+			readerFromInputStream(getInputStream());
+		}
+		else {
+			throw new OkapiIOException("RawDocument has no input defined.");
 		}
 
 		return inputReader;
@@ -205,8 +213,8 @@ public class RawDocument implements IResource {
 			inputReader = new InputStreamReader(inStream, getEncoding());
 		} catch (UnsupportedEncodingException e) {
 			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-			LOGGER.log(Level.SEVERE, "The encoding " + getEncoding()
-					+ "is not a standard Java encoding. Please check the spelling.", re);
+			LOGGER.log(Level.SEVERE,
+				String.format("The encoding '%s' is not supported.", getEncoding()), re);
 			throw re;
 		}
 	}
