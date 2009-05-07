@@ -4,15 +4,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -28,36 +31,95 @@ import org.junit.Test;
 public class TmxFilterTest {
 
 	private TmxFilter filter;
+	private FilterTestDriver testDriver;
 	
 	String simpleSnippet = "<?xml version=\"1.0\"?>\r"
-		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
+		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
 
+	String simpleBilingualSnippet = "<?xml version=\"1.0\"?>\r"
+		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+	
 	String tuMissingXmlLangSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
 
 	String invalidXmlSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tu></body></tmx>\r";
 
+	String emptyTuSnippet = "<?xml version=\"1.0\"?>\r"
+		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"></tu></body></tmx>\r";
+
+	String invalidElementsInsideTuSnippet = "<?xml version=\"1.0\"?>\r"
+		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><InvalidTag>Invalid Tag Content</InvalidTag><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
+	
+	
 	
 	@Before
 	public void setUp() {
 		filter = new TmxFilter();
+		testDriver = new FilterTestDriver();
+		testDriver.setDisplayLevel(1);
+		testDriver.setShowSkeleton(true);
 	}
 
+	
+	//--methods--
+	@Test
+	public void testGetName() {
+		assertEquals("okf_tmx", filter.getName());
+	}
 
+	@Test
+	public void testGetMimeType() {
+		assertEquals("text/x-tmx", filter.getMimeType());
+	}	
+	
+	@Test
+	public void testCancel() {
+		Event event;
+		filter.open(new RawDocument(simpleSnippet,"en-us","fr-fr"));			
+		while (filter.hasNext()) {
+			event = filter.next();
+			if (event.getEventType() == EventType.START_DOCUMENT) {
+				assertTrue(event.getResource() instanceof StartDocument);
+			} else if (event.getEventType() == EventType.TEXT_UNIT) {
+				//--cancel after first text unit--
+				filter.cancel();
+				assertTrue(event.getResource() instanceof TextUnit);
+			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
+				assertTrue(event.getResource() instanceof DocumentPart);
+			} 
+		}
+		
+		event = filter.next();
+		assertEquals(EventType.CANCELED, event.getEventType());
+		filter.close();		
+		
+	}	
+	
+	//--exceptions--
 	@Test (expected=NullPointerException.class)
 	public void testSourceLangNotSpecified() {
 		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, null));
 	}
 
 	@Test (expected=NullPointerException.class)
-	public void testTargetLangEmpty() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us",""));
+	public void testTargetLangNotSpecified() {
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us"));
+	}
+
+	@Test (expected=NullPointerException.class)
+	public void testTargetLangNotSpecified2() {
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us", null));
+	}
+	
+	@Test (expected=NullPointerException.class)
+	public void testSourceLangEmpty() {
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "","fr-fr"));
 	}	
 	
 	@Test (expected=NullPointerException.class)
-	public void testTargetLangEmpty2() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us",null));
+	public void testTargetLangEmpty() {
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us",""));
 	}	
 	
 	@Test (expected=OkapiBadFilterInputException.class)
@@ -69,6 +131,54 @@ public class TmxFilterTest {
 	public void testInvalidXml() {
 		FilterTestDriver.getStartDocument(getEvents(invalidXmlSnippet, "en-us","fr-fr"));
 	}
+
+	@Test (expected=OkapiBadFilterInputException.class)
+	public void testEmptyTu() {
+		FilterTestDriver.getStartDocument(getEvents(emptyTuSnippet, "en-us","fr-fr"));
+	}
+
+	@Test (expected=OkapiBadFilterInputException.class)
+	public void testInvalidElementInTu() {
+		FilterTestDriver.getStartDocument(getEvents(invalidElementsInsideTuSnippet, "en-us","fr-fr"));
+	}
+	
+	
+	@Test (expected=OkapiBadFilterInputException.class)
+	public void testOpenInvalidInputStream() {
+		InputStream nullStream=null;
+		filter.open(new RawDocument(nullStream,"en-us","fr-fr"));			
+		if ( !testDriver.process(filter) ) Assert.fail();
+		filter.close();	
+	}
+	
+	@Test (expected=OkapiIOException.class)
+	public void testOpenInvalidUri() throws Exception{
+
+		String basePath = TmxFilterTest.class.getResource("/Paragraph_TM.tmx").toURI().getPath();
+		basePath = "file://"+basePath.replace("/bin/Paragraph_TM.tmx","");
+
+		URI invalid_uri = new URI(basePath+"/invalid_filename.tmx");
+		filter.open(new RawDocument(invalid_uri,"en-us","fr-fr"));			
+		if ( !testDriver.process(filter) ) Assert.fail();
+		filter.close();	
+	}
+	
+	@Test
+	public void testInputStream() {
+		InputStream htmlStream = TmxFilterTest.class.getResourceAsStream("/Paragraph_TM.tmx");
+		filter.open(new RawDocument(htmlStream, "UTF-8", "en-us","fr-fr"));
+		if ( !testDriver.process(filter) ) Assert.fail();
+		filter.close();
+	}	
+	
+	/*
+	@Test
+	public void testOutputBasic_Comment () {
+		assertEquals(simpleBilingualSnippet, FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "fr-fr"));
+		System.out.println(FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "en"));
+	}*/	
+	
+	
 	
 	
 	@Test
@@ -90,7 +200,7 @@ public class TmxFilterTest {
 		assertEquals("tuid_1", tu.getName());
 	}
 	
-	@Test
+/*	@Test
 	public void runTest () {
 		FilterTestDriver testDriver = new FilterTestDriver();
 		TmxFilter filter = null;		
@@ -111,7 +221,7 @@ public class TmxFilterTest {
 		finally {
 			if ( filter != null ) filter.close();
 		}
-	}	
+	}	*/
 	
 /*	private void process (IFilter filter) {
 		
