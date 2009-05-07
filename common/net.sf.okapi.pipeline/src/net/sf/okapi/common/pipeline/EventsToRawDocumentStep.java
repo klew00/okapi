@@ -39,8 +39,8 @@ public class EventsToRawDocumentStep extends BasePipelineStep {
 	private URI userOutput;
 
 	/**
-	 * Create a EventsToRawDocumentStep that creates a temp file to write out
-	 * {@link Event}s. The temp file is closed after writing and passed down as
+	 * Create a EventsToRawDocumentStep that creates a temporary file to write out
+	 * {@link Event}s. The temporary file is closed after writing and passed down as
 	 * a {@link URI} to subsequent steps.
 	 */
 	public EventsToRawDocumentStep() {

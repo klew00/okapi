@@ -35,12 +35,27 @@ public class EventsWriterStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;
 
+	/**
+	 * Creates a new EventsWriterStep object.
+	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 */
+	public EventsWriterStep () {
+	}
+	
 	public EventsWriterStep(IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;
 	}
 
 	public IFilterWriter getFilterWriter() {
 		return filterWriter;
+	}
+	
+	/**
+	 * Sets the filter writer for this EventsWriterStep object.
+	 * @param filterWriter the filter writer to use.
+	 */
+	public void setFilterWriter (IFilterWriter filterWriter) {
+		this.filterWriter = filterWriter;
 	}
 
 	public String getName() {

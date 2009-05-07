@@ -33,8 +33,16 @@ import net.sf.okapi.common.resource.RawDocument;
  * @see EventsWriterStep 
  */
 public class RawDocumentToEventsStep extends BasePipelineStep {
+	
 	private IFilter filter;
 	private boolean hasEvents;
+
+	/**
+	 * Creates a new RawDocumentToEventsStep object.
+	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 */
+	public RawDocumentToEventsStep () {
+	}
 	
 	public RawDocumentToEventsStep(IFilter filter) {
 		this.filter = filter;
@@ -42,6 +50,14 @@ public class RawDocumentToEventsStep extends BasePipelineStep {
 
 	public IFilter getFilter() {
 		return filter;
+	}
+
+	/**
+	 * Sets the filter for this RawDocumentToEventsStep object.
+	 * @param filter the filter to use.
+	 */
+	public void setFilter (IFilter filter) {
+		this.filter = filter;
 	}
 
 	public String getName() {
@@ -58,7 +74,7 @@ public class RawDocumentToEventsStep extends BasePipelineStep {
 	}
 	
 	@Override
-	public Event handleEvent(Event event) {
+	public Event handleEvent (Event event) {
 		if (event != null && event.getEventType() == EventType.RAW_DOCUMENT) {
 			filter.open((RawDocument)event.getResource());
 		}
