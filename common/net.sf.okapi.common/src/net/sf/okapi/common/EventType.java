@@ -86,9 +86,14 @@ public enum EventType {
 	CANCELED,
 
 	/**
-	 * Used to notify pipeline steps that the pipeline is being shutdown.
+	 * Used to notify pipeline steps that the current batch operation is finished.
 	 */
 	FINISHED,
+	
+	/**
+	 * Used to notify pipeline steps that the current batch operation is starting.
+	 */
+	START,
 
 	/**
 	 * Document-level event. A {@link net.sf.okapi.common.resource.RawDocument} resource
