@@ -21,8 +21,11 @@
 package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -32,9 +35,70 @@ public class PipelineWrapper {
 	
 	private String path;
 	private ArrayList<Step> steps;
+	public final Map<String, Step> availableSteps;
 
+	// Temporary class to create a list of available steps
+	private Map<String, Step> buildStepList () {
+		Hashtable<String, Step> map = new Hashtable<String, Step>();
+		try {
+			Step step = new Step("RawDocumentToEventsStep",
+				"Raw document to filter events",
+				"net.sf.okapi.common.pipeline.RawDocumentToEventsStep", null);
+			IPipelineStep ps;
+			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			IParameters params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+				
+			step = new Step("EventsToRawDocumentStep",
+				"Filter events to raw document",
+				"net.sf.okapi.common.pipeline.EventsToRawDocumentStep", null);
+			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+							
+			step = new Step("EventsWriterStep",
+				"Filter events writer",
+				"net.sf.okapi.common.pipeline.EventsWriterStep", null);
+			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+								
+			step = new Step("XSLTransformStep",
+				"XSL transformation",
+				"net.sf.okapi.steps.xsltransform.XSLTransformStep", null);
+			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+			
+		}
+		catch ( InstantiationException e ) {
+			e.printStackTrace();
+		}
+		catch ( IllegalAccessException e ) {
+			e.printStackTrace();
+		}
+		catch ( ClassNotFoundException e ) {
+			e.printStackTrace();
+		}		
+		return map;
+	}
+	
 	public PipelineWrapper () {
 		steps = new ArrayList<Step>();
+		//TODO: use register system for this
+		availableSteps = buildStepList();
 	}
 	
 	public void clear () {
@@ -60,8 +124,7 @@ public class PipelineWrapper {
 			writer.writeLineBreak();
 			for ( Step step : steps ) {
 				writer.writeStartElement("step");
-				writer.writeAttributeString("utilId", step.utilId);
-				writer.writeAttributeString("className", step.className);
+				writer.writeAttributeString("stepClass", step.stepClass);
 				writer.writeEndElementLineBreak(); // step
 			}
 			writer.writeEndElementLineBreak(); // pipeline
@@ -79,7 +142,7 @@ public class PipelineWrapper {
 			// Create the real pipeline from the info
 			pipeline = new Pipeline();
 			for ( Step stepInfo : steps ) {
-				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.className).newInstance();
+				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
 				pipeline.addStep(step);
 			}
 
@@ -102,7 +165,7 @@ public class PipelineWrapper {
 	}
 
 	public void addStep (Step step) {
-		insertStep(-1, step); // insert at the end
+		steps.add(step);
 	}
 	
 	public void insertStep (int index,

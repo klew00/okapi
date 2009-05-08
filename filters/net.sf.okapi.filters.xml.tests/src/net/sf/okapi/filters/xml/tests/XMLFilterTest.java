@@ -106,11 +106,11 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputSimpleContent_WithLang () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-			+ "<doc xml:lang='en'>test</doc>";
-		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-			+ "<doc xml:lang='FR'>test</doc>";
-		//TODO: Make this work
+//		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+//			+ "<doc xml:lang='en'>test</doc>";
+//		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+//			+ "<doc xml:lang='FR'>test</doc>";
+		//TODO: Implement replacement of the lang value
 		//assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
 	}
 	
@@ -171,17 +171,6 @@ public class XMLFilterTest {
 		assertEquals("value 1", tu.getSource().toString());
 	}
 	
-	private ArrayList<Event> getEvents(String snippet) {
-		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en"));
-		while ( filter.hasNext() ) {
-			Event event = filter.next();
-			list.add(event);
-		}
-		filter.close();
-		return list;
-	}
-
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
@@ -210,6 +199,17 @@ public class XMLFilterTest {
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+	}
+
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, "en"));
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
 	}
 
 }

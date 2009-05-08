@@ -39,8 +39,8 @@
   
  <!-- Pipeline menu -->
  <command name="pipeline">&amp;Pipeline</command>
- <command name="pipeline.edit">&amp;Edit Pipeline...</command>
- <command name="pipeline.execute">E&amp;xcute Pipeline...</command>
+ <command name="pipeline.edit">&amp;Edit Pipeline... (TEST)</command>
+ <command name="pipeline.execute">E&amp;xcute Pipeline... (TEST)</command>
   
  <!-- Tools menu -->
  <command name="tools">&amp;Tools</command>

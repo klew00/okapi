@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.xsltransform;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 import javax.xml.transform.Result;
@@ -115,7 +114,7 @@ public class XSLTransformStep implements IPipelineStep {
 			trans = fact.newTransformer(xsltInput);
 		}
 		catch ( TransformerConfigurationException e ) {
-			throw new RuntimeException("Error in XSLT input", e);
+			throw new OkapiIOException("Error in XSLT input", e);
 		}
 	}
 
@@ -135,7 +134,7 @@ public class XSLTransformStep implements IPipelineStep {
 			try {
 				tmpOut = File.createTempFile("okptmp_", ".xml");
 			}
-			catch ( IOException e ) {
+			catch ( Throwable e ) {
 				throw new OkapiIOException("Cannot create temporary output.", e);
 			}
 			Result result = new javax.xml.transform.stream.StreamResult(tmpOut);
@@ -144,11 +143,12 @@ public class XSLTransformStep implements IPipelineStep {
 			trans.transform(xmlInput, result);
 			
 			// Create the new raw-document resource
-			event.setResource(new RawDocument(tmpOut.toURI(), "UTF-8",
-				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+			// Other info stays the same
+			rawDoc.setEncoding("UTF-8");
+			rawDoc.setInputURI(tmpOut.toURI());
 		}
 		catch ( TransformerException e ) {
-			throw new RuntimeException("Transformation error.", e);
+			throw new OkapiIOException("Transformation error.", e);
 		}
 	}
 

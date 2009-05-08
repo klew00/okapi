@@ -291,7 +291,7 @@ public class FilterSettingsPanel extends Composite {
 			String filterSettings;
 			while ( true ) {
 				InputDialog dlg = new InputDialog(getShell(), "New Parameters",
-					"Name:", "myParameters", null, 0);
+					"Name:", "myParameters", null, 0, -1);
 				String newName = dlg.showDialog();
 				if ( newName == null ) return;
 				filterSettings = getFilterName(cbFilters.getText()) + FilterSettingsMarkers.PARAMETERSSEP + newName;

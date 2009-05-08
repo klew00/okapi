@@ -985,7 +985,7 @@ public class SRXEditor {
 			String pattern = srxDoc.getMaskRule();
 			while ( true ) {
 				InputDialog dlg = new InputDialog(shell, Res.getString("edit.maskRuleCaption"), //$NON-NLS-1$
-					Res.getString("edit.maskRuleDesc"), "", null, 0);  //$NON-NLS-1$  //$NON-NLS-2$
+					Res.getString("edit.maskRuleDesc"), "", null, 0, -1);  //$NON-NLS-1$  //$NON-NLS-2$
 				dlg.setInputValue(pattern);
 				dlg.setAllowEmptyValue(true);
 				pattern = dlg.showDialog();

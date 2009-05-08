@@ -44,12 +44,13 @@ public class InputDialog {
 
 	/**
 	 * Creates a simple input dialog with one text field.
-	 * @param parent Parent shell of the dialog.
-	 * @param captionText Title of the dialog (can be null).
-	 * @param labelText Label of the text field (must be set).
-	 * @param defaultInputText Default input text (can be null).
-	 * @param helpFile Path to the help file (can be null).
-	 * @param buttonOptions Indicates if a browse button should be set:
+	 * @param parent parent shell of the dialog.
+	 * @param captionText title of the dialog (can be null).
+	 * @param labelText label of the text field (must be set).
+	 * @param defaultInputText default input text (can be null).
+	 * @param helpFile path to the help file (can be null).
+	 * @param buttonOptions indicates if a browse button should be set:
+	 * @param multiline height hint in pixel if the field is to be multiline, -1 otherwise.
 	 * 0=none, 1=directory browser.
 	 */
 	public InputDialog (Shell parent,
@@ -57,7 +58,8 @@ public class InputDialog {
 		String labelText,
 		String defaultInputText,
 		String helpFile,
-		int buttonOptions)
+		int buttonOptions,
+		int multiline)
 	{
 		help = helpFile;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -79,9 +81,11 @@ public class InputDialog {
 			label.setLayoutData(gdTmp);
 		}
 		
-		edField = new Text(cmpTmp, SWT.BORDER | SWT.SINGLE);
+		int opt = SWT.BORDER | SWT.SINGLE;
+		if ( multiline > 0 ) opt = SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL;
+		edField = new Text(cmpTmp, opt);
 		if ( defaultInputText != null ) edField.setText(defaultInputText);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		if ( buttonOptions == 0 ) {
 			gdTmp.horizontalSpan = 2;
 		}
@@ -94,6 +98,7 @@ public class InputDialog {
 				};
 			});
 		}
+		if ( multiline > 0 ) gdTmp.heightHint = multiline;
 		edField.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons

@@ -20,10 +20,12 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.applications.rainbow.plugins.PluginItem;
-import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
+import java.util.ArrayList;
+import java.util.Map;
+
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -45,7 +47,8 @@ public class PipelineEditor {
 	private IHelp help;
 //	private String projectDir;
 	private PipelineWrapper wrapper;
-	private PluginsAccess pa;
+	private Map<String, Step> availableSteps;
+	private ArrayList<Step> workSteps;
 	private Text edPath;
 	private List lbSteps;
 	private Button btLoad;
@@ -57,7 +60,7 @@ public class PipelineEditor {
 	private OKCancelPanel pnlActions;
 	
 	public boolean edit (Shell parent,
-		PluginsAccess pa,
+		Map<String, Step> availableSteps,
 		PipelineWrapper wrapper,
 		IHelp helpParam,
 		String projectDir,
@@ -65,7 +68,11 @@ public class PipelineEditor {
 	{
 		boolean result = false;
 		try {
-			this.pa = pa;
+			this.availableSteps = availableSteps;
+			workSteps = new ArrayList<Step>();
+			for ( Step step : wrapper.getSteps() ) {
+				workSteps.add(step.clone());
+			}
 			this.wrapper = wrapper;
 			this.help = helpParam;
 //			this.projectDir = projectDir;
@@ -218,8 +225,8 @@ public class PipelineEditor {
 	private void populate (int index) {
 		edPath.setText(wrapper.getPath()==null ? "" : wrapper.getPath());
 		lbSteps.removeAll();
-		for ( Step step : wrapper.getSteps() ) {
-			lbSteps.add(pa.getItem(step.utilId).toString());
+		for ( Step step : workSteps ) {
+			lbSteps.add(String.format("%s  [%s]", step.name, step.id));
 		}
 		if ( index != -1 ) {
 			if (( index < 0 ) || ( index > lbSteps.getItemCount() )) {
@@ -234,10 +241,13 @@ public class PipelineEditor {
 	
 	private void addStep () {
 		try {
-			UtilityPicker dlg = new UtilityPicker(shell, pa, help);
-			String util = dlg.showDialog();
-			if ( util == null ) return;
-			lbSteps.add(util);
+			UtilityPicker dlg = new UtilityPicker(shell, availableSteps, help);
+			String display = dlg.showDialog();
+			if ( display == null ) return;
+			String id = getId(display);
+			workSteps.add(availableSteps.get(id).clone());
+			lbSteps.add(display);
+			lbSteps.select(lbSteps.getItemCount()-1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -246,6 +256,26 @@ public class PipelineEditor {
 	
 	private void editStep () {
 		try {
+			int n = lbSteps.getSelectionIndex();
+			if ( n < 0 ) return;
+			Step step = workSteps.get(n);
+			if ( step.paramsData == null ) {
+				// No parameters for this step
+				return;
+			}
+			
+			if ( step.editorClass != null ) {
+//				params.fromString(step.paramsData);
+//				IParametersEditor editor = (IParametersEditor)Class.forName(step.editorClass).newInstance();
+//				editor.edit(paramsObject, uiContext, helpParam, projectDir)
+			}
+			else {
+				InputDialog dlg  = new InputDialog(shell, "Step Parameters", "Parameters:",
+					step.paramsData, null, 0, 200);
+				String data = dlg.showDialog();
+				if ( data == null ) return;
+				step.paramsData = data;
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -254,6 +284,7 @@ public class PipelineEditor {
 	
 	private void removeStep () {
 		try {
+			Dialogs.showError(shell, "Not implemented yet.", null);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -261,18 +292,17 @@ public class PipelineEditor {
 	}
 	
 	private boolean saveData () {
-		// Update the wrapper
+		// Copy the work steps to the real object
 		wrapper.clear();
-		for ( int i=0; i<lbSteps.getItemCount(); i++ ) {
-			String id = getId(lbSteps.getItem(i));
-			PluginItem item = pa.getItem(id);
-			wrapper.addStep(new Step(id, item.pluginClass));
+		for ( Step step : workSteps ) {
+			wrapper.addStep(step);
 		}
 		return true;
 	}
 	
 	private void save (String path) {
-		try {
+		Dialogs.showError(shell, "Not implemented yet.", null);
+/*		try {
 			if (( path == null ) || ( path.length() == 0 )) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null, null, null);
 				if ( path == null ) return;
@@ -284,11 +314,12 @@ public class PipelineEditor {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-		}
+		}*/
 	}
 
 	private void load (String path) {
-		try {
+		Dialogs.showError(shell, "Not implemented yet.", null);
+/*		try {
 			if (( path == null ) || ( path.length() == 0 )) {
 				String[] paths = Dialogs.browseFilenames(shell, "Load Pipeline", false, null, null, null);
 				if ( paths == null ) return;
@@ -299,7 +330,7 @@ public class PipelineEditor {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-		}
+		}*/
 	}
 
 }

@@ -31,5 +31,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/stax-wstx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.xsltransform"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

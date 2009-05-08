@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2008 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -16,34 +16,38 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
+============================================================================*/
 
-package net.sf.okapi.applications.rainbow.pipeline;
+package net.sf.okapi.steps.bomconversion;
 
-// Temporary structure to try steps
-public class Step {
+import net.sf.okapi.common.BaseParameters;
 
-	public String id;
-	public String name;
-	public String stepClass;
-	public String editorClass;
-	public String paramsData;
+public class Parameters extends BaseParameters {
 
-	public Step (String id,
-		String name,
-		String stepClass,
-		String editorClass)
-	{
-		this.id = id;
-		this.name = name;
-		this.stepClass = stepClass;
-		this.editorClass = editorClass;
+	public boolean removeBOM;
+	public boolean alsoNonUTF8;
+
+	public Parameters () {
+		reset();
+	}
+	
+	public void reset() {
+		removeBOM = false;
+		alsoNonUTF8 = false;
 	}
 
-	@Override
-	public Step clone () {
-		Step newStep = new Step(id, name, stepClass, editorClass);
-		newStep.paramsData = paramsData;
-		return newStep;
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		removeBOM = buffer.getBoolean("removeBOM", removeBOM);
+		alsoNonUTF8 = buffer.getBoolean("alsoNonUTF8", alsoNonUTF8);
 	}
+
+	public String toString() {
+		buffer.reset();
+		buffer.setParameter("removeBOM", removeBOM);
+		buffer.setParameter("alsoNonUTF8", alsoNonUTF8);
+		return buffer.toString();
+	}
+
 }

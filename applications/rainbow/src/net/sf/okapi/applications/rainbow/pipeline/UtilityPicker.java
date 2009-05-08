@@ -20,10 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import java.util.Iterator;
+import java.util.Map;
 
-import net.sf.okapi.applications.rainbow.plugins.PluginItem;
-import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -47,7 +45,7 @@ class UtilityPicker {
 	private OKCancelPanel pnlActions;
 	
 	public UtilityPicker (Shell parent,
-		PluginsAccess pa,
+		Map<String, Step> steps,
 		IHelp helpParam) 
 	{
 		result = null;
@@ -57,17 +55,15 @@ class UtilityPicker {
 		shell.setLayout(new GridLayout());
 		
 		Label label = new Label(shell, SWT.None);
-		label.setText("Utilities available:");
+		label.setText("Available steps:");
 		
 		lbUtilities = new List(shell, SWT.BORDER | SWT.V_SCROLL);
 		lbUtilities.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-		Iterator<String> iter = pa.getIterator();
-		PluginItem item;
-		while ( iter.hasNext() ) {
-			item = pa.getItem(iter.next());
-			if ( item.type != PluginsAccess.TYPE_UTILITY ) continue;
-			lbUtilities.add(item.toString());
+
+		Step step;
+		for ( String id : steps.keySet() ) {
+			step = steps.get(id);
+			lbUtilities.add(String.format("%s  [%s]", step.name, step.id));
 		}
 		
 		// Dialog-level buttons
