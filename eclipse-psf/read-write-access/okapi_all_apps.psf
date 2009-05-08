@@ -24,6 +24,9 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.translation,net.sf.okapi.lib.translation"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/mt/net.sf.okapi.mt.google,net.sf.okapi.mt.google"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline,net.sf.okapi.pipeline"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.steps.bomconversion,net.sf.okapi.steps.bomconversion"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.steps.charlisting,net.sf.okapi.steps.charlisting"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.steps.xlstransform,net.sf.okapi.steps.xsltransform"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.globalsight,net.sf.okapi.tm.globalsight"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.open-tran,net.sf.okapi.tm.opentran"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.simpletm,net.sf.okapi.tm.simpletm"/>
@@ -50,6 +53,11 @@
 <item elementID="=net.sf.okapi.ui.filters.po" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.lib.segmentation" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Steps" name="Okapi-Steps">
+<item elementID="=net.sf.okapi.steps.bomconversion" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.steps.charlisting" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.steps.xsltransform" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Lib" name="Okapi-Lib">
 <item elementID="=net.sf.okapi.tm.trados" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/win32-x86" type="4"/>
@@ -73,6 +81,7 @@
 <item elementID="=net.sf.okapi.filters.tmx" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.plaintext" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.javascript" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.markupfilter" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xliff" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -81,7 +90,6 @@
 <item elementID="=net.sf.okapi.filters.xml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.pipeline" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.plaintext" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Apps" name="Okapi-Apps">
 <item elementID="=rainbow" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
