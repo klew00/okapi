@@ -113,7 +113,7 @@ public class OpenXMLRoundTripTest {
 			sUserDir = sUserDir.substring(6,sUserDir.length()-5);
 			//sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
 			sInputPath = sUserDir + "/data/";
-			sOutputPath = sUserDir + "/output/";
+			sOutputPath = sUserDir + "/ootput/";
 			sGoldPath = sUserDir + "/gold/";
 			uri = new URI(sInputPath+filename);
 			try
