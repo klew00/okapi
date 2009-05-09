@@ -135,12 +135,16 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	/**
-	 * Appends a string of data to the first skeleton part.
+	 * Appends a string of data to the first skeleton part, a new
+	 * part is created is none exists already.
 	 * @param data the string data to append.
 	 */
 	public void appendToFirstPart (String data) { // DWH 5-2-09
 		if ( data.length() == 0 ) return;
-		if (!list.isEmpty()) {
+		if ( list.isEmpty() ) {
+			add(data);
+		}
+		else {
 			list.get(0).append(data);
 		}
 	}
@@ -153,7 +157,7 @@ public class GenericSkeleton implements ISkeleton {
 	 */
 	public void append (String data) {
 		if ( data.length() == 0 ) return;
-		if (( createNew ) || ( list.size() == 0 )) {
+		if ( createNew || list.isEmpty() ) {
 			add(data);
 		}
 		else {
@@ -168,7 +172,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param data the character data to append.
 	 */
 	public void append (char data) {
-		if (( createNew ) || ( list.size() == 0 )) {
+		if ( createNew || list.isEmpty() ) {
 			add(data);
 		}
 		else {

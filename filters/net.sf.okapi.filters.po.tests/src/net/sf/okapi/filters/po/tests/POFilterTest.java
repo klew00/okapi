@@ -189,8 +189,8 @@ public class POFilterTest {
 		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.po", null));
-		list.add(new InputDocument(root+"Test02.po", null));
+//		list.add(new InputDocument(root+"Test01.po", null));
+//		list.add(new InputDocument(root+"Test02.po", null));
 		list.add(new InputDocument(root+"Test03.po", null));
 		list.add(new InputDocument(root+"Test04.po", null));
 		list.add(new InputDocument(root+"Test05.po", null));

@@ -217,8 +217,23 @@ public class QueryManager {
 	 * @return The number of hits for the given query.
 	 */
 	public int query (String plainText) {
-		TextFragment tf = new TextFragment(plainText);
-		return query(tf);
+		results.clear();
+		ResourceItem ri;
+		for ( int id : resList.keySet() ) {
+			ri = resList.get(id);
+			if ( !ri.enabled ) continue; // Skip disabled entries
+			if ( ri.query.query(plainText) > 0 ) {
+				QueryResult res;
+				while ( ri.query.hasNext() ) {
+					res = ri.query.next();
+					res.connectorId = id;
+					results.add(res);
+				}
+			}
+		}
+		if ( results.size() > 0 ) current = 0;
+		Collections.sort(results); // Sort by weights
+		return results.size();
 	}
 
 	/**

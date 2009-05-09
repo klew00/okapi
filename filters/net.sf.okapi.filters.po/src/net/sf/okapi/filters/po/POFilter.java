@@ -413,6 +413,7 @@ public class POFilter implements IFilter {
 				skel.append(textLine);
 				StartGroup startGroup = new StartGroup(null, String.valueOf(++otherId));
 				startGroup.setSkeleton(skel);
+				skel.append(lineBreak);
 				startGroup.setType("x-gettext-domain");
 				setDomainName(startGroup);
 				level++;
@@ -524,7 +525,7 @@ public class POFilter implements IFilter {
 			if ( part2 != null ) {
 				skel.append(part2);
 			}
-			skel.add(lineBreak);
+			else skel.add(lineBreak);
 
 			// Send this entry as a document part
 			return new Event(EventType.DOCUMENT_PART, dp);

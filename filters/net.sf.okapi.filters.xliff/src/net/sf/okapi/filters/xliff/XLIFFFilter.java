@@ -39,6 +39,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -119,7 +120,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return "text/x-xliff";
+		return MimeTypeMapper.XLIFF_MIME_TYPE;
 	}
 
 	public IParameters getParameters () {
@@ -262,8 +263,8 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setType("text/x-xliff");
-			startDoc.setMimeType("text/x-xliff");
+			startDoc.setType(MimeTypeMapper.XLIFF_MIME_TYPE);
+			startDoc.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
 			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(lineBreak);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
@@ -325,6 +326,9 @@ public class XLIFFFilter implements IFilter {
 				else if ( "group".equals(name) ) {
 					if ( processStartGroup() ) return true;
 				}
+				else if ( "bin-unit".equals(name) ) {
+					if ( processStartBinUnit() ) return true;
+				}
 				else storeStartElement();
 				break;
 				
@@ -335,6 +339,9 @@ public class XLIFFFilter implements IFilter {
 				}
 				else if ( "group".equals(reader.getLocalName()) ) {
 					return processEndGroup();
+				}
+				else if ( "bin-unit".equals(reader.getLocalName()) ) {
+					return processEndBinUnit();
 				}
 				break;
 				
@@ -549,7 +556,7 @@ public class XLIFFFilter implements IFilter {
 					if ( "trans-unit".equals(name) ) {
 						storeEndElement();
 						tu.setSkeleton(skel);
-						tu.setMimeType("text/xml");
+						tu.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						return true;
 					}
@@ -1068,6 +1075,40 @@ public class XLIFFFilter implements IFilter {
 			return false;
 		}
 
+		// Else: it's a structural group
+		Ending ending = new Ending(String.valueOf(id));
+		ending.setSkeleton(skel);
+		queue.add(new Event(EventType.END_GROUP, ending));
+		return true;
+	}
+
+	private boolean processStartBinUnit () {
+		storeStartElement();
+
+		String tmp = reader.getAttributeValue("", "id");
+		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
+
+		StartGroup group = new StartGroup(parentIds.peek().toString(),
+			String.valueOf(++groupId));
+		group.setSkeleton(skel);
+		parentIds.push(groupId);
+		queue.add(new Event(EventType.START_GROUP, group));
+
+		// Get id for resname
+		tmp = reader.getAttributeValue("", "resname");
+		if ( tmp != null ) group.setName(tmp);
+		else if ( params.fallbackToID ) {
+			group.setName(reader.getAttributeValue("", "id"));
+		}
+
+		// Get restype (can be null)
+		group.setType(reader.getAttributeValue("", "restype"));
+		return true;
+	}
+
+	private boolean processEndBinUnit () {
+		// Pop and checks the value for this group
+		int id = parentIds.pop();
 		// Else: it's a structural group
 		Ending ending = new Ending(String.valueOf(id));
 		ending.setSkeleton(skel);

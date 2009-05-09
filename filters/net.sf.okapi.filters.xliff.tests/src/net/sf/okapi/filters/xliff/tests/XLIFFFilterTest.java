@@ -162,6 +162,8 @@ public class XLIFFFilterTest {
 		list.add(new InputDocument(root+"RB-11-Test01.xlf", null));
 		list.add(new InputDocument(root+"RB-12-Test02.xlf", null));
 		list.add(new InputDocument(root+"SF-12-Test03.xlf", null));
+		list.add(new InputDocument(root+"NStest01.xlf", null));
+		list.add(new InputDocument(root+"BinUnitTest01.xlf", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 

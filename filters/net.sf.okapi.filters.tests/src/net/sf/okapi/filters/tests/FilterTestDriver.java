@@ -209,8 +209,11 @@ public class FilterTestDriver {
 	static public boolean compareEvent(Event manual,
 		Event generated)
 	{
-		if (generated.getEventType() != manual.getEventType()) {
-			System.err.println("Event type difference");
+		if ( generated.getEventType() != manual.getEventType() ) {
+			System.err.println("Event type difference: "
+				+ generated.getEventType().toString()
+				+ " and "
+				+ manual.getEventType().toString());
 			return false;
 		}
 		
@@ -228,6 +231,27 @@ public class FilterTestDriver {
 				return false;
 			}
 			break;
+			
+		case START_GROUP:
+			StartGroup sg1 = (StartGroup)manual.getResource();
+			StartGroup sg2 = (StartGroup)generated.getResource();
+			if ( !compareIResource(sg1, sg2) ) {
+				return false;
+			}
+			if ( !compareINameable(sg1, sg2) ) {
+				return false;
+			}
+			if (sg1.isReferent() != sg2.isReferent()) {
+				return false;
+			}
+			break;
+
+		case END_GROUP:
+			if ( !compareIResource(manual.getResource(), generated.getResource()) ) {
+				return false;
+			}
+			break;
+			
 			
 		case TEXT_UNIT:
 			if ( !compareTextUnit((TextUnit)manual.getResource(), (TextUnit)generated.getResource()) ) {
@@ -629,7 +653,10 @@ public class FilterTestDriver {
 			}
 			else {
 				if ( tmp2 == null ) return false;
-				if ( !tmp1.equals(tmp2) ) return false;
+				if ( !tmp1.equals(tmp2) ) {
+					System.err.println("Skeleton differences: 1='"+tmp1+"'\n2='"+tmp2+"'");
+					return false;
+				}
 			}
 		}
 

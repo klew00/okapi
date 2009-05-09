@@ -41,6 +41,7 @@ public class ServalForm {
 	private TableModel modResults;
 	private QueryManager queryMgt;
 	private Font displayFont;
+	private Button chkRawText;
 	
 	public ServalForm (Shell shell) {
 		try {
@@ -63,7 +64,7 @@ public class ServalForm {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(2, false);
+		GridLayout layTmp = new GridLayout(3, false);
 		shell.setLayout(layTmp);
 		
 		// Menus
@@ -102,6 +103,7 @@ public class ServalForm {
 		edQuery = new Text(shell, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
+		gdTmp.horizontalSpan = 2;
 		edQuery.setLayoutData(gdTmp);
 
 		Font font = edQuery.getFont();
@@ -111,6 +113,7 @@ public class ServalForm {
 		edQuery.setFont(displayFont);
 		
 		stTmp = new Label(shell, SWT.NONE); // Place-holder
+		
 		Button btSearch = UIUtil.createGridButton(shell, SWT.PUSH, "Search", 80, 1);
 		btSearch.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -119,6 +122,9 @@ public class ServalForm {
 		});
 		shell.setDefaultButton(btSearch);
 		
+		chkRawText = new Button(shell, SWT.CHECK);
+		chkRawText.setText("Raw text");
+		
 		stTmp = new Label(shell, SWT.NONE);
 		stTmp.setText("Target:");
 		stTmp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
@@ -126,6 +132,7 @@ public class ServalForm {
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
+		gdTmp.horizontalSpan = 2;
 		edTarget.setLayoutData(gdTmp);
 		edTarget.setEditable(false);
 		edTarget.setFont(displayFont);
@@ -137,13 +144,14 @@ public class ServalForm {
 		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
+		gdTmp.horizontalSpan = 2;
 		edSource.setLayoutData(gdTmp);
 		edSource.setEditable(false);
 		edSource.setFont(displayFont);
 		
 		tblResults = new Table(shell, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		tblResults.setFont(displayFont);
 		tblResults.setLayoutData(gdTmp);
 		tblResults.setHeaderVisible(true);
@@ -170,7 +178,12 @@ public class ServalForm {
 	
 	private void query () {
 		try {
-			queryMgt.query(parseToTextFragment(edQuery.getText()));
+			if ( chkRawText.getSelection() ) {
+				queryMgt.query(edQuery.getText());
+			}
+			else {
+				queryMgt.query(parseToTextFragment(edQuery.getText()));
+			}
 			modResults.updateTable(queryMgt);
 			updateCurrentHit();
 		}

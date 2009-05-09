@@ -27,6 +27,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.axis.AxisFault;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -47,6 +49,8 @@ import com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.filterwriter.TMXContent;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -65,8 +69,10 @@ public class GlobalSightTMConnector implements ITMQuery {
 	private String gsTmProfile;
 	private Parameters params;
 	private DocumentBuilder docBuilder;
+	private TMXContent fmt;
 
 	public GlobalSightTMConnector () {
+		fmt = new TMXContent();
 		params = new Parameters();
 		DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 		Fact.setValidating(false);
@@ -127,7 +133,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 			results = new ArrayList<QueryResult>();
 		}
 		catch ( AxisFault e ) {
-			throw new RuntimeException("Error creating the GS Web services.", e);
+			throw new RuntimeException("Error creating the GlobalSight Web services.", e);
 		}
 		catch ( RemoteException e ) {
 			throw new RuntimeException("Error when login.", e);
@@ -135,6 +141,49 @@ public class GlobalSightTMConnector implements ITMQuery {
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException("Invalid server URL.", e);
 		}
+	}
+
+	public int query (TextFragment text) {
+		try {
+			results.clear();
+			String xmlRes = gsWS.searchEntries(gsToken,
+				gsTmProfile, fmt.setContent(text).toString(), srcLang);
+			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
+			NodeList list1 = doc.getElementsByTagName("entry");
+			Element elem;
+			NodeList list2;
+			NodeList list3;
+			QueryResult res;
+			for ( int i=0; i<list1.getLength(); i++ ) {
+				if ( i >= maxHits ) break;
+				elem = (Element)list1.item(i);
+				list2 = elem.getElementsByTagName("percentage");
+				res = new QueryResult();
+				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				if ( res.score < threshold ) continue;
+				list2 = elem.getElementsByTagName("source");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.source = readSegment((Element)list3.item(0));
+				list2 = elem.getElementsByTagName("target");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.target = readSegment((Element)list3.item(0));
+				results.add(res);
+			}
+		}
+		catch ( WebServiceException e ) {
+			throw new RuntimeException("Error querying TM.", e);
+		}
+		catch ( RemoteException e ) {
+			throw new RuntimeException("Error querying TM.", e);
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException("Error with query results.", e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error with query results.", e);
+		}
+		if ( results.size() > 0 ) current = 0;
+		return results.size();
 	}
 
 	public int query (String plainText) {
@@ -170,10 +219,10 @@ public class GlobalSightTMConnector implements ITMQuery {
 			throw new RuntimeException("Error querying TM.", e);
 		}
 		catch ( SAXException e ) {
-			throw new RuntimeException("Error with query resuls.", e);
+			throw new RuntimeException("Error with query results.", e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error with query resuls.", e);
+			throw new RuntimeException("Error with query results.", e);
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();
@@ -183,7 +232,10 @@ public class GlobalSightTMConnector implements ITMQuery {
 	private TextFragment readSegment (Element elem) {
 		TextFragment tf = new TextFragment();
 		NodeList list = elem.getChildNodes();
+		int lastId = -1;
+		int id = -1;
 		Node node;
+		Stack<Code> stack = new Stack<Code>();
 		for ( int i=0; i<list.getLength(); i++ ) {
 			node = list.item(i);
 			switch ( node.getNodeType() ) {
@@ -191,36 +243,45 @@ public class GlobalSightTMConnector implements ITMQuery {
 				tf.append(node.getNodeValue());
 				break;
 			case Node.ELEMENT_NODE:
-				tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+				NamedNodeMap map = node.getAttributes();
+				Node attr = map.getNamedItem("type");
+				if ( node.getNodeName().equals("bpt") ) {
+					id = getIdentifier(lastId, map.getNamedItem("x"));
+					stack.push(tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()), "[bpt/]", id));
+				}
+				else if ( node.getNodeName().equals("ept") ) {
+					Code code = stack.pop();
+					tf.append(TagType.CLOSING, code.getType(), "[ept/]", code.getId());
+				}
+				else if ( node.getNodeName().equals("ph") ) {
+					id = getIdentifier(lastId, map.getNamedItem("x"));
+					tf.append(TagType.PLACEHOLDER, (attr==null ? "ph" : attr.getNodeValue()), "[ph/]", id);
+				}
+				else if ( node.getNodeName().equals("it") ) {
+					Node pos = map.getNamedItem("pos");
+					if ( pos == null ) { // Error, but just treat it as a placeholder
+						id = getIdentifier(lastId, map.getNamedItem("x"));
+						tf.append(TagType.PLACEHOLDER, (attr==null ? "ph" : attr.getNodeValue()), "[it/]", id);
+					}
+					else if ( pos.getNodeValue().equals("begin") ) {
+						id = getIdentifier(lastId, map.getNamedItem("x"));
+						tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()), "[it-bpt/]", id);
+					}
+					else { // Assumes 'end'
+						tf.append(TagType.CLOSING, (attr==null ? "Xpt" : attr.getNodeValue()), "[it-ept/]");
+					}
+				}
 				break;
 			}
 		}
 		return tf;
 	}
 
-	public int query (TextFragment text) {
-		String qtext = text.getCodedText();
-		StringBuilder tmpCodes = new StringBuilder();
-		if ( text.hasCode() ) {
-			StringBuilder tmpText = new StringBuilder();
-			for ( int i=0; i<qtext.length(); i++ ) {
-				switch ( qtext.charAt(i) ) {
-				case TextFragment.MARKER_OPENING:
-				case TextFragment.MARKER_CLOSING:
-				case TextFragment.MARKER_ISOLATED:
-				case TextFragment.MARKER_SEGMENT:
-					tmpCodes.append(qtext.charAt(i));
-					tmpCodes.append(qtext.charAt(++i));
-					break;
-				default:
-					tmpText.append(qtext.charAt(i));
-				}
-			}
-			qtext = tmpText.toString();
-		}
-		return query(qtext);
+	private int getIdentifier (int lastId, Node attr) {
+		if ( attr == null ) return ++lastId;
+		return Integer.valueOf(attr.getNodeValue());
 	}
-
+	
 	public void removeAttribute (String name) {
 	}
 

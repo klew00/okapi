@@ -163,9 +163,9 @@ public class RoundTripComparison {
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
 				case END_SUBDOCUMENT:
+					break;
 				case START_GROUP:
 				case END_GROUP:
-					break;
 				case TEXT_UNIT:
 					extraction1Events.add(event);
 					break;
@@ -194,9 +194,9 @@ public class RoundTripComparison {
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
 				case END_SUBDOCUMENT:
+					break;
 				case START_GROUP:
 				case END_GROUP:
-					break;
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
@@ -231,9 +231,9 @@ public class RoundTripComparison {
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
 				case END_SUBDOCUMENT:
+					break;
 				case START_GROUP:
 				case END_GROUP:
-					break;
 				case TEXT_UNIT:
 					extraction1Events.add(event);
 					break;
@@ -263,9 +263,9 @@ public class RoundTripComparison {
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
 				case END_SUBDOCUMENT:
+					break;
 				case START_GROUP:
 				case END_GROUP:
-					break;
 				case TEXT_UNIT:
 					extraction2Events.add(event);
 					break;
