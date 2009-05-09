@@ -135,6 +135,17 @@ public class GenericSkeleton implements ISkeleton {
 	}
 
 	/**
+	 * Appends a string of data to the first skeleton part.
+	 * @param data the string data to append.
+	 */
+	public void appendToFirstPart (String data) { // DWH 5-2-09
+		if ( data.length() == 0 ) return;
+		if (!list.isEmpty()) {
+			list.get(0).append(data);
+		}
+	}
+
+	/**
 	 * Appends a string of data to this skeleton. The text is added to
 	 * the current part if the current part is already a data part, a new
 	 * part is created is necessary. 

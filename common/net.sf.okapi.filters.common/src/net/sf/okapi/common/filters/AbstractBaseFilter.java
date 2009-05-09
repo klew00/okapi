@@ -999,6 +999,20 @@ public abstract class AbstractBaseFilter implements IFilter {
 		currentSkeleton = null;
 	}
 
+	/**
+	 * Appends text to the first data part of the skeleton {@link TextUnit}
+	 * 
+	 * @param text
+	 *            the text
+	 * 
+	 * @throws OkapiIllegalFilterOperationException
+	 */
+	protected void appendToFirstSkeletonPart(String text) { // DWH 5-2-09
+		Event tempTextUnit = peekTempEvent();
+		GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
+		skel.appendToFirstPart(text);
+	}
+
 	// ////////////////////////////////////////////////////////////////////////
 	// Group Methods
 	// ////////////////////////////////////////////////////////////////////////
