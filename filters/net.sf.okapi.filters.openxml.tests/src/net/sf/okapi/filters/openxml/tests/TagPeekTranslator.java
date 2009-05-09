@@ -37,6 +37,10 @@ import net.sf.okapi.filters.openxml.ITranslator;
 
 public class TagPeekTranslator extends GenericSkeletonWriter implements ITranslator {
 	  // extends GenericSkeletonWriter because expandCodeContent is protected
+	public final static int MSWORD=1;
+	public final static int MSEXCEL=2;
+	public final static int MSPOWERPOINT=3;
+	public final static int MSWORDCHART=4; // DWH 4-16-09
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";
 	static final String PUNC=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?";
@@ -44,11 +48,15 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 	static final String PUNCDNL="- 	`~!#$%^&*()_+[{]}\\;:\",<.>";
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
+	static final String wordon="<w:r><w:t>";
+	static final String wordoff="</w:t></w:r>";
+	static final String ppon="<a:r><a:t>";
+	static final String ppoff="</a:t></a:r>";
 
-	public String translate(TextFragment tf, Logger LOGGER)
+	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
 		String s = tf.getCodedText();
-		String rslt=s,ss="",slow;
+		String rslt=s,ss="",slow,sss;
 		int i,j,k,len,codenum;
 		char carrot;
 		int nSurroundingCodes=0; // DWH 4-8-09
@@ -67,34 +75,64 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 					switch ( ch )
 					{
 						case TextFragment.MARKER_OPENING:
+							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							ss += "&lt;g" + codenum + ">";
+							ss += sss + "&lt;g" + codenum + "&gt;";
 							nSurroundingCodes++;
 							break;
 						case TextFragment.MARKER_CLOSING:
+							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							ss += "&lt;/g" + codenum + ">";
+							ss += "&lt;/g" + codenum + "&gt;" + sss;
 							nSurroundingCodes--;
 							break;
 						case TextFragment.MARKER_ISOLATED:
+							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
 							if (code.getTagType()==TextFragment.TagType.OPENING)
 								nSurroundingCodes++;
 							else if (code.getTagType()==TextFragment.TagType.CLOSING)
 								nSurroundingCodes--;
-							ss += "&lt;x" + codenum + ">";
+							if (nSurroundingCodes>0)
+							{
+								if (nFileType==MSWORD)
+								{
+									ss += sss + "&lt;x" + codenum + "&gt;";
+								}
+								else if (nFileType==MSPOWERPOINT)
+									ss += sss;
+								else
+									ss += sss;								
+							}
+							else
+							{
+								if (nFileType==MSWORD)
+								{
+									if (code.getTagType()==TextFragment.TagType.OPENING)
+										ss += wordon + "&lt;x" + codenum + "&gt;" + wordoff + sss;
+									else if (code.getTagType()==TextFragment.TagType.OPENING)
+										ss += sss + wordon + "&lt;x" + codenum + "&gt;" + wordoff;
+									else
+										ss += sss + "&lt;x" + codenum + "&gt;";
+								}
+								else if (nFileType==MSPOWERPOINT)
+									ss += sss /* + ppon + "&lt;x" + codenum + "&gt;" + ppoff*/;
+								else
+									ss += sss;
+							}
 							break;
 						case TextFragment.MARKER_SEGMENT:
+							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
 							if (code.getTagType()==TextFragment.TagType.OPENING)
 								nSurroundingCodes++;
 							else if (code.getTagType()==TextFragment.TagType.CLOSING)
 								nSurroundingCodes--;
-							ss += "&lt;y" + codenum + ">";
+							ss += sss /* + "&lt;y" + codenum + "&gt;"*/;
 							break;
 					}
 					if (code!=null)

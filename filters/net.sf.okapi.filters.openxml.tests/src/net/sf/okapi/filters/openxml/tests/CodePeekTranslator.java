@@ -20,6 +20,7 @@
 package net.sf.okapi.filters.openxml.tests;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.resource.Code;
@@ -36,6 +37,10 @@ import net.sf.okapi.filters.openxml.ITranslator;
 
 public class CodePeekTranslator extends GenericSkeletonWriter implements ITranslator {
 	  // extends GenericSkeletonWriter because expandCodeContent is protected
+	public final static int MSWORD=1;
+	public final static int MSEXCEL=2;
+	public final static int MSPOWERPOINT=3;
+	public final static int MSWORDCHART=4; // DWH 4-16-09
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";
 	static final String PUNC=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?";
@@ -43,129 +48,180 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 	static final String PUNCDNL="- 	`~!#$%^&*()_+[{]}\\;:\",<.>";
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
+	static final String wordon="<w:r><w:t>";
+	static final String wordoff="</w:t></w:r>";
+	static final String ppon="<a:r><a:t>";
+	static final String ppoff="</a:t></a:r>";
 
-	public String translate(TextFragment tf, Logger LOGGER)
+	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
 		String s = tf.getCodedText();
-		String rslt=s,ss="",slow;
+		String rslt=s,ss="",slow,sss;
 		int i,j,k,len,codenum;
 		String linebreak="<w:br/>";
 		char carrot;
 		int nSurroundingCodes=0; // DWH 4-8-09
 		Code code;
 		char ch;
-		len = s.length();
-		List<Code> codes = tf.getCodes();
-		if (len>1)
+		try
 		{
-			for(i=0;i<len;i++)
+			len = s.length();
+			List<Code> codes = tf.getCodes();
+			if (len>1)
 			{
-				ch = s.charAt(i);
-				code = null;
-				switch ( ch )
+				for(i=0;i<len;i++)
 				{
-					case TextFragment.MARKER_OPENING:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						ss += linebreak + "[MARKER_OPENING " + codenum + ":" + eggspand(code) + "]" + linebreak;
-						nSurroundingCodes++;
-						break;
-					case TextFragment.MARKER_CLOSING:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						ss += linebreak + "[MARKER_CLOSING " + codenum + ":" + eggspand(code) + "]" + linebreak;
-						nSurroundingCodes--;
-						break;
-					case TextFragment.MARKER_ISOLATED:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						if (code.getTagType()==TextFragment.TagType.OPENING)
-							nSurroundingCodes++;
-						else if (code.getTagType()==TextFragment.TagType.CLOSING)
-							nSurroundingCodes--;
-						ss += linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
-						break;
-					case TextFragment.MARKER_SEGMENT:
-						codenum = TextFragment.toIndex(s.charAt(++i));
-						code = codes.get(codenum);
-						if (code.getTagType()==TextFragment.TagType.OPENING)
-							nSurroundingCodes++;
-						else if (code.getTagType()==TextFragment.TagType.CLOSING)
-							nSurroundingCodes--;
-						ss += linebreak + "[MARKER_SEGMENT " + codenum + ":" + eggspand(code) + "]" + linebreak;
-						break;
-				}
-				if (code!=null)
-					continue;
-				if (i+2<len && s.substring(i,i+3).equals("---"))
-				{
-					ss += "---";
-					i += 2;
-				}
-				else if (i+1<len && s.substring(i,i+2).equals("--"))
-				{
-					ss += "--";
-					i += 1;				
-				}
-				else
-				{
-					j = hominyOf(s.substring(i),NUM);
-					if (j>0)
+					ch = s.charAt(i);
+					code = null;
+					switch ( ch )
 					{
-						ss += s.substring(i,i+j);
-						i += j-1;
-						continue;
+						case TextFragment.MARKER_OPENING:
+							sss = s.substring(i,i+2);
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (nFileType==MSWORD)
+								ss += sss + linebreak + "[MARKER_OPENING " + codenum + ":" + eggspand(code) + "]" + linebreak;
+							else if (nFileType==MSPOWERPOINT)
+								ss += sss + "[MARKER_OPENING " + codenum + " " + eggspand(code) + "]   ";
+							else
+								ss += sss;
+							nSurroundingCodes++;
+							break;
+						case TextFragment.MARKER_CLOSING:
+							sss = s.substring(i,i+2);
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (nFileType==MSWORD)
+								ss += linebreak + "[MARKER_CLOSING " + codenum + ":" + eggspand(code) + "]" + linebreak + sss;
+							else if (nFileType==MSPOWERPOINT)
+								ss += "[MARKER_CLOSING " + codenum + " " + eggspand(code) + "]   " + sss;
+							else
+								ss += sss;
+							nSurroundingCodes--;
+							break;
+						case TextFragment.MARKER_ISOLATED:
+							sss = s.substring(i,i+2);
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (code.getTagType()==TextFragment.TagType.OPENING)
+								nSurroundingCodes++;
+							else if (code.getTagType()==TextFragment.TagType.CLOSING)
+								nSurroundingCodes--;
+							if (nSurroundingCodes>0)
+							{
+								if (nFileType==MSWORD)
+								{
+									ss += sss + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
+								}
+								else if (nFileType==MSPOWERPOINT)
+									ss += sss;
+								else
+									ss += sss;								
+							}
+							else
+							{
+								if (nFileType==MSWORD)
+								{
+									if (code.getTagType()==TextFragment.TagType.OPENING)
+										ss += wordon + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak + wordoff + sss;
+									else if (code.getTagType()==TextFragment.TagType.OPENING)
+										ss += sss + wordon + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak + wordoff;
+									else
+										ss += sss + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
+								}
+								else if (nFileType==MSPOWERPOINT)
+									ss += sss /* + ppon + "&lt;x" + codenum + "&gt;" + ppoff*/;
+								else
+									ss += sss;
+							}
+							break;
+						case TextFragment.MARKER_SEGMENT:
+							sss = s.substring(i,i+2);
+							codenum = TextFragment.toIndex(s.charAt(++i));
+							code = codes.get(codenum);
+							if (code.getTagType()==TextFragment.TagType.OPENING)
+								nSurroundingCodes++;
+							else if (code.getTagType()==TextFragment.TagType.CLOSING)
+								nSurroundingCodes--;
+							ss += sss /* linebreak + "[MARKER_SEGMENT " + codenum + ":" + eggspand(code) + "]" + linebreak*/;
+							break;
 					}
-					j = hominyOf(s.substring(i),CONS);
-					if (j>0)
-					{
-						k = hominyLetters(s.substring(i+j));
-						slow = s.substring(i,i+j).toLowerCase();
-						if (k > -1)
-						{
-							ss += s.substring(i+j,i+j+k);
-							i += k;
-						}
-						ss += slow+"ay";
-						i += j-1;
+					if (code!=null)
 						continue;
+					if (i+2<len && s.substring(i,i+3).equals("---"))
+					{
+						ss += "---";
+						i += 2;
+					}
+					else if (i+1<len && s.substring(i,i+2).equals("--"))
+					{
+						ss += "--";
+						i += 1;				
 					}
 					else
 					{
-						k = hominyLetters(s.substring(i));
-						if (k>0)
+						j = hominyOf(s.substring(i),NUM);
+						if (j>0)
 						{
-							ss += s.substring(i,i+k)+"hay";
-							i += k-1;
+							ss += s.substring(i,i+j);
+							i += j-1;
+							continue;
+						}
+						j = hominyOf(s.substring(i),CONS);
+						if (j>0)
+						{
+							k = hominyLetters(s.substring(i+j));
+							slow = s.substring(i,i+j).toLowerCase();
+							if (k > -1)
+							{
+								ss += s.substring(i+j,i+j+k);
+								i += k;
+							}
+							ss += slow+"ay";
+							i += j-1;
+							continue;
 						}
 						else
 						{
-							carrot = s.charAt(i);
-							if (carrot=='&') // DWH 4-21-09 handle entities
+							k = hominyLetters(s.substring(i));
+							if (k>0)
 							{
-								k = s.indexOf(';', i);
-								if (k>=0 && (k-i<=5 || (k-i<=7 && s.charAt(i+1)=='#')))
-									// entity: leave it alone
+								ss += s.substring(i,i+k)+"hay";
+								i += k-1;
+							}
+							else
+							{
+								carrot = s.charAt(i);
+								if (carrot=='&') // DWH 4-21-09 handle entities
 								{
-									ss += s.substring(i,k+1);
-									i += k-i;
+									k = s.indexOf(';', i);
+									if (k>=0 && (k-i<=5 || (k-i<=7 && s.charAt(i+1)=='#')))
+										// entity: leave it alone
+									{
+										ss += s.substring(i,k+1);
+										i += k-i;
+									}
+									else
+										ss += carrot;
+								}
+								else if (TextFragment.isMarker(carrot))
+								{
+									ss += s.substring(i,i+2);
+									i++;
 								}
 								else
 									ss += carrot;
 							}
-							else if (TextFragment.isMarker(carrot))
-							{
-								ss += s.substring(i,i+2);
-								i++;
-							}
-							else
-								ss += carrot;
 						}
-					}
-				}			
+					}			
+				}
+				rslt = ss;
 			}
-			rslt = ss;
 		}
+		catch(Throwable e)
+		{
+			LOGGER.log(Level.WARNING,"Code Peek Translator failed on "+s);
+		}		
 		return rslt;
 	}
 	private int hominyOf(String s, String of)

@@ -42,6 +42,7 @@ import net.htmlparser.jericho.Tag;
 
 //import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
@@ -50,6 +51,7 @@ import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
@@ -113,11 +115,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private Hashtable<String,String> htXMLFileType=null;
 	private boolean bInTextRun = false; // DWH 4-10-09
 	private boolean bInSubTextRun = false; // DWH 4-10-09
+	private boolean bInDeletion = false; // DWH 5-8-09 <w:del> deletion in tracking mode in Word
+	private boolean bInInsertion = false; // DWH 5-8-09 <w:ins> insertion in tracking mode in Word
 	private boolean bBetweenTextMarkers=false; // DWH 4-14-09
 	private boolean bAfterText = false; // DWH 4-10-09
 	private TextRun trTextRun = null; // DWH 4-10-09
+	private TextRun trNonTextRun = null; // DWH 5-5-09
 	private boolean bIgnoredPreRun = false; // DWH 4-10-09
-	private boolean bHaveStuffBeforeTextRun = false; // DWH 4-15-09
+	private boolean bBeforeFirstTextRun = true; // DWH 4-15-09
 	private boolean bInMainFile = false; // DWH 4-15-09
 
 	public OpenXMLContentFilter() {
@@ -469,7 +474,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	 * @param a tag containing the CDATA
 	 */
 	protected void handleCdataSection(Tag tag) { // 1-5-09
-		addToDocumentPart(tag.toString());
+		if (bInDeletion) // DWH 5-8-09
+			addToNonTextRun(tag.toString());
+		else
+			addToDocumentPart(tag.toString());
 	}
 
 	/**
@@ -489,6 +497,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		if (text==null) // DWH 4-14-09
 			return;
 		String txt=text.toString();
+		if (bInDeletion) // DWH 5-8-09
+		{
+			addToNonTextRun(txt);
+			return;
+		}
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(txt);
@@ -544,6 +557,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	protected void handleDocumentPart(Tag tag) {
 		if (canStartNewTextUnit()) // DWH ifline and whole else: is an inline code if inside a text unit
 			addToDocumentPart(tag.toString()); // 1-5-09
+		else if (bInDeletion) // DWH 5-8-09
+			addToNonTextRun(tag.toString());
 		else
 			addCodeToCurrentTextUnit(tag);				
 	}
@@ -563,8 +578,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		String sPartName; // DWH 2-26-09 for PartName attribute in [Content_Types].xml
 		String sContentType; // DWH 2-26-09 for ContentType attribute in [Content_Types].xml
 		// if in excluded state everything is skeleton including text
+		String tempTagType; // DWH 5-7-09
 		if (startTag==null) // DWH 4-14-09
 			return;
+		if (bInDeletion)
+		{
+			addToNonTextRun(startTag);
+			return;
+		}
 		sTagName = startTag.getName(); // DWH 2-26-09
 		sTagString = startTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
@@ -592,8 +613,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			if (bInTextRun) // DWH 4-9-09
 				addToTextRun(startTag);
-			else
-				addCodeToCurrentTextUnit(startTag);
+			else // DWH 5-7-09
+			{
+				if (getConfig().getElementType(sTagName).equals("delete"))
+					bInDeletion = true;
+				addToNonTextRun(startTag); // DWH 5-5-09
+			}
 			break;
 
 		case ATTRIBUTES_ONLY:
@@ -613,13 +638,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					addToDocumentPart(sTagString);
 				}
 			}
-			else if (bInTextRun) // DWH 4-10-09
+			else
 			{
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
-				addToTextRun(startTag,propertyTextUnitPlaceholders);
+				if (bInTextRun) // DWH 4-10-09
+					addToTextRun(startTag,propertyTextUnitPlaceholders);
+				else
+					addToNonTextRun(startTag,propertyTextUnitPlaceholders);
 			}
-			else
-				addCodeToCurrentTextUnit(startTag);
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().pushGroupRule(sTagName);
@@ -634,6 +660,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
+			bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
 //			if (startTag.isSyntacticalEmptyElementTag()) // means the tag ended with />
 			if (sTagString.endsWith("/>")) // DWH 3-18-09 in case text unit element is a standalone tag (weird, but Microsoft does it)
 				addToDocumentPart(sTagString); // 1-5-09
@@ -655,26 +683,40 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
-			if (bInTextRun)
-				bInSubTextRun = true;
+			if (canStartNewTextUnit()) // DWH 5-5-09 shouldn't happen
+				addToDocumentPart(sTagString);
 			else
 			{
-				bInTextRun = true;
-				bAfterText = false;
-				bIgnoredPreRun = false;
-				trTextRun = new TextRun();
-				bBetweenTextMarkers = false; // DWH 4-16-09
-			}
-			addToTextRun(startTag);
-			break;
-		case TEXT_MARKER_ELEMENT: // DWH 4-14-09 whole case
-			if (bInTextRun)
-			{
-				bBetweenTextMarkers = true;
+				addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
+				bBeforeFirstTextRun = false; // DWH 5-5-09
+				if (getConfig().getElementType(sTagName).equals("insert")) // DWH 5-8-09 w:ins
+					bInInsertion = true;
+				else if (bInTextRun)
+					bInSubTextRun = true;
+				else
+				{
+					bInTextRun = true;
+					bAfterText = false;
+					bIgnoredPreRun = false;
+					bBetweenTextMarkers = false; // DWH 4-16-09
+				}
 				addToTextRun(startTag);
 			}
-			else
+			break;
+		case TEXT_MARKER_ELEMENT: // DWH 4-14-09 whole case
+			if (canStartNewTextUnit()) // DWH 5-5-09 shouldn't happen
 				addToDocumentPart(sTagString);
+			else
+			{
+				addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
+				if (bInTextRun)
+				{
+					bBetweenTextMarkers = true;
+					addToTextRun(startTag);
+				}
+				else
+					addToNonTextRun(sTagString);
+			}
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().pushPreserverWhitespaceRule(sTagName);
@@ -693,10 +735,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			else if (bInTextRun) // DWH 4-10-09
 				addToTextRun(startTag);
 			else
-			{
-				addCodeToCurrentTextUnit(startTag);
-				bHaveStuffBeforeTextRun = true;
-			}
+				addToNonTextRun(startTag); // DWH 5-5-09
 		}
 	}
 
@@ -710,9 +749,19 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		// if in excluded state everything is skeleton including text
 		String sTagName; // DWH 2-26-09
 		String sTagString; // DWH 4-14-09
+		String tempTagType; // DWH 5-5-09
 		if (endTag==null) // DWH 4-14-09
 			return;
 		sTagName = endTag.getName(); // DWH 2-26-09
+		if (bInDeletion)
+		{
+			addToNonTextRun(endTag);
+			if (getConfig().getElementType(sTagName).equals("delete"))
+			{
+				bInDeletion = false;
+			}
+			return;
+		}
 		sTagString = endTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(endTag.toString());
@@ -741,8 +790,17 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			if (bInTextRun) // DWH 4-9-09
 				addToTextRun(endTag);
+			else if (getConfig().getElementType(sTagName).equals("delete")) // DWH 5-7-09
+			{
+				if (trNonTextRun!=null)
+					addNonTextRunToCurrentTextUnit();
+				tempTagType = getTagType(); // DWH 5-7-09 saves what Abstract Base Filter thinks current tag type is
+				setTagType("d"); // DWH 5-7-09 type for current manufactured tag in text run, so tags will balance
+				addToTextUnit(TextFragment.TagType.CLOSING, sTagString, "d"); // DWH 5-7-09 adds as opening d
+				setTagType(tempTagType); // DWH 5-7-09  restore tag type to what AbstractBaseFilter expects
+			}
 			else
-				addCodeToCurrentTextUnit(endTag);
+				addToNonTextRun(endTag); // DWH 5-5-09
 			break;
 		case GROUP_ELEMENT:
 			getRuleState().popGroupRule();
@@ -762,28 +820,47 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				addTextRunToCurrentTextUnit(true);
 				bInTextRun = false;
 			} // otherwise this is an illegal element, so just ignore it
+			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
 			bBetweenTextMarkers = true; // DWH 4-16-09
 			getRuleState().popTextUnitRule();
 			endTextUnit(new GenericSkeleton(sTagString));
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
-			addToTextRun(endTag);
-			if (bInSubTextRun)
-				bInSubTextRun = false;
-			else if (bInTextRun)
+			if (canStartNewTextUnit()) // DWH 5-5-09
+				addToDocumentPart(sTagString);
+			else
 			{
-				addTextRunToCurrentTextUnit(true);
-				bInTextRun = false;
-			} // otherwise this is an illegal element, so just ignore it
+				addToTextRun(endTag);
+				if (getConfig().getElementType(sTagName).equals("insert")) // end of insertion </w:ins>
+				{
+					bInInsertion = false;
+					addTextRunToCurrentTextUnit(true);
+					bInTextRun = false;
+					addNonTextRunToCurrentTextUnit(); // DWH 5-5-09					
+				}
+				else if (bInSubTextRun)
+					bInSubTextRun = false;
+				else if (bInTextRun)
+				{
+					if (!bInInsertion) // DWH 5-5-09 if inserting, don't end TextRun till end of insertion
+					{
+						addTextRunToCurrentTextUnit(true);
+						addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
+					}
+					bInTextRun = false;
+				} // otherwise this is an illegal element, so just ignore it
+			}
 			break;
 		case TEXT_MARKER_ELEMENT: // DWH 4-14-09 whole case
-			if (bInTextRun)
+			if (canStartNewTextUnit()) // DWH 5-5-09
+				addToDocumentPart(sTagString);
+			else if (bInTextRun) // DWH 5-5-09 lacked else
 			{
 				bBetweenTextMarkers = false;
 				addToTextRun(endTag);
 			}
 			else
-				addToDocumentPart(sTagString);
+				addToNonTextRun(sTagString); // DWH 5-5-09
 			break;
 		case PRESERVE_WHITESPACE:
 			getRuleState().popPreserverWhitespaceRule();
@@ -795,10 +872,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			else if (bInTextRun) // DWH 4-9-09
 				addToTextRun(endTag);
 			else
-			{
-				addCodeToCurrentTextUnit(endTag); // in text unit, so add to inline codes
-				bHaveStuffBeforeTextRun = true;
-			}
+				addToNonTextRun(endTag); // DWH 5-5-09
 			break;
 		}
 	}
@@ -956,13 +1030,52 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		return(rslt);
 	}
 	/**
+	 * Adds a text string to a sequence of tags that are
+	 * not in a text run, that will become a single code.
+	 * @param s the text string to add
+	 */
+	private void addToNonTextRun(String s) // DWH 5-5-09
+	{
+		if (trNonTextRun==null)
+			trNonTextRun = new TextRun();
+		trNonTextRun.append(s);
+	}
+	/**
+	 * Adds a tag to a sequence of tags that are
+	 * not in a text run, that will become a single code.
+	 * @param s the text string to add
+	 */
+	private void addToNonTextRun(Tag tag) // DWH 5-5-09
+	{
+		if (trNonTextRun==null)
+			trNonTextRun = new TextRun();
+		trNonTextRun.append(tag.toString());
+	}
+	/**
+	 * Adds a tag and codes to a sequence of tags that are
+	 * not in a text run, that will become a single code.
+	 * @param tag the tag to add
+	 * @param propertyTextUnitPlaceholders a list of codes of embedded text
+     */
+	private void addToNonTextRun(Tag tag, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
+	{
+		String txt;
+		int offset;
+		if (trNonTextRun==null)
+			trNonTextRun = new TextRun();
+		txt=trNonTextRun.getText();
+		offset=txt.length();
+		trNonTextRun.appendWithPropertyTextUnitPlaceholders(tag.toString(),offset,propertyTextUnitPlaceholders);
+	}
+	/**
 	 * Adds a text string to a text run that will become a single code.
 	 * @param s the text string to add
 	 */
 	private void addToTextRun(String s)
 	{
-		if (bInTextRun && trTextRun!=null)
-			trTextRun.append(s);		
+		if (trTextRun==null)
+			trTextRun = new TextRun();
+		trTextRun.append(s);		
 	}
 	/**
 	 * Adds a tag to a text run that will become a single code.
@@ -971,8 +1084,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private void addToTextRun(Tag tag) // DWH 4-10-09 adds tag text to string that will be part of larger code later
 	{
 		// add something here to check if it was bold, italics, etc. to set a property
-		if (bInTextRun && trTextRun!=null)
-			trTextRun.append(tag.toString());
+		if (trTextRun==null)
+			trTextRun = new TextRun();
+		trTextRun.append(tag.toString());
 	}
 	/**
 	 * Adds a tag and codes to a text run that will become a single code.
@@ -983,13 +1097,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		String txt;
 		int offset;
-		if (bInTextRun && trTextRun!=null)
-		{
-			txt=trTextRun.getText();
-			offset=txt.length();
-			trTextRun.appendWithPropertyTextUnitPlaceholders(tag.toString(),offset,propertyTextUnitPlaceholders);
-		}
+		if (trTextRun==null)
+			trTextRun = new TextRun();
+		txt=trTextRun.getText();
+		offset=txt.length();
+		trTextRun.appendWithPropertyTextUnitPlaceholders(tag.toString(),offset,propertyTextUnitPlaceholders);
 	}
+	
 	/**
 	 * Adds the text and codes in a text run as a single code in a text unit.
                * If it is after text, it is added as a MARKER_CLOSING.  If no text
@@ -1006,7 +1120,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		TextFragment.TagType codeType;
 		String text,tempTagType;
 		int len;
-		if (bInTextRun && trTextRun!=null)
+		if (trTextRun!=null)
 		{
 			if (bAfterText)
 				codeType = TextFragment.TagType.CLOSING;
@@ -1016,7 +1130,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				codeType = TextFragment.TagType.OPENING;
 			text = trTextRun.getText();
 			if (codeType==TextFragment.TagType.OPENING &&
-				!bHaveStuffBeforeTextRun && // DWH 4-15-09 only do this if there wasn't stuff before <w:r>
+				!bBeforeFirstTextRun && // DWH 4-15-09 only do this if there wasn't stuff before <w:r>
 				bInMainFile && // DWH 4-15-08 only do this in MSWORD document and MSPOWERPOINT slides
 				((/*text.equals("<w:r><w:t>") || */text.equals("<w:r><w:t xml:space=\"preserve\">")) ||
 				 (/*text.equals("<a:r><a:t>") || */text.equals("<a:r><a:t xml:space=\"preserve\">"))))
@@ -1056,7 +1170,45 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
 			trTextRun = null;
 		}
-		bHaveStuffBeforeTextRun = false; // since the text run has now been added to the text unit
+		bBeforeFirstTextRun = false; // since the text run has now been added to the text unit
+	}
+	private void addNonTextRunToCurrentTextUnit() { // DWW 5-5-09
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+		TextFragment.TagType codeType;
+		String text,tempTagType;
+		if (trNonTextRun!=null)
+		{
+			text = trNonTextRun.getText();
+			if (canStartNewTextUnit()) // DWH shouldn't happen
+			{
+				addToDocumentPart(text);
+			}
+			propertyTextUnitPlaceholders = trNonTextRun.getPropertyTextUnitPlaceholders();
+			if (bBeforeFirstTextRun &&
+			   (propertyTextUnitPlaceholders==null || propertyTextUnitPlaceholders.size()==0))
+				// if a nonTextRun occurs before the first text run, and it doesn't have any
+				// embedded text, just add the tags to the skeleton after <w:r> or <a:r>.
+				// Since skeleton is not a TextFragment, it can't have embedded text, so if
+				// there is embedded text, do the else and make a PLACEHOLDER code
+			{
+				appendToFirstSkeletonPart(text);
+			}
+			else
+			{
+				codeType = TextFragment.TagType.PLACEHOLDER;
+				tempTagType = getTagType(); // DWH 4-24-09 saves what Abstract Base Filter thinks current tag type is
+				setTagType("x"); // DWH 4-24-09 type for current manufactured tag in text run, so tags will balance
+				if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+					// add code and process actionable attributes
+					addToTextUnit(codeType, text, "x", propertyTextUnitPlaceholders);
+				} else {
+					// no actionable attributes, just add the code as-is
+					addToTextUnit(codeType, text, "x");
+				}
+				setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
+			}
+			trNonTextRun = null;
+		}
 	}
 	public int getConfigurationType()
 	{

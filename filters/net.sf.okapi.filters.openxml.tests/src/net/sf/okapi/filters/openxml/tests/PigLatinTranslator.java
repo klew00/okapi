@@ -33,6 +33,10 @@ import net.sf.okapi.filters.openxml.ITranslator;
  */
 
 public class PigLatinTranslator implements ITranslator {
+	public final static int MSWORD=1;
+	public final static int MSEXCEL=2;
+	public final static int MSPOWERPOINT=3;
+	public final static int MSWORDCHART=4; // DWH 4-16-09
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";
 	static final String PUNC=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?";
@@ -45,7 +49,7 @@ public class PigLatinTranslator implements ITranslator {
 	{
 	}
 
-	public String translate(TextFragment tf, Logger LOGGER)
+	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;

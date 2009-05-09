@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.InputStream;
 //import java.net.URL;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
@@ -38,8 +40,10 @@ import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
  * to compare zip file output with a gold standard zip file.  
  */
 
+
 public class ZipCompare {
 
+	Logger LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
 	private FileCompare fc=null;
 	public ZipCompare()
 	{
@@ -53,8 +57,8 @@ public class ZipCompare {
 		ZipEntry oZipEntry,gZipEntry;
 		String sOEntryName,sGEntryName;
 		InputStream ois,gis;
-		Enumeration<? extends ZipEntry> oEntries;
-		Enumeration<? extends ZipEntry> gEntries;
+		Enumeration<? extends ZipEntry> oEntries=null;
+		Enumeration<? extends ZipEntry> gEntries=null;
 		try
 		{
 			File oZip = new File(out);
@@ -63,7 +67,9 @@ public class ZipCompare {
 		}
 		catch(Exception e)
 		{
-			throw new OkapiFileNotFoundException("Output file "+out+" not found.");
+			LOGGER.log(Level.WARNING,"ZipCompare:  Output file "+out+" not found.");
+//			throw new OkapiFileNotFoundException("Output file "+out+" not found.");
+			return false;
 		}
 		try
 		{
@@ -73,7 +79,9 @@ public class ZipCompare {
 		}
 		catch(Exception e)
 		{
-			throw new OkapiFileNotFoundException("Gold file "+gold+" not found.");
+			LOGGER.log(Level.WARNING,"ZipCompare:  Gold file "+gold+" not found.");
+//			throw new OkapiFileNotFoundException("Gold file "+gold+" not found.");
+			return false;
 		}
 		while( oEntries.hasMoreElements() )
 		{

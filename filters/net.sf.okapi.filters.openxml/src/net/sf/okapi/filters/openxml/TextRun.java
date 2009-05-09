@@ -40,7 +40,7 @@ public class TextRun {
 	public TextRun()
 	{
 		text = "";
-		propertyTextUnitPlaceholders = new ArrayList<PropertyTextUnitPlaceholder>();
+		propertyTextUnitPlaceholders = null;
 	}
 	
 	/**
@@ -65,6 +65,8 @@ public class TextRun {
 			p.setMainEndPos(p.getMainEndPos()+offset);
 			p.setValueStartPos(p.getValueStartPos()+offset);
 			p.setValueEndPos(p.getValueEndPos()+offset);
+			if (this.propertyTextUnitPlaceholders==null)
+				this.propertyTextUnitPlaceholders = new ArrayList<PropertyTextUnitPlaceholder>();
 			this.propertyTextUnitPlaceholders.add(p);
 		}
 	}

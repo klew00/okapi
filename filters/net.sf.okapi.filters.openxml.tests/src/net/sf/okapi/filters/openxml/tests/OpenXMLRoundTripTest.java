@@ -66,6 +66,8 @@ public class OpenXMLRoundTripTest {
 		ArrayList<String> themfiles = new ArrayList<String>();
 		zc = new ZipCompare();
 		themfiles.add("BoldWorld.docx");
+		themfiles.add("Deli.docx");
+		themfiles.add("Addcomments.docx");
 		themfiles.add("sample.docx");
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");

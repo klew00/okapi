@@ -29,5 +29,5 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public interface ITranslator
 {
-	public String translate(TextFragment tf, Logger lgr);
+	public String translate(TextFragment tf, Logger lgr, int nFileType);
 }

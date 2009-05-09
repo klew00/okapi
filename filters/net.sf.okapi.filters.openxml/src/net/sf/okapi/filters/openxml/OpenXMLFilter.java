@@ -229,6 +229,8 @@ public class OpenXMLFilter implements IFilter {
 	 * @param input a Raw Document to open and filter
 	 */
 	public void open (RawDocument input) {
+		if (input==null)
+			throw new RuntimeException("RawDocument is null");
 		open(input, true);
 	}
 	
@@ -240,6 +242,8 @@ public class OpenXMLFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
+		if (input==null)
+			throw new RuntimeException("RawDocument is null");
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
@@ -267,6 +271,8 @@ public class OpenXMLFilter implements IFilter {
 	public void open (RawDocument input,
 			boolean generateSkeleton, boolean bSquishable)
 	{
+		if (input==null)
+			throw new RuntimeException("RawDocument is null");
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
@@ -645,7 +651,7 @@ public class OpenXMLFilter implements IFilter {
 					{
 						TextUnit tu = (TextUnit)event.getResource();
 						TextFragment tfSource = tu.getSourceContent();
-						String torg = translator.translate(tfSource,LOGGER);
+						String torg = translator.translate(tfSource,LOGGER,nFileType); // DWH 5-7-09 nFileType
 						TextFragment tfTarget = tfSource.clone();
 //						tfTarget.setCodedText(torg);
 						tfTarget.setCodedText(/*"GLUNK "+*/torg); // DWH 4-8-09 testing 1 2 3 

@@ -41,6 +41,12 @@ filetype:
 #  ruleTypes: [ATTRIBUTES_ONLY]
 #  writableLocalizableAttributes: [val]
 
+'m:r':
+  ruleTypes: [TEXTRUN]
+
+'m:t':
+  ruleTypes: [TEXTMARKER]
+
 'w:p':
   ruleTypes: [TEXTUNIT]
 
@@ -56,8 +62,17 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [name]
 
+'w:del':
+  ruleTypes: [INLINE]
+  elementType: delete
+
+'w:ins':
+  ruleTypes: [TEXTRUN]
+  elementType: insert
+
 #'w:ppr':
-#  ruleTypes: [EXCLUDE]
+#  ruleTypes: [TEXTRUN]
+#  elementType: ParaStyle
 
 'w:lang':
   ruleTypes: [ATTRIBUTES_ONLY]
