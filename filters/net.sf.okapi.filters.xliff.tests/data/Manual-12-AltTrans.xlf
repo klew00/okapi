@@ -3,6 +3,10 @@
 <file datatype="x-test" original="test1"
  source-language="en" target-language="fr">
 <body>
+   <trans-unit id="6">
+      <source xml:lang="en">Text <ph id='1'>startCode<sub>[nested<ph id='2'>ph-in-sub</ph>still in sub]</sub>endCode</ph> text.</source>
+   </trans-unit>
+
    <trans-unit id="0" translate="no">
       <source xml:lang="en">Do not translate this.</source>
    </trans-unit>
@@ -23,6 +27,9 @@
          <source xml:lang="en">The text number four.</source>
          <target xml:lang="fr">Le texte numéro quatre.</target>
       </alt-trans>
+   </trans-unit>
+   <trans-unit id="5">
+      <source xml:lang="en">Text <ph id='1'>startCode<sub>nested</sub>endCode</ph> text.</source>
    </trans-unit>
 </body>
 </file>

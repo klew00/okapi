@@ -14,7 +14,9 @@
 	<tr>
 		<td class="smalltoc"><p>
 			- <a href="#overview">Overview</a><br>
-			- <a href="#processing">Processing Details</a><td class="hmenu">
+			- <a href="#processing">Processing Details</a><br>
+			- <a href="#limitations">Limitations</a><br>
+			- <a href="#parameters">Parameters</a><td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
 				<td><a href="../index.html">Filters</a></td>
 				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer's Guide</a></td>
@@ -54,6 +56,11 @@ following logic:</p>
 <h3>Line-Breaks</h3>
 <p>The type of line-breaks of the output is the same as the one of the original 
 input.</p>
+<h3>White spaces</h3>
+<p>If a <code>&lt;trans-unit&gt;</code> element has a <code>xml:space=&quot;preserve&quot;</code> 
+attribute, the white spaces inside the content of its source and target is left 
+as it. If the <code>xml:space</code> is not present, or as a value different 
+from <code>&quot;preserve&quot;</code>, the content of the source and target is unwrapped.</p>
 <h3>Mapping</h3>
 <p>The entries of the document are mapped as follow:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table1">
@@ -99,7 +106,15 @@ input.</p>
 	</tr>
 </table>
 
-<p>MORE DOCUMENTATION UPCOMING</p>
+<h2><a name="limitations"></a>Limitations</h2>
+<p>The content of the <code>&lt;sub&gt;</code> element is currently not supported as 
+text. Any element found inside a <code>&lt;bpt&gt;</code>, <code>&lt;ept&gt;</code>, <code>
+&lt;ph&gt;</code>, and <code>&lt;it&gt;</code> (including <code>&lt;sub&gt;</code>) is included in 
+the code of the parent inline element. A warning is generated when a <code>&lt;sub&gt;</code> 
+element is detected. Such elements are rarely (if ever used).</p>
+<h2><a name="parameters"></a>Parameters</h2>
+<p>&nbsp;</p>
+<p><span style="background-color: #FFFF00">MORE DOCUMENTATION UPCOMING</span></p>
 <p>&nbsp;</p>
 
 </body>

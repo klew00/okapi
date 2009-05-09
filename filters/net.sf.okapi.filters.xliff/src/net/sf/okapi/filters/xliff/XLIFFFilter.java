@@ -897,6 +897,7 @@ public class XLIFFFilter implements IFilter {
 		TextFragment content)
 	{
 		try {
+			int endStack = 1;
 			StringBuilder innerCode = new StringBuilder();
 			StringBuilder outerCode = null;
 			outerCode = new StringBuilder();
@@ -919,8 +920,14 @@ public class XLIFFFilter implements IFilter {
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
-					prefix = reader.getPrefix();
 					StringBuilder tmpg = new StringBuilder();
+					if ( reader.getLocalName().equals("sub") ) {
+						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
+					}
+					else if ( tagName.equals(reader.getLocalName()) ) {
+						endStack++; // Take embedded elements into account 
+					}
+					prefix = reader.getPrefix();
 					if (( prefix == null ) || ( prefix.length()==0 )) {
 						tmpg.append("<"+reader.getLocalName());
 					}
@@ -944,16 +951,30 @@ public class XLIFFFilter implements IFilter {
 							reader.getAttributeValue(i)));
 					}
 					tmpg.append(">");
+					innerCode.append(tmpg.toString());
 					outerCode.append(tmpg.toString());
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					if ( store ) storeEndElement();
 					if ( tagName.equals(reader.getLocalName()) ) {
-						Code code = content.append(tagType, type, innerCode.toString(), id);
-						outerCode.append("</"+tagName+">");
-						code.setOuterData(outerCode.toString());
-						return;	
+						if ( --endStack == 0 ) {
+							Code code = content.append(tagType, type, innerCode.toString(), id);
+							outerCode.append("</"+tagName+">");
+							code.setOuterData(outerCode.toString());
+							return;
+						}
+						// Else: fall thru
+					}
+					// Else store the close tag in the outer code
+					prefix = reader.getPrefix();
+					if (( prefix == null ) || ( prefix.length()==0 )) {
+						innerCode.append("</"+reader.getLocalName()+">");
+						outerCode.append("</"+reader.getLocalName()+">");
+					}
+					else {
+						innerCode.append("</"+prefix+":"+reader.getLocalName()+">");
+						outerCode.append("</"+prefix+":"+reader.getLocalName()+">");
 					}
 					break;
 

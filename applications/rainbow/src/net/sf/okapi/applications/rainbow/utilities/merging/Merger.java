@@ -305,9 +305,9 @@ public class Merger {
 	}
 
 	/*
-	 * Check the codes in the translated entry, use the original data if there is
-	 * none in the code coming from XLIFF, and generate non-stoping error if
-	 * non-deletable codes are missing.
+	 * Checks the codes in the translated entry, uses the original data if there is
+	 * none in the code coming from XLIFF, and generates a non-stopping error if
+	 * a non-deletable code is missing.
 	 */
 	private List<Code> transferCodes (List<Code> transCodes,
 		List<Code> oriCodes,
@@ -348,7 +348,10 @@ public class Merger {
 				}
 			}
 			else { // Get the data from the original
-				if (( transCode.getData() == null )
+				if ( transCode.getOuterData() != null ) {
+					transCode.setOuterData(oriCode.getOuterData());
+				}
+				else if (( transCode.getData() == null )
 					|| ( transCode.getData().length() == 0 )) {
 					transCode.setData(oriCode.getData());
 				}
