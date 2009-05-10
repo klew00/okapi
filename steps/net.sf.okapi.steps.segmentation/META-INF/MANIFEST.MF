@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Segmentation
+Bundle-SymbolicName: net.sf.okapi.steps.segmentation
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.steps.segmentation
+Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ net.sf.okapi.lib.segmentation;bundle-version="1.0.0"
