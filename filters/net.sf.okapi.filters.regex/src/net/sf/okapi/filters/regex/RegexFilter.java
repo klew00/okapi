@@ -264,7 +264,7 @@ public class RegexFilter implements IFilter {
 		encoding = "UTF-16";
 		hasUTF8BOM = false;
 		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
-		commonOpen(inputText.toString());
+		commonOpen(inputText.toString().replace(lineBreak, "\n"));
 	}
 
 	private void setOptions (String sourceLanguage,

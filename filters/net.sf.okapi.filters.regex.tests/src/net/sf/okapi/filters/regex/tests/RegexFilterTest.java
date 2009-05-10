@@ -22,34 +22,23 @@ package net.sf.okapi.filters.regex.tests;
 
 import static org.junit.Assert.*;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
-import net.sf.okapi.common.resource.INameable;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
 import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.filters.tests.RoundTripComparison;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author SV
- *
- */
 public class RegexFilterTest {
 	
 	private RegexFilter filter;
@@ -60,40 +49,26 @@ public class RegexFilterTest {
 	}
 
 	@Test
-	public void runTest () {
-		try {
-			FilterTestDriver testDriver = new FilterTestDriver();
-			// testDriver.setDisplayLevel(0);
-			testDriver.setDisplayLevel(2);
-			testDriver.setShowSkeleton(true);
-			
-			IParameters params = new Parameters();
-			URL paramsUrl = RegexFilterTest.class.getResource("/okf_regex@StringInfo.fprm");
-			params.load(paramsUrl.getPath(), false);
-			filter.setParameters(params);
-			InputStream input = RegexFilterTest.class.getResourceAsStream("/Test01_stringinfo_en.info");
-			filter.open(new RawDocument(input, "UTF-8", "en"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-			
-			paramsUrl = RegexFilterTest.class.getResource("/okf_regex@SRT.fprm");
-			params.load(paramsUrl.getPath(), false);
-			filter.setParameters(params);
-			input = RegexFilterTest.class.getResourceAsStream("/Test01_srt_en.srt");
-			filter.open(new RawDocument(input, "UTF-8", "en"));
-			if ( !testDriver.process(filter) ) Assert.fail();
-			filter.close();
-			
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail("Exception occured");
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
-	}
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		URL url = RegexFilterTest.class.getResource("/Test01_stringinfo_en.info");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01_srt_en.srt", "okf_regex@SRT.fprm"));
+		list.add(new InputDocument(root+"Test01_stringinfo_en.info", "okf_regex@StringInfo.fprm"));
+		list.add(new InputDocument(root+"TestRules01.txt", "okf_regex@TestRules01.fprm"));
+		list.add(new InputDocument(root+"TestRules02.txt", "okf_regex@TestRules02.fprm"));
+		list.add(new InputDocument(root+"TestRules03.txt", "okf_regex@TestRules03.fprm"));
+		list.add(new InputDocument(root+"TestRules04.txt", "okf_regex@TestRules04.fprm"));
+		list.add(new InputDocument(root+"TestRules05.txt", "okf_regex@TestRules05.fprm"));
+		list.add(new InputDocument(root+"TestRules06.txt", "okf_regex@TestRules06.fprm"));
 	
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+	}
+
 	@Test
 	public void testSimpleRule () {
 		String snippet = "test1=\"text1\"\ntest2=\"text2\"\n";
@@ -112,6 +87,30 @@ public class RegexFilterTest {
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("text2", tu.getSource().toString());
+	}
+
+	@Test
+	public void testIDAndText () {
+		String snippet = "[Id1]\tText1\r\n[Id2]\tText2";
+		Parameters params = new Parameters();
+		Rule rule = new Rule();
+		rule.setRuleType(Rule.RULETYPE_CONTENT);
+		rule.setExpression("^\\[(.*?)]\\s*(.*?)(\\n|\\Z)");
+		rule.setSourceGroup(2);
+		rule.setNameGroup(1);
+		rule.setPreserveWS(true);
+		params.rules.add(rule);
+		filter.setParameters(params);
+		// Process
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text1", tu.getSource().toString());
+		assertEquals("Id1", tu.getName());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("Text2", tu.getSource().toString());
+		assertEquals("Id2", tu.getName());
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
