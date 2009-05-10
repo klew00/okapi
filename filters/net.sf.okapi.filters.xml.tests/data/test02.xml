@@ -17,4 +17,7 @@
   and fill the form labeled with the following icon:
   <imgRef file="vat.png" alt="Value Added Tax Form"/>
  </par>
+ <par><![CDATA[&=amp, <=lt, &#xAAA;=not-a-ncr.]]></par>
+ <par>Before comment <!--comment xyz  --> and after.</par>
+ <par>Before PI <?abc attr="value"  ?> and after.</par>
 </myDoc>

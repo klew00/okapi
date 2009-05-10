@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -43,10 +44,12 @@ import static org.junit.Assert.*;
 public class XMLFilterTest {
 
 	private XMLFilter filter;
+	private GenericContent fmt;
 
 	@Before
 	public void setUp() {
 		filter = new XMLFilter();
+		fmt = new GenericContent();
 	}
 
 	@Test
@@ -64,51 +67,51 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputBasic_Comment () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><!--c--></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_PI () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><?pi ?></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_OneChar () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc>T</doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_EmptyRoot () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc/>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputSimpleContent () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>test</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test
 	public void testOutputSimpleContent_WithEscapes () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputSimpleContent_WithLang () {
-//		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+//		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 //			+ "<doc xml:lang='en'>test</doc>";
-//		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+//		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 //			+ "<doc xml:lang='FR'>test</doc>";
 		//TODO: Implement replacement of the lang value
 		//assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
@@ -116,36 +119,86 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputSupplementalChars () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>[&#x20000;]=U+D840,U+DC00</p>";
-		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>[\uD840\uDC00]=U+D840,U+DC00</p>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
+	public void testCDATAParsing () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(tu.getSourceContent().toString(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
+	}
+
+	@Test
+	public void testOutputCDATA () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>&amp;=amp, &lt;=lt, &amp;#xaaa;=not-a-ncr</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+
+	@Test
+	public void testCommentParsing () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(fmt.setContent(tu.getSourceContent()).toString(), "t1 <1/> t2");
+	}
+
+	@Test
+	public void testOutputComment () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+
+	@Test
+	public void testPIParsing () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(fmt.setContent(tu.getSourceContent()).toString(), "t1 <1/> t2");
+	}
+	
+	@Test
+	public void testOutputPI () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+
+	@Test
 	public void testOutputWhitespaces_Preserve () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>part 1\npart 2</p>"
 			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
-		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>part 1 part 2</p>"
 			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputWhitespaces_Default () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>part 1\npart 2\n  part3\n\t part4</p>";
-		String expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>part 1 part 2 part3 part4</p>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testSeveralUnits () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>text 1</p><p>text 2</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -161,7 +214,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testTranslatableAttributes () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1\">text 1</p><p>text 2</p><p>text 3</p></doc>";

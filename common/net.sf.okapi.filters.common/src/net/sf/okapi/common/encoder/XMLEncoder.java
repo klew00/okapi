@@ -53,7 +53,7 @@ public class XMLEncoder implements IEncoder {
 		this.lineBreak = lineBreak;
 		// Use an encoder only if the output is not UTF-8/16
 		// since those support all characters
-		if ( "utf-8".equals(encoding) || "utf-16".equals(encoding) ) {
+		if ( "utf-8".equalsIgnoreCase(encoding) || "utf-16".equalsIgnoreCase(encoding) ) {
 			chsEnc = null;
 		}
 		else {

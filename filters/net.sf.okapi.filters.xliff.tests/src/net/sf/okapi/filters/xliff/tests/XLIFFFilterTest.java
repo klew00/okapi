@@ -95,6 +95,17 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testOutputBPTTypeTransUnit () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
+			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
+			+ "</file></xliff>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+
+	@Test
 	public void testBPTAndSUBTypeTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBPTAndSUBTypeXLIFF(), 1);
 		assertNotNull(tu);

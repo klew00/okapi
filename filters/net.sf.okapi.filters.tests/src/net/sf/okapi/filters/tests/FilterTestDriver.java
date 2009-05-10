@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -496,34 +497,40 @@ public class FilterTestDriver {
 	 * 
 	 * @param list
 	 *            The list of events.
-	 * @param original
-	 *            The original string.
 	 * @param trgLang
 	 *            Code of the target (output) language.
 	 * @return The generated output string
 	 */
-	public static String generateOutput(ArrayList<Event> list, String original, String trgLang) {
+	public static String generateOutput (ArrayList<Event> list,
+		String trgLang)
+	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				tmp.append(writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(),
-						(StartDocument) event.getResource()));
+				tmp.append(writer.processStartDocument(trgLang, "UTF-8", null, new EncoderManager(),
+					(StartDocument) event.getResource()));
 				break;
 			case END_DOCUMENT:
-				tmp.append(writer.processEndDocument((Ending) event.getResource()));
+				tmp.append(writer.processEndDocument((Ending)event.getResource()));
+				break;
+			case START_SUBDOCUMENT:
+				tmp.append(writer.processStartSubDocument((StartSubDocument)event.getResource()));
+				break;
+			case END_SUBDOCUMENT:
+				tmp.append(writer.processEndSubDocument((Ending)event.getResource()));
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				TextUnit tu = (TextUnit)event.getResource();
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:
-				DocumentPart dp = (DocumentPart) event.getResource();
+				DocumentPart dp = (DocumentPart)event.getResource();
 				tmp.append(writer.processDocumentPart(dp));
 				break;
 			case START_GROUP:
-				StartGroup startGroup = (StartGroup) event.getResource();
+				StartGroup startGroup = (StartGroup)event.getResource();
 				tmp.append(writer.processStartGroup(startGroup));
 				break;
 			case END_GROUP:

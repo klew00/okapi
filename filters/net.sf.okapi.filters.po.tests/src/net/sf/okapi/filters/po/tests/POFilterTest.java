@@ -55,7 +55,7 @@ public class POFilterTest {
 		String snippet = "#, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
 	}
 		
@@ -64,7 +64,7 @@ public class POFilterTest {
 		String snippet = "#, c-format, fuzzy\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
 	}
 		
@@ -73,7 +73,7 @@ public class POFilterTest {
 		String snippet = "#, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
 	}
 
@@ -82,7 +82,7 @@ public class POFilterTest {
 		String snippet = "#, x-stuff, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
 	}
 	
@@ -92,7 +92,7 @@ public class POFilterTest {
 			+ "msgstr \"Texte 1\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr"));
 	}
 	
 	@Test
@@ -101,7 +101,7 @@ public class POFilterTest {
 			+ "msgstr \"\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Text 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr"));
 	}
 	
 	@Test
@@ -173,7 +173,7 @@ public class POFilterTest {
 	@Test
 	public void testOuputPluralEntry () {
 		String snippet = makePluralEntry();
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), snippet, "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		String expected = "msgid \"untranslated-singular\"\n"
 			+ "msgid_plural \"untranslated-plural\"\n"
 			+ "msgstr[0] \"untranslated-singular\"\n"

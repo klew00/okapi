@@ -66,21 +66,21 @@ public class PropertiesFilterTest {
 	@Test
 	public void testLineBreaks_CR () {
 		String snippet = "Key1=Text1\rKey2=Text2\r";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
 		assertEquals(snippet, result);
 	}
 
 	@Test
 	public void testineBreaks_CRLF () {
 		String snippet = "Key1=Text1\r\nKey2=Text2\r\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
 		assertEquals(snippet, result);
 	}
 	
 	@Test
 	public void testLineBreaks_LF () {
 		String snippet = "Key1=Text1\n\n\nKey2=Text2\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), snippet, "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
 		assertEquals(snippet, result);
 	}
 	
