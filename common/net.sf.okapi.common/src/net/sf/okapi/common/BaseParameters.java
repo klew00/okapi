@@ -70,7 +70,8 @@ public abstract class BaseParameters implements IParameters {
 			SR = null;
 
 			// Parse it
-			fromString(sbTmp.toString());
+			String tmp = sbTmp.toString().replace("\r\n", "\n");
+			fromString(tmp.replace("\r", "\n"));
 			path = filePath;
 		}
 		catch ( IOException e ) {
