@@ -35,7 +35,7 @@ public class RtfFullFileTest {
 		for (String f : testFileList) {		
 			System.out.println(f);
 			InputStream stream = RtfFullFileTest.class.getResourceAsStream("/" + f);
-			filter.open(new RawDocument(stream, "windows-1252", "en"));
+			filter.open(new RawDocument(stream, "windows-1252", "en", "fr"));
 			while (filter.hasNext()) {
 				event = filter.next();
 			}
