@@ -6,6 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+	net.sf.okapi.common.tests.AllTests.class,
 	net.sf.okapi.common.filters.tests.AllTests.class,
 	net.sf.okapi.common.tests.AllCommonFiltersTests.class,
 	net.sf.okapi.filters.html.tests.AllHtmlUnitTests.class,

@@ -1,9 +1,9 @@
 package net.sf.okapi.common.tests;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import net.sf.okapi.common.MemMappedCharSequence;
 
@@ -31,10 +31,9 @@ public class MemMappedCharSequenceTest {
 	}
 
 	@Test
-	public void testLarge() throws IOException {
-		File dir1 = new File (".");	
-		InputStream in = new FileInputStream(dir1.getCanonicalPath() + "/src/testfiles/test.txt");
-		charSequence = new MemMappedCharSequence(in, "UTF-16LE");
+	public void testLarge() throws IOException {	
+		URL url = ParametersTest.class.getResource("/test.txt");		
+		charSequence = new MemMappedCharSequence(url, "UTF-16LE");
 		assertEquals(7257720, charSequence.length());
 		assertEquals('<', charSequence.charAt(1));
 		assertEquals('U', charSequence.charAt(31));
@@ -44,9 +43,8 @@ public class MemMappedCharSequenceTest {
 	
 	@Test
 	public void testLowercase() throws IOException {
-		File dir1 = new File (".");	
-		InputStream in = new FileInputStream(dir1.getCanonicalPath() + "/src/testfiles/test.txt");
-		charSequence = new MemMappedCharSequence(in, "UTF-16LE", true);		
+		URL url = ParametersTest.class.getResource("/test.txt");	
+		charSequence = new MemMappedCharSequence(url, "UTF-16LE", true);		
 		assertEquals('u', charSequence.charAt(31));
 		charSequence.close();
 	}
