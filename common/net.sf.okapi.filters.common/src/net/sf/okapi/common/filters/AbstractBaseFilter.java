@@ -1334,18 +1334,16 @@ public abstract class AbstractBaseFilter implements IFilter {
 	/**
 	 * Allows implementers to set the START_DOCUMENT name for the current input.
 	 * 
-	 * @param name
-	 *            - set the input document name or path
+	 * @param documentName
+	 *		set the input document name or path
 	 */
 	protected void setDocumentName(String documentName) {
 		this.documentName = documentName;
 	}
 
 	/**
-	 * Get the START_DOCUMENT name for the current input.
-	 * 
-	 * @param name
-	 *            - set the input document name or path
+	 * Gets the START_DOCUMENT name for the current input.
+	 * @return the document name or path of the current input. 
 	 */
 	protected String getDocumentName() {
 		return documentName;
