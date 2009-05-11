@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -105,12 +105,12 @@ public class BOMConversionStep implements IPipelineStep {
 					input = (FileInputStream)rawDoc.getInputStream();
 				}
 				catch ( ClassCastException e ) {
-					throw new OkapiBadFilterInputException("RawDocument has no incompatible type of InputStream.");
+					throw new OkapiBadStepInputException("RawDocument is set with an incompatible type of InputStream.");
 				}
 			}
 			else {
 				// Change this exception to more generic (not just filter)
-				throw new OkapiBadFilterInputException("RawDocument has no input defined.");
+				throw new OkapiBadStepInputException("RawDocument has no input defined.");
 			}
 			
 			// Open the output
