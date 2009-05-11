@@ -21,13 +21,13 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 public class TestUtils {
 
 	public static String[] getTestFiles() throws URISyntaxException {
-		// read all files in the test html directory
-		URL url = RtfFullFileTest.class.getResource("/simpleTest.html");
+		// read all files in the test rtf data directory
+		URL url = RtfFullFileTest.class.getResource("/AddComments.rtf");
 		File dir = new File(url.toURI()).getParentFile();
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return name.endsWith(".html") || name.endsWith(".htm");
+				return name.endsWith(".rtf");
 			}
 		};
 		return dir.list(filter);

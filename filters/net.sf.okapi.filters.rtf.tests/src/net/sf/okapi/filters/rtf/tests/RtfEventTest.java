@@ -19,23 +19,12 @@
 
 package net.sf.okapi.filters.rtf.tests;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.rtf.RTFFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,17 +33,18 @@ import static org.junit.Assert.*;
 
 public class RtfEventTest {
 	private RTFFilter filter;
-	private URL parameters;
-	
+		
 	@Before
 	public void setUp() throws Exception {
-		filter = new RTFFilter();
-		//parameters = RtfEventTest.class.getResource("testConfiguration1.yml");
+		filter = new RTFFilter();	
+	}
+	
+	@Test
+	public void testBold() {		
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		//filter.setParametersFromURL(parameters);
 		filter.open(new RawDocument(snippet, "en"));
 		while (filter.hasNext()) {
 			Event event = filter.next();

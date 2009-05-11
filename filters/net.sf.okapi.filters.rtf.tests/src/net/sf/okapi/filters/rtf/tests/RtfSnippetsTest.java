@@ -38,6 +38,11 @@ public class RtfSnippetsTest {
 	public void tearDown() {
 	}
 	
+	@Test
+	public void testBold() {
+		
+	}
+	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		//filter.setParametersFromURL(parameters);

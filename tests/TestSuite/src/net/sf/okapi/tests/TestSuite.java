@@ -20,7 +20,10 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.filters.properties.tests.AllTests.class,
 	net.sf.okapi.filters.regex.tests.RegexFilterTest.class,
 	net.sf.okapi.filters.rtf.tests.RTFFilterTest.class,
-	
+	net.sf.okapi.filters.rtf.tests.RtfEventTest.class,
+	net.sf.okapi.filters.rtf.tests.RtfSnippetsTest.class,
+	net.sf.okapi.filters.rtf.tests.RtfFullFileTest.class,
+	net.sf.okapi.filters.rtf.tests.integration.ExtractionComparisionTest.class,	
 	net.sf.okapi.filters.tmx.tests.TmxFilterTest.class,
 	net.sf.okapi.filters.xliff.tests.XLIFFFilterTest.class,
 	net.sf.okapi.filters.xml.tests.XMLFilterTest.class,

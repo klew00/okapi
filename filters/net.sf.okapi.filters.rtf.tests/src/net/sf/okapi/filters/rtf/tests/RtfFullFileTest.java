@@ -27,14 +27,15 @@ public class RtfFullFileTest {
 		filter.close();
 	}
 
-	//@Test
+	@Test
 	public void testAllExternalFiles() throws URISyntaxException {
 		@SuppressWarnings("unused")
 		Event event = null;
 
-		for (String f : testFileList) {			
-			InputStream htmlStream = RtfFullFileTest.class.getResourceAsStream("/" + f);
-			filter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		for (String f : testFileList) {		
+			System.out.println(f);
+			InputStream stream = RtfFullFileTest.class.getResourceAsStream("/" + f);
+			filter.open(new RawDocument(stream, "windows-1252", "en"));
 			while (filter.hasNext()) {
 				event = filter.next();
 			}
