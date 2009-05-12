@@ -779,10 +779,14 @@ public final class MemMappedCharSequence implements CharSequence {
 		cb.clear(); // prepare buffer to be filled again
 	}
 
-	@SuppressWarnings("unchecked")
 	public void close() {
 		if (byteBuffer == null)
 			return;
+		tempUTF16BEfile.delete();
+		/*
+		 This code works around a bug that prevents temp files backed by a mem mapped buffer to be deleted. 
+		 We will try to find an implementation that is Java VM independent. Comment out for now to prevent compiler errors.
+		 
 		AccessController.doPrivileged(new java.security.PrivilegedAction() {
 			public Object run() {
 				try {
@@ -790,9 +794,8 @@ public final class MemMappedCharSequence implements CharSequence {
 							.getMethod("cleaner", new Class[0]);
 					getCleanerMethod.setAccessible(true);
 					sun.misc.Cleaner cleaner = (sun.misc.Cleaner) getCleanerMethod.invoke(byteBuffer, new Object[0]);
-					cleaner.clean();
-					if (byteBuffer != null)
-						tempUTF16BEfile.delete();
+					cleaner.clean();					
+					tempUTF16BEfile.delete();
 					byteBuffer = null;
 					System.gc();
 				} catch (Exception e) {
@@ -802,6 +805,6 @@ public final class MemMappedCharSequence implements CharSequence {
 				}
 				return null;
 			}
-		});
+		});*/
 	}
 }
