@@ -33,5 +33,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.common.pipeline.tests.AllPipelineTests.class,
 	net.sf.okapi.common.pipeline.tests.integration.AllPipelineIntegrationTests.class
 })
+
 public class TestSuite {
 }

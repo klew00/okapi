@@ -72,7 +72,7 @@ public class RoundTripComparison {
 				// Load parameters if needed
 				if ( doc.paramFile == null ) {
 					IParameters params = filter.getParameters();
-					params.reset();
+					if ( params != null ) params.reset();
 				}
 				else {
 					String root = Util.getDirectoryName(doc.path);
