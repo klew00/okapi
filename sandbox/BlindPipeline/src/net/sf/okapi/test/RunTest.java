@@ -44,7 +44,7 @@ public class RunTest {
 	}
 
 	public void run () {
-		executePipeline(createPipelineOne());
+		//executePipeline(createPipelineOne());
 		executePipeline(createPipelineTwo());
 		// Not working yet because FilterEventsToRawDocuments in nort working executePipeline(createPipelineThree());
 	}
@@ -113,8 +113,11 @@ public class RunTest {
 	private void executePipeline (IPipeline pipeline) {
 		try {
 			// Fill the input data
-			ArrayList<DocumentData> inputItems = new ArrayList<DocumentData>();
+			ArrayList<ArrayList<DocumentData>> inputItems = new ArrayList<ArrayList<DocumentData>>();
 			for ( ProjectItem item : proj ) {
+				
+				ArrayList<DocumentData> inputList = new ArrayList<DocumentData>();
+				
 				for ( int i=0; i<pipeline.inputCountRequested(); i++ ) {
 					if ( i > 2 ) {
 						throw new RuntimeException("Application does not support more than 3 input at the same time.");
@@ -136,17 +139,20 @@ public class RunTest {
 							+ ".out" + Util.getExtension(item.inputPaths[i]);
 					}
 					// Add the data to the list
-					inputItems.add(dd);
+					inputList.add(dd);
 				}
+				
+				inputItems.add(inputList);
 			}
 			
 			// Now inputs has all the data
 			pipeline.startBatch();
-			for ( DocumentData docData : inputItems ) {
+			for ( ArrayList<DocumentData> inputList : inputItems ) {
 				pipeline.initialize();
-				pipeline.preprocess(docData);
-				pipeline.processDocument(new RawDocument(docData.inputURI, docData.defaultEncoding,
-					docData.srcLang, docData.trgLang));
+				pipeline.preprocess(inputList);
+				DocumentData mainDoc = inputList.get(0); 
+				pipeline.processDocument(new RawDocument(mainDoc.inputURI, mainDoc.defaultEncoding,
+						mainDoc.srcLang, mainDoc.trgLang));
 				pipeline.postprocess();
 			}
 			pipeline.finishBatch();

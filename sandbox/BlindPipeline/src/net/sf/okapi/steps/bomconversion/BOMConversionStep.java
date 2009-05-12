@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -64,8 +65,8 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public void preprocess (DocumentData docData) {
-		super.preprocess(docData);
+	public void preprocess (List<DocumentData> inputs) {
+		super.preprocess(inputs);
 		buffer = new byte[1024*2];
 		hasNext = true;
 	}

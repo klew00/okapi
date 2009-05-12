@@ -21,6 +21,7 @@
 package net.sf.okapi.common.pipeline;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -153,11 +154,11 @@ public class Pipeline implements IPipeline {
 		done = true;
 	}
 
-	public void preprocess(DocumentData docData) {
+	public void preprocess(List<DocumentData> inputs) {
 		// finishedSteps is empty - we preprocess on the steps waiting to be
 		// processed.
 		for (IPipelineStep step : steps) {
-			step.preprocess(docData);
+			step.preprocess(inputs);
 		}
 	}
 

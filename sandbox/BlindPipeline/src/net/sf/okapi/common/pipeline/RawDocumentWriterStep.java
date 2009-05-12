@@ -1,7 +1,7 @@
 package net.sf.okapi.common.pipeline;
 
 import java.io.File;
-import java.io.InputStream;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -27,8 +27,8 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		return (inputIndex == 0);
 	}
 
-	public void preprocess (DocumentData docData) {
-		super.preprocess(docData);
+	public void preprocess (List<DocumentData> inputs) {
+		super.preprocess(inputs);
 		hasNext = true;
 	}
 	
@@ -54,7 +54,6 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		try {
 			rawDoc = (RawDocument)event.getResource();
 			
-			InputStream input;
 			if ( rawDoc.getInputCharSequence() != null ) {
 				//TODO
 				throw new RuntimeException("Not implemented yet");
@@ -62,7 +61,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			else if ( rawDoc.getInputURI() != null ) {
 				// Faster to copy using channels
 				String inputPath = rawDoc.getInputURI().getPath();
-				Util.copyFile(inputPath, docData.outputPath, false); // Copy, do not move
+				Util.copyFile(inputPath, inputs.get(0).outputPath, false); // Copy, do not move
 			}
 			else if ( rawDoc.getInputStream() != null ) {
 				throw new RuntimeException("Not implemented yet");
@@ -74,7 +73,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 				
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
-			rawDoc.setInputURI((new File(docData.outputPath)).toURI());
+			rawDoc.setInputURI((new File(inputs.get(0).outputPath)).toURI());
 			hasNext = true;
 		}
 		catch ( Throwable e ) {

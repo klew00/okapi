@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IFilter;
@@ -53,7 +55,7 @@ public interface IPipelineStep {
 	 */
 	public String getDescription ();
 	
-	void preprocess(DocumentData docData);
+	void preprocess(List<DocumentData> inputs);
 
 	/**
 	 * Executes the post-processing actions for this step.
