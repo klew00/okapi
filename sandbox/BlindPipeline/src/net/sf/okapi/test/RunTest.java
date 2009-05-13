@@ -1,12 +1,9 @@
 package net.sf.okapi.test;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.pipeline.DocumentData;
 import net.sf.okapi.common.pipeline.FilterEventsToRawDocumentStep;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -14,7 +11,6 @@ import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.pipeline.RawDocumentToFilterEventsStep;
 import net.sf.okapi.common.pipeline.RawDocumentWriterStep;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.bomconversion.BOMConversionStep;
 import net.sf.okapi.steps.textmodification.TextModificationStep;
 
@@ -63,32 +59,11 @@ public class RunTest {
 	
 	private void feedDriver () {
 		driver.resetInputs();
+		if ( driver.inputCountRequested() > 3 ) {
+			throw new RuntimeException("Application does not support more than 3 input at the same time.");
+		}
 		for ( ProjectItem item : proj ) {
-			ArrayList<DocumentData> inputList = new ArrayList<DocumentData>();
-			for ( int i=0; i<driver.inputCountRequested(); i++ ) {
-				if ( i > 2 ) {
-					throw new RuntimeException("Application does not support more than 3 input at the same time.");
-				}
-				DocumentData dd = new DocumentData();
-				// OK to have null, as some steps may use 1 *or* more input.
-				// E.g. a bilingual file, vs 1 source input and 1 target input
-				dd.inputURI = (new File(item.inputPaths[i])).toURI();
-				dd.defaultEncoding = item.encodings[i];
-				dd.filterConfig = item.filterConfigs[i];
-				dd.srcLang = "en";
-				dd.trgLang = "fr";
-				
-				// Do we need output for this entry?
-				if ( driver.needsOutput(i) ) {
-					// Output encoding same as the input
-					dd.outputEncoding = item.encodings[i];
-					dd.outputPath = Util.getFilename(item.inputPaths[i], false)
-						+ ".out" + Util.getExtension(item.inputPaths[i]);
-				}
-				// Add the data to the list
-				inputList.add(dd);
-			}
-			driver.addInputItem(inputList);
+			driver.addInputItem(item);
 		}
 	}
 	
@@ -116,7 +91,7 @@ public class RunTest {
 		TextModificationStep step = new TextModificationStep();
 		net.sf.okapi.steps.textmodification.Parameters params
 			= (net.sf.okapi.steps.textmodification.Parameters)step.getParameters();
-		params.type = params.TYPE_EXTREPLACE;
+		params.type = net.sf.okapi.steps.textmodification.Parameters.TYPE_EXTREPLACE;
 		pipeline.addStep(step);
 		
 		pipeline.addStep(new FilterEventsWriterStep());
@@ -135,7 +110,7 @@ public class RunTest {
 		TextModificationStep step1 = new TextModificationStep();
 		net.sf.okapi.steps.textmodification.Parameters params1
 			= (net.sf.okapi.steps.textmodification.Parameters)step1.getParameters();
-		params1.type = params1.TYPE_EXTREPLACE;
+		params1.type = net.sf.okapi.steps.textmodification.Parameters.TYPE_EXTREPLACE;
 		pipeline.addStep(step1);
 
 		// Convert back filter events to raw document

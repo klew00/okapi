@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -82,7 +80,7 @@ public interface IPipeline {
 
 	public void initialize ();
 	
-	public void preprocess(List<DocumentData> inputs);
+	public void preprocess(IDocumentData inputs);
 	
 	public void postprocess();
 	

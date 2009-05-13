@@ -20,9 +20,7 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -155,7 +153,7 @@ public class Pipeline implements IPipeline {
 		done = true;
 	}
 
-	public void preprocess (List<DocumentData> inputs) {
+	public void preprocess (IDocumentData inputs) {
 		// finishedSteps is empty - we preprocess on the steps waiting to be
 		// processed.
 		for (IPipelineStep step : steps) {
@@ -163,7 +161,7 @@ public class Pipeline implements IPipeline {
 		}
 	}
 
-	public void preprocess(RawDocument rawDoc, String filterConfig) {
+/*	public void preprocess(RawDocument rawDoc, String filterConfig) {
 		
 		ArrayList<DocumentData> list = new ArrayList<DocumentData>();
 		DocumentData dd = new DocumentData();
@@ -178,7 +176,7 @@ public class Pipeline implements IPipeline {
 			step.preprocess(list);
 		}
 	}
-
+*/
 	/*
 	 * Destroy this pipeline and call destroy on each pipeline step. Cleanup
 	 * code should go here.

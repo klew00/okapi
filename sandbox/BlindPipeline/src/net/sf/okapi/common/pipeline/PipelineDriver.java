@@ -4,16 +4,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.resource.RawDocument;
-
 public class PipelineDriver {
 	
 	private IPipeline pipeline;
-	private List<List<DocumentData>> inputItems;
+	private List<IDocumentData> inputItems;
 	
 	public PipelineDriver () {
 		pipeline = new Pipeline();
-		inputItems = new ArrayList<List<DocumentData>>();
+		inputItems = new ArrayList<IDocumentData>();
 	}
 
 	public void setPipeline (IPipeline pipeline) {
@@ -40,51 +38,12 @@ public class PipelineDriver {
 		pipeline.addStep(step);
 	}
 
-	public void processBatch (List<List<DocumentData>> inputItems) {
+	public void processBatch (List<IDocumentData> inputItems) {
 		this.inputItems = inputItems;
 		processBatch();
 	}
 	
-	public void addInputItem (URI inputURI,
-		String defaultEncoding,
-		String srcLang,
-		String trgLang,
-		String filterConfig)
-	{
-		addInputItem(inputURI, defaultEncoding, srcLang, trgLang,
-			filterConfig, null, null);
-	}
-	
-	public void addInputItem (URI inputURI,
-		String defaultEncoding,
-		String srcLang,
-		String trgLang,
-		String filterConfig,
-		String outputPath,
-		String outputEncoding)
-	{
-		DocumentData dd = new DocumentData();
-		dd.inputURI = inputURI;
-		dd.defaultEncoding = defaultEncoding;
-		dd.srcLang = srcLang;
-		dd.trgLang = trgLang;
-		dd.filterConfig = filterConfig;
-		dd.outputPath = outputPath;
-		dd.outputEncoding = outputEncoding;
-		ArrayList<DocumentData> list = new ArrayList<DocumentData>();
-		list.add(dd);
-		inputItems.add(list);
-	}
-		
-	public void addInputItem (DocumentData... inputs) {
-		ArrayList<DocumentData> list = new ArrayList<DocumentData>();
-		for ( DocumentData dd : inputs ) {
-			list.add(dd);
-		}
-		inputItems.add(list);
-	}
-	
-	public void addInputItem (List<DocumentData> inputs) {
+	public void addInputItem (IDocumentData inputs) {
 		inputItems.add(inputs);
 	}
 	
@@ -94,12 +53,10 @@ public class PipelineDriver {
 	
 	public void processBatch () {
 		pipeline.startBatch();
-		for ( List<DocumentData> inputList : inputItems ) {
+		for ( IDocumentData inputs : inputItems ) {
 			pipeline.initialize();
-			pipeline.preprocess(inputList);
-			DocumentData mainDoc = inputList.get(0); 
-			pipeline.processDocument(new RawDocument(mainDoc.inputURI, mainDoc.defaultEncoding,
-				mainDoc.srcLang, mainDoc.trgLang));
+			pipeline.preprocess(inputs);
+			pipeline.processDocument(inputs.getRawDocument(0));
 			pipeline.postprocess();
 		}
 		pipeline.finishBatch();

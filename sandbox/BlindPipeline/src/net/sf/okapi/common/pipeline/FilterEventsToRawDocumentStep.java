@@ -75,8 +75,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		hasNext = true;
 
 		if (event.getEventType() == EventType.START_DOCUMENT) {
-			language = inputs.get(0).trgLang; 
-			encoding = inputs.get(0).outputEncoding;
+			language = inputs.getTargetLanguage(); 
+			encoding = inputs.getOutputEncoding(0);
 			if ( encoding == null ) ((StartDocument)event.getResource()).getEncoding();
 
 			String mimeType = ((StartDocument) event.getResource()).getMimeType();

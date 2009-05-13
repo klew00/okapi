@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -31,7 +29,7 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	protected List<DocumentData> inputs;
+	protected IDocumentData inputs;
 	
 	// Override this if the step has parameters
 	public IParameters getParameters () { return null; }
@@ -105,7 +103,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	// Override these if there is a need for specialized pre or post processing.
 	// These methods are called once for every pipeline execution.
-	public void preprocess (List<DocumentData> inputs) {
+	public void preprocess (IDocumentData inputs) {
 		this.inputs = inputs;
 	}
 

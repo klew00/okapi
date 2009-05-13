@@ -78,9 +78,9 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 			StartDocument sd = (StartDocument)event.getResource();
 			if ( sd.getFilter() != null ) {
 				filterWriter = sd.getFilter().createFilterWriter();
-				filterWriter.setOptions(inputs.get(0).trgLang, inputs.get(0).outputEncoding);
+				filterWriter.setOptions(inputs.getTargetLanguage(), inputs.getOutputEncoding(0));
 				filterWriter.setParameters(sd.getFilterParameters());
-				filterWriter.setOutput(inputs.get(0).outputPath);
+				filterWriter.setOutput(inputs.getOutputPath(0));
 			}
 		}
 		return filterWriter.handleEvent(event);

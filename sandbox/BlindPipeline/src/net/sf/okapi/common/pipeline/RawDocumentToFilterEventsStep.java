@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.pipeline;
 
-import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
@@ -71,11 +69,11 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	@Override
-	public void preprocess (List<DocumentData> inputs) {
+	public void preprocess (IDocumentData inputs) {
 		super.preprocess(inputs);
-		if ( inputs.get(0).filterConfig != null ) {
+		if ( inputs.getFilterConfiguration(0) != null ) {
 			//TODO: This is where the filter+config lookup object would be used
-			if ( inputs.get(0).filterConfig.equals("okf_properties") ) {
+			if ( inputs.getFilterConfiguration(0).equals("okf_properties") ) {
 				filter = new net.sf.okapi.filters.properties.PropertiesFilter();
 			}
 			else {

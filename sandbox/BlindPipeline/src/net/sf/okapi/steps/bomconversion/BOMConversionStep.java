@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -33,7 +32,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipeline.DocumentData;
+import net.sf.okapi.common.pipeline.IDocumentData;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class BOMConversionStep extends BasePipelineStep {
@@ -65,7 +64,7 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public void preprocess (List<DocumentData> inputs) {
+	public void preprocess (IDocumentData inputs) {
 		super.preprocess(inputs);
 		buffer = new byte[1024*2];
 		hasNext = true;
