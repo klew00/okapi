@@ -11,6 +11,7 @@ import net.sf.okapi.common.pipeline.FilterEventsToRawDocumentStep;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.pipeline.RawDocumentToFilterEventsStep;
 import net.sf.okapi.common.pipeline.RawDocumentWriterStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -20,12 +21,15 @@ import net.sf.okapi.steps.textmodification.TextModificationStep;
 public class RunTest {
 	
 	private ArrayList<ProjectItem> proj = new ArrayList<ProjectItem>();
+	private PipelineDriver driver;
 
 	public static void main (String[] args) {
 		RunTest rt = new RunTest();
 		rt.run();
 	}
 	public RunTest () {
+		driver = new PipelineDriver();
+		
 		URL url = RunTest.class.getResource("/input1_en.properties");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
@@ -44,8 +48,11 @@ public class RunTest {
 	}
 
 	public void run () {
-		//executePipeline(createPipelineOne());
-		executePipeline(createPipelineTwo());
+		executePipeline(createPipelineOne());
+		
+//		driver.setPipeline(createPipelineTwo());
+//		driver.processBatch();
+		
 		// Not working yet because FilterEventsToRawDocuments in nort working executePipeline(createPipelineThree());
 	}
 	
@@ -156,6 +163,28 @@ public class RunTest {
 				pipeline.postprocess();
 			}
 			pipeline.finishBatch();
+
+			// Note: for process where the callers knows what the steps do
+			// we may have a way to just use a RawDocument
+			// calling a different version of the preprocess() 
+			/* 
+			pipeline.startBatch();
+			pipeline.initialize();
+			pipeline.preprocess(rawDoc, filterConfig);
+			pipeline.processDocument(rawDoc);
+			pipeline.postprocess();
+			pipeline.finishBatch();
+			*/
+
+			// Simpler: if the pipeline does not use the input data
+			// they can be left unset
+			/*
+			pipeline.startBatch();
+			pipeline.initialize();
+			pipeline.processDocument(rawDoc);
+			pipeline.finishBatch();
+			*/
+			
 		}
 		catch (Throwable e) {
 			e.printStackTrace();

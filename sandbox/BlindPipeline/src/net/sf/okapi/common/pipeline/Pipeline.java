@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -154,11 +155,27 @@ public class Pipeline implements IPipeline {
 		done = true;
 	}
 
-	public void preprocess(List<DocumentData> inputs) {
+	public void preprocess (List<DocumentData> inputs) {
 		// finishedSteps is empty - we preprocess on the steps waiting to be
 		// processed.
 		for (IPipelineStep step : steps) {
 			step.preprocess(inputs);
+		}
+	}
+
+	public void preprocess(RawDocument rawDoc, String filterConfig) {
+		
+		ArrayList<DocumentData> list = new ArrayList<DocumentData>();
+		DocumentData dd = new DocumentData();
+		dd.inputURI = rawDoc.getInputURI();
+		dd.defaultEncoding = rawDoc.getEncoding();
+		dd.filterConfig = filterConfig;
+		dd.srcLang = rawDoc.getSourceLanguage();
+		dd.trgLang = rawDoc.getTargetLanguage();
+		list.add(dd);
+		
+		for (IPipelineStep step : steps) {
+			step.preprocess(list);
 		}
 	}
 
