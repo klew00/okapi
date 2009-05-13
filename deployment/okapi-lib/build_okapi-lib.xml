@@ -80,6 +80,9 @@ Running on: ${os.name} ${os.arch}${line.separator}
 
 		<ant antfile="../shared/build_lib.translation.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_tm.opentran.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_tm.globalsight.xml" inheritAll="true"/>
+		
 		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
