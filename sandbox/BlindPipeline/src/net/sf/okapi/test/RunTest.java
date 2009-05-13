@@ -48,12 +48,48 @@ public class RunTest {
 	}
 
 	public void run () {
-		executePipeline(createPipelineOne());
-		
-//		driver.setPipeline(createPipelineTwo());
-//		driver.processBatch();
-		
-		// Not working yet because FilterEventsToRawDocuments in nort working executePipeline(createPipelineThree());
+		driver.setPipeline(createPipelineOne());
+		feedDriver();
+		//driver.processBatch();
+
+		driver.setPipeline(createPipelineTwo());
+		feedDriver();
+		//driver.processBatch();
+
+		driver.setPipeline(createPipelineThree());
+		feedDriver();
+		driver.processBatch();
+	}
+	
+	private void feedDriver () {
+		driver.resetInputs();
+		for ( ProjectItem item : proj ) {
+			ArrayList<DocumentData> inputList = new ArrayList<DocumentData>();
+			for ( int i=0; i<driver.inputCountRequested(); i++ ) {
+				if ( i > 2 ) {
+					throw new RuntimeException("Application does not support more than 3 input at the same time.");
+				}
+				DocumentData dd = new DocumentData();
+				// OK to have null, as some steps may use 1 *or* more input.
+				// E.g. a bilingual file, vs 1 source input and 1 target input
+				dd.inputURI = (new File(item.inputPaths[i])).toURI();
+				dd.defaultEncoding = item.encodings[i];
+				dd.filterConfig = item.filterConfigs[i];
+				dd.srcLang = "en";
+				dd.trgLang = "fr";
+				
+				// Do we need output for this entry?
+				if ( driver.needsOutput(i) ) {
+					// Output encoding same as the input
+					dd.outputEncoding = item.encodings[i];
+					dd.outputPath = Util.getFilename(item.inputPaths[i], false)
+						+ ".out" + Util.getExtension(item.inputPaths[i]);
+				}
+				// Add the data to the list
+				inputList.add(dd);
+			}
+			driver.addInputItem(inputList);
+		}
 	}
 	
 	private IPipeline createPipelineOne () {
@@ -115,81 +151,6 @@ public class RunTest {
 		// Write the output
 		pipeline.addStep(new RawDocumentWriterStep());
 		return pipeline;
-	}
-	
-	private void executePipeline (IPipeline pipeline) {
-		try {
-			// Fill the input data
-			ArrayList<ArrayList<DocumentData>> inputItems = new ArrayList<ArrayList<DocumentData>>();
-			for ( ProjectItem item : proj ) {
-				
-				ArrayList<DocumentData> inputList = new ArrayList<DocumentData>();
-				
-				for ( int i=0; i<pipeline.inputCountRequested(); i++ ) {
-					if ( i > 2 ) {
-						throw new RuntimeException("Application does not support more than 3 input at the same time.");
-					}
-					DocumentData dd = new DocumentData();
-					// OK to have null, as some steps may use 1 *or* more input.
-					// E.g. a bilingual file, vs 1 source input and 1 target input
-					dd.inputURI = (new File(item.inputPaths[i])).toURI();
-					dd.defaultEncoding = item.encodings[i];
-					dd.filterConfig = item.filterConfigs[i];
-					dd.srcLang = "en";
-					dd.trgLang = "fr";
-					
-					// Do we need output for this entry?
-					if ( pipeline.needsOutput(i) ) {
-						// Output encoding same as the input
-						dd.outputEncoding = item.encodings[i];
-						dd.outputPath = Util.getFilename(item.inputPaths[i], false)
-							+ ".out" + Util.getExtension(item.inputPaths[i]);
-					}
-					// Add the data to the list
-					inputList.add(dd);
-				}
-				
-				inputItems.add(inputList);
-			}
-			
-			// Now inputs has all the data
-			pipeline.startBatch();
-			for ( ArrayList<DocumentData> inputList : inputItems ) {
-				pipeline.initialize();
-				pipeline.preprocess(inputList);
-				DocumentData mainDoc = inputList.get(0); 
-				pipeline.processDocument(new RawDocument(mainDoc.inputURI, mainDoc.defaultEncoding,
-						mainDoc.srcLang, mainDoc.trgLang));
-				pipeline.postprocess();
-			}
-			pipeline.finishBatch();
-
-			// Note: for process where the callers knows what the steps do
-			// we may have a way to just use a RawDocument
-			// calling a different version of the preprocess() 
-			/* 
-			pipeline.startBatch();
-			pipeline.initialize();
-			pipeline.preprocess(rawDoc, filterConfig);
-			pipeline.processDocument(rawDoc);
-			pipeline.postprocess();
-			pipeline.finishBatch();
-			*/
-
-			// Simpler: if the pipeline does not use the input data
-			// they can be left unset
-			/*
-			pipeline.startBatch();
-			pipeline.initialize();
-			pipeline.processDocument(rawDoc);
-			pipeline.finishBatch();
-			*/
-			
-		}
-		catch (Throwable e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
 }

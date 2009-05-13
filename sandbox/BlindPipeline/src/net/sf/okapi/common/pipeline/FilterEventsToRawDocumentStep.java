@@ -53,7 +53,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	 * as input.
 	 * 
 	 * @param userOutput
-	 *            - user specified URI
+	 *            user specified URI
 	 */
 	public FilterEventsToRawDocumentStep(URI userOutput) {
 		this.userOutput = userOutput;
@@ -75,8 +75,9 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		hasNext = true;
 
 		if (event.getEventType() == EventType.START_DOCUMENT) {
-			language = ((StartDocument) event.getResource()).getLanguage();
-			encoding = ((StartDocument) event.getResource()).getEncoding();
+			language = inputs.get(0).trgLang; 
+			encoding = inputs.get(0).outputEncoding;
+			if ( encoding == null ) ((StartDocument)event.getResource()).getEncoding();
 
 			String mimeType = ((StartDocument) event.getResource()).getMimeType();
 			if (mimeType == null) {
