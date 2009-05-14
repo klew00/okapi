@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -165,7 +166,6 @@ public class TMXWriter {
 	public void writeItem (TextUnit item,
 		Map<String, String> attributes)
 	{
-		if ( item == null ) throw new NullPointerException();
 		itemCount++;
 		
 		String tuid = item.getName();
@@ -176,14 +176,29 @@ public class TMXWriter {
 		TextContainer srcTC = item.getSource();
 		TextContainer trgTC = item.getTarget(trgLang);
 //TODO: Output only the items with real match or translations		
+		
+		ScoresAnnotation scores = item.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
+
 		if ( !srcTC.isSegmented() ) { // Source is not segmented
-			writeTU(srcTC, trgTC, tuid, attributes);
+			if ( scores != null ) {
+				// Skip segments not leveraged
+				if ( scores.getScore(0) > 0 ) {
+					writeTU(srcTC, trgTC, tuid, attributes);
+				}
+			}
+			else {
+				writeTU(srcTC, trgTC, tuid, attributes);
+			}
 		}
 		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
 			// Write the segments
 			List<Segment> srcList = srcTC.getSegments();
 			List<Segment> trgList = trgTC.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
+				if ( scores != null ) {
+					// Skip segments not leveraged
+					if ( scores.getScore(i) == 0 ) continue;
+				}
 				writeTU(srcList.get(i).text,
 					(i>trgList.size()-1) ? null : trgList.get(i).text,
 					String.format("%s_s%02d", tuid, i+1),

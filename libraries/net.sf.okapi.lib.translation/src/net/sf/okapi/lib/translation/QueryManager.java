@@ -47,6 +47,7 @@ public class QueryManager {
 	private String srcLang;
 	private String trgLang;
 	private LinkedHashMap<String, String> attributes;
+	private int threshold = 75;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -77,7 +78,7 @@ public class QueryManager {
 	/**
 	 * Adds a translation resource to the manager and initializes it with the 
 	 * current source and target language of this manager, as well as any
-	 * attributes that is set.
+	 * attributes that is set, and the current threshold if it is relevant.
 	 * @param connector The translation resource connector to add.
 	 * @param resourceName Name of the translation resource to add.
 	 * @param params the parameters for this connector.
@@ -99,7 +100,9 @@ public class QueryManager {
 		for ( String name : attributes.keySet() ) {
 			connector.setAttribute(name, attributes.get(name));
 		}
-
+		if ( connector instanceof ITMQuery ) {
+			((ITMQuery)connector).setThreshold(threshold);
+		}
 		return id;
 	}
 	
@@ -319,6 +322,15 @@ public class QueryManager {
 	public String getTargetLanguage () {
 		return trgLang;
 	}
+	
+	public void setThreshold (int value) {
+		threshold = value;
+		for ( ResourceItem ri : resList.values() ) {
+			if ( ri.query instanceof ITMQuery ) {
+				((ITMQuery)ri.query).setThreshold(threshold);
+			}
+		}
+	}
 
 	/**
 	 * Leverages a text unit (segmented or not) based on the current settings.
@@ -344,23 +356,29 @@ public class QueryManager {
 					continue;
 				}
 				qr = next();
-				segList.get(i).text = qr.target;
+				// It's a 100% match
+				if ( qr.score == 100 ) {
+					// Check if they are several and if they have the same translation
+					if ( !exactsHaveSameTranslation() ) {
+						if ( threshold == 100 ) {
+							scores.add(0);
+							continue;
+						}
+						// If we do: Use the first one and lower the score to 99%
+						scores.add(99);
+						segList.get(i).text = qr.target;
+						leveraged++;
+						continue;
+					}
+					// Else: First is 100%, possibly several that have the same translations 
+					scores.add(qr.score); // That's 100% then
+					segList.get(i).text = qr.target;
+					leveraged++;
+					continue;
+				}
 				// First is not 100%: use it and move on
-				if ( qr.score < 100 ) {
-					scores.add(qr.score);
-					leveraged++;
-					continue;
-				}
-				// Else: one or more matches, first is 100%
-				// Check if they are several and if they have the same translation
-				if ( !exactsHaveSameTranslation() ) {
-					// If we do: Use the first one and lower the score to 99%
-					scores.add(99);
-					leveraged++;
-					continue;
-				}
-				// Else: Only one 100% or several that have the same translations 
-				scores.add(qr.score); // That's 100% then
+				scores.add(qr.score);
+				segList.get(i).text = qr.target;
 				leveraged++;
 			}
 		}
@@ -371,26 +389,38 @@ public class QueryManager {
 			}
 			else {
 				qr = next();
-				tc.setCodedText(qr.target.getCodedText(), false);
-				// Un-segmented entries that we have leveraged should be like
-				// a text unit with a single segment
-				makeSingleSegment(tu);
-
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score);
+					tc.setCodedText(qr.target.getCodedText(), false);
+					// Un-segmented entries that we have leveraged should be like
+					// a text unit with a single segment
+					makeSingleSegment(tu);
 					leveraged++;
 				}
 				// Else: one or more matches, first is 100%
 				// Check if they are several and if they have the same translation
 				else if ( !exactsHaveSameTranslation() ) {
-					// If we do: Use the first one and lower the score to 99%
-					scores.add(99);
-					leveraged++;
+					if ( threshold >= 100 ) {
+						scores.add(0);
+					}
+					else {
+						// If we do: Use the first one and lower the score to 99%
+						scores.add(99);
+						tc.setCodedText(qr.target.getCodedText(), false);
+						// Un-segmented entries that we have leveraged should be like
+						// a text unit with a single segment
+						makeSingleSegment(tu);
+						leveraged++;
+					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
 					scores.add(qr.score); // That's 100% then
+					tc.setCodedText(qr.target.getCodedText(), false);
+					// Un-segmented entries that we have leveraged should be like
+					// a text unit with a single segment
+					makeSingleSegment(tu);
 					leveraged++;
 				}
 			}
