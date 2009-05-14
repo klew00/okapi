@@ -77,7 +77,7 @@ public class RoundTripComparison {
 				else {
 					String root = Util.getDirectoryName(doc.path);
 					IParameters params = filter.getParameters();
-					params.load(root+"/"+doc.paramFile, false);
+					if ( params != null ) params.load(root+"/"+doc.paramFile, false);
 				}
 				// Execute the first extraction and the re-writing
 				executeFirstExtraction(doc);
@@ -119,12 +119,12 @@ public class RoundTripComparison {
 				// Load parameters if needed
 				if ( doc.paramFile == null ) {
 					IParameters params = filter.getParameters();
-					params.reset();
+					if ( params != null ) params.reset();
 				}
 				else {
 					String root = Util.getDirectoryName(doc.path);
 					IParameters params = filter.getParameters();
-					params.load(root+"/"+doc.paramFile, false);
+					if ( params != null ) params.load(root+"/"+doc.paramFile, false);
 				}
 				// Execute the first extraction and the re-writing
 				String outPath = executeFirstExtractionToFile(doc, outputDir);
