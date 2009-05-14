@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -53,6 +54,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
+	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
 	private int configurationType; // DWH 4-10-09
 	private ILayerProvider layer;
 	private EncoderManager encoderManager;
@@ -61,6 +63,9 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	{
 		super();
 		this.configurationType = configurationType; // DWH 4-10-09
+		encoderManager = new EncoderManager(); // DWH 5-14-09
+		encoderManager.setDefaultOptions(null, "utf-8", "\n"); // DWH 5-14-09
+		encoderManager.updateEncoder(MimeTypeMapper.DOCX_MIME_TYPE); // DWH 5-14-09
 	}
 	
 	/**
@@ -235,6 +240,8 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	 */
 	private String encody(String s, int context)
 	{
+		return(s); // DWH 5-14-09 no encoding is necessary for tags
+/*
 		if ( encoderManager == null ) {
 			if ( layer == null ) {
 				return s; // DWH 4-8-09 replaced tf.toString() with sTuff
@@ -252,5 +259,6 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 					encoderManager.encode(s, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 		}
+*/
 	}
 }

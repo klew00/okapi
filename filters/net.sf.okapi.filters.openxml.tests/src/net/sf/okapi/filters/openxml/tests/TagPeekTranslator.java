@@ -52,6 +52,8 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 	static final String wordoff="</w:t></w:r>";
 	static final String ppon="<a:r><a:t>";
 	static final String ppoff="</a:t></a:r>";
+	static final String lbrac="{";
+	static final String rbrac="}";
 
 	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
@@ -78,14 +80,14 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							ss += sss + "&lt;g" + codenum + "&gt;";
+							ss += sss + lbrac + "g" + codenum + rbrac;
 							nSurroundingCodes++;
 							break;
 						case TextFragment.MARKER_CLOSING:
 							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							ss += "&lt;/g" + codenum + "&gt;" + sss;
+							ss += lbrac + "/g" + codenum + rbrac + sss;
 							nSurroundingCodes--;
 							break;
 						case TextFragment.MARKER_ISOLATED:
@@ -100,7 +102,7 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 							{
 								if (nFileType==MSWORD)
 								{
-									ss += sss + "&lt;x" + codenum + "&gt;";
+									ss += sss + "lbrac + x" + codenum + rbrac;
 								}
 								else if (nFileType==MSPOWERPOINT)
 									ss += sss;
@@ -112,14 +114,14 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 								if (nFileType==MSWORD)
 								{
 									if (code.getTagType()==TextFragment.TagType.OPENING)
-										ss += wordon + "&lt;x" + codenum + "&gt;" + wordoff + sss;
+										ss += wordon + lbrac + "x" + codenum + rbrac + wordoff + sss;
 									else if (code.getTagType()==TextFragment.TagType.OPENING)
-										ss += sss + wordon + "&lt;x" + codenum + "&gt;" + wordoff;
+										ss += sss + wordon + lbrac + "x" + codenum + rbrac + wordoff;
 									else
-										ss += sss + "&lt;x" + codenum + "&gt;";
+										ss += sss + lbrac + "x" + codenum + rbrac;
 								}
 								else if (nFileType==MSPOWERPOINT)
-									ss += sss /* + ppon + "&lt;x" + codenum + "&gt;" + ppoff*/;
+									ss += sss /* + ppon + lbrac + codenum + rbrac + ppoff*/;
 								else
 									ss += sss;
 							}
@@ -132,7 +134,7 @@ public class TagPeekTranslator extends GenericSkeletonWriter implements ITransla
 								nSurroundingCodes++;
 							else if (code.getTagType()==TextFragment.TagType.CLOSING)
 								nSurroundingCodes--;
-							ss += sss /* + "&lt;y" + codenum + "&gt;"*/;
+							ss += sss /* + lbrac + "y" + codenum + rbrac */;
 							break;
 					}
 					if (code!=null)

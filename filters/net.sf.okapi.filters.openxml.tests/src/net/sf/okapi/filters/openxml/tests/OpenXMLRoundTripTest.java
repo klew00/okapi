@@ -67,11 +67,12 @@ public class OpenXMLRoundTripTest {
 		zc = new ZipCompare();
 		themfiles.add("BoldWorld.docx");
 		themfiles.add("Deli.docx");
+		themfiles.add("Escapades.docx");
 		themfiles.add("Addcomments.docx");
 		themfiles.add("sample.docx");
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");
-		themfiles.add("TranslationServicesOff.docx");
+//		themfiles.add("2008FinancialsDecember.xlsx");
 		themfiles.add("OpenXML_text_reference_document.docx");
 		themfiles.add("OpenXML_text_reference_v1_1.docx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");

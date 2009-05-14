@@ -37,6 +37,7 @@ import net.htmlparser.jericho.EndTag;
 //import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
 //import net.htmlparser.jericho.StartTagType;
+import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
@@ -106,10 +107,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
+	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
 
 	private int configurationType;
 	private Package p=null;
-//	private int filetype; // DWH 10-15-08
+	private int filetype=MSWORD; // DWH 4-13-09
 	private String sConfigFileName; // DWH 10-15-08
 	private URL urlConfig; // DWH 3-9-09
 	private Hashtable<String,String> htXMLFileType=null;
@@ -172,6 +174,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	 */
 	public void setUpConfig(int filetype)
 	{
+		this.filetype = filetype; // DWH 5-13-09
 		switch(filetype)
 		{
 			case MSWORDCHART:
@@ -185,6 +188,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			case MSPOWERPOINT:
 				sConfigFileName = "/net/sf/okapi/filters/openxml/powerpointConfiguration.yml"; // DWH 1-5-09 groovy -> yml
 				configurationType = MSPOWERPOINT;
+				break;
+			case MSEXCELCOMMENT: // DWH 5-13-09
+				sConfigFileName = "/net/sf/okapi/filters/openxml/excelCommentConfiguration.yml"; // DWH 1-5-09 groovy -> yml
+				configurationType = MSEXCEL;
 				break;
 			case MSWORD:
 			default:
@@ -497,6 +504,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		if (text==null) // DWH 4-14-09
 			return;
 		String txt=text.toString();
+		handleSomeText(txt,text.isWhiteSpace()); // DWH 5-14-09
+	}
+	
+	private void handleSomeText(String txt, boolean bWhiteSpace)
+	{
 		if (bInDeletion) // DWH 5-8-09
 		{
 			addToNonTextRun(txt);
@@ -512,7 +524,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		// The Jericho html parser always pulls out the largest stretch of text
 		// so standalone whitespace should always be ignorable if we are not
 		// already processing inline text
-		if (text.isWhiteSpace() && !isInsideTextRun()) {
+//		if (text.isWhiteSpace() && !isInsideTextRun()) {
+		if (bWhiteSpace && !isInsideTextRun()) {
 			addToDocumentPart(txt);
 			return;
 		}
@@ -529,11 +542,16 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			{
 				if (bBetweenTextMarkers)
 				{
-					addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
-					bAfterText = true;
-					addToTextUnit(txt); // adds the text
-					trTextRun = new TextRun(); // then starts a new text run for a code after the text
-					bInTextRun = true;
+					if (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='=')
+						addToTextRun(txt); // DWH 5-13-09 don't treat Excel formula as text to be translated
+					else
+					{
+						addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
+						bAfterText = true;
+						addToTextUnit(txt); // adds the text
+						trTextRun = new TextRun(); // then starts a new text run for a code after the text
+						bInTextRun = true;
+					}
 				}
 				else
 					addToTextRun(txt); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
@@ -563,6 +581,25 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addCodeToCurrentTextUnit(tag);				
 	}
 
+	/**
+	 * Handle all numeric entities. Default implementation converts entity to
+	 * Unicode character.
+	 * 
+	 * @param entity
+	 *            - the numeric entity
+	 */
+
+	protected void handleCharacterEntity(Segment entity) { // DWH 5-14-09
+		String decodedText = CharacterReference.decode(entity.toString(), false);
+/*
+ 		if (!isCurrentTextUnit()) {
+
+			startTextUnit();
+		}
+		addToTextUnit(decodedText);
+*/		if (decodedText!=null && !decodedText.equals("")) // DWH 5-14-09 treat CharacterEntities like other text
+		  handleSomeText(decodedText,false);
+	}
 	/**
 	 * Handles a start tag.  TEXT_UNIT_ELEMENTs start a new TextUnit.  TEXT_RUN_ELEMENTs
                * start a new text run.  TEXT_MARKER_ELEMENTS set a flag that any following
@@ -1120,7 +1157,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		TextFragment.TagType codeType;
 		String text,tempTagType;
 		int len;
-		if (trTextRun!=null)
+		if (trTextRun!=null && !(text=trTextRun.getText()).equals("")) // DWH 5-14-09 "" can occur with Character entities
 		{
 			if (bAfterText)
 				codeType = TextFragment.TagType.CLOSING;
@@ -1128,7 +1165,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			else
 				codeType = TextFragment.TagType.OPENING;
-			text = trTextRun.getText();
+//			text = trTextRun.getText();
 			if (codeType==TextFragment.TagType.OPENING &&
 				!bBeforeFirstTextRun && // DWH 4-15-09 only do this if there wasn't stuff before <w:r>
 				bInMainFile && // DWH 4-15-08 only do this in MSWORD document and MSPOWERPOINT slides
@@ -1169,8 +1206,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
 			trTextRun = null;
+			bBeforeFirstTextRun = false; // since the text run has now been added to the text unit
 		}
-		bBeforeFirstTextRun = false; // since the text run has now been added to the text unit
 	}
 	private void addNonTextRunToCurrentTextUnit() { // DWW 5-5-09
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
