@@ -20,12 +20,17 @@
 
 package net.sf.okapi.filters.regex.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -36,6 +41,7 @@ import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +69,7 @@ public class RegexFilterTest {
 		list.add(new InputDocument(root+"TestRules03.txt", "okf_regex@TestRules03.fprm"));
 		list.add(new InputDocument(root+"TestRules04.txt", "okf_regex@TestRules04.fprm"));
 		list.add(new InputDocument(root+"TestRules05.txt", "okf_regex@TestRules05.fprm"));
-		list.add(new InputDocument(root+"TestRules06.txt", "okf_regex@TestRules06.fprm"));
+		list.add(new InputDocument(root+"TestRules06.txt", "okf_regex@TestRules06.fprm")); 
 	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
@@ -124,318 +130,60 @@ public class RegexFilterTest {
 		return list;
 	}
 
+	@Test
+	public void testEmptyLines() {
+		String inputText = "Line 1\n\nLine 2\n\n\n\n\nLine 3\n\n\nLine 4";
+		//                  0123456 7 8901234 5 6 7 8 9012345 6 7 890123 
+		//                  0           1              2            3            
+		
+		Parameters params = new Parameters();
+		Rule rule = new Rule();
+		rule.setRuleType(Rule.RULETYPE_CONTENT);
+		params.regexOptions = Pattern.MULTILINE;
+		
+		rule.setExpression("^(.*?)$");
+		rule.setSourceGroup(1);
+		
+		//rule.setExpression("(^(?=.+))(.*?)$");
+		//rule.setSourceGroup(2);
+		
+		params.rules.add(rule);
+		filter.setParameters(params);
+		
+		FilterTestDriver testDriver = new FilterTestDriver();
+		testDriver.setDisplayLevel(2);
+		testDriver.setShowSkeleton(true);
+		
+		// List all events in Console
+		filter.open(new RawDocument(inputText, "en"));
+		if (!testDriver.process(filter)) Assert.fail();
+		filter.close();
+					
+		// Test individual events
+		filter.open(new RawDocument(inputText, "en"));
+		
+		Event e = filter.next();
+		assertEquals(e.getEventType(), EventType.START_DOCUMENT);
+		
+		_testTuEvent(filter.next(), "Line 1");
+		_testTuEvent(filter.next(), "Line 2");
+		_testTuEvent(filter.next(), "Line 3");
+		_testTuEvent(filter.next(), "Line 4");
+	}
+
 	
-// SV =====================================================================================================	
-//	
-//	private String TEST_PARAMS1 = "/okf_regex@StringInfo.fprm";
-//	private String TEST_DOC1 = "/Test01_stringinfo_en.info";
-//	
-//	private void initFilter(boolean setParams) {
-//		FilterTestDriver testDriver = new FilterTestDriver();
-//		testDriver.setDisplayLevel(2);
-//		testDriver.setShowSkeleton(true);
-//	
-//		if (!setParams) return;
-//		
-//		IParameters params = new Parameters();
-//		URL paramsUrl = RegexFilterTest.class.getResource(TEST_PARAMS1);
-//		params.load(paramsUrl.getPath(), false);
-//		filter.setParameters(params);		
-//	}
-//	
-//	@Test
-//	public void testDocName() {
-//// Pass the 3 input types, docName is expected to be null if the input is stream /char sequence, not null if URI
-//		
-//		initFilter(true);
-//
-//		// stream, docName = null 		
-//		InputStream input = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		try {
-//			Event event = filter.next();
-//			assertTrue(event.getResource() instanceof StartDocument);
-//			StartDocument sd = (StartDocument)event.getResource();
-//			
-//			assertNull(sd.getName());
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		
-//		// char sequence, docName = null 		
-//		filter.open(new RawDocument("a char sequence", "UTF-8", "en"));
-//		try {
-//			Event event2 = filter.next();
-//			assertTrue(event2.getResource() instanceof StartDocument);
-//			StartDocument sd2 = (StartDocument)event2.getResource();
-//			
-//			assertNull(sd2.getName());
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		
-//		// URI, docName <> null
-//		URL url = RegexFilterTest.class.getResource(TEST_DOC1);
-//		URI uri = null;
-//		try {
-//			uri = url.toURI();
-//		}
-//		catch (URISyntaxException e){
-//		}
-//		filter.open(new RawDocument(uri, "UTF-8", "en"));
-//		try {
-//			Event event3 = filter.next();
-//			assertTrue(event3.getResource() instanceof StartDocument);
-//			StartDocument sd3 = (StartDocument)event3.getResource();
-//			String name = sd3.getName();
-//			
-//			assertNotNull(name);
-//		}
-//		finally {
-//			filter.close();
-//		}
-//	}
-//	
-//	@Test
-//	public void testEmptyInput() {
-//// Empty input, check exceptions
-//				
-//		initFilter(true);
-//
-//		// 1. Empty stream, OkapiBadFilterInputException expected, no other
-//		boolean caught = false;
-//		boolean caught2 = false;
-//		
-//		InputStream input = null;
-//		try {
-//			filter.open(new RawDocument(input, "UTF-8", "en"));
-//		}	
-//		catch (OkapiBadFilterInputException e) {
-//			caught = true;
-//		}
-//		catch (Exception e) {
-//			caught2 = true;
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		
-//		assertTrue(caught);
-//		assertFalse(caught2);
-//		
-//		
-//		// 2. Empty raw doc, OkapiBadFilterInputException expected, no other
-//		caught = false;
-//		caught2 = false;
-//		
-//		try {
-//			filter.open(null);
-//		}	
-//		catch (OkapiBadFilterInputException e) {
-//			caught = true;
-//		}
-//		catch (Exception e) {
-//			caught2 = true;
-//		}
-//		finally {
-//			filter.close();
-//		}
-//	
-//		assertTrue(caught);
-//		assertFalse(caught2);
-//		
-//		
-//		// 3. Empty filter parameters, OkapiBadFilterInputException (? a new exception class) expected, no other
-//		caught = false;
-//		caught2 = false;
-//				
-//		try {
-//			filter.setParameters(null);
-//			
-//			InputStream input2 = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
-//			filter.open(new RawDocument(input2, "UTF-8", "en"));
-//		}	
-//		catch (OkapiBadFilterInputException e) {
-//			caught = true;
-//		}
-//		catch (Exception e) {
-//			caught2 = true;
-//		}
-//		finally {
-//			filter.close();
-//		}
-//	
-//		assertTrue(caught);
-//		assertFalse(caught2);
-//		
-//	}
-//	
-//		
-//	
-//	@Test
-//	public void testSetParameters() {
-//// Pass fake parameters, check if not eaten
-//		
-//		initFilter(false);		
-//		
-//		IParameters fakeParams = new TestParameters();
-//		filter.setParameters(fakeParams);
-//	}
-//	
-//	@Test
-//	public void testSkeleton_generateSkeletonOption() {
-//// Open filter with generateSkeleton true/false, see if the filter reacts
-//		
-//		boolean hasSkeleton = false;
-//		initFilter(true);
-//		
-//		// generateSkeleton = true 		
-//		InputStream input = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"), true); // !!!		
-//		try {
-//			Event event;
-//			while (filter.hasNext()) {
-//				event = filter.next();
-//				
-//				IResource res = event.getResource();
-//				ISkeleton skel = res.getSkeleton();
-//				String s = null;
-//				
-//				if (skel != null) {
-//					s = skel.toString();	
-//					
-//					if ((s != null) && (s != "")) {
-//						hasSkeleton = true;
-//						break;
-//					}
-//				};
-//			}
-//			
-//			assertTrue(hasSkeleton);			
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		
-//				
-//		// generateSkeleton = false
-//		hasSkeleton = false;
-//		input = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"), false); // !!!		
-//		try {
-//			Event event;
-//			while (filter.hasNext()) {
-//				event = filter.next();
-//				
-//				IResource res = event.getResource();
-//				ISkeleton skel = res.getSkeleton();
-//				String s = null;
-//				
-//				if (skel != null) {
-//					s = skel.toString();	
-//					
-//					if ((s != null) && (s != "")) {
-//						hasSkeleton = true;
-//						break;
-//					}
-//				};
-//			}
-//			
-//			assertFalse(hasSkeleton);
-//		}
-//		finally {
-//			filter.close();
-//		}
-//	}
-//	
-//	
-//	@Test
-//	public void testSkeleton_outputSkeleton() {
-//	// collects parts of the skeleton from events, builds a test string
-//		
-//		String outputSkeleton = "";
-//		
-//		InputStream input = RegexFilterTest.class.getResourceAsStream(TEST_DOC1);		
-//		filter.open(new RawDocument(input, "UTF-8", "en"), true);
-//		
-////		filter.open(new RawDocument("Line 1/r/nLine2", "UTF-8", "en"), true);
-//		try {
-//			Event event;
-//			while (filter.hasNext()) {
-//				event = filter.next();
-//				
-//				switch (event.getEventType()) {
-////					case START_DOCUMENT:
-////					case END_DOCUMENT:
-////					case START_SUBDOCUMENT:
-////					case END_SUBDOCUMENT:
-////					case START_GROUP:
-////					case END_GROUP:
-////					case TEXT_UNIT:
-//					case DOCUMENT_PART:
-//					
-//					IResource res = event.getResource();
-//					ISkeleton skel = res.getSkeleton();
-//					String s = null;
-//					
-//					if (skel != null) {
-//						s = skel.toString();	
-//						
-//						if ((s != null) && (s != "")) {
-//							outputSkeleton += s;						
-//						}
-//					}
-//				}
-//			}			
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		System.out.println("----------------------------- outputSkeleton -------------------------------");
-//		System.out.println(">>>>>>" + outputSkeleton + "<<<<<<");
-//	}
-//	
-//// Not yet	
-//	
-//	
-////	@Test
-//	public void testLinebreakNormalization() {
-//// Pass the 3 input types with /r/n linebreaks, check if replaced with /n
-//		
-//		initFilter(true);
-//		
-//		// char sequence 		
-//		filter.open(new RawDocument("Line 1/r/nLine2", "UTF-8", "en"), true);
-//		try {
-//			Event event2 = filter.next();
-//			assertTrue(event2.getResource() instanceof StartDocument);
-//			StartDocument sd2 = (StartDocument)event2.getResource();
-//	
-//			ISkeleton skel = sd2.getSkeleton();
-//			String s = null;
-//			if (skel != null) {s = skel.toString();}
-//			
-//			System.out.println(s);
-////			assertNull(sd2.getName());
-//		}
-//		finally {
-//			filter.close();
-//		}
-//		
-//		
-//	}
-//	
-////	@Test
-//	public void testSkeleton_common() {
-//// Write a skeleton into a file, compare with the input file
-//// Test trailing /n
-//// Check if open(, generateSkeleton = false) blocks skeleton generation
-//// Check if the linebreaks of skeleton are the same as those of the input file 		
-//	}
+	private void _testTuEvent(Event e, String expectedText) {
+		assertNotNull(e);
+		assertEquals(e.getEventType(), EventType.TEXT_UNIT);
+		
+		IResource res = e.getResource();
+		assertTrue(res instanceof TextUnit);
+		
+		assertEquals(((TextUnit) res).toString(), expectedText);
+		
+		e = filter.next();
+		assertEquals(e.getEventType(), EventType.DOCUMENT_PART);
+	}
 	
 }
+

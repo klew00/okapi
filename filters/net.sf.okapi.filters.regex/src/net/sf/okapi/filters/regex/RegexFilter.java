@@ -120,7 +120,8 @@ public class RegexFilter implements IFilter {
 		// Get the first best match among the rules
 		// trying to match expression
 		Rule bestRule;
-		int bestPosition = inputText.length()+99;
+		int maxPos = inputText.length() + 99;
+		int bestPosition = maxPos;
 		MatchResult result = null;
 		
 		while ( true ) {
@@ -143,11 +144,10 @@ public class RegexFilter implements IFilter {
 				}
 				// Check for empty content
 				if ( result.start() == result.end() ) {
-					if ( startSearch+1 < inputText.length() ) {
-						startSearch++;
-						continue;
-					}
-					else break; // Done
+						startSearch = result.end() + 1;
+						bestPosition = maxPos;
+						if (startSearch >= inputText.length()) break;						
+						continue;						
 				}
 				// Check for boundary to avoid infinite loop
 				else if ( result.start() != inputText.length() ) {
