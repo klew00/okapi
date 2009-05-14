@@ -77,7 +77,7 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("docx", DOCX_MIME_TYPE);
 		extensionToMimeMap.put("docm", DOCM_MIME_TYPE);
 		extensionToMimeMap.put("xlsx", XLSX_MIME_TYPE);
-		extensionToMimeMap.put("xlsx", XLSM_MIME_TYPE);
+		extensionToMimeMap.put("xlsm", XLSM_MIME_TYPE);
 		extensionToMimeMap.put("pptx", PPTX_MIME_TYPE);
 		extensionToMimeMap.put("pptm", PPTM_MIME_TYPE);
 	}
