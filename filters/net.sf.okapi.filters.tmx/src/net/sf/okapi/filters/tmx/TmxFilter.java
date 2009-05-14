@@ -25,9 +25,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -51,7 +52,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -62,6 +62,8 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 public class TmxFilter implements IFilter {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private boolean hasNext;
 	private XMLStreamReader reader;	
 	private String docName;
@@ -83,12 +85,20 @@ public class TmxFilter implements IFilter {
 	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 	private String currentLang;					//--current language processed in the TU
 	private boolean targetExists= false;
-	private ArrayList<TextUnit> subList;		//--keeps track of the subflows for a TU--
-	int subCounter = 0;
 	
+	private HashMap<String,String> rulesMap = new HashMap<String,String>();
+	private Stack<String> elemStack=new Stack<String>();
 	
 	public TmxFilter () {
 		params = new Parameters();
+		
+		rulesMap.put("<seg>", "<bpt><ept><it><ph><hi>");
+		rulesMap.put("<sub>", "<bpt><ept><it><ph><hi>");
+		rulesMap.put("<hi>", "<bpt><ept><it><ph><hi>");
+		rulesMap.put("<bpt>","<sub>");
+		rulesMap.put("<ept>","<sub>");
+		rulesMap.put("<it>","<sub>");
+		rulesMap.put("<ph>","<sub>");		
 	}
 	
 	public void cancel() {
@@ -162,6 +172,7 @@ public class TmxFilter implements IFilter {
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
+		
 		if ( input.getInputCharSequence() != null ) {
 			open(input.getInputCharSequence());
 		}
@@ -489,10 +500,6 @@ public class TmxFilter implements IFilter {
 		int eventType;
 		String localName;
 		
-		//--initialize sub element content--
-		subCounter=0;
-		
-		
 		//--determine which container to use--
 		TextContainer tc;
 		if(tuvTrgType == TuvXmlLang.SOURCE){
@@ -522,10 +529,19 @@ public class TmxFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.START_ELEMENT:		
+
+					localName = reader.getLocalName().toLowerCase();
+					if(!isValidElement(elemStack.peek(),localName,true)){
+						//--throws OkapiBadFilterInputException if not valid--
+					}
+			
+					elemStack.push(localName);
 					
 					if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-						localName = reader.getLocalName().toLowerCase();
-						if(localName.equals("ph") || localName.equals("it") || localName.equals("hi")){
+						if(localName.equals("hi")){
+							String typeAttr = getTypeAttribute();
+							tc.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
+						}else if(localName.equals("ph") || localName.equals("it")){
 							appendCode(TagType.PLACEHOLDER, ++id, localName, tc);
 						}else if(localName.equals("bpt")){
 							appendCode(TagType.OPENING, ++id, localName, tc);
@@ -540,6 +556,10 @@ public class TmxFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
+					
+					localName = reader.getLocalName().toLowerCase();
+					elemStack.pop();					
+					
 					if(reader.getLocalName().equals(startElement)){
 						if(tuvTrgType == TuvXmlLang.SOURCE){
 							pSkel.addContentPlaceholder(pTu, null);
@@ -550,7 +570,9 @@ public class TmxFilter implements IFilter {
 						return true;
 					}else{
 						if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-							
+							if(localName.equals("hi")){
+								tc.append(TagType.CLOSING, "hi","</hi>");	
+							}						
 						}else{
 							storeEndElement();
 							break;
@@ -572,7 +594,6 @@ public class TmxFilter implements IFilter {
 	private boolean processTranslationUnit(){
 		
 		int countTuvs=0;
-		subList=null;
 		
 		// Make a document part with skeleton between the previous event and now.
 		// Spaces can go with trans-unit to reduce the number of events.
@@ -621,6 +642,7 @@ public class TmxFilter implements IFilter {
 						storeTuStartElement();
 						
 					}else if(reader.getLocalName().equals("seg")){
+						elemStack.push("seg");
 						processSeg(tu, skel);
 					}
 					break;
@@ -635,13 +657,6 @@ public class TmxFilter implements IFilter {
 						if(countTuvs<1){
 							throw new OkapiBadFilterInputException("Each <tu> requires at least one <tuv>");							
 						}
-						
-						//--add any sub TUs--
-						if(subList!=null)
-							for (TextUnit subTu : subList){
-								queue.add(new Event(EventType.TEXT_UNIT, subTu));
-							}
-						subList=null;
 						
 						//--add the resname based on tuid--
 						if(tu.getProperty("tuid")!=null){
@@ -695,13 +710,12 @@ public class TmxFilter implements IFilter {
 		String tagName,
 		TextContainer content)
 	{
+		
+		String localName;
+		
 		try {
 			//--BEGIN SUBFLOW--
-			boolean insideSub = false;
-			TextUnit subTu=null;
-			boolean subTuExists = false;
-			GenericSkeleton subSkel=null;
-			TextContainer subTc = null;
+			//int subLevelCounter = 0;
 			//--END SUBFLOW--
 			
 			StringBuilder innerCode = new StringBuilder();
@@ -726,37 +740,17 @@ public class TmxFilter implements IFilter {
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
 					
-					//--BEGIN SUBFLOW--
-					if("sub".equals(reader.getLocalName())){
-						insideSub = true;	//TODO: change to a stack of subflows
-
-						//--create list of subflows if empty--
-						if (subList==null){
-							subList = new ArrayList<TextUnit>();
-						}					
-						
-						//--retrieve existing tu or create new one--
-						if(subList.size()>subCounter){
-							subTuExists=true;
-							subTu = subList.get(subCounter);
-						}else{
-							subTuExists=false;
-							subTu = new TextUnit(String.valueOf(++tuId));
-							subList.add(subCounter, subTu);
-						}
-						
-						//--set the correct tc for content--
-						if(tuvTrgType == TuvXmlLang.SOURCE){
-							subTc = subTu.getSource();
-						}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-							subTc = subTu.setTarget(currentLang, new TextContainer());
-						}else{
-							subTc=null;
-						}
-						outerCode.append("<seg>");
-						break;
+					localName = reader.getLocalName().toLowerCase();
+					if(!isValidElement(elemStack.peek(),localName, true)){
+						//--throws OkapiBadFilterInputException if not valid--
 					}
-					//--END SUBFLOW--
+					
+					elemStack.push(localName);
+
+					//--warn about subflow--
+					if("sub".equals(reader.getLocalName())){
+						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
+					}
 					
 					prefix = reader.getPrefix();
 					StringBuilder tmpg = new StringBuilder();
@@ -783,37 +777,34 @@ public class TmxFilter implements IFilter {
 							reader.getAttributeValue(i)));
 					}
 					tmpg.append(">");
+				
+					innerCode.append(tmpg.toString());
 					outerCode.append(tmpg.toString());
+					
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					
-					//--BEGIN SUBFLOW--
-					if("sub".equals(reader.getLocalName())){
-						
-						//--initialize new sub TU--
-						if(!subTuExists){
-							subSkel = new GenericSkeleton();
-							subSkel.append("<sub>");						
-							subSkel.addContentPlaceholder(subTu, currentLang);
-							subSkel.append("</sub>");
-							subTu.setSkeleton(subSkel);
-							subTu.setMimeType("text/xml");
-						}
-						
-						innerCode.append(TextFragment.makeRefMarker(subTu.getId()));
-						subCounter++;
-						insideSub = false;
-						outerCode.append("</seg>");
-						break;
-					}
-					//--END SUBFLOW--
+					elemStack.pop();
 					
-					if ( tagName.equals(reader.getLocalName()) ) {
+					//--completed the original placeholder/code and back up to the <seg> level--
+					if ( tagName.equals(reader.getLocalName()) && (elemStack.peek().equals("seg"))) {
+
 						Code code = content.append(tagType, tagName, innerCode.toString());
 						outerCode.append("</"+tagName+">");
 						code.setOuterData(outerCode.toString());
-						return;	
+						return;							
+					}else{
+						
+						String ns = reader.getPrefix();
+						if (( ns == null ) || ( ns.length()==0 )) {
+							innerCode.append("</"+reader.getLocalName()+">");
+							outerCode.append("</"+reader.getLocalName()+">");
+						}
+						else {
+							innerCode.append("</"+ns+":"+reader.getLocalName()+">");
+							outerCode.append("</"+ns+":"+reader.getLocalName()+">");
+						}						
 					}
 					break;
 
@@ -821,16 +812,8 @@ public class TmxFilter implements IFilter {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 
-					//--BEGIN SUBFLOW--
-					if(insideSub && subTc!=null){
-						subTc.append(reader.getText());
-						outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
-											
-					}//--END SUBFLOW--
-					else{
-						innerCode.append(reader.getText());//TODO: escape unsupported chars
-						outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
-					}
+					innerCode.append(reader.getText());//TODO: escape unsupported chars
+					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					break;
 				}
 			}
@@ -875,6 +858,38 @@ public class TmxFilter implements IFilter {
 			}
 		}
 		throw new OkapiBadFilterInputException("The required xml:lang attribute is missing in <tuv>. The file is not valid TMX.");
+	}
+
+	
+	/**
+	 * Gets the type attribute from the current element
+	 * @return 	returns the type or null if it's missing
+	 */		
+	private String getTypeAttribute(){
+
+		int count = reader.getAttributeCount();
+		for ( int i=0; i<count; i++ ) {
+			if(reader.getAttributeLocalName(i).equals("lang")){
+				return reader.getAttributeValue(i);
+			}
+		}
+		return null;
+	}
+	
+	
+	private boolean isValidElement(String curElem, String newElem, boolean throwException){
+		String rules = rulesMap.get("<"+curElem+">");
+
+		if(rules!=null && rules.contains("<"+newElem+">")){
+			return true;
+		}else{
+			if(throwException){
+				throw new OkapiBadFilterInputException("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
+			}else{
+				logger.warning("<"+newElem+"> not allowed in <"+curElem+">. Only "+rules+" allowed.");
+				return false;		
+			}
+		}
 	}
 	
 }
