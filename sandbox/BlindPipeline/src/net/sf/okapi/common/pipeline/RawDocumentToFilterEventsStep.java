@@ -76,6 +76,9 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			if ( inputs.getFilterConfiguration(0).equals("okf_properties") ) {
 				filter = new net.sf.okapi.filters.properties.PropertiesFilter();
 			}
+			else if ( inputs.getFilterConfiguration(0).equals("okf_xml") ) {
+				filter = new net.sf.okapi.filters.xml.XMLFilter();
+			}
 			else {
 				throw new RuntimeException("Unsupported filter type.");
 			}
@@ -88,12 +91,21 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent (Event event) {
+		//TODO: need to clean this up
 		if (( event != null ) && ( event.getEventType() == EventType.RAW_DOCUMENT )) {
 			if ( filter == null ) { // No filter assigned
 				return event;
 			}
 			filter.open((RawDocument)event.getResource());
 		}
+		
+		switch ( event.getEventType() ) {
+		case START:
+		case CANCELED:
+		case CUSTOM:
+			return event;
+		}
+
 		Event e = filter.next();
 		if (e != null && e.getEventType() == EventType.END_DOCUMENT) {
 			hasEvents = false;

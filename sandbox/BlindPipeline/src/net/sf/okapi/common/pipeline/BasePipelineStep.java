@@ -93,6 +93,10 @@ public abstract class BasePipelineStep implements IPipelineStep {
 			handleCustom(event);
 			break;
 
+		case START:
+			handleStart(event);
+			break;
+			
 		default:
 			// TODO: specific exception
 			throw new RuntimeException("Unkown Okapi Event: " + event.toString());
@@ -133,6 +137,9 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	// methods if we need to process
 	// the event
 
+	protected void handleStart (Event event) {
+	}
+	
 	protected void handleDocumentPart(Event event) {
 	}
 

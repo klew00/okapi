@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.resource.RawDocument;
+
 public class PipelineDriver {
 	
 	private IPipeline pipeline;
@@ -46,13 +48,92 @@ public class PipelineDriver {
 	public void addInputItem (IDocumentData inputs) {
 		inputItems.add(inputs);
 	}
+
+	/**
+	 * Adds an item item to this batch, using one or more RawDocument objects.
+	 * The added item will have as many input documents as provided. All of them
+	 * will be set to use the same filter configuration (the one provided). 
+	 * @param filterConfig the filter configuration to use for these documents (may be null).
+	 * @param rawDocs one or more RawDocuments to include in this item.
+	 */
+	public void addInputItem (String filterConfig,
+		RawDocument... rawDocs)
+	{
+		DocumentData dd = new DocumentData();
+		for ( RawDocument rawDoc : rawDocs ) {
+			if ( dd.srcLang == null ) {
+				dd.srcLang = rawDoc.getSourceLanguage();
+			}
+			if ( dd.trgLang == null ) {
+				dd.trgLang = rawDoc.getTargetLanguage();
+			}
+			DocumentDataItem ddi = new DocumentDataItem();
+			ddi.inputURI = rawDoc.getInputURI();
+			ddi.defaultEncoding = rawDoc.getEncoding();
+			ddi.filterConfig = filterConfig;
+			dd.list.add(ddi);
+		}
+		inputItems.add(dd);
+	}
+	
+	/**
+	 * Adds an item to this batch, using a RawDocument object. The added item
+	 * will have a single input document. 
+	 * @param rawDoc the RawDocument object from which to create an entry.
+	 * @param filterConfig the filter configuration to use for this document (may be null).
+	 * @param outputPath path of the output document (may be null if no output is used)
+	 * @param outputEncoding encoding of the output  (may be null if no output is used)
+	 */
+	public void addInputItem (RawDocument rawDoc,
+		String filterConfig,
+		String outputPath,
+		String outputEncoding)
+	{
+		DocumentDataItem ddi = new DocumentDataItem();
+		ddi.inputURI = rawDoc.getInputURI();
+		ddi.defaultEncoding = rawDoc.getEncoding();
+		ddi.filterConfig = filterConfig;
+		ddi.outputPath = outputPath;
+		ddi.outputEncoding = outputEncoding;
+		DocumentData dd = new DocumentData();
+		dd.srcLang = rawDoc.getSourceLanguage();
+		dd.trgLang = rawDoc.getTargetLanguage();
+		dd.list.add(ddi);
+		inputItems.add(dd);
+	}
+	
+	/**
+	 * Adds an item to this batch, using direct parameters. The added item
+	 * will have a single input document. 
+	 * @param inputURI the URI of the input document.
+	 * @param defaultEncoding the default encoding of the document.
+	 * @param filterConfig the filter configuration of the document.
+	 * @param srcLang the source language.
+	 * @param trgLang the target language.
+	 */
+	public void addInputItem (URI inputURI,
+		String defaultEncoding,
+		String filterConfig,
+		String srcLang,
+		String trgLang)
+	{
+		DocumentDataItem ddi = new DocumentDataItem();
+		ddi.inputURI = inputURI;
+		ddi.defaultEncoding = defaultEncoding;
+		ddi.filterConfig = filterConfig;
+		DocumentData dd = new DocumentData();
+		dd.srcLang = srcLang;
+		dd.trgLang = trgLang;
+		dd.list.add(ddi);
+		inputItems.add(dd);
+	}
 	
 	public void resetInputs () {
 		inputItems.clear();
 	}
 	
 	public void processBatch () {
-		pipeline.startBatch();
+		//TODO: use either call or event not both!!!! pipeline.startBatch();
 		for ( IDocumentData inputs : inputItems ) {
 			pipeline.initialize();
 			pipeline.preprocess(inputs);

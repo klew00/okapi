@@ -74,7 +74,8 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent(Event event) {
-		if ( event.getEventType() == EventType.START_DOCUMENT ) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
 			StartDocument sd = (StartDocument)event.getResource();
 			if ( sd.getFilter() != null ) {
 				filterWriter = sd.getFilter().createFilterWriter();
@@ -82,8 +83,18 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 				filterWriter.setParameters(sd.getFilterParameters());
 				filterWriter.setOutput(inputs.getOutputPath(0));
 			}
+			// Fall thru
+		case START_SUBDOCUMENT:
+		case END_SUBDOCUMENT:
+		case START_GROUP:
+		case END_GROUP:
+		case TEXT_UNIT:
+		case DOCUMENT_PART:
+		case END_DOCUMENT:
+			return filterWriter.handleEvent(event);
+		default:
+			return event;
 		}
-		return filterWriter.handleEvent(event);
 	}	
 	
 	@Override
