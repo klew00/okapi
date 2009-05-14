@@ -22,6 +22,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.filters.tmx.Parameters;
 import net.sf.okapi.filters.tmx.TmxFilter;
 
 import org.junit.Assert;
@@ -34,7 +35,7 @@ public class TmxFilterTest {
 	private FilterTestDriver testDriver;
 	
 	String simpleSnippet = "<?xml version=\"1.0\"?>\r"
-		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
+		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
 
 	String simpleBilingualSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
@@ -50,14 +51,20 @@ public class TmxFilterTest {
 
 	String invalidElementsInsideTuSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><InvalidTag>Invalid Tag Content</InvalidTag><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
+
+	String invalidElementInsidePlaceholderSnippet = "<?xml version=\"1.0\"?>\r"
+		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <ph type=\"fnote\">Before Sub\"<sub>Hello Subflow. </sub>After <invalid> test invalid placeholder element </invalid> Sub</ph>Universe!</seg></tuv></tu></body></tmx>\r";
 	
+	String invalidElementInsideSubSnippet = "<?xml version=\"1.0\"?>\r"
+		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <ph type=\"fnote\">Before Sub\"<sub>Hello <invalid> test invalid sub element </invalid> Subflow. </sub>After Sub</ph>Universe!</seg></tuv></tu></body></tmx>\r";
+
 	
 	
 	@Before
 	public void setUp() {
 		filter = new TmxFilter();
 		testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(1);
+		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 	}
 
@@ -142,6 +149,17 @@ public class TmxFilterTest {
 		FilterTestDriver.getStartDocument(getEvents(invalidElementsInsideTuSnippet, "en-us","fr-fr"));
 	}
 	
+	@Test (expected=OkapiBadFilterInputException.class)
+	public void testInvalidElementInSub() {
+		FilterTestDriver.getStartDocument(getEvents(invalidElementInsideSubSnippet, "en-us","fr-fr"));
+	}
+
+	@Test (expected=OkapiBadFilterInputException.class)
+	public void testInvalidElementInPlaceholder() {
+		FilterTestDriver.getStartDocument(getEvents(invalidElementInsidePlaceholderSnippet, "en-us","fr-fr"));
+	}
+
+	
 	
 	@Test (expected=OkapiBadFilterInputException.class)
 	public void testOpenInvalidInputStream() {
@@ -170,6 +188,27 @@ public class TmxFilterTest {
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}	
+
+	@Test
+	public void testConsolidatedStream() {
+		filter.open(new RawDocument(simpleSnippet, "en-us","fr-fr"));
+		if ( !testDriver.process(filter) ) Assert.fail();
+		filter.close();
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, "en-us","fr-fr"), simpleSnippet, "fr-fr"));
+	}	
+
+	@Test
+	public void testUnConsolidatedStream() {
+		Parameters params = (Parameters)filter.getParameters();
+		params.consolidateDpSkeleton=false;
+		
+		filter.open(new RawDocument(simpleSnippet, "en-us","fr-fr"));
+		if ( !testDriver.process(filter) ) Assert.fail();
+		filter.close();
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, "en-us","fr-fr"), simpleSnippet, "fr-fr"));
+	}	
+
+	
 	
 	/*
 	@Test
