@@ -539,9 +539,9 @@ public class OpenXMLFilter implements IFilter {
 		                    sDocType.equals("settings+xml") ||
 		                    sDocType.equals("glossary+xml"))) ||
 		             (nZipType==MSEXCEL &&
-		            	   (sDocType.equals("main+xml") ||
-				   	  	    sDocType.equals("worksheet+xml") ||
-				   			sDocType.equals("sharedStrings+xml") ||
+		            	   (sDocType.equals("sharedStrings+xml") ||
+		            	//  sDocType.equals("worksheet+xml") || DWH 5-15-09 sheetn.xml has number, formulas, nothing translatable
+		            	//	sDocType.equals("main+xml") || DWH 5-15-09 workbook.xml has nothing translatable
 				   			sDocType.equals("table+xml") ||
 				   			sDocType.equals("comments+xml"))) ||
 				   	 (nZipType==MSPOWERPOINT &&

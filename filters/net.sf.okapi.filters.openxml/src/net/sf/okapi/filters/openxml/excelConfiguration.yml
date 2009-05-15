@@ -36,11 +36,12 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   elementType: MSEXCEL
 
-author:
-  ruleTypes: [EXCLUDE]
+# used in sheetn files
+#author:
+#  ruleTypes: [EXCLUDE]
 
-v:
-  ruleTypes: [TEXTUNIT]
+#v:
+#  ruleTypes: [TEXTUNIT]
 
 # used in sharedString file
 
@@ -52,9 +53,9 @@ text:
   ruleTypes: [TEXTUNIT]
 
 # used in workbook file
-sheet:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
+#sheet:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [name]
 
 # next two used in table definition file
 table:
