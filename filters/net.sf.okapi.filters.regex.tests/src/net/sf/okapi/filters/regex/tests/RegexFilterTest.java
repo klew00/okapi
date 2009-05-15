@@ -31,7 +31,9 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.regex.Parameters;
@@ -132,10 +134,6 @@ public class RegexFilterTest {
 
 	@Test
 	public void testEmptyLines() {
-		String inputText = "Line 1\n\nLine 2\n\n\n\n\nLine 3\n\n\nLine 4";
-		//                  0123456 7 8901234 5 6 7 8 9012345 6 7 890123 
-		//                  0           1              2            3            
-		
 		Parameters params = new Parameters();
 		Rule rule = new Rule();
 		rule.setRuleType(Rule.RULETYPE_CONTENT);
@@ -149,40 +147,82 @@ public class RegexFilterTest {
 		
 		params.rules.add(rule);
 		filter.setParameters(params);
+						
+		String inputText = "Line 1\n\nLine 2\n\n\n\n\nLine 3\n\n\nLine 4";
+		//                  0123456 7 8901234 5 6 7 8 9012345 6 7 890123 
+		//                  0           1              2            3
+				
+		_listEvents(inputText);
 		
+		// Test individual events
+		filter.open(new RawDocument(inputText, "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, "");
+		_testEvent(EventType.TEXT_UNIT, "Line 1");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 2");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 3");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 4");
+		_testEvent(EventType.END_DOCUMENT, "");
+		
+		
+		String inputText2 = "Line 1\nLine 2\n\nLine 3\n\n\nLine 4\n\n\n\n\n\n";
+		//                   0123456 7890123 4 5678901 2 3 4567890 1 2 3 4 5  
+		//                   0          1           2            3
+		
+		filter.open(new RawDocument(inputText2, "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, "");
+		_testEvent(EventType.TEXT_UNIT, "Line 1");
+		_testEvent(EventType.DOCUMENT_PART, "\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 2");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 3");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n\n");
+		_testEvent(EventType.TEXT_UNIT, "Line 4");
+		_testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n\n");
+		_testEvent(EventType.END_DOCUMENT, "");
+	}	
+	
+	private void _testEvent(EventType expectedType, String expectedText) {
+		assertNotNull(filter);
+		
+		Event event = filter.next();		
+		assertNotNull(event);
+		
+		assertTrue(event.getEventType() == expectedType);
+		
+		switch (event.getEventType()) {
+		case TEXT_UNIT:
+			IResource res = event.getResource();
+			assertTrue(res instanceof TextUnit);
+			
+			assertEquals(((TextUnit) res).toString(), expectedText);
+			break;
+			
+		case DOCUMENT_PART:
+			res = event.getResource();
+			assertTrue(res instanceof DocumentPart);
+			
+			ISkeleton skel = res.getSkeleton();
+			if (skel != null) {
+				assertEquals(skel.toString(), expectedText);
+			}
+			break;
+		}
+	}
+		
+	private void _listEvents(String inputText) { 
+		// List all events in Console
 		FilterTestDriver testDriver = new FilterTestDriver();
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 		
-		// List all events in Console
 		filter.open(new RawDocument(inputText, "en"));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
-					
-		// Test individual events
-		filter.open(new RawDocument(inputText, "en"));
-		
-		Event e = filter.next();
-		assertEquals(e.getEventType(), EventType.START_DOCUMENT);
-		
-		_testTuEvent(filter.next(), "Line 1");
-		_testTuEvent(filter.next(), "Line 2");
-		_testTuEvent(filter.next(), "Line 3");
-		_testTuEvent(filter.next(), "Line 4");
-	}
-
-	
-	private void _testTuEvent(Event e, String expectedText) {
-		assertNotNull(e);
-		assertEquals(e.getEventType(), EventType.TEXT_UNIT);
-		
-		IResource res = e.getResource();
-		assertTrue(res instanceof TextUnit);
-		
-		assertEquals(((TextUnit) res).toString(), expectedText);
-		
-		e = filter.next();
-		assertEquals(e.getEventType(), EventType.DOCUMENT_PART);
 	}
 	
 }

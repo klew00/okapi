@@ -146,7 +146,10 @@ public class RegexFilter implements IFilter {
 				if ( result.start() == result.end() ) {
 						startSearch = result.end() + 1;
 						bestPosition = maxPos;
-						if (startSearch >= inputText.length()) break;						
+						if (startSearch >= inputText.length()) {
+							startSearch--;
+							break;						
+						}
 						continue;						
 				}
 				// Check for boundary to avoid infinite loop
@@ -160,7 +163,7 @@ public class RegexFilter implements IFilter {
 		}
 		
 		// Else: Send end of the skeleton if needed
-		if ( startSearch <= inputText.length() ) {
+		if ( startSearch < inputText.length() ) {
 			// Treat strings outside rules
 //TODO: implement extract string out of rules
 			// Send the skeleton
