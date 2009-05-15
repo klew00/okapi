@@ -27,12 +27,10 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipeline.IDocumentData;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class BOMConversionStep extends BasePipelineStep {
@@ -43,7 +41,7 @@ public class BOMConversionStep extends BasePipelineStep {
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};
 	private final byte[] BOM_UTF16LE = {(byte)0xFF,(byte)0xFE};
 
-	private boolean hasNext = true;
+	private boolean hasNext;
 	private Parameters params;
 	private byte[] buffer;
 
@@ -64,19 +62,6 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public void preprocess (IDocumentData inputs) {
-		super.preprocess(inputs);
-		buffer = new byte[1024*2];
-		hasNext = true;
-	}
-
-	@Override
-	public void postprocess () {
-		// Release the buffer
-		buffer = null;
-	}
-
-	@Override
 	public boolean hasNext () {
 		return hasNext;
 	}
@@ -92,16 +77,17 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
  
 	@Override
-	public Event handleEvent (Event event) {
-		if ( event.getEventType() == EventType.RAW_DOCUMENT ) {
-			handleRawDocument(event);
-		}
-		else {
-			hasNext = false;
-		}
-		return event;
+	protected void handleStartBatchItem (Event event) {
+		buffer = new byte[1024*2];
+		hasNext = true;
 	}
 
+	@Override
+	protected void handleEndBatchItem (Event event) {
+		// Release the buffer
+		buffer = null;
+	}
+	
 	@Override
 	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc;
@@ -205,6 +191,7 @@ public class BOMConversionStep extends BasePipelineStep {
 			// Set the new raw-document URI
 			// Other info stays the same
 			rawDoc.setInputURI(tmpOut.toURI());
+			hasNext = false;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);

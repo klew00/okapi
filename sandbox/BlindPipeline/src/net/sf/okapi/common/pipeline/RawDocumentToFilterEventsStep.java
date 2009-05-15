@@ -65,53 +65,56 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Filters a RawDocument into filter events.";
-	}
-	
-	@Override
-	public void preprocess (IDocumentData inputs) {
-		super.preprocess(inputs);
-		if ( inputs.getFilterConfiguration(0) != null ) {
-			//TODO: This is where the filter+config lookup object would be used
-			if ( inputs.getFilterConfiguration(0).equals("okf_properties") ) {
-				filter = new net.sf.okapi.filters.properties.PropertiesFilter();
-			}
-			else if ( inputs.getFilterConfiguration(0).equals("okf_xml") ) {
-				filter = new net.sf.okapi.filters.xml.XMLFilter();
-			}
-			else {
-				throw new RuntimeException("Unsupported filter type.");
-			}
-			hasEvents = true;
-		}
-		else { // No filter configuration provided: just pass it down
-			hasEvents = false;
-		}
+		return "Converts a RawDocument into filter events.";
 	}
 	
 	@Override
 	public Event handleEvent (Event event) {
-		//TODO: need to clean this up
-		if (( event != null ) && ( event.getEventType() == EventType.RAW_DOCUMENT )) {
-			if ( filter == null ) { // No filter assigned
-				return event;
-			}
-			filter.open((RawDocument)event.getResource());
+		if ( event.getEventType() == EventType.START_BATCH_ITEM ) {
+			// Needed because the process() method of the pipeline expects
+			// hasEvents to be set to true to prime things.
+			hasEvents = true;
+			return event;
 		}
 		
-		switch ( event.getEventType() ) {
-		case START:
-		case CANCELED:
-		case CUSTOM:
+		// Initialize the filter on RAW_DOCUMENT
+		if ( event.getEventType() == EventType.RAW_DOCUMENT ) {
+			if ( getContext().getFilterConfiguration(0) != null ) {
+				// Get the filter to use
+				//TODO: This is where the filter+config lookup object would be used
+				if ( getContext().getFilterConfiguration(0).equals("okf_properties") ) {
+					filter = new net.sf.okapi.filters.properties.PropertiesFilter();
+				}
+				else if ( getContext().getFilterConfiguration(0).equals("okf_xml") ) {
+					filter = new net.sf.okapi.filters.xml.XMLFilter();
+				}
+				else {
+					throw new RuntimeException("Unsupported filter type.");
+				}
+				hasEvents = true;
+			}
+			else { // No filter configuration provided: just pass it down
+				hasEvents = false;
+				return event;
+			}
+			// Open the document
+			filter.open((RawDocument)event.getResource());
 			return event;
 		}
 
-		Event e = filter.next();
-		if (e != null && e.getEventType() == EventType.END_DOCUMENT) {
-			hasEvents = false;
+		if ( hasEvents ) {
+			// Get events from the filter
+			Event e = filter.next();
+			if ( e.getEventType() == EventType.END_DOCUMENT) {
+				// END_DOCUMENT is the end of this raw document
+				hasEvents = false;
+			}
+			return e;
 		}
-		
-		return e;		
+		else {
+			// In all other cases: just pass the event through
+			return event;
+		}
 	}
 
 	@Override

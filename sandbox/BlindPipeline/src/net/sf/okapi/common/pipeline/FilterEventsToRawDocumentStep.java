@@ -55,7 +55,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	 * @param userOutput
 	 *            user specified URI
 	 */
-	public FilterEventsToRawDocumentStep(URI userOutput) {
+	public FilterEventsToRawDocumentStep (URI userOutput) {
 		this.userOutput = userOutput;
 	}
 
@@ -65,70 +65,80 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	 * input events are exhausted, at which point a RawDocument event is sent.
 	 */
 	@Override
-	public Event handleEvent(Event event) {
-		RawDocument input = null;
-		IFilter filter = null;
+	public Event handleEvent (Event event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			handleStartDocument(event);
+			return Event.NOOP_EVENT;
+
+		case END_DOCUMENT:
+			return processEndDocument(event);
 		
-//This assume the first event we get is a START_DOCUMENT...
-
-		// hasNext Event is true by default until we hit the END_DOCUMENT event
-		hasNext = true;
-
-		if (event.getEventType() == EventType.START_DOCUMENT) {
-			language = inputs.getTargetLanguage(); 
-			encoding = inputs.getOutputEncoding(0);
-			if ( encoding == null ) ((StartDocument)event.getResource()).getEncoding();
-
-			String mimeType = ((StartDocument) event.getResource()).getMimeType();
-			if (mimeType == null) {
-				filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
-				LOGGER.log(Level.WARNING, "Missing mime type in START_DOCUMENT");
-			} else {
-				filter = FilterFactory.getDefaultFilter(mimeType);
-				filterWriter = filter.createFilterWriter();
-			}
-
-			filterWriter.setOptions(language, encoding);
-			try {
-				if (userOutput != null) {
-					outputFile = new File(userOutput);
-				} else {
-					outputFile = File.createTempFile("EventsToRawDocumentStep", ".tmp");
-					userOutput = outputFile.toURI();
-				}
-			} catch (IOException e) {
-				OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
-				LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep",
-						userOutput.toString()), re);
-				throw re;
-			}
-
-			filterWriter.setOutput(outputFile.getAbsolutePath());
-			filterWriter.handleEvent(event);
-			hasNext = true;
-		} else if (event.getEventType() == EventType.END_DOCUMENT) {
-			// handle the END_DOCUMENT event and close the writer
-			filterWriter.handleEvent(event);
-			filterWriter.close();
-
-			// it should be safe to close the output file on jvm exit
-			if (outputFile.exists()) {
-				outputFile.deleteOnExit();
-			}
-
-			input = new RawDocument(outputFile.toURI(), encoding, language);
-			hasNext = false;
-
-			// return the RawDocument Event that is the end result of all
-			// previous Events
-			return new Event(EventType.RAW_DOCUMENT, input);
-		} else {
+		case START_SUBDOCUMENT:
+		case START_GROUP:
+		case END_SUBDOCUMENT:
+		case END_GROUP:
+		case DOCUMENT_PART:
+		case TEXT_UNIT:
 			// handle all the events between START_DOCUMENT and END_DOCUMENT
 			filterWriter.handleEvent(event);
+			return Event.NOOP_EVENT;
+		}
+		
+		// Else, just return the event
+		return event;
+	}
+
+	private Event processEndDocument (Event event) {
+		// Handle the END_DOCUMENT event and close the writer
+		filterWriter.handleEvent(event);
+		filterWriter.close();
+
+		// It should be safe to close the output file on jvm exit
+		if ( outputFile.exists() ) {
+			outputFile.deleteOnExit();
 		}
 
-		// return the NOOP event until we hit an END_DOCUMENT
-		return Event.NOOP_EVENT;
+		// Return the RawDocument Event that is the end result of all
+		// previous Events
+		RawDocument input = new RawDocument(outputFile.toURI(), encoding, language);
+		hasNext = false;
+		return new Event(EventType.RAW_DOCUMENT, input);
+	}
+	
+	@Override
+	protected void handleStartDocument (Event event) {
+		language = getContext().getTargetLanguage(); 
+		encoding = getContext().getOutputEncoding(0);
+		if ( encoding == null ) ((StartDocument)event.getResource()).getEncoding();
+
+		String mimeType = ((StartDocument) event.getResource()).getMimeType();
+		if (mimeType == null) {
+			filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+			LOGGER.log(Level.WARNING, "Missing mime type in START_DOCUMENT");
+		} else {
+			IFilter filter = FilterFactory.getDefaultFilter(mimeType);
+			filterWriter = filter.createFilterWriter();
+		}
+
+		filterWriter.setOptions(language, encoding);
+		try {
+			if (userOutput != null) {
+				outputFile = new File(userOutput);
+			} else {
+				outputFile = File.createTempFile("EventsToRawDocumentStep", ".tmp");
+				userOutput = outputFile.toURI();
+			}
+		} catch (IOException e) {
+			OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
+			LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep",
+					userOutput.toString()), re);
+			throw re;
+		}
+
+		filterWriter.setOutput(outputFile.getAbsolutePath());
+		filterWriter.handleEvent(event);
+		hasNext = true;
 	}
 
 	/**

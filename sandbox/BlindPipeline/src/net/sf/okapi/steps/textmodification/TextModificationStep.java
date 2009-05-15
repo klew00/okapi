@@ -86,7 +86,7 @@ public class TextModificationStep extends BasePipelineStep {
 				srxDoc.loadRules(trg);
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
-			trgSeg = srxDoc.compileLanguageRules(inputs.getTargetLanguage(), null);
+			trgSeg = srxDoc.compileLanguageRules(getContext().getTargetLanguage(), null);
 		}
 	}
 	
@@ -96,14 +96,14 @@ public class TextModificationStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		// Skip if already translate (only if required)
-		if ( !params.applyToExistingTarget && tu.hasTarget(inputs.getTargetLanguage()) ) return;
+		if ( !params.applyToExistingTarget && tu.hasTarget(getContext().getTargetLanguage()) ) return;
 		
 		// Apply the segmentation and/or segment marks if requested
 		if ( params.segment || params.markSegments ) {
-			if ( tu.hasTarget(inputs.getTargetLanguage()) ) {
+			if ( tu.hasTarget(getContext().getTargetLanguage()) ) {
 				if ( params.segment ) {
-					trgSeg.computeSegments(tu.getTarget(inputs.getTargetLanguage()));
-					tu.getTarget(inputs.getTargetLanguage()).createSegments(trgSeg.getRanges());
+					trgSeg.computeSegments(tu.getTarget(getContext().getTargetLanguage()));
+					tu.getTarget(getContext().getTargetLanguage()).createSegments(trgSeg.getRanges());
 				}
 			}
 			else {
@@ -116,11 +116,11 @@ public class TextModificationStep extends BasePipelineStep {
 		
 		// Else: do the requested modifications
 		// Make sure we have target content
-		tu.createTarget(inputs.getTargetLanguage(), false, IResource.COPY_ALL);
+		tu.createTarget(getContext().getTargetLanguage(), false, IResource.COPY_ALL);
 
 		// Merge all segments if needed
 		if ( params.segment || params.markSegments ) {
-			mergeSegments(tu.getTarget(inputs.getTargetLanguage()));
+			mergeSegments(tu.getTarget(getContext().getTargetLanguage()));
 			// Merge also the source to be in synch.
 			tu.getSource().mergeAllSegments();
 		}
@@ -148,7 +148,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (TextUnit tu) {
-		String result = tu.getTarget(inputs.getTargetLanguage()).getCodedText();
+		String result = tu.getTarget(getContext().getTargetLanguage()).getCodedText();
 		StringBuilder sb = new StringBuilder();
 		
 		for ( int i=0; i<result.length(); i++ ) {
@@ -170,7 +170,7 @@ public class TextModificationStep extends BasePipelineStep {
 					break;
 			}
 		}
-		TextContainer cnt = tu.getTarget(inputs.getTargetLanguage());
+		TextContainer cnt = tu.getTarget(getContext().getTargetLanguage());
 		cnt.setCodedText(sb.toString());
 	}	
 	
@@ -231,11 +231,11 @@ public class TextModificationStep extends BasePipelineStep {
 	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
 		try {
-			tmp = tu.getTarget(inputs.getTargetLanguage()).getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
+			tmp = tu.getTarget(getContext().getTargetLanguage()).getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
-			TextContainer cnt = tu.getTarget(inputs.getTargetLanguage()); 
-			cnt.setCodedText(tmp, tu.getTargetContent(inputs.getTargetLanguage()).getCodes(), false);
+			TextContainer cnt = tu.getTarget(getContext().getTargetLanguage()); 
+			cnt.setCodedText(tmp, tu.getTargetContent(getContext().getTargetLanguage()).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING,
@@ -246,7 +246,7 @@ public class TextModificationStep extends BasePipelineStep {
 	private void replaceWithExtendedChars (TextUnit tu) {
 		StringBuilder tmp = new StringBuilder();
 		try {
-			tmp.append(tu.getTarget(inputs.getTargetLanguage()).getCodedText());
+			tmp.append(tu.getTarget(getContext().getTargetLanguage()).getCodedText());
 			int n;
 			for ( int i=0; i<tmp.length(); i++ ) {
 				switch ( tmp.charAt(i) ) {
@@ -263,8 +263,8 @@ public class TextModificationStep extends BasePipelineStep {
 					break;
 				}
 			}
-			TextContainer cnt = tu.getTarget(inputs.getTargetLanguage()); 
-			cnt.setCodedText(tmp.toString(), tu.getTargetContent(inputs.getTargetLanguage()).getCodes(), false);
+			TextContainer cnt = tu.getTarget(getContext().getTargetLanguage()); 
+			cnt.setCodedText(tmp.toString(), tu.getTargetContent(getContext().getTargetLanguage()).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING,
@@ -281,7 +281,7 @@ public class TextModificationStep extends BasePipelineStep {
 		String tmp = null;
 		try {
 			// Use the target as the text to change.
-			tmp = tu.getTarget(inputs.getTargetLanguage()).getCodedText();
+			tmp = tu.getTarget(getContext().getTargetLanguage()).getCodedText();
 			if ( params.addPrefix ) {
 				tmp = params.prefix + tmp;
 			}
@@ -296,8 +296,8 @@ public class TextModificationStep extends BasePipelineStep {
 			if ( params.addSuffix ) {
 				tmp += params.suffix;
 			}
-			TextContainer cnt = tu.getTarget(inputs.getTargetLanguage()); 
-			cnt.setCodedText(tmp, tu.getTargetContent(inputs.getTargetLanguage()).getCodes(), false);
+			TextContainer cnt = tu.getTarget(getContext().getTargetLanguage()); 
+			cnt.setCodedText(tmp, tu.getTargetContent(getContext().getTargetLanguage()).getCodes(), false);
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING,

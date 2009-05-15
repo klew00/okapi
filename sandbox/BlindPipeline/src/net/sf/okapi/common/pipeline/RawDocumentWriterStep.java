@@ -11,7 +11,7 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public class RawDocumentWriterStep extends BasePipelineStep {
 
-	private boolean hasNext = true;
+	private boolean hasNext;
 	
 	public String getDescription() {
 		return "Write a raw document";
@@ -26,25 +26,14 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		return (inputIndex == 0);
 	}
 
-	public void preprocess (IDocumentData inputs) {
-		super.preprocess(inputs);
-		hasNext = true;
-	}
-	
 	@Override
 	public boolean hasNext () {
 		return hasNext;
 	}
 
 	@Override
-	public Event handleEvent (Event event) {
-		if ( event.getEventType() == EventType.RAW_DOCUMENT ) {
-			handleRawDocument(event);
-		}
-		else {
-			hasNext = false;
-		}
-		return event;
+	protected void handleStartBatchItem (Event event) {
+		hasNext = true;
 	}
 
 	@Override
@@ -60,7 +49,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			else if ( rawDoc.getInputURI() != null ) {
 				// Faster to copy using channels
 				String inputPath = rawDoc.getInputURI().getPath();
-				Util.copyFile(inputPath, inputs.getOutputPath(0), false); // Copy, do not move
+				Util.copyFile(inputPath, getContext().getOutputPath(0), false); // Copy, do not move
 			}
 			else if ( rawDoc.getInputStream() != null ) {
 				throw new RuntimeException("Not implemented yet");
@@ -72,12 +61,12 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 				
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
-			rawDoc.setInputURI((new File(inputs.getOutputPath(0))).toURI());
-			hasNext = true;
+			rawDoc.setInputURI((new File(getContext().getOutputPath(0))).toURI());
+			hasNext = false;
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error writing or copying a RawDocument.", e);
 		}
-
 	}
+
 }

@@ -21,7 +21,6 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
 
@@ -79,9 +78,9 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 			StartDocument sd = (StartDocument)event.getResource();
 			if ( sd.getFilter() != null ) {
 				filterWriter = sd.getFilter().createFilterWriter();
-				filterWriter.setOptions(inputs.getTargetLanguage(), inputs.getOutputEncoding(0));
+				filterWriter.setOptions(getContext().getTargetLanguage(), getContext().getOutputEncoding(0));
 				filterWriter.setParameters(sd.getFilterParameters());
-				filterWriter.setOutput(inputs.getOutputPath(0));
+				filterWriter.setOutput(getContext().getOutputPath(0));
 			}
 			// Fall thru
 		case START_SUBDOCUMENT:

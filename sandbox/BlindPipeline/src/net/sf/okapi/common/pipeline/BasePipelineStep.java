@@ -21,7 +21,6 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -29,13 +28,24 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	protected IDocumentData inputs;
+	private IPipeline pipeline;
 	
-	// Override this if the step has parameters
-	public IParameters getParameters () { return null; }
+	public void setPipeline (IPipeline pipeline) {
+		this.pipeline = pipeline;
+	}
+	
+	protected PipelineContext getContext () {
+		return pipeline.getContext();
+	}
 
 	// Override this if the step has parameters
-	public void setParameters (IParameters params) {}
+	public IParameters getParameters () {
+		return null;
+	}
+
+	// Override this if the step has parameters
+	public void setParameters (IParameters params) {
+	}
 
 	public boolean hasNext() {
 		return false;
@@ -43,75 +53,57 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	public Event handleEvent (Event event) {
 		// short circuit switch for null or noop cases
-		if (event == null || event.getEventType() == EventType.NO_OP) {
-			return event;
-		}
+		// if (event == null || event.getEventType() == EventType.NO_OP) {
+		//	return event;
+		// }
 
 		switch (event.getEventType()) {
-
-		case START_DOCUMENT:
-			handleStartDocument(event);
+		case START_BATCH:
+			handleStartBatch(event);
 			break;
-
-		case END_DOCUMENT:
-			handleEndDocument(event);
+		case END_BATCH:
+			handleEndBatch(event);
 			break;
-
-		case START_SUBDOCUMENT:
-			handleStartSubDocument(event);
+		case START_BATCH_ITEM:
+			handleStartBatchItem(event);
 			break;
-
-		case END_SUBDOCUMENT:
-			handleEndSubDocument(event);
+		case END_BATCH_ITEM:
+			handleEndBatchItem(event);
 			break;
-
-		case START_GROUP:
-			handleStartGroup(event);
-			break;
-
-		case END_GROUP:
-			handleEndGroup(event);
-			break;
-
-		case TEXT_UNIT:
-			handleTextUnit(event);
-			break;
-
-		case DOCUMENT_PART:
-			handleDocumentPart(event);
-			break;
-
 		case RAW_DOCUMENT:
 			handleRawDocument(event);
 			break;
-
-		case FINISHED:
-			handleFinished(event);
+		case START_DOCUMENT:
+			handleStartDocument(event);
 			break;
-			
+		case END_DOCUMENT:
+			handleEndDocument(event);
+			break;
+		case START_SUBDOCUMENT:
+			handleStartSubDocument(event);
+			break;
+		case END_SUBDOCUMENT:
+			handleEndSubDocument(event);
+			break;
+		case START_GROUP:
+			handleStartGroup(event);
+			break;
+		case END_GROUP:
+			handleEndGroup(event);
+			break;
+		case TEXT_UNIT:
+			handleTextUnit(event);
+			break;
+		case DOCUMENT_PART:
+			handleDocumentPart(event);
+			break;
 		case CUSTOM:
 			handleCustom(event);
 			break;
-
-		case START:
-			handleStart(event);
-			break;
-			
-		default:
-			// TODO: specific exception
-			throw new RuntimeException("Unkown Okapi Event: " + event.toString());
+		// default:
+		// Just pass it through
 		}
-
 		return event;
-	}
-
-	// Override these if there is a need for specialized pre or post processing.
-	// These methods are called once for every pipeline execution.
-	public void preprocess (IDocumentData inputs) {
-		this.inputs = inputs;
-	}
-
-	public void postprocess() {
 	}
 
 	public void cancel() {
@@ -131,45 +123,50 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public boolean needsOutput (int inputIndex) {
 		return false;
 	}
-
 	
 	// By default we simply pass the event on to the next step. Override these
 	// methods if we need to process
 	// the event
 
-	protected void handleStart (Event event) {
+	protected void handleStartBatch (Event event) {
 	}
 	
-	protected void handleDocumentPart(Event event) {
-	}
-
-	protected void handleStartDocument(Event event) {
-	}
-
-	protected void handleEndDocument(Event event) {
-	}
-
-	protected void handleStartSubDocument(Event event) {
-	}
-
-	protected void handleEndSubDocument(Event event) {
-	}
-
-	protected void handleStartGroup(Event event) {
-	}
-
-	protected void handleEndGroup(Event event) {
-	}
-
-	protected void handleTextUnit(Event event) {
-	}
-
-	protected void handleRawDocument(Event event) {
-	}
-
-	protected void handleFinished(Event event) {
+	protected void handleEndBatch (Event event) {
 	}
 	
-	protected void handleCustom(Event event) {
+	protected void handleStartBatchItem (Event event) {
+	}
+	
+	protected void handleEndBatchItem (Event event) {
+	}
+	
+	protected void handleRawDocument (Event event) {
+	}
+
+	protected void handleStartDocument (Event event) {
+	}
+
+	protected void handleEndDocument (Event event) {
+	}
+
+	protected void handleStartSubDocument (Event event) {
+	}
+
+	protected void handleEndSubDocument (Event event) {
+	}
+
+	protected void handleStartGroup (Event event) {
+	}
+
+	protected void handleEndGroup (Event event) {
+	}
+
+	protected void handleTextUnit (Event event) {
+	}
+
+	protected void handleDocumentPart (Event event) {
+	}
+
+	protected void handleCustom (Event event) {
 	}
 }

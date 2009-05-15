@@ -88,12 +88,12 @@ public enum EventType {
 	/**
 	 * Used to notify pipeline steps that the current batch operation is finished.
 	 */
-	FINISHED,
+	END_BATCH,
 	
 	/**
 	 * Used to notify pipeline steps that the current batch operation is starting.
 	 */
-	START,
+	START_BATCH,
 
 	/**
 	 * Document-level event. A {@link net.sf.okapi.common.resource.RawDocument} resource
@@ -111,6 +111,9 @@ public enum EventType {
 	 * No operation event that is ignored by all steps. Used as a placeholder
 	 * event when steps need to stay alive without triggering any actions.
 	 */
-	NO_OP
+	NO_OP,
+	
+	START_BATCH_ITEM,
+	END_BATCH_ITEM
 
 }

@@ -133,12 +133,10 @@ public class PipelineDriver {
 	}
 	
 	public void processBatch () {
-		//TODO: use either call or event not both!!!! pipeline.startBatch();
+		pipeline.startBatch();
 		for ( IDocumentData inputs : inputItems ) {
-			pipeline.initialize();
-			pipeline.preprocess(inputs);
-			pipeline.processDocument(inputs.getRawDocument(0));
-			pipeline.postprocess();
+			pipeline.getContext().setDocumentData(inputs);
+			pipeline.process(inputs.getRawDocument(0));
 		}
 		pipeline.finishBatch();
 	}

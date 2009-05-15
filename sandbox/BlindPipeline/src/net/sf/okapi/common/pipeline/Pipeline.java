@@ -31,30 +31,53 @@ import net.sf.okapi.common.resource.RawDocument;
  */
 public class Pipeline implements IPipeline {
 
-	LinkedList<IPipelineStep> steps;
-	LinkedList<IPipelineStep> finishedSteps;
-	volatile boolean cancel = false;
+	private LinkedList<IPipelineStep> steps;
+	private LinkedList<IPipelineStep> finishedSteps;
+	private volatile boolean cancel = false;
 	private boolean done = false;
 	private boolean destroyed = false;
-	private Event event;
+	private PipelineContext context;
 
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
 		finishedSteps = new LinkedList<IPipelineStep>();
+		context = new PipelineContext();
 	}
 
-	public void initialize () {
+	private void initialize () {
 		// Copy all the finished steps from previous run
 		for (IPipelineStep step : finishedSteps) {
 			steps.add(step);
 		}
 		finishedSteps.clear();
+	}
+
+	public void startBatch () {
+		initialize();
 		cancel = false;
 		done = false;
 		destroyed = false;
+
+		Event event = new Event(EventType.START_BATCH);
+		for ( IPipelineStep step : steps ) {
+			event = step.handleEvent(event);
+		}
+	}
+
+	public Event finishBatch () {		
+		// Non-terminal steps will return END_BATCH after receiving END_BATCH
+		// Terminal steps return an event which may be anything,
+		// including a CUSTOM event. The pipeline returns this final event.
+		Event event = Event.END_BATCH_EVENT;
+		for ( IPipelineStep step : steps ) {
+			event = step.handleEvent(Event.END_BATCH_EVENT);
+		}
+		done = true;
+		return event;
 	}
 
 	public void addStep (IPipelineStep step) {
+		step.setPipeline(this);
 		steps.add(step);
 	}
 
@@ -62,50 +85,33 @@ public class Pipeline implements IPipeline {
 		cancel = true;
 	}
 
-	private Event execute (Event input) {
-		// special processing for FINISHED event
-		// Non-terminal steps will return FINISHED after receiving FINISHED
-		// (simple pass through).
-		// Terminal steps return an event which may be anything,
-		// including a CUSTOM event. The pipeline returns this final event.
-		if (input.getEventType() == EventType.FINISHED) {
-			for (IPipelineStep step : steps) {
-				event = step.handleEvent(event);
-			}
-			return event;
-		}
-
-		event = input;
-
+	private void execute (Event event) {
 		// loop through the events until we run out of steps or hit cancel
-		while (!steps.isEmpty() && !cancel) {
+		while ( !steps.isEmpty() && !cancel ) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while (steps.getFirst().hasNext() && !cancel) {
+			while ( steps.getFirst().hasNext() && !cancel ) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
-				for (IPipelineStep step : steps) {
+				for ( IPipelineStep step : steps ) {
 					event = step.handleEvent(event);
 				}
-				// get ready for another pass down the pipeline
+				// Get ready for another pass down the pipeline
 				// overwrite the terminal steps event
 				event = Event.NOOP_EVENT;
 			}
-			// as each step exhausts its events remove it from the list and move
+			// As each step exhausts its events remove it from the list and move
 			// on to the next
 			finishedSteps.add(steps.remove());
 		}
-
-		// FINSHED event was not sent we just return NOOP event
-		return Event.NOOP_EVENT;
 	}
 
 	public PipelineReturnValue getState() {
-		if (destroyed)
+		if ( destroyed )
 			return PipelineReturnValue.DESTROYED;
-		else if (cancel)
+		else if ( cancel )
 			return PipelineReturnValue.CANCELLED;
-		else if (done)
+		else if ( done )
 			return PipelineReturnValue.SUCCEDED;
 		else
 			return PipelineReturnValue.RUNNING;
@@ -116,8 +122,8 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(FileResource)
 	 */
-	public Event processDocument (RawDocument input) {
-		return processEvent(new Event(EventType.RAW_DOCUMENT, input));
+	public Event process (RawDocument input) {
+		return process(new Event(EventType.RAW_DOCUMENT, input));
 	}
 	
 	/*
@@ -125,58 +131,32 @@ public class Pipeline implements IPipeline {
 	 * 
 	 * @see net.sf.okapi.common.pipeline.IPipeline#process(Event)
 	 */
-	public Event processEvent (Event input) {
-		// prime the pipeline with the input Event and run it to completion.
-		Event e = execute(input);
+	public Event process (Event input) {
+		initialize();
 
-		// copy any remaining steps into finishedSteps - makes initialization
+		// Pre-process for this batch-item
+		Event e = new Event(EventType.START_BATCH_ITEM);
+		for ( IPipelineStep step : steps ) {
+			step.handleEvent(e);
+		}
+		
+		// Prime the pipeline with the input Event and run it to completion.
+		execute(input);
+		// Copy any remaining steps into finishedSteps - makes initialization
 		// process easier down the road if we use the pipeline again
 		for (IPipelineStep step : steps) {
 			finishedSteps.add(step);
 		}
 		steps.clear();
 
-		// return the terminal event generated by the last step in the pipeline
-		// after receiving the FINISHED event
+		// Post-process for this batch-item
+		e = new Event(EventType.END_BATCH_ITEM);
+		for ( IPipelineStep step : steps ) {
+			step.handleEvent(e);
+		}
 		return e;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.pipeline.IPipeline#postprocess()
-	 */
-	public void postprocess() {
-		for (IPipelineStep step : finishedSteps) {
-			step.postprocess();
-		}
-		done = true;
-	}
-
-	public void preprocess (IDocumentData inputs) {
-		// finishedSteps is empty - we preprocess on the steps waiting to be
-		// processed.
-		for (IPipelineStep step : steps) {
-			step.preprocess(inputs);
-		}
-	}
-
-/*	public void preprocess(RawDocument rawDoc, String filterConfig) {
-		
-		ArrayList<DocumentData> list = new ArrayList<DocumentData>();
-		DocumentData dd = new DocumentData();
-		dd.inputURI = rawDoc.getInputURI();
-		dd.defaultEncoding = rawDoc.getEncoding();
-		dd.filterConfig = filterConfig;
-		dd.srcLang = rawDoc.getSourceLanguage();
-		dd.trgLang = rawDoc.getTargetLanguage();
-		list.add(dd);
-		
-		for (IPipelineStep step : steps) {
-			step.preprocess(list);
-		}
-	}
-*/
 	/*
 	 * Destroy this pipeline and call destroy on each pipeline step. Cleanup
 	 * code should go here.
@@ -186,14 +166,6 @@ public class Pipeline implements IPipeline {
 			step.destroy();
 		}
 		destroyed = true;
-	}
-
-	public void startBatch () {		
-		processEvent(new Event(EventType.START));
-	}
-
-	public Event finishBatch () {		
-		return processEvent(Event.FINISHED_EVENT);
 	}
 
 	public int inputCountRequested () {
@@ -213,6 +185,14 @@ public class Pipeline implements IPipeline {
 			}
 		}
 		return false;
+	}
+
+	public PipelineContext getContext () {
+		return context;
+	}
+
+	public void setContext (PipelineContext context) {
+		this.context = context;
 	}
 
 }

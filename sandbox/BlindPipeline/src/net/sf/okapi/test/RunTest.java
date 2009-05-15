@@ -74,7 +74,7 @@ public class RunTest {
 		BOMConversionStep step = new BOMConversionStep();
 		net.sf.okapi.steps.bomconversion.Parameters params
 			= (net.sf.okapi.steps.bomconversion.Parameters)step.getParameters();
-		params.removeBOM = true; // Remove thge BOM
+		params.removeBOM = true; // Remove the BOM
 		pipeline.addStep(step);
 		
 		pipeline.addStep(new RawDocumentWriterStep());

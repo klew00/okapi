@@ -28,6 +28,8 @@ import net.sf.okapi.common.filters.IFilter;
  * Common set of methods for a step within a {@link IPipeline} pipeline. 
  */
 public interface IPipelineStep {
+
+	public void setPipeline (IPipeline pipeline);
 	
 	/**
 	 * Gets the current parameters for this step.
@@ -53,15 +55,6 @@ public interface IPipelineStep {
 	 */
 	public String getDescription ();
 	
-	void preprocess(IDocumentData inputs);
-
-	/**
-	 * Executes the post-processing actions for this step.
-	 * Post-processing is done after all events are processed, and is called once per
-	 * pipeline execution.
-	 */
-	void postprocess();
-
 	/**
 	 * Processes each event sent though the pipeline.
 	 * @param event the event to process.
