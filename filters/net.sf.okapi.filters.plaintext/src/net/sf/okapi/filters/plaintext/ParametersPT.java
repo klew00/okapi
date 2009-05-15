@@ -22,89 +22,63 @@ package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.BaseParameters;
 
+/**
+ * Parameters of the Plain Text Filter 
+ */
+
 public class ParametersPT extends BaseParameters {
-
-//----------------------------------------------------------------------------------------------------------------------------	
-	/** Char sequence to be considered line break. If empty, line breaks are auto-detected from the input.
-	 * If specified (for instance, "\r\n" or "\r\n\r\n"), then auto-detection is not performed.<p>Default: null (auto-detect). */	
-	public String lineBreakPattern = null;	
-		
-	/** Generate text units for empty lines?<p>Default: false (no). */	
-	public boolean sendEmptyLines = false;   
-
-	/** 
-	 * Text to be inserted in the beginning of every line.<p>Default: null (don't insert anything).<p>A %d specifier will be replaced with the line's number.<p><p>
-	 * <b>Example:</b><p>The 15-th line is "<i>Penny Lane is in my ears and in my eyes...</i>", linePrefix is "%d.  ".<p>The filter will produce:<p>
-	 *  "<i>15.  Penny Lane is in my ears and in my eyes...</i>"
-	 * */	
-	public String linePrefix = null;
-	
-	/** Start index to number lines of the given text.<p>Default: 1. */
-	public int firstLineNumber = 1;
-	
-	/** You can specify a text to be added to every line's text. For example, you may want to add "\n" at the end of every line.
-	 * <p>Default: null  (don't add anything). */	
-	public String lineSuffix = null;
-	
-	/** Specify a non-empty string to replace Tab characters (\u0009) with the string (normally a run of 4-8 spaces). 
-	 * Leave empty not to replace tabs.<p>Default: null (don't extend tabs). */	
-	public String tabExtender = null;
-		
-	/** If true, Form feeds (\u000c) will act like line breaks, and be added to the first line of the two broken to. 
-	 * If false, they will be considered part of the current non-broken line.<p>Default: true (break lines). */
-	public boolean formFeedBreaksLine = true;
-	
-	/** Convert non-breaking spaces (\u00a0, \t) to regular spaces (\u0020).<p>Default: false (do not convert). */
-	public boolean convertNonBreakingSpaces = false;
-
-	/** Delete spaces (Space, Non-breaking Space, Tab) in the beginning of every line.<p>Default: false (don't delete). */	
-	public boolean trimHeadingSpaces = false;
-
-	/** Delete spaces (Space, Non-breaking Space, Tab) at the end of every line.<p>Default: false (don't delete). */
-	public boolean trimTrailingSpaces = false;
-	
-	/** If a Backspace character (\u0008, \b) is found in the line, it is deleted along with its preceding character.<p>Default: false (leave backspaces as are). */
-	public boolean backspaceDeletesPrevChar = false;
-	
-	/** Non-printable characters (\u0001 - \u001f) are converted to escape sequences (\a, \b, ...).<p>Default: false (don't convert). */
-	public boolean convertNonPrintableToEscapes = false;
-	
-	/** Unicode characters are replaced with their escape sequences (\u221e).<p>Default: false (not replaced). */
-	public boolean convertUnicodeToEscapes = false;
 			
-	/** Holds a reference to an external object whose breakLine() is called for every line to determine if the line needs to be further broken.<p>
-	 * Default: null (all line-breaking decisions are made by the filter). */
-	public ILineBreaker lineBreaker = null;
+	/**
+	 * Java regex rule used to extract lines of text.<p>Default: "^(.*?)$". 
+	 */
+	public String rule;
 	
-	/** Holds a reference to an external object whose processLine() is called BEFORE the filter's operations on the current line.<p>
-	 * Default: null (no preprocessor). */
-	public ILineProcessor linePreProcessor = null;
+	/**
+	 * Java regex capturing group denoting text to be extracted.<p>Default: 1.
+	 */
+	public int sourceGroup;
 	
-	/** Holds a reference to an external object whose processLine() is called AFTER the filter's operations on the current line.<p>
-	 * Default: null (no postprocessor). */
-	public ILineProcessor linePostProcessor = null;
-	
+	/**
+	 * Java regex options.<p>Default: Pattern.MULTILINE.
+	 */
+	public int regexOptions;
+							
 //----------------------------------------------------------------------------------------------------------------------------	
-	public void fromString(String data) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	public ParametersPT() {
-		super();
+		super();		
 		
 		reset();
+		toString(); // fill the list
 	}
 
-	public void reset() {
+	public void reset() {		
+		// All parameters are set to defaults here
+		rule = PlainTextFilter.DEF_RULE;
+		sourceGroup = PlainTextFilter.DEF_GROUP;		
+		regexOptions = PlainTextFilter.DEF_OPTIONS; 
+	}
+
+	public void fromString(String data) {
+		reset();
 		
+		buffer.fromString(data);
+		
+		// All parameters are retrieved here
+		rule =  buffer.getString("rule", PlainTextFilter.DEF_RULE);
+		sourceGroup = buffer.getInteger("sourceGroup", PlainTextFilter.DEF_GROUP);		
+		regexOptions = buffer.getInteger("regexOptions", PlainTextFilter.DEF_OPTIONS);
 	}
-
+	
 	@Override
 	public String toString () {
 		buffer.reset();
 		
+		// All parameters are set here
+		buffer.setString("rule", rule);
+		buffer.setInteger("sourceGroup", sourceGroup);		
+		buffer.setInteger("regexOptions", regexOptions);
+		
 		return buffer.toString();
 	}
 }
-
