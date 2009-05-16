@@ -881,8 +881,15 @@ public class XLIFFFilter implements IFilter {
 	private int retrieveId (int currentIdValue,
 		String id)
 	{
-		if ( id == null ) return ++currentIdValue;
-		return Integer.valueOf(id);
+		if (( id == null ) || ( id.length() == 0 )) return ++currentIdValue;
+		try {
+			return Integer.valueOf(id);
+		}
+		catch ( NumberFormatException e ) {
+			// Falls back to the has-code
+			//TODO: At some point code id needs to support a string
+			return id.hashCode();
+		}
 	}
 	
 	/**
