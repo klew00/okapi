@@ -106,8 +106,12 @@ public class PlainTextFilter implements IFilter {
 		regex.setParameters(regexParams);
 		
 		// Load the default line extraction rule from a file to regexParams
-		URL paramsUrl = PlainTextFilter.class.getResource("/def_line_extraction_rule.fprm");
-		regexParams.load(paramsUrl.getPath(), false);
+		URL url = PlainTextFilter.class.getResource("/def_line_extraction_rule.fprm");
+		
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		
+		regexParams.load(root + "def_line_extraction_rule.fprm", false);
 	}
 
 // IFilter	
