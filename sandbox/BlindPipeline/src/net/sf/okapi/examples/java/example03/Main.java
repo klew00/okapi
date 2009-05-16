@@ -53,7 +53,7 @@ public class Main {
 		
 		PipelineDriver driver = new PipelineDriver();
 		driver.setPipeline(pipeline);
-		driver.addInputItem(
+		driver.addBatchItem(
 			new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr"),
 			"okf_xml", "output.xml", "UTF-8");
 		driver.processBatch();

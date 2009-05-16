@@ -64,7 +64,7 @@ public class Pipeline implements IPipeline {
 		}
 	}
 
-	public Event finishBatch () {		
+	public Event endBatch () {		
 		// Non-terminal steps will return END_BATCH after receiving END_BATCH
 		// Terminal steps return an event which may be anything,
 		// including a CUSTOM event. The pipeline returns this final event.

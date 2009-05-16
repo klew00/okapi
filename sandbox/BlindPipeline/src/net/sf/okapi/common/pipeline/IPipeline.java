@@ -80,7 +80,7 @@ public interface IPipeline {
 	 * Finishes a batch of inputs and return the final {@link Event}
 	 * @return the final {@link Event} for this batch.
 	 */
-	public Event finishBatch();
+	public Event endBatch();
 
 	/**
 	 * Closes down {@link IPipeline} and recover resources from all steps.

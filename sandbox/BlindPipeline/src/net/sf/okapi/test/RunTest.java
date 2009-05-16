@@ -63,7 +63,7 @@ public class RunTest {
 			throw new RuntimeException("Application does not support more than 3 input at the same time.");
 		}
 		for ( ProjectItem item : proj ) {
-			driver.addInputItem(item);
+			driver.addBatchItem(item);
 		}
 	}
 	

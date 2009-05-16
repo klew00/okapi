@@ -45,7 +45,7 @@ public class PipelineDriver {
 		processBatch();
 	}
 	
-	public void addInputItem (IDocumentData inputs) {
+	public void addBatchItem (IDocumentData inputs) {
 		inputItems.add(inputs);
 	}
 
@@ -56,7 +56,7 @@ public class PipelineDriver {
 	 * @param filterConfig the filter configuration to use for these documents (may be null).
 	 * @param rawDocs one or more RawDocuments to include in this item.
 	 */
-	public void addInputItem (String filterConfig,
+	public void addBatchItem (String filterConfig,
 		RawDocument... rawDocs)
 	{
 		DocumentData dd = new DocumentData();
@@ -84,7 +84,7 @@ public class PipelineDriver {
 	 * @param outputPath path of the output document (may be null if no output is used)
 	 * @param outputEncoding encoding of the output  (may be null if no output is used)
 	 */
-	public void addInputItem (RawDocument rawDoc,
+	public void addBatchItem (RawDocument rawDoc,
 		String filterConfig,
 		String outputPath,
 		String outputEncoding)
@@ -111,7 +111,7 @@ public class PipelineDriver {
 	 * @param srcLang the source language.
 	 * @param trgLang the target language.
 	 */
-	public void addInputItem (URI inputURI,
+	public void addBatchItem (URI inputURI,
 		String defaultEncoding,
 		String filterConfig,
 		String srcLang,
@@ -138,7 +138,7 @@ public class PipelineDriver {
 			pipeline.getContext().setDocumentData(inputs);
 			pipeline.process(inputs.getRawDocument(0));
 		}
-		pipeline.finishBatch();
+		pipeline.endBatch();
 	}
 
 }
