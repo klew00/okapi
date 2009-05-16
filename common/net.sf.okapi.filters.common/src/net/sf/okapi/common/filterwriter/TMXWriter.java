@@ -175,9 +175,12 @@ public class TMXWriter {
 		
 		TextContainer srcTC = item.getSource();
 		TextContainer trgTC = item.getTarget(trgLang);
-//TODO: Output only the items with real match or translations		
+//TODO: Output only the items with real match or translations (not copy of source)		
 		
-		ScoresAnnotation scores = item.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
+		ScoresAnnotation scores = null;
+		if ( trgTC != null ) {
+			scores = trgTC.getAnnotation(ScoresAnnotation.class);
+		}
 
 		if ( !srcTC.isSegmented() ) { // Source is not segmented
 			if ( scores != null ) {
