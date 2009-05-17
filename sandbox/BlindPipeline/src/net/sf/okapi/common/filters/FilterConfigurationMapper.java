@@ -129,4 +129,9 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		return file.getAbsolutePath();
 	}
 
+	public void clear() {
+		configMap.clear();
+		mimeList.clear();
+	}
+
 }

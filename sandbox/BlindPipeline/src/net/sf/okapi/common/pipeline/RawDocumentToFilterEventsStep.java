@@ -22,9 +22,7 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**

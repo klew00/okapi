@@ -18,6 +18,11 @@ public interface IFilterConfigurationMapper {
 	public void removeMapping (String configId);
 	
 	/**
+	 * Removes all mappings from this mapper.
+	 */
+	public void clear ();
+	
+	/**
 	 * Creates an instance of the filter for a given configuration identifier
 	 * and loads its corresponding parameters.
 	 * @param configId the configuration identifier to use for look-up.  
