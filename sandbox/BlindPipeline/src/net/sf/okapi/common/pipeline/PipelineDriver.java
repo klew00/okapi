@@ -19,7 +19,11 @@ public class PipelineDriver {
 	public void setPipeline (IPipeline pipeline) {
 		this.pipeline = pipeline;
 	}
-	
+
+	public IPipeline getPipeline () {
+		return pipeline;
+	}
+
 	public void load (URI inputURI) {
 		//TODO
 	}

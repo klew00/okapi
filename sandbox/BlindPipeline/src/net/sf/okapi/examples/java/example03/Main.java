@@ -55,7 +55,7 @@ public class Main {
 		driver.setPipeline(pipeline);
 		driver.addBatchItem(
 			new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr"),
-			"okf_xml", "output.xml", "UTF-8");
+			"okapi.xml", "output.xml", "UTF-8");
 		driver.processBatch();
 
 		// destroy the pipeline and all steps - clean up resources

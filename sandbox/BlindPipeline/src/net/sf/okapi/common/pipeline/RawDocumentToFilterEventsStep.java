@@ -22,7 +22,9 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -81,14 +83,9 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		if ( event.getEventType() == EventType.RAW_DOCUMENT ) {
 			if ( getContext().getFilterConfiguration(0) != null ) {
 				// Get the filter to use
-				//TODO: This is where the filter+config lookup object would be used
-				if ( getContext().getFilterConfiguration(0).equals("okf_properties") ) {
-					filter = new net.sf.okapi.filters.properties.PropertiesFilter();
-				}
-				else if ( getContext().getFilterConfiguration(0).equals("okf_xml") ) {
-					filter = new net.sf.okapi.filters.xml.XMLFilter();
-				}
-				else {
+				filter = getContext().getFilterConfigurationMapper().createFilter(
+					getContext().getFilterConfiguration(0));
+				if ( filter == null ) {
 					throw new RuntimeException("Unsupported filter type.");
 				}
 				hasEvents = true;

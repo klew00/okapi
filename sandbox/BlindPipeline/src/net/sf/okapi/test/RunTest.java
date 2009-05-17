@@ -3,7 +3,10 @@ package net.sf.okapi.test;
 import java.net.URL;
 import java.util.ArrayList;
 
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.FilterEventsToRawDocumentStep;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -18,14 +21,13 @@ public class RunTest {
 	
 	private ArrayList<ProjectItem> proj = new ArrayList<ProjectItem>();
 	private PipelineDriver driver;
+	private FilterConfigurationMapper fcMapper;
 
 	public static void main (String[] args) {
 		RunTest rt = new RunTest();
 		rt.run();
 	}
 	public RunTest () {
-		driver = new PipelineDriver();
-		
 		URL url = RunTest.class.getResource("/input1_en.properties");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
@@ -33,14 +35,28 @@ public class RunTest {
 		ProjectItem pi = new ProjectItem();
 		pi.inputPaths[0] = root+"input1_en.properties";
 		pi.encodings[0] = "UTF-8";
-		pi.filterConfigs[0] = "okf_properties";
+		pi.filterConfigs[0] = "okapi.properties";
 		proj.add(pi);
 
+		// Use a custom config: only the second entry of the file should be seen as translatable
 		pi = new ProjectItem();
 		pi.inputPaths[0] = root+"input2_en.properties";
 		pi.encodings[0] = "UTF-8";
-		pi.filterConfigs[0] = "okf_properties";
+		pi.filterConfigs[0] = "okapi.properties-TextKeysOnly";
 		proj.add(pi);
+
+		fcMapper = new FilterConfigurationMapper();
+		FilterConfiguration baseFc = fcMapper.getConfiguration("okapi.properties");
+		FilterConfiguration fc = new FilterConfiguration(); 
+		fc.configId = "okapi.properties-TextKeysOnly";
+		fc.custom = true;
+		fc.filterClass = baseFc.filterClass;
+		fc.name = "My Properties Files Config";
+		fc.description = "properties file with key names that includes 'text'";
+		fc.parameters = "okapi.properties-TextKeysOnly.fprm";
+		fcMapper.addMapping(fc, MimeTypeMapper.PROPERTIES_MIME_TYPE);
+
+		driver = new PipelineDriver();
 	}
 
 	public void run () {
@@ -70,6 +86,7 @@ public class RunTest {
 	private IPipeline createPipelineOne () {
 		// First pipeline: simple BOM conversion
 		IPipeline pipeline = new Pipeline();
+		pipeline.getContext().setFilterConfigurationMapper(fcMapper);
 	
 		BOMConversionStep step = new BOMConversionStep();
 		net.sf.okapi.steps.bomconversion.Parameters params
@@ -83,6 +100,8 @@ public class RunTest {
 	
 	private IPipeline createPipelineTwo () {
 		IPipeline pipeline = new Pipeline();
+		pipeline.getContext().setFilterConfigurationMapper(fcMapper);
+		
 		pipeline.addStep(new RawDocumentToFilterEventsStep());
 		
 		// Text modification step
@@ -100,7 +119,8 @@ public class RunTest {
 	
 	private IPipeline createPipelineThree () {
 		IPipeline pipeline = new Pipeline();
-
+		pipeline.getContext().setFilterConfigurationMapper(fcMapper);
+		
 		// Convert Raw document to filter events
 		pipeline.addStep(new RawDocumentToFilterEventsStep());
 
