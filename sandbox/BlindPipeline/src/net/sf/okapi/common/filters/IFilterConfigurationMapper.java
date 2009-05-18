@@ -2,6 +2,8 @@ package net.sf.okapi.common.filters;
 
 import java.util.List;
 
+import net.sf.okapi.common.IParametersEditor;
+
 public interface IFilterConfigurationMapper {
 
 	/**
@@ -30,6 +32,16 @@ public interface IFilterConfigurationMapper {
 	 * configuration identifier, or null if the object could not be created.
 	 */
 	public IFilter createFilter (String configId);
+	
+	/**
+	 * Creates an instance of the filter's parameters editor for a given 
+	 * configuration identifier.
+	 * @param configId the configuration identifier to use for look-up.  
+	 * @return a new IParametersEditor object for the given
+	 * configuration identifier, or null if no editor is available or if
+	 * the object could not be created.
+	 */
+	public IParametersEditor createParametersEditor (String configId);
 	
 	/**
 	 * Gets the FilterConfiguration object for a given configuration identifier.

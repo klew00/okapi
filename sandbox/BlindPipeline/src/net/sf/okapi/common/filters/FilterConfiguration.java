@@ -4,6 +4,7 @@ public class FilterConfiguration {
 
 	public String configId;
 	public String filterClass;
+	public String editorClass;
 	public String parameters;
 	public String name;
 	public String description;

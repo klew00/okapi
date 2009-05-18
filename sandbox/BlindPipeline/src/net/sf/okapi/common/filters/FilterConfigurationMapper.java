@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.MimeTypeMapper;
 
 public class FilterConfigurationMapper implements IFilterConfigurationMapper {
@@ -84,6 +85,26 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 			}
 		}
 		return filter;
+	}
+
+	public IParametersEditor createParametersEditor (String configId) {
+		FilterConfiguration fc = configMap.get(configId);
+		if ( fc == null ) return null;
+		if ( fc.editorClass == null ) return null;
+		IParametersEditor editor = null;
+		try {
+			editor = (IParametersEditor)Class.forName(fc.editorClass).newInstance();
+		}
+		catch ( InstantiationException e ) {
+			// throw exception
+		}
+		catch ( IllegalAccessException e ) {
+			// throw exception
+		}
+		catch ( ClassNotFoundException e ) {
+			// throw exception
+		}
+		return editor;
 	}
 
 	public FilterConfiguration getConfiguration (String configId) {
