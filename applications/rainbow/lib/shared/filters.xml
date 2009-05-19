@@ -58,7 +58,7 @@
  >Filter for IDML-Content documents.</filter>
 
 <filter id="okf_msoffice"
-  name="(ALPHA) MS-Office 2007"
+  name="(ALPHA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
@@ -73,9 +73,14 @@
  >Filter for Translation Memory eXchange (TMX) documents</filter>
   
  <filter id="okf_mif"
-  name="(PRE-ALPHA-DON'T-EVEN-TRY) FrameMaker MIF"
+  name="(PRE-ALPHA-DON'T-EVEN-TRY) FrameMaker MIF Filter"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
  >Filter for Adobe FrameMaker MIF files.</filter>
+  
+ <filter id="okf_dtd"
+  name="(BETA) DTD Filter"
+  inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
+ >Filter for DTD files.</filter>
   
  <!--
  <filter id="okf_rtf"

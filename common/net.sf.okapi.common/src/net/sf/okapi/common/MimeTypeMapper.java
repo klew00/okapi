@@ -47,6 +47,7 @@ public final class MimeTypeMapper {
 	public static final String QUARK_MIME_TYPE = "text/qml";
 	public static final String FLASH_MIME_TYPE = "text/x-flash-xml";
 	public static final String PROPERTIES_MIME_TYPE = "text/x-properties";
+	public static final String DTD_MIME_TYPE = "application/xml+dtd";
 	public static final String SERVER_SIDE_INCLUDE_MIME_TYPE = "text/x-ssi";
 	public static final String DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 	public static final String XLSX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -80,6 +81,7 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("xlsm", XLSM_MIME_TYPE);
 		extensionToMimeMap.put("pptx", PPTX_MIME_TYPE);
 		extensionToMimeMap.put("pptm", PPTM_MIME_TYPE);
+		extensionToMimeMap.put("dtd", DTD_MIME_TYPE);
 	}
 
 	/**

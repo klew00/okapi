@@ -29,6 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.filters.plaintext.tests.PlainTextFilterTest.class,
 	net.sf.okapi.filters.xliff.tests.XLIFFFilterTest.class,
 	net.sf.okapi.filters.xml.tests.XMLFilterTest.class,
+	net.sf.okapi.filters.dtd.tests.DTDFilterTest.class,
 	net.sf.okapi.lib.jython.tests.JythonBasedPipelineTest.class,
 	net.sf.okapi.lib.segmentation.tests.AllTests.class,
 	net.sf.okapi.common.pipeline.tests.AllPipelineTests.class,

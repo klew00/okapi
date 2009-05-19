@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.encoder.tests;
 
+import net.sf.okapi.common.encoder.DTDEncoder;
 import net.sf.okapi.common.encoder.DefaultEncoder;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.encoder.PropertiesEncoder;
@@ -135,4 +136,16 @@ public class EncodersTest {
 		assertEquals("a", enc.encode((int)'a', 0));
 	}
 
+	@Test
+	public void testDTDEncoder () {
+		DTDEncoder enc = new DTDEncoder();
+		enc.setOptions(null, "us-ascii", "\n");
+		assertEquals("&lt;&amp;&#37;", enc.encode("<&%", 0));
+		assertEquals("&#x20000;", enc.encode("\uD840\uDC00", 0));
+		assertEquals("&#x20000;", enc.encode(0x20000, 0));
+		assertEquals("&#37;", enc.encode('%', 0));
+		assertEquals("&#37;", enc.encode((int)'%', 0));
+	}
+
+	
 }

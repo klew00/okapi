@@ -83,6 +83,7 @@ public class CommandLine {
 		
 		// Creates default project
 		FormatManager fm = new FormatManager();
+		fm.load(null); // TODO: implement real external file, for now it's hard-coded
 		prj = new Project(lm);
 		prj.setInputRoot(0, rootFolder, true);
 		prj.setInputRoot(1, rootFolder, true);
@@ -129,7 +130,7 @@ public class CommandLine {
 				optionsFile = nextArg(args, ++i);
 			}
 			else if ( "-fs".equals(arg) ) { //$NON-NLS-1$
-				Input inp = prj.getLastItem(0);
+				Input inp = prj.getLastItem(inpList);
 				if ( inp == null ) { 
 					throw new RuntimeException(Res.getString("CommandLine.fsBeforeInputError")); //$NON-NLS-1$
 				}

@@ -32,5 +32,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.xsltransform"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.dtd"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

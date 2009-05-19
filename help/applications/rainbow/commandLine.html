@@ -63,7 +63,12 @@ arguments of the command-line as described in the following table:</p>
 		assign to it. You can specify an absolute or a local filename. The input 
 		file root is reset to the folder of the given input file. If a project 
 		was loaded, all input files in that projects are removed and the input 
-		file root reset.</td>
+		file root reset.<br>
+		If you specify several input files (and their filter settings) the first 
+		one will be assigned to the input list 1, the second to the input list 
+		2, etc.<br>
+		If the filter settings is no specified in the command line, the default 
+		filter (if one can be found) is used.</td>
 	</tr>
 	<tr>
 		<td nowrap align="left" valign="top"><code>-o &lt;outputFile&gt;</code></td>
@@ -72,15 +77,21 @@ arguments of the command-line as described in the following table:</p>
 		options of the project (loaded or default).</td>
 	</tr>
 	<tr>
+		<td nowrap align="left" valign="top"><code>-pd &lt;directory&gt;</code></td>
+		<td>Sets the parameters directory (the location where the filter 
+		parameters files are stored). You can use <code>.</code> (dot) to 
+		specify the current directory. By default, if not project is loaded, the 
+		default parameters directory is the user home directory.</td>
+	</tr>
+	<tr>
 		<td nowrap align="left" valign="top"><code>-?</code> or <code>-h</code></td>
 		<td>Opens this help page.</td>
 	</tr>
 </table>
-<p>&nbsp;</p>
 <p>Here are some example of command lines in Windows. They assume Rainbow is 
 installed in <code>C:\rnb</code> directory.</p>
 <pre>C:\&gt;java -jar \rnb\lib\rainbow.jar -x oku_textrewriting -sl EN -tl FR -opt myOptions.opt myInput.xlf -o myOutput.xlf -np</pre>
-<p>The command-line above execute the Text Rewriting utility with the source 
+<p>The command-line above executes the Text Rewriting utility with the source 
 language set to <code>EN</code> and the target language set to <code>FR</code>. 
 The input document is the XLIFF file <code>myInput.xlf</code>, and the modified 
 file is saved as <code>myOutput.xlf</code>. The utility will use whatever 
@@ -88,9 +99,18 @@ options are set in the options file named <code>myOptions.opt</code>. If that
 file does not exist, one will be created with the default options for the Text 
 Rewriting utility. In both cases the user will not be prompted to change the 
 options (<code>-np</code> parameter).</p>
+<pre>C:\&gt;java -jar \rnb\lib\rainbow.jar -x oku_transcomparison -sl EN -tl FR -pd . myHumanTrans.xlf myMachineTrans.txt -fs okf_regex@myText</pre>
+<p>The command-line above executes the Translation Comparison utility with the 
+source language set to <code>EN</code> and the target language set to <code>FR</code>. 
+The current folder (<code>.</code>) is specified as the parameters directory. 
+The input file <code>myHumanTrans.xlf</code> is the input document for the Input 
+List 1, and the default XLIFF filter assigned to it. The input file <code>
+myMachineTrans.txt</code> is the input document for the Input List 2, and the 
+custom filter parameters <code>okf_regex@myText.fprm</code> is associated with 
+it. No utility options are specified, so the use will be prompted to set the 
+options.</p>
 <pre>C:\&gt;java -jar \rnb\lib\rainbow -h</pre>
 <p>The command-line above opens this help page.</p>
-<p>&nbsp;</p>
 <p>&nbsp;</p>
 </body>
 </html>
