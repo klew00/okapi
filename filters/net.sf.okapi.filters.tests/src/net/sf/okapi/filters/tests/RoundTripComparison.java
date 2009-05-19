@@ -70,7 +70,7 @@ public class RoundTripComparison {
 				extraction1Events.clear();
 				extraction2Events.clear();
 				// Load parameters if needed
-				if ( doc.paramFile == null ) {
+				if  (doc.paramFile == null  || doc.paramFile == "")  {
 					IParameters params = filter.getParameters();
 					if ( params != null ) params.reset();
 				}
