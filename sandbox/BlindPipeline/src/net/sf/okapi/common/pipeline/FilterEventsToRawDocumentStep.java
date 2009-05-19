@@ -32,7 +32,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	private static final Logger LOGGER = Logger.getLogger(FilterEventsToRawDocumentStep.class.getName());
 
 	private IFilterWriter filterWriter;
-	private boolean hasNext;
+	private boolean isDone;
 	private String language;
 	private String encoding;
 	private File outputFile;
@@ -102,7 +102,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		// Return the RawDocument Event that is the end result of all
 		// previous Events
 		RawDocument input = new RawDocument(outputFile.toURI(), encoding, language);
-		hasNext = false;
+		isDone = true;
 		return new Event(EventType.RAW_DOCUMENT, input);
 	}
 	
@@ -138,15 +138,15 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 		filterWriter.setOutput(outputFile.getAbsolutePath());
 		filterWriter.handleEvent(event);
-		hasNext = true;
+		isDone = false;
 	}
 
 	/**
 	 * This step generates NO_OP Events until the final RAW_DOCUMENT event is
 	 * sent.
 	 */
-	public boolean hasNext() {
-		return hasNext;
+	public boolean isDone() {
+		return isDone;
 	}
 
 	/**

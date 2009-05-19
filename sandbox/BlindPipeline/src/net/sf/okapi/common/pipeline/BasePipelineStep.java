@@ -47,8 +47,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public void setParameters (IParameters params) {
 	}
 
-	public boolean hasNext() {
-		return false;
+	public boolean isDone() {
+		return true;
 	}
 
 	public Event handleEvent (Event event) {

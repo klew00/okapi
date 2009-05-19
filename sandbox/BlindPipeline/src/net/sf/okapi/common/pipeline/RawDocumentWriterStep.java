@@ -10,7 +10,7 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public class RawDocumentWriterStep extends BasePipelineStep {
 
-	private boolean hasNext;
+	private boolean isDone;
 	
 	public String getDescription() {
 		return "Write a raw document";
@@ -26,13 +26,13 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean hasNext () {
-		return hasNext;
+	public boolean isDone () {
+		return isDone;
 	}
 
 	@Override
 	protected void handleStartBatchItem (Event event) {
-		hasNext = true;
+		isDone = false;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
 			rawDoc.setInputURI((new File(getContext().getOutputPath(0))).toURI());
-			hasNext = false;
+			isDone = true;
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error writing or copying a RawDocument.", e);

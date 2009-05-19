@@ -9,6 +9,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 
@@ -51,39 +52,57 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		mimeList.add(new MimeConfig(mimeType, config.configId));
 	}
 
-	public IFilter createFilter (String configId) {
+	public IFilter createFilter (String configId,
+		IFilter existingFilter)
+		throws OkapiFilterCreationException
+	{
+		// Get the configuration object for the given configId
 		FilterConfiguration fc = configMap.get(configId);
 		if ( fc == null ) return null;
+		
+		// Check if we can re-use the provided filter
 		IFilter filter = null;
-		try {
-			filter = (IFilter)Class.forName(fc.filterClass).newInstance();
+		if ( existingFilter != null ) {
+			if ( fc.filterClass.equals(existingFilter.getClass().getName()) ) {
+				filter = existingFilter;
+			}
 		}
-		catch ( InstantiationException e ) {
-			// throw exception
+		
+		// Instantiate the filter if needed
+		if ( filter == null ) {
+			try {
+				filter = (IFilter)Class.forName(fc.filterClass).newInstance();
+			}
+			catch ( InstantiationException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
 		}
-		catch ( IllegalAccessException e ) {
-			// throw exception
-		}
-		catch ( ClassNotFoundException e ) {
-			// throw exception
-		}
+		
+		// Always load the parameters if needed
 		if ( fc.parameters != null ) {
 			IParameters params = filter.getParameters();
 			if ( params == null ) {
-				throw new RuntimeException("Cannot read filter parameters for "+fc.configId);
+				throw new RuntimeException(String.format(
+					"Cannot create default parameters for '%s'.", fc.configId));
 			}
 			if ( fc.custom ) {
-				String path = getCustomParametersPath(fc);
-				if ( path == null ) {
-					throw new RuntimeException("Cannot find custom parameters file for "+fc.configId);
-				}
-				params.load(path, false);
+				params = getCustomParameters(fc, filter);
 			}
 			else {
+				// Note that we cannot assume the parameters are the same
+				// if we re-used an existing filter, as we cannot compare the 
+				// configuration identifiers
 				URL url = filter.getClass().getResource(fc.parameters);
 				params.load(url.getPath(), false);
 			}
 		}
+		
 		return filter;
 	}
 
@@ -145,9 +164,37 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 	/* This default implementation of IFilterConfiguration gets the custom data
 	 * from the current directory at the time the method is called.  
 	 */
-	public String getCustomParametersPath (FilterConfiguration config) {
+	public IParameters getCustomParameters (FilterConfiguration config,
+		IFilter existingFilter)
+		throws OkapiFilterCreationException
+	{
 		File file = new File(config.parameters);
-		return file.getAbsolutePath();
+		IFilter filter = null;
+		if ( existingFilter != null ) {
+			if ( config.filterClass.equals(existingFilter.getClass().getName()) ) {
+				filter = existingFilter;
+			}
+		}
+		if ( filter == null ) {
+			try {
+				filter = (IFilter)Class.forName(config.filterClass).newInstance();
+			}
+			catch ( InstantiationException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+			}
+		}
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			return null; // This filter does not have parameters
+		}
+		params.load(file.getAbsolutePath(), false);
+		return params;
 	}
 
 	public void clear() {

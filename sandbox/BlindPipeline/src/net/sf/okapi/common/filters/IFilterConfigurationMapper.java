@@ -2,7 +2,9 @@ package net.sf.okapi.common.filters;
 
 import java.util.List;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 public interface IFilterConfigurationMapper {
 
@@ -27,11 +29,20 @@ public interface IFilterConfigurationMapper {
 	/**
 	 * Creates an instance of the filter for a given configuration identifier
 	 * and loads its corresponding parameters.
-	 * @param configId the configuration identifier to use for look-up.  
+	 * @param configId the configuration identifier to use for look-up.
+	 * @param existingInstance an optional existing instance of a filter. This argument can be null.
+	 * If this argument is not null, it is checked against the requested filter and re-use
+	 * if the requested filter and the provided instance are the same. If the provided
+	 * instance is re-used, its parameters are always re-loaded.
+	 * Providing an existing instance of the requested filter may allow for better
+	 * efficiency.  
 	 * @return a new IFilter object (with its parameters loaded) for the given
 	 * configuration identifier, or null if the object could not be created.
+	 * @throws OkapiFilterCreationException if the filter could not be created.
 	 */
-	public IFilter createFilter (String configId);
+	public IFilter createFilter (String configId,
+		IFilter existingInstance)
+		throws OkapiFilterCreationException;
 	
 	/**
 	 * Creates an instance of the filter's parameters editor for a given 
@@ -67,16 +78,24 @@ public interface IFilterConfigurationMapper {
 	public List<FilterConfiguration> getConfigurations (String mimeType);
 
 	/**
-	 * Gets the full path for the parameters file of a given custom filter configuration.
+	 * Gets the parameters for a given custom filter configuration.
 	 * This method provides a way for this mapper to implements how it retrieves
-	 * custom filter parameters files. for example it could simply define a root
-	 * where all custom files are located, or a PATH mechanism, or whatever is 
-	 * appropriate for the implementation.  
+	 * custom filter parameters.  
 	 * @param the custom configuration for which the method should return the 
-	 * filter parameters file path.
-	 * @return the full path for the given custom filter configuration, or null
-	 * if the path could not be provided.
+	 * filter parameters.
+	 * @param existingFilter optional existing instance of the filter for the given
+	 * configuration. this argument can be null. If it not null, the provided filter
+	 * may be used to load the parameters (if it matches the appropriate class).
+	 * Providing this argument may allow the method to be more efficient by not 
+	 * creating a temporary filter to get an instance of the parameters to load. 
+	 * @return the parameters for the given custom filter configuration, or null
+	 * if the parameters could not be provided, or if the corresponding filter does not have
+	 * parameters.
+	 * @throws OkapiFilterCreationException if the filter of the given configuration
+	 * could not be created to load the parameters.
 	 */
-	public String getCustomParametersPath (FilterConfiguration config);
+	public IParameters getCustomParameters (FilterConfiguration config,
+		IFilter existingFilter)
+		throws OkapiFilterCreationException;
 	
 }

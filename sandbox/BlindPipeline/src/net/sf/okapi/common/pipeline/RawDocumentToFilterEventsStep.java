@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	
 	private IFilter filter;
-	private boolean hasEvents;
+	private boolean isDone;
 
 	/**
 	 * Creates a new RawDocumentToEventsStep object.
@@ -73,7 +73,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		if ( event.getEventType() == EventType.START_BATCH_ITEM ) {
 			// Needed because the process() method of the pipeline expects
 			// hasEvents to be set to true to prime things.
-			hasEvents = true;
+			isDone = false;
 			return event;
 		}
 		
@@ -82,14 +82,14 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			if ( getContext().getFilterConfiguration(0) != null ) {
 				// Get the filter to use
 				filter = getContext().getFilterConfigurationMapper().createFilter(
-					getContext().getFilterConfiguration(0));
+					getContext().getFilterConfiguration(0), filter);
 				if ( filter == null ) {
 					throw new RuntimeException("Unsupported filter type.");
 				}
-				hasEvents = true;
+				isDone = false;
 			}
 			else { // No filter configuration provided: just pass it down
-				hasEvents = false;
+				isDone = true;
 				return event;
 			}
 			// Open the document
@@ -97,24 +97,23 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			return event;
 		}
 
-		if ( hasEvents ) {
+		if ( isDone ) {
+			return event;
+		}
+		else {
 			// Get events from the filter
 			Event e = filter.next();
 			if ( e.getEventType() == EventType.END_DOCUMENT) {
 				// END_DOCUMENT is the end of this raw document
-				hasEvents = false;
+				isDone = true;
 			}
 			return e;
-		}
-		else {
-			// In all other cases: just pass the event through
-			return event;
 		}
 	}
 
 	@Override
-	public boolean hasNext() {
-		return hasEvents;
+	public boolean isDone() {
+		return isDone;
 	}
 
 	public void destroy() {

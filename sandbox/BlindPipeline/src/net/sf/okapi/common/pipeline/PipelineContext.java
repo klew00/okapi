@@ -10,6 +10,7 @@ public class PipelineContext implements IDocumentData {
 	private IDocumentData docData;
 	private IFilterConfigurationMapper configMapper;
 	
+	
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper configMapper) {
 		this.configMapper = configMapper;
 	}

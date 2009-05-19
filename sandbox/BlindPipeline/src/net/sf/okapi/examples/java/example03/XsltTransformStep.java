@@ -20,10 +20,10 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public class XsltTransformStep extends BasePipelineStep {
 	private InputStream xstlInputstream;
-	private boolean done;
+	private boolean isDone;
 	
-	public XsltTransformStep(InputStream xstlInputstream) {
-		done = false;
+	public XsltTransformStep (InputStream xstlInputstream) {
+		isDone = false;
 		this.xstlInputstream = xstlInputstream;
 	}
 
@@ -69,10 +69,10 @@ public class XsltTransformStep extends BasePipelineStep {
 		event.setResource(new RawDocument(transformedInput, "UTF-8", "en"));
 		
 		// this step is done generating events
-		done = true;
+		isDone = true;
 	}
 
-	public boolean hasNext() {
-		return !done;
+	public boolean isDone() {
+		return !isDone;
 	}
 }

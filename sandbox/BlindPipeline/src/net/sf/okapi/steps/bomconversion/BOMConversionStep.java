@@ -41,7 +41,7 @@ public class BOMConversionStep extends BasePipelineStep {
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};
 	private final byte[] BOM_UTF16LE = {(byte)0xFF,(byte)0xFE};
 
-	private boolean hasNext;
+	private boolean isDone;
 	private Parameters params;
 	private byte[] buffer;
 
@@ -62,8 +62,8 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean hasNext () {
-		return hasNext;
+	public boolean isDone () {
+		return isDone;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class BOMConversionStep extends BasePipelineStep {
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		buffer = new byte[1024*2];
-		hasNext = true;
+		isDone = false;
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class BOMConversionStep extends BasePipelineStep {
 			// Set the new raw-document URI
 			// Other info stays the same
 			rawDoc.setInputURI(tmpOut.toURI());
-			hasNext = false;
+			isDone = true;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);

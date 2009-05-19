@@ -90,7 +90,7 @@ public class Pipeline implements IPipeline {
 		while ( !steps.isEmpty() && !cancel ) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while ( steps.getFirst().hasNext() && !cancel ) {
+			while ( steps.getFirst().isDone() && !cancel ) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
 				for ( IPipelineStep step : steps ) {

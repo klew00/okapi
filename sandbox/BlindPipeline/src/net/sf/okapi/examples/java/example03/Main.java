@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -22,6 +24,7 @@ public class Main {
 
 	public static void main(String[] args) throws URISyntaxException, UnsupportedEncodingException {
 		IPipeline pipeline = new Pipeline();
+		pipeline.getContext().setFilterConfigurationMapper(new FilterConfigurationMapper());
 
 		// input resource as URL
 		URL inputXml = Main.class.getResource("test.xml");

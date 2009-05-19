@@ -101,7 +101,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		filterWriter.close();
 	}
 
-	public boolean hasNext() {		
+	public boolean isDone() {		
 		return false;
 	}	
 }

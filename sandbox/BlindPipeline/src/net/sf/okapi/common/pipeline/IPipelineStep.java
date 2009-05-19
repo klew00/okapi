@@ -69,7 +69,7 @@ public interface IPipelineStep {
 	 * 
 	 * @return true if can generate more events, false otherwise.
 	 */
-	boolean hasNext();
+	boolean isDone();
 	
 	/**
 	 * Executes any cleanup code for this step. Called once at the end of the pipeline lifecycle.
