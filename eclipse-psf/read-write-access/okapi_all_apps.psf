@@ -28,7 +28,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.steps.charlisting,net.sf.okapi.steps.charlisting"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.steps.xlstransform,net.sf.okapi.steps.xsltransform"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.globalsight,net.sf.okapi.tm.globalsight"/>
-<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.open-tran,net.sf.okapi.tm.opentran"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.opentran,net.sf.okapi.tm.opentran"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.simpletm,net.sf.okapi.tm.simpletm"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tm/net.sf.okapi.tm.trados,net.sf.okapi.tm.trados"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.ui.common,net.sf.okapi.ui.common"/>
