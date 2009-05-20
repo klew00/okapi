@@ -129,8 +129,8 @@ public class ParametersString {
 			if ( line.charAt(0) == '#' ) continue;
 			if (( n = line.indexOf('=')) == -1 ) continue;
 			
-			qualifiedName = line.trim().substring(0, n).trim();
-			value = line.trim().substring(n+1).trim();
+			qualifiedName = line.substring(0, n).trim();
+			value = line.substring(n+1).trim();
 			
 			if ( qualifiedName.endsWith(".b") ) {
 				key = prefix + qualifiedName.substring(0, qualifiedName.lastIndexOf("."));				
