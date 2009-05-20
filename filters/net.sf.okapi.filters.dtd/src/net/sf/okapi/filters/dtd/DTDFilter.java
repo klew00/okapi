@@ -90,8 +90,7 @@ public class DTDFilter implements IFilter {
 		params = new Parameters();
 
 		// Pre-compile pattern for un-escaping
-		String tmp = "";
-		tmp += "&#([0-9]*?);|&#[xX]([0-9a-fA-F]*?);|(&\\w*?;)|(%\\w*?;)";
+		String tmp = "&#([0-9]*?);|&#[xX]([0-9a-f]*?);|(&\\w*?;)|(%\\w*?;)";
 		pattern = Pattern.compile(tmp, Pattern.CASE_INSENSITIVE);
 		createCharEntitiesTable();
 		encoder = new DTDEncoder();
