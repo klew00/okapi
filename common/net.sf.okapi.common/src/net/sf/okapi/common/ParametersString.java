@@ -20,12 +20,29 @@
 
 package net.sf.okapi.common;
 
-/**
- * String-based representation of a set of parameters.
- */
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+/**
+ * String-based representation of a set of parameters.
+ * <ul>
+ * <li>The string or file should start with "#v1\n"
+ * <li>Each parameter is saved in a format: key=value
+ * <li>Keys and values are case-sensitive.
+ * <li>Keys should not contain periods (.) as this character is reserved for group handling.
+ * <li>The character \r should be escaped as $0d$
+ * <li>The character \n should be escaped as $0a$
+ * <li>The suffix .i and .b should be used for integer and boolean entries.
+ * <li>Commented lines are denoted by a character '#' as the first character of the line.
+ * <li>White-spaces are significant after '=' for string entries.
+ * </ul>
+ * Example:
+ * <pre>#v1
+ *paramKey1.b=true
+ *paramKey2.i = 123
+ *paramStr  =value for paramStr
+ * </pre>
+ */
 public class ParametersString {
 
 	private LinkedHashMap<String, Object> list;
@@ -122,27 +139,28 @@ public class ParametersString {
 		int n;
 		String qualifiedName;
 		String key;
-		String value;
+		String trimmedValue;
 		
 		for ( String line : lines ) {
-			if ( line.length() == 0 ) continue;
+			if ( line.trim().length() == 0 ) continue;
 			if ( line.charAt(0) == '#' ) continue;
 			if (( n = line.indexOf('=')) == -1 ) continue;
 			
 			qualifiedName = line.substring(0, n).trim();
-			value = line.substring(n+1).trim();
+			trimmedValue = line.substring(n+1).trim();
 			
 			if ( qualifiedName.endsWith(".b") ) {
 				key = prefix + qualifiedName.substring(0, qualifiedName.lastIndexOf("."));				
-				list.put(key, "true".equals(value));
+				list.put(key, "true".equals(trimmedValue));
 			}
 			else if ( qualifiedName.endsWith(".i") ) {
 				key = prefix + qualifiedName.substring(0, qualifiedName.lastIndexOf("."));
-				list.put(key, (int)Integer.valueOf(value));
+				list.put(key, (int)Integer.valueOf(trimmedValue));
 			}
 			else {
 				key = prefix + qualifiedName;
-				list.put(key, unescape(value));
+				// Does not use trimmed value because white-spaces are significant in string entries 
+				list.put(key, unescape(line.substring(n+1)));
 			}
 		}
 	}

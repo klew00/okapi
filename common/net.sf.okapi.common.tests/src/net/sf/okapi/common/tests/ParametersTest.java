@@ -61,6 +61,16 @@ public class ParametersTest {
 	}
 
 	@Test
+	public void testWhitespaces () {
+		String snippet = "#v1\nparamBool1.b  =  true  \nparamInt1.i  =  456 \nparamStr1  = AB  C  ";
+		DummyParameters params = new DummyParameters();
+		params.fromString(snippet);
+		assertTrue(params.paramBool1);
+		assertEquals(params.paramInt1, 456);
+		assertEquals(params.paramStr1, " AB  C  "); // WS count
+	}
+
+	@Test
 	public void testLoadParametersFromWindowsFile () {
 		DummyParameters params = new DummyParameters();
 		URL url = ParametersTest.class.getResource("/ParamTest01.txt");

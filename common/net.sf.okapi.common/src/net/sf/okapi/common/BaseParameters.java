@@ -32,6 +32,7 @@ import java.io.Writer;
 
 /**
  * Base class for properties-like parameters that implement IParameters.
+ * See the {@link ParametersString} documentation for details on the storage format.
  */
 public abstract class BaseParameters implements IParameters {
 
