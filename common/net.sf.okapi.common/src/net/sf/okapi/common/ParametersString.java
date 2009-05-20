@@ -120,23 +120,29 @@ public class ParametersString {
 		
 		String[] lines = data.split("\n", 0);
 		int n;
-		String name;
+		String qualifiedName;
+		String key;
+		String value;
 		
 		for ( String line : lines ) {
 			if ( line.length() == 0 ) continue;
 			if ( line.charAt(0) == '#' ) continue;
 			if (( n = line.indexOf('=')) == -1 ) continue;
-			name = line.substring(0, n);
-			if ( name.endsWith(".b") ) {
-				list.put(prefix+line.substring(0, n-2),
-					"true".equals(line.substring(n+1)));
+			
+			qualifiedName = line.trim().substring(0, n).trim();
+			value = line.trim().substring(n+1).trim();
+			
+			if ( qualifiedName.endsWith(".b") ) {
+				key = prefix + qualifiedName.substring(0, qualifiedName.lastIndexOf("."));				
+				list.put(key, "true".equals(value));
 			}
-			else if ( name.endsWith(".i") ) {
-				list.put(prefix+line.substring(0, n-2),
-					(int)Integer.valueOf(line.substring(n+1)));
+			else if ( qualifiedName.endsWith(".i") ) {
+				key = prefix + qualifiedName.substring(0, qualifiedName.lastIndexOf("."));
+				list.put(key, (int)Integer.valueOf(value));
 			}
 			else {
-				list.put(prefix+name, unescape(line.substring(n+1)));
+				key = prefix + qualifiedName;
+				list.put(key, unescape(value));
 			}
 		}
 	}
