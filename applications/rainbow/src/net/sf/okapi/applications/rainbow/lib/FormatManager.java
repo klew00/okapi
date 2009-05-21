@@ -41,6 +41,7 @@ public class FormatManager {
 		pairs.put(".rtf", "okf_rtf");
 		pairs.put(".idml", "okf_idml");
 		pairs.put(".po", "okf_po");
+		pairs.put(".pot", "okf_po");
 		pairs.put(".docx", "okf_msoffice");
 		pairs.put(".docm", "okf_msoffice");
 		pairs.put(".dotm", "okf_msoffice");
@@ -63,6 +64,7 @@ public class FormatManager {
 		pairs.put(".sxd", "okf_openoffice");
 		pairs.put(".std", "okf_openoffice");
 		pairs.put(".sdlxliff", "okf_xliff");
+		pairs.put(".dtd", "okf_dtd");
 	}
 	
 	/**

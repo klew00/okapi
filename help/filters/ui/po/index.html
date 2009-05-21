@@ -27,7 +27,7 @@
 
 <h2><a name="overview"></a>Overview</h2>
 <p>The PO Filter is an Okapi component that implements the <code>IFilter</code> interface for 
-Gettext PO (Portable Object) resource files. The filter is implement in the class <code>
+Gettext PO (Portable Object) resource files (as well as POT (PO templates)). The filter is implement in the class <code>
 net.sf.okapi.filters.po.POFilter</code> of the Okapi library.</p>
 <p>The implementation is based on the PO specifications found in the
 <a target="_blank" href="http://www.gnu.org/software/gettext/manual/html_node/gettext_9.html">GNU gettext manual</a>. 
@@ -71,10 +71,16 @@ following logic:</p>
 	</li>
 	<li>Else, if a header entry with a <code>charset</code> declaration 
 	exists in the first 1000 characters of the file:<ul>
-		<li>Then, the declared encoding is used. Note that if the encoding has been detected from a Byte-Order-Mark 
+	<li>If the value of the charset is &quot;<code>charset</code>&quot; (case 
+	insensitive):<ul>
+	<li>Then the file is likely to be a template with no encoding declared, so 
+	the current encoding (auto-detected or default) is used.</li>
+	<li>Else, the declared encoding is used. Note that if the encoding has been detected from a Byte-Order-Mark 
 		and the encoding declared in the header entry does not match, a warning is 
 		generated and the encoding of the Byte-Order-Mark is used.</li>
-	</ul>
+</ul>
+	</li>
+</ul>
 	</li>
 	<li>Otherwise, the input encoding used is the default encoding that was specified when 
 	setting the filter options.</li>

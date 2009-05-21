@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +42,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -177,29 +180,37 @@ public class POFilter implements IFilter {
 	}
 	
 	private void open (InputStream input) {
+		startingInput = input;
+		// Open the input reader from the provided stream
+		BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
+		// Correct the encoding if we have detected a different one
 		try {
-			startingInput = input;
-			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-			// Correct the encoding if we have detected a different one
 			encoding = bis.detectEncoding();
-			autoDetected = bis.autoDtected();
-			hasUTF8BOM = bis.hasUTF8BOM();
-			commonOpen(new InputStreamReader(bis, encoding));
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Error when detecting encoding.", e);
+		}
+		autoDetected = bis.autoDtected();
+		hasUTF8BOM = bis.hasUTF8BOM();
+		try {
+			commonOpen(new InputStreamReader(bis, encoding));
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiUnsupportedEncodingException(e);
 		}
 	}
 
 	private void open (URI inputURI) {
+		docName = inputURI.getPath();
+		this.inputURI = inputURI;
 		try {
-			docName = inputURI.getPath();
-			this.inputURI = inputURI;
 			open(inputURI.toURL().openStream());
 		}
+		catch ( MalformedURLException e ) {
+			throw new OkapiIOException("Error opening the input.", e);
+		}
 		catch ( IOException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Error opening the input.", e);
 		}
 	}
 
@@ -260,14 +271,33 @@ public class POFilter implements IFilter {
 			// Need to re-open the file with modified encoding
 			try {
 				reader.close();
-				if ( docName != null ) { // Was open from URI
-					startingInput.close();
-					startingInput = inputURI.toURL().openStream();
-				}
-				// Else: was open from startingInput 
-				reader = new BufferedReader(new InputStreamReader(startingInput, encoding));
 			}
 			catch ( IOException e ) {
+				throw new OkapiIOException("Error re-opening the input.", e);
+			}
+			if ( docName != null ) { // Was open from URI
+				try {
+					startingInput.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error re-opening the input.", e);
+				}
+				try {
+					startingInput = inputURI.toURL().openStream();
+				}
+				catch ( MalformedURLException e ) {
+					throw new OkapiIOException("Error re-opening the input.", e);
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error re-opening the input.", e);
+				}
+			}
+			// Else: was open from startingInput 
+			try {
+				reader = new BufferedReader(new InputStreamReader(startingInput, encoding));
+			}
+			catch ( UnsupportedEncodingException e ) {
+				throw new OkapiUnsupportedEncodingException("Error re-opening the input.", e);
 			}
 		}
 	}
@@ -736,6 +766,12 @@ public class POFilter implements IFilter {
 			// Try to detect encoding information
 			m = charsetPattern.matcher(tmp);
 			if ( m.find() ) {
+				if ( m.group(6).equalsIgnoreCase("charset") ) {
+					// POT may have 'charset' for encoding:
+					// We ignore it and use the auto-detected or default encoding
+					// Use the encoding already set
+					return false;
+				}
 				if ( autoDetected ) {
 					if ( !encoding.equalsIgnoreCase(m.group(6)) ) {
 						// Difference between auto-detected and internal

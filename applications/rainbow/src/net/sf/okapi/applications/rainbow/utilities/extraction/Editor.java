@@ -292,13 +292,13 @@ public class Editor implements IParametersEditor {
 		});
 		
 		chkUseFileName = new Button(cmpTmp, SWT.CHECK);
-		chkUseFileName.setText("Penalize matches with different FileName attribute");
+		chkUseFileName.setText("Penalize matches with a FileName attribute different from the document being processed");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkUseFileName.setLayoutData(gdTmp);
 
 		chkUseGroupName = new Button(cmpTmp, SWT.CHECK | SWT.WRAP);
-		chkUseGroupName.setText("Penalize matches with different GroupName attribute");
+		chkUseGroupName.setText("Penalize matches with a GroupName attribute different from the group being processed");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkUseGroupName.setLayoutData(gdTmp);
