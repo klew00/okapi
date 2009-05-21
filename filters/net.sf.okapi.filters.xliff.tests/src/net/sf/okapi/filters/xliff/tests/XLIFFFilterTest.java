@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -160,6 +161,21 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testNotes () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createDecoratedXLIFF(), 1);
+		assertNotNull(tu);
+		Property prop = tu.getProperty(Property.NOTE);
+		assertNotNull(prop);
+		assertEquals("note 1\n---\nnote 2", prop.getValue());
+		prop = tu.getSourceProperty(Property.NOTE);
+		assertNotNull(prop);
+		assertEquals("note src 1\n---\nnote src 2", prop.getValue());
+		prop = tu.getTargetProperty("fr", Property.NOTE);
+		assertNotNull(prop);
+		assertEquals("note trg", prop.getValue());
+	}
+
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
@@ -211,6 +227,22 @@ public class XLIFFFilterTest {
 			+ "<body><trans-unit id=\"13\"><source><bpt id='1'>a</bpt>S1<ept id='1'>/a</ept>, <bpt id='2'>b</bpt>S2<ept id='2'>/b</ept></source>"
 			+ "<target><bpt id='2'>b</bpt>T2<ept id='2'>/b</ept>, <bpt id='1'>a</bpt>T1<ept id='1'>/a</ept></target></trans-unit></body>"
 			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createDecoratedXLIFF () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"13\">"
+			+ "<source>text src</source>"
+			+ "<target>text trg</target>"
+			+ "<note>note 1</note>"
+			+ "<note annotates='general'>note 2</note>"
+			+ "<note annotates='source'>note src 1</note>"
+			+ "<note annotates='target'>note trg</note>"
+			+ "<note annotates='source'>note src 2</note>"
+			+ "</trans-unit></body></file></xliff>";
 		return getEvents(snippet);
 	}
 	

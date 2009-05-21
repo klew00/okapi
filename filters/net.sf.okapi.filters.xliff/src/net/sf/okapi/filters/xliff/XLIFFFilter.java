@@ -1009,12 +1009,31 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void processNote () {
+		//TODO: Handle 'annotates', etc.
 		try {
+			// Check the destination of the property
+			String dest = reader.getAttributeValue("", "annotates");
+			if ( dest == null ) dest = ""; // like 'general'
+			Property prop = null;
 			StringBuilder tmp = new StringBuilder();
-			if ( tu.hasProperty(Property.NOTE) ) {
-				tmp.append(tu.getProperty(Property.NOTE));
+			if ( dest.equals("source") ) {
+				prop = tu.getSourceProperty(Property.NOTE);
+			}
+			else if ( dest.equals("target") ) {
+				prop = tu.getTargetProperty(trgLang, Property.NOTE);
+			}
+			else {
+				prop = tu.getProperty(Property.NOTE);
+			}
+			if ( prop == null ) {
+				prop = new Property(Property.NOTE, "", true);
+			}
+			else {
+				tmp.append(prop.getValue());
 				tmp.append("\n---\n");
 			}
+
+			// Get the content
 			int eventType;
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -1028,8 +1047,16 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.END_ELEMENT:
 					String name = reader.getLocalName();
 					if ( name.equals("note") ) {
-						//TODO: Handle 'annotates', etc.
-						tu.setProperty(new Property(Property.NOTE, tmp.toString(), true));
+						prop.setValue(tmp.toString());
+						if ( dest.equals("source") ) {
+							tu.setSourceProperty(prop);
+						}
+						else if ( dest.equals("target") ) {
+							tu.setTargetProperty(trgLang, prop);
+						}
+						else {
+							tu.setProperty(prop);
+						}
 						return;
 					}
 					// Else: This should be an error as note are text only.
