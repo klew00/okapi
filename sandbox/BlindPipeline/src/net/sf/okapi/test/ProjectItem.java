@@ -4,10 +4,10 @@ import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.pipeline.IDocumentData;
+import net.sf.okapi.common.pipeline.IBatchItemContext;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class ProjectItem implements IDocumentData {
+public class ProjectItem implements IBatchItemContext {
 
 	public String[] inputPaths;
 	public String[] encodings;

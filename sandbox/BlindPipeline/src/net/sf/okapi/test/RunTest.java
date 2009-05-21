@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Okapi;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -28,6 +29,8 @@ public class RunTest {
 		rt.run();
 	}
 	public RunTest () {
+		Okapi.context.setBoolean("allowPrompt", true);
+		
 		URL url = RunTest.class.getResource("/input1_en.properties");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";

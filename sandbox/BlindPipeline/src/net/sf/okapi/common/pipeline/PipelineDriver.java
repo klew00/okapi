@@ -9,11 +9,11 @@ import net.sf.okapi.common.resource.RawDocument;
 public class PipelineDriver implements IPipelineDriver {
 	
 	private IPipeline pipeline;
-	private List<IDocumentData> inputItems;
+	private List<IBatchItemContext> batchItems;
 	
 	public PipelineDriver () {
 		pipeline = new Pipeline();
-		inputItems = new ArrayList<IDocumentData>();
+		batchItems = new ArrayList<IBatchItemContext>();
 	}
 
 	public void setPipeline (IPipeline pipeline) {
@@ -44,13 +44,13 @@ public class PipelineDriver implements IPipelineDriver {
 		pipeline.addStep(step);
 	}
 
-	public void processBatch (List<IDocumentData> inputItems) {
-		this.inputItems = inputItems;
+	public void processBatch (List<IBatchItemContext> inputItems) {
+		this.batchItems = inputItems;
 		processBatch();
 	}
 	
-	public void addBatchItem (IDocumentData inputs) {
-		inputItems.add(inputs);
+	public void addBatchItem (IBatchItemContext inputs) {
+		batchItems.add(inputs);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class PipelineDriver implements IPipelineDriver {
 			ddi.filterConfig = filterConfig;
 			dd.list.add(ddi);
 		}
-		inputItems.add(dd);
+		batchItems.add(dd);
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public class PipelineDriver implements IPipelineDriver {
 		dd.srcLang = rawDoc.getSourceLanguage();
 		dd.trgLang = rawDoc.getTargetLanguage();
 		dd.list.add(ddi);
-		inputItems.add(dd);
+		batchItems.add(dd);
 	}
 	
 	/**
@@ -129,18 +129,18 @@ public class PipelineDriver implements IPipelineDriver {
 		dd.srcLang = srcLang;
 		dd.trgLang = trgLang;
 		dd.list.add(ddi);
-		inputItems.add(dd);
+		batchItems.add(dd);
 	}
 	
 	public void resetItems () {
-		inputItems.clear();
+		batchItems.clear();
 	}
 	
 	public void processBatch () {
 		pipeline.startBatch();
-		for ( IDocumentData inputs : inputItems ) {
-			pipeline.getContext().setDocumentData(inputs);
-			pipeline.process(inputs.getRawDocument(0));
+		for ( IBatchItemContext item : batchItems ) {
+			pipeline.getContext().setDocumentData(item);
+			pipeline.process(item.getRawDocument(0));
 		}
 		pipeline.endBatch();
 	}

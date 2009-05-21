@@ -21,9 +21,9 @@ public interface IPipelineDriver {
 	
 	public void addStep (IPipelineStep step);
 
-	public void processBatch (List<IDocumentData> inputItems);
+	public void processBatch (List<IBatchItemContext> inputItems);
 	
-	public void addBatchItem (IDocumentData inputs);
+	public void addBatchItem (IBatchItemContext inputs);
 
 	/**
 	 * Adds an item item to this batch, using one or more RawDocument objects.

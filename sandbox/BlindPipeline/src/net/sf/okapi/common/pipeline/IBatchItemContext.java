@@ -4,7 +4,7 @@ import java.net.URI;
 
 import net.sf.okapi.common.resource.RawDocument;
 
-public interface IDocumentData {
+public interface IBatchItemContext {
 
 	public URI getInputURI (int index);
 	

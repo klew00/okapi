@@ -2,14 +2,14 @@ package net.sf.okapi.common.pipeline;
 
 import java.net.URI;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class PipelineContext implements IDocumentData {
+public class PipelineContext extends BaseContext implements IBatchItemContext {
 
-	private IDocumentData docData;
+	private IBatchItemContext docData;
 	private IFilterConfigurationMapper configMapper;
-	
 	
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper configMapper) {
 		this.configMapper = configMapper;
@@ -19,7 +19,7 @@ public class PipelineContext implements IDocumentData {
 		return configMapper;
 	}
 	
-	public void setDocumentData (IDocumentData docData) {
+	public void setDocumentData (IBatchItemContext docData) {
 		this.docData = docData;
 	}
 	

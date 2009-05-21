@@ -4,9 +4,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.resource.RawDocument;
 
-class DocumentData implements IDocumentData {
+class DocumentData extends BaseContext implements IBatchItemContext {
 
 	List<DocumentDataItem> list;
 	public String srcLang;
