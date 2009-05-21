@@ -24,10 +24,12 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 	
 	private LinkedHashMap<String, FilterConfiguration> configMap;
 	private List<MimeConfig> mimeList;
+	private LinkedHashMap<String, String> editorMap;
 	
 	public FilterConfigurationMapper () {
 		configMap = new LinkedHashMap<String, FilterConfiguration>();
 		mimeList = new ArrayList<MimeConfig>();
+		editorMap = new LinkedHashMap<String, String>();
 		
 		// Temporary hard-coded list for test
 		FilterConfiguration cfg = new FilterConfiguration();
@@ -36,7 +38,7 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		cfg.description = "Default XML documents.";
 		cfg.filterClass = "net.sf.okapi.filters.xml.XMLFilter";
 		cfg.parameters = null;
-		addMapping(cfg, MimeTypeMapper.XML_MIME_TYPE);
+		addConfiguration(cfg, MimeTypeMapper.XML_MIME_TYPE);
 		
 		cfg = new FilterConfiguration();
 		cfg.configId = "okapi.properties";
@@ -44,47 +46,29 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		cfg.description = "Default properties files.";
 		cfg.filterClass = "net.sf.okapi.filters.properties.PropertiesFilter";
 		cfg.parameters = null;
-		addMapping(cfg, MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		addConfiguration(cfg, MimeTypeMapper.PROPERTIES_MIME_TYPE);
 	}
 	
-	public void addMapping (FilterConfiguration config, String mimeType) {
+	public void addConfiguration (FilterConfiguration config, String mimeType) {
 		configMap.put(config.configId, config);
 		mimeList.add(new MimeConfig(mimeType, config.configId));
 	}
 
+	public IFilter createFilter (String configId) {
+		return createFilter(configId, null);
+	}
+	
 	public IFilter createFilter (String configId,
 		IFilter existingFilter)
-		throws OkapiFilterCreationException
 	{
 		// Get the configuration object for the given configId
 		FilterConfiguration fc = configMap.get(configId);
 		if ( fc == null ) return null;
 		
-		// Check if we can re-use the provided filter
-		IFilter filter = null;
-		if ( existingFilter != null ) {
-			if ( fc.filterClass.equals(existingFilter.getClass().getName()) ) {
-				filter = existingFilter;
-			}
-		}
+		// Instantiate the filter (or re-use one)
+		IFilter filter = instantiateFilter(fc, existingFilter);
 		
-		// Instantiate the filter if needed
-		if ( filter == null ) {
-			try {
-				filter = (IFilter)Class.forName(fc.filterClass).newInstance();
-			}
-			catch ( InstantiationException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
-			}
-		}
-		
-		// Always load the parameters if needed
+		// Always load the parameters (if there are parameters)
 		if ( fc.parameters != null ) {
 			IParameters params = filter.getParameters();
 			if ( params == null ) {
@@ -107,21 +91,44 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 	}
 
 	public IParametersEditor createParametersEditor (String configId) {
+		return createParametersEditor(configId, null);
+	}
+	
+	public IParametersEditor createParametersEditor (String configId,
+		IFilter existingFilter)
+	{
 		FilterConfiguration fc = configMap.get(configId);
 		if ( fc == null ) return null;
-		if ( fc.editorClass == null ) return null;
+		if ( fc.parameters == null ) return null;
+
+		IFilter filter = instantiateFilter(fc, existingFilter);
+
+		// Get the default parameters object
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			return null; // This filter does not have parameters
+		}
+		
+		// Lookup the editor class based on the parameters class
+		String editorClass = editorMap.get(params.getClass().getName());
+		if ( editorClass == null ) return null;
+		
+		// Else: instantiate the editor
 		IParametersEditor editor = null;
 		try {
-			editor = (IParametersEditor)Class.forName(fc.editorClass).newInstance();
+			editor = (IParametersEditor)Class.forName(editorClass).newInstance();
 		}
 		catch ( InstantiationException e ) {
-			// throw exception
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		catch ( IllegalAccessException e ) {
-			// throw exception
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		catch ( ClassNotFoundException e ) {
-			// throw exception
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		return editor;
 	}
@@ -149,7 +156,7 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		return null;
 	}
 
-	public void removeMapping (String configId) {
+	public void removeConfiguration (String configId) {
 		configMap.remove(configId);
 		int found = -1;
 		for ( int i=0; i<mimeList.size(); i++ ) {
@@ -161,14 +168,63 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		if ( found > -1 ) mimeList.remove(found);
 	}
 
+	public IParameters getCustomParameters (FilterConfiguration config) {
+		return getCustomParameters(config, null);
+	}
+
 	/* This default implementation of IFilterConfiguration gets the custom data
 	 * from the current directory at the time the method is called.  
 	 */
 	public IParameters getCustomParameters (FilterConfiguration config,
 		IFilter existingFilter)
-		throws OkapiFilterCreationException
 	{
+		// Instantiate a filter (or re-use one)
+		IFilter filter = instantiateFilter(config, existingFilter);
+
+		// Get the default parameters object
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			return null; // This filter does not have parameters
+		}
+
+		// Load the provided parameter file
+		// In this implementation we assume it is in the current directory
 		File file = new File(config.parameters);
+		params.load(file.getAbsolutePath(), false);
+		return params;
+	}
+
+	public void clearConfigurations() {
+		configMap.clear();
+		mimeList.clear();
+	}
+
+	public void addEditor (String editorClass,
+		String parametersClass)
+	{
+		editorMap.put(parametersClass, editorClass);
+	}
+
+	public void clearEditors () {
+		editorMap.clear();
+	}
+
+	public void removeEditor (String editorClass) {
+		String found = null;
+		for ( String key : editorMap.keySet() ) {
+			if ( editorMap.get(key).equals(editorClass) ) {
+				found = key;
+				break;
+			}
+		}
+		if ( found != null ) {
+			editorMap.remove(found);
+		}
+	}
+
+	private IFilter instantiateFilter (FilterConfiguration config,
+		IFilter existingFilter)
+	{
 		IFilter filter = null;
 		if ( existingFilter != null ) {
 			if ( config.filterClass.equals(existingFilter.getClass().getName()) ) {
@@ -180,26 +236,18 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 				filter = (IFilter)Class.forName(config.filterClass).newInstance();
 			}
 			catch ( InstantiationException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+				throw new OkapiFilterCreationException(
+					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
 			}
 			catch ( IllegalAccessException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+				throw new OkapiFilterCreationException(
+					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
 			}
 			catch ( ClassNotFoundException e ) {
-				throw new OkapiFilterCreationException("Cannot instantiate the filter ", e);
+				throw new OkapiFilterCreationException(
+					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
 			}
 		}
-		IParameters params = filter.getParameters();
-		if ( params == null ) {
-			return null; // This filter does not have parameters
-		}
-		params.load(file.getAbsolutePath(), false);
-		return params;
+		return filter;
 	}
-
-	public void clear() {
-		configMap.clear();
-		mimeList.clear();
-	}
-
 }

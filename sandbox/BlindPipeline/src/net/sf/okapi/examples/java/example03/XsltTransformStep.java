@@ -23,7 +23,7 @@ public class XsltTransformStep extends BasePipelineStep {
 	private boolean isDone;
 	
 	public XsltTransformStep (InputStream xstlInputstream) {
-		isDone = false;
+		isDone = true;
 		this.xstlInputstream = xstlInputstream;
 	}
 
@@ -35,9 +35,16 @@ public class XsltTransformStep extends BasePipelineStep {
 		return "Applies an XSLT template to the document.";
 	}
 	
-	/**
-	 * handler takes a 
-	 */
+	@Override
+	protected void handleStartBatch (Event event) {
+		isDone = true;
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		isDone = false;
+	}
+	
 	@Override
 	protected void handleRawDocument(Event event) {
 		
@@ -73,6 +80,6 @@ public class XsltTransformStep extends BasePipelineStep {
 	}
 
 	public boolean isDone() {
-		return !isDone;
+		return isDone;
 	}
 }

@@ -31,6 +31,11 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	}
 
 	@Override
+	protected void handleStartBatch (Event event) {
+		isDone = true;
+	}
+	
+	@Override
 	protected void handleStartBatchItem (Event event) {
 		isDone = false;
 	}

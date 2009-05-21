@@ -6,7 +6,7 @@ import java.util.List;
 
 import net.sf.okapi.common.resource.RawDocument;
 
-public class PipelineDriver {
+public class PipelineDriver implements IPipelineDriver {
 	
 	private IPipeline pipeline;
 	private List<IDocumentData> inputItems;
@@ -132,7 +132,7 @@ public class PipelineDriver {
 		inputItems.add(dd);
 	}
 	
-	public void resetInputs () {
+	public void resetItems () {
 		inputItems.clear();
 	}
 	

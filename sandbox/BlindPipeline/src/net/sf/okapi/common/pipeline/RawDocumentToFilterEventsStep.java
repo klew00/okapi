@@ -44,7 +44,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	public RawDocumentToFilterEventsStep () {
 	}
 	
-	public RawDocumentToFilterEventsStep(IFilter filter) {
+	public RawDocumentToFilterEventsStep (IFilter filter) {
 		this.filter = filter;
 	}
 
@@ -70,15 +70,19 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	
 	@Override
 	public Event handleEvent (Event event) {
-		if ( event.getEventType() == EventType.START_BATCH_ITEM ) {
+		switch ( event.getEventType() ) {
+		case START_BATCH:
+			isDone = true;
+			break;
+
+		case START_BATCH_ITEM:
 			// Needed because the process() method of the pipeline expects
 			// hasEvents to be set to true to prime things.
 			isDone = false;
 			return event;
-		}
 		
 		// Initialize the filter on RAW_DOCUMENT
-		if ( event.getEventType() == EventType.RAW_DOCUMENT ) {
+		case RAW_DOCUMENT:
 			if ( getContext().getFilterConfiguration(0) != null ) {
 				// Get the filter to use
 				filter = getContext().getFilterConfigurationMapper().createFilter(

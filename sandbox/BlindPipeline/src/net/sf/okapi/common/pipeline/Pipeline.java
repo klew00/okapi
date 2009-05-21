@@ -90,7 +90,7 @@ public class Pipeline implements IPipeline {
 		while ( !steps.isEmpty() && !cancel ) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while ( steps.getFirst().isDone() && !cancel ) {
+			while ( !steps.getFirst().isDone() && !cancel ) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
 				for ( IPipelineStep step : steps ) {
@@ -139,7 +139,7 @@ public class Pipeline implements IPipeline {
 		for ( IPipelineStep step : steps ) {
 			step.handleEvent(e);
 		}
-		
+
 		// Prime the pipeline with the input Event and run it to completion.
 		execute(input);
 		// Copy any remaining steps into finishedSteps - makes initialization

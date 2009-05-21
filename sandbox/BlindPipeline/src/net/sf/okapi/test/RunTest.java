@@ -54,7 +54,7 @@ public class RunTest {
 		fc.name = "My Properties Files Config";
 		fc.description = "properties file with key names that includes 'text'";
 		fc.parameters = "okapi.properties-TextKeysOnly.fprm";
-		fcMapper.addMapping(fc, MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		fcMapper.addConfiguration(fc, MimeTypeMapper.PROPERTIES_MIME_TYPE);
 
 		driver = new PipelineDriver();
 	}
@@ -74,7 +74,7 @@ public class RunTest {
 	}
 	
 	private void feedDriver () {
-		driver.resetInputs();
+		driver.resetItems();
 		if ( driver.inputCountRequested() > 3 ) {
 			throw new RuntimeException("Application does not support more than 3 input at the same time.");
 		}
