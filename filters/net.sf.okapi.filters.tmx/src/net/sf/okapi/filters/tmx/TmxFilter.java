@@ -52,7 +52,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -74,17 +73,16 @@ public class TmxFilter implements IFilter {
 	private LinkedList<Event> queue;	
 	private boolean canceled;
 	private GenericSkeleton skel;	
-	private TextUnit tu;
+	//private TextUnit tu;
 	private String encoding;	
 	private Parameters params;
 	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	
-	private enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
+	public enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
 	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
-	private String currentLang;					//--current language processed in the TU
-	private boolean targetExists= false;
+
 	
 	private HashMap<String,String> rulesMap = new HashMap<String,String>();
 	private Stack<String> elemStack=new Stack<String>();
@@ -321,6 +319,16 @@ public class TmxFilter implements IFilter {
 			switch ( eventType ) {
 			case XMLStreamConstants.START_ELEMENT:
 				if (reader.getLocalName().equals("tu")){
+					
+					// Make a document part with skeleton between the previous event and now.
+					// Spaces can go with trans-unit to reduce the number of events.
+					// This allows to have only the trans-unit skeleton parts with the TextUnit event
+					if ( !skel.isEmpty(true) ) {
+						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+						skel = new GenericSkeleton(); // And create a new skeleton for the next event
+						queue.add(new Event(EventType.DOCUMENT_PART, dp));
+					}
+					
 					return processTranslationUnit();
 				}else{
 					storeStartElement();
@@ -406,7 +414,8 @@ public class TmxFilter implements IFilter {
 		skel.append(">");
 	}
 	
-	private void storeTuStartElement () {
+/*	private void storeTuStartElement () {
+		
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
 			skel.append("<"+reader.getLocalName());
@@ -441,7 +450,7 @@ public class TmxFilter implements IFilter {
 			}			
 		}
 		skel.append(">");
-	}	
+	}*/	
 	
 	private void storeEndElement () {
 		String ns = reader.getPrefix();
@@ -451,33 +460,52 @@ public class TmxFilter implements IFilter {
 		else {
 			skel.append("</"+ns+":"+reader.getLocalName()+">");
 		}
-	}	
+	}
 	
 
-	private boolean processTuDocumentPart(){
-		storeTuStartElement();		
-		String startElement = reader.getLocalName();
+	/**
+	 * Processes notes or properties skeletizing start, content, and end element  
+	 * @param tmxTu The TmxTu helper for the current tu.
+	 * @return true for success and false for failure.
+	 */	
+	private boolean processTuDocumentPart(TmxTu tmxTu){
+		
+		String propName = "";							//used for <prop> elements to get the value of type to be used as prop name
+		String startElement = reader.getLocalName();	//prop or note
+		
+		if(tuvTrgType == TuvXmlLang.UNDEFINED){
+			//determine the property name and add skel to TmxTu
+			propName = tmxTu.parseStartElement(reader,startElement);
+		}else if (tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
+			//determine the property name and add skel to TmxTuv
+			propName = tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, startElement);
+		}
+		
 		try {
 			while(reader.hasNext()){
 				int eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
 					 //TODO: Check if it's ok to not check for unsupported chars
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
-					//--set the properties depending on the tuvTrgType--
+					//--append skel and set the properties depending on the tuvTrgType--
 					if(tuvTrgType == TuvXmlLang.UNDEFINED){
-						tu.setProperty(new Property(startElement, reader.getText(), true));
-					}else if(tuvTrgType == TuvXmlLang.SOURCE){
-						tu.setSourceProperty(new Property(startElement, reader.getText(), true));	
-					}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-						tu.setTargetProperty(currentLang, new Property(startElement, reader.getText(), true));
+						tmxTu.appendToSkel(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+						tmxTu.addProp(new Property(propName, reader.getText(), true));
+					}else if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
+						tmxTu.curTuv.skelBefore.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+						tmxTu.curTuv.setProperty(new Property(propName, reader.getText(), true));
 					}else if(tuvTrgType == TuvXmlLang.OTHER){
-						tu.setProperty(new Property(startElement, reader.getText(), true));
+						tmxTu.curTuv.skelBefore.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					}
 					break;
 				case XMLStreamConstants.END_ELEMENT:
-					if(reader.getLocalName().equals(startElement)){
-						storeEndElement();
+					if(reader.getLocalName().equalsIgnoreCase(startElement)){
+						//--append skel depending on the tuvTrgType--
+						if(tuvTrgType == TuvXmlLang.UNDEFINED){
+							tmxTu.parseEndElement(reader, true);
+						}else if (tuvTrgType == TuvXmlLang.UNDEFINED || tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
+							tmxTu.curTuv.parseEndElement(reader,true);
+						}
 						return true;
 					}
 					break;
@@ -489,31 +517,36 @@ public class TmxFilter implements IFilter {
 		}
 	}	
 	
+	
 	/**
 	 * Process a segment <seg>*</seg>, appending the skeleton to skel and adding the properties to nameable and reference to tu 
 	 */			
-	private boolean processSeg(TextUnit pTu, GenericSkeleton pSkel){
+	private boolean processSeg(TmxTu tmxTu){
 		
 		int id = 0;
 		//Stack<Integer> idStack = new Stack<Integer>();
 		//idStack.push(id);		
-		int eventType;
-		String localName;
+		
+		String curLocalName;
 		
 		//--determine which container to use--
 		TextContainer tc;
 		if(tuvTrgType == TuvXmlLang.SOURCE){
-			tc = pTu.getSource();
+			//tc = pTu.getSource();
+			tc = tmxTu.curTuv.tc;
 		}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-			tc = pTu.setTarget(currentLang, new TextContainer());
+			//tc = pTu.setTarget(currentLang, new TextContainer());
+			tc = tmxTu.curTuv.tc;
 		}else{
 			tc=null;
 		}
 		
-		storeTuStartElement();							//store the <seg> element with it's properties
-		String startElement = reader.getLocalName();	//need this variable to locate the ending </seg> element
+		//storeTuStartElement();							//store the <seg> element with it's properties
+		tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets);
+		
 		try {
 			while(reader.hasNext()){					//loop through the <seg> content
+				int eventType;
 				eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
@@ -524,61 +557,57 @@ public class TmxFilter implements IFilter {
 						tc.append(reader.getText());	//add to source or target container
 					}else{ 			
 						//TODO: Check if it's ok to not check for unsupported chars
-						pSkel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));	//add to skeleton
+						tmxTu.curTuv.appendToSkel(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
 					}
 					break;
 					
 				case XMLStreamConstants.START_ELEMENT:		
 
-					localName = reader.getLocalName().toLowerCase();
-					if(!isValidElement(elemStack.peek(),localName,true)){
+					curLocalName = reader.getLocalName().toLowerCase();
+					if(!isValidElement(elemStack.peek(),curLocalName,true)){
 						//--throws OkapiBadFilterInputException if not valid--
 					}
 			
-					elemStack.push(localName);
+					elemStack.push(curLocalName);
 					
 					if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-						if(localName.equals("hi")){
+						if(curLocalName.equals("hi")){
 							String typeAttr = getTypeAttribute();
 							tc.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
-						}else if(localName.equals("ph") || localName.equals("it")){
-							appendCode(TagType.PLACEHOLDER, ++id, localName, tc);
-						}else if(localName.equals("bpt")){
-							appendCode(TagType.OPENING, ++id, localName, tc);
-						}else if(localName.equals("ept")){
-							appendCode(TagType.CLOSING, ++id, localName, tc);
+						}else if(curLocalName.equals("ph") || curLocalName.equals("it")){
+							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, tc);
+						}else if(curLocalName.equals("bpt")){
+							appendCode(TagType.OPENING, ++id, curLocalName, tc);
+						}else if(curLocalName.equals("ept")){
+							appendCode(TagType.CLOSING, ++id, curLocalName, tc);
 						}
 						break;
 					}else{
-						//TODO: handle any remaining inline tags
-						storeStartElement();
+						tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets);
 					}
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 					
-					localName = reader.getLocalName().toLowerCase();
-					elemStack.pop();					
+					curLocalName = reader.getLocalName();		//current element
+					elemStack.pop();						//pop one element
 					
-					if(reader.getLocalName().equals(startElement)){
-						if(tuvTrgType == TuvXmlLang.SOURCE){
-							pSkel.addContentPlaceholder(pTu, null);
-						}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-							pSkel.addContentPlaceholder(pTu, currentLang);
-						}
-						storeEndElement();
+					if(curLocalName.equalsIgnoreCase("seg")){	//end of seg
+										
+						tmxTu.curTuv.finishedSegSection=true;
+						tmxTu.curTuv.parseEndElement(reader);
+
 						return true;
 					}else{
 						if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
-							if(localName.equals("hi")){
+							if(curLocalName.equals("hi")){
 								tc.append(TagType.CLOSING, "hi","</hi>");	
 							}						
 						}else{
-							storeEndElement();
+							tmxTu.curTuv.parseEndElement(reader, true);
 							break;
 						}
 					}
-					
 				}
 			}
 			return false;
@@ -593,96 +622,66 @@ public class TmxFilter implements IFilter {
 	 */		
 	private boolean processTranslationUnit(){
 		
-		int countTuvs=0;
-		
-		// Make a document part with skeleton between the previous event and now.
-		// Spaces can go with trans-unit to reduce the number of events.
-		// This allows to have only the trans-unit skeleton parts with the TextUnit event
-		if ( !skel.isEmpty(true) ) {
-			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
-			skel = new GenericSkeleton(); // And create a new skeleton for the next event
-			queue.add(new Event(EventType.DOCUMENT_PART, dp));
-		}
-		
-		tu = new TextUnit(String.valueOf(++tuId));
-		
-		
-		storeTuStartElement();
+		String currentLang;
+		TmxTu tmxTu = new TmxTu(srcLang, trgLang, lineBreak);	//create the TmxTu helper
+		tmxTu.parseStartElement(reader);						//add to TmxTu skelBefore
 
-		String localName;
+		String curLocalName;
+		
 		try {
 			while(reader.hasNext()){
 				
 				int eventType = reader.next();
 				switch ( eventType ) {
-
+				
 				case XMLStreamConstants.COMMENT:
-					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
+					//appends to either TmxTu or TmxTuv depending on tuvTrgType and skelBefore or skelAfter depending on flags
+					tmxTu.smartAppendToSkel(tuvTrgType, "<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
 					break;
-					
-				case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+				case XMLStreamConstants.CHARACTERS: 
+					//TODO: Check if it's ok to not check for unsupported chars
+					//appends to either TmxTu or TmxTuv depending on tuvTrgType and skelBefore or skelAfter depending on flags					
+					tmxTu.smartAppendToSkel(tuvTrgType, Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));					
 					break;
 				case XMLStreamConstants.START_ELEMENT:
 
-					localName = reader.getLocalName().toLowerCase(); 
-					if(localName.equals("note") || localName.equals("prop")){
+					curLocalName = reader.getLocalName(); 
+					if(curLocalName.equalsIgnoreCase("note") || curLocalName.equalsIgnoreCase("prop")){
 						//Todo: handle true/false
-						processTuDocumentPart();
+						processTuDocumentPart(tmxTu);
 					}else if(reader.getLocalName().equals("tuv")){
 						
 						currentLang = getXmlLangFromCurTuv();
-
-						if(currentLang.toLowerCase().equals(trgLang.toLowerCase())){
-							targetExists=true;
-						}
-						
 						tuvTrgType = getTuvTrgType(currentLang);
-						//currentLang=reader.getAttributeValue(0).toLowerCase();
-						storeTuStartElement();
+						
+						TmxTuv tmxTuv = tmxTu.addTmxTuv(currentLang,tuvTrgType);
+						tmxTuv.parseStartElement(reader,tuvTrgType, params.processAllTargets);
 						
 					}else if(reader.getLocalName().equals("seg")){
 						elemStack.push("seg");
-						processSeg(tu, skel);
+						processSeg(tmxTu);
 					}
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
 
-					localName = reader.getLocalName().toLowerCase(); 
-
-					if(localName.equals("tu")){
+					curLocalName = reader.getLocalName(); 
+					if(curLocalName.equalsIgnoreCase("tu")){
 						
-						//--TMX RULE: Make sure each <tu> contains at least one <tuv>--
-						if(countTuvs<1){
-							throw new OkapiBadFilterInputException("Each <tu> requires at least one <tuv>");							
-						}
+						tmxTu.parseEndElement(reader);
+						//System.out.println(tmxTu.toString());
 						
-						//--add the resname based on tuid--
-						if(tu.getProperty("tuid")!=null){
-							tu.setName(tu.getProperty("tuid").getValue());
-						}
-
-						//--create new skeleton and close source if target does not exist--
-						if(!targetExists){
-							skel.append("<tuv xml:lang=\""+trgLang+"\"><seg>");
-							skel.addContentPlaceholder(tu, trgLang);
-							skel.append("</seg></tuv>"+lineBreak);
-						}
+						tuId = tmxTu.addPrimaryTextUnitEvent(tuId, params.processAllTargets, queue);
+						tuId = tmxTu.addDuplicateTextUnitEvents(tuId, params.processAllTargets, queue);
 						
-						storeEndElement();
-						tu.setSkeleton(skel);
-						tu.setMimeType("text/xml");
-						
-						
-						queue.add(new Event(EventType.TEXT_UNIT, tu));
+						//--reset--
 						tuvTrgType = TuvXmlLang.UNDEFINED;
-						targetExists=false;
 						return true;
-					}else if(localName.equals("tuv")){
-						countTuvs++;
-						storeEndElement();
-						//TODO: Add finalizing the tuv
+						
+					}else if(curLocalName.equals("tuv")){
+
+						tmxTu.curTuv.parseEndElement(reader);
+
 					}else{
 						//--TMX RULE: Entering here would mean content other than <note>, <prop>, or <tuv> inside the <tu> which is invalid.
 						throw new OkapiBadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
@@ -714,10 +713,6 @@ public class TmxFilter implements IFilter {
 		String localName;
 		
 		try {
-			//--BEGIN SUBFLOW--
-			//int subLevelCounter = 0;
-			//--END SUBFLOW--
-			
 			StringBuilder innerCode = new StringBuilder();
 			StringBuilder outerCode = null;
 			outerCode = new StringBuilder();
@@ -830,9 +825,9 @@ public class TmxFilter implements IFilter {
 	 */		
 	private TuvXmlLang getTuvTrgType(String pLang){
 
-		if (pLang.toLowerCase().equals(srcLang.toLowerCase())){
+		if (pLang.equalsIgnoreCase(srcLang)){
 			return TuvXmlLang.SOURCE; 
-		}else if (pLang.toLowerCase().equals(trgLang.toLowerCase())){
+		}else if (pLang.equalsIgnoreCase(trgLang)){
 			return TuvXmlLang.TARGET;
 		}else{ 
 			return TuvXmlLang.OTHER;
