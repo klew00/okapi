@@ -21,42 +21,38 @@
 package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.filters.LocalizationDirectives;
 
 /**
- * Parameters of the Plain Text Filter 
+ * Plain Text Filter parameters 
  */
 
-public class ParametersPT extends BaseParameters {
-			
-	/**
-	 * Java regex rule used to extract lines of text.<p>Default: "^(.*?)$". 
-	 */
-	public String rule;
-	
-	/**
-	 * Java regex capturing group denoting text to be extracted.<p>Default: 1.
-	 */
-	public int sourceGroup;
-	
-	/**
-	 * Java regex options.<p>Default: Pattern.MULTILINE.
-	 */
-	public int regexOptions;
-							
+public class Parameters extends BaseParameters {
+
+	public boolean preserveWS;
+	public boolean useCodeFinder;
+	public LocalizationDirectives locDir;
+	public InlineCodeFinder codeFinder;
+
 //----------------------------------------------------------------------------------------------------------------------------	
 	
-	public ParametersPT() {
-		super();		
+	public Parameters() {
+		super();
+		locDir = new LocalizationDirectives();
+		codeFinder = new InlineCodeFinder();
 		
 		reset();
 		toString(); // fill the list
 	}
 
-	public void reset() {		
+	public void reset() {
+		locDir.reset();
+		codeFinder.reset();
+		
 		// All parameters are set to defaults here
-		rule = PlainTextFilter.DEF_RULE;
-		sourceGroup = PlainTextFilter.DEF_GROUP;		
-		regexOptions = PlainTextFilter.DEF_OPTIONS; 
+		preserveWS = true;
+		useCodeFinder = false;
 	}
 
 	public void fromString(String data) {
@@ -65,9 +61,12 @@ public class ParametersPT extends BaseParameters {
 		buffer.fromString(data);
 		
 		// All parameters are retrieved here
-		rule =  buffer.getString("rule", PlainTextFilter.DEF_RULE);
-		sourceGroup = buffer.getInteger("sourceGroup", PlainTextFilter.DEF_GROUP);		
-		regexOptions = buffer.getInteger("regexOptions", PlainTextFilter.DEF_OPTIONS);
+		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
+		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
+		locDir.setOptions(tmpBool1, tmpBool2);
+		
+		preserveWS = buffer.getBoolean("preserveWS", true);
+		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
 	}
 	
 	@Override
@@ -75,9 +74,11 @@ public class ParametersPT extends BaseParameters {
 		buffer.reset();
 		
 		// All parameters are set here
-		buffer.setString("rule", rule);
-		buffer.setInteger("sourceGroup", sourceGroup);		
-		buffer.setInteger("regexOptions", regexOptions);
+		buffer.setBoolean("useLD", locDir.useLD());
+		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
+		
+		buffer.setBoolean("preserveWS", preserveWS);
+		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		
 		return buffer.toString();
 	}
