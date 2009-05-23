@@ -263,7 +263,10 @@ public class PlainTextFilter implements IFilter {
 			codeFinder = prm.codeFinder;
 			
 			if (codeFinder == null) useCodeFinder = false;
-			if (useCodeFinder) codeFinder.compile();						
+			if (useCodeFinder) {
+				codeFinder.addRule(prm.regularExpressionForEmbeddedMarkup);
+				codeFinder.compile();						
+			}
 		}
 		
 		queue = new LinkedList<Event>();

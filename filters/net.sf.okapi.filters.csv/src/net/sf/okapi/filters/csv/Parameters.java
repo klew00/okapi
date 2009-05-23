@@ -49,6 +49,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	
 	/**
 	 * Specifies whether empty TUs are created for empty field values.<p>
+	 * This option is active only if detectColumnsMode = DETECT_COLUMNS_NONE, otherwise empty TUs are always created.<p>
 	 * Default: true (create empty TUs)
 	 */
 	public boolean sendEmptyFields = true;
@@ -66,7 +67,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	public int valuesStartRaw = 2;
 	
 	/**
-	 * The filter can detect number of columns in the input. This option specifies the way of number of column detection:
+	 * The filter can detect number of columns in the input. This option specifies the way of columns number detection:
 	 * <li>DETECT_COLUMNS_NONE = 0 - no detection is performed, if different raws contain different number of values, then different 
 	 * number of TUs will be sent for different raws  
 	 * <li>DETECT_COLUMNS_FIELD_NAMES = 1 - number of columns is determined by the number of field names listed in the raw 
@@ -118,7 +119,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	public String textQualifier = "\"";
 	
 	/** 
-	 * Indicates which columns contain ID. Can be represented by one of the following:
+	 * Indicates which columns contain ID. Can be represented by one of the following string types:
 	 *<li>"1" - index (1-based) of the column, containing ID
 	 *<li>"ID" - name of the column, containing ID
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing ID
@@ -128,7 +129,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	public String idColumns = "";			
 	
 	/** 
-	 * Indicates which columns contain source text. Can be represented by one of the following:
+	 * Indicates which columns contain source text. Can be represented by one of the following string types:
 	 *<li>"1" - index (1-based) of the column, containing source text
 	 *<li>"ID" - name of the column, containing source text
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text
@@ -138,7 +139,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	public String sourceColumns = "";		
 	
 	/** 
-	 * Indicates which columns contain target text. Can be represented by one of the following:
+	 * Indicates which columns contain target text. Can be represented by one of the following string types:
 	 *<li>"1" - index (1-based) of the column, containing target text
 	 *<li>"ID" - name of the column, containing target text
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing target text
@@ -148,7 +149,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.Parameters {
 	public String targetColumns = "";		
 	
 	/** 
-	 * Indicates which columns contain comments. Can be represented by one of the following:
+	 * Indicates which columns contain comments. Can be represented by one of the following string types:
 	 *<li>"1" - index (1-based) of the column, containing a comment
 	 *<li>"ID" - name of the column, containing a comment
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing comments

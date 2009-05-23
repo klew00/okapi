@@ -29,9 +29,11 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
  */
 
 public class Parameters extends BaseParameters {
-
+		
 	public boolean preserveWS;
 	public boolean useCodeFinder;
+	public String regularExpressionForEmbeddedMarkup;
+	
 	public LocalizationDirectives locDir;
 	public InlineCodeFinder codeFinder;
 
@@ -50,9 +52,14 @@ public class Parameters extends BaseParameters {
 		locDir.reset();
 		codeFinder.reset();
 		
+		// Default in-line codes: special escaped-chars and printf-style variable
+		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
+		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+		
 		// All parameters are set to defaults here
 		preserveWS = true;
 		useCodeFinder = false;
+		regularExpressionForEmbeddedMarkup = "";
 	}
 
 	public void fromString(String data) {
@@ -67,6 +74,7 @@ public class Parameters extends BaseParameters {
 		
 		preserveWS = buffer.getBoolean("preserveWS", true);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
+		regularExpressionForEmbeddedMarkup = buffer.getString("regularExpressionForEmbeddedMarkup", "");
 	}
 	
 	@Override
@@ -79,6 +87,7 @@ public class Parameters extends BaseParameters {
 		
 		buffer.setBoolean("preserveWS", preserveWS);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
+		buffer.setString("regularExpressionForEmbeddedMarkup", regularExpressionForEmbeddedMarkup);
 		
 		return buffer.toString();
 	}
