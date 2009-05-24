@@ -125,7 +125,22 @@ public class OpenXMLSnippetsTest {
 		snappet = generateOutput(getEvents(snippet, MSEXCEL), snippet);
 		assertEquals(snappet, snippet);
 	}
-	/*
+
+/*
+	@Test this has to be tested in OpenXMLFilter
+	public void testSquishSpace() {
+		String snippet = "<w:p><w:r><w:t space=\"preserve\">a </w:t></w:r><w:r><w:t>dog</w:t></w:r></w:p>";
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, "<w:p><w:r><w:t space=\"preserve\">a dog</w:t></w:r></w:p>");
+	}
+
+	@Test this has to be tested in OpenXMLFilter
+	public void testSquishRsid() {
+		String snippet = "<w:p w:rsidR=\"00126310\" w:rsidRDefault=\"00AE7E85\"><w:r w:rsidR=\"00402C87\"><w:t>pickle</w:t></w:r></w:p>";
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, "<w:p><w:r><w:t>pickle</w:t></w:r></w:p>");
+	}
+
 	@Test
 	public void testComplexEmptyElement() {
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
