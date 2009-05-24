@@ -224,9 +224,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		PipedInputStream piis=null;
 //		final PipedOutputStream pios = new PipedOutputStream();
-		try {
+		try
+		{
 			piis = new PipedInputStream(pios);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			LOGGER.log(Level.SEVERE,"Can't read piped input stream.");
 			throw new OkapiIOException("Can't read piped input stream.");
 		}		
@@ -241,7 +244,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	      String r1b4text="",r1aftext="",t1="";
 	      String r2b4text="",r2aftext="",t2="";
 	      int i,n;
-	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false,bInr=false,bB4text=true,bInInnerR=false;
+	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false;
+	      boolean bInsideTextMarkers=false,bInr=false,bB4text=true,bInInnerR=false;
 	      public void run()
 	      {
 	        try
@@ -316,16 +320,29 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	    			  curtext = curtext + c;
 	    	  }
 	      }
-	      private void havatag(String tug,String tugname)
+	      private void havatag(String snug,String tugname) // DWH 5-16-09 snug was tug
 	      {
+	    	  String tug=snug; // DWH 5-16-09
+	    	  String b4text; // DWH 5-20-09
+	    	  boolean bCollapsing=false; // DWH 5-22-09
 	    	  if (tugname.equals("w:p") || tugname.equals("a:p"))
 	    	  {
+	    		  tug = killRevisionIDsAndErrs(snug);
 	    		  onp = tug;
-	    		  bInap = true;
-	    		  bInr = false;
-	    		  bInInnerR = false; // DWH 3-9-09
-	    		  bHavr1 = false;
-	    		  bB4text = false;
+	    		  if (tug.equals("<w:p/>"))
+	    		  {
+	    			  bInap = false; // DWH 5-30-09
+	    			  offp += tug; // DWH 5-30-09
+	    			  streamTheCurrentStuff();
+	    		  }
+	    		  else
+	    		  {
+		    		  bInap = true;
+		    		  bInr = false;
+		    		  bInInnerR = false; // DWH 3-9-09
+		    		  bHavr1 = false;
+		    		  bB4text = false;
+	    		  }
 	    	  }
 	    	  else if (tugname.equals("/w:p") || tugname.equals("/a:p"))
 	    	  {
@@ -333,10 +350,21 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	    		  bInap = false;
 	    		  streamTheCurrentStuff();
 	    	  }
+	    	  else if (tugname.equals("w:t") || tugname.equals("a:t")) // DWH 5-18-09
+	    	  {
+	    		  bInsideTextMarkers = true;
+	    		  innanar(tug);
+	    	  }
+	    	  else if (tugname.equals("/w:t") || tugname.equals("/a:t")) // DWH 5-18-09
+	    	  {
+	    		  bInsideTextMarkers = false;
+	    		  innanar(tug);
+	    	  }
 	    	  else if (bInap)
 	    	  {
 		    	  if (tugname.equals("w:r") || tugname.equals("a:r"))
 		    	  {
+		    		  tug = killRevisionIDsAndErrs(snug);
 		    		  if (bInr)
 		    		  {
 		    			  bInInnerR = true; // DWH 3-2-09 ruby text has embedded <w:r> codes
@@ -365,15 +393,50 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			    		  if (bHavr1)
 			    		  {
 			    			  r2aftext = r2aftext + tug;
-			    			  if (r1b4text.equals(r2b4text) && r2aftext.equals(r2aftext))
+//			    			  if (r1b4text.equals(r2b4text) && r1aftext.equals(r2aftext))
+			    			  if (r1aftext.equals(r2aftext))
 			    			  {
-			    				  t1 = t1 + t2;
-			    				  r2b4text = "";
-			    				  r2aftext = "";
-			    				  t2 = "";
+			    				  bCollapsing = false;
+			    				  b4text = r1b4text;
+			    				  if (r1b4text.equals(r2b4text))
+			    					  bCollapsing = true;
+			    				  else
+			    				  {
+			    					  int ndx = r1b4text.indexOf(":t xml:space=\"preserve\"");
+			    					  if (ndx>-1)
+			    					  {
+			    						  if (r2b4text.equals(
+			    							  r1b4text.substring(0,ndx)+":t"+r1b4text.substring(ndx+23)))
+			    						  {
+			    							  bCollapsing = true;
+		    								  b4text = r1b4text; // choose one with preserve
+			    						  }
+			    					  }
+			    					  ndx = r2b4text.indexOf(":t xml:space=\"preserve\"");
+			    					  if (ndx>-1)
+			    					  {
+			    						  if (r1b4text.equals(
+			    							  r2b4text.substring(0,ndx)+":t"+r2b4text.substring(ndx+23)))
+			    						  {
+			    							  bCollapsing = true;
+		    								  b4text = r2b4text; // choose one with preserve
+			    						  }
+			    					  }			    					  
+			    				  }
+			    				  if (bCollapsing)
+			    				  {
+				    				  r1b4text = b4text; // DWH 5-22-09
+			    					  t1 = t1 + t2;
+				    				  r2b4text = "";
+				    				  r2aftext = "";
+				    				  t2 = "";
+			    				  }
+			    				  else
+				    				  streamTheCurrentStuff(); // DWH 5-22-09
 			    			  }
 			    			  else
 			    				  streamTheCurrentStuff();
+			    			        // tug is added by "r1aftext=r1aftext+tug" below or "r2aftext=r2aftext+tug" above
 			    		  }
 			    		  else
 			    		  {
@@ -391,7 +454,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		    		  		     // then puts current tag in onp to be output next 
 		    	  }
 	    	  }
-	    	  else
+	    	  else if (tugname.equalsIgnoreCase("w:sectPr") ||
+	    			   tugname.equalsIgnoreCase("a:sectPr"))
+	    	  {
+	    		  tug = killRevisionIDsAndErrs(tug);
+	    		  rat(tug);
+	    	  }
+	    	  else	    	  
 				rat(tug);
 	      }
 	      private void innanar(String tug)
@@ -411,12 +480,93 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
     				  r1aftext = r1aftext + tug;
     		  }	    	  
 	      }
+	      private String killRevisionIDsAndErrs(String tug) // DWH 5-16-09
+	      {
+	    	  String tigger;
+	    	  if (configurationType==MSWORD)
+	    		  tigger = killRevisionIDs(tug);
+	    	  else // this will be MSPOWERPOINT
+	    		  tigger=killErrs(tug);
+	    	  return tigger;
+	      }
+	      private String killRevisionIDs(String tug) // DWH 5-16-09 remove rsid attributes
+	      {
+	    	  String snug=tug;
+	    	  String shrug="";
+	    	  String slug;
+	    	  int ndx;
+	    	  while ((ndx=snug.indexOf(" w:rsid"))>-1)
+	    	  {
+	    		  shrug += snug.substring(0,ndx); // include all before the w:rsid
+	    		  snug = snug.substring(ndx); // look only at string starting with w:rsid
+	    		  slug = snug.substring(1);
+	    		  ndx = slug.indexOf(' ');
+	    		  if (ndx>-1)
+	    			  snug = slug.substring(ndx); // remove the rsid up to first space
+	    		  else
+	    		  {
+	    			  ndx = slug.indexOf("/>");
+	    			  if (ndx>-1)
+	    				  snug = snug.substring(ndx+1);
+	    			  else
+	    			  {
+		    			  ndx = slug.indexOf('>');
+		    			  if (ndx>-1)
+		    				  snug = snug.substring(ndx+1);	    				  
+	    			  }
+	    			  break;
+	    		  }
+	    	  }
+	    	  shrug += snug; // add whatever is left
+	    	  return shrug;
+	      }
+	      private String killErrs(String tug) // DWH 5-16-09 remove err= attribute
+	      {
+	    	  String snug=tug;
+	    	  String shrug="";
+	    	  String slug;
+	    	  int ndx;
+	    	  if ((ndx=snug.indexOf(" err="))>-1)
+	    	  {
+	    		  shrug += snug.substring(0,ndx); // include all before the w:rsid
+	    		  snug = snug.substring(ndx); // look only at string starting with w:rsid
+	    		  slug = snug.substring(1);
+	    		  ndx = slug.indexOf(' ');
+	    		  if (ndx>-1)
+	    			  snug = slug.substring(ndx); // remove the err=
+	    		  else
+	    		  {
+	    			  ndx = slug.indexOf("/>");
+	    			  if (ndx>-1)
+	    				  snug = snug.substring(ndx+1);
+	    			  else
+	    			  {
+		    			  ndx = slug.indexOf('>');
+		    			  if (ndx>-1)
+		    				  snug = snug.substring(ndx+1);	    				  
+	    			  }
+	    		  }
+	    	  }
+    		  shrug += snug;
+	    	  return shrug; // add whatever is left
+	      }
 	      private void havtext(String curtext)
 	      {
 	    	  if (bInap)
 	    	  {
-		    	  if (bInInnerR) // DWH 3-2-09 (just the condition) ruby text has embedded <w:r> codes
-		    		  innanar(curtext);
+		    	  if (bInInnerR || !bInsideTextMarkers)
+		    	  {
+		    		    // DWH 3-2-09 (just the condition) ruby text has embedded <w:r> codes
+		    		    // DWH 5-18-09 has to be inside text markers to be counted as text 
+		    		  if (bInr) // DWH 5-21-09
+		    			  innanar(curtext);
+		    		  else
+		    		  {
+		    			  streamTheCurrentStuff(); // DWH 5-21-09 if not in a text run
+		    			  streamTheCurrentStuff(); // DWH 5-21-09 put out previous text runs
+		    			  onp = curtext; // DWH 5-21-09 treat this as new material in p
+		    		  }
+		    	  }
 		    	  else
 		    	  {
 		    		  bB4text = false;
@@ -1172,7 +1322,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				((/*text.equals("<w:r><w:t>") || */text.equals("<w:r><w:t xml:space=\"preserve\">")) ||
 				 (/*text.equals("<a:r><a:t>") || */text.equals("<a:r><a:t xml:space=\"preserve\">"))))
 			{
-				bIgnoredPreRun = true; // don't put codes around text that has not attributes
+				bIgnoredPreRun = true; // don't put codes around text that has no attributes
 				trTextRun = null;
 				return;
 			}
