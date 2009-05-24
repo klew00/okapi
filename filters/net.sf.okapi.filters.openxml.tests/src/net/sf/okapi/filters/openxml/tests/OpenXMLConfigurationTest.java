@@ -67,10 +67,12 @@ public class OpenXMLConfigurationTest {
 */
 		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
 		rules = new TaggedFilterConfiguration(url);	
-		assertEquals(rules.getMainRuleType("t"), TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
-		assertEquals(rules.getMainRuleType("sheet"), TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		attributes = new HashMap<String, String>();
 		assertTrue(rules.isTranslatableAttribute("table", "name", attributes));
+
+		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/excelCommentConfiguration.yml");
+		rules = new TaggedFilterConfiguration(url);	
+		assertEquals(rules.getMainRuleType("t"), TaggedFilterConfiguration.RULE_TYPE.TEXT_MARKER_ELEMENT);
 
 		url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/powerpointConfiguration.yml");
 		rules = new TaggedFilterConfiguration(url);	
