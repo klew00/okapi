@@ -85,44 +85,77 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		int context)
 	{
 		String sTuff; // DWH 4-8-09
+		String text=tf.toString(); // DWH 5-18-09
 		boolean bInBlankText=false; // DWH 4-8-09
 		int nSurroundingCodes=0; // DWH 4-8-09
 		// Output simple text
 		if ( !tf.hasCode() ) {
-			if (context==1)
+			if (text.length()>0)
 			{
-				if (configurationType==MSWORD)
-					sTuff = "<w:r><w:t xml:space=\"preserve\">"+tf.toString()+"</w:t></w:r>"; // DWH 4-8-09
-				else if (configurationType==MSPOWERPOINT)
-					sTuff = "<a:r><a:t xml:space=\"preserve\">"+tf.toString()+"</a:t></a:r>"; // DWH 4-8-09
+/* commented DWH 5-22-09
+				if (context==1)
+				{
+					if (configurationType==MSWORD)
+						sTuff = "<w:r><w:t xml:space=\"preserve\">"+text+"</w:t></w:r>"; // DWH 4-8-09
+					else if (configurationType==MSPOWERPOINT)
+						sTuff = "<a:r><a:t xml:space=\"preserve\">"+text+"</a:t></a:r>"; // DWH 4-8-09
+					else
+						sTuff = text;
+				}
 				else
 					sTuff = tf.toString();
+				if ( encoderManager == null ) {
+					if ( layer == null ) {
+						return sTuff; // DWH 4-8-09 replaced tf.toString() with sTuff
+					}
+					else {
+						return layer.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
+					}
+				}
+				else {
+					if ( layer == null ) {
+						return encoderManager.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
+					}
+					else {
+						return layer.encode(
+							encoderManager.encode(sTuff, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
+					}
+				}
+*/
+				sTuff = text; // DWH 5-22-09
+				if ( encoderManager == null ) // DWH 5-22-09 whole if-else: encode first
+				{
+					if ( layer != null )
+						sTuff = layer.encode(text, context);
+				}
+				else
+				{	
+					if ( layer == null )
+						sTuff = encoderManager.encode(text, context);
+					else
+						sTuff = layer.encode(encoderManager.encode(sTuff, context), context);
+				}
+				if (context==1) // DWH 5-22-09 add unencoded tags if needed
+				{
+					if (configurationType==MSWORD)
+						text = "<w:r><w:t xml:space=\"preserve\">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
+					else if (configurationType==MSPOWERPOINT)
+						text = "<a:r><a:t xml:space=\"preserve\">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
+					else
+						text = sTuff;
+				}
+				else
+					text = sTuff; // DWH 5-22-09
+				return text; // DWH 5-22-09
 			}
 			else
-				sTuff = tf.toString();
-			if ( encoderManager == null ) {
-				if ( layer == null ) {
-					return sTuff; // DWH 4-8-09 replaced tf.toString() with sTuff
-				}
-				else {
-					return layer.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
-				}
-			}
-			else {
-				if ( layer == null ) {
-					return encoderManager.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
-				}
-				else {
-					return layer.encode(
-						encoderManager.encode(sTuff, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
-				}
-			}
+				return ""; // DWH 5-18-09 get nothing, return nothing
 		}
 
 		// Output text with in-line codes
 		List<Code> codes = tf.getCodes();
 		StringBuilder tmp = new StringBuilder();
-		String text = tf.getCodedText();
+		text = tf.getCodedText();
 		Code code;
 		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
