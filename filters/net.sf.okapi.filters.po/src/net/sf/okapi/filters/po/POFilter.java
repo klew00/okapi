@@ -29,6 +29,8 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +45,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -136,6 +139,22 @@ public class POFilter implements IFilter {
 	
 	public String getMimeType () {
 		return MimeTypeMapper.PO_MIME_TYPE;
+	}
+
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.PO_MIME_TYPE,
+			getClass().getName(),
+			"PO (Standard)",
+			"Standard bilingual PO files"));
+		list.add(new FilterConfiguration(getName()+"-monolingual",
+			MimeTypeMapper.PO_MIME_TYPE,
+			getClass().getName(),
+			"PO (Monolingual)",
+			"Monolingual PO files (msgid is a real ID, not the source text).",
+			"monolingual.fprm"));
+		return list;
 	}
 
 	public IParameters getParameters () {
@@ -309,6 +328,7 @@ public class POFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
+		startDoc.setFilter(this);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(MimeTypeMapper.PO_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.PO_MIME_TYPE);

@@ -25,13 +25,12 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
-public class SegmentationStep implements IPipelineStep {
+public class SegmentationStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -45,10 +44,6 @@ public class SegmentationStep implements IPipelineStep {
 		srcSeg = null;
 	}
 	
-	public void destroy () {
-		// Nothing to do
-	}
-
 	public String getDescription () {
 		return "Apply SRX segmentation to a document.";
 	}
@@ -57,59 +52,30 @@ public class SegmentationStep implements IPipelineStep {
 		return "SRX Segmentation";
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case START_DOCUMENT:
-			processStartDocument((StartDocument)event.getResource());
-			break;
-		case CANCELED:
-		case FINISHED:
-			srcSeg = null; // Reset for next batch
-			break;
-		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
-			break;
-		}
-		return event;
-	}
-
-	public boolean hasNext () {
-		return false;
-	}
-
-	public void postprocess () {
-		// Nothing to do
-	}
-
-	public void preprocess () {
-		// Nothing to do
-	}
-
-	public void setParameters (IParameters params) {
-		params = (Parameters)params;
-	}
- 
-	private void processStartDocument (StartDocument startDoc) {
-		if ( srcSeg == null ) {
-			String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
-			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
-			SRXDocument srxDoc = new SRXDocument();
-			srxDoc.loadRules(src);
+	@Override
+	protected void handleStartBatch (Event event) {
+		String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
+		String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
+		SRXDocument srxDoc = new SRXDocument();
+		srxDoc.loadRules(src);
+		if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
+		srcSeg = srxDoc.compileLanguageRules(getContext().getSourceLanguage(0), null);
+		if ( !src.equals(trg) ) {
+			srxDoc.loadRules(trg);
 			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(startDoc.getLanguage(), null);
-			if ( !src.equals(trg) ) {
-				srxDoc.loadRules(trg);
-				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			}
-			trgSeg = srxDoc.compileLanguageRules(trgLang, null);
 		}
+		trgLang = getContext().getTargetLanguage(0);
+		trgSeg = srxDoc.compileLanguageRules(trgLang, null);
 	}
 	
-	private void processTextUnit (TextUnit tu) {
+	@Override
+	protected void handleTextUnit (Event event) {
+		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 

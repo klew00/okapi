@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,6 +42,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -111,6 +114,22 @@ public class XMLFilter implements IFilter {
 		return MimeTypeMapper.XML_MIME_TYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"Generic XML",
+			"Configuration for generic XML documents (default ITS rules)."));
+		list.add(new FilterConfiguration(getName()+"-resx",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"RESX",
+			"Configuration for Microsoft RESX documents (without binary blocks).",
+			"resx.fprm"));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -295,6 +314,7 @@ public class XMLFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
+		startDoc.setFilter(this);
 		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 

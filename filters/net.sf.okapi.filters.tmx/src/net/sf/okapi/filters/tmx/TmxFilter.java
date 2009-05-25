@@ -25,8 +25,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
@@ -42,6 +44,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -124,6 +127,16 @@ public class TmxFilter implements IFilter {
 		return "text/x-tmx";
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			"text/x-tmx",
+			getClass().getName(),
+			"TMX",
+			"Configuration for Translation Memory eXchange (TMX) documents."));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -265,6 +278,7 @@ public class TmxFilter implements IFilter {
 			startDoc.setEncoding(encoding, hasUTF8BOM); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
+			startDoc.setFilter(this);
 			startDoc.setType("text/x-tmx");
 			startDoc.setMimeType("text/x-tmx");
 			startDoc.setMultilingual(true);

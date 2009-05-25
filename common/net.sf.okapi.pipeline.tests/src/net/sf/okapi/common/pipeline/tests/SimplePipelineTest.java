@@ -40,7 +40,10 @@ public class SimplePipelineTest {
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());
 
-		pipeline.process(new RawDocument("DUMMY", "en"));		
+		pipeline.startBatch();
+		pipeline.process(new RawDocument("DUMMY", "en"));
+		pipeline.endBatch();
+		
 		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());
 		pipeline.destroy();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());

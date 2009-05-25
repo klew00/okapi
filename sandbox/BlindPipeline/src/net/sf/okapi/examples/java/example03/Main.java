@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;

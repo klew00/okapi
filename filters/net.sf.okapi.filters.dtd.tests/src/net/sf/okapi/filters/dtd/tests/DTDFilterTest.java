@@ -82,11 +82,11 @@ public class DTDFilterTest {
 		assertEquals("\u00e3, \u00e3, \u00e3", tu.getSource().toString());
 	}
 	
-	@Test
-	public void testLineBreaks () {
-		String snippet = "<!--Comment-->\r<!ENTITY e1 \"t1\">\r<!ENTITY e2 \"t2\">\r";
+//	@Test
+//	public void testLineBreaks () {
+//		String snippet = "<!--Comment-->\r<!ENTITY e1 \"t1\">\r<!ENTITY e2 \"t2\">\r";
 //TODO		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
-	}
+//	}
 	
 	@Test
 	public void testDoubleExtraction () {

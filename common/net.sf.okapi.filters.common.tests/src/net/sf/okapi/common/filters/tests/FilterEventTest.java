@@ -1,6 +1,5 @@
 package net.sf.okapi.common.filters.tests;
 
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 

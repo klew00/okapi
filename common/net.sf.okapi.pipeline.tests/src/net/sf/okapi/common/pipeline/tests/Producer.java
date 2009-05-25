@@ -29,7 +29,6 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 public class Producer extends BasePipelineStep {	
 	
 	private static final Logger LOGGER = Logger.getLogger(Producer.class.getName());
-	
 	private int eventCount = -1;
 
 	public String getName() {
@@ -41,26 +40,26 @@ public class Producer extends BasePipelineStep {
 	}
 
 	@Override
-	public void postprocess() {	
-		LOGGER.log(Level.FINEST, getName() + " postprocess");
+	protected void handleEndBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
 	}
 
 	@Override
-	public void preprocess() {
-		LOGGER.log(Level.FINEST, getName() + " preprocess");		
+	protected void handleStartBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
 	}
-
+	
 	@Override
 	public Event handleEvent(Event event) {			
 		event = new Event(EventType.TEXT_UNIT, null);		
 		return event;
 	}
 
-	public boolean hasNext() {
+	public boolean isDone () {
 		eventCount++;
 		if (eventCount >= 10) {					
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 }

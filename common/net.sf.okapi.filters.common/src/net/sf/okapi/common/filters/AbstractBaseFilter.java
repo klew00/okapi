@@ -85,6 +85,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	private String mimeType;
 	private String newlineType;
 	private String documentName;
+	private IFilter filter;
 
 	private String currentTagType;
 
@@ -509,6 +510,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		startDocument.setMimeType(getMimeType());
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
+		startDocument.setFilter(getFilter());
 		startDocument.setName(getDocumentName());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
@@ -1308,7 +1310,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	/**
 	 * Does the input have a UTF-8 Byte Order Mark?
 	 * 
-	 * @return true if thre is a UTF-8 BOM, false otherwise.
+	 * @return true if there is a UTF-8 BOM, false otherwise.
 	 */
 	abstract protected boolean hasUtf8Bom();
 
@@ -1322,7 +1324,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Set the newline type.
+	 * Sets the newline type.
 	 * 
 	 * @param newlineType
 	 *            one of '\n', '\r' or '\r\n'.
@@ -1332,10 +1334,26 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
+	 * Gets the derived filter.
+	 * @return the derived filter.
+	 */
+	protected IFilter getFilter () {
+		return filter;
+	}
+	
+	/**
+	 * Sets the derived filter. 
+	 * @param filter the derived filter.
+	 */
+	protected void setFilter (IFilter filter) {
+		this.filter = filter;
+	}
+	
+	/**
 	 * Allows implementers to set the START_DOCUMENT name for the current input.
 	 * 
 	 * @param documentName
-	 *		set the input document name or path
+	 *		the input document name or path
 	 */
 	protected void setDocumentName(String documentName) {
 		this.documentName = documentName;

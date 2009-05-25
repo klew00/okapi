@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
-public abstract class BaseContext {
+public abstract class BaseContext implements IContext {
 
 	private Hashtable<String, Object> properties;
 	private Annotations annotations;

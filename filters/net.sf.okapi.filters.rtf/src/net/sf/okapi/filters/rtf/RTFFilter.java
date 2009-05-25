@@ -31,8 +31,10 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
@@ -44,6 +46,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -295,7 +298,17 @@ public class RTFFilter implements IFilter {
 	public String getMimeType () {
 		return "text/rtf"; //TODO: check
 	}
-
+	
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			"text/rtf",
+			getClass().getName(),
+			"RTF",
+			"Configuration for Rich Text Format (RTF) files."));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}
@@ -370,6 +383,7 @@ public class RTFFilter implements IFilter {
 			startDoc.setEncoding(passedEncoding, false);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
+			startDoc.setFilter(this);
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
 			startDoc.setMultilingual(true);

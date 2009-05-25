@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,9 +41,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.exceptions.*;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -51,7 +52,6 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
@@ -184,6 +184,16 @@ public class OpenXMLFilter implements IFilter {
 	 */
 	public String getMimeType () {
 		return MIMETYPE;
+	}
+
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"Microsoft Office Document",
+			"Microsoft Office documents (DOCX, XLSX, PPT)."));
+		return list;
 	}
 
 	/**
@@ -479,6 +489,7 @@ public class OpenXMLFilter implements IFilter {
 			startDoc.setName(docURI.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
+			startDoc.setFilter(this);
 			startDoc.setLineBreak("\n");
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);

@@ -38,16 +38,12 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class LineBreakConversionStep implements IPipelineStep {
+public class LineBreakConversionStep extends BasePipelineStep {
 
 	private Parameters params;
-
-	public void destroy () {
-		// Nothing to do
-	}
 
 	public String getDescription () {
 		return "Convert the type of line-break in a document.";
@@ -61,32 +57,11 @@ public class LineBreakConversionStep implements IPipelineStep {
 		return params;
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case RAW_DOCUMENT:
-			processRawDocument(event);
-			break;
-		}
-		return event;
-	}
-
-	public boolean hasNext () {
-		return false;
-	}
-
-	public void postprocess () {
-		// Nothing to do
-	}
-
-	public void preprocess () {
-		// Nothing to do
-	}
-
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
  
-	public void processRawDocument (Event event) {
+	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc;
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
@@ -95,7 +70,7 @@ public class LineBreakConversionStep implements IPipelineStep {
 			
 			InputStream input;
 			if ( rawDoc.getInputCharSequence() != null ) {
-				throw new OkapiBadStepInputException("CharSequence input not supported for now");
+				throw new OkapiBadStepInputException("CharSequence input not supported for now.");
 			}
 			if ( rawDoc.getInputURI() != null ) {
 				input = new FileInputStream(new File(rawDoc.getInputURI()));

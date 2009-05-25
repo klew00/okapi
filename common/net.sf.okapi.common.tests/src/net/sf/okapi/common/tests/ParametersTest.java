@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.tests;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.After;
@@ -71,10 +72,10 @@ public class ParametersTest {
 	}
 
 	@Test
-	public void testLoadParametersFromWindowsFile () {
+	public void testLoadParametersFromWindowsFile () throws URISyntaxException {
 		DummyParameters params = new DummyParameters();
 		URL url = ParametersTest.class.getResource("/ParamTest01.txt");
-		params.load(url.getPath(), false);
+		params.load(url.toURI(), false);
 		assertFalse(params.paramBool1);
 		assertEquals(789, params.paramInt1);
 		assertEquals(params.paramStr1, "TestOK");

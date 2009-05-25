@@ -6,9 +6,11 @@ import java.io.StringWriter;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.pipeline.EventsToRawDocumentStep;
+import net.sf.okapi.common.pipeline.BatchItemContext;
+import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -16,14 +18,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class EventsToRawDocumentStepTest {
-	private EventsToRawDocumentStep eventToDoc;
+	private FilterEventsToRawDocumentStep eventToDoc;
 	private String htmlSnippet;
 	private HtmlFilter htmlFilter;
+	private Pipeline pipeline;
 
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
 		htmlSnippet = "<p>This is a <i>test</i> snippet</p>";
+		pipeline = new Pipeline();
 	}
 
 	@After
@@ -34,10 +38,15 @@ public class EventsToRawDocumentStepTest {
 	@Test
 	public void htmlEventsToRawDocument() throws IOException {
 		Event event = null;
-		eventToDoc = new EventsToRawDocumentStep();
+		eventToDoc = new FilterEventsToRawDocumentStep();
+		
+		eventToDoc.setPipeline(pipeline);
+		BatchItemContext bic = new BatchItemContext(
+			new RawDocument(htmlSnippet, "en"), "okf_html", null, "UTF-8");
+		pipeline.getContext().setBatchItemContext(bic);
 
-		htmlFilter.open(new RawDocument(htmlSnippet, "en"));
-		while (htmlFilter.hasNext()) {
+		htmlFilter.open(bic.getRawDocument(0));
+		while ( htmlFilter.hasNext() ) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}
 
@@ -51,9 +60,19 @@ public class EventsToRawDocumentStepTest {
 	@Test
 	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
 		Event event = null;
-		eventToDoc = new EventsToRawDocumentStep(File.createTempFile("EventsToRawDocumentStepTest", ".tmp").toURI());
+		eventToDoc = new FilterEventsToRawDocumentStep(File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp").toURI());
 
-		htmlFilter.open(new RawDocument(htmlSnippet, "en"));
+		eventToDoc.setPipeline(pipeline);
+		BatchItemContext bic = new BatchItemContext(
+			new RawDocument(htmlSnippet, "en"), "okf_html", null, "UTF-8");
+		pipeline.getContext().setBatchItemContext(bic);
+
+		htmlFilter.open(bic.getRawDocument(0));
+		while ( htmlFilter.hasNext() ) {
+			event = eventToDoc.handleEvent(htmlFilter.next());
+		}
+
+		htmlFilter.open(bic.getRawDocument(0));
 		while (htmlFilter.hasNext()) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}

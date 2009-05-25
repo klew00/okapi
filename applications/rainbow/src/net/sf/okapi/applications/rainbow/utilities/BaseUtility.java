@@ -179,9 +179,9 @@ public abstract class BaseUtility implements IUtility {
 	public void destroy () {
 		// Do nothing by default
 	}
-
-	public boolean hasNext () {
-		return false;
+	
+	public int inputCountRequested () {
+		return 1; // Default
 	}
 
 }

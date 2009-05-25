@@ -46,7 +46,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
-import java.security.AccessController;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

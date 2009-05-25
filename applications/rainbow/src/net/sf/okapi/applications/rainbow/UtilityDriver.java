@@ -187,7 +187,7 @@ public class UtilityDriver implements CancelListener {
 				// Add input/output data from other input lists if requested
 				for ( int j=1; j<prj.inputLists.size(); j++ ) {
 					// Does the utility requests this list?
-					if ( j >= utility.requestInputCount() ) break; // No need to loop more
+					if ( j >= utility.inputCountRequested() ) break; // No need to loop more
 					// Do we have a corresponding input?
 					if ( prj.inputLists.get(j).size() > f ) {
 						// Data is available

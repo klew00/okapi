@@ -68,11 +68,13 @@ public class XsltTransformStep extends BasePipelineStep {
 		// overwrite our event to the new transformed content	
 		event.setResource(new RawDocument(transformedInput, "UTF-8", "en"));
 		
-		// this step is done generating events
+		// This step is done generating events
 		done = true;
 	}
 
-	public boolean hasNext() {
-		return !done;
+	@Override
+	public boolean isDone () {
+		return done;
 	}
+
 }

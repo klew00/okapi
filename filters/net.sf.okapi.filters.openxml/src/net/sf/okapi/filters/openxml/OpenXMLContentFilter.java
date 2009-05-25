@@ -27,6 +27,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.Hashtable;
 //import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 //import java.util.TreeMap; // DWH 10-10-08
@@ -43,16 +44,15 @@ import net.htmlparser.jericho.Tag;
 
 //import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.markupfilter.Parameters;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
@@ -130,8 +130,19 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
+		setFilter(this);
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			"text/xml",
+			getClass().getName(),
+			"Microsoft OpenXML Document",
+			"Microsoft OpenXML files (Used inside Office documents)."));
+		return list;
+	}
+	
 	/**
 	 * Logs information about the event fir the log level is FINEST. 
 	 * @param event event to log information about 

@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.xml.stream.XMLInputFactory;
@@ -43,6 +44,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -219,6 +221,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setEncoding("UTF-8", false);
 			startDoc.setLineBreak(lineBreak);
 			startDoc.setFilterParameters(params);
+			startDoc.setFilter(this);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 			hasNext = true;
 		}
@@ -248,13 +251,23 @@ public class ODFFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "ODFFilter";
+		return "okf_odf";
 	}
 
 	public String getMimeType () {
 		return MIMETYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"OpenDocument",
+			"XML OpenDocument files (e.g. use inside OpenOffice.org documents)."));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}

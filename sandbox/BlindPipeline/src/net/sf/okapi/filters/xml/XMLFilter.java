@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,6 +42,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -659,4 +662,15 @@ public class XMLFilter implements IFilter {
 		return true;
 	}
 	
+	public Map<String, FilterConfiguration> getConfigurations() {
+		LinkedHashMap<String, FilterConfiguration> map = new LinkedHashMap<String, FilterConfiguration>();
+		FilterConfiguration fc = new FilterConfiguration();
+		fc.configId = "okapi.xml";
+		fc.description = "ITS-based filter for XML documents";
+		fc.name = "XML (With ITS support)";
+		fc.filterClass = getClass().getName();
+		map.put(MimeTypeMapper.XML_MIME_TYPE, fc);
+		return map;
+	}
+
 }

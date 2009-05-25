@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
@@ -44,6 +46,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -123,6 +126,16 @@ public class XLIFFFilter implements IFilter {
 		return MimeTypeMapper.XLIFF_MIME_TYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.XLIFF_MIME_TYPE,
+			getClass().getName(),
+			"XLIFF",
+			"Configuration for XML Localisation Interchange File Format (XLIFF) document."));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -263,6 +276,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
+			startDoc.setFilter(this);
 			startDoc.setType(MimeTypeMapper.XLIFF_MIME_TYPE);
 			startDoc.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
 			startDoc.setMultilingual(true);

@@ -14,5 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.lib.translation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.globalsight"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.tm.opentran"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

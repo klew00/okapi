@@ -1,13 +1,13 @@
 package net.sf.okapi.filters.rtf.tests.integration;
 
-import static org.junit.Assert.assertTrue;
+//import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.filters.rtf.RTFFilter;
+//import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.filters.rtf.tests.TestUtils;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -17,13 +17,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ExtractionComparisionTest {
-	private RTFFilter rtfFilter;
+//	private RTFFilter rtfFilter;
 	private String[] testFileList;	
 	private String root;
 
 	@Before
 	public void setUp() throws Exception {
-		rtfFilter = new RTFFilter();		
+//		rtfFilter = new RTFFilter();		
 		testFileList = TestUtils.getTestFiles();
 		
 		URL url = ExtractionComparisionTest.class.getResource("/AddComments.rtf");

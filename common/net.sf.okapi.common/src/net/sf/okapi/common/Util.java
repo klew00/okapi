@@ -692,12 +692,13 @@ public class Util {
 		return lang1.equalsIgnoreCase(lang2);
 	}
 	
-	static public boolean isEmpty(Object obj) {
-		return (obj == null);
-	}
-	
-	static public boolean isEmpty(String string) {
-		return (string == null || string == "" || (string != null && string.length() == 0));
+	/**
+	 * Indicates if a string is null or empty.
+	 * @param string the string to test.
+	 * @return true if the string is either null or empty, false if it counts at least one character.
+	 */
+	static public boolean isEmpty (String string) {
+		return (( string != null ) && ( string.length() == 0 ));
 	}
 	
 }

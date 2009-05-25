@@ -191,7 +191,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return true;
 	}
 
-	public int requestInputCount () {
+	public int inputCountRequested () {
 		// Source and possibly target
 		return 2;
 	}
@@ -346,8 +346,4 @@ public class Utility extends BaseFilterDrivenUtility {
 		logger.info("Not aligned: "+tu.getName());
 	}
 	
-	public boolean hasNext () {
-		return false;
-	}
-
 }

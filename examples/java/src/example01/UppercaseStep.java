@@ -21,13 +21,12 @@
 package example01;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class UppercaseStep implements IPipelineStep {
+public class UppercaseStep extends BasePipelineStep {
 
 	private String trgLang;
 	
@@ -37,48 +36,22 @@ public class UppercaseStep implements IPipelineStep {
 		this.trgLang = trgLang;
 	}
 	
-	public void cancel() {
-	}
-
-	public void destroy () {
-	}
-
 	public String getName () {
 		return "Uppercase";
 	}
 
+	
 	public String getDescription () {
 		return "Converts text to upper cases.";
 	}
-	
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case TEXT_UNIT:
-			TextUnit tu = (TextUnit)event.getResource();
-			if ( tu.isTranslatable() ) {
-				TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
-				tf.setCodedText(tf.getCodedText().toUpperCase());
-			}
+
+	@Override
+	protected void handleTextUnit (Event event) {
+		TextUnit tu = (TextUnit)event.getResource();
+		if ( tu.isTranslatable() ) {
+			TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
+			tf.setCodedText(tf.getCodedText().toUpperCase());
 		}
-		return event;
-	}
-
-	public void postprocess () {
-	}
-
-	public void preprocess () {
-	}
-
-	public boolean hasNext() {
-		// This step does not take one event to generate several, so this is always false
-		return false;
-	}
-
-	public IParameters getParameters () {
-		return null;
-	}
-
-	public void setParameters (IParameters params) {
 	}
 
 }

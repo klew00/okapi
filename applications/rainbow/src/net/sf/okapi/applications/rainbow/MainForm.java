@@ -1191,11 +1191,11 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 
 			PipelineEditor dlg = new PipelineEditor();
-			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, true) ) return;
-
-			// Create the utility driver if needed
+			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, true) ) {
+				return; // No execution
+			}
+			// Else: execute
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
-
 			wrapper.execute();
 		}
 		catch ( Exception E ) {
@@ -1702,7 +1702,8 @@ public class MainForm implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
-		wrapper = new PipelineWrapper();
+		//TODO: set the fcmapper
+		wrapper = new PipelineWrapper(null);
 		currentInput = 0;
 		resetDisplay(-1);
 	}

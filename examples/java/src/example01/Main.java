@@ -22,19 +22,18 @@ package example01;
 
 import java.io.File;
 
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
-import net.sf.okapi.common.pipeline.EventsWriterStep;
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.common.pipeline.BatchItemContext;
+import net.sf.okapi.common.pipeline.IBatchItemContext;
 import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.xml.XMLFilter;
-import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
-import net.sf.okapi.filters.properties.PropertiesFilter;
+import net.sf.okapi.common.pipeline.PipelineContext;
 
 public class Main {
 	
@@ -44,8 +43,8 @@ public class Main {
 	private static String outputEncoding = "UTF-8";
 	private static String inputPath = null;
 	private static String outputPath = null;
-	private static IFilter filter = null;
 	private static String steps = "";
+	private static IFilterConfigurationMapper fcMapper;
 	
 	public static void main (String[] args) {
 		try {
@@ -80,18 +79,21 @@ public class Main {
 				outputPath = Util.getFilename(inputPath, false) + ".out" + Util.getExtension(inputPath); 
 			}
 
+			// Create the mapper
+			fcMapper = new FilterConfigurationMapper();
+			// Fill it with the default configurations of several filters
+			fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+			fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
+			fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
+			fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+			
 			// Detect the file to use
 			String ext = Util.getExtension(inputPath);
+			String mimeType = null;
 			if ( ext == null ) throw new RuntimeException("No filter detected for the file extension.");
-			if ( ext.equals(".xml") ) filter = new XMLFilter();
-			else if ( ext.equals(".html") ) filter = new HtmlFilter();
-			else if ( ext.equals(".htm") ) filter = new HtmlFilter();
-			else if ( ext.equals(".odt") ) filter = new OpenOfficeFilter();
-			else if ( ext.equals(".ods") ) filter = new OpenOfficeFilter();
-			else if ( ext.equals(".odp") ) filter = new OpenOfficeFilter();
-			else if ( ext.equals(".odg") ) filter = new OpenOfficeFilter();
-			else if ( ext.equals(".properties") ) filter = new PropertiesFilter();
-			else throw new RuntimeException("No filter detected for the file extension.");
+			ext = ext.substring(1); // No dot.
+			mimeType = MimeTypeMapper.getMimeType(ext);
+			FilterConfiguration cfg = fcMapper.getDefaultConfiguration(mimeType);
 			
 			// Display the parsed options
 			System.out.println("            input file: " + inputPath);
@@ -100,10 +102,11 @@ public class Main {
 			System.out.println("       output encoding: " + inputEncoding);
 			System.out.println("       source language: " + srcLang);
 			System.out.println("       target language: " + trgLang);
-			System.out.println("       filter detected: " + filter.getName());
+			System.out.println("    MIME type detected: " + mimeType);
+			System.out.println("configuration detected: " + cfg.configId);
 			
 			// Process
-			pipeline1();
+			pipeline1(cfg);
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
@@ -120,15 +123,14 @@ public class Main {
 		System.out.println(" -s pseudo|upper");
 	}
 	
-	private static void pipeline1 () {
+	private static void pipeline1 (FilterConfiguration config) {
 		// Create the pipeline
 		IPipeline pipeline = new Pipeline();
 		
-		// Create the filter step
-		IPipelineStep inputStep = new RawDocumentToEventsStep(filter);
-		// Add this step to the pipeline
-		pipeline.addStep(inputStep);
+		// Add the filter step to the pipeline
+		pipeline.addStep(new RawDocumentToFilterEventsStep());
 
+		// Add one or more processing step(s)
 		for ( int i=0; i<steps.length(); i++ ) {
 			switch ( steps.charAt(i) ) {
 			case 'p':
@@ -140,20 +142,21 @@ public class Main {
 			}
 		}
 
-		// Create the writer we will use
-		IFilterWriter writer = filter.createFilterWriter();
-		// Create the writer step (using the writer provider by our filter)
-		IPipelineStep outputStep = new EventsWriterStep(writer);
-		// Add this step to the pipeline
-		pipeline.addStep(outputStep);
+		// Add the writer step to the pipeline
+		pipeline.addStep(new FilterEventsWriterStep());
 
-		// Sets the writer options and output
-		writer.setOptions(trgLang, outputEncoding);
-		writer.setOutput(outputPath);
+		pipeline.setContext(new PipelineContext());
+		pipeline.getContext().setFilterConfigurationMapper(fcMapper);
+
+		IBatchItemContext bic = new BatchItemContext((new File(inputPath)).toURI(),
+			inputEncoding, config.configId, (new File(outputPath)).toURI(),
+			outputEncoding, srcLang, trgLang);
 		
-		// Launch the execution
-		RawDocument fr = new RawDocument((new File(inputPath)).toURI(), inputEncoding, srcLang);
-		pipeline.process(fr);
+		pipeline.startBatch();
+		pipeline.getContext().setBatchItemContext(bic);
+		pipeline.process(bic.getRawDocument(0));
+		pipeline.endBatch();
 		pipeline.destroy();
 	}
+
 }

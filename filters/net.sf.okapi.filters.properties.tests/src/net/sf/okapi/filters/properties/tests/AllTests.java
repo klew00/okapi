@@ -28,7 +28,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses({PropertiesFilterTest.class, PropertiesPipelineFilterTest.class})
+@SuiteClasses({PropertiesFilterTest.class})
 public class AllTests {
   public static Test suite() {
     return new JUnit4TestAdapter(AllTests.class);

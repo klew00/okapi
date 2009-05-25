@@ -27,7 +27,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,6 +43,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -138,6 +141,16 @@ public class PlainTextFilter implements IFilter {
 		return mimeType;
 	}
 	
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			mimeType,
+			getClass().getName(),
+			"Table Filter",
+			"Table-like files such as tab-delimited, CSV, fixed-width columns, etc."));
+		return list;
+	}
+
 	protected void setName(String filterName) {
 		this.filterName = filterName;
 	}
@@ -280,6 +293,7 @@ public class PlainTextFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
+		startDoc.setFilter(this);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
 		startDoc.setMimeType(getMimeType());

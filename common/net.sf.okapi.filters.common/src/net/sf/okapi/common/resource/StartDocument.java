@@ -21,6 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.IFilter;
 
 /**
  * Resource associated with the filter event START_DOCUMENT.
@@ -31,6 +32,7 @@ public class StartDocument extends BaseNameable {
 	protected String encoding;
 	protected boolean isMultilingual;
 	protected IParameters params;
+	protected IFilter filter;
 	protected boolean hasUTF8BOM;
 	protected String lineBreak;
 
@@ -42,7 +44,7 @@ public class StartDocument extends BaseNameable {
 	/**
 	 * Gets the language of this document. If the document is multilingual this
 	 * is the source language.
-	 * @return The (source) language of the document.
+	 * @return the (source) language of the document.
 	 */
 	public String getLanguage () {
 		return language;
@@ -51,7 +53,7 @@ public class StartDocument extends BaseNameable {
 	/**
 	 * Sets the language of the document. If the document is multilingual this
 	 * is the source language.
-	 * @param language (Source) language of the document.
+	 * @param language (source) language of the document.
 	 */
 	public void setLanguage (String language) {
 		this.language = language;
@@ -59,7 +61,7 @@ public class StartDocument extends BaseNameable {
 
 	/**
 	 * Gets the character set encoding of this document. For example "UTF-8"
-	 * @return The string identifying the character set of this document.
+	 * @return the string identifying the character set of this document.
 	 */
 	public String getEncoding () {
 		return encoding;
@@ -69,7 +71,7 @@ public class StartDocument extends BaseNameable {
 	 * Sets the character set encoding of this document.
 	 * @param encoding The string identifying the character set encoding of this document.
 	 * For example "UTF-8".
-	 * @param hasUTF8BOM True if this document is UTf-8 and has a Byte-Order-Mark.
+	 * @param hasUTF8BOM true if this document is UTf-8 and has a Byte-Order-Mark.
 	 * False in all other cases.
 	 */
 	public void setEncoding (String encoding,
@@ -81,7 +83,7 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Indicates if this document is multilingual.
-	 * @return True if this document is multilingual, false otherwise.
+	 * @return true if this document is multilingual, false otherwise.
 	 */
 	public boolean isMultilingual () {
 		return isMultilingual;
@@ -89,7 +91,7 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Sets the flag that indicates if this document is multilingual. 
-	 * @param value True to set this document as multilingual, false to set it
+	 * @param value true to set this document as multilingual, false to set it
 	 * as monolingual.
 	 */
 	public void setMultilingual (boolean value) {
@@ -98,7 +100,7 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Indicates if this document is encoded as UTF8 and has a Byte-Order-Mark.
-	 * @return True if this document is encoded as UTF8 and has a Byte-Order-Mark.
+	 * @return true if this document is encoded as UTF8 and has a Byte-Order-Mark.
 	 * False if the document is not encoded in UTF-8 or if if it is encoded in
 	 * UTF-8 and has not a Byte-Order-Mark. 
 	 */
@@ -108,7 +110,7 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Gets the type of line-break used in the original document.
-	 * @return The type of line-break used in the original document.
+	 * @return the type of line-break used in the original document.
 	 */
 	public String getLineBreak () {
 		return lineBreak;
@@ -116,16 +118,32 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Sets the type of line-break used in the original document.
-	 * @param value The type of line-break of the original document, for
+	 * @param value the type of line-break of the original document, for
 	 * example: "\r\n" (for Windows/DOS line-break).
 	 */
 	public void setLineBreak (String value) {
 		lineBreak = value;
 	}
+
+	/**
+	 * Gets the filter for this document.
+	 * @return the filter for this document.
+	 */
+	public IFilter getFilter () {
+		return filter;
+	}
 	
 	/**
+	 * Sets the filter for this document.
+	 * @param filter the filter for this document.
+	 */
+	public void setFilter (IFilter filter) {
+		this.filter = filter;
+	}
+
+	/**
 	 * Gets the current parameters for this document.
-	 * @return The object containing the parameters for this document.
+	 * @return the object containing the parameters for this document.
 	 */
 	public IParameters getFilterParameters () {
 		return params;
@@ -133,7 +151,7 @@ public class StartDocument extends BaseNameable {
 	
 	/**
 	 * Sets the parameters for this document.
-	 * @param params The object containing the parameters for this document.
+	 * @param params the object containing the parameters for this document.
 	 */
 	public void setFilterParameters (IParameters params) {
 		this.params = params;

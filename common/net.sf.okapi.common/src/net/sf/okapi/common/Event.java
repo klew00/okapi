@@ -25,7 +25,7 @@ package net.sf.okapi.common;
  */
 public class Event {
 
-	public final static Event FINISHED_EVENT = new Event(EventType.FINISHED);
+	public final static Event END_BATCH_EVENT = new Event(EventType.END_BATCH);
 	public final static Event NOOP_EVENT = new Event(EventType.NO_OP);
 	
 	private EventType filterEventType;

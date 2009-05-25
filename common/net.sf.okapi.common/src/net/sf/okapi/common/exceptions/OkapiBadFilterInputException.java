@@ -32,6 +32,7 @@ public class OkapiBadFilterInputException extends RuntimeException {
 	 * Creates an empty new OkapiBadFilterInputException object.
 	 */
 	public OkapiBadFilterInputException () {
+		super();
 	}
 
 	/**

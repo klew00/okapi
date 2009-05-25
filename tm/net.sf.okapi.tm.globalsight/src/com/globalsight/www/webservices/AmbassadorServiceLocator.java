@@ -72,7 +72,8 @@ public class AmbassadorServiceLocator extends org.apache.axis.client.Service imp
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
-    public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
+    @SuppressWarnings("unchecked")
+	public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (com.globalsight.www.webservices.Ambassador.class.isAssignableFrom(serviceEndpointInterface)) {
                 com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub _stub = new com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub(new java.net.URL(AmbassadorWebService_address), this);
@@ -91,6 +92,7 @@ public class AmbassadorServiceLocator extends org.apache.axis.client.Service imp
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @SuppressWarnings("unchecked")
     public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
@@ -110,8 +112,10 @@ public class AmbassadorServiceLocator extends org.apache.axis.client.Service imp
         return new javax.xml.namespace.QName("http://www.globalsight.com/webservices/", "AmbassadorService");
     }
 
-    private java.util.HashSet ports = null;
+    @SuppressWarnings("unchecked")
+	private java.util.HashSet ports = null;
 
+    @SuppressWarnings("unchecked")
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();

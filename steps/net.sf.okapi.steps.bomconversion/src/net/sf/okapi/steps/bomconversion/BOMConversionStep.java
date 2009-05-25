@@ -30,10 +30,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class BOMConversionStep implements IPipelineStep {
+public class BOMConversionStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -41,8 +41,13 @@ public class BOMConversionStep implements IPipelineStep {
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};
 	private final byte[] BOM_UTF16LE = {(byte)0xFF,(byte)0xFE};
 
+	private boolean isDone;
 	private Parameters params;
 	private byte[] buffer;
+
+	public BOMConversionStep () {
+		params = new Parameters();
+	}
 
 	public void destroy () {
 		// Nothing to do
@@ -56,36 +61,35 @@ public class BOMConversionStep implements IPipelineStep {
 		return "BOM Conversion";
 	}
 
+	@Override
+	public boolean isDone () {
+		return isDone;
+	}
+
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case RAW_DOCUMENT:
-			processRawDocument(event);
-			break;
-		}
-		return event;
-	}
-
-	public boolean hasNext () {
-		return false;
-	}
-
-	public void postprocess () {
-		// Nothing to do
-	}
-
-	public void preprocess () {
-		// Nothing to do
-	}
-
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
  
-	public void processRawDocument (Event event) {
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		buffer = new byte[1024*2];
+		isDone = false;
+	}
+
+	@Override
+	protected void handleEndBatchItem (Event event) {
+		// Release the buffer
+		buffer = null;
+	}
+	
+	@Override
+	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc;
 		FileInputStream input = null;
 		FileOutputStream output = null;
@@ -187,6 +191,7 @@ public class BOMConversionStep implements IPipelineStep {
 			// Set the new raw-document URI
 			// Other info stays the same
 			rawDoc.setInputURI(tmpOut.toURI());
+			isDone = true;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);

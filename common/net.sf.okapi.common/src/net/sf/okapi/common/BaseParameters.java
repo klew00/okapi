@@ -22,13 +22,14 @@ package net.sf.okapi.common;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URL;
 
 /**
  * Base class for properties-like parameters that implement IParameters.
@@ -49,20 +50,22 @@ public abstract class BaseParameters implements IParameters {
 		return path;
 	}
 	
-	public void load (String filePath,
+	public void load (URI inputURI,
 		boolean p_bIgnoreErrors)
 	{
+		char[] aBuf;
 		try {
 			// Reset the parameters to their defaults
 			reset();
-			// Open the file
+			// Open the file. use a URL so we can do openStream() and load
+			// predefined files from JARs.
+			URL url = inputURI.toURL();
 			Reader SR = new InputStreamReader(
-				new BufferedInputStream(new FileInputStream(filePath)),
-				"UTF-8");
+				new BufferedInputStream(url.openStream()), "UTF-8");
 
 			// Read the file in one string
 			StringBuilder sbTmp = new StringBuilder(1024);
-			char[] aBuf = new char[100];
+			aBuf = new char[1024];
 			int nCount;
 			while ((nCount = SR.read(aBuf)) > -1) {
 				sbTmp.append(aBuf, 0, nCount);	
@@ -73,10 +76,13 @@ public abstract class BaseParameters implements IParameters {
 			// Parse it
 			String tmp = sbTmp.toString().replace("\r\n", "\n");
 			fromString(tmp.replace("\r", "\n"));
-			path = filePath;
+			path = inputURI.getPath();
 		}
 		catch ( IOException e ) {
 			if ( !p_bIgnoreErrors ) throw new RuntimeException(e);
+		}
+		finally {
+			aBuf = null;
 		}
 	}
 

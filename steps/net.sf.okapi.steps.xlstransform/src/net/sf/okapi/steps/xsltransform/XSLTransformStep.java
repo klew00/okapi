@@ -33,10 +33,10 @@ import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class XSLTransformStep implements IPipelineStep {
+public class XSLTransformStep extends BasePipelineStep {
 
 	private Parameters params;
 	private Source xsltInput;
@@ -47,7 +47,8 @@ public class XSLTransformStep implements IPipelineStep {
 		params = new Parameters();
 		trans = null;
 	}
-	
+
+	@Override
 	public void destroy () {
 		// Make available to GC
 		trans = null;
@@ -62,43 +63,18 @@ public class XSLTransformStep implements IPipelineStep {
 		return "XSLT Transformation";
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case START_DOCUMENT:
-			if ( trans == null ) startBatch();
-			break;
-		case CANCELED:
-		case FINISHED:
-			trans = null; // Reset for next batch
-			break;
-		case RAW_DOCUMENT:
-			processRawDocument(event);
-			break;
-		}
-		return event;
-	}
-
-	public boolean hasNext () {
-		return false;
-	}
-
-	public void postprocess () {
-		// Nothing to do
-	}
-
-	public void preprocess () {
-		// Nothing to do
-	}
-
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
  
-	private void startBatch () {
+	@Override
+	protected void handleStartBatch (Event event) {
 		try {
 			// Create the parameters map
 			ConfigurationString cfgString = new ConfigurationString(params.paramList);
@@ -118,7 +94,8 @@ public class XSLTransformStep implements IPipelineStep {
 		}
 	}
 
-	public void processRawDocument (Event event) {
+	@Override
+	protected void handleRawDocument (Event event) {
 		try {
 			RawDocument rawDoc = (RawDocument)event.getResource();
 			trans.reset();

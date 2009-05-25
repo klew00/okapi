@@ -27,7 +27,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -41,6 +43,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -553,6 +556,17 @@ public class PropertiesFilter implements IFilter {
 		String text)
 	{
 		logger.log(level, String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
+	}
+
+	public Map<String, FilterConfiguration> getConfigurations() {
+		LinkedHashMap<String, FilterConfiguration> map = new LinkedHashMap<String, FilterConfiguration>();
+		FilterConfiguration fc = new FilterConfiguration();
+		fc.configId = "okapi.properties";
+		fc.description = "Filter for Java Properties files";
+		fc.name = "Java Properties";
+		fc.filterClass = getClass().getName();
+		map.put(MimeTypeMapper.PROPERTIES_MIME_TYPE, fc);
+		return map;
 	}
 
 }

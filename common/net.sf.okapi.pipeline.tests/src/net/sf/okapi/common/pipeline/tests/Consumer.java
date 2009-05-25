@@ -40,13 +40,13 @@ public class Consumer extends BasePipelineStep {
 	}
 
 	@Override
-	public void postprocess() {		
-		LOGGER.log(Level.FINEST, getName() + " postprocess");
+	protected void handleEndBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
 	}
 
 	@Override
-	public void preprocess() {
-		LOGGER.log(Level.FINEST, getName() + " preprocess");
+	protected void handleStartBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
 	}
 	
 	@Override
@@ -59,7 +59,4 @@ public class Consumer extends BasePipelineStep {
 		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
 	}
 
-	public boolean hasNext() {
-		return false;
-	}
 }

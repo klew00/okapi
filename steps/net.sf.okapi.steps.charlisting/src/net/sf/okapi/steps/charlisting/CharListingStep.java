@@ -30,24 +30,19 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class CharListingStep implements IPipelineStep {
+public class CharListingStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
-	private boolean firstDoc;
 
-	public CharListingStep () {
-		firstDoc = true;
-	}
-
+	@Override
 	public void destroy () {
-		firstDoc = true;
 		if ( charList == null ) {
 			charList.clear();
 			charList = null;
@@ -66,47 +61,17 @@ public class CharListingStep implements IPipelineStep {
 		return params;
 	}
 
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
-		case START_DOCUMENT:
-			if ( firstDoc ) {
-				firstDoc = false;
-				charList = new Hashtable<Character, Integer>();
-			}
-			break;
-			
-		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
-			break;
-			
-		case CANCELED:
-			firstDoc = true;
-			break;
-			
-		case FINISHED:
-			processFinished();
-			break;
-		}
-		return event;
-	}
-
-	public boolean hasNext () {
-		return false;
-	}
-
-	public void postprocess () {
-		// Nothing to do
-	}
-
-	public void preprocess () {
-		// Nothing to do
-	}
-
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
  
-	private void processFinished () {
+	@Override
+	protected void handleStartBatch (Event event) {
+		charList = new Hashtable<Character, Integer>();
+	}
+	
+	@Override
+	protected void handleEndBatch (Event event) {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
@@ -139,7 +104,6 @@ public class CharListingStep implements IPipelineStep {
 				String.format("Error with '%s'.", params.outputPath), e);
 		}
 		finally {
-			firstDoc = true;
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
@@ -147,7 +111,9 @@ public class CharListingStep implements IPipelineStep {
 		}
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	@Override
+	protected void handleTextUnit (Event event) {
+		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		// Get the coded text and detect the used characters

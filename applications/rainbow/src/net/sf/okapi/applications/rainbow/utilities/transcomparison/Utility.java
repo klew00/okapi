@@ -119,7 +119,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		return true;
 	}
 
-	public int requestInputCount () {
+	public int inputCountRequested () {
 		// Base file and to-compare file
 		return 2;
 	}

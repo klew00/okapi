@@ -29,6 +29,8 @@ import net.sf.okapi.common.filters.IFilter;
  */
 public interface IPipelineStep {
 	
+	public void setPipeline (IPipeline pipeline);
+	
 	/**
 	 * Gets the current parameters for this step.
 	 * @return the current parameters for this step.
@@ -54,20 +56,6 @@ public interface IPipelineStep {
 	public String getDescription ();
 	
 	/**
-	 * Executes the pre-processing actions for this step.
-	 * Pre-processing is done before any events are processed, and is called once per
-	 * pipeline execution.
-	 */
-	void preprocess();
-
-	/**
-	 * Executes the post-processing actions for this step.
-	 * Post-processing is done after all events are processed, and is called once per
-	 * pipeline execution.
-	 */
-	void postprocess();
-
-	/**
 	 * Processes each event sent though the pipeline.
 	 * @param event the event to process.
 	 * @return the event to pass down the pipeline.
@@ -81,11 +69,25 @@ public interface IPipelineStep {
 	 * 
 	 * @return true if can generate more events, false otherwise.
 	 */
-	boolean hasNext();
+	boolean isDone();
 	
 	/**
 	 * Executes any cleanup code for this step. Called once at the end of the pipeline lifecycle.
 	 */
 	void destroy();
+
+	/**
+	 * Indicates how many inputs are needed by this step for each process
+	 * within a batch. Most step will request one input per batch item.
+	 * @return the number of requested input per batch item.
+	 */
+	int inputCountRequested ();
+	
+	/**
+	 * Indicates if a given input needs corresponding output information.
+	 * @param inputIndex the index of the input to query. Use 0 for the main input.
+	 * @return true if the given input needs a corresponding output.
+	 */
+	boolean needsOutput (int inputIndex);
 
 }

@@ -54,4 +54,11 @@ public class Annotations {
 		return (A) annotations.get(annotationType);
 	}
 
+	/**
+	 * Removes all the annotations in this object.
+	 */
+	public void clear () {
+		annotations.clear();
+	}
+
 }

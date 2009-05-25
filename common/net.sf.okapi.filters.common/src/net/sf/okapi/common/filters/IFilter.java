@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.filters;
 
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -48,28 +50,6 @@ public interface IFilter {
 	public String getName ();
 
 	/**
-	 * Sets the options for this (monolingual) filter.
-	 * @param sourceLanguage Code of the source language.
-	 * @param defaultEncoding Name of the default encoding of the input document.
-	 * @param generateSkeleton Indicates if this filter should generate skeleton data or not.
-	 */
-//	public void setOptions (String sourceLanguage,
-//		String defaultEncoding,
-//		boolean generateSkeleton);
-
-	/**
-	 * Sets the options for this (multilingual) filter.
-	 * @param sourceLanguage Code of the source language.
-	 * @param targetLanguage Code of the target language.
-	 * @param defaultEncoding Name of the default encoding of the input document.
-	 * @param generateSkeleton Indicates if this filter should generate skeleton data or not.
-	 */
-//	public void setOptions (String sourceLanguage,
-//		String targetLanguage,
-//		String defaultEncoding,
-//		boolean generateSkeleton);
-
-	/**
 	 * Opens the input document described in a give RawDocument object.
 	 * Skeleton information is always created when you use this method.
 	 * @param input The RawDocument object to use to open the document.
@@ -83,30 +63,6 @@ public interface IFilter {
 	 */
 	public void open (RawDocument input,
 		boolean generateSkeleton);
-
-	/**
-	 * Opens the input document through its input stream.
-	 * You must call {@link #setOptions(String, String, boolean)} or
-	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
-	 * @param input The input stream of the input document.
-	 */
-//	public void open (InputStream input);
-
-	/**
-	 * Opens the input document that is as a character sequence.
-	 * You must call {@link #setOptions(String, String, boolean)} or
-	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
-	 * @param inputText The text that is the input document.
-	 */
-//	public void open (CharSequence inputText);
-
-	/**
-	 * Opens the input document through its URI.
-	 * You must call {@link #setOptions(String, String, boolean)} or
-	 * {@link #setOptions(String, String, String, boolean)} before calling this method.
-	 * @param inputURI The URI of the input document.
-	 */
-//	public void open (URI inputURI);
 
 	/**
 	 * Closes the input document. Developers should call this method from within their code
@@ -166,5 +122,11 @@ public interface IFilter {
 	 * @return The MIME type of the format supported by this filter.
 	 */
 	public String getMimeType ();
+
+	/**
+	 * Gets the list of all predefined configurations for this filter. 
+	 * @return a list of the all predefined configurations for this filter.
+	 */
+	public List<FilterConfiguration> getConfigurations();
 	
 }

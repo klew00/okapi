@@ -1,8 +1,6 @@
 package net.sf.okapi.common.tests;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.MemMappedCharSequence;

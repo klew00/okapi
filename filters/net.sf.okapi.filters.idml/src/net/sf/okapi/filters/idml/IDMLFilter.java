@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -36,6 +38,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -105,6 +108,16 @@ public class IDMLFilter implements IFilter {
 		return MIMETYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"IDML",
+			"Adobe InDesign IDML documents"));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -200,6 +213,7 @@ public class IDMLFilter implements IFilter {
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setLineBreak("\n");
 			startDoc.setFilterParameters(params);
+			startDoc.setFilter(this);
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}

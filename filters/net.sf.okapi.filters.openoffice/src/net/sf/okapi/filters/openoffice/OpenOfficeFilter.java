@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -36,6 +38,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -110,6 +113,16 @@ public class OpenOfficeFilter implements IFilter {
 		return MIMETYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"OpenOffice.org Documents",
+			"OpenOffice.org ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG documents"));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		// Should be the same as the internal ODF filter already 
 		return params;
@@ -208,6 +221,7 @@ public class OpenOfficeFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterParameters(params);
+			startDoc.setFilter(this);
 			startDoc.setLineBreak("\n"); // forced
 			startDoc.setEncoding("UTF-8", false); // Forced
 			ZipSkeleton skel = new ZipSkeleton(zipFile);

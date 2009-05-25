@@ -26,8 +26,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -38,6 +40,7 @@ import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -118,6 +121,16 @@ public class MIFFilter implements IFilter {
 		return MimeTypeMapper.MIF_MIME_TYPE;
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.MIF_MIME_TYPE,
+			getClass().getName(),
+			"MIF",
+			"Adobe FrameMaker MIF documents"));
+		return list;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}
@@ -181,6 +194,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
+			startDoc.setFilter(this);
 			startDoc.setType(getMimeType());
 			startDoc.setMimeType(getMimeType());
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));

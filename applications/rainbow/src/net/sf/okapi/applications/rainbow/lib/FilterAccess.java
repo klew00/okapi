@@ -235,7 +235,7 @@ public class FilterAccess {
 			IParameters params = newFilter.getParameters();
 			if ( params != null ) { // Not all filters have parameters
 				if (( paramPath != null ) && ( paramPath.length() > 0 )) {
-					params.load(paramPath, false);
+					params.load(Util.toURI(paramPath), false);
 				}
 				else {
 					params.reset();

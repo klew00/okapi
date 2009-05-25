@@ -124,12 +124,6 @@ public interface IUtility {
 	public boolean isFilterDriven ();
 	
 	/**
-	 * Gets the number of input documents needed for this utility.
-	 * @return The number of input documents needed.
-	 */
-	public int requestInputCount ();
-
-	/**
 	 * Adds a set of document information for the the input.
 	 * @param path The full path of the input to process.
 	 * @param encoding The default encoding.
@@ -163,5 +157,7 @@ public interface IUtility {
 	public void cancel ();
 	
 	public void destroy ();
+
+	public int inputCountRequested ();
 
 }

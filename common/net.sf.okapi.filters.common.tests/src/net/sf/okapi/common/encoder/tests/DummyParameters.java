@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.encoder.tests;
 
+import java.net.URI;
+
 import net.sf.okapi.common.IParameters;
 
 public class DummyParameters implements IParameters {
@@ -63,7 +65,7 @@ public class DummyParameters implements IParameters {
 		return null;
 	}
 
-	public void load (String filePath, boolean ignoreErrors) {
+	public void load (URI inputURI, boolean ignoreErrors) {
 		// Not needed for tests
 	}
 

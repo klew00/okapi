@@ -8,6 +8,7 @@ import net.sf.okapi.common.Okapi;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.FilterHarvester;
 import net.sf.okapi.common.pipeline.FilterEventsToRawDocumentStep;
 import net.sf.okapi.common.pipeline.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -58,6 +59,8 @@ public class RunTest {
 		fc.description = "properties file with key names that includes 'text'";
 		fc.parameters = "okapi.properties-TextKeysOnly.fprm";
 		fcMapper.addConfiguration(fc, MimeTypeMapper.PROPERTIES_MIME_TYPE);
+
+		FilterHarvester.harvestFilterConfigurations("C:\\Tmp\\TestOSGi\\Test.jar", fcMapper);
 
 		driver = new PipelineDriver();
 	}

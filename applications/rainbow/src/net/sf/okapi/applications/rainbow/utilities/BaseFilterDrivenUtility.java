@@ -26,6 +26,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.resource.RawDocument;
 
 public abstract class BaseFilterDrivenUtility extends BaseUtility
@@ -79,6 +80,18 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			if ( filter != null ) filter.close();
 			if ( filterWriter != null ) filterWriter.close();
 		}
+	}
+
+	public boolean isDone() {
+		return false;
+	}
+
+	public boolean needsOutput (int inputIndex) {
+		return (inputIndex==0);
+	}
+
+	public void setPipeline(IPipeline pipeline) {
+		// Not used
 	}
 
 }

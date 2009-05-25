@@ -82,6 +82,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
 		
 		<ant antfile="../shared/build_filters.html.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>

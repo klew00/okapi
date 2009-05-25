@@ -124,10 +124,10 @@ public class Parameters implements IParameters {
 		return path;
 	}
 
-	public void load (String filePath,
+	public void load (URI inputURI,
 		boolean ignoreErrors)
 	{
-		File f = new File(filePath);
+		File f = new File(inputURI);
 		try {
 			doc = docBuilder.parse(f);
 		}
@@ -137,7 +137,7 @@ public class Parameters implements IParameters {
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		} 
-		path = filePath;
+		path = inputURI.getPath();
 		docURI = f.toURI();
 	}
 

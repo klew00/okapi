@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common;
 
+import java.net.URI;
+
 /**
  * Common way for a component to expose its
  * parameters in a generic way.  
@@ -48,12 +50,12 @@ public interface IParameters {
 	
 	/**
 	 * Loads the parameters from a file.
-	 * @param filePath the full path of the parameters file to load.
+	 * @param inputURI the URI of the parameters file to load.
 	 * @param ignoreErrors true if the load should ignore any error
 	 * such as file not found. If an error occurs and this is set to true,
 	 * the method should create the parameters object with its default values.
 	 */
-	public void load (String filePath,
+	public void load (URI inputURI,
 		boolean ignoreErrors);
 	
 	/**

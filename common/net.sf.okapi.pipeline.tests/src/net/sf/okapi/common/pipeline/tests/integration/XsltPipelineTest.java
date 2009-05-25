@@ -1,20 +1,23 @@
 package net.sf.okapi.common.pipeline.tests.integration;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
-import net.sf.okapi.common.pipeline.EventsWriterStep;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.IPipelineDriver;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.xml.XMLFilter;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import static org.junit.Assert.*;
 import org.junit.After;
@@ -23,8 +26,15 @@ import org.junit.Test;
 
 public class XsltPipelineTest {
 
+	private IPipelineDriver driver;
+	private IFilterConfigurationMapper fcMapper;
+	
 	@Before
 	public void setUp() throws Exception {
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+		driver = new PipelineDriver();
+		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
 	}
 
 	@After
@@ -33,39 +43,45 @@ public class XsltPipelineTest {
 
 	@Test
 	public void runXsltPipeline() throws URISyntaxException,
-			UnsupportedEncodingException {
-		IPipeline pipeline = new Pipeline();
+		UnsupportedEncodingException, FileNotFoundException, IOException
+	{
+		driver.clearItems();
 
-		// input resource
+		// Input resource
 		URL inputXml = XsltPipelineTest.class.getResource("test.xml");
 
-		// make copy of input
-		InputStream in = XsltPipelineTest.class.getResourceAsStream("identity.xsl");
-		pipeline.addStep(new XsltTransformStep(in));
+		// Make copy of input
+		InputStream in1 = XsltPipelineTest.class.getResourceAsStream("identity.xsl");
+		driver.addStep(new XsltTransformStep(in1));
 
-		// remove b tags from input
-		in = XsltPipelineTest.class.getResourceAsStream("remove_b_tags.xsl");
-		pipeline.addStep(new XsltTransformStep(in));
+		// Remove b tags from input
+		InputStream in2 = XsltPipelineTest.class.getResourceAsStream("remove_b_tags.xsl");
+		driver.addStep(new XsltTransformStep(in2));
 
-		// filtering step - converts resource to events
-		IFilter filter = new XMLFilter();
-		IPipelineStep filterStep = new RawDocumentToEventsStep(filter);
-		pipeline.addStep(filterStep);
+		// Filtering step - converts resource to events
+		driver.addStep(new RawDocumentToFilterEventsStep());
 
-		// writer step - converts events to a resource
-		IFilterWriter writer = filter.createFilterWriter();
-		writer.setOptions("en", "UTF-8");
-		pipeline.addStep(new EventsWriterStep(writer));
+		// Writer step - converts events to a resource
+		driver.addStep(new FilterEventsWriterStep());
 
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		writer.setOutput(outStream);
+		RawDocument rd = new RawDocument(inputXml.toURI(), "UTF-8", "en");
+		File outFile = new File("output.xml");
+		driver.addBatchItem(rd, "okf_xml", outFile.toURI(), "UTF-8");
+		driver.processBatch();
 
-		pipeline.process(new RawDocument(inputXml.toURI(), "UTF-8", "en"));
-
+		// Read the result and compare
+		StringBuilder tmp = new StringBuilder();
+		BufferedReader reader;
+		reader = new BufferedReader(
+			new InputStreamReader(new FileInputStream(outFile), "UTF-8"));
+		char[] buf = new char[2048];
+		int count = 0;
+		while (( count = reader.read(buf)) != -1 ) {
+			tmp.append(buf, 0, count);
+		}
 		assertEquals(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>".replaceAll("\\r\\n", "\n"),
-				new String(outStream.toByteArray(), "UTF-8").replaceAll("\\r\\n", "\n"));
-
-		pipeline.destroy();
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<start fileID=\"02286_000_000\"><para id=\"1\">This is a test with .</para></start>",
+			tmp.toString());
 	}
+
 }

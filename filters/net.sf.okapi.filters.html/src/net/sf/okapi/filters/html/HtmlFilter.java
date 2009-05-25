@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.html;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Property;
@@ -64,7 +66,19 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		super();
 		bufferedWhitespace = new StringBuilder();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
+		setFilter(this);
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
+	}
+
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.HTML_MIME_TYPE,
+			getClass().getName(),
+			"HTML/XHTML",
+			"HTML and XHTML documents",
+			"defaultConfiguration.yml"));
+		return list;
 	}
 
 	/**
@@ -393,7 +407,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	 * @see net.sf.okapi.common.filters.IFilter#getName()
 	 */
 	public String getName() {
-		return "HTML Filter"; //$NON-NLS-1$
+		return "okf_html"; //$NON-NLS-1$
 	}
 
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
@@ -533,4 +547,5 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		}
 		return false;
 	}
+
 }

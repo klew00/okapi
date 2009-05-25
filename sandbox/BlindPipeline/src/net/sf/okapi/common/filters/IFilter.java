@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.filters;
 
+import java.util.Map;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -166,5 +168,11 @@ public interface IFilter {
 	 * @return The MIME type of the format supported by this filter.
 	 */
 	public String getMimeType ();
+
+	/**
+	 * Gets the list of all the pre-defined configurations for this filter.
+	 * @return a Map of the configurations available and their associated MIME types.
+	 */
+	public Map<String, FilterConfiguration> getConfigurations ();
 	
 }

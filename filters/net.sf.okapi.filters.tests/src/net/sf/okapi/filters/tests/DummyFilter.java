@@ -23,10 +23,12 @@ package net.sf.okapi.filters.tests;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -172,6 +174,10 @@ public class DummyFilter implements IFilter {
 		skel = new GenericSkeleton("</doc>\n");
 		ending.setSkeleton(skel);
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
+	}
+
+	public List<FilterConfiguration> getConfigurations() {
+		return null;
 	}
 
 }

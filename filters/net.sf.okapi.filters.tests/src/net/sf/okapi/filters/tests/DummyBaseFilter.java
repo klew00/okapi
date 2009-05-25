@@ -21,9 +21,11 @@
 package net.sf.okapi.filters.tests;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.AbstractBaseFilter;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.RawDocument;
@@ -100,5 +102,9 @@ public class DummyBaseFilter extends AbstractBaseFilter {
 	@Override
 	protected boolean hasUtf8Encoding() {
 		return false;
+	}
+
+	public List<FilterConfiguration> getConfigurations() {
+		return null;
 	}	
 }

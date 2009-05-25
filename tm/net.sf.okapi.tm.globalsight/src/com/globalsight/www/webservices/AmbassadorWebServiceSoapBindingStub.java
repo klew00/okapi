@@ -7,6 +7,7 @@
 
 package com.globalsight.www.webservices;
 
+@SuppressWarnings("unchecked")
 public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.Stub implements com.globalsight.www.webservices.Ambassador {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -788,7 +789,7 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
          super.cachedEndpoint = endpointURL;
     }
 
-    public AmbassadorWebServiceSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+	public AmbassadorWebServiceSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();
         } else {
@@ -797,17 +798,17 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
         ((org.apache.axis.client.Service)super.service).setTypeMappingVersion("1.2");
             java.lang.Class cls;
             javax.xml.namespace.QName qName;
-            javax.xml.namespace.QName qName2;
+//            javax.xml.namespace.QName qName2;
             java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
-            java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
-            java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-            java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-            java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-            java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-            java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
-            java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
-            java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
+//            java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
+//            java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
+//            java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
+//            java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
+//            java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
+//            java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
+//            java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
+//            java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
             qName = new javax.xml.namespace.QName("http://webservices.globalsight.com", "WebServiceException");
             cachedSerQNames.add(qName);
             cls = com.globalsight.webservices.WebServiceException.class;
@@ -817,7 +818,7 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
 
     }
 
-    protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
+	protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
         try {
             org.apache.axis.client.Call _call = super._createCall();
             if (super.maintainSessionSet) {
@@ -1530,7 +1531,7 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
 }
     }
 
-    public void createJob(java.util.HashMap args) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException {
+	public void createJob(java.util.HashMap args) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -1562,7 +1563,7 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
 }
     }
 
-    public java.lang.String getUniqueJobName(java.util.HashMap args) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException {
+	public java.lang.String getUniqueJobName(java.util.HashMap args) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

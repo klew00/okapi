@@ -28,6 +28,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -48,6 +49,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.DTDEncoder;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -217,6 +219,16 @@ public class DTDFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration("okf_dtd",
+			MimeTypeMapper.DTD_MIME_TYPE,
+			getClass().getName(),
+			"DTD (Document Type Definition)",
+			"Configuration for XML DTD documents (entities content)"));
+		return list;
+	}
+
 	private void commonOpen (Reader inputReader) {
 		close();
 		parseState = 1;
@@ -257,6 +269,7 @@ public class DTDFilter implements IFilter {
 	private Event start () {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setFilterParameters(params);
+		startDoc.setFilter(this);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);

@@ -1,20 +1,18 @@
 package example03;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
-import net.sf.okapi.common.pipeline.EventsWriterStep;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.common.pipeline.IPipelineDriver;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.xml.XMLFilter;
 
 /**
  * Example showing an Okapi pipeline running XSLT transformations on a file. The
@@ -23,46 +21,43 @@ import net.sf.okapi.filters.xml.XMLFilter;
  */
 public class Main {
 
-	public static void main(String[] args) throws URISyntaxException, UnsupportedEncodingException {
-		IPipeline pipeline = new Pipeline();
+	public static void main(String[] args)
+		throws URISyntaxException, UnsupportedEncodingException
+	{
+		IPipelineDriver driver = new PipelineDriver();
+		
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
 
-		// input resource as URL
+		// Input resource as URL
 		URL inputXml = Main.class.getResource("test.xml");
 
-		// make copy of input using identity XSLT
+		// Make copy of input using identity XSLT
 		InputStream in = Main.class.getResourceAsStream("identity.xsl");
-		pipeline.addStep(new XsltTransformStep(in));
+		driver.addStep(new XsltTransformStep(in));
 
-		// remove b tags from input using remove_b_tags XSLT
+		// Remove b tags from input using remove_b_tags XSLT
 		in = Main.class.getResourceAsStream("remove_b_tags.xsl");
-		pipeline.addStep(new XsltTransformStep(in));
+		driver.addStep(new XsltTransformStep(in));
 
-		// filtering step - converts raw resource to events
-		IFilter filter = new XMLFilter();
-		IPipelineStep filterStep = new RawDocumentToEventsStep(filter);
-		pipeline.addStep(filterStep);
+		// Filtering step - converts raw resource to events
+		driver.addStep(new RawDocumentToFilterEventsStep());
 
-		// writer step - converts events to a raw resource
-		IFilterWriter writer = filter.createFilterWriter();
-		writer.setOptions("en", "UTF-8");
-		pipeline.addStep(new EventsWriterStep(writer));
+		// Writer step - converts events to a raw resource
+		driver.addStep(new FilterEventsWriterStep());
 
-		// buffer for the writer step
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		writer.setOutput(outStream);
-
-		// run the pipeline:
+		// Set the info for the input and output
+		driver.addBatchItem(
+			new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr"),
+			"okf_xml", (new File("output.xml")).toURI(), "UTF-8");
+		
+		// Run the pipeline:
 		// (1) XSLT identity conversion step
 		// (2) XSLT replace b tag conversion step
 		// (3) XML filtering step creates IResource Events
 		// (4) Writer step takes Events and writes them out to outStream
-		pipeline.process(new RawDocument(inputXml.toURI(), "UTF-8", "en"));
-
-		// destroy the pipeline and all steps - clean up resources
-		pipeline.destroy();
-
-		// print out resulting XML file from the writer
-		System.out.println(new String(outStream.toByteArray(), "UTF-8"));
+		driver.processBatch();
 
 	}
 }

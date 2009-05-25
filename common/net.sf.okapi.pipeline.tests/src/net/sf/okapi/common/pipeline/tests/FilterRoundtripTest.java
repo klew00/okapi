@@ -22,17 +22,21 @@ package net.sf.okapi.common.pipeline.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.pipeline.RawDocumentToEventsStep;
-import net.sf.okapi.common.pipeline.EventsWriterStep;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.IPipelineDriver;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,88 +44,87 @@ import org.junit.Test;
 
 public class FilterRoundtripTest {
 
+	private IPipelineDriver driver;
+	private IFilterConfigurationMapper fcMapper;
+	
 	@Before
 	public void setUp() {
-
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		driver = new PipelineDriver();
+		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		driver.addStep(new FilterEventsWriterStep());
 	}
 
 	@Test
 	public void runPipelineFromString() {
-		IPipeline pipeline = new Pipeline();
-
-		HtmlFilter htmlFilter = new HtmlFilter();
-
-		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
-				genericSkeletonWriter);
-		genericFilterWriter.setOptions("es", "UTF-16LE");
-		genericFilterWriter.setOutput("genericOutput.txt");
-
-		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
-		pipeline.addStep(new EventsWriterStep(
-				genericFilterWriter));
-
-		RawDocument fr = new RawDocument(
-				"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
-				"en");
-		pipeline.process(fr);
+		driver.clearItems();
+		RawDocument rd = new RawDocument(
+			"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
+			"en", "es");
+		driver.addBatchItem(rd, "okf_html",
+			(new File("genericOutput.txt")).toURI(), "UTF-16LE");
+		driver.processBatch();
+		assertEquals("spam",
+			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
+				"UTF-16LE", "es")));
 	}
 
 	@Test
 	public void runPipelineFromStream() {
-		IPipeline pipeline = new Pipeline();
-
-		HtmlFilter htmlFilter = new HtmlFilter();
-
-		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
-				genericSkeletonWriter);
-		genericFilterWriter.setOptions("es", "UTF-8");
-		genericFilterWriter.setOutput("genericOutput.txt");
-
-		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
-		pipeline.addStep(new EventsWriterStep(
-				genericFilterWriter));
-		// HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html")
-		RawDocument fr = new RawDocument("\r\nX\rY\n", "en");
-		pipeline.process(fr);
-		pipeline.destroy();
+		driver.clearItems();
+		RawDocument rd = new RawDocument("\nX\n\nY\n", "en", "fr");
+		driver.addBatchItem(rd, "okf_html",
+			(new File("genericOutput.txt")).toURI(), "UTF-8");
+		driver.processBatch();
+		assertEquals("X Y",
+			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
+				"UTF-8", "fr")));
 	}
 	
 	@Test
 	public void runPipelineTwice() throws UnsupportedEncodingException {
-		IPipeline pipeline = new Pipeline();
+		String snippet = "<b>TEST ME</b>";
+		// First pass
+		driver.clearItems();
+		RawDocument rd = new RawDocument(snippet, "en", "es");
+		driver.addBatchItem(rd, "okf_html",
+			(new File("output1.html")).toURI(), "UTF-8");
+		driver.processBatch();
 
-		HtmlFilter htmlFilter = new HtmlFilter();
-
-		GenericSkeletonWriter genericSkeletonWriter = new GenericSkeletonWriter();
-		GenericFilterWriter genericFilterWriter = new GenericFilterWriter(
-				genericSkeletonWriter);
-		genericFilterWriter.setOptions("es", "UTF-8");
+		// Second pass
+		driver.clearItems();
+		rd = new RawDocument((new File("output1.html")).toURI(), "UTF-8", "es", "en");
+		driver.addBatchItem(rd, "okf_html",
+			(new File("output2.html")).toURI(), "UTF-8");
+		driver.processBatch();
 		
-		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		genericFilterWriter.setOutput(outStream);
-
-		pipeline.addStep(new RawDocumentToEventsStep(htmlFilter));
-		pipeline.addStep(new EventsWriterStep(
-				genericFilterWriter));
-
-		RawDocument fr = new RawDocument("<b>TEST ME</b>", "en");
-		
-		// first pass
-		pipeline.process(fr);
-		assertEquals("<b>TEST ME</b>",	new String(outStream.toByteArray(), "UTF-8"));
-		
-		// second pass - reset writer output for good measure
-		outStream = new ByteArrayOutputStream();
-		genericFilterWriter.setOutput(outStream);
-		pipeline.process(fr);
-		
-		assertEquals("<b>TEST ME</b>",	new String(outStream.toByteArray(), "UTF-8"));
-		
-		pipeline.destroy();
+		// Check result
+		assertEquals(snippet,
+			getFirstTUSource(new RawDocument((new File("output2.html")).toURI(),
+				"UTF-8", "es")));
 	}
 
+	private String getFirstTUSource (RawDocument rd) {
+		IFilter filter = new HtmlFilter();
+		try {
+			filter.open(rd);
+			Event event;
+			while ( filter.hasNext() ) {
+				event = filter.next();
+				if ( event.getEventType() == EventType.TEXT_UNIT ) {
+					TextUnit tu = (TextUnit)event.getResource();
+					return tu.getSource().toString();
+				}
+			}
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
+		return null;
+	}
+	
 	@After
 	public void cleanUp() {
 	}

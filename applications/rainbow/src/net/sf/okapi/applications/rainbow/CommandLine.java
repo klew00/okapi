@@ -229,7 +229,7 @@ public class CommandLine {
 		if ( optionsFile != null ) {
 			if ( util.hasParameters() ) {
 				// Ignore errors to allow to create an options file
-				util.getParameters().load(optionsFile, true);
+				util.getParameters().load(Util.toURI(optionsFile), true);
 			}
 		}
 		

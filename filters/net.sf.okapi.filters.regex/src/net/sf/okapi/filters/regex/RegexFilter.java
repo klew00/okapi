@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -40,6 +42,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -57,6 +60,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class RegexFilter implements IFilter {
 
+	private static String MIMETYPE = "text/x-regex";
+	
 	private boolean canceled;
 	private Parameters params;
 	private String encoding;
@@ -93,7 +98,30 @@ public class RegexFilter implements IFilter {
 	}
 	
 	public String getMimeType () {
-		return "text/x-regex";
+		return MIMETYPE;
+	}
+
+	public List<FilterConfiguration> getConfigurations () {
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName()+"-srt",
+			MIMETYPE,
+			getClass().getName(),
+			"STR Sub-Titles",
+			"Configuration for SRT (Sub-Rip Text) sub-titles files.",
+			"srt.fprm"));
+		list.add(new FilterConfiguration(getName()+"-textLine",
+			MIMETYPE,
+			getClass().getName(),
+			"Text (Line=Paragraph)",
+			"Configuration for text files where each line is a paragraph",
+			"textLine.fprm"));
+		list.add(new FilterConfiguration(getName()+"-textBlock",
+			MIMETYPE,
+			getClass().getName(),
+			"Text (Block=Paragraph)",
+			"Configuration for text files where each paragraph is separated by at least two line-breaks.",
+			"textBlock.fprm"));
+		return list;
 	}
 
 	public IParameters getParameters () {
@@ -228,7 +256,6 @@ public class RegexFilter implements IFilter {
 			while (( count = reader.read(buf)) != -1 ) {
 				tmp.append(buf, 0, count);
 			}
-			reader.readLine();
 			
 			// Detect line break type
 			lineBreak = BOMNewlineEncodingDetector.getNewlineType(tmp).toString();
@@ -317,6 +344,7 @@ public class RegexFilter implements IFilter {
 		startDoc.setLanguage(srcLang);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
+		startDoc.setFilter(this);
 		startDoc.setType(params.mimeType);
 		startDoc.setMimeType(params.mimeType);
 		startDoc.setMultilingual(hasRulesWithTarget());

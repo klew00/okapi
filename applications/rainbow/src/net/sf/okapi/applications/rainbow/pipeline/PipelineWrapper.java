@@ -27,61 +27,135 @@ import java.util.Map;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.IPipelineDriver;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 
 public class PipelineWrapper {
 	
+	public final Map<String, Step> availableSteps;
+	
 	private String path;
 	private ArrayList<Step> steps;
-	public final Map<String, Step> availableSteps;
+	private IPipelineDriver driver;
+	private IFilterConfigurationMapper fcMapper;
 
 	// Temporary class to create a list of available steps
 	private Map<String, Step> buildStepList () {
 		Hashtable<String, Step> map = new Hashtable<String, Step>();
 		try {
-			Step step = new Step("RawDocumentToEventsStep",
-				"Raw document to filter events",
-				"net.sf.okapi.common.pipeline.RawDocumentToEventsStep", null);
-			IPipelineStep ps;
-			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			IPipelineStep ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.common.RawDocumentToFilterEventsStep").newInstance();
+			Step step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
 			IParameters params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
 				
-			step = new Step("EventsToRawDocumentStep",
-				"Filter events to raw document",
-				"net.sf.okapi.common.pipeline.EventsToRawDocumentStep", null);
-			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			ps = (IPipelineStep)Class.forName(
+					"net.sf.okapi.steps.common.FilterEventsToRawDocumentStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
 							
-			step = new Step("EventsWriterStep",
-				"Filter events writer",
-				"net.sf.okapi.common.pipeline.EventsWriterStep", null);
-			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+			ps = (IPipelineStep)Class.forName(
+					"net.sf.okapi.steps.common.FilterEventsWriterStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
-								
-			step = new Step("XSLTransformStep",
-				"XSL transformation",
-				"net.sf.okapi.steps.xsltransform.XSLTransformStep", null);
-			ps = (IPipelineStep)Class.forName(step.stepClass).newInstance();
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.common.RawDocumentWriterStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+						
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+					
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
 			
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.bomconversion.BOMConversionStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.charlisting.CharListingStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+	
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.segmentation.SegmentationStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.textmodification.TextModificationStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
 		}
 		catch ( InstantiationException e ) {
 			e.printStackTrace();
@@ -95,8 +169,10 @@ public class PipelineWrapper {
 		return map;
 	}
 	
-	public PipelineWrapper () {
+	public PipelineWrapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
 		steps = new ArrayList<Step>();
+		driver = new PipelineDriver();
 		//TODO: use register system for this
 		availableSteps = buildStepList();
 	}
@@ -137,17 +213,20 @@ public class PipelineWrapper {
 	}
 	
 	public void execute () {
-		IPipeline pipeline = null;
 		try {
-			// Create the real pipeline from the info
-			pipeline = new Pipeline();
+			// Build the pipeline
+			driver.setPipeline(new Pipeline());
+			driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
 			for ( Step stepInfo : steps ) {
 				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
-				pipeline.addStep(step);
+				driver.addStep(step);
 			}
+			
+			// Set the input
+			//TODO
 
-			// Execute the steps
-			//pipeline.process(input)
+			// Execute
+			driver.processBatch();
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -158,10 +237,6 @@ public class PipelineWrapper {
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
-		finally {
-			if ( pipeline != null ) pipeline.destroy();
-		}
-		
 	}
 
 	public void addStep (Step step) {
