@@ -7,7 +7,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 	net.sf.okapi.common.tests.AllTests.class,
-	net.sf.okapi.common.filters.tests.AllTests.class,
 	net.sf.okapi.common.tests.AllCommonFiltersTests.class,
 	net.sf.okapi.filters.html.tests.AllHtmlUnitTests.class,
 	net.sf.okapi.filters.html.tests.integration.ExtractionComparisionTest.class,
@@ -16,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.filters.mif.tests.MIFFilterTest.class,
 	net.sf.okapi.filters.openoffice.tests.ODFFilterTest.class,
 	net.sf.okapi.filters.openoffice.tests.OpenOfficeFilterTest.class,
-	net.sf.okapi.filters.openxml.tests.AllOpenXMLTests.class,
+	//net.sf.okapi.filters.openxml.tests.AllOpenXMLTests.class,
 	net.sf.okapi.filters.po.tests.POFilterTest.class,
 	net.sf.okapi.filters.properties.tests.AllTests.class,
 	net.sf.okapi.filters.regex.tests.RegexFilterTest.class,

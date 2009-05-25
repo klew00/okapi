@@ -45,7 +45,6 @@ public class ResourcesTest {
 	public void setUp () throws Exception {
 	}
 	
-	
 	@Test
 	public void testMETATag1 () {
 		String test = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";

@@ -94,4 +94,9 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 		// Not used
 	}
 
+	public IPipeline getPipeline () {
+		// Not used
+		return null;
+	}
+
 }

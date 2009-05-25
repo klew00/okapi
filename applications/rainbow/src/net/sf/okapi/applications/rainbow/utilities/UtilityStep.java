@@ -74,31 +74,35 @@ public class UtilityStep implements IPipelineStep {
 	//======================= Just temporary until we move all utilities to steps
 	
 	public IParameters getParameters() {
-		// TODO Auto-generated method stub
+		//x TODO Auto-generated method stub
 		return null;
 	}
 
 	public void setParameters(IParameters params) {
-		// TODO Auto-generated method stub		
+		//x TODO Auto-generated method stub		
 	}
 
 	public int inputCountRequested() {
-		// TODO Auto-generated method stub
+		//x TODO Auto-generated method stub
 		return 1;
 	}
 
 	public boolean isDone() {
-		// TODO Auto-generated method stub
+		//x TODO Auto-generated method stub
 		return false;
 	}
 
 	public boolean needsOutput(int inputIndex) {
-		// TODO Auto-generated method stub
+		//x TODO Auto-generated method stub
 		return false;
 	}
 
 	public void setPipeline(IPipeline pipeline) {
-		// TODO Auto-generated method stub
-		
+		//x TODO Auto-generated method stub
+	}
+
+	public IPipeline getPipeline() {
+		//x TODO Auto-generated method stub
+		return null;
 	}
 }
