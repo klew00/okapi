@@ -32,8 +32,10 @@ import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.IBatchItemContext;
 import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.IPipelineDriver;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.PipelineContext;
+import net.sf.okapi.common.pipeline.PipelineDriver;
 
 public class Main {
 	
@@ -89,10 +91,9 @@ public class Main {
 			
 			// Detect the file to use
 			String ext = Util.getExtension(inputPath);
-			String mimeType = null;
 			if ( ext == null ) throw new RuntimeException("No filter detected for the file extension.");
 			ext = ext.substring(1); // No dot.
-			mimeType = MimeTypeMapper.getMimeType(ext);
+			String mimeType = MimeTypeMapper.getMimeType(ext);
 			FilterConfiguration cfg = fcMapper.getDefaultConfiguration(mimeType);
 			
 			// Display the parsed options
@@ -124,39 +125,40 @@ public class Main {
 	}
 	
 	private static void pipeline1 (FilterConfiguration config) {
-		// Create the pipeline
-		IPipeline pipeline = new Pipeline();
+		// Create the driver
+		IPipelineDriver driver = new PipelineDriver();
 		
 		// Add the filter step to the pipeline
-		pipeline.addStep(new RawDocumentToFilterEventsStep());
+		driver.addStep(new RawDocumentToFilterEventsStep());
 
 		// Add one or more processing step(s)
 		for ( int i=0; i<steps.length(); i++ ) {
 			switch ( steps.charAt(i) ) {
 			case 'p':
-				pipeline.addStep(new PseudoTranslateStep(trgLang, i==steps.length()-1));
+				driver.addStep(new PseudoTranslateStep());
 				break;
 			case 'u':
-				pipeline.addStep(new UppercaseStep(trgLang, i==steps.length()-1));
+				driver.addStep(new UppercaseStep());
 				break;
 			}
 		}
 
 		// Add the writer step to the pipeline
-		pipeline.addStep(new FilterEventsWriterStep());
+		driver.addStep(new FilterEventsWriterStep());
 
-		pipeline.setContext(new PipelineContext());
-		pipeline.getContext().setFilterConfigurationMapper(fcMapper);
+		// Set the filter configuration mapper
+		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
 
-		IBatchItemContext bic = new BatchItemContext((new File(inputPath)).toURI(),
-			inputEncoding, config.configId, (new File(outputPath)).toURI(),
-			outputEncoding, srcLang, trgLang);
+		driver.addBatchItem(new BatchItemContext(
+			(new File(inputPath)).toURI(), // URI of the input document
+			inputEncoding, // Default encoding
+			config.configId, // Filter configuration of the document
+			(new File(outputPath)).toURI(), // Output
+			outputEncoding, // Encoding for the output
+			srcLang, // Source language
+			trgLang)); // Target language
 		
-		pipeline.startBatch();
-		pipeline.getContext().setBatchItemContext(bic);
-		pipeline.process(bic.getRawDocument(0));
-		pipeline.endBatch();
-		pipeline.destroy();
+		driver.processBatch();
 	}
 
 }

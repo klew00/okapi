@@ -28,28 +28,20 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class UppercaseStep extends BasePipelineStep {
 
-	private String trgLang;
-	
-	public UppercaseStep (String trgLang,
-		boolean hasNext)
-	{
-		this.trgLang = trgLang;
-	}
-	
 	public String getName () {
 		return "Uppercase";
 	}
-
 	
 	public String getDescription () {
-		return "Converts text to upper cases.";
+		return "Converts text units content to upper cases.";
 	}
 
 	@Override
 	protected void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( tu.isTranslatable() ) {
-			TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
+			TextFragment tf = tu.createTarget(getContext().getTargetLanguage(0),
+				false, IResource.COPY_CONTENT);
 			tf.setCodedText(tf.getCodedText().toUpperCase());
 		}
 	}

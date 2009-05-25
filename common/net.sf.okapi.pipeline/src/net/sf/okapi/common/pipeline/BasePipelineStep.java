@@ -34,16 +34,23 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		this.pipeline = pipeline;
 	}
 	
+	public IPipeline getPipeline () {
+		return pipeline;
+	}
+	
+	/**
+	 * Gets the {@link PipelineContext} of the current pipeline associated
+	 * with this step.
+	 * @return the current {@link PipelineContext} for this step.
+	 */
 	protected PipelineContext getContext () {
 		return pipeline.getContext();
 	}
 
-	// Override this if the step has parameters
 	public IParameters getParameters () {
 		return null;
 	}
 
-	// Override this if the step has parameters
 	public void setParameters (IParameters params) {
 	}
 
@@ -104,10 +111,6 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public void cancel() {
 	}
 
-	/**
-	 * used to cleanup any resources, close files etc.. Only called at the end
-	 * of the Pipeline life cycle.
-	 */
 	public void destroy() {
 	}
 
@@ -119,49 +122,104 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		return false;
 	}
 	
-	// By default we simply pass the event on to the next step. Override these
-	// methods if we need to process
-	// the event
+	// By default we simply pass the event on to the next step.
+	// Override these methods if you need to process the event
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleStartBatch (Event event) {
 	}
 	
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleEndBatch (Event event) {
 	}
 	
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH_ITEM} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleStartBatchItem (Event event) {
 	}
 	
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH_ITEM} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleEndBatchItem (Event event) {
 	}
 	
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#RAW_DOCUMENT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleRawDocument (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_DOCUMENT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleStartDocument (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_DOCUMENT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleEndDocument (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleStartSubDocument (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_SUBDOCUMENT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleEndSubDocument (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#START_GROUP} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleStartGroup (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#END_GROUP} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleEndGroup (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#TEXT_UNIT} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleTextUnit (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#DOCUMENT_PART} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleDocumentPart (Event event) {
 	}
 
+	/**
+	 * Handles the {@link net.sf.okapi.common.EventType#CUSTOM} event.
+	 * @param event the event itself. 
+	 */
 	protected void handleCustom (Event event) {
 	}
 

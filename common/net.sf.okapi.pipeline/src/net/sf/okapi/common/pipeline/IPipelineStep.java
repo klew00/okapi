@@ -29,7 +29,17 @@ import net.sf.okapi.common.filters.IFilter;
  */
 public interface IPipelineStep {
 	
+	/**
+	 * Sets the pipeline where this step is used.
+	 * @param pipeline the pipeline associated with this step.
+	 */
 	public void setPipeline (IPipeline pipeline);
+	
+	/**
+	 * Gets the pipeline associated with this step.
+	 * @return the pipeline associated with this step.
+	 */
+	public IPipeline getPipeline ();
 	
 	/**
 	 * Gets the current parameters for this step.
@@ -63,10 +73,9 @@ public interface IPipelineStep {
 	Event handleEvent(Event event);
 	
 	/**
-	 * Steps that can generate {@link Event}s such as {@link IFilter}s return true until 
+	 * Steps that can generate {@link Event}s such as {@link IFilter}s return false until 
 	 * no more events can be created. 
-	 * Steps which do not create {@link Event} always return false.
-	 * 
+	 * Steps which do not create {@link Event}s always return true.
 	 * @return true if can generate more events, false otherwise.
 	 */
 	boolean isDone();

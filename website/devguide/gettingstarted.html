@@ -88,6 +88,16 @@ kinds of event that can go through a pipeline.</p>
 		<th>Filter-Specific Event?</th>
 	</tr>
 	<tr>
+		<td><code>START_BATCH</code></td>
+		<td>none</td>
+		<td>no (starts a batch)</td>
+	</tr>
+	<tr>
+		<td><code>START_BATCH_ITEM</code></td>
+		<td>none</td>
+		<td>no (starts a batch item)</td>
+	</tr>
+	<tr>
 		<td><code>RAW_DOCUMENT</code></td>
 		<td><code>
 		<a href="../javadoc/net/sf/okapi/common/resource/RawDocument.html">
@@ -159,6 +169,16 @@ kinds of event that can go through a pipeline.</p>
 		<td><code>CUSTOM</code></td>
 		<td>custom resource</td>
 		<td>no (used for custom events)</td>
+	</tr>
+	<tr>
+		<td><code>END_BATCH_ITEM</code></td>
+		<td>none</td>
+		<td>no (ends a batch item)</td>
+	</tr>
+	<tr>
+		<td><code>END_BATCH</code></td>
+		<td>none</td>
+		<td>no (ends a batch)</td>
 	</tr>
 	</table>
 <p>A filter always generates at least the <code>START_DOCUMENT</code> 

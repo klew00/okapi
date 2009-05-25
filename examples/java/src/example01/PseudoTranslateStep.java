@@ -31,39 +31,34 @@ public class PseudoTranslateStep extends BasePipelineStep {
 	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
 	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 
-	private String trgLang;
-	
-	public PseudoTranslateStep (String trgLang,
-		boolean hasNext)
-	{
-		this.trgLang = trgLang;
-	}
-	
 	public String getName () {
 		return "Pseudo-Translation";
 	}
 
 	public String getDescription () {
-		return "Pseudo-translates text.";
+		return "Pseudo-translates text units content.";
 	}
 	
 	@Override
 	protected void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
-		if ( tu.isTranslatable() ) {
-			TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
-			StringBuilder text = new StringBuilder(tf.getCodedText());
-			int n;
-			for ( int i=0; i<text.length(); i++ ) {
-				if ( TextFragment.isMarker(text.charAt(i)) ) i++; // Skip the pair
-				else {
-					if ( (n = OLDCHARS.indexOf(text.charAt(i))) > -1 ) {
-						text.setCharAt(i, NEWCHARS.charAt(n));
-					}
+		if ( !tu.isTranslatable() ) return;
+
+		TextFragment tf = tu.createTarget(getContext().getTargetLanguage(0),
+			false, IResource.COPY_CONTENT);
+		StringBuilder text = new StringBuilder(tf.getCodedText());
+		int n;
+		for ( int i=0; i<text.length(); i++ ) {
+			if ( TextFragment.isMarker(text.charAt(i)) ) {
+				i++; // Skip the pair
+			}
+			else {
+				if ( (n = OLDCHARS.indexOf(text.charAt(i))) > -1 ) {
+					text.setCharAt(i, NEWCHARS.charAt(n));
 				}
 			}
-			tf.setCodedText(text.toString());
 		}
+		tf.setCodedText(text.toString());
 	}
 
 }
