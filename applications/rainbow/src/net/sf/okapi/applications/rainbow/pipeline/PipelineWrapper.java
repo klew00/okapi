@@ -235,6 +235,11 @@ public class PipelineWrapper {
 			driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
 			for ( Step stepInfo : steps ) {
 				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
+				// Update the parameters with the one in the pipeline storage
+				IParameters params = step.getParameters();
+				if (( params != null ) && ( stepInfo.paramsData != null )) {
+					params.fromString(stepInfo.paramsData);
+				}
 				driver.addStep(step);
 			}
 			

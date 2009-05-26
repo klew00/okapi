@@ -275,7 +275,8 @@ public class PipelineEditor {
 					step.paramsData, null, 0, 200);
 				String data = dlg.showDialog();
 				if ( data == null ) return;
-				step.paramsData = data;
+				data = data.replace("\r\n", "\n");
+				step.paramsData = data.replace("\r", "\n");
 			}
 		}
 		catch ( Throwable e ) {
