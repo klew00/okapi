@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.translationcomparison;
 
-import java.io.File;
-
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {

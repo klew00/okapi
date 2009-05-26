@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="filters.plaintext" default="filters.plaintext"> 
+
+	<property name="proj_filters.plaintext" value="../../filters/net.sf.okapi.filters.plaintext"/> 
+	<property name="src_filters.plaintext" value="${proj_filters.plaintext}/src"/> 
+ 
+	<path id="mainClassPath_filters.plaintext">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="filters.plaintext"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_filters.plaintext}" destdir="${tmp}" classpathref="mainClassPath_filters.plaintext"/>
+ 		
+		<copy todir="${tmp}">
+			<fileset dir="${src_filters.plaintext}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+
+	</target>
+
+</project>

@@ -220,8 +220,17 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		return params;
 	}
 
-	public void clearConfigurations () {
-		configMap.clear();
+	public void clearConfigurations (boolean customOnly) {
+		if ( customOnly ) {
+			for ( FilterConfiguration fc : configMap.values() ) {
+				if ( fc.custom ) {
+					configMap.remove(fc.configId);
+				}
+			}
+		}
+		else {
+			configMap.clear();
+		}
 	}
 
 	public void addEditor (String editorClass,
@@ -247,7 +256,13 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		}
 	}
 
-	private IFilter instantiateFilter (FilterConfiguration config,
+	/**
+	 * Instantiate a filter from a given configuration, trying to re-use an existing one.
+	 * @param config the configuration corresponding to the filter to load.
+	 * @param existingFilter an optional existing filter we can try to reuse.
+	 * @return
+	 */
+	protected IFilter instantiateFilter (FilterConfiguration config,
 		IFilter existingFilter)
 	{
 		IFilter filter = null;

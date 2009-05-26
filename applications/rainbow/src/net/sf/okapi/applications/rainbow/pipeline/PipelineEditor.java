@@ -78,7 +78,7 @@ public class PipelineEditor {
 //			this.projectDir = projectDir;
 			create(parent, executeMode);
 			populate(0);
-			showDialog();
+			result = showDialog();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -193,6 +193,7 @@ public class PipelineEditor {
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
+					result = true;
 				}
 				shell.close();
 			};

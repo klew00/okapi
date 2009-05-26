@@ -82,6 +82,11 @@
   inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
  >Filter for DTD files.</filter>
   
+ <filter id="okf_plaintext"
+  name="(BETA) Plain Text Filter"
+  inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
+ >Filter for plain text files.</filter>
+  
  <!--
  <filter id="okf_rtf"
   name="Trados-RTF Filter"

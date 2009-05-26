@@ -32,6 +32,8 @@ import net.sf.okapi.common.resource.RawDocument;
  */
 public class BatchItemContext extends BaseContext implements IBatchItemContext {
 
+	private static final int INITIAL_CAPACITY = 2;
+	
 	private List<DocumentData> list;
 
 	/**
@@ -39,7 +41,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	 */
 	public BatchItemContext () {
 		super();
-		list = new ArrayList<DocumentData>();
+		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 	}
 	
 	/**
@@ -57,7 +59,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		String outputEncoding)
 	{
 		super();
-		list = new ArrayList<DocumentData>();
+		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = rawDoc;
 		ddi.filterConfigId = filterConfigId;
@@ -86,7 +88,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		String targetLanguage)
 	{
 		super();
-		list = new ArrayList<DocumentData>();
+		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
 		ddi.filterConfigId = filterConfigId;
@@ -103,6 +105,28 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		list.add(data);
 	}
 	
+	/**
+	 * Adds a document to the list of inputs for this batch item 
+	 * using the provided arguments. 
+	 * @param rawDoc the {@link RawDocument} to use as the main input document.
+	 * @param filterConfigId the filter configuration ID for the input document
+	 * (can be null if not used).
+	 * @param outputURI the output URI of the input document (can be null if not used).
+	 * @param outputEncoding the output encoding (can be null if not used).
+	 */
+	public void add (RawDocument rawDoc,
+		String filterConfigId,
+		URI outputURI,
+		String outputEncoding)
+	{
+		DocumentData dd = new DocumentData();
+		dd.rawDocument = rawDoc;
+		dd.filterConfigId = filterConfigId;
+		dd.outputURI = outputURI;
+		dd.outputEncoding = outputEncoding;
+		list.add(dd);
+	}
+		
 	public String getFilterConfigurationId (int index) {
 		return list.get(index).filterConfigId;
 	}

@@ -50,9 +50,11 @@ public interface IFilterConfigurationMapper {
 	public void removeConfiguration (String configId);
 	
 	/**
-	 * Removes all configuration mappings from this mapper.
+	 * Removes configuration mappings from this mapper.
+	 * @param customOnly true to clear only custom configuration, false to 
+	 * clear all configurations from this mapper.
 	 */
-	public void clearConfigurations ();
+	public void clearConfigurations (boolean customOnly);
 	
 	/**
 	 * Adds a new editor mapping to this mapper.

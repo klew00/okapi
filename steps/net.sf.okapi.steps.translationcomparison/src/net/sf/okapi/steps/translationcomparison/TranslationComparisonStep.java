@@ -81,6 +81,23 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		initDone = false; // Delay batch initialization until first batch item
 	}
 	
+	protected void handleEndBatch (Event event) {
+		matcher = null;
+		if ( params.generateHTML && ( writer != null )) {
+			writer.close();
+			writer = null;
+		}
+		if ( params.generateTMX && ( tmx != null )) {
+			tmx.writeEndDocument();
+			tmx.close();
+			tmx = null;
+		}
+		Runtime.getRuntime().gc();
+		if ( params.autoOpen && ( pathToOpen != null )) {
+			//			UIUtil.start(pathToOpen);
+		}
+	}
+	
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		// Once per batch initialization
@@ -239,7 +256,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	private void initializeDocumentData () {
 		// Initialize the filter to read the translation to compare
-		getContext().getFilterConfigurationMapper().createFilter(
+		inputToCompare = getContext().getFilterConfigurationMapper().createFilter(
 			getContext().getFilterConfigurationId(1), inputToCompare);
 		
 		// Open the second input for this batch item
@@ -250,7 +267,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( params.generateHTML ) {
 			// Use the to-compare file for the output name
 			if ( pathToOpen == null ) {
-				pathToOpen = getContext().getRawDocument(1).getInputURI() + ".html"; //$NON-NLS-1$
+				pathToOpen = getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
 			}
 			writer.create(pathToOpen); //$NON-NLS-1$
 			writer.writeStartDocument();

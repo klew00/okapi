@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterMapper;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.lib.LanguageItem;
@@ -156,6 +157,7 @@ public class MainForm implements IParametersProvider {
 	private ResourceManager rm;
 	private FormatManager fm;
 	private FilterAccess fa;
+	private FilterMapper fcMapper;
 	private EncodingManager em;
 	private PluginsAccess plugins;
 	private UtilityDriver ud;
@@ -257,6 +259,9 @@ public class MainForm implements IParametersProvider {
 		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		// Define default editor, if none, the fall back for .txt will be used.
 		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
+		
+		fcMapper = new FilterMapper();
+		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 
 		// Toolbar
 		createToolbar();
@@ -1196,10 +1201,17 @@ public class MainForm implements IParametersProvider {
 			}
 			// Else: execute
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
-			wrapper.execute();
+			
+			// Get the latest custom configurations
+			// Get the latest custom configurations
+			fcMapper.setParametersFolder(prj.getParametersFolder());
+			fcMapper.updateCustomConfigurations();
+
+			wrapper.execute(prj);
 		}
-		catch ( Exception E ) {
-			Dialogs.showError(shell, E.getMessage(), null);
+		catch ( Exception e ) {
+			log.error(e.getMessage());
+			e.printStackTrace();
 		}
 		finally {
 			stopWaiting();
@@ -1702,8 +1714,7 @@ public class MainForm implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
-		//TODO: set the fcmapper
-		wrapper = new PipelineWrapper(null);
+		wrapper = new PipelineWrapper(fcMapper);
 		currentInput = 0;
 		resetDisplay(-1);
 	}

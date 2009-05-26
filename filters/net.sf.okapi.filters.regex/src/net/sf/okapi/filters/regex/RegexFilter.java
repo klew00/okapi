@@ -103,6 +103,12 @@ public class RegexFilter implements IFilter {
 
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"Regex Default",
+			"Default Regex configuration.",
+			"srt.fprm"));
 		list.add(new FilterConfiguration(getName()+"-srt",
 			MIMETYPE,
 			getClass().getName(),

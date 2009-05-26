@@ -50,7 +50,7 @@ public class FilterConfigurationTest {
 		fcm.addConfiguration(fc1);
 		FilterConfiguration res1 = fcm.getConfiguration(fc1.configId);
 		assertNotNull(res1);
-		fcm.clearConfigurations();
+		fcm.clearConfigurations(false);
 		res1 = fcm.getConfiguration(fc1.configId);
 		assertNull(res1);
 	}

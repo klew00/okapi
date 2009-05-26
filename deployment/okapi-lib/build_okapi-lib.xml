@@ -79,6 +79,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_filters.rtf.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.tmx.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.dtd.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.plaintext.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_lib.translation.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>

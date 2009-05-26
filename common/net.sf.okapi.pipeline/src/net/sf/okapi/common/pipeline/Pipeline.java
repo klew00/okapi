@@ -76,8 +76,9 @@ public class Pipeline implements IPipeline {
 		// Non-terminal steps will return END_BATCH after receiving END_BATCH
 		// Terminal steps return an event which may be anything,
 		// including a CUSTOM event. The pipeline returns this final event.
+		// We run this on finishedSteps since steps is empty by the time we get here
 		Event event = Event.END_BATCH_EVENT;
-		for ( IPipelineStep step : steps ) {
+		for ( IPipelineStep step : finishedSteps ) {
 			event = step.handleEvent(Event.END_BATCH_EVENT);
 		}
 		done = true;

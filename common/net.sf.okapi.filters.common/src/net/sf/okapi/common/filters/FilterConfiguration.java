@@ -34,6 +34,12 @@ public class FilterConfiguration {
 	public String mimeType;
 
 	/**
+	 * Creates an empty FilterConfiguration object.
+	 */
+	public FilterConfiguration () {
+	}
+	
+	/**
 	 * Creates a FilterConfiguration object and initializes it.
 	 * @param configId the configuration identifier.
 	 * @param mimeType the MIME type associated with this configuration.

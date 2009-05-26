@@ -20,18 +20,24 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.applications.rainbow.Input;
+import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.IPipelineDriver;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.PipelineDriver;
+import net.sf.okapi.common.resource.RawDocument;
 
 public class PipelineWrapper {
 	
@@ -49,7 +55,7 @@ public class PipelineWrapper {
 			IPipelineStep ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.common.RawDocumentToFilterEventsStep").newInstance();
 			Step step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			IParameters params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -59,7 +65,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 					"net.sf.okapi.steps.common.FilterEventsToRawDocumentStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -69,7 +75,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 					"net.sf.okapi.steps.common.FilterEventsWriterStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -79,7 +85,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.common.RawDocumentWriterStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -89,7 +95,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -99,7 +105,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -109,7 +115,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.bomconversion.BOMConversionStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -119,7 +125,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.charlisting.CharListingStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -129,7 +135,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -139,7 +145,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.segmentation.SegmentationStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -149,7 +155,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.textmodification.TextModificationStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -159,7 +165,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.translationcomparison.TranslationComparisonStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), null);
+				ps.getName(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -222,7 +228,7 @@ public class PipelineWrapper {
 		}
 	}
 	
-	public void execute () {
+	public void execute (Project prj) {
 		try {
 			// Build the pipeline
 			driver.setPipeline(new Pipeline());
@@ -232,8 +238,49 @@ public class PipelineWrapper {
 				driver.addStep(step);
 			}
 			
-			// Set the input
-			//TODO
+			// Set the batch items
+			driver.clearItems();
+			int f = -1;
+			URI outURI;
+			URI inpURI;
+			BatchItemContext bic;
+			int inputRequested = driver.inputCountRequested();
+			
+			for ( Input item : prj.getList(0) ) {
+				f++;
+				// Set the data for the first input of the batch item
+				outURI = (new File(prj.buildTargetPath(0, item.relativePath))).toURI();
+				inpURI = (new File(prj.getInputRoot(0) + File.separator + item.relativePath)).toURI();
+				bic = new BatchItemContext(new RawDocument(
+						inpURI, prj.buildSourceEncoding(item),
+						prj.getSourceLanguage(), prj.getTargetLanguage()),
+					item.filterSettings,
+					outURI, prj.buildTargetEncoding(item));
+				
+				// Add input/output data from other input lists if requested
+				for ( int j=1; j<3; j++ ) {
+					// Does the utility requests this list?
+					if ( j >= inputRequested ) break; // No need to loop more
+					// Do we have a corresponding input?
+					if ( 3 > f ) {
+						// Data is available
+						Input item2 = prj.getList(j).get(f);
+						// Input
+						outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
+						inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
+						bic.add(new RawDocument(
+								inpURI, prj.buildSourceEncoding(item),
+								prj.getSourceLanguage(), prj.getTargetLanguage()),
+							item2.filterSettings,
+							outURI, prj.buildTargetEncoding(item2));
+					}
+					// Else: don't add anything
+					// The lists will return null and that is up to the utility to check.
+				}
+				
+				// Add the constructed batch item to the driver's list
+				driver.addBatchItem(bic);
+			}
 
 			// Execute
 			driver.processBatch();

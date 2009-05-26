@@ -20,12 +20,12 @@
 
 package net.sf.okapi.applications.rainbow;
 
-class Input {
+public class Input {
 
-	String relativePath;
-	String format;
-	String sourceEncoding;
-	String targetEncoding;
-	String filterSettings;
+	public String relativePath;
+	public String format;
+	public String sourceEncoding;
+	public String targetEncoding;
+	public String filterSettings;
 
 }
