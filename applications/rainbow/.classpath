@@ -39,5 +39,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.linebreakconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.segmentation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.textmodification"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.translationcomparison"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

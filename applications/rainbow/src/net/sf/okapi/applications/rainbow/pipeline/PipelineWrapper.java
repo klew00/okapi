@@ -156,6 +156,16 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.translationcomparison.TranslationComparisonStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
 		}
 		catch ( InstantiationException e ) {
 			e.printStackTrace();
