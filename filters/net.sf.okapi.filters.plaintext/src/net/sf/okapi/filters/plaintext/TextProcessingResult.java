@@ -16,9 +16,9 @@ public enum TextProcessingResult {
 	 * Test was processed, events were created and sent
 	 */
 	ACCEPTED, 	
-	
+		
 	/**
-	 * Text was not processed, to be processed it needs to be combined with a next portion 
+	 * Text was not processed, processing will be done later
 	 */
-	COMBINE_WITH_NEXT
+	DELAYED_DECISION
 }

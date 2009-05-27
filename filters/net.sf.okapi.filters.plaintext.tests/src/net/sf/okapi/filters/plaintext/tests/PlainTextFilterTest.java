@@ -38,11 +38,18 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
+import net.sf.okapi.filters.plaintext.TextFragmentUtils;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -68,6 +75,62 @@ public class PlainTextFilterTest {
 		testDriver.setShowSkeleton(true);
 	}
 
+	@Test
+	public void testUtils() {
+		String st = "12345678";
+		assertEquals("45678", Util.trimStart(st, "123"));
+		assertEquals("12345", Util.trimEnd(st, "678"));
+		assertEquals("12345678", Util.trimEnd(st, "9"));
+		
+		TextFragment tc = new TextFragment("test");
+		
+		Code c = new Code(TagType.PLACEHOLDER, "code");
+		tc.append(c);
+		
+		tc.append(" string");
+		System.out.println(tc.toString());
+		System.out.println(tc.getCodedText());
+		
+		
+		//--------------------
+		//TextContainer tcc = new TextContainer("    123456  ");
+		TextContainer tcc = new TextContainer();
+		Code c2 = new Code(TagType.PLACEHOLDER, "code");
+		tcc.append(c2);
+		tcc.append("    123456  ");
+		
+		GenericSkeleton skel = new GenericSkeleton();
+		TextFragmentUtils.trimLeft(tcc, skel);
+		
+		assertEquals("123456  ", tcc.getCodedText());
+		assertEquals("    ", skel.toString());
+		
+		//--------------------
+		TextContainer tcc2 = new TextContainer("    123456  ");
+		Code c3 = new Code(TagType.PLACEHOLDER, "code");
+		tcc2.append(c3);
+		
+		GenericSkeleton skel2 = new GenericSkeleton();
+		TextFragmentUtils.trimRight(tcc2, skel2);
+		
+		assertEquals("    123456", tcc2.getCodedText());
+		assertEquals("  ", skel2.toString());
+		
+		//--------------------
+		TextContainer tcc4 = new TextContainer("    123456  ");
+		Code c4 = new Code(TagType.PLACEHOLDER, "code");
+		tcc4.append(c4);
+		
+		char ch = TextFragmentUtils.getLastChar(tcc4);
+		assertEquals('6', ch);
+		
+		//--------------------
+		TextContainer tcc5 = new TextContainer("    123456  ");
+		
+		TextFragmentUtils.deleteLastChar(tcc5);
+		assertEquals("    12345  ", tcc5.getCodedText());
+	}
+	
 	@Test
 	public void testEmptyInput() {
 		// Empty input, check exceptions
@@ -130,19 +193,20 @@ public class PlainTextFilterTest {
 			filter.close();
 		}
 	
-		// Empty filter parameters, no exception expected
+		// Empty filter parameters, OkapiBadFilterParametersException 
 		try {
-			filter.setParameters(null);
-			
+			filter.setParameters(null);						
 			InputStream input2 = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			fail("OkapiBadFilterParametersException should've been trown");
 		}	
+		catch (OkapiBadFilterParametersException e) {
+		}
 		finally {
 			filter.close();
 		}		
 	}		
-	
-	
+		
 	@Test
 	public void testNameAndMimeType() {
 		assertEquals(filter.getMimeType(), "text/plain");
@@ -176,6 +240,7 @@ public class PlainTextFilterTest {
 	
 	@Test
 	public void testFiles() {
+		_testFile("BOM_MacUTF16withBOM2.txt", false);		
 		_testFile("cr.txt", false);
 		_testFile("crlf_start.txt", true);
 		_testFile("crlf_end.txt", true);
@@ -246,6 +311,22 @@ public class PlainTextFilterTest {
 	}
 	
 	@Test
+	public void testEvents() {
+		String filename = "cr.txt";
+		
+		testDriver.setDisplayLevel(2);
+		testDriver.setShowSkeleton(true);
+		
+		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
+		assertNotNull(input);
+		
+		System.out.println(filename);
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		if (!testDriver.process(filter)) Assert.fail();
+		filter.close();
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
@@ -285,8 +366,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();		
 	}
-	
-			
+				
 // Helpers
 	
 	private void _testFile(String filename, boolean emptyTail) {
@@ -329,7 +409,7 @@ public class PlainTextFilterTest {
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
 			
-			assertEquals(((TextUnit) res).toString(), expectedText);
+			assertEquals(expectedText, ((TextUnit) res).toString());
 			break;
 			
 		case DOCUMENT_PART:
@@ -339,7 +419,7 @@ public class PlainTextFilterTest {
 			
 			ISkeleton skel = res.getSkeleton();
 			if (skel != null) {
-				assertEquals(skel.toString(), expectedText);
+				assertEquals(expectedText, skel.toString());
 			}
 			break;
 		}

@@ -6,5 +6,4 @@ Bundle-Version: 1.0.0
 Fragment-Host: net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit4;bundle-version="4.3.1"
-Import-Package: net.sf.okapi.filters.regex,
- net.sf.okapi.filters.tests
+Import-Package: net.sf.okapi.filters.tests

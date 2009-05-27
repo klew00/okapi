@@ -30,6 +30,10 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 		
+	public boolean sendEmptySourceTU;
+	public boolean unescapeSource;
+	public boolean trimLeft;
+	public boolean trimRight;
 	public boolean preserveWS;
 	public boolean useCodeFinder;
 	public String regularExpressionForEmbeddedMarkup;
@@ -57,6 +61,10 @@ public class Parameters extends BaseParameters {
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 		
 		// All parameters are set to defaults here
+		sendEmptySourceTU = false;
+		unescapeSource = true;
+		trimLeft = true;
+		trimRight = false;
 		preserveWS = true;
 		useCodeFinder = false;
 		regularExpressionForEmbeddedMarkup = "";
@@ -72,6 +80,10 @@ public class Parameters extends BaseParameters {
 		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);
 		
+		sendEmptySourceTU = buffer.getBoolean("sendEmptySourceTU", false);
+		unescapeSource = buffer.getBoolean("unescapeSource", true);
+		trimLeft = buffer.getBoolean("trimLeft", true);
+		trimRight = buffer.getBoolean("trimRight", false);
 		preserveWS = buffer.getBoolean("preserveWS", true);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
 		regularExpressionForEmbeddedMarkup = buffer.getString("regularExpressionForEmbeddedMarkup", "");
@@ -85,6 +97,10 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useLD", locDir.useLD());
 		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
 		
+		buffer.setBoolean("sendEmptySourceTU", sendEmptySourceTU);
+		buffer.setBoolean("unescapeSource", unescapeSource);
+		buffer.setBoolean("trimLeft", trimLeft);
+		buffer.setBoolean("trimRight", trimRight);
 		buffer.setBoolean("preserveWS", preserveWS);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setString("regularExpressionForEmbeddedMarkup", regularExpressionForEmbeddedMarkup);
