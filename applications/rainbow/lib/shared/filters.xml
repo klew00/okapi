@@ -47,6 +47,21 @@
   inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
  >Filter for XML documents. This filter supports the Internationalization Tag Set (ITS).</filter>
   
+ <filter id="okf_dtd"
+  name="(BETA) DTD Filter"
+  inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
+ >Filter for DTD files.</filter>
+  
+ <filter id="okf_plaintext"
+  name="(BETA) Plain Text Filter"
+  inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
+ >Filter for plain text files.</filter>
+  
+ <filter id="okf_csv"
+  name="(BETA) Table Filter"
+  inputFilterClass="net.sf.okapi.filters.csv.CSV_Filter"
+ >Filter for table-type files (tab-delimited, CSV, fixed-width tables, etc.)</filter>
+  
  <filter id="okf_idml"
   name="(ALPHA) IDML Filter"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
@@ -76,16 +91,6 @@
   name="(PRE-ALPHA-DON'T-EVEN-TRY) FrameMaker MIF Filter"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
  >Filter for Adobe FrameMaker MIF files.</filter>
-  
- <filter id="okf_dtd"
-  name="(BETA) DTD Filter"
-  inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
- >Filter for DTD files.</filter>
-  
- <filter id="okf_plaintext"
-  name="(BETA) Plain Text Filter"
-  inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
- >Filter for plain text files.</filter>
   
  <!--
  <filter id="okf_rtf"
