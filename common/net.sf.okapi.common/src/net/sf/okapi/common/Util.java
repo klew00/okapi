@@ -72,7 +72,7 @@ public class Util {
 	}
 
 	/**
-	 * Removes from the from of a string any of the specified characters. 
+	 * Removes from the start of a string any of the specified characters. 
 	 * @param text String to trim.
 	 * @param chars List of the characters to trim.
 	 * @return The trimmed string.
@@ -88,6 +88,26 @@ public class Util {
 		}
 		if ( n >= text.length() ) return "";
 		if ( n > 0 ) return text.substring(n);
+		return text;
+	}
+	
+	/**
+	 * Removes from the end of a string any of the specified characters. 
+	 * @param text String to trim.
+	 * @param chars List of the characters to trim.
+	 * @return The trimmed string.
+	 */
+	static public String trimEnd (String text,
+		String chars)
+	{
+		if ( text == null ) return text;
+		int n = text.length() - 1;
+		while ( n >= 0 ) {
+			if ( chars.indexOf(text.charAt(n)) == -1 ) break;
+			n--;
+		}
+		if ( n < 0) return "";
+		if ( n > 0 ) return text.substring(0, n + 1);
 		return text;
 	}
 
@@ -125,7 +145,7 @@ public class Util {
 	 * Creates the directory tree for the give full path (dir+filename)
 	 * @param path Directory and filename. If you want to pass only a directory
 	 * name make sure it has a trailing separator (e.g. "c:\project\tmp\").
-	 * The path can be a URL path (e.g. "/C:/test/file.ext").
+	 * The path can bea URL path (e.g. "/C:/test/file.ext").
 	 */
 	static public void createDirectories (String path) {
 		int n = path.lastIndexOf('/'); // Try generic first
@@ -692,13 +712,47 @@ public class Util {
 		return lang1.equalsIgnoreCase(lang2);
 	}
 	
-	/**
-	 * Indicates if a string is null or empty.
-	 * @param string the string to test.
-	 * @return true if the string is either null or empty, false if it counts at least one character.
-	 */
-	static public boolean isEmpty (String string) {
-		return (( string != null ) && ( string.length() == 0 ));
+	static public boolean isEmpty(Object obj) {
+		return (obj == null);
+	}
+	
+	static public boolean isEmpty(String string) {
+		return (string == null || string == "" || (string != null && string.length() == 0));
+	}
+
+// Safe string functions	
+	static public int getLength(String string) {
+		return (isEmpty(string)) ? 0 : string.length();
+	}
+	
+	static public char getCharAt(String string, int pos) {
+		if (isEmpty(string)) return '\0';
+		
+		return (string.length() > pos) ? string.charAt(pos) : 0;
+	}
+	
+	static public char getLastChar(String string) {
+		if (isEmpty(string)) return '\0';
+		
+		return string.charAt(string.length() - 1);
+	}
+	
+	static public String deleteLastChar(String string) {
+		if (isEmpty(string)) return "";
+		
+		return string.substring(0, string.length() - 1);
+	}
+	
+	static public char getLastChar(StringBuilder sb) {
+		if (isEmpty(sb)) return '\0';
+		
+		return sb.charAt(sb.length() - 1);
+	}
+	
+	static public void deleteLastChar(StringBuilder sb) {
+		if (isEmpty(sb)) return;
+		
+		sb.deleteCharAt(sb.length() - 1);
 	}
 	
 }
