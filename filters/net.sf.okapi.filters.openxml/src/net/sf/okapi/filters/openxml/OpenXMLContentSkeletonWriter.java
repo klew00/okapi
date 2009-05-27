@@ -55,6 +55,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
+	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private int configurationType; // DWH 4-10-09
 	private ILayerProvider layer;
 	private EncoderManager encoderManager;

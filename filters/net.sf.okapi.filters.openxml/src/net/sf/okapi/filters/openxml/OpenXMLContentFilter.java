@@ -108,6 +108,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
+	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 
 	private int configurationType;
 	private Package p=null;
@@ -203,6 +204,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			case MSEXCELCOMMENT: // DWH 5-13-09
 				sConfigFileName = "/net/sf/okapi/filters/openxml/excelCommentConfiguration.yml"; // DWH 1-5-09 groovy -> yml
 				configurationType = MSEXCEL;
+				break;
+			case MSWORDDOCPROPERTIES: // DWH 5-13-09
+				sConfigFileName = "/net/sf/okapi/filters/openxml/wordDocPropertiesConfiguration.yml"; // DWH 5-25-09
+				configurationType = MSWORDDOCPROPERTIES;
 				break;
 			case MSWORD:
 			default:
@@ -867,7 +872,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			{
 				getRuleState().pushTextUnitRule(sTagName);
 				startTextUnit(new GenericSkeleton(sTagString)); // DWH 1-29-09
-				if (configurationType==MSEXCEL || configurationType==MSWORDCHART)
+				if (configurationType==MSEXCEL ||
+					configurationType==MSWORDCHART ||
+					configurationType==MSWORDDOCPROPERTIES)
 				// DWH 4-16-09 Excel and Word Charts don't have text runs or text markers
 				{
 					bInTextRun = true;

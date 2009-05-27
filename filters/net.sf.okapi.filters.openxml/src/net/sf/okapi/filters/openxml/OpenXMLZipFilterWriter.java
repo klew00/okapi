@@ -66,6 +66,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
+	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private String outputPath;
 	private ZipFile zipOriginal;
 	private ZipOutputStream zipOut;

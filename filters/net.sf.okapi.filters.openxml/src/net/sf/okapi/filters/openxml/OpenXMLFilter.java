@@ -83,6 +83,7 @@ public class OpenXMLFilter implements IFilter {
 	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
+	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private final String MIMETYPE = "text/xml";
 	private final String docId = "sd";
 	
@@ -103,6 +104,11 @@ public class OpenXMLFilter implements IFilter {
 	private ITranslator translator=null;
 	private String sOutputLanguage="en-US";
 	private boolean canceled = false;
+	private boolean bPreferenceTranslateDocProperties = true;
+	private boolean bPreferenceTranslateComments = true;
+	private boolean bPreferenceTranslatePowerpointNotes = true; // DWH 5-26-09 preferences
+	private boolean bPreferenceTranslatePowerpointMasters = true; // DWH 5-26-09 preferences
+	private boolean bPreferenceTranslateWordHeadersFooters = true; // DWH 5-26-09 preferences
 
 	public OpenXMLFilter () {
 	}
@@ -192,7 +198,7 @@ public class OpenXMLFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"Microsoft Office Document",
-			"Microsoft Office documents (DOCX, XLSX, PPT)."));
+			"Microsoft Office documents (DOCX, XLSX, PPTX)."));
 		return list;
 	}
 
@@ -527,7 +533,9 @@ public class OpenXMLFilter implements IFilter {
 			    sDocType = sDocType.substring(iCute+1);
 			bInMainFile = (sEntryName.endsWith(".xml") &&
 				    		((nZipType==MSWORD && sDocType.equals("main+xml")) ||
-				    		 (nZipType==MSPOWERPOINT && sDocType.equals("slide+xml"))));
+				    		 (nZipType==MSPOWERPOINT && sDocType.equals("slide+xml") &&
+				    		  bPreferenceTranslatePowerpointMasters)));
+			                    // DWH 5-26-09 translate if translating Powerpoint master slides
 			openXMLContentFilter.setBInMainFile(bInMainFile); // DWH 4-15-09 only allow blank text in main files
 			if (bInMainFile && bSquishable)
 			{
@@ -543,23 +551,30 @@ public class OpenXMLFilter implements IFilter {
 				    	   (sDocType.equals("main+xml") ||
 			   				sDocType.equals("footnotes+xml") ||
 			   				sDocType.equals("endnotes+xml") ||
-		                    sDocType.equals("header+xml") ||
-		                    sDocType.equals("footer+xml") ||
-		                    sDocType.equals("comments+xml") ||
+		                    (sDocType.equals("header+xml") && bPreferenceTranslateWordHeadersFooters) ||
+		                    (sDocType.equals("footer+xml") && bPreferenceTranslateWordHeadersFooters) ||
+		                    (sDocType.equals("comments+xml") && bPreferenceTranslateComments) ||
+		                      // DWH 5-25-09 translate if translating comments
 		                    sDocType.equals("chart+xml") ||
 		                    sDocType.equals("settings+xml") ||
+		                    (sDocType.equals("core-properties+xml") && bPreferenceTranslateDocProperties) ||
+		                      // DWH 5-25-09 translate if translating document properties
 		                    sDocType.equals("glossary+xml"))) ||
 		             (nZipType==MSEXCEL &&
 		            	   (sDocType.equals("sharedStrings+xml") ||
 		            	//  sDocType.equals("worksheet+xml") || DWH 5-15-09 sheetn.xml has number, formulas, nothing translatable
 		            	//	sDocType.equals("main+xml") || DWH 5-15-09 workbook.xml has nothing translatable
-				   			sDocType.equals("table+xml") ||
-				   			sDocType.equals("comments+xml"))) ||
+		            		(sDocType.equals("comments+xml") && bPreferenceTranslateDocProperties) ||
+		                      // DWH 5-25-09 translate if translating comments
+		            	    sDocType.equals("table+xml"))
+				   			) ||
 				   	 (nZipType==MSPOWERPOINT &&
-				   	       (sDocType.equals("slide+xml") ||
-				   	        sDocType.equals("notesSlide+xml")))))) {
+				   	       (sDocType.equals("notesSlide+xml") && bPreferenceTranslatePowerpointNotes))))) {
+						     // DWH 5-26-09 translate if translating Powerpoint notes
 				if (nZipType==MSWORD && sDocType.equals("chart+xml")) // DWH 4-16-09
 					nFileType = MSWORDCHART;
+				else if (nZipType==MSWORD && sDocType.equals("core-properties+xml"))
+					nFileType = MSWORDDOCPROPERTIES; // DWH 5-25-09
 				else if (nZipType==MSEXCEL && sDocType.equals("comments+xml")) // DWH 5-13-09
 					nFileType = MSEXCELCOMMENT;
 				else
@@ -740,5 +755,45 @@ public class OpenXMLFilter implements IFilter {
 	{
 		nLogLevel = lvl;
 		LOGGER.setLevel(lvl);
+	}
+	public void setBPreferenceTranslateDocProperties(boolean bPreferenceTranslateDocProperties)
+	{
+		this.bPreferenceTranslateDocProperties = bPreferenceTranslateDocProperties;
+	}
+	public boolean getBPreferenceTranslateDocProperties()
+	{
+		return bPreferenceTranslateDocProperties;
+	}
+	public void setBPreferenceTranslateComments(boolean bPreferenceTranslateComments)
+	{
+		this.bPreferenceTranslateComments = bPreferenceTranslateComments;
+	}
+	public boolean getBPreferenceTranslateComments()
+	{
+		return bPreferenceTranslateComments;
+	}
+	public void setBPreferenceTranslatePowerpointNotes(boolean bPreferenceTranslatePowerpointNotes)
+	{
+		this.bPreferenceTranslatePowerpointNotes = bPreferenceTranslatePowerpointNotes;
+	}
+	public boolean getBPreferenceTranslatePowerpointNotes()
+	{
+		return bPreferenceTranslatePowerpointNotes;
+	}
+	public void setBPreferenceTranslatePowerpointMasters(boolean bPreferenceTranslatePowerpointMasters)
+	{
+		this.bPreferenceTranslatePowerpointMasters = bPreferenceTranslatePowerpointMasters;
+	}
+	public boolean getBPreferenceTranslatePowerpointMasters()
+	{
+		return bPreferenceTranslatePowerpointMasters;
+	}
+	public void setBPreferenceTranslateWordHeadersFooters(boolean bPreferenceTranslateWordHeadersFooters)
+	{
+		this.bPreferenceTranslateWordHeadersFooters = bPreferenceTranslateWordHeadersFooters;
+	}
+	public boolean getBPreferenceTranslateWordHeadersFooters()
+	{
+		return bPreferenceTranslateWordHeadersFooters;
 	}
 }
