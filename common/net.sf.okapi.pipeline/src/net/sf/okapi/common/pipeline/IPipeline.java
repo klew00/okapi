@@ -99,6 +99,13 @@ public interface IPipeline {
 	public boolean needsOutput (int inputIndex);
 
 	/**
+	 * Indicates if a given step is currently the last one in this pipeline.
+	 * @param step the step to compare with. 
+	 * @return true if the given step is the last one in this pipeline.
+	 */
+	public boolean isLastStep (IPipelineStep step);
+	
+	/**
 	 * Frees all resources from all steps in this pipeline.
 	 */
 	public void destroy();

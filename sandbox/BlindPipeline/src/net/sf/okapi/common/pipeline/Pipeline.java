@@ -77,7 +77,7 @@ public class Pipeline implements IPipeline {
 	}
 
 	public void addStep (IPipelineStep step) {
-		step.setPipeline(this);
+		step.setPipelineContext(getContext());
 		steps.add(step);
 	}
 

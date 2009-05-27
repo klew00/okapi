@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -75,7 +76,12 @@ public class BOMConversionStep extends BasePipelineStep {
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
- 
+
+	@Override
+	public boolean needsOutput (int inputIndex) {
+		return pipeline.isLastStep(this);
+	}
+	
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		buffer = new byte[1024*2];
@@ -118,14 +124,21 @@ public class BOMConversionStep extends BasePipelineStep {
 			}
 			
 			// Open the output
-			File tmpOut;
-			try {
-				tmpOut = File.createTempFile("okptmp_", ".bom");
+			File outFile;
+			if ( pipeline.isLastStep(this) ) {
+				outFile = new File(getContext().getOutputURI(0));
+				Util.createDirectories(outFile.getAbsolutePath());
 			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
+			else {
+				try {
+					outFile = File.createTempFile("okp-bom_", ".tmp");
+				}
+				catch ( Throwable e ) {
+					throw new OkapiIOException("Cannot create temporary output.", e);
+				}
+				outFile.deleteOnExit();
 			}
-			output = new FileOutputStream(tmpOut);
+			output = new FileOutputStream(outFile);
 			
 			// Reset the start of the buffer
 			for ( int i=0; i<5; i++ ) buffer[i] = 0;
@@ -159,7 +172,7 @@ public class BOMConversionStep extends BasePipelineStep {
 						output.write(buffer, 0, len);
 					}
 				}
-				else { // No BOM present
+				else { // No BOM present: use the default encoding provided
 					if ( !params.removeBOM ) { // If we add, do it
 						String enc = rawDoc.getEncoding().toLowerCase();
 						if ( enc.equals("utf-16") || enc.equals("utf-16le") ) {
@@ -190,13 +203,13 @@ public class BOMConversionStep extends BasePipelineStep {
 			
 			// Set the new raw-document URI
 			// Other info stays the same
-			rawDoc.setInputURI(tmpOut.toURI());
-			isDone = true;
+			rawDoc.setInputURI(outFile.toURI());
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);
 		}
 		finally {
+			isDone = true;
 			try { // Close the files
 				if ( output != null ) {
 					output.close();

@@ -47,35 +47,40 @@ public interface IBatchItemContext {
 	/**
 	 * Gets a RawDocument object from the given input document of this batch item.
 	 * @param index the zero-based index of the input document.
-	 * @return a new RawDocument object from the given input document.
+	 * @return the RawDocument object from the given input document,
+	 * or null if there is no RawDocument for the given input.
 	 */
 	public RawDocument getRawDocument (int index);
 	
 	/**
 	 * Gets the output URI for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the output URI of the given the input document.
+	 * @return the output URI of the given the input document,
+	 * or null if there is no output URI for the given input.
 	 */
 	public URI getOutputURI (int index);
 	
 	/**
 	 * Gets the output encoding for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the output encoding of the given the input document.
+	 * @return the output encoding of the given the input document,
+	 * or null if there is no output encoding for the given input.
 	 */
 	public String getOutputEncoding (int index);
 	
 	/**
 	 * Gets the source language for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the source language of the given the input document.
+	 * @return the source language of the given the input document,
+	 * or null if there is no source language for the given input.
 	 */
 	public String getSourceLanguage (int index);
 	
 	/**
 	 * Gets the target language for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the target language of the given the input document.
+	 * @return the target language of the given the input document,
+	 * or null if there is no target language for the given input.
 	 */
 	public String getTargetLanguage (int index);
 	

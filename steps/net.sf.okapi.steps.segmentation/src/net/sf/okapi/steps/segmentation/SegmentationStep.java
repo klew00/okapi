@@ -44,12 +44,12 @@ public class SegmentationStep extends BasePipelineStep {
 		srcSeg = null;
 	}
 	
-	public String getDescription () {
-		return "Apply SRX segmentation to a document.";
-	}
-
 	public String getName () {
 		return "SRX Segmentation";
+	}
+
+	public String getDescription () {
+		return "Apply SRX segmentation to a document.";
 	}
 
 	@Override

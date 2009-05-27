@@ -43,8 +43,13 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public class LineBreakConversionStep extends BasePipelineStep {
 
+	private boolean isDone;
 	private Parameters params;
 
+	public LineBreakConversionStep () {
+		params = new Parameters();
+	}
+	
 	public String getDescription () {
 		return "Convert the type of line-break in a document.";
 	}
@@ -53,14 +58,32 @@ public class LineBreakConversionStep extends BasePipelineStep {
 		return "Line-Break Conversion";
 	}
 
+	@Override
+	public boolean isDone () {
+		return isDone;
+	}
+
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
  
+	@Override
+	public boolean needsOutput (int inputIndex) {
+		return pipeline.isLastStep(this);
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		isDone = false;
+	}
+
+	@Override
 	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc;
 		BufferedReader reader = null;
@@ -93,14 +116,22 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			reader = new BufferedReader(new InputStreamReader(bis, encoding));
 			
 			// Open the output
-			File tmpOut;
-			try {
-				tmpOut = File.createTempFile("okptmp_", ".bom");
+			File outFile;
+			if ( pipeline.isLastStep(this) ) {
+				outFile = new File(getContext().getOutputURI(0));
+				Util.createDirectories(outFile.getAbsolutePath());
 			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
+			else {
+				try {
+					outFile = File.createTempFile("okp-lbc_", ".tmp");
+				}
+				catch ( Throwable e ) {
+					throw new OkapiIOException("Cannot create temporary output.", e);
+				}
+				outFile.deleteOnExit();
 			}
-			OutputStream output = new FileOutputStream(tmpOut);
+			OutputStream output = new FileOutputStream(outFile);
+			
 			writer = new OutputStreamWriter(new BufferedOutputStream(output), encoding);
 			// Write BOM if there was one
 			Util.writeBOMIfNeeded(writer, (bis.getBOMSize()>0), encoding);
@@ -147,7 +178,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				
 				// Set the new raw-document URI and the encoding (in case one was auto-detected)
 				// Other info stays the same
-				rawDoc.setInputURI(tmpOut.toURI());
+				rawDoc.setInputURI(outFile.toURI());
 				rawDoc.setEncoding(encoding);
 			}
 		}
@@ -155,6 +186,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			throw new OkapiIOException("IO error while converting.", e);
 		}
 		finally {
+			isDone = true;
 			try {
 				if ( writer != null ) {
 					writer.close();

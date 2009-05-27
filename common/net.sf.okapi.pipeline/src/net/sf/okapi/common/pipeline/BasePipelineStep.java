@@ -28,7 +28,7 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	private IPipeline pipeline;
+	protected IPipeline pipeline;
 	
 	public void setPipeline (IPipeline pipeline) {
 		this.pipeline = pipeline;

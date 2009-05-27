@@ -128,26 +128,32 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	}
 		
 	public String getFilterConfigurationId (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).filterConfigId;
 	}
 	
 	public String getOutputEncoding (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).outputEncoding;
 	}
 	
 	public URI getOutputURI (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).outputURI;
 	}
 	
 	public RawDocument getRawDocument (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).rawDocument;
 	}
 	
 	public String getSourceLanguage (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).rawDocument.getSourceLanguage();
 	}
 
 	public String getTargetLanguage (int index) {
+		if ( list.size() <= index ) return null;
 		return list.get(index).rawDocument.getTargetLanguage();
 	}
 

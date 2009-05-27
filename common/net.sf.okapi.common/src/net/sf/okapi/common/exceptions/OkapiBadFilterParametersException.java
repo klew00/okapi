@@ -21,7 +21,7 @@
 package net.sf.okapi.common.exceptions;
 
 /**
- * Signals that filter parameters are either null or not an instance of expected class. 
+ * Signals that filter parameters are either null or not an instance of the expected class. 
  * This is likely a wrong value passed with setParameters().
  * The exception is thrown when an input is open.
  */

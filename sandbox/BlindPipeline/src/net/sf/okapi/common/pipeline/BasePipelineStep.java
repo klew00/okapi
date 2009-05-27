@@ -28,14 +28,14 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	private IPipeline pipeline;
+	private PipelineContext ctx;
 	
-	public void setPipeline (IPipeline pipeline) {
-		this.pipeline = pipeline;
+	public void setPipelineContext (PipelineContext ctx) {
+		this.ctx = ctx;
 	}
 	
 	protected PipelineContext getContext () {
-		return pipeline.getContext();
+		return ctx;
 	}
 
 	// Override this if the step has parameters

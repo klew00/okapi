@@ -41,6 +41,10 @@ public class CharListingStep extends BasePipelineStep {
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
 
+	public CharListingStep () {
+		params = new Parameters();
+	}
+	
 	@Override
 	public void destroy () {
 		if ( charList == null ) {

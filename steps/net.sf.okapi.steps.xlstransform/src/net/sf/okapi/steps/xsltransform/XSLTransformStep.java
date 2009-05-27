@@ -22,6 +22,7 @@ package net.sf.okapi.steps.xsltransform;
 
 import java.io.File;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -32,11 +33,14 @@ import javax.xml.transform.TransformerException;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class XSLTransformStep extends BasePipelineStep {
+
+	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
 	private Source xsltInput;
@@ -74,6 +78,11 @@ public class XSLTransformStep extends BasePipelineStep {
 	}
  
 	@Override
+	public boolean needsOutput (int inputIndex) {
+		return pipeline.isLastStep(this);
+	}
+	
+	@Override
 	protected void handleStartBatch (Event event) {
 		try {
 			// Create the parameters map
@@ -90,7 +99,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			trans = fact.newTransformer(xsltInput);
 		}
 		catch ( TransformerConfigurationException e ) {
-			throw new OkapiIOException("Error in XSLT input", e);
+			throw new OkapiIOException("Error in XSLT input.", e);
 		}
 	}
 
@@ -106,23 +115,30 @@ public class XSLTransformStep extends BasePipelineStep {
 				rawDoc.getReader());
 			
 			// Create the output
-			//TODO: Need to use output provided by the pipeline if this is last step!
-			File tmpOut;
-			try {
-				tmpOut = File.createTempFile("okptmp_", ".xml");
+			File outFile;
+			if ( pipeline.isLastStep(this) ) {
+				outFile = new File(getContext().getOutputURI(0));
+				Util.createDirectories(outFile.getAbsolutePath());
 			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
+			else {
+				try {
+					outFile = File.createTempFile("okp-xslt_", ".tmp");
+				}
+				catch ( Throwable e ) {
+					throw new OkapiIOException("Cannot create temporary output.", e);
+				}
+				outFile.deleteOnExit();
 			}
-			Result result = new javax.xml.transform.stream.StreamResult(tmpOut);
+			
+			Result result = new javax.xml.transform.stream.StreamResult(outFile);
 			
 			// Apply the template
 			trans.transform(xmlInput, result);
 			
 			// Create the new raw-document resource
 			// Other info stays the same
-			rawDoc.setEncoding("UTF-8");
-			rawDoc.setInputURI(tmpOut.toURI());
+			rawDoc.setInputURI(outFile.toURI());
+			rawDoc.setEncoding("UTF-8"); // Just so we have a default
 		}
 		catch ( TransformerException e ) {
 			throw new OkapiIOException("Transformation error.", e);
@@ -131,22 +147,37 @@ public class XSLTransformStep extends BasePipelineStep {
 
 	private void fillParameters () {
 		trans.clearParameters();
-		String value;
-		for ( String key : paramList.keySet() ) {
-/*TODO			value = paramList.get(key).replace("${SrcLang}", srcLang); //$NON-NLS-1$
-			value = value.replace("${TrgLang}", trgLang); //$NON-NLS-1$
-			value = value.replace("${Input1}", Util.makeURIFromPath(getInputPath(0))); //$NON-NLS-1$
-			value = value.replace("${Output1}", Util.makeURIFromPath(getOutputPath(0))); //$NON-NLS-1$
-			if ( getInputPath(1) != null ) {
-				value = value.replace("${Input2}", Util.makeURIFromPath(getInputPath(1))); //$NON-NLS-1$
-				value = value.replace("${Output2}", Util.makeURIFromPath(getOutputPath(1))); //$NON-NLS-1$
+		String value = null;
+		try {
+			for ( String key : paramList.keySet() ) {
+				value = paramList.get(key).replace("${SrcLang}", getContext().getSourceLanguage(0)); //$NON-NLS-1$
+				if ( value.indexOf("${Input1}") > -1 ) {
+					value = value.replace("${Input1}", getContext().getRawDocument(0).getInputURI().toString()); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${TrgLang}") > -1 ) {
+					value = value.replace("${TrgLang}", getContext().getTargetLanguage(0)); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${Output1}") > -1 ) {
+					value = value.replace("${Output1}", getContext().getOutputURI(0).toString()); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${Input2}") > -1 ) {
+					value = value.replace("${Input2}", getContext().getRawDocument(1).getInputURI().toString()); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${Output2}") > -1 ) {
+					value = value.replace("${Output2}", getContext().getOutputURI(1).toString()); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${Input3}") > -1 ) {
+					value = value.replace("${Input3}", getContext().getRawDocument(2).getInputURI().toString()); //$NON-NLS-1$
+				}
+				if ( value.indexOf("${Output3}") > -1 ) {
+					value = value.replace("${Output3}", getContext().getOutputURI(2).toString()); //$NON-NLS-1$
+				}
+				value = paramList.get(key);
+				trans.setParameter(key, value);
 			}
-			if ( getInputPath(2) != null ) {
-				value = value.replace("${Input3}", Util.makeURIFromPath(getInputPath(2))); //$NON-NLS-1$
-				value = value.replace("${Output3}", Util.makeURIFromPath(getOutputPath(2))); //$NON-NLS-1$
-			}*/
-			value = paramList.get(key);
-			trans.setParameter(key, value);
+		}
+		catch ( Throwable e ) {
+			logger.severe(String.format("Error when trying to substitute variables in the parameter value '%s'", value));
 		}
 	}
 

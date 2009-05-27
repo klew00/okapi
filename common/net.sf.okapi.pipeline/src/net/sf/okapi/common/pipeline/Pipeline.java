@@ -90,7 +90,7 @@ public class Pipeline implements IPipeline {
 		steps.add(step);
 	}
 
-	public void cancel() {
+	public void cancel () {
 		cancel = true;
 	}
 
@@ -157,7 +157,7 @@ public class Pipeline implements IPipeline {
 	}
 
 	public void destroy () {
-		for (IPipelineStep step : finishedSteps) {
+		for ( IPipelineStep step : finishedSteps ) {
 			step.destroy();
 		}
 		destroyed = true;
@@ -188,6 +188,11 @@ public class Pipeline implements IPipeline {
 
 	public void setContext (PipelineContext context) {
 		this.context = context;
+	}
+
+	public boolean isLastStep (IPipelineStep step) {
+		if ( steps.size() == 0 ) return false;
+		return steps.getLast().equals(step);
 	}
 
 }

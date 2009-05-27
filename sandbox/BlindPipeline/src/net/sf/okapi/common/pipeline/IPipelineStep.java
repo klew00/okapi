@@ -29,7 +29,7 @@ import net.sf.okapi.common.filters.IFilter;
  */
 public interface IPipelineStep {
 
-	public void setPipeline (IPipeline pipeline);
+	public void setPipelineContext (PipelineContext ctx);
 	
 	/**
 	 * Gets the current parameters for this step.
