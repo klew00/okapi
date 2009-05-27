@@ -50,10 +50,12 @@ import org.junit.Test;
 public class OpenXMLSnippetsTest {
 	private static Logger LOGGER;
 	private OpenXMLContentFilter openXMLContentFilter;
-	private static final int MSWORD=1;
-	private static final int MSEXCEL=2;
-	private static final int MSPOWERPOINT=3;
+	public final static int MSWORD=1;
+	public final static int MSEXCEL=2;
+	public final static int MSPOWERPOINT=3;
 	public final static int MSWORDCHART=4; // DWH 4-16-09
+	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
+	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private String snappet;
 	
 	@Before

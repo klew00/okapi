@@ -67,6 +67,7 @@ public class OpenXMLRoundTripTest {
 		zc = new ZipCompare();
 		themfiles.add("BoldWorld.docx");
 		themfiles.add("Deli.docx");
+		themfiles.add("DocProperties.docx");
 		themfiles.add("Escapades.docx");
 		themfiles.add("Addcomments.docx");
 		themfiles.add("sample.docx");
