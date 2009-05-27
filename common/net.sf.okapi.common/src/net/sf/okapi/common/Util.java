@@ -112,20 +112,6 @@ public class Util {
 	}
 
 	/**
-	 * Gets the application name from an application caption.
-	 * This methods extracts the application name from a caption of the form 
-	 * "filename - application name". If no "- " is found, the whole caption
-	 * is returned as-it. 
-	 * @param text The full caption where to take the name from.
-	 * @return The name of the application.
-	 */
-	static public String getNameInCaption (String text) {
-		int n = text.indexOf("- ");
-		if ( n > -1 ) return text.substring(n+1);
-		else return text; // Same as caption itself
-	}
-
-	/**
 	 * Gets the directory name of a full path.
 	 * @param path Full path from where to extract the directory name. The path
 	 * can be a URL path (e.g. "/C:/test/file.ext").
@@ -145,7 +131,7 @@ public class Util {
 	 * Creates the directory tree for the give full path (dir+filename)
 	 * @param path Directory and filename. If you want to pass only a directory
 	 * name make sure it has a trailing separator (e.g. "c:\project\tmp\").
-	 * The path can bea URL path (e.g. "/C:/test/file.ext").
+	 * The path can be a URL path (e.g. "/C:/test/file.ext").
 	 */
 	static public void createDirectories (String path) {
 		int n = path.lastIndexOf('/'); // Try generic first
@@ -712,15 +698,20 @@ public class Util {
 		return lang1.equalsIgnoreCase(lang2);
 	}
 	
+	/**
+	 * Indicates if a given string is null or empty.
+	 * @param string the string to check.
+	 * @return true if the given string is null or empty.
+	 */
+	static public boolean isEmpty(String string) {
+		return (string == null || string == "");
+	}
+
 	static public boolean isEmpty(Object obj) {
 		return (obj == null);
 	}
 	
-	static public boolean isEmpty(String string) {
-		return (string == null || string == "" || (string != null && string.length() == 0));
-	}
-
-// Safe string functions	
+// Safe string functions
 	static public int getLength(String string) {
 		return (isEmpty(string)) ? 0 : string.length();
 	}
@@ -744,14 +735,12 @@ public class Util {
 	}
 	
 	static public char getLastChar(StringBuilder sb) {
-		if (isEmpty(sb)) return '\0';
-		
+		if (( sb == null ) || ( sb.length() == 0 )) return '\0';
 		return sb.charAt(sb.length() - 1);
 	}
 	
 	static public void deleteLastChar(StringBuilder sb) {
-		if (isEmpty(sb)) return;
-		
+		if (( sb == null ) || ( sb.length() == 0 )) return;
 		sb.deleteCharAt(sb.length() - 1);
 	}
 	

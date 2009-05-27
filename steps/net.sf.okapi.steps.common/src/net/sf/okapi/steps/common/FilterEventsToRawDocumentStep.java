@@ -21,14 +21,11 @@
 package net.sf.okapi.steps.common;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -46,33 +43,16 @@ import net.sf.okapi.common.resource.StartDocument;
  */
 public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(FilterEventsToRawDocumentStep.class.getName());
-
 	private IFilterWriter filterWriter;
 	private boolean isDone;
 	private String language;
 	private String encoding;
 	private File outputFile;
-	private URI userOutput;
 
 	/**
-	 * Create a new FilterEventsToRawDocumentStep object that creates a temporary file to write out
-	 * {@link Event}s. The temporary file is closed after writing and passed down as
-	 * a {@link URI} to subsequent steps.
+	 * Create a new FilterEventsToRawDocumentStep object.
 	 */
-	public FilterEventsToRawDocumentStep() {
-	}
-
-	/**
-	 * Create a EventsToRawDocumentStep that takes a user specified {@link URI}
-	 * and writes all processed {@link FilterEventsToRawDocumentStep} to this file.
-	 * The URI is passed down the pipeline for subsequent steps to use as input.
-	 * 
-	 * @param userOutput
-	 *            user specified URI
-	 */
-	public FilterEventsToRawDocumentStep (URI userOutput) {
-		this.userOutput = userOutput;
+	public FilterEventsToRawDocumentStep () {
 	}
 
 	public String getName() {
@@ -83,10 +63,15 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		return "Combine document events into a full document and pass it along as an event (RawDocument)";
 	}
 
+	@Override
+	public boolean needsOutput (int inputIndex) {
+		return pipeline.isLastStep(this);
+	}
+	
 	/**
-	 * Catch all incoming {@link Event}s and write them out to the a temp or
-	 * user specified {@link URI}. This step generates NO_OP events until the
-	 * input events are exhausted, at which point a RawDocument event is sent.
+	 * Catch all incoming {@link Event}s and write them out to the output document.
+	 * This step generates NO_OP events until the input events are exhausted, at
+	 * which point a RawDocument event is sent.
 	 */
 	@Override
 	public Event handleEvent (Event event) {
@@ -118,11 +103,6 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter.handleEvent(event);
 		filterWriter.close();
 
-		// It should be safe to close the output file on jvm exit
-		if ( outputFile.exists() ) {
-			outputFile.deleteOnExit();
-		}
-
 		// Return the RawDocument Event that is the end result of all
 		// previous Events
 		RawDocument input = new RawDocument(outputFile.toURI(), encoding, language);
@@ -140,20 +120,21 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		
 		filterWriter = startDoc.getFilterWriter();
 		filterWriter.setOptions(language, encoding);
-		try {
-			if (userOutput != null) {
-				outputFile = new File(userOutput);
-			} else {
-				outputFile = File.createTempFile("EventsToRawDocumentStep", ".tmp");
-				userOutput = outputFile.toURI();
-			}
-		} catch (IOException e) {
-			OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
-			LOGGER.log(Level.SEVERE, String.format("Cannot create the file (%s) in EventsToRawDocumentStep",
-					userOutput.toString()), re);
-			throw re;
+		
+		if ( pipeline.isLastStep(this) ) {
+			outputFile = new File(getContext().getOutputURI(0));
+			Util.createDirectories(outputFile.getAbsolutePath());
 		}
-
+		else {
+			try {
+				outputFile = File.createTempFile("okp-fe2rd_", ".tmp");
+			}
+			catch ( Throwable e ) {
+				throw new OkapiIOException("Cannot create temporary output.", e);
+			}
+			outputFile.deleteOnExit();
+		}
+		
 		filterWriter.setOutput(outputFile.getAbsolutePath());
 		filterWriter.handleEvent(event);
 		isDone = false;

@@ -60,11 +60,15 @@ public class EventsToRawDocumentStepTest {
 	@Test
 	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
 		Event event = null;
-		eventToDoc = new FilterEventsToRawDocumentStep(File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp").toURI());
 
+		eventToDoc = new FilterEventsToRawDocumentStep();
 		eventToDoc.setPipeline(pipeline);
+		// Make sure the step in in a pipeline to use the output file
+		pipeline.addStep(eventToDoc); 
+		
+		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
 		BatchItemContext bic = new BatchItemContext(
-			new RawDocument(htmlSnippet, "en"), "okf_html", null, "UTF-8");
+			new RawDocument(htmlSnippet, "en"), "okf_html", tmpFile.toURI(), "UTF-8");
 		pipeline.getContext().setBatchItemContext(bic);
 
 		htmlFilter.open(bic.getRawDocument(0));
@@ -82,6 +86,7 @@ public class EventsToRawDocumentStepTest {
 		// Get the EventsToRawDocumentStep output and compare it to our input
 		assertEquals(htmlSnippet, convertRawDocumentToString((RawDocument)event.getResource()));
 		eventToDoc.destroy();
+		pipeline = new Pipeline();
 	}
 
 	private String convertRawDocumentToString(RawDocument d) throws IOException {		

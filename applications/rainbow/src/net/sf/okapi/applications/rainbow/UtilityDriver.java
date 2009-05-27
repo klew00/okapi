@@ -137,7 +137,7 @@ public class UtilityDriver implements CancelListener {
 				MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 				dlg.setMessage(String.format(Res.getString("UtilityDriver.confirmExecution"), //$NON-NLS-1$
 					pluginItem.name));
-				dlg.setText(Util.getNameInCaption(shell.getText()));
+				dlg.setText(getNameInCaption(shell.getText()));
 				if ( dlg.open() != SWT.YES ) return false;
 			}
 		}
@@ -247,6 +247,20 @@ public class UtilityDriver implements CancelListener {
 	public void cancelOccurred (CancelEvent event) {
 		stopProcess = true;
 		if ( filter != null ) filter.cancel();
+	}
+
+	/**
+	 * Gets the application name from an application caption.
+	 * This methods extracts the application name from a caption of the form 
+	 * "filename - application name". If no "- " is found, the whole caption
+	 * is returned as-it. 
+	 * @param text The full caption where to take the name from.
+	 * @return The name of the application.
+	 */
+	private String getNameInCaption (String text) {
+		int n = text.indexOf("- ");
+		if ( n > -1 ) return text.substring(n+1);
+		else return text; // Same as caption itself
 	}
 
 }

@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.common;
 
+import java.io.File;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -54,7 +56,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return (inputIndex == 0);
+		return pipeline.isLastStep(this);
 	}
 
 	@Override
@@ -76,6 +78,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc = (RawDocument)event.getResource();
 		try {
+			File outFile;
 			rawDoc = (RawDocument)event.getResource();
 			
 			if ( rawDoc.getInputCharSequence() != null ) {
@@ -83,9 +86,22 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 				throw new RuntimeException("Not implemented yet");
 			}
 			else if ( rawDoc.getInputURI() != null ) {
+				if ( pipeline.isLastStep(this) ) {
+					outFile = new File(getContext().getOutputURI(0));
+					Util.createDirectories(outFile.getAbsolutePath());
+				}
+				else {
+					try {
+						outFile = File.createTempFile("okp-rdw_", ".tmp");
+					}
+					catch ( Throwable e ) {
+						throw new OkapiIOException("Cannot create temporary output.", e);
+					}
+					outFile.deleteOnExit();
+				}
 				// Faster to copy using channels
 				String inputPath = rawDoc.getInputURI().getPath();
-				Util.copyFile(inputPath, getContext().getOutputURI(0).getPath(), false); // Copy, do not move
+				Util.copyFile(inputPath, outFile.getAbsolutePath(), false); // Copy, do not move
 			}
 			else if ( rawDoc.getInputStream() != null ) {
 				throw new RuntimeException("Not implemented yet");
@@ -97,7 +113,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 				
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
-			rawDoc.setInputURI(getContext().getOutputURI(0));
+			rawDoc.setInputURI(outFile.toURI());
 			isDone = true;
 		}
 		catch ( Throwable e ) {
