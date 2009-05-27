@@ -41,7 +41,7 @@ public class FilterConfigurationTest {
 		fcm.addConfigurations("net.sf.okapi.filters.regex.RegexFilter");
 		FilterConfiguration cfg = fcm.getDefaultConfiguration("text/x-regex");
 		assertNotNull(cfg);
-		assertEquals("okf_regex-srt", cfg.configId);
+		assertEquals("okf_regex", cfg.configId);
 	}
 
 	@Test

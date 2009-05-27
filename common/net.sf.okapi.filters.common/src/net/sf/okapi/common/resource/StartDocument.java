@@ -21,7 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 
 /**
  * Resource associated with the filter event START_DOCUMENT.
@@ -32,7 +32,7 @@ public class StartDocument extends BaseNameable {
 	protected String encoding;
 	protected boolean isMultilingual;
 	protected IParameters params;
-	protected IFilter filter;
+	protected IFilterWriter filterWriter;
 	protected boolean hasUTF8BOM;
 	protected String lineBreak;
 
@@ -129,16 +129,16 @@ public class StartDocument extends BaseNameable {
 	 * Gets the filter for this document.
 	 * @return the filter for this document.
 	 */
-	public IFilter getFilter () {
-		return filter;
+	public IFilterWriter getFilterWriter () {
+		return filterWriter;
 	}
 	
 	/**
 	 * Sets the filter for this document.
 	 * @param filter the filter for this document.
 	 */
-	public void setFilter (IFilter filter) {
-		this.filter = filter;
+	public void setFilterWriter (IFilterWriter filterWriter) {
+		this.filterWriter = filterWriter;
 	}
 
 	/**

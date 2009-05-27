@@ -293,7 +293,7 @@ public class PlainTextFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
 		startDoc.setMimeType(getMimeType());

@@ -276,7 +276,7 @@ public class XLIFFFilter implements IFilter {
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType(MimeTypeMapper.XLIFF_MIME_TYPE);
 			startDoc.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
 			startDoc.setMultilingual(true);

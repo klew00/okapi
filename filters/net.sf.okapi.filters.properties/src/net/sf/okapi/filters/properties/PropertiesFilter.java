@@ -285,7 +285,7 @@ public class PropertiesFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType("text/x-properties");
 		startDoc.setMimeType("text/x-properties");

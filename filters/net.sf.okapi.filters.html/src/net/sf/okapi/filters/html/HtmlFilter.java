@@ -66,7 +66,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		super();
 		bufferedWhitespace = new StringBuilder();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
-		setFilter(this);
+		setFilterWriter(createFilterWriter());
 		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
 	}
 

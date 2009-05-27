@@ -350,7 +350,7 @@ public class RegexFilter implements IFilter {
 		startDoc.setLanguage(srcLang);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType(params.mimeType);
 		startDoc.setMimeType(params.mimeType);
 		startDoc.setMultilingual(hasRulesWithTarget());

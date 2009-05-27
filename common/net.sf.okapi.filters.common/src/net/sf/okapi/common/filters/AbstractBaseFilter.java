@@ -85,7 +85,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	private String mimeType;
 	private String newlineType;
 	private String documentName;
-	private IFilter filter;
+	private IFilterWriter filterWriter;
 
 	private String currentTagType;
 
@@ -510,7 +510,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		startDocument.setMimeType(getMimeType());
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
-		startDocument.setFilter(getFilter());
+		startDocument.setFilterWriter(getFilterWriter());
 		startDocument.setName(getDocumentName());
 		Event event = new Event(EventType.START_DOCUMENT, startDocument);
 		filterEvents.add(event);
@@ -1334,19 +1334,19 @@ public abstract class AbstractBaseFilter implements IFilter {
 	}
 
 	/**
-	 * Gets the derived filter.
-	 * @return the derived filter.
+	 * Gets the filter writer for this filter.
+	 * @return the filter writer.
 	 */
-	protected IFilter getFilter () {
-		return filter;
+	protected IFilterWriter getFilterWriter () {
+		return filterWriter;
 	}
 	
 	/**
-	 * Sets the derived filter. 
-	 * @param filter the derived filter.
+	 * Sets the filter writer for this filter. 
+	 * @param filter the filter writer.
 	 */
-	protected void setFilter (IFilter filter) {
-		this.filter = filter;
+	protected void setFilterWriter (IFilterWriter filterWriter) {
+		this.filterWriter = filterWriter;
 	}
 	
 	/**

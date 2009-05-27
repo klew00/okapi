@@ -194,7 +194,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType(getMimeType());
 			startDoc.setMimeType(getMimeType());
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));

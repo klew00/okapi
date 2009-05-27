@@ -278,7 +278,7 @@ public class TmxFilter implements IFilter {
 			startDoc.setEncoding(encoding, hasUTF8BOM); //TODO: UTF8 BOM detection
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType("text/x-tmx");
 			startDoc.setMimeType("text/x-tmx");
 			startDoc.setMultilingual(true);

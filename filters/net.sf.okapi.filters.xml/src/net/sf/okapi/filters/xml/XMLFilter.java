@@ -314,7 +314,7 @@ public class XMLFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 

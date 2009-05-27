@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.filters.mif.tests.MIFFilterTest.class,
 	net.sf.okapi.filters.openoffice.tests.ODFFilterTest.class,
 	net.sf.okapi.filters.openoffice.tests.OpenOfficeFilterTest.class,
-	//net.sf.okapi.filters.openxml.tests.AllOpenXMLTests.class,
+	net.sf.okapi.filters.openxml.tests.AllOpenXMLTests.class,
 	net.sf.okapi.filters.po.tests.POFilterTest.class,
 	net.sf.okapi.filters.properties.tests.AllTests.class,
 	net.sf.okapi.filters.regex.tests.RegexFilterTest.class,

@@ -29,13 +29,10 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
  * Converts filters events into a {@link RawDocument}. This class implements the
@@ -137,17 +134,11 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	protected void handleStartDocument (Event event) {
 		language = getContext().getTargetLanguage(0); 
 		encoding = getContext().getOutputEncoding(0);
-		if ( encoding == null ) ((StartDocument)event.getResource()).getEncoding();
 
-		IFilter filter = ((StartDocument) event.getResource()).getFilter();
-		if ( filter == null ) {
-			filterWriter = new GenericFilterWriter(new GenericSkeletonWriter());
-			LOGGER.log(Level.WARNING, "Missing filter information in START_DOCUMENT, using default filter-writer.");
-		}
-		else {
-			filterWriter = filter.createFilterWriter();
-		}
-
+		StartDocument startDoc = (StartDocument)event.getResource();
+		if ( encoding == null ) encoding = startDoc.getEncoding();
+		
+		filterWriter = startDoc.getFilterWriter();
 		filterWriter.setOptions(language, encoding);
 		try {
 			if (userOutput != null) {

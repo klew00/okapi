@@ -32,7 +32,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -114,20 +114,24 @@ public class PipelineEditor {
 		edPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edPath.setEditable(false);
 
+		int width = 100;
+
 		btLoad = new Button(shell, SWT.PUSH);
 		btLoad.setText("Load...");
+		GridData gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btLoad.setLayoutData(gdTmp);
 		btLoad.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				load(null);
 			}
 		});
 		
-		lbSteps = new List(shell, SWT.BORDER);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		lbSteps = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 5;
 		lbSteps.setLayoutData(gdTmp);
 		
-		int width = 100;
 		btSave = new Button(shell, SWT.PUSH);
 		btSave.setText("Save");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -212,8 +216,11 @@ public class PipelineEditor {
 		shell.setDefaultButton(pnlActions.btOK);
 
 		shell.pack();
-		Rectangle Rect = shell.getBounds();
-		shell.setMinimumSize(Rect.width, Rect.height);
+		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 550 ) startSize.x = 550;
+		if ( startSize.y < 350 ) startSize.y = 350;
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}
 

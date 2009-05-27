@@ -252,7 +252,7 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setEncoding(encoding, false); //TODO: UTF8BOM detection
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType("text/xml");
 		startDoc.setMimeType("text/xml");
 		startDoc.setLineBreak("\n");

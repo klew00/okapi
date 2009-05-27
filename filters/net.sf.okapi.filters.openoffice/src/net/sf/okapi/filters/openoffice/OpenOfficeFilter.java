@@ -221,7 +221,7 @@ public class OpenOfficeFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterParameters(params);
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setLineBreak("\n"); // forced
 			startDoc.setEncoding("UTF-8", false); // Forced
 			ZipSkeleton skel = new ZipSkeleton(zipFile);

@@ -221,7 +221,7 @@ public class ODFFilter implements IFilter {
 			startDoc.setEncoding("UTF-8", false);
 			startDoc.setLineBreak(lineBreak);
 			startDoc.setFilterParameters(params);
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 			hasNext = true;
 		}

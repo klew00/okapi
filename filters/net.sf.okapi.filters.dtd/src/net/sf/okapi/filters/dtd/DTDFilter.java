@@ -269,7 +269,7 @@ public class DTDFilter implements IFilter {
 	private Event start () {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setFilterParameters(params);
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLanguage(srcLang);

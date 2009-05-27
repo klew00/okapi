@@ -383,7 +383,7 @@ public class RTFFilter implements IFilter {
 			startDoc.setEncoding(passedEncoding, false);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
-			startDoc.setFilter(this);
+			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType("text/rtf");
 			startDoc.setMimeType("text/rtf");
 			startDoc.setMultilingual(true);

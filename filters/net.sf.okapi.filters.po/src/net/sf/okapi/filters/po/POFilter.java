@@ -328,7 +328,7 @@ public class POFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
-		startDoc.setFilter(this);
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(MimeTypeMapper.PO_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.PO_MIME_TYPE);

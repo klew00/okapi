@@ -130,7 +130,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
-		setFilter(this);
+		setFilterWriter(createFilterWriter());
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
