@@ -75,7 +75,8 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("sample.xlsx");
 		themfiles.add("sampleMore.xlsx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
-		
+//		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
+//		themfiles.add("glorp.docx");
 		themfiles.add("OpenXML_text_reference_document.docx");
 		themfiles.add("OpenXML_text_reference_v1_1.docx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
