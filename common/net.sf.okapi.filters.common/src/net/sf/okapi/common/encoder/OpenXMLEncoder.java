@@ -81,9 +81,11 @@ public class OpenXMLEncoder implements IEncoder {
 						String tmp = new String(Character.toChars(cp));
 							sbTmp.append(tmp);
 					}
+					else
+						sbTmp.append(String.valueOf(ch));
 				}
-				else // Should be able to fold to char, supplementary case will be treated
-					sbTmp.append(String.valueOf(ch));
+				else // ASCII chars
+					sbTmp.append(ch);
 				break;
 			}
 		}
