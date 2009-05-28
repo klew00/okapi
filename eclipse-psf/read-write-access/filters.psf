@@ -4,6 +4,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.common,net.sf.okapi.common"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.filters.common,net.sf.okapi.filters.common"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.csv,net.sf.okapi.filters.csv"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.dtd,net.sf.okapi.filters.dtd"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.html,net.sf.okapi.filters.html"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.idml,net.sf.okapi.filters.idml"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.javascript,net.sf.okapi.filters.javascript"/>
@@ -24,6 +25,7 @@
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Filters" name="Okapi-Filters">
 <item elementID="=net.sf.okapi.filters.idml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.mif" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.dtd" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.csv" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -39,7 +41,7 @@
 <item elementID="=net.sf.okapi.filters.openoffice" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.rtf" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.pipeline" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 </psf>
