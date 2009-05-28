@@ -29,6 +29,7 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -104,11 +105,15 @@ public class OpenXMLFilter implements IFilter {
 	private ITranslator translator=null;
 	private String sOutputLanguage="en-US";
 	private boolean canceled = false;
+	private HashSet hsExcludeStyles = null; // DWH 5-28-09 set of styles to exclude from translation
 	private boolean bPreferenceTranslateDocProperties = true;
 	private boolean bPreferenceTranslateComments = true;
 	private boolean bPreferenceTranslatePowerpointNotes = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslatePowerpointMasters = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslateWordHeadersFooters = true; // DWH 5-26-09 preferences
+	private boolean bPreferenceTranslateAllStyles = true; // DWH 5-28-09 if false, exclude a given list
+	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-28-09
+	private boolean bMinedHiddenStyles = true; // DWH 5-28-09
 
 	public OpenXMLFilter () {
 	}
@@ -125,6 +130,7 @@ public class OpenXMLFilter implements IFilter {
 	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
+		hsExcludeStyles = new HashSet(); // DWH 5-28-09
 	}
 
 	/**
@@ -447,7 +453,7 @@ public class OpenXMLFilter implements IFilter {
 	 */
 	private Event openZipFile () {
 		File fZip;
-		String sEntryName,sZipType;
+		String sEntryName,sZipType,sDocType; // DWH 5-28-09
 		int iCute;
 		try
 		{
@@ -486,6 +492,8 @@ public class OpenXMLFilter implements IFilter {
 //			params = (Parameters)openXMLContentFilter.getParameters();
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
+			if (nZipType==MSWORD && !bPreferenceTranslateWordHidden)
+				bMinedHiddenStyles = false; // DWH 5-28-09 so mine hidden styles first
 			entries = zipFile.entries();
 			openXMLContentFilter.initFileTypes(); // new HashTable for file types in zip file
 			subDocId = 0;
@@ -531,10 +539,19 @@ public class OpenXMLFilter implements IFilter {
 		    iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
 		    if (iCute>0)
 			    sDocType = sDocType.substring(iCute+1);
+		    if (!bMinedHiddenStyles) // DWH 5-28-09 find styles for hidden text
+		    {
+		    	if (sDocType.equals("styles+xml"))
+		    	{
+		    		bMinedHiddenStyles = true;
+		    		entries = zipFile.entries(); // reset to go through all of them
+		    	}
+		    	else
+		    		continue;
+		    }
 			bInMainFile = (sEntryName.endsWith(".xml") &&
-				    		((nZipType==MSWORD && sDocType.equals("main+xml")) ||
-				    		 (nZipType==MSPOWERPOINT && sDocType.equals("slide+xml") &&
-				    		  bPreferenceTranslatePowerpointMasters)));
+				    		(nZipType==MSWORD && sDocType.equals("main+xml") ||
+				    		 nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")));
 			                    // DWH 5-26-09 translate if translating Powerpoint master slides
 			openXMLContentFilter.setBInMainFile(bInMainFile); // DWH 4-15-09 only allow blank text in main files
 			if (bInMainFile && bSquishable)
@@ -556,6 +573,7 @@ public class OpenXMLFilter implements IFilter {
 		                    (sDocType.equals("comments+xml") && bPreferenceTranslateComments) ||
 		                      // DWH 5-25-09 translate if translating comments
 		                    sDocType.equals("chart+xml") ||
+		                    (sDocType.equals("styles+xml") && !bPreferenceTranslateWordHidden) ||
 		                    sDocType.equals("settings+xml") ||
 		                    (sDocType.equals("core-properties+xml") && bPreferenceTranslateDocProperties) ||
 		                      // DWH 5-25-09 translate if translating document properties
@@ -569,7 +587,8 @@ public class OpenXMLFilter implements IFilter {
 		            	    sDocType.equals("table+xml"))
 				   			) ||
 				   	 (nZipType==MSPOWERPOINT &&
-				   	       (sDocType.equals("notesSlide+xml") && bPreferenceTranslatePowerpointNotes))))) {
+				   	       (((sDocType.equals("notesSlide+xml") && bPreferenceTranslatePowerpointNotes)) ||
+				   	    	  sDocType.equals("slideMaster+xml") && bPreferenceTranslatePowerpointMasters))))) {
 						     // DWH 5-26-09 translate if translating Powerpoint notes
 				if (nZipType==MSWORD && sDocType.equals("chart+xml")) // DWH 4-16-09
 					nFileType = MSWORDCHART;
@@ -644,6 +663,9 @@ public class OpenXMLFilter implements IFilter {
 			}
 
 			openXMLContentFilter.open(new RawDocument(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
+			if (!bPreferenceTranslateWordHidden || !bPreferenceTranslateAllStyles)
+				  // DWH 5-28-09 list of styles to exclude
+				openXMLContentFilter.setHSExcludeStyles(hsExcludeStyles);
 			//			openXMLContentFilter.next(); // START
 			event = openXMLContentFilter.next(); // START_DOCUMENT
 			LOGGER.log(Level.FINEST,openXMLContentFilter.getParameters().toString());
@@ -695,6 +717,8 @@ public class OpenXMLFilter implements IFilter {
 					// Read the FINISHED event
 	//				openXMLContentFilter.next();
 					// Change the END_DOCUMENT to END_SUBDOCUMENT
+					if (!bPreferenceTranslateWordHidden) // DWH 5-28-09 save mined styles
+						hsExcludeStyles = openXMLContentFilter.getHSExcludeStyles();
 					Ending ending = new Ending(String.valueOf(subDocId));
 					nextAction = NextAction.NEXTINZIP;
 					ZipSkeleton skel = new ZipSkeleton(

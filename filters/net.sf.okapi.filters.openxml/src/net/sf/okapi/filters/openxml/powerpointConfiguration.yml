@@ -41,6 +41,9 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [lang]
 
+'a:fld': 
+  ruleTypes: [TEXTRUN]
+
 'a:p': 
   ruleTypes: [TEXTUNIT]
 

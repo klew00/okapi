@@ -88,41 +88,13 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		String sTuff; // DWH 4-8-09
 		String text=tf.toString(); // DWH 5-18-09
 		boolean bInBlankText=false; // DWH 4-8-09
+		boolean bHasBlankInText=false; // DWH 5-28-09
 		int nSurroundingCodes=0; // DWH 4-8-09
+		String sPreserve=""; // DWH 5-28-09 xml:space="preserve" if there is a space
 		// Output simple text
 		if ( !tf.hasCode() ) {
 			if (text.length()>0)
 			{
-/* commented DWH 5-22-09
-				if (context==1)
-				{
-					if (configurationType==MSWORD)
-						sTuff = "<w:r><w:t xml:space=\"preserve\">"+text+"</w:t></w:r>"; // DWH 4-8-09
-					else if (configurationType==MSPOWERPOINT)
-						sTuff = "<a:r><a:t xml:space=\"preserve\">"+text+"</a:t></a:r>"; // DWH 4-8-09
-					else
-						sTuff = text;
-				}
-				else
-					sTuff = tf.toString();
-				if ( encoderManager == null ) {
-					if ( layer == null ) {
-						return sTuff; // DWH 4-8-09 replaced tf.toString() with sTuff
-					}
-					else {
-						return layer.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
-					}
-				}
-				else {
-					if ( layer == null ) {
-						return encoderManager.encode(sTuff, context); // DWH 4-8-09 replaced tf.toString() with sTuff
-					}
-					else {
-						return layer.encode(
-							encoderManager.encode(sTuff, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
-					}
-				}
-*/
 				sTuff = text; // DWH 5-22-09
 				if ( encoderManager == null ) // DWH 5-22-09 whole if-else: encode first
 				{
@@ -138,10 +110,15 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				}
 				if (context==1) // DWH 5-22-09 add unencoded tags if needed
 				{
+					bHasBlankInText = ((text.indexOf(' ')>-1) || (text.indexOf('\u00A0')>-1)); // DWH 5-28-09
+					if (bHasBlankInText)
+						sPreserve = " xml:space=\"preserve\""; // DWH 5-28-09
 					if (configurationType==MSWORD)
-						text = "<w:r><w:t xml:space=\"preserve\">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
+						text = "<w:r><w:t"+sPreserve+">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
+//						text = "<w:r><w:t xml:space=\"preserve\">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
 					else if (configurationType==MSPOWERPOINT)
-						text = "<a:r><a:t xml:space=\"preserve\">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
+						text = "<a:r><a:t"+sPreserve+">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
+//						text = "<a:r><a:t xml:space=\"preserve\">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
 					else
 						text = sTuff;
 				}

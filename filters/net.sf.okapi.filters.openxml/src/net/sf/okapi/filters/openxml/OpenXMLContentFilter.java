@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.Hashtable;
 //import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 //import java.util.TreeMap; // DWH 10-10-08
@@ -127,11 +128,16 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bIgnoredPreRun = false; // DWH 4-10-09
 	private boolean bBeforeFirstTextRun = true; // DWH 4-15-09
 	private boolean bInMainFile = false; // DWH 4-15-09
+	private HashSet hsExcludeStyles = null; // DWH 5-27-09 set of styles to exclude from translation
+	private boolean bExcludeText = false; // DWH 5-27-09
+	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
+	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
 
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
 		setFilterWriter(createFilterWriter());
+		hsExcludeStyles = new HashSet<String>();
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -378,7 +384,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	    	  }
 	    	  else if (bInap)
 	    	  {
-		    	  if (tugname.equals("w:r") || tugname.equals("a:r"))
+		    	  if (tugname.equals("w:r") ||
+		    		  tugname.equals("a:r") || tugname.equals("a:fld")) // DWH 5-27-09 a:fld
 		    	  {
 		    		  tug = killRevisionIDsAndErrs(snug);
 		    		  if (bInr)
@@ -396,7 +403,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		    			  bB4text = true;
 		    		  }
 		    	  }
-		    	  else if (tugname.equals("/w:r") || tugname.equals("/a:r"))
+		    	  else if (tugname.equals("/w:r") ||
+		    			   tugname.equals("/a:r") || tugname.equals("/a:fld")) // DWH 5-27-09 a:fld
 		    	  {
 		    		  if (bInInnerR)
 		    		  {
@@ -812,7 +820,19 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
-				startTextUnit();
+				if (getConfig().getElementType(sTagName).equals("style")) // DWH 5-27-09 to exclude hidden styles
+				{
+					sCurrentCharacterStyle = startTag.getAttributeValue("name");
+					addToDocumentPart(sTagString);
+				}
+				else if (getConfig().getElementType(sTagName).equals("hidden")) // DWH 5-27-09 to exclude hidden styles
+				{
+					if (!sCurrentCharacterStyle.equals(""))
+						excludeStyle(sCurrentCharacterStyle);
+					addToDocumentPart(sTagString);
+				}
+				else
+					startTextUnit();
 			}
 			if (bInTextRun) // DWH 4-9-09
 				addToTextRun(startTag);
@@ -1337,8 +1357,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			if (codeType==TextFragment.TagType.OPENING &&
 				!bBeforeFirstTextRun && // DWH 4-15-09 only do this if there wasn't stuff before <w:r>
 				bInMainFile && // DWH 4-15-08 only do this in MSWORD document and MSPOWERPOINT slides
-				((/*text.equals("<w:r><w:t>") || */text.equals("<w:r><w:t xml:space=\"preserve\">")) ||
-				 (/*text.equals("<a:r><a:t>") || */text.equals("<a:r><a:t xml:space=\"preserve\">"))))
+				((text.equals("<w:r><w:t>") || text.equals("<w:r><w:t xml:space=\"preserve\">")) ||
+				 (text.equals("<a:r><a:t>") || text.equals("<a:r><a:t xml:space=\"preserve\">"))))
 			{
 				bIgnoredPreRun = true; // don't put codes around text that has no attributes
 				trTextRun = null;
@@ -1415,6 +1435,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			trNonTextRun = null;
 		}
 	}
+	public void excludeStyle(String sTyle) // DWH 5-27-09 to exclude selected styles or hidden text 
+	{
+		if (sTyle!=null && !sTyle.equals(""))
+			hsExcludeStyles.add(sTyle);
+	}
 	public int getConfigurationType()
 	{
 		return configurationType;
@@ -1430,5 +1455,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public void setLogger(Logger lgr)
 	{
 		LOGGER = lgr;
+	}
+	public void setHSExcludeStyles(HashSet hsExcludeStyles)
+	{
+		this.hsExcludeStyles = hsExcludeStyles;
+	}
+	public HashSet getHSExcludeStyles()
+	{
+		return hsExcludeStyles;
 	}
 }

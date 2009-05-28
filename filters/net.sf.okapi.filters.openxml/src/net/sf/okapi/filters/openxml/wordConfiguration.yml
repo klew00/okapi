@@ -78,8 +78,10 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [w:val]
 
-#'w:rstyle':           DWH 3-9-09 this dies because r:style is a standalone tag
-#  elementType: {link: ['w:val', EQUALS, 'Hyperlink']}
+#  DWH 3-9-09 this dies because r:style is a standalone tag
+'w:rstyle':
+  ruleTypes: [INLINE]
+  elementType: style
 
 'w:t':
   ruleTypes: [TEXTMARKER]
@@ -87,5 +89,9 @@ filetype:
 'w:themefontlang':
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [w:val]
+
+'w:vanish':
+  ruleTypes: [INLINE]
+  elementType: hidden
 
 
