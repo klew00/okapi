@@ -30,7 +30,6 @@ import java.util.Map;
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.IPipelineDriver;
@@ -202,33 +201,34 @@ public class PipelineWrapper {
 	}
 	
 	public void load (String path) {
-		//TODO
+		PipelineStorage store = new PipelineStorage();
+		store.setPath(path);
+		driver.setPipeline(store.read());
+		// Set the info-steps
+		Step infoStep;
+		IParameters params;
+		steps.clear();
+		for ( IPipelineStep step : driver.getPipeline().getSteps() ) {
+			infoStep = new Step(step.getClass().getSimpleName(),
+				step.getName(), step.getClass().getName(), null);
+			params = step.getParameters();
+			if ( params != null ) {
+				infoStep.paramsData = params.toString();
+			}
+			steps.add(infoStep);
+		}
 		this.path = path;
 	}
 	
 	public void save (String path) {
-		XMLWriter writer = null;
-		try {
-			writer = new XMLWriter();
-			writer.create(path);
-			writer.writeStartDocument();
-			writer.writeStartElement("pipeline");
-			writer.writeLineBreak();
-			for ( Step step : steps ) {
-				writer.writeStartElement("step");
-				writer.writeAttributeString("stepClass", step.stepClass);
-				writer.writeEndElementLineBreak(); // step
-			}
-			writer.writeEndElementLineBreak(); // pipeline
-			writer.writeEndDocument();
-			this.path = path; 
-		}
-		finally {
-			if ( writer != null ) writer.close();
-		}
+		PipelineStorage store = new PipelineStorage();
+		copyInfoStepsToPipeline();
+		store.setPath(path);
+		store.write(driver.getPipeline());
+		this.path = path;
 	}
 	
-	public void execute (Project prj) {
+	private void copyInfoStepsToPipeline () {
 		try {
 			// Build the pipeline
 			driver.setPipeline(new Pipeline());
@@ -242,53 +242,6 @@ public class PipelineWrapper {
 				}
 				driver.addStep(step);
 			}
-			
-			// Set the batch items
-			driver.clearItems();
-			int f = -1;
-			URI outURI;
-			URI inpURI;
-			BatchItemContext bic;
-			int inputRequested = driver.inputCountRequested();
-			
-			for ( Input item : prj.getList(0) ) {
-				f++;
-				// Set the data for the first input of the batch item
-				outURI = (new File(prj.buildTargetPath(0, item.relativePath))).toURI();
-				inpURI = (new File(prj.getInputRoot(0) + File.separator + item.relativePath)).toURI();
-				bic = new BatchItemContext(new RawDocument(
-						inpURI, prj.buildSourceEncoding(item),
-						prj.getSourceLanguage(), prj.getTargetLanguage()),
-					item.filterSettings,
-					outURI, prj.buildTargetEncoding(item));
-				
-				// Add input/output data from other input lists if requested
-				for ( int j=1; j<3; j++ ) {
-					// Does the utility requests this list?
-					if ( j >= inputRequested ) break; // No need to loop more
-					// Do we have a corresponding input?
-					if ( 3 > f ) {
-						// Data is available
-						Input item2 = prj.getList(j).get(f);
-						// Input
-						outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
-						inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
-						bic.add(new RawDocument(
-								inpURI, prj.buildSourceEncoding(item),
-								prj.getSourceLanguage(), prj.getTargetLanguage()),
-							item2.filterSettings,
-							outURI, prj.buildTargetEncoding(item2));
-					}
-					// Else: don't add anything
-					// The lists will return null and that is up to the utility to check.
-				}
-				
-				// Add the constructed batch item to the driver's list
-				driver.addBatchItem(bic);
-			}
-
-			// Execute
-			driver.processBatch();
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException(e);
@@ -299,6 +252,56 @@ public class PipelineWrapper {
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void execute (Project prj) {
+		copyInfoStepsToPipeline();
+		// Set the batch items
+		driver.clearItems();
+		int f = -1;
+		URI outURI;
+		URI inpURI;
+		BatchItemContext bic;
+		int inputRequested = driver.inputCountRequested();
+		
+		for ( Input item : prj.getList(0) ) {
+			f++;
+			// Set the data for the first input of the batch item
+			outURI = (new File(prj.buildTargetPath(0, item.relativePath))).toURI();
+			inpURI = (new File(prj.getInputRoot(0) + File.separator + item.relativePath)).toURI();
+			bic = new BatchItemContext(new RawDocument(
+					inpURI, prj.buildSourceEncoding(item),
+					prj.getSourceLanguage(), prj.getTargetLanguage()),
+				item.filterSettings,
+				outURI, prj.buildTargetEncoding(item));
+			
+			// Add input/output data from other input lists if requested
+			for ( int j=1; j<3; j++ ) {
+				// Does the utility requests this list?
+				if ( j >= inputRequested ) break; // No need to loop more
+				// Do we have a corresponding input?
+				if ( 3 > f ) {
+					// Data is available
+					Input item2 = prj.getList(j).get(f);
+					// Input
+					outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
+					inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
+					bic.add(new RawDocument(
+							inpURI, prj.buildSourceEncoding(item),
+							prj.getSourceLanguage(), prj.getTargetLanguage()),
+						item2.filterSettings,
+						outURI, prj.buildTargetEncoding(item2));
+				}
+				// Else: don't add anything
+				// The lists will return null and that is up to the utility to check.
+			}
+			
+			// Add the constructed batch item to the driver's list
+			driver.addBatchItem(bic);
+		}
+
+		// Execute
+		driver.processBatch();
 	}
 
 	public void addStep (Step step) {

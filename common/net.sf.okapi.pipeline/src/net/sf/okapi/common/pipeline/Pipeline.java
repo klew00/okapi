@@ -20,7 +20,9 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -90,6 +92,10 @@ public class Pipeline implements IPipeline {
 		steps.add(step);
 	}
 
+	public List<IPipelineStep> getSteps () {
+		return new ArrayList<IPipelineStep>(steps);
+	}
+	
 	public void cancel () {
 		cancel = true;
 	}

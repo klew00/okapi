@@ -52,7 +52,7 @@
   inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
  >Filter for DTD files.</filter>
   
- <filter id="okf_plaintext"
+ <!--<filter id="okf_plaintext"
   name="(BETA) Plain Text Filter"
   inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
  >Filter for plain text files.</filter>
@@ -61,6 +61,7 @@
   name="(BETA) Table Filter"
   inputFilterClass="net.sf.okapi.filters.csv.CSV_Filter"
  >Filter for table-type files (tab-delimited, CSV, fixed-width tables, etc.)</filter>
+-->
   
  <filter id="okf_idml"
   name="(ALPHA) IDML Filter"

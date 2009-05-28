@@ -45,7 +45,6 @@ public class PipelineEditor {
 	private Shell shell;
 	private boolean result;
 	private IHelp help;
-//	private String projectDir;
 	private PipelineWrapper wrapper;
 	private Map<String, Step> availableSteps;
 	private ArrayList<Step> workSteps;
@@ -69,13 +68,9 @@ public class PipelineEditor {
 		boolean result = false;
 		try {
 			this.availableSteps = availableSteps;
-			workSteps = new ArrayList<Step>();
-			for ( Step step : wrapper.getSteps() ) {
-				workSteps.add(step.clone());
-			}
 			this.wrapper = wrapper;
 			this.help = helpParam;
-//			this.projectDir = projectDir;
+			setDataFromWrapper();
 			create(parent, executeMode);
 			populate(0);
 			result = showDialog();
@@ -91,6 +86,13 @@ public class PipelineEditor {
 		return result;
 	}
 
+	private void setDataFromWrapper () {
+		workSteps = new ArrayList<Step>();
+		for ( Step step : wrapper.getSteps() ) {
+			workSteps.add(step.clone());
+		}
+	}
+	
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -310,36 +312,33 @@ public class PipelineEditor {
 	}
 	
 	private void save (String path) {
-		Dialogs.showError(shell, "Not implemented yet.", null);
-/*		try {
+		try {
 			if (( path == null ) || ( path.length() == 0 )) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null, null, null);
 				if ( path == null ) return;
 			}
-			if ( saveData() ) return;
-			
-			// Save it
+			if ( !saveData() ) return;
 			wrapper.save(path);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-		}*/
+		}
 	}
 
 	private void load (String path) {
-		Dialogs.showError(shell, "Not implemented yet.", null);
-/*		try {
+		try {
 			if (( path == null ) || ( path.length() == 0 )) {
 				String[] paths = Dialogs.browseFilenames(shell, "Load Pipeline", false, null, null, null);
 				if ( paths == null ) return;
 				else path = paths[0];
 			}
 			wrapper.load(path);
+			setDataFromWrapper();
 			populate(-1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-		}*/
+		}
 	}
 
 }

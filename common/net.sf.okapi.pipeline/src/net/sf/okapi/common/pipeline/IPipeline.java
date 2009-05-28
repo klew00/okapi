@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -60,6 +62,12 @@ public interface IPipeline {
 	 * @param step the step to add.
 	 */
 	public void addStep (IPipelineStep step);
+	
+	/**
+	 * Gets the list of all steps in this pipeline.
+	 * @return a list of all steps in this pipeline, the list may be empty.
+	 */
+	public List<IPipelineStep> getSteps ();
 
 	/**
 	 * Gets the current {@link PipelineContext} for this pipeline.
