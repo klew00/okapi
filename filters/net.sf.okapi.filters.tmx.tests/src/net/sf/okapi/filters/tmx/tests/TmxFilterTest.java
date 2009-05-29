@@ -58,7 +58,14 @@ public class TmxFilterTest {
 	String invalidElementInsideSubSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <ph type=\"fnote\">Before Sub\"<sub>Hello <invalid> test invalid sub element </invalid> Subflow. </sub>After Sub</ph>Universe!</seg></tuv></tu></body></tmx>\r";
 
-	
+	String multiTransSnippet = "<?xml version=\"1.0\"?>"
+		+ "<tmx version=\"1.4\"><header creationtool=\"x\" creationtoolversion=\"1\" segtype=\"sentence\" o-tmf=\"x\" adminlang=\"en\" srclang=\"en-us\" datatype=\"plaintext\"></header><body><tu>"
+		+ "<tuv xml:lang=\"en-us\"><seg>Hello</seg>s</tuv>"
+		+ "<tuv xml:lang=\"fr\"><seg>Bonjour</seg></tuv>"
+		+ "<tuv xml:lang=\"fr\"><seg>Salut</seg></tuv>"
+		+ "<tuv xml:lang=\"de\"><seg>Hallo</seg></tuv>"
+		+ "<tuv xml:lang=\"it\"><seg>Buongiorno</seg></tuv>"
+		+ "</tu></body></tmx>\r";
 	
 	@Before
 	public void setUp() {
@@ -67,7 +74,6 @@ public class TmxFilterTest {
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 	}
-
 	
 	//--methods--
 	@Test
@@ -158,8 +164,6 @@ public class TmxFilterTest {
 	public void testInvalidElementInPlaceholder() {
 		FilterTestDriver.getStartDocument(getEvents(invalidElementInsidePlaceholderSnippet, "en-us","fr-fr"));
 	}
-
-	
 	
 	@Test (expected=OkapiBadFilterInputException.class)
 	public void testOpenInvalidInputStream() {
@@ -171,7 +175,6 @@ public class TmxFilterTest {
 	
 	@Test (expected=OkapiIOException.class)
 	public void testOpenInvalidUri() throws Exception{
-
 		String basePath = TmxFilterTest.class.getResource("/Paragraph_TM.tmx").toURI().getPath();
 		basePath = "file://"+basePath.replace("/bin/Paragraph_TM.tmx","");
 
@@ -207,8 +210,6 @@ public class TmxFilterTest {
 		filter.close();
 		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, "en-us","fr-fr"), simpleSnippet, "fr-fr"));
 	}	
-
-	
 	
 	/*
 	@Test
@@ -216,9 +217,6 @@ public class TmxFilterTest {
 		assertEquals(simpleBilingualSnippet, FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "fr-fr"));
 		System.out.println(FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "en"));
 	}*/	
-	
-	
-	
 	
 	@Test
 	public void testStartDocument () {
@@ -237,6 +235,29 @@ public class TmxFilterTest {
 		assertNotNull(tu);
 		assertEquals("Hello World!", tu.getSource().toString());
 		assertEquals("tuid_1", tu.getName());
+	}
+	
+	@Test
+	public void testMulipleTargets () {
+		ArrayList<Event> events = getEvents(multiTransSnippet, "en-us", "fr");
+
+		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu);
+		assertEquals("Hello", tu.getSource().toString());
+		assertEquals(3, tu.getTargetLanguages().size());
+		assertTrue(tu.hasTarget("fr"));
+		assertEquals("Bonjour", tu.getTarget("fr").toString());
+		assertTrue(tu.hasTarget("de"));
+		assertEquals("Hallo", tu.getTarget("de").toString());
+		assertTrue(tu.hasTarget("it"));
+		assertEquals("Buongiorno", tu.getTarget("it").toString());
+
+		tu = FilterTestDriver.getTextUnit(events, 2);
+		assertNotNull(tu);
+		assertEquals("Hello", tu.getSource().toString());
+		assertEquals(1, tu.getTargetLanguages().size());
+		assertTrue(tu.hasTarget("fr"));
+		assertEquals("Salut", tu.getTarget("fr").toString());
 	}
 	
 /*	@Test
