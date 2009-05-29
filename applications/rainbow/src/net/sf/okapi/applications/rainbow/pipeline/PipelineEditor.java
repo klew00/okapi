@@ -133,6 +133,11 @@ public class PipelineEditor {
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 5;
 		lbSteps.setLayoutData(gdTmp);
+		lbSteps.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateStepDisplay();
+			}
+		});
 		
 		btSave = new Button(shell, SWT.PUSH);
 		btSave.setText("Save");
@@ -232,6 +237,18 @@ public class PipelineEditor {
 		return listEntry.substring(pos+1, listEntry.length()-1);
 	}
 
+	private void updateStepDisplay () {
+		int n = lbSteps.getSelectionIndex();
+		if ( n < 0 ) {
+			btRemoveStep.setEnabled(false);
+			btEditStep.setEnabled(false);
+			return; 
+		}
+		Step step = workSteps.get(n);
+		btRemoveStep.setEnabled(true);
+		btEditStep.setEnabled(step.paramsData!=null);
+	}
+	
 	private void populate (int index) {
 		edPath.setText(wrapper.getPath()==null ? "" : wrapper.getPath());
 		lbSteps.removeAll();
@@ -247,6 +264,7 @@ public class PipelineEditor {
 			index = 0;
 		}
 		lbSteps.select(index);
+		updateStepDisplay();
 	}
 	
 	private void addStep () {

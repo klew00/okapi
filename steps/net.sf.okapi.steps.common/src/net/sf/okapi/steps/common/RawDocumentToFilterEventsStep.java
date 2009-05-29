@@ -22,6 +22,7 @@ package net.sf.okapi.steps.common;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -77,18 +78,18 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		
 		// Initialize the filter on RAW_DOCUMENT
 		case RAW_DOCUMENT:
-			if ( getContext().getFilterConfigurationId(0) != null ) {
-				// Get the filter to use
+			if ( Util.isEmpty(getContext().getFilterConfigurationId(0)) ) {
+				// No filter configuration provided: just pass it down
+				isDone = true;
+				return event;
+			}
+			else { // Get the filter to use
 				filter = getContext().getFilterConfigurationMapper().createFilter(
 					getContext().getFilterConfigurationId(0), filter);
 				if ( filter == null ) {
 					throw new RuntimeException("Unsupported filter type.");
 				}
 				isDone = false;
-			}
-			else { // No filter configuration provided: just pass it down
-				isDone = true;
-				return event;
 			}
 			// Open the document
 			filter.open((RawDocument)event.getResource());

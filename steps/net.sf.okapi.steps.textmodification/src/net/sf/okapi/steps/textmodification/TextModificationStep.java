@@ -48,10 +48,10 @@ public class TextModificationStep extends BasePipelineStep {
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
 	private String trgLang;
+	private boolean initDone;
 
 	public TextModificationStep () {
 		params = new Parameters();
-		srcSeg = null;
 	}
 	
 	public String getDescription () {
@@ -72,8 +72,13 @@ public class TextModificationStep extends BasePipelineStep {
 		params = (Parameters)params;
 	}
  
-	@Override
 	protected void handleStartBatch (Event event) {
+		initDone = false;
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		if ( initDone ) return; // Initialize once per batch
 		trgLang = getContext().getTargetLanguage(0);
 		if ( params.segment ) {
 			String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
@@ -88,6 +93,7 @@ public class TextModificationStep extends BasePipelineStep {
 			}
 			trgSeg = srxDoc.compileLanguageRules(trgLang, null);
 		}
+		initDone = true;
 	}
 	
 	@Override

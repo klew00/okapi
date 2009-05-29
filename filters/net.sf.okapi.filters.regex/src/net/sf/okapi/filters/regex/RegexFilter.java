@@ -107,8 +107,7 @@ public class RegexFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"Regex Default",
-			"Default Regex configuration.",
-			null));
+			"Default Regex configuration."));
 		list.add(new FilterConfiguration(getName()+"-srt",
 			MIMETYPE,
 			getClass().getName(),

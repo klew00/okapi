@@ -23,6 +23,7 @@ package net.sf.okapi.common.pipeline;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -30,6 +31,11 @@ import net.sf.okapi.common.resource.RawDocument;
  * Default implementation of the {@link IPipelineDriver} interface.
  */
 public class PipelineDriver implements IPipelineDriver {
+
+	/**
+	 * Logger for this driver.
+	 */
+	protected final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private IPipeline pipeline;
 	private List<IBatchItemContext> batchItems;
@@ -70,6 +76,7 @@ public class PipelineDriver implements IPipelineDriver {
 	public void processBatch () {
 		pipeline.startBatch();
 		for ( IBatchItemContext item : batchItems ) {
+			displayInput(item);
 			pipeline.getContext().setBatchItemContext(item);
 			pipeline.process(item.getRawDocument(0));
 		}
@@ -124,6 +131,16 @@ public class PipelineDriver implements IPipelineDriver {
 	
 	public void clearItems () {
 		batchItems.clear();
+	}
+
+	/**
+	 * Logs the information about which batch item is about to be processed. This
+	 * method is called inside the loop that process the batch.
+	 * @param item the batch item that is about to be processed.
+	 */
+	protected void displayInput (IBatchItemContext item) {
+		logger.info(String.format("\n-- Input: %s",
+			item.getRawDocument(0).getInputURI().getPath()));
 	}
 	
 }

@@ -22,6 +22,7 @@ package net.sf.okapi.steps.xsltransform;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.transform.Result;
@@ -46,6 +47,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	private Source xsltInput;
 	private Map<String, String> paramList;
 	private Transformer trans;
+	private boolean isDone;
 	
 	public XSLTransformStep () {
 		params = new Parameters();
@@ -70,6 +72,11 @@ public class XSLTransformStep extends BasePipelineStep {
 	@Override
 	public IParameters getParameters () {
 		return params;
+	}
+	
+	@Override
+	public boolean isDone () {
+		return isDone;
 	}
 
 	@Override
@@ -97,10 +104,16 @@ public class XSLTransformStep extends BasePipelineStep {
 			javax.xml.transform.TransformerFactory fact =
 				javax.xml.transform.TransformerFactory.newInstance();
 			trans = fact.newTransformer(xsltInput);
+			isDone = true;
 		}
 		catch ( TransformerConfigurationException e ) {
 			throw new OkapiIOException("Error in XSLT input.", e);
 		}
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		isDone = false;
 	}
 
 	@Override
@@ -110,9 +123,15 @@ public class XSLTransformStep extends BasePipelineStep {
 			trans.reset();
 			fillParameters();
 			
-			// Create input source
-			Source xmlInput = new javax.xml.transform.stream.StreamSource(
-				rawDoc.getReader());
+			Properties props = trans.getOutputProperties();
+			for ( Object obj: props.keySet() ) {
+				String key = (String)obj;
+				String value = props.getProperty(key);
+				value = value+"";
+			}
+			
+			// Create the input source
+			Source xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getReader());
 			
 			// Create the output
 			File outFile;
@@ -142,6 +161,9 @@ public class XSLTransformStep extends BasePipelineStep {
 		}
 		catch ( TransformerException e ) {
 			throw new OkapiIOException("Transformation error.", e);
+		}
+		finally {
+			isDone = true;
 		}
 	}
 

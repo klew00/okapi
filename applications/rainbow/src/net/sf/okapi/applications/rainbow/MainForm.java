@@ -260,9 +260,6 @@ public class MainForm implements IParametersProvider {
 		// Define default editor, if none, the fall back for .txt will be used.
 		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
 		
-		fcMapper = new FilterMapper();
-		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
-
 		// Toolbar
 		createToolbar();
 		
@@ -1183,6 +1180,9 @@ public class MainForm implements IParametersProvider {
 	private void editPipeline () {
 		try {
 			PipelineEditor dlg = new PipelineEditor();
+			if ( wrapper == null ) {
+				createPipelineWrapper();
+			}
 			dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, false);
 		}
 		catch ( Throwable e ) {
@@ -1194,7 +1194,9 @@ public class MainForm implements IParametersProvider {
 		try {
 			// Save any pending data
 			saveSurfaceData();
-
+			if ( wrapper == null ) {
+				createPipelineWrapper();
+			}
 			PipelineEditor dlg = new PipelineEditor();
 			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, true) ) {
 				return; // No execution
@@ -1714,9 +1716,17 @@ public class MainForm implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
-		wrapper = new PipelineWrapper(fcMapper);
+		wrapper = null;
 		currentInput = 0;
 		resetDisplay(-1);
+	}
+	
+	private void createPipelineWrapper () {
+		if ( fcMapper == null ) {
+			fcMapper = new FilterMapper();
+			fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
+		}
+		wrapper = new PipelineWrapper(fcMapper);
 	}
 	
 	private void openProject (String path) {
