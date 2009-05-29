@@ -81,7 +81,8 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("OpenXML_text_reference_v1_1.docx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
-
+		themfiles.add("Hidden.docx");
+		
 		for(String s : themfiles)
 		{
 			runOneTest(s,false,false); // English
