@@ -129,10 +129,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bBeforeFirstTextRun = true; // DWH 4-15-09
 	private boolean bInMainFile = false; // DWH 4-15-09
 	private HashSet hsExcludeStyles = null; // DWH 5-27-09 set of styles to exclude from translation
-	private boolean bExcludeText = false; // DWH 5-27-09
+	private boolean bExcludeTextInRun = false; // DWH 5-27-09
+	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
-
+	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-29-09
+	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
@@ -716,7 +718,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			{
 				if (bBetweenTextMarkers)
 				{
-					if (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='=')
+					if (bExcludeTextInRun || bExcludeTextInUnit || // DWH 5-29-09 don't treat as text if excluding text
+						    (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='='))
 						addToTextRun(txt); // DWH 5-13-09 don't treat Excel formula as text to be translated
 					else
 					{
@@ -820,27 +823,50 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
-				if (getConfig().getElementType(sTagName).equals("style")) // DWH 5-27-09 to exclude hidden styles
-				{
-					sCurrentCharacterStyle = startTag.getAttributeValue("name");
-					addToDocumentPart(sTagString);
-				}
-				else if (getConfig().getElementType(sTagName).equals("hidden")) // DWH 5-27-09 to exclude hidden styles
+				if (getConfig().getElementType(sTagName).equals("style"))
+					// DWH 5-27-09 to exclude hidden styles
+					sCurrentCharacterStyle = startTag.getAttributeValue("w:styleId");
+				else if (getConfig().getElementType(sTagName).equals("hidden"))
+					// DWH 5-27-09 to exclude hidden styles
 				{
 					if (!sCurrentCharacterStyle.equals(""))
 						excludeStyle(sCurrentCharacterStyle);
-					addToDocumentPart(sTagString);
 				}
-				else
-					startTextUnit();
+				addToDocumentPart(sTagString);
 			}
-			if (bInTextRun) // DWH 4-9-09
-				addToTextRun(startTag);
-			else // DWH 5-7-09
+			else
 			{
-				if (getConfig().getElementType(sTagName).equals("delete"))
-					bInDeletion = true;
-				addToNonTextRun(startTag); // DWH 5-5-09
+				if (getConfig().getElementType(sTagName).equals("rstyle")) // DWH 5-29-09 text run style
+					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
+				{
+					sCurrentCharacterStyle = startTag.getAttributeValue("w:val");
+					if (hsExcludeStyles.contains(sCurrentCharacterStyle))
+						bExcludeTextInRun = true;
+				}
+				else if (getConfig().getElementType(sTagName).equals("pstyle")) // DWH 5-29-09 text unit style
+					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
+				{
+					sCurrentParagraphStyle = startTag.getAttributeValue("w:val");
+					if (hsExcludeStyles.contains(sCurrentParagraphStyle))
+						bExcludeTextInUnit = true;
+				}
+				else if (getConfig().getElementType(sTagName).equals("hidden") &&
+						!bPreferenceTranslateWordHidden)
+							// DWH 5-29-09 to exclude hidden styles
+				{
+					if (bInTextRun)
+						bExcludeTextInRun = true;
+					else
+						bExcludeTextInUnit = true;
+				}
+				if (bInTextRun) // DWH 4-9-09
+					addToTextRun(startTag);
+				else // DWH 5-7-09
+				{
+					if (getConfig().getElementType(sTagName).equals("delete"))
+						bInDeletion = true;
+					addToNonTextRun(startTag); // DWH 5-5-09
+				}
 			}
 			break;
 
@@ -883,6 +909,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+			bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
 			bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
 //			if (startTag.isSyntacticalEmptyElementTag()) // means the tag ended with />
@@ -908,6 +935,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
+			bExcludeTextInRun = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			if (canStartNewTextUnit()) // DWH 5-5-09 shouldn't happen
 				addToDocumentPart(sTagString);
 			else
@@ -1011,9 +1039,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
-				startTextUnit();
+				addToDocumentPart(sTagString); // DWH 5-29-09
 			}
-			if (bInTextRun) // DWH 4-9-09
+			else if (bInTextRun) // DWH 5-29-09
 				addToTextRun(endTag);
 			else if (getConfig().getElementType(sTagName).equals("delete")) // DWH 5-7-09
 			{
@@ -1040,6 +1068,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+			bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			if (bInTextRun)
 			{
 				addTextRunToCurrentTextUnit(true);
@@ -1051,6 +1080,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			endTextUnit(new GenericSkeleton(sTagString));
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
+			bExcludeTextInRun = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			if (canStartNewTextUnit()) // DWH 5-5-09
 				addToDocumentPart(sTagString);
 			else
@@ -1463,5 +1493,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public HashSet getHSExcludeStyles()
 	{
 		return hsExcludeStyles;
+	}
+	public void setBPreferenceTranslateWordHidden(boolean bPreferenceTranslateWordHidden)
+	{
+		this.bPreferenceTranslateWordHidden = bPreferenceTranslateWordHidden;
+	}
+	public boolean getBPreferenceTranslateWordHidden()
+	{
+		return bPreferenceTranslateWordHidden;
 	}
 }

@@ -78,8 +78,15 @@ filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   writableLocalizableAttributes: [w:val]
 
-#  DWH 3-9-09 this dies because r:style is a standalone tag
+'w:pstyle':
+  ruleTypes: [INLINE]
+  elementType: pstyle
+
 'w:rstyle':
+  ruleTypes: [INLINE]
+  elementType: rstyle
+
+'w:style':
   ruleTypes: [INLINE]
   elementType: style
 

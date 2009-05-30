@@ -20,8 +20,8 @@
 package net.sf.okapi.filters.openxml.tests;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -29,10 +29,10 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.ITranslator;
 
 /**
- * Implements ITranslator and modifies text to be translated by
- * expanding codes, showing the code type and tags encoded.  This
- * is useful for debugging to be able to see in the original file
- * format what the encoded text looks like.
+ * Implements ITranslator and modifies text to be translated to
+ * show the tags the translator will see while translating.  This
+ * is used in OpenXMLRoundTripTest, so the tags are shown in the
+ * orignal file format.
  */
 
 public class CodePeekTranslator extends GenericSkeletonWriter implements ITranslator {
@@ -52,13 +52,14 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 	static final String wordoff="</w:t></w:r>";
 	static final String ppon="<a:r><a:t>";
 	static final String ppoff="</a:t></a:r>";
+	static final String lbrac="{";
+	static final String rbrac="}";
 
 	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow,sss;
 		int i,j,k,len,codenum;
-		String linebreak="<w:br/>";
 		char carrot;
 		int nSurroundingCodes=0; // DWH 4-8-09
 		Code code;
@@ -79,24 +80,14 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							if (nFileType==MSWORD)
-								ss += sss + linebreak + "[MARKER_OPENING " + codenum + ":" + eggspand(code) + "]" + linebreak;
-							else if (nFileType==MSPOWERPOINT)
-								ss += sss + "[MARKER_OPENING " + codenum + " " + eggspand(code) + "]   ";
-							else
-								ss += sss;
+							ss += sss + lbrac + "g" + codenum + ":" + eggspand(code) + rbrac;
 							nSurroundingCodes++;
 							break;
 						case TextFragment.MARKER_CLOSING:
 							sss = s.substring(i,i+2);
 							codenum = TextFragment.toIndex(s.charAt(++i));
 							code = codes.get(codenum);
-							if (nFileType==MSWORD)
-								ss += linebreak + "[MARKER_CLOSING " + codenum + ":" + eggspand(code) + "]" + linebreak + sss;
-							else if (nFileType==MSPOWERPOINT)
-								ss += "[MARKER_CLOSING " + codenum + " " + eggspand(code) + "]   " + sss;
-							else
-								ss += sss;
+							ss += lbrac + "/g" + codenum + ":" + eggspand(code) + rbrac + sss;
 							nSurroundingCodes--;
 							break;
 						case TextFragment.MARKER_ISOLATED:
@@ -111,7 +102,7 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 							{
 								if (nFileType==MSWORD)
 								{
-									ss += sss + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
+									ss += sss + "lbrac + x" + codenum + ":" + eggspand(code) + rbrac;
 								}
 								else if (nFileType==MSPOWERPOINT)
 									ss += sss;
@@ -123,14 +114,14 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 								if (nFileType==MSWORD)
 								{
 									if (code.getTagType()==TextFragment.TagType.OPENING)
-										ss += wordon + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak + wordoff + sss;
+										ss += wordon + lbrac + "x" + codenum + ":" + eggspand(code) + rbrac + wordoff + sss;
 									else if (code.getTagType()==TextFragment.TagType.OPENING)
-										ss += sss + wordon + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak + wordoff;
+										ss += sss + wordon + lbrac + "x" + codenum + ":" + eggspand(code) + rbrac + wordoff;
 									else
-										ss += sss + linebreak + "[MARKER_ISOLATED " + codenum + ":" + eggspand(code) + "]" + linebreak;
+										ss += sss + lbrac + "x" + codenum  + ":" + eggspand(code)+ rbrac;
 								}
 								else if (nFileType==MSPOWERPOINT)
-									ss += sss /* + ppon + "&lt;x" + codenum + "&gt;" + ppoff*/;
+									ss += sss /* + ppon + lbrac + codenum + rbrac + ppoff*/;
 								else
 									ss += sss;
 							}
@@ -143,7 +134,7 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 								nSurroundingCodes++;
 							else if (code.getTagType()==TextFragment.TagType.CLOSING)
 								nSurroundingCodes--;
-							ss += sss /* linebreak + "[MARKER_SEGMENT " + codenum + ":" + eggspand(code) + "]" + linebreak*/;
+							ss += sss /* + lbrac + "y" + codenum + rbrac */;
 							break;
 					}
 					if (code!=null)
@@ -220,8 +211,8 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 		}
 		catch(Throwable e)
 		{
-			LOGGER.log(Level.WARNING,"Code Peek Translator failed on "+s);
-		}		
+			LOGGER.log(Level.WARNING,"Tag Translator failed on "+s);
+		}
 		return rslt;
 	}
 	private int hominyOf(String s, String of)
@@ -258,9 +249,9 @@ public class CodePeekTranslator extends GenericSkeletonWriter implements ITransl
 		for(int i=0; i<len; i++)
 		{
 			carrot = s.charAt(i);
-			if (carrot=='<')
-				ss += "&lt;";
-			else
+//			if (carrot=='<')
+//				ss += "&lt;";
+//			else
 				ss += carrot;
 		}
 		return ss;

@@ -111,11 +111,12 @@ public class OpenXMLFilter implements IFilter {
 	private boolean bPreferenceTranslatePowerpointNotes = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslatePowerpointMasters = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslateWordHeadersFooters = true; // DWH 5-26-09 preferences
-	private boolean bPreferenceTranslateAllStyles = true; // DWH 5-28-09 if false, exclude a given list
+	private boolean bPreferenceTranslateWordAllStyles = true; // DWH 5-28-09 if false, exclude a given list
 	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-28-09
 	private boolean bMinedHiddenStyles = true; // DWH 5-28-09
 
 	public OpenXMLFilter () {
+		hsExcludeStyles = new HashSet(); // DWH 5-29-09
 	}
 	
 	/**
@@ -496,6 +497,8 @@ public class OpenXMLFilter implements IFilter {
 				bMinedHiddenStyles = false; // DWH 5-28-09 so mine hidden styles first
 			entries = zipFile.entries();
 			openXMLContentFilter.initFileTypes(); // new HashTable for file types in zip file
+			openXMLContentFilter.setBPreferenceTranslateWordHidden(bPreferenceTranslateWordHidden);
+				// DWH 5-29-09 whether or not to translate hidden text
 			subDocId = 0;
 			nextAction = NextAction.NEXTINZIP;
 			
@@ -546,9 +549,14 @@ public class OpenXMLFilter implements IFilter {
 		    		bMinedHiddenStyles = true;
 		    		entries = zipFile.entries(); // reset to go through all of them
 		    	}
-		    	else
+		    	else if (!sEntryName.equals("[Content_Types].xml"))
 		    		continue;
 		    }
+		    else if (!bPreferenceTranslateWordHidden &&
+		    		 (sEntryName.equals("[Content_Types].xml") ||
+		    		  sDocType.equals("styles+xml")))
+		    	continue;
+		          // DWH 5-29-09 these two files have already been added to the zip, so don't add them again
 			bInMainFile = (sEntryName.endsWith(".xml") &&
 				    		(nZipType==MSWORD && sDocType.equals("main+xml") ||
 				    		 nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")));
@@ -663,7 +671,7 @@ public class OpenXMLFilter implements IFilter {
 			}
 
 			openXMLContentFilter.open(new RawDocument(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
-			if (!bPreferenceTranslateWordHidden || !bPreferenceTranslateAllStyles)
+			if (!bPreferenceTranslateWordHidden || !bPreferenceTranslateWordAllStyles)
 				  // DWH 5-28-09 list of styles to exclude
 				openXMLContentFilter.setHSExcludeStyles(hsExcludeStyles);
 			//			openXMLContentFilter.next(); // START
@@ -819,5 +827,21 @@ public class OpenXMLFilter implements IFilter {
 	public boolean getBPreferenceTranslateWordHeadersFooters()
 	{
 		return bPreferenceTranslateWordHeadersFooters;
+	}
+	public void setBPreferenceTranslateWordHidden(boolean bPreferenceTranslateWordHidden)
+	{
+		this.bPreferenceTranslateWordHidden = bPreferenceTranslateWordHidden;
+	}
+	public boolean getBPreferenceTranslateWordHidden()
+	{
+		return bPreferenceTranslateWordHidden;
+	}
+	public void setBPreferenceTranslateWordAllStyles(boolean bPreferenceTranslateWordAllStyles)
+	{
+		this.bPreferenceTranslateWordAllStyles = bPreferenceTranslateWordAllStyles;
+	}
+	public boolean getBPreferenceTranslateWordAllStyles()
+	{
+		return bPreferenceTranslateWordAllStyles;
 	}
 }
