@@ -51,10 +51,11 @@ public class PipelineWrapper {
 	private Map<String, Step> buildStepList () {
 		Hashtable<String, Step> map = new Hashtable<String, Step>();
 		try {
+//TODO: Replace by auto-discovery of plugins			
 			IPipelineStep ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.common.RawDocumentToFilterEventsStep").newInstance();
 			Step step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			IParameters params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -64,7 +65,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 					"net.sf.okapi.steps.common.FilterEventsToRawDocumentStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -74,7 +75,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 					"net.sf.okapi.steps.common.FilterEventsWriterStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -84,7 +85,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.common.RawDocumentWriterStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -94,7 +95,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -104,7 +105,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -114,7 +115,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.bomconversion.BOMConversionStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -124,7 +125,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.charlisting.CharListingStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -134,7 +135,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -144,7 +145,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.segmentation.SegmentationStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -154,7 +155,7 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.textmodification.TextModificationStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -164,7 +165,17 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.translationcomparison.TranslationComparisonStep").newInstance();
 			step = new Step(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.encodingconversion.EncodingConversionStep").newInstance();
+			step = new Step(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
@@ -200,6 +211,10 @@ public class PipelineWrapper {
 		return path;
 	}
 	
+	public void setPath (String path) {
+		this.path = path;
+	}
+	
 	public void load (String path) {
 		PipelineStorage store = new PipelineStorage();
 		store.setPath(path);
@@ -210,7 +225,8 @@ public class PipelineWrapper {
 		steps.clear();
 		for ( IPipelineStep step : driver.getPipeline().getSteps() ) {
 			infoStep = new Step(step.getClass().getSimpleName(),
-				step.getName(), step.getClass().getName(), null);
+				step.getName(), step.getDescription(),
+				step.getClass().getName(), null);
 			params = step.getParameters();
 			if ( params != null ) {
 				infoStep.paramsData = params.toString();

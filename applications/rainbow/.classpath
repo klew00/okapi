@@ -41,6 +41,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.textmodification"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.translationcomparison"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.plaintext"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.csv"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.encodingconversion"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

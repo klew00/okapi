@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -56,6 +57,8 @@ public class PipelineEditor {
 	private Button btAddStep;
 	private Button btEditStep;
 	private Button btRemoveStep;
+	private Button btNew;
+	private Text edDescription;
 	private OKCancelPanel pnlActions;
 	
 	public boolean edit (Shell parent,
@@ -131,11 +134,22 @@ public class PipelineEditor {
 		
 		lbSteps = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 5;
+		gdTmp.verticalSpan = 7;
 		lbSteps.setLayoutData(gdTmp);
 		lbSteps.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateStepDisplay();
+			}
+		});
+		
+		btNew = new Button(shell, SWT.PUSH);
+		btNew.setText("New");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btNew.setLayoutData(gdTmp);
+		btNew.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				newPipeline();
 			}
 		});
 		
@@ -160,6 +174,8 @@ public class PipelineEditor {
 				save(null);
 			}
 		});
+
+		new Label(shell, SWT.NONE);
 		
 		btAddStep = new Button(shell, SWT.PUSH);
 		btAddStep.setText("Add Step...");
@@ -193,6 +209,13 @@ public class PipelineEditor {
 				editStep();
 			}
 		});
+		
+		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 45;
+		gdTmp.horizontalSpan = 2;
+		edDescription.setLayoutData(gdTmp);
+		edDescription.setEditable(false);
 
 		// Dialog-level buttons
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -242,11 +265,13 @@ public class PipelineEditor {
 		if ( n < 0 ) {
 			btRemoveStep.setEnabled(false);
 			btEditStep.setEnabled(false);
+			edDescription.setText("");
 			return; 
 		}
 		Step step = workSteps.get(n);
 		btRemoveStep.setEnabled(true);
 		btEditStep.setEnabled(step.paramsData!=null);
+		edDescription.setText(step.description);
 	}
 	
 	private void populate (int index) {
@@ -276,6 +301,7 @@ public class PipelineEditor {
 			workSteps.add(availableSteps.get(id).clone());
 			lbSteps.add(display);
 			lbSteps.select(lbSteps.getItemCount()-1);
+			updateStepDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -298,7 +324,9 @@ public class PipelineEditor {
 //				editor.edit(paramsObject, uiContext, helpParam, projectDir)
 			}
 			else {
-				InputDialog dlg  = new InputDialog(shell, "Step Parameters", "Parameters:",
+				InputDialog dlg  = new InputDialog(shell,
+					"Step Options ("+step.name+")",
+					"Parameters:",
 					step.paramsData, null, 0, 200);
 				String data = dlg.showDialog();
 				if ( data == null ) return;
@@ -313,7 +341,11 @@ public class PipelineEditor {
 	
 	private void removeStep () {
 		try {
-			Dialogs.showError(shell, "Not implemented yet.", null);
+			int n = lbSteps.getSelectionIndex();
+			if ( n < 0 ) return;
+			workSteps.remove(n);
+			if ( n >= workSteps.size() ) n = workSteps.size()-1;
+			populate(n);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -359,4 +391,10 @@ public class PipelineEditor {
 		}
 	}
 
+	private void newPipeline () {
+		wrapper.setPath(null);
+		wrapper.clear();
+		setDataFromWrapper();
+		populate(-1);
+	}
 }
