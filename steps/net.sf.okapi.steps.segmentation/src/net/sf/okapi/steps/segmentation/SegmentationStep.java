@@ -38,6 +38,7 @@ public class SegmentationStep extends BasePipelineStep {
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
 	private String trgLang;
+	private boolean initDone;
 
 	public SegmentationStep () {
 		params = new Parameters();
@@ -59,6 +60,12 @@ public class SegmentationStep extends BasePipelineStep {
 
 	@Override
 	protected void handleStartBatch (Event event) {
+		initDone = false;
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		if ( initDone ) return; // Initialize once per batch
 		String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 		String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
 		SRXDocument srxDoc = new SRXDocument();
