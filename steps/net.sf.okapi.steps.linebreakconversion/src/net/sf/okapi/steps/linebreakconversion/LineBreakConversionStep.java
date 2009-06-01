@@ -51,7 +51,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Convert the type of line-break in a document.";
+		return "Convert the type of line-breaks in a text-based file.";
 	}
 
 	public String getName () {

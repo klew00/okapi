@@ -20,8 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-// Temporary structure to try steps
-public class Step {
+public class StepInfo {
 
 	public String id;
 	public String name;
@@ -30,7 +29,7 @@ public class Step {
 	public String editorClass;
 	public String paramsData;
 
-	public Step (String id,
+	public StepInfo (String id,
 		String name,
 		String description,
 		String stepClass,
@@ -44,8 +43,8 @@ public class Step {
 	}
 
 	@Override
-	public Step clone () {
-		Step newStep = new Step(id, name, description, stepClass, editorClass);
+	public StepInfo clone () {
+		StepInfo newStep = new StepInfo(id, name, description, stepClass, editorClass);
 		newStep.paramsData = paramsData;
 		return newStep;
 	}

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import net.sf.okapi.common.IHelp;
@@ -36,16 +37,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
-class UtilityPicker {
+class StepPicker {
 
 	private Shell shell;
 	private List lbUtilities;
+	private Text edDescription;
 	private String result;
+	private ArrayList<StepInfo> availableSteps;
 	private OKCancelPanel pnlActions;
 	
-	public UtilityPicker (Shell parent,
-		Map<String, Step> steps,
+	public StepPicker (Shell parent,
+		Map<String, StepInfo> steps,
 		IHelp helpParam) 
 	{
 		result = null;
@@ -60,12 +64,31 @@ class UtilityPicker {
 		lbUtilities = new List(shell, SWT.BORDER | SWT.V_SCROLL);
 		lbUtilities.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		Step step;
+		StepInfo step;
+		availableSteps = new ArrayList<StepInfo>(); 
 		for ( String id : steps.keySet() ) {
 			step = steps.get(id);
-			lbUtilities.add(String.format("%s  [%s]", step.name, step.id));
+			lbUtilities.add(String.format("%s  - [%s]", step.name, step.id));
+			availableSteps.add(step);
 		}
+		lbUtilities.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateStepDisplay();
+			}
+		});
 		
+		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 45;
+		gdTmp.horizontalSpan = 2;
+		edDescription.setLayoutData(gdTmp);
+		edDescription.setEditable(false);
+		
+		if ( lbUtilities.getItemCount() > 0 ) {
+			lbUtilities.select(0);
+			updateStepDisplay();
+		}
+
 		// Dialog-level buttons
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -81,7 +104,7 @@ class UtilityPicker {
 			};
 		};
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		//gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
@@ -92,6 +115,16 @@ class UtilityPicker {
 		Dialogs.centerWindow(shell, parent);
 	}
 
+	private void updateStepDisplay () {
+		int n = lbUtilities.getSelectionIndex();
+		if ( n < 0 ) {
+			edDescription.setText("");
+			return; 
+		}
+		StepInfo step = availableSteps.get(n);
+		edDescription.setText(step.description);
+	}
+	
 	public String showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {

@@ -72,7 +72,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Convert the character set encoding of a file.";
+		return "Convert the character set encoding of a text-based file.";
 	}
 
 	public String getName () {

@@ -54,7 +54,7 @@ public class CharListingStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Generates a list of all the characters in a set of documents.";
+		return "Generate a list of all the characters in the text units content of a set of documents.";
 	}
 
 	public String getName () {

@@ -55,7 +55,7 @@ public class TextModificationStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Modify translatable text of a document.";
+		return "Apply various modifications the text units content of a document.";
 	}
 
 	public String getName () {

@@ -50,7 +50,7 @@ public class SegmentationStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Apply SRX segmentation to a document.";
+		return "Apply SRX segmentation to the text units content of a document.";
 	}
 
 	@Override

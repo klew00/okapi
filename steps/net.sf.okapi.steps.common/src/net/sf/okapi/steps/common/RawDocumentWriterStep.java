@@ -47,7 +47,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	}
 	
 	public String getDescription() {
-		return "Write a raw document to an output file";
+		return "Write a RawDocument to an output file.";
 	}
 
 	public String getName () {

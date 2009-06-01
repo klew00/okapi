@@ -55,7 +55,7 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Add or remove BOM to a document.";
+		return "Add or remove Unicode Byte-Order-Mark (BOM) in a text-based file.";
 	}
 
 	public String getName () {

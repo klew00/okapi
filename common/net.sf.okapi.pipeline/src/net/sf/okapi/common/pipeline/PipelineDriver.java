@@ -139,8 +139,13 @@ public class PipelineDriver implements IPipelineDriver {
 	 * @param item the batch item that is about to be processed.
 	 */
 	protected void displayInput (IBatchItemContext item) {
-		logger.info(String.format("\n-- Input: %s",
-			item.getRawDocument(0).getInputURI().getPath()));
+		if ( item.getRawDocument(0).getInputURI() != null ) {
+			logger.info(String.format("\n-- Input: %s",
+				item.getRawDocument(0).getInputURI().getPath()));
+		}
+		else {
+			logger.info("\n-- Input (No path available)");
+		}
 	}
 	
 }

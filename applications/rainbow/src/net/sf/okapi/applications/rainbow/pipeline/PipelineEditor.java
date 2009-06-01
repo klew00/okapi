@@ -47,22 +47,24 @@ public class PipelineEditor {
 	private boolean result;
 	private IHelp help;
 	private PipelineWrapper wrapper;
-	private Map<String, Step> availableSteps;
-	private ArrayList<Step> workSteps;
+	private Map<String, StepInfo> availableSteps;
+	private ArrayList<StepInfo> workSteps;
 	private Text edPath;
 	private List lbSteps;
 	private Button btLoad;
 	private Button btSave;
 	private Button btSaveAs;
-	private Button btAddStep;
-	private Button btEditStep;
-	private Button btRemoveStep;
 	private Button btNew;
+	private Button btAddStep;
+	private Button btRemoveStep;
+	private Button btMoveStepUp;
+	private Button btMoveStepDown;
+	private Button btEditStep;
 	private Text edDescription;
 	private OKCancelPanel pnlActions;
 	
 	public boolean edit (Shell parent,
-		Map<String, Step> availableSteps,
+		Map<String, StepInfo> availableSteps,
 		PipelineWrapper wrapper,
 		IHelp helpParam,
 		String projectDir,
@@ -90,8 +92,8 @@ public class PipelineEditor {
 	}
 
 	private void setDataFromWrapper () {
-		workSteps = new ArrayList<Step>();
-		for ( Step step : wrapper.getSteps() ) {
+		workSteps = new ArrayList<StepInfo>();
+		for ( StepInfo step : wrapper.getSteps() ) {
 			workSteps.add(step.clone());
 		}
 	}
@@ -134,7 +136,7 @@ public class PipelineEditor {
 		
 		lbSteps = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 7;
+		gdTmp.verticalSpan = 9;
 		lbSteps.setLayoutData(gdTmp);
 		lbSteps.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -196,6 +198,28 @@ public class PipelineEditor {
 		btRemoveStep.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				removeStep();
+			}
+		});
+		
+		btMoveStepUp = new Button(shell, SWT.PUSH);
+		btMoveStepUp.setText("Move Up");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btMoveStepUp.setLayoutData(gdTmp);
+		btMoveStepUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveStepUp();
+			}
+		});
+		
+		btMoveStepDown = new Button(shell, SWT.PUSH);
+		btMoveStepDown.setText("Move Down");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btMoveStepDown.setLayoutData(gdTmp);
+		btMoveStepDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveStepDown();
 			}
 		});
 		
@@ -263,22 +287,26 @@ public class PipelineEditor {
 	private void updateStepDisplay () {
 		int n = lbSteps.getSelectionIndex();
 		if ( n < 0 ) {
-			btRemoveStep.setEnabled(false);
-			btEditStep.setEnabled(false);
 			edDescription.setText("");
+			btRemoveStep.setEnabled(false);
+			btMoveStepUp.setEnabled(false);
+			btMoveStepDown.setEnabled(false);
+			btEditStep.setEnabled(false);
 			return; 
 		}
-		Step step = workSteps.get(n);
-		btRemoveStep.setEnabled(true);
-		btEditStep.setEnabled(step.paramsData!=null);
+		StepInfo step = workSteps.get(n);
 		edDescription.setText(step.description);
+		btRemoveStep.setEnabled(true);
+		btMoveStepUp.setEnabled(n>0);
+		btMoveStepDown.setEnabled(n<workSteps.size()-1);
+		btEditStep.setEnabled(step.paramsData!=null);
 	}
 	
 	private void populate (int index) {
 		edPath.setText(wrapper.getPath()==null ? "" : wrapper.getPath());
 		lbSteps.removeAll();
-		for ( Step step : workSteps ) {
-			lbSteps.add(String.format("%s  [%s]", step.name, step.id));
+		for ( StepInfo step : workSteps ) {
+			lbSteps.add(String.format("%s  - [%s]", step.name, step.id));
 		}
 		if ( index != -1 ) {
 			if (( index < 0 ) || ( index > lbSteps.getItemCount() )) {
@@ -292,9 +320,37 @@ public class PipelineEditor {
 		updateStepDisplay();
 	}
 	
+	private void moveStepUp () {
+		try {
+			int n = lbSteps.getSelectionIndex();
+			if ( n <= 0 ) return;
+			StepInfo tmp = workSteps.get(n-1);
+			workSteps.set(n-1, workSteps.get(n));
+			workSteps.set(n, tmp);
+			populate(n-1); // New position
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void moveStepDown () {
+		try {
+			int n = lbSteps.getSelectionIndex();
+			if ( n > lbSteps.getItemCount()-1 ) return;
+			StepInfo tmp = workSteps.get(n+1);
+			workSteps.set(n+1, workSteps.get(n));
+			workSteps.set(n, tmp);
+			populate(n+1); // New position
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	private void addStep () {
 		try {
-			UtilityPicker dlg = new UtilityPicker(shell, availableSteps, help);
+			StepPicker dlg = new StepPicker(shell, availableSteps, help);
 			String display = dlg.showDialog();
 			if ( display == null ) return;
 			String id = getId(display);
@@ -312,7 +368,7 @@ public class PipelineEditor {
 		try {
 			int n = lbSteps.getSelectionIndex();
 			if ( n < 0 ) return;
-			Step step = workSteps.get(n);
+			StepInfo step = workSteps.get(n);
 			if ( step.paramsData == null ) {
 				// No parameters for this step
 				return;
@@ -355,7 +411,7 @@ public class PipelineEditor {
 	private boolean saveData () {
 		// Copy the work steps to the real object
 		wrapper.clear();
-		for ( Step step : workSteps ) {
+		for ( StepInfo step : workSteps ) {
 			wrapper.addStep(step);
 		}
 		return true;

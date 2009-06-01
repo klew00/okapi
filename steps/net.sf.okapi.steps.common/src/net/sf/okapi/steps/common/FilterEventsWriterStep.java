@@ -59,7 +59,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Writes out filter events into a document.";
+		return "Write out filter events into a document.";
 	}
 
 	public boolean needsOutput (int inputIndex) {

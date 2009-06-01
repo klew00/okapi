@@ -58,7 +58,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Compare the translations between two documents.";
+		return "Compare the translated text units between two documents.";
 	}
 
 	@Override

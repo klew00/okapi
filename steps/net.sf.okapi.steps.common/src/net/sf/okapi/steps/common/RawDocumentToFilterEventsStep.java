@@ -60,7 +60,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Converts a RawDocument into filter events.";
+		return "Convert a RawDocument into filter events.";
 	}
 	
 	@Override
