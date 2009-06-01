@@ -133,7 +133,6 @@ public class CharListingStep extends BasePipelineStep {
 				else {
 					charList.put(text.charAt(i), 1);
 				}
-				break;
 			}
 		}
 	}
