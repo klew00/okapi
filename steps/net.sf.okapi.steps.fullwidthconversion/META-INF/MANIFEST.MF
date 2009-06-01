@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Fulle Width Conversion
+Bundle-SymbolicName: net.sf.okapi.steps.fullwidthconversion
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.steps.fullwidthconversion
+Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ net.sf.okapi.lib.segmentation;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
