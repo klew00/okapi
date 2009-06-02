@@ -79,7 +79,12 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	@Override
 	public boolean isDone () {
-		return isDone;
+		if ( !params.plainText ) {
+			return true;
+		}
+		else { // Expects RawDocument
+			return isDone;
+		}
 	}
 	
 	@Override
@@ -99,32 +104,23 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	@Override
 	protected void handleStartBatchItem (Event event) {
-		System.out.println("handleStartBatchItem");
-		isDone = false;
+		if ( !params.plainText ) { // RawDocument mode
+			isDone = false;
+		}
 		trgLang = getContext().getTargetLanguage(0);
 	}	
 	
 	@Override
 	protected void handleRawDocument (Event event) {
-
-		//--Limit the textunit handler to running in filter-mode--
-		//--TODO: Need a way to detect if the previous step processed events or rawDoc--
-		if(params.plainText==false){
-			super.handleRawDocument(event);
-			System.out.println("isDone: "+isDone);
-			isDone = true;
-			return;
-			//throw new OkapiBadStepInputException("Search and Replace cannot be performed on the filter events in the current pipeline configuration. \nPlease re-configure the pipeline or modify Search and Replace to use the non-filter (entire file) option. ");
-		}		
-		
+		if ( !params.plainText ) {
+			return; // Options set to use on text units only, so we just skip this event
+		}
 		RawDocument rawDoc;
 		FileInputStream input = null;
 		FileOutputStream output = null;		
-
 		BufferedReader reader = null;
 		OutputStreamWriter oWriter = null;
 		BufferedWriter writer = null;
-		
 		try {
 			rawDoc = (RawDocument)event.getResource();		
 			if ( rawDoc.getInputCharSequence() != null ) {
@@ -152,18 +148,15 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			BOMAwareInputStream bis = new BOMAwareInputStream(input, rawDoc.getEncoding());
 			String encoding = bis.detectEncoding(); // Update the encoding: it'll be use for the output
 			reader = new BufferedReader(new InputStreamReader(bis, encoding));
-
 			
 			// Open the output
 			File outFile;
 			if ( pipeline.isLastStep(this) ) {
-				System.out.println("This is the last step");
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {
 				try {
-					System.out.println("This is not the last step");
 					outFile = File.createTempFile("okptmp_", ".snr");
 				}
 				catch ( Throwable e ) {
@@ -244,12 +237,9 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	protected void handleTextUnit (Event event) {
 
 		//--Limit the textunit handler to running in filter-mode--
-		if(params.plainText==true){
+		if ( params.plainText ) {
 			throw new OkapiBadStepInputException("Search and Replace cannot be performed on the entire file (non-filter mode) in the current pipeline configuration. \nPlease re-configure the pipeline or modify Search and Replace to use the filter-mode option. ");
 		}
-		
-		//--detect that step is running in filter-mode and update isDone--
-		isDone = true;
 		
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
