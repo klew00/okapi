@@ -56,6 +56,8 @@ public class OpenOfficeFilterTest {
 		list.add(new InputDocument(root+"TestDocument02.odt", null));
 		list.add(new InputDocument(root+"TestDocument03.odt", null));
 		list.add(new InputDocument(root+"TestDocument04.odt", null));
+		list.add(new InputDocument(root+"TestDocument05.odt", null));
+		list.add(new InputDocument(root+"TestDocument06.odt", null));
 		list.add(new InputDocument(root+"TestDrawing01.odg", null));
 		list.add(new InputDocument(root+"TestPresentation01.odp", null));
 		RoundTripComparison rtc = new RoundTripComparison();

@@ -80,6 +80,7 @@ public class ODFFilter implements IFilter {
 	protected static final String OFFICE_ANNOTATION = "office:annotation";
 
 	private Hashtable<String, ElementRule> toExtract;
+	private Hashtable<String, AttributeRule> attrbutesToExtract;
 	private ArrayList<String> toProtect;
 	private ArrayList<String> subFlow;
 	private LinkedList<Event> queue;
@@ -96,6 +97,7 @@ public class ODFFilter implements IFilter {
 	private boolean hasNext;
 	private Stack<Context> context;
 	private String lineBreak = "\n";
+	private String containerMimeType;
 
 	public ODFFilter () {
 		toExtract = new Hashtable<String, ElementRule>();
@@ -107,6 +109,11 @@ public class ODFFilter implements IFilter {
 		toExtract.put("meta:keyword", new ElementRule("meta:keyword", null));
 		toExtract.put("meta:user-defined", new ElementRule("meta:user-defined", "meta:name"));
 		toExtract.put("text:index-title-template", new ElementRule("text:index-title-template", null));
+		
+		attrbutesToExtract = new Hashtable<String, AttributeRule>();
+		attrbutesToExtract.put("style:num-prefix", new AttributeRule("style:num-prefix", null));
+		attrbutesToExtract.put("style:num-suffix", new AttributeRule("style:num-suffix", null));
+		attrbutesToExtract.put("table:name", new AttributeRule("table:name", "application/vnd.oasis.opendocument.spreadsheet"));
 
 		subFlow = new ArrayList<String>();
 		subFlow.add("text:note");
@@ -178,6 +185,7 @@ public class ODFFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
+		containerMimeType = "";
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
@@ -230,6 +238,15 @@ public class ODFFilter implements IFilter {
 		}
 	}
 
+	/**
+	 * Sets the MIME type of the file containing this document. This is the MIME type found
+	 * in the mimetype file of the zip file.
+	 * @param mimeType the MIME type to set.
+	 */
+	public void setContainerMimeType (String mimeType) {
+		containerMimeType = mimeType;
+	}
+	
 	private void open (CharSequence input) {
 		//TODO: Check for better solution, going from char to byte to read char is just not good
 		try {
@@ -382,7 +399,10 @@ public class ODFFilter implements IFilter {
 		//id???
 	}
 	
-	private String buildStartTag (String name) {
+	// Build the start tag name, and store it in skel if inSkeleton==true
+	private String buildStartTag (String name,
+		boolean inSkeleton )
+	{
 		StringBuilder tmp = new StringBuilder();
 		// Tag name
 		tmp.append("<" + name);
@@ -398,18 +418,62 @@ public class ODFFilter implements IFilter {
 		}
 
 		// Attributes
+		String qualName;
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-			prefix = reader.getAttributePrefix(i); 
-			tmp.append(String.format(" %s%s=\"%s\"",
-				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
-				reader.getAttributeLocalName(i),
-				reader.getAttributeValue(i))); //TODO: Are quotes escaped???
+			
+			prefix = reader.getAttributePrefix(i);
+			if ( prefix == null ) {
+				qualName = reader.getAttributeLocalName(i);
+			}
+			else {
+				qualName = prefix+":"+reader.getAttributeLocalName(i);
+			}
+			// Is this attribute translatable?
+			if ( attrbutesToExtract.containsKey(qualName) ) {
+				AttributeRule rule = attrbutesToExtract.get(qualName);
+				// Use indexOf to handle both normal non-template and template cases
+				if (( rule.mimeType == null ) || ( containerMimeType.indexOf(rule.mimeType) == 0 )) {
+					// This is translatable, should we extract?
+					String text = reader.getAttributeValue(i);
+					if ( hasTrueText(text) ) {
+						// Create a text unit
+						TextUnit tu = new TextUnit(String.valueOf(++tuId));
+						tu.setSourceContent(new TextFragment(text));
+						tu.setIsReferent(true);
+						tu.setMimeType(MIMETYPE);
+						tu.setType("x-"+qualName);
+						queue.add(new Event(EventType.TEXT_UNIT, tu));
+						tmp.append(String.format(" %s=\"", qualName));
+						skel.append(tmp.toString());
+						skel.addReference(tu);
+						tmp.setLength(0); // Reset buffer
+						tmp.append("\""); // End of attribute value
+						continue; // Next attribute
+					}
+					// Else: fall thru
+				}
+				// Else: fall thru
+			}
+			// Not translatable
+			tmp.append(String.format(" %s=\"%s\"", qualName,
+				Util.escapeToXML(reader.getAttributeValue(i), 3, false, null)));
 		}
 
 		tmp.append(">");
+		if ( inSkeleton ) {
+			skel.append(tmp.toString());
+		}
 		return tmp.toString();
+	}
+	
+	private boolean hasTrueText (String text) {
+		if ( Util.isEmpty(text) ) return false;
+		for ( int i=0; i<text.length(); i++ ) {
+			if ( Character.isLetter(text.charAt(i)) ) return true;
+		}
+		return false;
 	}
 	
 	private String buildEndTag (String name) {
@@ -447,7 +511,8 @@ public class ODFFilter implements IFilter {
 				// Create the new fragment and skeleton
 				// And add the start tag of the sub-flow to the new skeleton
 				tf = new TextFragment();
-				skel = new GenericSkeleton(buildStartTag(name));
+				skel = new GenericSkeleton();
+				buildStartTag(name, true);
 				// Set the new variables are the new context
 				context.push(new Context(name, true));
 				context.peek().setVariables(tf, skel, tu);
@@ -460,8 +525,8 @@ public class ODFFilter implements IFilter {
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					skel = new GenericSkeleton(); // Start new skeleton 
 				}
-				// Start the new text-unit
-				skel.append(buildStartTag(name));
+				// Start the new text-unit (append it to skel)
+				buildStartTag(name, true);
 				//TODO: need a way to set the TextUnit's name/id/restype/etc.
 				tu = new TextUnit(null); // ID set only if needed
 				setTUInfo(name);
@@ -484,7 +549,8 @@ public class ODFFilter implements IFilter {
 				// Create the new fragment and skeleton
 				tf = new TextFragment();
 				// Create the skeleton and add the start tag
-				skel = new GenericSkeleton(buildStartTag(name));
+				skel = new GenericSkeleton();
+				buildStartTag(name, true);
 				// Add the start-tag to the new context 
 				// Set the new variables are the new context
 				context.push(new Context(name, true));
@@ -506,7 +572,8 @@ public class ODFFilter implements IFilter {
 				// Create the new fragment and skeleton
 				tf = new TextFragment();
 				// Create the skeleton and add the start tag
-				skel = new GenericSkeleton(buildStartTag(name));
+				skel = new GenericSkeleton();
+				buildStartTag(name, true);
 				// Add the start-tag to the new context 
 				// Set the new variables are the new context
 				context.push(new Context(name, true));
@@ -536,16 +603,16 @@ public class ODFFilter implements IFilter {
 			if ( context.peek().extract ) {
 				if ( name.equals("text:a") ) processStartALink(name);
 				else if ( toProtect.contains(name) ) processReadOnlyInlineElement(name);
-				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name)));
+				else tf.append(new Code(TagType.OPENING, name, buildStartTag(name, false)));
 			}
-			else {
-				skel.append(buildStartTag(name));
+			else { // Append to skel
+				buildStartTag(name, true);
 			}
 		}
 	}
 
 	private void processStartALink (String name) {
-		String data = buildStartTag(name);
+		String data = buildStartTag(name, false);
 		String href = reader.getAttributeValue(NSURI_XLINK, "href");
 		if ( href != null ) {
 			//TODO: set the property, but where???
@@ -554,14 +621,14 @@ public class ODFFilter implements IFilter {
 	}
 	
 	private void processReadOnlyInlineElement (String name) throws XMLStreamException {
-		StringBuilder tmp = new StringBuilder(buildStartTag(name));
+		StringBuilder tmp = new StringBuilder(buildStartTag(name, false));
 		while ( true ) {
 			switch ( reader.next() ) {
 			case XMLStreamConstants.CHARACTERS:
 				tmp.append(reader.getText());
 				break;
 			case XMLStreamConstants.START_ELEMENT:
-				tmp.append(buildStartTag(makePrintName()));
+				tmp.append(buildStartTag(makePrintName(), false));
 				break;
 			case XMLStreamConstants.END_ELEMENT:
 				String tmpName = makePrintName();

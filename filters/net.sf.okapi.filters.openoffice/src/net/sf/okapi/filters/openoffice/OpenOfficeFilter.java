@@ -20,9 +20,11 @@
 
 package net.sf.okapi.filters.openoffice;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -62,7 +64,7 @@ public class OpenOfficeFilter implements IFilter {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
 	}
 
-	private final String MIMETYPE = "application/vnd.adobe.indesign-idml-package";
+	private final String MIMETYPE = "application/x-openoffice";
 	private final String docId = "sd";
 	
 	private ZipFile zipFile;
@@ -75,6 +77,7 @@ public class OpenOfficeFilter implements IFilter {
 	private String srcLang;
 	private ODFFilter filter;
 	private Parameters params;
+	private String internalMimeType;
 
 	public OpenOfficeFilter () {
 		params = new Parameters();
@@ -209,12 +212,37 @@ public class OpenOfficeFilter implements IFilter {
 		if ( filter != null ) filter.setParameters(params);
 	}
 
+	private void getInternalMimeType () {
+		try {
+			ZipEntry entry;
+			internalMimeType = "";
+			while( entries.hasMoreElements() ) {
+				entry = entries.nextElement();
+				if ( entry.getName().equals("mimetype") ) {
+					BufferedReader br = new BufferedReader(new InputStreamReader(zipFile.getInputStream(entry)));
+					internalMimeType = br.readLine();
+					internalMimeType = internalMimeType.trim();
+					br.close();
+				}
+				return;
+			}
+		}
+		catch (IOException e) {
+			throw new OkapiIOException("Error opening mimetype file.", e);
+		}
+		finally {
+			entries = zipFile.entries();
+		}
+	}
+	
 	private Event openZipFile () {
 		try {
 			zipFile = new ZipFile(new File(docURI));
 			entries = zipFile.entries();
 			subDocId = 0;
 			nextAction = NextAction.NEXTINZIP;
+			// Initialize the internalMime type
+			getInternalMimeType();
 			
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
@@ -263,9 +291,10 @@ public class OpenOfficeFilter implements IFilter {
 		try {
 			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
 			event = filter.next(); // START_DOCUMENT
+			filter.setContainerMimeType(internalMimeType);
 		}
 		catch (IOException e) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Error opening internal file.", e);
 		}
 		
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT
