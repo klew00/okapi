@@ -83,17 +83,17 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 				isDone = true;
 				return event;
 			}
-			else { // Get the filter to use
-				filter = getContext().getFilterConfigurationMapper().createFilter(
-					getContext().getFilterConfigurationId(0), filter);
-				if ( filter == null ) {
-					throw new RuntimeException("Unsupported filter type.");
-				}
-				isDone = false;
+			// Else: Get the filter to use
+			filter = getContext().getFilterConfigurationMapper().createFilter(
+				getContext().getFilterConfigurationId(0), filter);
+			if ( filter == null ) {
+				throw new RuntimeException("Unsupported filter type.");
 			}
+			isDone = false;
 			// Open the document
 			filter.open((RawDocument)event.getResource());
-			return event;
+			// Return the first event from the filter
+			return filter.next();
 		}
 
 		if ( isDone ) {

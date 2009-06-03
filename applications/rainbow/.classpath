@@ -44,5 +44,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.encodingconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.fulwidthconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.searchandreplace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.uriconversion"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

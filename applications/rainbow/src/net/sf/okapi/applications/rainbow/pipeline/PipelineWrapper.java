@@ -203,9 +203,9 @@ public class PipelineWrapper {
 			map.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-			"net.sf.okapi.steps.uriconversion.UriConversionStep").newInstance();
+				"net.sf.okapi.steps.uriconversion.UriConversionStep").newInstance();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-					ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
 			if ( params != null ) {
 				step.paramsData = params.toString();
