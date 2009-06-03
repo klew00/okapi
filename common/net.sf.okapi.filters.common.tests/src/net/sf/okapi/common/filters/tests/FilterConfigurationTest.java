@@ -67,6 +67,20 @@ public class FilterConfigurationTest {
 	}
 
 	@Test
+	public void removeFilterTest () {
+		String configId = "okf_regex-srt";
+		String filterClass = "net.sf.okapi.filters.regex.RegexFilter";
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfigurations(filterClass);
+		FilterConfiguration cfg = fcm.getConfiguration(configId);
+		assertNotNull(cfg);
+		// Now remove
+		fcm.removeConfigurations(filterClass);
+		cfg = fcm.getConfiguration(configId);
+		assertNull(cfg);
+	}
+
+	@Test
 	public void createEditorTest () {
 		String configId = "okf_regex-srt";
 		String editorClass = "net.sf.okapi.filters.ui.regex.Editor";

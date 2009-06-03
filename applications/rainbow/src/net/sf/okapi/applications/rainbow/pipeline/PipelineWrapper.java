@@ -30,6 +30,8 @@ import java.util.Map;
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IParametersEditorMapper;
+import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.IPipelineDriver;
@@ -46,10 +48,12 @@ public class PipelineWrapper {
 	private ArrayList<StepInfo> steps;
 	private IPipelineDriver driver;
 	private IFilterConfigurationMapper fcMapper;
+	private IParametersEditorMapper peMapper;
 
 	// Temporary class to create a list of available steps
 	private Map<String, StepInfo> buildStepList () {
 		Hashtable<String, StepInfo> map = new Hashtable<String, StepInfo>();
+		peMapper = new ParametersEditorMapper();
 		try {
 //TODO: Replace by auto-discovery of plugins			
 			IPipelineStep ps = (IPipelineStep)Class.forName(
@@ -154,13 +158,15 @@ public class PipelineWrapper {
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.textmodification.TextModificationStep").newInstance();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
+			peMapper.addEditor("net.sf.okapi.steps.ui.textmodification.ParametersEditor", step.paramsClass);
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.translationcomparison.TranslationComparisonStep").newInstance();
@@ -243,6 +249,10 @@ public class PipelineWrapper {
 	
 	public void setPath (String path) {
 		this.path = path;
+	}
+	
+	public IParametersEditorMapper getEditorMapper () {
+		return peMapper;
 	}
 	
 	public void load (String path) {

@@ -38,17 +38,24 @@ public interface IFilterConfigurationMapper {
 	public void addConfiguration (FilterConfiguration config);
 	
 	/**
-	 * Adds all the predefined configurations of a given filter to this mapper.
-	 * @param filterClass the class name of the filter to lookup.
-	 */
-	public void addConfigurations (String filterClass);
-	
-	/**
 	 * Removes a given configuration from this mapper.
 	 * @param configId the identifier of the configuration to remove.
 	 */
 	public void removeConfiguration (String configId);
 	
+	/**
+	 * Adds all the predefined configurations of a given filter to this mapper.
+	 * @param filterClass the class name of the filter to lookup.
+	 */
+	public void addConfigurations (String filterClass);
+
+	/**
+	 * Removes all the configurations (predefined and custom) of a given
+	 * filter from this mapper. 
+	 * @param filterClass the class name of the filter to lookup.
+	 */
+	public void removeConfigurations (String filterClass);
+
 	/**
 	 * Removes configuration mappings from this mapper.
 	 * @param customOnly true to clear only custom configuration, false to 

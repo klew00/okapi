@@ -26,25 +26,25 @@ public class StepInfo {
 	public String name;
 	public String description;
 	public String stepClass;
-	public String editorClass;
+	public String paramsClass;
 	public String paramsData;
 
 	public StepInfo (String id,
 		String name,
 		String description,
 		String stepClass,
-		String editorClass)
+		String parametersClass)
 	{
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.stepClass = stepClass;
-		this.editorClass = editorClass;
+		this.paramsClass = parametersClass;
 	}
 
 	@Override
 	public StepInfo clone () {
-		StepInfo newStep = new StepInfo(id, name, description, stepClass, editorClass);
+		StepInfo newStep = new StepInfo(id, name, description, stepClass, paramsClass);
 		newStep.paramsData = paramsData;
 		return newStep;
 	}

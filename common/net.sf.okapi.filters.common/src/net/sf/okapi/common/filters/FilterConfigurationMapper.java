@@ -24,27 +24,30 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.ParametersEditorMapper;
+import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 /**
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
  */
-public class FilterConfigurationMapper implements IFilterConfigurationMapper {
+public class FilterConfigurationMapper extends ParametersEditorMapper implements IFilterConfigurationMapper {
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
-	private LinkedHashMap<String, String> editorMap;
 	
 	/**
 	 * Creates a new FilterConfigurationMapper object with no mappings.
 	 */
 	public FilterConfigurationMapper () {
+		super();
 		configMap = new LinkedHashMap<String, FilterConfiguration>();
-		editorMap = new LinkedHashMap<String, String>();
 	}
 
 	public void addConfigurations (String filterClass) {
@@ -70,9 +73,7 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		}
 	}
 
-
-	public void addConfiguration (FilterConfiguration config)
-	{
+	public void addConfiguration (FilterConfiguration config) {
 		configMap.put(config.configId, config);
 	}
 
@@ -118,6 +119,7 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		return filter;
 	}
 
+	@Override
 	public IParametersEditor createParametersEditor (String configId) {
 		return createParametersEditor(configId, null);
 	}
@@ -147,15 +149,15 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 			editor = (IParametersEditor)Class.forName(editorClass).newInstance();
 		}
 		catch ( InstantiationException e ) {
-			throw new OkapiFilterCreationException(
+			throw new OkapiEditorCreationException(
 				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		catch ( IllegalAccessException e ) {
-			throw new OkapiFilterCreationException(
+			throw new OkapiEditorCreationException(
 				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new OkapiFilterCreationException(
+			throw new OkapiEditorCreationException(
 				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		return editor;
@@ -190,6 +192,17 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 
 	public void removeConfiguration (String configId) {
 		configMap.remove(configId);
+	}
+
+	public void removeConfigurations (String filterClass) {
+		Entry<String, FilterConfiguration> entry;
+		Iterator<Entry<String, FilterConfiguration>> iter = configMap.entrySet().iterator();
+		while ( iter.hasNext() ) {
+			entry = iter.next();
+			if ( entry.getValue().filterClass.equals(filterClass) ) {
+				iter.remove();
+			}
+		}
 	}
 
 	public IParameters getCustomParameters (FilterConfiguration config) {
@@ -230,29 +243,6 @@ public class FilterConfigurationMapper implements IFilterConfigurationMapper {
 		}
 		else {
 			configMap.clear();
-		}
-	}
-
-	public void addEditor (String editorClass,
-		String parametersClass)
-	{
-		editorMap.put(parametersClass, editorClass);
-	}
-
-	public void clearEditors () {
-		editorMap.clear();
-	}
-
-	public void removeEditor (String editorClass) {
-		String found = null;
-		for ( String key : editorMap.keySet() ) {
-			if ( editorMap.get(key).equals(editorClass) ) {
-				found = key;
-				break;
-			}
-		}
-		if ( found != null ) {
-			editorMap.remove(found);
 		}
 	}
 

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -147,7 +149,7 @@ public class PipelineEditor {
 		});
 		lbSteps.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
-				editStep();
+				editStepParameters();
 			}
 			public void mouseDown(MouseEvent e) {}
 			public void mouseUp(MouseEvent e) {}
@@ -239,7 +241,7 @@ public class PipelineEditor {
 		btEditStep.setLayoutData(gdTmp);
 		btEditStep.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				editStep();
+				editStepParameters();
 			}
 		});
 		
@@ -373,7 +375,7 @@ public class PipelineEditor {
 		}
 	}
 	
-	private void editStep () {
+	private void editStepParameters () {
 		try {
 			int n = lbSteps.getSelectionIndex();
 			if ( n < 0 ) return;
@@ -383,10 +385,20 @@ public class PipelineEditor {
 				return;
 			}
 			
-			if ( step.editorClass != null ) {
-//				params.fromString(step.paramsData);
-//				IParametersEditor editor = (IParametersEditor)Class.forName(step.editorClass).newInstance();
-//				editor.edit(paramsObject, uiContext, helpParam, projectDir)
+			if ( step.paramsClass != null ) {
+				// Instantiate an editor object
+				IParametersEditor editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+				if ( editor != null ) {
+					// Instantiate a Parameters object for this step
+					IParameters params = editor.createParameters();
+					// Set it with the data from this step
+					params.fromString(step.paramsData);
+					// Edit the data
+					if ( !editor.edit(params, null, null, null) ) return; // Cancel
+					// Save the data
+					step.paramsData = params.toString();
+				}
+				// Else: Fall thru to manual editing
 			}
 			else {
 				InputDialog dlg  = new InputDialog(shell,

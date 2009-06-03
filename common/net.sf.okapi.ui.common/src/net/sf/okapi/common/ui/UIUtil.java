@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 public class UIUtil {
 
@@ -165,4 +166,24 @@ public class UIUtil {
 		}
 	}
 	
+	/**
+	 * Checks the selected path against the project folder variable and set
+	 * the edit field as appropriate.
+	 * @param path the new selected path. 
+	 * @param edField the edit field where to show the path.
+	 * @param projectDir the project folder (can be null).
+	 */
+	public static void checkProjectFolderAfterPick (String path,
+		Text edField,
+		String projectDir)
+	{
+		if ( path == null ) return;
+//TODO: Implement projectDir variable		
+//		String oriPath = edField.getText().replace(BaseUtility.VAR_PROJDIR, projectDir);
+//		if ( !path.equals(oriPath) ) {
+			edField.setText(path);
+//		}
+		edField.selectAll();
+		edField.setFocus();
+	}
 }
