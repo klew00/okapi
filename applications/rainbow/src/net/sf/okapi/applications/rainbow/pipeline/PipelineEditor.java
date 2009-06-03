@@ -30,6 +30,8 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -143,7 +145,14 @@ public class PipelineEditor {
 				updateStepDisplay();
 			}
 		});
-		
+		lbSteps.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+				editStep();
+			}
+			public void mouseDown(MouseEvent e) {}
+			public void mouseUp(MouseEvent e) {}
+		});
+
 		btNew = new Button(shell, SWT.PUSH);
 		btNew.setText("New");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);

@@ -29,6 +29,8 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -63,6 +65,14 @@ class StepPicker {
 		
 		lbUtilities = new List(shell, SWT.BORDER | SWT.V_SCROLL);
 		lbUtilities.setLayoutData(new GridData(GridData.FILL_BOTH));
+		lbUtilities.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+				if ( !saveData() ) return;
+				shell.close();
+			}
+			public void mouseDown(MouseEvent e) {}
+			public void mouseUp(MouseEvent e) {}
+		});
 
 		StepInfo step;
 		availableSteps = new ArrayList<StepInfo>(); 
