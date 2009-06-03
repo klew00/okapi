@@ -270,6 +270,7 @@ public class PipelineWrapper {
 			params = step.getParameters();
 			if ( params != null ) {
 				infoStep.paramsData = params.toString();
+				infoStep.paramsClass = params.getClass().getName();
 			}
 			steps.add(infoStep);
 		}

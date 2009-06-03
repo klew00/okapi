@@ -47,8 +47,6 @@ import org.eclipse.swt.widgets.Text;
 
 public class ParametersEditor implements IParametersEditor {
 
-	private static final String SIMPLETM_EXT = ".data.db";
-	
 	private Shell shell;
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
@@ -63,8 +61,6 @@ public class ParametersEditor implements IParametersEditor {
 	private Button chkAddID;
 	private Button chkAddName;
 	private Button chkMarkSegments;
-	private Text edTMPath;
-	private Button btGetTMPath;
 	private SegmentationPanel pnlSegmentation;
 	private IHelp help;
 	private String projectDir;
@@ -134,19 +130,12 @@ public class ParametersEditor implements IParametersEditor {
 		lbTypes.add("Keep the original text");
 		lbTypes.add("Replace letters by Xs and digits by Ns");
 		lbTypes.add("Remove text but keep inline codes");
-//		lbTypes.add("Translate extact matches");
 		lbTypes.add("Replace selected ASCII letters by extended characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
 		lbTypes.setLayoutData(gdTmp);
-		lbTypes.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
-				btGetTMPath.setEnabled(edTMPath.isEnabled());
-			}
-		});
-		
+
 		chkAddPrefix = new Button(cmpTmp, SWT.CHECK);
 		chkAddPrefix.setText("Add the following prefix:");
 		chkAddPrefix.addSelectionListener(new SelectionAdapter() {
@@ -200,39 +189,6 @@ public class ParametersEditor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		grpTmp.setLayoutData(gdTmp);
 		
-		Composite cmpTM = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(2, false);
-		layTmp.marginWidth = 0;
-		cmpTM.setLayout(layTmp);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		cmpTM.setLayoutData(gdTmp);
-		
-		stTmp = new Label(cmpTM, SWT.NONE);
-		stTmp.setText("Full path of the TM database to use for translation:");
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		stTmp.setLayoutData(gdTmp);
-		
-		edTMPath = new Text(cmpTM, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edTMPath.setLayoutData(gdTmp);
-		
-		btGetTMPath = new Button(cmpTM, SWT.PUSH);
-		btGetTMPath.setText("...");
-		btGetTMPath.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
-					"Simple TMs (*"+SIMPLETM_EXT+")\tAll Files (*.*)",
-					"*"+SIMPLETM_EXT+"\t*.*");
-				if ( paths == null ) return;
-				if ( paths[0].endsWith(SIMPLETM_EXT) ) {
-					paths[0] = paths[0].substring(0, paths[0].length()-SIMPLETM_EXT.length());
-				}
-				UIUtil.checkProjectFolderAfterPick(paths[0], edTMPath, projectDir);
-			}
-		});
-
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
 			"Apply the following segmentation rules:", null, projectDir);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -283,12 +239,9 @@ public class ParametersEditor implements IParametersEditor {
 		chkAddName.setSelection(params.addName);
 		chkAddID.setSelection(params.addID);
 		chkMarkSegments.setSelection(params.markSegments);
-//		edTMPath.setText(params.tmPath);
 
 		edPrefix.setEnabled(chkAddPrefix.getSelection());
 		edSuffix.setEnabled(chkAddSuffix.getSelection());
-		edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
-		btGetTMPath.setEnabled(edTMPath.isEnabled());
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
@@ -303,7 +256,6 @@ public class ParametersEditor implements IParametersEditor {
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();
 		params.markSegments = chkMarkSegments.getSelection();
-//		params.tmPath = edTMPath.getText();
 		params.segment = pnlSegmentation.getSegment();
 		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
 		params.targetSrxPath = pnlSegmentation.getTargetSRX();
