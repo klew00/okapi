@@ -24,5 +24,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.rtf.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.dtd.tests"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.tests"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.textmodification.tests"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

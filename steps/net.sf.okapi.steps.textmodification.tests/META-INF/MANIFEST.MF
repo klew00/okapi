@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Text Modification Step Tests
+Bundle-SymbolicName: net.sf.okapi.steps.textmodification.tests;singleton:=true
+Bundle-Version: 1.0.0
+Fragment-Host: net.sf.okapi.steps.textmodification;bundle-version="1.0.0"
+Require-Bundle: org.junit4;bundle-version="4.3.1",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ net.sf.okapi.pipeline;bundle-version="1.0.0",
+ net.sf.okapi.steps.tests;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

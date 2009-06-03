@@ -29,18 +29,18 @@ public class Parameters extends BaseParameters {
 	public static final int TYPE_KEEPINLINE = 2;
 	public static final int TYPE_EXTREPLACE = 3;
 	
-	protected int type;
-	protected boolean addPrefix;
-	protected String prefix;
-	protected boolean addSuffix;
-	protected String suffix;
-	protected boolean applyToExistingTarget;
-	protected boolean addName;
-	protected boolean addID;
-	protected boolean segment;
-	protected boolean markSegments;
-	protected String sourceSrxPath;
-	protected String targetSrxPath;
+	public int type;
+	public boolean addPrefix;
+	public String prefix;
+	public boolean addSuffix;
+	public String suffix;
+	public boolean applyToExistingTarget;
+	public boolean addName;
+	public boolean addID;
+	public boolean segment;
+	public boolean markSegments;
+	public String sourceSrxPath;
+	public String targetSrxPath;
 	
 	public Parameters () {
 		reset();
