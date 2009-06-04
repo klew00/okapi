@@ -57,7 +57,7 @@ public final class BOMNewlineEncodingDetector {
 
 	private static final Logger LOGGER = Logger.getLogger(BOMNewlineEncodingDetector.class.getName());
 
-	private static final int MAX_LOOKAHEAD = 2048;
+	private static final int MAX_LOOKAHEAD = 1024;
 
 	/**
 	 * Defines type friendly newline types.
