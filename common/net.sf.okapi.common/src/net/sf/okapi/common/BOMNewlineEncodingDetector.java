@@ -91,12 +91,6 @@ public final class BOMNewlineEncodingDetector {
 		}
 	}
 
-	private final InputStream inputStream;
-	private String encoding = null;
-	private String encodingSpecificationInfo = null;
-	private boolean definitive = true;
-	private int bomSize;
-
 	/**
 	 * Java friendly UTF-16 encoding name.
 	 */
@@ -160,6 +154,11 @@ public final class BOMNewlineEncodingDetector {
 
 	private String defaultEncoding = ISO_8859_1;
 
+	private final InputStream inputStream;
+	private String encoding = null;
+	private String encodingSpecificationInfo = null;
+	private boolean definitive = true;
+	private int bomSize;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf7Bom;
 	private boolean hasBom;
@@ -177,7 +176,7 @@ public final class BOMNewlineEncodingDetector {
 		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		inputStream.mark(4);
 		autodetected = false;
-		bomSize = 0;
+		bomSize = 0;		
 		init();
 	}
 

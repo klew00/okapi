@@ -150,6 +150,7 @@ public class DTDFilter implements IFilter {
 			input.getEncoding(), generateSkeleton);
 		encoding = input.getEncoding();
 		hasUTF8BOM = input.hasUtf8Bom();
+		lineBreak = input.getNewLineType();
 		commonOpen(input.getReader());
 	}
 		
@@ -190,8 +191,7 @@ public class DTDFilter implements IFilter {
 		canceled = false;
 
 		tuId = 0;
-		otherId = 0;
-		lineBreak = System.getProperty("line.separator");
+		otherId = 0;		
 		strWriter = new StringWriter();
 		writer = new PrintWriter(strWriter);
 

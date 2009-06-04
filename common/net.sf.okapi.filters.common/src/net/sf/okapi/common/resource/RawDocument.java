@@ -220,11 +220,59 @@ public class RawDocument implements IResource {
 	}
 
 	/**
+	 * Creates a Reader based on the current input types.
+	 * 
+	 * @param removeBom
+	 *            - true if we want to remove the Byte Order Mark, false
+	 *            otherwise
+	 * @return - a Reader
+	 */
+	public Reader getReader(boolean removeBom) {
+		if (hasBom()) {
+			if (removeBom) {
+				getStream(removeBom);
+			}
+		}
+		return getReader();
+	}
+
+	/**
+	 * Creates or returns an existing {@link InputStream} from the input for
+	 * this RawDocument. The stream is created from inputURI, inputStream or
+	 * inputCharSequence.
+	 * 
+	 * @param removeBom
+	 *            - true if we want to remove the Byte Order Mark, false
+	 *            otherwise
+	 * @return the InputStream
+	 * 
+	 * @throws OkapiIOException
+	 */
+	public InputStream getStream(boolean removeBom) {
+		InputStream s = getStream();
+		if (hasBom()) {
+			if (removeBom) {
+				byte[] bom = new byte[this.getBomSize()];
+				try {
+					s.read(bom);
+				} catch (IOException e) {
+					throw new OkapiIOException("Error removing BOM from stream", e);
+				}
+			}
+		}
+		return s;
+	}
+
+	/**
 	 * Creates a Reader based on the current Stream.
 	 * 
 	 * @return a Reader
 	 */
 	public Reader getReader() {
+		if (isBinary()) {
+			throw new OkapiNotImplementedException("Cannot create a Reader on a binary document");
+		}
+		
 		Reader reader = null;
 		try {
 			if (inputCharSequence != null) {
