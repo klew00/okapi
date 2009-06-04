@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.resource;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.StringReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
