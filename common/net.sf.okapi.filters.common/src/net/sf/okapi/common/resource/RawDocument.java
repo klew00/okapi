@@ -270,7 +270,7 @@ public class RawDocument implements IResource {
 		Reader reader = null;
 		try {
 			if (inputCharSequence != null) {
-				reader = new BufferedReader(new StringReader(inputCharSequence.toString()));
+				reader = new StringReader(inputCharSequence.toString());
 			} else {
 				reader = new InputStreamReader(getStream(), getEncoding());
 			}
@@ -294,8 +294,8 @@ public class RawDocument implements IResource {
 	public InputStream getStream() {
 		if (inputCharSequence != null) {
 			try {
-				aStream = new BufferedInputStream(new ByteArrayInputStream(inputCharSequence.toString().getBytes(
-						getEncoding())));
+				aStream = new ByteArrayInputStream(inputCharSequence.toString().getBytes(
+						getEncoding()));
 			} catch (UnsupportedEncodingException e) {
 				OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
 				LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", getEncoding()), re);
@@ -305,7 +305,7 @@ public class RawDocument implements IResource {
 			URL url = null;
 			try {
 				url = getInputURI().toURL();
-				aStream = new BufferedInputStream(getInputURI().toURL().openStream());
+				aStream = getInputURI().toURL().openStream();
 			} catch (IllegalArgumentException e) {
 				OkapiIOException re = new OkapiIOException(e);
 				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI must be absolute: "
@@ -326,7 +326,7 @@ public class RawDocument implements IResource {
 			if (aStream != null) {
 				return aStream;
 			}
-			aStream = new BufferedInputStream(inputStream);
+			aStream = inputStream;
 		} else {
 			throw new OkapiIOException("RawDocument has no input defined.");
 		}
