@@ -98,8 +98,8 @@ public class DummyFilter implements IFilter {
 		else if ( input.getInputURI() != null ) {
 			open(input.getInputURI());
 		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
+		else if ( input.getStream() != null ) {
+			open(input.getStream());
 		}
 		else {
 			throw new RuntimeException("RawDocument has no input defined.");

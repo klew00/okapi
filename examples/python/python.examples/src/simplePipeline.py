@@ -18,17 +18,18 @@
 #  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 #===========================================================================
 
-from net.sf.okapi.common.pipeline import Pipeline, BasePipelineStep, FilterPipelineStepAdaptor
+from net.sf.okapi.common.pipeline import Pipeline, BasePipelineStep
 from net.sf.okapi.common import EventType, Event
 from net.sf.okapi.common.resource import RawDocument
+from net.sf.okapi.steps.common import RawDocumentToFilterEventsStep
 from net.sf.okapi.filters.html import HtmlFilter
     
 class Consumer(BasePipelineStep):
     def handleEvent(self, event): 
-        print "%s<===>%s\nSKEL:%s\n=========" % (event.getEventType(), event.getResource(), event.getResource().getSkeleton())
+        print "%s" % (event.getEventType())
 
 pipeline = Pipeline()
-pipeline.addStep(FilterPipelineStepAdaptor(HtmlFilter()))
+pipeline.addStep(RawDocumentToFilterEventsStep(HtmlFilter()))
 pipeline.addStep(Consumer())
 
 

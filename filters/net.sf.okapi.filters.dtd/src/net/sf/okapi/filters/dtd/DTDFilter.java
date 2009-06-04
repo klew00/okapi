@@ -21,13 +21,9 @@
 package net.sf.okapi.filters.dtd;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -41,13 +37,11 @@ import com.wutka.dtd.DTDEntity;
 import com.wutka.dtd.DTDOutput;
 import com.wutka.dtd.DTDParser;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.DTDEncoder;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -154,50 +148,11 @@ public class DTDFilter implements IFilter {
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
+		encoding = input.getEncoding();
+		hasUTF8BOM = input.hasUtf8Bom();
+		commonOpen(input.getReader());
 	}
-	
-	private void open (InputStream input) {
-		try {
-			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-			// Correct the encoding if we have detected a different one
-			encoding = bis.detectEncoding();
-			hasUTF8BOM = bis.hasUTF8BOM();
-			commonOpen(new InputStreamReader(bis, encoding));
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void open (CharSequence inputText) {
-		encoding = "UTF-16";
-		hasUTF8BOM = false;
-		commonOpen(new StringReader(inputText.toString()));
-	}
-	
+		
 	private void setOptions (String sourceLanguage,
 		String targetLanguage,
 		String defaultEncoding,

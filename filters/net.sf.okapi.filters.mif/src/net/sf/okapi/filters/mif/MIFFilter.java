@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -35,10 +34,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -148,18 +145,12 @@ public class MIFFilter implements IFilter {
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
+		
+		if (input.getInputURI() != null) {
+			docName = input.getInputURI().getPath();
 		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
+		
+		open(input.getStream());
 	}
 	
 	private void setOptions (String sourceLanguage,
@@ -204,21 +195,6 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void open (CharSequence inputText) {
-		// Not supported with MIF filter
-		throw new OkapiNotImplementedException();
-	}
-
 	public void setParameters (IParameters params) {
 	}
 

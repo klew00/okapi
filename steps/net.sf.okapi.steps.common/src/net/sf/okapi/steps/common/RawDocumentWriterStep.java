@@ -24,7 +24,6 @@ import java.io.File;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -81,39 +80,25 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			File outFile;
 			rawDoc = (RawDocument)event.getResource();
 			
-			if ( rawDoc.getInputCharSequence() != null ) {
-				//TODO
-				throw new RuntimeException("Not implemented yet");
-			}
-			else if ( rawDoc.getInputURI() != null ) {
-				if ( pipeline.isLastStep(this) ) {
-					outFile = new File(getContext().getOutputURI(0));
-					Util.createDirectories(outFile.getAbsolutePath());
-				}
-				else {
-					try {
-						outFile = File.createTempFile("okp-rdw_", ".tmp");
-					}
-					catch ( Throwable e ) {
-						throw new OkapiIOException("Cannot create temporary output.", e);
-					}
-					outFile.deleteOnExit();
-				}
-				// Faster to copy using channels
-				String inputPath = rawDoc.getInputURI().getPath();
-				Util.copyFile(inputPath, outFile.getAbsolutePath(), false); // Copy, do not move
-			}
-			else if ( rawDoc.getInputStream() != null ) {
-				throw new RuntimeException("Not implemented yet");
+			if ( pipeline.isLastStep(this) ) {
+				outFile = new File(getContext().getOutputURI(0));
+				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {
-				// Change this exception to more generic (not just filter)
-				throw new OkapiBadStepInputException("RawDocument has no input defined.");
-			}
+				try {
+					outFile = File.createTempFile("okp-rdw_", ".tmp");
+				}
+				catch ( Throwable e ) {
+					throw new OkapiIOException("Cannot create temporary output.", e);
+				}
+				outFile.deleteOnExit();
+			}			
+			Util.copy(rawDoc.getStream(), outFile);
 				
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
-			rawDoc.setInputURI(outFile.toURI());
+			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
+					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 			isDone = true;
 		}
 		catch ( Throwable e ) {

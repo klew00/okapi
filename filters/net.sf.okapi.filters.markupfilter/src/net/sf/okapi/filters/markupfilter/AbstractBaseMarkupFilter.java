@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
@@ -51,7 +50,6 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.StreamedSource;
 import net.htmlparser.jericho.Tag;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -94,7 +92,6 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private URL defaultConfig;
-	private BOMNewlineEncodingDetector bomEncodingDetector;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
 
@@ -174,7 +171,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			if (document != null) {
 				document.close();
 			}
-		} catch (IOException e) {
+		} catch (IOException e) {			
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
 			throw re;
@@ -189,7 +186,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	private Source getParsedHeader(final InputStream inputStream) {
 		try {
-			inputStream.mark(0);
+			inputStream.mark(PREVIEW_BYTE_COUNT);
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
 			int i;
 			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
@@ -199,12 +196,17 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 				bytes[i] = (byte) nextByte;
 			}
 			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0, i));
-			inputStream.reset();
 			return parsedInput;
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Could not reset the input stream to it's start position", re);
 			throw re;
+		} finally {
+			try {
+				inputStream.reset();
+			} catch (IOException e) {
+				
+			}
 		}
 	}
 
@@ -236,82 +238,43 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	public void open(RawDocument input, boolean generateSkeleton) {
 		// close StreamedSource from previous run
 		if (document != null) {
-			try {
-				document.close();
-			} catch (IOException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
-				throw re;
-			}
+			close();
 		}
+		
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
-		if (input.getInputCharSequence() != null) {
-			setDocumentName("");
-			open(input.getInputCharSequence());
-		} else if (input.getInputURI() != null) {
+		
+		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().toString());
-			open(input.getInputURI());
-		} else if (input.getInputStream() != null) {
-			setDocumentName("");
-			open(input.getInputStream());
-		} else {
-			OkapiBadFilterInputException e = new OkapiBadFilterInputException("Input data not found when starting filter");
-			LOGGER.log(Level.SEVERE, e.toString());
-			throw e;
 		}
-	}
+		hasUtf8Bom = input.hasUtf8Bom();
+		hasUtf8Encoding = input.hasUtf8Encoding();
+		setNewlineType(input.getNewLineType());
 
-	private void open(CharSequence input) {
-		setNewlineType(BOMNewlineEncodingDetector.getNewlineType(input).toString());
-		document = new StreamedSource(input);
-		startFilter();
-	}
+		Source parsedHeader = getParsedHeader(input.getStream());
+		String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
 
-	private void open(InputStream input) {
+		if (detectedEncoding == null && getEncoding() != null) {
+			detectedEncoding = getEncoding();
+			LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
+					getEncoding()));
+		} else if (getEncoding() == null) {
+			detectedEncoding = parsedHeader.getEncoding(); // get best guess
+			LOGGER.log(Level.WARNING, String.format(
+					"Default encoding and detected encoding not found. Using best guess encoding (%s)",
+					detectedEncoding));
+		}
+
 		try {
-			bomEncodingDetector = new BOMNewlineEncodingDetector(input);
-			hasUtf8Bom = bomEncodingDetector.hasUtf8Bom();
-			hasUtf8Encoding = bomEncodingDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
-			setNewlineType(bomEncodingDetector.getNewlineType().toString());
-
-			Source parsedHeader = getParsedHeader(input);
-			String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
-
-			if (detectedEncoding == null && getEncoding() != null) {
-				detectedEncoding = getEncoding();
-				LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
-						getEncoding()));
-			} else if (getEncoding() == null) {
-				detectedEncoding = parsedHeader.getEncoding(); // get best guess
-				LOGGER.log(Level.WARNING, String.format(
-						"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-						detectedEncoding));
-			}
-
-			BOMAwareInputStream bomis = new BOMAwareInputStream(input, detectedEncoding);
-			bomis.detectEncoding();
-			document = new StreamedSource(new InputStreamReader(bomis, detectedEncoding));
 			setEncoding(detectedEncoding);
+			input.setEncoding(detectedEncoding);
+			document = new StreamedSource(input.getReader());
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
 			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
 			throw re;
 		}
-		startFilter();
-	}
 
-	private void open(URI inputURI) {
-		try {
-			open(inputURI.toURL().openStream());
-		} catch (MalformedURLException e) {
-			OkapiBadFilterInputException re = new OkapiBadFilterInputException(e);
-			LOGGER.log(Level.SEVERE, "Filter could not open URI", re);
-			throw re;
-		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Filter could not open URI", re);
-			throw re;
-		}
+		startFilter();
 	}
 
 	/**

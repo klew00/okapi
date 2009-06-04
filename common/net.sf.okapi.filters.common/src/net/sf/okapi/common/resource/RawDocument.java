@@ -20,11 +20,14 @@
 
 package net.sf.okapi.common.resource;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -32,20 +35,22 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
  * Resource that carries all the information needed for a filter to open a given
  * document, and also the resource associated with the event RAW_DOCUMENT.
- * Documents are passed through the pipeline either as RawDocument, or a
- * filter events. Specialized steps allows to convert one to the other and
- * conversely. The RawDocument object has one (and only one) of three input
- * objects: a CharSequence, a URI, or an InputStream.
+ * Documents are passed through the pipeline either as RawDocument, or a filter
+ * events. Specialized steps allows to convert one to the other and conversely.
+ * The RawDocument object has one (and only one) of three input objects: a
+ * CharSequence, a URI, or an InputStream.
  */
 public class RawDocument implements IResource {
 
@@ -59,7 +64,14 @@ public class RawDocument implements IResource {
 	private InputStream inputStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
-	private Reader inputReader;
+	private InputStream aStream;
+	private boolean hasUtf8Bom;
+	private boolean hasUtf8Encoding;
+	private String newLineType;
+	private boolean isBinary;
+	private boolean hasBom;
+	private boolean autodetected;
+	private int bomSize;
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence and a source
@@ -90,8 +102,8 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Creates a new RawDocument object with a given URI, a default encoding
-	 * and a source language.
+	 * Creates a new RawDocument object with a given URI, a default encoding and
+	 * a source language.
 	 * 
 	 * @param inputURI
 	 *            the URI for this RawDocument.
@@ -101,12 +113,29 @@ public class RawDocument implements IResource {
 	 *            the source language for this RawDocument.
 	 */
 	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage) {
-		create(inputURI, defaultEncoding, sourceLanguage, null);
+		create(inputURI, defaultEncoding, sourceLanguage, null, false);
 	}
 
 	/**
-	 * Creates a new RawDocument object with a given URI, a default encoding,
-	 * a source language and a target language.
+	 * Creates a new RawDocument object with a given URI, a default encoding and
+	 * a source language.
+	 * 
+	 * @param inputURI
+	 *            the URI for this RawDocument.
+	 * @param defaultEncoding
+	 *            the default encoding for this RawDocument.
+	 * @param sourceLanguage
+	 *            the source language for this RawDocument.
+	 * @param isBinary
+	 *            is the input non textual?
+	 */
+	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, boolean isBinary) {
+		create(inputURI, defaultEncoding, sourceLanguage, null, isBinary);
+	}
+
+	/**
+	 * Creates a new RawDocument object with a given URI, a default encoding, a
+	 * source language and a target language.
 	 * 
 	 * @param inputURI
 	 *            the URI for this RawDocument.
@@ -118,7 +147,7 @@ public class RawDocument implements IResource {
 	 *            the target language for this RawDocument.
 	 */
 	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
+		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage, false);
 	}
 
 	/**
@@ -133,7 +162,44 @@ public class RawDocument implements IResource {
 	 *            the source language for this RawDocument.
 	 */
 	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage) {
-		create(inputStream, defaultEncoding, sourceLanguage, null);
+		create(inputStream, defaultEncoding, sourceLanguage, null, false);
+	}
+
+	/**
+	 * Creates a new RawDocument object with a given URI, a default encoding, a
+	 * source language and a target language.
+	 * 
+	 * @param inputURI
+	 *            the URI for this RawDocument.
+	 * @param defaultEncoding
+	 *            the default encoding for this RawDocument.
+	 * @param sourceLanguage
+	 *            the source language for this RawDocument.
+	 * @param targetLanguage
+	 *            the target language for this RawDocument.
+	 * @param isBinary
+	 *            is the input non textual?
+	 */
+	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage,
+			boolean isBinary) {
+		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage, isBinary);
+	}
+
+	/**
+	 * Creates a new RawDocument object with a given InputStream, a default
+	 * encoding and a source language.
+	 * 
+	 * @param inputStream
+	 *            the InputStream for this RawDocument.
+	 * @param defaultEncoding
+	 *            the default encoding for this RawDocument.
+	 * @param sourceLanguage
+	 *            the source language for this RawDocument.
+	 * @param isBinary
+	 *            is the input non textual?
+	 */
+	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, boolean isBinary) {
+		create(inputStream, defaultEncoding, sourceLanguage, null, isBinary);
 	}
 
 	/**
@@ -150,94 +216,138 @@ public class RawDocument implements IResource {
 	 *            the target language for this RawDocument.
 	 */
 	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage);
+		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage, false);
 	}
 
 	/**
-	 * Creates a {@link Reader} from the input for this RawDocument.
-	 * The reader is created from inputStream or inputCharSequence.
-	 * If an inputURI is set then a temporary InputStream is created automatically.
+	 * Creates a Reader based on the current Stream.
 	 * 
-	 * @return the Reader
+	 * @return a Reader
+	 */
+	public Reader getReader() {
+		Reader reader = null;
+		try {
+			if (inputCharSequence != null) {
+				reader = new BufferedReader(new StringReader(inputCharSequence.toString()));
+			} else {
+				reader = new InputStreamReader(getStream(), getEncoding());
+			}
+		} catch (UnsupportedEncodingException e) {
+			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
+			LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", getEncoding()), re);
+			throw re;
+		}
+		return reader;
+	}
+
+	/**
+	 * Creates or returns an existing {@link InputStream} from the input for
+	 * this RawDocument. The stream is created from inputURI, inputStream or
+	 * inputCharSequence.
+	 * 
+	 * @return the InputStream
 	 * 
 	 * @throws OkapiIOException
 	 */
-	public Reader getReader() {
-		// Re-use existing reader if there is one
-		//TODO: how dangerous is this? Should it be reset, etc? 
-		if ( inputReader != null ) {
-			return inputReader;
-		}
-
-		// Create a reader for the current input 
-		if ( getInputCharSequence() != null ) {
-			inputReader = new StringReader(getInputCharSequence().toString());
-		}
-		else if ( getInputURI() != null ) {
+	public InputStream getStream() {
+		if (inputCharSequence != null) {
+			try {
+				aStream = new BufferedInputStream(new ByteArrayInputStream(inputCharSequence.toString().getBytes(
+						getEncoding())));
+			} catch (UnsupportedEncodingException e) {
+				OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
+				LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", getEncoding()), re);
+				throw re;
+			}
+		} else if (getInputURI() != null) {
 			URL url = null;
 			try {
 				url = getInputURI().toURL();
-				readerFromInputStream(getInputURI().toURL().openStream());
-			}
-			catch (IllegalArgumentException e) {
+				aStream = new BufferedInputStream(getInputURI().toURL().openStream());
+			} catch (IllegalArgumentException e) {
 				OkapiIOException re = new OkapiIOException(e);
 				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI must be absolute: "
-					+ ((url == null) ? "URL is null" : url.toString()), re);
+						+ ((url == null) ? "URL is null" : url.toString()), re);
 				throw re;
-			}
-			catch (MalformedURLException e) {
+			} catch (MalformedURLException e) {
 				OkapiIOException re = new OkapiIOException(e);
 				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI may be malformed: "
-					+ ((url == null) ? "URL is null" : url.toString()), re);
+						+ ((url == null) ? "URL is null" : url.toString()), re);
 				throw re;
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				OkapiIOException re = new OkapiIOException(e);
 				LOGGER.log(Level.SEVERE,
-					"Could not open the URL. The URL is OK but the input stream could not be opened", re);
+						"Could not open the URL. The URL is OK but the input stream could not be opened", re);
 				throw re;
 			}
-		}
-		else if ( getInputStream() != null ) {
-			readerFromInputStream(getInputStream());
-		}
-		else {
+		} else if (inputStream != null) {
+			if (aStream != null) {
+				return aStream;
+			}
+			aStream = new BufferedInputStream(inputStream);
+		} else {
 			throw new OkapiIOException("RawDocument has no input defined.");
 		}
 
-		return inputReader;
+		return aStream;
 	}
 
-	private void readerFromInputStream(InputStream inStream) {
+	private void getInputInfo() {
 		try {
-			inputReader = new InputStreamReader(inStream, getEncoding());
-		} catch (UnsupportedEncodingException e) {
-			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-			LOGGER.log(Level.SEVERE,
-				String.format("The encoding '%s' is not supported.", getEncoding()), re);
-			throw re;
+			BOMNewlineEncodingDetector bomDetector = new BOMNewlineEncodingDetector(getStream(), encoding);
+			if (bomDetector.isDifinitive()) {
+				if (!bomDetector.getEncoding().equals(getEncoding())) {
+					LOGGER.log(Level.FINE, String.format("Byte Order Mark detected. Changing encoding to %s'",
+							bomDetector.getEncoding()));
+				}
+				this.encoding = bomDetector.getEncoding();
+			}
+			this.hasBom = bomDetector.hasBom();
+			this.hasUtf8Bom = bomDetector.hasUtf8Bom();
+			this.hasUtf8Encoding = bomDetector.getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
+			this.newLineType = bomDetector.getNewlineType().toString();
+			this.autodetected = bomDetector.isAutodetected();
+			this.bomSize = bomDetector.getBomSize();
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
 		}
 	}
 
-	private void create(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
-		setInputCharSequence(inputCharSequence);
-		setEncoding("UTF-16");
-		setSourceLanguage(sourceLanguage);
-		setTargetLanguage(targetLanguage);
+	private void create(CharSequence inputCharSequence, String srcLang, String trgLang) {
+		this.inputCharSequence = inputCharSequence;
+		this.encoding = "UTF-16";
+		this.srcLang = srcLang;
+		this.trgLang = trgLang;
+		this.autodetected = false;
+		this.bomSize = 0;
+		getInputInfo();
 	}
 
-	private void create(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		setInputURI(inputURI);
-		setEncoding(defaultEncoding);
-		setSourceLanguage(sourceLanguage);
-		setTargetLanguage(targetLanguage);
+	private void create(URI inputURI, String defaultEncoding, String srcLang, String trgLang, boolean isBinary) {
+		this.inputURI = inputURI;
+		this.encoding = defaultEncoding;
+		this.srcLang = srcLang;
+		this.trgLang = trgLang;
+		this.isBinary = isBinary;
+		this.autodetected = false;
+		this.bomSize = 0;
+		if (!isBinary) {
+			getInputInfo();
+		}
 	}
 
-	private void create(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		setInputStream(inputStream);
-		setEncoding(defaultEncoding);
-		setSourceLanguage(sourceLanguage);
-		setTargetLanguage(targetLanguage);
+	private void create(InputStream inputStream, String defaultEncoding, String srcLang, String trgLang,
+			boolean isBinary) {
+		this.inputStream = inputStream;
+		this.encoding = defaultEncoding;
+		this.srcLang = srcLang;
+		this.trgLang = trgLang;
+		this.isBinary = isBinary;
+		this.autodetected = false;
+		this.bomSize = 0;
+		if (!isBinary) {
+			getInputInfo();
+		}
 	}
 
 	/*
@@ -264,11 +374,13 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Returns always null as there is never a skeleton associated to a RawDocument.
+	 * Returns always null as there is never a skeleton associated to a
+	 * RawDocument.
+	 * 
 	 * @return always null.
 	 */
 	public ISkeleton getSkeleton() {
-		return null;
+		throw new OkapiNotImplementedException("The RawDocument resource does not have skeketon");
 	}
 
 	/*
@@ -298,37 +410,12 @@ public class RawDocument implements IResource {
 	 * This method has no effect as there is never a skeleton for a RawDocument.
 	 */
 	public void setSkeleton(ISkeleton skeleton) {
-		// This resource has no skeleton
-	}
-
-	/**
-	 * Gets the InputStream object associated with this resource. It may be null
-	 * if either {@link #getInputCharSequence()} or {@link #getInputURI()} are
-	 * not null.
-	 * 
-	 * @return the InputStream object for this resource (may be null).
-	 */
-	public InputStream getInputStream() {
-		return inputStream;
-	}
-
-	/**
-	 * Sets the InputStream object associated with this resource.
-	 * 
-	 * @param inputStream
-	 *            the InputStream object for this resource.
-	 */
-	public void setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
-		// Only one of the three inputs can be set at the same time
-		inputURI = null;
-		inputCharSequence = null;
+		throw new OkapiNotImplementedException("RawDcoument has no skeleton");
 	}
 
 	/**
 	 * Gets the URI object associated with this resource. It may be null if
-	 * either {@link #getInputCharSequence()} or {@link #getInputStream()} are
-	 * not null.
+	 * either CharSequence InputStream inputs are not null.
 	 * 
 	 * @return the URI object for this resource (may be null).
 	 */
@@ -337,40 +424,13 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Sets the URI object associated with this resource.
+	 * Gets the CharSequence associated with this resource. It may be null if
+	 * either URI or InputStream inputs are not null.
 	 * 
-	 * @param inputURI
-	 *         the URI object for this resource.
-	 */
-	public void setInputURI(URI inputURI) {
-		this.inputURI = inputURI;
-		// Only one of the three inputs can be set at the same time
-		inputStream = null;
-		inputCharSequence = null;
-	}
-
-	/**
-	 * Gets the CharSequence object associated with this resource. It may be
-	 * null if either {@link #getInputURI()} or {@link #getInputStream()} are
-	 * not null.
-	 * 
-	 * @return the CharSequence object for this resource (may be null).
+	 * @return the CHarSequence
 	 */
 	public CharSequence getInputCharSequence() {
 		return inputCharSequence;
-	}
-
-	/**
-	 * Sets the CharSequence object associated with this resource.
-	 * 
-	 * @param inputCharSequence
-	 *            the CharSequence object for this resource.
-	 */
-	public void setInputCharSequence(CharSequence inputCharSequence) {
-		this.inputCharSequence = inputCharSequence;
-		// Only one of the three inputs can be set at the same time
-		inputURI = null;
-		inputStream = null;
 	}
 
 	/**
@@ -383,32 +443,12 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Sets the default encoding associated with this resource.
-	 * 
-	 * @param encoding
-	 *            the default encoding associated with this resource.
-	 */
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	/**
 	 * Gets the source language associated to this resource.
 	 * 
 	 * @return the source language associated to this resource.
 	 */
 	public String getSourceLanguage() {
 		return srcLang;
-	}
-
-	/**
-	 * Sets the source language associated with this resource.
-	 * 
-	 * @param language
-	 *            the source language associated with this resource.
-	 */
-	public void setSourceLanguage(String language) {
-		srcLang = language;
 	}
 
 	/**
@@ -421,13 +461,76 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Sets the target language associated with this resource.
-	 * 
-	 * @param language
-	 *           the target language associated with this resource.
+	 * @return the hasUtf8Bom
 	 */
-	public void setTargetLanguage(String language) {
-		trgLang = language;
+	public boolean hasUtf8Bom() {
+		return hasUtf8Bom;
 	}
 
+	/**
+	 * @return the hasUtf8Encoding
+	 */
+	public boolean hasUtf8Encoding() {
+		return hasUtf8Encoding;
+	}
+
+	/**
+	 * Get the newline type in the input, if none are found return the platform
+	 * default newline
+	 * 
+	 * @return the newLineType
+	 */
+	public String getNewLineType() {
+		return newLineType;
+	}
+
+	/**
+	 * Is the input a non-textual?
+	 * 
+	 * @return the isBinary
+	 */
+	public boolean isBinary() {
+		return isBinary;
+	}
+
+	/**
+	 * Does this document have a byte order mark?
+	 * 
+	 * @return true if there is a BOM, false otherwise.
+	 */
+	public boolean hasBom() {
+		return hasBom;
+	}
+
+	/**
+	 * Set the input encoding. <h4>WARNING:</h4> Any Readers gotten via
+	 * getReader() are now invalid. In some cases it may not be possible to
+	 * create a new Reader. It is best to set the encoding <b>before</b> a any
+	 * calls to getReader
+	 * <p>
+	 * 
+	 * @param encoding
+	 */
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	/**
+	 * Indicates if the guessed encoding was auto-detected. If not it is the
+	 * default encoding that was provided.
+	 * 
+	 * @return True if the guessed encoding was auto-detected, false if not.
+	 */
+	public boolean isAutodetected() {
+		return autodetected;
+	}
+
+	/**
+	 * Gets the number of bytes used by the Byte-Order-mark in this document.
+	 * 
+	 * @return The byte size of the BOM in this document.
+	 */
+	public int getBomSize() {
+		return bomSize;
+	}
 }

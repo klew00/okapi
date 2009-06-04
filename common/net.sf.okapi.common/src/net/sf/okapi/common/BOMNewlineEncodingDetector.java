@@ -57,6 +57,8 @@ public final class BOMNewlineEncodingDetector {
 
 	private static final Logger LOGGER = Logger.getLogger(BOMNewlineEncodingDetector.class.getName());
 
+	private static final int MAX_LOOKAHEAD = 2048;
+
 	/**
 	 * Defines type friendly newline types.
 	 */
@@ -93,6 +95,7 @@ public final class BOMNewlineEncodingDetector {
 	private String encoding = null;
 	private String encodingSpecificationInfo = null;
 	private boolean definitive = true;
+	private int bomSize;
 
 	/**
 	 * Java friendly UTF-16 encoding name.
@@ -160,6 +163,8 @@ public final class BOMNewlineEncodingDetector {
 	private boolean hasUtf8Bom;
 	private boolean hasUtf7Bom;
 	private boolean hasBom;
+	private int maxLookahead = MAX_LOOKAHEAD;
+	private boolean autodetected;
 
 	/**
 	 * Create a new BOMNewlineEncodingDetector from an {@link InputStream}.
@@ -170,7 +175,9 @@ public final class BOMNewlineEncodingDetector {
 	 */
 	public BOMNewlineEncodingDetector(final InputStream inputStream) throws IOException {
 		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
-		inputStream.mark(0);
+		inputStream.mark(4);
+		autodetected = false;
+		bomSize = 0;
 		init();
 	}
 
@@ -186,7 +193,9 @@ public final class BOMNewlineEncodingDetector {
 	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding) throws IOException {
 		this.defaultEncoding = defaultEncoding;
 		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
-		inputStream.mark(0);
+		inputStream.mark(4);
+		autodetected = false;
+		bomSize = 0;
 		init();
 	}
 
@@ -217,6 +226,13 @@ public final class BOMNewlineEncodingDetector {
 
 	}
 
+	public NewlineType getNewlineType(int maxLookahead) {
+		this.maxLookahead = maxLookahead;
+		NewlineType newlineType = getNewlineType();
+		this.maxLookahead = MAX_LOOKAHEAD;
+		return newlineType;
+	}
+
 	/**
 	 * Detects newline type using the inputStream itself.
 	 * 
@@ -224,10 +240,20 @@ public final class BOMNewlineEncodingDetector {
 	 */
 	public NewlineType getNewlineType() {
 		int c;
+		int count = 0;
 		Reader reader = null;
+		inputStream.mark(maxLookahead);
 		try {
 			reader = openReader();
 			while ((c = reader.read()) != -1) {
+				// passed our buffer size if we didn't find any new lines yet
+				// then set the default and warn.
+				if (++count > maxLookahead) {
+					LOGGER.log(Level.WARNING,
+							"Could not find newlines within lookahead buffer. Setting default newline type.");
+					break;
+				}
+
 				if (c == '\n')
 					return NewlineType.LF;
 				if (c == '\r') {
@@ -323,8 +349,9 @@ public final class BOMNewlineEncodingDetector {
 		hasBom = false;
 
 		final int b1 = inputStream.read();
-		if (b1 == -1)
+		if (b1 == -1) {
 			return setEncoding(null, "empty input stream");
+		}
 		final int b2 = inputStream.read();
 		final int b3 = inputStream.read();
 		final int b4 = inputStream.read();
@@ -334,52 +361,73 @@ public final class BOMNewlineEncodingDetector {
 			if (b2 == 0xBB && b3 == 0xBF) {
 				hasUtf8Bom = true;
 				hasBom = true;
+				autodetected = true;
+				bomSize = 3;
 				return setEncoding(UTF_8, "UTF-8 Byte Order Mark (EF BB BF)");
 			}
 		} else if (b1 == 0xFE) {
 			if (b2 == 0xFF) {
 				hasBom = true;
+				autodetected = true;
+				bomSize = 2;
 				return setEncoding(UTF_16, "UTF-16 big-endian Byte Order Mark (FE FF)");
 			}
 		} else if (b1 == 0xFF) {
 			if (b2 == 0xFE) {
 				if (b3 == 0 && b4 == 0) {
 					hasBom = true;
+					autodetected = true;
+					bomSize = 4;
 					return setEncoding(UTF_32, "UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
 				}
 				hasBom = true;
+				autodetected = true;
+				bomSize = 2;
 				return setEncoding(UTF_16, "UTF-16 little-endian Byte Order Mark (FF EE)");
 			}
 		} else if (b1 == 0) {
 			if (b2 == 0 && b3 == 0xFE && b4 == 0xFF) {
 				hasBom = true;
+				autodetected = true;
+				bomSize = 4;
 				return setEncoding(UTF_32, "UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
 			}
 		} else if (b1 == 0x0E) {
 			if (b2 == 0xFE && b3 == 0xFF) {
 				hasBom = true;
+				autodetected = true;
+				bomSize = 3;
 				return setEncoding(SCSU, "SCSU Byte Order Mark (0E FE FF)");
 			}
 		} else if (b1 == 0x2B) {
 			if (b2 == 0x2F && b3 == 0x76) {
 				hasUtf7Bom = true;
 				hasBom = true;
+				autodetected = true;
+				bomSize = 3;
 				return setEncoding(UTF_7, "UTF-7 Byte Order Mark (2B 2F 76)");
 			}
 		} else if (b1 == 0xDD) {
 			if (b2 == 0x73 && b3 == 0x66 && b4 == 0x73) {
 				hasBom = true;
+				autodetected = true;
+				bomSize = 4;
 				return setEncoding(UTF_EBCDIC, "UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
 			}
 		} else if (b1 == 0xFB) {
 			if (b2 == 0xEE && b3 == 0x28) {
 				hasBom = true;
+				autodetected = true;
+				bomSize = 3;
 				return setEncoding(BOCU_1, "BOCU-1 Byte Order Mark (FB EE 28)");
 			}
 		}
+
 		// No Unicode Byte Order Mark found. Have to start guessing.
 		definitive = false;
-
+		autodetected = false;
+		bomSize = 0;
+		
 		LOGGER.log(Level.FINEST, "BOM not found. Now trying to guess document encoding.");
 
 		/*
@@ -395,7 +443,7 @@ public final class BOMNewlineEncodingDetector {
 			 * The stream contains between 1 and 3 bytes. This means the
 			 * document can't possibly specify the encoding, so make a best
 			 * guess based on the first 3 bytes.
-			 *			
+			 * 
 			 * It might be possible to rule out some encodings based on these
 			 * bytes, but it is impossible to make a definite determination. The
 			 * main thing to determine is whether it is an 8-bit or 16-bit
@@ -532,6 +580,7 @@ public final class BOMNewlineEncodingDetector {
 
 	/**
 	 * Get the defaultEncoding set by the user.
+	 * 
 	 * @return String representation of the encoding
 	 */
 	public String getDefaultEncoding() {
@@ -540,6 +589,7 @@ public final class BOMNewlineEncodingDetector {
 
 	/**
 	 * Set the default encoding.
+	 * 
 	 * @param defaultEncoding
 	 */
 	public void setDefaultEncoding(String defaultEncoding) {
@@ -548,6 +598,7 @@ public final class BOMNewlineEncodingDetector {
 
 	/**
 	 * Does this document have a byte order mark?
+	 * 
 	 * @return true if there is a BOM, false otherwise.
 	 */
 	public boolean hasBom() {
@@ -555,8 +606,10 @@ public final class BOMNewlineEncodingDetector {
 	}
 
 	/**
-	 * Does this document have a UTF-8 byte order mark?
-	 * @return true if there is a BOM, false otherwise.
+	 * Indicates if the guessed encoding is UTF-8 and this file has a BOM.
+	 * 
+	 * @return True if the guessed encoding is UTF-8 and this file has a BOM,
+	 *         false otherwise.
 	 */
 	public boolean hasUtf8Bom() {
 		return hasUtf8Bom;
@@ -564,9 +617,28 @@ public final class BOMNewlineEncodingDetector {
 
 	/**
 	 * Does this document have a UTF-7 byte order mark?
+	 * 
 	 * @return true if there is a BOM, false otherwise.
 	 */
 	public boolean hasUtf7Bom() {
 		return hasUtf7Bom;
+	}
+
+	/**
+	 * Indicates if the guessed encoding was auto-detected. If not it is the
+	 * default encoding that was provided.
+	 * 
+	 * @return True if the guessed encoding was auto-detected, false if not.
+	 */
+	public boolean isAutodetected() {
+		return autodetected;
+	}
+	
+	/**
+	 * Gets the number of bytes used by the Byte-Order-mark in this document.
+	 * @return The byte size of the BOM in this document.
+	 */
+	public int getBomSize() {
+		return bomSize;
 	}
 }

@@ -48,6 +48,14 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	/**
+	 * Creates a new RawDocumentToFilterEventsStep object.
+	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 */
+	public RawDocumentToFilterEventsStep (IFilter filter) {
+		setFilter(filter);
+	}
+	
+	/**
 	 * Sets the filter for this RawDocumentToEventsStep object.
 	 * @param filter the filter to use.
 	 */

@@ -11,6 +11,7 @@
 		<project>net.sf.okapi.filters.properties</project>
 		<project>net.sf.okapi.filters.xml</project>
 		<project>net.sf.okapi.pipeline</project>
+		<project>net.sf.okapi.steps.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

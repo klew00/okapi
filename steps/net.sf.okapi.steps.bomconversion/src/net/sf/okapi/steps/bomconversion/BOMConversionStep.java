@@ -21,15 +21,14 @@
 package net.sf.okapi.steps.bomconversion;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -97,32 +96,13 @@ public class BOMConversionStep extends BasePipelineStep {
 	@Override
 	protected void handleRawDocument (Event event) {
 		RawDocument rawDoc;
-		FileInputStream input = null;
+		InputStream input = null;
 		FileOutputStream output = null;
+		
 		try {
 			rawDoc = (RawDocument)event.getResource();
-			if ( rawDoc.getInputCharSequence() != null ) {
-				// Nothing to do
-				//TODO: Check if this is the appropriate behavior
-				return;
-			}
-			if ( rawDoc.getInputURI() != null ) {
-				input = new FileInputStream(new File(rawDoc.getInputURI()));
-			}
-			else if ( rawDoc.getInputStream() != null ) {
-				// Try to cast, in cast it's a FileInputStream
-				try {
-					input = (FileInputStream)rawDoc.getInputStream();
-				}
-				catch ( ClassCastException e ) {
-					throw new OkapiBadStepInputException("RawDocument is set with an incompatible type of InputStream.");
-				}
-			}
-			else {
-				// Change this exception to more generic (not just filter)
-				throw new OkapiBadStepInputException("RawDocument has no input defined.");
-			}
-			
+			input = rawDoc.getStream();
+						
 			// Open the output
 			File outFile;
 			if ( pipeline.isLastStep(this) ) {
@@ -203,7 +183,8 @@ public class BOMConversionStep extends BasePipelineStep {
 			
 			// Set the new raw-document URI
 			// Other info stays the same
-			rawDoc.setInputURI(outFile.toURI());
+			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
+					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));			
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);
