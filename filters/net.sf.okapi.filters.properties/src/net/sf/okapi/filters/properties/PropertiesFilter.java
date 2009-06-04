@@ -22,11 +22,7 @@ package net.sf.okapi.filters.properties;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,14 +30,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.BOMAwareInputStream;
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -177,7 +170,7 @@ public class PropertiesFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -240,7 +233,7 @@ public class PropertiesFilter implements IFilter {
 		encoding = defaultEncoding;
 		srcLang = sourceLanguage;
 	}
-
+*/
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -253,12 +246,28 @@ public class PropertiesFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	private void commonOpen (Reader inputReader) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
+		close();
 		parseState = 1;
 		canceled = false;
 
 		// Open the input reader from the provided reader
-		reader = new BufferedReader(inputReader);
+		Reader rdr = input.getReader();
+		if ( rdr instanceof BufferedReader ) {
+			reader = (BufferedReader)rdr;
+		}
+		else {
+			reader = new BufferedReader(rdr);
+		}
+		encoding = input.getEncoding();
+		srcLang = input.getSourceLanguage();
+		hasUTF8BOM = input.hasUtf8Bom();
+		lineBreak = input.getNewLineType();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
+		}
 		
 		// Initializes the variables
 		tuId = 0;

@@ -23,7 +23,6 @@ package net.sf.okapi.filters.openoffice;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
@@ -159,7 +158,7 @@ public class OpenOfficeFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -206,7 +205,24 @@ public class OpenOfficeFilter implements IFilter {
 	{
 		srcLang = sourceLanguage;
 	}
+*/
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
+		close();
 
+		docURI = input.getInputURI();
+		if ( docURI == null ) {
+			throw new OkapiBadFilterInputException("This filter supports only URI input.");
+		}
+		nextAction = NextAction.OPENZIP;
+		queue = new LinkedList<Event>();
+		filter = new ODFFilter();
+		filter.setParameters(params);
+		
+		srcLang = input.getSourceLanguage();
+	}
+	
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 		if ( filter != null ) filter.setParameters(params);

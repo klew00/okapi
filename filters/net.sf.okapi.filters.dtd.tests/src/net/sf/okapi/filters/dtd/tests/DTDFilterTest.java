@@ -33,6 +33,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.dtd.DTDFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -61,6 +62,14 @@ public class DTDFilterTest {
 		Property prop = tu.getProperty(Property.NOTE);
 		assertNotNull(prop);
 		assertEquals("Comment", prop.getValue());
+	}
+	
+	@Test
+	public void testLineBreaks () {
+		String snippet = "<!--Comment-->\r<!ENTITY entry1 \"Text1\">\r";
+		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(snippet));
+		assertNotNull(sd);
+		assertEquals("\r", sd.getLineBreak());
 	}
 	
 	@Test

@@ -22,10 +22,7 @@ package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,15 +30,11 @@ import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
-import net.sf.okapi.common.BOMAwareInputStream;
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -225,7 +218,7 @@ public class RegexFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -311,7 +304,7 @@ public class RegexFilter implements IFilter {
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
 	}
-
+*/
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -324,11 +317,53 @@ public class RegexFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	private void commonOpen (String text) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		close(); // Just in case resources need to be freed
+	
+		BufferedReader reader = null;
+		Reader rdr = input.getReader();
+		if ( rdr instanceof BufferedReader ) {
+			reader = (BufferedReader)rdr;
+		}
+		else {
+			reader = new BufferedReader(rdr);
+		}
+		encoding = input.getEncoding();
+		srcLang = input.getSourceLanguage();
+		trgLang = input.getTargetLanguage();
+		hasUTF8BOM = input.hasUtf8Bom();
+		lineBreak = input.getNewLineType();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
+		}
+		
+		//TODO: Optimize this with a better 'readToEnd()'
+		StringBuilder tmp = new StringBuilder();
+		char[] buf = new char[2048];
+		int count = 0;
+		try {
+			while (( count = reader.read(buf)) != -1 ) {
+				tmp.append(buf, 0, count);
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error reading the input.", e);
+		}
+		finally {
+			if ( reader != null ) {
+				try {
+					reader.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing the input.", e);
+				}
+			}
+		}
 		
 		// Set the input string
-		inputText = text;
+		inputText = tmp.toString().replace(lineBreak, "\n");
 
 		parseState = 1;
 		canceled = false;

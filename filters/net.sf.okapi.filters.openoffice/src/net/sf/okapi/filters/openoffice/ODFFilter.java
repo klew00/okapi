@@ -20,11 +20,6 @@
 
 package net.sf.okapi.filters.openoffice;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -40,10 +35,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -182,7 +175,7 @@ public class ODFFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		containerMimeType = "";
@@ -201,19 +194,28 @@ public class ODFFilter implements IFilter {
 			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
 		}
 	}
-	
-	private void open (InputStream input) {
+*/	
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		try {
 			close();
 			applyParameters();
 			canceled = false;
+			containerMimeType = "";
 			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
-			reader = fact.createXMLStreamReader(input);
+
+			input.setEncoding("UTF-8");
+			reader = fact.createXMLStreamReader(input.getStream());
+			language = input.getSourceLanguage();
+			if ( input.getInputURI() != null ) {
+				docName = input.getInputURI().getPath();
+			}
 			
 			context = new Stack<Context>();
 			context.push(new Context("", false));
@@ -247,7 +249,7 @@ public class ODFFilter implements IFilter {
 		containerMimeType = mimeType;
 	}
 	
-	private void open (CharSequence input) {
+/*	private void open (CharSequence input) {
 		//TODO: Check for better solution, going from char to byte to read char is just not good
 		try {
 			open(new ByteArrayInputStream(input.toString().getBytes("UTF-8")));
@@ -266,7 +268,7 @@ public class ODFFilter implements IFilter {
 			throw new OkapiIOException(e);
 		}
 	}
-
+*/
 	public String getName () {
 		return "okf_odf";
 	}
@@ -310,14 +312,6 @@ public class ODFFilter implements IFilter {
 	
 	public void setParameters (IParameters newParams) {
 		params = (Parameters)newParams;
-	}
-
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		language = sourceLanguage;
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
