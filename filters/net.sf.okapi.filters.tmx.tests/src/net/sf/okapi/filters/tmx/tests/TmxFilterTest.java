@@ -165,7 +165,7 @@ public class TmxFilterTest {
 		FilterTestDriver.getStartDocument(getEvents(invalidElementInsidePlaceholderSnippet, "en-us","fr-fr"));
 	}
 	
-	@Test (expected=OkapiBadFilterInputException.class)
+	@Test (expected=OkapiIOException.class)
 	public void testOpenInvalidInputStream() {
 		InputStream nullStream=null;
 		filter.open(new RawDocument(nullStream,"en-us","fr-fr"));			

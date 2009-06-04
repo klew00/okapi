@@ -20,11 +20,6 @@
 
 package net.sf.okapi.filters.tmx;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,7 +32,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -178,7 +173,7 @@ public class TmxFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -218,14 +213,13 @@ public class TmxFilter implements IFilter {
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
-	}	
+	}*/	
 	
-	private void commonOpen (int type,
-		Object obj)
+	
+	public void open (RawDocument input,
+			boolean generateSkeleton)
 	{
 		try {
-			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
-			if ( trgLang == null || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
 			close();
 			canceled = false;			
 			
@@ -237,28 +231,24 @@ public class TmxFilter implements IFilter {
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);			
 
-			BOMNewlineEncodingDetector detector = null;
-			try {
-				switch ( type ) {
-				case 0: // From InputStream
-					detector = new BOMNewlineEncodingDetector((InputStream)obj);
-					hasUTF8BOM = detector.hasUtf8Bom();
-					lineBreak = detector.getNewlineType().toString();
-					reader = fact.createXMLStreamReader((InputStream)obj);
-					break;
-				case 1: // From Reader
-					reader = fact.createXMLStreamReader((Reader)obj);
-					break;
-				}
+			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
+			reader = fact.createXMLStreamReader(input.getReader());
+
+			encoding = input.getEncoding(); // Real encoding
+			srcLang = input.getSourceLanguage();
+			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
+			trgLang = input.getTargetLanguage();
+			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
+			hasUTF8BOM = input.hasUtf8Bom();
+			lineBreak = input.getNewLineType();
+			if ( input.getInputURI() != null ) {
+				docName = input.getInputURI().getPath();
 			}
-			catch ( IOException e ) {
-				throw new OkapiIOException(e);
-			}
-			finally {
-				if ( detector != null ) {
-					detector = null; // Release it
-				}
-			}			
+
+			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
+			if ( trgLang == null || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
+			
+			
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			tuId = 0;
@@ -303,19 +293,6 @@ public class TmxFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
-	private void setOptions(String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		srcLang = sourceLanguage;
-		trgLang = targetLanguage;
-		
-		// Default encoding should be UTF-8, other must be declared
-		// And that will be auto-detected and encoding will be updated
-		encoding = "UTF-8";
-	}
-	
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
