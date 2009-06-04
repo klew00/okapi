@@ -53,8 +53,9 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
  * CharSequence, a URI, or an InputStream.
  */
 public class RawDocument implements IResource {
-
 	private static final Logger LOGGER = Logger.getLogger(RawDocument.class.getName());
+
+	public static final String ISO_8859_1 = "ISO-8859-1";
 
 	private Annotations annotations;
 	private String id;
@@ -121,16 +122,14 @@ public class RawDocument implements IResource {
 	 * a source language.
 	 * 
 	 * @param inputURI
-	 *            the URI for this RawDocument.
-	 * @param defaultEncoding
-	 *            the default encoding for this RawDocument.
+	 *            the URI for this RawDocument.	
 	 * @param sourceLanguage
 	 *            the source language for this RawDocument.
 	 * @param isBinary
 	 *            is the input non textual?
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, boolean isBinary) {
-		create(inputURI, defaultEncoding, sourceLanguage, null, isBinary);
+	public RawDocument(URI inputURI, String sourceLanguage, boolean isBinary) {
+		create(inputURI, ISO_8859_1, sourceLanguage, null, isBinary);
 	}
 
 	/**
@@ -171,8 +170,6 @@ public class RawDocument implements IResource {
 	 * 
 	 * @param inputURI
 	 *            the URI for this RawDocument.
-	 * @param defaultEncoding
-	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
 	 *            the source language for this RawDocument.
 	 * @param targetLanguage
@@ -180,9 +177,8 @@ public class RawDocument implements IResource {
 	 * @param isBinary
 	 *            is the input non textual?
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage,
-			boolean isBinary) {
-		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage, isBinary);
+	public RawDocument(URI inputURI, String sourceLanguage, String targetLanguage, boolean isBinary) {
+		create(inputURI, ISO_8859_1, sourceLanguage, targetLanguage, isBinary);
 	}
 
 	/**
@@ -191,15 +187,13 @@ public class RawDocument implements IResource {
 	 * 
 	 * @param inputStream
 	 *            the InputStream for this RawDocument.
-	 * @param defaultEncoding
-	 *            the default encoding for this RawDocument.
 	 * @param sourceLanguage
 	 *            the source language for this RawDocument.
 	 * @param isBinary
 	 *            is the input non textual?
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, boolean isBinary) {
-		create(inputStream, defaultEncoding, sourceLanguage, null, isBinary);
+	public RawDocument(InputStream inputStream, String sourceLanguage, boolean isBinary) {
+		create(inputStream, ISO_8859_1, sourceLanguage, null, isBinary);
 	}
 
 	/**
@@ -272,7 +266,7 @@ public class RawDocument implements IResource {
 		if (isBinary()) {
 			throw new OkapiNotImplementedException("Cannot create a Reader on a binary document");
 		}
-		
+
 		Reader reader = null;
 		try {
 			if (inputCharSequence != null) {
@@ -560,6 +554,10 @@ public class RawDocument implements IResource {
 	 * @param encoding
 	 */
 	public void setEncoding(String encoding) {
+		if (isBinary()) {
+			throw new OkapiNotImplementedException("Cannot set an encoding on a binary document");
+		}
+
 		this.encoding = encoding;
 	}
 
