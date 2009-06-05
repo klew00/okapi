@@ -236,9 +236,9 @@ public class TmxFilter implements IFilter {
 
 			encoding = input.getEncoding(); // Real encoding
 			srcLang = input.getSourceLanguage();
-			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
+			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();
-			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
+			if ( trgLang == null  || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
 			hasUTF8BOM = input.hasUtf8Bom();
 			lineBreak = input.getNewLineType();
 			if ( input.getInputURI() != null ) {
@@ -562,11 +562,11 @@ public class TmxFilter implements IFilter {
 							String typeAttr = getTypeAttribute();
 							tc.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
 						}else if(curLocalName.equals("ph") || curLocalName.equals("it")){
-							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, tc);
+							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, curLocalName, tc);
 						}else if(curLocalName.equals("bpt")){
-							appendCode(TagType.OPENING, ++id, curLocalName, tc);
+							appendCode(TagType.OPENING, ++id, curLocalName,"Xpt", tc);
 						}else if(curLocalName.equals("ept")){
-							appendCode(TagType.CLOSING, ++id, curLocalName, tc);
+							appendCode(TagType.CLOSING, -1, curLocalName,"Xpt", tc);
 						}
 						break;
 					}else{
@@ -688,12 +688,14 @@ public class TmxFilter implements IFilter {
 	 * @param type The type of in-line code.
 	 * @param id The id of the code to add.
 	 * @param tagName The tag name of the in-line element to process.
+	 * @param type The tag name of the in-line element to process. 
 	 * @param content The object where to put the code.
 	 * Do not save if this parameter is null.
 	 */
 	private void appendCode (TagType tagType,
 		int id,
 		String tagName,
+		String type,
 		TextContainer content)
 	{
 		
@@ -772,7 +774,7 @@ public class TmxFilter implements IFilter {
 					//--completed the original placeholder/code and back up to the <seg> level--
 					if ( tagName.equals(reader.getLocalName()) && (elemStack.peek().equals("seg"))) {
 
-						Code code = content.append(tagType, tagName, innerCode.toString());
+						Code code = content.append(tagType, type, innerCode.toString(), id);
 						outerCode.append("</"+tagName+">");
 						code.setOuterData(outerCode.toString());
 						return;							
