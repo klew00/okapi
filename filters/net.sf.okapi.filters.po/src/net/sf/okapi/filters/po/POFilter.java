@@ -22,29 +22,19 @@ package net.sf.okapi.filters.po;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -107,8 +97,6 @@ public class POFilter implements IFilter {
 	private String references;
 	private String msgIDPlural;
 	private String domain;
-	private InputStream startingInput;
-	private URI inputURI;
 	private boolean hasFuzzyFlag;
 	
 	public POFilter () {
@@ -179,7 +167,7 @@ public class POFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
+/*	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
@@ -249,7 +237,7 @@ public class POFilter implements IFilter {
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;
 	}
-
+*/
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -262,7 +250,9 @@ public class POFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	private void commonOpen (Reader inputReader) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		close();
 		parseState = 1;
 		canceled = false;
@@ -271,7 +261,6 @@ public class POFilter implements IFilter {
 		nbPlurals = 0;
 		tuId = 0;
 		otherId = 0;
-		lineBreak = System.getProperty("line.separator");
 		pluralMode = 0;
 		pluralCount = 0;
 		readLine = true;
@@ -284,7 +273,17 @@ public class POFilter implements IFilter {
 		}
 
 		// Open the input reader from the provided reader
-		reader = new BufferedReader(inputReader);
+		reader = new BufferedReader(input.getReader(true));
+	
+		encoding = input.getEncoding();
+		srcLang = input.getSourceLanguage();
+		trgLang = input.getTargetLanguage();
+		hasUTF8BOM = input.hasUtf8Bom();
+		lineBreak = input.getNewLineType();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
+		}
+		
 		// Try to read the header info
 		if ( detectInformation() ) {
 			// Need to re-open the file with modified encoding
@@ -294,30 +293,8 @@ public class POFilter implements IFilter {
 			catch ( IOException e ) {
 				throw new OkapiIOException("Error re-opening the input.", e);
 			}
-			if ( docName != null ) { // Was open from URI
-				try {
-					startingInput.close();
-				}
-				catch ( IOException e ) {
-					throw new OkapiIOException("Error re-opening the input.", e);
-				}
-				try {
-					startingInput = inputURI.toURL().openStream();
-				}
-				catch ( MalformedURLException e ) {
-					throw new OkapiIOException("Error re-opening the input.", e);
-				}
-				catch ( IOException e ) {
-					throw new OkapiIOException("Error re-opening the input.", e);
-				}
-			}
-			// Else: was open from startingInput 
-			try {
-				reader = new BufferedReader(new InputStreamReader(startingInput, encoding));
-			}
-			catch ( UnsupportedEncodingException e ) {
-				throw new OkapiUnsupportedEncodingException("Error re-opening the input.", e);
-			}
+			input.setEncoding(encoding);
+			reader = new BufferedReader(input.getReader(true)); //new InputStreamReader(startingInput, encoding));
 		}
 	}
 	
