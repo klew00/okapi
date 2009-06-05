@@ -22,8 +22,7 @@ from java.io import File
 
 from net.sf.okapi.common.resource import RawDocument
 from net.sf.okapi.common.pipeline import Pipeline
-from net.sf.okapi.common.pipeline import RawDocumentToEventsStep
-from net.sf.okapi.common.pipeline import EventsWriterStep
+from net.sf.okapi.steps.common import RawDocumentToFilterEventsStep, FilterEventsWriterStep
 
 from net.sf.okapi.filters.xml import XMLFilter
 from net.sf.okapi.filters.html import HtmlFilter
@@ -39,7 +38,7 @@ def runPipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, 
     pipeline = Pipeline()
         
     # Create the filter step
-    inputStep = RawDocumentToEventsStep(filter)
+    inputStep = RawDocumentToFilterEventsStep(filter)
     
     # Add this step to the pipeline
     pipeline.addStep(inputStep)
@@ -52,7 +51,7 @@ def runPipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, 
     writer = filter.createFilterWriter()
     
     # Create the writer step (using the writer provider by our filter)
-    outputStep = EventsWriterStep(writer)
+    outputStep = FilterEventsWriterStep(writer)
     
     # Add this step to the pipeline
     pipeline.addStep(outputStep)

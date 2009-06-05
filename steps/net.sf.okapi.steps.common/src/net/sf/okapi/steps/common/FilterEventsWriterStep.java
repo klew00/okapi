@@ -47,6 +47,16 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	}
 	
 	/**
+	 * Creates a new FilterEventsWriterStep object.
+	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 * 
+	 * @param filterWriter the writer used to convert Events to a document
+	 */
+	public FilterEventsWriterStep (IFilterWriter filterWriter) {
+		setFilterWriter(filterWriter);
+	}
+	
+	/**
 	 * Sets the filter writer for this EventsWriterStep object.
 	 * @param filterWriter the filter writer to use.
 	 */
