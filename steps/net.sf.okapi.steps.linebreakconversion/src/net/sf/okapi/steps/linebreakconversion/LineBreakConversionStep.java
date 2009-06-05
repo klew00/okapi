@@ -25,13 +25,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.CharBuffer;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -88,12 +85,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 		OutputStreamWriter writer = null;
 		try {
 			rawDoc = (RawDocument)event.getResource();
-			
-			InputStream input = rawDoc.getStream();
-			
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, rawDoc.getEncoding());
-			String encoding = bis.detectEncoding(); // Update the encoding: it'll be use for the output
-			reader = new BufferedReader(new InputStreamReader(bis, encoding));
+			reader = new BufferedReader(rawDoc.getReader(true));
 			
 			// Open the output
 			File outFile;
@@ -112,9 +104,9 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			}
 			OutputStream output = new FileOutputStream(outFile);
 			
-			writer = new OutputStreamWriter(new BufferedOutputStream(output), encoding);
+			writer = new OutputStreamWriter(new BufferedOutputStream(output), rawDoc.getEncoding());
 			// Write BOM if there was one
-			Util.writeBOMIfNeeded(writer, (bis.getBOMSize()>0), encoding);
+			Util.writeBOMIfNeeded(writer, rawDoc.hasUtf8Bom(), rawDoc.getEncoding());
 			
 			// Set the variables
 			CharBuffer buffer = CharBuffer.allocate(1024);
@@ -155,12 +147,11 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				if ( length-start > 0 ) {
 					writer.write(buffer.array(), start, length-start);
 				}
+				writer.close();
 				
-				// Set the new raw-document URI and the encoding (in case one was auto-detected)
-				// Other info stays the same
-				rawDoc.setEncoding(encoding);
+				// Creates the new RawDocument
 				event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-						rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 			}
 		}
 		catch ( IOException e ) {
@@ -171,11 +162,9 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			try {
 				if ( writer != null ) {
 					writer.close();
-					writer = null;
 				}
 				if ( reader != null ) {
 					reader.close();
-					reader = null;
 				}
 			}
 			catch ( IOException e ) {
