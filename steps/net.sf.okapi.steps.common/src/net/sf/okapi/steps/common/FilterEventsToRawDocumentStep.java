@@ -33,10 +33,10 @@ import net.sf.okapi.common.resource.StartDocument;
 
 /**
  * Converts filters events into a {@link RawDocument}. This class implements the
- * {@link net.sf.okapi.common.pipeline.IPipelineStep} interface for a step that takes filter events and
- * creates an output document using a provided {@link IFilterWriter}
- * implementation. When the document is completed, a {@link RawDocument} is
- * generated.
+ * {@link net.sf.okapi.common.pipeline.IPipelineStep} interface for a step that 
+ * takes filter events and creates an output document using the {@link IFilterWriter}
+ * implementation provided by the filter through the START_DOCUMENT even.
+ * When the document is completed, a {@link RawDocument} is generated.
  * 
  * @see RawDocumentToFilterEventsStep
  * @see FilterEventsWriterStep
