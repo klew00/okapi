@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	
 	private IFilter filter;
+	private boolean filterfromSetFilter;
 	private boolean isDone;
 
 	/**
@@ -48,8 +49,11 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	/**
-	 * Creates a new RawDocumentToFilterEventsStep object.
-	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 * Creates a new RawDocumentToFilterEventsStep object with a given filter.
+	 * Use this constructor to create an object that is using a filter set using
+	 * the one provided here, or using {@link #setFilter(IFilter)}, not using
+	 * the filter configuration mapper of the pipeline context.
+	 * @param filter the filter to set.
 	 */
 	public RawDocumentToFilterEventsStep (IFilter filter) {
 		setFilter(filter);
@@ -60,6 +64,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	 * @param filter the filter to use.
 	 */
 	public void setFilter (IFilter filter) {
+		filterfromSetFilter = true;
 		this.filter = filter;
 	}
 
@@ -86,16 +91,19 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		
 		// Initialize the filter on RAW_DOCUMENT
 		case RAW_DOCUMENT:
-			if ( Util.isEmpty(getContext().getFilterConfigurationId(0)) ) {
-				// No filter configuration provided: just pass it down
-				isDone = true;
-				return event;
-			}
-			// Else: Get the filter to use
-			filter = getContext().getFilterConfigurationMapper().createFilter(
-				getContext().getFilterConfigurationId(0), filter);
-			if ( filter == null ) {
-				throw new RuntimeException("Unsupported filter type.");
+			if ( !filterfromSetFilter ) {
+				// Filter is to be set from the configuration
+				if ( Util.isEmpty(getContext().getFilterConfigurationId(0)) ) {
+					// No filter configuration provided: just pass it down
+					isDone = true;
+					return event;
+				}
+				// Else: Get the filter to use
+				filter = getContext().getFilterConfigurationMapper().createFilter(
+					getContext().getFilterConfigurationId(0), filter);
+				if ( filter == null ) {
+					throw new RuntimeException("Unsupported filter type.");
+				}
 			}
 			isDone = false;
 			// Open the document
