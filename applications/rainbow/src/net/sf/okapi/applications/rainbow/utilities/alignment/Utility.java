@@ -241,8 +241,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			
 			// Open the file with the translations
 			File f = new File(getInputPath(1));
-			RawDocument res = new RawDocument(f.toURI(), getInputEncoding(1), srcLang);
-			res.setTargetLanguage(trgLang);
+			RawDocument res = new RawDocument(f.toURI(), getInputEncoding(1), srcLang, trgLang);
 			trgFilter.open(res, false);
 			
 			// Fill the database with the target file

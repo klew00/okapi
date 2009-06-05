@@ -56,8 +56,7 @@ public class Reader implements IReader {
 			reader = new XLIFFFilter();
 			// Encoding is not really used so we can hard-code
 			File f = new File(path);
-			RawDocument res = new RawDocument(f.toURI(), "UTF-8", sourceLanguage);
-			res.setTargetLanguage(targetLanguage);
+			RawDocument res = new RawDocument(f.toURI(), "UTF-8", sourceLanguage, targetLanguage);
 			reader.open(res, false);
 		}
 		catch ( Exception e ) {

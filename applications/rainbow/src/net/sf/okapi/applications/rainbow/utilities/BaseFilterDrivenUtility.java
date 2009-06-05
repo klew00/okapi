@@ -55,8 +55,7 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 	
 			// Setup the filter
 			File f = new File(getInputPath(0));
-			RawDocument res = new RawDocument(f.toURI(), getInputEncoding(0), srcLang);
-			res.setTargetLanguage(trgLang);
+			RawDocument res = new RawDocument(f.toURI(), getInputEncoding(0), srcLang, trgLang);
 			filter.open(res);
 
 			// Create the filter writer if required
