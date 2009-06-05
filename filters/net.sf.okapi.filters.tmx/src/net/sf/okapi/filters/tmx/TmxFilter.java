@@ -245,10 +245,6 @@ public class TmxFilter implements IFilter {
 				docName = input.getInputURI().getPath();
 			}
 
-			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
-			if ( trgLang == null || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
-			
-			
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			tuId = 0;
@@ -877,5 +873,4 @@ public class TmxFilter implements IFilter {
 			}
 		}
 	}
-	
 }
