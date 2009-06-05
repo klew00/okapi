@@ -22,10 +22,8 @@ package net.sf.okapi.filters.rtf;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -42,7 +40,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -356,27 +353,17 @@ public class RTFFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
 		try {
+			passedEncoding = input.getEncoding();
+			srcLang = input.getSourceLanguage();
+			trgLang = input.getTargetLanguage();
+			if ( input.getInputURI() != null ) {
+				docName = input.getInputURI().getPath();
+			}
+			
 			reset(passedEncoding);
 			reader = new BufferedReader(
-				new InputStreamReader(input, passedEncoding));
+				new InputStreamReader(input.getStream(), passedEncoding));
 	
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
@@ -393,32 +380,6 @@ public class RTFFilter implements IFilter {
 		catch ( UnsupportedEncodingException e ) {
 			throw new OkapiUnsupportedEncodingException(e);
 		}
-	}
-
-	private void open (CharSequence inputText) {
-		// Not supported with RTF filter for now
-		//TODO: Support charsequence input
-		throw new UnsupportedOperationException();
-	}
-
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		passedEncoding = defaultEncoding;
-		srcLang = sourceLanguage;
-		trgLang = targetLanguage;
 	}
 
 	public void setParameters (IParameters params) {
