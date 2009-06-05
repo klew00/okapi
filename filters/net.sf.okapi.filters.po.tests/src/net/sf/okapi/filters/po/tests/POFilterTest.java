@@ -198,6 +198,8 @@ public class POFilterTest {
 		list.add(new InputDocument(root+"TestMonoLingual_FR.po", "okf_po@Monolingual.fprm"));
 		list.add(new InputDocument(root+"AllCasesTest.po", null));
 		list.add(new InputDocument(root+"Test_nautilus.af.po", null));
+		list.add(new InputDocument(root+"Test_DrupalRussianCP1251.po", null));
+		
 		list.add(new InputDocument(root+"POT-Test01.pot", null));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
