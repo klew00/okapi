@@ -20,26 +20,17 @@
 
 package net.sf.okapi.steps.searchandreplace;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
@@ -102,11 +93,21 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		return pipeline.isLastStep(this);
 	}
 
+	
+	/*@Override
+	protected void handleStartBatch (Event event) {
+		if ( !params.plainText ) { // RawDocument mode
+			isDone = false;
+		}
+		trgLang = getContext().getTargetLanguage(0);
+	}*/	
+		
+	
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		if ( !params.plainText ) { // RawDocument mode
 			isDone = false;
-		}
+		}		
 		trgLang = getContext().getTargetLanguage(0);
 	}	
 	
@@ -116,39 +117,27 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			return; // Options set to use on text units only, so we just skip this event
 		}
 		RawDocument rawDoc;
-		FileInputStream input = null;
-		FileOutputStream output = null;		
+		String encoding = null;
 		BufferedReader reader = null;
-		OutputStreamWriter oWriter = null;
 		BufferedWriter writer = null;
+
+		String result = null;
+		StringBuilder assembled = new StringBuilder();
+		
 		try {
-			rawDoc = (RawDocument)event.getResource();		
-			if ( rawDoc.getInputCharSequence() != null ) {
-				// Nothing to do
-				//TODO: Check if this is the appropriate behavior
-				return;
-			}
-			if ( rawDoc.getInputURI() != null ) {
-				input = new FileInputStream(new File(rawDoc.getInputURI()));
-			}
-			else if ( rawDoc.getInputStream() != null ) {
-				// Try to cast, in cast it's a FileInputStream
-				try {
-					input = (FileInputStream)rawDoc.getInputStream();
-				}
-				catch ( ClassCastException e ) {
-					throw new OkapiBadStepInputException("RawDocument is set with an incompatible type of InputStream.");
-				}
-			}
-			else {
-				// Change this exception to more generic (not just filter)
-				throw new OkapiBadStepInputException("RawDocument has no input defined.");
-			}
+			rawDoc = (RawDocument)event.getResource();
+			encoding = rawDoc.getEncoding();
+			reader = new BufferedReader(rawDoc.getReader());
 			
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, rawDoc.getEncoding());
-			String encoding = bis.detectEncoding(); // Update the encoding: it'll be use for the output
-			reader = new BufferedReader(new InputStreamReader(bis, encoding));
-			
+	        char[] buf = new char[1024];
+	        int numRead=0;
+	        while((numRead=reader.read(buf)) != -1){
+	            assembled.append(buf, 0, numRead);
+	        }
+	        reader.close();
+	        result = assembled.toString();
+	        assembled = null;
+	        
 			// Open the output
 			File outFile;
 			if ( pipeline.isLastStep(this) ) {
@@ -164,22 +153,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				}
 				outFile.deleteOnExit();
 			}
-			// Set the new raw-document URI
-			// Other info stays the same
-			rawDoc.setInputURI(outFile.toURI());
-			
-			output = new FileOutputStream(outFile);
-			oWriter = new OutputStreamWriter(new BufferedOutputStream(output), encoding);
-			// Write BOM if there was one
-			Util.writeBOMIfNeeded(writer, (bis.getBOMSize()>0), encoding);
-			
-	        FileChannel fc = input.getChannel();
-	    
-	        // Create a read-only CharBuffer on the file
-	        ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-	        CharBuffer cbuf = Charset.forName(encoding).newDecoder().decode(bbuf);
-	        String result = cbuf.toString();
-
+		
 	        for ( String[] s : params.rules ) {
 	        	if ( s[0].equals("true") ) {
 		        	int flags = 0;
@@ -196,17 +170,15 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		        	}
 	        	}
 	        }
-	        
-			writer = new BufferedWriter(oWriter);
+
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), encoding));
 			Util.writeBOMIfNeeded(writer, true, encoding);
 			writer.write(result);
 			
-			fc.close();
-			input.close();
 			writer.close();
-			oWriter.close();
+			reader.close();
 			
-		
+			event.setResource(new RawDocument(outFile.toURI(),rawDoc.getEncoding(),rawDoc.getSourceLanguage(),rawDoc.getTargetLanguage()));
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
