@@ -143,26 +143,6 @@ public class DTDFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		encoding = input.getEncoding();
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
-		commonOpen(input.getReader());
-	}
-		
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		encoding = defaultEncoding;
-		srcLang = sourceLanguage;
-	}
-
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -185,7 +165,9 @@ public class DTDFilter implements IFilter {
 		return list;
 	}
 
-	private void commonOpen (Reader inputReader) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		close();
 		parseState = 1;
 		canceled = false;
@@ -200,8 +182,18 @@ public class DTDFilter implements IFilter {
 			params.codeFinder.compile();
 		}
 
+		Reader rdr = null;
 		try {
-			DTDParser parser = new DTDParser(inputReader);
+			rdr = input.getReader();
+			DTDParser parser = new DTDParser(rdr);
+			encoding = input.getEncoding();
+			srcLang = input.getSourceLanguage();
+			hasUTF8BOM = input.hasUtf8Bom();
+			lineBreak = input.getNewLineType();
+			if ( input.getInputURI() != null ) {
+				docName = input.getInputURI().getPath();
+			}
+
 			DTD dtd = parser.parse();
 			items = dtd.items.elements();
 			encoder.setOptions(null, encoding, lineBreak);
@@ -210,9 +202,9 @@ public class DTDFilter implements IFilter {
 			throw new OkapiIOException("Error parsing the DTD", e);
 		}
 		finally {
-			if ( inputReader != null ) {
+			if ( rdr != null ) {
 				try {
-					inputReader.close();
+					rdr.close();
 				}
 				catch ( IOException e ) {
 					throw new OkapiIOException("Error when closing the DTD reader.", e);

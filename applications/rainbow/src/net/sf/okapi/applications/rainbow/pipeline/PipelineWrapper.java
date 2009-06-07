@@ -39,6 +39,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.ui.UIUtil;
 
 public class PipelineWrapper {
 	
@@ -315,6 +316,7 @@ public class PipelineWrapper {
 		copyInfoStepsToPipeline();
 		// Set the batch items
 		driver.clearItems();
+		driver.getPipeline().getContext().removeProperty("outputFile");
 		int f = -1;
 		URI outURI;
 		URI inpURI;
@@ -359,6 +361,12 @@ public class PipelineWrapper {
 
 		// Execute
 		driver.processBatch();
+		
+		// Look if there 
+		String path = driver.getPipeline().getContext().getString("outputFile");
+		if ( path != null ) {
+			UIUtil.start(path);
+		}
 	}
 
 	public void addStep (StepInfo step) {

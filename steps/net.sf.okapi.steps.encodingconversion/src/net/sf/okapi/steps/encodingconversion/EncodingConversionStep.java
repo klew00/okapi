@@ -23,11 +23,9 @@ package net.sf.okapi.steps.encodingconversion;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -38,7 +36,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -178,12 +175,9 @@ public class EncodingConversionStep extends BasePipelineStep {
 			}
 			
 			// Try to auto-detect the encoding for HTML/XML
-			String inputEncoding = rawDoc.getEncoding();
 			String outputEncoding = getContext().getOutputEncoding(0);
-			String inputPath = rawDoc.getInputURI().getPath();
-//TODO: replace by use of getStream() when available			
-			reader = new BufferedReader(new InputStreamReader(
-				new FileInputStream(inputPath), inputEncoding));
+			reader = new BufferedReader(rawDoc.getReader(true));
+			String inputEncoding = rawDoc.getEncoding();
 			reader.read(buffer);
 			String detectedEncoding = checkDeclaration(inputEncoding);
 			if ( !detectedEncoding.equalsIgnoreCase(inputEncoding) ) {
@@ -191,11 +185,8 @@ public class EncodingConversionStep extends BasePipelineStep {
 			}
 			reader.close();
 
-			// Open the input document with BOM-aware reader
-			BOMAwareInputStream bis = new BOMAwareInputStream(
-				new FileInputStream(inputPath), inputEncoding);
-			inputEncoding = bis.detectEncoding();
-			reader = new BufferedReader(new InputStreamReader(bis, inputEncoding));
+			// Open the input document
+			reader = new BufferedReader(rawDoc.getReader(true));
 			logger.info("Input encoding: " + inputEncoding);
 			
 			// Open the output document
@@ -301,11 +292,13 @@ public class EncodingConversionStep extends BasePipelineStep {
 						writer.write(buffer.get(i));
 					}
 				}
+				writer.close();
 
 				// Set the new raw-document URI and the encoding (in case one was auto-detected)
 				// Other info stays the same
-				rawDoc.setInputURI(outFile.toURI());
-				rawDoc.setEncoding(outputEncoding);
+				RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
+					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage());
+				event.setResource(newDoc);
 			}
 		}
 		catch ( FileNotFoundException e) {

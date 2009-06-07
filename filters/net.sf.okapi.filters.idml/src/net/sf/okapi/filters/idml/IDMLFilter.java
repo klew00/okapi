@@ -22,7 +22,6 @@ package net.sf.okapi.filters.idml;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -152,50 +151,19 @@ public class IDMLFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
-		// Not supported for this filter
-		throw new UnsupportedOperationException(
-			"Method is not supported for this filter.");
-	}
-
-	private void open (CharSequence inputText) {
-		// Not supported for this filter
-		throw new UnsupportedOperationException(
-			"Method is not supported for this filter.");
-	}
-
-	private void open (URI inputURI) {
 		close();
-		docURI = inputURI;
+
+		docURI = input.getInputURI();
+		if ( docURI == null ) {
+			throw new OkapiBadFilterInputException("This filter supports only URI input.");
+		}
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		filter = new IDMLContentFilter();
-	}
 
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		srcLang = sourceLanguage;
+		srcLang = input.getSourceLanguage();
 	}
-
+	
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}

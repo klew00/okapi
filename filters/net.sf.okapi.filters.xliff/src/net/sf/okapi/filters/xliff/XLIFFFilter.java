@@ -227,10 +227,11 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
-			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
+			// Force UTF-8 as the default (except if auto-detected)
+			if ( !input.isAutodetected() ) input.setEncoding("UTF-8");
 			reader = fact.createXMLStreamReader(input.getReader());
 
-			encoding = input.getEncoding(); // Real encoding
+			encoding = input.getEncoding();
 			srcLang = input.getSourceLanguage();
 			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();

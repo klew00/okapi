@@ -155,10 +155,8 @@ public class XSLTransformStep extends BasePipelineStep {
 			trans.transform(xmlInput, result);
 			
 			// Create the new raw-document resource
-			// Other info stays the same			
-			rawDoc.setEncoding("UTF-8"); // Just so we have a default
-			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+			event.setResource(new RawDocument(outFile.toURI(), "UTF-8", 
+				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 		}
 		catch ( TransformerException e ) {
 			throw new OkapiIOException("Transformation error.", e);

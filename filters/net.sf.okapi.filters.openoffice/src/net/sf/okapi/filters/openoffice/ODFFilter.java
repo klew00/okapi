@@ -175,69 +175,49 @@ public class ODFFilter implements IFilter {
 		open(input, true);
 	}
 	
-/*	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		containerMimeType = "";
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-*/	
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
+		close();
+		applyParameters();
+		canceled = false;
+		containerMimeType = "";
+		
+		XMLInputFactory fact = XMLInputFactory.newInstance();
+		fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
+		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
+
+//TODO: how to make sure it's UTF-8???			input.setEncoding("UTF-8");
 		try {
-			close();
-			applyParameters();
-			canceled = false;
-			containerMimeType = "";
-			
-			XMLInputFactory fact = XMLInputFactory.newInstance();
-			fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
-			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
-			fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
-
-			input.setEncoding("UTF-8");
 			reader = fact.createXMLStreamReader(input.getStream());
-			language = input.getSourceLanguage();
-			if ( input.getInputURI() != null ) {
-				docName = input.getInputURI().getPath();
-			}
-			
-			context = new Stack<Context>();
-			context.push(new Context("", false));
-			otherId = 0;
-			tuId = 0;
-
-			queue = new LinkedList<Event>();
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
-			startDoc.setLanguage(language);
-			startDoc.setName(docName);
-			startDoc.setMimeType(MIMETYPE);
-			startDoc.setType(startDoc.getMimeType());
-			startDoc.setEncoding("UTF-8", false);
-			startDoc.setLineBreak(lineBreak);
-			startDoc.setFilterParameters(params);
-			startDoc.setFilterWriter(createFilterWriter());
-			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
-			hasNext = true;
 		}
 		catch ( XMLStreamException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Cannot create the XML stream.", e);
 		}
+		language = input.getSourceLanguage();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
+		}
+		
+		context = new Stack<Context>();
+		context.push(new Context("", false));
+		otherId = 0;
+		tuId = 0;
+
+		queue = new LinkedList<Event>();
+		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		startDoc.setLanguage(language);
+		startDoc.setName(docName);
+		startDoc.setMimeType(MIMETYPE);
+		startDoc.setType(startDoc.getMimeType());
+		startDoc.setEncoding("UTF-8", false);
+		startDoc.setLineBreak(lineBreak);
+		startDoc.setFilterParameters(params);
+		startDoc.setFilterWriter(createFilterWriter());
+		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
+		hasNext = true;
 	}
 
 	/**

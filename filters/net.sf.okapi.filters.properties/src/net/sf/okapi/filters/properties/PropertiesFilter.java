@@ -22,7 +22,6 @@ package net.sf.okapi.filters.properties;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,8 +66,8 @@ public class PropertiesFilter implements IFilter {
 	private TextUnit tuRes;
 	private LinkedList<Event> queue;
 	private String textLine;
-	private int lineNumber;
-	private int lineSince;
+	private long lineNumber;
+	private long lineSince;
 	private long position;
 	private int tuId;
 	private int otherId;
@@ -254,13 +253,7 @@ public class PropertiesFilter implements IFilter {
 		canceled = false;
 
 		// Open the input reader from the provided reader
-		Reader rdr = input.getReader();
-		if ( rdr instanceof BufferedReader ) {
-			reader = (BufferedReader)rdr;
-		}
-		else {
-			reader = new BufferedReader(rdr);
-		}
+		reader = new BufferedReader(input.getReader());
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		hasUTF8BOM = input.hasUtf8Bom();

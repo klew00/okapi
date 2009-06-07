@@ -81,6 +81,12 @@ public abstract class BaseContext implements IContext {
 		properties.put(name, value);
 	}
 	
+	public void removeProperty (String name) {
+		if ( properties != null ) {
+			properties.remove(name);
+		}
+	}
+	
 	public void clearProperties () {
 		if ( properties != null ) {
 			properties.clear();

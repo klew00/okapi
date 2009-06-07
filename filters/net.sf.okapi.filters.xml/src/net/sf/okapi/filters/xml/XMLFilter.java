@@ -21,9 +21,6 @@
 package net.sf.okapi.filters.xml;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,14 +30,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -166,62 +161,12 @@ public class XMLFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
-		commonOpen(0, input);
-	}
-
-	private void open (CharSequence inputText) {
-		encoding = "UTF-16";
-		hasUTF8BOM = false;
-		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
-		InputSource is = new InputSource(new StringReader(inputText.toString()));
-		commonOpen(2, is);
-	}
-
-	private void open (URI inputURI) {
-		docName = inputURI.getPath();
-		commonOpen(1, inputURI);
-	}
-
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		srcLang = sourceLanguage;
-		encoding = defaultEncoding;
-	}
-
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
-	/**
-	 * Shared open method for the public open() calls.
-	 * @param type Indicates the type of obj: 0=InputStream, 1=URI, 2=InputSource.
-	 * @param obj The object to read.
-	 */
-	private void commonOpen (int type,
-		Object obj)
+	public void open (RawDocument input,
+		boolean generateSkeleton)
 	{
 		close();
 		// Initializes the variables
@@ -233,7 +178,6 @@ public class XMLFilter implements IFilter {
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
-		
 		fact.setExpandEntityReferences(false);
 		
 		// Create the document builder
@@ -244,50 +188,35 @@ public class XMLFilter implements IFilter {
 		catch (ParserConfigurationException e) {
 			throw new OkapiIOException(e);
 		}
-		
 		//TODO: Do this only as an option
 		// Avoid DTD declaration
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
-		
-		URI uri = null;
-		BOMNewlineEncodingDetector detector = null;
-		// Load the document
+
+		// Force UTF-8 as the default (if not auto-detected)
+		if ( !input.isAutodetected() ) input.setEncoding("UTF-8");
 		try {
-			
-			switch ( type ) {
-			case 0: // InputStream
-				detector = new BOMNewlineEncodingDetector((InputStream)obj);
-				hasUTF8BOM = detector.hasUtf8Bom();
-				lineBreak = detector.getNewlineType().toString();
-				doc = docBuilder.parse((InputStream)obj);
-				break;
-			case 1: // URI
-				uri = (URI)obj;
-				detector = new BOMNewlineEncodingDetector(uri.toURL().openStream());
-				hasUTF8BOM = detector.hasUtf8Bom();
-				lineBreak = detector.getNewlineType().toString();
-				doc = docBuilder.parse(uri.toString());
-				break;
-			case 2: // InputSource
-				doc = docBuilder.parse((InputSource)obj);
-				break;
-			}
+			// Make sure we skip possible BOM since the parser is not BOM-aware
+			doc = docBuilder.parse(new InputSource(input.getReader(true)));
 		}
 		catch ( SAXException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Error when parsing the document.", e);
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Error when reading the document.", e);
 		}
-		finally {
-			if ( detector != null ) {
-				detector = null; // Release it
-			}
+
+		encoding = input.getEncoding();
+		srcLang = input.getSourceLanguage();
+		if ( srcLang == null ) throw new NullPointerException("Source language not set.");
+		hasUTF8BOM = input.hasUtf8Bom();
+		lineBreak = input.getNewLineType();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
 		}
 		
 		// Create the ITS engine
 		ITSEngine itsEng;
-		itsEng = new ITSEngine(doc, uri);
+		itsEng = new ITSEngine(doc, input.getInputURI());
 		// Load the parameters file if there is one
 		if ( params != null ) {
 			if ( params.getDocument() != null ) {

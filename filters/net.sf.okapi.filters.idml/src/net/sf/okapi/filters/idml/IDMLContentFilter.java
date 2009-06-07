@@ -20,12 +20,6 @@
 
 package net.sf.okapi.filters.idml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,12 +29,10 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -161,79 +153,30 @@ public class IDMLContentFilter implements IFilter {
 		open(input, true);
 	}
 	
-	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
-		try {
-			close();
-			// Open the input reader from the provided stream
-			BOMAwareInputStream bis = new BOMAwareInputStream(input, "UTF-8");
-			// Correct the encoding if we have detected a different one
-			encoding = bis.detectEncoding();
-			commonOpen(new InputStreamReader(bis, encoding));
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void open (CharSequence inputText) {
-		encoding = "UTF-16";
-		commonOpen(new StringReader(inputText.toString()));
-	}
-
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		// Ignore encoding: We always output UTF-8 here
-		srcLang = sourceLanguage;
-	}
-
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
-	private void commonOpen (Reader inputReader) {
+	public void open (RawDocument input,
+		boolean generateSkeleton)
+	{
 		close();
 		canceled = false;
 
 		XMLInputFactory fact = XMLInputFactory.newInstance();
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+
+//TODO: how to make sure it's UTF-8???			input.setEncoding("UTF-8");
 		try {
-			reader = fact.createXMLStreamReader(inputReader);
+			reader = fact.createXMLStreamReader(input.getStream());
 		}
 		catch ( XMLStreamException e ) {
-			throw new OkapiIOException(e);
+			throw new OkapiIOException("Cannot create the XML stream.", e);
+		}
+		srcLang = input.getSourceLanguage();
+		if ( input.getInputURI() != null ) {
+			docName = input.getInputURI().getPath();
 		}
 
 		//TODO: Need to auto-detect the encoding and update 'encoding' variable

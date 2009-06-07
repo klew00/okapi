@@ -76,6 +76,13 @@ public interface IContext {
 		int value);
 	
 	/**
+	 * Removes a given property from this context. If the property does not exist
+	 * nothing happens.
+	 * @param name the name of the property to remove.
+	 */
+	public void removeProperty (String name);
+	
+	/**
 	 * Removes all properties from this context.
 	 */
 	public void clearProperties ();
