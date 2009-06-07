@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersProvider;
@@ -53,20 +54,19 @@ public class FilterSettingsPanel extends Composite {
 	private Button btDelete;
 	private IParametersProvider paramsProv;
 	private String[] paramsList;
-	private IHelp help;
-	private String projectDir;
-//For later:	private Text edParamsDir;
+	private BaseContext context;
 	
-	public FilterSettingsPanel(Composite p_Parent,
+	public FilterSettingsPanel (Composite p_Parent,
 		IHelp helpParam,
 		int p_nFlags,
 		IParametersProvider paramProv,
 		String projectDir)
 	{
 		super(p_Parent, SWT.NONE);
-		help = helpParam;
+		context = new BaseContext();
+		context.setObject("help", helpParam);
+		context.setString("projDir", projectDir);
 		this.paramsProv = paramProv;
-		this.projectDir = projectDir;
 		createContent();
 	}
 	
@@ -275,7 +275,8 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the UI side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3], projectDir) ) {
+			context.setObject("shell", getParent().getShell());
+			if ( fa.editParameters(aRes[1], params, context, aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);
@@ -322,7 +323,8 @@ public class FilterSettingsPanel extends Composite {
 				return;
 			}
 			// Now call the editor (from the client side)
-			if ( fa.editParameters(aRes[1], params, getParent().getShell(), help, aRes[3], projectDir) ) {
+			context.setObject("shell", getParent().getShell());
+			if ( fa.editParameters(aRes[1], params, context, aRes[3]) ) {
 				// Save the data if needed
 				// We use the provider here to (to save on the server side)
 				paramsProv.save(filterSettings, params);

@@ -21,22 +21,31 @@
 package net.sf.okapi.common;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Abstract implementation of the {@link IContext} interface.
+ * Basic implementation of the {@link IContext} interface.
  */
-public abstract class BaseContext implements IContext {
+public class BaseContext implements IContext {
 
-	private Hashtable<String, Object> properties;
+	private Map<String, Object> properties;
 	private Annotations annotations;
 
 	/**
 	 * Creates an empty context.
 	 */
 	public BaseContext () {
+	}
+
+	/**
+	 * Creates a BaseContext object and copy a map of properties.
+	 * @param properties the map of properties to copy.
+	 */
+	public BaseContext (Map<String, Object> properties) {
+		this.properties = new Hashtable<String, Object>(properties);
 	}
 	
 	public String getString (String name) {
@@ -81,12 +90,32 @@ public abstract class BaseContext implements IContext {
 		properties.put(name, value);
 	}
 	
+	public Object getObject (String name) {
+		if ( properties == null ) return null;
+		return properties.get(name);
+	}
+	
+	public void setObject (String name,
+		Object value)
+	{
+		if ( properties == null ) {
+			properties = new Hashtable<String, Object>();
+		}
+		properties.put(name, value);
+	}
+	
 	public void removeProperty (String name) {
 		if ( properties != null ) {
 			properties.remove(name);
 		}
 	}
 	
+	public Map<String, Object> getProperties () {
+		if ( properties == null ) {
+			properties = new Hashtable<String, Object>();
+		}
+		return properties;
+	}
 	public void clearProperties () {
 		if ( properties != null ) {
 			properties.clear();

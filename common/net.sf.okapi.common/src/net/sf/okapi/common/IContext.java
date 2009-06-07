@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common;
 
+import java.util.Map;
+
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
@@ -76,11 +78,33 @@ public interface IContext {
 		int value);
 	
 	/**
+	 * Gets an object property of this context.
+	 * @param name the name of the property to retrieve.
+	 * @return the value of the property or null if it is not defined.
+	 */
+	public Object getObject (String name);
+	
+	/**
+	 * Sets an object property for this context. If the property is already
+	 * defined its value will be overwritten.
+	 * @param name the name of the property to set.
+	 * @param value the value to set. 
+	 */
+	public void setObject (String name,
+		Object value);
+	
+	/**
 	 * Removes a given property from this context. If the property does not exist
 	 * nothing happens.
 	 * @param name the name of the property to remove.
 	 */
 	public void removeProperty (String name);
+	
+	/**
+	 * Gets the map of the existing properties for this context.
+	 * @return the map of the properties for this context. May be empty but not null.
+	 */
+	public Map<String, Object> getProperties ();
 	
 	/**
 	 * Removes all properties from this context.

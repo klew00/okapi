@@ -25,17 +25,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;

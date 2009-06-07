@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -74,18 +75,16 @@ public class Editor implements IParametersEditor {
 	 * @param object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters params,
-		Object object,
-		IHelp helpParam,
-		String projectDir)
+		IContext context)
 	{
 		boolean bRes = false;
 		try {
 			shell = null;
-			this.projectDir = projectDir;
-			help = helpParam;
+			help = (IHelp)context.getObject("help");
+			this.projectDir = context.getString("projDir");
 			this.params = (Parameters)params;
-			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)object);
+			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			create((Shell)context.getObject("shell"));
 			return showDialog();
 		}
 		catch ( Exception e ) {

@@ -32,24 +32,13 @@ public interface IParametersEditor {
 	 * (returns true), the parameters have been updated in p_Parameters to
 	 * reflect the changes. 
 	 * @param paramsObject the parameters to edit.
-	 * @param uiContext an implementation-specific object. For example, the
-	 * parent window from where the editor is called. The type and value of
-	 * uiContext depend on each implementation. See the documentation of the 
-	 * implementation for details. Because not all callers may be able to
-	 * provide the proper context passing a null value is allowed.
-	 * @param helpParam the IHelp object responsible for displaying the help.
-	 * Because not all callers may be able to provide the proper object 
-	 * passing a null value is allowed.
-	 * @param projectDir project directory (without separator). This is used 
-	 * for the ${ProjDir} variable. Because not all callers may be able to
-	 * provide the proper project directory passing a null value is allowed.
+	 * @param context an implementation of the {@link IContext} interface that
+	 * holds caller-specific information.
 	 * @return true if the edit was successful, false if the user canceled or if 
 	 * an error occurred. 
 	 */
 	public boolean edit (IParameters paramsObject,
-		Object uiContext,
-		IHelp helpParam,
-		String projectDir);
+		IContext context);
 	
 	/**
 	 * Creates an instance of the parameters object the editor can edit (with

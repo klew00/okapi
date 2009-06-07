@@ -35,6 +35,7 @@ import net.sf.okapi.applications.rainbow.utilities.CancelListener;
 import net.sf.okapi.applications.rainbow.utilities.IFilterDrivenUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.IFilter;
@@ -60,6 +61,7 @@ public class UtilityDriver implements CancelListener {
 	private boolean stopProcess;
 	private IHelp help;
 	private boolean canPrompt;
+	private BaseContext context;
 	
 	public UtilityDriver (ILog log,
 		FilterAccess fa,
@@ -72,6 +74,7 @@ public class UtilityDriver implements CancelListener {
 		this.plugins = plugins;
 		this.help = help;
 		this.canPrompt = canPrompt;
+		context = new BaseContext();
 	}
 	
 	/**
@@ -126,7 +129,10 @@ public class UtilityDriver implements CancelListener {
 			if ( utility.hasParameters() ) {
 				// Invoke the editor if there is one
 				if ( editor != null ) {
-					if ( !editor.edit(utility.getParameters(), shell, help, prj.getProjectFolder()) ) return false;
+					context.setObject("shell", shell);
+					context.setObject("help", help);
+					context.setString("projDir", prj.getProjectFolder());
+					if ( !editor.edit(utility.getParameters(), context) ) return false;
 					// Save the parameters in memory
 					prj.setUtilityParameters(utility.getName(),
 						utility.getParameters().toString());

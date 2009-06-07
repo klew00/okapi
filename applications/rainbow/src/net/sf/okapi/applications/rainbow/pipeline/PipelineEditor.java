@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -66,6 +67,7 @@ public class PipelineEditor {
 	private Button btEditStep;
 	private Text edDescription;
 	private OKCancelPanel pnlActions;
+	private BaseContext context;
 	
 	public boolean edit (Shell parent,
 		Map<String, StepInfo> availableSteps,
@@ -74,6 +76,9 @@ public class PipelineEditor {
 		String projectDir,
 		boolean executeMode)
 	{
+		context = new BaseContext();
+		//TODO: Set properties of context
+		
 		boolean result = false;
 		try {
 			this.availableSteps = availableSteps;
@@ -394,7 +399,7 @@ public class PipelineEditor {
 					// Set it with the data from this step
 					params.fromString(step.paramsData);
 					// Edit the data
-					if ( !editor.edit(params, null, null, null) ) return; // Cancel
+					if ( !editor.edit(params, context) ) return; // Cancel
 					// Save the data
 					step.paramsData = params.toString();
 				}

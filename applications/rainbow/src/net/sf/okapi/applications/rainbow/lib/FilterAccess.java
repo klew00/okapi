@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
@@ -303,10 +303,8 @@ public class FilterAccess {
 	//TODO: Rethink the error handling
 	public boolean editParameters (String filterID,
 		IParameters paramObject,
-		Object uiContext,
-		IHelp helpParam,
-		String paramsPath,
-		String projectDir)
+		IContext context,
+		String paramsPath)
 	{
 		IParametersEditor paramsEditor = loadEditor(filterID);
 		boolean result = false;
@@ -324,7 +322,7 @@ public class FilterAccess {
 				}
 			}
 		}
-		else result = paramsEditor.edit(paramObject, uiContext, helpParam, projectDir);
+		else result = paramsEditor.edit(paramObject, context);
 		return result;
 	}
 	

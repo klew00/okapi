@@ -26,6 +26,8 @@ import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.xliff.OptionsEditor;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
+import net.sf.okapi.common.BaseContext;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -77,6 +79,7 @@ public class Editor implements IParametersEditor {
 	private IHelp help;
 	private String projectDir;
 	private IParameters xliffOptions;
+	private BaseContext context;
 	
 	/**
 	 * Invokes the editor for the options of the ExportPackage action.
@@ -84,18 +87,20 @@ public class Editor implements IParametersEditor {
 	 * @param object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters params,
-		Object object,
-		IHelp helpParam,
-		String projectDir)
+		IContext context)
 	{
 		boolean bRes = false;
 		try {
 			shell = null;
-			help = helpParam;
+			help = (IHelp)context.getObject("help");
+			this.projectDir = context.getString("projDir");
 			this.params = (Parameters)params;
-			this.projectDir = projectDir;
-			shell = new Shell((Shell)object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)object);
+			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			create((Shell)context.getObject("shell"));
+
+			this.context = new BaseContext(context.getProperties());
+			this.context.setObject("shell", shell);
+			
 			return showDialog();
 		}
 		catch ( Exception e ) {
@@ -437,7 +442,8 @@ public class Editor implements IParametersEditor {
 		switch ( n ) {
 		case 0: // XLIFF
 			OptionsEditor dlg = new OptionsEditor();
-			dlg.edit(xliffOptions, shell, help, projectDir);
+			context.setObject("shell", shell);
+			dlg.edit(xliffOptions, context);
 			break;
 		}
 	}

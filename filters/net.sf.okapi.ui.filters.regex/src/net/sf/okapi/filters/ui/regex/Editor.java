@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ui.regex;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -89,13 +90,11 @@ public class Editor implements IParametersEditor {
 	 * @param p_Object The SWT Shell object of the parent shell in the UI.
 	 */
 	public boolean edit (IParameters p_Options,
-		Object p_Object,
-		IHelp helpParam,
-		String projectDir)
+		IContext context)
 	{
 		boolean bRes = false;
 		shell = null;
-		help = helpParam;
+		help = (IHelp)context.getObject("help");
 		
 		params = (Parameters)p_Options;
 		// Make a work copy (in case of escape)
@@ -105,8 +104,8 @@ public class Editor implements IParametersEditor {
 		}
 		
 		try {
-			shell = new Shell((Shell)p_Object, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)p_Object);
+			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			create((Shell)context.getObject("shell"));
 			return showDialog();
 		}
 		catch ( Exception E ) {
