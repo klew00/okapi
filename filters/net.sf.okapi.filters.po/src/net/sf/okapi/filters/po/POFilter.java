@@ -167,77 +167,6 @@ public class POFilter implements IFilter {
 		open(input, true);
 	}
 	
-/*	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
-		startingInput = input;
-		// Open the input reader from the provided stream
-		BOMAwareInputStream bis = new BOMAwareInputStream(input, encoding);
-		// Correct the encoding if we have detected a different one
-		try {
-			encoding = bis.detectEncoding();
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException("Error when detecting encoding.", e);
-		}
-		autoDetected = bis.autoDtected();
-		hasUTF8BOM = bis.hasUTF8BOM();
-		try {
-			commonOpen(new InputStreamReader(bis, encoding));
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new OkapiUnsupportedEncodingException(e);
-		}
-	}
-
-	private void open (URI inputURI) {
-		docName = inputURI.getPath();
-		this.inputURI = inputURI;
-		try {
-			open(inputURI.toURL().openStream());
-		}
-		catch ( MalformedURLException e ) {
-			throw new OkapiIOException("Error opening the input.", e);
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException("Error opening the input.", e);
-		}
-	}
-
-	private void open (CharSequence inputText) {
-		encoding = "UTF-16";
-		hasUTF8BOM = false;
-		autoDetected = true;
-		commonOpen(new StringReader(inputText.toString()));
-	}
-	
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		encoding = defaultEncoding;
-		srcLang = sourceLanguage;
-		trgLang = targetLanguage;
-	}
-*/
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -605,6 +534,8 @@ public class POFilter implements IFilter {
 				if ( !hasFuzzyFlag ) {
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
 				}
+				// Synchronizes source and target codes as much as possible
+				tc.synchronizeCodes(tu.getSourceContent());
 			}
 			//else { // Correct the approved property
 			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");

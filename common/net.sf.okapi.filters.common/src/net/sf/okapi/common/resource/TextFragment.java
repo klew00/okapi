@@ -331,7 +331,7 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Helper method that check if a given character is an inline code marker.
+	 * Helper method that checks if a given character is an inline code marker.
 	 * @param ch the character to check.
 	 * @return true if the character is a code marker, false if it is not.
 	 */
@@ -1460,4 +1460,80 @@ public class TextFragment implements Comparable<Object> {
 		isBalanced = true;
 	}
 
+	/**
+	 * Synchronizes the code IDs of this fragment with the ones of a given fragment.
+	 * This method re-assign the IDs of the in-line codes of this fragment based on the
+	 * ones of the provided fragment.
+	 * An example of usage is when source and target fragments have codes generated
+	 * from regular expressions and not in the same order.
+	 * For example if the source is <code>%d equals %s</code> and the target is
+	 * <code>%s equals %d</code> and <code>%d</code> and <code>%d</code> are codes.
+	 * You want their IDs to match for the code with the same content.
+	 * @param base the fragment to use as the base for the synchronization.
+	 */
+	public void synchronizeCodes (TextFragment base) {
+		if ( !base.hasCode() ) return;
+		List<Code> toUse = new ArrayList<Code>(base.getCodes());
+		Code srcCode;
+		Code candidate;
+		isBalanced = false;
+		lastCodeID = 0;
+		boolean needExtra = false;
+
+		for ( Code trgCode : codes ) {
+			// Closing codes are aligned by the balancing
+			if ( trgCode.tagType == TagType.CLOSING ) continue;
+			
+			// Get the first non-closing source code
+			srcCode = null;
+			while ( !toUse.isEmpty() ) {
+				srcCode = toUse.get(0); // First available is the normal match
+				if ( srcCode.tagType == TagType.CLOSING ) {
+					toUse.remove(0);
+				}
+				else break;
+			}
+			if ( srcCode == null ) continue; // No more source
+			
+			// Check if source is same content and same ID
+			if ( trgCode.getData().equals(srcCode.getData()) &&
+				(trgCode.getId() == srcCode.getId()) )
+			{
+				// First source code has the same content and ID
+				toUse.remove(0); // Remove it from the list of available codes
+				if ( lastCodeID < trgCode.getId() ) lastCodeID = trgCode.getId();
+				continue;
+			}
+			
+			// Else: Content or ID is different
+			// Try to find the first same content
+			boolean found = false;
+			for ( int i=0; i<toUse.size(); i++ ) {
+				candidate = toUse.get(i);
+				if ( trgCode.getData().equals(candidate.getData()) ) {
+					trgCode.setId(candidate.getId());
+					toUse.remove(i);
+					found = true;
+					if ( lastCodeID < trgCode.getId() ) lastCodeID = trgCode.getId();
+					break;
+				}
+			}
+			if ( !found ) { // Extra target code
+				trgCode.setId(-1);
+				needExtra = true;
+			}
+		}
+		
+		// If needed, set the IDs of non-closing non-assigned codes
+		if ( needExtra ) {
+			for ( Code trgCode : codes ) {
+				if ( trgCode.tagType != TagType.CLOSING ) {
+					if ( trgCode.getId() == -1 ) {
+						trgCode.setId(++lastCodeID);
+					}
+				}
+			}
+		}
+	}
+	
 }

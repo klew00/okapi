@@ -1343,7 +1343,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	
 	/**
 	 * Sets the filter writer for this filter. 
-	 * @param filter the filter writer.
+	 * @param filterWriter the filter writer to set.
 	 */
 	protected void setFilterWriter (IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;

@@ -250,7 +250,8 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	 * Instantiate a filter from a given configuration, trying to re-use an existing one.
 	 * @param config the configuration corresponding to the filter to load.
 	 * @param existingFilter an optional existing filter we can try to reuse.
-	 * @return
+	 * @return the instance of the requested filter, or null if an error occurred.
+	 * @throws OkapiFilterCreationException if the filter could not be instantiated.
 	 */
 	protected IFilter instantiateFilter (FilterConfiguration config,
 		IFilter existingFilter)
@@ -267,15 +268,15 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			}
 			catch ( InstantiationException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
 			}
 			catch ( IllegalAccessException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
 			}
 			catch ( ClassNotFoundException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate the filter configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
 			}
 		}
 		return filter;

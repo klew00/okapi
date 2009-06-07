@@ -126,16 +126,16 @@ public class StartDocument extends BaseNameable {
 	}
 
 	/**
-	 * Gets the filter for this document.
-	 * @return the filter for this document.
+	 * Gets the filter writer for this document.
+	 * @return the filter writer for this document.
 	 */
 	public IFilterWriter getFilterWriter () {
 		return filterWriter;
 	}
 	
 	/**
-	 * Sets the filter for this document.
-	 * @param filter the filter for this document.
+	 * Sets the filter writer for this document.
+	 * @param filterWriter the filter writer for this document.
 	 */
 	public void setFilterWriter (IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;

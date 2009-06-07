@@ -25,13 +25,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
@@ -41,6 +45,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * Implements the IFilter interface for PO files.
+ */
 public class POFilterTest {
 	
 	private POFilter filter;
@@ -66,6 +73,41 @@ public class POFilterTest {
 			+ "msgstr \"Texte 1\"\n";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
+	}
+		
+	@Test
+	public void testInlines () {
+		String snippet = "msgid \"Text %s and %d and %f\"\n"
+			+ "msgstr \"Texte %f et %d et %s\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(tu);
+		assertTrue(tu.hasTarget("fr"));
+		TextFragment src = tu.getSourceContent();
+		TextFragment trg = tu.getTargetContent("fr");
+		List<Code> srcCodes = src.getCodes();
+		assertEquals(3, srcCodes.size());
+		List<Code> trgCodes = trg.getCodes();
+		assertEquals(srcCodes.size(), trgCodes.size());
+		for ( Code srcCode : srcCodes ) {
+			for ( Code trgCode : trgCodes ) {
+				// Same ID must have the same content, except for open/close
+				if ( srcCode.getId() == trgCode.getId() ) {
+					switch ( srcCode.getTagType() ) {
+					case OPENING:
+						if ( trgCode.getTagType() == TagType.CLOSING ) break;
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					case CLOSING:
+						if ( trgCode.getTagType() == TagType.OPENING ) break;
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					default:
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					}
+				}
+			}
+		}
 	}
 		
 	@Test
