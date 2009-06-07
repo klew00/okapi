@@ -84,30 +84,9 @@ public class POFilterTest {
 		assertTrue(tu.hasTarget("fr"));
 		TextFragment src = tu.getSourceContent();
 		TextFragment trg = tu.getTargetContent("fr");
-		List<Code> srcCodes = src.getCodes();
-		assertEquals(3, srcCodes.size());
-		List<Code> trgCodes = trg.getCodes();
-		assertEquals(srcCodes.size(), trgCodes.size());
-		for ( Code srcCode : srcCodes ) {
-			for ( Code trgCode : trgCodes ) {
-				// Same ID must have the same content, except for open/close
-				if ( srcCode.getId() == trgCode.getId() ) {
-					switch ( srcCode.getTagType() ) {
-					case OPENING:
-						if ( trgCode.getTagType() == TagType.CLOSING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					case CLOSING:
-						if ( trgCode.getTagType() == TagType.OPENING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					default:
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					}
-				}
-			}
-		}
+		assertEquals(3, src.getCodes());
+		assertEquals(src.getCodes(), trg.getCodes().size());
+		FilterTestDriver.checkCodeData(src, trg);
 	}
 		
 	@Test

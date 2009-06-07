@@ -668,12 +668,12 @@ public class POFilter implements IFilter {
  			// Read the a chunk of the beginning of the file
 			reader.mark(1024);
 	 		buffer = new char[1024];
-	 		int n = reader.read(buffer, 0, 1024);
+	 		reader.read(buffer, 0, 1024);
 	 		reader.reset();
 	 		String tmp = new String(buffer);  
 
 	 		// try to detect the line-break type
-			n = tmp.indexOf('\n');
+/*Done by rawdoc			n = tmp.indexOf('\n');
 			if ( n == -1 ) {
 				n = tmp.indexOf('\r');
 				if ( n != -1 ) lineBreak = "\r";
@@ -683,7 +683,7 @@ public class POFilter implements IFilter {
 				if ( tmp.charAt(n-1) != '\r' ) lineBreak = "\n";
 				// Else: same as default
 			}
-	 		
+*/	 		
 			// Try to detect plural information
 			Matcher m = pluralPattern.matcher(tmp);
 			if ( m.find() ) {

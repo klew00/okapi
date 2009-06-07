@@ -22,7 +22,6 @@ package net.sf.okapi.filters.xliff.tests;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -34,7 +33,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -94,30 +92,9 @@ public class XLIFFFilterTest {
 		assertTrue(tu.hasTarget("fr"));
 		TextFragment src = tu.getSourceContent();
 		TextFragment trg = tu.getTargetContent("fr");
-		List<Code> srcCodes = src.getCodes();
-		assertEquals(4, srcCodes.size());
-		List<Code> trgCodes = trg.getCodes();
-		assertEquals(4, trgCodes.size());
-		for ( Code srcCode : srcCodes ) {
-			for ( Code trgCode : trgCodes ) {
-				// Same ID must have the same content, except for open/close
-				if ( srcCode.getId() == trgCode.getId() ) {
-					switch ( srcCode.getTagType() ) {
-					case OPENING:
-						if ( trgCode.getTagType() == TagType.CLOSING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					case CLOSING:
-						if ( trgCode.getTagType() == TagType.OPENING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					default:
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					}
-				}
-			}
-		}
+		assertEquals(4, src.getCodes());
+		assertEquals(src.getCodes().size(), trg.getCodes().size());
+		FilterTestDriver.checkCodeData(src, trg);
 	}
 	
 	@Test

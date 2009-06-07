@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +45,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
@@ -206,7 +209,41 @@ public class FilterTestDriver {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Compares the codes of two text fragments so in-lines codes that have the same
+	 * IDs have also the same content (getData()), except for opening/closing cases. 
+	 * @param tf1 the base fragment.
+	 * @param tf2 the fragment to compare with the base fragment.
+	 */
+	static public void checkCodeData (TextFragment tf1,
+		TextFragment tf2)
+	{
+		List<Code> srcCodes = tf1.getCodes();
+		List<Code> trgCodes = tf2.getCodes();
+		for ( Code srcCode : srcCodes ) {
+			for ( Code trgCode : trgCodes ) {
+				// Same ID must have the same content, except for open/close
+				if ( srcCode.getId() == trgCode.getId() ) {
+					switch ( srcCode.getTagType() ) {
+					case OPENING:
+						if ( trgCode.getTagType() == TagType.CLOSING ) break;
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					case CLOSING:
+						if ( trgCode.getTagType() == TagType.OPENING ) break;
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					default:
+						assertEquals(srcCode.getData(), trgCode.getData());
+						break;
+					}
+				}
+			}
+		}
+	}
+		
+
 	static public boolean compareEvent(Event manual,
 		Event generated)
 	{

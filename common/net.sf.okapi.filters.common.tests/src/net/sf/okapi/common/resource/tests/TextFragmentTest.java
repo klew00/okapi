@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.InvalidPositionException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -520,28 +521,9 @@ public class TextFragmentTest {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment2();
 		tf2.synchronizeCodes(tf1);
-		List<Code> srcCodes = tf1.getCodes();
-		List<Code> trgCodes = tf2.getCodes();
-		for ( Code srcCode : srcCodes ) {
-			for ( Code trgCode : trgCodes ) {
-				// Same ID must have the same content, except for open/close
-				if ( srcCode.getId() == trgCode.getId() ) {
-					switch ( srcCode.getTagType() ) {
-					case OPENING:
-						if ( trgCode.getTagType() == TagType.CLOSING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					case CLOSING:
-						if ( trgCode.getTagType() == TagType.OPENING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					default:
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					}
-				}
-			}
-		}
+		FilterTestDriver.checkCodeData(tf1, tf2);
+		assertEquals(fmt.setContent(tf1).toString(false),
+			"<1>A<2/>B</1>C");
 		assertEquals(fmt.setContent(tf2).toString(false),
 			"<2/>A<1>B</1>C");
     }
@@ -551,30 +533,23 @@ public class TextFragmentTest {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment3();
 		tf2.synchronizeCodes(tf1);
-		List<Code> srcCodes = tf1.getCodes();
-		List<Code> trgCodes = tf2.getCodes();
-		for ( Code srcCode : srcCodes ) {
-			for ( Code trgCode : trgCodes ) {
-				// Same ID must have the same content, except for open/close
-				if ( srcCode.getId() == trgCode.getId() ) {
-					switch ( srcCode.getTagType() ) {
-					case OPENING:
-						if ( trgCode.getTagType() == TagType.CLOSING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					case CLOSING:
-						if ( trgCode.getTagType() == TagType.OPENING ) break;
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					default:
-						assertEquals(srcCode.getData(), trgCode.getData());
-						break;
-					}
-				}
-			}
-		}
+		FilterTestDriver.checkCodeData(tf1, tf2);
+		assertEquals(fmt.setContent(tf1).toString(false),
+			"<1>A<2/>B</1>C");
 		assertEquals(fmt.setContent(tf2).toString(false),
 			"<3><2/>A</3>B<1>C</1>D<4/>");
+    }
+	
+	@Test
+    public void testSynchronizeCodeIdentifiersMoreComplex () {
+		TextFragment tf1 = makeFragment1();
+		TextFragment tf2 = makeFragment4();
+		tf2.synchronizeCodes(tf1);
+		FilterTestDriver.checkCodeData(tf1, tf2);
+		assertEquals(fmt.setContent(tf1).toString(false),
+			"<1>A<2/>B</1>C");
+		assertEquals(fmt.setContent(tf2).toString(false),
+			"<2/>A<3>B</3>C");
     }
 	
 	/**
@@ -623,6 +598,21 @@ public class TextFragmentTest {
 		tf.append(TagType.CLOSING, "b", "[/b]");
 		tf.append("D");
 		tf.append(TagType.PLACEHOLDER, "br", "[br/]");
+		return tf;
+	}
+
+	/**
+	 * Makes a fragment <code>[br/]A[u]B[/u]C<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment4 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "br", "[br/]");
+		tf.append("A");
+		tf.append(TagType.OPENING, "u", "[u]");
+		tf.append("B");
+		tf.append(TagType.CLOSING, "u", "[/u]");
+		tf.append("C");
 		return tf;
 	}
 
