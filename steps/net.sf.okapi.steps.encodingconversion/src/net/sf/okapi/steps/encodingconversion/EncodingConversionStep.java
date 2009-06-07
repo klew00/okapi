@@ -292,14 +292,16 @@ public class EncodingConversionStep extends BasePipelineStep {
 						writer.write(buffer.get(i));
 					}
 				}
-				writer.close();
-
-				// Set the new raw-document URI and the encoding (in case one was auto-detected)
-				// Other info stays the same
-				RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
-					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage());
-				event.setResource(newDoc);
 			}
+			
+			// Done: close the output
+			writer.close();
+			// Set the new raw-document URI and the encoding (in case one was auto-detected)
+			// Other info stays the same
+			RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
+				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage());
+			event.setResource(newDoc);
+			
 		}
 		catch ( FileNotFoundException e) {
 			throw new RuntimeException(e);
