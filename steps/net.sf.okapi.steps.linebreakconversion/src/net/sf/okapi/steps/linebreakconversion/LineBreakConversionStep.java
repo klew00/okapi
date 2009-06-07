@@ -147,12 +147,13 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				if ( length-start > 0 ) {
 					writer.write(buffer.array(), start, length-start);
 				}
-				writer.close();
-				
-				// Creates the new RawDocument
-				event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 			}
+			
+			// Done: close the output
+			writer.close();
+			// Creates the new RawDocument
+			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
+				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);
