@@ -24,9 +24,9 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	protected int conversionType;
-	protected boolean updateAll;
-	protected String escapeList;
+	public int conversionType;
+	public boolean updateAll;
+	public String escapeList;
 	
 	public Parameters () {
 		reset();

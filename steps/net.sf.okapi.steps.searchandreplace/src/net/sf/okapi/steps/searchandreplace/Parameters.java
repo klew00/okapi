@@ -26,12 +26,12 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean plainText;
-	protected boolean regEx;
-	protected boolean dotAll;
-	protected boolean ignoreCase;
-	protected boolean multiLine;
-	protected ArrayList<String[]> rules;
+	public boolean plainText;
+	public boolean regEx;
+	public boolean dotAll;
+	public boolean ignoreCase;
+	public  boolean multiLine;
+	public ArrayList<String[]> rules;
 	
 	public Parameters () {
 		reset();
