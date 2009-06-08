@@ -196,22 +196,24 @@ public class PipelineWrapper {
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep").newInstance();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
-			params = ps.getParameters();
+			ps.getName(), ps.getDescription(), ps.getClass().getName(),
+			params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
+			peMapper.addEditor("net.sf.okapi.steps.ui.searchandreplace.ParametersEditor", step.paramsClass);
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.uriconversion.UriConversionStep").newInstance();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
-			params = ps.getParameters();
+			ps.getName(), ps.getDescription(), ps.getClass().getName(),
+			params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
+			peMapper.addEditor("net.sf.okapi.steps.ui.uriconversion.ParametersEditor", step.paramsClass);
 			
 		}
 		catch ( InstantiationException e ) {
