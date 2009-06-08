@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -49,6 +50,9 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private Parameters params;
 	private String trgLang;
 	private boolean isDone;
+	
+	private Matcher matcher;
+	private Pattern patterns[];
 	
 	@Override
 	public void destroy () {
@@ -94,13 +98,28 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	
-	/*@Override
+	@Override
 	protected void handleStartBatch (Event event) {
-		if ( !params.plainText ) { // RawDocument mode
-			isDone = false;
+		if ( params.regEx ){
+			
+			int flags = 0;
+			patterns = new Pattern[params.rules.size()];
+			
+			//--initialize patterns--
+			if ( params.dotAll ) flags |=  Pattern.DOTALL;
+        	if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
+        	if ( params.multiLine ) flags |= Pattern.MULTILINE;
+			
+        	for(int i=0; i<params.rules.size();i++){
+        		String s[] = params.rules.get(i);
+ 	        	//if ( s[0].equals("true") ) {
+	        		if ( params.regEx ){
+	        			patterns[i]= Pattern.compile(s[1], flags);
+ 		        	}
+ 	        	//}        	
+        	 }
 		}
-		trgLang = getContext().getTargetLanguage(0);
-	}*/	
+	}	
 		
 	
 	@Override
@@ -153,24 +172,24 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				}
 				outFile.deleteOnExit();
 			}
-		
-	        for ( String[] s : params.rules ) {
-	        	if ( s[0].equals("true") ) {
-		        	int flags = 0;
-		        	if ( params.dotAll ) flags |=  Pattern.DOTALL;
-		        	if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
-		        	if ( params.multiLine ) flags |= Pattern.MULTILINE;
-		        	
-		        	if ( params.regEx ){
-		        		Pattern pattern = Pattern.compile(s[1], flags);
-		        		Matcher matcher = pattern.matcher(result);
-		        		result = matcher.replaceAll(s[2]);
-		        	}else{
-		        		result = result.replace(s[1],s[2]);
-		        	}
-	        	}
-	        }
 
+        	if ( params.regEx ){
+        		for(int i=0; i<params.rules.size();i++){
+            		String s[] = params.rules.get(i);
+     	           	if ( s[0].equals("true") ) {
+		        		
+     	           		matcher = patterns[i].matcher(result);
+		        		result = matcher.replaceAll(s[2]);
+    	        	}
+    	        }
+        	}else{
+    	        for ( String[] s : params.rules ) {
+    	        	if ( s[0].equals("true") ) {
+   		        		result = result.replace(s[1],s[2]);
+    	        	}
+    	        }
+        	}
+			
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), encoding));
 			Util.writeBOMIfNeeded(writer, true, encoding);
 			writer.write(result);
@@ -224,22 +243,23 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			tu.createTarget(trgLang, false, IResource.COPY_ALL);
 
 			String result = tu.getTargetContent(trgLang).getCodedText();
-	        for ( String[] s : params.rules ) {
-	        	if ( s[0].equals("true") ) {
-		        	int flags = 0;
-		        	if ( params.dotAll ) flags |=  Pattern.DOTALL;
-		        	if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
-		        	if ( params.multiLine ) flags |= Pattern.MULTILINE;
-		        	
-		        	if ( params.regEx ){
-		        		Pattern pattern = Pattern.compile(s[1], flags);
-		        		Matcher matcher = pattern.matcher(result);
+
+        	if ( params.regEx ){
+        		for(int i=0; i<params.rules.size();i++){
+            		String s[] = params.rules.get(i);
+     	           	if ( s[0].equals("true") ) {
+		        		
+     	           		matcher = patterns[i].matcher(result);
 		        		result = matcher.replaceAll(s[2]);
-		        	}else{
-		        		result = result.replace(s[1],s[2]);
-		        	}
-	        	}
-	        }			
+    	        	}
+    	        }
+        	}else{
+    	        for ( String[] s : params.rules ) {
+    	        	if ( s[0].equals("true") ) {
+   		        		result = result.replace(s[1],s[2]);
+    	        	}
+    	        }
+        	}
 			
 			TextContainer cnt = tu.getTarget(trgLang); 
 			cnt.setCodedText(result);
