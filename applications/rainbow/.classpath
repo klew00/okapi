@@ -45,8 +45,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.fulwidthconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.searchandreplace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.uriconversion"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.textmodification"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/net.sf.okapi.ui.steps.textmodification"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.encodingconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.charlisting"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.searchandreplace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.uriconversion"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
