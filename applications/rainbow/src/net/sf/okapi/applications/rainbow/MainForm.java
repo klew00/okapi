@@ -495,27 +495,6 @@ public class MainForm implements IParametersProvider {
 		miUtilities.setText(rm.getCommandLabel("utilities")); //$NON-NLS-1$
 		buildUtilitiesMenu();
 
-		// Pipeline menu
-		MenuItem miPipeline = new MenuItem(menuBar, SWT.CASCADE);
-		miPipeline.setText(rm.getCommandLabel("pipeline")); //$NON-NLS-1$
-		dropMenu = new Menu(shell, SWT.DROP_DOWN);
-		miPipeline.setMenu(dropMenu);
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "pipeline.edit"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				editPipeline();
-			}
-		});
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "pipeline.execute"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline();
-			}
-		});
-
 		// Tools menu
 		miTools = new MenuItem(menuBar, SWT.CASCADE);
 		miTools.setText(rm.getCommandLabel("tools")); //$NON-NLS-1$
@@ -1177,19 +1156,6 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	private void editPipeline () {
-		try {
-			PipelineEditor dlg = new PipelineEditor();
-			if ( wrapper == null ) {
-				createPipelineWrapper();
-			}
-			dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, false);
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}
-	
 	private void executePipeline () {
 		try {
 			// Save any pending data
@@ -1198,7 +1164,7 @@ public class MainForm implements IParametersProvider {
 				createPipelineWrapper();
 			}
 			PipelineEditor dlg = new PipelineEditor();
-			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null, true) ) {
+			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null) ) {
 				return; // No execution
 			}
 			// Else: execute
@@ -1320,6 +1286,16 @@ public class MainForm implements IParametersProvider {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
+		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.pipeline"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline();
+			}
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
@@ -1328,7 +1304,7 @@ public class MainForm implements IParametersProvider {
 				new MenuItem(dropMenu, SWT.SEPARATOR);
 			}
 			else {
-				MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+				menuItem = new MenuItem(dropMenu, SWT.PUSH);
 				menuItem.setText(item.name+"..."); //$NON-NLS-1$
 				menuItem.setData(item.id);
 				menuItem.addSelectionListener(new SelectionAdapter() {
@@ -1724,6 +1700,7 @@ public class MainForm implements IParametersProvider {
 	private void createPipelineWrapper () {
 		if ( fcMapper == null ) {
 			fcMapper = new FilterMapper();
+			// Get pre-defined configurations
 			fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		}
 		wrapper = new PipelineWrapper(fcMapper);

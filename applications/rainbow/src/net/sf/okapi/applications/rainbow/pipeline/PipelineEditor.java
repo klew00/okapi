@@ -73,8 +73,7 @@ public class PipelineEditor {
 		Map<String, StepInfo> availableSteps,
 		PipelineWrapper wrapper,
 		IHelp helpParam,
-		String projectDir,
-		boolean executeMode)
+		String projectDir)
 	{
 		context = new BaseContext();
 		//TODO: Set properties of context
@@ -85,7 +84,7 @@ public class PipelineEditor {
 			this.wrapper = wrapper;
 			this.help = helpParam;
 			setDataFromWrapper();
-			create(parent, executeMode);
+			create(parent);
 			populate(0);
 			result = showDialog();
 		}
@@ -116,12 +115,9 @@ public class PipelineEditor {
 		return result;
 	}
 
-	private void create (Shell parent,
-		boolean executeMode)
-	{
+	private void create (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		if ( executeMode ) shell.setText("Execute Pipeline");
-		else shell.setText("Edit Pipeline");
+		shell.setText("Edit/Execute Pipeline");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout(2, false);
 		shell.setLayout(layTmp);
@@ -267,19 +263,18 @@ public class PipelineEditor {
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
+				}
+				if ( e.widget.getData().equals("x") ) { //$NON-NLS-1$
+					if ( !saveData() ) return;
 					result = true;
 				}
 				shell.close();
 			};
 		};
 		
-		
-		if ( executeMode ) {
-			pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true, "Execute");
-		}
-		else {
-			pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		}
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true,
+			"Close", "Execute");
+
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);

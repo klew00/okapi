@@ -249,6 +249,7 @@ public class XMLFilterTest {
 		list.add(new InputDocument(root+"JavaProperties.xml", "okf_xml@JavaProperties.fprm"));
 		list.add(new InputDocument(root+"TestMultiLang.xml", null));
 		list.add(new InputDocument(root+"Test01.resx", "okf_xml@resx.fprm"));
+		list.add(new InputDocument(root+"MozillaRDFTest01.rdf", "okf_xml@MozillaRDF.fprm"));
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));

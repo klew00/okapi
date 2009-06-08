@@ -120,8 +120,26 @@ public class XMLFilter implements IFilter {
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
 			"RESX",
-			"Configuration for Microsoft RESX documents (without binary blocks).",
+			"Configuration for Microsoft RESX documents (without binary data).",
 			"resx.fprm"));
+		list.add(new FilterConfiguration(getName()+"-MozillaRDF",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"Mozilla RDF",
+			"Configuration for Mozilla RDF documents.",
+			"MozillaRDF.fprm"));
+		list.add(new FilterConfiguration(getName()+"-JavaProperties",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"Java Properties in XML",
+			"Configuration for Java Properties files in XML.",
+			"JavaProperties.fprm"));
+		list.add(new FilterConfiguration(getName()+"-AndroidStrings",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"Android Strings",
+			"Configuration for Android Strings XML documents.",
+			"AndroidStrings.fprm"));
 		return list;
 	}
 	

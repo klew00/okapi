@@ -38,6 +38,7 @@ public class OKCancelPanel extends Composite {
 	public Button btOK;
 	public Button btCancel;
 	public Button btHelp;
+	public Button btExtra;
 
 	/**
 	 * Creates a new panel for Help/OK/Cancel buttons.
@@ -54,7 +55,7 @@ public class OKCancelPanel extends Composite {
 		boolean showHelp)
 	{
 		super(parent, SWT.NONE);
-		createContent(action, showHelp, Res.getString("OKCancelPanel.btOK"));
+		createContent(action, showHelp, Res.getString("OKCancelPanel.btOK"), null);
 	}
 	
 	/**
@@ -74,12 +75,35 @@ public class OKCancelPanel extends Composite {
 		String okLabel)
 	{
 		super(parent, SWT.NONE);
-		createContent(action, showHelp, okLabel);
+		createContent(action, showHelp, okLabel, null);
+	}
+	
+	/**
+	 * Creates a new panel for Help/OK/Cancel buttons.
+	 * @param parent the parent control.
+	 * @param flags the style flags.
+	 * @param action the action to execute when any of the buttons is clicked.
+	 * The receiving event, the widget's data is marked: 'c' for the Cancel
+	 * button, 'o' for OK, and 'h' for help, and 'x' for the extra button.
+	 * @param showHelp true to display the Help button.
+	 * @param okLabel the label for the 'o' button.
+	 * @param extraLabel the label for the 'x' button (can be null)
+	 */
+	public OKCancelPanel (Composite parent,
+		int flags,
+		SelectionAdapter action,
+		boolean showHelp,
+		String okLabel,
+		String extraLabel)
+	{
+		super(parent, SWT.NONE);
+		createContent(action, showHelp, okLabel, extraLabel);
 	}
 	
 	private void createContent (SelectionAdapter action,
 		boolean showHelp,
-		String okLabel)
+		String okLabel,
+		String extraLabel)
 	{
 		GridLayout layTmp = new GridLayout(2, true);
 		layTmp.marginHeight = 0;
@@ -107,12 +131,14 @@ public class OKCancelPanel extends Composite {
 
 		// Create the buttons in a platform-specific order
 		if ( UIUtil.getPlatformType() == UIUtil.PFTYPE_WIN ) {
+			if ( extraLabel != null ) btExtra = new Button(cmpTmp, SWT.PUSH);
 			btOK = new Button(cmpTmp, SWT.PUSH);
 			btCancel = new Button(cmpTmp, SWT.PUSH);
 		}
 		else { // UIUtil.PFTYPE_UNIX, UIUtil.PFTYPE_MAC
 			btCancel = new Button(cmpTmp, SWT.PUSH);
 			btOK = new Button(cmpTmp, SWT.PUSH);
+			if ( extraLabel != null ) btExtra = new Button(cmpTmp, SWT.PUSH);
 		}
 
 		btOK.setText(okLabel);
@@ -131,11 +157,28 @@ public class OKCancelPanel extends Composite {
 		btCancel.pack();
 		Rectangle rect2 = btCancel.getBounds();
 		
+		Rectangle rect3 = null;
+		if ( btExtra != null ) {
+			btExtra.setText(extraLabel);
+			btExtra.setData("x");
+			btExtra.addSelectionListener(action);
+			rdTmp = new RowData();
+			btExtra.setLayoutData(rdTmp);
+			btExtra.pack();
+			rect3 = btExtra.getBounds();
+		}
+		
 		int max = rect1.width;
 		if ( max < rect2.width ) max = rect2.width;
+		if ( rect3 != null ) {
+			if ( max < rect3.width ) max = rect3.width;
+		}
 		if ( max < nWidth ) max = nWidth;
 		((RowData)btOK.getLayoutData()).width = max;
 		((RowData)btCancel.getLayoutData()).width = max;
+		if ( btExtra != null ) {
+			((RowData)btExtra.getLayoutData()).width = max;
+		}
 	}
 	
 	public void setOKText (String text) {
