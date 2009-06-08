@@ -55,6 +55,7 @@ public abstract class BaseWriter implements IWriter {
 	protected String trgLang;
 	protected String encoding;
 	protected String outputPath;
+	protected boolean preSegmented;
 	
 	
 	public BaseWriter () {
@@ -75,7 +76,8 @@ public abstract class BaseWriter implements IWriter {
 		String projectID,
 		String outputFolder,
 		String packageID,
-		String sourceRoot)
+		String sourceRoot,
+		boolean preSegmented)
 	{
 		manifest.setSourceLanguage(sourceLanguage);
 		trgLang = targetLanguage;
@@ -85,6 +87,7 @@ public abstract class BaseWriter implements IWriter {
 		manifest.setPackageID(packageID);
 		manifest.setPackageType(getPackageType());
 		this.inputRoot = sourceRoot;
+		this.preSegmented = preSegmented;
 	}
 
 	public void writeStartPackage () {

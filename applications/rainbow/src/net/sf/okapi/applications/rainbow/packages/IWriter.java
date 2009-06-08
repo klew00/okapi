@@ -34,19 +34,21 @@ public interface IWriter extends IFilterWriter {
 	
 	/**
 	 * Sets the global parameters of the package.
-	 * @param sourceLanguage The source language.
-	 * @param targetLanguage The target language.
-	 * @param projectID The project identifier.
-	 * @param outputDir The root folder for the output.
-	 * @param packageID The package identifier.
-	 * @param sourceRoot The root folder of the original inputs.
+	 * @param sourceLanguage the source language.
+	 * @param targetLanguage the target language.
+	 * @param projectID the project identifier.
+	 * @param outputDir the root folder for the output.
+	 * @param packageID the package identifier.
+	 * @param sourceRoot the root folder of the original inputs.
+	 * @param preSegmented indicates if the files are pre-segmented.
 	 */
 	public void setInformation (String sourceLanguage,
 		String targetLanguage,
 		String projectID,
 		String outputDir,
 		String packageID,
-		String sourceRoot);
+		String sourceRoot,
+		boolean preSegmented);
 	
 	public void writeStartPackage ();
 	

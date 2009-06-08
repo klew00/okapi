@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -109,7 +109,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			XR.writeEndElementLineBreak(); // target_lang
 
 			XR.writeStartElement("sentence_seg");
-			XR.writeRawXML("true");
+			XR.writeRawXML(preSegmented ? "false" : "true");
 			XR.writeEndElementLineBreak(); // sentence_seg
 
 			XR.writeEndElementLineBreak(); // project
