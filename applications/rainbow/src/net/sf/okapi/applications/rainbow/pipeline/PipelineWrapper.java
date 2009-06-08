@@ -119,14 +119,16 @@ public class PipelineWrapper {
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.charlisting.CharListingStep").newInstance();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
 			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+			params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
 			}
 			map.put(step.id, step);
-	
+			peMapper.addEditor("net.sf.okapi.steps.ui.charlisting.ParametersEditor", step.paramsClass);
+
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
 			step = new StepInfo(ps.getClass().getSimpleName(),

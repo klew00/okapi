@@ -25,6 +25,7 @@ import net.sf.okapi.common.BaseParameters;
 public class Parameters extends BaseParameters {
 
 	public String outputPath;
+	public boolean autoOpen;
 
 	public Parameters () {
 		reset();
@@ -32,17 +33,20 @@ public class Parameters extends BaseParameters {
 	
 	public void reset() {
 		outputPath = "charlist.txt";
+		autoOpen = true;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		outputPath = buffer.getString("outputPath", outputPath);
+		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
 	}
 
 	public String toString() {
 		buffer.reset();
 		buffer.setParameter("outputPath", outputPath);
+		buffer.setParameter("autoOpen", autoOpen);
 		return buffer.toString();
 	}
 	

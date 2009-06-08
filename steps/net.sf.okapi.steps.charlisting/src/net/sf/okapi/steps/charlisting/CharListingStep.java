@@ -109,9 +109,11 @@ public class CharListingStep extends BasePipelineStep {
 		}
 		finally {
 			if ( writer != null ) {
-				getContext().setString("outputFile", params.outputPath);
 				writer.close();
 				writer = null;
+				if ( params.autoOpen ) {
+					getContext().setString("outputFile", params.outputPath);
+				}
 			}
 		}
 	}
