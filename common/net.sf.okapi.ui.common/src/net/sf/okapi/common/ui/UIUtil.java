@@ -125,6 +125,7 @@ public class UIUtil {
 	public static void inheritIcon (Shell dialog,
 		Shell parent)
 	{
+		if ( parent == null ) return;
 		Image[] list = parent.getImages();
 		if (( list == null ) || ( list.length < 2 )) dialog.setImage(parent.getImage()); 
 		else dialog.setImages(list);

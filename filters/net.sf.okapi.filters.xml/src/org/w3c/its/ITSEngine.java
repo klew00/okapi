@@ -272,7 +272,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		else if ( "no".equals(value) ) rule.flag = false;
 		else throw new ITSException("Invalid value for 'translate'.");
 		
-		value = elem.getAttributeNS(ITSX_NS_URI, "target");
+		value = elem.getAttributeNS(ITSX_NS_URI, "targetPointer");
 		if ( value.length() > 0 ) {
 			rule.info = value;
 			rule.infoType = TRANSLATE_TRGPOINTER; 

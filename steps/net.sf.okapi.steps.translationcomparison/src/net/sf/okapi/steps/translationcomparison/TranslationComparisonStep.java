@@ -94,7 +94,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		Runtime.getRuntime().gc();
 		if ( params.autoOpen && ( pathToOpen != null )) {
-			//			UIUtil.start(pathToOpen);
+			getContext().setString("outputFile",  pathToOpen);
 		}
 	}
 	
@@ -266,10 +266,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( writer != null ) writer.close();
 		if ( params.generateHTML ) {
 			// Use the to-compare file for the output name
+			String outPath = getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
 			if ( pathToOpen == null ) {
-				pathToOpen = getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
+				pathToOpen = getContext().getRawDocument(1).getInputURI().toString();
+				pathToOpen += ".html";
 			}
-			writer.create(pathToOpen); //$NON-NLS-1$
+			writer.create(outPath); //$NON-NLS-1$
 			writer.writeStartDocument();
 			writer.writeStartElement("html"); //$NON-NLS-1$
 			writer.writeStartElement("head"); //$NON-NLS-1$

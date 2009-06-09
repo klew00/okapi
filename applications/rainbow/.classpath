@@ -50,5 +50,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.charlisting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.searchandreplace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.uriconversion"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.translationcomparison"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
