@@ -42,7 +42,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.translationcomparison"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.plaintext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.encodingconversion"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.fulwidthconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.searchandreplace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.uriconversion"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/net.sf.okapi.ui.steps.textmodification"/>
@@ -51,5 +50,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.searchandreplace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.uriconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.translationcomparison"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.fullwidthconversion"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
