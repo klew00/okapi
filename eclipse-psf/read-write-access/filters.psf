@@ -3,7 +3,6 @@
 <provider id="org.tigris.subversion.subclipse.core.svnnature">
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.common,net.sf.okapi.common"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.filters.common,net.sf.okapi.filters.common"/>
-<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.csv,net.sf.okapi.filters.csv"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.dtd,net.sf.okapi.filters.dtd"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.html,net.sf.okapi.filters.html"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.idml,net.sf.okapi.filters.idml"/>
@@ -17,6 +16,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.properties,net.sf.okapi.filters.properties"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.regex,net.sf.okapi.filters.regex"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.rtf,net.sf.okapi.filters.rtf"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.table,net.sf.okapi.filters.table"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tmx,net.sf.okapi.filters.tmx"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff,net.sf.okapi.filters.xliff"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml,net.sf.okapi.filters.xml"/>
@@ -28,20 +28,20 @@
 <item elementID="=net.sf.okapi.filters.dtd" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.csv" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openxml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.po" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.tmx" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.plaintext" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.javascript" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.markupfilter" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.javascript" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xliff" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openoffice" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.rtf" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.pipeline" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.regex" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.pipeline" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/net.sf.okapi.filters.table" type="4"/>
 </workingSets>
 </psf>
