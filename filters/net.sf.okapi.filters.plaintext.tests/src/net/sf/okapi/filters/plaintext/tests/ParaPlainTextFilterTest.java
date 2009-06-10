@@ -19,11 +19,7 @@
 ===========================================================================*/
 
 package net.sf.okapi.filters.plaintext.tests;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -35,7 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -45,7 +40,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -56,11 +50,11 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
-import net.sf.okapi.filters.plaintext.paragraphs.*;
+import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
+import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -69,15 +63,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PlainTextFilterTest {
+public class ParaPlainTextFilterTest {
 	
-	private PlainTextFilter filter;
+	private ParaPlainTextFilter filter;
 	private FilterTestDriver testDriver;
+	private Parameters params;
 	
 	@Before
 	public void setUp() {
-		filter = new PlainTextFilter();
+		filter = new ParaPlainTextFilter();
 		assertNotNull(filter);
+
+		params = (Parameters) filter.getParameters();
+		assertNotNull(params);
 		
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
@@ -230,7 +228,7 @@ public class PlainTextFilterTest {
 		// Empty filter parameters, OkapiBadFilterParametersException 
 		try {
 			filter.setParameters(null);						
-			InputStream input2 = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
+			InputStream input2 = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 			filter.open(new RawDocument(input2, "UTF-8", "en"));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}	
@@ -244,10 +242,10 @@ public class PlainTextFilterTest {
 	@Test
 	public void testNameAndMimeType() {
 		assertEquals(filter.getMimeType(), "text/plain");
-		assertEquals(filter.getName(), "okf_plaintext");
+		assertEquals(filter.getName(), "okf_plaintext_paragraphs");
 		
 		// Read lines from a file, check mime types 
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
 		while (filter.hasNext()) {
@@ -274,6 +272,9 @@ public class PlainTextFilterTest {
 	
 	@Test
 	public void testFiles() {
+		
+		params.extractParagraphs = false;
+		
 		_testFile("BOM_MacUTF16withBOM2.txt", false);		
 		_testFile("cr.txt", false);
 		_testFile("crlf_start.txt", true);
@@ -285,9 +286,19 @@ public class PlainTextFilterTest {
 	}
 				
 	@Test
+	public void testFiles2() {
+		
+		params.extractParagraphs = true;
+//		params.reset();
+		
+		_testFile("crlfcrlf_end.txt", true);
+	}
+	
+	@Test
 	public void testSkeleton () {
 		String st = null;
 		String expected = null;
+		params.extractParagraphs = false;
 		
 		try {
 			st = _getSkeleton(_getFullFileName("crlf_start.txt")); // Trailing linebreak
@@ -297,7 +308,7 @@ public class PlainTextFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -317,7 +328,7 @@ public class PlainTextFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -337,7 +348,47 @@ public class PlainTextFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+		} 
+		catch (IOException e) {
+		}
+		assertEquals(expected, st);
+	}
+	
+	@Test
+	public void testSkeleton4 () {
+		String st = null;
+		String expected = null;
+		
+		try {
+			st = _getSkeleton(_getFullFileName("crlfcrlf.txt")); // No trailing linebreak
+		} 
+		catch (UnsupportedEncodingException e) {
+		}	
+		System.out.println(String.format("Skeleton of %s\n---\n", "crlfcrlf.txt") + st + "\n----------");
+		
+		try {
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlfcrlf.txt"));			
+		} 
+		catch (IOException e) {
+		}
+		assertEquals(expected, st);
+	}
+	
+	@Test
+	public void testSkeleton5 () {
+		String st = null;
+		String expected = null;
+		
+		try {
+			st = _getSkeleton(_getFullFileName("lgpl.txt")); // No trailing linebreak
+		} 
+		catch (UnsupportedEncodingException e) {
+		}	
+		System.out.println(String.format("Skeleton of %s\n---\n", "lgpl.txt") + st + "\n----------");
+		
+		try {
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/lgpl.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -351,7 +402,7 @@ public class PlainTextFilterTest {
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 		
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
 		System.out.println(filename);
@@ -363,9 +414,10 @@ public class PlainTextFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
+		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
+		params.extractParagraphs = true;
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
@@ -373,10 +425,43 @@ public class PlainTextFilterTest {
 		list.add(new InputDocument(root + "csv_test1.txt", ""));
 		list.add(new InputDocument(root + "crlf_start.txt", ""));
 		list.add(new InputDocument(root + "crlf_end.txt", ""));
-		list.add(new InputDocument(root + "crlf.txt", ""));
-		list.add(new InputDocument(root + "crlfcrlf_end.txt", ""));
-		list.add(new InputDocument(root + "crlfcrlf.txt", ""));
+		list.add(new InputDocument(root + "crlf.txt", ""));		
 		list.add(new InputDocument(root + "lf.txt", "")); 
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+	}
+	
+	@Test
+	public void testDoubleExtraction2() {
+		// Read all files in the data directory
+		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		params.extractParagraphs = true;
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(root + "crlfcrlf.txt", ""));
+		list.add(new InputDocument(root + "crlfcrlf_end.txt", ""));
+		list.add(new InputDocument(root + "crlfcrlfcrlf.txt", ""));
+		list.add(new InputDocument(root + "crlfcrlfcrlf_end.txt", ""));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+	}
+	
+	@Test
+	public void testDoubleExtraction3() {
+		// Read all files in the data directory
+		URL url = ParaPlainTextFilterTest.class.getResource("/lgpl.txt");
+		String root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
+		params.extractParagraphs = true;
+		
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(root + "lgpl.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
@@ -385,8 +470,9 @@ public class PlainTextFilterTest {
 	@Test
 	public void testCancel() {
 		testDriver.setDisplayLevel(2);
+		params.extractParagraphs = false;
 		
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 		assertNotNull(input);
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
@@ -402,23 +488,12 @@ public class PlainTextFilterTest {
 	}
 	
 	@Test
-	public void testConfigurations() {
-		
-		List<FilterConfiguration> configs = filter.getConfigurations();
-		assertNotNull(configs);
-		assertEquals(7, configs.size());
-	}
-	
-	
-	@Test
 	public void testLineNumbers() {
 		
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
-		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
-		
-		Parameters params = (Parameters) filter.getActiveParameters();
+		Parameters params = (Parameters) filter.getParameters();
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
@@ -433,7 +508,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();		
 		
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = true;
@@ -451,12 +526,10 @@ public class PlainTextFilterTest {
 	@Test
 	public void testParagraphs() {
 		
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
-
-		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
 		
-		Parameters params = (Parameters) filter.getActiveParameters();
+		Parameters params = (Parameters) filter.getParameters();
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
@@ -471,7 +544,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();
 		
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = false;
@@ -488,7 +561,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();
 		
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = false;
@@ -506,7 +579,7 @@ public class PlainTextFilterTest {
 		filter.close();
 				
 		//---------------------------------------------------------------------------
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = true;
@@ -520,7 +593,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();
 		
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = true;
@@ -534,7 +607,7 @@ public class PlainTextFilterTest {
 		
 		filter.close();
 		
-		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
 		params.extractParagraphs = true;
@@ -554,7 +627,7 @@ public class PlainTextFilterTest {
 	private void _testFile(String filename, boolean emptyTail) {
 		testDriver.setDisplayLevel(2);
 		
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
@@ -569,7 +642,7 @@ public class PlainTextFilterTest {
 		filter.close();
 		
 		// List events
-		input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
 		System.out.println(filename);
@@ -644,7 +717,7 @@ public class PlainTextFilterTest {
 	}
 	
 	private String _getFullFileName(String fileName) {
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
+		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;

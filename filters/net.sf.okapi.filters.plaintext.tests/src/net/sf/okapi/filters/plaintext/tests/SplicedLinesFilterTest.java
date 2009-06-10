@@ -41,9 +41,12 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.SplicedLinesFilter;
+import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.spliced.Parameters;
+import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -70,21 +73,23 @@ public class SplicedLinesFilterTest {
 
 	@Test
 	public void testCombinedLines() {
-		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");
 		assertNotNull(input);
 		
+		Parameters params = (Parameters) filter.getParameters();
+		
 		// 1.
-		filter.createPlaceholders = false;
+		params.createPlaceholders = false;
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
 		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1 Line 2 Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
+		_testEvent(EventType.TEXT_UNIT, "Line 1 Line 2 Line 3", 1);
+		_testEvent(EventType.TEXT_UNIT, "Line 4", 4);
 		_testEvent(EventType.END_DOCUMENT, null);
 		
 		// 2.
-		filter.createPlaceholders = true;
-		input = PlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");				
+		params.createPlaceholders = true;
+		input = ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");				
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
 		_testEvent(EventType.START_DOCUMENT, null);
@@ -98,7 +103,7 @@ public class SplicedLinesFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = PlainTextFilterTest.class.getResource("/combined_lines.txt");
+		URL url = ParaPlainTextFilterTest.class.getResource("/combined_lines.txt");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
 		
@@ -123,7 +128,7 @@ public class SplicedLinesFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -143,7 +148,7 @@ public class SplicedLinesFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines_end.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/combined_lines_end.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines_end.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -163,7 +168,7 @@ public class SplicedLinesFilterTest {
 		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/combined_lines2.txt"));			
+			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -201,8 +206,44 @@ public class SplicedLinesFilterTest {
 		}
 	}
 	
+	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
+		assertNotNull(filter);
+		
+		Event event = filter.next();		
+		assertNotNull(event);
+		
+		assertTrue(event.getEventType() == expectedType);
+		
+		switch (event.getEventType()) {
+		case TEXT_UNIT:
+			IResource res = event.getResource();
+			assertTrue(res instanceof TextUnit);
+			
+			assertEquals(expectedText, ((TextUnit) res).toString());
+			
+			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			assertNotNull(prop);
+			
+			String st = prop.getValue();
+			assertEquals(expectedLineNum, new Integer(st));
+			
+			break;
+			
+		case DOCUMENT_PART:
+			if (expectedText == null) break;
+			res = event.getResource();
+			assertTrue(res instanceof DocumentPart);
+			
+			ISkeleton skel = res.getSkeleton();
+			if (skel != null) {
+				assertEquals(expectedText, skel.toString());
+			}
+			break;
+		}
+	}
+	
 	private String _getFullFileName(String fileName) {
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
+		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
