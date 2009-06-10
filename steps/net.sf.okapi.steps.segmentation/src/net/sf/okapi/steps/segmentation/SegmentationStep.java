@@ -66,6 +66,7 @@ public class SegmentationStep extends BasePipelineStep {
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		if ( initDone ) return; // Initialize once per batch
+		//TODO: implement projDir
 		String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 		String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
 		SRXDocument srxDoc = new SRXDocument();
@@ -86,12 +87,13 @@ public class SegmentationStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 
-		//TODO: Decide what to do with target, is target real target or copy of source?
 		if ( tu.hasTarget(trgLang) ) {
-			trgSeg.computeSegments(tu.getTarget(trgLang));
-			tu.getTarget(trgLang).createSegments(trgSeg.getRanges());
+			if ( params.segmentTarget ) {
+				trgSeg.computeSegments(tu.getTarget(trgLang));
+				tu.getTarget(trgLang).createSegments(trgSeg.getRanges());
+			}
 		}
-		else {
+		else if ( params.segmentSource ) {
 			srcSeg.computeSegments(tu.getSource());
 			tu.getSource().createSegments(srcSeg.getRanges());
 		}

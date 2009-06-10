@@ -24,14 +24,18 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	protected String sourceSrxPath;
-	protected String targetSrxPath;
+	public boolean segmentSource;
+	public boolean segmentTarget;
+	public String sourceSrxPath;
+	public String targetSrxPath;
 	
 	public Parameters () {
 		reset();
 	}
 	
 	public void reset() {
+		segmentSource = true;
+		segmentTarget = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
 	}
@@ -39,6 +43,8 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		segmentSource = buffer.getBoolean("segmentSource", segmentSource);
+		segmentTarget = buffer.getBoolean("segmentTarget", segmentTarget);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 	}
@@ -46,6 +52,8 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString() {
 		buffer.reset();
+		buffer.setBoolean("segmentSource", segmentSource);
+		buffer.setBoolean("segmentTarget", segmentTarget);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
 		return buffer.toString();

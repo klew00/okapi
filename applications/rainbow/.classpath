@@ -54,5 +54,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.bomconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.linebreakconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.xsltransform"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

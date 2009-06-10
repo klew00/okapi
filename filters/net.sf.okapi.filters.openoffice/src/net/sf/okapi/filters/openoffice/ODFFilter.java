@@ -189,7 +189,8 @@ public class ODFFilter implements IFilter {
 		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
-//TODO: how to make sure it's UTF-8???			input.setEncoding("UTF-8");
+		// The encoding may be not set if it comes as a binary RawDocument
+		// Which is OK since XMLStreamReader does its own detection
 		try {
 			reader = fact.createXMLStreamReader(input.getStream());
 		}
@@ -212,6 +213,8 @@ public class ODFFilter implements IFilter {
 		startDoc.setName(docName);
 		startDoc.setMimeType(MIMETYPE);
 		startDoc.setType(startDoc.getMimeType());
+		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
+		// We should use reader.getEncoding() when it's set
 		startDoc.setEncoding("UTF-8", false);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(params);
@@ -229,26 +232,6 @@ public class ODFFilter implements IFilter {
 		containerMimeType = mimeType;
 	}
 	
-/*	private void open (CharSequence input) {
-		//TODO: Check for better solution, going from char to byte to read char is just not good
-		try {
-			open(new ByteArrayInputStream(input.toString().getBytes("UTF-8")));
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new OkapiUnsupportedEncodingException(e);
-		} 
-	}
-
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			open(inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-*/
 	public String getName () {
 		return "okf_odf";
 	}

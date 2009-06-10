@@ -149,9 +149,11 @@ public class PipelineWrapper {
 				"net.sf.okapi.steps.segmentation.SegmentationStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.ui.segmentation.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
