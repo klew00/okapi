@@ -40,6 +40,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -128,6 +129,13 @@ public class Util {
 		return text;
 	}
 
+	static public String trim(String text) {
+		
+		if (text == null) return "";	
+						
+		return text.trim();
+	}
+	
 	/**
 	 * Gets the directory name of a full path.
 	 * 
@@ -880,14 +888,27 @@ public class Util {
 	 * @return true if the given string is null or empty.
 	 */
 	static public boolean isEmpty(String string) {
-		return (string == null || string == "");
+		// return (string == null || string == ""); // !!! Doesn't work
+		return (string == null || string == "" || (string != null && string.length() == 0));
+	}
+	
+	static public boolean isEmpty(String string, boolean ignoreWS) {
+		return (string == null || string == "" ||				
+				(string != null && 
+						(string.length() == 0 || 
+						(ignoreWS && isEmpty(string.trim()))
+				)));
+	}
+	
+	static public boolean isEmpty(StringBuilder sb) {
+		return (sb == null ||(sb != null && sb.length() == 0));
 	}
 
-	static public boolean isEmpty(Object obj) {
-		return (obj == null);
+	static public <E> boolean isEmpty(List <E> e) {
+		return (e == null ||(e != null && e.isEmpty()));
 	}
-
-	// Safe string functions
+	
+// Safe string functions	
 	static public int getLength(String string) {
 		return (isEmpty(string)) ? 0 : string.length();
 	}
@@ -924,4 +945,11 @@ public class Util {
 			return;
 		sb.deleteCharAt(sb.length() - 1);
 	}
+
+// List helpers	
+	public static <E> boolean checkIndex(int index, List<E> list) {
+		
+		return ((list != null) && (index >= 0) && (index < list.size()));
+	}
+	
 }

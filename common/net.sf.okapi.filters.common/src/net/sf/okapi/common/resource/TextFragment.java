@@ -224,7 +224,10 @@ public class TextFragment implements Comparable<Object> {
 				break;
 			}
 			if ( !done ) {
-				if ( textEnd-1 < untilIndex ) break;
+				if ( textEnd-1 < untilIndex ) {
+					textEnd = -1;
+					break;
+				}
 				textEnd--;
 			}
 		}
@@ -284,7 +287,10 @@ public class TextFragment implements Comparable<Object> {
 				break;
 			}
 			if ( !done ) {
-				if ( textStart == untilIndex ) break;
+				if ( textStart == untilIndex ) {
+					textStart = -1;
+					break;
+				}
 				else textStart++;
 			}
 		}
