@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CSV Filter
-Bundle-SymbolicName: net.sf.okapi.filters.csv
+Bundle-SymbolicName: net.sf.okapi.filters.table
 Bundle-Version: 1.0.0
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
