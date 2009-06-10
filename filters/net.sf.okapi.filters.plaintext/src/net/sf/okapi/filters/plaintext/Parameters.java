@@ -20,91 +20,24 @@
 
 package net.sf.okapi.filters.plaintext;
 
-import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.common.filters.LocalizationDirectives;
+import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
 
 /**
  * Plain Text Filter parameters 
+ * 
+ * @version 0.1, 09.06.2009
+ * @author Sergei Vasilyev
  */
 
-public class Parameters extends BaseParameters {
-		
-	public boolean sendEmptySourceTU;
-	public boolean unescapeSource;
-	public boolean trimLeft;
-	public boolean trimRight;
-	public boolean preserveWS;
-	public boolean useCodeFinder;
-	public String regularExpressionForEmbeddedMarkup;
-	
-	public LocalizationDirectives locDir;
-	public InlineCodeFinder codeFinder;
+public class Parameters extends CompoundFilterParameters {
 
-//----------------------------------------------------------------------------------------------------------------------------	
-	
 	public Parameters() {
 		super();
-		locDir = new LocalizationDirectives();
-		codeFinder = new InlineCodeFinder();
 		
-		reset();
-		toString(); // fill the list
-	}
-
-	public void reset() {
-		locDir.reset();
-		codeFinder.reset();
-		
-		// Default in-line codes: special escaped-chars and printf-style variable
-		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
-		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
-		
-		// All parameters are set to defaults here
-		sendEmptySourceTU = false;
-		unescapeSource = true;
-		trimLeft = true;
-		trimRight = false;
-		preserveWS = true;
-		useCodeFinder = false;
-		regularExpressionForEmbeddedMarkup = "";
-	}
-
-	public void fromString(String data) {
-		reset();
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here
-		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
-		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
-		locDir.setOptions(tmpBool1, tmpBool2);
-		
-		sendEmptySourceTU = buffer.getBoolean("sendEmptySourceTU", false);
-		unescapeSource = buffer.getBoolean("unescapeSource", true);
-		trimLeft = buffer.getBoolean("trimLeft", true);
-		trimRight = buffer.getBoolean("trimRight", false);
-		preserveWS = buffer.getBoolean("preserveWS", true);
-		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
-		regularExpressionForEmbeddedMarkup = buffer.getString("regularExpressionForEmbeddedMarkup", "");
+		addParameters(net.sf.okapi.filters.plaintext.base.Parameters.class);
+		addParameters(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);
+		addParameters(net.sf.okapi.filters.plaintext.spliced.Parameters.class);
+		addParameters(net.sf.okapi.filters.plaintext.regex.Parameters.class);
 	}
 	
-	@Override
-	public String toString () {
-		buffer.reset();
-		
-		// All parameters are set here
-		buffer.setBoolean("useLD", locDir.useLD());
-		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
-		
-		buffer.setBoolean("sendEmptySourceTU", sendEmptySourceTU);
-		buffer.setBoolean("unescapeSource", unescapeSource);
-		buffer.setBoolean("trimLeft", trimLeft);
-		buffer.setBoolean("trimRight", trimRight);
-		buffer.setBoolean("preserveWS", preserveWS);
-		buffer.setBoolean("useCodeFinder", useCodeFinder);
-		buffer.setString("regularExpressionForEmbeddedMarkup", regularExpressionForEmbeddedMarkup);
-		
-		return buffer.toString();
-	}
 }
