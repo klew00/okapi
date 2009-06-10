@@ -18,13 +18,24 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext;
+package net.sf.okapi.filters.plaintext.common;
 
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class TextFragmentUtils {
+/**
+ * 
+ * 
+ * @version 0.1, 09.06.2009
+ * @author Sergei Vasilyev
+ */
+
+public class TextUnitUtils {
 	
 	/**
 	 * 
@@ -41,17 +52,22 @@ public class TextFragmentUtils {
 	 */
 	public static void trimLeft(TextFragment textFragment, GenericSkeleton skel) {
 		
-		if (Util.isEmpty(textFragment)) return;
+		if (textFragment == null) return;
 		String st = textFragment.getCodedText();
+		TextFragment skelTF;
 		
-		int pos = TextFragment.getFirstNonWhitespacePosition(st, 0, -1, true, true, true, true);
-		if (pos == -1) return;
-		
-		TextFragment skelTF = textFragment.subSequence(0, pos);
-		textFragment.setCodedText(st.substring(pos));
-		
-		if (Util.isEmpty(skel)) return;
-		if (Util.isEmpty(skelTF)) return;
+		int pos = TextFragment.getFirstNonWhitespacePosition(st, 0, -1, true, true, true, true);		
+		if (pos == -1) { // Whole string is whitespaces
+			skelTF = new TextFragment(st);
+			textFragment.setCodedText("");			
+		}
+		else {
+			skelTF = textFragment.subSequence(0, pos);
+			textFragment.setCodedText(st.substring(pos));			
+		}
+			
+		if (skel == null) return;
+		if (skelTF == null) return;
 		
 		skel.append(skelTF.toString());  // Codes get removed
 	}
@@ -71,18 +87,23 @@ public class TextFragmentUtils {
 	 */
 	public static void trimRight(TextFragment textFragment, GenericSkeleton skel) {
 		
-		if (Util.isEmpty(textFragment)) return;
+		if (textFragment == null) return;
 		
 		String st = textFragment.getCodedText();
+		TextFragment skelTF;
 		
 		int pos = TextFragment.getLastNonWhitespacePosition(st, -1, 0, true, true, true, true);
-		if (pos == -1) return;
-		
-		TextFragment skelTF = textFragment.subSequence(pos + 1, st.length());
-		textFragment.setCodedText(st.substring(0, pos + 1));
-		
-		if (Util.isEmpty(skel)) return;
-		if (Util.isEmpty(skelTF)) return;
+		if (pos == -1) { // Whole string is whitespaces
+			skelTF = new TextFragment(st);
+			textFragment.setCodedText("");			
+		}
+		else {
+			skelTF = textFragment.subSequence(pos + 1, st.length());
+			textFragment.setCodedText(st.substring(0, pos + 1));			
+		}
+						
+		if (skel == null) return;
+		if (skelTF == null) return;
 		
 		skel.append(skelTF.toString());  // Codes get removed);
 	}
@@ -94,7 +115,7 @@ public class TextFragmentUtils {
 	 */
 	public static char getLastChar(TextFragment textFragment) {
 		
-		if (Util.isEmpty(textFragment)) return '\0';
+		if (textFragment == null) return '\0';
 		
 		String st = textFragment.getCodedText();
 		
@@ -110,7 +131,7 @@ public class TextFragmentUtils {
 	 */
 	public static void deleteLastChar(TextFragment textFragment) {
 		
-		if (Util.isEmpty(textFragment)) return;
+		if (textFragment == null) return;
 		String st = textFragment.getCodedText();
 		
 		int pos = TextFragment.getLastNonWhitespacePosition(st, -1, 0, true, true, true, true);
@@ -127,12 +148,64 @@ public class TextFragmentUtils {
 	 */
 	public static int lastIndexOf(TextFragment textFragment, String findWhat) {
 		
-		if (Util.isEmpty(textFragment)) return -1;
+		if (textFragment == null) return -1;
 		if (Util.isEmpty(findWhat)) return -1;
 		if (Util.isEmpty(textFragment.getCodedText())) return -1;
 		
 		return (textFragment.getCodedText()).lastIndexOf(findWhat);
 	}
+				
+	public static boolean isEmpty(TextFragment textFragment) {
 		
+		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));		
+	}
+
+	public static TextUnit buildTU(
+			TextUnit textUnit, 
+			String name, 
+			TextContainer source, 
+			TextContainer target, 
+			String language, 
+			String comment) {
 		
+		if (textUnit == null) {
+			
+			textUnit = new TextUnit("");			
+		}
+		
+		if (textUnit.getSkeleton() == null) {
+			
+			GenericSkeleton skel = new GenericSkeleton();
+			textUnit.setSkeleton(skel);
+		}		
+		
+		if (!Util.isEmpty(name))
+			textUnit.setName(name);
+		
+		if (source != null)
+			textUnit.setSource(source);
+		
+		if (target != null && !Util.isEmpty(language))
+			textUnit.setTarget(language, target);
+		
+		if (comment != null)
+			textUnit.setProperty(new Property(Property.NOTE, comment));
+		
+		return textUnit;
+	}
+
+	public static GenericSkeleton forseSkeleton(TextUnit tu) {
+		
+		if (tu == null) return null;
+		
+		ISkeleton res = tu.getSkeleton();
+		if (res == null) {
+			
+			res = new GenericSkeleton();
+			tu.setSkeleton(res);
+		}
+		
+		return (GenericSkeleton) res;
+	}
+	
 }

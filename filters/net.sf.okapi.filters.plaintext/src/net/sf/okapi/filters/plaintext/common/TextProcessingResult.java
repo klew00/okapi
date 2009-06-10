@@ -1,4 +1,11 @@
-package net.sf.okapi.filters.plaintext;
+package net.sf.okapi.filters.plaintext.common;
+
+/**
+ * 
+ * 
+ * @version 0.1, 09.06.2009
+ * @author Sergei Vasilyev
+ */
 
 public enum TextProcessingResult {
 	
