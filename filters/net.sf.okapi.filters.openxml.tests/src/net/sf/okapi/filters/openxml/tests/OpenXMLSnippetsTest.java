@@ -73,6 +73,13 @@ public class OpenXMLSnippetsTest {
 	}
 
 	@Test
+	public void testInlineLanguageWithText() {
+		String snippet = "<w:p><w:r><w:lang w:val=\"en-US\"/><w:t>zorcon</w:t></w:r></w:p>";
+		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
+		assertEquals(snappet, snippet);
+	}
+
+	@Test
 	public void testInsertion() {
 		String snippet = "<w:p><w:ins><w:r><w:t xml:space=\"preserve\">zorcon</w:t></w:r></w:ins></w:p>";
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
@@ -89,13 +96,6 @@ public class OpenXMLSnippetsTest {
 	@Test
 	public void testOneWord() {
 		String snippet = "<w:p><w:r><w:rPr><w:lang w:val=\"en-US\"/><w:b/><w:bCs></w:rPr><w:t>zorcon</w:t></w:r></w:p>";
-		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
-		assertEquals(snappet, snippet);
-	}
-
-	@Test
-	public void testInlineLanguageWithText() {
-		String snippet = "<w:p><w:r><w:lang w:val=\"en-US\"/><w:t>zorcon</w:t></w:r></w:p>";
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}

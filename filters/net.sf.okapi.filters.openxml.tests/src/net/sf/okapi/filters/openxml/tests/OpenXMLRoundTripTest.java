@@ -23,6 +23,10 @@ package net.sf.okapi.filters.openxml.tests;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -79,6 +83,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
+//		themfiles.add("TestDako2.docx");
 		
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
@@ -97,9 +102,12 @@ public class OpenXMLRoundTripTest {
 	public void runOneTest (String filename, boolean bTranslating, boolean bPeeking) {
 		String sInputPath=null,sOutputPath=null,sGoldPath=null;
 		Event event;
+		File filly;
 		URI uri;
 		String sUserDir;
+		String sUserDirURI;  // DWH 6-9-09 URI
 		OpenXMLFilter filter = null;
+		BufferedInputStream bis;
 		boolean rtrued2;
 		try {
 			if (bPeeking)
@@ -117,14 +125,19 @@ public class OpenXMLRoundTripTest {
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
 			sUserDir = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
+			sUserDirURI = sUserDir.substring(0,sUserDir.length()-5); // DWH 6-9-09
 			sUserDir = sUserDir.substring(6,sUserDir.length()-5);
-			//sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
-			sInputPath = sUserDir + "/data/";
+//			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
+			sInputPath = sUserDirURI + "/data/"; // DWH 6-9-09
+//			sInputPath = sUserDir + "/data/"; // DWH 6-9-09
 			sOutputPath = sUserDir + "/ootput/";
 			sGoldPath = sUserDir + "/gold/";
 			uri = new URI(sInputPath+filename);
 			try
 			{
+//				filly = new File(sInputPath+filename);
+//				bis = new BufferedInputStream(new FileInputStream(filly));
+//				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 //				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 3-27-09
 				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 5-16-09 squish
 			}

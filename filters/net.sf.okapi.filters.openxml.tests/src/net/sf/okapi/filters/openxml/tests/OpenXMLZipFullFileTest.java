@@ -86,7 +86,7 @@ public class OpenXMLZipFullFileTest {
 
 		for (String f : testFileList) {
 			String ff = base+deary+f;
-			String fff = ff.replace(" ","%20");
+			String fff = "file:/"+ff.replace(" ","%20").toLowerCase(); // DWH 6-11-09 added file: and lowercase
 			try {
 				URI uriFf = new URI(fff);
 				openXMLFilter.open(new RawDocument(uriFf,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 4-22-09

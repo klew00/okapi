@@ -277,8 +277,8 @@ public class OpenXMLFilter implements IFilter {
 			open(input.getInputURI());
 			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
 		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
+		else if ( input.getStream() != null ) {
+			open(input.getStream());
 		}
 		else {
 			throw new RuntimeException("InputResource has no input defined.");
@@ -306,8 +306,8 @@ public class OpenXMLFilter implements IFilter {
 			open(input.getInputURI(),bSquishable);
 			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
 		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
+		else if ( input.getStream() != null ) {
+			open(input.getStream());
 		}
 		else {
 			throw new RuntimeException("InputResource has no input defined.");
@@ -340,8 +340,9 @@ public class OpenXMLFilter implements IFilter {
 			open(input.getInputURI(),bSquishable,nLogLevel);
 			LOGGER.log(Level.FINER,"\nOpening "+input.getInputURI().toString());
 		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
+		else if ( input.getStream() != null ) {
+			open(input.getStream());
+			LOGGER.log(Level.FINER,"\nOpening ");
 		}
 		else {
 			throw new RuntimeException("InputResource has no input defined.");
@@ -542,25 +543,28 @@ public class OpenXMLFilter implements IFilter {
 		    iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
 		    if (iCute>0)
 			    sDocType = sDocType.substring(iCute+1);
-		    if (!bMinedHiddenStyles) // DWH 5-28-09 find styles for hidden text
+		    if (nZipType==MSWORD)
 		    {
-		    	if (sDocType.equals("styles+xml"))
-		    	{
-		    		bMinedHiddenStyles = true;
-		    		entries = zipFile.entries(); // reset to go through all of them
-		    	}
-		    	else if (!sEntryName.equals("[Content_Types].xml"))
-		    		continue;
+			    if (!bMinedHiddenStyles) // DWH 5-28-09 find styles for hidden text
+			    {
+			    	if (sDocType.equals("styles+xml"))
+			    	{
+			    		bMinedHiddenStyles = true;
+			    		entries = zipFile.entries(); // reset to go through all of them
+			    	}
+			    	else if (!sEntryName.equals("[Content_Types].xml"))
+			    		continue;
+			    }
+			    else if (!bPreferenceTranslateWordHidden &&
+			    		 (sEntryName.equals("[Content_Types].xml") ||
+			    		  sDocType.equals("styles+xml")))
+			    	continue;
+			          // DWH 5-29-09 these two files have already been added to the zip, so don't add them again
 		    }
-		    else if (!bPreferenceTranslateWordHidden &&
-		    		 (sEntryName.equals("[Content_Types].xml") ||
-		    		  sDocType.equals("styles+xml")))
-		    	continue;
-		          // DWH 5-29-09 these two files have already been added to the zip, so don't add them again
 			bInMainFile = (sEntryName.endsWith(".xml") &&
-				    		(nZipType==MSWORD && sDocType.equals("main+xml") ||
-				    		 nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")));
-			                    // DWH 5-26-09 translate if translating Powerpoint master slides
+			    		  (nZipType==MSWORD && sDocType.equals("main+xml") ||
+			    		   nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")));
+		                    // DWH 5-26-09 translate if translating Powerpoint master slides
 			openXMLContentFilter.setBInMainFile(bInMainFile); // DWH 4-15-09 only allow blank text in main files
 			if (bInMainFile && bSquishable)
 			{
