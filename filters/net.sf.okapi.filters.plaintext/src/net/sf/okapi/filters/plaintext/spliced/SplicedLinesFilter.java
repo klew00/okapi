@@ -42,9 +42,9 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 
 	public static final String FILTER_NAME				= "okf_plaintext_spliced";
 	
-	public static final String CONFIG_SPLICED			= "okf_plaintext_spliced";
-	public static final String CONFIG_SPLICED_UNDERLINE	= "okf_plaintext_spliced_underline";
-	public static final String CONFIG_SPLICED_BACKSLASH	= "okf_plaintext_spliced_backslash";
+	public static final String FILTER_CONFIG			= "okf_plaintext_spliced";
+	public static final String FILTER_CONFIG_UNDERLINE	= "okf_plaintext_spliced_underline";
+	public static final String FILTER_CONFIG_BACKSLASH	= "okf_plaintext_spliced_backslash";
 	
 	private Parameters params; 	
 	private List<TextContainer> splicedLines;
@@ -57,19 +57,19 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		setParameters(new Parameters());	// Spliced Lines Filter parameters
 
 		addConfiguration(true, 
-				CONFIG_SPLICED,
+				FILTER_CONFIG,
 				"Spliced Lines Filter",
 				"Extracts as one line the consecutive lines with a predefined splicer character at the end", 
 				null);
 		
 		addConfiguration(false, 
-				CONFIG_SPLICED_UNDERLINE,
+				FILTER_CONFIG_UNDERLINE,
 				"Underline Spliced Lines Filter",
 				"Sliced line filter with the underline character (_) used as the splicer", 
 				null);
 		
 		addConfiguration(false, 
-				CONFIG_SPLICED_BACKSLASH,
+				FILTER_CONFIG_BACKSLASH,
 				"Backspace Spliced Lines Filter",
 				"Sliced line filter with the backspace character (\\) used as the splicer", 
 				null);
