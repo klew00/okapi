@@ -218,7 +218,7 @@ public class IDMLFilter implements IFilter {
 		filter.setParameters(params);
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), srcLang, true));
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {

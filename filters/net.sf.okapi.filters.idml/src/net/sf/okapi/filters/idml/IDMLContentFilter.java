@@ -166,8 +166,10 @@ public class IDMLContentFilter implements IFilter {
 		XMLInputFactory fact = XMLInputFactory.newInstance();
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
-//TODO: how to make sure it's UTF-8???			input.setEncoding("UTF-8");
+		// The encoding may be not set if it comes as a binary RawDocument
+		// Which is OK since XMLStreamReader does its own detection
 		try {
 			reader = fact.createXMLStreamReader(input.getStream());
 		}
@@ -179,9 +181,6 @@ public class IDMLContentFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 
-		//TODO: Need to auto-detect the encoding and update 'encoding' variable
-		// use reader.getCharacterEncodingScheme() ??? but start doc not reported
-		
 		// Set the start event
 		stack = 0;
 		tuId = 0;
@@ -192,6 +191,8 @@ public class IDMLContentFilter implements IFilter {
 		
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
+		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
+		// We should use reader.getEncoding() when it's set
 		startDoc.setEncoding(encoding, false); //TODO: UTF8BOM detection
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
@@ -208,6 +209,9 @@ public class IDMLContentFilter implements IFilter {
 		skel.append("<?xml version=\"1.0\" encoding=\"");
 		skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
 		skel.append("\"?>");
+		//skel.append("<?xml version=\"1.0\" "
+		//	+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
+		//	+ "?>");
 		startDoc.setSkeleton(skel);
 	}
 
