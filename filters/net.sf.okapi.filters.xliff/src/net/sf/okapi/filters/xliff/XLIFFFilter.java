@@ -228,13 +228,11 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
-			// determine encoding based on BOM, if any
+			// Determine encoding based on BOM, if any
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
 			input.setEncoding(detector.getEncoding());
-			
-			//TODO: How does this filter auto detect the encoding??
 			reader = fact.createXMLStreamReader(input.getReader());
 
 			encoding = input.getEncoding();

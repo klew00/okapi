@@ -185,11 +185,10 @@ public class DTDFilter implements IFilter {
 
 		Reader rdr = null;
 		try {
-			rdr = input.getReader();
-			DTDParser parser = new DTDParser(rdr);
-			
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
+			input.setEncoding(detector.getEncoding());
+			DTDParser parser = new DTDParser(input.getReader());
 			
 			encoding = detector.getEncoding();
 			srcLang = input.getSourceLanguage();

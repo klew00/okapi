@@ -236,7 +236,7 @@ public class RegexFilter implements IFilter {
 		close(); // Just in case resources need to be freed
 	
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
-		detector.detectBom();
+		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		
 		BufferedReader reader = new BufferedReader(input.getReader());		

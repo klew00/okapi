@@ -192,6 +192,7 @@ public class ODFFilter implements IFilter {
 		// The encoding may be not set if it comes as a binary RawDocument
 		// Which is OK since XMLStreamReader does its own detection
 		try {
+			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
 			reader = fact.createXMLStreamReader(input.getStream());
 		}
 		catch ( XMLStreamException e ) {

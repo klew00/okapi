@@ -255,7 +255,7 @@ public class PropertiesFilter implements IFilter {
 
 		// Open the input reader from the provided reader
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
-		detector.detectBom();
+		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		
 		reader = new BufferedReader(input.getReader());

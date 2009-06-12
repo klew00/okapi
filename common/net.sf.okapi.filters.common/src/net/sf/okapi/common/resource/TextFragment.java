@@ -1485,6 +1485,7 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public void synchronizeCodes (TextFragment base) {
 		if ( !base.hasCode() ) return;
+		if ( codes == null ) return; // No codes in this fragment
 		List<Code> toUse = new ArrayList<Code>(base.getCodes());
 		Code srcCode;
 		Code candidate;

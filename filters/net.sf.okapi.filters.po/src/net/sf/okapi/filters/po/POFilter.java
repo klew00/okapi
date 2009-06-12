@@ -208,17 +208,17 @@ public class POFilter implements IFilter {
 			params.codeFinder.compile();
 		}
 
-		// detect and remove BOM
+		// Detect and remove BOM
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 				
 		// Open the input stream (JEH cannot call setEncoding after getReader is called so use getStream instead)
 		try {
 			reader = new BufferedReader(new InputStreamReader(input.getStream(), input.getEncoding()));
-		} catch (UnsupportedEncodingException e1) {
-			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e1);
-			LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", input.getEncoding()), re);
-			throw re;
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiUnsupportedEncodingException(
+				String.format("The encoding '%s' is not supported.", input.getEncoding()), e);
 		}
 	
 		encoding = input.getEncoding();
@@ -240,7 +240,7 @@ public class POFilter implements IFilter {
 				throw new OkapiIOException("Error re-opening the input.", e);
 			}
 			input.setEncoding(encoding);
-			reader = new BufferedReader(input.getReader()); //new InputStreamReader(startingInput, encoding));
+			reader = new BufferedReader(input.getReader());
 		}
 	}
 	
