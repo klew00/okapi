@@ -56,7 +56,7 @@ public class TextUnitUtils {
 		String st = textFragment.getCodedText();
 		TextFragment skelTF;
 		
-		int pos = TextFragment.getFirstNonWhitespacePosition(st, 0, -1, true, true, true, true);		
+		int pos = TextFragment.indexOfFirstNonWhitespace(st, 0, -1, true, true, true, true);		
 		if (pos == -1) { // Whole string is whitespaces
 			skelTF = new TextFragment(st);
 			textFragment.setCodedText("");			
@@ -92,7 +92,7 @@ public class TextUnitUtils {
 		String st = textFragment.getCodedText();
 		TextFragment skelTF;
 		
-		int pos = TextFragment.getLastNonWhitespacePosition(st, -1, 0, true, true, true, true);
+		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, true, true, true, true);
 		if (pos == -1) { // Whole string is whitespaces
 			skelTF = new TextFragment(st);
 			textFragment.setCodedText("");			
@@ -119,7 +119,7 @@ public class TextUnitUtils {
 		
 		String st = textFragment.getCodedText();
 		
-		int pos = TextFragment.getLastNonWhitespacePosition(st, -1, 0, true, true, true, true);
+		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, true, true, true, true);
 		if (pos == -1) return '\0';
 		
 		return st.charAt(pos);
@@ -134,7 +134,7 @@ public class TextUnitUtils {
 		if (textFragment == null) return;
 		String st = textFragment.getCodedText();
 		
-		int pos = TextFragment.getLastNonWhitespacePosition(st, -1, 0, true, true, true, true);
+		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, true, true, true, true);
 		if (pos == -1) return;
 		
 		textFragment.remove(pos, pos + 1);

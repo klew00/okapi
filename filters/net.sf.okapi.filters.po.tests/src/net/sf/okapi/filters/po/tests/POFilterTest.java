@@ -81,8 +81,8 @@ public class POFilterTest {
 		assertTrue(tu.hasTarget("fr"));
 		TextFragment src = tu.getSourceContent();
 		TextFragment trg = tu.getTargetContent("fr");
-		assertEquals(3, src.getCodes());
-		assertEquals(src.getCodes(), trg.getCodes().size());
+		assertEquals(3, src.getCodes().size());
+		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
 	}
 		
@@ -217,7 +217,6 @@ public class POFilterTest {
 		list.add(new InputDocument(root+"AllCasesTest.po", null));
 		list.add(new InputDocument(root+"Test_nautilus.af.po", null));
 		list.add(new InputDocument(root+"Test_DrupalRussianCP1251.po", null));
-		
 		list.add(new InputDocument(root+"POT-Test01.pot", null));
 	
 		RoundTripComparison rtc = new RoundTripComparison();

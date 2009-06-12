@@ -295,20 +295,20 @@ public class SRXSegmenter implements ISegmenter {
 		int trimmedTextStart;
 		for ( int pos : finalSplits ) {
 			// Trim white-spaces and codes as required at the front
-			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText,
+			trimmedTextStart = TextFragment.indexOfFirstNonWhitespace(codedText,
 				textStart, pos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
-			if ( trimmedTextStart == pos-1 ) {
+			if ( trimmedTextStart == -1 ) { //pos-1 ) {
 				// Only spaces in the segment: Continue with the next position
 				continue;
 			}
 			if ( trimLeadingWS || trimCodes ) textStart = trimmedTextStart;
 			// Trim white-spaces and codes as required at the back
 			if ( trimTrailingWS || trimCodes ) {
-				textEnd = TextFragment.getLastNonWhitespacePosition(codedText,
+				textEnd = TextFragment.indexOfLastNonWhitespace(codedText,
 					pos-1, 0, isSCWS, isECWS, isICWS, trimTrailingWS);
 			}
 			else textEnd = pos-1;
-			if ( textEnd > textStart ) { // Only if there is something
+			if ( textEnd >= textStart ) { // Only if there is something // was > only
 				if ( textEnd < pos ) textEnd++; // Adjust for +1 position
 				starts.add(textStart);
 				ends.add(textEnd);
@@ -319,18 +319,19 @@ public class SRXSegmenter implements ISegmenter {
 		int lastPos = codedText.length();
 		if ( textStart < lastPos ) {
 			// Trim white-spaces and codes as required at the front
-			trimmedTextStart = TextFragment.getFirstNonWhitespacePosition(codedText, textStart,
+			trimmedTextStart = TextFragment.indexOfFirstNonWhitespace(codedText, textStart,
 				lastPos-1, isSCWS, isECWS, isICWS, trimLeadingWS);
-			if ( trimLeadingWS || trimCodes  ) textStart = trimmedTextStart;
-			if ( trimmedTextStart < lastPos ) {
+			if ( trimLeadingWS || trimCodes  ) {
+				if ( trimmedTextStart != -1 ) textStart = trimmedTextStart;
+			}
+			if (( trimmedTextStart != -1 ) && ( trimmedTextStart < lastPos )) {
 				// Trim white-spaces and code as required at the back
 				if ( trimTrailingWS || trimCodes ) {
-					textEnd = TextFragment.getLastNonWhitespacePosition(codedText, lastPos-1,
+					textEnd = TextFragment.indexOfLastNonWhitespace(codedText, lastPos-1,
 						textStart, isSCWS, isECWS, isICWS, trimTrailingWS);
 				}
 				else textEnd = lastPos-1;
-				//TODO: fix case of last segment is single letter char surrounded by WS 
-				if ( textEnd > textStart ) { // Only if there is something
+				if ( textEnd >= textStart ) { // Only if there is something
 					if ( textEnd < lastPos ) textEnd++; // Adjust for +1 position
 					starts.add(textStart);
 					ends.add(textEnd);
@@ -403,7 +404,7 @@ public class SRXSegmenter implements ISegmenter {
 		}
 
 		// Trim the white-spaces and required codes at the end of the segment
-		end = TextFragment.getLastNonWhitespacePosition(text, end, start,
+		end = TextFragment.indexOfLastNonWhitespace(text, end, start,
 			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimTrailingWS);
 		
 		// Adjust for +1 position (it's a range)

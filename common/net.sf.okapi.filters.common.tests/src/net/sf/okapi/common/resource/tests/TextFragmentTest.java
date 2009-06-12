@@ -551,6 +551,111 @@ public class TextFragmentTest {
 		assertEquals(fmt.setContent(tf2).toString(false),
 			"<2/>A<3>B</3>C");
     }
+
+	@Test
+	public void testIndexOfNonWSEmpty () {
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace("", -1, 0, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace("", 0, -1, true, true, true, true));
+	}
+
+	@Test
+	public void testIndexOfFirstNonWSSimple () {
+		String text = " 12 4   ";
+		assertEquals(1, TextFragment.indexOfFirstNonWhitespace(text, 0, -1, true, true, true, true));
+		assertEquals(1, TextFragment.indexOfFirstNonWhitespace(text, 0, -1, true, true, true, true));
+		assertEquals(1, TextFragment.indexOfFirstNonWhitespace(text, 1, -1, true, true, true, true));
+		assertEquals(2, TextFragment.indexOfFirstNonWhitespace(text, 2, -1, true, true, true, true));
+		assertEquals(4, TextFragment.indexOfFirstNonWhitespace(text, 3, -1, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace(text, 5, -1, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace(text, 5, 6, true, true, true, true));
+	}
+
+	@Test
+	public void testIndexOfLastNonWSSimple () {
+		String text = "  23 5  8";
+		assertEquals(8, TextFragment.indexOfLastNonWhitespace(text, -1, 5, true, true, true, true));
+		assertEquals(8, TextFragment.indexOfLastNonWhitespace(text, 8, 0, true, true, true, true));
+		assertEquals(5, TextFragment.indexOfLastNonWhitespace(text, 7, 0, true, true, true, true));
+		assertEquals(3, TextFragment.indexOfLastNonWhitespace(text, 4, 0, true, true, true, true));
+		assertEquals(3, TextFragment.indexOfLastNonWhitespace(text, 3, 0, true, true, true, true));
+		assertEquals(2, TextFragment.indexOfLastNonWhitespace(text, 2, 0, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace(text, 7, 6, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace(text, 1, 0, true, true, true, true));
+	}
+	
+	@Test
+	public void textIndexOfFirstNonWSEmpty () {
+		TextFragment tf = new TextFragment("  ");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" ");
+		String text = tf.getCodedText();
+		// "  XX XX "
+		// "01234567"
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace(text, 0, 0, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace(text, 0, -1, true, true, true, true));
+		// WS are not WS
+		assertEquals(4, TextFragment.indexOfFirstNonWhitespace(text, 2, 0, true, true, true, false));
+	}
+	
+	@Test
+	public void testIndexOfLastNonWSEmpty () {
+		TextFragment tf = new TextFragment("  ");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" ");
+		String text = tf.getCodedText();
+		// "  XX XX "
+		// "01234567"
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace(text, -1, 0, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace(text, 6, 0, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfLastNonWhitespace(text, 7, 0, true, true, true, true));
+		// WS are not WS
+		assertEquals(7, TextFragment.indexOfLastNonWhitespace(text, -1, 0, true, true, true, false));
+	}
+	
+	@Test
+	public void testIndexOfFirstNonWSWithCodes () {
+		TextFragment tf = new TextFragment("  ab");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append("c");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		String text = tf.getCodedText();
+		// "  abXXcXX XX"
+		// "012345678901"
+		assertEquals(2, TextFragment.indexOfFirstNonWhitespace(text, 0, -1, true, true, true, true));
+		assertEquals(2, TextFragment.indexOfFirstNonWhitespace(text, 0, -1, true, true, true, true));
+		assertEquals(6, TextFragment.indexOfFirstNonWhitespace(text, 4, -1, true, true, true, true));
+		assertEquals(-1, TextFragment.indexOfFirstNonWhitespace(text, 7, -1, true, true, true, true));
+		// WS are not WS
+		assertEquals(9, TextFragment.indexOfFirstNonWhitespace(text, 7, -1, true, true, true, false));
+		// Placeholder codes are not WS
+		assertEquals(7, TextFragment.indexOfFirstNonWhitespace(text, 7, -1, true, true, false, true));
+		assertEquals(10, TextFragment.indexOfFirstNonWhitespace(text, 9, -1, true, true, false, true));
+	}
+	
+	@Test
+	public void testIndexOfLastNonWSWithCodes () {
+		TextFragment tf = new TextFragment("  ab");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append("c");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(" d");
+		String text = tf.getCodedText();
+		// "  abXXcXX d"
+		// "01234567890"
+		assertEquals(10, TextFragment.indexOfLastNonWhitespace(text, -1, 0, true, true, true, true));
+		assertEquals(6, TextFragment.indexOfLastNonWhitespace(text, 9, 0, true, true, true, true));
+		assertEquals(3, TextFragment.indexOfLastNonWhitespace(text, 5, 0, true, true, true, true));
+		// WS are not WS
+		assertEquals(9, TextFragment.indexOfLastNonWhitespace(text, 9, 0, true, true, true, false));
+		// Placeholder codes are not WS
+		assertEquals(8, TextFragment.indexOfLastNonWhitespace(text, 9, 0, true, true, false, true));
+	}
 	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>

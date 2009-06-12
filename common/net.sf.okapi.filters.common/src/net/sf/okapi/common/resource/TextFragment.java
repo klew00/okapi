@@ -168,9 +168,13 @@ public class TextFragment implements Comparable<Object> {
 	 * @param closingMarkerIsWS indicates if closing markers count as whitespace.
 	 * @param isolatedMarkerIsWS indicates if isolated markers count as whitespace.
 	 * @param whitespaceIsWS indicates if whitespace characters count as whitespace.
-	 * @return the first non-whitespace character position from the back, given the parameters.
+	 * @return the first non-whitespace character position from the back, given the 
+	 * parameters, or -1 if the text in null, empty or if no non-whitespace has been
+	 * found after the character at the position untilIndex has been checked.
+	 * If the last non-whitespace found is a code, the position returned is the index
+	 * of the second special character marker for that code.
 	 */
-	public static int getLastNonWhitespacePosition (String codedText,
+	public static int indexOfLastNonWhitespace (String codedText,
 		int fromIndex,
 		int untilIndex,
 		boolean openingMarkerIsWS,
@@ -190,20 +194,20 @@ public class TextFragment implements Comparable<Object> {
 			switch ( codedText.charAt(textEnd) ) {
 			case TextFragment.MARKER_OPENING:
 				if ( !openingMarkerIsWS ) {
-					textEnd += 2;
+					textEnd++; // was += 2;
 					done = true;
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				if ( !closingMarkerIsWS ) {
-					textEnd += 2;
+					textEnd++; // was += 2;
 					done = true;
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				if ( !isolatedMarkerIsWS ) {
-					textEnd += 2;
+					textEnd++; //was += 2;
 					done = true;
 				}
 				break;
@@ -247,9 +251,11 @@ public class TextFragment implements Comparable<Object> {
 	 * @param closingMarkerIsWS indicates if closing markers count as whitespace.
 	 * @param isolatedMarkerIsWS indicates if isolated markers count as whitespace.
 	 * @param whitespaceIsWS indicates if whitespace characters count as whitespace.
-	 * @return the first non-whitespace character position, given the parameters.
+	 * @return the first non-whitespace character position, given the parameters,
+	 * or -1 if the text is null or empty, or no non-whitespace has been found
+	 * after the character at the position untilIndex has been checked. 
 	 */
-	public static int getFirstNonWhitespacePosition (String codedText,
+	public static int indexOfFirstNonWhitespace (String codedText,
 		int fromIndex,
 		int untilIndex,
 		boolean openingMarkerIsWS,

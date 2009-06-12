@@ -39,19 +39,29 @@ import static org.junit.Assert.*;
 public class SegmentationTest {
 
 	ISegmenter segmenter;
+	ISegmenter segmenterTrim;
 	
 	@Before
 	public void setUp() {
-		SRXDocument doc = new SRXDocument();
+		SRXDocument doc1 = new SRXDocument();
 		LanguageMap langMap = new LanguageMap(".*", "default");
-		doc.addLanguageMap(langMap);
+		doc1.addLanguageMap(langMap);
 		// Add the rules
 		ArrayList<Rule> langRules = new ArrayList<Rule>();
 		langRules.add(new Rule("\\.", "\\s", true));
+		langRules.add(new Rule("\\|", "", true));
 		// Add the ruls to the document
-		doc.addLanguageRule("default", langRules);
+		doc1.addLanguageRule("default", langRules);
 		// Create the segmenter
-		segmenter = doc.compileLanguageRules("en", null);
+		segmenter = doc1.compileLanguageRules("en", null);
+
+		SRXDocument doc2 = new SRXDocument();
+		doc2.addLanguageMap(langMap);
+		doc2.addLanguageRule("default", langRules);
+		doc2.setTrimLeadingWhitespaces(true);
+		doc2.setTrimTrailingWhitespaces(true);
+		// Create the segmenter
+		segmenterTrim = doc2.compileLanguageRules("en", null);
 	}
 
 	@Test
@@ -124,6 +134,45 @@ public class SegmentationTest {
 		assertEquals(" Added Part.", tc.getSegments().get(2).toString());
 	}
 	
+	@Test
+	public void testSegmentationSimple1 () {
+		TextContainer tc = createSegmentedContainer("a. z", segmenter);
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals("a.", tc.getSegments().get(0).toString());
+		assertEquals(" z", tc.getSegments().get(1).toString());
+		tc = createSegmentedContainer("a. z", segmenterTrim);
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals("a.", tc.getSegments().get(0).toString());
+		assertEquals("z", tc.getSegments().get(1).toString());
+	}
+	
+	@Test
+	public void testSegmentationSimpleWithLeadingTrainlingWS () {
+		TextContainer tc = createSegmentedContainer(" a.  ", segmenter);
+		assertEquals(2, tc.getSegmentCount());
+		assertEquals(" a.", tc.getSegments().get(0).toString());
+		assertEquals("  ", tc.getSegments().get(1).toString());
+		// 1 segment only because the last one is only made of whitespaces
+		tc = createSegmentedContainer("a. ", segmenterTrim);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("a.", tc.getSegments().get(0).toString());
+	}
+	
+	@Test
+	public void testSegmentationWithEmpty () {
+		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
+		assertEquals(3, tc.getSegmentCount());
+		assertEquals(" a.", tc.getSegments().get(0).toString());
+		assertEquals(" |", tc.getSegments().get(1).toString());
+		assertEquals(" b.", tc.getSegments().get(2).toString());
+		// 1 segment only because the last one is only made of whitespaces
+		tc = createSegmentedContainer(" a. |  b.", segmenterTrim);
+		assertEquals(3, tc.getSegmentCount());
+		assertEquals("a.", tc.getSegments().get(0).toString());
+		assertEquals("|", tc.getSegments().get(1).toString());
+		assertEquals("b.", tc.getSegments().get(2).toString());
+	}
+
 	private TextContainer createSegmentedContainer () {
 		TextContainer tc = new TextContainer();
 		tc.append(TagType.OPENING, "s", "<s>");
@@ -133,6 +182,15 @@ public class SegmentationTest {
 		segmenter.computeSegments(tc);
 		tc.createSegments(segmenter.getRanges());
 		tc.insert(2, new TextFragment("Outside"));
+		return tc;
+	}
+
+	private TextContainer createSegmentedContainer (String text,
+		ISegmenter segmenter)
+	{
+		TextContainer tc = new TextContainer(text);
+		segmenter.computeSegments(tc);
+		tc.createSegments(segmenter.getRanges());
 		return tc;
 	}
 
