@@ -76,7 +76,7 @@ public class PipelineEditor {
 		String projectDir)
 	{
 		context = new BaseContext();
-		//TODO: Set properties of context
+		context.setObject("shell", parent);
 		
 		boolean result = false;
 		try {
@@ -118,7 +118,7 @@ public class PipelineEditor {
 	private void create (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Edit/Execute Pipeline");
-		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
+		UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout(2, false);
 		shell.setLayout(layTmp);
 		

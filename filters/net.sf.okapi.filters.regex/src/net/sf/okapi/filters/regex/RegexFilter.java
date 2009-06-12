@@ -22,7 +22,6 @@ package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -235,14 +234,7 @@ public class RegexFilter implements IFilter {
 	{
 		close(); // Just in case resources need to be freed
 	
-		BufferedReader reader = null;
-		Reader rdr = input.getReader();
-		if ( rdr instanceof BufferedReader ) {
-			reader = (BufferedReader)rdr;
-		}
-		else {
-			reader = new BufferedReader(rdr);
-		}
+		BufferedReader reader = new BufferedReader(input.getReader());
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();

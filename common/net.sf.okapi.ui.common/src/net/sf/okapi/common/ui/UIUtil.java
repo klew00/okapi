@@ -120,7 +120,7 @@ public class UIUtil {
 	 * shell. If the parent has several images available, they are passed to the
 	 * dialog, otherwise the current result of parent.getImage() is used. 
 	 * @param dialog The dialog where to set the icon.
-	 * @param parent The parent to inherit from.
+	 * @param parent The parent to inherit from (if null nothing is done).
 	 */
 	public static void inheritIcon (Shell dialog,
 		Shell parent)
