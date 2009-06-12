@@ -22,11 +22,16 @@ package net.sf.okapi.filters.po;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -35,6 +40,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -57,7 +63,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Implements the IFilter interface for PO files.
  */
 public class POFilter implements IFilter {
-
+	private static final Logger LOGGER = Logger.getLogger(POFilter.class.getName());
+	
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
@@ -201,14 +208,24 @@ public class POFilter implements IFilter {
 			params.codeFinder.compile();
 		}
 
-		// Open the input reader from the provided reader
-		reader = new BufferedReader(input.getReader(true));
+		// detect and remove BOM
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectAndRemoveBom();
+				
+		// Open the input stream (JEH cannot call setEncoding after getReader is called so use getStream instead)
+		try {
+			reader = new BufferedReader(new InputStreamReader(input.getStream(), input.getEncoding()));
+		} catch (UnsupportedEncodingException e1) {
+			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e1);
+			LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", input.getEncoding()), re);
+			throw re;
+		}
 	
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
+		hasUTF8BOM = detector.hasUtf8Bom();
+		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}
@@ -223,7 +240,7 @@ public class POFilter implements IFilter {
 				throw new OkapiIOException("Error re-opening the input.", e);
 			}
 			input.setEncoding(encoding);
-			reader = new BufferedReader(input.getReader(true)); //new InputStreamReader(startingInput, encoding));
+			reader = new BufferedReader(input.getReader()); //new InputStreamReader(startingInput, encoding));
 		}
 	}
 	

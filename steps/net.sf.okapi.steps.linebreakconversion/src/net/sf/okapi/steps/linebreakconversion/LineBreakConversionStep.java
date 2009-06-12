@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.CharBuffer;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -85,7 +86,12 @@ public class LineBreakConversionStep extends BasePipelineStep {
 		OutputStreamWriter writer = null;
 		try {
 			rawDoc = (RawDocument)event.getResource();
-			reader = new BufferedReader(rawDoc.getReader(true));
+			
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
+			detector.detectAndRemoveBom();
+			rawDoc.setEncoding(detector.getEncoding());
+			
+			reader = new BufferedReader(rawDoc.getReader());
 			
 			// Open the output
 			File outFile;
@@ -106,7 +112,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			
 			writer = new OutputStreamWriter(new BufferedOutputStream(output), rawDoc.getEncoding());
 			// Write BOM if there was one
-			Util.writeBOMIfNeeded(writer, rawDoc.hasUtf8Bom(), rawDoc.getEncoding());
+			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), rawDoc.getEncoding());
 			
 			// Set the variables
 			CharBuffer buffer = CharBuffer.allocate(1024);

@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
@@ -179,10 +180,13 @@ public class AbstractLineFilter extends AbstractFilter {
 	{
 		if (input == null) throw new OkapiBadFilterInputException("RawDocument is not defined in open(RawDocument, boolean).");
 					
-		encoding = input.getEncoding();
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectBom();
+		input.setEncoding(detector.getEncoding());
+		encoding = detector.getEncoding();
 		srcLang = input.getSourceLanguage();
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
+		hasUTF8BOM = detector.hasUtf8Bom();
+		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}

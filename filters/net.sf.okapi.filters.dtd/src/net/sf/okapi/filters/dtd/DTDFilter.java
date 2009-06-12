@@ -37,6 +37,7 @@ import com.wutka.dtd.DTDEntity;
 import com.wutka.dtd.DTDOutput;
 import com.wutka.dtd.DTDParser;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -186,10 +187,14 @@ public class DTDFilter implements IFilter {
 		try {
 			rdr = input.getReader();
 			DTDParser parser = new DTDParser(rdr);
-			encoding = input.getEncoding();
+			
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+			detector.detectBom();
+			
+			encoding = detector.getEncoding();
 			srcLang = input.getSourceLanguage();
-			hasUTF8BOM = input.hasUtf8Bom();
-			lineBreak = input.getNewLineType();
+			hasUTF8BOM = detector.hasUtf8Bom();
+			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
 			}

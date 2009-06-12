@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -176,7 +177,12 @@ public class EncodingConversionStep extends BasePipelineStep {
 			
 			// Try to auto-detect the encoding for HTML/XML
 			String outputEncoding = getContext().getOutputEncoding(0);
-			reader = new BufferedReader(rawDoc.getReader(true));
+			
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
+			detector.detectAndRemoveBom();
+			rawDoc.setEncoding(detector.getEncoding());
+			
+			reader = new BufferedReader(rawDoc.getReader());
 			String inputEncoding = rawDoc.getEncoding();
 			reader.read(buffer);
 			String detectedEncoding = checkDeclaration(inputEncoding);
@@ -186,7 +192,8 @@ public class EncodingConversionStep extends BasePipelineStep {
 			reader.close();
 
 			// Open the input document
-			reader = new BufferedReader(rawDoc.getReader(true));
+			//TODO: Where did we reset the reader - cann't call this twice unless we reset it
+			reader = new BufferedReader(rawDoc.getReader());
 			logger.info("Input encoding: " + inputEncoding);
 			
 			// Open the output document

@@ -29,6 +29,7 @@ import java.util.Stack;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -234,12 +235,16 @@ public class RegexFilter implements IFilter {
 	{
 		close(); // Just in case resources need to be freed
 	
-		BufferedReader reader = new BufferedReader(input.getReader());
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectBom();
+		input.setEncoding(detector.getEncoding());
+		
+		BufferedReader reader = new BufferedReader(input.getReader());		
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
+		hasUTF8BOM = detector.hasUtf8Bom();
+		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}

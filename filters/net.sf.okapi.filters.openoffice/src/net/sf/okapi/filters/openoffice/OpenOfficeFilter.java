@@ -257,7 +257,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter.close();
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), srcLang, true));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), RawDocument.UNKOWN_ENCODING, srcLang));
 			event = filter.next(); // START_DOCUMENT
 			filter.setContainerMimeType(internalMimeType);
 		}

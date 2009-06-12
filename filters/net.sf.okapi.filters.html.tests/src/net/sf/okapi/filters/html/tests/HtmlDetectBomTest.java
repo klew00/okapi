@@ -32,6 +32,7 @@ public class HtmlDetectBomTest {
 	public void testDetectBom() throws IOException {
 		InputStream htmlStream = HtmlDetectBomTest.class.getResourceAsStream("/ruby.html");		
 		BOMNewlineEncodingDetector bomDetector = new BOMNewlineEncodingDetector(htmlStream);
+		bomDetector.detectBom();
 		
 		assertTrue(bomDetector.hasBom());
 		assertTrue(bomDetector.hasUtf8Bom());

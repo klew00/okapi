@@ -170,14 +170,12 @@ public final class BOMNewlineEncodingDetector {
 	 * Cannot detect {@link NewlineType} unless a valid encoding is detected.
 	 * 
 	 * @param inputStream
-	 * @throws IOException
 	 */
-	public BOMNewlineEncodingDetector(final InputStream inputStream) throws IOException {
+	public BOMNewlineEncodingDetector(final InputStream inputStream) {
 		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		inputStream.mark(4);
 		autodetected = false;
-		bomSize = 0;		
-		init();
+		bomSize = 0;
 	}
 
 	/**
@@ -186,16 +184,14 @@ public final class BOMNewlineEncodingDetector {
 	 * input bytes to Unicode for detection of the {@link NewlineType}
 	 * 
 	 * @param inputStream
-	 * @param defaultEncoding
-	 * @throws IOException
+	 * @param defaultEncoding	
 	 */
-	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding) throws IOException {
+	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding)  {
 		this.defaultEncoding = defaultEncoding;
 		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
 		inputStream.mark(4);
 		autodetected = false;
 		bomSize = 0;
-		init();
 	}
 
 	/**
@@ -342,239 +338,277 @@ public final class BOMNewlineEncodingDetector {
 		return true;
 	}
 
-	private boolean init() throws IOException {
+	public void detectBom() {
+		try {
+			detectBomInternal();
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Error detecting Byte Order Mark (BOM)", re);
+			throw re;
+		}
+	}
+
+	public void detectAndRemoveBom() {
+		try {
+			detectBomInternal();
+			if (hasBom()) {				
+				for (int i = 0; i < getBomSize(); i++) {
+					inputStream.read(); // read the byte to remove it
+				}				
+			}
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Error detecting Byte Order Mark (BOM)", re);
+			throw re;
+		}
+	}
+
+	private boolean detectBomInternal() throws IOException {
 		hasUtf8Bom = false;
 		hasUtf7Bom = false;
 		hasBom = false;
 
-		final int b1 = inputStream.read();
-		if (b1 == -1) {
-			return setEncoding(null, "empty input stream");
-		}
-		final int b2 = inputStream.read();
-		final int b3 = inputStream.read();
-		final int b4 = inputStream.read();
-		inputStream.reset();
-		// Check for Unicode Byte Order Mark:
-		if (b1 == 0xEF) {
-			if (b2 == 0xBB && b3 == 0xBF) {
-				hasUtf8Bom = true;
-				hasBom = true;
-				autodetected = true;
-				bomSize = 3;
-				return setEncoding(UTF_8, "UTF-8 Byte Order Mark (EF BB BF)");
+		try {
+			inputStream.mark(5);
+			final int b1 = inputStream.read();
+			if (b1 == -1) {
+				return setEncoding(null, "empty input stream");
 			}
-		} else if (b1 == 0xFE) {
-			if (b2 == 0xFF) {
-				hasBom = true;
-				autodetected = true;
-				bomSize = 2;
-				return setEncoding(UTF_16, "UTF-16 big-endian Byte Order Mark (FE FF)");
-			}
-		} else if (b1 == 0xFF) {
-			if (b2 == 0xFE) {
-				if (b3 == 0 && b4 == 0) {
+			final int b2 = inputStream.read();
+			final int b3 = inputStream.read();
+			final int b4 = inputStream.read();
+
+			// Check for Unicode Byte Order Mark:
+			if (b1 == 0xEF) {
+				if (b2 == 0xBB && b3 == 0xBF) {
+					hasUtf8Bom = true;
+					hasBom = true;
+					autodetected = true;
+					bomSize = 3;
+					return setEncoding(UTF_8, "UTF-8 Byte Order Mark (EF BB BF)");
+				}
+			} else if (b1 == 0xFE) {
+				if (b2 == 0xFF) {
+					hasBom = true;
+					autodetected = true;
+					bomSize = 2;
+					return setEncoding(UTF_16, "UTF-16 big-endian Byte Order Mark (FE FF)");
+				}
+			} else if (b1 == 0xFF) {
+				if (b2 == 0xFE) {
+					if (b3 == 0 && b4 == 0) {
+						hasBom = true;
+						autodetected = true;
+						bomSize = 4;
+						return setEncoding(UTF_32, "UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
+					}
+					hasBom = true;
+					autodetected = true;
+					bomSize = 2;
+					return setEncoding(UTF_16, "UTF-16 little-endian Byte Order Mark (FF EE)");
+				}
+			} else if (b1 == 0) {
+				if (b2 == 0 && b3 == 0xFE && b4 == 0xFF) {
 					hasBom = true;
 					autodetected = true;
 					bomSize = 4;
-					return setEncoding(UTF_32, "UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
+					return setEncoding(UTF_32, "UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
 				}
-				hasBom = true;
-				autodetected = true;
-				bomSize = 2;
-				return setEncoding(UTF_16, "UTF-16 little-endian Byte Order Mark (FF EE)");
+			} else if (b1 == 0x0E) {
+				if (b2 == 0xFE && b3 == 0xFF) {
+					hasBom = true;
+					autodetected = true;
+					bomSize = 3;
+					return setEncoding(SCSU, "SCSU Byte Order Mark (0E FE FF)");
+				}
+			} else if (b1 == 0x2B) {
+				if (b2 == 0x2F && b3 == 0x76) {
+					hasUtf7Bom = true;
+					hasBom = true;
+					autodetected = true;
+					bomSize = 3;
+					return setEncoding(UTF_7, "UTF-7 Byte Order Mark (2B 2F 76)");
+				}
+			} else if (b1 == 0xDD) {
+				if (b2 == 0x73 && b3 == 0x66 && b4 == 0x73) {
+					hasBom = true;
+					autodetected = true;
+					bomSize = 4;
+					return setEncoding(UTF_EBCDIC, "UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
+				}
+			} else if (b1 == 0xFB) {
+				if (b2 == 0xEE && b3 == 0x28) {
+					hasBom = true;
+					autodetected = true;
+					bomSize = 3;
+					return setEncoding(BOCU_1, "BOCU-1 Byte Order Mark (FB EE 28)");
+				}
 			}
-		} else if (b1 == 0) {
-			if (b2 == 0 && b3 == 0xFE && b4 == 0xFF) {
-				hasBom = true;
-				autodetected = true;
-				bomSize = 4;
-				return setEncoding(UTF_32, "UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
-			}
-		} else if (b1 == 0x0E) {
-			if (b2 == 0xFE && b3 == 0xFF) {
-				hasBom = true;
-				autodetected = true;
-				bomSize = 3;
-				return setEncoding(SCSU, "SCSU Byte Order Mark (0E FE FF)");
-			}
-		} else if (b1 == 0x2B) {
-			if (b2 == 0x2F && b3 == 0x76) {
-				hasUtf7Bom = true;
-				hasBom = true;
-				autodetected = true;
-				bomSize = 3;
-				return setEncoding(UTF_7, "UTF-7 Byte Order Mark (2B 2F 76)");
-			}
-		} else if (b1 == 0xDD) {
-			if (b2 == 0x73 && b3 == 0x66 && b4 == 0x73) {
-				hasBom = true;
-				autodetected = true;
-				bomSize = 4;
-				return setEncoding(UTF_EBCDIC, "UTF-EBCDIC Byte Order Mark (DD 73 66 73)");
-			}
-		} else if (b1 == 0xFB) {
-			if (b2 == 0xEE && b3 == 0x28) {
-				hasBom = true;
-				autodetected = true;
-				bomSize = 3;
-				return setEncoding(BOCU_1, "BOCU-1 Byte Order Mark (FB EE 28)");
-			}
-		}
 
-		// No Unicode Byte Order Mark found. Have to start guessing.
-		definitive = false;
-		autodetected = false;
-		bomSize = 0;
-		
-		LOGGER.log(Level.FINEST, "BOM not found. Now trying to guess document encoding.");
+			// No Unicode Byte Order Mark found. Have to start guessing.
+			definitive = false;
+			autodetected = false;
+			hasBom = false;
+			bomSize = 0;
 
-		/*
-		 * The best we can do is to provide an encoding that reflects the
-		 * correct number and ordering of bytes for characters in the ASCII
-		 * range. The result will be one of ISO_8859_1, EBCDIC, UTF_16BE,
-		 * UTF_16LE, UTF_32BE or UTF_32LE. Assumes 00 bytes indicate multi-byte
-		 * encodings rather than the presence of NUL characters or characters
-		 * with a code that is a multiple of 0x100.
-		 */
-		if (b4 == -1) {
+			LOGGER.log(Level.FINEST, "BOM not found. Now trying to guess document encoding.");
+
 			/*
-			 * The stream contains between 1 and 3 bytes. This means the
-			 * document can't possibly specify the encoding, so make a best
-			 * guess based on the first 3 bytes.
-			 * 
-			 * It might be possible to rule out some encodings based on these
-			 * bytes, but it is impossible to make a definite determination. The
-			 * main thing to determine is whether it is an 8-bit or 16-bit
-			 * encoding. In order to guess the most likely encoding, assume that
-			 * the text contains only ASCII characters, and that any 00 bytes
-			 * indicate a 16-bit encoding. The only strictly 8-bit encoding
-			 * guaranteed to be supported on all java platforms is ISO-8859-1
-			 * (UTF-8 uses a variable number of bytes per character). If no 00
-			 * bytes are present it is safest to assume ISO-8859-1, as this
-			 * accepts the full range of values 00-FF in every byte.
+			 * The best we can do is to provide an encoding that reflects the
+			 * correct number and ordering of bytes for characters in the ASCII
+			 * range. The result will be one of ISO_8859_1, EBCDIC, UTF_16BE,
+			 * UTF_16LE, UTF_32BE or UTF_32LE. Assumes 00 bytes indicate
+			 * multi-byte encodings rather than the presence of NUL characters
+			 * or characters with a code that is a multiple of 0x100.
 			 */
-			if (b2 == -1 || b3 != -1)
-				return setEncoding(ISO_8859_1, "default 8-bit ASCII-compatible encoding (stream 3 bytes long)"); // The
+			if (b4 == -1) {
+				/*
+				 * The stream contains between 1 and 3 bytes. This means the
+				 * document can't possibly specify the encoding, so make a best
+				 * guess based on the first 3 bytes.
+				 * 
+				 * It might be possible to rule out some encodings based on
+				 * these bytes, but it is impossible to make a definite
+				 * determination. The main thing to determine is whether it is
+				 * an 8-bit or 16-bit encoding. In order to guess the most
+				 * likely encoding, assume that the text contains only ASCII
+				 * characters, and that any 00 bytes indicate a 16-bit encoding.
+				 * The only strictly 8-bit encoding guaranteed to be supported
+				 * on all java platforms is ISO-8859-1 (UTF-8 uses a variable
+				 * number of bytes per character). If no 00 bytes are present it
+				 * is safest to assume ISO-8859-1, as this accepts the full
+				 * range of values 00-FF in every byte.
+				 */
+				if (b2 == -1 || b3 != -1)
+					return setEncoding(ISO_8859_1, "default 8-bit ASCII-compatible encoding (stream 3 bytes long)"); // The
+				/*
+				 * stream contains exactly 1 or 3 bytes, so assume an 8-bit
+				 * encoding regardless of whether any 00 bytes are present. The
+				 * stream contains exactly 2 bytes.
+				 */
+				if (b1 == 0)
+					return setEncoding(UTF_16BE,
+							"default 16-bit BE encoding (byte stream starts with 00, stream 2 bytes long)");
+				if (b2 == 0)
+					return setEncoding(UTF_16LE,
+							"default 16-bit LE encoding (byte stream pattern XX 00, stream 2 bytes long)");
+				// No 00 bytes present, assume 8-bit encoding:
+				return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
+			}
 			/*
-			 * stream contains exactly 1 or 3 bytes, so assume an 8-bit encoding
-			 * regardless of whether any 00 bytes are present. The stream
-			 * contains exactly 2 bytes.
+			 * Stream contains at least 4 bytes. The patterns used for
+			 * documentation are made up of: 0 - zero byte X - non-zero byte ? -
+			 * byte value not yet determined
 			 */
-			if (b1 == 0)
-				return setEncoding(UTF_16BE,
-						"default 16-bit BE encoding (byte stream starts with 00, stream 2 bytes long)");
-			if (b2 == 0)
-				return setEncoding(UTF_16LE,
-						"default 16-bit LE encoding (byte stream pattern XX 00, stream 2 bytes long)");
-			// No 00 bytes present, assume 8-bit encoding:
-			return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
-		}
-		/*
-		 * Stream contains at least 4 bytes. The patterns used for documentation
-		 * are made up of: 0 - zero byte X - non-zero byte ? - byte value not
-		 * yet determined
-		 */
-		if (b1 == 0) {
-			// pattern 0???
-			if (b2 == 0)
-				return setEncoding(UTF_32BE, "default 32-bit BE encoding (byte stream starts with 00 00)"); // pattern
-			/*
-			 * 00?? most likely indicates UTF-32BE pattern 0X?? Regardless of
-			 * the final two bytes, assume that the first two bytes indicate a
-			 * 16-bit BE encoding. There are many circumstances where this could
-			 * be an incorrect assumption, for example: - UTF-16LE encoding with
-			 * first character U+0100 (or any other character whose code is a
-			 * multiple of 100Hex) - any encoding with first character NUL -
-			 * UTF-32BE encoding with first character outside of Basic
-			 * Multilingual Plane (BMP) Checking the final two bytes might give
-			 * some clues as to whether any of these other situations are more
-			 * likely, but none of the clues will yield less than a 50% chance
-			 * that the encoding is in fact UTF-16BE as suggested by the first
-			 * two bytes.
-			 */
-			return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with 00)"); // >=50%
-			/*
-			 * chance that encoding is UTF-16BE
-			 */
-		}
-		// pattern X???
-		if (b4 == 0) {
-			// pattern X??0
+			if (b1 == 0) {
+				// pattern 0???
+				if (b2 == 0)
+					return setEncoding(UTF_32BE, "default 32-bit BE encoding (byte stream starts with 00 00)"); // pattern
+				/*
+				 * 00?? most likely indicates UTF-32BE pattern 0X?? Regardless
+				 * of the final two bytes, assume that the first two bytes
+				 * indicate a 16-bit BE encoding. There are many circumstances
+				 * where this could be an incorrect assumption, for example: -
+				 * UTF-16LE encoding with first character U+0100 (or any other
+				 * character whose code is a multiple of 100Hex) - any encoding
+				 * with first character NUL - UTF-32BE encoding with first
+				 * character outside of Basic Multilingual Plane (BMP) Checking
+				 * the final two bytes might give some clues as to whether any
+				 * of these other situations are more likely, but none of the
+				 * clues will yield less than a 50% chance that the encoding is
+				 * in fact UTF-16BE as suggested by the first two bytes.
+				 */
+				return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with 00)"); // >=50%
+				/*
+				 * chance that encoding is UTF-16BE
+				 */
+			}
+			// pattern X???
+			if (b4 == 0) {
+				// pattern X??0
+				if (b3 == 0)
+					return setEncoding(UTF_32LE,
+							"default 32-bit LE encoding (byte stream starts with pattern XX ?? 00 00)"); // pattern
+				/*
+				 * X?00 most likely indicates UTF-32LE pattern X?X0
+				 */
+				return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream stars with pattern XX ?? XX 00)"); // Regardless
+				/*
+				 * of the second byte, assume the fourth 00 byte indicates
+				 * UTF-16LE.
+				 */
+			}
+			// pattern X??X
+			if (b2 == 0) {
+				/*
+				 * pattern X0?X Assuming the second 00 byte doesn't indicate a
+				 * NUL character, and that it is very unlikely that this is a
+				 * 32-bit encoding of a character outside of the BMP, we can
+				 * assume that it indicates a 16-bit encoding. If the pattern is
+				 * X00X, there is a 50/50 chance that the encoding is BE or LE,
+				 * with one of the characters have a code that is a multiple of
+				 * 0x100. This should be a very rare occurrence, and there is no
+				 * more than a 50% chance that the encoding will be different to
+				 * that assumed (UTF-16LE) without checking for this occurrence,
+				 * so don't bother checking for it. If the pattern is X0XX, this
+				 * is likely to indicate a 16-bit LE encoding with the second
+				 * character > U+00FF.
+				 */
+				return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream starts with pattern XX 00 ?? XX)");
+			}
+			// pattern XX?X
 			if (b3 == 0)
-				return setEncoding(UTF_32LE, "default 32-bit LE encoding (byte stream starts with pattern XX ?? 00 00)"); // pattern
+				return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with pattern XX XX 00 XX)"); // pattern
 			/*
-			 * X?00 most likely indicates UTF-32LE pattern X?X0
+			 * XX0X likely to indicate a 16-bit BE encoding with the first
+			 * character > U+00FF. pattern XXXX Although it is still possible
+			 * that this is a 16-bit encoding with the first two characters >
+			 * U+00FF Assume the more likely case of four 8-bit characters <=
+			 * U+00FF. Check whether it fits some common EBCDIC strings that
+			 * might be found at the start of a document:
 			 */
-			return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream stars with pattern XX ?? XX 00)"); // Regardless
+			if (b1 == 0x4C) { // first character is EBCDIC '<' (ASCII 'L'),
+				// check a
+				// couple more characters before assuming EBCDIC
+				// encoding:
+				if (b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
+					return setEncoding(EBCDIC, "default EBCDIC encoding (<?xml...> detected)"); // first
+				/*
+				 * four bytes are "<?xm" in EBCDIC ("Lo§”" in Windows-1252)
+				 */
+				if (b2 == 0x5A && b3 == 0xC4 && b4 == 0xD6)
+					return setEncoding(EBCDIC, "default EBCDIC encoding (<!DOCTYPE...> detected)"); // first
+				/*
+				 * four bytes are "<!DO" in EBCDIC ("LZÄÖ" in Windows-1252)
+				 */
+				if ((b2 & b3 & b4 & 0x80) != 0)
+					return setEncoding(EBCDIC, "default EBCDIC-compatible encoding (HTML element detected)"); // all
+				/*
+				 * of the 3 bytes after the '<' have the high-order bit set,
+				 * indicating EBCDIC letters such as "<HTM" ("LÈãÔ" in
+				 * Windows-1252), or "<htm" ("Lˆ£”" in Windows-1252) although
+				 * this is not an exhaustive check for EBCDIC, it is safer to
+				 * assume a more common preliminary encoding if none of these
+				 * conditions are met.
+				 */
+			}
+
 			/*
-			 * of the second byte, assume the fourth 00 byte indicates UTF-16LE.
+			 * Now confident that it is not EBCDIC, but some other 8-bit
+			 * encoding. Most other 8-bit encodings are compatible with ASCII.
+			 * Since a document specified encoding requires only ASCII
+			 * characters, just choose an arbitrary 8-bit preliminary encoding.
+			 * UTF-8 is however not a good choice as it is not strictly an 8-bit
+			 * encoding. UTF-8 bytes with a value >= 0x80 indicate the presence
+			 * of a multi-byte character, and there are many byte values that
+			 * are illegal. Therefore, choose the only true 8-bit encoding that
+			 * accepts all byte values and is guaranteed to be available on all
+			 * java implementations.
 			 */
+			return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
+		} finally {
+			inputStream.reset();
 		}
-		// pattern X??X
-		if (b2 == 0) {
-			/*
-			 * pattern X0?X Assuming the second 00 byte doesn't indicate a NUL
-			 * character, and that it is very unlikely that this is a 32-bit
-			 * encoding of a character outside of the BMP, we can assume that it
-			 * indicates a 16-bit encoding. If the pattern is X00X, there is a
-			 * 50/50 chance that the encoding is BE or LE, with one of the
-			 * characters have a code that is a multiple of 0x100. This should
-			 * be a very rare occurrence, and there is no more than a 50% chance
-			 * that the encoding will be different to that assumed (UTF-16LE)
-			 * without checking for this occurrence, so don't bother checking
-			 * for it. If the pattern is X0XX, this is likely to indicate a
-			 * 16-bit LE encoding with the second character > U+00FF.
-			 */
-			return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream starts with pattern XX 00 ?? XX)");
-		}
-		// pattern XX?X
-		if (b3 == 0)
-			return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with pattern XX XX 00 XX)"); // pattern
-		/*
-		 * XX0X likely to indicate a 16-bit BE encoding with the first character
-		 * > U+00FF. pattern XXXX Although it is still possible that this is a
-		 * 16-bit encoding with the first two characters > U+00FF Assume the
-		 * more likely case of four 8-bit characters <= U+00FF. Check whether it
-		 * fits some common EBCDIC strings that might be found at the start of a
-		 * document:
-		 */
-		if (b1 == 0x4C) { // first character is EBCDIC '<' (ASCII 'L'), check a
-			// couple more characters before assuming EBCDIC
-			// encoding:
-			if (b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
-				return setEncoding(EBCDIC, "default EBCDIC encoding (<?xml...> detected)"); // first
-			/*
-			 * four bytes are "<?xm" in EBCDIC ("Lo§”" in Windows-1252)
-			 */
-			if (b2 == 0x5A && b3 == 0xC4 && b4 == 0xD6)
-				return setEncoding(EBCDIC, "default EBCDIC encoding (<!DOCTYPE...> detected)"); // first
-			/*
-			 * four bytes are "<!DO" in EBCDIC ("LZÄÖ" in Windows-1252)
-			 */
-			if ((b2 & b3 & b4 & 0x80) != 0)
-				return setEncoding(EBCDIC, "default EBCDIC-compatible encoding (HTML element detected)"); // all
-			/*
-			 * of the 3 bytes after the '<' have the high-order bit set,
-			 * indicating EBCDIC letters such as "<HTM" ("LÈãÔ" in
-			 * Windows-1252), or "<htm" ("Lˆ£”" in Windows-1252) although this
-			 * is not an exhaustive check for EBCDIC, it is safer to assume a
-			 * more common preliminary encoding if none of these conditions are
-			 * met.
-			 */
-		}
-		/*
-		 * Now confident that it is not EBCDIC, but some other 8-bit encoding.
-		 * Most other 8-bit encodings are compatible with ASCII. Since a
-		 * document specified encoding requires only ASCII characters, just
-		 * choose an arbitrary 8-bit preliminary encoding. UTF-8 is however not
-		 * a good choice as it is not strictly an 8-bit encoding. UTF-8 bytes
-		 * with a value >= 0x80 indicate the presence of a multi-byte character,
-		 * and there are many byte values that are illegal. Therefore, choose
-		 * the only true 8-bit encoding that accepts all byte values and is
-		 * guaranteed to be available on all java implementations.
-		 */
-		return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
 	}
 
 	/**
@@ -632,12 +666,17 @@ public final class BOMNewlineEncodingDetector {
 	public boolean isAutodetected() {
 		return autodetected;
 	}
-	
+
 	/**
 	 * Gets the number of bytes used by the Byte-Order-mark in this document.
+	 * 
 	 * @return The byte size of the BOM in this document.
 	 */
 	public int getBomSize() {
 		return bomSize;
+	}
+	
+	public boolean hasUtf8Encoding() {
+		return getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
 	}
 }

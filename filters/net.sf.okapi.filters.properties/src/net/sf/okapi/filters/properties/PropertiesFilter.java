@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -253,11 +254,15 @@ public class PropertiesFilter implements IFilter {
 		canceled = false;
 
 		// Open the input reader from the provided reader
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectBom();
+		input.setEncoding(detector.getEncoding());
+		
 		reader = new BufferedReader(input.getReader());
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
+		hasUTF8BOM = detector.hasUtf8Bom();
+		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}

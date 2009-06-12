@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -210,11 +211,14 @@ public class XMLFilter implements IFilter {
 		// Avoid DTD declaration
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
 
-		// Force UTF-8 as the default (if not auto-detected)
-		if ( !input.isAutodetected() ) input.setEncoding("UTF-8");
+		input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectAndRemoveBom();
+		input.setEncoding(detector.getEncoding());
+		
 		try {
 			// Make sure we skip possible BOM since the parser is not BOM-aware
-			doc = docBuilder.parse(new InputSource(input.getReader(true)));
+			doc = docBuilder.parse(new InputSource(input.getReader()));
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException("Error when parsing the document.", e);
@@ -226,8 +230,8 @@ public class XMLFilter implements IFilter {
 		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		if ( srcLang == null ) throw new NullPointerException("Source language not set.");
-		hasUTF8BOM = input.hasUtf8Bom();
-		lineBreak = input.getNewLineType();
+		hasUTF8BOM = detector.hasUtf8Bom();
+		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}

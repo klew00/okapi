@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -232,6 +233,13 @@ public class TmxFilter implements IFilter {
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);			
 
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
+			
+			// determine encoding based on BOM, if any
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+			detector.detectBom();
+			input.setEncoding(detector.getEncoding());
+			
+			//TODO: How does this filter auto detect the encoding??
 			reader = fact.createXMLStreamReader(input.getReader());
 
 			encoding = input.getEncoding(); // Real encoding
@@ -239,8 +247,8 @@ public class TmxFilter implements IFilter {
 			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();
 			if ( trgLang == null  || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
-			hasUTF8BOM = input.hasUtf8Bom();
-			lineBreak = input.getNewLineType();
+			hasUTF8BOM = detector.hasUtf8Bom();
+			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
 			}

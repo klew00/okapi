@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -227,8 +228,13 @@ public class XLIFFFilter implements IFilter {
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
-			// Force UTF-8 as the default (except if auto-detected)
-			if ( !input.isAutodetected() ) input.setEncoding("UTF-8");
+			// determine encoding based on BOM, if any
+			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+			detector.detectBom();
+			input.setEncoding(detector.getEncoding());
+			
+			//TODO: How does this filter auto detect the encoding??
 			reader = fact.createXMLStreamReader(input.getReader());
 
 			encoding = input.getEncoding();
@@ -236,8 +242,8 @@ public class XLIFFFilter implements IFilter {
 			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();
 			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
-			hasUTF8BOM = input.hasUtf8Bom();
-			lineBreak = input.getNewLineType();
+			hasUTF8BOM = detector.hasUtf8Bom();
+			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
 			}

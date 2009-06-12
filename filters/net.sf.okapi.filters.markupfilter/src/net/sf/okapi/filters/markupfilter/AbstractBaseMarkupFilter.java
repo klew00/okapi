@@ -240,14 +240,17 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			close();
 		}
 		
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(), input.getEncoding(), generateSkeleton);
-		
 		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().toString());
 		}
-		hasUtf8Bom = input.hasUtf8Bom();
-		hasUtf8Encoding = input.hasUtf8Encoding();
-		setNewlineType(input.getNewLineType());
+		
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		detector.detectBom();
+
+		setEncoding(detector.getEncoding());
+		hasUtf8Bom = detector.hasUtf8Bom();
+		hasUtf8Encoding = detector.hasUtf8Encoding();
+		setNewlineType(detector.getNewlineType().toString());
 
 		Source parsedHeader = getParsedHeader(input.getStream());
 		String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
@@ -263,9 +266,9 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 					detectedEncoding));
 		}
 
-		try {
-			setEncoding(detectedEncoding);
+		try {			
 			input.setEncoding(detectedEncoding);
+			setOptions(input.getSourceLanguage(), input.getTargetLanguage(), detectedEncoding, generateSkeleton);
 			document = new StreamedSource(input.getReader());
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
